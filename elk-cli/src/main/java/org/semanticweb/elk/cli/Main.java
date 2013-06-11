@@ -39,6 +39,7 @@ import joptsimple.OptionSpec;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.EmptyChangesLoader;
+import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -50,7 +51,6 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
@@ -169,14 +169,13 @@ public class Main {
 
 		// create reasoner
 		ReasonerFactory reasoningFactory = new ReasonerFactory();
-		Reasoner reasoner = reasoningFactory.createReasoner(
+		Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
+		OntologyLoader loader = new Owl2StreamLoader(parserFactory,
+				options.valueOf(inputFile));
+		Reasoner reasoner = reasoningFactory.createReasoner(loader,
 				new LoggingStageExecutor(), configuration);
 
 		try {
-			Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
-			reasoner.registerOntologyLoader(new Owl2StreamLoader(parserFactory,
-					options.valueOf(inputFile)));
-
 			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
 			if (options.has(satisfiable)) {
@@ -188,12 +187,7 @@ public class Main {
 			}
 
 			if (options.has(classify)) {
-				Taxonomy<ElkClass> taxonomy = null;
-				try {
-					taxonomy = reasoner.getTaxonomy();
-				} catch (ElkInconsistentOntologyException e) {
-					taxonomy = PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY;
-				}
+				Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
 				if (options.hasArgument(outputFile))
 					writeClassTaxonomyToFile(options.valueOf(outputFile),
 							taxonomy);
@@ -203,11 +197,7 @@ public class Main {
 
 			if (options.has(realize)) {
 				InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = null;
-				try {
-					taxonomy = reasoner.getInstanceTaxonomy();
-				} catch (ElkInconsistentOntologyException e) {
-					taxonomy = PredefinedTaxonomy.INCONSISTENT_INDIVIDUAL_TAXONOMY;
-				}
+				taxonomy = reasoner.getInstanceTaxonomyQuietly();
 				if (options.hasArgument(outputFile))
 					writeInstanceTaxonomyToFile(options.valueOf(outputFile),
 							taxonomy);

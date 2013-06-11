@@ -22,11 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * A {@link ReasonerStage} during which the class taxonomy of the current
@@ -44,10 +42,11 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	/**
 	 * the computation used for this stage
 	 */
-	private ClassTaxonomyComputation computation_ = null;
+	protected ClassTaxonomyComputation computation_ = null;
 
-	public ClassTaxonomyComputationStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public ClassTaxonomyComputationStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -56,45 +55,40 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.doneClassTaxonomy;
-	}
-
-	@Override
-	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new ConsistencyCheckingStage(
-				reasoner));
-		// return Arrays
-		// .asList((ReasonerStage) new ClassSaturationStage(reasoner));
-	}
-
-	@Override
-	public void execute() throws ElkInterruptedException {
-		if (computation_ == null)
-			initComputation();
-		progressMonitor.start(getName());
-		try {
-			for (;;) {
-				computation_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
+	public boolean preExecute() {
+		if (!super.preExecute()) {
+			return false;
 		}
-		reasoner.taxonomy = computation_.getTaxonomy();
-		reasoner.doneClassTaxonomy = true;
+		
+		if (LOGGER_.isInfoEnabled()) {
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		}
+		
+		reasoner.initClassTaxonomy();
+		
+		this.computation_ = new ClassTaxonomyComputation(Operations.split(
+				reasoner.ontologyIndex.getIndexedClasses(), 64),
+				reasoner.getProcessExecutor(), workerNo, progressMonitor,
+				reasoner.saturationState, reasoner.classTaxonomyState.getTaxonomy());
+		return true;
 	}
 
 	@Override
-	void initComputation() {
-		super.initComputation();
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		this.computation_ = new ClassTaxonomyComputation(
-				reasoner.ontologyIndex.getIndexedClasses(),
-				reasoner.getProcessExecutor(), workerNo, progressMonitor,
-				reasoner.ontologyIndex);
+	public void executeStage() throws ElkInterruptedException {
+		computation_.process();
+	}
+
+	@Override
+	public boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+
+		reasoner.classTaxonomyState.getWriter().setTaxonomy(
+				computation_.getTaxonomy());
+		reasoner.ruleAndConclusionStats.add(computation_
+				.getRuleAndConclusionStatistics());
+		this.computation_ = null;
+		return true;
 	}
 
 	@Override

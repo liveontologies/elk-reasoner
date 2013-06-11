@@ -34,7 +34,7 @@ package org.semanticweb.elk.util.concurrent.computation;
  *            the type of the job processor
  * 
  */
-public interface InputProcessorListenerNotifyFinishedJob<J, P extends InputProcessor<J>> {
+public interface InputProcessorListenerNotifyFinishedJob<J> {
 
 	/**
 	 * This function is called after the input processor detects when the job is

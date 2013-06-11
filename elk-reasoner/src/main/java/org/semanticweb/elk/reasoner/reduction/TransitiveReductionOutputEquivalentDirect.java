@@ -29,9 +29,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
- * The result of the transitive reduction for satisfiable indexed class
- * expression; it contains information about equivalent classes and direct
- * super-classes.
+ * The result of the transitive reduction for a satisfiable
+ * {@link IndexedClassExpression}; it contains information about its equivalent
+ * classes and direct subsumers.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -44,23 +44,23 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 public class TransitiveReductionOutputEquivalentDirect<R extends IndexedClassExpression>
 		extends TransitiveReductionOutputEquivalent<R> {
 
-	final List<TransitiveReductionOutputEquivalent<IndexedClass>> directSuperClasses;
+	final List<TransitiveReductionOutputEquivalent<IndexedClass>> directSubsumers;
 
 	public TransitiveReductionOutputEquivalentDirect(R root) {
 		super(root);
-		this.directSuperClasses = new LinkedList<TransitiveReductionOutputEquivalent<IndexedClass>>();
+		this.directSubsumers = new LinkedList<TransitiveReductionOutputEquivalent<IndexedClass>>();
 	}
 
 	/**
-	 * Returns the list of partial outputs of transitive reduction (only
-	 * equivalent classes) for direct, i.e., transitively reduced, super classes
-	 * of the root.
+	 * Returns the list of partial outputs of transitive reduction, containing
+	 * equivalent classes of direct, i.e., transitively reduced, subsumers of
+	 * the root.
 	 * 
 	 * @return the list consisting of partial output of transitive reduction for
-	 *         direct super classes of the root
+	 *         direct subsumers of the root
 	 */
-	public List<TransitiveReductionOutputEquivalent<IndexedClass>> getDirectSuperClasses() {
-		return directSuperClasses;
+	public List<TransitiveReductionOutputEquivalent<IndexedClass>> getDirectSubsumers() {
+		return directSubsumers;
 	}
 
 	@Override

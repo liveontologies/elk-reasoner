@@ -26,6 +26,8 @@
 package org.semanticweb.elk.util.collections;
 
 import java.util.AbstractSet;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -43,7 +45,8 @@ import java.util.Set;
  *            the type of the elements in this set
  * 
  */
-public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E> {
+public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
+		DirectAccess<E> {
 
 	/**
 	 * The default initial capacity - MUST be a power of two.
@@ -127,7 +130,7 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E> {
 	 *         stretch the table.
 	 */
 	static private int computeUpperSize(int capacity) {
-		if (capacity > 128)
+		if (capacity > 64)
 			return (3 * capacity) / 4; // max 75% filled
 		else
 			return capacity;
@@ -336,16 +339,39 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E> {
 	}
 
 	@Override
+	public boolean removeAll(Collection<?> c) {
+		boolean modified = false;
+		for (Object o : c) {
+			modified |= remove(o);
+		}
+		return modified;
+	}
+
+	@Override
 	public Iterator<E> iterator() {
 		return new ElementIterator();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void clear() {
-		for (int i = 0; i < data.length; i++)
-			if (data[i] != null)
-				data[i] = null;
+		int capacity = data.length >> 2;
+		if (capacity == 0)
+			capacity = 1;
 		size = 0;
+		upperSize = computeUpperSize(capacity);
+		lowerSize = computeLowerSize(capacity);
+		this.data = (E[]) new Object[capacity];
+	}
+
+	@Override
+	public String toString() {
+		return Arrays.toString(toArray());
+	}
+
+	@Override
+	public E[] getRawData() {
+		return data;
 	}
 
 	private class ElementIterator implements Iterator<E> {
@@ -362,14 +388,15 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E> {
 			this.expectedSize = size;
 			this.dataSnapshot = data;
 			cursor = 0;
-
 			seekNext();
 		}
 
 		void seekNext() {
-			for (nextElement = null; cursor < dataSnapshot.length
-					&& (nextElement = dataSnapshot[cursor]) == null; cursor++)
-				;
+			while (cursor < dataSnapshot.length)
+				if ((nextElement = dataSnapshot[cursor++]) != null)
+					return;
+			// no next element
+			nextElement = null;
 		}
 
 		@Override
@@ -384,7 +411,6 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E> {
 			if (nextElement == null)
 				throw new NoSuchElementException();
 			E result = nextElement;
-			cursor++;
 			seekNext();
 			return result;
 		}

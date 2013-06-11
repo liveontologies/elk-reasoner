@@ -24,14 +24,10 @@ package org.semanticweb.elk.reasoner.indexing.entries;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
-import org.semanticweb.elk.util.collections.entryset.StrongKeyEntry;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
- * The wrapper class to define custom equality and hash functions for indexed
- * The wrapper class to define custom equality and hash functions for indexed
- * property chains to be used in {@link KeyEntryHashSet}. It is based on the
- * extension of the {@link StrongKeyEntry} class.
+ * The wrapper class to define custom equality and hash functions for
+ * {@link IndexedPropertyChain}s to be used in {@link KeyEntryHashSet}.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -44,14 +40,10 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @see KeyEntryHashSet
  */
 public abstract class IndexedPropertyChainEntry<T, K extends IndexedPropertyChain>
-		extends StrongKeyEntry<T, K> {
+		extends IndexedObjectEntry<T, K> {
 
 	IndexedPropertyChainEntry(K representative) {
 		super(representative);
-	}
-
-	static int combinedHashCode(Object... objects) {
-		return HashGenerator.combinedHashCode(objects);
 	}
 
 }

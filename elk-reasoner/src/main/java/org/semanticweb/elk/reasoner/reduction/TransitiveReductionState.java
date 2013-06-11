@@ -47,10 +47,9 @@ class TransitiveReductionState<R extends IndexedClassExpression, J extends Trans
 	 */
 	final TransitiveReductionOutputEquivalentDirect<R> output;
 	/**
-	 * The (current state of the) iterator over derived super indexed class
-	 * expressions
+	 * The (current state of the) iterator over derived subsumers of the root
 	 */
-	final Iterator<IndexedClassExpression> superClassExpressionsIterator;
+	final Iterator<IndexedClassExpression> subsumerIterator;
 
 	/**
 	 * Constructing the state for the initiator job. It is required that the
@@ -62,7 +61,7 @@ class TransitiveReductionState<R extends IndexedClassExpression, J extends Trans
 		this.initiatorJob = initiatorJob;
 		R root = initiatorJob.getInput();
 		this.output = new TransitiveReductionOutputEquivalentDirect<R>(root);
-		this.superClassExpressionsIterator = root.getContext()
-				.getSuperClassExpressions().iterator();
+		this.subsumerIterator = root.getContext().getSubsumers()
+				.iterator();
 	}
 }

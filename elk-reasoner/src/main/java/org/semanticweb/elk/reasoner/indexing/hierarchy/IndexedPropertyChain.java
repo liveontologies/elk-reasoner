@@ -25,12 +25,14 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
-import org.semanticweb.elk.reasoner.saturation.properties.IndexedPropertyChainSaturation;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -49,7 +51,25 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class IndexedPropertyChain {
+public abstract class IndexedPropertyChain extends IndexedObject implements
+		Comparable<IndexedPropertyChain> {
+
+	protected static final Logger LOGGER_ = Logger
+			.getLogger(IndexedPropertyChain.class);
+
+	/**
+	 * This counts how often this object occurred in the ontology.
+	 */
+	int occurrenceNo = 0;
+
+	/** Hash code for this object. */
+	private final int hashCode_ = HashGenerator.generateNextHashCode();
+
+	/**
+	 * The {@link SaturatedPropertyChain} object assigned to this
+	 * {@link IndexedPropertyChain}
+	 */
+	private volatile SaturatedPropertyChain saturated_ = null;
 
 	/**
 	 * All told super object properties of this
@@ -66,27 +86,22 @@ public abstract class IndexedPropertyChain {
 
 	/**
 	 * @return All told super object properties of this
-	 *         {@link IndexedBinaryPropertyChain}, or {@code null} if none is
-	 *         assigned
+	 *         {@link IndexedBinaryPropertyChain}
 	 */
 	public List<IndexedObjectProperty> getToldSuperProperties() {
-		return toldSuperProperties_;
+		return toldSuperProperties_ == null ? Collections
+				.<IndexedObjectProperty> emptyList() : Collections
+				.unmodifiableList(toldSuperProperties_);
 	}
 
 	/**
-	 * @return All told sub object properties of this
-	 *         {@link IndexedBinaryPropertyChain}, or {@code null} if none is
-	 *         assigned
-	 */
-	public abstract List<IndexedPropertyChain> getToldSubProperties();
-
-	/**
 	 * @return All {@link IndexedBinaryPropertyChain}s in which this
-	 *         {@link IndexedPropertyChain} occurs on right, or {@code null} if
-	 *         none is assigned
+	 *         {@link IndexedPropertyChain} occurs on right
 	 */
 	public Collection<IndexedBinaryPropertyChain> getRightChains() {
-		return rightChains_;
+		return rightChains_ == null ? Collections
+				.<IndexedBinaryPropertyChain> emptySet() : Collections
+				.unmodifiableCollection(rightChains_);
 	}
 
 	/**
@@ -155,49 +170,45 @@ public abstract class IndexedPropertyChain {
 	}
 
 	/**
-	 * This counts how often this object occurred in the ontology.
-	 */
-	int occurrenceNo = 0;
-
-	/**
-	 * The {@link SaturatedPropertyChain} object assigned to this
-	 * {@link IndexedPropertyChain}
-	 */
-	private volatile SaturatedPropertyChain saturated_ = null;
-
-	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
 	abstract void updateOccurrenceNumber(int increment);
 
-	/**
-	 * @return {@code true} if this {@link IndexedPropertyChain} occur in the
-	 *         ontology index
-	 */
+	@Override
 	public boolean occurs() {
 		return occurrenceNo > 0;
 	}
 
 	/**
-	 * @return The corresponding {@code SaturatedObjecProperty} assigned to this
-	 *         {@link IndexedPropertyChain}, or {@code null} if none was
-	 *         assigned.
+	 * @return the string representation for the occurrence numbers of this
+	 *         {@link IndexedClassExpression}
 	 */
-	public SaturatedPropertyChain getSaturated() {
-		return getSaturated(true);
+	public String printOccurrenceNumbers() {
+		return "[all=" + occurrenceNo + "]";
 	}
 
 	/**
-	 * If the parameter is set to false, the saturation object will be returned
-	 * "as is", i.e. possibly null or not yet populated. Otherwise, saturation
-	 * will be triggered automatically.
-	 * 
-	 * @param saturate
-	 * @return
+	 * verifies that occurrence numbers are not negative
 	 */
-	public SaturatedPropertyChain getSaturated(boolean saturate) {
-		return saturate && (saturated_ == null || !saturated_.isComputed()) ? saturate()
-				: saturated_;
+	public void checkOccurrenceNumbers() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(this + " occurences: " + printOccurrenceNumbers());
+		if (occurrenceNo < 0)
+			throw new ElkUnexpectedIndexingException(this
+					+ " has a negative occurrence: " + printOccurrenceNumbers());
+	}
+
+	public void updateAndCheckOccurrenceNumbers(int increment) {
+		updateOccurrenceNumber(increment);
+		checkOccurrenceNumbers();
+	}
+
+	/**
+	 * @return The corresponding {@code SaturatedObjecProperty} assigned to this
+	 *         {@link IndexedPropertyChain} or {@code null} if none is assigned
+	 */
+	public SaturatedPropertyChain getSaturated() {
+		return saturated_;
 	}
 
 	/**
@@ -206,29 +217,35 @@ public abstract class IndexedPropertyChain {
 	 * 
 	 * @param saturatedObjectProperty
 	 *            assign the given {@link SaturatedPropertyChain} to this
-	 *            {@link IndexedClassExpression}
+	 *            {@link IndexedPropertyChain}
 	 * 
-	 * @return {@code true} if the operation succeeded. If this method is called
-	 *         for the same object from different threads with at the same time
-	 *         with non-null arguments, only one call returns {@code true}.
+	 * @return the previous {@link SaturatedPropertyChain} assigned to this
+	 *         {@link IndexedPropertyChain} or {@code null} if none was
+	 *         assigned.
 	 */
-	public synchronized void setSaturated(
+	public synchronized SaturatedPropertyChain setSaturated(
 			SaturatedPropertyChain saturatedObjectProperty) {
+		if (saturated_ != null)
+			return saturated_;
+		if (saturatedObjectProperty == null)
+			throw new ElkUnexpectedIndexingException(this
+					+ ": cannot assign null saturation");
 		saturated_ = saturatedObjectProperty;
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace(this + ": saturation assinged");
+		}
+		return null;
 	}
 
 	/**
 	 * Resets the corresponding {@code SaturatedObjecProperty} to {@code null}.
 	 */
-	public void resetSaturated() {
-		if (saturated_ != null)
-			synchronized (this) {
-				saturated_ = null;
-			}
+	public synchronized void resetSaturated() {
+		saturated_ = null;
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace(this + ": saturation removed");
+		}
 	}
-
-	/** Hash code for this object. */
-	private final int hashCode_ = HashGenerator.generateNextHashCode();
 
 	/**
 	 * Get an integer hash code to be used for this object.
@@ -240,20 +257,29 @@ public abstract class IndexedPropertyChain {
 		return hashCode_;
 	}
 
-	private SaturatedPropertyChain saturate() {
-		SaturatedPropertyChain saturated = IndexedPropertyChainSaturation
-				.saturate(this);
-
-		setSaturated(saturated);
-
-		return saturated;
+	@Override
+	public int compareTo(IndexedPropertyChain o) {
+		if (this == o)
+			return 0;
+		else if (this.hashCode_ == o.hashCode_) {
+			/*
+			 * hash code collision for different elements should happen very
+			 * rarely; in this case we rely on the unique string representation
+			 * of indexed objects to compare them
+			 */
+			return this.toString().compareTo(o.toString());
+		} else
+			return (this.hashCode_ < o.hashCode_ ? -1 : 1);
 	}
 
 	public abstract <O> O accept(IndexedPropertyChainVisitor<O> visitor);
-	
-	public abstract <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor, P parameter);
 
 	@Override
-	public abstract String toString();
+	public <O> O accept(IndexedObjectVisitor<O> visitor) {
+		return accept((IndexedPropertyChainVisitor<O>) visitor);
+	}
+
+	public abstract <O, P> O accept(
+			IndexedPropertyChainVisitorEx<O, P> visitor, P parameter);
 
 }

@@ -24,10 +24,13 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
 
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 // TODO: documentation
@@ -41,29 +44,23 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class ClassTaxonomyComputation
 		extends
-		ReasonerComputation<IndexedClass, ClassTaxonomyComputationFactory.Engine, ClassTaxonomyComputationFactory> {
+		ReasonerComputation<Collection<IndexedClass>, ClassTaxonomyComputationFactory> {
 
-	public ClassTaxonomyComputation(Collection<IndexedClass> inputs,
+	public ClassTaxonomyComputation(
+			Collection<? extends Collection<IndexedClass>> inputs,
 			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
-			IndividualClassTaxonomy partialTaxonomy) {
-		super(inputs, new ClassTaxonomyComputationFactory(ontologyIndex,
+			ProgressMonitor progressMonitor, SaturationState saturationState,
+			UpdateableTaxonomy<ElkClass> partialTaxonomy) {
+		super(inputs, new ClassTaxonomyComputationFactory(saturationState,
 				maxWorkers, partialTaxonomy), executor, maxWorkers,
 				progressMonitor);
-	}
-
-	public ClassTaxonomyComputation(Collection<IndexedClass> inputs,
-			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
-		this(inputs, executor, maxWorkers, progressMonitor, ontologyIndex,
-				new ConcurrentTaxonomy());
 	}
 
 	/**
 	 * @return the taxonomy computed by this computation; the method
 	 *         {@link #process()} should be called first to compute the taxonomy
 	 */
-	public IndividualClassTaxonomy getTaxonomy() {
+	public UpdateableTaxonomy<ElkClass> getTaxonomy() {
 		return inputProcessorFactory.getTaxonomy();
 	}
 
@@ -72,6 +69,10 @@ public class ClassTaxonomyComputation
 	 */
 	public void printStatistics() {
 		inputProcessorFactory.printStatistics();
+	}
+
+	public SaturationStatistics getRuleAndConclusionStatistics() {
+		return inputProcessorFactory.getRuleAndConclusionStatistics();
 	}
 
 }

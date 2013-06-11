@@ -22,20 +22,21 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.List;
-
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedBinaryPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 
 /**
- * Represents a complex ElkSubObjectPropertyOfAxiom. The chain consists of two
- * components: an IndexedObjectProperty on the left and an
- * IndexedPropertyExpression on the right. This reflects the fact that property
- * inclusions are binarized during index constructions. The auxiliary
- * IndexedBinaryPropertyChains may not represent any ElkObject in the ontology.
+ * Represents a complex {@link ElkSubObjectPropertyExpression}s. The chain
+ * consists of two components: an {@link IndexedObjectProperty} on the left and
+ * an {@link IndexedPropertyChain} on the right. This reflects the fact that
+ * property inclusions are binarized during index constructions. The auxiliary
+ * {@link IndexedBinaryPropertyChain}s may not represent any ElkObject in the
+ * ontology.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  */
 
@@ -100,30 +101,27 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 	public <O> O accept(IndexedBinaryPropertyChainVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
-	@Override
-	public <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor, P parameter) {
-		return visitor.visit(this, parameter);
-	}
-	
 
 	@Override
-	public List<IndexedPropertyChain> getToldSubProperties() {
-		return null;
+	public <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor,
+			P parameter) {
+		return visitor.visit(this, parameter);
 	}
-	
+
 	/**
-	 * Returns the property which is composable with the given property in this chain 
+	 * Returns the property which is composable with the given property in this
+	 * chain
 	 * 
 	 * @param ipc
 	 * @return
 	 */
 	public IndexedPropertyChain getComposable(IndexedPropertyChain ipc) {
-		return ipc == leftProperty_ ? rightProperty_ : (ipc == rightProperty_ ? leftProperty_ : null);
+		return ipc == leftProperty_ ? rightProperty_
+				: (ipc == rightProperty_ ? leftProperty_ : null);
 	}
 
 	@Override
-	public String toString() {
+	public String toStringStructural() {
 		return "ObjectPropertyChain(" + this.leftProperty_ + ' '
 				+ this.rightProperty_ + ')';
 	}

@@ -24,13 +24,10 @@ package org.semanticweb.elk.reasoner.indexing.entries;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
-import org.semanticweb.elk.util.collections.entryset.StrongKeyEntry;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
- * The wrapper class to define custom equality and hash functions for indexed
- * class expressions to be used in {@link KeyEntryHashSet}. It is based on the
- * extension of the {@link StrongKeyEntry} class.
+ * The wrapper class to define custom equality and hash functions for
+ * {@link IndexedClassExpression}s to be used in {@link KeyEntryHashSet}.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -42,14 +39,10 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  *            entry
  */
 public abstract class IndexedClassExpressionEntry<T, K extends IndexedClassExpression>
-		extends StrongKeyEntry<T, K> {
+		extends IndexedObjectEntry<T, K> {
 
 	IndexedClassExpressionEntry(K representative) {
 		super(representative);
-	}
-
-	static int combinedHashCode(Object... objects) {
-		return HashGenerator.combinedHashCode(objects);
 	}
 
 }

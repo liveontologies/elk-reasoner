@@ -48,6 +48,8 @@ import java.util.Iterator;
  */
 public class KeyEntryHashSet<T> extends AbstractCollection<T> {
 
+	// TODO: Implement correct removal of elements
+
 	/**
 	 * The factory used for wrapping keys into entries
 	 */
@@ -108,6 +110,12 @@ public class KeyEntryHashSet<T> extends AbstractCollection<T> {
 
 	}
 
+	@Override
+	public boolean add(T key) {
+		KeyEntry<T, ? extends T> entry = keyEntryFactory.createEntry(key);
+		return entry == entryHashSet.mergeEntry(entry);
+	}
+
 	/**
 	 * Retrieves the element in the set that is equal to the given object, if it
 	 * exists, or returns null otherwise. Equality of entries is decided by
@@ -151,6 +159,11 @@ public class KeyEntryHashSet<T> extends AbstractCollection<T> {
 		else
 			return entry.getKey();
 
+	}
+
+	@Override
+	public boolean remove(Object o) {
+		throw new UnsupportedOperationException("Deletion not supported");
 	}
 
 	@Override

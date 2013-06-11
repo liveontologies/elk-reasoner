@@ -27,12 +27,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
@@ -71,11 +73,11 @@ public class Reasoner extends AbstractReasonerState {
 	/**
 	 * the executor used for concurrent tasks
 	 */
-	protected volatile ComputationExecutor executor;
+	private volatile ComputationExecutor executor_;
 	/**
 	 * Number of workers for concurrent jobs.
 	 */
-	protected final int workerNo;
+	private int workerNo_;
 
 	/**
 	 * Should fresh entities in reasoner queries be accepted (configuration
@@ -88,13 +90,13 @@ public class Reasoner extends AbstractReasonerState {
 	 * Constructor. In most cases, Reasoners should be created by the
 	 * {@link ReasonerFactory}.
 	 * */
-	protected Reasoner(ReasonerStageExecutor stageExecutor,
-			ExecutorService executor, int workerNo) {
+	protected Reasoner(OntologyLoader ontologyLoader,
+			ReasonerStageExecutor stageExecutor, ExecutorService executor) {
+		super(ontologyLoader);
+
 		this.stageExecutor = stageExecutor;
-		this.workerNo = workerNo;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
-		reset();
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info("ELK reasoner was created");
 	}
@@ -134,14 +136,47 @@ public class Reasoner extends AbstractReasonerState {
 
 	@Override
 	protected int getNumberOfWorkers() {
-		return workerNo;
+		return workerNo_;
+	}
+	
+	/**
+	 * Sets the number of working threads. Shouldn't be used during reasoning.
+	 * 
+	 * @param workerNo
+	 */
+	public void setNumberOfWorkers(int workerNo) {
+		workerNo_ = workerNo;
+	}
+	
+	/**
+	 * This supposed to be the central place where the reasoner gets its
+	 * configuration options
+	 * 
+	 * @param config
+	 */
+	public final void setConfigurationOptions(ReasonerConfiguration config) {
+		int newWorkerNo = config
+				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS); 
+		
+		setAllowIncrementalMode(config
+				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
+		setAllowIncrementalTaxonomy(config
+				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY));
+		
+		if (newWorkerNo > workerNo_) {
+			// need to re-create the executor since it may have already created
+			// a pool with a fixed number of threads
+			executor_ = null;
+		}
+		
+		workerNo_ = newWorkerNo;
 	}
 
 	@Override
 	protected ComputationExecutor getProcessExecutor() {
-		if (executor == null)
-			executor = new ComputationExecutor(workerNo, "elk-reasoner");
-		return executor;
+		if (executor_ == null)
+			executor_ = new ComputationExecutor(workerNo_, "elk-reasoner");
+		return executor_;
 	}
 
 	@Override
@@ -167,13 +202,12 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public boolean shutdown(long timeout, TimeUnit unit)
 			throws InterruptedException {
-		reset();
-		if (executor == null)
+		if (executor_ == null)
 			return true;
-		executor.shutdown();
-		executor.awaitTermination(timeout, unit);
-		boolean success = executor.isShutdown();
-		executor = null;
+		executor_.shutdown();
+		executor_.awaitTermination(timeout, unit);
+		boolean success = executor_.isShutdown();
+		executor_ = null;
 		if (success) {
 			if (LOGGER_.isInfoEnabled())
 				LOGGER_.info("ELK reasoner has shut down");

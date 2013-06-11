@@ -47,11 +47,6 @@ public class FreshTaxonomyNode<T extends ElkObject> extends FreshNode<T>
 	}
 
 	@Override
-	public Taxonomy<T> getTaxonomy() {
-		return taxonomy;
-	}
-
-	@Override
 	public Set<? extends TaxonomyNode<T>> getDirectSuperNodes() {
 		return Collections.singleton(taxonomy.getTopNode());
 	}

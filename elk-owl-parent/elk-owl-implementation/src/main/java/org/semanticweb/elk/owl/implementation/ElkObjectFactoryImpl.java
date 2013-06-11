@@ -81,6 +81,7 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
@@ -113,23 +114,18 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.owl.managers.DummyElkObjectManager;
-import org.semanticweb.elk.owl.managers.ElkObjectManager;
+import org.semanticweb.elk.owl.managers.DummyElkObjectRecycler;
+import org.semanticweb.elk.owl.managers.ElkObjectRecycler;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 
 /**
- * A factory for creating ElkObjects based on the implementations in the
- * org.semanticweb.elk.syntax.implementation package.
+ * A factory for creating {@link ElkObject}s based on the implementations in the
+ * {@link org.semanticweb.elk.owl.implementation} package.
  * 
  * @author Markus Kroetzsch
  */
 public class ElkObjectFactoryImpl implements ElkObjectFactory {
-
-	protected static final ElkClass ELK_OWL_THING = new ElkClassImpl(
-			PredefinedElkIri.OWL_THING.get());
-
-	protected static final ElkClass ELK_OWL_NOTHING = new ElkClassImpl(
-			PredefinedElkIri.OWL_NOTHING.get());
 
 	protected static final ElkObjectProperty ELK_OWL_TOP_OBJECT_PROPERTY = new ElkObjectPropertyImpl(
 			PredefinedElkIri.OWL_TOP_OBJECT_PROPERTY.get());
@@ -146,74 +142,71 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	protected static final ElkDatatype ELK_RDF_PLAIN_LITERAL = new ElkDatatypeImpl(
 			PredefinedElkIri.RDF_PLAIN_LITERAL.get());
 
-	protected final ElkObjectManager objectManager;
+	protected final ElkObjectRecycler objectRecycler_;
 
 	/**
-	 * Construct an ElkObjectFactoryImpl that uses the DummyElkObjectManager.
+	 * Construct an {@link ElkObjectFactoryImpl} that uses the
+	 * {@link DummyElkObjectRecycler} for recycling {@link ElkObject}s.
 	 */
 	public ElkObjectFactoryImpl() {
-		this(new DummyElkObjectManager());
+		this(new DummyElkObjectRecycler());
 	}
 
 	/**
-	 * Construct an ElkObjectFactoryImpl that uses the given object manager for
-	 * handling objects. The object manager can be used to manage global object
-	 * references, especially to avoid duplicates. Multiple factories can share
-	 * one manager if desired. An instance of ElkDummyObjectManager can be used
-	 * to ignore duplicates.
+	 * Construct an {@link ElkObjectFactoryImpl} that uses the given
+	 * {@link ElkObjectRecycler} for recycling {@link ElkObject}s.
 	 * 
-	 * @param objectManager
+	 * @param objectRecycler
 	 *            object manager to be used
 	 */
-	public ElkObjectFactoryImpl(ElkObjectManager objectManager) {
-		this.objectManager = objectManager;
+	public ElkObjectFactoryImpl(ElkObjectRecycler objectRecycler) {
+		this.objectRecycler_ = objectRecycler;
 	}
 
 	@Override
 	public ElkAnnotationProperty getAnnotationProperty(ElkIri iri) {
-		return (ElkAnnotationProperty) objectManager
-				.getCanonicalElkObject(new ElkAnnotationPropertyImpl(iri));
+		return (ElkAnnotationProperty) objectRecycler_
+				.recycle(new ElkAnnotationPropertyImpl(iri));
 	}
 
 	@Override
 	public ElkAnonymousIndividual getAnonymousIndividual(String nodeId) {
-		return (ElkAnonymousIndividual) objectManager
-				.getCanonicalElkObject(new ElkAnonymousIndividualImpl(nodeId));
+		return (ElkAnonymousIndividual) objectRecycler_
+				.recycle(new ElkAnonymousIndividualImpl(nodeId));
 	}
 
 	@Override
 	public ElkAsymmetricObjectPropertyAxiom getAsymmetricObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression) {
-		return (ElkAsymmetricObjectPropertyAxiom) objectManager
-				.getCanonicalElkObject(new ElkAsymmetricObjectPropertyAxiomImpl(
+		return (ElkAsymmetricObjectPropertyAxiom) objectRecycler_
+				.recycle(new ElkAsymmetricObjectPropertyAxiomImpl(
 						objectPropertyExpression));
 	}
 
 	@Override
 	public ElkClass getClass(ElkIri iri) {
-		return (ElkClass) objectManager.getCanonicalElkObject(new ElkClassImpl(
-				iri));
+		return (ElkClass) objectRecycler_.recycle(new ElkClassImpl(iri));
 	}
 
 	@Override
 	public ElkClassAssertionAxiom getClassAssertionAxiom(
 			ElkClassExpression classExpression, ElkIndividual individual) {
-		return (ElkClassAssertionAxiom) objectManager
-				.getCanonicalElkObject(new ElkClassAssertionAxiomImpl(
-						classExpression, individual));
+		return (ElkClassAssertionAxiom) objectRecycler_
+				.recycle(new ElkClassAssertionAxiomImpl(classExpression,
+						individual));
 	}
 
 	@Override
 	public ElkDataComplementOf getDataComplementOf(ElkDataRange dataRange) {
-		return (ElkDataComplementOf) objectManager
-				.getCanonicalElkObject(new ElkDataComplementOfImpl(dataRange));
+		return (ElkDataComplementOf) objectRecycler_
+				.recycle(new ElkDataComplementOfImpl(dataRange));
 	}
 
 	@Override
 	public ElkDataExactCardinality getDataExactCardinality(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality) {
-		return (ElkDataExactCardinality) objectManager
-				.getCanonicalElkObject(new ElkDataExactCardinalityImpl(
+		return (ElkDataExactCardinality) objectRecycler_
+				.recycle(new ElkDataExactCardinalityImpl(
 						dataPropertyExpression, cardinality));
 	}
 
@@ -221,96 +214,96 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkDataExactCardinalityQualified getDataExactCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange) {
-		return (ElkDataExactCardinalityQualified) objectManager
-				.getCanonicalElkObject(new ElkDataExactCardinalityQualifiedImpl(
+		return (ElkDataExactCardinalityQualified) objectRecycler_
+				.recycle(new ElkDataExactCardinalityQualifiedImpl(
 						dataPropertyExpression, cardinality, dataRange));
 	}
 
 	@Override
 	public ElkDataHasValue getDataHasValue(
 			ElkDataPropertyExpression dataPropertyExpression, ElkLiteral literal) {
-		return (ElkDataHasValue) objectManager
-				.getCanonicalElkObject(new ElkDataHasValueImpl(
-						dataPropertyExpression, literal));
+		return (ElkDataHasValue) objectRecycler_
+				.recycle(new ElkDataHasValueImpl(dataPropertyExpression,
+						literal));
 	}
 
 	@Override
 	public ElkDataIntersectionOf getDataIntersectionOf(
 			ElkDataRange firstDataRange, ElkDataRange secondDataRange,
 			ElkDataRange... otherDataRanges) {
-		return (ElkDataIntersectionOf) objectManager
-				.getCanonicalElkObject(new ElkDataIntersectionOfImpl(
-						ElkObjectListObject.varArgsToList(firstDataRange,
-								secondDataRange, otherDataRanges)));
+		return (ElkDataIntersectionOf) objectRecycler_
+				.recycle(new ElkDataIntersectionOfImpl(ElkObjectListObject
+						.varArgsToList(firstDataRange, secondDataRange,
+								otherDataRanges)));
 	}
 
 	@Override
 	public ElkDataIntersectionOf getDataIntersectionOf(
 			List<? extends ElkDataRange> dataRanges) {
-		return (ElkDataIntersectionOf) objectManager
-				.getCanonicalElkObject(new ElkDataIntersectionOfImpl(dataRanges));
+		return (ElkDataIntersectionOf) objectRecycler_
+				.recycle(new ElkDataIntersectionOfImpl(dataRanges));
 	}
 
 	@Override
 	public ElkDataMaxCardinality getDataMaxCardinality(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality) {
-		return (ElkDataMaxCardinality) objectManager
-				.getCanonicalElkObject(new ElkDataMaxCardinalityImpl(
-						dataPropertyExpression, cardinality));
+		return (ElkDataMaxCardinality) objectRecycler_
+				.recycle(new ElkDataMaxCardinalityImpl(dataPropertyExpression,
+						cardinality));
 	}
 
 	@Override
 	public ElkDataMaxCardinalityQualified getDataMaxCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange) {
-		return (ElkDataMaxCardinalityQualified) objectManager
-				.getCanonicalElkObject(new ElkDataMaxCardinalityQualifiedImpl(
+		return (ElkDataMaxCardinalityQualified) objectRecycler_
+				.recycle(new ElkDataMaxCardinalityQualifiedImpl(
 						dataPropertyExpression, cardinality, dataRange));
 	}
 
 	@Override
 	public ElkDataMinCardinality getDataMinCardinality(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality) {
-		return (ElkDataMinCardinality) objectManager
-				.getCanonicalElkObject(new ElkDataMinCardinalityImpl(
-						dataPropertyExpression, cardinality));
+		return (ElkDataMinCardinality) objectRecycler_
+				.recycle(new ElkDataMinCardinalityImpl(dataPropertyExpression,
+						cardinality));
 	}
 
 	@Override
 	public ElkDataMinCardinalityQualified getDataMinCardinalityQualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality,
 			ElkDataRange dataRange) {
-		return (ElkDataMinCardinalityQualified) objectManager
-				.getCanonicalElkObject(new ElkDataMinCardinalityQualifiedImpl(
+		return (ElkDataMinCardinalityQualified) objectRecycler_
+				.recycle(new ElkDataMinCardinalityQualifiedImpl(
 						dataPropertyExpression, cardinality, dataRange));
 	}
 
 	@Override
 	public ElkDataOneOf getDataOneOf(ElkLiteral firstLiteral,
 			ElkLiteral... otherLiterals) {
-		return (ElkDataOneOf) objectManager
-				.getCanonicalElkObject(new ElkDataOneOfImpl(ElkObjectListObject
+		return (ElkDataOneOf) objectRecycler_
+				.recycle(new ElkDataOneOfImpl(ElkObjectListObject
 						.varArgsToList(firstLiteral, otherLiterals)));
 	}
 
 	@Override
 	public ElkDataOneOf getDataOneOf(List<? extends ElkLiteral> literals) {
-		return (ElkDataOneOf) objectManager
-				.getCanonicalElkObject(new ElkDataOneOfImpl(literals));
+		return (ElkDataOneOf) objectRecycler_.recycle(new ElkDataOneOfImpl(
+				literals));
 	}
 
 	@Override
 	public ElkDataProperty getDataProperty(ElkIri iri) {
-		return (ElkDataProperty) objectManager
-				.getCanonicalElkObject(new ElkDataPropertyImpl(iri));
+		return (ElkDataProperty) objectRecycler_
+				.recycle(new ElkDataPropertyImpl(iri));
 	}
 
 	@Override
 	public ElkDataPropertyAssertionAxiom getDataPropertyAssertionAxiom(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkIndividual individual, ElkLiteral literal) {
-		return (ElkDataPropertyAssertionAxiom) objectManager
-				.getCanonicalElkObject(new ElkDataPropertyAssertionAxiomImpl(
+		return (ElkDataPropertyAssertionAxiom) objectRecycler_
+				.recycle(new ElkDataPropertyAssertionAxiomImpl(
 						dataPropertyExpression, individual, literal));
 	}
 
@@ -318,8 +311,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkDataPropertyDomainAxiom getDataPropertyDomainAxiom(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkClassExpression classExpression) {
-		return (ElkDataPropertyDomainAxiom) objectManager
-				.getCanonicalElkObject(new ElkDataPropertyDomainAxiomImpl(
+		return (ElkDataPropertyDomainAxiom) objectRecycler_
+				.recycle(new ElkDataPropertyDomainAxiomImpl(
 						dataPropertyExpression, classExpression));
 	}
 
@@ -327,15 +320,14 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkDataPropertyRangeAxiom getDataPropertyRangeAxiom(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkDataRange dataRange) {
-		return (ElkDataPropertyRangeAxiom) objectManager
-				.getCanonicalElkObject(new ElkDataPropertyRangeAxiomImpl(
+		return (ElkDataPropertyRangeAxiom) objectRecycler_
+				.recycle(new ElkDataPropertyRangeAxiomImpl(
 						dataPropertyExpression, dataRange));
 	}
 
 	@Override
 	public ElkDatatype getDatatype(ElkIri iri) {
-		return (ElkDatatype) objectManager
-				.getCanonicalElkObject(new ElkDatatypeImpl(iri));
+		return (ElkDatatype) objectRecycler_.recycle(new ElkDatatypeImpl(iri));
 	}
 
 	@Override
@@ -346,38 +338,37 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	@Override
 	public ElkDatatypeRestriction getDatatypeRestriction(ElkDatatype datatype,
 			List<ElkFacetRestriction> facetRestrictions) {
-		return (ElkDatatypeRestriction) objectManager
-				.getCanonicalElkObject(new ElkDatatypeRestrictionImpl(datatype,
+		return (ElkDatatypeRestriction) objectRecycler_
+				.recycle(new ElkDatatypeRestrictionImpl(datatype,
 						facetRestrictions));
 	}
 
 	@Override
 	public ElkDataUnionOf getDataUnionOf(ElkDataRange firstDataRange,
 			ElkDataRange secondDataRange, ElkDataRange... otherDataRanges) {
-		return (ElkDataUnionOf) objectManager
-				.getCanonicalElkObject(new ElkDataUnionOfImpl(
-						ElkObjectListObject.varArgsToList(firstDataRange,
-								secondDataRange, otherDataRanges)));
+		return (ElkDataUnionOf) objectRecycler_.recycle(new ElkDataUnionOfImpl(
+				ElkObjectListObject.varArgsToList(firstDataRange,
+						secondDataRange, otherDataRanges)));
 	}
 
 	@Override
 	public ElkDataUnionOf getDataUnionOf(List<? extends ElkDataRange> dataRanges) {
-		return (ElkDataUnionOf) objectManager
-				.getCanonicalElkObject(new ElkDataUnionOfImpl(dataRanges));
+		return (ElkDataUnionOf) objectRecycler_.recycle(new ElkDataUnionOfImpl(
+				dataRanges));
 	}
 
 	@Override
 	public ElkDeclarationAxiom getDeclarationAxiom(ElkEntity entity) {
-		return (ElkDeclarationAxiom) objectManager
-				.getCanonicalElkObject(new ElkDeclarationAxiomImpl(entity));
+		return (ElkDeclarationAxiom) objectRecycler_
+				.recycle(new ElkDeclarationAxiomImpl(entity));
 	}
 
 	@Override
 	public ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
 			ElkIndividual... otherIndividuals) {
-		return (ElkDifferentIndividualsAxiom) objectManager
-				.getCanonicalElkObject(new ElkDifferentIndividualsAxiomImpl(
+		return (ElkDifferentIndividualsAxiom) objectRecycler_
+				.recycle(new ElkDifferentIndividualsAxiomImpl(
 						ElkObjectListObject.varArgsToList(firstIndividual,
 								secondIndividual, otherIndividuals)));
 	}
@@ -385,9 +376,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	@Override
 	public ElkDifferentIndividualsAxiom getDifferentIndividualsAxiom(
 			List<? extends ElkIndividual> individuals) {
-		return (ElkDifferentIndividualsAxiom) objectManager
-				.getCanonicalElkObject(new ElkDifferentIndividualsAxiomImpl(
-						individuals));
+		return (ElkDifferentIndividualsAxiom) objectRecycler_
+				.recycle(new ElkDifferentIndividualsAxiomImpl(individuals));
 	}
 
 	@Override
@@ -395,8 +385,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions) {
-		return (ElkDisjointClassesAxiom) objectManager
-				.getCanonicalElkObject(new ElkDisjointClassesAxiomImpl(
+		return (ElkDisjointClassesAxiom) objectRecycler_
+				.recycle(new ElkDisjointClassesAxiomImpl(
 						ElkClassExpressionListObject.varArgsToList(
 								firstClassExpression, secondClassExpression,
 								otherClassExpressions)));
@@ -405,8 +395,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	@Override
 	public ElkDisjointClassesAxiom getDisjointClassesAxiom(
 			List<? extends ElkClassExpression> disjointClassExpressions) {
-		return (ElkDisjointClassesAxiom) objectManager
-				.getCanonicalElkObject(new ElkDisjointClassesAxiomImpl(
+		return (ElkDisjointClassesAxiom) objectRecycler_
+				.recycle(new ElkDisjointClassesAxiomImpl(
 						disjointClassExpressions));
 	}
 
@@ -415,8 +405,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			ElkDataPropertyExpression firstDataPropertyExpression,
 			ElkDataPropertyExpression secondDataPropertyExpression,
 			ElkDataPropertyExpression... otherDataPropertyExpressions) {
-		return (ElkDisjointDataPropertiesAxiom) objectManager
-				.getCanonicalElkObject(new ElkDisjointDataPropertiesAxiomImpl(
+		return (ElkDisjointDataPropertiesAxiom) objectRecycler_
+				.recycle(new ElkDisjointDataPropertiesAxiomImpl(
 						ElkObjectListObject.varArgsToList(
 								firstDataPropertyExpression,
 								secondDataPropertyExpression,
@@ -426,8 +416,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	@Override
 	public ElkDisjointDataPropertiesAxiom getDisjointDataPropertiesAxiom(
 			List<? extends ElkDataPropertyExpression> disjointDataPropertyExpressions) {
-		return (ElkDisjointDataPropertiesAxiom) objectManager
-				.getCanonicalElkObject(new ElkDisjointDataPropertiesAxiomImpl(
+		return (ElkDisjointDataPropertiesAxiom) objectRecycler_
+				.recycle(new ElkDisjointDataPropertiesAxiomImpl(
 						disjointDataPropertyExpressions));
 	}
 
@@ -436,8 +426,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			ElkObjectPropertyExpression firstObjectPropertyExpression,
 			ElkObjectPropertyExpression secondObjectPropertyExpression,
 			ElkObjectPropertyExpression... otherObjectPropertyExpressions) {
-		return (ElkDisjointObjectPropertiesAxiom) objectManager
-				.getCanonicalElkObject(new ElkDisjointObjectPropertiesAxiomImpl(
+		return (ElkDisjointObjectPropertiesAxiom) objectRecycler_
+				.recycle(new ElkDisjointObjectPropertiesAxiomImpl(
 						ElkObjectListObject.varArgsToList(
 								firstObjectPropertyExpression,
 								secondObjectPropertyExpression,
@@ -447,8 +437,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	@Override
 	public ElkDisjointObjectPropertiesAxiom getDisjointObjectPropertiesAxiom(
 			List<? extends ElkObjectPropertyExpression> disjointObjectPropertyExpressions) {
-		return (ElkDisjointObjectPropertiesAxiom) objectManager
-				.getCanonicalElkObject(new ElkDisjointObjectPropertiesAxiomImpl(
+		return (ElkDisjointObjectPropertiesAxiom) objectRecycler_
+				.recycle(new ElkDisjointObjectPropertiesAxiomImpl(
 						disjointObjectPropertyExpressions));
 	}
 
@@ -457,19 +447,18 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions) {
-		return (ElkDisjointUnionAxiom) objectManager
-				.getCanonicalElkObject(new ElkDisjointUnionAxiomImpl(
-						definedClass, ElkObjectListObject.varArgsToList(
-								firstClassExpression, secondClassExpression,
-								otherClassExpressions)));
+		return (ElkDisjointUnionAxiom) objectRecycler_
+				.recycle(new ElkDisjointUnionAxiomImpl(definedClass,
+						ElkObjectListObject.varArgsToList(firstClassExpression,
+								secondClassExpression, otherClassExpressions)));
 	}
 
 	@Override
 	public ElkDisjointUnionAxiom getDisjointUnionAxiom(ElkClass definedClass,
 			List<? extends ElkClassExpression> disjointClassExpressions) {
-		return (ElkDisjointUnionAxiom) objectManager
-				.getCanonicalElkObject(new ElkDisjointUnionAxiomImpl(
-						definedClass, disjointClassExpressions));
+		return (ElkDisjointUnionAxiom) objectRecycler_
+				.recycle(new ElkDisjointUnionAxiomImpl(definedClass,
+						disjointClassExpressions));
 	}
 
 	@Override
@@ -477,17 +466,17 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions) {
-		return (ElkEquivalentClassesAxiom) objectManager
-				.getCanonicalElkObject(new ElkEquivalentClassesAxiomImpl(
-						ElkObjectListObject.varArgsToList(firstClassExpression,
+		return (ElkEquivalentClassesAxiom) objectRecycler_
+				.recycle(new ElkEquivalentClassesAxiomImpl(ElkObjectListObject
+						.varArgsToList(firstClassExpression,
 								secondClassExpression, otherClassExpressions)));
 	}
 
 	@Override
 	public ElkEquivalentClassesAxiom getEquivalentClassesAxiom(
 			List<? extends ElkClassExpression> equivalentClassExpressions) {
-		return (ElkEquivalentClassesAxiom) objectManager
-				.getCanonicalElkObject(new ElkEquivalentClassesAxiomImpl(
+		return (ElkEquivalentClassesAxiom) objectRecycler_
+				.recycle(new ElkEquivalentClassesAxiomImpl(
 						equivalentClassExpressions));
 	}
 
@@ -496,8 +485,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			ElkDataPropertyExpression firstDataPropertyExpression,
 			ElkDataPropertyExpression secondDataPropertyExpression,
 			ElkDataPropertyExpression... otherDataPropertyExpressions) {
-		return (ElkEquivalentDataPropertiesAxiom) objectManager
-				.getCanonicalElkObject(new ElkEquivalentDataPropertiesAxiomImpl(
+		return (ElkEquivalentDataPropertiesAxiom) objectRecycler_
+				.recycle(new ElkEquivalentDataPropertiesAxiomImpl(
 						ElkObjectListObject.varArgsToList(
 								firstDataPropertyExpression,
 								secondDataPropertyExpression,
@@ -507,8 +496,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	@Override
 	public ElkEquivalentDataPropertiesAxiom getEquivalentDataPropertiesAxiom(
 			List<? extends ElkDataPropertyExpression> equivalentDataPropertyExpressions) {
-		return (ElkEquivalentDataPropertiesAxiom) objectManager
-				.getCanonicalElkObject(new ElkEquivalentDataPropertiesAxiomImpl(
+		return (ElkEquivalentDataPropertiesAxiom) objectRecycler_
+				.recycle(new ElkEquivalentDataPropertiesAxiomImpl(
 						equivalentDataPropertyExpressions));
 	}
 
@@ -517,8 +506,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			ElkObjectPropertyExpression firstObjectPropertyExpression,
 			ElkObjectPropertyExpression secondObjectPropertyExpression,
 			ElkObjectPropertyExpression... otherObjectPropertyExpressions) {
-		return (ElkEquivalentObjectPropertiesAxiom) objectManager
-				.getCanonicalElkObject(new ElkEquivalentObjectPropertiesAxiomImpl(
+		return (ElkEquivalentObjectPropertiesAxiom) objectRecycler_
+				.recycle(new ElkEquivalentObjectPropertiesAxiomImpl(
 						ElkObjectListObject.varArgsToList(
 								firstObjectPropertyExpression,
 								secondObjectPropertyExpression,
@@ -528,32 +517,32 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	@Override
 	public ElkEquivalentObjectPropertiesAxiom getEquivalentObjectPropertiesAxiom(
 			List<? extends ElkObjectPropertyExpression> equivalentObjectPropertyExpressions) {
-		return (ElkEquivalentObjectPropertiesAxiom) objectManager
-				.getCanonicalElkObject(new ElkEquivalentObjectPropertiesAxiomImpl(
+		return (ElkEquivalentObjectPropertiesAxiom) objectRecycler_
+				.recycle(new ElkEquivalentObjectPropertiesAxiomImpl(
 						equivalentObjectPropertyExpressions));
 	}
 
 	@Override
 	public ElkFunctionalDataPropertyAxiom getFunctionalDataPropertyAxiom(
 			ElkDataPropertyExpression dataPropertyExpression) {
-		return (ElkFunctionalDataPropertyAxiom) objectManager
-				.getCanonicalElkObject(new ElkFunctionalDataPropertyAxiomImpl(
+		return (ElkFunctionalDataPropertyAxiom) objectRecycler_
+				.recycle(new ElkFunctionalDataPropertyAxiomImpl(
 						dataPropertyExpression));
 	}
 
 	@Override
 	public ElkFunctionalObjectPropertyAxiom getFunctionalObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression) {
-		return (ElkFunctionalObjectPropertyAxiom) objectManager
-				.getCanonicalElkObject(new ElkFunctionalObjectPropertyAxiomImpl(
+		return (ElkFunctionalObjectPropertyAxiom) objectRecycler_
+				.recycle(new ElkFunctionalObjectPropertyAxiomImpl(
 						objectPropertyExpression));
 	}
 
 	@Override
 	public ElkInverseFunctionalObjectPropertyAxiom getInverseFunctionalObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression) {
-		return (ElkInverseFunctionalObjectPropertyAxiom) objectManager
-				.getCanonicalElkObject(new ElkInverseFunctionalObjectPropertyAxiomImpl(
+		return (ElkInverseFunctionalObjectPropertyAxiom) objectRecycler_
+				.recycle(new ElkInverseFunctionalObjectPropertyAxiomImpl(
 						objectPropertyExpression));
 	}
 
@@ -561,8 +550,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkInverseObjectPropertiesAxiom getInverseObjectPropertiesAxiom(
 			ElkObjectPropertyExpression firstObjectPropertyExpression,
 			ElkObjectPropertyExpression secondObjectPropertyExpression) {
-		return (ElkInverseObjectPropertiesAxiom) objectManager
-				.getCanonicalElkObject(new ElkInverseObjectPropertiesAxiomImpl(
+		return (ElkInverseObjectPropertiesAxiom) objectRecycler_
+				.recycle(new ElkInverseObjectPropertiesAxiomImpl(
 						firstObjectPropertyExpression,
 						secondObjectPropertyExpression));
 	}
@@ -570,29 +559,29 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	@Override
 	public ElkIrreflexiveObjectPropertyAxiom getIrreflexiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression) {
-		return (ElkIrreflexiveObjectPropertyAxiom) objectManager
-				.getCanonicalElkObject(new ElkIrreflexiveObjectPropertyAxiomImpl(
+		return (ElkIrreflexiveObjectPropertyAxiom) objectRecycler_
+				.recycle(new ElkIrreflexiveObjectPropertyAxiomImpl(
 						objectPropertyExpression));
 	}
 
 	@Override
 	public ElkLiteral getLiteral(String lexicalForm, ElkDatatype datatype) {
-		return (ElkLiteral) objectManager
-				.getCanonicalElkObject(new ElkLiteralImpl(lexicalForm, datatype));
+		return (ElkLiteral) objectRecycler_.recycle(new ElkLiteralImpl(
+				lexicalForm, datatype));
 	}
 
 	@Override
 	public ElkNamedIndividual getNamedIndividual(ElkIri iri) {
-		return (ElkNamedIndividual) objectManager
-				.getCanonicalElkObject(new ElkNamedIndividualImpl(iri));
+		return (ElkNamedIndividual) objectRecycler_
+				.recycle(new ElkNamedIndividualImpl(iri));
 	}
 
 	@Override
 	public ElkNegativeDataPropertyAssertionAxiom getNegativeDataPropertyAssertionAxiom(
 			ElkDataPropertyExpression dataPropertyExpression,
 			ElkIndividual individual, ElkLiteral literal) {
-		return (ElkNegativeDataPropertyAssertionAxiom) objectManager
-				.getCanonicalElkObject(new ElkNegativeDataPropertyAssertionAxiomImpl(
+		return (ElkNegativeDataPropertyAssertionAxiom) objectRecycler_
+				.recycle(new ElkNegativeDataPropertyAssertionAxiomImpl(
 						dataPropertyExpression, individual, literal));
 	}
 
@@ -600,8 +589,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkNegativeObjectPropertyAssertionAxiom getNegativeObjectPropertyAssertionAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual) {
-		return (ElkNegativeObjectPropertyAssertionAxiom) objectManager
-				.getCanonicalElkObject(new ElkNegativeObjectPropertyAssertionAxiomImpl(
+		return (ElkNegativeObjectPropertyAssertionAxiom) objectRecycler_
+				.recycle(new ElkNegativeObjectPropertyAssertionAxiomImpl(
 						objectPropertyExpression, firstIndividual,
 						secondIndividual));
 	}
@@ -610,25 +599,24 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkObjectAllValuesFrom getObjectAllValuesFrom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression) {
-		return (ElkObjectAllValuesFrom) objectManager
-				.getCanonicalElkObject(new ElkObjectAllValuesFromImpl(
+		return (ElkObjectAllValuesFrom) objectRecycler_
+				.recycle(new ElkObjectAllValuesFromImpl(
 						objectPropertyExpression, classExpression));
 	}
 
 	@Override
 	public ElkObjectComplementOf getObjectComplementOf(
 			ElkClassExpression classExpression) {
-		return (ElkObjectComplementOf) objectManager
-				.getCanonicalElkObject(new ElkObjectComplementOfImpl(
-						classExpression));
+		return (ElkObjectComplementOf) objectRecycler_
+				.recycle(new ElkObjectComplementOfImpl(classExpression));
 	}
 
 	@Override
 	public ElkObjectExactCardinality getObjectExactCardinality(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality) {
-		return (ElkObjectExactCardinality) objectManager
-				.getCanonicalElkObject(new ElkObjectExactCardinalityImpl(
+		return (ElkObjectExactCardinality) objectRecycler_
+				.recycle(new ElkObjectExactCardinalityImpl(
 						objectPropertyExpression, cardinality));
 	}
 
@@ -636,26 +624,25 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkObjectExactCardinalityQualified getObjectExactCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression) {
-		return (ElkObjectExactCardinalityQualified) objectManager
-				.getCanonicalElkObject(new ElkObjectExactCardinalityQualifiedImpl(
+		return (ElkObjectExactCardinalityQualified) objectRecycler_
+				.recycle(new ElkObjectExactCardinalityQualifiedImpl(
 						objectPropertyExpression, cardinality, classExpression));
 	}
 
 	@Override
 	public ElkObjectHasSelf getObjectHasSelf(
 			ElkObjectPropertyExpression objectPropertyExpression) {
-		return (ElkObjectHasSelf) objectManager
-				.getCanonicalElkObject(new ElkObjectHasSelfImpl(
-						objectPropertyExpression));
+		return (ElkObjectHasSelf) objectRecycler_
+				.recycle(new ElkObjectHasSelfImpl(objectPropertyExpression));
 	}
 
 	@Override
 	public ElkObjectHasValue getObjectHasValue(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkIndividual individual) {
-		return (ElkObjectHasValue) objectManager
-				.getCanonicalElkObject(new ElkObjectHasValueImpl(
-						objectPropertyExpression, individual));
+		return (ElkObjectHasValue) objectRecycler_
+				.recycle(new ElkObjectHasValueImpl(objectPropertyExpression,
+						individual));
 	}
 
 	@Override
@@ -663,44 +650,32 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions) {
-		return (ElkObjectIntersectionOf) objectManager
-				.getCanonicalElkObject(new ElkObjectIntersectionOfImpl(
-						ElkObjectListObject.varArgsToList(firstClassExpression,
+		return (ElkObjectIntersectionOf) objectRecycler_
+				.recycle(new ElkObjectIntersectionOfImpl(ElkObjectListObject
+						.varArgsToList(firstClassExpression,
 								secondClassExpression, otherClassExpressions)));
 	}
 
 	@Override
 	public ElkObjectIntersectionOf getObjectIntersectionOf(
 			List<? extends ElkClassExpression> classExpressions) {
-		return (ElkObjectIntersectionOf) objectManager
-				.getCanonicalElkObject(new ElkObjectIntersectionOfImpl(
-						classExpressions));
+		return (ElkObjectIntersectionOf) objectRecycler_
+				.recycle(new ElkObjectIntersectionOfImpl(classExpressions));
 	}
 
 	@Override
 	public ElkObjectInverseOf getObjectInverseOf(
 			ElkObjectProperty objectProperty) {
-		return (ElkObjectInverseOf) objectManager
-				.getCanonicalElkObject(new ElkObjectInverseOfImpl(
-						objectProperty));
-	}
-
-	/**
-	 * Obtain access to the classes object manager. Can be used to share the
-	 * same object manager among multiple factories.
-	 * 
-	 * @return the {@link ElkObjectManager} used in this factory
-	 */
-	public ElkObjectManager getObjectManager() {
-		return objectManager;
+		return (ElkObjectInverseOf) objectRecycler_
+				.recycle(new ElkObjectInverseOfImpl(objectProperty));
 	}
 
 	@Override
 	public ElkObjectMaxCardinality getObjectMaxCardinality(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality) {
-		return (ElkObjectMaxCardinality) objectManager
-				.getCanonicalElkObject(new ElkObjectMaxCardinalityImpl(
+		return (ElkObjectMaxCardinality) objectRecycler_
+				.recycle(new ElkObjectMaxCardinalityImpl(
 						objectPropertyExpression, cardinality));
 	}
 
@@ -708,8 +683,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkObjectMaxCardinalityQualified getObjectMaxCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression) {
-		return (ElkObjectMaxCardinalityQualified) objectManager
-				.getCanonicalElkObject(new ElkObjectMaxCardinalityQualifiedImpl(
+		return (ElkObjectMaxCardinalityQualified) objectRecycler_
+				.recycle(new ElkObjectMaxCardinalityQualifiedImpl(
 						objectPropertyExpression, cardinality, classExpression));
 	}
 
@@ -717,8 +692,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkObjectMinCardinality getObjectMinCardinality(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality) {
-		return (ElkObjectMinCardinality) objectManager
-				.getCanonicalElkObject(new ElkObjectMinCardinalityImpl(
+		return (ElkObjectMinCardinality) objectRecycler_
+				.recycle(new ElkObjectMinCardinalityImpl(
 						objectPropertyExpression, cardinality));
 	}
 
@@ -726,39 +701,38 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkObjectMinCardinalityQualified getObjectMinCardinalityQualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality, ElkClassExpression classExpression) {
-		return (ElkObjectMinCardinalityQualified) objectManager
-				.getCanonicalElkObject(new ElkObjectMinCardinalityQualifiedImpl(
+		return (ElkObjectMinCardinalityQualified) objectRecycler_
+				.recycle(new ElkObjectMinCardinalityQualifiedImpl(
 						objectPropertyExpression, cardinality, classExpression));
 	}
 
 	@Override
 	public ElkObjectOneOf getObjectOneOf(ElkIndividual firstIndividual,
 			ElkIndividual... otherIndividuals) {
-		return (ElkObjectOneOf) objectManager
-				.getCanonicalElkObject(new ElkObjectOneOfImpl(
-						ElkObjectListObject.varArgsToList(firstIndividual,
-								otherIndividuals)));
+		return (ElkObjectOneOf) objectRecycler_.recycle(new ElkObjectOneOfImpl(
+				ElkObjectListObject.varArgsToList(firstIndividual,
+						otherIndividuals)));
 	}
 
 	@Override
 	public ElkObjectOneOf getObjectOneOf(
 			List<? extends ElkIndividual> individuals) {
-		return (ElkObjectOneOf) objectManager
-				.getCanonicalElkObject(new ElkObjectOneOfImpl(individuals));
+		return (ElkObjectOneOf) objectRecycler_.recycle(new ElkObjectOneOfImpl(
+				individuals));
 	}
 
 	@Override
 	public ElkObjectProperty getObjectProperty(ElkIri iri) {
-		return (ElkObjectProperty) objectManager
-				.getCanonicalElkObject(new ElkObjectPropertyImpl(iri));
+		return (ElkObjectProperty) objectRecycler_
+				.recycle(new ElkObjectPropertyImpl(iri));
 	}
 
 	@Override
 	public ElkObjectPropertyAssertionAxiom getObjectPropertyAssertionAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual) {
-		return (ElkObjectPropertyAssertionAxiom) objectManager
-				.getCanonicalElkObject(new ElkObjectPropertyAssertionAxiomImpl(
+		return (ElkObjectPropertyAssertionAxiom) objectRecycler_
+				.recycle(new ElkObjectPropertyAssertionAxiomImpl(
 						objectPropertyExpression, firstIndividual,
 						secondIndividual));
 	}
@@ -766,8 +740,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	@Override
 	public ElkObjectPropertyChain getObjectPropertyChain(
 			List<? extends ElkObjectPropertyExpression> objectPropertyExpressions) {
-		return (ElkObjectPropertyChain) objectManager
-				.getCanonicalElkObject(new ElkObjectPropertyChainImpl(
+		return (ElkObjectPropertyChain) objectRecycler_
+				.recycle(new ElkObjectPropertyChainImpl(
 						objectPropertyExpressions));
 	}
 
@@ -775,8 +749,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkObjectPropertyDomainAxiom getObjectPropertyDomainAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression) {
-		return (ElkObjectPropertyDomainAxiom) objectManager
-				.getCanonicalElkObject(new ElkObjectPropertyDomainAxiomImpl(
+		return (ElkObjectPropertyDomainAxiom) objectRecycler_
+				.recycle(new ElkObjectPropertyDomainAxiomImpl(
 						objectPropertyExpression, classExpression));
 	}
 
@@ -784,8 +758,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkObjectPropertyRangeAxiom getObjectPropertyRangeAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression) {
-		return (ElkObjectPropertyRangeAxiom) objectManager
-				.getCanonicalElkObject(new ElkObjectPropertyRangeAxiomImpl(
+		return (ElkObjectPropertyRangeAxiom) objectRecycler_
+				.recycle(new ElkObjectPropertyRangeAxiomImpl(
 						objectPropertyExpression, classExpression));
 	}
 
@@ -793,8 +767,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkObjectSomeValuesFrom getObjectSomeValuesFrom(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression) {
-		return (ElkObjectSomeValuesFrom) objectManager
-				.getCanonicalElkObject(new ElkObjectSomeValuesFromImpl(
+		return (ElkObjectSomeValuesFrom) objectRecycler_
+				.recycle(new ElkObjectSomeValuesFromImpl(
 						objectPropertyExpression, classExpression));
 	}
 
@@ -803,18 +777,17 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			ElkClassExpression firstClassExpression,
 			ElkClassExpression secondClassExpression,
 			ElkClassExpression... otherClassExpressions) {
-		return (ElkObjectUnionOf) objectManager
-				.getCanonicalElkObject(new ElkObjectUnionOfImpl(
-						ElkObjectListObject.varArgsToList(firstClassExpression,
+		return (ElkObjectUnionOf) objectRecycler_
+				.recycle(new ElkObjectUnionOfImpl(ElkObjectListObject
+						.varArgsToList(firstClassExpression,
 								secondClassExpression, otherClassExpressions)));
 	}
 
 	@Override
 	public ElkObjectUnionOf getObjectUnionOf(
 			List<? extends ElkClassExpression> classExpressions) {
-		return (ElkObjectUnionOf) objectManager
-				.getCanonicalElkObject(new ElkObjectUnionOfImpl(
-						classExpressions));
+		return (ElkObjectUnionOf) objectRecycler_
+				.recycle(new ElkObjectUnionOfImpl(classExpressions));
 	}
 
 	@Override
@@ -829,12 +802,12 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	@Override
 	public ElkClass getOwlNothing() {
-		return ElkObjectFactoryImpl.ELK_OWL_NOTHING;
+		return PredefinedElkClass.OWL_NOTHING;
 	}
 
 	@Override
 	public ElkClass getOwlThing() {
-		return ElkObjectFactoryImpl.ELK_OWL_THING;
+		return PredefinedElkClass.OWL_THING;
 	}
 
 	@Override
@@ -850,8 +823,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	@Override
 	public ElkReflexiveObjectPropertyAxiom getReflexiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression) {
-		return (ElkReflexiveObjectPropertyAxiom) objectManager
-				.getCanonicalElkObject(new ElkReflexiveObjectPropertyAxiomImpl(
+		return (ElkReflexiveObjectPropertyAxiom) objectRecycler_
+				.recycle(new ElkReflexiveObjectPropertyAxiomImpl(
 						objectPropertyExpression));
 	}
 
@@ -859,35 +832,34 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkSameIndividualAxiom getSameIndividualAxiom(
 			ElkIndividual firstIndividual, ElkIndividual secondIndividual,
 			ElkIndividual... otherIndividuals) {
-		return (ElkSameIndividualAxiom) objectManager
-				.getCanonicalElkObject(new ElkSameIndividualAxiomImpl(
-						ElkObjectListObject.varArgsToList(firstIndividual,
-								secondIndividual, otherIndividuals)));
+		return (ElkSameIndividualAxiom) objectRecycler_
+				.recycle(new ElkSameIndividualAxiomImpl(ElkObjectListObject
+						.varArgsToList(firstIndividual, secondIndividual,
+								otherIndividuals)));
 	}
 
 	@Override
 	public ElkSameIndividualAxiom getSameIndividualAxiom(
 			List<? extends ElkIndividual> individuals) {
-		return (ElkSameIndividualAxiom) objectManager
-				.getCanonicalElkObject(new ElkSameIndividualAxiomImpl(
-						individuals));
+		return (ElkSameIndividualAxiom) objectRecycler_
+				.recycle(new ElkSameIndividualAxiomImpl(individuals));
 	}
 
 	@Override
 	public ElkSubClassOfAxiom getSubClassOfAxiom(
 			ElkClassExpression subClassExpression,
 			ElkClassExpression superClassExpression) {
-		return (ElkSubClassOfAxiom) objectManager
-				.getCanonicalElkObject(new ElkSubClassOfAxiomImpl(
-						subClassExpression, superClassExpression));
+		return (ElkSubClassOfAxiom) objectRecycler_
+				.recycle(new ElkSubClassOfAxiomImpl(subClassExpression,
+						superClassExpression));
 	}
 
 	@Override
 	public ElkSubDataPropertyOfAxiom getSubDataPropertyOfAxiom(
 			ElkDataPropertyExpression subDataPropertyExpression,
 			ElkDataPropertyExpression superDataPropertyExpression) {
-		return (ElkSubDataPropertyOfAxiom) objectManager
-				.getCanonicalElkObject(new ElkSubDataPropertyOfAxiomImpl(
+		return (ElkSubDataPropertyOfAxiom) objectRecycler_
+				.recycle(new ElkSubDataPropertyOfAxiomImpl(
 						subDataPropertyExpression, superDataPropertyExpression));
 	}
 
@@ -895,8 +867,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	public ElkSubObjectPropertyOfAxiom getSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subObjectPropertyExpression,
 			ElkObjectPropertyExpression superObjectPropertyExpression) {
-		return (ElkSubObjectPropertyOfAxiom) objectManager
-				.getCanonicalElkObject(new ElkSubObjectPropertyOfAxiomImpl(
+		return (ElkSubObjectPropertyOfAxiom) objectRecycler_
+				.recycle(new ElkSubObjectPropertyOfAxiomImpl(
 						subObjectPropertyExpression,
 						superObjectPropertyExpression));
 	}
@@ -904,16 +876,16 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	@Override
 	public ElkSymmetricObjectPropertyAxiom getSymmetricObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression) {
-		return (ElkSymmetricObjectPropertyAxiom) objectManager
-				.getCanonicalElkObject(new ElkSymmetricObjectPropertyAxiomImpl(
+		return (ElkSymmetricObjectPropertyAxiom) objectRecycler_
+				.recycle(new ElkSymmetricObjectPropertyAxiomImpl(
 						objectPropertyExpression));
 	}
 
 	@Override
 	public ElkTransitiveObjectPropertyAxiom getTransitiveObjectPropertyAxiom(
 			ElkObjectPropertyExpression objectPropertyExpression) {
-		return (ElkTransitiveObjectPropertyAxiom) objectManager
-				.getCanonicalElkObject(new ElkTransitiveObjectPropertyAxiomImpl(
+		return (ElkTransitiveObjectPropertyAxiom) objectRecycler_
+				.recycle(new ElkTransitiveObjectPropertyAxiomImpl(
 						objectPropertyExpression));
 	}
 
@@ -922,64 +894,60 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			Set<ElkObjectPropertyExpression> objectPEs,
 			Set<ElkDataPropertyExpression> dataPEs) {
 
-		return (ElkHasKeyAxiom) objectManager
-				.getCanonicalElkObject(new ElkHasKeyAxiomImpl(classExpr,
-						objectPEs, dataPEs));
+		return (ElkHasKeyAxiom) objectRecycler_.recycle(new ElkHasKeyAxiomImpl(
+				classExpr, objectPEs, dataPEs));
 	}
 
 	@Override
 	public ElkDatatypeDefinitionAxiom getDatatypeDefinitionAxiom(
 			ElkDatatype datatype, ElkDataRange dataRange) {
 
-		return (ElkDatatypeDefinitionAxiom) objectManager
-				.getCanonicalElkObject(new ElkDatatypeDefinitionAxiomImpl(
-						datatype, dataRange));
+		return (ElkDatatypeDefinitionAxiom) objectRecycler_
+				.recycle(new ElkDatatypeDefinitionAxiomImpl(datatype, dataRange));
 	}
 
 	@Override
 	public ElkDataAllValuesFrom getDataAllValuesFrom(ElkDataRange dataRange,
 			ElkDataPropertyExpression dpe1, ElkDataPropertyExpression... dpe) {
-		return (ElkDataAllValuesFrom) objectManager
-				.getCanonicalElkObject(new ElkDataAllValuesFromImpl(
-						ElkObjectListObject.varArgsToList(dpe1, dpe), dataRange));
+		return (ElkDataAllValuesFrom) objectRecycler_
+				.recycle(new ElkDataAllValuesFromImpl(ElkObjectListObject
+						.varArgsToList(dpe1, dpe), dataRange));
 	}
 
 	@Override
 	public ElkDataAllValuesFrom getDataAllValuesFrom(ElkDataRange dataRange,
 			List<? extends ElkDataPropertyExpression> dpList) {
-		return (ElkDataAllValuesFrom) objectManager
-				.getCanonicalElkObject(new ElkDataAllValuesFromImpl(dpList,
-						dataRange));
+		return (ElkDataAllValuesFrom) objectRecycler_
+				.recycle(new ElkDataAllValuesFromImpl(dpList, dataRange));
 	}
 
 	@Override
 	public ElkDataSomeValuesFrom getDataSomeValuesFrom(ElkDataRange dataRange,
 			ElkDataPropertyExpression dpe1, ElkDataPropertyExpression... dpe) {
-		return (ElkDataSomeValuesFrom) objectManager
-				.getCanonicalElkObject(new ElkDataSomeValuesFromImpl(
-						ElkObjectListObject.varArgsToList(dpe1, dpe), dataRange));
+		return (ElkDataSomeValuesFrom) objectRecycler_
+				.recycle(new ElkDataSomeValuesFromImpl(ElkObjectListObject
+						.varArgsToList(dpe1, dpe), dataRange));
 	}
 
 	@Override
 	public ElkDataSomeValuesFrom getDataSomeValuesFrom(ElkDataRange dataRange,
 			List<? extends ElkDataPropertyExpression> dpList) {
-		return (ElkDataSomeValuesFrom) objectManager
-				.getCanonicalElkObject(new ElkDataSomeValuesFromImpl(dpList,
-						dataRange));
+		return (ElkDataSomeValuesFrom) objectRecycler_
+				.recycle(new ElkDataSomeValuesFromImpl(dpList, dataRange));
 	}
 
 	@Override
 	public ElkFacetRestriction getFacetRestriction(ElkIri iri,
 			ElkLiteral literal) {
-		return (ElkFacetRestriction) objectManager
-				.getCanonicalElkObject(new ElkFacetRestrictionImpl(iri, literal));
+		return (ElkFacetRestriction) objectRecycler_
+				.recycle(new ElkFacetRestrictionImpl(iri, literal));
 	}
 
 	@Override
 	public ElkAnnotation getAnnotation(ElkAnnotationProperty property,
 			ElkAnnotationValue value) {
-		return (ElkAnnotation) objectManager
-				.getCanonicalElkObject(new ElkAnnotationImpl(property, value));
+		return (ElkAnnotation) objectRecycler_.recycle(new ElkAnnotationImpl(
+				property, value));
 	}
 
 	@Override
@@ -987,34 +955,34 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 			ElkAnnotationProperty property, ElkAnnotationSubject subject,
 			ElkAnnotationValue value) {
 
-		return (ElkAnnotationAssertionAxiom) objectManager
-				.getCanonicalElkObject(new ElkAnnotationAssertionAxiomImpl(
-						property, subject, value));
+		return (ElkAnnotationAssertionAxiom) objectRecycler_
+				.recycle(new ElkAnnotationAssertionAxiomImpl(property, subject,
+						value));
 	}
 
 	@Override
 	public ElkAnnotationPropertyDomainAxiom getAnnotationPropertyDomainAxiom(
 			ElkAnnotationProperty property, ElkIri domain) {
 
-		return (ElkAnnotationPropertyDomainAxiom) objectManager
-				.getCanonicalElkObject(new ElkAnnotationPropertyDomainAxiomImpl(
-						property, domain));
+		return (ElkAnnotationPropertyDomainAxiom) objectRecycler_
+				.recycle(new ElkAnnotationPropertyDomainAxiomImpl(property,
+						domain));
 	}
 
 	@Override
 	public ElkAnnotationPropertyRangeAxiom getAnnotationPropertyRangeAxiom(
 			ElkAnnotationProperty property, ElkIri range) {
-		return (ElkAnnotationPropertyRangeAxiom) objectManager
-				.getCanonicalElkObject(new ElkAnnotationPropertyRangeAxiomImpl(
-						property, range));
+		return (ElkAnnotationPropertyRangeAxiom) objectRecycler_
+				.recycle(new ElkAnnotationPropertyRangeAxiomImpl(property,
+						range));
 	}
 
 	@Override
 	public ElkSubAnnotationPropertyOfAxiom getSubAnnotationPropertyOfAxiom(
 			ElkAnnotationProperty subAnnotationProperty,
 			ElkAnnotationProperty superAnnotationProperty) {
-		return (ElkSubAnnotationPropertyOfAxiom) objectManager
-				.getCanonicalElkObject(new ElkSubAnnotationPropertyOfAxiomImpl(
+		return (ElkSubAnnotationPropertyOfAxiom) objectRecycler_
+				.recycle(new ElkSubAnnotationPropertyOfAxiomImpl(
 						subAnnotationProperty, superAnnotationProperty));
 	}
 

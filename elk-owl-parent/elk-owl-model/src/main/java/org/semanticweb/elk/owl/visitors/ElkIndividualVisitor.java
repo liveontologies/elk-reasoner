@@ -23,10 +23,11 @@
 package org.semanticweb.elk.owl.visitors;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 
 /**
- * Visitor interface for ELKIndividual.
+ * Visitor interface for {@link ElkIndividual}.
  * 
  * @author Markus Kroetzsch
  * 

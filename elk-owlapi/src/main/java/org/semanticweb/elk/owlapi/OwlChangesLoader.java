@@ -29,17 +29,26 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.loading.AxiomChangeListener;
 import org.semanticweb.elk.loading.ChangesLoader;
+import org.semanticweb.elk.loading.ElkAxiomChange;
 import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.Loader;
+import org.semanticweb.elk.loading.SimpleElkAxiomChange;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.AddImport;
+import org.semanticweb.owlapi.model.AddOntologyAnnotation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeVisitorEx;
 import org.semanticweb.owlapi.model.RemoveAxiom;
+import org.semanticweb.owlapi.model.RemoveImport;
+import org.semanticweb.owlapi.model.RemoveOntologyAnnotation;
+import org.semanticweb.owlapi.model.SetOntologyID;
 
 /**
  * An {@link ChangesLoader} that accumulates the {@link OWLOntologyChange} and
@@ -61,11 +70,23 @@ public class OwlChangesLoader implements ChangesLoader {
 
 	/** list to accumulate the unprocessed changes to the ontology */
 	protected final LinkedList<OWLOntologyChange> pendingChanges;
+	
+	private AxiomChangeListener changeListener_ = null;
+	
+	protected final LinkedList<ElkAxiomChange> changesToNotifyListener_;
 
 	OwlChangesLoader(ProgressMonitor progressMonitor) {
 		this.progressMonitor = progressMonitor;
 		this.pendingChanges = new LinkedList<OWLOntologyChange>();
+		this.changesToNotifyListener_ = new LinkedList<ElkAxiomChange>();
 	}
+	
+
+	@Override
+	public void registerChangeListener(AxiomChangeListener listener) {
+		changeListener_ = listener;
+	}
+
 
 	@Override
 	public Loader getLoader(final ElkAxiomProcessor axiomInserter,
@@ -93,19 +114,45 @@ public class OwlChangesLoader implements ChangesLoader {
 							LOGGER_.error(exception);
 							throw exception;
 						}
-						OWLAxiom owlAxiom = change.getAxiom();
-						ElkAxiom elkAxiom = OWL_CONVERTER_.convert(owlAxiom);
-						if (change instanceof AddAxiom) {
-							axiomInserter.visit(elkAxiom);
-							if (LOGGER_.isTraceEnabled())
-								LOGGER_.trace("adding " + owlAxiom);
-						} else if (change instanceof RemoveAxiom) {
-							axiomDeleter.visit(elkAxiom);
-							if (LOGGER_.isTraceEnabled())
-								LOGGER_.trace("removing " + owlAxiom);
-						} else
-							throw new ElkLoadingException(
-									"Change type is not supported!");
+						
+						ElkLoadingException error = change.accept(new BasicAxiomChangeVisitor<ElkLoadingException>() {
+							
+							@Override
+							public ElkLoadingException visit(RemoveAxiom arg) {
+								ElkAxiom elkAxiom = OWL_CONVERTER_.convert(arg.getAxiom());
+								
+								axiomDeleter.visit( elkAxiom);
+								
+								if (LOGGER_.isTraceEnabled())
+									LOGGER_.trace("removing " + arg.getAxiom());
+								
+								return null;
+							}
+							
+							@Override
+							public ElkLoadingException visit(AddAxiom arg) {
+								ElkAxiom elkAxiom = OWL_CONVERTER_.convert(arg.getAxiom());
+								
+								axiomInserter.visit( elkAxiom);
+								
+								if (LOGGER_.isTraceEnabled())
+									LOGGER_.trace("adding " + arg.getAxiom());
+								
+								return null;
+							}
+
+							@Override
+							protected ElkLoadingException defaultVisit(OWLOntologyChange arg) {
+								return new ElkLoadingException("Ontology change " + arg.toString() + " is not supported");
+							}
+						});
+						
+						if (error != null) {
+							LOGGER_.error(error);
+							
+							throw error;
+						}
+						
 						currentAxiom++;
 						progressMonitor.report(currentAxiom, changesCount);
 					}
@@ -119,9 +166,46 @@ public class OwlChangesLoader implements ChangesLoader {
 			}
 		};
 	}
+	
+	void flush() {
+		// notify the listener of all buffered changes
+		if (changeListener_ != null) {
+			for (ElkAxiomChange change : changesToNotifyListener_) {
+				changeListener_.notify(change);
+			}
+
+			changesToNotifyListener_.clear();
+		}
+	}
 
 	void registerChange(OWLOntologyChange change) {
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Registering change: " + change);
+		}
+		
 		pendingChanges.add(change);
+		// convert this change to the Elk's axiom change and notify the listener
+		// TODO save the converted Elk axiom to the queue to not convert the second time?
+		if (changeListener_ != null) {
+			change.accept(new BasicAxiomChangeVisitor<Object>() {
+
+				@Override
+				public Object visit(RemoveAxiom arg) {
+					changesToNotifyListener_.add(new SimpleElkAxiomChange(
+							OWL_CONVERTER_.convert(arg.getAxiom()), -1));
+
+					return null;
+				}
+
+				@Override
+				public Object visit(AddAxiom arg) {
+					changesToNotifyListener_.add(new SimpleElkAxiomChange(
+							OWL_CONVERTER_.convert(arg.getAxiom()), 1));
+
+					return null;
+				}
+			});
+		}
 	}
 
 	Set<OWLAxiom> getPendingAxiomAdditions() {
@@ -148,4 +232,42 @@ public class OwlChangesLoader implements ChangesLoader {
 		return pendingChanges;
 	}
 
+	
+	private abstract static class BasicAxiomChangeVisitor<O> implements OWLOntologyChangeVisitorEx<O> {
+
+		@Override
+		public abstract O visit(AddAxiom arg);
+
+		@Override
+		public abstract O visit(RemoveAxiom arg);
+		
+		protected O defaultVisit(OWLOntologyChange arg) {
+			return null;
+		}
+
+		@Override
+		public O visit(SetOntologyID arg0) {
+			return defaultVisit(arg0);
+		}
+
+		@Override
+		public O visit(AddImport arg0) {
+			return defaultVisit(arg0);
+		}
+
+		@Override
+		public O visit(RemoveImport arg0) {
+			return defaultVisit(arg0);
+		}
+
+		@Override
+		public O visit(AddOntologyAnnotation arg0) {
+			return defaultVisit(arg0);
+		}
+
+		@Override
+		public O visit(RemoveOntologyAnnotation arg0) {
+			return defaultVisit(arg0);
+		}		
+	}
 }

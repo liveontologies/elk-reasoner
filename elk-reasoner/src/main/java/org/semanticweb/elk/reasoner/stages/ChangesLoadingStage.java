@@ -22,8 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
@@ -41,8 +39,11 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(ChangesLoadingStage.class);
 
-	public ChangesLoadingStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	private Loader changesLoader_;
+
+	public ChangesLoadingStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -51,29 +52,30 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.doneChangeLoading;
+	public boolean preExecute() {
+		if (!super.preExecute())
+			return false;
+		this.changesLoader_ = reasoner.getChangesLoader();
+		return true;
 	}
 
 	@Override
-	public Iterable<ReasonerStage> getDependencies() {
-		return Arrays
-				.asList((ReasonerStage) new OntologyLoadingStage(reasoner));
-	}
-
-	@Override
-	public void execute() throws ElkException {
-		initComputation();
-		Loader changesLoader = reasoner.getChangesLoader();
-		if (changesLoader == null)
+	public void executeStage() throws ElkException {
+		if (changesLoader_ == null)
 			LOGGER_.warn("Ontology changes loader is not registered. No changes will be loaded!");
-		else
-			for (;;) {
-				changesLoader.load();
-				if (!interrupted())
-					break;
-			}
-		reasoner.doneChangeLoading = true;
+		else {
+			changesLoader_.load();
+		}
+	}
+
+	@Override
+	public boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		if (changesLoader_ != null)
+			this.changesLoader_.dispose();
+		this.changesLoader_ = null;
+		return true;
 	}
 
 	@Override

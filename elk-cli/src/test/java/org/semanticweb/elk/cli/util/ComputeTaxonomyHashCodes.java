@@ -32,6 +32,7 @@ import java.io.OutputStreamWriter;
 
 import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.loading.EmptyChangesLoader;
+import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -42,7 +43,7 @@ import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
+import org.semanticweb.elk.reasoner.stages.FailingOnInterruptStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
@@ -124,10 +125,10 @@ public class ComputeTaxonomyHashCodes {
 
 			System.err.println(ontFile.getName());
 
-			Reasoner reasoner = reasonerFactory.createReasoner(
-					new TestStageExecutor(), configuraion);
-			reasoner.registerOntologyLoader(new Owl2StreamLoader(
-					new Owl2FunctionalStyleParserFactory(), ontFile));
+			OntologyLoader loader = new Owl2StreamLoader(
+					new Owl2FunctionalStyleParserFactory(), ontFile);
+			Reasoner reasoner = reasonerFactory.createReasoner(loader,
+					new FailingOnInterruptStageExecutor(), configuraion);
 			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
 			int hash = hasher.hash(reasoner);

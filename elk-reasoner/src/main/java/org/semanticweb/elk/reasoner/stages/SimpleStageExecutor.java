@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 
 /**
  * A simple {@link ReasonerStageExecutor}. If a stage has not been done, first,
@@ -32,23 +31,15 @@ import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class SimpleStageExecutor extends SimpleInterrupter implements
-		ReasonerStageExecutor {
+public class SimpleStageExecutor extends AbstractStageExecutor {
 
 	@Override
-	public void complete(ReasonerStage stage) throws ElkException {
-		if (!stage.done()) {
-			for (ReasonerStage dependentStage : stage.getDependencies()) {
-				complete(dependentStage);
-				if (dependentStage.isInterrupted())
-					return;
-			}
-			registerCurrentThreadToInterrupt();
-			try {
-				stage.execute();
-			} finally {
-				clearThreadToInterrupt();
-			}
+	public void execute(ReasonerStage stage) throws ElkException {		
+		try {
+			stage.preExecute();
+			stage.execute();
+		} finally {
+			stage.postExecute();
 		}
 	}
 }

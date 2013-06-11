@@ -29,9 +29,9 @@ package org.semanticweb.elk.testing;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- * @param <I> 
- * @param <EO> 
- * @param <AO> 
+ * @param <I>
+ * @param <EO>
+ * @param <AO>
  * 
  */
 public class BasicTestManifest<I extends TestInput, EO extends TestOutput, AO extends TestOutput>
@@ -71,6 +71,7 @@ public class BasicTestManifest<I extends TestInput, EO extends TestOutput, AO ex
 	@Override
 	public void compare(AO actualOutput) throws TestResultComparisonException {
 		if (!expOutput.equals(actualOutput)) {
+
 			throw new TestResultComparisonException(
 					"Actual result isn't equal to the expected one", expOutput,
 					actualOutput);

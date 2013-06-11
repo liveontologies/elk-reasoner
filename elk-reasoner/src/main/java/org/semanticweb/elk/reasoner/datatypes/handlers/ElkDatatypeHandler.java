@@ -52,7 +52,7 @@ import org.semanticweb.elk.owl.visitors.ElkDataValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexingException;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingUnsupportedException;
 
 /**
  * @author Pospishnyi Olexandr
@@ -83,7 +83,7 @@ public class ElkDatatypeHandler implements DatatypeHandler, ElkDataValueSpaceVis
 		if (dh != null) {
 			return dh;
 		} else {
-			throw new IndexingException(datatype);
+			throw new ElkIndexingUnsupportedException(datatype);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class ElkDatatypeHandler implements DatatypeHandler, ElkDataValueSpaceVis
 		if (vs != null) {
 			return vs;
 		} else {
-			throw new IndexingException(elkLiteral);
+			throw new ElkIndexingUnsupportedException(elkLiteral);
 		}
 	}
 
@@ -102,7 +102,7 @@ public class ElkDatatypeHandler implements DatatypeHandler, ElkDataValueSpaceVis
 		if (elkDatatype.asELDatatype() != null) {
 			return new EntireValueSpace(elkDatatype.asELDatatype());
 		} else {
-			throw new IndexingException(elkDatatype);
+			throw new ElkIndexingUnsupportedException(elkDatatype);
 		}
 	}
 
@@ -112,28 +112,28 @@ public class ElkDatatypeHandler implements DatatypeHandler, ElkDataValueSpaceVis
 		if (vs != null) {
 			return vs;
 		} else {
-			throw new IndexingException(elkDatatypeRestriction);
+			throw new ElkIndexingUnsupportedException(elkDatatypeRestriction);
 		}
 	}
 
 	@Override
 	public ValueSpace visit(ElkDataUnionOf elkDataUnionOf) {
-		throw new IndexingException(elkDataUnionOf);
+		throw new ElkIndexingUnsupportedException(elkDataUnionOf);
 	}
 
 	@Override
 	public ValueSpace visit(ElkDataComplementOf elkDataComplementOf) {
-		throw new IndexingException(elkDataComplementOf);
+		throw new ElkIndexingUnsupportedException(elkDataComplementOf);
 	}
 
 	@Override
 	public ValueSpace visit(ElkDataIntersectionOf elkDataIntersectionOf) {
-		throw new IndexingException(elkDataIntersectionOf);
+		throw new ElkIndexingUnsupportedException(elkDataIntersectionOf);
 	}
 
 	@Override
 	public ValueSpace visit(ElkDataOneOf elkDataOneOf) {
-		throw new IndexingException(elkDataOneOf);
+		throw new ElkIndexingUnsupportedException(elkDataOneOf);
 	}
 
 	@Override

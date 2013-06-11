@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataPropertyVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedDataProperty;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -36,12 +37,12 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 
  * @author Pospishnyi Olexandr
  */
-public class IndexedDataProperty {
+public class IndexedDataProperty extends IndexedObject{
 
 	/**
-	 * The corresponding {@link ElkDataProperty}
+	 * The corresponding {@link ElkIri}
 	 */
-	private ElkDataProperty property_;
+	private ElkIri dataPropertyIri;
 
 	/**
 	 * The list of super-properties of this data property
@@ -66,15 +67,11 @@ public class IndexedDataProperty {
 	private final AtomicReference<SaturatedDataProperty> saturated_ = new AtomicReference<SaturatedDataProperty>();
 
 	public IndexedDataProperty(ElkDataProperty property) {
-		this.property_ = property;
+		this.dataPropertyIri = property.getIri();
 	}
 
 	public ElkIri getIri() {
-		return property_.getIri();
-	}
-
-	public ElkDataProperty getProperty() {
-		return property_;
+		return this.dataPropertyIri;
 	}
 
 	/**
@@ -147,7 +144,7 @@ public class IndexedDataProperty {
 					1);
 		negativeDatatypeExpressions_.add(datatypeExpression);
 	}
-
+	
 	protected boolean removeNegativeDatatypeExpression(
 			IndexedDatatypeExpression datatypeExpression) {
 		boolean success = false;
@@ -162,18 +159,24 @@ public class IndexedDataProperty {
 	public <O> O accept(IndexedDataPropertyVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
+	
+	@Override
+	public <O> O accept(IndexedObjectVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
 
 	protected void updateOccurrenceNumber(int increment) {
 		occurrenceNo += increment;
 	}
 
+	@Override
 	public boolean occurs() {
 		return occurrenceNo > 0;
 	}
 
 	@Override
-	public String toString() {
-		return '<' + property_.getIri().getFullIriAsString() + '>';
+	public String toStringStructural() {
+		return '<' + dataPropertyIri.getFullIriAsString() + '>';
 	}
 
 	/**

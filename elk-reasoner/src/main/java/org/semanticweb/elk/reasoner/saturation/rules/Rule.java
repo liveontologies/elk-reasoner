@@ -1,4 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
+
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 /**
- * A rule that can be applied to elements of a particular type using a
- * {@link RuleEngine}.
+ * A rule that can be applied to elements of a particular type within a
+ * {@link SaturationStateImpl.AbstractWriter}.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -33,13 +36,19 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 public interface Rule<E> {
 
 	/**
-	 * Applying the rule to an element using a {@link RuleEngine}
+	 * Applying the rule to an element within a {@link SaturationStateImpl.Writer}
 	 * 
-	 * @param ruleEngine
-	 *            a {@link RuleEngine} used for this rule application
+	 * @param engine
+	 *            a {@link BasicSaturationStateWriter} which could be changed as a
+	 *            result of this rule's application
 	 * @param element
 	 *            the element to which the rule is applied
 	 */
-	public void apply(RuleEngine ruleEngine, E element);
+	public void apply(BasicSaturationStateWriter engine, E element);
+
+	/**
+	 * @return the name of this rule
+	 */
+	public String getName();
 
 }

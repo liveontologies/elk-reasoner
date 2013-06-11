@@ -22,6 +22,11 @@
  */
 package org.semanticweb.elk.util.collections;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.AbstractCollection;
+import java.util.AbstractSet;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,6 +34,12 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+/**
+ * Some useful static methods for collections
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public class Operations {
 
 	public static final Multimap<?, ?> EMPTY_MULTIMAP = new Multimap<Object, Object>() {
@@ -108,6 +119,14 @@ public class Operations {
 		};
 	}
 
+	/**
+	 * Concatenates several {@link Iterable}s into one
+	 * 
+	 * @param input
+	 *            the {@link Iterable} of {@link Iterable}s to be concatenated
+	 * @return {@link Iterable} consisting of all elements found in input
+	 *         {@link Iterable}s
+	 */
 	public static <T> Iterable<T> concat(
 			final Iterable<? extends Iterable<? extends T>> input) {
 		assert input != null;
@@ -161,7 +180,101 @@ public class Operations {
 	}
 
 	/**
-	 * An interface for boolean conditions over some type.
+	 * Splits the input {@link Iterable} on batches with at most given number of
+	 * elements.
+	 * 
+	 * @param elements
+	 *            the {@link Iterable} to be split
+	 * @param batchSize
+	 *            the maximal number of elements in batches
+	 * @return a {@link Iterable} of batches containing elements from the input
+	 *         collection
+	 * @see #concat(Iterable)
+	 */
+	public static <T> Iterable<ArrayList<T>> split(
+			final Iterable<? extends T> elements, final int batchSize) {
+		return new Iterable<ArrayList<T>>() {
+
+			@Override
+			public Iterator<ArrayList<T>> iterator() {
+				return new Iterator<ArrayList<T>>() {
+
+					final Iterator<? extends T> elementsIterator = elements
+							.iterator();
+
+					@Override
+					public boolean hasNext() {
+						return elementsIterator.hasNext();
+					}
+
+					@Override
+					public ArrayList<T> next() {
+						final ArrayList<T> nextBatch = new ArrayList<T>(batchSize);
+						int count = 0;
+						while (count++ < batchSize
+								&& elementsIterator.hasNext()) {
+							nextBatch.add(elementsIterator.next());
+						}
+						return nextBatch;
+					}
+
+					@Override
+					public void remove() {
+						throw new UnsupportedOperationException(
+								"Deletion is not supported");
+					}
+				};
+			}
+		};
+	}
+
+	/**
+	 * Splits the input {@link Collection} on batches with at most given number
+	 * of elements.
+	 * 
+	 * @param elements
+	 *            the {@link Collection} to be split
+	 * @param batchSize
+	 *            the maximal number of elements in batches
+	 * @return a {@link Collection} of batches containing elements from the
+	 *         input collection
+	 */
+	public static <T> Collection<ArrayList<T>> split(
+			final Collection<? extends T> elements, final int batchSize) {
+		return new AbstractCollection<ArrayList<T>>() {
+
+			@Override
+			public Iterator<ArrayList<T>> iterator() {
+				return split((Iterable<? extends T>) elements, batchSize)
+						.iterator();
+			}
+
+			@Override
+			public int size() {
+				// rounding up
+				return (elements.size() + batchSize - 1) / batchSize;
+			}
+		};
+	}
+
+	public static <T> Collection<T> getCollection(final Iterable<T> iterable,
+			final int size) {
+		return new AbstractCollection<T>() {
+
+			@Override
+			public Iterator<T> iterator() {
+				return iterable.iterator();
+			}
+
+			@Override
+			public int size() {
+				return size;
+			}
+		};
+	}
+
+	/**
+	 * Boolean conditions over some type.
 	 * 
 	 * @param <T>
 	 *            the type of elements which can be used with this condition
@@ -290,13 +403,13 @@ public class Operations {
 				} catch (ClassCastException cce) {
 					return false;
 				}
-				// here's why the condition must be consistent with equals():
-				// we check it on the passed element while we really need to
-				// check it on the element
-				// which is in the underlying set (and is equal to o according
-				// to equals()).
-				// However, as long as the condition is consistent, the result
-				// will be the same.
+				/*
+				 * here's why the condition must be consistent with equals(): we
+				 * check it on the passed element while we really need to check
+				 * it on the element which is in the underlying set (and is
+				 * equal to o according to equals()). However, as long as the
+				 * condition is consistent, the result will be the same.
+				 */
 				return condition.holds(elem);
 			}
 
@@ -361,5 +474,222 @@ public class Operations {
 
 		};
 
+	}
+
+	/**
+	 * Transformations of input values to output values
+	 * 
+	 * @param <I>
+	 *            the type of the input of the transformation
+	 * @param <O>
+	 *            the type of the output of the transformation
+	 */
+	public interface Transformation<I, O> {
+		/**
+		 * Transforms the input element
+		 * 
+		 * @param element
+		 *            the element to be transformed
+		 * @return the result of the transformation
+		 */
+		public O transform(I element);
+	}
+
+	// TODO: get rid of Conditions in favour of transformations
+	
+	/**
+	 * Transforms elements using a given {@link Transformation} the output
+	 * elements consist of the result of the transformation in the same order;
+	 * if the transformation returns {@code null}, it is not included in the
+	 * output
+	 * 
+	 * @param input
+	 *            the input elements
+	 * @param transformation
+	 *            the transformation for elements
+	 * @return the transformed output elements
+	 * 
+	 */
+	public static <I, O> Iterable<O> map(final Iterable<I> input,
+			final Transformation<? super I, O> transformation) {
+		assert input != null;
+
+		return new Iterable<O>() {
+
+			@Override
+			public Iterator<O> iterator() {
+
+				return new Iterator<O>() {
+					Iterator<I> i = input.iterator();
+					O next;
+					boolean hasNext = advance();
+
+					@Override
+					public boolean hasNext() {
+						return hasNext;
+					}
+
+					@Override
+					public O next() {
+						if (hasNext) {
+							O result = next;
+							hasNext = advance();
+							return result;
+						}
+						throw new NoSuchElementException();
+					}
+
+					@Override
+					public void remove() {
+						i.remove();
+					}
+
+					boolean advance() {
+						while (i.hasNext()) {
+							next = transformation.transform(i.next());
+							if (next != null)
+								return true;
+						}
+						return false;
+					}
+				};
+			}
+		};
+	}
+
+	/**
+	 * Prints key-value entries present in the first {@link Multimap} but not in
+	 * the second {@link Multimap} using the given {@link Writer} and prefixing
+	 * all messages with a given prefix.
+	 * 
+	 * @param first
+	 * @param second
+	 * @param writer
+	 * @param prefix
+	 * @throws IOException
+	 */
+	public static <K, V> void dumpDiff(Multimap<K, V> first,
+			Multimap<K, V> second, Writer writer, String prefix)
+			throws IOException {
+		for (K key : first.keySet()) {
+			Collection<V> firstValues = first.get(key);
+			Collection<V> secondValues = second.get(key);
+			dumpDiff(firstValues, secondValues, writer, prefix + key + "->");
+		}
+
+	}
+
+	/**
+	 * Prints the elements present in the first {@link Collection} but not in
+	 * the second {@link Collection} using the given {@link Writer} and
+	 * prefixing all messages with a given prefix.
+	 * 
+	 * @param first
+	 * @param second
+	 * @param writer
+	 * @param prefix
+	 * @throws IOException
+	 */
+	public static <T> void dumpDiff(Collection<T> first, Collection<T> second,
+			Writer writer, String prefix) throws IOException {
+		for (T element : first)
+			if (!second.contains(element))
+				writer.append(prefix + element + "\n");
+	}
+
+	/**
+	 * A simple object that transforms objects of type {@link I} to objects of
+	 * type {@link O}
+	 * 
+	 * @author Pavel Klinov
+	 * 
+	 *         pavel.klinov@uni-ulm.de
+	 */
+	public interface Functor<I, O> {
+
+		public O apply(I element);
+	}
+	
+	/**
+	 * An extension of {@link Functor} which can do the reverse transformation
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	public interface FunctorEx<I, O> extends Functor<I, O> {
+		
+		/**
+		 * The reason this method takes Objects rather than {@link O} is because
+		 * it's primarily used for an efficient implementation of
+		 * {@link Set.contains}, which takes an Object
+		 * 
+		 * @return Can return null if the transformation is not possible
+		 */
+		public I deapply(Object element);
+	}
+	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private static class MapIterator<I, O> implements Iterator<O> {
+		
+		private final Iterator<? extends I> iter_;
+		private final Functor<I, O> functor_;
+		
+		MapIterator(Iterator<? extends I> iter, Functor<I, O> functor) {
+			iter_ = iter;
+			functor_ = functor;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return iter_.hasNext();
+		}
+
+		@Override
+		public O next() {
+			return functor_.apply(iter_.next());
+		}
+
+		@Override
+		public void remove() {
+			iter_.remove();
+		}
+		
+		
+	}
+	
+	/**
+	 * A simple second-order map function
+	 * 
+	 * @param input
+	 * @param functor
+	 * @return
+	 */
+	public static <I,O> Set<O> map(final Set<? extends I> input, final FunctorEx<I,O> functor) {
+		return new AbstractSet<O>() { 
+
+			@Override
+			public Iterator<O> iterator() {
+				return new MapIterator<I, O>(input.iterator(), functor);
+			}
+
+			@Override
+			public boolean contains(Object o) {
+				I element = functor.deapply(o);
+				
+				return element == null ? false : input.contains(element);
+			}
+
+			@Override
+			public int size() {
+				return input.size();
+			}
+			
+		};
 	}
 }

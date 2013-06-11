@@ -40,11 +40,9 @@ public class TaxonomyDiffManifest<EO extends ClassTaxonomyTestOutput, AO extends
 		if (getExpectedOutput().getHashCode() != (actualOutput.getHashCode())) {
 			// FIXME: where do I see the expected and actual values (if I do not
 			// print them myself as below)?
-			throw new TestResultComparisonException(
-					"Expected taxonomy hashcode "
-							+ getExpectedOutput().getHashCode()
-							+ " not equal to the actual hashcode"
-							+ actualOutput.getHashCode(), getExpectedOutput(),
+			throw new TestResultComparisonException("\n"
+					+ "EXPECTED TAXONOMY:\n" + getExpectedOutput()
+					+ "ACTUAL TAXONOMY:\n" + actualOutput, getExpectedOutput(),
 					actualOutput);
 		}
 	}

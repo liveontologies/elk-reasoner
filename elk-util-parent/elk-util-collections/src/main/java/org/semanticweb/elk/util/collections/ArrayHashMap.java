@@ -141,7 +141,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	 *         stretch the tables.
 	 */
 	static private int computeUpperSize(int capacity) {
-		if (capacity > 128)
+		if (capacity > 64)
 			return (3 * capacity) / 4; // max 75% filled
 		else
 			return capacity;
@@ -382,7 +382,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	 */
 	private void shrink() {
 		int oldCapacity = keys.length;
-		if (oldCapacity == 1)
+		if (oldCapacity <= DEFAULT_INITIAL_CAPACITY)
 			return;
 		K oldKeys[] = keys;
 		V oldValues[] = values;
@@ -426,14 +426,17 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void clear() {
-		for (int i = 0; i < keys.length; i++)
-			if (keys[i] != null) {
-				keys[i] = null;
-				values[i] = null;
-			}
+		int capacity = keys.length >> 2;
+		if (capacity == 0)
+			capacity = 1;
 		size = 0;
+		upperSize = computeUpperSize(capacity);
+		lowerSize = computeLowerSize(capacity);
+		this.keys = (K[]) new Object[capacity];
+		this.values = (V[]) new Object[capacity];
 	}
 
 	@Override
@@ -459,7 +462,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		// current cursor
 		int cursor;
 		// reference to the next key
-		K nextKey = null;
+		K nextKey;
 
 		KeyIterator() {
 			this.expectedSize = size;
@@ -469,9 +472,11 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		}
 
 		void seekNext() {
-			for (nextKey = null; cursor < keysSnapshot.length
-					&& (nextKey = keysSnapshot[cursor]) == null; cursor++)
-				;
+			while (cursor < keysSnapshot.length)
+				if ((nextKey = keysSnapshot[cursor++]) != null)
+					return;
+			// no next key
+			nextKey = null;
 		}
 
 		@Override
@@ -486,7 +491,6 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 			if (nextKey == null)
 				throw new NoSuchElementException();
 			K result = nextKey;
-			cursor++;
 			seekNext();
 			return result;
 		}
@@ -498,7 +502,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 
 	}
 
-	private final class KeySet extends AbstractSet<K> {
+	private final class KeySet extends AbstractSet<K> implements DirectAccess<K> {
 
 		@Override
 		public Iterator<K> iterator() {
@@ -520,6 +524,11 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 			return size;
 		}
 
+		@Override
+		public K[] getRawData() {
+			return keys;
+		}
+
 	}
 
 	private class ValueIterator implements Iterator<V> {
@@ -530,7 +539,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		// current cursor
 		int cursor;
 		// reference to the next key
-		V nextValue = null;
+		V nextValue;
 
 		ValueIterator() {
 			this.expectedSize = size;
@@ -540,9 +549,11 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		}
 
 		void seekNext() {
-			for (nextValue = null; cursor < valuesSnapshot.length
-					&& (nextValue = valuesSnapshot[cursor]) == null; cursor++)
-				;
+			while (cursor < valuesSnapshot.length)
+				if ((nextValue = valuesSnapshot[cursor++]) != null)
+					return;
+			// no next value
+			nextValue = null;
 		}
 
 		@Override
@@ -557,7 +568,6 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 			if (nextValue == null)
 				throw new NoSuchElementException();
 			V result = nextValue;
-			cursor++;
 			seekNext();
 			return result;
 		}
@@ -568,7 +578,8 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		}
 	}
 
-	private final class ValueCollection extends AbstractCollection<V> {
+	private final class ValueCollection extends AbstractCollection<V> implements
+			DirectAccess<V> {
 
 		@Override
 		public Iterator<V> iterator() {
@@ -578,6 +589,11 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		@Override
 		public int size() {
 			return size;
+		}
+
+		@Override
+		public V[] getRawData() {
+			return values;
 		}
 
 	}
@@ -604,9 +620,11 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		}
 
 		void seekNext() {
-			for (nextKey = null; cursor < keysSnapshot.length
-					&& (nextKey = keysSnapshot[cursor]) == null; cursor++)
-				;
+			while (cursor < keysSnapshot.length)
+				if ((nextKey = keysSnapshot[cursor++]) != null)
+					return;
+			// no next key found
+			nextKey = null;
 		}
 
 		@Override
@@ -620,8 +638,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 				throw new ConcurrentModificationException();
 			if (nextKey == null)
 				throw new NoSuchElementException();
-			Entry result = new Entry(this, cursor);
-			cursor++;
+			Entry result = new Entry(this, cursor - 1);
 			seekNext();
 			return result;
 		}

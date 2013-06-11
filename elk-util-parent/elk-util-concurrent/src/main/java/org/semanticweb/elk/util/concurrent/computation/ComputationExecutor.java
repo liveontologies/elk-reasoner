@@ -37,10 +37,6 @@ import java.util.concurrent.TimeUnit;
  * @author "Yevgeny Kazakov"
  * 
  */
-/**
- * @author "Yevgeny Kazakov"
- * 
- */
 public class ComputationExecutor extends ThreadPoolExecutor {
 
 	/**
@@ -81,6 +77,13 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 						Thread result = new Thread(threadGroup, r,
 								threadGroup.getName() + "-thread-"
 										+ threadGroup.getNextThreadId());
+						/*
+						 * Worker threads don't do any sort of IO and shouldn't
+						 * require any clean-up. So they can be safely abandoned
+						 * when JVM exits.
+						 */
+						result.setDaemon(true);
+						
 						return result;
 					}
 				});

@@ -22,12 +22,20 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 
+/**
+ * Represents all occurrences of an {@link ElkIndividual} in an ontology.
+ * 
+ * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public class IndexedIndividual extends IndexedClassEntity {
 	/**
 	 * The ElkNamedIndividual that is the sole instance of this nominal
@@ -57,11 +65,20 @@ public class IndexedIndividual extends IndexedClassEntity {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment,
-			int positiveIncrement, int negativeIncrement) {
+	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
+			int increment, int positiveIncrement, int negativeIncrement) {
+
+		if (occurrenceNo_ == 0 && increment > 0) {
+			index.addNamedIndividual(elkNamedIndividual_);
+		}
+
 		occurrenceNo_ += increment;
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
+
+		if (occurrenceNo_ == 0 && increment < 0) {
+			index.removeNamedIndividual(elkNamedIndividual_);
+		}
 	}
 
 	@Override
@@ -70,13 +87,14 @@ public class IndexedIndividual extends IndexedClassEntity {
 	}
 
 	@Override
-	public String toString() {
+	public String toStringStructural() {
 		return "ObjectOneOf(<"
 				+ elkNamedIndividual_.getIri().getFullIriAsString() + ">)";
 	}
 
 	@Override
-	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
-		// nothing so far
+	public void accept(DecompositionRuleApplicationVisitor visitor,
+			Context context) {
+		// TODO Auto-generated method stub
 	}
 }

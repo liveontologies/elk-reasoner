@@ -25,7 +25,8 @@ package org.semanticweb.elk.reasoner.indexing.entries;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 
 /**
- * Implements an equality view for instances of {@link IndexedBinaryPropertyChain}
+ * Implements an equality view for instances of
+ * {@link IndexedBinaryPropertyChain}
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -51,10 +52,19 @@ public class IndexedBinaryPropertyChainEntry<T, K extends IndexedBinaryPropertyC
 
 	@Override
 	public boolean equals(Object other) {
-		IndexedBinaryPropertyChainEntry<?, ?> otherEntry = (IndexedBinaryPropertyChainEntry<?, ?>) other;
-		return this.key.getLeftProperty().equals(
-				otherEntry.key.getLeftProperty())
-				&& this.key.getRightProperty().equals(
-						otherEntry.key.getRightProperty());
+		if (this == other) {
+			return true;
+		}
+
+		if (other instanceof IndexedBinaryPropertyChainEntry<?, ?>) {
+			IndexedBinaryPropertyChainEntry<?, ?> otherEntry = (IndexedBinaryPropertyChainEntry<?, ?>) other;
+			
+			return this.key.getLeftProperty().equals(
+					otherEntry.key.getLeftProperty())
+					&& this.key.getRightProperty().equals(
+							otherEntry.key.getRightProperty());
+		} else {
+			return false;
+		}
 	}
 }

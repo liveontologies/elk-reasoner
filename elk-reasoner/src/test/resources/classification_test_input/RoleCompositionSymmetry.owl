@@ -1,0 +1,22 @@
+Prefix( : = <http://example.org/> )
+Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
+Prefix( rdfs: = <http://www.w3.org/2000/01/rdf-schema#> )
+
+Ontology(
+
+Annotation(rdfs:label "this is to test that composition axioms are indexed symmetrically")
+
+Declaration(ObjectProperty(:R1))
+Declaration(ObjectProperty(:R2))
+Declaration(ObjectProperty(:R3))
+
+SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2) :R1)
+SubObjectPropertyOf(ObjectPropertyChain(:R1 :R2) :R3)
+SubObjectPropertyOf(ObjectPropertyChain(:R1 :R3) :R1)
+SubObjectPropertyOf(ObjectPropertyChain(:R1 :R3) :R3)
+SubObjectPropertyOf(ObjectPropertyChain(:R2 :R3) :R1)
+SubObjectPropertyOf(ObjectPropertyChain(:R2 :R3) :R3)
+SubObjectPropertyOf(:R1 :R2)
+SubObjectPropertyOf(:R2 :R3)
+
+)

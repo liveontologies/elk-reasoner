@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLObjectInverseOf;
@@ -36,12 +35,16 @@ import org.semanticweb.owlapi.model.OWLPropertyExpressionVisitorEx;
  * {@link ElkObjectPropertyExpression}.
  * 
  * @author "Yevgeny Kazakov"
+ * @author Frantisek Simancik
  * 
  */
 public class OwlObjectPropertyExpressionConverterVisitor implements
 		OWLPropertyExpressionVisitorEx<ElkObjectPropertyExpression> {
 
 	private static OwlObjectPropertyExpressionConverterVisitor INSTANCE_ = new OwlObjectPropertyExpressionConverterVisitor();
+
+	private static OwlObjectInverseOfConverterVisitor OWL_OBJECT_INVERSE_OF_CONVERTER_ = OwlObjectInverseOfConverterVisitor
+			.getInstance();
 
 	private OwlObjectPropertyExpressionConverterVisitor() {
 	}
@@ -50,9 +53,6 @@ public class OwlObjectPropertyExpressionConverterVisitor implements
 		return INSTANCE_;
 	}
 
-	private static OwlObjectInverseOfConverterVisitor OWL_OBJECT_INVERSE_OF_CONVERTER = OwlObjectInverseOfConverterVisitor
-			.getInstance();
-
 	@Override
 	public ElkObjectPropertyExpression visit(OWLObjectProperty property) {
 		return new ElkObjectPropertyWrap<OWLObjectProperty>(property);
@@ -60,7 +60,7 @@ public class OwlObjectPropertyExpressionConverterVisitor implements
 
 	@Override
 	public ElkObjectPropertyExpression visit(OWLObjectInverseOf property) {
-		return property.accept(OWL_OBJECT_INVERSE_OF_CONVERTER);
+		return property.getInverse().accept(OWL_OBJECT_INVERSE_OF_CONVERTER_);
 	}
 
 	@Override
@@ -68,6 +68,6 @@ public class OwlObjectPropertyExpressionConverterVisitor implements
 		throw new IllegalArgumentException(
 				OWLDataProperty.class.getSimpleName()
 						+ " cannot be converted to "
-						+ ElkObjectProperty.class.getSimpleName());
+						+ ElkObjectPropertyExpression.class.getSimpleName());
 	}
 }

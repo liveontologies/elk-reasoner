@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import org.semanticweb.elk.loading.EmptyChangesLoader;
+import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
@@ -63,10 +64,10 @@ public class CLIDiffRealizationCorrectnessTest extends
 	@Override
 	protected Reasoner createReasoner(final InputStream input)
 			throws Owl2ParseException, IOException {
-		Reasoner reasoner = new ReasonerFactory()
-				.createReasoner(new RestartingTestStageExecutor());
-		reasoner.registerOntologyLoader(new Owl2StreamLoader(
-				new Owl2FunctionalStyleParserFactory(), input));
+		OntologyLoader loader = new Owl2StreamLoader(
+				new Owl2FunctionalStyleParserFactory(), input);
+		Reasoner reasoner = new ReasonerFactory().createReasoner(loader,
+				new RestartingTestStageExecutor());
 		reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 		return reasoner;
 	}

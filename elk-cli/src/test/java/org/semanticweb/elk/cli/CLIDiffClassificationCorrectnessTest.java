@@ -28,8 +28,10 @@ package org.semanticweb.elk.cli;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import org.junit.Ignore;
 
 import org.semanticweb.elk.loading.EmptyChangesLoader;
+import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
@@ -49,11 +51,7 @@ import org.semanticweb.elk.testing.TestInput;
 public class CLIDiffClassificationCorrectnessTest extends
 		DiffClassificationCorrectnessTest {
 
-	/*static final String[] IGNORE_LIST = { "DisjointSelf.owl",
-			"AssertionDisjoint.owl", "Disjoint.owl", "DisjointSelf.owl",
-			"ReflexiveRole.owl", "kangaroo.owl" };*/
-	
-	static final String[] IGNORE_LIST = {};	
+	static final String[] IGNORE_LIST = {};
 
 	static {
 		Arrays.sort(IGNORE_LIST);
@@ -67,10 +65,10 @@ public class CLIDiffClassificationCorrectnessTest extends
 	@Override
 	protected Reasoner createReasoner(final InputStream input)
 			throws Owl2ParseException, IOException {
-		Reasoner reasoner = new ReasonerFactory()
-				.createReasoner(new RestartingTestStageExecutor());
-		reasoner.registerOntologyLoader(new Owl2StreamLoader(
-				new Owl2FunctionalStyleParserFactory(), input));
+		OntologyLoader loader = new Owl2StreamLoader(
+				new Owl2FunctionalStyleParserFactory(), input);
+		Reasoner reasoner = new ReasonerFactory().createReasoner(loader,
+				new RestartingTestStageExecutor());
 		reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 		return reasoner;
 	}

@@ -23,10 +23,6 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.RuleStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * A common interface for engines used in the saturation for
@@ -41,7 +37,7 @@ public interface RuleEngine {
 	 * @return the {@link IndexedClassExpression} corresponding to
 	 *         {@code owl:Nothing}.
 	 */
-	public IndexedClassExpression getOwlNothing();
+	//public IndexedClassExpression getOwlNothing();
 
 	/**
 	 * Return the {@link Context} which has the given
@@ -56,7 +52,7 @@ public interface RuleEngine {
 	 * @return the {@link Context} with the given root
 	 * 
 	 */
-	public Context getCreateContext(IndexedClassExpression root);
+	//public Context getCreateContext(IndexedClassExpression root);
 
 	/**
 	 * Produce a {@link Conclusion} in the given {@link Context}, which will be
@@ -69,16 +65,15 @@ public interface RuleEngine {
 	 *            the {@link Conclusion} produced in the {@link Context}
 	 * 
 	 */
-	public void produce(Context context, Conclusion conclusion);
+	//public void produce(Context context, Conclusion conclusion);
 
 	/**
 	 * @return the {@link ConclusionsCounter} of this {@link RuleEngine}.
 	 */
-	public ConclusionsCounter getConclusionsCounter();
+//	public ConclusionsCounter getConclusionsCounter();
 
 	/**
 	 * @return the {@link ConclusionsCounter} of this {@link RuleEngine}.
 	 */
-	public RuleStatistics getRulesTimer();
-
+//	public RuleStatistics getRulesTimer();
 }

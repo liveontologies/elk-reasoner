@@ -22,68 +22,143 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.datatypes.handlers.ElkDatatypeHandler;
 import org.semanticweb.elk.reasoner.indexing.entries.IndexedEntryConverter;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectFilter;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryFactory;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
 
 /**
- * A cache of all indexed objects in the ontology backed by a KeyEntryHashSet.
- * It uses indexed Entries to compare object with respect to structural
- * equality. Supports (non-recursive) addition, removal, and retrieval of single
- * indexed objects. The recursion for indexing subobjects is in the
- * ElkObjectIndexerVisitor.
+ * A cache of {@link IndexedObject}s in the ontology backed by a
+ * {@link KeyEntryHashSet}. It uses indexed {@link KeyEntry}s to compare object
+ * with respect to structural equality. Supports (non-recursive) addition,
+ * removal, and retrieval of single indexed objects. The recursion for indexing
+ * subobjects is in the {@link IndexObjectConverter}. Not all
+ * {@link IndexedObject}s are cached but only those whose uniqueness modulo
+ * structural equivalence is important for index updating to work correctly.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
+ * 
+ * @seenElkObjectIndexerVisitor
  * 
  */
 public class IndexedObjectCache implements IndexedObjectFilter {
 
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(IndexedObjectCache.class);
+
 	protected final KeyEntryHashSet<IndexedClassExpression> indexedClassExpressionLookup;
 	protected final KeyEntryHashSet<IndexedPropertyChain> indexedPropertyChainLookup;
-	protected final KeyEntryHashSet<IndexedDataProperty> indexedDataPropertiesLookup;
+        protected final KeyEntryHashSet<IndexedDataProperty> indexedDataPropertiesLookup;
+	protected final KeyEntryHashSet<IndexedAxiom> indexedAxiomLookup;
+        protected final ElkDatatypeHandler datatypeHandler;
 	protected int indexedClassCount = 0;
 	protected int indexedIndividualCount = 0;
 	protected int indexedObjectPropertyCount = 0;
 	protected int indexedDataPropertyCount = 0;
 
-	protected IndexedObjectCache() {
+	public IndexedObjectCache() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace("Creating new cache");
+
 		indexedClassExpressionLookup = new KeyEntryHashSet<IndexedClassExpression>(
-				indexedClassExpressionViewFactory, 1024);
+				new IndexedClassExpressionViewFactory(), 1024);
 		indexedPropertyChainLookup = new KeyEntryHashSet<IndexedPropertyChain>(
-				indexedPropertyChainViewFactory, 128);
-		indexedDataPropertiesLookup = new KeyEntryHashSet<IndexedDataProperty>(
+				new IndexedPropertyChainViewFactory(), 128);
+                indexedDataPropertiesLookup = new KeyEntryHashSet<IndexedDataProperty>(
 				indexedDataPropertyViewFactory, 128);
+		indexedAxiomLookup = new KeyEntryHashSet<IndexedAxiom>(
+				new IndexedAxiomViewFactory(), 1024);
+                datatypeHandler = new ElkDatatypeHandler();
 	}
 
-	protected void clear() {
+	public IndexObjectConverter getIndexObjectConverter() {
+		return new IndexObjectConverter(this, this, datatypeHandler);
+	}
+
+	public void clear() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace("Clear cache");
 		indexedClassExpressionLookup.clear();
 		indexedPropertyChainLookup.clear();
+		indexedAxiomLookup.clear();
 		indexedClassCount = 0;
 		indexedIndividualCount = 0;
 		indexedObjectPropertyCount = 0;
 	}
 
-	@Override
-	public IndexedClassExpression filter(IndexedClassExpression ice) {
-		IndexedClassExpression result = indexedClassExpressionLookup.get(ice);
-		if (result == null)
-			return ice;
-		else
-			return result;
+	public long size() {
+		return indexedClassCount + indexedIndividualCount
+				+ indexedObjectPropertyCount;
+	}
+
+	public boolean isEmpty() {
+		return indexedClassExpressionLookup.isEmpty()
+				&& indexedPropertyChainLookup.isEmpty()
+                                && indexedDataPropertiesLookup.isEmpty()
+				&& indexedAxiomLookup.isEmpty();
+	}
+
+	/**
+	 * Remove all object of the given {@link IndexedObjectCache} from this
+	 * {@link IndexedObjectCache}
+	 * 
+	 * @param other
+	 *            the {@link IndexedObjectCache} whose stored object should be
+	 *            removed from this {@link IndexedObjectCache}
+	 */
+	public void subtract(IndexedObjectCache other) {
+		for (IndexedClassExpression ice : other.indexedClassExpressionLookup) {
+			if (ice.getCompositionRuleHead() != null)
+				throw new ElkUnexpectedIndexingException(
+						"Deleting object with registered rules: " + ice);
+			Context context = ice.getContext();
+			if (context != null)
+				context.removeLinks();
+			if (!ice.accept(deletor))
+				throw new ElkUnexpectedIndexingException(
+						"Cannot remove indexed object from the cache " + ice);
+		}
+		for (IndexedPropertyChain ipc : other.indexedPropertyChainLookup) {
+			if (!ipc.accept(deletor))
+				throw new ElkUnexpectedIndexingException(
+						"Cannot remove indexed object from the cache " + ipc);
+		}
+                for (IndexedDataProperty idp : other.indexedDataPropertiesLookup) {
+			if (!idp.accept(deletor))
+				throw new ElkUnexpectedIndexingException(
+						"Cannot remove indexed object from the cache " + idp);
+		}
+		for (IndexedAxiom ax : other.indexedAxiomLookup)
+			if (!ax.accept(deletor))
+				throw new ElkUnexpectedIndexingException(
+						"Cannot remove indexed object from the cache " + ax);
+		// the counters should be subtracted during deletion
 	}
 
 	@Override
-	public IndexedPropertyChain filter(IndexedPropertyChain ipc) {
-		IndexedPropertyChain result = indexedPropertyChainLookup.get(ipc);
-		if (result == null)
-			return ipc;
-		else
-			return result;
+	public IndexedClass visit(IndexedClass element) {
+		return resolveCache(
+				(IndexedClass) indexedClassExpressionLookup.get(element),
+				element);
+	}
+
+	@Override
+	public IndexedIndividual visit(IndexedIndividual element) {
+		return resolveCache(
+				(IndexedIndividual) indexedClassExpressionLookup.get(element),
+				element);
 	}
     
 	@Override
-	public IndexedDataProperty filter(IndexedDataProperty idp) {
+	public IndexedDataProperty visit(IndexedDataProperty idp) {
 		IndexedDataProperty result = indexedDataPropertiesLookup.get(idp);
 		if (result == null) {
 			return idp;
@@ -92,18 +167,27 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		}
 	}
 
-	protected void add(IndexedClassExpression ice) {
-		indexedClassExpressionLookup.merge(ice);
-		if (ice instanceof IndexedClass)
-			indexedClassCount++;
-		else if (ice instanceof IndexedIndividual)
-			indexedIndividualCount++;
+	@Override
+	public IndexedObjectIntersectionOf visit(IndexedObjectIntersectionOf element) {
+		return resolveCache(
+				(IndexedObjectIntersectionOf) indexedClassExpressionLookup
+						.get(element),
+				element);
 	}
 
-	protected void add(IndexedPropertyChain ipc) {
-		indexedPropertyChainLookup.merge(ipc);
-		if (ipc instanceof IndexedObjectProperty)
-			indexedObjectPropertyCount++;
+	@Override
+	public IndexedObjectSomeValuesFrom visit(IndexedObjectSomeValuesFrom element) {
+		return resolveCache(
+				(IndexedObjectSomeValuesFrom) indexedClassExpressionLookup
+						.get(element),
+				element);
+	}
+
+	@Override
+	public IndexedDatatypeExpression visit(IndexedDatatypeExpression element) {
+		return resolveCache(
+				(IndexedDatatypeExpression) indexedClassExpressionLookup.get(element),
+				element);
 	}
         
 	protected void add(IndexedDataProperty idp) {
@@ -113,18 +197,19 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		}
 	}
 
-	protected void remove(IndexedClassExpression ice) {
-		indexedClassExpressionLookup.removeEntry(ice);
-		if (ice instanceof IndexedClass)
-			indexedClassCount--;
-		else if (ice instanceof IndexedIndividual)
-			indexedIndividualCount--;
+	@Override
+	public IndexedObjectProperty visit(IndexedObjectProperty element) {
+		return resolveCache(
+				(IndexedObjectProperty) indexedPropertyChainLookup.get(element),
+				element);
 	}
 
-	protected void remove(IndexedPropertyChain ipc) {
-		indexedPropertyChainLookup.removeEntry(ipc);
-		if (ipc instanceof IndexedObjectProperty)
-			indexedObjectPropertyCount--;
+	@Override
+	public IndexedBinaryPropertyChain visit(IndexedBinaryPropertyChain element) {
+		return resolveCache(
+				(IndexedBinaryPropertyChain) indexedPropertyChainLookup
+						.get(element),
+				element);
 	}
         
 	protected void remove(IndexedDataProperty idp) {
@@ -134,12 +219,227 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		}
 	}
 
-	/**
-	 * The factory used in indexedClassExpressionLookup for wrapping indexed
-	 * class expressions in the corresponding entries to use structural
-	 * equality.
-	 */
-	class IndexedClassExpressionViewFactory implements
+	@Override
+	public IndexedSubClassOfAxiom visit(IndexedSubClassOfAxiom axiom) {
+		// caching not supported
+		return axiom;
+	}
+
+	@Override
+	public IndexedDisjointnessAxiom visit(IndexedDisjointnessAxiom axiom) {
+		return resolveCache(
+				(IndexedDisjointnessAxiom) indexedAxiomLookup.get(axiom), axiom);
+	}
+
+	private static <T> T resolveCache(T cached, T element) {
+		return cached == null ? element : cached;
+	}
+
+	final IndexedObjectVisitor<Boolean> inserter = new IndexedObjectVisitor<Boolean>() {
+		@Override
+		public Boolean visit(IndexedClass element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Adding " + element);
+			if (indexedClassExpressionLookup.add(element)) {
+				indexedClassCount++;
+				return true;
+			} else
+				return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedIndividual element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Adding " + element);
+			if (indexedClassExpressionLookup.add(element)) {
+				indexedIndividualCount++;
+				return true;
+			} else
+				return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectIntersectionOf element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Adding " + element);
+			return indexedClassExpressionLookup.add(element);
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectSomeValuesFrom element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Adding " + element);
+			return indexedClassExpressionLookup.add(element);
+		}
+
+		@Override
+		public Boolean visit(IndexedDatatypeExpression element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Adding " + element);
+			return indexedClassExpressionLookup.add(element);
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectProperty element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Adding " + element);
+			if (indexedPropertyChainLookup.add(element)) {
+				indexedObjectPropertyCount++;
+				if (SaturatedPropertyChain.isRelevant(element))
+					SaturatedPropertyChain.getCreate(element);
+				return true;
+			}
+			return false;
+		}
+                
+                @Override
+		public Boolean visit(IndexedDataProperty element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Adding " + element);
+			if (indexedDataPropertiesLookup.add(element)) {
+				indexedDataPropertyCount++;
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedBinaryPropertyChain element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Adding " + element);
+			if (indexedPropertyChainLookup.add(element)) {
+				if (SaturatedPropertyChain.isRelevant(element))
+					SaturatedPropertyChain.getCreate(element);
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedSubClassOfAxiom axiom) {
+			// caching not supported
+			return true;
+		}
+
+		@Override
+		public Boolean visit(IndexedDisjointnessAxiom axiom) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Adding " + axiom);
+			return indexedAxiomLookup.add(axiom);
+		}
+	};
+
+	final IndexedObjectVisitor<Boolean> deletor = new IndexedObjectVisitor<Boolean>() {
+
+		@Override
+		public Boolean visit(IndexedClass element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Removing " + element);
+
+			if (indexedClassExpressionLookup.removeEntry(element) != null) {
+				indexedClassCount--;
+				return true;
+			} else
+				return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedIndividual element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Removing " + element);
+
+			if (indexedClassExpressionLookup.removeEntry(element) != null) {
+				indexedIndividualCount--;
+				return true;
+			} else
+				return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectIntersectionOf element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Removing " + element);
+
+			return indexedClassExpressionLookup.removeEntry(element) != null;
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectSomeValuesFrom element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Removing " + element);
+
+			return indexedClassExpressionLookup.removeEntry(element) != null;
+		}
+
+		@Override
+		public Boolean visit(IndexedDatatypeExpression element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Removing " + element);
+
+			return indexedClassExpressionLookup.removeEntry(element) != null;
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectProperty element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Removing " + element);
+
+			if (indexedPropertyChainLookup.removeEntry(element) != null) {
+				indexedObjectPropertyCount--;
+				return true;
+			} else
+				return false;
+		}
+                
+                @Override
+		public Boolean visit(IndexedDataProperty element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Removing " + element);
+
+			if (indexedDataPropertiesLookup.removeEntry(element) != null) {
+				indexedDataPropertyCount--;
+				return true;
+			} else
+				return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedBinaryPropertyChain element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Removing " + element);
+
+			return indexedPropertyChainLookup.removeEntry(element) != null;
+		}
+
+		@Override
+		public Boolean visit(IndexedSubClassOfAxiom axiom) {
+			// caching not supported
+			return true;
+		}
+
+		@Override
+		public Boolean visit(IndexedDisjointnessAxiom axiom) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Removing " + axiom);
+
+			return indexedAxiomLookup.removeEntry(axiom) != null;
+		}
+	};
+
+	private class IndexedAxiomViewFactory implements
+			KeyEntryFactory<IndexedAxiom> {
+
+		final IndexedEntryConverter<IndexedAxiom> converter = new IndexedEntryConverter<IndexedAxiom>();
+
+		@Override
+		public KeyEntry<IndexedAxiom, ? extends IndexedAxiom> createEntry(
+				IndexedAxiom key) {
+			return key.accept(converter);
+		}
+
+	}
+
+	private class IndexedClassExpressionViewFactory implements
 			KeyEntryFactory<IndexedClassExpression> {
 
 		final IndexedEntryConverter<IndexedClassExpression> converter = new IndexedEntryConverter<IndexedClassExpression>();
@@ -152,13 +452,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 	}
 
-	IndexedClassExpressionViewFactory indexedClassExpressionViewFactory = new IndexedClassExpressionViewFactory();
-
-	/**
-	 * The factory used in indexedPropertyChainLookup for wrapping indexed class
-	 * expressions in the corresponding entries to use structural equality.
-	 */
-	class IndexedPropertyChainViewFactory implements
+	private class IndexedPropertyChainViewFactory implements
 			KeyEntryFactory<IndexedPropertyChain> {
 
 		final IndexedEntryConverter<IndexedPropertyChain> converter = new IndexedEntryConverter<IndexedPropertyChain>();

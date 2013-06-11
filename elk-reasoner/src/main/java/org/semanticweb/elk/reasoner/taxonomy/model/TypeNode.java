@@ -32,40 +32,45 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * 
  * @author Markus Kroetzsch
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
  * @param <T>
  *            the type of objects in this node
  * @param <I>
  *            the type of instances of this node
  */
-public interface TypeNode<T extends ElkObject, I extends ElkObject>
-		extends TaxonomyNode<T> {
+public interface TypeNode<T extends ElkObject, I extends ElkObject> extends
+		TaxonomyNode<T> {
 
 	/**
-	 * Get an unmodifiable set of nodes for ElkObjects that are direct instances
-	 * of this Node.
+	 * Get an unmodifiable set of {@link InstanceNode}s that are direct
+	 * instances of this {@link TypeNode}. An {@link InstanceNode} is a direct
+	 * instance of a {@link TypeNode} if it is an instance of the
+	 * {@link TypeNode} and not an instance of any sub-node of a
+	 * {@link TypeNode}.
 	 * 
-	 * @return list of nodes for direct instances of this node's members
+	 * @return nodes for direct instances of this node's members
 	 */
 	public Set<? extends InstanceNode<T, I>> getDirectInstanceNodes();
 
 	/**
-	 * Get an unmodifiable set of nodes for ElkObjects that are (possibly
-	 * indirect) instances of this Node.
+	 * Get an unmodifiable set of {@link InstanceNode}s that are (possibly
+	 * indirect) instances of this {@link TypeNode}.
 	 * 
-	 * @return list of nodes for instances of this node's members
+	 * @return nodes for all instances of this node's members
 	 */
 	public Set<? extends InstanceNode<T, I>> getAllInstanceNodes();
-	
+
 	@Override
-	public Set<TypeNode<T,I>> getDirectSuperNodes();
+	public Set<? extends TypeNode<T, I>> getDirectSuperNodes();
+
 	@Override
-	public Set<TypeNode<T,I>> getAllSuperNodes();
+	public Set<? extends TypeNode<T, I>> getAllSuperNodes();
+
 	@Override
-	public Set<TypeNode<T,I>> getDirectSubNodes();
+	public Set<? extends TypeNode<T, I>> getDirectSubNodes();
+
 	@Override
-	public Set<TypeNode<T,I>> getAllSubNodes();
-	@Override
-	public InstanceTaxonomy<T,I> getTaxonomy();
+	public Set<? extends TypeNode<T, I>> getAllSubNodes();
 
 }

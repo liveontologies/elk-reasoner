@@ -25,6 +25,7 @@ package org.semanticweb.elk.owlapi;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import org.junit.Ignore;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;

@@ -35,12 +35,20 @@ import java.lang.reflect.Constructor;
  */
 public class TaskFactory {
 
-	public static Task create(String className, String[] params) {
+	public static Task createTask(String className, String[] params) {
+		return (Task) create(className, params);
+	}
+	
+	public static TaskCollection createTaskCollection(String className, String[] params) {
+		return (TaskCollection) create(className, params);
+	}
+	
+	private static Object create(String className, String[] params) {
 		try {
 			Class<?> clazz = Class.forName(className);
 			Constructor<?> constructor = clazz.getConstructor(new Class<?>[] {String[].class});
 
-			return (Task) constructor.newInstance(new Object[] {params});
+			return constructor.newInstance(new Object[] {params});
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

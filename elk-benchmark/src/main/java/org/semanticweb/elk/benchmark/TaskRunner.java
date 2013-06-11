@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.benchmark;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.util.logging.ElkTimer;
 
 
@@ -38,22 +40,20 @@ import org.semanticweb.elk.util.logging.ElkTimer;
  */
 public class TaskRunner {
 
-	protected final Task task;
+	private static final Logger LOGGER_ = Logger
+			.getLogger(TaskRunner.class);
+	
 	protected final int warmups;
 	protected final int runs;
 	
-	protected TaskRunner(Task task, int warmups, int runs) {
-		this.task = task;
+	protected TaskRunner(int warmups, int runs) {
 		this.warmups = warmups;
 		this.runs = runs;
 	}
 	
-	public void run() throws TaskException {
-		run(task);
-	}
-	
-	protected void run(Task task) throws TaskException {
+	public void run(Task task) throws TaskException {
 		ElkTimer timer = ElkTimer.getNamedTimer(task.getName());
+		Metrics metrics = task.getMetrics();
 		
 		for (int i = 0; i < warmups; i++) {
 			System.out.println("Warm-up run #" + i);
@@ -63,13 +63,14 @@ public class TaskRunner {
 		
 		long wallTimeElapsed = 0;
 		
+		metrics.reset();
+		
 		for (int i = 0; i < runs; i++) {
-			System.out.print("Actual run #" + i + "... ");
+			System.out.println("Actual run #" + i + " of " + task.getName());
 			task.prepare();
 			
 			timer.start();
-			task.run();
-			
+			task.run();			
 			timer.stop();
 			
 			long wallRuntime = (timer.getTotalWallTime() - wallTimeElapsed)/1000000;
@@ -77,8 +78,18 @@ public class TaskRunner {
 			System.out.println("... finished in " + wallRuntime  + " ms");
 			
 			wallTimeElapsed = timer.getTotalWallTime();
+			
+			if (metrics != null) {
+				metrics.incrementRunCount();
+			}
 		}
 		
+		task.dispose();
+		
 		System.out.println("Average running time: " + timer.getAvgWallTime() / 1000000 + " ms");
+		
+		if (metrics != null) {
+			metrics.printAverages(LOGGER_, Level.INFO);
+		}
 	}
 }

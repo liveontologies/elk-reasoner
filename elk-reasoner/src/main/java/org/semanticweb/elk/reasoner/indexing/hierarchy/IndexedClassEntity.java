@@ -22,9 +22,18 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 
+/**
+ * Represents all occurrences of an {@link ElkClass} or {@link ElkIndividual} in
+ * an ontology.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public abstract class IndexedClassEntity extends IndexedClassExpression {
 
 	abstract public <O> O accept(IndexedClassEntityVisitor<O> visitor);

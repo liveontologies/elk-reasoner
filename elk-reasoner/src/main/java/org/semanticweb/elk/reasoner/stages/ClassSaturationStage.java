@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,9 +22,6 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
@@ -45,8 +43,9 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 	 */
 	private ClassExpressionSaturation<IndexedClass> computation_ = null;
 
-	public ClassSaturationStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public ClassSaturationStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -55,43 +54,31 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.doneClassSaturation;
-	}
-
-	@Override
-	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new ConsistencyCheckingStage(
-				reasoner));
-	}
-
-	@Override
-	public void execute() throws ElkInterruptedException {
-		if (computation_ == null)
-			initComputation();
-		progressMonitor.start(getName());
-		try {
-			for (;;) {
-				computation_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
-		}
-		reasoner.doneClassSaturation = true;
-
-	}
-
-	@Override
-	void initComputation() {
-		super.initComputation();
+	public boolean preExecute() {
+		if (!super.preExecute())
+			return false;
 		this.computation_ = new ClassExpressionSaturation<IndexedClass>(
 				reasoner.ontologyIndex.getIndexedClasses(),
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), reasoner.ontologyIndex);
+				reasoner.getProgressMonitor(), reasoner.saturationState);
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		return true;
+	}
+
+	@Override
+	public void executeStage() throws ElkInterruptedException {
+		computation_.process();
+	}
+
+	@Override
+	public boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+		this.computation_ = null;
+		reasoner.ruleAndConclusionStats.add(computation_
+				.getRuleAndConclusionStatistics());
+		return true;
 	}
 
 	@Override

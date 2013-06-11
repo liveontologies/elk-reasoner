@@ -31,13 +31,14 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
  * A hierarchy of certain ElkObjects. For each such object, the taxonomy holds a
- * TaxonomyNode object from which direct sub- and super- nodes can be retrieved.
+ * {@link TaxonomyNode} object from which direct sub- and super- nodes can be
+ * retrieved.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  * @author Frantisek Simancik
  * @param <T>
- *            the type of the {@link ElkObject}s stored in this taxonomy
+ *            the type of objects stored in this taxonomy
  */
 public interface Taxonomy<T extends ElkObject> {
 

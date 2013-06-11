@@ -27,53 +27,36 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 
 /**
- * Interface for public methods of the index of the ontology.
+ * An object representing the compiled logical information about the ontology
+ * that enables execution of reasoning inference rules. There are two type of
+ * rules: the global rules stored for the ontology that can be obtained using {
+ * {@link #getContextInitRuleHead()}, and the local rules associated with
+ * specific {@link IndexedObject}s, such as {@link IndexedClassExpression}s and
+ * {@link IndexedPropertyChain}s. The methods of this class provide access to
+ * such objects.
  * 
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik
  * 
  */
 public interface OntologyIndex {
-
-	/**
-	 * Return the indexed representation of the given {@link ElkClassExpression}
-	 * 
-	 * @param elkClassExpression
-	 *            an input {@link ElkClassExpression}
-	 * @return the {@link IndexedClassExpression} corresponding to the input if
-	 *         it occurs in the indexed ontology, or {@code null} if the input
-	 *         is not contained in the indexed ontology
-	 */
-	IndexedClassExpression getIndexed(ElkClassExpression elkClassExpression);
-
-	/**
-	 * Return the indexed representation of the given
-	 * {@link ElkSubObjectPropertyExpression}
-	 * 
-	 * @param elkSubObjectPropertyExpression
-	 *            an input {@link ElkSubObjectPropertyExpression}
-	 * @return the {@link IndexedPropertyChain} corresponding to the input if it
-	 *         occurs in the indexed ontology, or {@code null} if the input is
-	 *         not contained in the indexed ontology
-	 */
-	IndexedPropertyChain getIndexed(
-			ElkSubObjectPropertyExpression elkSubObjectPropertyExpression);
 
 	/**
 	 * Return the indexed representation of {@code owl:Thing}
@@ -96,14 +79,15 @@ public interface OntologyIndex {
 	/**
 	 * @return the {@link IndexedClassExpression}s for all
 	 *         {@link ElkClassExpression}s occurring in the ontology (including
-	 *         {@code owl:Thing} and {@code owl:Nothing})
+	 *         {@code owl:Thing} and {@code owl:Nothing}) or added/removed from
+	 *         the ontology since the last commit of the differential index
 	 */
 	Collection<IndexedClassExpression> getIndexedClassExpressions();
 
 	/**
 	 * @return the {@link IndexedClass}es for all {@link ElkClass}es occurring
 	 *         in the ontology (including {@code owl:Thing} and
-	 *         {@code owl:Nothing} )
+	 *         {@code owl:Nothing})
 	 */
 	Collection<IndexedClass> getIndexedClasses();
 
@@ -139,19 +123,11 @@ public interface OntologyIndex {
 	Collection<IndexedObjectProperty> getReflexiveObjectProperties();
 
 	/**
-	 * @return the {@link ElkAxiomProcessor} using which one can add
-	 *         {@link ElkAxiom}s to the ontology
+	 * @return the first context initialization rule assigned to this
+	 *         {@link OntologyIndex}, or {@code null} if there no such rules;
+	 *         all other rules can be obtained by traversing over
+	 *         {@link LinkRule#next()}
 	 */
-	ElkAxiomProcessor getAxiomInserter();
+	LinkRule<Context> getContextInitRuleHead();
 
-	/**
-	 * @return the {@link ElkAxiomProcessor} using which one can delete
-	 *         {@link ElkAxiom}s from the ontology
-	 */
-	ElkAxiomProcessor getAxiomDeleter();
-
-	/**
-	 * Erase all information from this {@link OntologyIndex}
-	 */
-	void clear();
 }

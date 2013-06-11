@@ -65,7 +65,8 @@ public class Owl2FunctionalStyleParserTest extends
 	protected static Owl2FunctionalStyleParser getParserForString(
 			String testString, boolean defaultPrefixes) {
 		InputStream stream = new ByteArrayInputStream(testString.getBytes());
-		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(stream);
+		Owl2FunctionalStyleParser parser = new Owl2FunctionalStyleParser(
+				stream, new ElkObjectFactoryImpl());
 		;
 		if (defaultPrefixes)
 			for (PredefinedElkPrefix prefix : PredefinedElkPrefix.values())
@@ -117,12 +118,12 @@ public class Owl2FunctionalStyleParserTest extends
 
 	@Override
 	protected Owl2Parser instantiateParser(InputStream stream) {
-		return new Owl2FunctionalStyleParser(stream);
+		return new Owl2FunctionalStyleParser(stream, new ElkObjectFactoryImpl());
 	}
 
 	@Override
 	protected Owl2Parser instantiateParser(Reader reader) {
-		return new Owl2FunctionalStyleParser(reader);
+		return new Owl2FunctionalStyleParser(reader, new ElkObjectFactoryImpl());
 	}
 
 }

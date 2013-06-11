@@ -24,17 +24,19 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from this
@@ -48,7 +50,9 @@ import org.semanticweb.elk.util.logging.CachedTimeThread;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ForwardLink implements Conclusion {
+public class ForwardLink extends AbstractConclusion {
+
+	private static final Logger LOGGER_ = Logger.getLogger(ForwardLink.class);
 
 	/**
 	 * the {@link IndexedPropertyChain} in the existential restriction
@@ -67,60 +71,84 @@ public class ForwardLink implements Conclusion {
 		this.target_ = target;
 	}
 
-	@Override
-	public void apply(RuleEngine ruleEngine, Context context) {
+	public IndexedPropertyChain getRelation() {
+		return relation_;
+	}
+	
+	public Context getTarget() {
+		return target_;
+	}
+	
+	public void apply(BasicSaturationStateWriter engine, Context context) {
+		/* compose the link with all backward links */
+		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
+				.getSaturated().getCompositionsByLeftSubProperty();
+		final Multimap<IndexedPropertyChain, Context> backLinks = context
+				.getBackwardLinksByObjectProperty();
 
-		ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		statistics.forwLinkTime -= CachedTimeThread.currentTimeMillis;
-		try {
+		for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
+				comps.keySet(), backLinks.keySet())) {
 
-			statistics.forwLinkInfNo++;
+			Collection<IndexedPropertyChain> compositions = comps
+					.get(backwardRelation);
+			Collection<Context> sources = backLinks.get(backwardRelation);
 
-			if (!context
-					.getBackwardLinkRulesChain()
-					.getCreate(ThisBackwardLinkRule.MATCHER_,
-							ThisBackwardLinkRule.FACTORY_).addForwardLink(this))
-				return;
-
-			statistics.forwLinkNo++;
-
-			/* compose the link with all backward links */
-			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
-					.getSaturated().getCompositionsByLeftSubProperty();
-			final Multimap<IndexedPropertyChain, Context> backLinks = context
-					.getBackwardLinksByObjectProperty();
-
-			for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-					comps.keySet(), backLinks.keySet())) {
-
-				Collection<IndexedPropertyChain> compositions = comps
-						.get(backwardRelation);
-				Collection<Context> sources = backLinks.get(backwardRelation);
-
-				for (IndexedPropertyChain composition : compositions)
-					for (Context source : sources) {
-						ruleEngine.produce(target_, new BackwardLink(source,
-								composition));
-					}
-			}
-		} finally {
-			statistics.forwLinkTime += CachedTimeThread.currentTimeMillis;
+			for (IndexedPropertyChain composition : compositions)
+				for (Context source : sources) {
+					engine.produce(target_, new BackwardLink(source,
+							composition));
+				}
 		}
 	}
 
+	@Override
+	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
+		return visitor.visit(this, context);
+	}
+
+	public boolean addToContextBackwardLinkRule(Context context) {
+		return context
+				.getBackwardLinkRuleChain()
+				.getCreate(ThisBackwardLinkRule.MATCHER_,
+						ThisBackwardLinkRule.FACTORY_).addForwardLink(this);
+	}
+
+	public boolean removeFromContextBackwardLinkRule(Context context) {
+		ThisBackwardLinkRule rule = context.getBackwardLinkRuleChain().find(
+				ThisBackwardLinkRule.MATCHER_);
+
+		return rule != null ? rule.removeForwardLink(this) : false;
+	}
+
+	public boolean containsBackwardLinkRule(Context context) {
+		ThisBackwardLinkRule rule = context.getBackwardLinkRuleChain().find(
+				ThisBackwardLinkRule.MATCHER_);
+
+		return rule != null ? rule.containsForwardLink(this) : false;
+	}
+
+	@Override
+	public String toString() {
+		return relation_ + "->" + target_.getRoot();
+	}
+
 	/**
-	 * A type of {@link BackwardLinkRules} created for {@link ForwardLink}s and
-	 * stored in the {@link Context} where it is produced. There can be at most
-	 * one rule of this type stored in every {@link Context}. The rule
-	 * essentially indexes all {@link ForwardLink}s produced in this
-	 * {@link Context} and applies inferences with every produced
-	 * {@link BackwardLink} in this {@link Context}, such as computing implied
-	 * role chains.
+	 * A type of {@link ModifiableLinkRule<BackwardLink>} created for
+	 * {@link ForwardLink}s and stored in the {@link Context} where it is
+	 * produced. There can be at most one rule of this type stored in every
+	 * {@link Context}. The rule essentially indexes all {@link ForwardLink}s
+	 * produced in this {@link Context} and applies inferences with every
+	 * produced {@link BackwardLink} in this {@link Context}, such as computing
+	 * implied role chains.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	private static class ThisBackwardLinkRule extends BackwardLinkRules {
+	public static class ThisBackwardLinkRule extends
+			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
+			ModifiableLinkRule<BackwardLink> {
+
+		private static final String NAME = "ForwardLink BackwardLink Composition";
 
 		/**
 		 * the record that stores all {@link ForwardLink}s produced in the
@@ -129,10 +157,57 @@ public class ForwardLink implements Conclusion {
 		 */
 		private final Multimap<IndexedPropertyChain, Context> forwardLinksByObjectProperty_;
 
-		ThisBackwardLinkRule(BackwardLinkRules tail) {
+		ThisBackwardLinkRule(ModifiableLinkRule<BackwardLink> tail) {
 			super(tail);
 			this.forwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>(
 					3);
+		}
+
+		public Multimap<IndexedPropertyChain, Context> getForwardLinksByObjectProperty() {
+			return forwardLinksByObjectProperty_;
+		}
+
+		@Override
+		public String getName() {
+			return NAME;
+		}
+
+		@Override
+		public void apply(BasicSaturationStateWriter engine, BackwardLink link) {
+
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Applying " + NAME + " to " + link);
+			}
+
+			/* compose the link with all forward links */
+			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link
+					.getRelation().getSaturated()
+					.getCompositionsByRightSubProperty();
+			if (comps == null)
+				return;
+
+			Context source = link.getSource();
+
+			for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
+					comps.keySet(), forwardLinksByObjectProperty_.keySet())) {
+
+				Collection<IndexedPropertyChain> compositions = comps
+						.get(forwardRelation);
+				Collection<Context> forwardTargets = forwardLinksByObjectProperty_
+						.get(forwardRelation);
+
+				for (IndexedPropertyChain composition : compositions)
+					for (Context forwardTarget : forwardTargets)
+						engine.produce(forwardTarget, new BackwardLink(source,
+								composition));
+			}
+
+		}
+
+		@Override
+		public void accept(RuleApplicationVisitor visitor, BasicSaturationStateWriter writer,
+				BackwardLink backwardLink) {
+			visitor.visit(this, writer, backwardLink);
 		}
 
 		/**
@@ -149,55 +224,27 @@ public class ForwardLink implements Conclusion {
 					link.target_);
 		}
 
-		@Override
-		public void apply(RuleEngine ruleEngine, BackwardLink link) {
-
-			RuleStatistics timer = ruleEngine.getRulesTimer();
-
-			timer.timeForwardLinkBackwardLinkRule -= CachedTimeThread.currentTimeMillis;
-
-			timer.countForwardLinkBackwardLinkRule++;
-
-			try {
-
-				/* compose the link with all forward links */
-				final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link
-						.getReltaion().getSaturated()
-						.getCompositionsByRightSubProperty();
-				if (comps == null)
-					return;
-
-				Context source = link.getSource();
-
-				for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-						comps.keySet(), forwardLinksByObjectProperty_.keySet())) {
-
-					Collection<IndexedPropertyChain> compositions = comps
-							.get(forwardRelation);
-					Collection<Context> forwardTargets = forwardLinksByObjectProperty_
-							.get(forwardRelation);
-
-					for (IndexedPropertyChain composition : compositions)
-						for (Context forwardTarget : forwardTargets)
-							ruleEngine.produce(forwardTarget, new BackwardLink(
-									source, composition));
-				}
-
-			} finally {
-				timer.timeForwardLinkBackwardLinkRule += CachedTimeThread.currentTimeMillis;
-			}
+		private boolean removeForwardLink(ForwardLink link) {
+			return forwardLinksByObjectProperty_.remove(link.relation_,
+					link.target_);
 		}
 
-		private static Matcher<BackwardLinkRules, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<BackwardLinkRules, ThisBackwardLinkRule>(
+		private boolean containsForwardLink(ForwardLink link) {
+			return forwardLinksByObjectProperty_.contains(link.relation_,
+					link.target_);
+		}
+
+		private static Matcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule>(
 				ThisBackwardLinkRule.class);
 
 		/**
 		 * The factory used for appending a new instance of this rule to a
-		 * {@link BackwardLinkRules} chain
+		 * {@link ModifiableLinkRule<BackwardLink>} chain
 		 */
-		private static ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<BackwardLinkRules, ThisBackwardLinkRule>() {
+		private static ReferenceFactory<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule>() {
 			@Override
-			public ThisBackwardLinkRule create(BackwardLinkRules tail) {
+			public ThisBackwardLinkRule create(
+					ModifiableLinkRule<BackwardLink> tail) {
 				return new ThisBackwardLinkRule(tail);
 			}
 		};

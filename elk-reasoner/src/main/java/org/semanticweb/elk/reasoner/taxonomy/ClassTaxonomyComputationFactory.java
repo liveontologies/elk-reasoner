@@ -22,12 +22,13 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionFactory;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
@@ -36,28 +37,36 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalen
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputEquivalentDirect;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfiable;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputationFactory.Engine;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
  * The factory for engines that concurrently construct a {@link Taxonomy}. The
- * jobs are submitted using the method {@link Engine#submit(IndexedClass)},
- * which require the computation of the {@link Node} for the input
- * {@link IndexedClass}.
+ * jobs are submitted using the method {@link Engine#submit(Collection)}, which
+ * require the computation of the {@link Node} for the input {@link Collection}
+ * of {@link IndexedClass}.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
 public class ClassTaxonomyComputationFactory implements
-		InputProcessorFactory<IndexedClass, Engine> {
+		InputProcessorFactory<Collection<IndexedClass>, Engine> {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(ClassTaxonomyComputationFactory.class);
 
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
-	private final IndividualClassTaxonomy taxonomy_;
+	private final UpdateableTaxonomy<ElkClass> taxonomy_;
 	/**
 	 * The transitive reduction shared structures used in the taxonomy
 	 * construction
@@ -71,7 +80,7 @@ public class ClassTaxonomyComputationFactory implements
 	/**
 	 * The reference to cache the value of the top node for frequent use
 	 */
-	private final AtomicReference<NonBottomClassNode> topNodeRef_;
+	private final AtomicReference<UpdateableTaxonomyNode<ElkClass>> topNodeRef_;
 
 	/**
 	 * Create a shared engine for the input ontology index and a partially
@@ -79,35 +88,35 @@ public class ClassTaxonomyComputationFactory implements
 	 * that have been made before. For this to work, the taxonomy object must
 	 * originate from an earlier run of this engine on the same ontology.
 	 * 
-	 * @param ontologyIndex
-	 *            the ontology index for which the engine is created
+	 * @param saturationState
+	 *            the saturation state of the reasoner
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 * @param partialTaxonomy
 	 *            the (partially pre-computed) class taxonomy object to store
 	 *            results in
 	 */
-	public ClassTaxonomyComputationFactory(OntologyIndex ontologyIndex,
-			int maxWorkers, IndividualClassTaxonomy partialTaxonomy) {
+	public ClassTaxonomyComputationFactory(SaturationState saturationState,
+			int maxWorkers, UpdateableTaxonomy<ElkClass> partialTaxonomy) {
 		this.taxonomy_ = partialTaxonomy;
 		this.transitiveReductionShared_ = new TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>(
-				ontologyIndex, maxWorkers,
+				saturationState, maxWorkers,
 				new ThisTransitiveReductionListener());
 		this.outputProcessor_ = new TransitiveReductionOutputProcessor();
-		this.topNodeRef_ = new AtomicReference<NonBottomClassNode>();
+		this.topNodeRef_ = new AtomicReference<UpdateableTaxonomyNode<ElkClass>>();
 	}
 
 	/**
 	 * Create a new class taxonomy engine for the input ontology index.
 	 * 
-	 * @param ontologyIndex
-	 *            the ontology index for which the engine is created
+	 * @param saturationState
+	 *            the saturation state of the reasoner
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 */
-	public ClassTaxonomyComputationFactory(OntologyIndex ontologyIndex,
+	public ClassTaxonomyComputationFactory(SaturationState saturationState,
 			int maxWorkers) {
-		this(ontologyIndex, maxWorkers, new ConcurrentTaxonomy());
+		this(saturationState, maxWorkers, new ConcurrentClassTaxonomy());
 	}
 
 	/**
@@ -116,9 +125,8 @@ public class ClassTaxonomyComputationFactory implements
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
-	private class ThisTransitiveReductionListener
-			implements
-			TransitiveReductionListener<TransitiveReductionJob<IndexedClass>, TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>.Engine> {
+	private class ThisTransitiveReductionListener implements
+			TransitiveReductionListener<TransitiveReductionJob<IndexedClass>> {
 
 		@Override
 		public void notifyFinished(TransitiveReductionJob<IndexedClass> job)
@@ -143,36 +151,39 @@ public class ClassTaxonomyComputationFactory implements
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
 
-			NonBottomClassNode node = taxonomy_.getCreateClassNode(output
-					.getEquivalent());
+			UpdateableTaxonomyNode<ElkClass> node = taxonomy_
+					.getCreateNode(output.getEquivalent());
 
-			// FIXME this sort of equality check is not guaranteed to work
-			// for ElkClasses
 			if (node.getMembers().contains(PredefinedElkClass.OWL_THING)) {
 				topNodeRef_.compareAndSet(null, node);
+				node.trySetModified(false);
 				return;
 			}
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
-					.getDirectSuperClasses()) {
-				NonBottomClassNode superNode = taxonomy_
-						.getCreateClassNode(directSuperEquivalent
-								.getEquivalent());
+					.getDirectSubsumers()) {
+				UpdateableTaxonomyNode<ElkClass> superNode = taxonomy_
+						.getCreateNode(directSuperEquivalent.getEquivalent());
 				assignDirectSuperClassNode(node, superNode);
 			}
 			// if there are no direct super nodes, then the top node is the
 			// only direct super node
 			if (node.getDirectSuperNodes().isEmpty()) {
-				NonBottomClassNode topNode = getCreateTopNode();
+				UpdateableTaxonomyNode<ElkClass> topNode = getCreateTopNode();
 				assignDirectSuperClassNode(node, topNode);
 			}
+
+			node.trySetModified(false);
 		}
 
 		@Override
 		public void visit(
 				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
 
-			taxonomy_.addUnsatisfiableClass(output.getRoot().getElkClass());
+			taxonomy_.addToBottomNode(output.getRoot().getElkClass());
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace(output.getRoot() + ": added to the bottom node");
+			}
 		}
 
 		@Override
@@ -193,11 +204,12 @@ public class ClassTaxonomyComputationFactory implements
 	 * top node.
 	 * 
 	 */
-	NonBottomClassNode getCreateTopNode() {
+	UpdateableTaxonomyNode<ElkClass> getCreateTopNode() {
 		if (topNodeRef_.get() == null) {
-			NonBottomClassNode topNode = taxonomy_
-					.getCreateClassNode(Collections
+			UpdateableTaxonomyNode<ElkClass> topNode = taxonomy_
+					.getCreateNode(Collections
 							.<ElkClass> singleton(PredefinedElkClass.OWL_THING));
+			topNode.trySetModified(false);
 			topNodeRef_.compareAndSet(null, topNode);
 		}
 		return topNodeRef_.get();
@@ -213,8 +225,9 @@ public class ClassTaxonomyComputationFactory implements
 	 * @param superNode
 	 *            the node that should be the super-node of the first node
 	 */
-	private static void assignDirectSuperClassNode(NonBottomClassNode subNode,
-			NonBottomClassNode superNode) {
+	private static void assignDirectSuperClassNode(
+			UpdateableTaxonomyNode<ElkClass> subNode,
+			UpdateableTaxonomyNode<ElkClass> superNode) {
 		subNode.addDirectSuperNode(superNode);
 		/*
 		 * since super-nodes can be added from different nodes, this call should
@@ -230,7 +243,7 @@ public class ClassTaxonomyComputationFactory implements
 	 * 
 	 * @return the taxonomy constructed by this engine
 	 */
-	public IndividualClassTaxonomy getTaxonomy() {
+	public UpdateableTaxonomy<ElkClass> getTaxonomy() {
 		return this.taxonomy_;
 	}
 
@@ -252,7 +265,14 @@ public class ClassTaxonomyComputationFactory implements
 		transitiveReductionShared_.printStatistics();
 	}
 
-	public class Engine implements InputProcessor<IndexedClass> {
+	public SaturationStatistics getRuleAndConclusionStatistics() {
+		return transitiveReductionShared_.getRuleAndConclusionStatistics();
+	}
+
+	/**
+	 * 
+	 */
+	public class Engine implements InputProcessor<Collection<IndexedClass>> {
 
 		/**
 		 * The transitive reduction engine used in the taxonomy construction
@@ -265,9 +285,14 @@ public class ClassTaxonomyComputationFactory implements
 		}
 
 		@Override
-		public final void submit(IndexedClass job) {
-			transitiveReductionEngine
-					.submit(new TransitiveReductionJob<IndexedClass>(job));
+		public final void submit(Collection<IndexedClass> input) {
+			for (IndexedClass ic : input) {
+				if (LOGGER_.isTraceEnabled()) {
+					LOGGER_.trace(ic + ": taxonomy construction started");
+				}
+				transitiveReductionEngine
+						.submit(new TransitiveReductionJob<IndexedClass>(ic));
+			}
 		}
 
 		@Override

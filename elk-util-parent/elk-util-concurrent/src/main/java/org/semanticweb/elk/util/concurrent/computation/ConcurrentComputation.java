@@ -42,12 +42,10 @@ import java.util.concurrent.BlockingQueue;
  * 
  * @param <I>
  *            the type of the input to be processed.
- * @param <P>
- *            the type of the processor for the input
  * @param <F>
  *            the type of the factory for the input processors
  */
-public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends InputProcessorFactory<I, P>> {
+public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	/**
 	 * the factory for the input processor engines
 	 */
@@ -121,7 +119,7 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 	/**
 	 * Starts the workers to process the input.
 	 * 
-	 * @return {@code true} if the operation was successfull
+	 * @return {@code true} if the operation was successful
 	 */
 	public synchronized boolean start() {
 		finishRequested = false;
@@ -199,12 +197,21 @@ public class ConcurrentComputation<I, P extends InputProcessor<I>, F extends Inp
 		public final void run() {
 			I nextInput;
 			// we use one engine per worker run
-			P inputProcessor = inputProcessorFactory.getEngine();
+			InputProcessor<I> inputProcessor = inputProcessorFactory
+					.getEngine();
+
 			try {
+				boolean doneProcess = false;
 				for (;;) {
 					if (interrupted)
 						break;
 					try {
+						// make sure that all previously submitted inputs are
+						// processed
+						if (!doneProcess) {
+							inputProcessor.process(); // can be interrupted
+							doneProcess = true;
+						}
 						if (finishRequested) {
 							nextInput = buffer.poll();
 							if (nextInput == null) {

@@ -30,7 +30,6 @@ import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestOutput;
@@ -42,7 +41,7 @@ import org.semanticweb.elk.testing.TestResultComparisonException;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- * @param <EO> 
+ * @param <EO>
  */
 @RunWith(PolySuite.class)
 public abstract class BaseRealizationCorrectnessTest<EO extends TestOutput>
@@ -68,12 +67,7 @@ public abstract class BaseRealizationCorrectnessTest<EO extends TestOutput>
 	@Test
 	public void realize() throws TestResultComparisonException, ElkException {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy;
-		try {
-			taxonomy = reasoner.getInstanceTaxonomy();
-			manifest.compare(new InstanceTaxonomyTestOutput(taxonomy));
-		} catch (ElkInconsistentOntologyException e) {
-			manifest.compare(new InstanceTaxonomyTestOutput(
-					PredefinedTaxonomy.INCONSISTENT_INDIVIDUAL_TAXONOMY));
-		}
+		taxonomy = reasoner.getInstanceTaxonomyQuietly();
+		manifest.compare(new InstanceTaxonomyTestOutput(taxonomy));
 	}
 }

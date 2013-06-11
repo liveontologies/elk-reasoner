@@ -28,10 +28,11 @@ package org.semanticweb.elk.benchmark.reasoning;
 import java.io.File;
 
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
-import org.semanticweb.elk.benchmark.Result;
+import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.loading.EmptyChangesLoader;
+import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -39,7 +40,8 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
+import org.semanticweb.elk.reasoner.stages.TimingStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
@@ -47,33 +49,40 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
  * A task to classify an ontology
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class ClassificationTask implements Task {
 
 	private Reasoner reasoner_;
 	private final String ontologyFile_;
 	private final ReasonerConfiguration reasonerConfig_;
-	
+	private final Metrics metrics_ = new Metrics();
+
 	public ClassificationTask(String[] args) {
 		ontologyFile_ = args[0];
-		reasonerConfig_ = getConfig(args);
+		reasonerConfig_ = BenchmarkUtils.getReasonerConfiguration(args);
 	}
-	
+
 	@Override
 	public String getName() {
-		return "EL classification [" + ontologyFile_.substring(ontologyFile_.lastIndexOf('/')) + "]";
+		return "EL classification ["
+				+ ontologyFile_.substring(ontologyFile_.lastIndexOf('/')) + "]";
 	}
 
 	@Override
 	public void prepare() throws TaskException {
 		try {
 			File ontologyFile = BenchmarkUtils.getFile(ontologyFile_);
-			
-			reasoner_ = new ReasonerFactory().createReasoner(new LoggingStageExecutor(), reasonerConfig_);
-			reasoner_.registerOntologyLoader(new Owl2StreamLoader(
-				new Owl2FunctionalStyleParserFactory(), ontologyFile));
+
+			//metrics_.reset();
+			OntologyLoader loader = new Owl2StreamLoader(
+					new Owl2FunctionalStyleParserFactory(), ontologyFile);
+			reasoner_ = new ReasonerFactory().createReasoner(loader,
+					//new SimpleStageExecutor(),
+					//new RuleAndConclusionCountMeasuringExecutor( new SimpleStageExecutor(), metrics_),
+					new TimingStageExecutor(new SimpleStageExecutor(), metrics_),
+					reasonerConfig_);
 			reasoner_.registerOntologyChangesLoader(new EmptyChangesLoader());
 			reasoner_.loadOntology();
 		} catch (Exception e) {
@@ -81,33 +90,34 @@ public class ClassificationTask implements Task {
 		}
 	}
 
-	private ReasonerConfiguration getConfig(String[] args) {
-		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
-		
-		if (args.length > 1) {
-			config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS, args[1]);
+	@Override
+	public void run() throws TaskException {
+		try {
+			Taxonomy<ElkClass> t = reasoner_.getTaxonomy();
+
+			System.out.println(TaxonomyHasher.hash(t));
+
+		} catch (ElkException e) {
+			throw new TaskException(e);
+		} finally {
+			try {
+				reasoner_.shutdown();
+			} catch (InterruptedException e) {
+			}
 		}
-		
-		return config;
 	}
 
 	@Override
-	public Result run() throws TaskException {
+	public void dispose() {
 		try {
-			Taxonomy<ElkClass> t = reasoner_.getTaxonomy();
-			
-			System.out.println(TaxonomyHasher.hash(t));
-			
-		} catch (ElkException e) {
-			throw new TaskException(e);
+			reasoner_.shutdown();
+		} catch (InterruptedException e) {
 		}
-		finally {
-			try {
-				reasoner_.shutdown();
-			} catch (InterruptedException e) {}
-		}
-		
-		return null;
+	}
+
+	@Override
+	public Metrics getMetrics() {
+		return metrics_;
 	}
 
 }

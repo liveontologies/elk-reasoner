@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.taxonomy;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,7 +25,6 @@ package org.semanticweb.elk.reasoner.taxonomy;
  * #L%
  */
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
@@ -40,14 +39,17 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.owl.visitors.AbstractElkEntityVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.MockInstanceTaxonomy.MutableTypeNode;
@@ -58,17 +60,39 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
  */
 public class MockTaxonomyLoader {
 
+	/**
+	 * Loads an {@link InstanceTaxonomy} using the given
+	 * {@link ElkObjectFactory} and {@link Owl2Parser}. The
+	 * {@link ElkObjectFactory} should create equal {@link ElkClass}s and
+	 * {@link ElkIndividual}s for equal {@link ElkIri}s (w.r.t. to the
+	 * {@link #equals(Object)} method. The {@link Owl2Parser} should use the
+	 * same {@link ElkObjectFactory}.
+	 * 
+	 * 
+	 * @param factory
+	 *            the {@link ElkObjectFactory} that is used to create
+	 *            {@link ElkObject}s.
+	 * 
+	 * @param parser
+	 *            the {@link Owl2Parser} for loading the ontology representing
+	 *            the taxonomy; it should use the same {@link ElkObjectFactory}
+	 * 
+	 * @return the {@link InstanceTaxonomy} constructed from the parsed ontology
+	 * 
+	 * @throws Owl2ParseException
+	 *             if the ontology cannot be parsed by the parser
+	 */
 	public static InstanceTaxonomy<ElkClass, ElkNamedIndividual> load(
-			Owl2Parser parser) throws IOException, Owl2ParseException {
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		// can't use predefined Elk classes here because they don't override
-		// hashCode() and equals() for easy lookups (they're enums)
+			ElkObjectFactory factory, Owl2Parser parser)
+			throws Owl2ParseException {
 		final MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
-				factory.getClass(PredefinedElkIri.OWL_THING.get()),
-				factory.getClass(PredefinedElkIri.OWL_NOTHING.get()),
+				factory.getClass(PredefinedElkClass.OWL_THING.getIri()),
+				factory.getClass(PredefinedElkClass.OWL_NOTHING.getIri()),
 				Comparators.ELK_CLASS_COMPARATOR,
 				Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
 		TaxonomyInserter listener = new TaxonomyInserter(taxonomy);
@@ -200,7 +224,8 @@ public class MockTaxonomyLoader {
 						.getClassExpression();
 				ElkNamedIndividual individual = (ElkNamedIndividual) elkClassAssertionAxiom
 						.getIndividual();
-				MutableTypeNode<ElkClass, ElkNamedIndividual> typeNode = taxonomy.getTypeNode(type);
+				MutableTypeNode<ElkClass, ElkNamedIndividual> typeNode = taxonomy
+						.getTypeNode(type);
 
 				if (typeNode == null && !createNodes) {
 					// wait

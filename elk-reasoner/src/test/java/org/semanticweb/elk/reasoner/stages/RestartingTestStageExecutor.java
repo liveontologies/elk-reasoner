@@ -38,14 +38,15 @@ public class RestartingTestStageExecutor extends SimpleInterrupter implements
 
 	@Override
 	public void complete(ReasonerStage stage) throws ElkException {
-		if (!stage.done()) {
+		if (!stage.isCompleted()) {
 
-			for (ReasonerStage dependentStage : stage.getDependencies()) {
+			for (ReasonerStage dependentStage : stage.getPreStages()) {
 				complete(dependentStage);
 			}
 			registerCurrentThreadToInterrupt();
 			for (;;) {
 				try {
+					stage.preExecute();
 					stage.execute();
 					break;
 				} catch (ElkException e) {
@@ -55,6 +56,7 @@ public class RestartingTestStageExecutor extends SimpleInterrupter implements
 					} else
 						throw e;
 				} finally {
+					stage.postExecute();
 					finish(stage);
 				}
 			}

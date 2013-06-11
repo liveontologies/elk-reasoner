@@ -36,6 +36,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
@@ -50,7 +52,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class ConsistencyChecking
 		extends
-		ReasonerComputation<SaturationJob<IndexedClassEntity>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>.Engine, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>> {
+		ReasonerComputation<SaturationJob<IndexedClassEntity>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>> {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
@@ -110,19 +112,23 @@ public class ConsistencyChecking
 	 *            the monitor for reporting the progress of the computation
 	 */
 	public ConsistencyChecking(Collection<IndexedClassEntity> inputEntities,
-			ConsistencyMonitor consistencyMonitor, OntologyIndex ontologyIndex,
-			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor) {
+			ConsistencyMonitor consistencyMonitor,
+			SaturationState saturationState, ComputationExecutor executor,
+			int maxWorkers, ProgressMonitor progressMonitor) {
 		this(
 				new TodoJobs(inputEntities, consistencyMonitor),
 				consistencyMonitor,
 				new ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>(
-						ontologyIndex, maxWorkers,
+						saturationState, maxWorkers,
 						new ThisClassExpressionSaturationListener(
 								consistencyMonitor)), executor, maxWorkers,
 				progressMonitor);
 	}
 
+	public SaturationStatistics getRuleAndConclusionStatistics() {
+		return inputProcessorFactory.getRuleAndConclusionStatistics();
+	}	
+	
 	/**
 	 * @param ontologyIndex
 	 *            the representation of the ontology
@@ -133,12 +139,16 @@ public class ConsistencyChecking
 	public static Collection<IndexedClassEntity> getTestEntities(
 			final OntologyIndex ontologyIndex) {
 		if (!ontologyIndex.getIndexedOwlNothing().occursPositively()) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("owl:Nothing does not occur positively; ontology is consistent");
 			/*
 			 * if the ontology does not have any positive occurrence of bottom,
 			 * everything is always consistent
 			 */
 			return Collections.emptySet();
 		} else {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("owl:Nothing occurs positively");
 			/*
 			 * first consistency is checked for {@code owl:Thing}, then for the
 			 * individuals in the ontology
@@ -175,9 +185,10 @@ public class ConsistencyChecking
 	 *            the indexed representation of the ontology
 	 */
 	public ConsistencyChecking(ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex) {
+			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
+			SaturationState saturationState) {
 		this(getTestEntities(ontologyIndex), new ConsistencyMonitor(),
-				ontologyIndex, executor, maxWorkers, progressMonitor);
+				saturationState, executor, maxWorkers, progressMonitor);
 	}
 
 	@Override
@@ -210,7 +221,7 @@ public class ConsistencyChecking
 	 */
 	private static class ThisClassExpressionSaturationListener
 			implements
-			ClassExpressionSaturationListener<SaturationJob<IndexedClassEntity>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>.Engine> {
+			ClassExpressionSaturationListener<SaturationJob<IndexedClassEntity>> {
 
 		private final ConsistencyMonitor consistenceMonitor;
 

@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
@@ -30,8 +31,9 @@ import java.io.IOException;
 import org.junit.Test;
 import org.semanticweb.elk.config.ConfigurationException;
 import org.semanticweb.elk.config.ConfigurationFactory;
+import org.semanticweb.elk.loading.EmptyOntologyLoader;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
+import org.semanticweb.elk.reasoner.stages.FailingOnInterruptStageExecutor;
 
 /**
  * 
@@ -45,8 +47,9 @@ public class ReasonerFactoryTest {
 	@SuppressWarnings("static-method")
 	@Test
 	public void createReasonerDefaultConfig() {
-		Reasoner reasoner = new ReasonerFactory()
-				.createReasoner(new TestStageExecutor());
+		Reasoner reasoner = new ReasonerFactory().createReasoner(
+				new EmptyOntologyLoader(),
+				new FailingOnInterruptStageExecutor());
 
 		assertEquals(Runtime.getRuntime().availableProcessors(),
 				reasoner.getNumberOfWorkers());
@@ -56,7 +59,8 @@ public class ReasonerFactoryTest {
 	public void createReasonerCustomConfig() throws ConfigurationException,
 			IOException {
 		Reasoner reasoner = new ReasonerFactory().createReasoner(
-				new TestStageExecutor(),
+				new EmptyOntologyLoader(),
+				new FailingOnInterruptStageExecutor(),
 				(ReasonerConfiguration) new ConfigurationFactory()
 						.getConfiguration(getClass().getClassLoader()
 								.getResourceAsStream("elk_test.properties"),
@@ -65,6 +69,6 @@ public class ReasonerFactoryTest {
 
 		assertNotNull(reasoner);
 		assertEquals(10, reasoner.getNumberOfWorkers());
+		assertFalse(reasoner.isIncrementalMode());
 	}
-
 }

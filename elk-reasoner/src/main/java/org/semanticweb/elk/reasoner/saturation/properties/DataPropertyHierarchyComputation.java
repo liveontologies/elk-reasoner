@@ -35,7 +35,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class DataPropertyHierarchyComputation
 		extends
-		ReasonerComputation<IndexedDataProperty, DataPropertyHierarchyComputationFactory.Engine, DataPropertyHierarchyComputationFactory> {
+		ReasonerComputation<IndexedDataProperty, DataPropertyHierarchyComputationFactory> {
 
 	protected DataPropertyHierarchyComputation(
 			DataPropertyHierarchyComputationFactory inputProcessorFactory,

@@ -48,4 +48,5 @@ public interface ChangesLoader {
 	public Loader getLoader(ElkAxiomProcessor axiomInserter,
 			ElkAxiomProcessor axiomDeleter);
 
+	public void registerChangeListener(final AxiomChangeListener listener);
 }

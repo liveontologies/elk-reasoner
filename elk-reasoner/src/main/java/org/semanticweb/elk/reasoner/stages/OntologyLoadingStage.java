@@ -22,8 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Collections;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
@@ -37,13 +35,16 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
  */
 public class OntologyLoadingStage extends AbstractReasonerStage {
 
+	public OntologyLoadingStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
+	}
+
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
 			.getLogger(OntologyLoadingStage.class);
 
-	public OntologyLoadingStage(AbstractReasonerState reasoner) {
-		super(reasoner);
-	}
+	private Loader ontologyLoader_;
 
 	@Override
 	public String getName() {
@@ -51,31 +52,36 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.doneLoading;
+	public boolean preExecute() {
+		if (!super.preExecute())
+			return false;
+		ontologyLoader_ = reasoner.getOntologyLoader();
+		reasoner.trySetIncrementalMode(false);
+		return true;
 	}
 
 	@Override
-	public Iterable<ReasonerStage> getDependencies() {
-		return Collections.emptyList();
-	}
-
-	@Override
-	public void execute() throws ElkException {
-		initComputation();
-		Loader ontologyLoader = reasoner.getOntologyLoader();
-		if (ontologyLoader == null)
+	public void executeStage() throws ElkException {
+		if (this.ontologyLoader_ == null)
 			LOGGER_.warn("Ontology loader is not registered. No axioms will be loaded!");
 		else
 			for (;;) {
-				ontologyLoader.load();
-				if (!interrupted())
+				this.ontologyLoader_.load();
+				if (!spuriousInterrupt())
 					break;
 			}
-		reasoner.doneLoading = true;
+	}
+
+	@Override
+	public boolean postExecute() {
+		if (!super.postExecute())
+			return false;		
+		this.ontologyLoader_ = null;
+		return true;
 	}
 
 	@Override
 	public void printInfo() {
 	}
+
 }

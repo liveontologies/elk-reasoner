@@ -1,3 +1,6 @@
+Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
+Prefix( : = <http://example.org/> )
 Ontology(
-EquivalentClasses(<http://www.w3.org/2002/07/owl#Nothing> <http://www.w3.org/2002/07/owl#Thing>)
+# inconsistent
+EquivalentClasses(owl:Nothing owl:Thing :A :B :C)
 )

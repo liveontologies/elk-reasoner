@@ -1,4 +1,8 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,11 +25,19 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-public abstract class IndexedAxiom {
+public abstract class IndexedAxiom extends IndexedObject {
 
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
-	abstract void updateOccurrenceNumbers(int increment);
+	abstract void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
+			final int increment);
+
+	public abstract <O> O accept(IndexedAxiomVisitor<O> visitor);
+
+	@Override
+	public <O> O accept(IndexedObjectVisitor<O> visitor) {
+		return accept((IndexedAxiomVisitor<O>) visitor);
+	}
 
 }

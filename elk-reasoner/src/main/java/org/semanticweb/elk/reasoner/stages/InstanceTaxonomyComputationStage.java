@@ -22,9 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
 
@@ -46,8 +43,9 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	 */
 	private InstanceTaxonomyComputation computation_ = null;
 
-	public InstanceTaxonomyComputationStage(AbstractReasonerState reasoner) {
-		super(reasoner);
+	public InstanceTaxonomyComputationStage(AbstractReasonerState reasoner,
+			AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -56,44 +54,43 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.doneInstanceTaxonomy;
-	}
+	public boolean preExecute() {
+		if (!super.preExecute())
+			return false;
+		
+		if (reasoner.doneTaxonomy()) {
+			reasoner.initInstanceTaxonomy();
 
-	@Override
-	public List<ReasonerStage> getDependencies() {
-		return Arrays.asList((ReasonerStage) new ClassTaxonomyComputationStage(
-				reasoner));
-	}
-
-	@Override
-	public void execute() throws ElkInterruptedException {
-		if (computation_ == null)
-			initComputation();
-		progressMonitor.start(getName());
-		try {
-			for (;;) {
-				computation_.process();
-				if (!interrupted())
-					break;
-			}
-		} finally {
-			progressMonitor.finish();
-		}
-		reasoner.taxonomy = computation_.getTaxonomy();
-		reasoner.doneInstanceTaxonomy = true;
-	}
-
-	@Override
-	void initComputation() {
-		super.initComputation();
-		if (reasoner.doneClassTaxonomy)
-			this.computation_ = new InstanceTaxonomyComputation(
+			computation_ = new InstanceTaxonomyComputation(
 					reasoner.ontologyIndex.getIndexedIndividuals(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.ontologyIndex, reasoner.taxonomy);
-		if (LOGGER_.isInfoEnabled())
+					reasoner.saturationState, reasoner.instanceTaxonomyState.getTaxonomy());
+		}
+
+		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		}
+		
+		return true;
+	}
+
+	@Override
+	public void executeStage() throws ElkInterruptedException {
+		for (;;) {
+			computation_.process();
+			if (!spuriousInterrupt())
+				break;
+		}
+	}
+
+	@Override
+	public boolean postExecute() {
+		if (!super.postExecute())
+			return false;
+
+		this.computation_ = null;
+		
+		return true;
 	}
 
 	@Override

@@ -22,16 +22,20 @@
  */
 package org.semanticweb.elk.reasoner.indexing.entries;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataPropertyVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
@@ -52,6 +56,7 @@ import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
  */
 public class IndexedEntryConverter<T>
 		implements
+		IndexedAxiomVisitor<KeyEntry<T, ? extends IndexedAxiom>>,
 		IndexedClassExpressionVisitor<KeyEntry<T, ? extends IndexedClassExpression>>,
 		IndexedPropertyChainVisitor<IndexedPropertyChainEntry<T, ? extends IndexedPropertyChain>>,
 		IndexedDataPropertyVisitor<KeyEntry<T, ? extends IndexedDataProperty>> {
@@ -106,6 +111,19 @@ public class IndexedEntryConverter<T>
 	public IndexedIndividualEntry<T, IndexedIndividual> visit(
 			IndexedIndividual element) {
 		return new IndexedIndividualEntry<T, IndexedIndividual>(element);
+	}
+
+	@Override
+	public KeyEntry<T, ? extends IndexedSubClassOfAxiom> visit(
+			IndexedSubClassOfAxiom axiom) {
+		return new IndexedSubClassOfAxiomEntry<T, IndexedSubClassOfAxiom>(axiom);
+	}
+
+	@Override
+	public KeyEntry<T, ? extends IndexedAxiom> visit(
+			IndexedDisjointnessAxiom axiom) {
+		return new IndexedDisjointnessAxiomEntry<T, IndexedDisjointnessAxiom>(
+				axiom);
 	}
 
 }

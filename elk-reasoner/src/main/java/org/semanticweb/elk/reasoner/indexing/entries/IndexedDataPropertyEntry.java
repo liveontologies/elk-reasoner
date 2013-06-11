@@ -47,7 +47,7 @@ public class IndexedDataPropertyEntry<T, K extends IndexedDataProperty> extends
 	@Override
 	public int computeHashCode() {
 		return HashGenerator.combinedHashCode(IndexedDataProperty.class,
-				this.key.getProperty().getIri());
+				this.key.getIri());
 	}
 
 	@Override
@@ -57,8 +57,8 @@ public class IndexedDataPropertyEntry<T, K extends IndexedDataProperty> extends
 		}
 		if (other instanceof IndexedDataPropertyEntry<?, ?>) {
 			IndexedDataPropertyEntry<?, ?> otherEntry = (IndexedDataPropertyEntry<?, ?>) other;
-			return this.key.getProperty().getIri()
-					.equals(otherEntry.key.getProperty().getIri());
+			return this.key.getIri()
+					.equals(otherEntry.key.getIri());
 		}
 		return false;
 	}

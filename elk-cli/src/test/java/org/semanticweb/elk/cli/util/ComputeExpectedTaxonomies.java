@@ -33,6 +33,7 @@ import java.io.Writer;
 
 import org.semanticweb.elk.io.FileUtils;
 import org.semanticweb.elk.loading.EmptyChangesLoader;
+import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -40,12 +41,10 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
-import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.stages.TestStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.PredefinedTaxonomy;
+import org.semanticweb.elk.reasoner.stages.FailingOnInterruptStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -76,13 +75,7 @@ public class ComputeExpectedTaxonomies {
 					@Override
 					public Taxonomy<ElkClass> getTaxonomy(Reasoner reasoner)
 							throws ElkException {
-						try {
-							return reasoner.getTaxonomy();
-						} catch (ElkInconsistentOntologyException e) {
-							System.err.println("Inconsistent!");
-
-							return PredefinedTaxonomy.INCONSISTENT_CLASS_TAXONOMY;
-						}
+						return reasoner.getTaxonomyQuietly();
 					}
 
 					@Override
@@ -98,13 +91,7 @@ public class ComputeExpectedTaxonomies {
 			@Override
 			public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy(
 					Reasoner reasoner) throws ElkException {
-				try {
-					return reasoner.getInstanceTaxonomy();
-				} catch (ElkInconsistentOntologyException e) {
-					System.err.println("Inconsistent!");
-
-					return PredefinedTaxonomy.INCONSISTENT_INDIVIDUAL_TAXONOMY;
-				}
+				return reasoner.getInstanceTaxonomyQuietly();
 			}
 
 			@SuppressWarnings("unchecked")
@@ -135,10 +122,10 @@ public class ComputeExpectedTaxonomies {
 
 			System.err.println(ontFile.getName());
 
-			Reasoner reasoner = reasonerFactory.createReasoner(
-					new TestStageExecutor(), configuraion);
-			reasoner.registerOntologyLoader(new Owl2StreamLoader(
-					new Owl2FunctionalStyleParserFactory(), ontFile));
+			OntologyLoader loader = new Owl2StreamLoader(
+					new Owl2FunctionalStyleParserFactory(), ontFile);
+			Reasoner reasoner = reasonerFactory.createReasoner(loader,
+					new FailingOnInterruptStageExecutor(), configuraion);
 			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
 			Taxonomy<ElkClass> taxonomy = gt.getTaxonomy(reasoner);

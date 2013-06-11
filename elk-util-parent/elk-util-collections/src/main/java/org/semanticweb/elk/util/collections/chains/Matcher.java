@@ -27,12 +27,12 @@ package org.semanticweb.elk.util.collections.chains;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <T>
+ * @param <I>
  *            the input type of elements that should be matched
  * @param <O>
  *            the output type of elements that satisfies the matching conditions
  */
-public interface Matcher<T, O> {
+public interface Matcher<I, O> {
 
 	/**
 	 * Tests whether the given element satisfies the matching conditions.
@@ -43,6 +43,6 @@ public interface Matcher<T, O> {
 	 *         to the input element, if the input element satisfies the matching
 	 *         condition, or {@link null} otherwise.
 	 */
-	O match(T candidate);
+	O match(I candidate);
 
 }

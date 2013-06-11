@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
@@ -49,7 +50,8 @@ public class MockInstanceTaxonomyTest {
 
 	@Test
 	public void testTopBotEquivalence() {
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObjectFactory factory = new ElkObjectFactoryImpl(
+				new ElkEntityRecycler());// we reuse iri objects
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
 				PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING,
 				Comparators.ELK_CLASS_COMPARATOR,
@@ -78,7 +80,8 @@ public class MockInstanceTaxonomyTest {
 	
 	@Test
 	public void testForDuplicates() {
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObjectFactory factory = new ElkObjectFactoryImpl(
+				new ElkEntityRecycler());// we reuse iri objects
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
 				PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING,
 				Comparators.ELK_CLASS_COMPARATOR,
@@ -104,7 +107,8 @@ public class MockInstanceTaxonomyTest {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	public void testMockTaxonomy() {
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		ElkObjectFactory factory = new ElkObjectFactoryImpl(
+				new ElkEntityRecycler());// we reuse iri objects
 		MockInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = new MockInstanceTaxonomy<ElkClass, ElkNamedIndividual>(
 				PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING,
 				Comparators.ELK_CLASS_COMPARATOR,

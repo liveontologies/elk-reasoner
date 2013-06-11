@@ -21,39 +21,27 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.properties.DataPropertyHierarchyComputation;
 
 /**
  * A {@link ReasonerStage}, which purpose is to compute the data property
  * hierarchy of the given ontology
- * 
+ *
  * @author "Yevgeny Kazakov"
- * 
+ *
  */
-public class DataPropertyHierarchyComputationStage extends
-		AbstractReasonerStage {
-
-	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(DataPropertyHierarchyComputationStage.class);
+public class DataPropertyHierarchyComputationStage extends AbstractReasonerStage {
 
 	/**
 	 * the computation used for this stage
 	 */
-	private DataPropertyHierarchyComputation computation_;
-	/**
-	 * the number of workers used in the computation for this stage
-	 */
-	private final int workerNo;
+	private DataPropertyHierarchyComputation computation_ = null;
 
-	public DataPropertyHierarchyComputationStage(AbstractReasonerState reasoner) {
-		super(reasoner);
-		this.workerNo = reasoner.getNumberOfWorkers();
-		this.progressMonitor = reasoner.getProgressMonitor();
+	public DataPropertyHierarchyComputationStage(
+		AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
+		super(reasoner, preStages);
 	}
 
 	@Override
@@ -62,40 +50,37 @@ public class DataPropertyHierarchyComputationStage extends
 	}
 
 	@Override
-	public boolean done() {
-		return reasoner.doneDataPropertyHierarchyComputation;
+	public boolean preExecute() {
+		if (!super.preExecute()) {
+			return false;
+		}
+		computation_ = new DataPropertyHierarchyComputation(
+			reasoner.getProcessExecutor(), workerNo,
+			reasoner.getProgressMonitor(), reasoner.ontologyIndex);
+		return true;
 	}
 
 	@Override
-	public List<? extends ReasonerStage> getDependencies() {
-		return Arrays.asList(new OntologyLoadingStage(reasoner),
-				new ChangesLoadingStage(reasoner));
-	}
-
-	@Override
-	public void execute() throws ElkInterruptedException {
-		if (computation_ == null)
-			initComputation();
+	public void executeStage() throws ElkException {
 		for (;;) {
 			computation_.process();
-			if (!interrupted())
+			if (!spuriousInterrupt()) {
 				break;
+			}
 		}
-		reasoner.doneDataPropertyHierarchyComputation = true;
 	}
 
 	@Override
-	void initComputation() {
-		super.initComputation();
-		this.computation_ = new DataPropertyHierarchyComputation(
-				reasoner.getProcessExecutor(), workerNo, progressMonitor,
-				reasoner.ontologyIndex);
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
+	public boolean postExecute() {
+		if (!super.postExecute()) {
+			return false;
+		}
+		computation_ = null;
+		return true;
 	}
 
 	@Override
 	public void printInfo() {
+		// TODO Auto-generated method stub
 	}
-
 }

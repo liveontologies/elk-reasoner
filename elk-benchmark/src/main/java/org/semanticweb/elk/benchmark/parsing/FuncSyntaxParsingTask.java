@@ -29,7 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import org.semanticweb.elk.benchmark.Result;
+import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.io.IOUtils;
@@ -61,7 +61,7 @@ public class FuncSyntaxParsingTask implements Task {
 	}
 
 	@Override
-	public Result run() throws TaskException {
+	public void run() throws TaskException {
 		InputStream stream = null;
 
 		try {
@@ -83,8 +83,6 @@ public class FuncSyntaxParsingTask implements Task {
 		} finally {
 			IOUtils.closeQuietly(stream);
 		}
-
-		return null;
 	}
 
 	@Override
@@ -95,4 +93,15 @@ public class FuncSyntaxParsingTask implements Task {
 	@Override
 	public void prepare() throws TaskException {		
 	}
+	
+	@Override
+	public void dispose() {
+	}
+
+	@Override
+	public Metrics getMetrics() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }

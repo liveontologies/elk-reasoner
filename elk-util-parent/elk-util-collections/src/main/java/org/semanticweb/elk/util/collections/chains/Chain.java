@@ -32,7 +32,7 @@ package org.semanticweb.elk.util.collections.chains;
  *            the types of the elements in the chain
  * @see Matcher
  */
-public interface Chain<T extends Reference<T>> extends Reference<T> {
+public interface Chain<T extends ModifiableLink<T>> extends ModifiableLink<T> {
 
 	/**
 	 * Finds the first element in the chain that satisfies the provided

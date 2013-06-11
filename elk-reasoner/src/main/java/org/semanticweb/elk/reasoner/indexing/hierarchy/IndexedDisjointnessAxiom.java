@@ -26,14 +26,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
@@ -47,238 +51,285 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
-	/**
-	 * We use two types of composition rules for disjointness axioms. If the
-	 * number of members in the axiom exceeds the threshold, we register
-	 * {@link ThisNaryCompositionRule}s with the members; otherwise, we register
-	 * {@link ThisBinaryCompositionRule} with the members.
-	 */
-	private final static int DISJOINT_AXIOM_BINARIZATION_THRESHOLD = 3;
+	protected static final Logger LOGGER_ = Logger
+			.getLogger(IndexedDisjointnessAxiom.class);
 
-	private final List<IndexedClassExpression> members_;
+	/**
+	 * {@link IndexedClassExpression}s that have at least two equal occurrences
+	 * (according to the {@link Object#equals(Object)} method) in this
+	 * {@link IndexedDisjointnessAxiom}
+	 */
+	private final Set<IndexedClassExpression> inconsistentMembers_;
+	/**
+	 * {@link IndexedClassExpression}s that occur exactly once in this
+	 * {@link IndexedDisjointnessAxiom}
+	 */
+	private final Set<IndexedClassExpression> disjointMembers_;
+
+	/**
+	 * This counts how often this {@link IndexedDisjointnessAxiom} occurrs in
+	 * the ontology.
+	 */
+	int occurrenceNo = 0;
 
 	IndexedDisjointnessAxiom(List<IndexedClassExpression> members) {
-		members_ = members;
+		this.inconsistentMembers_ = new ArrayHashSet<IndexedClassExpression>(1);
+		this.disjointMembers_ = new ArrayHashSet<IndexedClassExpression>(2);
+		for (IndexedClassExpression member : members) {
+			if (inconsistentMembers_.contains(member))
+				continue;
+			if (!disjointMembers_.add(member)) {
+				disjointMembers_.remove(member);
+				inconsistentMembers_.add(member);
+			}
+		}
 	}
 
-	public List<IndexedClassExpression> getMembers() {
-		return members_;
+	/**
+	 * @return {@link IndexedClassExpression}s that have at least two equal
+	 *         occurrences (according to the {@link Object#equals(Object)}
+	 *         method) in this {@link IndexedDisjointnessAxiom}
+	 */
+	public Set<IndexedClassExpression> getInconsistentMembers() {
+		return inconsistentMembers_;
+	}
+
+	/**
+	 * {@link IndexedClassExpression}s that occur exactly once in this
+	 * {@link IndexedDisjointnessAxiom}
+	 */
+	public Set<IndexedClassExpression> getDisjointMembers() {
+		return disjointMembers_;
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment) {
-		if (increment > 0) {
-			registerCompositionRule();
-		} else {
-			deregisterCompositionRule();
+	public boolean occurs() {
+		return occurrenceNo > 0;
+	}
+
+	@Override
+	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
+			final int increment) {
+
+		if (occurrenceNo == 0 && increment > 0) {
+			// first occurrence of this axiom
+			registerCompositionRule(index);
+		}
+
+		occurrenceNo += increment;
+
+		if (occurrenceNo == 0 && increment < 0) {
+			// last occurrence of this axiom
+			deregisterCompositionRule(index);
 		}
 	}
 
-	private void registerCompositionRule() {
-		if (members_.size() > DISJOINT_AXIOM_BINARIZATION_THRESHOLD) {
-			for (IndexedClassExpression ice : members_) {
-				ice.getChainCompositionRules()
-						.getCreate(ThisNaryCompositionRule.MATCHER_,
-								ThisNaryCompositionRule.FACTORY_)
-						.addDisjointnessAxiom(this);
-			}
-		} else {
-			for (final IndexedClassExpression member : members_) {
-				ThisBinaryCompositionRule rule = member
-						.getChainCompositionRules().getCreate(
-								ThisBinaryCompositionRule.MATCHER_,
-								ThisBinaryCompositionRule.FACTORY_);
-				boolean selfFound = false; // true when otherMember = member
-				for (IndexedClassExpression otherMember : members_) {
-					if (!selfFound && otherMember == member) {
-						selfFound = true;
-						continue;
-					}
-					rule.addDisjointClass(otherMember);
-				}
-			}
-		}
-
+	@Override
+	public <O> O accept(IndexedAxiomVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
-	private void deregisterCompositionRule() {
-		if (members_.size() > DISJOINT_AXIOM_BINARIZATION_THRESHOLD) {
-			for (IndexedClassExpression ice : members_) {
-				Chain<ContextRules> compositionRules = ice
-						.getChainCompositionRules();
-				ThisNaryCompositionRule rule = compositionRules
-						.find(ThisNaryCompositionRule.MATCHER_);
-				rule.removeDisjointnessAxiom(this);
-				if (rule.isEmpty()) {
-					compositionRules.remove(ThisNaryCompositionRule.MATCHER_);
-				}
-			}
-		} else {
-			for (final IndexedClassExpression member : members_) {
-				Chain<ContextRules> compositionRules = member
-						.getChainCompositionRules();
-				ThisBinaryCompositionRule rule = compositionRules.getCreate(
-						ThisBinaryCompositionRule.MATCHER_,
-						ThisBinaryCompositionRule.FACTORY_);
-				boolean selfFound = false; // true when otherMember = member
-				for (IndexedClassExpression otherMember : members_) {
-					if (!selfFound && otherMember == member) {
-						selfFound = true;
-						continue;
-					}
-					rule.removeDisjointClass(otherMember);
-				}
-				if (rule.isEmpty()) {
-					compositionRules.remove(ThisBinaryCompositionRule.MATCHER_);
-				}
-			}
+	@Override
+	public String toStringStructural() {
+		List<IndexedClassExpression> members = new LinkedList<IndexedClassExpression>();
+		for (IndexedClassExpression inconsistentMember : inconsistentMembers_) {
+			// each inconsistent member is added two times
+			members.add(inconsistentMember);
+			members.add(inconsistentMember);
+		}
+		members.addAll(disjointMembers_);
+		return "DisjointClasses(" + members + ")";
+	}
+
+	private void registerCompositionRule(ModifiableOntologyIndex index) {
+		for (IndexedClassExpression ice : inconsistentMembers_)
+			index.add(ice, new ThisContradictionRule());
+		for (IndexedClassExpression ice : disjointMembers_) {
+			index.add(ice, new ThisCompositionRule(this));
+		}
+	}
+
+	private void deregisterCompositionRule(ModifiableOntologyIndex index) {
+		for (IndexedClassExpression ice : inconsistentMembers_)
+			index.remove(ice, new ThisContradictionRule());
+		for (IndexedClassExpression ice : disjointMembers_) {
+			index.remove(ice, new ThisCompositionRule(this));
 		}
 	}
 
 	/**
-	 * This composition rule derives the disjointness axioms as a new kind of a
-	 * super class expression. For each member, all disjointness axioms
-	 * containing this member are registered with this rule (possibly several
-	 * times if the member occurs several times in one axiom). If the rule
-	 * produce some disjointness axiom in a context at least two times, this
-	 * means that two different members of this disjointness axioms have been
-	 * derived in the context. Therefore, a contradiction should be produced.
+	 * {@link ThisCompositionRule} derives the disjointness axioms as a new kind
+	 * of element. For each subsumer, all disjointness axioms containing this
+	 * subsumer are registered using this rule.
 	 * 
 	 * @author Pavel Klinov
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 * @author "Yevgeny Kazakov"
 	 */
-	private static class ThisNaryCompositionRule extends ContextRules {
+	public static class ThisCompositionRule extends
+			ModifiableLinkImpl<ChainableRule<Context>> implements
+			ChainableRule<Context> {
+
+		public static final String NAME = "DisjointClasses Introduction";
 
 		/**
-		 * List of relevant disjointness axioms axioms in which the member, for
-		 * which this rule is registered, appears. Note: this should allow for
-		 * duplicate axioms in order to handle correctly situations when
-		 * disjointness axioms contain multiple copies of the same element.
+		 * Set of relevant {@link IndexedDisjointnessAxiom}s in which the
+		 * member, for which this rule is registered, appears.
 		 */
-		private final List<IndexedDisjointnessAxiom> disjointnessAxioms_;
+		private final Set<IndexedDisjointnessAxiom> disjointnessAxioms_;
 
-		public ThisNaryCompositionRule(ContextRules tail) {
+		private ThisCompositionRule(ChainableRule<Context> tail) {
 			super(tail);
-			disjointnessAxioms_ = new LinkedList<IndexedDisjointnessAxiom>();
+			disjointnessAxioms_ = new ArrayHashSet<IndexedDisjointnessAxiom>();
+		}
+
+		ThisCompositionRule(IndexedDisjointnessAxiom axiom) {
+			this((ChainableRule<Context>) null);
+			disjointnessAxioms_.add(axiom);
+		}
+
+		public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
+			return disjointnessAxioms_;
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, Context context) {
-			for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
-				/*
-				 * if the disjointness axiom has been already derived for this
-				 * context, it must have been derived for a different member, so
-				 * a contradiction should be produced
-				 */
-				if (!context.addDisjointnessAxiom(disAxiom))
-					ruleEngine.produce(
-							context,
-							new PositiveSuperClassExpression(ruleEngine
-									.getOwlNothing()));
+		public String getName() {
+			return NAME;
+		}
 
+		@Override
+		public void accept(RuleApplicationVisitor visitor,
+				BasicSaturationStateWriter writer, Context context) {
+			visitor.visit(this, writer, context);
+		}
+
+		@Override
+		public void apply(BasicSaturationStateWriter writer, Context context) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Applying " + NAME + " to " + context);
+			}
+			for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
+				writer.produce(context, new DisjointnessAxiom(disAxiom));
 		}
 
 		protected boolean isEmpty() {
 			return disjointnessAxioms_.isEmpty();
 		}
 
-		/**
-		 * @param disjointnessAxiom
-		 *            the axiom to be added to this rule
-		 */
-		protected void addDisjointnessAxiom(
-				IndexedDisjointnessAxiom disjointnessAxiom) {
-			disjointnessAxioms_.add(disjointnessAxiom);
+		@Override
+		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
+			return rule.disjointnessAxioms_.addAll(this.disjointnessAxioms_);
 		}
 
-		/**
-		 * @param disjointnessAxiom
-		 *            the axiom to be removed from this rule
-		 * @return {@code true} if successfully removed
-		 */
-		protected boolean removeDisjointnessAxiom(
-				IndexedDisjointnessAxiom disjointnessAxiom) {
-			return disjointnessAxioms_.remove(disjointnessAxiom);
+		@Override
+		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+			ThisCompositionRule rule = ruleChain.find(MATCHER_);
+			boolean changed = false;
+			if (rule != null) {
+				changed = rule.disjointnessAxioms_
+						.removeAll(this.disjointnessAxioms_);
+				if (rule.isEmpty())
+					ruleChain.remove(MATCHER_);
+			}
+			return changed;
 		}
 
-		private static Matcher<ContextRules, ThisNaryCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisNaryCompositionRule>(
-				ThisNaryCompositionRule.class);
+		private static Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
+				ThisCompositionRule.class);
 
-		private static ReferenceFactory<ContextRules, ThisNaryCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisNaryCompositionRule>() {
+		private static ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
 			@Override
-			public ThisNaryCompositionRule create(ContextRules tail) {
-				return new ThisNaryCompositionRule(tail);
+			public ThisCompositionRule create(ChainableRule<Context> tail) {
+				return new ThisCompositionRule(tail);
 			}
 		};
 	}
 
 	/**
-	 * This composition rule can produce only contradiction. Each rule for a
-	 * member registers all other members with which this member occurs in a
-	 * disjointness axioms. When the rule is applied, it is checked if the
-	 * intersection of this set of "forbidden super classes" with the super
-	 * classes derived in the context is non-empty, and if so, derives a
-	 * contradiction.
+	 * A rule which derives a {@link Contradiction} for inconsistent members of
+	 * this {@link IndexedDisjointnessAxiom}.
 	 * 
-	 * @author Pavel Klinov
-	 * 
-	 *         pavel.klinov@uni-ulm.de
 	 * @author "Yevgeny Kazakov"
+	 * 
 	 */
-	private static class ThisBinaryCompositionRule extends ContextRules {
+	public static class ThisContradictionRule extends
+			ModifiableLinkImpl<ChainableRule<Context>> implements
+			ChainableRule<Context> {
+
+		public static final String NAME = "DisjointClasses Contradiction Introduction";
 
 		/**
-		 * {@link IndexedClassExpression}s that appear with the member for which
-		 * this rule is registered. The member itself is not included in this
-		 * set, unless it appears in some disjointness axiom at least two times.
+		 * The number of {@link IndexedDisjointnessAxiom}s in which the
+		 * {@link IndexedClassExpression}, for which this rule is registered,
+		 * occurs more than once.
 		 */
-		private final Set<IndexedClassExpression> forbiddenSuperClasses_;
+		private int contradictionCounter;
 
-		public ThisBinaryCompositionRule(ContextRules tail) {
+		public ThisContradictionRule(ChainableRule<Context> tail) {
 			super(tail);
-			forbiddenSuperClasses_ = new ArrayHashSet<IndexedClassExpression>();
+			this.contradictionCounter = 0;
+		}
+
+		ThisContradictionRule() {
+			this((ChainableRule<Context>) null);
+			this.contradictionCounter++;
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, Context context) {
+		public String getName() {
+			return NAME;
+		}
 
-			if (!new LazySetIntersection<IndexedClassExpression>(
-					forbiddenSuperClasses_, context.getSuperClassExpressions())
-					.isEmpty()) {
-
-				ruleEngine.produce(context, new PositiveSuperClassExpression(
-						ruleEngine.getOwlNothing()));
+		@Override
+		public void apply(BasicSaturationStateWriter writer, Context context) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Applying " + NAME + " to " + context);
 			}
+			writer.produce(context, Contradiction.getInstance());
+		}
+
+		@Override
+		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+			ThisContradictionRule rule = ruleChain
+					.getCreate(MATCHER_, FACTORY_);
+			rule.contradictionCounter += this.contradictionCounter;
+			return this.contradictionCounter != 0;
+		}
+
+		@Override
+		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+			ThisContradictionRule rule = ruleChain.find(MATCHER_);
+			if (rule == null) {
+				return false;
+			}
+			rule.contradictionCounter -= this.contradictionCounter;
+			if (rule.isEmpty())
+				ruleChain.remove(MATCHER_);
+			return this.contradictionCounter != 0;
+		}
+
+		@Override
+		public void accept(RuleApplicationVisitor visitor,
+				BasicSaturationStateWriter writer, Context context) {
+			visitor.visit(this, writer, context);
 		}
 
 		protected boolean isEmpty() {
-			return forbiddenSuperClasses_.isEmpty();
+			return this.contradictionCounter == 0;
 		}
 
-		protected void addDisjointClass(IndexedClassExpression disjointClass) {
-			forbiddenSuperClasses_.add(disjointClass);
-		}
+		private static Matcher<ChainableRule<Context>, ThisContradictionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisContradictionRule>(
+				ThisContradictionRule.class);
 
-		/**
-		 * @param disjointClass
-		 * @return {@code true} if successfully removed
-		 */
-		protected boolean removeDisjointClass(
-				IndexedClassExpression disjointClass) {
-			return forbiddenSuperClasses_.remove(disjointClass);
-		}
-
-		private static Matcher<ContextRules, ThisBinaryCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisBinaryCompositionRule>(
-				ThisBinaryCompositionRule.class);
-
-		private static ReferenceFactory<ContextRules, ThisBinaryCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisBinaryCompositionRule>() {
+		private static ReferenceFactory<ChainableRule<Context>, ThisContradictionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisContradictionRule>() {
 			@Override
-			public ThisBinaryCompositionRule create(ContextRules tail) {
-				return new ThisBinaryCompositionRule(tail);
+			public ThisContradictionRule create(ChainableRule<Context> tail) {
+				return new ThisContradictionRule(tail);
 			}
 		};
+
 	}
 
 }

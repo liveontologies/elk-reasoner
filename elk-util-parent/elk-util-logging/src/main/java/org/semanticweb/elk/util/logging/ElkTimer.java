@@ -181,6 +181,9 @@ public class ElkTimer {
 		currentStartWallTime = -1;
 		totalCpuTime = 0;
 		totalWallTime = 0;
+		measurements = 0;
+		isRunning = false;
+		threadCount = 0;
 	}
 
 	/**
@@ -444,6 +447,15 @@ public class ElkTimer {
 	public static ElkTimer getNamedTimer(String timerName) {
 		return getNamedTimer(timerName, RECORD_ALL, Thread.currentThread()
 				.getId());
+	}
+	
+	/**
+	 * Returns all registered timers
+	 * 
+	 * @return
+	 */
+	public static Iterable<ElkTimer> getNamedTimers() {
+		return registeredTimers.keySet();
 	}
 
 	/**

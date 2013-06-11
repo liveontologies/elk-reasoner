@@ -45,25 +45,40 @@ public interface ReasonerStage {
 	 *         executed: the results of the computation could have been computed
 	 *         by other stages
 	 */
-	public boolean done();
+	public boolean isCompleted();
 
 	/**
 	 * @return the list of stages that are required to be executed before
 	 *         executing this stage; the order of the execution does not matter
 	 */
-	public Iterable<? extends ReasonerStage> getDependencies();
+	public Iterable<? extends ReasonerStage> getPreStages();
 
 	/**
-	 * Performs the execution of this stage; in order to ensure correctness of
-	 * the execution, it is necessary that all staged from the dependencies are
-	 * done. If the execution of this stage has not been interrupted, the
-	 * results for this stage should be computed and the function
-	 * {@link #done()} should return {@code true}.
+	 * Invoked prior to {@link #execute()} to perform any necessary
+	 * initialization
+	 * 
+	 * @return {@code true} if the operation is successful
+	 */
+	public boolean preExecute();
+
+	/**
+	 * Performs the execution of this stage.
 	 * 
 	 * @throws ElkException
 	 *             if execution was not successful
 	 */
 	public void execute() throws ElkException;
+
+	/**
+	 * Invoked after {@link #execute()} to perform any necessary clean-up. Could
+	 * be invoked before {@link #execute()} if {@link #preExecute} threw an
+	 * exception.
+	 * 
+	 * FIXME: can {@link #preExecute} throw an exception? If so, document.
+	 * 
+	 * @return {@code true} if the operation is successful
+	 */
+	public boolean postExecute();
 
 	/**
 	 * @return {@code true} if this executor was interrupted

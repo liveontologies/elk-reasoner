@@ -23,56 +23,79 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
+import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
-	protected final IndexedClassExpression subClass, superClass;
+	private static final Logger LOGGER_ = Logger
+			.getLogger(IndexedSubClassOfAxiom.class);
+
+	private final IndexedClassExpression subClass_, superClass_;
 
 	protected IndexedSubClassOfAxiom(IndexedClassExpression subClass,
 			IndexedClassExpression superClass) {
-		this.subClass = subClass;
-		this.superClass = superClass;
+		this.subClass_ = subClass;
+		this.superClass_ = superClass;
+	}
+
+	public IndexedClassExpression getSubClass() {
+		return this.subClass_;
+	}
+
+	public IndexedClassExpression getSuperClass() {
+		return this.superClass_;
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment) {
+	public boolean occurs() {
+		// we do not cache sub class axioms
+		// TODO: introduce a method for testing if we cache an object in the
+		// index
+		return false;
+	}
 
+	@Override
+	public String toStringStructural() {
+		return "SubClassOf(" + this.subClass_ + ' ' + this.superClass_ + ')';
+	}
+
+	@Override
+	public <O> O accept(IndexedAxiomVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
+			final int increment) {
 		if (increment > 0) {
-			registerCompositionRule();
+			index.add(subClass_, new ThisCompositionRule(superClass_));
 		} else {
-			deregisterCompositionRule();
+			index.remove(subClass_, new ThisCompositionRule(superClass_));
 		}
 	}
 
-	public void registerCompositionRule() {
-		subClass.getChainCompositionRules()
-				.getCreate(ThisCompositionRule.MATCHER_,
-						ThisCompositionRule.FACTORY_)
-				.addToldSuperClassExpression(superClass);
-	}
+	/**
+	 * 
+	 */
+	public static class ThisCompositionRule extends
+			ModifiableLinkImpl<ChainableRule<Context>> implements
+			ChainableRule<Context> {
 
-	public void deregisterCompositionRule() {
-		Chain<ContextRules> compositionRules = subClass
-				.getChainCompositionRules();
-		ThisCompositionRule rule = compositionRules
-				.find(ThisCompositionRule.MATCHER_);
-		rule.removeToldSuperClassExpression(superClass);
-		if (rule.isEmpty())
-			compositionRules.remove(ThisCompositionRule.MATCHER_);
-	}
-
-	private static class ThisCompositionRule extends ContextRules {
+		private static final String NAME = "SubClassOf Expansion";
 
 		/**
 		 * Correctness of axioms deletions requires that
@@ -80,24 +103,105 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		 */
 		private List<IndexedClassExpression> toldSuperClassExpressions_;
 
-		ThisCompositionRule(ContextRules tail) {
+		ThisCompositionRule(ChainableRule<Context> tail) {
 			super(tail);
 			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
 					1);
 		}
 
-		protected void addToldSuperClassExpression(
+		/*
+		 * used for registration
+		 */
+		ThisCompositionRule(IndexedClassExpression ice) {
+			super(null);
+			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
+					1);
+
+			toldSuperClassExpressions_.add(ice);
+		}
+
+		public Collection<IndexedClassExpression> getToldSuperclasses() {
+			return toldSuperClassExpressions_;
+		}
+
+		@Override
+		public String getName() {
+			return NAME;
+		}
+
+		@Override
+		public void apply(BasicSaturationStateWriter writer, Context context) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Applying " + toString() + " to " + context);
+			}
+			for (IndexedClassExpression implied : toldSuperClassExpressions_) {
+				writer.produce(context, new PositiveSubsumer(implied));
+			}
+		}
+
+		@Override
+		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+			ThisCompositionRule rule = ruleChain.getCreate(
+					ThisCompositionRule.MATCHER_, ThisCompositionRule.FACTORY_);
+			boolean changed = false;
+
+			for (IndexedClassExpression ice : toldSuperClassExpressions_) {
+				if (LOGGER_.isTraceEnabled())
+					LOGGER_.trace("Adding " + ice.toString() + " to " + NAME);
+				changed |= rule.addToldSuperClassExpression(ice);
+			}
+
+			return changed;
+
+		}
+
+		@Override
+		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+			ThisCompositionRule rule = ruleChain
+					.find(ThisCompositionRule.MATCHER_);
+			boolean changed = false;
+
+			if (rule != null) {
+				for (IndexedClassExpression ice : toldSuperClassExpressions_) {
+					if (LOGGER_.isTraceEnabled())
+						LOGGER_.trace("Removing " + ice.toString() + " from "
+								+ NAME);
+					changed |= rule.removeToldSuperClassExpression(ice);
+				}
+
+				if (rule.isEmpty()) {
+					ruleChain.remove(ThisCompositionRule.MATCHER_);
+
+					if (LOGGER_.isTraceEnabled()) {
+						LOGGER_.trace(NAME + ": removed");
+					}
+
+					return true;
+				}
+			}
+
+			return changed;
+
+		}
+
+		@Override
+		public void accept(RuleApplicationVisitor visitor,
+				BasicSaturationStateWriter writer, Context context) {
+			visitor.visit(this, writer, context);
+		}
+
+		protected boolean addToldSuperClassExpression(
 				IndexedClassExpression superClassExpression) {
-			toldSuperClassExpressions_.add(superClassExpression);
+			return toldSuperClassExpressions_.add(superClassExpression);
 		}
 
 		/**
 		 * @param superClassExpression
 		 * @return true if successfully removed
 		 */
-		protected void removeToldSuperClassExpression(
+		protected boolean removeToldSuperClassExpression(
 				IndexedClassExpression superClassExpression) {
-			toldSuperClassExpressions_.remove(superClassExpression);
+			return toldSuperClassExpressions_.remove(superClassExpression);
 		}
 
 		/**
@@ -108,32 +212,20 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(RuleEngine ruleEngine, Context context) {
-
-			RuleStatistics stats = ruleEngine.getRulesTimer();
-
-			stats.timeSubClassOfRule -= CachedTimeThread.currentTimeMillis;
-			stats.countSubClassOfRule++;
-
-			try {
-
-				for (IndexedClassExpression implied : toldSuperClassExpressions_)
-					ruleEngine.produce(context,
-							new PositiveSuperClassExpression(implied));
-			} finally {
-				stats.timeSubClassOfRule += CachedTimeThread.currentTimeMillis;
-			}
+		public String toString() {
+			return getName() + ": " + toldSuperClassExpressions_;
 		}
 
-		private static Matcher<ContextRules, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ContextRules, ThisCompositionRule>(
+		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
 				ThisCompositionRule.class);
 
-		private static ReferenceFactory<ContextRules, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ContextRules, ThisCompositionRule>() {
+		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(ContextRules tail) {
+			public ThisCompositionRule create(ChainableRule<Context> tail) {
 				return new ThisCompositionRule(tail);
 			}
 		};
 
 	}
+
 }

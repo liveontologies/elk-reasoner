@@ -24,7 +24,7 @@ package org.semanticweb.elk.benchmark.reasoning;
  * #L%
  */
 
-import org.semanticweb.elk.benchmark.AllFilesMultiTask;
+import org.semanticweb.elk.benchmark.AllFilesTaskCollection;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskFactory;
 
@@ -33,20 +33,14 @@ import org.semanticweb.elk.benchmark.TaskFactory;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class AllFilesClassificationTask extends AllFilesMultiTask {
+public class AllFilesClassificationTask extends AllFilesTaskCollection {
 
 	public AllFilesClassificationTask(String[] args) {
 		super(args);
 	}
 
 	@Override
-	public String getName() {
-		return "Multi classification";
-	}
-
-	@Override
 	public Task instantiateSubTask(String[] args) {
-		return TaskFactory.create(ClassificationTask.class.getName(), args);
+		return TaskFactory.createTask(ClassificationTask.class.getName(), args);
 	}
-
 }

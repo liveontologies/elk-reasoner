@@ -1,0 +1,18 @@
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(test:=<http://www.test.com/schema#>)
+
+
+Ontology(
+SubClassOf(<test:Beast> <test:Irrational>)
+SubClassOf(<test:Human> <test:Rational>)
+DisjointClasses(<test:Irrational> <test:Rational>)
+SubClassOf(<test:Kangaroo> <test:Beast>)
+SubClassOf(<test:KangarooInfant> <test:Kangaroo>)
+SubClassOf(<test:MaternityKangaroo> ObjectIntersectionOf(<test:Kangaroo> ObjectSomeValuesFrom(<test:has-child> <test:KangarooInfant>)))
+DisjointClasses(<test:Rational> <test:Irrational>)
+ObjectPropertyDomain(<test:has-child> <test:Human>)
+)

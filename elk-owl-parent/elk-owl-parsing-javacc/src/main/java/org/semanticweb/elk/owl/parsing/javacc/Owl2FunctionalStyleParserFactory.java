@@ -23,21 +23,36 @@
 package org.semanticweb.elk.owl.parsing.javacc;
 
 import java.io.InputStream;
-import java.io.StringReader;
+import java.io.Reader;
 
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
 
 public class Owl2FunctionalStyleParserFactory implements Owl2ParserFactory {
 
-	@Override
-	public Owl2Parser getParser(InputStream stream) {
-		return new Owl2FunctionalStyleParser(stream);
+	/**
+	 * the {@link ElkObjectFactory} used with this {@link Owl2ParserFactory}
+	 */
+	private final ElkObjectFactory objectFactory_;
+
+	public Owl2FunctionalStyleParserFactory(ElkObjectFactory objectFactory) {
+		this.objectFactory_ = objectFactory;
+	}
+
+	public Owl2FunctionalStyleParserFactory() {
+		this.objectFactory_ = new ElkObjectFactoryImpl();
 	}
 
 	@Override
-	public Owl2Parser getParser(StringReader reader) {
-		return new Owl2FunctionalStyleParser(reader);
+	public Owl2Parser getParser(InputStream stream) {
+		return new Owl2FunctionalStyleParser(stream, objectFactory_);
+	}
+
+	@Override
+	public Owl2Parser getParser(Reader reader) {
+		return new Owl2FunctionalStyleParser(reader, objectFactory_);
 	}
 
 }

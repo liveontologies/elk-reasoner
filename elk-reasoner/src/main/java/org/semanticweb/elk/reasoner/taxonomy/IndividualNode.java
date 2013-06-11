@@ -34,14 +34,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.util.Comparators;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -56,16 +56,11 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author Markus Kroetzsch
  */
 public class IndividualNode implements
-		InstanceNode<ElkClass, ElkNamedIndividual> {
+		UpdateableInstanceNode<ElkClass, ElkNamedIndividual> {
 
 	// logger for events
 	private static final Logger LOGGER_ = Logger
 			.getLogger(IndividualNode.class);
-
-	/**
-	 * The link to the taxonomy to which this node belongs
-	 */
-	private final ConcurrentTaxonomy taxonomy_;
 
 	/**
 	 * Equivalent ElkClass objects that are representatives of this node.
@@ -75,7 +70,12 @@ public class IndividualNode implements
 	 * ElkClass nodes whose members are direct types of the members of this
 	 * node.
 	 */
-	private final Set<TypeNode<ElkClass, ElkNamedIndividual>> directTypeNodes_;
+	private final Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directTypeNodes_;
+	/**
+	 * <tt>true</tt> if the direct type nodes need to be recomputed
+	 */
+	private final AtomicBoolean modified_ = new AtomicBoolean(true);
+	
 
 	/**
 	 * Constructing the class node for a given taxonomy and the set of
@@ -86,11 +86,10 @@ public class IndividualNode implements
 	 * @param members
 	 *            non-empty list of equivalent ElkClass objects
 	 */
-	protected IndividualNode(ConcurrentTaxonomy taxonomy,
-			Collection<ElkNamedIndividual> members) {
-		this.taxonomy_ = taxonomy;
+	protected IndividualNode(Collection<ElkNamedIndividual> members) {
+
 		this.members_ = new ArrayList<ElkNamedIndividual>(members);
-		this.directTypeNodes_ = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>();
+		this.directTypeNodes_ = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
 		Collections.sort(this.members_,
 				Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
 	}
@@ -101,7 +100,8 @@ public class IndividualNode implements
 	 * @param typeNode
 	 *            node to add
 	 */
-	void addDirectTypeNode(NonBottomClassNode typeNode) {
+	@Override
+	public void addDirectTypeNode(UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + ": new direct type-node " + typeNode);
 		directTypeNodes_.add(typeNode);
@@ -139,6 +139,14 @@ public class IndividualNode implements
 
 		};
 	}
+	
+	public void setMembers(Collection<ElkNamedIndividual> members) {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(this + ": updating members to " + members);
+		members_.clear();
+		members_.addAll(members);
+		Collections.sort(this.members_, Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
+	}
 
 	@Override
 	public ElkNamedIndividual getCanonicalMember() {
@@ -146,25 +154,29 @@ public class IndividualNode implements
 	}
 
 	@Override
-	public Set<TypeNode<ElkClass, ElkNamedIndividual>> getDirectTypeNodes() {
+	public Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getDirectTypeNodes() {
 		return Collections.unmodifiableSet(directTypeNodes_);
 	}
 
 	@Override
-	public Set<TypeNode<ElkClass, ElkNamedIndividual>> getAllTypeNodes() {
-		Set<TypeNode<ElkClass, ElkNamedIndividual>> result = new ArrayHashSet<TypeNode<ElkClass, ElkNamedIndividual>>(
+	public Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> getAllTypeNodes() {
+		Set<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> result = new ArrayHashSet<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>(
 				directTypeNodes_.size());
 
-		Queue<TypeNode<ElkClass, ElkNamedIndividual>> todo = new LinkedList<TypeNode<ElkClass, ElkNamedIndividual>>();
+		Queue<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> todo = new LinkedList<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
+
 		todo.addAll(directTypeNodes_);
+
 		while (!todo.isEmpty()) {
-			TypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
+			UpdateableTypeNode<ElkClass, ElkNamedIndividual> next = todo.poll();
+
 			if (result.add(next)) {
-				for (TypeNode<ElkClass, ElkNamedIndividual> nextSuperNode : next
-						.getDirectSuperNodes())
+				for (UpdateableTypeNode<ElkClass, ElkNamedIndividual> nextSuperNode : next
+						.getDirectUpdateableSuperNodes())
 					todo.add(nextSuperNode);
 			}
 		}
+
 		return Collections.unmodifiableSet(result);
 	}
 
@@ -176,13 +188,35 @@ public class IndividualNode implements
 	}
 
 	@Override
-	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
-		return this.taxonomy_;
-	}
-
-	@Override
 	public String toString() {
 		return getCanonicalMember().getIri().getFullIriAsString();
 	}
 
+	@Override
+	public boolean trySetModified(boolean modified) {
+		boolean result = modified_.compareAndSet(!modified, modified);
+		
+		if (result && LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("node " + this + ": set "
+					+ (modified ? "modified" : "not modifiled"));
+		}
+		
+		return result;
+	}
+
+	@Override
+	public boolean isModified() {
+		return modified_.get();
+	}
+
+
+	@Override
+	public void removeDirectTypeNode(
+			UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace(this + ": removing direct type node: " + typeNode);
+		}
+		
+		directTypeNodes_.remove(typeNode);
+	}
 }

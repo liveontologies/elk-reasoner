@@ -22,20 +22,32 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.datatypes.handlers.ElkDatatypeHandler;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ChangeIndexingProcessor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndexImpl;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 public class ConcurrentSaturatorTest extends TestCase {
@@ -46,6 +58,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		super(testName);
 	}
 
+	@Test
 	public void testExistentials() throws InterruptedException,
 			ExecutionException {
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -57,34 +70,47 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ElkObjectProperty s = objectFactory.getObjectProperty(new ElkFullIri(
 				"S"));
 
-		OntologyIndex ontologyIndex = new OntologyIndexImpl();
+		ModifiableOntologyIndex index = new DirectIndex();
 		ComputationExecutor executor = new ComputationExecutor(16, "test");
+		ElkDatatypeHandler datatypeHandler = new ElkDatatypeHandler();
 
-		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
+		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(new MainAxiomIndexerVisitor(index,
+				datatypeHandler, true));
 		inserter.visit(objectFactory.getEquivalentClassesAxiom(b, c));
 		inserter.visit(objectFactory.getSubClassOfAxiom(a,
 				objectFactory.getObjectSomeValuesFrom(r, b)));
 		inserter.visit(objectFactory.getSubClassOfAxiom(
-				objectFactory.getObjectSomeValuesFrom(s, c), d));
+				objectFactory.getObjectSomeValuesFrom(r, c), d));
 		inserter.visit(objectFactory.getSubObjectPropertyOfAxiom(r, s));
 
-		IndexedClassExpression A = ontologyIndex.getIndexed(a);
-		IndexedClassExpression D = ontologyIndex.getIndexed(d);
+		IndexedObjectCache objectCache = index.getIndexedObjectCache();
+		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
+				 objectCache, datatypeHandler);
+
+		IndexedClassExpression A = a.accept(converter);
+		IndexedClassExpression D = d.accept(converter);
+		IndexedPropertyChain R = r.accept(converter);
+
+		final TestPropertySaturation propertySaturation = new TestPropertySaturation(
+				executor, 16, index);
 
 		final TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
-				executor, 16, ontologyIndex);
+				executor, 16, index);
+
+		propertySaturation.start();
+		propertySaturation.submit(R);
+		propertySaturation.finish();
 
 		classExpressionSaturation.start();
 		classExpressionSaturation
 				.submit(new SaturationJob<IndexedClassExpression>(A));
-
 		classExpressionSaturation.finish();
 
-		assertTrue("A contains D", A.getContext().getSuperClassExpressions()
-				.contains(D));
+		assertTrue("A contains D", A.getContext().getSubsumers().contains(D));
 
 	}
 
+	@Test
 	public void testConjunctions() throws InterruptedException,
 			ExecutionException {
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
@@ -92,33 +118,29 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
 
-		final OntologyIndex ontologyIndex = new OntologyIndexImpl();
+		final ModifiableOntologyIndex index = new DirectIndex();
 		ComputationExecutor executor = new ComputationExecutor(16, "test");
-		final ElkAxiomProcessor inserter = ontologyIndex.getAxiomInserter();
+		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(new MainAxiomIndexerVisitor(index, new ElkDatatypeHandler(),
+				true));
 
 		inserter.visit(objectFactory.getSubClassOfAxiom(a, b));
 		inserter.visit(objectFactory.getSubClassOfAxiom(a, c));
 		inserter.visit(objectFactory.getSubClassOfAxiom(
 				objectFactory.getObjectIntersectionOf(b, c), d));
 
-		IndexedClassExpression A = ontologyIndex.getIndexed(a);
-		IndexedClassExpression B = ontologyIndex.getIndexed(b);
-		IndexedClassExpression C = ontologyIndex.getIndexed(c);
-		IndexedClassExpression D = ontologyIndex.getIndexed(d);
-		IndexedClassExpression I = ontologyIndex.getIndexed(objectFactory
-				.getObjectIntersectionOf(b, c));
+		IndexedObjectCache objectCache = index.getIndexedObjectCache();
+		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
+				objectCache, new ElkDatatypeHandler());
 
-//		assertTrue("A SubClassOf B",
-//				A.getToldSuperClassExpressions().contains(B));
-//		assertTrue("A SubClassOf C",
-//				A.getToldSuperClassExpressions().contains(C));
-//		assertFalse("A SubClassOf D", A.getToldSuperClassExpressions()
-//				.contains(D));
-//		assertTrue("I SubClassOf D",
-//				I.getToldSuperClassExpressions().contains(D));
+		IndexedClassExpression A = a.accept(converter);
+		IndexedClassExpression B = b.accept(converter);
+		IndexedClassExpression C = c.accept(converter);
+		IndexedClassExpression D = d.accept(converter);
+		IndexedClassExpression I = objectFactory.getObjectIntersectionOf(b, c)
+				.accept(converter);
 
 		final TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
-				executor, 16, ontologyIndex);
+				executor, 16, index);
 
 		classExpressionSaturation.start();
 		classExpressionSaturation
@@ -126,16 +148,58 @@ public class ConcurrentSaturatorTest extends TestCase {
 		classExpressionSaturation.finish();
 		Context context = A.getContext();
 
-		assertTrue("A contains A",
-				context.getSuperClassExpressions().contains(A));
-		assertTrue("A contains B",
-				context.getSuperClassExpressions().contains(B));
-		assertTrue("A contains C",
-				context.getSuperClassExpressions().contains(C));
-		assertTrue("A contains I",
-				context.getSuperClassExpressions().contains(I));
-		assertTrue("A contains D",
-				context.getSuperClassExpressions().contains(D));
+		assertTrue("A contains A", context.getSubsumers().contains(A));
+		assertTrue("A contains B", context.getSubsumers().contains(B));
+		assertTrue("A contains C", context.getSubsumers().contains(C));
+		assertTrue("A contains I", context.getSubsumers().contains(I));
+		assertTrue("A contains D", context.getSubsumers().contains(D));
 	}
-
+	
+	public void testContextLinking() {
+		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
+		final ModifiableOntologyIndex index = new DirectIndex();
+		final SaturationStateImpl state = new SaturationStateImpl(index);
+		IndexedObjectCache objectCache = index.getIndexedObjectCache();
+		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
+				objectCache, new ElkDatatypeHandler());
+		IndexedClassExpression A = a.accept(converter);
+		IndexedClassExpression B = b.accept(converter);
+		IndexedClassExpression C = c.accept(converter);
+		
+		ExtendedSaturationStateWriter writer = state.getExtendedWriter(
+				ContextCreationListener.DUMMY,
+				ContextModificationListener.DUMMY,
+				new BasicCompositionRuleApplicationVisitor(),
+				new ConclusionInsertionVisitor(), false);
+		
+		Context cA = writer.getCreateContext(A);
+		Context cB = writer.getCreateContext(B);
+		Context cC = writer.getCreateContext(C);
+		
+		assertEquals(3, getRoots(state.getContexts()).size());
+		
+		cC.removeLinks();
+		
+		assertEquals(2, getRoots(state.getContexts()).size());
+		
+		cA.removeLinks();
+		
+		assertEquals(1, getRoots(state.getContexts()).size());
+		
+		cB.removeLinks();
+		
+		assertTrue(state.getContexts().isEmpty());
+	}
+	
+	private Collection<IndexedClassExpression> getRoots(Iterable<Context> contexts) {
+		List<IndexedClassExpression> roots = new ArrayList<IndexedClassExpression>();
+		
+		for (Context c : contexts) {
+			roots.add(c.getRoot());
+		}
+		
+		return roots;
+	}
 }

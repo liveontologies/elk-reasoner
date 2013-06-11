@@ -22,14 +22,12 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
-import java.util.Set;
-
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.BackwardLinkRules;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
-import org.semanticweb.elk.util.collections.LazySetIntersection;
-import org.semanticweb.elk.util.logging.CachedTimeThread;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from a
@@ -75,59 +73,45 @@ public class BackwardLink implements Conclusion {
 		return source_;
 	}
 
-	/**
-	 * @return the {@link IndexedPropertyChain} of this {@link BackwardLink}
-	 *         which is used in the existential restriction corresponding to
-	 *         this {@link BackwardLink}
-	 * 
-	 */
-	public IndexedPropertyChain getReltaion() {
-		return relation_;
+	public void apply(BasicSaturationStateWriter writer, Context context,
+			RuleApplicationVisitor ruleAppVisitor) {
+
+		// if this is the first/last backward link for this relation,
+		// generate new propagations for this relation
+		if (context.getBackwardLinksByObjectProperty().get(relation_).size() == 1) {
+			IndexedObjectSomeValuesFrom.generatePropagations(writer, relation_,
+					context);
+		}
+
+		// apply all backward link rules of the context
+		LinkRule<BackwardLink> backLinkRule = context.getBackwardLinkRuleHead();
+		while (backLinkRule != null) {
+			backLinkRule.accept(ruleAppVisitor, writer, this);
+			backLinkRule = backLinkRule.next();
+		}
+
+		/*
+		 * convert backward link to a forward link if it can potentially be
+		 * composed
+		 */
+		if (!relation_.getSaturated().getCompositionsByLeftSubProperty()
+				.isEmpty()) {
+			writer.produce(source_, new ForwardLink(relation_, context));
+		}
 	}
 
 	@Override
-	public void apply(RuleEngine ruleEngine, Context context) {
-
-		ConclusionsCounter statistics = ruleEngine.getConclusionsCounter();
-		statistics.backLinkTime -= CachedTimeThread.currentTimeMillis;
-		try {
-			statistics.backLinkInfNo++;
-
-			if (!context.addBackwardLink(this))
-				return;
-
-			statistics.backLinkNo++;
-
-			// apply all backward link rules of the context
-			BackwardLinkRules rules = context.getBackwardLinkRules();
-
-			while (rules != null) {
-				rules.apply(ruleEngine, this);
-				rules = rules.next();
-			}
-
-			/*
-			 * convert backward link to a forward link if it can potentially be
-			 * composed
-			 */
-			Set<IndexedPropertyChain> toldProperties = source_.getRoot()
-					.getPosPropertiesInExistentials();
-			if (toldProperties != null
-					&& !new LazySetIntersection<IndexedPropertyChain>(
-							toldProperties, relation_.getSaturated()
-									.getLeftComposableProperties()).isEmpty()) {
-				ruleEngine
-						.produce(source_, new ForwardLink(relation_, context));
-			}
-		} finally {
-			statistics.backLinkTime += CachedTimeThread.currentTimeMillis;
-		}
-
+	public Context getSourceContext(Context contextWhereStored) {
+		return source_;
 	}
 
 	@Override
 	public String toString() {
-		return (relation_ + "<-" + source_.getRoot());
+		return (relation_ + "<-" + source_);
 	}
 
+	@Override
+	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
+		return visitor.visit(this, context);
+	}
 }

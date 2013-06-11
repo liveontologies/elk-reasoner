@@ -106,6 +106,10 @@ public class BaseConfiguration {
 	public int getParameterAsInt(String name) {
 		return Integer.valueOf(paramMap.get(name));
 	}
+	
+	public boolean getParameterAsBoolean(String name) {
+		return Boolean.valueOf(paramMap.get(name));
+	}	
 
 	public BaseConfiguration setParameter(String name, String value) {
 		if (!validate(name, value))

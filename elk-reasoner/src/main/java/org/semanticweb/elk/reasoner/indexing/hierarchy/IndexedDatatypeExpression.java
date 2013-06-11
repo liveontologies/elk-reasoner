@@ -22,16 +22,17 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.Collection;
+import java.util.Set;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDatatypeExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSuperClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedDataProperty;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
-import org.semanticweb.elk.util.logging.CachedTimeThread;
+import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 
 /**
  *
@@ -43,7 +44,7 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 	protected final IndexedDataProperty property;
 
 	protected final ValueSpace valueSpace;
-
+	
 	public IndexedDatatypeExpression(IndexedDataProperty property,
 			ValueSpace valueSpace) {
 		this.property = property;
@@ -59,8 +60,17 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(int increment,
-			int positiveIncrement, int negativeIncrement) {
+	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public void accept(DecompositionRuleApplicationVisitor visitor, Context context) {
+		visitor.visit(this, context);
+	}
+
+	@Override
+	void updateOccurrenceNumbers(ModifiableOntologyIndex index, int increment, int positiveIncrement, int negativeIncrement) {
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
 			property.addNegativeDatatypeExpression(this);
@@ -69,23 +79,17 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
 
+		checkOccurrenceNumbers();
+
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
 			property.removeNegativeDatatypeExpression(this);
 		}
 	}
 
-	public <O> O accept(IndexedDatatypeExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
+	
 	@Override
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedDatatypeExpressionVisitor<O>) visitor);
-	}
-
-	@Override
-	public String toString() {
+	public String toStringStructural() {
 		switch (valueSpace.getType()) {
 			case BINARY_VALUE:
 			case DATETIME_VALUE:
@@ -104,46 +108,34 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 		}
 	}
 
-	@Override
-	public void applyDecompositionRule(RuleEngine ruleEngine, Context context) {
-		RuleStatistics stats = ruleEngine.getRulesTimer();
-
-		stats.timeDatatypeExpressionDecompositionRule -= CachedTimeThread.currentTimeMillis;
-		stats.countDatatypeExpressionDecompositionRule++;
-
-		try {
-			IndexedDataProperty idp = getProperty();
-			ValueSpace vs = getValueSpace();
-			if (vs == EmptyValueSpace.INSTANCE) {
-				// this means that value space is inconsistent; in this
-				// case we are done
-				ruleEngine.produce(context, new PositiveSuperClassExpression(
-						ruleEngine.getOwlNothing()));
-			}
-			SaturatedDataProperty saturatedDataProperty = idp.getSaturated();
-			if (saturatedDataProperty != null) {
-				for (IndexedDataProperty superProperty : saturatedDataProperty.getSuperProperties()) {
-					Iterable<IndexedDatatypeExpression> negativeDatatypeExpressions = superProperty
-							.getNegativeDatatypeExpressions();
-					if (negativeDatatypeExpressions == null) {
+	public void applyRule(Context context, IndexedDatatypeExpression ide, BasicSaturationStateWriter writer) {
+		IndexedDataProperty idp = ide.getProperty();
+		ValueSpace vs = ide.getValueSpace();
+		if (vs == EmptyValueSpace.INSTANCE) {
+			// this means that value space is inconsistent; in this
+			// case we are done
+			writer.produce(context, Contradiction.getInstance());
+		}
+		SaturatedDataProperty saturatedDataProperty = idp.getSaturated();
+		if (saturatedDataProperty != null) {
+			for (IndexedDataProperty superProperty : saturatedDataProperty.getSuperProperties()) {
+				Iterable<IndexedDatatypeExpression> negativeDatatypeExpressions = superProperty
+					.getNegativeDatatypeExpressions();
+				if (negativeDatatypeExpressions == null) {
+					continue;
+				}
+				for (IndexedDatatypeExpression candidate : negativeDatatypeExpressions) {
+					if (candidate == this) // already derived
+					{
 						continue;
 					}
-					for (IndexedDatatypeExpression candidate : negativeDatatypeExpressions) {
-						if (candidate == this) // already derived
-						{
-							continue;
-						}
-						// check if the candidate value space subsumes the current
-						// value space
-						if (vs.isSubsumedBy(candidate.getValueSpace())) {
-							ruleEngine.produce(context,
-									new NegativeSuperClassExpression(candidate));
-						}
+					// check if the candidate value space subsumes the current
+					// value space
+					if (vs.isSubsumedBy(candidate.getValueSpace())) {
+						writer.produce(context, new NegativeSubsumer(candidate));
 					}
 				}
 			}
-		} finally {
-			stats.timeDatatypeExpressionDecompositionRule += CachedTimeThread.currentTimeMillis;
 		}
 	}
 

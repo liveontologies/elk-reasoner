@@ -34,13 +34,11 @@ import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -50,11 +48,9 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 
 /**
@@ -67,35 +63,7 @@ import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
  *
  */
 public abstract class AbstractElkAxiomIndexerVisitor extends
-		AbstractElkAxiomVisitor<Void> implements ElkAxiomProcessor {
-
-	public abstract void indexSubClassOfAxiom(ElkClassExpression subClass,
-			ElkClassExpression superClass);
-
-	public abstract void indexSubObjectPropertyOfAxiom(
-			ElkSubObjectPropertyExpression subProperty,
-			ElkObjectPropertyExpression superProperty);
-
-	public abstract void indexSubDataPropertyOfAxiom(
-			ElkDataPropertyExpression subProperty,
-			ElkDataPropertyExpression superProperty);
-
-	public abstract void indexClassAssertion(ElkIndividual individual,
-			ElkClassExpression type);
-
-	public abstract void indexDisjointClassExpressions(
-			List<? extends ElkClassExpression> list);
-
-	public abstract void indexReflexiveObjectProperty(
-			ElkObjectPropertyExpression reflexiveProperty);
-
-	public abstract IndexedClass indexClassDeclaration(ElkClass ec);
-
-	public abstract IndexedObjectProperty indexObjectPropertyDeclaration(
-			ElkObjectProperty eop);
-
-	public abstract IndexedIndividual indexNamedIndividualDeclaration(
-			ElkNamedIndividual eni);
+		AbstractElkAxiomVisitor<Void> implements ElkAxiomIndexer {
 
 	/**
 	 * Object factory that is used internally to replace some syntactic
@@ -107,16 +75,10 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 
 	@Override
 	protected Void defaultLogicalVisit(ElkAxiom axiom) {
-		throw new IndexingException(axiom);
+		throw new ElkIndexingUnsupportedException(axiom);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor#visit(
-	 * org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom)
-	 *
+	/**
 	 * Reduces equivalent object properties to subproperty axioms.
 	 */
 	@Override
@@ -133,6 +95,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 				indexSubObjectPropertyOfAxiom(p, first);
 			}
 		}
+
 		return null;
 	}
 
@@ -231,9 +194,41 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 		return null;
 	}
 
+	private final static int DISJOINT_AXIOM_BINARIZATION_THRESHOLD = 2;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.owl.AbstractElkAxiomVisitor#visit(org.semanticweb
+	 * .elk.owl.interfaces.ElkDisjointClassesAxiom)
+	 * 
+	 * Binarize disjointness axioms that contain not many classes
+	 */
 	@Override
 	public Void visit(ElkDisjointClassesAxiom axiom) {
-		indexDisjointClassExpressions(axiom.getClassExpressions());
+		List<? extends ElkClassExpression> members = axiom
+				.getClassExpressions();
+		// if the axiom contains sufficiently many disjoint classes, convert it
+		// natively
+		if (axiom.getClassExpressions().size() > DISJOINT_AXIOM_BINARIZATION_THRESHOLD) {
+			indexDisjointClassExpressions(axiom.getClassExpressions());
+			return null;
+		}
+		// create a binary disjointness axiom for all pairs (member,
+		// otherMember) where
+		// otherMember occurs after member in members
+		for (final ElkClassExpression member : members) {
+			boolean selfFound = false; // true when otherMember = member
+			for (ElkClassExpression otherMember : members) {
+				if (!selfFound) {
+					if (otherMember == member)
+						selfFound = true;
+				} else
+					indexSubClassOfAxiom(objectFactory.getObjectIntersectionOf(
+							member, otherMember), objectFactory.getOwlNothing());
+			}
+		}
 		return null;
 	}
 
@@ -251,12 +246,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor#visit(org.
-	 * semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom)
-	 *
+	/**
 	 * Reduces property assertions to class assertions with ObjectHasValue.
 	 */
 	@Override
@@ -302,13 +292,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 			return null;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see
-		 * org.semanticweb.elk.owl.visitors.ElkEntityVisitor#visit(org.semanticweb
-		 * .elk.owl.interfaces.ElkDatatype)
-		 *
+		/**
 		 * Nothing is done, datatypes are supported only syntactically. Warning
 		 * is logged when indexing ElkDataHasValue.
 		 */
@@ -323,13 +307,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 			return null;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see
-		 * org.semanticweb.elk.owl.visitors.ElkEntityVisitor#visit(org.semanticweb
-		 * .elk.owl.interfaces.ElkDatatype)
-		 *
+		/**
 		 * Nothing is done, datatypes are supported only syntactically. Warning
 		 * is logged when indexing ElkDataHasValue.
 		 */
@@ -344,13 +322,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 			return null;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see
-		 * org.semanticweb.elk.owl.visitors.ElkEntityVisitor#visit(org.semanticweb
-		 * .elk.owl.interfaces.ElkAnnotationProperty)
-		 *
+		/**
 		 * Nothing is done, annotations are ignored during indexing.
 		 */
 		@Override

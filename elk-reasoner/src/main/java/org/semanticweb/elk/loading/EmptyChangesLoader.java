@@ -38,4 +38,9 @@ public class EmptyChangesLoader implements ChangesLoader {
 		return new EmptyLoader();
 	}
 
+	@Override
+	public void registerChangeListener(AxiomChangeListener listener) {
+		// does nothing
+	}
+
 }

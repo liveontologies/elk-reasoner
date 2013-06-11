@@ -13,7 +13,7 @@
 
 	<property environment="env"/>
   	<property name = "protege.home"	location="${env.PROTEGE_HOME}"/>
-  	<property name = "plugin_jar" location="${env.M2_REPO}/org/semanticweb/elk/elk-protege/0.3.0-SNAPSHOT/elk-protege-0.3.0-SNAPSHOT.jar"/>
+  	<property name = "plugin_jar" location="${env.M2_REPO}/org/semanticweb/elk/elk-protege/0.4.0-SNAPSHOT/elk-protege-0.4.0-SNAPSHOT.jar"/>
 	<property name = "protege.plugins" location="${env.PROTEGE_HOME}/plugins/"/>
 
    <target name = "install">

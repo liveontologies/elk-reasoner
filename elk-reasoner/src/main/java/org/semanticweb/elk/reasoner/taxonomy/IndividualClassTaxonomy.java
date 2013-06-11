@@ -22,28 +22,18 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy;
 
-import java.util.Collection;
-
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 
 /**
- * Abstract taxonomy for classes and their instances (individuals). The main
- * purpose of this is to provide an "interface" that is specific enough for
- * engines to modify the data without needing to refer to a particular
- * implementation.
+ * A marker interface for taxonomy of classes and their instances (individuals).
  * 
  * @author Markus Kroetzsch
+ * @author Pavel Klinov
  * 
  */
-public abstract class IndividualClassTaxonomy implements
-		InstanceTaxonomy<ElkClass, ElkNamedIndividual> {
 
-	abstract NonBottomClassNode getCreateClassNode(Collection<ElkClass> members);
-
-	abstract IndividualNode getCreateIndividualNode(
-			Collection<ElkNamedIndividual> members);
-
-	abstract void addUnsatisfiableClass(ElkClass elkClass);
+public interface IndividualClassTaxonomy extends UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> {
+	
 }

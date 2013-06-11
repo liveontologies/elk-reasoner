@@ -22,27 +22,24 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import java.util.Collection;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.RuleStatistics;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
+import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
+import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionsCounter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSuperClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionSourceUnsaturationVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.context.ContextImpl;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.Engine;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
-import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
@@ -53,457 +50,300 @@ import org.semanticweb.elk.util.logging.CachedTimeThread;
  * @author Frantisek Simancik
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
- *
+ * @author Pavel Klinov
+ * 
  */
-public class RuleApplicationFactory implements
-		InputProcessorFactory<IndexedClassExpression, Engine> {
+public class RuleApplicationFactory {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = Logger
 			.getLogger(RuleApplicationFactory.class);
 
-	/**
-	 * Cached constants
-	 */
-	private final IndexedClassExpression owlThing_, owlNothing_;
+	// static final boolean COLLECT_CONCLUSION_COUNTS =
+	// true;//LOGGER_.isDebugEnabled();
+	// static final boolean COLLECT_CONCLUSION_TIMES =
+	// true;//LOGGER_.isDebugEnabled();
+	// static final boolean COLLECT_RULE_COUNTS =
+	// true;//LOGGER_.isDebugEnabled();
+	// static final boolean COLLECT_RULE_TIMES =
+	// true;//LOGGER_.isDebugEnabled();
+
+	final SaturationState saturationState;
 
 	/**
-	 * The set of reflexive properties of the ontology
+	 * The {@link SaturationStatistics} aggregated for all workers
 	 */
-	private final Set<IndexedObjectProperty> reflexiveProperties_;
-
+	private final SaturationStatistics aggregatedStats_;
 	/**
-	 * The queue containing all activated contexts. Every activated context
-	 * occurs exactly once.
+	 * If true, the factory will keep track of contexts which get modified
+	 * during saturation. This is needed, for example, for cleaning contexts
+	 * modified during de-saturation or for cleaning taxonomy nodes which
+	 * correspond to modified contexts (during de-saturation and re-saturation)
 	 */
-	private final Queue<Context> activeContexts_;
+	private final boolean trackModifiedContexts_;
 
-	/**
-	 * The approximate number of contexts ever created by this engine. This
-	 * number is used not only for statistical purposes, but also by saturation
-	 * engine callers to control when to submit new saturation tasks: if there
-	 * are too many unprocessed contexts, new saturation tasks are not
-	 * submitted.
-	 */
-	protected final AtomicInteger approximateContextNumber_ = new AtomicInteger(
-			0);
-
-	/**
-	 * To reduce thread congestion, {@link #approximateContextNumber_} is not
-	 * updated immediately when contexts are created, but after a worker creates
-	 * {@link #contextUpdateInterval_} new contexts.
-	 */
-	private final int contextUpdateInterval_ = 32;
-
-	/**
-	 * The {@link ConclusionsCounter} aggregated for all workers
-	 */
-	private final ConclusionsCounter aggregatedConclusionsCounter_;
-
-	/**
-	 * The {@link RuleStatistics} aggregated for all workers
-	 */
-	private final RuleStatistics aggregatedRuleStats_;
-
-	/**
-	 * The {@link ThisStatistics} aggregated for all workers
-	 */
-	private final ThisStatistics aggregatedFactoryStats_;
-
-	/**
-	 * The number of finished workers;
-	 */
-	private final AtomicInteger workerCount_ = new AtomicInteger(0);
-
-	public RuleApplicationFactory(OntologyIndex ontologyIndex) {
-		this.activeContexts_ = new ConcurrentLinkedQueue<Context>();
-		this.aggregatedConclusionsCounter_ = new ConclusionsCounter();
-		this.aggregatedRuleStats_ = new RuleStatistics();
-		this.aggregatedFactoryStats_ = new ThisStatistics();
-		this.reflexiveProperties_ = new ArrayHashSet<IndexedObjectProperty>();
-		Collection<IndexedObjectProperty> reflexiveObjectProperties = ontologyIndex
-				.getReflexiveObjectProperties();
-		if (reflexiveObjectProperties != null)
-			reflexiveProperties_.addAll(reflexiveObjectProperties);
-
-		owlThing_ = ontologyIndex.getIndexed(PredefinedElkClass.OWL_THING);
-		owlNothing_ = ontologyIndex.getIndexed(PredefinedElkClass.OWL_NOTHING);
+	public RuleApplicationFactory(final SaturationState saturationState) {
+		this(saturationState, false);
 	}
 
-	@Override
-	public Engine getEngine() {
-		return new Engine();
+	public RuleApplicationFactory(final SaturationState saturationState,
+			final boolean trackModifiedContexts) {
+		this.aggregatedStats_ = new SaturationStatistics();
+		this.saturationState = saturationState;
+		this.trackModifiedContexts_ = trackModifiedContexts;
 	}
 
-	@Override
+	/*
+	 * This method is supposed to be overridden in subclasses
+	 */
+	public BaseEngine getDefaultEngine(ContextCreationListener listener,
+			ContextModificationListener modListener) {
+		return new DefaultEngine(listener, modListener);
+	}
+
 	public void finish() {
-		checkStatistics();
+		// aggregatedStats_.check(LOGGER_);
+	}
+
+	public SaturationStatistics getSaturationStatistics() {
+		return aggregatedStats_;
+	}
+
+	public SaturationState getSaturationState() {
+		return saturationState;
 	}
 
 	/**
-	 * Returns the approximate number of contexts created. The real number of
-	 * contexts is larger, but to ensure good concurrency performance it is not
-	 * updated often. It is exact when all engines created by this factory
-	 * finish.
-	 *
-	 * @return the approximate number of created contexts
+	 * This engine has all the functionality for applying rules but needs to be
+	 * extended if new contexts may need to be created
 	 */
-	public int getApproximateContextNumber() {
-		return approximateContextNumber_.get();
-	}
+	public abstract class BaseEngine implements
+			InputProcessor<IndexedClassExpression>, RuleEngine {
 
-	/**
-	 * Prints statistic of rule applications
-	 */
-	public void printStatistics() {
-		if (LOGGER_.isDebugEnabled()) {
-			checkStatistics();
-			// CONTEXT STATISTICS:
-			if (approximateContextNumber_.get() > 0)
-				LOGGER_.debug("Contexts created: " + approximateContextNumber_);
-			if (approximateContextNumber_.get() > 0)
-				LOGGER_.debug("Contexts processing: "
-						+ aggregatedFactoryStats_.contContextProcess + " ("
-						+ aggregatedFactoryStats_.timeContextProcess
-						/ workerCount_.get() + " ms)");
-			// CONCLUSIONS STATISTICS:
-			if (aggregatedConclusionsCounter_
-					.getPositiveSuperClassExpressionInfNo()
-					+ aggregatedConclusionsCounter_
-							.getNegativeSuperClassExpressionInfNo() > 0)
-				LOGGER_.debug("Super classes positive/negative/unique: "
-						+ aggregatedConclusionsCounter_
-								.getPositiveSuperClassExpressionInfNo()
-						+ "/"
-						+ aggregatedConclusionsCounter_
-								.getNegativeSuperClassExpressionInfNo()
-						+ "/"
-						+ aggregatedConclusionsCounter_
-								.getSuperClassExpressionNo()
-						+ " ("
-						+ aggregatedConclusionsCounter_
-								.getSuperClassExpressionTime()
-						/ workerCount_.get() + " ms)");
-			if (aggregatedConclusionsCounter_.getBackLinkInfNo() > 0)
-				LOGGER_.debug("Backward Links produced/unique: "
-						+ aggregatedConclusionsCounter_.getBackLinkInfNo()
-						+ "/" + aggregatedConclusionsCounter_.getBackLinkNo()
-						+ " ("
-						+ aggregatedConclusionsCounter_.getBackLinkTime()
-						/ workerCount_.get() + " ms)");
-			if (aggregatedConclusionsCounter_.getForwLinkInfNo() > 0)
-				LOGGER_.debug("Forward Links produced/unique: "
-						+ aggregatedConclusionsCounter_.getForwLinkInfNo()
-						+ "/" + aggregatedConclusionsCounter_.getForwLinkNo()
-						+ " ("
-						+ aggregatedConclusionsCounter_.getForwLinkTime()
-						/ workerCount_.get() + " ms)");
-			LOGGER_.debug("Total conclusion processing time: "
-					+ (aggregatedConclusionsCounter_
-							.getSuperClassExpressionTime()
-							+ aggregatedConclusionsCounter_.getBackLinkTime() + aggregatedConclusionsCounter_
-								.getForwLinkTime()) / workerCount_.get()
-					+ " ms"
-
-			);
-
-			// RULES STATISTICS:
-			if (aggregatedRuleStats_
-					.getObjectSomeValuesFromCompositionRuleCount() > 0)
-				LOGGER_.debug("DatatypeExpression decomposition rules: "
-						+ aggregatedRuleStats_
-								.getDatatypeExpressionDecompositionRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getDatatypeExpressionDecompositionRuleTime()
-						/ workerCount_.get() + " ms)");
-			if (aggregatedRuleStats_
-					.getObjectSomeValuesFromCompositionRuleCount() > 0)
-				LOGGER_.debug("ObjectSomeValuesFrom composition rules: "
-						+ aggregatedRuleStats_
-								.getObjectSomeValuesFromCompositionRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getObjectSomeValuesFromCompositionRuleTime()
-						/ workerCount_.get() + " ms)");
-			if (aggregatedRuleStats_
-					.getObjectSomeValuesFromDecompositionRuleCount() > 0)
-				LOGGER_.debug("ObjectSomeValuesFrom decomposition rules: "
-						+ aggregatedRuleStats_
-								.getObjectSomeValuesFromDecompositionRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getObjectSomeValuesFromDecompositionRuleTime()
-						/ workerCount_.get() + " ms)");
-			if (aggregatedRuleStats_
-					.getObjectSomeValuesFromBackwardLinkRuleCount() > 0)
-				LOGGER_.debug("ObjectSomeValuesFrom backward link rules: "
-						+ aggregatedRuleStats_
-								.getObjectSomeValuesFromBackwardLinkRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getObjectSomeValuesFromBackwardLinkRuleTime()
-						/ workerCount_.get() + " ms)");
-			if (aggregatedRuleStats_
-					.getObjectIntersectionOfCompositionRuleCount() > 0)
-				LOGGER_.debug("ObjectIntersectionOf composition rules: "
-						+ aggregatedRuleStats_
-								.getObjectIntersectionOfCompositionRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getObjectIntersectionOfCompositionRuleTime()
-						/ workerCount_.get() + " ms)");
-			if (aggregatedRuleStats_
-					.getObjectIntersectionOfDecompositionRuleCount() > 0)
-				LOGGER_.debug("ObjectIntersectionOf decomposition rules: "
-						+ aggregatedRuleStats_
-								.getObjectIntersectionOfDecompositionRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getObjectIntersectionOfDecompositionRuleTime()
-						/ workerCount_.get() + " ms)");
-			if (aggregatedRuleStats_.getForwardLinkBackwardLinkRuleCount() > 0)
-				LOGGER_.debug("ForwardLink backward link rules: "
-						+ aggregatedRuleStats_
-								.getForwardLinkBackwardLinkRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getForwardLinkBackwardLinkRuleTime()
-						/ workerCount_.get() + " ms)");
-			if (aggregatedRuleStats_.getClassDecompositionRuleCount() > 0)
-				LOGGER_.debug("Class decomposition rules: "
-						+ aggregatedRuleStats_.getClassDecompositionRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_.getClassDecompositionRuleTime()
-						/ workerCount_.get() + "ms)");
-			if (aggregatedRuleStats_.getClassBottomBackwardLinkRuleCount() > 0)
-				LOGGER_.debug("owl:Nothing backward link rules: "
-						+ aggregatedRuleStats_
-								.getClassBottomBackwardLinkRuleCount()
-						+ " ("
-						+ aggregatedRuleStats_
-								.getClassBottomBackwardLinkRuleTime()
-						/ workerCount_.get() + " ms)");
-			if (aggregatedRuleStats_.getSubClassOfRuleCount() > 0)
-				LOGGER_.debug("SubClassOf expansion rules: "
-						+ aggregatedRuleStats_.getSubClassOfRuleCount() + " ("
-						+ aggregatedRuleStats_.getSubClassOfRuleTime()
-						/ workerCount_.get() + " ms)");
-			LOGGER_.debug("Total rules time: "
-					+ (aggregatedRuleStats_
-							.getObjectSomeValuesFromCompositionRuleTime()
-							+ aggregatedRuleStats_
-									.getObjectSomeValuesFromDecompositionRuleTime()
-							+ aggregatedRuleStats_
-									.getDatatypeExpressionDecompositionRuleTime()
-							+ aggregatedRuleStats_
-									.getObjectSomeValuesFromBackwardLinkRuleTime()
-							+ aggregatedRuleStats_
-									.getObjectIntersectionOfCompositionRuleTime()
-							+ aggregatedRuleStats_
-									.getObjectIntersectionOfDecompositionRuleTime()
-							+ aggregatedRuleStats_
-									.getForwardLinkBackwardLinkRuleTime()
-							+ aggregatedRuleStats_
-									.getClassDecompositionRuleTime()
-							+ aggregatedRuleStats_
-									.getClassBottomBackwardLinkRuleTime() + aggregatedRuleStats_
-								.getSubClassOfRuleTime()) / workerCount_.get()
-					+ " ms");
-		}
-	}
-
-	private void checkStatistics() {
-		if (aggregatedFactoryStats_.contContextProcess < approximateContextNumber_
-				.get())
-			LOGGER_.error("More contexts than context activations!");
-		if (aggregatedConclusionsCounter_
-				.getPositiveSuperClassExpressionInfNo()
-				+ aggregatedConclusionsCounter_
-						.getNegativeSuperClassExpressionInfNo() < aggregatedConclusionsCounter_
-					.getSuperClassExpressionNo())
-			LOGGER_.error("More unique derived superclasses than produced!");
-		if (aggregatedConclusionsCounter_.getBackLinkInfNo() < aggregatedConclusionsCounter_
-				.getBackLinkNo())
-			LOGGER_.error("More unique backward links than produced!");
-		if (aggregatedConclusionsCounter_.getForwLinkInfNo() < aggregatedConclusionsCounter_
-				.getForwLinkNo())
-			LOGGER_.error("More unique forward links than produced!");
-	}
-
-	public class Engine implements InputProcessor<IndexedClassExpression>,
-			RuleEngine {
+		private ConclusionVisitor<?> conclusionProcessor_;
 
 		/**
-		 * Local {@link ConclusionsCounter} created for every worker
+		 * Local {@link SaturationStatistics} created for every worker
 		 */
-		private final ConclusionsCounter conclusionsCounter_ = new ConclusionsCounter();
-		/**
-		 * Local {@link RuleStatistics} created for every worker
-		 */
-		private final RuleStatistics ruleStats_ = new RuleStatistics();
-		/**
-		 * Local {@link ThisStatistics} created for every worker
-		 */
-		private final ThisStatistics factoryStats_ = new ThisStatistics();
-		/**
-		 * Worker-local counter for the number of created contexts
-		 */
-		private int localContextNumber = 0;
+		protected final SaturationStatistics localStatistics;
 
-		// don't allow creating of engines directly; only through the factory
-		private Engine() {
-		}
+		protected final ContextStatistics localContextStatistics;
 
-		@Override
-		public void submit(IndexedClassExpression job) {
-			getCreateContext(job);
+		protected BaseEngine(SaturationStatistics localStatistics) {
+			this.localStatistics = localStatistics;
+			this.localContextStatistics = localStatistics
+					.getContextStatistics();
 		}
 
 		@Override
 		public void process() {
-			factoryStats_.timeContextProcess -= CachedTimeThread.currentTimeMillis;
+			localContextStatistics.timeContextProcess -= CachedTimeThread
+					.getCurrentTimeMillis();
+
+			BasicSaturationStateWriter writer = getSaturationStateWriter();
+
+			if (conclusionProcessor_ == null) {
+				conclusionProcessor_ = getConclusionProcessor(writer,
+						localStatistics);
+			}
+
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					break;
-				Context nextContext = activeContexts_.poll();
-				if (nextContext == null)
+
+				Context nextContext = writer.pollForActiveContext();
+
+				if (nextContext == null) {
 					break;
-				process(nextContext);
+				} else {
+					process(nextContext);
+				}
 			}
-			factoryStats_.timeContextProcess += CachedTimeThread.currentTimeMillis;
+
+			localContextStatistics.timeContextProcess += CachedTimeThread
+					.getCurrentTimeMillis();
 		}
 
 		@Override
 		public void finish() {
-			approximateContextNumber_.addAndGet(localContextNumber);
-			localContextNumber = 0;
-			aggregatedConclusionsCounter_.merge(conclusionsCounter_);
-			aggregatedRuleStats_.merge(ruleStats_);
-			aggregatedFactoryStats_.merge(factoryStats_);
-			workerCount_.incrementAndGet();
-		}
-
-		/**
-		 * @return the {@code owl:Thing} object in this ontology
-		 */
-		@Override
-		public IndexedClassExpression getOwlNothing() {
-			return owlNothing_;
-		}
-
-		/**
-		 * @return the {@code owl:Nothing} object in this ontology
-		 */
-		public IndexedClassExpression getOwlThing() {
-			return owlThing_;
-		}
-
-		/**
-		 * @return the reflexive object properties in this ontology
-		 */
-		public Set<IndexedObjectProperty> getReflexiveObjectProperties() {
-			return reflexiveProperties_;
-		}
-
-		/**
-		 * @return the object collecting statistics of rule applications
-		 */
-		@Override
-		public ConclusionsCounter getConclusionsCounter() {
-			return this.conclusionsCounter_;
-		}
-
-		@Override
-		public RuleStatistics getRulesTimer() {
-			return this.ruleStats_;
-		}
-
-		@Override
-		public Context getCreateContext(IndexedClassExpression root) {
-			if (root.getContext() == null) {
-				Context context = new ContextImpl(root);
-				if (root.setContext(context)) {
-					if (++localContextNumber == contextUpdateInterval_) {
-						approximateContextNumber_.addAndGet(localContextNumber);
-						localContextNumber = 0;
-					}
-					if (LOGGER_.isTraceEnabled()) {
-						LOGGER_.trace(root + ": context created");
-					}
-					initContext(context);
-				}
-			}
-			return root.getContext();
-		}
-
-		/**
-		 * Schedule the given item to be processed in the given context
-		 *
-		 * @param context
-		 *            the context in which the conclusion is processed
-		 * @param conclusion
-		 *            the conclusion produced in the given context
-		 */
-		@Override
-		public void produce(Context context, Conclusion conclusion) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(context.getRoot() + ": new conclusion "
-						+ conclusion);
-			if (context.addToDo(conclusion))
-				// context was activated
-				activeContexts_.add(context);
+			aggregatedStats_.add(localStatistics);
+			localStatistics.reset();
 		}
 
 		/**
 		 * Process all scheduled items in the given context
-		 *
+		 * 
 		 * @param context
 		 *            the context in which to process the scheduled items
 		 */
 		protected void process(Context context) {
-			factoryStats_.contContextProcess++;
+			localContextStatistics.countProcessedContexts++;
 			for (;;) {
 				Conclusion conclusion = context.takeToDo();
+
 				if (conclusion == null)
 					return;
-				conclusion.apply(this, context);
+
+				conclusion.accept(conclusionProcessor_, context);
 			}
 		}
 
-		private void initContext(Context context) {
-			produce(context,
-					new PositiveSuperClassExpression(context.getRoot()));
-			// TODO: register this as a ContextRule when owlThing occurs
-			// negative and apply all such context initialization rules here
-			IndexedClassExpression owlThing = getOwlThing();
-			if (owlThing.occursNegatively())
-				produce(context, new PositiveSuperClassExpression(owlThing));
+		/**
+		 * Filters the {@link ConclusionVisitor} that applies inference rules to
+		 * {@link Conclusion}s by wrapping, if necessary, with the code
+		 * producing statistics
+		 * 
+		 * @param ruleProcessor
+		 *            the {@link ConclusionVisitor} to be wrapped
+		 * @param localStatistics
+		 *            the object accumulating local statistics for this worker
+		 * @return the input {@link ConclusionVisitor} possibly wrapped with
+		 *         some code for producing statistics
+		 */
+		protected ConclusionVisitor<Boolean> getUsedConclusionsCountingVisitor(
+				ConclusionVisitor<Boolean> ruleProcessor,
+				SaturationStatistics localStatistics) {
+			return SaturationUtils.getUsedConclusionCountingProcessor(
+					ruleProcessor, localStatistics);
 		}
 
+		/**
+		 * Returns the base {@link ConclusionVisitor} that performs processing
+		 * of {@code Conclusion}s within a {@link Context}. This can be further
+		 * wrapped in some other code.
+		 * 
+		 * @param saturationStateWriter
+		 *            the {@link SaturationStateImpl.AbstractWriter} using which
+		 *            one can produce new {@link Conclusion}s in {@link Context}
+		 *            s
+		 * @param localStatistics
+		 *            the object accumulating local statistics for this worker
+		 * @return the base {@link ConclusionVisitor} that performs processing
+		 *         of {@code Conclusion}s within a {@link Context}
+		 */
+		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
+				BasicSaturationStateWriter saturationStateWriter,
+				SaturationStatistics localStatistics) {
+
+			return new CombinedConclusionVisitor(
+					new ConclusionInsertionVisitor(),
+					getUsedConclusionsCountingVisitor(
+							new ConclusionApplicationVisitor(
+									saturationStateWriter,
+									SaturationUtils
+											.getStatsAwareCompositionRuleAppVisitor(localStatistics
+													.getRuleStatistics()),
+									SaturationUtils
+											.getStatsAwareDecompositionRuleAppVisitor(
+													getDecompositionRuleApplicationVisitor(),
+													localStatistics
+															.getRuleStatistics())),
+							localStatistics));
+		}
+
+		/**
+		 * Returns the final {@link ConclusionVisitor} that is used by this
+		 * {@link DefaultEngine} for processing {@code Conclusion}s within
+		 * {@link Context}s
+		 * 
+		 * @param saturationStateWriter
+		 *            the {@link SaturationStateImpl.AbstractWriter} using which
+		 *            one can produce new {@link Conclusion}s in {@link Context}
+		 *            s
+		 * @param localStatistics
+		 *            the object accumulating local statistics for this worker
+		 * @return the final {@link ConclusionVisitor} that is used by this
+		 *         {@link DefaultEngine} for processing {@code Conclusion}s
+		 *         within {@link Context}s
+		 */
+		protected ConclusionVisitor<?> getConclusionProcessor(
+				BasicSaturationStateWriter saturationStateWriter,
+				SaturationStatistics localStatistics) {
+			ConclusionVisitor<Boolean> result = getBaseConclusionProcessor(
+					saturationStateWriter, localStatistics);
+			if (trackModifiedContexts_) {
+				result = new CombinedConclusionVisitor(result,
+						new ConclusionSourceUnsaturationVisitor(
+								saturationStateWriter));
+			}
+
+			return SaturationUtils.getProcessedConclusionCountingProcessor(
+					result, localStatistics);
+		}
+
+		protected abstract DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor();
+
+		protected abstract BasicSaturationStateWriter getSaturationStateWriter();
 	}
 
 	/**
-	 * Counters accumulating statistical information about this factory.
-	 *
-	 * @author "Yevgeny Kazakov"
-	 *
+	 * Default rule application engine which can create new contexts via
+	 * {@link SaturationStateImpl.ExtendedWriter} (either directly when a new
+	 * {@link IndexedClassExpression} is submitted or during decomposition
 	 */
-	private static class ThisStatistics {
-		/**
-		 * the number of times a context has been processed using
-		 * {@link Engine#process(Context)}
-		 */
-		int contContextProcess;
+	public class DefaultEngine extends BaseEngine {
 
-		/**
-		 * the time spent within {@link Engine#process()}
-		 */
-		long timeContextProcess;
+		private final ExtendedSaturationStateWriter saturationStateWriter_;
 
-		public synchronized void merge(ThisStatistics statistics) {
-			this.contContextProcess += statistics.contContextProcess;
-			this.timeContextProcess += statistics.timeContextProcess;
+		protected DefaultEngine(
+				ExtendedSaturationStateWriter saturationStateWriter,
+				SaturationStatistics localStatistics) {
+			super(localStatistics);
+			this.saturationStateWriter_ = saturationStateWriter;
+		}
+
+		protected DefaultEngine(final ContextCreationListener listener,
+				final ContextModificationListener modListener) {
+			this(listener, modListener, new SaturationStatistics());
+		}
+
+		private DefaultEngine(final ContextCreationListener listener,
+				final ContextModificationListener modificationListener,
+				final SaturationStatistics localStatistics) {
+
+			this(
+					saturationState
+							.getExtendedWriter(
+									SaturationUtils
+											.addStatsToContextCreationListener(
+													listener,
+													localStatistics
+															.getContextStatistics()),
+									SaturationUtils
+											.addStatsToContextModificationListener(
+													modificationListener,
+													localStatistics
+															.getContextStatistics()),
+									SaturationUtils
+											.getStatsAwareCompositionRuleAppVisitor(localStatistics
+													.getRuleStatistics()),
+									SaturationUtils
+											.addStatsToConclusionVisitor(localStatistics
+													.getConclusionStatistics()),
+									trackModifiedContexts_), localStatistics);
+
+		}
+
+		@Override
+		public void submit(IndexedClassExpression job) {
+			saturationStateWriter_.getCreateContext(job);
+		}
+
+		@Override
+		protected ExtendedSaturationStateWriter getSaturationStateWriter() {
+			return saturationStateWriter_;
+		}
+
+		@Override
+		protected DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor() {
+			// here we need an extended writer to pass to the decomposer which
+			// can create new contexts
+			DecompositionRuleApplicationVisitor visitor = new ForwardDecompositionRuleApplicationVisitor(
+					saturationStateWriter_);
+
+			return SaturationUtils.getStatsAwareDecompositionRuleAppVisitor(
+					visitor, localStatistics.getRuleStatistics());
+
 		}
 	}
 

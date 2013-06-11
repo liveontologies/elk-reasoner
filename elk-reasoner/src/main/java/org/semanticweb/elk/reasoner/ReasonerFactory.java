@@ -25,11 +25,14 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
+import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 
 /**
  * The main factory to instantiate {@link Reasoner}
@@ -44,6 +47,12 @@ import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 public class ReasonerFactory {
 
 	final static Logger LOGGER_ = Logger.getLogger(ReasonerFactory.class);
+	final static ReasonerStageExecutor DEFAULT_STAGE_EXECUTOR = new SimpleStageExecutor();
+
+	public Reasoner createReasoner(OntologyLoader ontologyLoader) {
+		return createReasoner(ontologyLoader, DEFAULT_STAGE_EXECUTOR,
+				ReasonerConfiguration.getConfiguration());
+	}
 
 	/**
 	 * Creates {@link Reasoner} with the configuration loaded from
@@ -52,8 +61,9 @@ public class ReasonerFactory {
 	 * @param stageExecutor
 	 * @return ELK reasoner
 	 */
-	public Reasoner createReasoner(ReasonerStageExecutor stageExecutor) {
-		return createReasoner(stageExecutor,
+	public Reasoner createReasoner(OntologyLoader ontologyLoader,
+			ReasonerStageExecutor stageExecutor) {
+		return createReasoner(ontologyLoader, stageExecutor,
 				ReasonerConfiguration.getConfiguration());
 	}
 
@@ -64,12 +74,20 @@ public class ReasonerFactory {
 	 * @param config
 	 * @return ELK reasoner
 	 */
-	@SuppressWarnings("static-method")
-	public Reasoner createReasoner(ReasonerStageExecutor stageExecutor,
+	public Reasoner createReasoner(OntologyLoader ontologyLoader,
+			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
+		return createReasoner(ontologyLoader, stageExecutor,
+				Executors.newCachedThreadPool(), config);
+	}
+
+	public Reasoner createReasoner(OntologyLoader ontologyLoader,
+			ReasonerStageExecutor stageExecutor, ExecutorService executor,
 			ReasonerConfiguration config) {
-		return new Reasoner(
-				stageExecutor,
-				Executors.newCachedThreadPool(),
-				config.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS));
+		Reasoner reasoner = new Reasoner(ontologyLoader, stageExecutor,
+				executor);
+
+		reasoner.setConfigurationOptions(config);
+
+		return reasoner;
 	}
 }

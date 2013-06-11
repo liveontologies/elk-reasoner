@@ -56,8 +56,8 @@ import java.util.Set;
  */
 public class LazySetIntersection<E> extends AbstractSet<E> {
 
-	final Set<E> firstSet;
-	final Set<E> secondSet;
+	final Set<E> smallSet;
+	final Set<E> largeSet;
 
 	/**
 	 * Returns a new {@link Set} view for intersection of two input sets.
@@ -68,23 +68,33 @@ public class LazySetIntersection<E> extends AbstractSet<E> {
 	 *            the second set of the intersection
 	 */
 	public LazySetIntersection(Set<E> firstSet, Set<E> secondSet) {
-		this.firstSet = firstSet;
-		this.secondSet = secondSet;
+		if (firstSet.size() < secondSet.size()) {
+			this.smallSet = firstSet;
+			this.largeSet = secondSet;
+		} else {
+			this.smallSet = secondSet;
+			this.largeSet = firstSet;
+		}
+
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Iterator<E> iterator() {
-		if (firstSet.size() < secondSet.size())
-			// iterating over the fist set
-			return new SetIntersectionIterator<E>(firstSet, secondSet);
-		else
-			// iterating over the second set
-			return new SetIntersectionIterator<E>(secondSet, firstSet);
+		try {
+			// create a more efficient iterator if the set supports direct
+			// access
+			return new RawSetIntersectionIterator<E>(
+					((DirectAccess<E>) smallSet).getRawData(), largeSet);
+		} catch (ClassCastException e) {
+			// resort to generic set intersection otherwise
+			return new SetIntersectionIterator<E>(smallSet, largeSet);
+		}
 	}
 
 	@Override
 	public boolean contains(Object o) {
-		return firstSet.contains(o) && secondSet.contains(o);
+		return smallSet.contains(o) && largeSet.contains(o);
 	}
 
 	@Override
@@ -94,7 +104,7 @@ public class LazySetIntersection<E> extends AbstractSet<E> {
 
 	@Override
 	public int size() {
-		return Math.min(firstSet.size(), secondSet.size());
+		return smallSet.size();
 	}
 
 	@Override
@@ -105,8 +115,6 @@ public class LazySetIntersection<E> extends AbstractSet<E> {
 	static class SetIntersectionIterator<E> implements Iterator<E> {
 		final Iterator<E> elementIterator;
 		final Set<E> elementChecker;
-		// if there is a next element
-		boolean hasNext;
 		// reference to the next element
 		E next;
 
@@ -117,21 +125,65 @@ public class LazySetIntersection<E> extends AbstractSet<E> {
 		}
 
 		void seekNext() {
-			for (hasNext = false; !hasNext && elementIterator.hasNext();) {
+			while (elementIterator.hasNext()) {
 				next = elementIterator.next();
 				if (elementChecker.contains(next))
-					hasNext = true;
+					return;
 			}
+			next = null;
 		}
 
 		@Override
 		public boolean hasNext() {
-			return hasNext;
+			return next != null;
 		}
 
 		@Override
 		public E next() {
-			if (!hasNext)
+			if (next == null)
+				throw new NoSuchElementException();
+			E result = next;
+			seekNext();
+			return result;
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	static class RawSetIntersectionIterator<E> implements Iterator<E> {
+		final E[] rawElements;
+		final Set<E> elementChecker;
+		// current position within randomAccessSet
+		int pos = 0;
+		// reference to the next element
+		E next;
+
+		RawSetIntersectionIterator(E[] rawElements, Set<E> checkingSet) {
+			this.rawElements = rawElements;
+			this.elementChecker = checkingSet;
+			seekNext();
+		}
+
+		void seekNext() {
+			while (pos < rawElements.length) {
+				next = rawElements[pos++];
+				if (next != null && elementChecker.contains(next))
+					return;
+			}
+			next = null;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return next != null;
+		}
+
+		@Override
+		public E next() {
+			if (next == null)
 				throw new NoSuchElementException();
 			E result = next;
 			seekNext();
