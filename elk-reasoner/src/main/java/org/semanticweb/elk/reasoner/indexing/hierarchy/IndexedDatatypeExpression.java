@@ -22,17 +22,19 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.Collection;
 import java.util.Set;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import static org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression.LOGGER_;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedDataProperty;
+import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 
 /**
  *
@@ -44,7 +46,7 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 	protected final IndexedDataProperty property;
 
 	protected final ValueSpace valueSpace;
-	
+
 	public IndexedDatatypeExpression(IndexedDataProperty property,
 			ValueSpace valueSpace) {
 		this.property = property;
@@ -74,6 +76,7 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
 			property.addNegativeDatatypeExpression(this);
+			index.add(property, new ThisCompositionRule(this));
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -84,10 +87,11 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
 			property.removeNegativeDatatypeExpression(this);
+			index.remove(property, new ThisCompositionRule(this));
 		}
 	}
 
-	
+
 	@Override
 	public String toStringStructural() {
 		switch (valueSpace.getType()) {
@@ -108,9 +112,9 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 		}
 	}
 
-	public void applyRule(Context context, IndexedDatatypeExpression ide, BasicSaturationStateWriter writer) {
-		IndexedDataProperty idp = ide.getProperty();
-		ValueSpace vs = ide.getValueSpace();
+	public void applyRule(Context context, BasicSaturationStateWriter writer) {
+		IndexedDataProperty idp = getProperty();
+		ValueSpace vs = getValueSpace();
 		if (vs == EmptyValueSpace.INSTANCE) {
 			// this means that value space is inconsistent; in this
 			// case we are done
@@ -139,4 +143,37 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 		}
 	}
 
+	public static class ThisCompositionRule implements DatatypeRule<Context> {
+
+		private static final String NAME = "Datatype Expression Composition";
+		
+		private IndexedDatatypeExpression negExistential_;
+
+		ThisCompositionRule(IndexedDatatypeExpression negExistential) {
+			this.negExistential_ = negExistential;
+		}
+
+		@Override
+		public String getName() {
+			return NAME;
+		}
+
+		public IndexedDatatypeExpression getNegExistential() {
+			return negExistential_;
+		}
+
+		public void setNegExistential_(IndexedDatatypeExpression negExistential_) {
+			this.negExistential_ = negExistential_;
+		}
+
+		@Override
+		public void apply(BasicSaturationStateWriter writer, IndexedDatatypeExpression datatypeExpression, Context context) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Applying " + NAME + " to " + context + " [" + datatypeExpression + "]");
+			}
+			if (negExistential_.valueSpace.contains(datatypeExpression.valueSpace)) {
+				writer.produce(context, new NegativeSubsumer(negExistential_));
+			}
+		}
+	}
 }

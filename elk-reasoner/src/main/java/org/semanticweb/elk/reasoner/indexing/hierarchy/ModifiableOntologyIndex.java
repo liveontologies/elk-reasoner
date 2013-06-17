@@ -27,6 +27,7 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 
 /**
  * Common methods for constructing an {@link OntologyIndex}. They allow addition
@@ -174,6 +175,32 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 */
 	public void remove(IndexedClassExpression target,
 			ChainableRule<Context> oldRule)
+			throws ElkUnexpectedIndexingException;
+	
+	/**
+	 * Adds a new datatype rule for the given {@link IndexedDataProperty}
+	 * 
+	 * @param target
+	 *            the {@link IndexedDataProperty} for which to add the rule
+	 * @param newRule
+	 *            the datatype rule to be added
+	 */
+	public void add(IndexedDataProperty target, DatatypeRule<Context> newRule);
+	
+	/**
+	 * Removes an existing datatype rule for the given
+	 * {@link IndexedDataProperty}
+	 * 
+	 * @param target
+	 *            the {@link IndexedDataProperty} for which to remove the
+	 *            rule
+	 * @param oldRule
+	 *            the context rule to be removed
+	 * @throws ElkUnexpectedIndexingException
+	 *             if the given rule was not registered with this
+	 *             {@link IndexedDataProperty}
+	 */
+	public void remove(IndexedDataProperty target, DatatypeRule<Context> oldRule)
 			throws ElkUnexpectedIndexingException;
 
 }

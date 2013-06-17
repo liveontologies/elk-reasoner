@@ -38,6 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -279,7 +280,16 @@ public class DirectIndex implements ModifiableOntologyIndex {
 			}
 		};
 	}
-	
+
+	@Override
+	public void add(IndexedDataProperty target, DatatypeRule<Context> newRule) {
+		// we do not rack datatype changes here
+	}
+
+	@Override
+	public void remove(IndexedDataProperty target, DatatypeRule<Context> oldRule) throws ElkUnexpectedIndexingException {
+		// we do not rack datatype changes here
+	}
 	
 	/**
 	 * Adds root to the context

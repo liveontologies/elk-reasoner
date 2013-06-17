@@ -52,7 +52,6 @@ import org.semanticweb.elk.testing.PolySuite;
  *         pavel.klinov@uni-ulm.de
  */
 @RunWith(PolySuite.class)
-@Ignore(value = "Ignored while refactoring datatypes")
 public class IncrementalClassificationCorrectnessTest extends
 		BaseIncrementalClassificationCorrectnessTest<ElkAxiom> {
 

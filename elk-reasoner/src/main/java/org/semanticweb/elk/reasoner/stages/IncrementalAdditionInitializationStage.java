@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
@@ -47,7 +48,9 @@ import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -75,6 +78,7 @@ public class IncrementalAdditionInitializationStage extends
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
+		Multimap<IndexedDataProperty, DatatypeRule<Context>> changedDatatypesRules = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 		RuleApplicationVisitor initRuleAppVisitor = SaturationUtils
 				.getStatsAwareCompositionRuleAppVisitor(stageStatistics_
@@ -148,14 +152,15 @@ public class IncrementalAdditionInitializationStage extends
 
 		changedInitRules = diffIndex.getAddedContextInitRules();
 		changedRulesByCE = diffIndex.getAddedContextRulesByClassExpressions();
+		changedDatatypesRules = diffIndex.getAddedDatatypeRulesByProperty();
 
-		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
+		if (changedInitRules != null || !changedRulesByCE.isEmpty() || !changedDatatypesRules.isEmpty()) {
 			inputs = Operations.split(reasoner.saturationState.getContexts(),
 					8 * workerNo);
 		}
 
 		this.initialization_ = new IncrementalChangesInitialization(inputs,
-				changedInitRules, changedRulesByCE, reasoner.saturationState,
+				changedInitRules, changedRulesByCE, changedDatatypesRules, reasoner.saturationState,
 				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
 				reasoner.getProgressMonitor());
 

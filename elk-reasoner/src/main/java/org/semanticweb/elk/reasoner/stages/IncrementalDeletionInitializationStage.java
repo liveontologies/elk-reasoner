@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.AbstractIndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
@@ -40,6 +41,8 @@ import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
+import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -67,12 +70,14 @@ public class IncrementalDeletionInitializationStage extends
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
+		Multimap<IndexedDataProperty, DatatypeRule<Context>> changedDatatypesRules = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 
 		changedInitRules = diffIndex.getRemovedContextInitRules();
 		changedRulesByCE = diffIndex.getRemovedContextRulesByClassExpressions();
+		changedDatatypesRules = diffIndex.getRemovedDatatypeRulesByProperty();
 
-		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
+		if (changedInitRules != null || !changedRulesByCE.isEmpty() ||!changedDatatypesRules.isEmpty()) {
 
 			inputs = Operations.split(reasoner.saturationState.getContexts(),
 					8 * workerNo);
@@ -81,7 +86,7 @@ public class IncrementalDeletionInitializationStage extends
 		//System.err.println(changedRulesByCE.keySet().size());
 
 		this.initialization_ = new IncrementalChangesInitialization(inputs,
-				changedInitRules, changedRulesByCE, reasoner.saturationState,
+				changedInitRules, changedRulesByCE, changedDatatypesRules, reasoner.saturationState,
 				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
 				reasoner.getProgressMonitor());
 		

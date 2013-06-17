@@ -59,7 +59,7 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 
 	@Override
 	public void visit(IndexedDatatypeExpression ice, Context context) {
-		ice.applyRule(context, ice, getSaturationStateWriter());
+		ice.applyRule(context, getSaturationStateWriter());
 	}
 
 	@Override

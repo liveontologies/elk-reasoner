@@ -31,9 +31,11 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.Rule;
+import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.HashSetMultimap;
+import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
@@ -85,6 +87,8 @@ public class DifferentialIndex extends DirectIndex {
 	 */
 	private Map<IndexedClassExpression, ChainableRule<Context>> addedContextRuleHeadByClassExpressions_,
 			removedContextRuleHeadByClassExpressions_;
+	
+	private Multimap<IndexedDataProperty, DatatypeRule<Context>> addedDatatypeRulesByProperty_,removedDatatypeRulesByProperty_;
 
 	public DifferentialIndex(IndexedObjectCache objectCache) {
 		super(objectCache);
@@ -113,6 +117,7 @@ public class DifferentialIndex extends DirectIndex {
 		this.addedContextInitRules_ = null;
 		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				32);
+		this.addedDatatypeRulesByProperty_ = new HashSetMultimap<IndexedDataProperty, DatatypeRule<Context>>();
 	}
 
 	public void initDeletions() {
@@ -120,6 +125,7 @@ public class DifferentialIndex extends DirectIndex {
 		this.todoDeletions_ = new IndexedObjectCache();
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				32);
+		this.removedDatatypeRulesByProperty_ = new HashSetMultimap<IndexedDataProperty, DatatypeRule<Context>>();
 	}
 
 	/* read-only methods */
@@ -448,6 +454,36 @@ public class DifferentialIndex extends DirectIndex {
 			final IndexedClassExpression target) {
 		return AbstractChain.getMapBackedChain(
 				removedContextRuleHeadByClassExpressions_, target);
+	}
+
+	@Override
+	public void add(IndexedDataProperty target, DatatypeRule<Context> newRule) {
+		if (incrementalMode) {
+			if (!removedDatatypeRulesByProperty_.remove(target, newRule)) {
+				addedDatatypeRulesByProperty_.add(target, newRule);
+			}
+		} else {
+			super.add(target, newRule);
+		}
+	}
+
+	@Override
+	public void remove(IndexedDataProperty target, DatatypeRule<Context> oldRule) throws ElkUnexpectedIndexingException {
+		if (incrementalMode) {
+			if (!addedDatatypeRulesByProperty_.remove(target, oldRule)) {
+				removedDatatypeRulesByProperty_.add(target, oldRule);
+			}
+		} else {
+			super.remove(target, oldRule);
+		}
+	}
+
+	public Multimap<IndexedDataProperty, DatatypeRule<Context>> getAddedDatatypeRulesByProperty() {
+		return addedDatatypeRulesByProperty_;
+	}
+
+	public Multimap<IndexedDataProperty, DatatypeRule<Context>> getRemovedDatatypeRulesByProperty() {
+		return removedDatatypeRulesByProperty_;
 	}
 
 	void addIndexedObject(IndexedObject iobj) {

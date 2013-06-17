@@ -52,7 +52,6 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  * 
  */
 @RunWith(PolySuite.class)
-@Ignore(value = "Ignored while refactoring datatypes")
 public class RandomWalkIncrementalClassificationCorrectnessTest extends BaseRandomWalkIncrementalCorrectnessTest {
 
 	// logger for this class

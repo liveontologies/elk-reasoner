@@ -84,7 +84,6 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
  * pavel.klinov@uni-ulm.de
  */
 @RunWith(PolySuite.class)
-@Ignore(value = "Ignored while refactoring datatypes")
 public class OWLAPIRandomWalkIncrementalClassificationTest {
 
 	// logger for this class

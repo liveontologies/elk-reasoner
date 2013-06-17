@@ -34,7 +34,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -43,13 +50,17 @@ import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
+import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
+
 
 /**
  * Goes through the input class expressions and puts each context's superclass
@@ -68,10 +79,11 @@ public class IncrementalChangesInitialization extends
 			Collection<ArrayList<Context>> inputs,
 			ChainableRule<Context> changedGlobalRules,
 			Map<IndexedClassExpression, ChainableRule<Context>> changes,
+			Multimap<IndexedDataProperty, DatatypeRule<Context>> datatypeChanges,
 			SaturationState state, ComputationExecutor executor,
 			SaturationStatistics stageStats, int maxWorkers,
 			ProgressMonitor progressMonitor) {
-		super(inputs, new ContextInitializationFactory(state, changes,
+		super(inputs, new ContextInitializationFactory(state, changes, datatypeChanges,
 				changedGlobalRules, stageStats), executor, maxWorkers,
 				progressMonitor);
 	}
@@ -92,6 +104,7 @@ class ContextInitializationFactory
 
 	private final SaturationState saturationState_;
 	private final Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges_;
+	private final Multimap<IndexedDataProperty, DatatypeRule<Context>> datatypeChanges_;
 	private final IndexedClassExpression[] indexChangesKeys_;
 	private final LinkRule<Context> changedGlobalRuleHead_;
 	private AtomicInteger ruleHits = new AtomicInteger(0);
@@ -100,6 +113,7 @@ class ContextInitializationFactory
 	public ContextInitializationFactory(
 			SaturationState state,
 			Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges,
+			Multimap<IndexedDataProperty, DatatypeRule<Context>> datatypeChanges,
 			LinkRule<Context> changedGlobalRuleHead,
 			SaturationStatistics stageStats) {
 
@@ -107,6 +121,7 @@ class ContextInitializationFactory
 		indexChanges_ = indexChanges;
 		indexChangesKeys_ = new IndexedClassExpression[indexChanges.keySet()
 				.size()];
+		datatypeChanges_ = datatypeChanges;
 		indexChanges.keySet().toArray(indexChangesKeys_);
 		changedGlobalRuleHead_ = changedGlobalRuleHead;
 		stageStatistics_ = stageStats;
@@ -128,6 +143,8 @@ class ContextInitializationFactory
 						.getRuleStatistics());
 		final BasicSaturationStateWriter saturationStateWriter = saturationState_
 				.getWriter(ContextModificationListener.DUMMY, conclusionVisitor);
+		final DatatypeChangesApplicationVisitor datatypeChangeApplicationVisitor_ = 
+				new DatatypeChangesApplicationVisitor(datatypeChanges_, saturationStateWriter);
 
 		localStatistics.getConclusionStatistics().startMeasurements();
 
@@ -162,6 +179,11 @@ class ContextInitializationFactory
 					for (IndexedClassExpression changedICE : subsumers) {
 						applyLocalRules(context, changedICE);
 					}
+				}
+				// iterate over all subsumers, apply relevant datatype changes
+				datatypeChangeApplicationVisitor_.setContext(context);
+				for (IndexedClassExpression subsumer : subsumers) {
+					subsumer.accept(datatypeChangeApplicationVisitor_);
 				}
 			}
 
@@ -348,4 +370,57 @@ class ContextInitializationFactory
 		}
 	}
 
+	private static class DatatypeChangesApplicationVisitor implements IndexedClassExpressionVisitor<Boolean> {
+
+		private final Multimap<IndexedDataProperty, DatatypeRule<Context>> datatypeChanges_;
+		private final Set<IndexedDataProperty> affectedDatatypeProperties_;
+		private final BasicSaturationStateWriter saturationStateWriter;
+		private Context context;
+
+		public DatatypeChangesApplicationVisitor(Multimap<IndexedDataProperty, DatatypeRule<Context>> datatypeChanges, 
+				BasicSaturationStateWriter saturationStateWriter) {
+			this.datatypeChanges_ = datatypeChanges;
+			this.affectedDatatypeProperties_ = datatypeChanges.keySet();
+			this.saturationStateWriter = saturationStateWriter;
+		}
+
+		public void setContext(Context context) {
+			this.context = context;
+		}
+		
+		
+		@Override
+		public Boolean visit(IndexedClass param) {
+			return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedIndividual param) {
+			return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectIntersectionOf param) {
+			return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectSomeValuesFrom param) {
+			return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedDatatypeExpression ide) {
+			Set<IndexedDataProperty> ideProperties = ide.getProperty().getSaturated().getSuperProperties();
+			LazySetIntersection<IndexedDataProperty> lazySetIntersection =
+				new LazySetIntersection<IndexedDataProperty>(ideProperties, affectedDatatypeProperties_);
+			for (IndexedDataProperty affectedDataProperty : lazySetIntersection) {
+				for (DatatypeRule<Context> rule : datatypeChanges_.get(affectedDataProperty)) {
+					rule.apply(saturationStateWriter, ide, context);
+				}
+			}
+			return true;
+		}
+	}
+	
 }
