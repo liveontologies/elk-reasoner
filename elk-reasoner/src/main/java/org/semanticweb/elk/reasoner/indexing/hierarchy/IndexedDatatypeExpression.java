@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedDataProperty;
 import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.Rule;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  *
@@ -75,8 +75,7 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 	void updateOccurrenceNumbers(ModifiableOntologyIndex index, int increment, int positiveIncrement, int negativeIncrement) {
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			property.addNegativeDatatypeExpression(this);
-			index.add(property, new ThisCompositionRule(this));
+			index.add(property, new ThisDatatypeRule(this));
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -86,8 +85,7 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			property.removeNegativeDatatypeExpression(this);
-			index.remove(property, new ThisCompositionRule(this));
+			index.remove(property, new ThisDatatypeRule(this));
 		}
 	}
 
@@ -122,35 +120,28 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 		}
 		SaturatedDataProperty saturatedDataProperty = idp.getSaturated();
 		if (saturatedDataProperty != null) {
-			for (IndexedDataProperty superProperty : saturatedDataProperty.getSuperProperties()) {
-				Iterable<IndexedDatatypeExpression> negativeDatatypeExpressions = superProperty
-					.getNegativeDatatypeExpressions();
-				if (negativeDatatypeExpressions == null) {
-					continue;
-				}
-				for (IndexedDatatypeExpression candidate : negativeDatatypeExpressions) {
-					if (candidate == this) // already derived
-					{
-						continue;
-					}
-					// check if the candidate value space subsumes the current
-					// value space
-					if (vs.isSubsumedBy(candidate.getValueSpace())) {
-						writer.produce(context, new NegativeSubsumer(candidate));
+			for (IndexedDataProperty superProperty : 
+					saturatedDataProperty.getSuperProperties()) {
+				if (superProperty.getAssosiatedDatatypeRules() != null) {
+					for (DatatypeRule<Context> datatypeRule : 
+							superProperty.getAssosiatedDatatypeRules()) {
+						datatypeRule.apply(writer, this, context);
 					}
 				}
 			}
 		}
 	}
+	
 
-	public static class ThisCompositionRule implements DatatypeRule<Context> {
+	public static class ThisDatatypeRule implements DatatypeRule<Context> {
 
 		private static final String NAME = "Datatype Expression Composition";
 		
-		private IndexedDatatypeExpression negExistential_;
+		private final IndexedDatatypeExpression negExistential_;
 
-		ThisCompositionRule(IndexedDatatypeExpression negExistential) {
+		ThisDatatypeRule(IndexedDatatypeExpression negExistential) {
 			this.negExistential_ = negExistential;
+			hashCode_ = HashGenerator.combinedHashCode(ThisDatatypeRule.class, negExistential_);
 		}
 
 		@Override
@@ -162,18 +153,38 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 			return negExistential_;
 		}
 
-		public void setNegExistential_(IndexedDatatypeExpression negExistential_) {
-			this.negExistential_ = negExistential_;
-		}
-
 		@Override
 		public void apply(BasicSaturationStateWriter writer, IndexedDatatypeExpression datatypeExpression, Context context) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Applying " + NAME + " to " + context + " [" + datatypeExpression + "]");
 			}
-			if (negExistential_.valueSpace.contains(datatypeExpression.valueSpace)) {
+			if (negExistential_ != datatypeExpression && 
+					negExistential_.valueSpace.contains(datatypeExpression.valueSpace)) {
 				writer.produce(context, new NegativeSubsumer(negExistential_));
 			}
 		}
+		
+		private final int hashCode_;
+
+		@Override
+		public final int hashCode() {
+			return hashCode_;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			final ThisDatatypeRule other = (ThisDatatypeRule) obj;
+			if (this.negExistential_ != other.negExistential_ && (this.negExistential_ == null || !this.negExistential_.equals(other.negExistential_))) {
+				return false;
+			}
+			return true;
+		}
+		
 	}
 }

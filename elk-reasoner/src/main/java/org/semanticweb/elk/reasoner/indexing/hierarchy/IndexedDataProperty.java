@@ -23,14 +23,18 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataPropertyVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedDataProperty;
+import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -50,15 +54,11 @@ public class IndexedDataProperty extends IndexedObject{
 	private List<IndexedDataProperty> toldSuperProperties_;
 
 	/**
-	 * The list of negative occurrences of {@link IndexedDatatypeExpression}s
-	 * with this {@link ElkDataProperty}
-	 */
-	private List<IndexedDatatypeExpression> negativeDatatypeExpressions_;
-
-	/**
 	 * This counts how often this object occurred in the ontology.
 	 */
 	protected int occurrenceNo = 0;
+	
+	private Set<DatatypeRule<Context>> assosiatedDatatypeRules;
 
 	/**
 	 * the reference to a {@link SaturatedDataProperty} assigned to this
@@ -82,15 +82,26 @@ public class IndexedDataProperty extends IndexedObject{
 		return toldSuperProperties_;
 	}
 
-	/**
-	 * @return all negative occurrences of {@link IndexedDatatypeExpression}s
-	 *         with this {@link ElkDataProperty}, or {@code null} if there are
-	 *         none
-	 */
-	public List<IndexedDatatypeExpression> getNegativeDatatypeExpressions() {
-		return negativeDatatypeExpressions_;
+	protected void addDatatypeRule(DatatypeRule<Context> rule) {
+		if (assosiatedDatatypeRules == null)
+			assosiatedDatatypeRules = new HashSet<DatatypeRule<Context>>(1);
+		assosiatedDatatypeRules.add(rule);
+	}
+	
+	protected boolean removeDatatypeRule(DatatypeRule<Context> rule) {
+		boolean success = false;
+		if (rule != null) {
+			success = assosiatedDatatypeRules.remove(rule);
+			if (assosiatedDatatypeRules.isEmpty())
+				assosiatedDatatypeRules = null;
+		}
+		return success;
 	}
 
+	public Set<DatatypeRule<Context>> getAssosiatedDatatypeRules() {
+		return assosiatedDatatypeRules;
+	}
+	
 	/**
 	 * @return The corresponding {@code SaturatedDataProperty} assigned to this
 	 *         {@link IndexedDataProperty}, or {@code null} if none was
@@ -133,25 +144,6 @@ public class IndexedDataProperty extends IndexedObject{
 			success = toldSuperProperties_.remove(subProperty);
 			if (toldSuperProperties_.isEmpty())
 				toldSuperProperties_ = null;
-		}
-		return success;
-	}
-
-	protected void addNegativeDatatypeExpression(
-			IndexedDatatypeExpression datatypeExpression) {
-		if (negativeDatatypeExpressions_ == null)
-			negativeDatatypeExpressions_ = new ArrayList<IndexedDatatypeExpression>(
-					1);
-		negativeDatatypeExpressions_.add(datatypeExpression);
-	}
-	
-	protected boolean removeNegativeDatatypeExpression(
-			IndexedDatatypeExpression datatypeExpression) {
-		boolean success = false;
-		if (negativeDatatypeExpressions_ != null) {
-			success = negativeDatatypeExpressions_.remove(datatypeExpression);
-			if (negativeDatatypeExpressions_.isEmpty())
-				negativeDatatypeExpressions_ = null;
 		}
 		return success;
 	}

@@ -283,12 +283,14 @@ public class DirectIndex implements ModifiableOntologyIndex {
 
 	@Override
 	public void add(IndexedDataProperty target, DatatypeRule<Context> newRule) {
-		// we do not rack datatype changes here
+		target.addDatatypeRule(newRule);
 	}
 
 	@Override
 	public void remove(IndexedDataProperty target, DatatypeRule<Context> oldRule) throws ElkUnexpectedIndexingException {
-		// we do not rack datatype changes here
+		if (!target.removeDatatypeRule(oldRule))
+			throw new ElkUnexpectedIndexingException(
+					"Cannot remove datatype rule for data property " + target);
 	}
 	
 	/**

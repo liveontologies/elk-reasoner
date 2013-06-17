@@ -342,6 +342,15 @@ public class DifferentialIndex extends DirectIndex {
 				nextRule = nextRule.next();
 			}
 		}
+		for (IndexedDataProperty target : addedDatatypeRulesByProperty_.keySet()) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Committing context rule additions for " + target);
+			}
+			for (DatatypeRule<Context> rule : addedDatatypeRulesByProperty_.get(target)) {
+				target.addDatatypeRule(rule);
+			}
+		}
+		
 		initAdditions();
 	}
 
@@ -355,7 +364,9 @@ public class DifferentialIndex extends DirectIndex {
 				&& (addedContextRuleHeadByClassExpressions_ == null || addedContextRuleHeadByClassExpressions_
 						.isEmpty())
 				&& (removedContextRuleHeadByClassExpressions_ == null || removedContextRuleHeadByClassExpressions_
-						.isEmpty());
+						.isEmpty())
+				&& (removedDatatypeRulesByProperty_ == null || removedDatatypeRulesByProperty_.isEmpty())
+				&& (addedDatatypeRulesByProperty_ == null || addedDatatypeRulesByProperty_.isEmpty());
 	}
 
 	/**
@@ -459,7 +470,9 @@ public class DifferentialIndex extends DirectIndex {
 	@Override
 	public void add(IndexedDataProperty target, DatatypeRule<Context> newRule) {
 		if (incrementalMode) {
-			if (!removedDatatypeRulesByProperty_.remove(target, newRule)) {
+			if (removedDatatypeRulesByProperty_.remove(target, newRule)) {
+				target.addDatatypeRule(newRule);
+			} else {
 				addedDatatypeRulesByProperty_.add(target, newRule);
 			}
 		} else {
@@ -472,6 +485,11 @@ public class DifferentialIndex extends DirectIndex {
 		if (incrementalMode) {
 			if (!addedDatatypeRulesByProperty_.remove(target, oldRule)) {
 				removedDatatypeRulesByProperty_.add(target, oldRule);
+				if (!target.removeDatatypeRule(oldRule)) {
+					throw new ElkUnexpectedIndexingException(
+						"Cannot remove datatype rule "
+						+ oldRule.getName());
+				}
 			}
 		} else {
 			super.remove(target, oldRule);
