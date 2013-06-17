@@ -27,6 +27,8 @@ package org.semanticweb.elk.reasoner.incremental;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -411,7 +413,12 @@ class ContextInitializationFactory
 
 		@Override
 		public Boolean visit(IndexedDatatypeExpression ide) {
-			Set<IndexedDataProperty> ideProperties = ide.getProperty().getSaturated().getSuperProperties();
+			Set<IndexedDataProperty> ideProperties;
+			if (ide.getProperty().getSaturated() != null) {
+				ideProperties = ide.getProperty().getSaturated().getSuperProperties();
+			} else {
+				ideProperties = Collections.singleton(ide.getProperty());
+			}
 			LazySetIntersection<IndexedDataProperty> lazySetIntersection =
 				new LazySetIntersection<IndexedDataProperty>(ideProperties, affectedDatatypeProperties_);
 			for (IndexedDataProperty affectedDataProperty : lazySetIntersection) {

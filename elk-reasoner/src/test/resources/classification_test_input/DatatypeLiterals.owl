@@ -8,22 +8,6 @@ Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
 
 Ontology(<http://www.semanticweb.org/Test.owl>
 
-Declaration(Class(:DA))
-Declaration(Class(:DB))
-Declaration(Class(:DC))
-Declaration(Class(:DD))
-Declaration(Class(:DE))
-Declaration(Class(:DF))
-Declaration(Class(:DG))
-Declaration(Class(:DH))
-Declaration(Class(:DI))
-Declaration(Class(:DJ))
-Declaration(Class(:DK))
-Declaration(Class(:DL))
-Declaration(Class(:DM))
-Declaration(Class(:DN))
-Declaration(Class(:DO))
-
 EquivalentClasses(:DA DataHasValue(:prop "Foo"@us))
 EquivalentClasses(:DB DataHasValue(:prop "Foo"^^xsd:string))
 EquivalentClasses(:DC DataHasValue(:prop "foooooo"^^xsd:normalizedString))
@@ -40,6 +24,4 @@ EquivalentClasses(:DM DataSomeValuesFrom(:prop DatatypeRestriction(rdf:PlainLite
 EquivalentClasses(:DN DataSomeValuesFrom(:prop xsd:Name))
 EquivalentClasses(:DO DataSomeValuesFrom(:prop xsd:token))
 
-Declaration(DataProperty(:prop))
-Declaration(DataProperty(:prop2))
 )

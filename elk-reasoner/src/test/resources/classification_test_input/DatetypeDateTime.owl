@@ -8,19 +8,6 @@ Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
 
 Ontology(<http://www.semanticweb.org/TestELK.owl>
 
-Declaration(Class(:A))
-Declaration(Class(:B))
-Declaration(Class(:C))
-Declaration(Class(:D))
-Declaration(Class(:E))
-Declaration(Class(:F))
-Declaration(Class(:G))
-Declaration(Class(:H))
-Declaration(Class(:I))
-Declaration(Class(:J))
-Declaration(Class(:K))
-Declaration(Class(:L))
-
 EquivalentClasses(:A DataHasValue(:prop "1956-06-25T04:00:00-05:00"^^xsd:dateTime))
 EquivalentClasses(:B DataHasValue(:prop "1956-06-25T10:00:00+01:00"^^xsd:dateTime))
 EquivalentClasses(:C DataSomeValuesFrom(:prop xsd:dateTime))
@@ -34,5 +21,4 @@ EquivalentClasses(:J DataSomeValuesFrom(:prop DatatypeRestriction(xsd:dateTime x
 EquivalentClasses(:K DataSomeValuesFrom(:prop DatatypeRestriction(xsd:dateTime xsd:minInclusive "1900-10-26T21:32:52+06:00"^^xsd:dateTime xsd:maxExclusive "2011-01-01T21:32:52Z"^^xsd:dateTime)))
 EquivalentClasses(:L DataSomeValuesFrom(:prop DatatypeRestriction(xsd:dateTime xsd:maxExclusive "1900-10-26T21:32:52+06:00"^^xsd:dateTimeStamp xsd:minExclusive "2011-01-01T21:32:52Z"^^xsd:dateTimeStamp)))
 
-Declaration(DataProperty(:prop))
 )
