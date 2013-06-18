@@ -154,6 +154,8 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 					}
 				}
 				
+				changingAxioms.addAll(ontology.getAxioms(AxiomType.DECLARATION));
+				
 			} catch (OWLOntologyCreationException e) {
 				throw new Owl2ParseException(e);
 			}
