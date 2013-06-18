@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.incremental;
  * #L%
  */
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -54,6 +55,15 @@ public class OnOffVector<T> extends Vector<T> {
 		boolean result = super.add(element);
 		if (result)
 			onOffValues_.add(true);
+		return result;
+	}
+
+	@Override
+	public synchronized boolean addAll(Collection<? extends T> collection) {
+		boolean result = false;
+		for (T element : collection) {
+			result |= add(element);
+		}
 		return result;
 	}
 
