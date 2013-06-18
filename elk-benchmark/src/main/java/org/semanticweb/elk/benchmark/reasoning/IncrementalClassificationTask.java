@@ -158,6 +158,10 @@ public class IncrementalClassificationTask implements Task {
 			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
 				axioms.add(elkAxiom);
 			}
+
+			@Override
+			public void finish() throws Owl2ParseException {
+			}
 		});
 
 		return axioms;

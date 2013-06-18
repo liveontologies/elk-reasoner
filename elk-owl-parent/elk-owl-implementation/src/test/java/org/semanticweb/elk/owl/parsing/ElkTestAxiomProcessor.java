@@ -129,4 +129,9 @@ public class ElkTestAxiomProcessor implements Owl2ParserAxiomProcessor {
 	public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
 		elkPrefixes.add(elkPrefix);
 	}
+
+	@Override
+	public void finish() throws Owl2ParseException {
+		// everything is processed immediately
+	}
 }

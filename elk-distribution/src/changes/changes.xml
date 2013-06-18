@@ -15,7 +15,40 @@ will appear in the produced result.
 		<title>ELK Reasoner Project</title>
 	</properties>
 	<body>
-	    <release version="${release.version}" date="${buildDate}" description="Current version">
+	    <release version="${release.version}" date="${buildDate}" description="Forth public release">
+			<action dev="pavel" type="add">
+				Incremental classification. The reasoner will incrementally update the inferred class and instance hierarchies after adding, removing, or modifying
+				axioms. Changes in axioms which may affect the property hierarchy or property chains,
+				e.g., SubObjectPropertyOf, TransitiveObjectProperty, etc., will still trigger full re-classification.
+			</action>
+			<action dev="yevgeny" type="update">
+				Reasoning stage management reorganized to improve maintainability.
+			</action>
+			<action dev="yevgeny" type="update">
+				Faster iteration over arrays which back ArrayHashMap and ArrayHashSet.
+			</action>
+			<action dev="yevgeny" type="update">
+				Various optimizations of the producer/consumer interactions during parsing and classification to reduce the overhead of the queue
+				and make iteration over the passed data cache friendlier. 
+			</action>
+			<action dev="pavel" type="add">
+				ELK now features a concurrent OWL 2 FSS parser which tokenizes the input stream in a parallel thread.
+			</action>
+			<action dev="pavel" type="add">
+				Incremental reasoning mode can be enabled/disabled from the Reasoner Preferences panel in Protege.
+			</action>
+			<action dev="pavel" type="fix" issue="14">
+				ELK now tracks changes in axioms which belong to imported ontologies. Also it doesn't log warnings for changes in ontologies outside the
+				import closure.
+			</action>	    
+	    </release>
+	    <release version="0.3.2" date="2013-01-17" description="Second maintenance release after the third public release">
+			<action dev="yevgeny" type="fix">
+			    Fixed an issue causing a deadlock with many workers in the saturation stage. 
+			</action>
+			<action dev="yevgeny" type="update">
+				Updated dependencies for OWL API to v.3.4.2.
+			</action>	    
 	    </release>
 	    <release version="0.3.2" date="2013-01-17" description="Second maintenance relase after the third public release">
 			<action dev="yevgeny" type="fix">

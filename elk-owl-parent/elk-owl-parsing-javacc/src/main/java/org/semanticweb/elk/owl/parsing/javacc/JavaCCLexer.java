@@ -1,11 +1,14 @@
+/**
+ * 
+ */
+package org.semanticweb.elk.owl.parsing.javacc;
 /*
  * #%L
  * ELK OWL JavaCC Parser
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,25 +23,13 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.parsing.javacc;
-
-import java.io.Reader;
-
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.parsing.Owl2Parser;
-import org.semanticweb.elk.owl.printers.AbstractImplOwl2FunctionalSyntaxPrinterTest;
 
 /**
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
- *
  */
-public class JavaCCBasedOwlFunctionalStylePrinterTest extends AbstractImplOwl2FunctionalSyntaxPrinterTest{
+public interface JavaCCLexer {
 
-	@Override
-	protected Owl2Parser instantiateParser(Reader reader) {
-		return new Owl2FunctionalStyleParserFactory(new ElkObjectFactoryImpl()).getParser(reader);
-	}
+	public Token getNextToken(); 
 }
