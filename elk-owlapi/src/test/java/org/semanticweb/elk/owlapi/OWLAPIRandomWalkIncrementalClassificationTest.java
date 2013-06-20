@@ -33,6 +33,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -99,12 +100,11 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 	 * how many changes are generated in every round
 	 */
 	static int ITERATIONS = 5;
+	
+	private final static AxiomFilter axiomFilter_ = new DummyAxiomFilter();//new PropertyAxiomFilter();
 
 	protected final ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> manifest;
 	
-	@SuppressWarnings("unchecked")
-	final Set<AxiomType<?>> DYNAMIC_AXIOM_TYPES = new HashSet<AxiomType<?>>(Arrays.asList(AxiomType.SUBCLASS_OF, AxiomType.EQUIVALENT_CLASSES, AxiomType.DISJOINT_CLASSES));	
-
 	public OWLAPIRandomWalkIncrementalClassificationTest(
 			ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> testManifest) {
 		manifest = testManifest;
@@ -131,8 +131,8 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		ElkReasoner incrementalReasoner = null;
 		long seed = RandomSeedProvider.VALUE;
 
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Initial load of test axioms");
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Initial load of test axioms");
 		}
 
 		try {
@@ -143,15 +143,7 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 			
 			try {
 				ontology = manager.loadOntologyFromOntologyDocument(stream);
-				
-				for (OWLAxiom axiom : ontology.getLogicalAxioms()) {
-					if (DYNAMIC_AXIOM_TYPES.contains(axiom.getAxiomType())) {
-						changingAxioms.add(axiom);
-					}
-					else {
-						staticAxioms.add(axiom);
-					}
-				}
+				axiomFilter_.filter(ontology, staticAxioms, changingAxioms);
 				
 			} catch (OWLOntologyCreationException e) {
 				throw new Owl2ParseException(e);
@@ -282,6 +274,69 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 
 			manager.applyChanges(changes);
 			owlapiReasoner_.flush();
+		}
+	}
+	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private static interface AxiomFilter {
+		
+		void filter(OWLOntology ontology, Collection<OWLAxiom> staticAxioms, Collection<OWLAxiom> dynamicAxioms);
+	}
+	
+	/**
+	 * Treats property axioms and static, all others as changing
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	@SuppressWarnings("unused")
+	private static class PropertyAxiomFilter implements AxiomFilter {
+
+		@SuppressWarnings("unchecked")
+		final Set<AxiomType<?>> STATIC_AXIOM_TYPES = new HashSet<AxiomType<?>>(
+				Arrays.asList(AxiomType.TRANSITIVE_OBJECT_PROPERTY,
+						AxiomType.SUB_PROPERTY_CHAIN_OF,
+						AxiomType.SUB_OBJECT_PROPERTY,
+						AxiomType.REFLEXIVE_OBJECT_PROPERTY));
+		
+		@Override
+		public void filter(OWLOntology ontology,
+				Collection<OWLAxiom> staticAxioms,
+				Collection<OWLAxiom> dynamicAxioms) {
+			
+			for (OWLAxiom axiom : ontology.getAxioms()) {
+				if (STATIC_AXIOM_TYPES.contains(axiom.getAxiomType())) {
+					staticAxioms.add(axiom);
+				}
+				else {
+					dynamicAxioms.add(axiom);
+				}
+			}
+		}
+		
+	}
+	
+	/**
+	 * Treats all axioms as changing so the reasoner will be forced to
+	 * re-classify in case of non-incremental changes
+	 * 
+	 * @author Pavel Klinov
+	 * 
+	 *         pavel.klinov@uni-ulm.de
+	 */
+	private static class DummyAxiomFilter implements AxiomFilter {
+
+		@Override
+		public void filter(OWLOntology ontology,
+				Collection<OWLAxiom> staticAxioms,
+				Collection<OWLAxiom> dynamicAxioms) {
+			dynamicAxioms.addAll(ontology.getAxioms());
 		}
 		
 	}

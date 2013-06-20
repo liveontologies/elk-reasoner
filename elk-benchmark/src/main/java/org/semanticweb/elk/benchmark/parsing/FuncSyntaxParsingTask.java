@@ -77,6 +77,10 @@ public class FuncSyntaxParsingTask implements Task {
 				public void visit(ElkPrefix elkPrefix)
 						throws Owl2ParseException {
 				}
+
+				@Override
+				public void finish() throws Owl2ParseException {
+				}
 			});
 		} catch (Throwable e) {
 			throw new TaskException(e);

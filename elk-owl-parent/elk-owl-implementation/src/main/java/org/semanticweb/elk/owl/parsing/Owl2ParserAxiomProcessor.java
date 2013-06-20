@@ -39,5 +39,6 @@ public interface Owl2ParserAxiomProcessor {
 
 	public void visit(ElkAxiom elkAxiom) throws Owl2ParseException;
 	public void visit(ElkPrefix elkPrefix) throws Owl2ParseException;
+	public void finish() throws Owl2ParseException;
 
 }

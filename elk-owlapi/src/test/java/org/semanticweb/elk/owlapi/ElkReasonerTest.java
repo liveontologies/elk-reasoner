@@ -63,12 +63,9 @@ public class ElkReasonerTest {
 	/**
 	 * Testing correctness of the reasoner with respect to ontology changes
 	 * 
-	 * @throws OWLOntologyCreationException
-	 * @throws URISyntaxException
 	 */
 	@Test
-	public void testChanges() throws OWLOntologyCreationException,
-			URISyntaxException {
+	public void testChanges() throws Exception {
 
 		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
 		OWLDataFactory dataFactory = man.getOWLDataFactory();
@@ -149,10 +146,8 @@ public class ElkReasonerTest {
 			reasoner.flush();
 
 			// Because the removed axiom belongs to the imported ontology and
-			// not
-			// main ontology, the remove does not make any effect. So, we should
-			// end
-			// up with the ontology we have started with
+			// not main ontology, the remove does not make any effect. So, we
+			// should end up with the ontology we have started with
 
 			assertEquals(root.getAxiomCount(), 3);
 			// all three ontologies should be in the closure
@@ -236,6 +231,79 @@ public class ElkReasonerTest {
 		}
 
 	}
+	
+	
+	/**
+	 * Testing correctness of the reasoner when changes are made to other, imported or not, ontologies
+	 * 
+	 */
+	@Test
+	public void testChangesToOtherOntologies() throws Exception {
+
+		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLDataFactory dataFactory = man.getOWLDataFactory();
+
+		// set up resolution of prefixes
+		DefaultPrefixManager pm = new DefaultPrefixManager(
+				"http://www.example.com/main#");
+		pm.setPrefix("A:", "http://www.example.com/A#");
+		pm.setPrefix("B:", "http://www.example.com/B#");
+
+		// define query classes
+		OWLClass mainY = dataFactory.getOWLClass(":Y", pm);
+		OWLClass extA = dataFactory.getOWLClass("A:A", pm);
+		OWLClass extB = dataFactory.getOWLClass("B:B", pm);
+		OWLClass extC = dataFactory.getOWLClass("B:C", pm);
+
+		// loading the root ontology
+		OWLOntology root = loadOntology(man, "root.owl");
+		// the imported ontologies must be loaded
+		OWLOntology ontoA = man.getOntology(IRI.create("http://www.example.com/A"));
+		OWLOntology ontoB = man.getOntology(IRI.create("http://www.example.com/B"));
+
+		// Create an ELK reasoner.
+		OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
+		OWLReasoner reasoner = reasonerFactory.createReasoner(root);
+
+		try {
+			
+			assertTrue(reasoner.getSuperClasses(extA, false).containsEntity(
+					extC));
+			assertTrue(reasoner.getSuperClasses(mainY, false).containsEntity(
+					extC));
+			
+			// ************************************
+			// ** removing an axiom "A:A is-a B:B" from impA
+			// ************************************
+			OWLAxiom axiom = dataFactory.getOWLSubClassOfAxiom(extA, extB);
+			man.removeAxiom(ontoA, axiom);
+			reasoner.flush();
+			
+			assertFalse(reasoner.getSuperClasses(extA, false).containsEntity(
+					extC));
+			// put it back
+			man.addAxiom(ontoA, axiom);
+			reasoner.flush();
+			
+			assertTrue(reasoner.getSuperClasses(extA, false).containsEntity(
+					extC));
+
+			// ************************************
+			// ** removing an axiom "B:B is-a B:C" from impB
+			// ************************************
+			axiom = dataFactory.getOWLSubClassOfAxiom(extB, extC);
+			man.removeAxiom(ontoB, axiom);
+			reasoner.flush();
+			
+			assertFalse(reasoner.getSuperClasses(mainY, false).containsEntity(
+					extC));
+
+		}
+		finally {
+			reasoner.dispose();
+		}
+	}
+	
 
 	/**
 	 * Loading ontologies from the test resources

@@ -55,7 +55,7 @@ public abstract class ModelOwl2FunctionalSyntaxPrinterTest {
 			builder.append(System.getProperty("line.separator"));
 		}
 		
-		System.out.println(builder.toString());
+		//System.out.println(builder.toString());
 		
 		Set<? extends ElkObject> loadedElkObjects = loadPrintedElkObjects(builder.toString(), prefixes);
 		//TODO A diff here?

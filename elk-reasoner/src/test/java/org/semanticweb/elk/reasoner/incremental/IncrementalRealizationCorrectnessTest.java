@@ -96,6 +96,11 @@ public class IncrementalRealizationCorrectnessTest extends
 				// all axioms are dynamic
 				changingAxioms.add(elkAxiom);
 			}
+
+			@Override
+			public void finish() throws Owl2ParseException {
+				// everything is processed immediately
+			}
 		});
 	}
 

@@ -179,6 +179,10 @@ public class OwlChangesLoader implements ChangesLoader {
 	}
 
 	void registerChange(OWLOntologyChange change) {
+		if (LOGGER_.isTraceEnabled()) {
+			LOGGER_.trace("Registering change: " + change);
+		}
+		
 		pendingChanges.add(change);
 		// convert this change to the Elk's axiom change and notify the listener
 		// TODO save the converted Elk axiom to the queue to not convert the second time?

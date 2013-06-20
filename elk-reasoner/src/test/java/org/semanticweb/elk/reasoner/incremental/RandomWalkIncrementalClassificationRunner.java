@@ -45,6 +45,8 @@ import org.semanticweb.elk.util.collections.Operations;
 /**
  * A reusable runner which can be used for both unit tests and benchmarking
  * 
+ * @param T Type of axioms (using the ELK API, the OWL API, or whatever) 
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
@@ -111,13 +113,13 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			for (int i = 0; i < iterations_; i++) {
 				IncrementalChange<T> change = tracker.generateNextChange();
 
-				if (LOGGER_.isDebugEnabled()) {
-					LOGGER_.debug("Change for round " + (j + 1) + " iteration " + (i + 1));
+				if (LOGGER_.isTraceEnabled()) {
+					LOGGER_.trace("Change for round " + (j + 1) + " iteration " + (i + 1));
 
-					LOGGER_.debug("Deleted axioms");
-					printCurrentAxioms(change.getDeletions(), Level.DEBUG);
-					LOGGER_.debug("Added axioms");
-					printCurrentAxioms(change.getAdditions(), Level.DEBUG);
+					LOGGER_.trace("Deleted axioms");
+					printCurrentAxioms(change.getDeletions(), Level.TRACE);
+					LOGGER_.trace("Added axioms");
+					printCurrentAxioms(change.getAdditions(), Level.TRACE);
 				}
 				
 				io_.loadChanges(reasoner, change);
@@ -126,22 +128,20 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 
 				resultHashHistory.add(resultHash);
 
-				if (LOGGER_.isDebugEnabled()) {
-					LOGGER_.debug("Taxonomy hash code for round " + (j + 1)
+				if (LOGGER_.isTraceEnabled()) {
+					LOGGER_.trace("Taxonomy hash code for round " + (j + 1)
 							+ " iteration " + (i + 1) + ": " + resultHash);
-					LOGGER_.debug("Current axioms");
+					LOGGER_.trace("Current axioms");
 					printCurrentAxioms(Operations.concat(
 							changingAxioms.getOnElements(), staticAxioms),
 							Level.DEBUG);
-				}
-
-				if (LOGGER_.isTraceEnabled()) {
+					
 					printResult(reasoner, LOGGER_, Level.TRACE);
 				}
 			}
 
-			if (LOGGER_.isDebugEnabled()) {
-				LOGGER_.debug("Checking the final result");
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Checking the final result");
 			}
 
 			String finalResultHash = resultHashHistory.pollLast();
@@ -154,9 +154,9 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				assertEquals("Seed " + seed, expectedResultHash,
 						finalResultHash);
 			} catch (AssertionError e) {
-				LOGGER_.debug("======= Current Result =======");
+				LOGGER_.error("======= Current Result =======");
 				printResult(reasoner, LOGGER_, Level.DEBUG);
-				LOGGER_.debug("====== Expected Result =======");
+				LOGGER_.error("====== Expected Result =======");
 				printResult(standardReasoner, LOGGER_, Level.DEBUG);
 				standardReasoner.shutdown();
 				throw e;
@@ -164,8 +164,8 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 
 			standardReasoner.shutdown();
 
-			if (LOGGER_.isDebugEnabled()) {
-				LOGGER_.debug("Reverting the changes");
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Reverting the changes");
 			}
 
 			for (;;) {
@@ -179,13 +179,12 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 
 				io_.revertChanges(reasoner, change);
 				
-				if (LOGGER_.isDebugEnabled()) {
-					LOGGER_.debug("Reverting the next change");
-
-					LOGGER_.debug("Adding back:");
-					printCurrentAxioms(change.getDeletions(), Level.DEBUG);
-					LOGGER_.debug("Deleting:");
-					printCurrentAxioms(change.getAdditions(), Level.DEBUG);
+				if (LOGGER_.isTraceEnabled()) {
+					LOGGER_.trace("Reverting the next change");
+					LOGGER_.trace("Adding back:");
+					printCurrentAxioms(change.getDeletions(), Level.TRACE);
+					LOGGER_.trace("Deleting:");
+					printCurrentAxioms(change.getAdditions(), Level.TRACE);
 				}				
 
 				String taxonomyHash = getResultHash(reasoner);
@@ -194,7 +193,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 					assertEquals("Seed " + seed, expectedHash, taxonomyHash);
 				} catch (AssertionError e) {
 					// TODO print the taxonomies here?
-					printResult(reasoner, LOGGER_, Level.INFO);
+					printResult(reasoner, LOGGER_, Level.ERROR);
 
 					throw e;
 				}
@@ -210,7 +209,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 	 * reasoning tasks
 	 */
 
-	protected void printResult(Reasoner reasoner, Logger logger, Level trace)
+	protected void printResult(Reasoner reasoner, Logger logger, Level level)
 			throws IOException, ElkException {
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
 		StringWriter writer = new StringWriter();
@@ -218,8 +217,8 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 		TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
 		writer.flush();
 
-		logger.log(trace, "CLASS TAXONOMY");
-		logger.log(trace, writer.getBuffer());
+		logger.log(level, "CLASS TAXONOMY");
+		logger.log(level, writer.getBuffer());
 		writer.close();
 	}
 
