@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NegativeInfinity;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
@@ -293,5 +294,10 @@ public class NumericIntervalValueSpace implements ValueSpace {
 		return (lowerInclusive ? "[" : "(") + lowerBound.toString() + ","
 			+ upperBound.toString() + (upperInclusive ? "]" : ")")
 			+ "^^" + datatype;
+	}
+	
+	@Override
+	public <O> O accept(ValueSpaceVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }

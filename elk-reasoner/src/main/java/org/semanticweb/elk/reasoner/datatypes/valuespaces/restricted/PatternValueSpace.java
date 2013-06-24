@@ -26,6 +26,7 @@ import dk.brics.automaton.Automaton;
 import dk.brics.automaton.BasicOperations;
 import dk.brics.automaton.RegExp;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -128,5 +129,10 @@ public class PatternValueSpace implements ValueSpace {
 	@Override
 	public String toString() {
 		return datatype.toString() + " pattern: \"" + automaton.getInfo() + "\"";
+	}
+	
+	@Override
+	public <O> O accept(ValueSpaceVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }

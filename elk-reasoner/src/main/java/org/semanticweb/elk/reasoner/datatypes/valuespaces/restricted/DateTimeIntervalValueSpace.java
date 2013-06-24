@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.handlers.DateTimeDatatypeHandler;
+import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.DateTimeValue;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -168,5 +169,10 @@ public class DateTimeIntervalValueSpace implements ValueSpace {
 		return (lowerInclusive ? "[" : "(") + lowerBound.toString() + ","
 			+ upperBound.toString() + (upperInclusive ? "]" : ")")
 			+ "^^" + datatype;
+	}
+	
+	@Override
+	public <O> O accept(ValueSpaceVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }

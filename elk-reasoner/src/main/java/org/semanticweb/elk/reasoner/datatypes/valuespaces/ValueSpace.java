@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.util.collections.Subsumable;
 
 
@@ -64,4 +65,6 @@ public interface ValueSpace extends Subsumable<ValueSpace> {
 	 * @return true if this value space contains {@code valueSpace}
 	 */
 	public boolean contains(ValueSpace valueSpace);
+	
+	public <O> O accept(ValueSpaceVisitor<O> visitor);
 }

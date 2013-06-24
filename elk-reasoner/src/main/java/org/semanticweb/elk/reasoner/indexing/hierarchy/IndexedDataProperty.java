@@ -23,13 +23,14 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.reasoner.datatypes.index.AdaptableDatatypeIndex;
+import org.semanticweb.elk.reasoner.datatypes.index.DatatypeIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataPropertyVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -58,8 +59,8 @@ public class IndexedDataProperty extends IndexedObject{
 	 */
 	protected int occurrenceNo = 0;
 	
-	private Set<DatatypeRule<Context>> assosiatedDatatypeRules;
-
+	private DatatypeIndex datatypeIndex;
+	
 	/**
 	 * the reference to a {@link SaturatedDataProperty} assigned to this
 	 * {@link IndexedDataProperty}
@@ -68,6 +69,7 @@ public class IndexedDataProperty extends IndexedObject{
 
 	public IndexedDataProperty(ElkDataProperty property) {
 		this.dataPropertyIri = property.getIri();
+		this.datatypeIndex = new AdaptableDatatypeIndex();
 	}
 
 	public ElkIri getIri() {
@@ -83,23 +85,15 @@ public class IndexedDataProperty extends IndexedObject{
 	}
 
 	protected void addDatatypeRule(DatatypeRule<Context> rule) {
-		if (assosiatedDatatypeRules == null)
-			assosiatedDatatypeRules = new HashSet<DatatypeRule<Context>>(1);
-		assosiatedDatatypeRules.add(rule);
+		datatypeIndex.addDatatypeRule(rule);
 	}
 	
 	protected boolean removeDatatypeRule(DatatypeRule<Context> rule) {
-		boolean success = false;
-		if (rule != null) {
-			success = assosiatedDatatypeRules.remove(rule);
-			if (assosiatedDatatypeRules.isEmpty())
-				assosiatedDatatypeRules = null;
-		}
-		return success;
+		return datatypeIndex.removeDatatypeRule(rule);
 	}
 
-	public Set<DatatypeRule<Context>> getAssosiatedDatatypeRules() {
-		return assosiatedDatatypeRules;
+	public Collection<DatatypeRule> getAssosiatedDatatypeRules(IndexedDatatypeExpression ide) {
+		return datatypeIndex.getDatatypeRulesFor(ide);
 	}
 	
 	/**

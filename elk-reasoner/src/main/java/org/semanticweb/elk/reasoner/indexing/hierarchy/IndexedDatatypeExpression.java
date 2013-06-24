@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.Set;
+import java.util.Collection;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import static org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression.LOGGER_;
@@ -122,9 +122,10 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 		if (saturatedDataProperty != null) {
 			for (IndexedDataProperty superProperty : 
 					saturatedDataProperty.getSuperProperties()) {
-				if (superProperty.getAssosiatedDatatypeRules() != null) {
-					for (DatatypeRule<Context> datatypeRule : 
-							superProperty.getAssosiatedDatatypeRules()) {
+				Collection<DatatypeRule> assosiatedDatatypeRules = 
+					superProperty.getAssosiatedDatatypeRules(this);
+				if (assosiatedDatatypeRules != null) {
+					for (DatatypeRule<Context> datatypeRule : assosiatedDatatypeRules) {
 						datatypeRule.apply(writer, this, context);
 					}
 				}
@@ -147,6 +148,11 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 		@Override
 		public String getName() {
 			return NAME;
+		}
+
+		@Override
+		public ValueSpace getValueSpace() {
+			return negExistential_.getValueSpace();
 		}
 
 		public IndexedDatatypeExpression getNegExistential() {

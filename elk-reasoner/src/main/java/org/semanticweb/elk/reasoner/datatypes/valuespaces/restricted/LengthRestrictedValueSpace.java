@@ -26,6 +26,7 @@ import dk.brics.automaton.Automaton;
 import dk.brics.automaton.BasicOperations;
 import dk.brics.automaton.Datatypes;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
@@ -164,5 +165,10 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 	@Override
 	public String toString() {
 		return datatype.toString() + " length: >=" + minLength + " <=" + maxLength;
+	}
+	
+	@Override
+	public <O> O accept(ValueSpaceVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }

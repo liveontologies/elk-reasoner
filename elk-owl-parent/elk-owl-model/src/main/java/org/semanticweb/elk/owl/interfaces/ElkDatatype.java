@@ -101,6 +101,30 @@ public interface ElkDatatype extends ElkDataRange, ElkEntity {
 			}
 			return null;
 		}
+
+		/**
+		 * Get topmost parent datatype that contains this datatype's
+		 * value space
+		 *
+		 * @return parent datatype within same value space
+		 */
+		public ELDatatype getRootValueSpaceDatatype() {
+			ELDatatype dt = this;
+			if (dt == rdfs_Literal) {
+				return dt;
+			}
+			while (dt.parent != rdfs_Literal) {
+				dt = dt.parent;
+			}
+			return dt;
+		}
+		
+		/**
+		 * @return parent datatype
+		 */
+		public ELDatatype getParent() {
+			return this.parent;
+		}
 	}
 
 	public String getDatatypeShortname();

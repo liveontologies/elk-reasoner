@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.util.collections.Pair;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -131,5 +132,10 @@ public class LiteralValue implements ValueSpace {
 	@Override
 	public String toString() {
 		return "\"" + this.value + "@" + (language != null ? language : "") + "\"^^" + datatype;
+	}
+	
+	@Override
+	public <O> O accept(ValueSpaceVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }

@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
@@ -127,5 +128,10 @@ public class NumericValue implements ValueSpace {
 	@Override
 	public String toString() {
 		return value.toString() + "^^" + datatype;
+	}
+	
+	@Override
+	public <O> O accept(ValueSpaceVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }

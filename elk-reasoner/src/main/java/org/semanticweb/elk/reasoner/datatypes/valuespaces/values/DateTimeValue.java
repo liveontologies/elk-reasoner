@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -118,5 +119,10 @@ public class DateTimeValue implements ValueSpace {
 	@Override
 	public String toString() {
 		return value.toString() + "^^" + datatype;
+	}
+	
+	@Override
+	public <O> O accept(ValueSpaceVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }

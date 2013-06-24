@@ -36,6 +36,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 
@@ -67,5 +68,10 @@ public interface DatatypeRule<E> {
 	 * @return the name of this rule
 	 */
 	public String getName();
+	
+	/**
+	 * @return the {@link ValueSpace} associated with this rule's datatype expression.
+	 */
+	public ValueSpace getValueSpace();
 
 }

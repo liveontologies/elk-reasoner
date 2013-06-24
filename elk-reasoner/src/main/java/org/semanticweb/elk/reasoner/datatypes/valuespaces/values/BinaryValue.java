@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 
 import java.util.Arrays;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -111,4 +112,8 @@ public class BinaryValue implements ValueSpace {
 		return new String(value) + "^^" + this.datatype;
 	}
 
+	@Override
+	public <O> O accept(ValueSpaceVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
 }

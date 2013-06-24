@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -94,5 +95,10 @@ public class EntireValueSpace implements ValueSpace {
 	@Override
 	public String toString() {
 		return datatype.toString();
+	}
+
+	@Override
+	public <O> O accept(ValueSpaceVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }

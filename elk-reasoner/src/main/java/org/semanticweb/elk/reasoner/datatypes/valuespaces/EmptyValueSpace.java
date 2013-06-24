@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 
 
 /**
@@ -70,5 +71,10 @@ public class EmptyValueSpace implements ValueSpace {
 	@Override
 	public String toString() {
 		return "Ø";
+	}
+	
+	@Override
+	public <O> O accept(ValueSpaceVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }
