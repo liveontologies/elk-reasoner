@@ -56,4 +56,11 @@ public interface DatatypeIndex {
 	 * @return a collection of relevant datatype rules
 	 */
 	public Collection<DatatypeRule> getDatatypeRulesFor(IndexedDatatypeExpression ide);
+	
+	/**
+	 * Add all rules to specified {@link DatatypeIndex}
+	 *
+	 * @param index {@link DatatypeIndex} to merge into
+	 */
+	public void appendTo(DatatypeIndex index);
 }

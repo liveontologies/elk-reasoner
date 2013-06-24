@@ -35,6 +35,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
+import org.semanticweb.elk.reasoner.datatypes.index.DatatypeIndex;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
@@ -48,9 +49,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
-import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -78,7 +77,7 @@ public class IncrementalAdditionInitializationStage extends
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
-		Multimap<IndexedDataProperty, DatatypeRule<Context>> changedDatatypesRules = null;
+		Map<IndexedDataProperty, DatatypeIndex> changedDatatypesRules = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 		RuleApplicationVisitor initRuleAppVisitor = SaturationUtils
 				.getStatsAwareCompositionRuleAppVisitor(stageStatistics_

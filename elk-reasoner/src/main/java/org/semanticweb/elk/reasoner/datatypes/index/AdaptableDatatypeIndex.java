@@ -66,6 +66,12 @@ public class AdaptableDatatypeIndex implements DatatypeIndex {
 		return ide.getValueSpace().accept(indexSelector).getDatatypeRulesFor(ide);
 	}
 
+	@Override
+	public void appendTo(DatatypeIndex index) {
+		simpleDatatypeIndex.appendTo(index);
+		treeDatatypeIndex.appendTo(index);
+	}
+
 	private class IndexSelector implements ValueSpaceVisitor<DatatypeIndex> {
 
 		@Override

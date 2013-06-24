@@ -88,10 +88,14 @@ public class IndexedDataProperty extends IndexedObject{
 		datatypeIndex.addDatatypeRule(rule);
 	}
 	
+	protected void addDatatypeRules(DatatypeIndex index) {
+		index.appendTo(datatypeIndex);
+	}
+	
 	protected boolean removeDatatypeRule(DatatypeRule<Context> rule) {
 		return datatypeIndex.removeDatatypeRule(rule);
 	}
-
+	
 	public Collection<DatatypeRule> getAssosiatedDatatypeRules(IndexedDatatypeExpression ide) {
 		return datatypeIndex.getDatatypeRulesFor(ide);
 	}

@@ -28,7 +28,6 @@ package org.semanticweb.elk.reasoner.incremental;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,6 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
+import org.semanticweb.elk.reasoner.datatypes.index.DatatypeIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
@@ -56,7 +56,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
-import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -81,7 +80,7 @@ public class IncrementalChangesInitialization extends
 			Collection<ArrayList<Context>> inputs,
 			ChainableRule<Context> changedGlobalRules,
 			Map<IndexedClassExpression, ChainableRule<Context>> changes,
-			Multimap<IndexedDataProperty, DatatypeRule<Context>> datatypeChanges,
+			Map<IndexedDataProperty, DatatypeIndex> datatypeChanges,
 			SaturationState state, ComputationExecutor executor,
 			SaturationStatistics stageStats, int maxWorkers,
 			ProgressMonitor progressMonitor) {
@@ -106,7 +105,7 @@ class ContextInitializationFactory
 
 	private final SaturationState saturationState_;
 	private final Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges_;
-	private final Multimap<IndexedDataProperty, DatatypeRule<Context>> datatypeChanges_;
+	private final Map<IndexedDataProperty, DatatypeIndex> datatypeChanges_;
 	private final IndexedClassExpression[] indexChangesKeys_;
 	private final LinkRule<Context> changedGlobalRuleHead_;
 	private AtomicInteger ruleHits = new AtomicInteger(0);
@@ -115,7 +114,7 @@ class ContextInitializationFactory
 	public ContextInitializationFactory(
 			SaturationState state,
 			Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges,
-			Multimap<IndexedDataProperty, DatatypeRule<Context>> datatypeChanges,
+			Map<IndexedDataProperty, DatatypeIndex> datatypeChanges,
 			LinkRule<Context> changedGlobalRuleHead,
 			SaturationStatistics stageStats) {
 
@@ -374,12 +373,12 @@ class ContextInitializationFactory
 
 	private static class DatatypeChangesApplicationVisitor implements IndexedClassExpressionVisitor<Boolean> {
 
-		private final Multimap<IndexedDataProperty, DatatypeRule<Context>> datatypeChanges_;
+		private final Map<IndexedDataProperty, DatatypeIndex> datatypeChanges_;
 		private final Set<IndexedDataProperty> affectedDatatypeProperties_;
 		private final BasicSaturationStateWriter saturationStateWriter;
 		private Context context;
 
-		public DatatypeChangesApplicationVisitor(Multimap<IndexedDataProperty, DatatypeRule<Context>> datatypeChanges, 
+		public DatatypeChangesApplicationVisitor(Map<IndexedDataProperty, DatatypeIndex> datatypeChanges, 
 				BasicSaturationStateWriter saturationStateWriter) {
 			this.datatypeChanges_ = datatypeChanges;
 			this.affectedDatatypeProperties_ = datatypeChanges.keySet();
@@ -422,7 +421,7 @@ class ContextInitializationFactory
 			LazySetIntersection<IndexedDataProperty> lazySetIntersection =
 				new LazySetIntersection<IndexedDataProperty>(ideProperties, affectedDatatypeProperties_);
 			for (IndexedDataProperty affectedDataProperty : lazySetIntersection) {
-				for (DatatypeRule<Context> rule : datatypeChanges_.get(affectedDataProperty)) {
+				for (DatatypeRule<Context> rule : datatypeChanges_.get(affectedDataProperty).getDatatypeRulesFor(ide)) {
 					rule.apply(saturationStateWriter, ide, context);
 				}
 			}

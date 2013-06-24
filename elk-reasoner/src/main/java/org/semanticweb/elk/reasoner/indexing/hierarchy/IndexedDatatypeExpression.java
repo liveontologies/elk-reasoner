@@ -164,8 +164,7 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Applying " + NAME + " to " + context + " [" + datatypeExpression + "]");
 			}
-			if (negExistential_ != datatypeExpression && 
-					negExistential_.valueSpace.contains(datatypeExpression.valueSpace)) {
+			if (negExistential_ != datatypeExpression) {
 				writer.produce(context, new NegativeSubsumer(negExistential_));
 			}
 		}

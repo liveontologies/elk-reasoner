@@ -23,12 +23,15 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.reasoner.datatypes.index.DatatypeIndex;
+import org.semanticweb.elk.reasoner.datatypes.index.SimpleDatatypeIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
@@ -88,7 +91,7 @@ public class DifferentialIndex extends DirectIndex {
 	private Map<IndexedClassExpression, ChainableRule<Context>> addedContextRuleHeadByClassExpressions_,
 			removedContextRuleHeadByClassExpressions_;
 	
-	private Multimap<IndexedDataProperty, DatatypeRule<Context>> addedDatatypeRulesByProperty_,removedDatatypeRulesByProperty_;
+	private Map<IndexedDataProperty, DatatypeIndex> addedDatatypeRulesByProperty_,removedDatatypeRulesByProperty_;
 
 	public DifferentialIndex(IndexedObjectCache objectCache) {
 		super(objectCache);
@@ -117,7 +120,7 @@ public class DifferentialIndex extends DirectIndex {
 		this.addedContextInitRules_ = null;
 		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				32);
-		this.addedDatatypeRulesByProperty_ = new HashSetMultimap<IndexedDataProperty, DatatypeRule<Context>>();
+		this.addedDatatypeRulesByProperty_ = new HashMap<IndexedDataProperty, DatatypeIndex>();
 	}
 
 	public void initDeletions() {
@@ -125,7 +128,7 @@ public class DifferentialIndex extends DirectIndex {
 		this.todoDeletions_ = new IndexedObjectCache();
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				32);
-		this.removedDatatypeRulesByProperty_ = new HashSetMultimap<IndexedDataProperty, DatatypeRule<Context>>();
+		this.removedDatatypeRulesByProperty_ = new HashMap<IndexedDataProperty, DatatypeIndex>();
 	}
 
 	/* read-only methods */
@@ -346,9 +349,7 @@ public class DifferentialIndex extends DirectIndex {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Committing context rule additions for " + target);
 			}
-			for (DatatypeRule<Context> rule : addedDatatypeRulesByProperty_.get(target)) {
-				target.addDatatypeRule(rule);
-			}
+			target.addDatatypeRules(addedDatatypeRulesByProperty_.get(target));
 		}
 		
 		initAdditions();
@@ -467,13 +468,23 @@ public class DifferentialIndex extends DirectIndex {
 				removedContextRuleHeadByClassExpressions_, target);
 	}
 
+	private DatatypeIndex getDatatypeIndex(Map<IndexedDataProperty, DatatypeIndex> map, IndexedDataProperty key) {
+		DatatypeIndex index = map.get(key);
+		if (index == null) {
+			index = new SimpleDatatypeIndex();
+			map.put(key, index);
+		}
+		return index;
+	}
+	
 	@Override
 	public void add(IndexedDataProperty target, DatatypeRule<Context> newRule) {
 		if (incrementalMode) {
-			if (removedDatatypeRulesByProperty_.remove(target, newRule)) {
+			if (removedDatatypeRulesByProperty_.get(target) != null &&
+				removedDatatypeRulesByProperty_.get(target).removeDatatypeRule(newRule)) {
 				target.addDatatypeRule(newRule);
 			} else {
-				addedDatatypeRulesByProperty_.add(target, newRule);
+				getDatatypeIndex(addedDatatypeRulesByProperty_ ,target).addDatatypeRule(newRule);
 			}
 		} else {
 			super.add(target, newRule);
@@ -483,8 +494,9 @@ public class DifferentialIndex extends DirectIndex {
 	@Override
 	public void remove(IndexedDataProperty target, DatatypeRule<Context> oldRule) throws ElkUnexpectedIndexingException {
 		if (incrementalMode) {
-			if (!addedDatatypeRulesByProperty_.remove(target, oldRule)) {
-				removedDatatypeRulesByProperty_.add(target, oldRule);
+			if (addedDatatypeRulesByProperty_.get(target) == null || 
+				!addedDatatypeRulesByProperty_.get(target).removeDatatypeRule(oldRule)) {
+				getDatatypeIndex(removedDatatypeRulesByProperty_, target).addDatatypeRule(oldRule);
 				if (!target.removeDatatypeRule(oldRule)) {
 					throw new ElkUnexpectedIndexingException(
 						"Cannot remove datatype rule "
@@ -496,11 +508,11 @@ public class DifferentialIndex extends DirectIndex {
 		}
 	}
 
-	public Multimap<IndexedDataProperty, DatatypeRule<Context>> getAddedDatatypeRulesByProperty() {
+	public Map<IndexedDataProperty, DatatypeIndex> getAddedDatatypeRulesByProperty() {
 		return addedDatatypeRulesByProperty_;
 	}
 
-	public Multimap<IndexedDataProperty, DatatypeRule<Context>> getRemovedDatatypeRulesByProperty() {
+	public Map<IndexedDataProperty, DatatypeIndex> getRemovedDatatypeRulesByProperty() {
 		return removedDatatypeRulesByProperty_;
 	}
 
