@@ -364,7 +364,7 @@ public abstract class AbstractReasonerState {
 
 		getStageExecutor().complete(stageManager.changesLoadingStage);
 
-		if (nonIncrementalChange_/*!isIncrementalMode()*/) {
+		if (nonIncrementalChange_) {
 			/*
 			 * the mode was switched to non-incremental during change loading.
 			 * As such, we should recompute everything, e.g., the role

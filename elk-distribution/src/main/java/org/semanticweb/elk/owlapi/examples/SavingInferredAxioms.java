@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.OWLFunctionalSyntaxOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -58,11 +59,11 @@ public class SavingInferredAxioms {
 
 	public static void main(String[] args) throws OWLOntologyStorageException,
 			OWLOntologyCreationException {
-		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager inputOntologyManager = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager outputOntologyManager = OWLManager.createOWLOntologyManager();
 
 		// Load your ontology.
-		OWLOntology ont = man.loadOntologyFromOntologyDocument(new File(
-				"c:/ontologies/ontology.owl"));
+		OWLOntology ont = inputOntologyManager.loadOntologyFromOntologyDocument(new File("path-to-ontology"));
 
 		// Create an ELK reasoner.
 		OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
@@ -78,14 +79,15 @@ public class SavingInferredAxioms {
 		gens.add(new InferredEquivalentClassAxiomGenerator());
 
 		// Put the inferred axioms into a fresh empty ontology.
-		OWLOntology infOnt = man.createOntology();
+		OWLOntology infOnt = outputOntologyManager.createOntology();
 		InferredOntologyGenerator iog = new InferredOntologyGenerator(reasoner,
 				gens);
-		iog.fillOntology(man, infOnt);
+		iog.fillOntology(outputOntologyManager, infOnt);
 
 		// Save the inferred ontology.
-		man.saveOntology(infOnt,
-				IRI.create((new File("c:/ontologies/result.owl").toURI())));
+		outputOntologyManager.saveOntology(infOnt,
+				new OWLFunctionalSyntaxOntologyFormat(),
+				IRI.create((new File("path-to-output").toURI())));
 
 		// Terminate the worker threads used by the reasoner.
 		reasoner.dispose();

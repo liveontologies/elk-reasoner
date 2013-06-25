@@ -205,7 +205,7 @@ public class ElkReasoner implements OWLReasoner {
 	/**
 	 * Exposes the ELK reasoner used internally in this OWL API wrapper.
 	 */
-	protected Reasoner getInternalReasoner() {
+	public Reasoner getInternalReasoner() {
 		return reasoner_;
 	}
 	
@@ -941,23 +941,34 @@ public class ElkReasoner implements OWLReasoner {
 		public void ontologiesChanged(List<? extends OWLOntologyChange> changes)
 				throws OWLException {
 			for (OWLOntologyChange change : changes) {
-				if (!change.getOntology().equals(owlOntology_)) {
-					LOGGER_.warn("Ignoring the change not applicable to the current ontology: "
-							+ change);
+				if (!relevantChange(change)) {
+					if (LOGGER_.isTraceEnabled()) {
+						LOGGER_.trace("Ignoring the change not applicable to the current ontology: "
+								+ change);
+					}
 					continue;
 				}
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace("registering change: " + change);
-				}
-				ontologyChangesLoader_.registerChange(change);
+				
 				if (!change.isAxiomChange()) {
-					// currently we cannot handle non-axiom changes
-					// incrementally
+					if (LOGGER_.isTraceEnabled()) {
+						LOGGER_.trace("Non-axiom change: " + change + "\n The ontology will be reloaded.");
+					}
+					// cannot handle non-axiom changes incrementally
 					ontologyReloadRequired_ = true;
+				}
+				else {
+					ontologyChangesLoader_.registerChange(change);	
 				}
 			}
 			if (!isBufferingMode_)
 				flush();
+		}
+
+		/**
+		 */
+		private boolean relevantChange(OWLOntologyChange change) {
+			return owlOntology_.getImportsClosure().contains(change.getOntology());
+			//return change.getOntology().equals(owlOntology_);
 		}
 	}
 
