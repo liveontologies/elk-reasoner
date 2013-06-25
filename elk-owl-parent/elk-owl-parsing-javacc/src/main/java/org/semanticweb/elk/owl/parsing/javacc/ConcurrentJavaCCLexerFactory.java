@@ -37,7 +37,7 @@ import java.util.concurrent.SynchronousQueue;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ConcurrentJavaCCLexerFactory implements JavaCCLexerFactory {
+public class ConcurrentJavaCCLexerFactory implements JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> {
 
 	@Override
 	public AbstractOwl2FunctionalStyleParserTokenManager createLexer(

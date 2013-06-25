@@ -29,12 +29,12 @@ package org.semanticweb.elk.owl.parsing.javacc;
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface JavaCCLexerFactory {
+public interface JavaCCLexerFactory<T> {
 
 	/**
 	 * 
 	 * @param nativeLexer The lexer which has physical access to the input stream of characters
 	 * @return
 	 */
-	public AbstractOwl2FunctionalStyleParserTokenManager createLexer(AbstractOwl2FunctionalStyleParserTokenManager nativeLexer);
+	public T createLexer(T nativeLexer);
 }

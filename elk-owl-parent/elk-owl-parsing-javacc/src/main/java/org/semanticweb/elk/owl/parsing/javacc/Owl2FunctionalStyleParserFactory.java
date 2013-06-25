@@ -34,17 +34,17 @@ import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
 
 public class Owl2FunctionalStyleParserFactory implements Owl2ParserFactory {
 
-	private final static JavaCCLexerFactory DEFAULT_LEXER_FACTORY = new ConcurrentJavaCCLexerFactory();
+	private final static JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> DEFAULT_LEXER_FACTORY = new ConcurrentJavaCCLexerFactory();
 
 	/**
 	 * the {@link ElkObjectFactory} used with this {@link Owl2ParserFactory}
 	 */
 	private final ElkObjectFactory objectFactory_;
 
-	private final JavaCCLexerFactory lexerFactory_;
+	private final JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> lexerFactory_;
 
 	public Owl2FunctionalStyleParserFactory(ElkObjectFactory objectFactory,
-			JavaCCLexerFactory lexerFactory) {
+			JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> lexerFactory) {
 		this.objectFactory_ = objectFactory;
 		this.lexerFactory_ = lexerFactory;
 	}
@@ -82,12 +82,12 @@ public class Owl2FunctionalStyleParserFactory implements Owl2ParserFactory {
 
 		private final ElkPrefixDeclarations prefixDeclarations_;
 
-		private final JavaCCLexerFactory lexerFactory_;
+		private final JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> lexerFactory_;
 
 		private Owl2FunctionalStyleParser(InputStream stream,
 				ElkObjectFactory objectFactory,
 				ElkPrefixDeclarations prefixDeclarations,
-				JavaCCLexerFactory factory) {
+				JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> factory) {
 			super(stream);
 			this.objectFactory_ = objectFactory;
 			this.prefixDeclarations_ = prefixDeclarations;
@@ -97,7 +97,7 @@ public class Owl2FunctionalStyleParserFactory implements Owl2ParserFactory {
 		}
 
 		Owl2FunctionalStyleParser(InputStream stream,
-				ElkObjectFactory objectFactory, JavaCCLexerFactory lexerFactory) {
+				ElkObjectFactory objectFactory, JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> lexerFactory) {
 			this(stream, objectFactory, new ElkPrefixDeclarationsImpl(),
 					lexerFactory);
 		}
@@ -105,7 +105,7 @@ public class Owl2FunctionalStyleParserFactory implements Owl2ParserFactory {
 		Owl2FunctionalStyleParser(Reader reader,
 				ElkObjectFactory objectFactory,
 				ElkPrefixDeclarations prefixDeclarations,
-				JavaCCLexerFactory factory) {
+				JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> factory) {
 			super(reader);
 			this.objectFactory_ = objectFactory;
 			this.prefixDeclarations_ = prefixDeclarations;
@@ -115,7 +115,7 @@ public class Owl2FunctionalStyleParserFactory implements Owl2ParserFactory {
 		}
 
 		Owl2FunctionalStyleParser(Reader reader,
-				ElkObjectFactory objectFactory, JavaCCLexerFactory lexerFactory) {
+				ElkObjectFactory objectFactory, JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> lexerFactory) {
 			this(reader, objectFactory, new ElkPrefixDeclarationsImpl(),
 					lexerFactory);
 		}
