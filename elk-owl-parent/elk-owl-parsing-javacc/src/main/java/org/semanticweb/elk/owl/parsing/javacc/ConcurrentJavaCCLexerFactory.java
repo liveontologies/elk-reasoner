@@ -25,16 +25,17 @@ package org.semanticweb.elk.owl.parsing.javacc;
  * #L%
  */
 
-import java.util.concurrent.ArrayBlockingQueue;
-
-import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 
 /**
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
  */
 public class ConcurrentJavaCCLexerFactory implements JavaCCLexerFactory {
 
@@ -55,86 +56,94 @@ public class ConcurrentJavaCCLexerFactory implements JavaCCLexerFactory {
 class ConcurrentJavaCCLexer extends
 		AbstractOwl2FunctionalStyleParserTokenManager {
 
-	private final static int TOKEN_ARRAY_SIZE = 1024;
-	private final static int TOKEN_QUEUE_SIZE = 255;
-
-	private final AbstractOwl2FunctionalStyleParserTokenManager lexer_;
-
-	private final Thread lexerThread_;
-	// These queues may be replaced by a faster sync'ed solution
-	// since we know that the array pool is bounded
-	private final ArrayBlockingQueue<Token[]> producedTokenQueue_;
-
-	private final ArrayBlockingQueue<Token[]> freeTokenQueue_;
-
-	private boolean finished_ = false;
-
-	private Token[] tokenArray_ = null;
-
-	private int tokenIndex_ = 0;
-
-	private Token[][] tokens_ = new Token[TOKEN_QUEUE_SIZE][TOKEN_ARRAY_SIZE];
+	/**
+	 * how many tokens are in the batch
+	 */
+	private final static int DEFAULT_BATCH_LENGTH = 4096;
 
 	/**
-	 * the exception created if something goes wrong
+	 * an object from which messages are received from the lexer thread
 	 */
-	protected volatile ElkException exception_;
+	private final BlockingQueue<LexerMessage> messagePipe_;
+	/**
+	 * the processor of lexer messages
+	 */
+	private final LexerMessageVisitor messageProcessor_;
+	/**
+	 * the reference to the last batch of tokens taken from the lexer
+	 */
+	private LexerBatch lastBatch_;
+	/**
+	 * the cached size of the batch
+	 */
+	private int batchSize_;
+	/**
+	 * the position of the next token to take from the batch
+	 */
+	private int pos_;
+
+	/**
+	 * cached last token taken
+	 */
+	private Token lastToken_ = null;
 
 	public ConcurrentJavaCCLexer(
 			AbstractOwl2FunctionalStyleParserTokenManager nativeLexer) {
 		super(null);
 
-		lexer_ = nativeLexer;
-		lexerThread_ = new Thread(new Lexer(), "elk-lexer-thread");
-		producedTokenQueue_ = new ArrayBlockingQueue<Token[]>(
-				TOKEN_QUEUE_SIZE + 1);
-		freeTokenQueue_ = new ArrayBlockingQueue<Token[]>(TOKEN_QUEUE_SIZE);
+		messagePipe_ = new SynchronousQueue<LexerMessage>();
+		messageProcessor_ = new LexerMessageProcessor();
 
-		lexerThread_.start();
+		pos_ = 0;
+		batchSize_ = 0;
+		lastBatch_ = null;
 
-		for (int i = 0; i < TOKEN_QUEUE_SIZE; i++) {
-			freeTokenQueue_.add(tokens_[i]);
-		}
+		new Thread(new Lexer(nativeLexer, messagePipe_, DEFAULT_BATCH_LENGTH),
+				"elk-lexer-thread").start();
 	}
 
 	@Override
 	public Token getNextToken() {
-		if (finished_) {
-			return null;
-		}
-
-		if (tokenArray_ == null || tokenIndex_ >= tokenArray_.length) {
-
-			try {
-
-				if (tokenArray_ != null) {
-					// release the array so the lexer thread can reuse it
-					freeTokenQueue_.add(tokenArray_);
-				}
-
-				tokenArray_ = producedTokenQueue_.take();
-				tokenIndex_ = 0;
-
-				if (tokenArray_.length == 0) {
-					//we've been poisoned...
-					finished_ = true;
-
-					return null;
-				}
-			} catch (InterruptedException e) {
-				exception_ = new Owl2ParseException(
-						"ELK parser was interrupted", e);
-				e.printStackTrace();
-
-				return null;
+		for (;;) {
+			if (pos_ < batchSize_) {
+				lastToken_ = lastBatch_.get(pos_++);
+				return lastToken_;
 			}
+			// else
+			try {
+				messagePipe_.take().accept(messageProcessor_);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				throw new Error("ELK lexer was interrupted", e);
+			}
+			if (lastBatch_ == null) {
+				// no more tokens; keep returning the last token (probably EOF)
+				return lastToken_;
+			}
+			// new batch; update the position
+			batchSize_ = lastBatch_.size();
+			pos_ = 0;
 		}
-
-		return tokenArray_[tokenIndex_++];
 	}
 
-	public ElkException getError() {
-		return exception_;
+	/**
+	 * Processing messages from the lexer thread
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	private class LexerMessageProcessor implements LexerMessageVisitor {
+
+		@Override
+		public void visit(LexerBatch batch) {
+			lastBatch_ = batch;
+		}
+
+		@Override
+		public void visit(LexerError error) {
+			throw error.getError();
+		}
+
 	}
 
 	/**
@@ -142,59 +151,73 @@ class ConcurrentJavaCCLexer extends
 	 * @author Pavel Klinov
 	 * 
 	 *         pavel.klinov@uni-ulm.de
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
 	 */
-	private class Lexer implements Runnable {
+	private static class Lexer implements Runnable {
 
-		private Token[] producerTokenArray_ = null;
+		/**
+		 * the lexer used to generate the tokens
+		 */
+		private final AbstractOwl2FunctionalStyleParserTokenManager lexer_;
+		/**
+		 * an object through which the messages are sent
+		 */
+		private final BlockingQueue<LexerMessage> messagePipe_;
+		/**
+		 * the length of batches
+		 */
+		private final int batchLength_;
+		/**
+		 * the next batch of axioms that should be filled
+		 */
+		private LexerBatch nextBatch_;
 
-		private int producedIndex_ = 0;
+		Lexer(AbstractOwl2FunctionalStyleParserTokenManager lexer,
+				BlockingQueue<LexerMessage> messagePipe, int batchLength) {
+			this.lexer_ = lexer;
+			this.messagePipe_ = messagePipe;
+			this.batchLength_ = batchLength;
+			nextBatch_ = new LexerBatch(batchLength_);
+		}
 
 		@Override
 		public void run() {
 			try {
-
-				producerTokenArray_ = freeTokenQueue_.take();
-				// producerTokenArray_ = new Token[TOKEN_ARRAY_SIZE];
-
 				for (;;) {
-					boolean putIntoQueue = false;
-					Token nextToken = null;
-
-					nextToken = lexer_.getNextToken();
-
-					if (producedIndex_ >= TOKEN_ARRAY_SIZE) {
-						// producedTokenQueue_.put(producerTokenArray_);
-						// producerTokenArray_ = new Token[TOKEN_ARRAY_SIZE];
-						producedTokenQueue_.add(producerTokenArray_);
-						producerTokenArray_ = freeTokenQueue_.take();
-						producedIndex_ = 0;
-
-						putIntoQueue = true;
+					Token nextToken = lexer_.getNextToken();
+					nextBatch_.add(nextToken);
+					if (nextBatch_.size() == batchLength_) {
+						messagePipe_.put(nextBatch_);
+						nextBatch_ = new LexerBatch(batchLength_);
 					}
-
-					producerTokenArray_[producedIndex_++] = nextToken;
-
-					if (nextToken == null
-							|| AbstractOwl2FunctionalStyleParserTokenManager.EOF == nextToken.kind) {
-						if (!putIntoQueue) {
-							producedTokenQueue_.put(producerTokenArray_);
-						}
-
-						break;
+					if (nextToken.kind == AbstractOwl2FunctionalStyleParserTokenManager.EOF) {
+						messagePipe_.put(nextBatch_);
+						return;
 					}
 				}
-
-				producedTokenQueue_.put(new Token[] {});// poison
-
 			} catch (InterruptedException e) {
-				exception_ = new Owl2ParseException(
-						"ELK parser was interrupted", e);
+				for (;;) {
+					try {
+						messagePipe_.put(new LexerError(new Error(
+								"ELK lexer was interrupted", e)));
+						return;
+					} catch (InterruptedException e1) {
+						// continue; we have to send the error despite anything
+					}
+				}
 			} catch (TokenMgrError err) {
-				// Error occurred, need to kill the consumer thread
-				exception_ = new Owl2ParseException("Lexical error", err);
-				producedTokenQueue_.add(new Token[] {});// poison
+				for (;;) {
+					try {
+						messagePipe_.put(new LexerError(err));
+						return;
+					} catch (InterruptedException e) {
+						// continue; we have to send the error despite anything
+					}
+				}
 			}
 		}
-
 	}
+
 }
