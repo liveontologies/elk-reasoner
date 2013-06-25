@@ -106,6 +106,7 @@ public class Owl2ParserLoader implements Loader {
 		this.batchLength_ = batchLength;
 		this.finished_ = false;
 		this.parserThread_ = new Thread(new Parser(), "elk-parser-thread");
+		parserThread_.setDaemon(true);
 		this.started_ = false;
 		this.exception = null;
 	}
