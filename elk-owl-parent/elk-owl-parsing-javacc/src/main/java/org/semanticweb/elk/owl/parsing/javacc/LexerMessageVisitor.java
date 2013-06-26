@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.semanticweb.elk.owl.parsing.javacc;
 
 /*
@@ -26,22 +23,15 @@ package org.semanticweb.elk.owl.parsing.javacc;
  */
 
 /**
- * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ * The visitor pattern for {@link LexerMessage}
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ConcurrentJavaCCLexerFactory implements
-		JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> {
+interface LexerMessageVisitor {
 
-	@Override
-	public AbstractOwl2FunctionalStyleParserTokenManager createLexer(
-			AbstractOwl2FunctionalStyleParserTokenManager nativeLexer) {
+	public void visit(LexerBatch batch);
 
-		return new ConcurrentJavaCCLexer(nativeLexer);
-	}
+	public void visit(LexerError error);
 
 }

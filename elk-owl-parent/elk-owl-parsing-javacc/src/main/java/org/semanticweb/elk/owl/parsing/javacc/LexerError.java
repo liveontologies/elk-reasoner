@@ -1,8 +1,4 @@
-/**
- * 
- */
 package org.semanticweb.elk.owl.parsing.javacc;
-
 /*
  * #%L
  * ELK OWL JavaCC Parser
@@ -26,22 +22,25 @@ package org.semanticweb.elk.owl.parsing.javacc;
  */
 
 /**
- * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ * A {@link LexerMessage} that indicates lexing error
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ConcurrentJavaCCLexerFactory implements
-		JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> {
+class LexerError implements LexerMessage {
 
-	@Override
-	public AbstractOwl2FunctionalStyleParserTokenManager createLexer(
-			AbstractOwl2FunctionalStyleParserTokenManager nativeLexer) {
+	private Error error_;
 
-		return new ConcurrentJavaCCLexer(nativeLexer);
+	public LexerError(Error error) {
+		this.error_ = error;
 	}
 
+	public Error getError() {
+		return error_;
+	}
+
+	@Override
+	public void accept(LexerMessageVisitor visitor) {
+		visitor.visit(this);
+	}
 }

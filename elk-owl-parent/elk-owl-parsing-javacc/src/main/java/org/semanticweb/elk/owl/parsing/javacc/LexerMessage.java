@@ -1,8 +1,4 @@
-/**
- * 
- */
 package org.semanticweb.elk.owl.parsing.javacc;
-
 /*
  * #%L
  * ELK OWL JavaCC Parser
@@ -26,22 +22,11 @@ package org.semanticweb.elk.owl.parsing.javacc;
  */
 
 /**
- * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ * The abstract message type that can be send from the lexer thread
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ConcurrentJavaCCLexerFactory implements
-		JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> {
-
-	@Override
-	public AbstractOwl2FunctionalStyleParserTokenManager createLexer(
-			AbstractOwl2FunctionalStyleParserTokenManager nativeLexer) {
-
-		return new ConcurrentJavaCCLexer(nativeLexer);
-	}
-
+interface LexerMessage {
+	public void accept(LexerMessageVisitor visitor);
 }

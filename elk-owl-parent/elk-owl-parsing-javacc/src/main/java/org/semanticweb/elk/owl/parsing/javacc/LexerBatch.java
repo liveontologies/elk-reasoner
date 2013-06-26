@@ -1,8 +1,4 @@
-/**
- * 
- */
 package org.semanticweb.elk.owl.parsing.javacc;
-
 /*
  * #%L
  * ELK OWL JavaCC Parser
@@ -25,23 +21,25 @@ package org.semanticweb.elk.owl.parsing.javacc;
  * #L%
  */
 
+import java.util.ArrayList;
+
 /**
- * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ * A {@link LexerMessage} that holds tokens
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
-public class ConcurrentJavaCCLexerFactory implements
-		JavaCCLexerFactory<AbstractOwl2FunctionalStyleParserTokenManager> {
+class LexerBatch extends ArrayList<Token> implements LexerMessage {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1438353325200022815L;
 
-	@Override
-	public AbstractOwl2FunctionalStyleParserTokenManager createLexer(
-			AbstractOwl2FunctionalStyleParserTokenManager nativeLexer) {
-
-		return new ConcurrentJavaCCLexer(nativeLexer);
+	public LexerBatch(int length) {
+		super(length);
 	}
 
+	@Override
+	public void accept(LexerMessageVisitor visitor) {
+		visitor.visit(this);
+	}
 }

@@ -1,6 +1,5 @@
 package org.semanticweb.elk.util.logging;
 
-
 /*
  * #%L
  * ELK Utilities for Logging
@@ -46,10 +45,15 @@ public class CachedTimeThread extends Thread {
 		setDaemon(true);
 	}
 
-	static {
-		new CachedTimeThread().start();
+	CachedTimeThread(String name) {
+		super(name);
+		setDaemon(true);
 	}
-	
+
+	static {
+		new CachedTimeThread("elk-timer-thread").start();
+	}
+
 	public static long getCurrentTimeMillis() {
 		return currentTimeMillis;
 	}
@@ -58,8 +62,8 @@ public class CachedTimeThread extends Thread {
 	public void run() {
 		for (;;) {
 			currentTimeMillis = (int) System.currentTimeMillis();
-			//currentTimeMillis.set(System.currentTimeMillis());
-			
+			// currentTimeMillis.set(System.currentTimeMillis());
+
 			try {
 				Thread.sleep(UPDATE_FREQUENCY_);
 			} catch (InterruptedException e) {
