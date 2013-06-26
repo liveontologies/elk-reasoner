@@ -50,9 +50,9 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -375,14 +375,14 @@ class ContextInitializationFactory
 
 		private final Map<IndexedDataProperty, DatatypeIndex> datatypeChanges_;
 		private final Set<IndexedDataProperty> affectedDatatypeProperties_;
-		private final BasicSaturationStateWriter saturationStateWriter;
+		private final BasicSaturationStateWriter writer;
 		private Context context;
 
 		public DatatypeChangesApplicationVisitor(Map<IndexedDataProperty, DatatypeIndex> datatypeChanges, 
 				BasicSaturationStateWriter saturationStateWriter) {
 			this.datatypeChanges_ = datatypeChanges;
 			this.affectedDatatypeProperties_ = datatypeChanges.keySet();
-			this.saturationStateWriter = saturationStateWriter;
+			this.writer = saturationStateWriter;
 		}
 
 		public void setContext(Context context) {
@@ -421,8 +421,9 @@ class ContextInitializationFactory
 			LazySetIntersection<IndexedDataProperty> lazySetIntersection =
 				new LazySetIntersection<IndexedDataProperty>(ideProperties, affectedDatatypeProperties_);
 			for (IndexedDataProperty affectedDataProperty : lazySetIntersection) {
-				for (DatatypeRule<Context> rule : datatypeChanges_.get(affectedDataProperty).getDatatypeRulesFor(ide)) {
-					rule.apply(saturationStateWriter, ide, context);
+				for (IndexedClassExpression expr : 
+					datatypeChanges_.get(affectedDataProperty).getDatatypeExpressionsFor(ide)) {
+					writer.produce(context, new NegativeSubsumer(expr));
 				}
 			}
 			return true;

@@ -25,16 +25,13 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.Collection;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
-import static org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression.LOGGER_;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedDataProperty;
-import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  *
@@ -75,7 +72,7 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 	void updateOccurrenceNumbers(ModifiableOntologyIndex index, int increment, int positiveIncrement, int negativeIncrement) {
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			index.add(property, new ThisDatatypeRule(this));
+			index.add(property, this);
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -85,7 +82,7 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			index.remove(property, new ThisDatatypeRule(this));
+			index.remove(property, this);
 		}
 	}
 
@@ -122,74 +119,14 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 		if (saturatedDataProperty != null) {
 			for (IndexedDataProperty superProperty : 
 					saturatedDataProperty.getSuperProperties()) {
-				Collection<DatatypeRule> assosiatedDatatypeRules = 
-					superProperty.getAssosiatedDatatypeRules(this);
-				if (assosiatedDatatypeRules != null) {
-					for (DatatypeRule<Context> datatypeRule : assosiatedDatatypeRules) {
-						datatypeRule.apply(writer, this, context);
+				Collection<IndexedDatatypeExpression> assosiatedDatatypeExprs = 
+					superProperty.getAssosiatedDatatypeExpressions(this);
+				if (assosiatedDatatypeExprs != null) {
+					for (IndexedDatatypeExpression expr : assosiatedDatatypeExprs) {
+						writer.produce(context, new NegativeSubsumer(expr));
 					}
 				}
 			}
 		}
-	}
-	
-
-	public static class ThisDatatypeRule implements DatatypeRule<Context> {
-
-		private static final String NAME = "Datatype Expression Composition";
-		
-		private final IndexedDatatypeExpression negExistential_;
-
-		ThisDatatypeRule(IndexedDatatypeExpression negExistential) {
-			this.negExistential_ = negExistential;
-			hashCode_ = HashGenerator.combinedHashCode(ThisDatatypeRule.class, negExistential_);
-		}
-
-		@Override
-		public String getName() {
-			return NAME;
-		}
-
-		@Override
-		public ValueSpace getValueSpace() {
-			return negExistential_.getValueSpace();
-		}
-
-		public IndexedDatatypeExpression getNegExistential() {
-			return negExistential_;
-		}
-
-		@Override
-		public void apply(BasicSaturationStateWriter writer, IndexedDatatypeExpression datatypeExpression, Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + context + " [" + datatypeExpression + "]");
-			}
-			if (negExistential_ != datatypeExpression) {
-				writer.produce(context, new NegativeSubsumer(negExistential_));
-			}
-		}
-		
-		private final int hashCode_;
-
-		@Override
-		public final int hashCode() {
-			return hashCode_;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (obj == null) {
-				return false;
-			}
-			if (getClass() != obj.getClass()) {
-				return false;
-			}
-			final ThisDatatypeRule other = (ThisDatatypeRule) obj;
-			if (this.negExistential_ != other.negExistential_ && (this.negExistential_ == null || !this.negExistential_.equals(other.negExistential_))) {
-				return false;
-			}
-			return true;
-		}
-		
 	}
 }

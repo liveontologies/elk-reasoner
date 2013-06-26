@@ -255,12 +255,21 @@ public class NumericIntervalValueSpace implements ValueSpace {
 				return false;
 		}
 	}
+	
+	public boolean contains(Number value, ELDatatype datatype) {
+		if (!datatype.isCompatibleWith(this.datatype)) {
+			return false;
+		}
+		int l = NumberComparator.INSTANCE.compare(value, this.lowerBound);
+		int u = NumberComparator.INSTANCE.compare(value, this.upperBound);
+		return (lowerInclusive ? l >= 0 : l > 0) && (upperInclusive ? u <= 0 : u < 0);
+	}
 
 	@Override
 	public boolean isSubsumedBy(ValueSpace valueSpace) {
 		return valueSpace.contains(this);
 	}
-
+	
 	@Override
 	public boolean equals(Object other) {
 		if (this == other) {

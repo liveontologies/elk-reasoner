@@ -33,7 +33,6 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.DateTimeValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.NumericValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
-import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 
 /**
  *
@@ -52,18 +51,18 @@ public class AdaptableDatatypeIndex implements DatatypeIndex {
 	}
 
 	@Override
-	public void addDatatypeRule(DatatypeRule rule) {
-		rule.getValueSpace().accept(indexSelector).addDatatypeRule(rule);
+	public void addDatatypeExpression(IndexedDatatypeExpression ide) {
+		ide.getValueSpace().accept(indexSelector).addDatatypeExpression(ide);
 	}
 
 	@Override
-	public boolean removeDatatypeRule(DatatypeRule rule) {
-		return rule.getValueSpace().accept(indexSelector).removeDatatypeRule(rule);
+	public boolean removeDatatypeExpression(IndexedDatatypeExpression ide) {
+		return ide.getValueSpace().accept(indexSelector).removeDatatypeExpression(ide);
 	}
 
 	@Override
-	public Collection<DatatypeRule> getDatatypeRulesFor(IndexedDatatypeExpression ide) {
-		return ide.getValueSpace().accept(indexSelector).getDatatypeRulesFor(ide);
+	public Collection<IndexedDatatypeExpression> getDatatypeExpressionsFor(IndexedDatatypeExpression ide) {
+		return ide.getValueSpace().accept(indexSelector).getDatatypeExpressionsFor(ide);
 	}
 
 	@Override

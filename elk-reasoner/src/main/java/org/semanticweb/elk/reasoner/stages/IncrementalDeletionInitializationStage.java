@@ -69,14 +69,14 @@ public class IncrementalDeletionInitializationStage extends
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
-		Map<IndexedDataProperty, DatatypeIndex> changedDatatypesRules = null;
+		Map<IndexedDataProperty, DatatypeIndex> changedDatatypesExprs = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 
 		changedInitRules = diffIndex.getRemovedContextInitRules();
 		changedRulesByCE = diffIndex.getRemovedContextRulesByClassExpressions();
-		changedDatatypesRules = diffIndex.getRemovedDatatypeRulesByProperty();
+		changedDatatypesExprs = diffIndex.getRemovedDatatypeExpressionsByProperty();
 
-		if (changedInitRules != null || !changedRulesByCE.isEmpty() ||!changedDatatypesRules.isEmpty()) {
+		if (changedInitRules != null || !changedRulesByCE.isEmpty() ||!changedDatatypesExprs.isEmpty()) {
 
 			inputs = Operations.split(reasoner.saturationState.getContexts(),
 					8 * workerNo);
@@ -85,7 +85,7 @@ public class IncrementalDeletionInitializationStage extends
 		//System.err.println(changedRulesByCE.keySet().size());
 
 		this.initialization_ = new IncrementalChangesInitialization(inputs,
-				changedInitRules, changedRulesByCE, changedDatatypesRules, reasoner.saturationState,
+				changedInitRules, changedRulesByCE, changedDatatypesExprs, reasoner.saturationState,
 				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
 				reasoner.getProgressMonitor());
 		

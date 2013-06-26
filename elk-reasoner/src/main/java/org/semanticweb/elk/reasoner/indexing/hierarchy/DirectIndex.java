@@ -38,7 +38,6 @@ import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -282,13 +281,13 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	@Override
-	public void add(IndexedDataProperty target, DatatypeRule<Context> newRule) {
-		target.addDatatypeRule(newRule);
+	public void add(IndexedDataProperty target, IndexedDatatypeExpression newIde) {
+		target.addDatatypeExpression(newIde);
 	}
 
 	@Override
-	public void remove(IndexedDataProperty target, DatatypeRule<Context> oldRule) throws ElkUnexpectedIndexingException {
-		if (!target.removeDatatypeRule(oldRule))
+	public void remove(IndexedDataProperty target, IndexedDatatypeExpression oldIde) throws ElkUnexpectedIndexingException {
+		if (!target.removeDatatypeExpression(oldIde))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove datatype rule for data property " + target);
 	}

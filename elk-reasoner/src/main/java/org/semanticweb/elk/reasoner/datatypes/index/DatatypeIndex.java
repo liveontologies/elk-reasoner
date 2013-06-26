@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.datatypes.index;
 
 import java.util.Collection;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
-import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 
 /**
  * General interface for storage and retrieval of datatype expressions.
@@ -33,32 +32,36 @@ import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 public interface DatatypeIndex {
 
 	/**
-	 * Add new rule to this datatype index
+	 * Add new {@link IndexedDatatypeExpression} to this index
 	 *
-	 * @param rule {@link DatatypeRule} to add for this index
+	 * @param ide {@link IndexedDatatypeExpression} to add for this index
 	 */
-	public void addDatatypeRule(DatatypeRule rule);
+	public void addDatatypeExpression(IndexedDatatypeExpression ide);
 
 	/**
-	 * Remove already stored rule from this datatype index
+	 * Remove already stored {@link IndexedDatatypeExpression} from this
+	 * index
 	 *
-	 * @param rule {@link DatatypeRule} to remove for this index
-	 * @return true if this index contained the specified rule.
+	 * @param ide {@link IndexedDatatypeExpression} to remove for this index
+	 * @return true if this index contained the specified
+	 * {@link IndexedDatatypeExpression} .
 	 */
-	public boolean removeDatatypeRule(DatatypeRule rule);
+	public boolean removeDatatypeExpression(IndexedDatatypeExpression ide);
 
 	/**
-	 * Search this datatype index for all {@link DatatypeRule}s that must be
-	 * applied for this {@link IndexedDatatypeExpression}.
+	 * Search this datatype index for all {@link IndexedDatatypeExpression}s
+	 * that subsume this {@link IndexedDatatypeExpression}.
 	 *
 	 * @param ide {@link IndexedDatatypeExpression} for which a search of
-	 * relevant {@link DatatypeRule}s will be conducted in the index
-	 * @return a collection of relevant datatype rules
+	 * relevant {@link IndexedDatatypeExpression}s will be conducted in the
+	 * index
+	 * @return a collection of relevant {@link IndexedDatatypeExpression}s
 	 */
-	public Collection<DatatypeRule> getDatatypeRulesFor(IndexedDatatypeExpression ide);
-	
+	public Collection<IndexedDatatypeExpression> getDatatypeExpressionsFor(IndexedDatatypeExpression ide);
+
 	/**
-	 * Add all rules to specified {@link DatatypeIndex}
+	 * Add all {@link IndexedDatatypeExpression}s from this
+	 * {@link DatatypeIndex} to specified {@link DatatypeIndex}
 	 *
 	 * @param index {@link DatatypeIndex} to merge into
 	 */

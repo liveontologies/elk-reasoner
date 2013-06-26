@@ -77,7 +77,7 @@ public class IncrementalAdditionInitializationStage extends
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		ChainableRule<Context> changedInitRules = null;
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
-		Map<IndexedDataProperty, DatatypeIndex> changedDatatypesRules = null;
+		Map<IndexedDataProperty, DatatypeIndex> changedDatatypeExprs = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 		RuleApplicationVisitor initRuleAppVisitor = SaturationUtils
 				.getStatsAwareCompositionRuleAppVisitor(stageStatistics_
@@ -151,15 +151,15 @@ public class IncrementalAdditionInitializationStage extends
 
 		changedInitRules = diffIndex.getAddedContextInitRules();
 		changedRulesByCE = diffIndex.getAddedContextRulesByClassExpressions();
-		changedDatatypesRules = diffIndex.getAddedDatatypeRulesByProperty();
+		changedDatatypeExprs = diffIndex.getAddedDatatypeExpressionsByProperty();
 
-		if (changedInitRules != null || !changedRulesByCE.isEmpty() || !changedDatatypesRules.isEmpty()) {
+		if (changedInitRules != null || !changedRulesByCE.isEmpty() || !changedDatatypeExprs.isEmpty()) {
 			inputs = Operations.split(reasoner.saturationState.getContexts(),
 					8 * workerNo);
 		}
 
 		this.initialization_ = new IncrementalChangesInitialization(inputs,
-				changedInitRules, changedRulesByCE, changedDatatypesRules, reasoner.saturationState,
+				changedInitRules, changedRulesByCE, changedDatatypeExprs, reasoner.saturationState,
 				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
 				reasoner.getProgressMonitor());
 

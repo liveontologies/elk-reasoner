@@ -33,9 +33,7 @@ import org.semanticweb.elk.reasoner.datatypes.index.AdaptableDatatypeIndex;
 import org.semanticweb.elk.reasoner.datatypes.index.DatatypeIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataPropertyVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedDataProperty;
-import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -84,20 +82,20 @@ public class IndexedDataProperty extends IndexedObject{
 		return toldSuperProperties_;
 	}
 
-	protected void addDatatypeRule(DatatypeRule<Context> rule) {
-		datatypeIndex.addDatatypeRule(rule);
+	protected void addDatatypeExpression(IndexedDatatypeExpression ide) {
+		datatypeIndex.addDatatypeExpression(ide);
 	}
 	
-	protected void addDatatypeRules(DatatypeIndex index) {
+	protected void addDatatypeExpressions(DatatypeIndex index) {
 		index.appendTo(datatypeIndex);
 	}
 	
-	protected boolean removeDatatypeRule(DatatypeRule<Context> rule) {
-		return datatypeIndex.removeDatatypeRule(rule);
+	protected boolean removeDatatypeExpression(IndexedDatatypeExpression ide) {
+		return datatypeIndex.removeDatatypeExpression(ide);
 	}
 	
-	public Collection<DatatypeRule> getAssosiatedDatatypeRules(IndexedDatatypeExpression ide) {
-		return datatypeIndex.getDatatypeRulesFor(ide);
+	public Collection<IndexedDatatypeExpression> getAssosiatedDatatypeExpressions(IndexedDatatypeExpression ide) {
+		return datatypeIndex.getDatatypeExpressionsFor(ide);
 	}
 	
 	/**

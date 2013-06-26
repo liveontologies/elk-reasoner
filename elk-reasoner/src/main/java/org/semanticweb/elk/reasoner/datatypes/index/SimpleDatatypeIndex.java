@@ -28,50 +28,48 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import static org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
-import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 
 /**
  * Simple (and inefficient) storage and retrieval of datatype expressions. All
- * rules belonging to the same datatype hierarchy (and thus sharing a value
- * space among themselves) are stored in a single collection.
+ * expressions belonging to the same datatype hierarchy (and thus sharing a
+ * value space among themselves) are stored in a single collection.
  *
  * @author Pospishnyi Oleksandr
  */
 public class SimpleDatatypeIndex implements DatatypeIndex {
 
-	protected EnumMap<ElkDatatype.ELDatatype, Set<DatatypeRule>> datatypeRules;
+	protected EnumMap<ELDatatype, Set<IndexedDatatypeExpression>> datatypeExpressions;
 
 	@Override
-	public void addDatatypeRule(DatatypeRule rule) {
-		if (datatypeRules == null) {
-			datatypeRules = new EnumMap<ElkDatatype.ELDatatype, Set<DatatypeRule>>
-				(ElkDatatype.ELDatatype.class);
+	public void addDatatypeExpression(IndexedDatatypeExpression ide) {
+		if (datatypeExpressions == null) {
+			datatypeExpressions = new EnumMap<ELDatatype, Set<IndexedDatatypeExpression>>(ELDatatype.class);
 		}
-		ElkDatatype.ELDatatype rootDatatype = 
-			rule.getValueSpace().getDatatype().getRootValueSpaceDatatype();
-		Set<DatatypeRule> rulesByDatatype =
-			datatypeRules.get(rootDatatype);
-		if (rulesByDatatype == null) {
-			rulesByDatatype = new HashSet<DatatypeRule>();
-			datatypeRules.put(rootDatatype, rulesByDatatype);
+		ELDatatype rootDatatype =
+			ide.getValueSpace().getDatatype().getRootValueSpaceDatatype();
+		Set<IndexedDatatypeExpression> expressionsByDatatype =
+			datatypeExpressions.get(rootDatatype);
+		if (expressionsByDatatype == null) {
+			expressionsByDatatype = new HashSet<IndexedDatatypeExpression>();
+			datatypeExpressions.put(rootDatatype, expressionsByDatatype);
 		}
-		rulesByDatatype.add(rule);
+		expressionsByDatatype.add(ide);
 	}
 
 	@Override
-	public boolean removeDatatypeRule(DatatypeRule rule) {
+	public boolean removeDatatypeExpression(IndexedDatatypeExpression ide) {
 		boolean success = false;
-		if (rule != null && datatypeRules != null) {
-			ElkDatatype.ELDatatype rootDatatype =
-				rule.getValueSpace().getDatatype().getRootValueSpaceDatatype();
-			Set<DatatypeRule> rulesByDatatype = 
-					datatypeRules.get(rootDatatype);
-			if (rulesByDatatype != null) {
-				success = rulesByDatatype.remove(rule);
-				if (rulesByDatatype.isEmpty()) {
-					datatypeRules.remove(rootDatatype);
+		if (ide != null && datatypeExpressions != null) {
+			ELDatatype rootDatatype =
+				ide.getValueSpace().getDatatype().getRootValueSpaceDatatype();
+			Set<IndexedDatatypeExpression> expressionsByDatatype =
+				datatypeExpressions.get(rootDatatype);
+			if (expressionsByDatatype != null) {
+				success = expressionsByDatatype.remove(ide);
+				if (expressionsByDatatype.isEmpty()) {
+					datatypeExpressions.remove(rootDatatype);
 				}
 			}
 		}
@@ -79,32 +77,32 @@ public class SimpleDatatypeIndex implements DatatypeIndex {
 	}
 
 	@Override
-	public Collection<DatatypeRule> getDatatypeRulesFor(IndexedDatatypeExpression ide) {
-		if (datatypeRules != null) {
-			ElkDatatype.ELDatatype rootDatatype =
+	public Collection<IndexedDatatypeExpression> getDatatypeExpressionsFor(IndexedDatatypeExpression ide) {
+		if (datatypeExpressions != null) {
+			ELDatatype rootDatatype =
 				ide.getValueSpace().getDatatype().getRootValueSpaceDatatype();
-			Set<DatatypeRule> rulesByDatatype =
-				datatypeRules.get(rootDatatype);
-			Set<DatatypeRule> resultSet;
+			Set<IndexedDatatypeExpression> expressionsByDatatype =
+				datatypeExpressions.get(rootDatatype);
+			Set<IndexedDatatypeExpression> resultSet;
 
-			if (rulesByDatatype != null) {
-				resultSet = new HashSet<DatatypeRule>(rulesByDatatype);
+			if (expressionsByDatatype != null) {
+				resultSet = new HashSet<IndexedDatatypeExpression>(expressionsByDatatype);
 			} else {
-				resultSet = new HashSet<DatatypeRule>();
+				resultSet = new HashSet<IndexedDatatypeExpression>();
 			}
 
-			if (rootDatatype != ElkDatatype.ELDatatype.rdfs_Literal) {
-				//using all rules for rdfs:Literal datatype
-				Set<DatatypeRule> rdfsLiteralRules = datatypeRules.get(ElkDatatype.ELDatatype.rdfs_Literal);
-				if (rdfsLiteralRules != null) {
-					resultSet.addAll(rdfsLiteralRules);
+			if (rootDatatype != ELDatatype.rdfs_Literal) {
+				//using all expressions for rdfs:Literal datatype
+				Set<IndexedDatatypeExpression> rdfsLiteralExpressions = datatypeExpressions.get(ELDatatype.rdfs_Literal);
+				if (rdfsLiteralExpressions != null) {
+					resultSet.addAll(rdfsLiteralExpressions);
 				}
 			}
 
-			Iterator<DatatypeRule> iterator = resultSet.iterator();
+			Iterator<IndexedDatatypeExpression> iterator = resultSet.iterator();
 			while (iterator.hasNext()) {
-				DatatypeRule rule = iterator.next();
-				if (!rule.getValueSpace().contains(ide.getValueSpace())) {
+				IndexedDatatypeExpression expression = iterator.next();
+				if (!expression.getValueSpace().contains(ide.getValueSpace())) {
 					iterator.remove();
 				}
 			}
@@ -115,10 +113,10 @@ public class SimpleDatatypeIndex implements DatatypeIndex {
 
 	@Override
 	public void appendTo(DatatypeIndex index) {
-		for (Map.Entry<ElkDatatype.ELDatatype, Set<DatatypeRule>> entry : datatypeRules.entrySet()) {
-			Set<DatatypeRule> rules = entry.getValue();
-			for (DatatypeRule datatypeRule : rules) {
-				index.addDatatypeRule(datatypeRule);
+		for (Map.Entry<ELDatatype, Set<IndexedDatatypeExpression>> entry : datatypeExpressions.entrySet()) {
+			Set<IndexedDatatypeExpression> expressions = entry.getValue();
+			for (IndexedDatatypeExpression datatypeExpression : expressions) {
+				index.addDatatypeExpression(datatypeExpression);
 			}
 		}
 	}

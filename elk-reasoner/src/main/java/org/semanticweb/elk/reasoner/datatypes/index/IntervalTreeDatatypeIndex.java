@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.datatypes.index;
 
 import java.util.Collection;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
-import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 
 /**
  *
@@ -32,17 +31,17 @@ import org.semanticweb.elk.reasoner.saturation.rules.DatatypeRule;
 class IntervalTreeDatatypeIndex implements DatatypeIndex {
 
 	@Override
-	public void addDatatypeRule(DatatypeRule rule) {
+	public void addDatatypeExpression(IndexedDatatypeExpression ide) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public boolean removeDatatypeRule(DatatypeRule rule) {
+	public boolean removeDatatypeExpression(IndexedDatatypeExpression ide) {
 		throw new UnsupportedOperationException("Not supported yet."); 
 	}
 
 	@Override
-	public Collection<DatatypeRule> getDatatypeRulesFor(IndexedDatatypeExpression ide) {
+	public Collection<IndexedDatatypeExpression> getDatatypeExpressionsFor(IndexedDatatypeExpression ide) {
 		throw new UnsupportedOperationException("Not supported yet."); 
 	}
 
