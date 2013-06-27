@@ -31,7 +31,7 @@ will appear in the produced result.
 				Various optimizations of the producer/consumer interactions during parsing and classification to reduce the overhead of the queue
 				and make iteration over the passed data cache friendlier. 
 			</action>
-			<action dev="pavel" type="add">
+			<action dev="yevgeny" type="add">
 				ELK now features a concurrent OWL 2 FSS parser which tokenizes the input stream in a parallel thread.
 			</action>
 			<action dev="pavel" type="add">
