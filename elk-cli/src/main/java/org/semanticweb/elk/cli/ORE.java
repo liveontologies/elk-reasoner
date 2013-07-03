@@ -167,7 +167,7 @@ public class ORE {
 
 	private static void printTime(long ts) {
 		System.out.println("Operation time: "
-				+ (System.currentTimeMillis() - ts) + " ms.");
+				+ (System.currentTimeMillis() - ts));
 
 	}
 
@@ -230,14 +230,14 @@ public class ORE {
 	static void writeClassTaxonomyToFile(File file, Taxonomy<ElkClass> taxonomy)
 			throws IOException, ElkInconsistentOntologyException, ElkException {
 
-		TaxonomyPrinter.dumpClassTaxomomyToFile(taxonomy, file.getPath(), true);
+		TaxonomyPrinter.dumpClassTaxomomyToFile(taxonomy, file.getPath(), false);
 	}
 
 	static void writeInstanceTaxonomyToFile(File file,
 			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy)
 			throws IOException, ElkInconsistentOntologyException, ElkException {
 		TaxonomyPrinter.dumpInstanceTaxomomyToFile(taxonomy, file.getPath(),
-				true);
+				false);
 	}
 
 }
