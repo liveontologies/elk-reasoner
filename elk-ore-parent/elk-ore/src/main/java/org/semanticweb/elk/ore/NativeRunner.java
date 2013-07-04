@@ -59,8 +59,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
  *         pavel.klinov@uni-ulm.de
  */
 public class NativeRunner {
-
-	private enum TASKS {
+	
+	enum Task {
 		SAT, QUERY, CLASSIFICATION, CONSISTENCY
 	};
 
@@ -73,20 +73,21 @@ public class NativeRunner {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-
-		TASKS task = validateArgs(args);
-
+		Task task = validateArgs(args);
 		// help
 		if (task == null) {
 			printHelp();
 			return;
 		}
 
+		NativeRunner runner = new NativeRunner();
+		
+		runner.run(args, task);
+	}
+	
+	void run(String[] args, Task task) throws Exception {
 		File input = getOutputFile(args[1]);
 		File output = getOutputFile(args[2]);
-
-		long ts = System.currentTimeMillis();
-
 		// create reasoner
 		ReasonerFactory reasoningFactory = new ReasonerFactory();
 		Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
@@ -96,6 +97,10 @@ public class NativeRunner {
 
 		try {
 			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
+			
+			loadOntology(reasoner);
+			
+			long ts = System.currentTimeMillis();
 
 			System.out.println("Started " + task.toString() + " on " + input);
 
@@ -144,7 +149,11 @@ public class NativeRunner {
 		}
 	}
 
-	private static File getOutputFile(String path) {
+	protected void loadOntology(Reasoner reasoner) throws ElkException {
+		// no eager loading so it will be done later and included in measurements
+	}
+
+	private File getOutputFile(String path) {
 		File file = new File(path);
 
 		try {
@@ -167,31 +176,31 @@ public class NativeRunner {
 		return file;
 	}
 
-	private static void printTime(long ts) {
+	private void printTime(long ts) {
 		System.out.println("Operation time: "
 				+ (System.currentTimeMillis() - ts));
 
 	}
 
-	private static void printCompleted(TASKS task, File input) {
+	private void printCompleted(Task task, File input) {
 		System.out.println("Completed " + task.toString() + " on " + input);
 	}
 
-	private static TASKS validateArgs(String[] args) {
-		TASKS task = null;
+	static Task validateArgs(String[] args) {
+		Task task = null;
 
 		if (args.length < 3) {
 			return null;// not enough arguments
 		}
 
-		for (TASKS t : TASKS.values()) {
+		for (Task t : Task.values()) {
 			if (t.name().equalsIgnoreCase(args[0])) {
 				task = t;
 				break;
 			}
 		}
 
-		if (TASKS.SAT == task && args.length < 4) {
+		if (Task.SAT == task && args.length < 4) {
 			System.out.println("Missing concept URI for the SAT task");
 			return null;
 		}
@@ -211,7 +220,7 @@ public class NativeRunner {
 		return arg.replaceAll("^\"|\"$", "");
 	}
 
-	private static void printHelp() {
+	static void printHelp() {
 		System.out
 				.println("The system requires the following command line arguments:\n"
 						+ "* name of the reasoning task, one of: SAT, QUERY (not supported), CONSISTENCY, CLASSIFICATION, case insensitive\n"
@@ -220,7 +229,7 @@ public class NativeRunner {
 						+ "* concept URI, in case of SAT");
 	}
 
-	static void writeStringToFile(File file, String string, boolean append)
+	void writeStringToFile(File file, String string, boolean append)
 			throws IOException, ElkException {
 		FileWriter fstream = new FileWriter(file, append);
 		BufferedWriter writer = new BufferedWriter(fstream);
@@ -230,14 +239,14 @@ public class NativeRunner {
 		writer.close();
 	}
 
-	static void writeClassTaxonomyToFile(File file, Taxonomy<ElkClass> taxonomy)
+	void writeClassTaxonomyToFile(File file, Taxonomy<ElkClass> taxonomy)
 			throws IOException, ElkInconsistentOntologyException, ElkException {
 
 		TaxonomyPrinter
 				.dumpClassTaxomomyToFile(taxonomy, file.getPath(), false);
 	}
 
-	static void writeInstanceTaxonomyToFile(File file,
+	void writeInstanceTaxonomyToFile(File file,
 			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy)
 			throws IOException, ElkInconsistentOntologyException, ElkException {
 		TaxonomyPrinter.dumpInstanceTaxomomyToFile(taxonomy, file.getPath(),
