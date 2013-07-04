@@ -106,13 +106,14 @@ public class ORE {
 
 			switch (task) {
 			case SAT:
+				String sep = System.getProperty("line.separator");
 				ElkObjectFactory factory = new ElkObjectFactoryImpl();
 				boolean isSat = reasoner.isSatisfiable(factory
 						.getClass(new ElkFullIri(args[3])));
 
 				printTime(ts);
 
-				writeStringToFile(output, args[3] + "," + String.valueOf(isSat));
+				writeStringToFile(output, args[3] + "," + String.valueOf(isSat) + sep, true);
 
 				printCompleted(task, input);
 
@@ -132,7 +133,7 @@ public class ORE {
 
 				printTime(ts);
 
-				writeStringToFile(output, String.valueOf(!isConsistent));
+				writeStringToFile(output, String.valueOf(!isConsistent), false);
 
 				printCompleted(task, input);
 
@@ -147,8 +148,7 @@ public class ORE {
 		}
 	}
 
-	private static File getOutputFile(String path) {
-		
+	private static File getOutputFile(String path) {		
 		File file = new File(path);
 		
 		try {
@@ -157,7 +157,12 @@ public class ORE {
 			}
 			
 			file.getParentFile().mkdirs();
-			file.createNewFile();
+			
+			if (!file.exists()) {
+				if (!file.createNewFile()) {
+					throw new IOException("Output file does not exist and cannot be created");
+				}
+			}
 		} catch (IOException e) {
 			System.err.println("Error: " + e.getMessage());
 		}
@@ -218,12 +223,13 @@ public class ORE {
 						+ "* concept URI, in case of SAT");
 	}
 
-	static void writeStringToFile(File file, String string) throws IOException,
+	static void writeStringToFile(File file, String string, boolean append) throws IOException,
 			ElkException {
-		FileWriter fstream = new FileWriter(file);
+		FileWriter fstream = new FileWriter(file, append);
 		BufferedWriter writer = new BufferedWriter(fstream);
 
 		writer.write(string);
+		writer.flush();
 		writer.close();
 	}
 
