@@ -138,7 +138,7 @@ public class Reasoner extends AbstractReasonerState {
 	protected int getNumberOfWorkers() {
 		return workerNo_;
 	}
-	
+
 	/**
 	 * Sets the number of working threads. Shouldn't be used during reasoning.
 	 * 
@@ -147,7 +147,7 @@ public class Reasoner extends AbstractReasonerState {
 	public void setNumberOfWorkers(int workerNo) {
 		workerNo_ = workerNo;
 	}
-	
+
 	/**
 	 * This supposed to be the central place where the reasoner gets its
 	 * configuration options
@@ -156,19 +156,19 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public final void setConfigurationOptions(ReasonerConfiguration config) {
 		int newWorkerNo = config
-				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS); 
-		
+				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
+
 		setAllowIncrementalMode(config
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
 		setAllowIncrementalTaxonomy(config
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY));
-		
+
 		if (newWorkerNo > workerNo_) {
 			// need to re-create the executor since it may have already created
 			// a pool with a fixed number of threads
 			executor_ = null;
 		}
-		
+
 		workerNo_ = newWorkerNo;
 	}
 
@@ -455,14 +455,8 @@ public class Reasoner extends AbstractReasonerState {
 	 */
 	public boolean isSatisfiable(ElkClassExpression classExpression)
 			throws ElkException {
-		if (classExpression instanceof ElkClass) {
-			Node<ElkClass> classNode = getClassNode((ElkClass) classExpression);
-			return (!classNode.getMembers().contains(
-					PredefinedElkClass.OWL_NOTHING));
-		} else { // TODO: complex class expressions currently not supported
-			throw new ElkUnsupportedReasoningTaskException(
-					"ELK does not support satisfiability checking for unnamed class expressions");
-		}
+		return classExpression.accept(
+				new ElkClassExpressionSatisfiabilityCheckingVisitor(this))
+				.get();
 	}
-
 }
