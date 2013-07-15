@@ -145,6 +145,14 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	}
 
 	@Override
+	public IndexedObjectComplementOf visit(IndexedObjectComplementOf element) {
+		return resolveCache(
+				(IndexedObjectComplementOf) indexedClassExpressionLookup
+						.get(element),
+				element);
+	}
+
+	@Override
 	public IndexedObjectIntersectionOf visit(IndexedObjectIntersectionOf element) {
 		return resolveCache(
 				(IndexedObjectIntersectionOf) indexedClassExpressionLookup
@@ -222,6 +230,13 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		}
 
 		@Override
+		public Boolean visit(IndexedObjectComplementOf element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Adding " + element);
+			return indexedClassExpressionLookup.add(element);
+		}
+
+		@Override
 		public Boolean visit(IndexedObjectIntersectionOf element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Adding " + element);
@@ -279,6 +294,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 				LOGGER_.trace("Adding " + axiom);
 			return indexedAxiomLookup.add(axiom);
 		}
+
 	};
 
 	final IndexedObjectVisitor<Boolean> deletor = new IndexedObjectVisitor<Boolean>() {
@@ -305,6 +321,14 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 				return true;
 			} else
 				return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectComplementOf element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Removing " + element);
+
+			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
@@ -364,6 +388,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 			return indexedAxiomLookup.removeEntry(axiom) != null;
 		}
+
 	};
 
 	private class IndexedAxiomViewFactory implements

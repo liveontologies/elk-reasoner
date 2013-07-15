@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -76,15 +78,19 @@ public class DecompositionRuleApplicationCounterVisitor implements
 	}
 
 	@Override
-	public void visit(IndexedObjectIntersectionOf ice,
-			Context context) {
+	public void visit(IndexedObjectComplementOf ice, Context context) {
+		counter_.countIndexedObjectComplementOfDecompositionRule++;
+		visitor_.visit(ice, context);
+	}
+
+	@Override
+	public void visit(IndexedObjectIntersectionOf ice, Context context) {
 		counter_.countIndexedObjectIntersectionOfDecompositionRule++;
 		visitor_.visit(ice, context);
 	}
 
 	@Override
-	public void visit(IndexedObjectSomeValuesFrom ice,
-			Context context) {
+	public void visit(IndexedObjectSomeValuesFrom ice, Context context) {
 		counter_.countIndexedObjectSomeValuesFromDecompositionRule++;
 		visitor_.visit(ice, context);
 	}

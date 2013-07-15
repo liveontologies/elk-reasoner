@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.ContextRootInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
@@ -95,6 +97,14 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 			BasicSaturationStateWriter writer, Context context) {
 		counter_.countDisjointnessAxiomContradictionRule++;
 		visitor_.visit(thisContradictionRule, writer, context);
+	}
+
+	@Override
+	public void visit(
+			IndexedObjectComplementOf.ThisCompositionRule thisCompositionRule,
+			BasicSaturationStateWriter writer, Context context) {
+		counter_.countObjectComplementOfCompositionRule++;
+		visitor_.visit(thisCompositionRule, writer, context);
 	}
 
 	@Override

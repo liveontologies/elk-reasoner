@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -70,26 +72,39 @@ public class DecompositionRuleApplicationTimerVisitor implements
 	}
 
 	@Override
-	public void visit(IndexedObjectIntersectionOf ice,
-			Context context) {
-		timer_.timeIndexedObjectIntersectionOf -= CachedTimeThread.getCurrentTimeMillis();
+	public void visit(IndexedObjectComplementOf ice, Context context) {
+		timer_.timeIndexedObjectComplementOf -= CachedTimeThread
+				.getCurrentTimeMillis();
 		visitor_.visit(ice, context);
-		timer_.timeIndexedObjectIntersectionOf += CachedTimeThread.getCurrentTimeMillis();
+		timer_.timeIndexedObjectComplementOf += CachedTimeThread
+				.getCurrentTimeMillis();
 	}
 
 	@Override
-	public void visit(IndexedObjectSomeValuesFrom ice,
-			Context context) {
-		timer_.timeIndexedObjectSomeValuesFrom -= CachedTimeThread.getCurrentTimeMillis();
+	public void visit(IndexedObjectIntersectionOf ice, Context context) {
+		timer_.timeIndexedObjectIntersectionOf -= CachedTimeThread
+				.getCurrentTimeMillis();
 		visitor_.visit(ice, context);
-		timer_.timeIndexedObjectSomeValuesFrom += CachedTimeThread.getCurrentTimeMillis();
+		timer_.timeIndexedObjectIntersectionOf += CachedTimeThread
+				.getCurrentTimeMillis();
+	}
+
+	@Override
+	public void visit(IndexedObjectSomeValuesFrom ice, Context context) {
+		timer_.timeIndexedObjectSomeValuesFrom -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(ice, context);
+		timer_.timeIndexedObjectSomeValuesFrom += CachedTimeThread
+				.getCurrentTimeMillis();
 	}
 
 	@Override
 	public void visit(IndexedDataHasValue ice, Context context) {
-		timer_.timeIndexedDataHasValue -= CachedTimeThread.getCurrentTimeMillis();
+		timer_.timeIndexedDataHasValue -= CachedTimeThread
+				.getCurrentTimeMillis();
 		visitor_.visit(ice, context);
-		timer_.timeIndexedDataHasValue += CachedTimeThread.getCurrentTimeMillis();
+		timer_.timeIndexedDataHasValue += CachedTimeThread
+				.getCurrentTimeMillis();
 	}
 
 }

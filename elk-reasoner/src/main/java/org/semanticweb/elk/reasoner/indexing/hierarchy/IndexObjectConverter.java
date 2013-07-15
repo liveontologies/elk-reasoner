@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -84,6 +85,14 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 				.getProperty().accept(this);
 		return indexedClassFilter.visit(new IndexedObjectSomeValuesFrom(iop,
 				elkObjectHasValue.getFiller().accept(this)));
+	}
+
+	@Override
+	public IndexedClassExpression visit(
+			ElkObjectComplementOf elkObjectComplementOf) {
+		IndexedClassExpression ice = elkObjectComplementOf.getClassExpression()
+				.accept(this);
+		return indexedClassFilter.visit(new IndexedObjectComplementOf(ice));
 	}
 
 	@Override

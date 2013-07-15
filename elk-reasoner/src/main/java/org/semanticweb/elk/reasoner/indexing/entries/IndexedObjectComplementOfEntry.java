@@ -1,8 +1,4 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.indexing.visitors;
-
+package org.semanticweb.elk.reasoner.indexing.entries;
 /*
  * #%L
  * ELK Reasoner
@@ -25,39 +21,30 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 
-/**
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
- * 
- * @author "Yevgeny Kazakov"
- */
-public abstract class AbstractIndexedClassEntityVisitor<O> implements
-		IndexedClassExpressionVisitor<O> {
+public class IndexedObjectComplementOfEntry<T, K extends IndexedObjectComplementOf>
+		extends IndexedClassExpressionEntry<T, K> {
 
-	@Override
-	public O visit(IndexedDataHasValue element) {
-		return null;
+	IndexedObjectComplementOfEntry(K representative) {
+		super(representative);
 	}
 
 	@Override
-	public O visit(IndexedObjectSomeValuesFrom element) {
-		return null;
+	public int computeHashCode() {
+		return combinedHashCode(IndexedObjectIntersectionOfEntry.class,
+				this.key.getNegated());
 	}
 
 	@Override
-	public O visit(IndexedObjectComplementOf element) {
-		return null;
+	public boolean equals(Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (other instanceof IndexedObjectComplementOfEntry<?, ?>) {
+			IndexedObjectComplementOfEntry<?, ?> otherView = (IndexedObjectComplementOfEntry<?, ?>) other;
+			return this.key.getNegated().equals(otherView.key.getNegated());
+		}
+		return false;
 	}
-
-	@Override
-	public O visit(IndexedObjectIntersectionOf element) {
-		return null;
-	}
-
 }

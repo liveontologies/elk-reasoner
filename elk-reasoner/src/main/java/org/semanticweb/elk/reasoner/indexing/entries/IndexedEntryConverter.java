@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
@@ -62,6 +63,13 @@ public class IndexedEntryConverter<T>
 	public IndexedClassExpressionEntry<T, IndexedClass> visit(
 			IndexedClass element) {
 		return new IndexedClassEntry<T, IndexedClass>(element);
+	}
+
+	@Override
+	public IndexedClassExpressionEntry<T, IndexedObjectComplementOf> visit(
+			IndexedObjectComplementOf element) {
+		return new IndexedObjectComplementOfEntry<T, IndexedObjectComplementOf>(
+				element);
 	}
 
 	@Override

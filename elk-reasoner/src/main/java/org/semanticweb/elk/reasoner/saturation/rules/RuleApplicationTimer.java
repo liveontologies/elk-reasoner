@@ -61,6 +61,11 @@ public class RuleApplicationTimer {
 	int timeDisjointnessAxiomContradictionRule;
 
 	/**
+	 * timer for {@link IndexedObjectComplementOf.ThisCompositionRule}
+	 */
+	int timeObjectComplementOfCompositionRule;
+	
+	/**
 	 * timer for {@link IndexedObjectIntersectionOf.ThisCompositionRule}
 	 */
 	int timeObjectIntersectionOfCompositionRule;
@@ -98,6 +103,7 @@ public class RuleApplicationTimer {
 		timeContextRootInitializationRule = 0;
 		timeDisjointnessAxiomCompositionRule = 0;
 		timeDisjointnessAxiomContradictionRule = 0;
+		timeObjectComplementOfCompositionRule = 0;
 		timeObjectIntersectionOfCompositionRule = 0;
 		timeSubClassOfAxiomCompositionRule = 0;
 		timeObjectSomeValuesFromCompositionRule = 0;
@@ -116,6 +122,7 @@ public class RuleApplicationTimer {
 		timeContextRootInitializationRule += timer.timeContextRootInitializationRule;
 		timeDisjointnessAxiomCompositionRule += timer.timeDisjointnessAxiomCompositionRule;
 		timeDisjointnessAxiomContradictionRule += timer.timeDisjointnessAxiomContradictionRule;
+		timeObjectComplementOfCompositionRule += timer.timeObjectComplementOfCompositionRule;
 		timeObjectIntersectionOfCompositionRule += timer.timeObjectIntersectionOfCompositionRule;
 		timeSubClassOfAxiomCompositionRule += timer.timeSubClassOfAxiomCompositionRule;
 		timeObjectSomeValuesFromCompositionRule += timer.timeObjectSomeValuesFromCompositionRule;
@@ -129,6 +136,7 @@ public class RuleApplicationTimer {
 				+ timeContextRootInitializationRule
 				+ timeDisjointnessAxiomCompositionRule
 				+ timeDisjointnessAxiomContradictionRule
+				+ timeObjectComplementOfCompositionRule
 				+ timeObjectIntersectionOfCompositionRule
 				+ timeSubClassOfAxiomCompositionRule
 				+ timeObjectSomeValuesFromCompositionRule

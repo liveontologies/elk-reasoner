@@ -1,8 +1,4 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.indexing.visitors;
-
 /*
  * #%L
  * ELK Reasoner
@@ -25,39 +21,18 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 
 /**
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ * Visitor pattern interface for instances of {@link IndexedObjectComplementOf}.
  * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
-public abstract class AbstractIndexedClassEntityVisitor<O> implements
-		IndexedClassExpressionVisitor<O> {
+public interface IndexedObjectComplementOfVisitor<O> {
 
-	@Override
-	public O visit(IndexedDataHasValue element) {
-		return null;
-	}
-
-	@Override
-	public O visit(IndexedObjectSomeValuesFrom element) {
-		return null;
-	}
-
-	@Override
-	public O visit(IndexedObjectComplementOf element) {
-		return null;
-	}
-
-	@Override
-	public O visit(IndexedObjectIntersectionOf element) {
-		return null;
-	}
+	O visit(IndexedObjectComplementOf element);
 
 }

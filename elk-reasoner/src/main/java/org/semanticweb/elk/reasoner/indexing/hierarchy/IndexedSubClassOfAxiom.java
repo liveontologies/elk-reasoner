@@ -120,6 +120,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			toldSuperClassExpressions_.add(ice);
 		}
 
+		// TODO: hide this method
 		public Collection<IndexedClassExpression> getToldSuperclasses() {
 			return toldSuperClassExpressions_;
 		}

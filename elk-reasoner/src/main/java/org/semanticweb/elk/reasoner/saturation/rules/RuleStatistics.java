@@ -50,11 +50,11 @@ public class RuleStatistics {
 			numOfMeasurements_ = 1;
 		}
 	}
-	
+
 	private boolean measurementsTaken() {
 		return numOfMeasurements_ > 0;
 	}
-	
+
 	/**
 	 * Reset all timers to zero.
 	 */
@@ -84,8 +84,8 @@ public class RuleStatistics {
 		if (ruleCounter.countForwardLinkBackwardLinkRule > 0)
 			logger.debug("Forward link from backward link rules: "
 					+ ruleCounter.countForwardLinkBackwardLinkRule + " ("
-					+ ruleTimer.timeForwardLinkBackwardLinkRule / numOfMeasurements_
-					+ " ms)");
+					+ ruleTimer.timeForwardLinkBackwardLinkRule
+					/ numOfMeasurements_ + " ms)");
 
 		if (ruleCounter.countDisjointnessAxiomContradictionRule > 0)
 			logger.debug("Disjointness axiom contradiction rules: "
@@ -104,7 +104,7 @@ public class RuleStatistics {
 					+ ruleCounter.countOwlThingContextInitializationRule + " ("
 					+ ruleTimer.timeOwlThingContextInitializationRule
 					/ numOfMeasurements_ + " ms)");
-		
+
 		if (ruleCounter.countContextRootInitializationRule > 0)
 			logger.debug("Context root init rules: "
 					+ ruleCounter.countContextRootInitializationRule + " ("
@@ -114,8 +114,8 @@ public class RuleStatistics {
 		if (ruleCounter.countSubClassOfAxiomCompositionRule > 0)
 			logger.debug("Subclass expansions: "
 					+ ruleCounter.countSubClassOfAxiomCompositionRule + " ("
-					+ ruleTimer.timeSubClassOfAxiomCompositionRule / numOfMeasurements_
-					+ " ms)");
+					+ ruleTimer.timeSubClassOfAxiomCompositionRule
+					/ numOfMeasurements_ + " ms)");
 
 		if (ruleCounter.countContradictionBottomBackwardLinkRule > 0)
 			logger.debug("Propagations of inconsistency: "
@@ -126,8 +126,8 @@ public class RuleStatistics {
 		if (ruleCounter.countPropagationBackwardLinkRule > 0)
 			logger.debug("Propagations via backward links: "
 					+ ruleCounter.countPropagationBackwardLinkRule + " ("
-					+ ruleTimer.timePropagationBackwardLinkRule / numOfMeasurements_
-					+ " ms)");
+					+ ruleTimer.timePropagationBackwardLinkRule
+					/ numOfMeasurements_ + " ms)");
 
 		if (ruleCounter.countObjectSomeValuesFromCompositionRule
 				+ decompositionRuleCounter.countIndexedObjectSomeValuesFromDecompositionRule > 0)
@@ -135,8 +135,10 @@ public class RuleStatistics {
 					+ ruleCounter.countObjectSomeValuesFromCompositionRule
 					+ "/"
 					+ decompositionRuleCounter.countIndexedObjectSomeValuesFromDecompositionRule
-					+ " (" + ruleTimer.timeObjectSomeValuesFromCompositionRule
-					/ numOfMeasurements_ + "/"
+					+ " ("
+					+ ruleTimer.timeObjectSomeValuesFromCompositionRule
+					/ numOfMeasurements_
+					+ "/"
 					+ decompositionRuleTimer.timeIndexedObjectSomeValuesFrom
 					/ numOfMeasurements_ + " ms)");
 
@@ -153,11 +155,22 @@ public class RuleStatistics {
 					+ decompositionRuleTimer.timeIndexedObjectIntersectionOf
 					/ numOfMeasurements_ + " ms)");
 
+		if (ruleCounter.countObjectComplementOfCompositionRule
+				+ decompositionRuleCounter.countIndexedObjectComplementOfDecompositionRule > 0)
+			logger.debug("ObjectComplementOf composition/decomposition rules: "
+					+ ruleCounter.countObjectComplementOfCompositionRule
+					+ "/"
+					+ decompositionRuleCounter.countIndexedObjectComplementOfDecompositionRule
+					+ " (" + ruleTimer.timeObjectComplementOfCompositionRule
+					/ numOfMeasurements_ + "/"
+					+ decompositionRuleTimer.timeIndexedObjectComplementOf
+					/ numOfMeasurements_ + " ms)");
+
 		if (decompositionRuleCounter.countIndexedClassDecompositionRule > 0)
 			logger.debug("Class decomposition rules: "
-					+ decompositionRuleCounter.countIndexedClassDecompositionRule + " ("
-					+ decompositionRuleTimer.timeIndexedClass / numOfMeasurements_
-					+ " ms)");
+					+ decompositionRuleCounter.countIndexedClassDecompositionRule
+					+ " (" + decompositionRuleTimer.timeIndexedClass
+					/ numOfMeasurements_ + " ms)");
 
 		logger.debug("Total rule time: "
 				+ (ruleTimer.timeContradictionBottomBackwardLinkRule
@@ -177,13 +190,17 @@ public class RuleStatistics {
 	}
 
 	public long getTotalRuleAppCount() {
-		return ruleCounter.getTotalRuleAppCount() + decompositionRuleCounter.getTotalRuleAppCount();
+		return ruleCounter.getTotalRuleAppCount()
+				+ decompositionRuleCounter.getTotalRuleAppCount();
 	}
-	
+
 	public double getTotalRuleTime() {
-		double compTotal = numOfMeasurements_ == 0 ? 0 : 1d*ruleTimer.getTotalRuleAppTime() / numOfMeasurements_;
-		double decompTotal = numOfMeasurements_ == 0 ? 0 : 1d*decompositionRuleTimer.getTotalRuleAppTime() / numOfMeasurements_;
-		
+		double compTotal = numOfMeasurements_ == 0 ? 0 : 1d
+				* ruleTimer.getTotalRuleAppTime() / numOfMeasurements_;
+		double decompTotal = numOfMeasurements_ == 0 ? 0 : 1d
+				* decompositionRuleTimer.getTotalRuleAppTime()
+				/ numOfMeasurements_;
+
 		return compTotal + decompTotal;
 	}
 }

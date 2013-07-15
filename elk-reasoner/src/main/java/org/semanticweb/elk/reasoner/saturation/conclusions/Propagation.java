@@ -132,6 +132,7 @@ public class Propagation extends AbstractConclusion {
 					1);
 		}
 		
+		// TODO: hide this method
 		public Multimap<IndexedPropertyChain, IndexedClassExpression> getPropagationsByObjectProperty() {
 			return propagationsByObjectProperty_;
 		}

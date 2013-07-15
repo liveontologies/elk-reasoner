@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,13 +27,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 
-public class AbstractIndexedObjectFilter implements
-		IndexedObjectFilter {
+public class AbstractIndexedObjectFilter implements IndexedObjectFilter {
 
 	@Override
 	public IndexedClass visit(IndexedClass element) {
@@ -41,6 +42,11 @@ public class AbstractIndexedObjectFilter implements
 
 	@Override
 	public IndexedIndividual visit(IndexedIndividual element) {
+		return element;
+	}
+
+	@Override
+	public IndexedObjectComplementOf visit(IndexedObjectComplementOf element) {
 		return element;
 	}
 
