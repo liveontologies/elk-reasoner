@@ -35,7 +35,7 @@
 							<Implementation-Title>${project.name}</Implementation-Title>
 						</manifestEntries>
 						<manifest>
-							<mainClass>org.semanticweb.elk.ore.NativeRunnerWithEagerLoading</mainClass>
+							<mainClass>org.semanticweb.elk.ore.NativeRunner</mainClass>
 						</manifest>
 					</archive>
 					<appendAssemblyId>false</appendAssemblyId>
