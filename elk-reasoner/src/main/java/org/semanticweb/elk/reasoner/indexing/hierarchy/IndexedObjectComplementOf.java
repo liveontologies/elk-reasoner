@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
@@ -41,6 +42,7 @@ import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
  * Represents all occurrences of an {@link ElkObjectComplementOf} in an
@@ -75,9 +77,17 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 	@Override
 	void updateOccurrenceNumbers(ModifiableOntologyIndex index, int increment,
 			int positiveIncrement, int negativeIncrement) {
-		if (negativeOccurrenceNo == 0 && positiveIncrement > 0) {
+		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
 			// first positive occurrence of this expression
 			index.add(negated_, new ThisCompositionRule(this));
+		}
+
+		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
+			// first negative occurrence of this expression
+			if (LOGGER_.isEnabledFor(Level.WARN))
+				LOGGER_.warn(new ElkMessage(
+						"ELK does not support negative occurrences of ObjectComplementOf. Reasoning might be incomplete!",
+						"reasoner.indexing.IndexedObjectComplementOf"));
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -85,8 +95,8 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 
 		checkOccurrenceNumbers();
 
-		if (negativeOccurrenceNo == 0 && positiveIncrement < 0) {
-			// no negative occurrences of this expression left
+		if (positiveOccurrenceNo == 0 && positiveIncrement < 0) {
+			// no positive occurrences of this expression left
 			index.remove(negated_, new ThisCompositionRule(this));
 		}
 	}

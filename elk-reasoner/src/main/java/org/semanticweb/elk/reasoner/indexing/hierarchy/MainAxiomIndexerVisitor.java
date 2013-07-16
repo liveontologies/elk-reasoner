@@ -95,17 +95,25 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 		this.objectCache_ = index.getIndexedObjectCache();
 		this.owlNothing_ = index.getIndexedOwlNothing();
 		this.multiplicity_ = insert ? 1 : -1;
-		IndexedPropertyChainFilter propertyOccurrenceUpdateFilter = new PropertyOccurrenceUpdateFilter(
+		final IndexedPropertyChainFilter propertyOccurrenceUpdateFilter = new PropertyOccurrenceUpdateFilter(
 				multiplicity_);
 		this.neutralIndexer = new IndexObjectConverter(
 				new ClassOccurrenceUpdateFilter(multiplicity_, 0, 0),
 				propertyOccurrenceUpdateFilter);
+		IndexObjectConverterFactory negativeIndexerFactory = new IndexObjectConverterFactory() {
+			@Override
+			public IndexObjectConverter create(
+					IndexObjectConverter complementary) {
+				return new IndexObjectConverter(
+						new ClassOccurrenceUpdateFilter(multiplicity_, 0,
+								multiplicity_), propertyOccurrenceUpdateFilter,
+						complementary);
+			}
+		};
 		this.positiveIndexer = new IndexObjectConverter(
 				new ClassOccurrenceUpdateFilter(multiplicity_, multiplicity_, 0),
-				propertyOccurrenceUpdateFilter);
-		this.negativeIndexer = new IndexObjectConverter(
-				new ClassOccurrenceUpdateFilter(multiplicity_, 0, multiplicity_),
-				propertyOccurrenceUpdateFilter);
+				propertyOccurrenceUpdateFilter, negativeIndexerFactory);
+		this.negativeIndexer = positiveIndexer.getComplementaryConverter();
 		/*
 		 * this.noOpConverter = new IndexObjectConverter( new
 		 * ClassOccurrenceUpdateFilter(0, 0, 0),
