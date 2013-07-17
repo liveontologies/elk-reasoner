@@ -177,7 +177,8 @@ public abstract class AbstractReasonerState {
 		this.ontologyIndex = new DifferentialIndex(objectCache_);
 		this.axiomInserter_ = new MainAxiomIndexerVisitor(ontologyIndex, true);
 		this.axiomDeleter_ = new MainAxiomIndexerVisitor(ontologyIndex, false);
-		this.saturationState = SaturationStateFactory.createSaturationState(ontologyIndex);
+		this.saturationState = SaturationStateFactory
+				.createSaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
 		this.ontologyLoader_ = ontologyLoader
@@ -188,7 +189,7 @@ public abstract class AbstractReasonerState {
 		this.allowIncrementalMode_ = allow;
 
 		if (!allow) {
-			trySetIncrementalMode(false);
+			setNonIncrementalMode();
 			allowIncrementalTaxonomy_ = false;
 		}
 
@@ -198,16 +199,26 @@ public abstract class AbstractReasonerState {
 		}
 	}
 
+	public boolean isAllowIncrementalMode() {
+		return allowIncrementalMode_;
+	}
+
 	public boolean isIncrementalMode() {
 		return ontologyIndex.isIncrementalMode();
 	}
 
-	void trySetIncrementalMode(boolean mode) {
-		if (!allowIncrementalMode_ && mode)
-			// switching to incremental mode not allowed
-			return;
+	void setNonIncrementalMode() {
+		ontologyIndex.setIncrementalMode(false);
+	}
 
-		ontologyIndex.setIncrementalMode(mode);
+	boolean trySetIncrementalMode() {
+		if (!allowIncrementalMode_)
+			// switching to incremental mode not allowed
+			return false;
+
+		ontologyIndex.setIncrementalMode(true);
+		return true;
+
 	}
 
 	/**
@@ -325,7 +336,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public boolean isInconsistent() throws ElkException {
-		
+
 		ruleAndConclusionStats.reset();
 		loadChanges();
 
@@ -333,6 +344,7 @@ public abstract class AbstractReasonerState {
 			getStageExecutor().complete(
 					stageManager.incrementalConsistencyCheckingStage);
 		} else {
+			setNonIncrementalMode();
 			getStageExecutor().complete(stageManager.consistencyCheckingStage);
 			stageManager.incrementalConsistencyCheckingStage.setCompleted();
 		}
@@ -347,7 +359,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public void loadOntology() throws ElkException {
-		trySetIncrementalMode(false);
+		setNonIncrementalMode();
 		getStageExecutor().complete(stageManager.ontologyLoadingStage);
 	}
 
@@ -358,8 +370,8 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public void loadChanges() throws ElkException {
-		trySetIncrementalMode(true);
-		
+		trySetIncrementalMode();
+
 		nonIncrementalChange_ = false;
 
 		getStageExecutor().complete(stageManager.changesLoadingStage);
@@ -373,7 +385,7 @@ public abstract class AbstractReasonerState {
 			stageManager.propertyInitializationStage.invalidate();
 			setAllowIncrementalMode(false);
 		}
-		
+
 		nonIncrementalChange_ = false;
 	}
 
@@ -391,7 +403,7 @@ public abstract class AbstractReasonerState {
 			throws ElkInconsistentOntologyException, ElkException {
 
 		ruleAndConclusionStats.reset();
-		
+
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
@@ -399,6 +411,7 @@ public abstract class AbstractReasonerState {
 			getStageExecutor().complete(
 					stageManager.incrementalClassTaxonomyComputationStage);
 		} else {
+			setNonIncrementalMode();
 			getStageExecutor().complete(
 					stageManager.classTaxonomyComputationStage);
 			stageManager.incrementalClassTaxonomyComputationStage
@@ -447,7 +460,7 @@ public abstract class AbstractReasonerState {
 			throws ElkException {
 
 		ruleAndConclusionStats.reset();
-		
+
 		if (isInconsistent())
 			throw new ElkInconsistentOntologyException();
 
@@ -455,6 +468,7 @@ public abstract class AbstractReasonerState {
 			getStageExecutor().complete(
 					stageManager.incrementalInstanceTaxonomyComputationStage);
 		} else {
+			setNonIncrementalMode();
 			getStageExecutor().complete(
 					stageManager.instanceTaxonomyComputationStage);
 			stageManager.incrementalInstanceTaxonomyComputationStage

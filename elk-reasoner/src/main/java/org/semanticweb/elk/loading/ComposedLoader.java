@@ -1,5 +1,4 @@
-package org.semanticweb.elk.reasoner;
-
+package org.semanticweb.elk.loading;
 /*
  * #%L
  * ELK Reasoner
@@ -22,36 +21,33 @@ package org.semanticweb.elk.reasoner;
  * #L%
  */
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
-
 /**
- * A {@link SatisfiabilityCheckingOutcome} for the test that has returned an
- * exception
+ * A {@link Loader} that consists of two given {@link Loader}s, which are used
+ * one after another when {@link #load()} is called
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class SatisfiabilityCheckingException extends
-		SatisfiabilityCheckingOutcome {
+public class ComposedLoader implements Loader {
 
-	/**
-	 * the exception returned by the test
-	 */
-	private final ElkException exception_;
+	private final Loader firstLoader_, secondLoader_;
 
-	/**
-	 * Creates the outcome for an exception
-	 * 
-	 * @param exception
-	 *            the {@link ElkException} happened during the test
-	 */
-	public SatisfiabilityCheckingException(ElkException exception) {
-		this.exception_ = exception;
+	public ComposedLoader(Loader firstLoader, Loader secondLoader) {
+		this.firstLoader_ = firstLoader;
+		this.secondLoader_ = secondLoader;
 	}
 
 	@Override
-	public boolean get() throws ElkException {
-		throw exception_;
+	public void load() throws ElkLoadingException {
+		firstLoader_.load();
+		secondLoader_.load();
+
+	}
+
+	@Override
+	public void dispose() {
+		firstLoader_.dispose();
+		secondLoader_.dispose();
 	}
 
 }
