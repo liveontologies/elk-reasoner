@@ -37,8 +37,7 @@ import java.io.Writer;
 
 import org.junit.Test;
 import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.loading.EmptyChangesLoader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
@@ -173,13 +172,11 @@ public class TaxonomyIOTest {
 
 		try {
 			stream = getClass().getClassLoader().getResourceAsStream(resource);
-			OntologyLoader streamLoader = new Owl2StreamLoader(
+			AxiomLoader streamLoader = new Owl2StreamLoader(
 					new Owl2FunctionalStyleParserFactory(), stream);
 
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 					streamLoader, new FailingOnInterruptStageExecutor(), 1);
-
-			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
 			return reasoner.getInstanceTaxonomy();
 		} finally {

@@ -61,8 +61,6 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.ontologyIndex,
 				reasoner.saturationState);
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		return true;
 	}
 
@@ -78,13 +76,13 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 		reasoner.inconsistentOntology = computation_.isInconsistent();
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
-		
-		//FIXME Obviously needed a better clean-up after inconsistency
+
+		// FIXME Obviously needed a better clean-up after inconsistency
 		if (reasoner.inconsistentOntology) {
 			reasoner.classTaxonomyState.getWriter().clearTaxonomy();
 			reasoner.instanceTaxonomyState.getWriter().clearTaxonomy();
 		}
-		
+
 		this.computation_ = null;
 		return true;
 	}

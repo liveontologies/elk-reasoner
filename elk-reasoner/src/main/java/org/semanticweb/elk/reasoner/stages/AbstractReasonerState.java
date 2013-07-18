@@ -28,11 +28,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.AxiomChangeListener;
-import org.semanticweb.elk.loading.ChangesLoader;
-import org.semanticweb.elk.loading.ElkAxiomChange;
-import org.semanticweb.elk.loading.Loader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
+import org.semanticweb.elk.loading.ComposedAxiomLoader;
+import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -137,13 +135,9 @@ public abstract class AbstractReasonerState {
 	 */
 	final InstanceTaxonomyState instanceTaxonomyState = new InstanceTaxonomyState();
 	/**
-	 * The source where the input ontology can be loaded
+	 * The source where axioms and changes in ontology can be loaded
 	 */
-	private final Loader ontologyLoader_;
-	/**
-	 * The source where changes in ontology can be loaded
-	 */
-	private ChangesLoader changesLoader_;
+	private AxiomLoader axiomLoader_;
 	/**
 	 * if {@code true}, reasoning will be done incrementally whenever possible
 	 */
@@ -151,28 +145,30 @@ public abstract class AbstractReasonerState {
 
 	private boolean allowIncrementalTaxonomy_ = true;
 	/**
-	 * Setting this to true during the change loading stage indicates that some
-	 * change, most likely some role axioms, should switch the reasoning mode to
-	 * non-incremental
+	 * if the property hierarchy correspond to the loading axioms
 	 */
-	private boolean nonIncrementalChange_ = false;
+	boolean propertyHierarchyUpToDate_ = true;
 	/**
-	 * The listener used to switch off the incremental mode
+	 * The listener used to detect if the axiom has an impact on the role
+	 * hierarchy
 	 */
 	private NonIncrementalChangeListener<ElkAxiom> nonIncrementalChangeListener_ = new NonIncrementalChangeListener<ElkAxiom>() {
 
 		@Override
 		public void notify(ElkAxiom axiom) {
+			if (!propertyHierarchyUpToDate_)
+				return;
+
 			if (LOGGER_.isDebugEnabled()) {
 				LOGGER_.debug("Disallowing incremental mode due to "
 						+ OwlFunctionalStylePrinter.toString(axiom));
 			}
 
-			nonIncrementalChange_ = true;
+			propertyHierarchyUpToDate_ = false;
 		}
 	};
 
-	protected AbstractReasonerState(OntologyLoader ontologyLoader) {
+	protected AbstractReasonerState() {
 		this.objectCache_ = new IndexedObjectCache();
 		this.ontologyIndex = new DifferentialIndex(objectCache_);
 		this.axiomInserter_ = new MainAxiomIndexerVisitor(ontologyIndex, true);
@@ -181,8 +177,11 @@ public abstract class AbstractReasonerState {
 				.createSaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
-		this.ontologyLoader_ = ontologyLoader
-				.getLoader(new ChangeIndexingProcessor(axiomInserter_));
+	}
+
+	protected AbstractReasonerState(AxiomLoader axiomLoader) {
+		this();
+		registerAxiomLoader(axiomLoader);
 	}
 
 	public void setAllowIncrementalMode(boolean allow) {
@@ -190,8 +189,8 @@ public abstract class AbstractReasonerState {
 
 		if (!allow) {
 			setNonIncrementalMode();
-			allowIncrementalTaxonomy_ = false;
 		}
+		setAllowIncrementalTaxonomy(allow);
 
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info("Incremental mode is "
@@ -209,6 +208,7 @@ public abstract class AbstractReasonerState {
 
 	void setNonIncrementalMode() {
 		ontologyIndex.setIncrementalMode(false);
+		setAllowIncrementalTaxonomy(false);
 	}
 
 	boolean trySetIncrementalMode() {
@@ -222,58 +222,42 @@ public abstract class AbstractReasonerState {
 	}
 
 	/**
-	 * Reset the changes loading stage and all subsequent stages
+	 * Reset the axiom loading stage and all subsequent stages
 	 */
-	private void resetChangesLoading() {
+	private void resetAxiomLoading() {
 		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Reset changes loading");
-		stageManager.changesLoadingStage.invalidate();
+			LOGGER_.trace("Reset axiom loading");
+		stageManager.axiomLoadingStage.invalidate();
+		stageManager.incrementalCompletionStage.invalidate();
 	}
 
-	public void registerOntologyChangesLoader(ChangesLoader changesLoader) {
+	public void registerAxiomLoader(AxiomLoader newAxiomLoader) {
 		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Registering ontology changes loader");
-		resetChangesLoading();
+			LOGGER_.trace("Registering new axiom loader");
+		resetAxiomLoading();
 
-		changesLoader_ = changesLoader;
-
-		if (changesLoader_ != null) {
-			changesLoader_.registerChangeListener(new AxiomChangeListener() {
-
-				@Override
-				public void notify(ElkAxiomChange change) {
-					resetChangesLoading();
-				}
-			});
-		}
+		if (axiomLoader_ == null || axiomLoader_.isLoadingFinished())
+			axiomLoader_ = newAxiomLoader;
+		else
+			axiomLoader_ = new ComposedAxiomLoader(axiomLoader_, newAxiomLoader);
 	}
 
-	/**
-	 * @return the source where the input ontology can be loaded
-	 */
-	Loader getOntologyLoader() {
-		return ontologyLoader_;
-	}
-
-	/**
-	 * @return the source where changes in ontology can be loaded
-	 */
-	Loader getChangesLoader() {
-
-		if (changesLoader_ == null) {
-			return null;
+	void loadPendingAxioms() throws ElkLoadingException {
+		if (axiomLoader_ == null) {
+			return;
 		}
-
 		// wrapping both the inserter and the deleter to receive notifications
 		// if some axiom change can't be incorporated incrementally
-		ElkAxiomProcessor inserterWrapper = new ChangeIndexingProcessor(
+
+		ElkAxiomProcessor axiomInserter = new ChangeIndexingProcessor(
 				new NonIncrementalChangeCheckingVisitor(axiomInserter_,
 						nonIncrementalChangeListener_));
-		ElkAxiomProcessor deleterWrapper = new ChangeIndexingProcessor(
+		ElkAxiomProcessor axiomDeleter = new ChangeIndexingProcessor(
 				new NonIncrementalChangeCheckingVisitor(axiomDeleter_,
 						nonIncrementalChangeListener_));
 
-		return changesLoader_.getLoader(inserterWrapper, deleterWrapper);
+		axiomLoader_.load(axiomInserter, axiomDeleter);
+
 	}
 
 	/**
@@ -338,7 +322,7 @@ public abstract class AbstractReasonerState {
 	public boolean isInconsistent() throws ElkException {
 
 		ruleAndConclusionStats.reset();
-		loadChanges();
+		loadAxioms();
 
 		if (isIncrementalMode() && !saturationState.getContexts().isEmpty()) {
 			getStageExecutor().complete(
@@ -353,40 +337,23 @@ public abstract class AbstractReasonerState {
 	}
 
 	/**
-	 * Forces the reasoner to load ontology
+	 * Forces the reasoner to load the axioms (deletions and additions)
 	 * 
 	 * @throws ElkException
 	 *             if the reasoning process cannot be completed successfully
 	 */
-	public void loadOntology() throws ElkException {
-		setNonIncrementalMode();
-		getStageExecutor().complete(stageManager.ontologyLoadingStage);
-	}
-
-	/**
-	 * Forces the reasoner to reload ontology changes
-	 * 
-	 * @throws ElkException
-	 *             if the reasoning process cannot be completed successfully
-	 */
-	public void loadChanges() throws ElkException {
-		trySetIncrementalMode();
-
-		nonIncrementalChange_ = false;
-
-		getStageExecutor().complete(stageManager.changesLoadingStage);
-
-		if (nonIncrementalChange_) {
+	void loadAxioms() throws ElkException {
+		if (classTaxonomyState.getTaxonomy() != null)
+			trySetIncrementalMode();
+		getStageExecutor().complete(stageManager.axiomLoadingStage);
+		if (!propertyHierarchyUpToDate_) {
 			/*
-			 * the mode was switched to non-incremental during change loading.
-			 * As such, we should recompute everything, e.g., the role
-			 * saturation
+			 * switching to non-incremental mode due to changes in property
+			 * axioms
 			 */
 			stageManager.propertyInitializationStage.invalidate();
-			setAllowIncrementalMode(false);
+			setNonIncrementalMode();
 		}
-
-		nonIncrementalChange_ = false;
 	}
 
 	/**
@@ -411,6 +378,7 @@ public abstract class AbstractReasonerState {
 			getStageExecutor().complete(
 					stageManager.incrementalClassTaxonomyComputationStage);
 		} else {
+			stageManager.axiomLoadingStage.invalidate();
 			setNonIncrementalMode();
 			getStageExecutor().complete(
 					stageManager.classTaxonomyComputationStage);
@@ -592,7 +560,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	protected OntologyIndex getOntologyIndex() throws ElkException {
-		getStageExecutor().complete(stageManager.ontologyLoadingStage);
+		loadAxioms();
 		return ontologyIndex;
 	}
 

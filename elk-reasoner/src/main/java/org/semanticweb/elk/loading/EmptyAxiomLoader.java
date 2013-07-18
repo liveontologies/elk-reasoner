@@ -21,33 +21,27 @@ package org.semanticweb.elk.loading;
  * #L%
  */
 
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+
 /**
- * A {@link Loader} that consists of two given {@link Loader}s, which are used
- * one after another when {@link #load()} is called
+ * An {@link AxiomLoader} that loads nothing
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ComposedLoader implements Loader {
-
-	private final Loader firstLoader_, secondLoader_;
-
-	public ComposedLoader(Loader firstLoader, Loader secondLoader) {
-		this.firstLoader_ = firstLoader;
-		this.secondLoader_ = secondLoader;
-	}
+public class EmptyAxiomLoader extends AbstractAxiomLoader implements
+		AxiomLoader {
 
 	@Override
-	public void load() throws ElkLoadingException {
-		firstLoader_.load();
-		secondLoader_.load();
+	public void load(ElkAxiomProcessor axiomInserter,
+			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
+		// does nothing
 
 	}
 
 	@Override
-	public void dispose() {
-		firstLoader_.dispose();
-		secondLoader_.dispose();
+	public boolean isLoadingFinished() {
+		return true;
 	}
 
 }

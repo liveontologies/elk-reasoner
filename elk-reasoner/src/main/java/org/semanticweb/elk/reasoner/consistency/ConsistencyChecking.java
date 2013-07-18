@@ -127,8 +127,8 @@ public class ConsistencyChecking
 
 	public SaturationStatistics getRuleAndConclusionStatistics() {
 		return inputProcessorFactory.getRuleAndConclusionStatistics();
-	}	
-	
+	}
+
 	/**
 	 * @param ontologyIndex
 	 *            the representation of the ontology

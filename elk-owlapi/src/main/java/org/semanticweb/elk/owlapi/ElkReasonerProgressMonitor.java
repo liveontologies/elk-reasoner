@@ -48,14 +48,14 @@ public class ElkReasonerProgressMonitor implements ProgressMonitor {
 	}
 
 	@Override
-	public void start(String message) {
+	public synchronized void start(String message) {
 		pm.reasonerTaskStarted(message);
 		lastProgress = 0;
 		lastUpdateTime = System.currentTimeMillis();
 	}
 
 	@Override
-	public void report(int state, int maxState) {
+	public synchronized void report(int state, int maxState) {
 		long time = System.currentTimeMillis();
 		double progress;
 		if (maxState == 0)
@@ -71,7 +71,7 @@ public class ElkReasonerProgressMonitor implements ProgressMonitor {
 	}
 
 	@Override
-	public void finish() {
+	public synchronized void finish() {
 		pm.reasonerTaskStopped();
 	}
 

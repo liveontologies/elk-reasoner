@@ -115,17 +115,20 @@ public class ComplexClassQueryTest {
 		loader.add(objectFactory.getSubClassOfAxiom(A, B)).add(
 				(objectFactory.getSubClassOfAxiom(B, C)));
 		reasoner.getTaxonomy();
-		Set<? extends Node<ElkClass>> subClasses = reasoner.getSubClasses(
-				objectFactory.getObjectIntersectionOf(B, C), true);
-		assertEquals(1, subClasses.size());
-		for (Node<ElkClass> node : subClasses) {
-			assertTrue(node.getMembers().contains(B));
-		}
+		
 		Set<? extends Node<ElkClass>> superClasses = reasoner.getSuperClasses(
 				objectFactory.getObjectIntersectionOf(B, C), true);
 		assertEquals(1, superClasses.size());
 		for (Node<ElkClass> node : superClasses) {
 			assertTrue(node.getMembers().contains(C));
 		}
+		
+		Set<? extends Node<ElkClass>> subClasses = reasoner.getSubClasses(
+				objectFactory.getObjectIntersectionOf(B, C), true);
+		assertEquals(1, subClasses.size());
+		for (Node<ElkClass> node : subClasses) {
+			assertTrue(node.getMembers().contains(A));
+		}
+		
 	}
 }

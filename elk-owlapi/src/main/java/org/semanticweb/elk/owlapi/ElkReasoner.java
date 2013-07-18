@@ -107,8 +107,8 @@ public class ElkReasoner implements OWLReasoner {
 	private final OwlConverter owlConverter_;
 	/** Converter from ELK OWL to OWL API */
 	private final ElkConverter elkConverter_;
-	/** the object using which one can load the ontology changes */
-	private OwlChangesLoader ontologyChangesLoader_;
+	/** this object is used to load pending changes */
+	private volatile OwlChangesLoader bufferedChangesLoader_;
 	/** configurations required for ELK reasoner */
 	private final ReasonerConfiguration config_;
 	private final boolean isAllowFreshEntities;
@@ -130,8 +130,9 @@ public class ElkReasoner implements OWLReasoner {
 		this.elkProgressMonitor_ = elkConfig.getProgressMonitor() == null ? new DummyProgressMonitor()
 				: new ElkReasonerProgressMonitor(elkConfig.getProgressMonitor());
 		this.isBufferingMode_ = isBufferingMode;
+		this.ontologyChangeListener_ = new OntologyChangeListener();
 		this.owlOntologymanager_
-				.addOntologyChangeListener(this.ontologyChangeListener_ = new OntologyChangeListener());
+				.addOntologyChangeListener(ontologyChangeListener_);
 		this.objectFactory_ = new ElkObjectFactoryImpl();
 		this.owlConverter_ = OwlConverter.getInstance();
 		this.elkConverter_ = ElkConverter.getInstance();
@@ -141,21 +142,13 @@ public class ElkReasoner implements OWLReasoner {
 		this.isAllowFreshEntities = elkConfig.getFreshEntityPolicy() == FreshEntityPolicy.ALLOW;
 
 		reCreateReasoner();
-		this.ontologyChangesLoader_ = new OwlChangesLoader(
+		this.bufferedChangesLoader_ = new OwlChangesLoader(
 				this.elkProgressMonitor_);
 
-		reasoner_.registerOntologyChangesLoader(ontologyChangesLoader_);
+		reasoner_.registerAxiomLoader(bufferedChangesLoader_);
 
 		if (isBufferingMode) {
-			/*
-			 * for buffering mode we need to load the ontology now in order to
-			 * correctly answer queries if no changes are flushed
-			 */
-			try {
-				reasoner_.loadOntology();
-			} catch (ElkException e) {
-				throw elkConverter_.convert(e);
-			}
+			reasoner_.registerAxiomLoader(bufferedChangesLoader_);
 			this.ontologyReloadRequired_ = false;
 		} else
 			/*
@@ -306,16 +299,19 @@ public class ElkReasoner implements OWLReasoner {
 		try {
 			if (ontologyReloadRequired_) {
 				reCreateReasoner();
-				this.ontologyChangesLoader_ = new OwlChangesLoader(
+				bufferedChangesLoader_ = new OwlChangesLoader(
 						this.elkProgressMonitor_);
-				reasoner_.loadOntology();
 				ontologyReloadRequired_ = false;
+			} else {
+				if (!bufferedChangesLoader_.isLoadingFinished())
+					reasoner_.registerAxiomLoader(bufferedChangesLoader_);
+				if (isBufferingMode_) {
+					// in buffering mode, new changes need to be buffered
+					// separately in order not to mix with the old changes
+					bufferedChangesLoader_ = new OwlChangesLoader(
+							this.elkProgressMonitor_);
+				}
 			}
-			// notify the reasoner re: the changes from the listener
-			ontologyChangesLoader_.flush();
-			reasoner_.loadChanges();
-		} catch (ElkException e) {
-			throw elkConverter_.convert(e);
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
 		}
@@ -568,21 +564,21 @@ public class ElkReasoner implements OWLReasoner {
 	public Set<OWLAxiom> getPendingAxiomAdditions() {
 		if (LOGGER_.isDebugEnabled())
 			LOGGER_.debug("getPendingAxiomAdditions()");
-		return ontologyChangesLoader_.getPendingAxiomAdditions();
+		return bufferedChangesLoader_.getPendingAxiomAdditions();
 	}
 
 	@Override
 	public Set<OWLAxiom> getPendingAxiomRemovals() {
 		if (LOGGER_.isDebugEnabled())
 			LOGGER_.debug("getPendingAxiomRemovals()");
-		return ontologyChangesLoader_.getPendingAxiomRemovals();
+		return bufferedChangesLoader_.getPendingAxiomRemovals();
 	}
 
 	@Override
 	public List<OWLOntologyChange> getPendingChanges() {
 		if (LOGGER_.isDebugEnabled())
 			LOGGER_.debug("getPendingChanges()");
-		return ontologyChangesLoader_.getPendingChanges();
+		return bufferedChangesLoader_.getPendingChanges();
 	}
 
 	@Override
@@ -950,7 +946,7 @@ public class ElkReasoner implements OWLReasoner {
 					// cannot handle non-axiom changes incrementally
 					ontologyReloadRequired_ = true;
 				} else {
-					ontologyChangesLoader_.registerChange(change);
+					bufferedChangesLoader_.registerChange(change);
 				}
 			}
 			if (!isBufferingMode_)

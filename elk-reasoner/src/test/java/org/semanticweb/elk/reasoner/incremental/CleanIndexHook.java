@@ -77,7 +77,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 			LOGGER_.debug("Cleaning the index...");
 		}
 
-		reasoner.registerOntologyChangesLoader(loader);
+		reasoner.registerAxiomLoader(loader);
 		reasoner.setAllowIncrementalMode(false);
 		// trigger removal
 		reasoner.getTaxonomyQuietly();
@@ -97,7 +97,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 			}
 		}
 
-		reasoner.registerOntologyChangesLoader(loader);
+		reasoner.registerAxiomLoader(loader);
 		reasoner.getTaxonomyQuietly();
 
 		cnt = getIndexSize(reasoner);

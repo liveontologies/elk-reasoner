@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,14 +25,15 @@ package org.semanticweb.elk.reasoner.incremental;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.elk.loading.Loader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AbstractAxiomLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
+import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * An {@link OntologyLoader} that additionally saves the loaded axioms into two
+ * An {@link AxiomLoader} that additionally saves the loaded axioms into two
  * collections. The first one keeps changing axioms that can be added or removed
  * by the incremental changes. The second one keeps the remaining axioms.
  * 
@@ -40,9 +42,10 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ClassAxiomTrackingOntologyLoader implements OntologyLoader {
+public class ClassAxiomTrackingLoader extends AbstractAxiomLoader
+		implements AxiomLoader {
 
-	protected final OntologyLoader loader_;
+	protected final AxiomLoader loader_;
 	/**
 	 * stores axioms that can be added and removed by incremental changes
 	 */
@@ -53,14 +56,14 @@ public class ClassAxiomTrackingOntologyLoader implements OntologyLoader {
 	 */
 	protected final List<ElkAxiom> staticAxioms_;
 
-	public ClassAxiomTrackingOntologyLoader(OntologyLoader loader,
+	public ClassAxiomTrackingLoader(AxiomLoader loader,
 			OnOffVector<ElkAxiom> trackedAxioms, List<ElkAxiom> untrackedAxioms) {
 		this.loader_ = loader;
 		this.changingAxioms_ = trackedAxioms;
 		this.staticAxioms_ = untrackedAxioms;
 	}
 
-	ClassAxiomTrackingOntologyLoader(OntologyLoader loader) {
+	ClassAxiomTrackingLoader(AxiomLoader loader) {
 		this(loader, new OnOffVector<ElkAxiom>(127), new ArrayList<ElkAxiom>());
 	}
 
@@ -73,10 +76,10 @@ public class ClassAxiomTrackingOntologyLoader implements OntologyLoader {
 	}
 
 	@Override
-	public Loader getLoader(final ElkAxiomProcessor axiomInserter) {
+	public void load(final ElkAxiomProcessor axiomInserter,
+			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
 
-		final ElkAxiomProcessor processor = new ElkAxiomProcessor() {
-
+		final ElkAxiomProcessor wrappedAxiomInserter = new ElkAxiomProcessor() {
 			@Override
 			public void visit(ElkAxiom elkAxiom) {
 				axiomInserter.visit(elkAxiom);
@@ -88,8 +91,18 @@ public class ClassAxiomTrackingOntologyLoader implements OntologyLoader {
 				}
 			}
 		};
+		loader_.load(wrappedAxiomInserter, axiomDeleter);
 
-		return loader_.getLoader(processor);
+	}
+
+	@Override
+	public boolean isLoadingFinished() {
+		return loader_.isLoadingFinished();
+	}
+
+	@Override
+	public void dispose() {
+		loader_.dispose();
 	}
 
 }

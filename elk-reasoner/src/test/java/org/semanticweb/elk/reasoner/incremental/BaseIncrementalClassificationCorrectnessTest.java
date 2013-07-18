@@ -82,9 +82,10 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("======= Computing Incremental Taxonomy =======");
 
-		Taxonomy<ElkClass> incremental = incrementalReasoner.getTaxonomyQuietly();
+		Taxonomy<ElkClass> incremental = incrementalReasoner
+				.getTaxonomyQuietly();
 
-		try {
+		try {						
 			assertEquals("Seed " + seed, TaxonomyHasher.hash(expected),
 					TaxonomyHasher.hash(incremental));
 		} catch (AssertionError e) {
@@ -93,7 +94,7 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 				TaxonomyPrinter.dumpClassTaxomomy(expected, writer, false);
 				TaxonomyPrinter.dumpClassTaxomomy(incremental, writer, false);
 				writer.flush();
-				
+
 				throw e;
 			} catch (IOException ioe) {
 				ioe.printStackTrace();

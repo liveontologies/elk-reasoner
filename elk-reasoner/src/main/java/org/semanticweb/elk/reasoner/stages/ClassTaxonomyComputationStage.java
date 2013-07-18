@@ -59,17 +59,14 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		if (!super.preExecute()) {
 			return false;
 		}
-		
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		}
-		
+
 		reasoner.initClassTaxonomy();
-		
+
 		this.computation_ = new ClassTaxonomyComputation(Operations.split(
 				reasoner.ontologyIndex.getIndexedClasses(), 64),
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,
-				reasoner.saturationState, reasoner.classTaxonomyState.getTaxonomy());
+				reasoner.saturationState,
+				reasoner.classTaxonomyState.getTaxonomy());
 		return true;
 	}
 

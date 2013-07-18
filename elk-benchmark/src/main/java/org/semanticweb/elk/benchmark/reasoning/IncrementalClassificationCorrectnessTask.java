@@ -69,8 +69,8 @@ public class IncrementalClassificationCorrectnessTask extends
 		TestChangesLoader changeLoader1 = new TestChangesLoader();
 		TestChangesLoader changeLoader2 = new TestChangesLoader();
 
-		standardReasoner_.registerOntologyChangesLoader(changeLoader1);
-		incrementalReasoner.registerOntologyChangesLoader(changeLoader2);
+		standardReasoner_.registerAxiomLoader(changeLoader1);
+		incrementalReasoner.registerAxiomLoader(changeLoader2);
 		// initial correctness check
 		correctnessCheck(standardReasoner_, incrementalReasoner, -1);
 

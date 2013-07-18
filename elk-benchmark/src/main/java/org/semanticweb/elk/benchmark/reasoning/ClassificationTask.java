@@ -31,8 +31,7 @@ import org.semanticweb.elk.benchmark.BenchmarkUtils;
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
-import org.semanticweb.elk.loading.EmptyChangesLoader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -76,15 +75,13 @@ public class ClassificationTask implements Task {
 			File ontologyFile = BenchmarkUtils.getFile(ontologyFile_);
 
 			//metrics_.reset();
-			OntologyLoader loader = new Owl2StreamLoader(
+			AxiomLoader loader = new Owl2StreamLoader(
 					new Owl2FunctionalStyleParserFactory(), ontologyFile);
 			reasoner_ = new ReasonerFactory().createReasoner(loader,
 					//new SimpleStageExecutor(),
 					//new RuleAndConclusionCountMeasuringExecutor( new SimpleStageExecutor(), metrics_),
 					new TimingStageExecutor(new SimpleStageExecutor(), metrics_),
 					reasonerConfig_);
-			reasoner_.registerOntologyChangesLoader(new EmptyChangesLoader());
-			reasoner_.loadOntology();
 		} catch (Exception e) {
 			throw new TaskException(e);
 		}

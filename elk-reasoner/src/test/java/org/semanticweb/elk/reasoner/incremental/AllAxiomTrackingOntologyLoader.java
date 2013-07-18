@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,35 +22,39 @@ package org.semanticweb.elk.reasoner.incremental;
  * #L%
  */
 
-import org.semanticweb.elk.loading.Loader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AbstractAxiomLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
+import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * An {@link OntologyLoader} that treats all kinds of axioms as dynamic (changing)
+ * An {@link AxiomLoader} that treats all kinds of axioms as dynamic (changing)
  * 
- * @see ClassAxiomTrackingOntologyLoader and {@link ClassAndIndividualAxiomTrackingOntologyLoader}
+ * @see ClassAxiomTrackingLoader and
+ *      {@link ClassAndIndividualAxiomTrackingLoader}
  * 
  * @author Pavel Klinov
  * 
+ * @author "Yevgeny Kazakov"
+ * 
  */
-public class AllAxiomTrackingOntologyLoader implements OntologyLoader {
+public class AllAxiomTrackingOntologyLoader extends AbstractAxiomLoader
+		implements AxiomLoader {
 
-	protected final OntologyLoader loader_;
+	protected final AxiomLoader loader_;
 	/**
 	 * stores axioms that can be added and removed by incremental changes
 	 */
 	protected final OnOffVector<ElkAxiom> changingAxioms_;
 
-
-	public AllAxiomTrackingOntologyLoader(OntologyLoader loader,
+	public AllAxiomTrackingOntologyLoader(AxiomLoader loader,
 			OnOffVector<ElkAxiom> trackedAxioms) {
 		this.loader_ = loader;
 		this.changingAxioms_ = trackedAxioms;
 	}
 
-	AllAxiomTrackingOntologyLoader(OntologyLoader loader) {
+	AllAxiomTrackingOntologyLoader(AxiomLoader loader) {
 		this(loader, new OnOffVector<ElkAxiom>(127));
 	}
 
@@ -58,9 +63,10 @@ public class AllAxiomTrackingOntologyLoader implements OntologyLoader {
 	}
 
 	@Override
-	public Loader getLoader(final ElkAxiomProcessor axiomInserter) {
+	public void load(final ElkAxiomProcessor axiomInserter,
+			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
 
-		final ElkAxiomProcessor processor = new ElkAxiomProcessor() {
+		final ElkAxiomProcessor trackingAxiomInserter = new ElkAxiomProcessor() {
 
 			@Override
 			public void visit(ElkAxiom elkAxiom) {
@@ -69,7 +75,16 @@ public class AllAxiomTrackingOntologyLoader implements OntologyLoader {
 			}
 		};
 
-		return loader_.getLoader(processor);
+		loader_.load(trackingAxiomInserter, axiomDeleter);
 	}
 
+	@Override
+	public boolean isLoadingFinished() {
+		return loader_.isLoadingFinished();
+	}
+
+	@Override
+	public void dispose() {
+		loader_.dispose();
+	}
 }

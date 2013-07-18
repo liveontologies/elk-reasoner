@@ -27,11 +27,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.AxiomChangeListener;
-import org.semanticweb.elk.loading.ChangesLoader;
+import org.semanticweb.elk.loading.AbstractAxiomLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
-import org.semanticweb.elk.loading.Loader;
-import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -106,9 +104,9 @@ public class Reasoner extends AbstractReasonerState {
 	 * Constructor. In most cases, Reasoners should be created by the
 	 * {@link ReasonerFactory}.
 	 * */
-	protected Reasoner(OntologyLoader ontologyLoader,
+	protected Reasoner(AxiomLoader axiomLoader,
 			ReasonerStageExecutor stageExecutor, ExecutorService executor) {
-		super(ontologyLoader);
+		super(axiomLoader);
 
 		this.stageExecutor = stageExecutor;
 		this.progressMonitor = new DummyProgressMonitor();
@@ -313,29 +311,29 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	/**
-	 * Return the {@link Node} for the given {@link ElkClassExpression}. Calling
-	 * of this method may trigger the computation of the taxonomy, if it has not
-	 * been done yet. If the input is an {@link ElkClass} that does not occur in
-	 * the ontology and fresh entities are not allowed, a
+	 * Return the {@link TaxonomyNode} for the given {@link ElkClassExpression}.
+	 * Calling of this method may trigger the computation of the taxonomy, if it
+	 * has not been done yet. If the input is an {@link ElkClass} that does not
+	 * occur in the ontology and fresh entities are not allowed, a
 	 * {@link ElkFreshEntitiesException} will be thrown.
 	 * 
 	 * @param classExpression
 	 *            the {@link ElkClassExpression} for which to return the
 	 *            {@link Node}
-	 * @return the class node for the given {@link ElkClassExpression}
+	 * @return the {@link TaxonomyNode} for the given {@link ElkClassExpression}
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public Node<ElkClass> getClassNode(ElkClassExpression classExpression)
-			throws ElkException {
+	public TaxonomyNode<ElkClass> getClassNode(
+			ElkClassExpression classExpression) throws ElkException {
 		if (classExpression instanceof ElkClass) {
 			return getTaxonomyNode((ElkClass) classExpression);
 		}
 		// else
 		ElkClass queryClass = elkFactory.getClass(new ElkFullIri(
 				OwlFunctionalStylePrinter.toString(classExpression)));
-		ElkAxiom materializedQuery = elkFactory.getSubClassOfAxiom(queryClass,
-				classExpression);
+		ElkAxiom materializedQuery = elkFactory.getEquivalentClassesAxiom(
+				queryClass, classExpression);
 		return getQueryTaxonomyNode(queryClass, materializedQuery);
 	}
 
@@ -361,16 +359,7 @@ public class Reasoner extends AbstractReasonerState {
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkException {
 
-		TaxonomyNode<ElkClass> queryNode;
-		if (classExpression instanceof ElkClass) {
-			queryNode = getTaxonomyNode((ElkClass) classExpression);
-		} else {
-			ElkClass queryClass = elkFactory.getClass(new ElkFullIri(
-					OwlFunctionalStylePrinter.toString(classExpression)));
-			ElkAxiom materializedQuery = elkFactory.getSubClassOfAxiom(
-					classExpression, queryClass);
-			queryNode = getQueryTaxonomyNode(queryClass, materializedQuery);
-		}
+		TaxonomyNode<ElkClass> queryNode = getClassNode(classExpression);
 
 		return (direct) ? queryNode.getDirectSubNodes() : queryNode
 				.getAllSubNodes();
@@ -398,16 +387,7 @@ public class Reasoner extends AbstractReasonerState {
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkException {
 
-		TaxonomyNode<ElkClass> queryNode;
-		if (classExpression instanceof ElkClass) {
-			queryNode = getTaxonomyNode((ElkClass) classExpression);
-		} else {
-			ElkClass queryClass = elkFactory.getClass(new ElkFullIri(
-					OwlFunctionalStylePrinter.toString(classExpression)));
-			ElkAxiom materializedQuery = elkFactory.getSubClassOfAxiom(
-					queryClass, classExpression);
-			queryNode = getQueryTaxonomyNode(queryClass, materializedQuery);
-		}
+		TaxonomyNode<ElkClass> queryNode = getClassNode(classExpression);
 
 		return (direct) ? queryNode.getDirectSuperNodes() : queryNode
 				.getAllSuperNodes();
@@ -496,7 +476,7 @@ public class Reasoner extends AbstractReasonerState {
 
 		Node<ElkClass> queryNode;
 		if (classExpression instanceof ElkClass) {
-			queryNode = getClassNode((ElkClass) classExpression);
+			queryNode = getClassNode(classExpression);
 		} else {
 			ElkClass queryClass = elkFactory.getClass(new ElkFullIri(
 					OwlFunctionalStylePrinter.toString(classExpression)));
@@ -514,57 +494,39 @@ public class Reasoner extends AbstractReasonerState {
 	 * @param addition
 	 *            {@code true} if the axiom should be added, {@code false} if it
 	 *            should be removed
-	 * @return a {@code ChangesLoader} that peforms addition, or respectivley,
+	 * @return an {@code AxiomLoader} that performs addition, or respectively,
 	 *         removal of the given axiom
 	 */
-	static ChangesLoader getQueryLoader(final ElkAxiom materializedQuery,
+	static AxiomLoader getQueryLoader(final ElkAxiom materializedQuery,
 			final boolean addition) {
 
-		return new ChangesLoader() {
+		return new AbstractAxiomLoader() {
+
+			boolean finished = false;
 
 			@Override
-			public void registerChangeListener(AxiomChangeListener listener) {
-				// not needed in this case
+			public void load(ElkAxiomProcessor axiomInserter,
+					ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
+				(addition ? axiomInserter : axiomDeleter)
+						.visit(materializedQuery);
+				if (LOGGER_.isTraceEnabled())
+					LOGGER_.trace((addition ? "adding materialized quiery axiom: "
+							: "removing materialized quiery axiom: ")
+							+ OwlFunctionalStylePrinter
+									.toString(materializedQuery));
+				finished = true;
 			}
 
 			@Override
-			public Loader getLoader(final ElkAxiomProcessor axiomInserter,
-					final ElkAxiomProcessor axiomDeleter) {
-				return new Loader() {
-
-					@Override
-					public void load() throws ElkLoadingException {
-						if (addition) {
-							axiomInserter.visit(materializedQuery);
-							if (LOGGER_.isTraceEnabled())
-								LOGGER_.trace("adding materialized quiery axiom: "
-										+ OwlFunctionalStylePrinter
-												.toString(materializedQuery));
-						} else {
-							// deletion
-							axiomDeleter.visit(materializedQuery);
-							if (LOGGER_.isTraceEnabled())
-								LOGGER_.trace("removing materialized quiery axiom: "
-										+ OwlFunctionalStylePrinter
-												.toString(materializedQuery));
-
-						}
-
-					}
-
-					@Override
-					public void dispose() {
-						// nothing to dispose
-
-					}
-				};
+			public boolean isLoadingFinished() {
+				return finished;
 			}
 		};
 
 	}
 
 	/**
-	 * Compute a {@link Node} for the given {@link ElkClass} in the taxonomy
+	 * Computes a {@link Node} for the given {@link ElkClass} in the taxonomy
 	 * resulted from adding the given {@link ElkAxiom}
 	 * 
 	 * @param queryClass
@@ -582,12 +544,11 @@ public class Reasoner extends AbstractReasonerState {
 
 		boolean oldIsAllowIncrementalMode = isAllowIncrementalMode();
 		setAllowIncrementalMode(true);
-		registerOntologyChangesLoader(getQueryLoader(materializedQuery, true));
+		registerAxiomLoader(getQueryLoader(materializedQuery, true));
 		try {
 			return getClassNode(queryClass);
 		} finally {
-			registerOntologyChangesLoader(getQueryLoader(materializedQuery,
-					false));
+			registerAxiomLoader(getQueryLoader(materializedQuery, false));
 			setAllowIncrementalMode(oldIsAllowIncrementalMode);
 		}
 	}
@@ -612,12 +573,11 @@ public class Reasoner extends AbstractReasonerState {
 
 		boolean oldIsAllowIncrementalMode = isAllowIncrementalMode();
 		setAllowIncrementalMode(true);
-		registerOntologyChangesLoader(getQueryLoader(materializedQuery, true));
+		registerAxiomLoader(getQueryLoader(materializedQuery, true));
 		try {
 			return getTypeNode(queryClass);
 		} finally {
-			registerOntologyChangesLoader(getQueryLoader(materializedQuery,
-					false));
+			registerAxiomLoader(getQueryLoader(materializedQuery, false));
 			setAllowIncrementalMode(oldIsAllowIncrementalMode);
 		}
 	}
@@ -641,12 +601,11 @@ public class Reasoner extends AbstractReasonerState {
 
 		boolean oldIsAllowIncrementalMode = isAllowIncrementalMode();
 		setAllowIncrementalMode(true);
-		registerOntologyChangesLoader(getQueryLoader(materializedQuery, true));
+		registerAxiomLoader(getQueryLoader(materializedQuery, true));
 		try {
 			return getTaxonomyNode(queryClass);
 		} finally {
-			registerOntologyChangesLoader(getQueryLoader(materializedQuery,
-					false));
+			registerAxiomLoader(getQueryLoader(materializedQuery, false));
 			setAllowIncrementalMode(oldIsAllowIncrementalMode);
 		}
 	}

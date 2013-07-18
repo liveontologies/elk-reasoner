@@ -151,6 +151,7 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 
 			incrementalReasoner = new ElkReasoner(ontology, true,
 					new PostProcessingStageExecutor());
+			
 			// let the runner run..
 			RandomWalkRunnerIO<OWLAxiom> io = new OWLAPIBasedIO(ontology, incrementalReasoner);
 			

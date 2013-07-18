@@ -63,7 +63,7 @@ public class IncrementalRealizationCorrectnessTest extends
 	protected void applyChanges(final Reasoner reasoner,
 			final Iterable<ElkAxiom> changes,
 			final IncrementalChangeType type) {
-		reasoner.registerOntologyChangesLoader(new TestChangesLoader(changes, type));
+		reasoner.registerAxiomLoader(new TestChangesLoader(changes, type));
 	}
 
 	@Override

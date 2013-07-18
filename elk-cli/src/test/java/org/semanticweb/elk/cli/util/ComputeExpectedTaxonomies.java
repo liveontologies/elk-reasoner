@@ -32,8 +32,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import org.semanticweb.elk.io.FileUtils;
-import org.semanticweb.elk.loading.EmptyChangesLoader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -122,11 +121,10 @@ public class ComputeExpectedTaxonomies {
 
 			System.err.println(ontFile.getName());
 
-			OntologyLoader loader = new Owl2StreamLoader(
+			AxiomLoader loader = new Owl2StreamLoader(
 					new Owl2FunctionalStyleParserFactory(), ontFile);
 			Reasoner reasoner = reasonerFactory.createReasoner(loader,
 					new FailingOnInterruptStageExecutor(), configuraion);
-			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
 			Taxonomy<ElkClass> taxonomy = gt.getTaxonomy(reasoner);
 			// create the expected result file

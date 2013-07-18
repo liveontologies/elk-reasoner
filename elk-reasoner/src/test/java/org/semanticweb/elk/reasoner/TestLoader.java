@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,9 +25,9 @@ package org.semanticweb.elk.reasoner;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.semanticweb.elk.loading.AbstractAxiomLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
-import org.semanticweb.elk.loading.Loader;
-import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
@@ -40,7 +41,7 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class TestLoader implements OntologyLoader {
+public class TestLoader extends AbstractAxiomLoader implements AxiomLoader {
 
 	// axioms to be added
 	private final Queue<ElkAxiom> axioms_ = new LinkedList<ElkAxiom>();
@@ -61,25 +62,20 @@ public class TestLoader implements OntologyLoader {
 	}
 
 	@Override
-	public Loader getLoader(final ElkAxiomProcessor axiomLoader) {
-		return new Loader() {
+	public void load(ElkAxiomProcessor axiomInserter,
+			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
+		for (;;) {
+			ElkAxiom axiom = axioms_.poll();
+			if (axiom == null)
+				break;
+			axiomInserter.visit(axiom);
+		}
 
-			@Override
-			public void load() throws ElkLoadingException {
-				for (;;) {
-					ElkAxiom axiom = axioms_.poll();
-					if (axiom == null)
-						break;
-					axiomLoader.visit(axiom);
-				}
-			}
+	}
 
-			@Override
-			public void dispose() {
-				// nothing to dispose
-			}
-
-		};
+	@Override
+	public boolean isLoadingFinished() {
+		return axioms_.isEmpty();
 	}
 
 }

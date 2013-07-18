@@ -23,48 +23,45 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.Loader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 
 /**
- * A {@link ReasonerStage} during which ontology changes are applied to the
+ * A {@link ReasonerStage} during which the input ontology is loaded into the
  * reasoner.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ChangesLoadingStage extends AbstractReasonerStage {
+public class AxiomLoadingStage extends AbstractReasonerStage {
 
-	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(ChangesLoadingStage.class);
-
-	private Loader changesLoader_;
-
-	public ChangesLoadingStage(AbstractReasonerState reasoner,
+	public AxiomLoadingStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
 	}
 
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(AxiomLoadingStage.class);
+
 	@Override
 	public String getName() {
-		return "Loading of Changes";
+		return "Loading of Axioms";
 	}
 
 	@Override
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		this.changesLoader_ = reasoner.getChangesLoader();
 		return true;
 	}
 
 	@Override
 	public void executeStage() throws ElkException {
-		if (changesLoader_ == null)
-			LOGGER_.warn("Ontology changes loader is not registered. No changes will be loaded!");
-		else {
-			changesLoader_.load();
+		for (;;) {
+			reasoner.loadPendingAxioms();
+			if (!spuriousInterrupt())
+				break;
 		}
 	}
 
@@ -72,9 +69,6 @@ public class ChangesLoadingStage extends AbstractReasonerStage {
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		if (changesLoader_ != null)
-			this.changesLoader_.dispose();
-		this.changesLoader_ = null;
 		return true;
 	}
 
