@@ -100,13 +100,19 @@ public class OWLAPILowLevelIncrementalCorrectnessTest {
 		assertFalse(reasoner.getSubClasses(B, true).containsEntity(A));
 		assertFalse(reasoner.getSuperClasses(A, true).containsEntity(B));
 
+		reasoner.flush();
+		
+		assertFalse(reasoner.getEquivalentClasses(A).contains(B));
+		assertTrue(reasoner.getSubClasses(B, true).containsEntity(A));
+		assertTrue(reasoner.getSuperClasses(A, true).containsEntity(B));
+		
 		// this axiom should trigger non-incremental classification
 		OWLAxiom axRsubS = factory.getOWLSubObjectPropertyOfAxiom(R, S);
 		ontologyManager.addAxiom(ont, axRsubS);
 
-		assertTrue(reasoner.getEquivalentClasses(A).contains(B));
-		assertFalse(reasoner.getSubClasses(B, true).containsEntity(A));
-		assertFalse(reasoner.getSuperClasses(A, true).containsEntity(B));
+		assertFalse(reasoner.getEquivalentClasses(A).contains(B));
+		assertTrue(reasoner.getSubClasses(B, true).containsEntity(A));
+		assertTrue(reasoner.getSuperClasses(A, true).containsEntity(B));
 
 		// Terminate the worker threads used by the reasoner.
 		reasoner.dispose();
