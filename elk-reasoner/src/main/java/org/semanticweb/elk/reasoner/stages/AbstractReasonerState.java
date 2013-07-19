@@ -184,8 +184,10 @@ public abstract class AbstractReasonerState {
 		registerAxiomLoader(axiomLoader);
 	}
 
-	public void setAllowIncrementalMode(boolean allow) {
-		this.allowIncrementalMode_ = allow;
+	public synchronized void setAllowIncrementalMode(boolean allow) {
+		if (allowIncrementalMode_ == allow)
+			return;
+		allowIncrementalMode_ = allow;
 
 		if (!allow) {
 			setNonIncrementalMode();
@@ -198,11 +200,11 @@ public abstract class AbstractReasonerState {
 		}
 	}
 
-	public boolean isAllowIncrementalMode() {
+	public synchronized boolean isAllowIncrementalMode() {
 		return allowIncrementalMode_;
 	}
 
-	public boolean isIncrementalMode() {
+	public synchronized boolean isIncrementalMode() {
 		return ontologyIndex.isIncrementalMode();
 	}
 
@@ -224,14 +226,14 @@ public abstract class AbstractReasonerState {
 	/**
 	 * Reset the axiom loading stage and all subsequent stages
 	 */
-	public void resetAxiomLoading() {
+	public synchronized void resetAxiomLoading() {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("Reset axiom loading");
 		stageManager.axiomLoadingStage.invalidate();
 		stageManager.incrementalCompletionStage.invalidate();
 	}
 
-	public void registerAxiomLoader(AxiomLoader newAxiomLoader) {
+	public synchronized void registerAxiomLoader(AxiomLoader newAxiomLoader) {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("Registering new axiom loader");
 		resetAxiomLoading();
@@ -287,7 +289,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * interrupts running reasoning stages
 	 */
-	public void interrupt() {
+	public synchronized void interrupt() {
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info("Interrupt requested");
 		isInterrupted_ = true;
@@ -300,14 +302,14 @@ public abstract class AbstractReasonerState {
 	 * @return {@code true} if the reasoner has been interrupted and the
 	 *         interrupt status of the reasoner has not been cleared yet
 	 */
-	public boolean isInterrupted() {
+	public synchronized boolean isInterrupted() {
 		return isInterrupted_;
 	}
 
 	/**
 	 * clears the interrupt status of the reasoner
 	 */
-	public void clearInterrupt() {
+	public synchronized void clearInterrupt() {
 		isInterrupted_ = false;
 	}
 
@@ -319,7 +321,7 @@ public abstract class AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the reasoning process cannot be completed successfully
 	 */
-	public boolean isInconsistent() throws ElkException {
+	public synchronized boolean isInconsistent() throws ElkException {
 
 		ruleAndConclusionStats.reset();
 		loadAxioms();
@@ -366,7 +368,7 @@ public abstract class AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the reasoning process cannot be completed successfully
 	 */
-	public Taxonomy<ElkClass> getTaxonomy()
+	public synchronized Taxonomy<ElkClass> getTaxonomy()
 			throws ElkInconsistentOntologyException, ElkException {
 
 		ruleAndConclusionStats.reset();
@@ -397,7 +399,8 @@ public abstract class AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the reasoning process cannot be completed successfully
 	 */
-	public Taxonomy<ElkClass> getTaxonomyQuietly() throws ElkException {
+	public synchronized Taxonomy<ElkClass> getTaxonomyQuietly()
+			throws ElkException {
 		Taxonomy<ElkClass> result;
 
 		try {
@@ -424,7 +427,7 @@ public abstract class AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the reasoning process cannot be completed successfully
 	 */
-	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy()
+	public synchronized InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomy()
 			throws ElkException {
 
 		ruleAndConclusionStats.reset();
@@ -454,7 +457,7 @@ public abstract class AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the reasoning process cannot be completed successfully
 	 */
-	public InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomyQuietly()
+	public synchronized InstanceTaxonomy<ElkClass, ElkNamedIndividual> getInstanceTaxonomyQuietly()
 			throws ElkException {
 
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> result;
@@ -484,7 +487,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * @return all {@link ElkClass}es occurring in the ontology
 	 */
-	public Set<ElkClass> getAllClasses() {
+	public synchronized Set<ElkClass> getAllClasses() {
 		Set<ElkClass> result = new ArrayHashSet<ElkClass>(ontologyIndex
 				.getIndexedClasses().size());
 		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
@@ -495,7 +498,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * @return all {@link ElkNamedIndividual}s occurring in the ontology
 	 */
-	public Set<ElkNamedIndividual> getAllNamedIndividuals() {
+	public synchronized Set<ElkNamedIndividual> getAllNamedIndividuals() {
 		Set<ElkNamedIndividual> allNamedIndividuals = new ArrayHashSet<ElkNamedIndividual>(
 				ontologyIndex.getIndexedClasses().size());
 		for (IndexedIndividual ii : ontologyIndex.getIndexedIndividuals())
@@ -503,7 +506,7 @@ public abstract class AbstractReasonerState {
 		return allNamedIndividuals;
 	}
 
-	public Map<IndexedClassExpression, Context> getContextMap() {
+	public synchronized Map<IndexedClassExpression, Context> getContextMap() {
 		final Map<IndexedClassExpression, Context> result = new ArrayHashMap<IndexedClassExpression, Context>(
 				1024);
 		for (IndexedClassExpression ice : ontologyIndex
@@ -516,7 +519,7 @@ public abstract class AbstractReasonerState {
 		return result;
 	}
 
-	public Map<IndexedPropertyChain, SaturatedPropertyChain> getPropertySaturationMap() {
+	public synchronized Map<IndexedPropertyChain, SaturatedPropertyChain> getPropertySaturationMap() {
 		final Map<IndexedPropertyChain, SaturatedPropertyChain> result = new ArrayHashMap<IndexedPropertyChain, SaturatedPropertyChain>(
 				256);
 		for (IndexedPropertyChain ipc : ontologyIndex
@@ -532,14 +535,14 @@ public abstract class AbstractReasonerState {
 	/**
 	 * @return {@code true} if the ontology has been checked for consistency.
 	 */
-	public boolean doneConsistencyCheck() {
+	public synchronized boolean doneConsistencyCheck() {
 		return stageManager.consistencyCheckingStage.isCompleted;
 	}
 
 	/**
 	 * @return {@code true} if the class taxonomy has been computed
 	 */
-	public boolean doneTaxonomy() {
+	public synchronized boolean doneTaxonomy() {
 		return stageManager.classTaxonomyComputationStage.isCompleted
 				|| stageManager.incrementalClassTaxonomyComputationStage.isCompleted;
 	}
@@ -547,7 +550,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * @return {@code true} if the instance taxonomy has been computed
 	 */
-	public boolean doneInstanceTaxonomy() {
+	public synchronized boolean doneInstanceTaxonomy() {
 		return stageManager.instanceTaxonomyComputationStage.isCompleted;
 	}
 
@@ -580,12 +583,12 @@ public abstract class AbstractReasonerState {
 		return allowIncrementalTaxonomy_;
 	}
 
-	public void initClassTaxonomy() {
+	public synchronized void initClassTaxonomy() {
 		classTaxonomyState.getWriter().setTaxonomy(
 				new ConcurrentClassTaxonomy());
 	}
 
-	public void initInstanceTaxonomy() {
+	public synchronized void initInstanceTaxonomy() {
 		instanceTaxonomyState.initTaxonomy(new ConcurrentInstanceTaxonomy(
 				classTaxonomyState.getTaxonomy()));
 	}
@@ -595,7 +598,7 @@ public abstract class AbstractReasonerState {
 	 * SOME DEBUG METHODS, FIXME: REMOVE
 	 */
 	// ////////////////////////////////////////////////////////////////
-	public Collection<IndexedClassExpression> getIndexedClassExpressions() {
+	public synchronized Collection<IndexedClassExpression> getIndexedClassExpressions() {
 		return ontologyIndex.getIndexedClassExpressions();
 	}
 }

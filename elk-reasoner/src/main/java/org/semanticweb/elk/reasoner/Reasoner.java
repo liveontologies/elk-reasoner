@@ -121,7 +121,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * 
 	 * @param progressMonitor
 	 */
-	public void setProgressMonitor(ProgressMonitor progressMonitor) {
+	public synchronized void setProgressMonitor(ProgressMonitor progressMonitor) {
 		this.progressMonitor = progressMonitor;
 	}
 
@@ -134,7 +134,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * 
 	 * @param allow
 	 */
-	public void setAllowFreshEntities(boolean allow) {
+	public synchronized void setAllowFreshEntities(boolean allow) {
 		allowFreshEntities = allow;
 	}
 
@@ -144,7 +144,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * 
 	 * @return {@code true} if fresh entities are allowed
 	 */
-	public boolean getAllowFreshEntities() {
+	public synchronized boolean getAllowFreshEntities() {
 		return allowFreshEntities;
 	}
 
@@ -158,7 +158,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * 
 	 * @param workerNo
 	 */
-	public void setNumberOfWorkers(int workerNo) {
+	public synchronized void setNumberOfWorkers(int workerNo) {
 		workerNo_ = workerNo;
 	}
 
@@ -168,7 +168,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * 
 	 * @param config
 	 */
-	public final void setConfigurationOptions(ReasonerConfiguration config) {
+	public synchronized void setConfigurationOptions(ReasonerConfiguration config) {
 		int newWorkerNo = config
 				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
 
@@ -214,7 +214,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws InterruptedException
 	 *             if the current thread was interrupted
 	 */
-	public boolean shutdown(long timeout, TimeUnit unit)
+	public synchronized boolean shutdown(long timeout, TimeUnit unit)
 			throws InterruptedException {
 		if (executor_ == null)
 			return true;
@@ -239,7 +239,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws InterruptedException
 	 *             if the current thread was interrupted
 	 */
-	public boolean shutdown() throws InterruptedException {
+	public synchronized boolean shutdown() throws InterruptedException {
 		return shutdown(1, TimeUnit.MINUTES);
 	}
 
@@ -324,7 +324,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public TaxonomyNode<ElkClass> getClassNode(
+	public synchronized TaxonomyNode<ElkClass> getClassNode(
 			ElkClassExpression classExpression) throws ElkException {
 		if (classExpression instanceof ElkClass) {
 			return getTaxonomyNode((ElkClass) classExpression);
@@ -355,7 +355,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public Set<? extends Node<ElkClass>> getSubClasses(
+	public synchronized Set<? extends Node<ElkClass>> getSubClasses(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkException {
 
@@ -383,7 +383,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public Set<? extends Node<ElkClass>> getSuperClasses(
+	public synchronized Set<? extends Node<ElkClass>> getSuperClasses(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkException {
 
@@ -411,7 +411,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public Set<? extends Node<ElkNamedIndividual>> getInstances(
+	public synchronized Set<? extends Node<ElkNamedIndividual>> getInstances(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkException {
 
@@ -449,7 +449,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public Set<? extends Node<ElkClass>> getTypes(
+	public synchronized Set<? extends Node<ElkClass>> getTypes(
 			ElkNamedIndividual elkNamedIndividual, boolean direct)
 			throws ElkException {
 		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceNode(elkNamedIndividual);
@@ -471,7 +471,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public boolean isSatisfiable(ElkClassExpression classExpression)
+	public synchronized boolean isSatisfiable(ElkClassExpression classExpression)
 			throws ElkException {
 
 		Node<ElkClass> queryNode;
