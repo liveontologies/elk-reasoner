@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
@@ -128,6 +129,14 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 			IndexedObjectSomeValuesFrom.ThisCompositionRule thisCompositionRule,
 			BasicSaturationStateWriter writer, Context context) {
 		counter_.countObjectSomeValuesFromCompositionRule++;
+		visitor_.visit(thisCompositionRule, writer, context);
+	}
+
+	@Override
+	public void visit(
+			IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
+			BasicSaturationStateWriter writer, Context context) {
+		counter_.countObjectUnionOfCompositionRule++;
 		visitor_.visit(thisCompositionRule, writer, context);
 	}
 

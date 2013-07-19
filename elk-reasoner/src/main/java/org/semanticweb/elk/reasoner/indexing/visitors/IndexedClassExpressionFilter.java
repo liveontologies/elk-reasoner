@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 
 public interface IndexedClassExpressionFilter extends
 		IndexedClassVisitor<IndexedClass>,
@@ -35,6 +36,7 @@ public interface IndexedClassExpressionFilter extends
 		IndexedObjectComplementOfVisitor<IndexedObjectComplementOf>,
 		IndexedObjectIntersectionOfVisitor<IndexedObjectIntersectionOf>,
 		IndexedObjectSomeValuesFromVisitor<IndexedObjectSomeValuesFrom>,
+		IndexedObjectUnionOfVisitor<IndexedObjectUnionOf>,
 		IndexedDataHasValueVisitor<IndexedDataHasValue> {
 
 }

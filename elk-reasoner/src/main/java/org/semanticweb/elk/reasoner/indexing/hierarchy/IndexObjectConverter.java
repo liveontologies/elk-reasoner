@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.apache.log4j.Level;
@@ -38,6 +40,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainFilter;
@@ -190,6 +193,17 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 				.getProperty().accept(this);
 		return indexedClassFilter_.visit(new IndexedObjectSomeValuesFrom(iop,
 				elkObjectSomeValuesFrom.getFiller().accept(this)));
+	}
+
+	@Override
+	public IndexedClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
+		List<IndexedClassExpression> conjuncts = new ArrayList<IndexedClassExpression>(
+				elkObjectUnionOf.getClassExpressions().size());
+		for (ElkClassExpression conjunct : elkObjectUnionOf
+				.getClassExpressions()) {
+			conjuncts.add(conjunct.accept(this));
+		}
+		return indexedClassFilter_.visit(new IndexedObjectUnionOf(conjuncts));
 	}
 
 	@Override

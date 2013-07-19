@@ -39,6 +39,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf.ThisCompositionRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
@@ -289,6 +291,16 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				BasicSaturationStateWriter writer, Context context) {
 			for (IndexedClassExpression ice : thisCompositionRule
 					.getNegativeExistentials()) {
+				iceValidator_.checkNew(ice);
+			}
+		}
+
+		@Override
+		public void visit(
+				IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
+				BasicSaturationStateWriter writer, Context context) {
+			for (IndexedClassExpression ice : thisCompositionRule
+					.getDisjunctions()) {
 				iceValidator_.checkNew(ice);
 			}
 		}

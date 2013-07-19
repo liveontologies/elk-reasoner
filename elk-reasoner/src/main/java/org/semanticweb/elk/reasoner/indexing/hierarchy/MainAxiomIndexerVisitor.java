@@ -305,6 +305,11 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 		}
 
 		@Override
+		public IndexedObjectUnionOf visit(IndexedObjectUnionOf element) {
+			return update(objectCache_.visit(element));
+		}
+
+		@Override
 		public IndexedDataHasValue visit(IndexedDataHasValue element) {
 			return update(objectCache_.visit(element));
 		}

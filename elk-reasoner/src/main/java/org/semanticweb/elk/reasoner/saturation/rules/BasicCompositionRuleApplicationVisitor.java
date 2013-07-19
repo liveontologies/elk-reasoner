@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom.
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
@@ -86,6 +87,12 @@ public class BasicCompositionRuleApplicationVisitor implements
 
 	@Override
 	public void visit(IndexedObjectSomeValuesFrom.ThisCompositionRule rule,
+			BasicSaturationStateWriter writer, Context context) {
+		rule.apply(writer, context);
+	}
+
+	@Override
+	public void visit(IndexedObjectUnionOf.ThisCompositionRule rule,
 			BasicSaturationStateWriter writer, Context context) {
 		rule.apply(writer, context);
 	}

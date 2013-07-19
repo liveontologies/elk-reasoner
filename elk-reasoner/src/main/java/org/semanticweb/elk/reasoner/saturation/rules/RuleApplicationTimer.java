@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,10 +22,13 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
@@ -44,7 +48,7 @@ public class RuleApplicationTimer {
 	 * timer for {@link IndexedClass.OwlThingContextInitializationRule}
 	 */
 	int timeOwlThingContextInitializationRule;
-	
+
 	/**
 	 * timer for {@link DirectIndex.ContextRootInitializationRule}
 	 */
@@ -64,7 +68,7 @@ public class RuleApplicationTimer {
 	 * timer for {@link IndexedObjectComplementOf.ThisCompositionRule}
 	 */
 	int timeObjectComplementOfCompositionRule;
-	
+
 	/**
 	 * timer for {@link IndexedObjectIntersectionOf.ThisCompositionRule}
 	 */
@@ -79,6 +83,11 @@ public class RuleApplicationTimer {
 	 * timer for {@link IndexedObjectSomeValuesFrom.ThisCompositionRule}
 	 */
 	int timeObjectSomeValuesFromCompositionRule;
+
+	/**
+	 * timer for {@link IndexedObjectUnionOf.ThisCompositionRule}
+	 */
+	int timeObjectUnionOfCompositionRule;
 
 	/**
 	 * timer for {@link ForwardLink.ThisBackwardLinkRule}
@@ -107,6 +116,7 @@ public class RuleApplicationTimer {
 		timeObjectIntersectionOfCompositionRule = 0;
 		timeSubClassOfAxiomCompositionRule = 0;
 		timeObjectSomeValuesFromCompositionRule = 0;
+		timeObjectUnionOfCompositionRule = 0;
 		timeForwardLinkBackwardLinkRule = 0;
 		timePropagationBackwardLinkRule = 0;
 		timeContradictionBottomBackwardLinkRule = 0;
@@ -126,6 +136,7 @@ public class RuleApplicationTimer {
 		timeObjectIntersectionOfCompositionRule += timer.timeObjectIntersectionOfCompositionRule;
 		timeSubClassOfAxiomCompositionRule += timer.timeSubClassOfAxiomCompositionRule;
 		timeObjectSomeValuesFromCompositionRule += timer.timeObjectSomeValuesFromCompositionRule;
+		timeObjectUnionOfCompositionRule += timer.timeObjectUnionOfCompositionRule;
 		timeForwardLinkBackwardLinkRule += timer.timeForwardLinkBackwardLinkRule;
 		timePropagationBackwardLinkRule += timer.timePropagationBackwardLinkRule;
 		timeContradictionBottomBackwardLinkRule += timer.timeContradictionBottomBackwardLinkRule;
@@ -140,6 +151,7 @@ public class RuleApplicationTimer {
 				+ timeObjectIntersectionOfCompositionRule
 				+ timeSubClassOfAxiomCompositionRule
 				+ timeObjectSomeValuesFromCompositionRule
+				+ timeObjectUnionOfCompositionRule
 				+ timeForwardLinkBackwardLinkRule
 				+ timePropagationBackwardLinkRule
 				+ timeContradictionBottomBackwardLinkRule;

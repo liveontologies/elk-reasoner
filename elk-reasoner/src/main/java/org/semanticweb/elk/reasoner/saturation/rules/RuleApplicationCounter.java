@@ -82,6 +82,11 @@ public class RuleApplicationCounter {
 	int countObjectSomeValuesFromCompositionRule;
 
 	/**
+	 * counter for {@link IndexedObjectUnionOf.ThisCompositionRule}
+	 */
+	int countObjectUnionOfCompositionRule;
+
+	/**
 	 * counter for {@link ForwardLink.ThisBackwardLinkRule}
 	 */
 	int countForwardLinkBackwardLinkRule;
@@ -108,6 +113,7 @@ public class RuleApplicationCounter {
 		countObjectIntersectionOfCompositionRule = 0;
 		countSubClassOfAxiomCompositionRule = 0;
 		countObjectSomeValuesFromCompositionRule = 0;
+		countObjectUnionOfCompositionRule = 0;
 		countForwardLinkBackwardLinkRule = 0;
 		countPropagationBackwardLinkRule = 0;
 		countContradictionBottomBackwardLinkRule = 0;
@@ -127,6 +133,7 @@ public class RuleApplicationCounter {
 		countObjectIntersectionOfCompositionRule += counter.countObjectIntersectionOfCompositionRule;
 		countSubClassOfAxiomCompositionRule += counter.countSubClassOfAxiomCompositionRule;
 		countObjectSomeValuesFromCompositionRule += counter.countObjectSomeValuesFromCompositionRule;
+		countObjectUnionOfCompositionRule += counter.countObjectUnionOfCompositionRule;
 		countForwardLinkBackwardLinkRule += counter.countForwardLinkBackwardLinkRule;
 		countPropagationBackwardLinkRule += counter.countPropagationBackwardLinkRule;
 		countContradictionBottomBackwardLinkRule += counter.countContradictionBottomBackwardLinkRule;
@@ -141,6 +148,7 @@ public class RuleApplicationCounter {
 				+ countObjectIntersectionOfCompositionRule
 				+ countSubClassOfAxiomCompositionRule
 				+ countObjectSomeValuesFromCompositionRule
+				+ countObjectUnionOfCompositionRule
 				+ countForwardLinkBackwardLinkRule
 				+ countPropagationBackwardLinkRule
 				+ countContradictionBottomBackwardLinkRule;

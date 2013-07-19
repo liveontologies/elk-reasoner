@@ -1,5 +1,4 @@
 package org.semanticweb.elk.reasoner.indexing.entries;
-
 /*
  * #%L
  * ELK Reasoner
@@ -22,10 +21,10 @@ package org.semanticweb.elk.reasoner.indexing.entries;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 
 /**
- * Implements an equality view for instances of {@link IndexedObjectComplement}
+ * Implements an equality view for instances of {@link IndexedObjectUnionOf}
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -36,17 +35,17 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf
  *            the type of the wrapped indexed object used as the key of the
  *            entry
  */
-public class IndexedObjectComplementOfEntry<T, K extends IndexedObjectComplementOf>
+public class IndexedObjectUnionOfEntry<T, K extends IndexedObjectUnionOf>
 		extends IndexedClassExpressionEntry<T, K> {
 
-	IndexedObjectComplementOfEntry(K representative) {
+	IndexedObjectUnionOfEntry(K representative) {
 		super(representative);
 	}
 
 	@Override
 	public int computeHashCode() {
 		return combinedHashCode(IndexedObjectIntersectionOfEntry.class,
-				this.key.getNegated());
+				this.key.getDisjuncts().hashCode());
 	}
 
 	@Override
@@ -54,10 +53,11 @@ public class IndexedObjectComplementOfEntry<T, K extends IndexedObjectComplement
 		if (this == other) {
 			return true;
 		}
-		if (other instanceof IndexedObjectComplementOfEntry<?, ?>) {
-			IndexedObjectComplementOfEntry<?, ?> otherView = (IndexedObjectComplementOfEntry<?, ?>) other;
-			return this.key.getNegated().equals(otherView.key.getNegated());
+		if (other instanceof IndexedObjectUnionOfEntry<?, ?>) {
+			IndexedObjectUnionOfEntry<?, ?> otherView = (IndexedObjectUnionOfEntry<?, ?>) other;
+			return this.key.getDisjuncts().equals(otherView.key.getDisjuncts());
 		}
 		return false;
 	}
+
 }

@@ -169,6 +169,14 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	}
 
 	@Override
+	public IndexedObjectUnionOf visit(IndexedObjectUnionOf element) {
+		return resolveCache(
+				(IndexedObjectUnionOf) indexedClassExpressionLookup
+						.get(element),
+				element);
+	}
+
+	@Override
 	public IndexedDataHasValue visit(IndexedDataHasValue element) {
 		return resolveCache(
 				(IndexedDataHasValue) indexedClassExpressionLookup.get(element),
@@ -251,6 +259,13 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		}
 
 		@Override
+		public Boolean visit(IndexedObjectUnionOf element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Adding " + element);
+			return indexedClassExpressionLookup.add(element);
+		}
+
+		@Override
 		public Boolean visit(IndexedDataHasValue element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Adding " + element);
@@ -327,7 +342,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		public Boolean visit(IndexedObjectComplementOf element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Removing " + element);
-
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
@@ -335,7 +349,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		public Boolean visit(IndexedObjectIntersectionOf element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Removing " + element);
-
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
@@ -343,7 +356,13 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		public Boolean visit(IndexedObjectSomeValuesFrom element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Removing " + element);
+			return indexedClassExpressionLookup.removeEntry(element) != null;
+		}
 
+		@Override
+		public Boolean visit(IndexedObjectUnionOf element) {
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("Removing " + element);
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
@@ -351,7 +370,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		public Boolean visit(IndexedDataHasValue element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Removing " + element);
-
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 

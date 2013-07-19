@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
@@ -80,16 +81,22 @@ public class IndexedEntryConverter<T>
 	}
 
 	@Override
-	public IndexedClassExpressionEntry<T, IndexedDataHasValue> visit(
-			IndexedDataHasValue element) {
-		return new IndexedDataHasValueEntry<T, IndexedDataHasValue>(element);
-	}
-
-	@Override
 	public IndexedClassExpressionEntry<T, IndexedObjectSomeValuesFrom> visit(
 			IndexedObjectSomeValuesFrom element) {
 		return new IndexedObjectSomeValuesFromEntry<T, IndexedObjectSomeValuesFrom>(
 				element);
+	}
+
+	@Override
+	public KeyEntry<T, ? extends IndexedClassExpression> visit(
+			IndexedObjectUnionOf element) {
+		return new IndexedObjectUnionOfEntry<T, IndexedObjectUnionOf>(element);
+	}
+
+	@Override
+	public IndexedClassExpressionEntry<T, IndexedDataHasValue> visit(
+			IndexedDataHasValue element) {
+		return new IndexedDataHasValueEntry<T, IndexedDataHasValue>(element);
 	}
 
 	@Override

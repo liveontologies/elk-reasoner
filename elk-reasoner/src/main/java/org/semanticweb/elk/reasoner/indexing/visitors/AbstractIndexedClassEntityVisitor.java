@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 
 /**
  * @author Pavel Klinov
@@ -46,17 +47,22 @@ public abstract class AbstractIndexedClassEntityVisitor<O> implements
 	}
 
 	@Override
-	public O visit(IndexedObjectSomeValuesFrom element) {
-		return null;
-	}
-
-	@Override
 	public O visit(IndexedObjectComplementOf element) {
 		return null;
 	}
 
 	@Override
 	public O visit(IndexedObjectIntersectionOf element) {
+		return null;
+	}
+
+	@Override
+	public O visit(IndexedObjectSomeValuesFrom element) {
+		return null;
+	}
+
+	@Override
+	public O visit(IndexedObjectUnionOf element) {
 		return null;
 	}
 
