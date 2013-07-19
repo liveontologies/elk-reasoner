@@ -166,6 +166,12 @@ public class RuleStatistics {
 					+ decompositionRuleTimer.timeIndexedObjectComplementOf
 					/ numOfMeasurements_ + " ms)");
 
+		if (ruleCounter.countObjectUnionOfCompositionRule > 0)
+			logger.debug("ObjectUnionOf composition rules: "
+					+ ruleCounter.countObjectUnionOfCompositionRule + " ("
+					+ ruleTimer.timeObjectUnionOfCompositionRule
+					/ numOfMeasurements_ + " ms)");
+
 		if (decompositionRuleCounter.countIndexedClassDecompositionRule > 0)
 			logger.debug("Class decomposition rules: "
 					+ decompositionRuleCounter.countIndexedClassDecompositionRule
@@ -179,13 +185,16 @@ public class RuleStatistics {
 						+ ruleTimer.timeForwardLinkBackwardLinkRule
 						+ ruleTimer.timeObjectIntersectionOfCompositionRule
 						+ ruleTimer.timeObjectSomeValuesFromCompositionRule
+						+ ruleTimer.timeObjectComplementOfCompositionRule
+						+ ruleTimer.timeObjectUnionOfCompositionRule
 						+ ruleTimer.timeOwlThingContextInitializationRule
 						+ ruleTimer.timeContextRootInitializationRule
 						+ ruleTimer.timePropagationBackwardLinkRule
 						+ ruleTimer.timeSubClassOfAxiomCompositionRule
 						+ decompositionRuleTimer.timeIndexedClass
 						+ decompositionRuleTimer.timeIndexedDataHasValue
-						+ decompositionRuleTimer.timeIndexedObjectIntersectionOf + decompositionRuleTimer.timeIndexedObjectSomeValuesFrom)
+						+ decompositionRuleTimer.timeIndexedObjectIntersectionOf
+						+ decompositionRuleTimer.timeIndexedObjectSomeValuesFrom + decompositionRuleTimer.timeIndexedObjectComplementOf)
 				/ numOfMeasurements_ + " ms");
 	}
 
