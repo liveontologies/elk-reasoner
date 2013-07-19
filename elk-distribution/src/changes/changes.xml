@@ -21,17 +21,20 @@ will appear in the produced result.
 			</action>
 			<action dev="yevgeny" type="add">
 				Queries of complex class expressions (satisfiability checking, retrieval of equivalent classes, subclasses, and superclasses) are now supported through incremental reasoning.
-			</action>
+			</action>			
 			<action dev="yevgeny" type="add">
-				Support for explanation feature in Protege through queries for complex class expressions. For this, positive occurrences of negation (ObjectComplementOf) are supported.
+				Support for positive occurrences of negation (ObjectComplementOf) and negative occurrences of disjunctions (ObjectUnionOf).
 			</action>
 			<action dev="yevgeny" type="update">
 				New rule engine under the hood that provides a general way of specifying and registering composition and decomposition rules for various language features.
 			</action>
 			<action dev="yevgeny" type="update">
 				New reasoning stage management to keep track of dependencies between reasoning stages and of their execution.
+			</action>
+			<action dev="yevgeny" type="add">
+				Support for explanation and DL query features in Protege through queries for complex class expressions.
 			</action>						
-			<action dev="yevgeny" type="update">
+			<action dev="pavel" type="update">
 				The OWL 2 FSS parser now runs lexer and tokenizer in parallel threads.
 			</action>
 			<action dev="pavel" type="add">
