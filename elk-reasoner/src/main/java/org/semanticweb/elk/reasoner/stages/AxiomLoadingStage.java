@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 
 /**

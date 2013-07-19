@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +42,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -51,8 +53,10 @@ import org.semanticweb.elk.reasoner.taxonomy.model.FreshTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.FreshTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.taxonomy.model.SimpleNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.util.collections.LazyCollectionMinusSet;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
@@ -168,7 +172,8 @@ public class Reasoner extends AbstractReasonerState {
 	 * 
 	 * @param config
 	 */
-	public synchronized void setConfigurationOptions(ReasonerConfiguration config) {
+	public synchronized void setConfigurationOptions(
+			ReasonerConfiguration config) {
 		int newWorkerNo = config
 				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
 
@@ -335,6 +340,37 @@ public class Reasoner extends AbstractReasonerState {
 		ElkAxiom materializedQuery = elkFactory.getEquivalentClassesAxiom(
 				queryClass, classExpression);
 		return getQueryTaxonomyNode(queryClass, materializedQuery);
+	}
+
+	/**
+	 * Return the {@code Node} containing equivalent classes of the given
+	 * {@link ElkClassExpression}. Calling of this method may trigger the
+	 * computation of the taxonomy, if it has not been done yet.
+	 * 
+	 * @param classExpression
+	 *            the {@link ElkClassExpression} for which to return the
+	 *            {@link Node}
+	 * @return the set of {@link Node} whose members are {@link ElkClass}es
+	 *         equivalent to the given {@link ElkClassExpression}
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	public synchronized Node<ElkClass> getEquivalentClasses(
+			ElkClassExpression classExpression) throws ElkException {
+		if (classExpression instanceof ElkClass) {
+			return getTaxonomyNode((ElkClass) classExpression);
+		}
+		// else
+		ElkClass queryClass = elkFactory.getClass(new ElkFullIri(
+				OwlFunctionalStylePrinter.toString(classExpression)));
+		ElkAxiom materializedQuery = elkFactory.getEquivalentClassesAxiom(
+				queryClass, classExpression);
+		Node<ElkClass> queryNode = getQueryTaxonomyNode(queryClass,
+				materializedQuery);
+
+		return new SimpleNode<ElkClass>(new LazyCollectionMinusSet<ElkClass>(
+				queryNode.getMembers(), Collections.singleton(queryClass)),
+				Comparators.ELK_CLASS_COMPARATOR);
 	}
 
 	/**

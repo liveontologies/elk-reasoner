@@ -251,7 +251,7 @@ public class ElkReasoner implements OWLReasoner {
 			ElkException {
 		try {
 			return elkConverter_.convertClassNode(reasoner_
-					.getClassNode(elkClass));
+					.getEquivalentClasses(elkClass));
 		} catch (ElkException e) {
 			throw elkConverter_.convert(e);
 		}
@@ -448,7 +448,7 @@ public class ElkReasoner implements OWLReasoner {
 		checkInterrupted();
 		try {
 			return elkConverter_.convertClassNode(reasoner_
-					.getClassNode(owlConverter_.convert(ce)));
+					.getEquivalentClasses(owlConverter_.convert(ce)));
 		} catch (ElkUnsupportedReasoningTaskException e) {
 			throw unsupportedOwlApiMethod(
 					"getEquivalentClasses(OWLClassExpression)", e.getMessage());
