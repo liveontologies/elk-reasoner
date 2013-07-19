@@ -302,14 +302,21 @@ public class ElkReasoner implements OWLReasoner {
 				bufferedChangesLoader_ = new OwlChangesLoader(
 						this.elkProgressMonitor_);
 				ontologyReloadRequired_ = false;
-			} else {
-				if (!bufferedChangesLoader_.isLoadingFinished())
-					reasoner_.registerAxiomLoader(bufferedChangesLoader_);
+			} else if (!bufferedChangesLoader_.isLoadingFinished()) {
+				// there is something new in the buffer
 				if (isBufferingMode_) {
 					// in buffering mode, new changes need to be buffered
 					// separately in order not to mix with the old changes
+					// so, we need to register the buffer with the reasoner
+					// and create a new one
+					reasoner_.registerAxiomLoader(bufferedChangesLoader_);
 					bufferedChangesLoader_ = new OwlChangesLoader(
 							this.elkProgressMonitor_);
+				} else {
+					// in non-buffering node the changes loader is already
+					// registered, so we just need to
+					// notify the reasoner about new axioms
+					reasoner_.resetAxiomLoading();
 				}
 			}
 		} catch (ElkRuntimeException e) {

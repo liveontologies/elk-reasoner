@@ -224,7 +224,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * Reset the axiom loading stage and all subsequent stages
 	 */
-	private void resetAxiomLoading() {
+	public void resetAxiomLoading() {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace("Reset axiom loading");
 		stageManager.axiomLoadingStage.invalidate();
