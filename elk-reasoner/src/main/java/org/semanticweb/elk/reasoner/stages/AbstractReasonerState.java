@@ -380,7 +380,6 @@ public abstract class AbstractReasonerState {
 			getStageExecutor().complete(
 					stageManager.incrementalClassTaxonomyComputationStage);
 		} else {
-			stageManager.axiomLoadingStage.invalidate();
 			setNonIncrementalMode();
 			getStageExecutor().complete(
 					stageManager.classTaxonomyComputationStage);

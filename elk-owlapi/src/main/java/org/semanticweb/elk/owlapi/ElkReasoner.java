@@ -92,8 +92,16 @@ public class ElkReasoner implements OWLReasoner {
 	// OWL API related objects
 	private final OWLOntology owlOntology_;
 	private final OWLOntologyManager owlOntologymanager_;
-	/** ELK progress monitor implementation to display progress */
-	private final ProgressMonitor elkProgressMonitor_;
+	/**
+	 * ELK progress monitor to display progress of main reasoning tasks, e.g.,
+	 * classification
+	 */
+	private final ProgressMonitor mainProgressMonitor_;
+	/**
+	 * ELK progress monitor to display progress of other reasoning tasks, e.g.,
+	 * satisfiability checking
+	 */
+	private final ProgressMonitor secondaryProgressMonitor_;
 	/**
 	 * {@code true} iff the buffering mode for reasoner is
 	 * {@link BufferingMode#BUFFERING}
@@ -127,8 +135,9 @@ public class ElkReasoner implements OWLReasoner {
 			ReasonerStageExecutor stageExecutor) {
 		this.owlOntology_ = ontology;
 		this.owlOntologymanager_ = ontology.getOWLOntologyManager();
-		this.elkProgressMonitor_ = elkConfig.getProgressMonitor() == null ? new DummyProgressMonitor()
+		this.mainProgressMonitor_ = elkConfig.getProgressMonitor() == null ? new DummyProgressMonitor()
 				: new ElkReasonerProgressMonitor(elkConfig.getProgressMonitor());
+		this.secondaryProgressMonitor_ = new DummyProgressMonitor();
 		this.isBufferingMode_ = isBufferingMode;
 		this.ontologyChangeListener_ = new OntologyChangeListener();
 		this.owlOntologymanager_
@@ -143,7 +152,7 @@ public class ElkReasoner implements OWLReasoner {
 
 		reCreateReasoner();
 		this.bufferedChangesLoader_ = new OwlChangesLoader(
-				this.elkProgressMonitor_);
+				this.mainProgressMonitor_);
 
 		reasoner_.registerAxiomLoader(bufferedChangesLoader_);
 
@@ -189,10 +198,13 @@ public class ElkReasoner implements OWLReasoner {
 	 */
 	private void reCreateReasoner() {
 		this.reasoner_ = new ReasonerFactory().createReasoner(
-				new OwlOntologyLoader(owlOntology_, this.elkProgressMonitor_),
+				new OwlOntologyLoader(owlOntology_, this.mainProgressMonitor_),
 				stageExecutor_, config_);
 		this.reasoner_.setAllowFreshEntities(isAllowFreshEntities);
-		this.reasoner_.setProgressMonitor(this.elkProgressMonitor_);
+		// use the secondary progress monitor by default, when necessary, we
+		// switch to the primary progress monitor; this is to avoid bugs with
+		// progress monitors in Protege
+		this.reasoner_.setProgressMonitor(this.secondaryProgressMonitor_);
 	}
 
 	/**
@@ -300,7 +312,7 @@ public class ElkReasoner implements OWLReasoner {
 			if (ontologyReloadRequired_) {
 				reCreateReasoner();
 				bufferedChangesLoader_ = new OwlChangesLoader(
-						this.elkProgressMonitor_);
+						this.secondaryProgressMonitor_);
 				ontologyReloadRequired_ = false;
 			} else if (!bufferedChangesLoader_.isLoadingFinished()) {
 				// there is something new in the buffer
@@ -311,7 +323,7 @@ public class ElkReasoner implements OWLReasoner {
 					// and create a new one
 					reasoner_.registerAxiomLoader(bufferedChangesLoader_);
 					bufferedChangesLoader_ = new OwlChangesLoader(
-							this.elkProgressMonitor_);
+							this.secondaryProgressMonitor_);
 				} else {
 					// in non-buffering node the changes loader is already
 					// registered, so we just need to
@@ -914,6 +926,8 @@ public class ElkReasoner implements OWLReasoner {
 		if (LOGGER_.isDebugEnabled())
 			LOGGER_.debug("precomputeInferences(InferenceType...)");
 		checkInterrupted();
+		// we use the main progress monitor only here
+		this.reasoner_.setProgressMonitor(this.mainProgressMonitor_);
 		try {
 			for (InferenceType inferenceType : inferenceTypes) {
 				if (inferenceType.equals(InferenceType.CLASS_HIERARCHY))
@@ -928,6 +942,8 @@ public class ElkReasoner implements OWLReasoner {
 			throw elkConverter_.convert(e);
 		} catch (ElkRuntimeException e) {
 			throw elkConverter_.convert(e);
+		} finally {
+			this.reasoner_.setProgressMonitor(this.secondaryProgressMonitor_);
 		}
 
 	}
