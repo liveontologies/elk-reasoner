@@ -1,10 +1,35 @@
-package org.semanticweb.elk.reasoner.datatypes.index.itree;
+package org.semanticweb.elk.util.collections.intervals;
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 
 /**
+ * Balanced binary tree data structure capable of storing {@link Interval} keys
+ * and multiple arbitrary values for them. Insertion and deletion are O(log n)
+ * operations. Query is O((k+1)log n) operation, where k is the number of intervals
+ * that are included by the query interval.
  *
  * @author Pospishnyi Oleksandr
  */
@@ -16,16 +41,30 @@ public class IntervalTree<K extends Interval, V> {
 	public IntervalTree() {
 	}
 
+	/**
+	 * Get the size of the interval tree.
+	 *
+	 * @return number of entries in the tree
+	 */
 	public int size() {
 		return size;
 	}
 
-	public V put(K key, V value) {
+	/**
+	 * Add an interval and an associated data value to the tree. If the
+	 * entry with the specified key already exists in the tree, then the
+	 * value will be appended to it, without replacing the previously stored
+	 * value.
+	 *
+	 * @param key an {@link Interval} key
+	 * @param value arbitrary data value
+	 */
+	public void add(K key, V value) {
 		Entry<K, V> t = root;
 		if (t == null) {
 			root = new Entry<K, V>(key, value, null);
 			size = 1;
-			return null;
+			return;
 		}
 		int cmp;
 		Entry<K, V> parent;
@@ -41,7 +80,8 @@ public class IntervalTree<K extends Interval, V> {
 			} else if (cmp > 0) {
 				t = t.right;
 			} else {
-				return t.setValue(value);
+				t.setValue(value);
+				return;
 			}
 		} while (t != null);
 		Entry<K, V> e = new Entry<K, V>(key, value, parent);
@@ -52,24 +92,28 @@ public class IntervalTree<K extends Interval, V> {
 		}
 		fixAfterInsertion(e);
 		size++;
-		return null;
 	}
 
-	public V remove(Object key) {
-		Entry<K, V> p = getEntry(key);
-		if (p == null) {
-			return null;
+	/**
+	 * Remove an interval from the tree
+	 *
+	 * @param key an {@link Interval} key
+	 * @param value value to be deleted
+	 * @return boolean flag, indicating the successfulness of the operation
+	 */
+	public boolean remove(K key, V value) {
+		Entry<K, V> e = getEntry(key, value);
+		if (e == null) {
+			return false;
 		}
-
-		V oldValue = p.value;
-		deleteEntry(p);
-		return oldValue;
+		boolean ret = e.value.remove(value);
+		if (e.value.isEmpty()) {
+			deleteEntry(e);
+		}
+		return ret;
 	}
 
-	final Entry<K, V> getEntry(Object key) {
-		if (key == null) {
-			throw new NullPointerException();
-		}
+	protected Entry<K, V> getEntry(K key, V value) {
 		Comparable<? super K> k = (Comparable<? super K>) key;
 		Entry<K, V> p = root;
 		while (p != null) {
@@ -85,28 +129,53 @@ public class IntervalTree<K extends Interval, V> {
 		return null;
 	}
 
-	public Collection<Entry<K, V>> search(Interval i) {
-		Collection<Entry<K, V>> result = new HashSet<Entry<K, V>>();
+	/**
+	 * search for all {@link Interval}s that include the following
+	 * {@link Interval} and return all their associated data values
+	 *
+	 * @param i search {@link Interval}
+	 * @return all data values from {@link Interval}s that include the
+	 * {@link Interval} i
+	 */
+	public Collection<V> searchIncludes(Interval i) {
+		Collection<V> result = new ArrayList<V>();
 		if (root != null) {
 			search(root, i, result);
 		}
 		return result;
 	}
 
-	private void search(Entry<K, V> n, Interval i, Collection<Entry<K, V>> result) {
-		if (i.getMin().compareTo(n.min) < 0 && i.getMax().compareTo(n.max) > 0) {
-			return;
+	private boolean search(Entry<K, V> x, Interval i, Collection<V> result) {
+		if (x.left != null && x.left.max.compareTo(i.getHigh()) >= 0) {
+			boolean fnd = search(x.left, i, result);
+			if (x.key.contains(i)) {
+				result.addAll(x.value);
+				fnd = true;
+			}
+			if (fnd) {
+				if (x.right != null && x.right.max.compareTo(i.getHigh()) >= 0) {
+					return search(x.right, i, result);
+				} else {
+					return true;
+				}
+			}
+		} else {
+			if (x.key.contains(i)) {
+				result.addAll(x.value);
+
+				if (x.right != null && x.right.max.compareTo(i.getHigh()) >= 0) {
+					return search(x.right, i, result);
+				} else {
+					return true;
+				}
+
+			} else {
+				if (x.right != null && x.right.max.compareTo(i.getHigh()) >= 0) {
+					return search(x.right, i, result);
+				}
+			}
 		}
-		if (n.left != null) {
-			search(n.left, i, result);
-		}
-		if (n.key.getMax().compareTo(i.getMax()) >= 0
-			&& n.key.getMin().compareTo(i.getMin()) <= 0) {
-			result.add(n);
-		}
-		if (n.right != null) {
-			search(n.right, i, result);
-		}
+		return false;
 	}
 
 	private void deleteEntry(Entry<K, V> z) {
@@ -169,7 +238,6 @@ public class IntervalTree<K extends Interval, V> {
 			propagate = propagateStart.update();
 		}
 	}
-	
 	/*
 	 * Red-black mechanics
 	 */
@@ -179,11 +247,10 @@ public class IntervalTree<K extends Interval, V> {
 	/*
 	 * Internal Entry class
 	 */
-	public static final class Entry<K extends Interval, V> {
+	protected static final class Entry<K extends Interval, V> {
 
 		K key;
-		V value;
-		Comparable min;
+		Collection<V> value;
 		Comparable max;
 		Entry<K, V> left = null;
 		Entry<K, V> right = null;
@@ -192,45 +259,33 @@ public class IntervalTree<K extends Interval, V> {
 
 		Entry(K key, V value, Entry<K, V> parent) {
 			this.key = key;
-			this.value = value;
+			this.value = Arrays.asList(value);
 			this.parent = parent;
-			this.min = key.getMin();
-			this.max = key.getMax();
 		}
 
-		public V getValue() {
+		public Collection<V> getValues() {
 			return value;
 		}
 
-		public V setValue(V value) {
-			V oldValue = this.value;
-			this.value = value;
-			return oldValue;
+		public void setValue(V v) {
+			try {
+				value.add(v);
+			} catch (UnsupportedOperationException e) {
+				this.value = new ArrayList<V>(value);
+				this.value.add(v);
+			}
 		}
 
 		public boolean update() {
-			Comparable newMin;
 			Comparable newMax;
 
-			newMin = minOf(left != null ? left.min : null, right != null ? right.min : null, key.getMin());
-			newMax = maxOf(left != null ? left.max : null, right != null ? right.max : null, key.getMax());
+			newMax = maxOf(left != null ? left.max : null, right != null ? right.max : null, key.getHigh());
 
-			if ((max != newMax) || (min != newMin)) {
+			if (max != newMax) {
 				max = newMax;
-				min = newMin;
 				return true;
 			}
 			return false;
-		}
-
-		protected static <T extends Comparable<T>> T minOf(T... ts) {
-			T min = null;
-			for (T t : ts) {
-				if (t != null && (min == null || t.compareTo(min) < 0)) {
-					min = t;
-				}
-			}
-			return min;
 		}
 
 		protected static <T extends Comparable<T>> T maxOf(T... ts) {
@@ -489,10 +544,10 @@ public class IntervalTree<K extends Interval, V> {
 	static boolean valEquals(Object o1, Object o2) {
 		return (o1 == null ? o2 == null : o1.equals(o2));
 	}
+
 	/*
 	 * Printing operations
 	 */
-
 	public void print(int spread) {
 		printHelper(root, 0, spread);
 	}
@@ -509,9 +564,9 @@ public class IntervalTree<K extends Interval, V> {
 			System.out.print("  ");
 		}
 		if (n.color == BLACK) {
-			System.out.println("\u001B[30m" + n.min + n.key + n.max);
+			System.out.println("\u001B[30m" + n.key + n.value);
 		} else {
-			System.out.println("\u001B[31m" + n.min + n.key + n.max);
+			System.out.println("\u001B[31m" + n.key + n.value);
 		}
 		if (n.left != null) {
 			printHelper(n.left, indent + spread, spread);
