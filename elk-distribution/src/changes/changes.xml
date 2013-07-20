@@ -16,10 +16,10 @@ will appear in the produced result.
 	</properties>
 	<body>
 	    <release version="${release.version}" date="${buildDate}" description="Forth public release">
-			<action dev="pavel" type="add">
+			<action dev="pavel" type="add"  issue="9">
 				Incremental reasoning. The reasoner can incrementally update the inferred class and instance hierarchies after adding, removing, or modifying axioms. Changes in axioms which may affect the property hierarchy or property chains, e.g., SubObjectPropertyOf, TransitiveObjectProperty, etc., will still trigger full re-classification.
 			</action>
-			<action dev="yevgeny" type="add">
+			<action dev="yevgeny" type="add" issue="10">
 				Queries of complex class expressions (satisfiability checking, retrieval of equivalent classes, subclasses, and superclasses) are now supported through incremental reasoning.
 			</action>			
 			<action dev="yevgeny" type="add">
@@ -40,10 +40,7 @@ will appear in the produced result.
 			<action dev="pavel" type="add">
 				Incremental reasoning mode can be enabled/disabled from the Reasoner Preferences panel in Protege.
 			</action>						
-			<action dev="yevgeny" type="fix" issue="10">
-				Elk now supports queries for complex class expressions through incremental reasoning
-			</action>
-			<action dev="yevgeny" type="fix" issue="12">
+			<action dev="pavel" type="fix" issue="12">
 				Fix the location of examples in the owlapi-library distribution package as described in the README.txt file
 			</action>
 			<action dev="pavel" type="fix" issue="14">
