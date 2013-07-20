@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 
 /**
@@ -38,10 +37,6 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 			AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
 	}
-
-	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(AxiomLoadingStage.class);
 
 	@Override
 	public String getName() {

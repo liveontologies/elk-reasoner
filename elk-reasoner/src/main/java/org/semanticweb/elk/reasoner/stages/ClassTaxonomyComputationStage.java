@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
 
@@ -34,10 +33,6 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  */
 class ClassTaxonomyComputationStage extends AbstractReasonerStage {
-
-	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(ClassTaxonomyComputationStage.class);
 
 	/**
 	 * the computation used for this stage

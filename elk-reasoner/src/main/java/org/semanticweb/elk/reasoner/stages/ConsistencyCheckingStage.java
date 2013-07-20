@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 
 /**
@@ -33,10 +32,6 @@ import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
  * 
  */
 class ConsistencyCheckingStage extends AbstractReasonerStage {
-
-	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(ConsistencyCheckingStage.class);
 
 	/**
 	 * the computation used for this stage

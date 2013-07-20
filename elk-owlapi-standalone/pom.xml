@@ -64,7 +64,7 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<excludeGroupIds>${project.groupId},net.sourceforge.owlapi</excludeGroupIds>
+							<excludeGroupIds>${project.groupId},net.sourceforge.owlapi,org.apache.felix</excludeGroupIds>
 							<outputDirectory>${project.build.directory}/lib</outputDirectory>
 							<stripVersion>true</stripVersion>
 						</configuration>
@@ -76,7 +76,7 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<excludeGroupIds>${project.groupId},net.sourceforge.owlapi</excludeGroupIds>
+							<excludeGroupIds>${project.groupId},net.sourceforge.owlapi,org.apache.felix</excludeGroupIds>
 							<outputDirectory>${project.build.directory}/lib</outputDirectory>
 							<stripVersion>true</stripVersion>
 							<classifier>sources</classifier>

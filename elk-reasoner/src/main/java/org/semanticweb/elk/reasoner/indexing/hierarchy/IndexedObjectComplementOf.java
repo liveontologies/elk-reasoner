@@ -22,12 +22,8 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectComplementOfVisitor;
