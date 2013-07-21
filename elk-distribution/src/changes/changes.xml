@@ -15,7 +15,9 @@ will appear in the produced result.
 		<title>ELK Reasoner Project</title>
 	</properties>
 	<body>
-	    <release version="${release.version}" date="${buildDate}" description="Forth public release">
+	    <release version="${release.version}" date="${buildDate}" description="Current version">
+	    </release>
+	    <release version="0.4.0" date="2013-07-20" description="Forth public release">
 			<action dev="pavel" type="add"  issue="9">
 				Incremental reasoning. The reasoner can incrementally update the inferred class and instance hierarchies after adding, removing, or modifying axioms. Changes in axioms which may affect the property hierarchy or property chains, e.g., SubObjectPropertyOf, TransitiveObjectProperty, etc., will still trigger full re-classification.
 			</action>
@@ -44,8 +46,7 @@ will appear in the produced result.
 				Fix the location of examples in the owlapi-library distribution package as described in the README.txt file
 			</action>
 			<action dev="pavel" type="fix" issue="14">
-				ELK now tracks changes in axioms which belong to imported ontologies. Also it doesn't log warnings for changes in ontologies outside the
-				import closure.
+				ELK now tracks changes in axioms which belong to imported ontologies. Also it doesn't log warnings for changes in ontologies outside the import closure.
 			</action>
 			<action dev="yevgeny" type="fix" issue="18">
 			    Fixed conversion of double inverse object properties from OWL API				
