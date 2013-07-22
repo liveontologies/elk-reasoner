@@ -1,11 +1,14 @@
+/**
+ * 
+ */
+package org.semanticweb.elk.owl.parsing.javacc;
 /*
  * #%L
- * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * ELK OWL JavaCC Parser
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,28 +23,18 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.loading;
 
 /**
- * A common interface for loading processes
- * 
- * @author "Yevgeny Kazakov"
- * 
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public interface Loader {
+public interface JavaCCLexerFactory<T> {
 
 	/**
-	 * Runs the loading process. If loading process is interrupted, it can be
-	 * continued by calling this method again.
 	 * 
-	 * @throws ElkLoadingException
-	 *             if loading cannot be completed successfully
+	 * @param nativeLexer The lexer which has physical access to the input stream of characters
+	 * @return
 	 */
-	public void load() throws ElkLoadingException;
-
-	/**
-	 * Close resources used by this {@link Loader}
-	 */
-	public void dispose();
-
+	public T createLexer(T nativeLexer);
 }

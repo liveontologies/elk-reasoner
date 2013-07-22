@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
 
@@ -34,10 +33,6 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  */
 class ClassTaxonomyComputationStage extends AbstractReasonerStage {
-
-	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(ClassTaxonomyComputationStage.class);
 
 	/**
 	 * the computation used for this stage
@@ -59,17 +54,14 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		if (!super.preExecute()) {
 			return false;
 		}
-		
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		}
-		
+
 		reasoner.initClassTaxonomy();
-		
+
 		this.computation_ = new ClassTaxonomyComputation(Operations.split(
 				reasoner.ontologyIndex.getIndexedClasses(), 64),
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,
-				reasoner.saturationState, reasoner.classTaxonomyState.getTaxonomy());
+				reasoner.saturationState,
+				reasoner.classTaxonomyState.getTaxonomy());
 		return true;
 	}
 

@@ -63,7 +63,7 @@ public class IncrementalClassificationCorrectnessTest extends
 	protected void applyChanges(final Reasoner reasoner,
 			final Iterable<ElkAxiom> changes,
 			final IncrementalChangeType type) {
-		reasoner.registerOntologyChangesLoader(new TestChangesLoader(changes, type));
+		reasoner.registerAxiomLoader(new TestChangesLoader(changes, type));
 	}
 
 	@Override
@@ -89,6 +89,11 @@ public class IncrementalClassificationCorrectnessTest extends
 			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
 				// all axioms are dynamic
 				changingAxioms.add(elkAxiom);
+			}
+
+			@Override
+			public void finish() throws Owl2ParseException {
+				// everything is processed immediately
 			}
 		});
 	}

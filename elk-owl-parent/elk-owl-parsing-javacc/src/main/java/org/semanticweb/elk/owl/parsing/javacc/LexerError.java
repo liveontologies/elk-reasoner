@@ -1,14 +1,11 @@
-/**
- * 
- */
-package org.semanticweb.elk.loading;
+package org.semanticweb.elk.owl.parsing.javacc;
 /*
  * #%L
- * ELK Reasoner
+ * ELK OWL JavaCC Parser
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +22,25 @@ package org.semanticweb.elk.loading;
  */
 
 /**
- * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * A {@link LexerMessage} that indicates lexing error
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
  */
-public interface AxiomChangeListener {
+class LexerError implements LexerMessage {
 
-	public void notify(ElkAxiomChange change);
+	private Error error_;
+
+	public LexerError(Error error) {
+		this.error_ = error;
+	}
+
+	public Error getError() {
+		return error_;
+	}
+
+	@Override
+	public void accept(LexerMessageVisitor visitor) {
+		visitor.visit(this);
+	}
 }

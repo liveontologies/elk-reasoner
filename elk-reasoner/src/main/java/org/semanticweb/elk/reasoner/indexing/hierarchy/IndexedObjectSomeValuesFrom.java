@@ -161,6 +161,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			this.negExistentials_.add(negExistential);
 		}
 
+		// TODO: hide this method
 		public Collection<IndexedObjectSomeValuesFrom> getNegativeExistentials() {
 			return negExistentials_;
 		}

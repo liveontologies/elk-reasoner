@@ -53,7 +53,7 @@ public class RandomWalkIncrementalRealizationRunner<T> extends
 	}
 
 	@Override
-	protected void printResult(Reasoner reasoner, Logger logger, Level trace)
+	protected void printResult(Reasoner reasoner, Logger logger, Level level)
 			throws IOException, ElkException {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner
 				.getInstanceTaxonomyQuietly();
@@ -62,8 +62,8 @@ public class RandomWalkIncrementalRealizationRunner<T> extends
 		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
 		writer.flush();
 
-		logger.log(trace, "INSTANCE TAXONOMY");
-		logger.log(trace, writer.getBuffer());
+		logger.log(level, "INSTANCE TAXONOMY");
+		logger.log(level, writer.getBuffer());
 		writer.close();
 	}
 
@@ -71,12 +71,6 @@ public class RandomWalkIncrementalRealizationRunner<T> extends
 	protected String getResultHash(Reasoner reasoner) throws ElkException {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner
 				.getInstanceTaxonomyQuietly();
-
-		/*
-		 * for (TypeNode<ElkClass, ElkNamedIndividual> typeNode :
-		 * taxonomy.getTypeNodes()) { System.out.println(typeNode + ": " +
-		 * typeNode.getDirectInstanceNodes()); }
-		 */
 
 		return TaxonomyPrinter.getInstanceHashString(taxonomy);
 	}

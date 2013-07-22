@@ -37,8 +37,9 @@ import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.loading.Loader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AbstractAxiomLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
+import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.Owl2ParserLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -105,34 +106,42 @@ public class IncrementalClassificationTask implements Task {
 
 			final Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
 					.getParser(stream);
-			final OntologyLoader loader = new OntologyLoader() {
+			final AxiomLoader loader = new AbstractAxiomLoader() {
 
 				@Override
-				public Loader getLoader(final ElkAxiomProcessor axiomLoader) {
+				public void load(final ElkAxiomProcessor axiomInserter,
+						ElkAxiomProcessor axiomDeleter)
+						throws ElkLoadingException {
 
+					ElkAxiomProcessor wrappedAxiomInserter = axiomInserter;
 					if (saveAxioms) {
-						return new Owl2ParserLoader(parser,
-								new ElkAxiomProcessor() {
+						wrappedAxiomInserter = new ElkAxiomProcessor() {
 
-									@Override
-									public void visit(ElkAxiom elkAxiom) {
-										axiomLoader.visit(elkAxiom);
+							@Override
+							public void visit(ElkAxiom elkAxiom) {
+								axiomInserter.visit(elkAxiom);
 
-										if (passAxiom(elkAxiom)) {
-											loadedAxioms.add(elkAxiom);
-										}
-									}
-								});
-					} else {
-						return new Owl2ParserLoader(parser, axiomLoader);
+								if (passAxiom(elkAxiom)) {
+									loadedAxioms.add(elkAxiom);
+								}
+							}
+						};
 					}
+					new Owl2ParserLoader(parser).load(wrappedAxiomInserter,
+							axiomDeleter);
+				}
+
+				@Override
+				public boolean isLoadingFinished() {
+					// TODO Auto-generated method stub
+					return false;
 				}
 			};
 
 			Reasoner reasoner = new ReasonerFactory().createReasoner(loader,
 					new LoggingStageExecutor(), reasonerConfig);
 
-			reasoner.loadOntology();
+			// reasoner.loadAxioms();
 
 			return reasoner;
 		} catch (Exception e) {
@@ -158,6 +167,10 @@ public class IncrementalClassificationTask implements Task {
 			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
 				axioms.add(elkAxiom);
 			}
+
+			@Override
+			public void finish() throws Owl2ParseException {
+			}
 		});
 
 		return axioms;
@@ -173,7 +186,7 @@ public class IncrementalClassificationTask implements Task {
 		Random rnd = new Random(seed);
 		TestChangesLoader changeLoader = new TestChangesLoader();
 
-		incrementalReasoner.registerOntologyChangesLoader(changeLoader);
+		incrementalReasoner.registerAxiomLoader(changeLoader);
 
 		for (int i = 0; i < REPEAT_NUMBER; i++) {
 			try {

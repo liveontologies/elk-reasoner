@@ -1,11 +1,11 @@
+package org.semanticweb.elk.owl.parsing.javacc;
 /*
  * #%L
- * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * ELK OWL JavaCC Parser
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,26 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.loading;
 
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import java.util.ArrayList;
 
 /**
- * An {@link OntologyLoader} for the empty ontology
+ * A {@link LexerMessage} that holds tokens
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
-public class EmptyOntologyLoader implements OntologyLoader {
+class LexerBatch extends ArrayList<Token> implements LexerMessage {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1438353325200022815L;
+
+	public LexerBatch(int length) {
+		super(length);
+	}
 
 	@Override
-	public Loader getLoader(ElkAxiomProcessor axiomLoader) {
-		return new EmptyLoader();
+	public void accept(LexerMessageVisitor visitor) {
+		visitor.visit(this);
 	}
 }

@@ -29,8 +29,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.ContextRootIn
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass.OwlThingContextInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom.ThisCompositionRule;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
@@ -52,7 +54,7 @@ public class BasicCompositionRuleApplicationVisitor implements
 			BasicSaturationStateWriter writer, Context context) {
 		rule.apply(writer, context);
 	}
-	
+
 	@Override
 	public void visit(ContextRootInitializationRule rule,
 			BasicSaturationStateWriter writer, Context context) {
@@ -61,6 +63,12 @@ public class BasicCompositionRuleApplicationVisitor implements
 
 	@Override
 	public void visit(ThisCompositionRule rule,
+			BasicSaturationStateWriter writer, Context context) {
+		rule.apply(writer, context);
+	}
+
+	@Override
+	public void visit(IndexedObjectComplementOf.ThisCompositionRule rule,
 			BasicSaturationStateWriter writer, Context context) {
 		rule.apply(writer, context);
 	}
@@ -79,6 +87,12 @@ public class BasicCompositionRuleApplicationVisitor implements
 
 	@Override
 	public void visit(IndexedObjectSomeValuesFrom.ThisCompositionRule rule,
+			BasicSaturationStateWriter writer, Context context) {
+		rule.apply(writer, context);
+	}
+
+	@Override
+	public void visit(IndexedObjectUnionOf.ThisCompositionRule rule,
 			BasicSaturationStateWriter writer, Context context) {
 		rule.apply(writer, context);
 	}
@@ -106,4 +120,5 @@ public class BasicCompositionRuleApplicationVisitor implements
 			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		rule.apply(writer, backwardLink);
 	}
+
 }

@@ -189,6 +189,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			disjointnessAxioms_.add(axiom);
 		}
 
+		// TODO: hide this method
 		public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
 			return disjointnessAxioms_;
 		}

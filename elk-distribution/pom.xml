@@ -3,14 +3,18 @@
 	<parent>
 		<artifactId>elk-parent</artifactId>
 		<groupId>org.semanticweb.elk</groupId>
-		<version>0.4.0-SNAPSHOT</version>
+		<version>0.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>elk-distribution</artifactId>
 	<packaging>jar</packaging>
 
 	<name>ELK Distribution</name>
-	<description>The module for packaging of ELK products and their distribution</description>
+	<description>
+		
+		The module for packaging of ELK products and their distribution
+	
+	</description>
 
 	<dependencies>
 		<dependency>
@@ -88,22 +92,38 @@
 		<elk-standalone.assembly-id>standalone-executable</elk-standalone.assembly-id>
 		<elk-owlapi.assembly-id>owlapi-library</elk-owlapi.assembly-id>
 		<elk-protege.assembly-id>protege-plugin</elk-protege.assembly-id>
-		<elk-standalone.file>${project.artifactId}-${project.version}-${elk-standalone.assembly-id}</elk-standalone.file>
-		<elk-owlapi.file>${project.artifactId}-${project.version}-${elk-owlapi.assembly-id}</elk-owlapi.file>
-		<elk-protege.file>${project.artifactId}-${project.version}-${elk-protege.assembly-id}</elk-protege.file>
-		<!-- the following timestamp and release.version properties are used for 
-			the current release information changes.xml file -->
+		<elk-standalone.file>
+			
+			${project.artifactId}-${project.version}-${elk-standalone.assembly-id}
+		
+		</elk-standalone.file>
+		<elk-owlapi.file>
+			
+			${project.artifactId}-${project.version}-${elk-owlapi.assembly-id}
+		
+		</elk-owlapi.file>
+		<elk-protege.file>
+			
+			${project.artifactId}-${project.version}-${elk-protege.assembly-id}
+		
+		</elk-protege.file>
+		<!-- the following timestamp and release.version properties are used for the current
+			release
+			information changes.xml file -->
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<buildDate>${maven.build.timestamp}</buildDate>
-		<release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
+		<release.version>
+			${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+		</release.version>
 	</properties>
 
 	<build>
 		<plugins>
 			<plugin>
-				<!-- the plugin used to generate the modified plugin versions, such as 
-					release.version used templates/*.vm and parsedVersion.osgiVersion used in 
-					src/main/update.properties -->
+				<!-- the plugin used to generate the modified plugin versions, such as release.version
+					used
+					templates/*.vm and parsedVersion.osgiVersion used in src/main/update.properties
+					-->
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
 				<version>1.7</version>
@@ -117,13 +137,15 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<!-- the plugin to filter files by expanding the defined properties with 
-					their values; the expanded versions are copied to the target -->
+				<!-- the plugin to filter files by expanding the defined properties with their values;
+					the
+					expanded versions are copied to the target -->
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.5</version>
 				<executions>
-					<!-- Copy Java sources to the output directory so that it's available 
-						in the classpath (the tests could compile it) -->
+					<!-- Copy Java sources to the output directory so that it's available in the classpath
+						(the
+						tests could compile it) -->
 					<execution>
 						<id>copy-examples-to-resources</id>
 						<phase>process-resources</phase>
@@ -149,16 +171,16 @@
 						<configuration>
 							<outputDirectory>${project.build.directory}</outputDirectory>
 							<resources>
-								<resource>
-									<!-- filtering of the update.properties and version-info.txt files 
-										used for Protege 4 auto-update feature -->
+								<!-- filtering of the update.properties and version-info.txt files used for Protege
+										4 auto-update feature -->
+								<!--resource>
 									<directory>${basedir}/src/main/resources/protege</directory>
 									<filtering>true</filtering>
 									<includes>
 										<include>update.properties</include>
 										<include>version-info.txt</include>
 									</includes>
-								</resource>
+								</resource-->
 								<resource>
 									<!-- filtering of the changes.xml file -->
 									<directory>${basedir}/src/changes</directory>
@@ -170,10 +192,34 @@
 							</resources>
 						</configuration>
 					</execution>
+
+
+					<execution>
+						<id>copy-update-properties-to-site</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/site/resources</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/main/resources/protege/</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>update.properties</include>
+										<include>version-info.txt</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+
 				</executions>
 			</plugin>
-			<!-- A plugin to expose paths to some dependency jars as properties (they 
-				will be propagated to tests) -->
+			<!-- A plugin to expose paths to some dependency jars as properties (they will be
+				propagated
+				to tests) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -187,8 +233,9 @@
 			</plugin>
 
 			<plugin>
-				<!-- Propagating some necessary information, mostly paths to jars/zip 
-					archives, to the tests -->
+				<!-- Propagating some necessary information, mostly paths to jars/zip archives, to
+					the
+					tests -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
@@ -241,8 +288,7 @@
 						</configuration>
 					</execution>
 					<execution>
-						<!-- generation of the version-info.txt file for Protege 4 auto-update 
-							feature -->
+						<!-- generation of the version-info.txt file for Protege 4 auto-update feature -->
 						<id>generate-protege-version-info</id>
 						<phase>generate-resources</phase>
 						<goals>
@@ -251,7 +297,7 @@
 						<configuration>
 							<announcementFile>version-info.txt</announcementFile>
 							<template>version-info.vm</template>
-							<outputDirectory>${project.build.directory}</outputDirectory>
+							<outputDirectory>${project.build.directory}/site/resources</outputDirectory>
 						</configuration>
 					</execution>
 					<execution>
@@ -270,9 +316,9 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<!-- the plugin for assembling of the distribution zip files; we will 
-					run some test on them, therefore we create them at the generate-test-resources 
-					phase -->
+				<!-- the plugin for assembling of the distribution zip files; we will run some test
+					on
+					them, therefore we create them at the generate-test-resources phase -->
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.3</version>
 				<executions>
@@ -351,16 +397,19 @@
 							</execution>
 						</executions>
 						<configuration>
-							<!-- the server and access credentials should be defined in the maven 
-								user configuration file (usually ~/.m2/settings.xml) -->
+							<!-- the server and access credentials should be defined in the maven user configuration
+								file
+								(usually ~/.m2/settings.xml) -->
 							<serverId>elk-reasoner.googlecode.com</serverId>
 							<failsOnError>true</failsOnError>
 							<projectName>elk-reasoner</projectName>
 							<uploads>
 								<upload>
 									<file>${project.build.directory}/${elk-standalone.file}.zip</file>
-									<summary>ELK reasoner standalone executable version
-										${project.version}</summary>
+									<summary>
+										ELK reasoner standalone executable version
+										${project.version}
+									</summary>
 									<labels>
 										<label>Featured</label>
 										<label>OpSys-All</label>
@@ -378,8 +427,10 @@
 								</upload>
 								<upload>
 									<file>${project.build.directory}/${elk-owlapi.file}.zip</file>
-									<summary>ELK reasoner library for OWL API version
-										${project.version}</summary>
+									<summary>
+										ELK reasoner library for OWL API version
+										${project.version}
+									</summary>
 									<labels>
 										<label>Featured</label>
 										<label>OpSys-All</label>
@@ -388,41 +439,6 @@
 								</upload>
 							</uploads>
 						</configuration>
-					</plugin>
-					<plugin>
-						<!-- the plugin for manipulating with Source Control Management (SCM) 
-							systems -->
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>wagon-maven-plugin</artifactId>
-						<version>1.0-beta-4</version>
-						<dependencies>
-							<dependency>
-								<!-- the subversion SCM plugin -->
-								<groupId>com.google.code.maven-svn-wagon</groupId>
-								<artifactId>maven-svn-wagon</artifactId>
-								<version>1.4</version>
-							</dependency>
-						</dependencies>
-						<executions>
-							<execution>
-								<!-- uploading the following files during the project deployment 
-									phase -->
-								<phase>deploy</phase>
-								<goals>
-									<goal>upload</goal>
-								</goals>
-								<configuration>
-									<!-- the server and access credentials should be defined in the 
-										maven user configuration file (usually ~/.m2/settings.xml) -->
-									<serverId>elk-reasoner.googlecode.com</serverId>
-									<fromDir>${basedir}/target</fromDir>
-									<includes>update.properties,version-info.txt</includes>
-									<!-- uploading the update.properties and version-info.txt files 
-										to the resources folder of the googlecode svn -->
-									<url>svn:https://elk-reasoner.googlecode.com/svn/resources/elk-reasoner</url>
-								</configuration>
-							</execution>
-						</executions>
 					</plugin>
 				</plugins>
 			</build>

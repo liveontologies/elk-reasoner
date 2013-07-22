@@ -77,7 +77,7 @@ public class IncrementalAdditionInitializationStage extends
 		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 		RuleApplicationVisitor initRuleAppVisitor = SaturationUtils
-				.addStatsToCompositionRuleApplicationVisitor(stageStatistics_
+				.getStatsAwareCompositionRuleAppVisitor(stageStatistics_
 						.getRuleStatistics());
 		ContextCreationListener contextCreationListener = SaturationUtils
 				.addStatsToContextCreationListener(
@@ -90,6 +90,7 @@ public class IncrementalAdditionInitializationStage extends
 		ConclusionVisitor<?> conclusionVisitor = SaturationUtils
 				.addStatsToConclusionVisitor(stageStatistics_
 						.getConclusionStatistics());
+
 		// first, create and init contexts for new classes
 		final IndexObjectConverter converter = reasoner.objectCache_
 				.getIndexObjectConverter();
@@ -155,8 +156,9 @@ public class IncrementalAdditionInitializationStage extends
 
 		this.initialization_ = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
-				reasoner.getProcessExecutor(), initRuleAppVisitor,
-				conclusionVisitor, workerNo, reasoner.getProgressMonitor());
+				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
+				reasoner.getProgressMonitor());
+
 		return true;
 	}
 

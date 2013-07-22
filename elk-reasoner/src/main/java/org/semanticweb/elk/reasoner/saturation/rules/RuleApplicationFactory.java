@@ -59,10 +59,14 @@ public class RuleApplicationFactory {
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(RuleApplicationFactory.class);
 
-	//static final boolean COLLECT_CONCLUSION_COUNTS = true;//LOGGER_.isDebugEnabled();
-	//static final boolean COLLECT_CONCLUSION_TIMES = true;//LOGGER_.isDebugEnabled();
-	//static final boolean COLLECT_RULE_COUNTS = true;//LOGGER_.isDebugEnabled();
-	//static final boolean COLLECT_RULE_TIMES = true;//LOGGER_.isDebugEnabled();
+	// static final boolean COLLECT_CONCLUSION_COUNTS =
+	// true;//LOGGER_.isDebugEnabled();
+	// static final boolean COLLECT_CONCLUSION_TIMES =
+	// true;//LOGGER_.isDebugEnabled();
+	// static final boolean COLLECT_RULE_COUNTS =
+	// true;//LOGGER_.isDebugEnabled();
+	// static final boolean COLLECT_RULE_TIMES =
+	// true;//LOGGER_.isDebugEnabled();
 
 	final SaturationState saturationState;
 
@@ -77,7 +81,7 @@ public class RuleApplicationFactory {
 	 * correspond to modified contexts (during de-saturation and re-saturation)
 	 */
 	private final boolean trackModifiedContexts_;
-	
+
 	public RuleApplicationFactory(final SaturationState saturationState) {
 		this(saturationState, false);
 	}
@@ -86,7 +90,7 @@ public class RuleApplicationFactory {
 			final boolean trackModifiedContexts) {
 		this.aggregatedStats_ = new SaturationStatistics();
 		this.saturationState = saturationState;
-		this.trackModifiedContexts_ = true;
+		this.trackModifiedContexts_ = trackModifiedContexts;
 	}
 
 	/*
@@ -98,7 +102,7 @@ public class RuleApplicationFactory {
 	}
 
 	public void finish() {
-		//aggregatedStats_.check(LOGGER_);
+		// aggregatedStats_.check(LOGGER_);
 	}
 
 	public SaturationStatistics getSaturationStatistics() {
@@ -108,14 +112,13 @@ public class RuleApplicationFactory {
 	public SaturationState getSaturationState() {
 		return saturationState;
 	}
-	
 
 	/**
 	 * This engine has all the functionality for applying rules but needs to be
 	 * extended if new contexts may need to be created
 	 */
-	public abstract class BaseEngine implements InputProcessor<IndexedClassExpression>,
-			RuleEngine {
+	public abstract class BaseEngine implements
+			InputProcessor<IndexedClassExpression>, RuleEngine {
 
 		private ConclusionVisitor<?> conclusionProcessor_;
 
@@ -123,24 +126,27 @@ public class RuleApplicationFactory {
 		 * Local {@link SaturationStatistics} created for every worker
 		 */
 		protected final SaturationStatistics localStatistics;
-		
+
 		protected final ContextStatistics localContextStatistics;
 
 		protected BaseEngine(SaturationStatistics localStatistics) {
 			this.localStatistics = localStatistics;
-			this.localContextStatistics = localStatistics.getContextStatistics();
+			this.localContextStatistics = localStatistics
+					.getContextStatistics();
 		}
 
 		@Override
 		public void process() {
-			localContextStatistics.timeContextProcess -= CachedTimeThread.currentTimeMillis;
-			
+			localContextStatistics.timeContextProcess -= CachedTimeThread
+					.getCurrentTimeMillis();
+
 			BasicSaturationStateWriter writer = getSaturationStateWriter();
-			
+
 			if (conclusionProcessor_ == null) {
-				conclusionProcessor_ = getConclusionProcessor(writer, localStatistics);
+				conclusionProcessor_ = getConclusionProcessor(writer,
+						localStatistics);
 			}
-			
+
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					break;
@@ -153,8 +159,9 @@ public class RuleApplicationFactory {
 					process(nextContext);
 				}
 			}
-			
-			localContextStatistics.timeContextProcess += CachedTimeThread.currentTimeMillis;
+
+			localContextStatistics.timeContextProcess += CachedTimeThread
+					.getCurrentTimeMillis();
 		}
 
 		@Override
@@ -176,7 +183,7 @@ public class RuleApplicationFactory {
 
 				if (conclusion == null)
 					return;
-				
+
 				conclusion.accept(conclusionProcessor_, context);
 			}
 		}
@@ -196,7 +203,8 @@ public class RuleApplicationFactory {
 		protected ConclusionVisitor<Boolean> getUsedConclusionsCountingVisitor(
 				ConclusionVisitor<Boolean> ruleProcessor,
 				SaturationStatistics localStatistics) {
-			return SaturationUtils.getUsedConclusionCountingProcessor(ruleProcessor, localStatistics);
+			return SaturationUtils.getUsedConclusionCountingProcessor(
+					ruleProcessor, localStatistics);
 		}
 
 		/**
@@ -205,8 +213,9 @@ public class RuleApplicationFactory {
 		 * wrapped in some other code.
 		 * 
 		 * @param saturationStateWriter
-		 *            the {@link SaturationStateImpl.AbstractWriter} using which one can
-		 *            produce new {@link Conclusion}s in {@link Context}s
+		 *            the {@link SaturationStateImpl.AbstractWriter} using which
+		 *            one can produce new {@link Conclusion}s in {@link Context}
+		 *            s
 		 * @param localStatistics
 		 *            the object accumulating local statistics for this worker
 		 * @return the base {@link ConclusionVisitor} that performs processing
@@ -221,10 +230,15 @@ public class RuleApplicationFactory {
 					getUsedConclusionsCountingVisitor(
 							new ConclusionApplicationVisitor(
 									saturationStateWriter,
-									SaturationUtils.addStatsToCompositionRuleApplicationVisitor(localStatistics.getRuleStatistics()),
-									SaturationUtils.addStatsToDecompositionRuleApplicationVisitor(
-											getDecompositionRuleApplicationVisitor(),
-											localStatistics.getRuleStatistics())), localStatistics));
+									SaturationUtils
+											.getStatsAwareCompositionRuleAppVisitor(localStatistics
+													.getRuleStatistics()),
+									SaturationUtils
+											.getStatsAwareDecompositionRuleAppVisitor(
+													getDecompositionRuleApplicationVisitor(),
+													localStatistics
+															.getRuleStatistics())),
+							localStatistics));
 		}
 
 		/**
@@ -233,13 +247,14 @@ public class RuleApplicationFactory {
 		 * {@link Context}s
 		 * 
 		 * @param saturationStateWriter
-		 *            the {@link SaturationStateImpl.AbstractWriter} using which one can
-		 *            produce new {@link Conclusion}s in {@link Context}s
+		 *            the {@link SaturationStateImpl.AbstractWriter} using which
+		 *            one can produce new {@link Conclusion}s in {@link Context}
+		 *            s
 		 * @param localStatistics
 		 *            the object accumulating local statistics for this worker
 		 * @return the final {@link ConclusionVisitor} that is used by this
-		 *         {@link DefaultEngine} for processing {@code Conclusion}s within
-		 *         {@link Context}s
+		 *         {@link DefaultEngine} for processing {@code Conclusion}s
+		 *         within {@link Context}s
 		 */
 		protected ConclusionVisitor<?> getConclusionProcessor(
 				BasicSaturationStateWriter saturationStateWriter,
@@ -251,16 +266,16 @@ public class RuleApplicationFactory {
 						new ConclusionSourceUnsaturationVisitor(
 								saturationStateWriter));
 			}
-			
-			return SaturationUtils.getProcessedConclusionCountingProcessor(result, localStatistics);
+
+			return SaturationUtils.getProcessedConclusionCountingProcessor(
+					result, localStatistics);
 		}
-		
+
 		protected abstract DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor();
-		
+
 		protected abstract BasicSaturationStateWriter getSaturationStateWriter();
 	}
-	
-	
+
 	/**
 	 * Default rule application engine which can create new contexts via
 	 * {@link SaturationStateImpl.ExtendedWriter} (either directly when a new
@@ -270,27 +285,43 @@ public class RuleApplicationFactory {
 
 		private final ExtendedSaturationStateWriter saturationStateWriter_;
 
-		protected DefaultEngine(ExtendedSaturationStateWriter saturationStateWriter,
+		protected DefaultEngine(
+				ExtendedSaturationStateWriter saturationStateWriter,
 				SaturationStatistics localStatistics) {
 			super(localStatistics);
 			this.saturationStateWriter_ = saturationStateWriter;
 		}
 
-		protected DefaultEngine(final ContextCreationListener listener, final ContextModificationListener modListener) {
+		protected DefaultEngine(final ContextCreationListener listener,
+				final ContextModificationListener modListener) {
 			this(listener, modListener, new SaturationStatistics());
 		}
 
 		private DefaultEngine(final ContextCreationListener listener,
 				final ContextModificationListener modificationListener,
 				final SaturationStatistics localStatistics) {
-			this(saturationState.getExtendedWriter(
-					SaturationUtils.addStatsToContextCreationListener(listener, localStatistics.getContextStatistics()),
-					SaturationUtils.addStatsToContextModificationListener(modificationListener, localStatistics.getContextStatistics()),
-					SaturationUtils.addStatsToCompositionRuleApplicationVisitor(localStatistics.getRuleStatistics()),
-					SaturationUtils.addStatsToConclusionVisitor(localStatistics.getConclusionStatistics()),
-					trackModifiedContexts_),
-					localStatistics
-					);
+
+			this(
+					saturationState
+							.getExtendedWriter(
+									SaturationUtils
+											.addStatsToContextCreationListener(
+													listener,
+													localStatistics
+															.getContextStatistics()),
+									SaturationUtils
+											.addStatsToContextModificationListener(
+													modificationListener,
+													localStatistics
+															.getContextStatistics()),
+									SaturationUtils
+											.getStatsAwareCompositionRuleAppVisitor(localStatistics
+													.getRuleStatistics()),
+									SaturationUtils
+											.addStatsToConclusionVisitor(localStatistics
+													.getConclusionStatistics()),
+									trackModifiedContexts_), localStatistics);
+
 		}
 
 		@Override
@@ -305,12 +336,14 @@ public class RuleApplicationFactory {
 
 		@Override
 		protected DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor() {
-			//here we need an extended writer to pass to the decomposer which can create new contexts
+			// here we need an extended writer to pass to the decomposer which
+			// can create new contexts
 			DecompositionRuleApplicationVisitor visitor = new ForwardDecompositionRuleApplicationVisitor(
 					saturationStateWriter_);
 
-			return SaturationUtils.addStatsToDecompositionRuleApplicationVisitor(visitor,
-					localStatistics.getRuleStatistics());
+			return SaturationUtils.getStatsAwareDecompositionRuleAppVisitor(
+					visitor, localStatistics.getRuleStatistics());
+
 		}
 	}
 

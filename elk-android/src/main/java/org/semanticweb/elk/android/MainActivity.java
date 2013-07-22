@@ -25,8 +25,7 @@ package org.semanticweb.elk.android;
 import java.lang.reflect.Field;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.EmptyChangesLoader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
@@ -174,11 +173,10 @@ public class MainActivity extends Activity {
 		ReasonerConfiguration configuration = ReasonerConfiguration
 				.getConfiguration();
 		Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
-		OntologyLoader loader = new Owl2StreamLoader(parserFactory, this
+		AxiomLoader loader = new Owl2StreamLoader(parserFactory, this
 				.getResources().openRawResource(ontologyId));
 		reasoner = reasoningFactory.createReasoner(loader,
 				new LoggingStageExecutor(), configuration);
-		reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 		reasoner.setProgressMonitor(new ProgressIndicator());
 		// set the parameters from preferences
 		SharedPreferences prefs = PreferenceManager
@@ -281,6 +279,6 @@ public class MainActivity extends Activity {
 			mProgress_.setProgress(0);
 
 		}
-	};
+	}
 
 }

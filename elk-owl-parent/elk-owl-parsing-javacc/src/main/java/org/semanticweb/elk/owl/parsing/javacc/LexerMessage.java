@@ -1,11 +1,11 @@
+package org.semanticweb.elk.owl.parsing.javacc;
 /*
  * #%L
- * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * ELK OWL JavaCC Parser
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,26 +20,13 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.loading;
-
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * A factory for creating loaders for ontology axioms
- * 
- * @see Loader
+ * The abstract message type that can be send from the lexer thread
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface OntologyLoader {
-
-	/**
-	 * @param axiomLoader
-	 *            an {@link ElkAxiomProcessor} that should load the axioms
-	 * @return a loader which loads the axioms using the given
-	 *         {@link ElkAxiomProcessor}
-	 */
-	public Loader getLoader(ElkAxiomProcessor axiomLoader);
-
+interface LexerMessage {
+	public void accept(LexerMessageVisitor visitor);
 }

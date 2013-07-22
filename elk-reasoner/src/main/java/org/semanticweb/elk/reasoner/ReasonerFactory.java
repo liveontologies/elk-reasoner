@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
@@ -49,8 +49,8 @@ public class ReasonerFactory {
 	final static Logger LOGGER_ = Logger.getLogger(ReasonerFactory.class);
 	final static ReasonerStageExecutor DEFAULT_STAGE_EXECUTOR = new SimpleStageExecutor();
 
-	public Reasoner createReasoner(OntologyLoader ontologyLoader) {
-		return createReasoner(ontologyLoader, DEFAULT_STAGE_EXECUTOR,
+	public Reasoner createReasoner(AxiomLoader axiomLoader) {
+		return createReasoner(axiomLoader, DEFAULT_STAGE_EXECUTOR,
 				ReasonerConfiguration.getConfiguration());
 	}
 
@@ -61,9 +61,9 @@ public class ReasonerFactory {
 	 * @param stageExecutor
 	 * @return ELK reasoner
 	 */
-	public Reasoner createReasoner(OntologyLoader ontologyLoader,
+	public Reasoner createReasoner(AxiomLoader axiomLoader,
 			ReasonerStageExecutor stageExecutor) {
-		return createReasoner(ontologyLoader, stageExecutor,
+		return createReasoner(axiomLoader, stageExecutor,
 				ReasonerConfiguration.getConfiguration());
 	}
 
@@ -74,17 +74,17 @@ public class ReasonerFactory {
 	 * @param config
 	 * @return ELK reasoner
 	 */
-	public Reasoner createReasoner(OntologyLoader ontologyLoader,
+	public Reasoner createReasoner(AxiomLoader axiomLoader,
 			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
-		return createReasoner(ontologyLoader, stageExecutor,
+		return createReasoner(axiomLoader, stageExecutor,
 				Executors.newCachedThreadPool(), config);
 	}
 
-	public Reasoner createReasoner(OntologyLoader ontologyLoader,
+	@SuppressWarnings("static-method")
+	public Reasoner createReasoner(AxiomLoader axiomLoader,
 			ReasonerStageExecutor stageExecutor, ExecutorService executor,
 			ReasonerConfiguration config) {
-		Reasoner reasoner = new Reasoner(ontologyLoader, stageExecutor,
-				executor);
+		Reasoner reasoner = new Reasoner(axiomLoader, stageExecutor, executor);
 
 		reasoner.setConfigurationOptions(config);
 

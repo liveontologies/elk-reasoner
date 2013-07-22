@@ -44,7 +44,8 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainFilter
  * @author "Yevgeny Kazakov"
  * 
  */
-public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor implements ElkAxiomIndexingVisitor {
+public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
+		implements ElkAxiomIndexingVisitor {
 
 	/**
 	 * The index in which the changes are recorded
@@ -66,7 +67,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor impl
 	 * and a negative occurrence of {@link IndexedClassExpression}s.
 	 */
 	private final IndexObjectConverter neutralIndexer, positiveIndexer,
-			negativeIndexer;
+			negativeIndexer;// , noOpConverter;
 
 	/**
 	 * An {@link IndexedAxiomFilter} used to update occurrences of
@@ -94,17 +95,30 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor impl
 		this.objectCache_ = index.getIndexedObjectCache();
 		this.owlNothing_ = index.getIndexedOwlNothing();
 		this.multiplicity_ = insert ? 1 : -1;
-		IndexedPropertyChainFilter propertyOccurrenceUpdateFilter = new PropertyOccurrenceUpdateFilter(
+		final IndexedPropertyChainFilter propertyOccurrenceUpdateFilter = new PropertyOccurrenceUpdateFilter(
 				multiplicity_);
 		this.neutralIndexer = new IndexObjectConverter(
 				new ClassOccurrenceUpdateFilter(multiplicity_, 0, 0),
 				propertyOccurrenceUpdateFilter);
+		IndexObjectConverterFactory negativeIndexerFactory = new IndexObjectConverterFactory() {
+			@Override
+			public IndexObjectConverter create(
+					IndexObjectConverter complementary) {
+				return new IndexObjectConverter(
+						new ClassOccurrenceUpdateFilter(multiplicity_, 0,
+								multiplicity_), propertyOccurrenceUpdateFilter,
+						complementary);
+			}
+		};
 		this.positiveIndexer = new IndexObjectConverter(
 				new ClassOccurrenceUpdateFilter(multiplicity_, multiplicity_, 0),
-				propertyOccurrenceUpdateFilter);
-		this.negativeIndexer = new IndexObjectConverter(
-				new ClassOccurrenceUpdateFilter(multiplicity_, 0, multiplicity_),
-				propertyOccurrenceUpdateFilter);
+				propertyOccurrenceUpdateFilter, negativeIndexerFactory);
+		this.negativeIndexer = positiveIndexer.getComplementaryConverter();
+		/*
+		 * this.noOpConverter = new IndexObjectConverter( new
+		 * ClassOccurrenceUpdateFilter(0, 0, 0),
+		 * propertyOccurrenceUpdateFilter);
+		 */
 		this.axiomUpdateFilter = new AxiomOccurrenceUpdateFilter(multiplicity_);
 	}
 
@@ -112,10 +126,18 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor impl
 	public int getMultiplicity() {
 		return multiplicity_;
 	}
-	
+
 	@Override
 	public void indexSubClassOfAxiom(ElkClassExpression subElkClass,
 			ElkClassExpression superElkClass) {
+		// If this is uncommented, deleting a subsumption C => D would
+		// effectively replace it by C => T. This means there will be fewer
+		// rule deletions during the deletion stage.
+		/*
+		 * IndexedClassExpression subIndexedClass = multiplicity_ > 0 ?
+		 * subElkClass .accept(negativeIndexer) :
+		 * subElkClass.accept(noOpConverter);
+		 */
 
 		IndexedClassExpression subIndexedClass = subElkClass
 				.accept(negativeIndexer);
@@ -222,7 +244,6 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor impl
 		return eni.accept(neutralIndexer);
 	}
 
-	
 	/**
 	 * A {@link ClassOccurrenceUpdateFilter}, which is responsible for updating
 	 * the occurrence counters of {@link IndexedClassExpression}s, as well as
@@ -249,8 +270,9 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor impl
 			ice.updateAndCheckOccurrenceNumbers(index_, increment,
 					positiveIncrement, negativeIncrement);
 
-			if (!ice.occurs() && increment < 0)
+			if (!ice.occurs() && increment < 0) {
 				index_.remove(ice);
+			}
 
 			return ice;
 		}
@@ -266,6 +288,11 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor impl
 		}
 
 		@Override
+		public IndexedObjectComplementOf visit(IndexedObjectComplementOf element) {
+			return update(objectCache_.visit(element));
+		}
+
+		@Override
 		public IndexedObjectIntersectionOf visit(
 				IndexedObjectIntersectionOf element) {
 			return update(objectCache_.visit(element));
@@ -274,6 +301,11 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor impl
 		@Override
 		public IndexedObjectSomeValuesFrom visit(
 				IndexedObjectSomeValuesFrom element) {
+			return update(objectCache_.visit(element));
+		}
+
+		@Override
+		public IndexedObjectUnionOf visit(IndexedObjectUnionOf element) {
 			return update(objectCache_.visit(element));
 		}
 

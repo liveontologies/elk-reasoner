@@ -22,8 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.Loader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 
 /**
@@ -33,18 +31,12 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class OntologyLoadingStage extends AbstractReasonerStage {
+public class AxiomLoadingStage extends AbstractReasonerStage {
 
-	public OntologyLoadingStage(AbstractReasonerState reasoner,
+	public AxiomLoadingStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
 	}
-
-	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(OntologyLoadingStage.class);
-
-	private Loader ontologyLoader_;
 
 	@Override
 	public String getName() {
@@ -55,28 +47,22 @@ public class OntologyLoadingStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		ontologyLoader_ = reasoner.getOntologyLoader();
-		reasoner.trySetIncrementalMode(false);
 		return true;
 	}
 
 	@Override
 	public void executeStage() throws ElkException {
-		if (this.ontologyLoader_ == null)
-			LOGGER_.warn("Ontology loader is not registered. No axioms will be loaded!");
-		else
-			for (;;) {
-				this.ontologyLoader_.load();
-				if (!spuriousInterrupt())
-					break;
-			}
+		for (;;) {
+			reasoner.loadPendingAxioms();
+			if (!spuriousInterrupt())
+				break;
+		}
 	}
 
 	@Override
 	public boolean postExecute() {
 		if (!super.postExecute())
-			return false;		
-		this.ontologyLoader_ = null;
+			return false;
 		return true;
 	}
 

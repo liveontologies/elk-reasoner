@@ -38,8 +38,7 @@ import joptsimple.OptionSpec;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.EmptyChangesLoader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -170,14 +169,12 @@ public class Main {
 		// create reasoner
 		ReasonerFactory reasoningFactory = new ReasonerFactory();
 		Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
-		OntologyLoader loader = new Owl2StreamLoader(parserFactory,
+		AxiomLoader loader = new Owl2StreamLoader(parserFactory,
 				options.valueOf(inputFile));
 		Reasoner reasoner = reasoningFactory.createReasoner(loader,
 				new LoggingStageExecutor(), configuration);
 
 		try {
-			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
-
 			if (options.has(satisfiable)) {
 				boolean inconsistent = reasoner.isInconsistent();
 				if (options.hasArgument(outputFile)) {

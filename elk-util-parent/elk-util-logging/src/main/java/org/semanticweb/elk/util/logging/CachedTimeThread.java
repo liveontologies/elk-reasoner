@@ -33,7 +33,7 @@ public class CachedTimeThread extends Thread {
 	/**
 	 * the frequency of update for the time snapshot values in milliseconds
 	 */
-	private static final int UPDATE_FREQUENCY_ = 10;
+	private static final int UPDATE_FREQUENCY_ = 1;
 
 	/**
 	 * the current time in milliseconds delayed by at most 10 milliseconds the
@@ -45,14 +45,25 @@ public class CachedTimeThread extends Thread {
 		setDaemon(true);
 	}
 
+	CachedTimeThread(String name) {
+		super(name);
+		setDaemon(true);
+	}
+
 	static {
-		new CachedTimeThread().start();
+		new CachedTimeThread("elk-timer-thread").start();
+	}
+
+	public static long getCurrentTimeMillis() {
+		return currentTimeMillis;
 	}
 
 	@Override
 	public void run() {
 		for (;;) {
-			currentTimeMillis = System.currentTimeMillis();
+			currentTimeMillis = (int) System.currentTimeMillis();
+			// currentTimeMillis.set(System.currentTimeMillis());
+
 			try {
 				Thread.sleep(UPDATE_FREQUENCY_);
 			} catch (InterruptedException e) {

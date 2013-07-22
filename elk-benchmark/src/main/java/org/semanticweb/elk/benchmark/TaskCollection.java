@@ -2,6 +2,8 @@
  * 
  */
 package org.semanticweb.elk.benchmark;
+
+import java.util.Collection;
 /*
  * #%L
  * ELK Benchmarking Package
@@ -31,7 +33,7 @@ package org.semanticweb.elk.benchmark;
  */
 public interface TaskCollection {
 
-	public Iterable<Task> getTasks() throws TaskException;
+	public Collection<Task> getTasks() throws TaskException;
 	public Metrics getMetrics();
 	public void dispose();
 }

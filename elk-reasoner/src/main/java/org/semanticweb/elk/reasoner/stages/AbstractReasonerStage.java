@@ -175,8 +175,10 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 
 	@Override
 	public void execute() throws ElkException {
-		//preExecute();
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		progressMonitor.start(getName());
+
 		try {
 			for (;;) {
 				executeStage();
@@ -186,7 +188,6 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 		} finally {
 			progressMonitor.finish();
 		}
-		//postExecute();
 	}
 
 	/**

@@ -17,9 +17,44 @@ will appear in the produced result.
 	<body>
 	    <release version="${release.version}" date="${buildDate}" description="Current version">
 	    </release>
-	    <release version="0.3.2" date="2013-01-17" description="Second maintenance relase after the third public release">
+	    <release version="0.4.0" date="2013-07-20" description="Forth public release">
+			<action dev="pavel" type="add"  issue="9">
+				Incremental reasoning. The reasoner can incrementally update the inferred class and instance hierarchies after adding, removing, or modifying axioms. Changes in axioms which may affect the property hierarchy or property chains, e.g., SubObjectPropertyOf, TransitiveObjectProperty, etc., will still trigger full re-classification.
+			</action>
+			<action dev="yevgeny" type="add" issue="10">
+				Queries of complex class expressions (satisfiability checking, retrieval of equivalent classes, subclasses, and superclasses) are now supported through incremental reasoning.
+			</action>			
+			<action dev="yevgeny" type="add">
+				Support for positive occurrences of negation (ObjectComplementOf) and negative occurrences of disjunctions (ObjectUnionOf).
+			</action>
+			<action dev="yevgeny" type="update">
+				New rule engine under the hood that provides a general way of specifying and registering composition and decomposition rules for various language features.
+			</action>
+			<action dev="yevgeny" type="update">
+				New reasoning stage management to keep track of dependencies between reasoning stages and of their execution.
+			</action>
+			<action dev="yevgeny" type="add">
+				Support for explanation and DL query features in Protege through queries for complex class expressions.
+			</action>						
+			<action dev="pavel" type="update">
+				The OWL 2 FSS parser now runs lexer and tokenizer in parallel threads.
+			</action>
+			<action dev="pavel" type="add">
+				Incremental reasoning mode can be enabled/disabled from the Reasoner Preferences panel in Protege.
+			</action>						
+			<action dev="pavel" type="fix" issue="12">
+				Fix the location of examples in the owlapi-library distribution package as described in the README.txt file
+			</action>
+			<action dev="pavel" type="fix" issue="14">
+				ELK now tracks changes in axioms which belong to imported ontologies. Also it doesn't log warnings for changes in ontologies outside the import closure.
+			</action>
+			<action dev="yevgeny" type="fix" issue="18">
+			    Fixed conversion of double inverse object properties from OWL API				
+			</action>
+	    </release>
+	    <release version="0.3.2" date="2013-01-17" description="Second maintenance release after the third public release">
 			<action dev="yevgeny" type="fix">
-			    Fixed an issue causing a deadlock with many workers in the saturation stage. 
+				Fixed an issue causing a deadlock with many workers in the saturation stage. 
 			</action>
 			<action dev="yevgeny" type="update">
 				Updated dependencies for OWL API to v.3.4.2.
@@ -27,7 +62,7 @@ will appear in the produced result.
 	    </release>
 		<release version="0.3.1" date="2012-08-30" description="First maintenance relase after the third public release">				    
 			<action dev="yevgeny" type="fix" issue="7">
-			    Fixed NoSuchElementException when loading imported ontologies through OWLAPI that have no axioms. 
+				Fixed NoSuchElementException when loading imported ontologies through OWLAPI that have no axioms. 
 			</action>
 			<action dev="pavel" type="fix">
 				Fixed a bug with incorrect handling of lexical errors during parsing of OWL2 FSS files with the native ELK's parser.

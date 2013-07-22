@@ -82,17 +82,18 @@ public class SaturationUtils {
 	 * ------------------------------------------------------------------------------------
 	 */
 	
-	private static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
-	private static final boolean COLLECT_CONCLUSION_TIMES = LOGGER_.isDebugEnabled();
-	private static final boolean COLLECT_RULE_COUNTS = LOGGER_.isDebugEnabled();
-	private static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
+	public static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
+	public static final boolean COLLECT_CONCLUSION_TIMES = LOGGER_.isDebugEnabled();
+	public static final boolean COLLECT_RULE_COUNTS = LOGGER_.isDebugEnabled();
+	public static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
+	public static final boolean COLLECT_PROCESSING_TIMES = LOGGER_.isDebugEnabled();
 	
 	/**
 	 * 
 	 * @param localStatistics
 	 * @return
 	 */
-	public static RuleApplicationVisitor addStatsToCompositionRuleApplicationVisitor(
+	public static RuleApplicationVisitor getStatsAwareCompositionRuleAppVisitor(
 			RuleStatistics localStatistics) {
 		RuleApplicationVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
 
@@ -102,6 +103,8 @@ public class SaturationUtils {
 		}
 
 		if (COLLECT_RULE_TIMES) {
+			localStatistics.startMeasurements();
+			
 			ruleAppVisitor = new RuleApplicationTimerVisitor(ruleAppVisitor,
 					localStatistics.ruleTimer);
 		}
@@ -109,7 +112,7 @@ public class SaturationUtils {
 		return ruleAppVisitor;
 	}
 
-	public static DecompositionRuleApplicationVisitor addStatsToDecompositionRuleApplicationVisitor(
+	public static DecompositionRuleApplicationVisitor getStatsAwareDecompositionRuleAppVisitor(
 			DecompositionRuleApplicationVisitor decompRuleAppVisitor,
 			RuleStatistics localStatistics) {
 		if (COLLECT_RULE_COUNTS) {
@@ -118,6 +121,8 @@ public class SaturationUtils {
 		}
 
 		if (COLLECT_RULE_TIMES) {
+			localStatistics.startMeasurements();
+			
 			decompRuleAppVisitor = new DecompositionRuleApplicationTimerVisitor(
 					decompRuleAppVisitor, localStatistics.decompositionRuleTimer);
 		}
@@ -159,17 +164,20 @@ public class SaturationUtils {
 			ConclusionVisitor<Boolean> conclusionVisitor,
 			SaturationStatistics localStatistics) {
 		
+		ConclusionStatistics stats = localStatistics.getConclusionStatistics();
+
 		if (COLLECT_CONCLUSION_COUNTS) {
 			conclusionVisitor = new PreprocessedConclusionVisitor<Boolean>(
-					new CountingConclusionVisitor(localStatistics
-							.getConclusionStatistics()
-							.getProcessedConclusionCounts()), conclusionVisitor);
-		}
-		if (COLLECT_CONCLUSION_TIMES)
-			return new TimedConclusionVisitor(localStatistics
-					.getConclusionStatistics().getConclusionTimers(),
+					new CountingConclusionVisitor(
+							stats.getProcessedConclusionCounts()),
 					conclusionVisitor);
-		else {
+		}
+		if (COLLECT_CONCLUSION_TIMES) {
+			stats.startMeasurements();
+
+			return new TimedConclusionVisitor(stats.getConclusionTimers(),
+					conclusionVisitor);
+		} else {
 			return conclusionVisitor;
 		}
 	}	

@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,6 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 
@@ -31,6 +33,10 @@ public class DecompositionRuleApplicationTimer {
 	 * timer for {@link IndexedClass}
 	 */
 	int timeIndexedClass;
+	/**
+	 * timer for {@link IndexedObjectComplementOf}
+	 */
+	int timeIndexedObjectComplementOf;
 	/**
 	 * timer for {@link IndexedObjectIntersectionOf}
 	 */
@@ -49,6 +55,7 @@ public class DecompositionRuleApplicationTimer {
 	 */
 	public void reset() {
 		timeIndexedClass = 0;
+		timeIndexedObjectComplementOf = 0;
 		timeIndexedObjectIntersectionOf = 0;
 		timeIndexedObjectSomeValuesFrom = 0;
 		timeIndexedDataHasValue = 0;
@@ -61,9 +68,16 @@ public class DecompositionRuleApplicationTimer {
 	 */
 	public synchronized void add(DecompositionRuleApplicationTimer timer) {
 		timeIndexedClass += timer.timeIndexedClass;
+		timeIndexedObjectComplementOf += timer.timeIndexedObjectComplementOf;
 		timeIndexedObjectIntersectionOf += timer.timeIndexedObjectIntersectionOf;
 		timeIndexedObjectSomeValuesFrom += timer.timeIndexedObjectSomeValuesFrom;
 		timeIndexedDataHasValue += timer.timeIndexedDataHasValue;
+	}
+
+	public int getTotalRuleAppTime() {
+		return timeIndexedClass + timeIndexedObjectComplementOf
+				+ timeIndexedObjectIntersectionOf
+				+ timeIndexedObjectSomeValuesFrom + timeIndexedDataHasValue;
 	}
 
 }

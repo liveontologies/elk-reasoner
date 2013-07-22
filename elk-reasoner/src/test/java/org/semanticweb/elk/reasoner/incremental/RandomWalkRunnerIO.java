@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.incremental;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.EmptyChangesLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.Reasoner;
@@ -68,7 +67,6 @@ public interface RandomWalkRunnerIO<T> {
 					new SimpleStageExecutor());
 
 			reasoner.setAllowIncrementalMode(false);
-			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
 			return reasoner;
 		}
@@ -76,8 +74,8 @@ public interface RandomWalkRunnerIO<T> {
 		@Override
 		public void loadChanges(final Reasoner reasoner,
 				final IncrementalChange<ElkAxiom> change) {
-			reasoner.registerOntologyChangesLoader(new TestChangesLoader(
-					change.getAdditions(), change.getDeletions()));
+			reasoner.registerAxiomLoader(new TestChangesLoader(change
+					.getAdditions(), change.getDeletions()));
 		}
 
 		@Override
@@ -88,8 +86,8 @@ public interface RandomWalkRunnerIO<T> {
 		@Override
 		public void revertChanges(Reasoner reasoner,
 				IncrementalChange<ElkAxiom> change) {
-			reasoner.registerOntologyChangesLoader(new TestChangesLoader(
-					change.getDeletions(), change.getAdditions()));
+			reasoner.registerAxiomLoader(new TestChangesLoader(change
+					.getDeletions(), change.getAdditions()));
 		}
 
 	}
