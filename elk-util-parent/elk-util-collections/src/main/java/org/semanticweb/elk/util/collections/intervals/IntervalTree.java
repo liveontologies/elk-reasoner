@@ -28,8 +28,8 @@ import java.util.Collection;
 /**
  * Balanced binary tree data structure capable of storing {@link Interval} keys
  * and multiple arbitrary values for them. Insertion and deletion are O(log n)
- * operations. Query is O((k+1)log n) operation, where k is the number of intervals
- * that are included by the query interval.
+ * operations. Query is O((k+1)log n) operation, where k is the number of
+ * intervals that are included by the query interval.
  *
  * @author Pospishnyi Oleksandr
  */
@@ -62,7 +62,7 @@ public class IntervalTree<K extends Interval, V> {
 	public void add(K key, V value) {
 		Entry<K, V> t = root;
 		if (t == null) {
-			root = new Entry<K, V>(key, value, null);
+			root = new Entry<K, V>(key, value);
 			size = 1;
 			return;
 		}
@@ -72,8 +72,10 @@ public class IntervalTree<K extends Interval, V> {
 			throw new NullPointerException();
 		}
 		Comparable<? super K> k = (Comparable<? super K>) key;
+		Entry<K, V> e = new Entry<K, V>(key, value);
 		do {
 			parent = t;
+			t.updateMax(e);
 			cmp = k.compareTo(t.key);
 			if (cmp < 0) {
 				t = t.left;
@@ -84,7 +86,7 @@ public class IntervalTree<K extends Interval, V> {
 				return;
 			}
 		} while (t != null);
-		Entry<K, V> e = new Entry<K, V>(key, value, parent);
+		e.setParent(parent);
 		if (cmp < 0) {
 			parent.left = e;
 		} else {
@@ -181,9 +183,6 @@ public class IntervalTree<K extends Interval, V> {
 	private void deleteEntry(Entry<K, V> z) {
 		size--;
 
-		boolean propagate = false;
-		Entry<K, V> propagateStart = null;
-
 		// If strictly internal, copy successor's element to p and then make p
 		// point to successor.
 		if (z.left != null && z.right != null) {
@@ -227,15 +226,8 @@ public class IntervalTree<K extends Interval, V> {
 				} else if (z == z.parent.right) {
 					z.parent.right = null;
 				}
-				propagate = z.parent.update();
-				propagateStart = z.parent;
 				z.parent = null;
 			}
-		}
-
-		while (propagate && (propagateStart != root)) {
-			propagateStart = parentOf(propagateStart);
-			propagate = propagateStart.update();
 		}
 	}
 	/*
@@ -257,9 +249,13 @@ public class IntervalTree<K extends Interval, V> {
 		Entry<K, V> parent;
 		boolean color = BLACK;
 
-		Entry(K key, V value, Entry<K, V> parent) {
+		Entry(K key, V value) {
 			this.key = key;
 			this.value = Arrays.asList(value);
+			this.max = key.getHigh();
+		}
+
+		public void setParent(Entry<K, V> parent) {
 			this.parent = parent;
 		}
 
@@ -276,16 +272,12 @@ public class IntervalTree<K extends Interval, V> {
 			}
 		}
 
-		public boolean update() {
-			Comparable newMax;
+		protected void updateMax(Entry<K, V> e) {
+			this.max = maxOf(e.max, this.max);
+		}
 
-			newMax = maxOf(left != null ? left.max : null, right != null ? right.max : null, key.getHigh());
-
-			if (max != newMax) {
-				max = newMax;
-				return true;
-			}
-			return false;
+		protected void updateMax() {
+			this.max = maxOf(left != null ? left.max : null, right != null ? right.max : null, key.getHigh());
 		}
 
 		protected static <T extends Comparable<T>> T maxOf(T... ts) {
@@ -324,9 +316,6 @@ public class IntervalTree<K extends Interval, V> {
 	private void fixAfterInsertion(Entry<K, V> z) {
 		z.color = RED;
 
-		boolean propagate = z.update();
-		Entry<K, V> propagateStart = z;
-
 		while (z != null && z != root && z.parent.color == RED) {
 			if (parentOf(z) == leftOf(parentOf(parentOf(z)))) {
 				Entry<K, V> y = rightOf(parentOf(parentOf(z)));
@@ -334,10 +323,7 @@ public class IntervalTree<K extends Interval, V> {
 					setColor(parentOf(z), BLACK);
 					setColor(y, BLACK);
 					setColor(parentOf(parentOf(z)), RED);
-					parentOf(z).update();
 					z = parentOf(parentOf(z));
-					propagate = z.update();
-					propagateStart = z;
 				} else {
 					if (z == rightOf(parentOf(z))) {
 						z = parentOf(z);
@@ -345,8 +331,7 @@ public class IntervalTree<K extends Interval, V> {
 					}
 					setColor(parentOf(z), BLACK);
 					setColor(parentOf(parentOf(z)), RED);
-					propagate = rotateRight(parentOf(parentOf(z)));
-					propagateStart = parentOf(z);
+					rotateRight(parentOf(parentOf(z)));
 				}
 			} else {
 				Entry<K, V> y = leftOf(parentOf(parentOf(z)));
@@ -354,10 +339,7 @@ public class IntervalTree<K extends Interval, V> {
 					setColor(parentOf(z), BLACK);
 					setColor(y, BLACK);
 					setColor(parentOf(parentOf(z)), RED);
-					parentOf(z).update();
 					z = parentOf(parentOf(z));
-					propagate = z.update();
-					propagateStart = z;
 				} else {
 					if (z == leftOf(parentOf(z))) {
 						z = parentOf(z);
@@ -365,25 +347,14 @@ public class IntervalTree<K extends Interval, V> {
 					}
 					setColor(parentOf(z), BLACK);
 					setColor(parentOf(parentOf(z)), RED);
-					propagate = rotateLeft(parentOf(parentOf(z)));
-					propagateStart = parentOf(z);
+					rotateLeft(parentOf(parentOf(z)));
 				}
 			}
 		}
-
-		while (propagate && (propagateStart != root)) {
-			propagateStart = parentOf(propagateStart);
-			propagate = propagateStart.update();
-		}
-
 		root.color = BLACK;
 	}
 
 	private void fixAfterDeletion(Entry<K, V> z) {
-
-		boolean propagate = z.update();
-		Entry<K, V> propagateStart = z;
-
 		while (z != root && colorOf(z) == BLACK) {
 			if (z == leftOf(parentOf(z))) {
 				Entry<K, V> sib = rightOf(parentOf(z));
@@ -391,8 +362,7 @@ public class IntervalTree<K extends Interval, V> {
 				if (colorOf(sib) == RED) {
 					setColor(sib, BLACK);
 					setColor(parentOf(z), RED);
-					propagate = rotateLeft(parentOf(z));
-					propagateStart = parentOf(z);
+					rotateLeft(parentOf(z));
 					sib = rightOf(parentOf(z));
 				}
 
@@ -410,8 +380,7 @@ public class IntervalTree<K extends Interval, V> {
 					setColor(sib, colorOf(parentOf(z)));
 					setColor(parentOf(z), BLACK);
 					setColor(rightOf(sib), BLACK);
-					propagate = rotateLeft(parentOf(z));
-					propagateStart = parentOf(z);
+					rotateLeft(parentOf(z));
 					z = root;
 				}
 			} else { // symmetric
@@ -420,8 +389,7 @@ public class IntervalTree<K extends Interval, V> {
 				if (colorOf(sib) == RED) {
 					setColor(sib, BLACK);
 					setColor(parentOf(z), RED);
-					propagate = rotateRight(parentOf(z));
-					propagateStart = parentOf(z);
+					rotateRight(parentOf(z));
 					sib = leftOf(parentOf(z));
 				}
 
@@ -439,16 +407,10 @@ public class IntervalTree<K extends Interval, V> {
 					setColor(sib, colorOf(parentOf(z)));
 					setColor(parentOf(z), BLACK);
 					setColor(leftOf(sib), BLACK);
-					propagate = rotateRight(parentOf(z));
-					propagateStart = parentOf(z);
+					rotateRight(parentOf(z));
 					z = root;
 				}
 			}
-		}
-
-		while (propagate && (propagateStart != root)) {
-			propagateStart = parentOf(propagateStart);
-			propagate = propagateStart.update();
 		}
 
 		setColor(z, BLACK);
@@ -479,46 +441,48 @@ public class IntervalTree<K extends Interval, V> {
 		return (p == null) ? null : p.right;
 	}
 
-	private boolean rotateLeft(Entry<K, V> p) {
-		Entry<K, V> r = p.right;
-		p.right = r.left;
-		if (r.left != null) {
-			r.left.parent = p;
+	private void rotateLeft(Entry<K, V> x) {
+		if (x != null) {
+			Entry<K, V> y = x.right;
+			x.right = y.left;
+			if (y.left != null) {
+				y.left.parent = x;
+			}
+			y.parent = x.parent;
+			if (x.parent == null) {
+				root = y;
+			} else if (x.parent.left == x) {
+				x.parent.left = y;
+			} else {
+				x.parent.right = y;
+			}
+			y.left = x;
+			x.parent = y;
+			x.updateMax();
+			y.updateMax();
 		}
-		r.parent = p.parent;
-		if (p.parent == null) {
-			root = r;
-		} else if (p.parent.left == p) {
-			p.parent.left = r;
-		} else {
-			p.parent.right = r;
-		}
-		r.left = p;
-		p.parent = r;
-		boolean res = p.update();
-		res = r.update() || res;
-		return res;
 	}
 
-	private boolean rotateRight(Entry<K, V> p) {
-		Entry<K, V> l = p.left;
-		p.left = l.right;
-		if (l.right != null) {
-			l.right.parent = p;
+	private void rotateRight(Entry<K, V> x) {
+		if (x != null) {
+			Entry<K, V> y = x.left;
+			x.left = y.right;
+			if (y.right != null) {
+				y.right.parent = x;
+			}
+			y.parent = x.parent;
+			if (x.parent == null) {
+				root = y;
+			} else if (x.parent.right == x) {
+				x.parent.right = y;
+			} else {
+				x.parent.left = y;
+			}
+			y.right = x;
+			x.parent = y;
+			y.updateMax();
+			x.updateMax();
 		}
-		l.parent = p.parent;
-		if (p.parent == null) {
-			root = l;
-		} else if (p.parent.right == p) {
-			p.parent.right = l;
-		} else {
-			p.parent.left = l;
-		}
-		l.right = p;
-		p.parent = l;
-		boolean res = p.update();
-		res = l.update() || res;
-		return res;
 	}
 
 	Entry<K, V> successor(Entry<K, V> t) {
@@ -564,9 +528,9 @@ public class IntervalTree<K extends Interval, V> {
 			System.out.print("  ");
 		}
 		if (n.color == BLACK) {
-			System.out.println("\u001B[30m" + n.key + n.value);
+			System.out.println("\u001B[30m" + n.key + n.max);
 		} else {
-			System.out.println("\u001B[31m" + n.key + n.value);
+			System.out.println("\u001B[31m" + n.key + n.max);
 		}
 		if (n.left != null) {
 			printHelper(n.left, indent + spread, spread);
