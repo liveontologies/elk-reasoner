@@ -41,15 +41,24 @@ public class IntervalTreeTest extends TestCase {
 		super(name);
 	}
 
+	/**
+	 * Test interval tree with wide spread of intervals. Produces tree with
+	 * large amount of nodes with 1 value per each.
+	 */
 	public void testWideTree() {
-		final int treeSize = 1000;
+		final int datasetSize = 1000;
 
 		Random rnd = new Random(System.currentTimeMillis());
 
+		//IntervalTree to test
 		IntervalTree<TestInterval, TestInterval> testTree = new IntervalTree<TestInterval, TestInterval>();
-		ArrayList<TestInterval> intervals = new ArrayList<TestInterval>(treeSize);
 
-		for (int i = 0; i < treeSize; i++) {
+		//Reference list of intervals (for comparison)
+		ArrayList<TestInterval> intervals = new ArrayList<TestInterval>(datasetSize);
+
+		//initial tree construction 
+
+		for (int i = 0; i < datasetSize; i++) {
 			int a = rnd.nextInt();
 			int b = rnd.nextInt();
 			TestInterval testInterval = new TestInterval(a > b ? b : a, true, a > b ? a : b, true);
@@ -57,6 +66,33 @@ public class IntervalTreeTest extends TestCase {
 			intervals.add(testInterval);
 			assertTrue(testInterval.getLow().compareTo(testInterval.getHigh()) <= 0);
 		}
+
+
+		//remove 25% of intervals and repopulate
+
+		int changeSetSize = Math.round(datasetSize * 0.25f);
+
+		for (int i = 0; i < changeSetSize; i++) {
+			TestInterval del = intervals.get(rnd.nextInt(intervals.size()));
+			testTree.remove(del, del);
+			intervals.remove(del);
+		}
+
+		assertEquals(testTree.size(), datasetSize - changeSetSize);
+		assertEquals(testTree.size(), intervals.size());
+
+		for (int i = 0; i < changeSetSize; i++) {
+			int a = rnd.nextInt();
+			int b = rnd.nextInt();
+			TestInterval testInterval = new TestInterval(a > b ? b : a, true, a > b ? a : b, true);
+			testTree.add(testInterval, testInterval);
+			intervals.add(testInterval);
+		}
+
+		//test that all intervals are present in the tree and reference list
+
+		assertEquals(testTree.size(), datasetSize);
+		assertEquals(testTree.size(), intervals.size());
 
 		//test that every stored interval can be retrieved
 
@@ -72,11 +108,10 @@ public class IntervalTreeTest extends TestCase {
 			assertEquals(treeAnswer.size(), listAnswer.size());
 			assertTrue(listAnswer.containsAll(treeAnswer));
 		}
-		
 
 		//test that every interval was retrieved for any random query interval
 
-		for (int i = 0; i < treeSize; i++) {
+		for (int i = 0; i < datasetSize; i++) {
 			int a = rnd.nextInt();
 			int b = rnd.nextInt();
 			TestInterval testInterval = new TestInterval(a > b ? b : a, true, a > b ? a : b, true);
@@ -87,15 +122,24 @@ public class IntervalTreeTest extends TestCase {
 		}
 	}
 
+	/**
+	 * Test interval tree with small spread of intervals. Produces tree with
+	 * small amount of nodes but many values for each.
+	 */
 	public void testNarrowTree() {
-		final int treeSize = 1000;
+		final int datasetSize = 1000;
 
 		Random rnd = new Random(System.currentTimeMillis());
 
+		//IntervalTree to test
 		IntervalTree<TestInterval, TestInterval> testTree = new IntervalTree<TestInterval, TestInterval>();
-		ArrayList<TestInterval> intervals = new ArrayList<TestInterval>(treeSize);
 
-		for (int i = 0; i < treeSize; i++) {
+		//Reference list of intervals (for comparison)
+		ArrayList<TestInterval> intervals = new ArrayList<TestInterval>(datasetSize);
+
+		//initial tree construction 
+
+		for (int i = 0; i < datasetSize; i++) {
 			int a = rnd.nextInt(20);
 			int b = rnd.nextInt(20);
 			TestInterval testInterval = new TestInterval(a > b ? b : a, true, a > b ? a : b, true);
@@ -103,6 +147,32 @@ public class IntervalTreeTest extends TestCase {
 			intervals.add(testInterval);
 			assertTrue(testInterval.getLow().compareTo(testInterval.getHigh()) <= 0);
 		}
+
+		//remove 25% of intervals and repopulate
+
+		int changeSetSize = Math.round(datasetSize * 0.25f);
+
+		for (int i = 0; i < changeSetSize; i++) {
+			TestInterval del = intervals.get(rnd.nextInt(intervals.size()));
+			testTree.remove(del, del);
+			intervals.remove(del);
+		}
+
+		assertEquals(testTree.size(), datasetSize - changeSetSize);
+		assertEquals(testTree.size(), intervals.size());
+
+		for (int i = 0; i < changeSetSize; i++) {
+			int a = rnd.nextInt(20);
+			int b = rnd.nextInt(20);
+			TestInterval testInterval = new TestInterval(a > b ? b : a, true, a > b ? a : b, true);
+			testTree.add(testInterval, testInterval);
+			intervals.add(testInterval);
+		}
+
+		//test that all intervals are present in the tree and reference list
+
+		assertEquals(testTree.size(), datasetSize);
+		assertEquals(testTree.size(), intervals.size());
 
 		//test that every stored interval can be retrieved
 
@@ -122,7 +192,7 @@ public class IntervalTreeTest extends TestCase {
 
 		//test that every interval was retrieved for any random query interval
 
-		for (int i = 0; i < treeSize; i++) {
+		for (int i = 0; i < datasetSize; i++) {
 			int a = rnd.nextInt(30) - 10;
 			int b = rnd.nextInt(30) - 10;
 			TestInterval testInterval = new TestInterval(a > b ? b : a, true, a > b ? a : b, true);

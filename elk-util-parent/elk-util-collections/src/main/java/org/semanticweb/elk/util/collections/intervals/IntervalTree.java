@@ -71,6 +71,7 @@ public class IntervalTree<K extends Interval, V> {
 		if (key == null) {
 			throw new NullPointerException();
 		}
+		size++;
 		Comparable<? super K> k = (Comparable<? super K>) key;
 		Entry<K, V> e = new Entry<K, V>(key, value);
 		do {
@@ -93,7 +94,6 @@ public class IntervalTree<K extends Interval, V> {
 			parent.right = e;
 		}
 		fixAfterInsertion(e);
-		size++;
 	}
 
 	/**
@@ -108,8 +108,9 @@ public class IntervalTree<K extends Interval, V> {
 		if (e == null) {
 			return false;
 		}
-		boolean ret = e.value.remove(value);
-		if (e.value.isEmpty()) {
+		size--;
+		boolean ret = e.removeValue(value);
+		if (e.hasEmptyValue()) {
 			deleteEntry(e);
 		}
 		return ret;
@@ -181,16 +182,15 @@ public class IntervalTree<K extends Interval, V> {
 	}
 
 	private void deleteEntry(Entry<K, V> z) {
-		size--;
-
-		// If strictly internal, copy successor's element to p and then make p
+		// If strictly internal, copy successor's element to z and then make z
 		// point to successor.
 		if (z.left != null && z.right != null) {
 			Entry<K, V> s = successor(z);
 			z.key = s.key;
 			z.value = s.value;
+			propagateMax(z);
 			z = s;
-		} // p has 2 children
+		}
 
 		// Start fixup at replacement node, if it exists.
 		Entry<K, V> replacement = (z.left != null ? z.left : z.right);
@@ -209,6 +209,10 @@ public class IntervalTree<K extends Interval, V> {
 			// Null out links so they are OK to use by fixAfterDeletion.
 			z.left = z.right = z.parent = null;
 
+			if (replacement.parent != null) {
+				propagateMax(replacement.parent);
+			}
+
 			// Fix replacement
 			if (z.color == BLACK) {
 				fixAfterDeletion(replacement);
@@ -226,8 +230,17 @@ public class IntervalTree<K extends Interval, V> {
 				} else if (z == z.parent.right) {
 					z.parent.right = null;
 				}
+				propagateMax(z.parent);
 				z.parent = null;
 			}
+		}
+	}
+
+	private void propagateMax(Entry<K, V> z) {
+		Comparable oldMax = z.max;
+		z.updateMax();
+		if (!oldMax.equals(z.max) && z.parent != null) {
+			propagateMax(z.parent);
 		}
 	}
 	/*
@@ -270,6 +283,19 @@ public class IntervalTree<K extends Interval, V> {
 				this.value = new ArrayList<V>(value);
 				this.value.add(v);
 			}
+		}
+
+		public boolean removeValue(V v) {
+			try {
+				return value.remove(v);
+			} catch (UnsupportedOperationException e) {
+				this.value = null;
+				return true;
+			}
+		}
+
+		public boolean hasEmptyValue() {
+			return this.value == null || this.value.isEmpty();
 		}
 
 		protected void updateMax(Entry<K, V> e) {
@@ -528,9 +554,9 @@ public class IntervalTree<K extends Interval, V> {
 			System.out.print("  ");
 		}
 		if (n.color == BLACK) {
-			System.out.println("\u001B[30m" + n.key + n.max);
+			System.out.println("\u001B[30m" + n.key + ':' + n.max);
 		} else {
-			System.out.println("\u001B[31m" + n.key + n.max);
+			System.out.println("\u001B[31m" + n.key + ':' + n.max);
 		}
 		if (n.left != null) {
 			printHelper(n.left, indent + spread, spread);
