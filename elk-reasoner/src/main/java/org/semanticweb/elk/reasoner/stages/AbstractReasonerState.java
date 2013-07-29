@@ -244,8 +244,15 @@ public abstract class AbstractReasonerState {
 			axiomLoader_ = new ComposedAxiomLoader(axiomLoader_, newAxiomLoader);
 	}
 
-	void loadPendingAxioms() throws ElkLoadingException {
-		if (axiomLoader_ == null) {
+	/**
+	 * Forces loading of all axioms from the registered {@link AxiomLoader}s.
+	 * Typically, loading lazily when reasoning tasks are requested.
+	 * 
+	 * @throws ElkLoadingException
+	 *             if axioms cannot be loaded
+	 */
+	public void forceLoading() throws ElkLoadingException {
+		if (axiomLoader_ == null || axiomLoader_.isLoadingFinished()) {
 			return;
 		}
 		// wrapping both the inserter and the deleter to receive notifications

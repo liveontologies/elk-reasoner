@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
@@ -153,18 +154,13 @@ public class ElkReasoner implements OWLReasoner {
 		reCreateReasoner();
 		this.bufferedChangesLoader_ = new OwlChangesLoader(
 				this.mainProgressMonitor_);
-
-		reasoner_.registerAxiomLoader(bufferedChangesLoader_);
-
-		if (isBufferingMode) {
+		if (!isBufferingMode_) {
+			// register the change loader only in non-buffering mode;
+			// in buffering mode the loader is registered only when
+			// changes are flushed
 			reasoner_.registerAxiomLoader(bufferedChangesLoader_);
-			this.ontologyReloadRequired_ = false;
-		} else
-			/*
-			 * for non-buffering mode, we can load the ontology lazily when the
-			 * first query is asked
-			 */
-			this.ontologyReloadRequired_ = true;
+		}
+		this.ontologyReloadRequired_ = false;
 	}
 
 	ElkReasoner(OWLOntology ontology, boolean isBufferingMode,
@@ -205,6 +201,13 @@ public class ElkReasoner implements OWLReasoner {
 		// switch to the primary progress monitor; this is to avoid bugs with
 		// progress monitors in Protege
 		this.reasoner_.setProgressMonitor(this.secondaryProgressMonitor_);
+		if (isBufferingMode_) {
+			try {
+				reasoner_.forceLoading();
+			} catch (ElkLoadingException e) {
+				throw elkConverter_.convert(e);
+			}
+		}
 	}
 
 	/**
@@ -979,9 +982,10 @@ public class ElkReasoner implements OWLReasoner {
 		/**
 		 */
 		private boolean relevantChange(OWLOntologyChange change) {
-			return owlOntology_.getImportsClosure().contains(
-					change.getOntology());
-			// return change.getOntology().equals(owlOntology_);
+			OWLOntology changedOntology = change.getOntology();
+			return changedOntology.equals(owlOntology_)
+					|| owlOntology_.getImportsClosure().contains(
+							change.getOntology());
 		}
 	}
 

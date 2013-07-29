@@ -53,12 +53,12 @@ public abstract class BaseOWLAPILowLevelIncrementalClassTest {
 	abstract void prepare();
 
 	/**
-	 * Performs addition of some axioms to the ontology
+	 * Performs addition of axioms (the same as in {@link #remove()})
 	 */
 	abstract void add();
 
 	/**
-	 * Performs deletion of axioms to the ontology
+	 * Performs deletion of axioms (the same as in {@link #add()})
 	 */
 	abstract void remove();
 
@@ -77,7 +77,6 @@ public abstract class BaseOWLAPILowLevelIncrementalClassTest {
 		boolean bufferingMode = reasoner.getBufferingMode().equals(
 				BufferingMode.BUFFERING);
 
-		testPresent();
 		remove();
 		if (bufferingMode) {
 			// the changes are still not yet taken into account
@@ -104,6 +103,7 @@ public abstract class BaseOWLAPILowLevelIncrementalClassTest {
 			testAbsent();
 		}
 
+		// take into account all changes
 		reasoner.flush();
 
 		testAbsent();

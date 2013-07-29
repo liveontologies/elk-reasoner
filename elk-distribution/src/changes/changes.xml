@@ -16,6 +16,9 @@ will appear in the produced result.
 	</properties>
 	<body>
 	    <release version="${release.version}" date="${buildDate}" description="Current version">
+			<action dev="yevgeny" type="fix" issue="20">
+			    Fixed a bug when changes were loaded in buffering mode without calling flush()				
+			</action>
 	    </release>
 	    <release version="0.4.0" date="2013-07-20" description="Forth public release">
 			<action dev="pavel" type="add"  issue="9">

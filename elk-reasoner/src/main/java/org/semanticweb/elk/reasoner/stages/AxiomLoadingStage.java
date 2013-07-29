@@ -53,7 +53,7 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 	@Override
 	public void executeStage() throws ElkException {
 		for (;;) {
-			reasoner.loadPendingAxioms();
+			reasoner.forceLoading();
 			if (!spuriousInterrupt())
 				break;
 		}
