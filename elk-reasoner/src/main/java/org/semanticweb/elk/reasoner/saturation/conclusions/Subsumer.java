@@ -45,7 +45,7 @@ public abstract class Subsumer implements Conclusion {
 	 * the implied {@code IndexedClassExpression} represented by this
 	 * {@link Subsumer}
 	 */
-	protected final IndexedClassExpression expression;
+	final IndexedClassExpression expression;
 
 	public Subsumer(IndexedClassExpression expression) {
 		this.expression = expression;

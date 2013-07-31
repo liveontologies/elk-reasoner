@@ -266,16 +266,16 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		 * {@link IndexedClassExpression}, for which this rule is registered,
 		 * occurs more than once.
 		 */
-		private int contradictionCounter;
+		private int contradictionCounter_;
 
 		public ThisContradictionRule(ChainableRule<Context> tail) {
 			super(tail);
-			this.contradictionCounter = 0;
+			this.contradictionCounter_ = 0;
 		}
 
 		ThisContradictionRule() {
 			this((ChainableRule<Context>) null);
-			this.contradictionCounter++;
+			this.contradictionCounter_++;
 		}
 
 		@Override
@@ -295,8 +295,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
 			ThisContradictionRule rule = ruleChain
 					.getCreate(MATCHER_, FACTORY_);
-			rule.contradictionCounter += this.contradictionCounter;
-			return this.contradictionCounter != 0;
+			rule.contradictionCounter_ += this.contradictionCounter_;
+			return this.contradictionCounter_ != 0;
 		}
 
 		@Override
@@ -305,10 +305,10 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			if (rule == null) {
 				return false;
 			}
-			rule.contradictionCounter -= this.contradictionCounter;
+			rule.contradictionCounter_ -= this.contradictionCounter_;
 			if (rule.isEmpty())
 				ruleChain.remove(MATCHER_);
-			return this.contradictionCounter != 0;
+			return this.contradictionCounter_ != 0;
 		}
 
 		@Override
@@ -318,7 +318,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 
 		protected boolean isEmpty() {
-			return this.contradictionCounter == 0;
+			return this.contradictionCounter_ == 0;
 		}
 
 		private static Matcher<ChainableRule<Context>, ThisContradictionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisContradictionRule>(
