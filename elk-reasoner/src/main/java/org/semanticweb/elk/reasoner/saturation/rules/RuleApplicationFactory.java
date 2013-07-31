@@ -59,15 +59,6 @@ public class RuleApplicationFactory {
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(RuleApplicationFactory.class);
 
-	// static final boolean COLLECT_CONCLUSION_COUNTS =
-	// true;//LOGGER_.isDebugEnabled();
-	// static final boolean COLLECT_CONCLUSION_TIMES =
-	// true;//LOGGER_.isDebugEnabled();
-	// static final boolean COLLECT_RULE_COUNTS =
-	// true;//LOGGER_.isDebugEnabled();
-	// static final boolean COLLECT_RULE_TIMES =
-	// true;//LOGGER_.isDebugEnabled();
-
 	final SaturationState saturationState;
 
 	/**
@@ -143,8 +134,7 @@ public class RuleApplicationFactory {
 			BasicSaturationStateWriter writer = getSaturationStateWriter();
 
 			if (conclusionProcessor_ == null) {
-				conclusionProcessor_ = getConclusionProcessor(writer,
-						localStatistics);
+				conclusionProcessor_ = getConclusionProcessor(writer);
 			}
 
 			for (;;) {
@@ -155,9 +145,8 @@ public class RuleApplicationFactory {
 
 				if (nextContext == null) {
 					break;
-				} else {
-					process(nextContext);
 				}
+				process(nextContext);
 			}
 
 			localContextStatistics.timeContextProcess += CachedTimeThread
@@ -195,14 +184,11 @@ public class RuleApplicationFactory {
 		 * 
 		 * @param ruleProcessor
 		 *            the {@link ConclusionVisitor} to be wrapped
-		 * @param localStatistics
-		 *            the object accumulating local statistics for this worker
 		 * @return the input {@link ConclusionVisitor} possibly wrapped with
 		 *         some code for producing statistics
 		 */
 		protected ConclusionVisitor<Boolean> getUsedConclusionsCountingVisitor(
-				ConclusionVisitor<Boolean> ruleProcessor,
-				SaturationStatistics localStatistics) {
+				ConclusionVisitor<Boolean> ruleProcessor) {
 			return SaturationUtils.getUsedConclusionCountingProcessor(
 					ruleProcessor, localStatistics);
 		}
@@ -216,29 +202,23 @@ public class RuleApplicationFactory {
 		 *            the {@link SaturationStateImpl.AbstractWriter} using which
 		 *            one can produce new {@link Conclusion}s in {@link Context}
 		 *            s
-		 * @param localStatistics
-		 *            the object accumulating local statistics for this worker
 		 * @return the base {@link ConclusionVisitor} that performs processing
 		 *         of {@code Conclusion}s within a {@link Context}
 		 */
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
-				BasicSaturationStateWriter saturationStateWriter,
-				SaturationStatistics localStatistics) {
+				BasicSaturationStateWriter saturationStateWriter) {
 
 			return new CombinedConclusionVisitor(
 					new ConclusionInsertionVisitor(),
-					getUsedConclusionsCountingVisitor(
-							new ConclusionApplicationVisitor(
-									saturationStateWriter,
-									SaturationUtils
-											.getStatsAwareCompositionRuleAppVisitor(localStatistics
-													.getRuleStatistics()),
-									SaturationUtils
-											.getStatsAwareDecompositionRuleAppVisitor(
-													getDecompositionRuleApplicationVisitor(),
-													localStatistics
-															.getRuleStatistics())),
-							localStatistics));
+					getUsedConclusionsCountingVisitor(new ConclusionApplicationVisitor(
+							saturationStateWriter,
+							SaturationUtils
+									.getStatsAwareCompositionRuleAppVisitor(localStatistics
+											.getRuleStatistics()),
+							SaturationUtils
+									.getStatsAwareDecompositionRuleAppVisitor(
+											getDecompositionRuleApplicationVisitor(),
+											localStatistics.getRuleStatistics()))));
 		}
 
 		/**
@@ -250,17 +230,13 @@ public class RuleApplicationFactory {
 		 *            the {@link SaturationStateImpl.AbstractWriter} using which
 		 *            one can produce new {@link Conclusion}s in {@link Context}
 		 *            s
-		 * @param localStatistics
-		 *            the object accumulating local statistics for this worker
 		 * @return the final {@link ConclusionVisitor} that is used by this
 		 *         {@link DefaultEngine} for processing {@code Conclusion}s
 		 *         within {@link Context}s
 		 */
 		protected ConclusionVisitor<?> getConclusionProcessor(
-				BasicSaturationStateWriter saturationStateWriter,
-				SaturationStatistics localStatistics) {
-			ConclusionVisitor<Boolean> result = getBaseConclusionProcessor(
-					saturationStateWriter, localStatistics);
+				BasicSaturationStateWriter saturationStateWriter) {
+			ConclusionVisitor<Boolean> result = getBaseConclusionProcessor(saturationStateWriter);
 			if (trackModifiedContexts_) {
 				result = new CombinedConclusionVisitor(result,
 						new ConclusionSourceUnsaturationVisitor(

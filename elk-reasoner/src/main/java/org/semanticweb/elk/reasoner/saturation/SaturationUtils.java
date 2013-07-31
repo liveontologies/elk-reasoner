@@ -152,9 +152,8 @@ public class SaturationUtils {
 					new CountingConclusionVisitor(localStatistics
 							.getConclusionStatistics()
 							.getUsedConclusionCounts()), ruleProcessor);
-		} else {
-			return ruleProcessor;
 		}
+		return ruleProcessor;
 	}
 	
 	/**
@@ -177,9 +176,8 @@ public class SaturationUtils {
 
 			return new TimedConclusionVisitor(stats.getConclusionTimers(),
 					conclusionVisitor);
-		} else {
-			return conclusionVisitor;
 		}
+		return conclusionVisitor;
 	}	
 	
 	
