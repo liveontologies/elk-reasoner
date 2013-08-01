@@ -56,14 +56,23 @@ public class IntervalTreeTest extends TestCase {
 		//Reference list of intervals (for comparison)
 		ArrayList<TestInterval> intervals = new ArrayList<TestInterval>(datasetSize);
 
+		//Reference list of values
+		ArrayList<TestInterval> values = new ArrayList<TestInterval>(datasetSize);
+
 		//initial tree construction 
 
 		for (int i = 0; i < datasetSize; i++) {
 			int a = rnd.nextInt();
 			int b = rnd.nextInt();
-			TestInterval testInterval = new TestInterval(a > b ? b : a, true, a > b ? a : b, true);
+			TestInterval testInterval;
+			if (a == b) {
+				testInterval = new TestInterval(a, true, b, true);
+			} else {
+				testInterval = new TestInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
+			}
 			testTree.add(testInterval, testInterval);
 			intervals.add(testInterval);
+			values.add(testInterval);
 			assertTrue(testInterval.getLow().compareTo(testInterval.getHigh()) <= 0);
 		}
 
@@ -76,6 +85,7 @@ public class IntervalTreeTest extends TestCase {
 			TestInterval del = intervals.get(rnd.nextInt(intervals.size()));
 			testTree.remove(del, del);
 			intervals.remove(del);
+			values.remove(del);
 		}
 
 		assertEquals(testTree.size(), datasetSize - changeSetSize);
@@ -84,15 +94,30 @@ public class IntervalTreeTest extends TestCase {
 		for (int i = 0; i < changeSetSize; i++) {
 			int a = rnd.nextInt();
 			int b = rnd.nextInt();
-			TestInterval testInterval = new TestInterval(a > b ? b : a, true, a > b ? a : b, true);
+			TestInterval testInterval;
+			if (a == b) {
+				testInterval = new TestInterval(a, true, b, true);
+			} else {
+				testInterval = new TestInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
+			}
 			testTree.add(testInterval, testInterval);
 			intervals.add(testInterval);
+			values.add(testInterval);
 		}
 
 		//test that all intervals are present in the tree and reference list
 
 		assertEquals(testTree.size(), datasetSize);
 		assertEquals(testTree.size(), intervals.size());
+
+		//test that all values are present in the tree and reference list
+
+		Collection<TestInterval> treeValues = testTree.values();
+		assertEquals(treeValues.size(), values.size());
+
+		for (TestInterval value : values) {
+			assertTrue(treeValues.contains(value));
+		}
 
 		//test that every stored interval can be retrieved
 
@@ -114,7 +139,12 @@ public class IntervalTreeTest extends TestCase {
 		for (int i = 0; i < datasetSize; i++) {
 			int a = rnd.nextInt();
 			int b = rnd.nextInt();
-			TestInterval testInterval = new TestInterval(a > b ? b : a, true, a > b ? a : b, true);
+			TestInterval testInterval;
+			if (a == b) {
+				testInterval = new TestInterval(a, true, b, true);
+			} else {
+				testInterval = new TestInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
+			}
 			Collection<TestInterval> treeAnswer = testTree.searchIncludes(testInterval);
 			Collection<TestInterval> listAnswer = getAllIncludes(intervals, testInterval);
 			assertEquals(treeAnswer.size(), listAnswer.size());
@@ -137,14 +167,23 @@ public class IntervalTreeTest extends TestCase {
 		//Reference list of intervals (for comparison)
 		ArrayList<TestInterval> intervals = new ArrayList<TestInterval>(datasetSize);
 
+		//Reference list of values
+		ArrayList<TestInterval> values = new ArrayList<TestInterval>(datasetSize);
+
 		//initial tree construction 
 
 		for (int i = 0; i < datasetSize; i++) {
 			int a = rnd.nextInt(20);
 			int b = rnd.nextInt(20);
-			TestInterval testInterval = new TestInterval(a > b ? b : a, true, a > b ? a : b, true);
+			TestInterval testInterval;
+			if (a == b) {
+				testInterval = new TestInterval(a, true, b, true);
+			} else {
+				testInterval = new TestInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
+			}
 			testTree.add(testInterval, testInterval);
 			intervals.add(testInterval);
+			values.add(testInterval);
 			assertTrue(testInterval.getLow().compareTo(testInterval.getHigh()) <= 0);
 		}
 
@@ -156,6 +195,7 @@ public class IntervalTreeTest extends TestCase {
 			TestInterval del = intervals.get(rnd.nextInt(intervals.size()));
 			testTree.remove(del, del);
 			intervals.remove(del);
+			values.remove(del);
 		}
 
 		assertEquals(testTree.size(), datasetSize - changeSetSize);
@@ -164,15 +204,30 @@ public class IntervalTreeTest extends TestCase {
 		for (int i = 0; i < changeSetSize; i++) {
 			int a = rnd.nextInt(20);
 			int b = rnd.nextInt(20);
-			TestInterval testInterval = new TestInterval(a > b ? b : a, true, a > b ? a : b, true);
+			TestInterval testInterval;
+			if (a == b) {
+				testInterval = new TestInterval(a, true, b, true);
+			} else {
+				testInterval = new TestInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
+			}
 			testTree.add(testInterval, testInterval);
 			intervals.add(testInterval);
+			values.add(testInterval);
 		}
 
 		//test that all intervals are present in the tree and reference list
 
 		assertEquals(testTree.size(), datasetSize);
 		assertEquals(testTree.size(), intervals.size());
+
+		//test that all values are present in the tree and reference list
+
+		Collection<TestInterval> treeValues = testTree.values();
+		assertEquals(treeValues.size(), values.size());
+
+		for (TestInterval value : values) {
+			assertTrue(treeValues.contains(value));
+		}
 
 		//test that every stored interval can be retrieved
 
@@ -195,7 +250,12 @@ public class IntervalTreeTest extends TestCase {
 		for (int i = 0; i < datasetSize; i++) {
 			int a = rnd.nextInt(30) - 10;
 			int b = rnd.nextInt(30) - 10;
-			TestInterval testInterval = new TestInterval(a > b ? b : a, true, a > b ? a : b, true);
+			TestInterval testInterval;
+			if (a == b) {
+				testInterval = new TestInterval(a, true, b, true);
+			} else {
+				testInterval = new TestInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
+			}
 			Collection<TestInterval> treeAnswer = testTree.searchIncludes(testInterval);
 			Collection<TestInterval> listAnswer = getAllIncludes(intervals, testInterval);
 			assertEquals(treeAnswer.size(), listAnswer.size());

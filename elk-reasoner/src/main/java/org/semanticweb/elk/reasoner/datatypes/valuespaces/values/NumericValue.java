@@ -26,7 +26,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
+import org.semanticweb.elk.reasoner.datatypes.numbers.AbstractInterval;
 import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
+import org.semanticweb.elk.reasoner.datatypes.numbers.Endpoint;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -36,7 +38,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  *
  * @author Pospishnyi Olexandr
  */
-public class NumericValue implements ValueSpace {
+public class NumericValue extends AbstractInterval implements ValueSpace {
 
 	public ELDatatype datatype;
 	public ELDatatype effectiveDatatype;
@@ -46,6 +48,8 @@ public class NumericValue implements ValueSpace {
 		this.value = value;
 		this.datatype = datatype;
 		this.effectiveDatatype = getCorrespondingDatatype(value);
+		this.low = new Endpoint(value, true, true);
+		this.high = new Endpoint(value, true, false);
 	}
 
 	@Override
@@ -80,8 +84,8 @@ public class NumericValue implements ValueSpace {
 	}
 
 	/**
-	 * NumericValue could contain only another NumericValue if both
-	 * value spaces have equal values
+	 * NumericValue could contain only another NumericValue if both value
+	 * spaces have equal values
 	 *
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
@@ -92,7 +96,7 @@ public class NumericValue implements ValueSpace {
 			return false;
 		}
 		int compare = NumberComparator.INSTANCE.compare(value,
-				((NumericValue) valueSpace).value);
+			((NumericValue) valueSpace).value);
 		return compare == 0;
 	}
 
@@ -129,7 +133,7 @@ public class NumericValue implements ValueSpace {
 	public String toString() {
 		return value.toString() + "^^" + datatype;
 	}
-	
+
 	@Override
 	public <O> O accept(ValueSpaceVisitor<O> visitor) {
 		return visitor.visit(this);

@@ -26,7 +26,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
+import org.semanticweb.elk.reasoner.datatypes.numbers.AbstractInterval;
 import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
+import org.semanticweb.elk.reasoner.datatypes.numbers.Endpoint;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NegativeInfinity;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
 import org.semanticweb.elk.reasoner.datatypes.numbers.PositiveInfinity;
@@ -40,7 +42,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  *
  * @author Pospishnyi Olexandr
  */
-public class NumericIntervalValueSpace implements ValueSpace {
+public class NumericIntervalValueSpace extends AbstractInterval implements ValueSpace {
 
 	public ELDatatype datatype;
 	public ELDatatype effectiveDatatype;
@@ -70,6 +72,8 @@ public class NumericIntervalValueSpace implements ValueSpace {
 		this.lowerInclusive = lowerInclusive;
 		this.upperBound = upperBound;
 		this.upperInclusive = upperInclusive;
+		this.low = new Endpoint(lowerBound, lowerInclusive, true);
+		this.high = new Endpoint(upperBound, upperInclusive, false);
 	}
 
 	@SuppressWarnings("static-method")

@@ -45,24 +45,50 @@ public class AdaptableDatatypeIndex implements DatatypeIndex {
 	private final IndexSelector indexSelector;
 
 	public AdaptableDatatypeIndex() {
-		this.indexSelector = new IndexSelector();
 		this.simpleDatatypeIndex = new SimpleDatatypeIndex();
-		this.treeDatatypeIndex= new IntervalTreeDatatypeIndex();
+		this.treeDatatypeIndex = new IntervalTreeDatatypeIndex();
+		this.indexSelector = new IndexSelector();
 	}
 
 	@Override
 	public void addDatatypeExpression(IndexedDatatypeExpression ide) {
 		ide.getValueSpace().accept(indexSelector).addDatatypeExpression(ide);
+//		simpleDatatypeIndex.addDatatypeExpression(ide);
+//		if (ide.getValueSpace().accept(indexSelector) == treeDatatypeIndex) {
+//			treeDatatypeIndex.addDatatypeExpression(ide);
+//		}
 	}
 
 	@Override
 	public boolean removeDatatypeExpression(IndexedDatatypeExpression ide) {
 		return ide.getValueSpace().accept(indexSelector).removeDatatypeExpression(ide);
+//		boolean r1 = simpleDatatypeIndex.removeDatatypeExpression(ide);
+//		if (ide.getValueSpace().accept(indexSelector) == treeDatatypeIndex) {
+//			boolean r2 = treeDatatypeIndex.removeDatatypeExpression(ide);
+//			if (r1 != r2) {
+//				System.out.println("!!!!!");
+//			}
+//		}
+//		return r1;
 	}
 
 	@Override
 	public Collection<IndexedDatatypeExpression> getDatatypeExpressionsFor(IndexedDatatypeExpression ide) {
-		return ide.getValueSpace().accept(indexSelector).getDatatypeExpressionsFor(ide);
+		DatatypeIndex index = ide.getValueSpace().accept(indexSelector);
+		Collection<IndexedDatatypeExpression> ret = index.getDatatypeExpressionsFor(ide);
+		if (index == treeDatatypeIndex) {
+			ret.addAll(simpleDatatypeIndex.getDatatypeExpressionsFor(ide));
+		}
+		return ret;
+
+//		Collection<IndexedDatatypeExpression> r1 = simpleDatatypeIndex.getDatatypeExpressionsFor(ide);
+//		if (ide.getValueSpace().accept(indexSelector) == treeDatatypeIndex) {
+//			Collection<IndexedDatatypeExpression> r2 = treeDatatypeIndex.getDatatypeExpressionsFor(ide);
+//			if (r1.size() != r2.size()) {
+//				System.out.println("!!!");
+//			}
+//		}
+//		return r1;
 	}
 
 	@Override
@@ -95,7 +121,7 @@ public class AdaptableDatatypeIndex implements DatatypeIndex {
 
 		@Override
 		public DatatypeIndex visit(NumericIntervalValueSpace valueSpace) {
-			return simpleDatatypeIndex;
+			return treeDatatypeIndex;
 		}
 
 		@Override
@@ -120,7 +146,7 @@ public class AdaptableDatatypeIndex implements DatatypeIndex {
 
 		@Override
 		public DatatypeIndex visit(NumericValue value) {
-			return simpleDatatypeIndex;
+			return treeDatatypeIndex;
 		}
 	}
 }

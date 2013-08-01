@@ -133,6 +133,31 @@ public class IntervalTree<K extends Interval, V> {
 	}
 
 	/**
+	 * @return all values stored in this interval tree
+	 */
+	public Collection<V> values() {
+		ArrayList<V> ret = new ArrayList<V>(size);
+		Entry<K, V> e = getFirstEntry();
+		if (e != null) {
+			ret.addAll(e.value);
+			while ((e = successor(e)) != null) {
+				ret.addAll(e.value);
+			}
+		}
+		return ret;
+	}
+
+	private Entry<K, V> getFirstEntry() {
+		Entry<K, V> p = root;
+		if (p != null) {
+			while (p.left != null) {
+				p = p.left;
+			}
+		}
+		return p;
+	}
+
+	/**
 	 * search for all {@link Interval}s that include the following
 	 * {@link Interval} and return all their associated data values
 	 *
