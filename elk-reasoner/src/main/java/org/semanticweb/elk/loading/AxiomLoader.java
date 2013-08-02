@@ -25,28 +25,39 @@ package org.semanticweb.elk.loading;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * A factory for creating loaders for ontology changes
- * 
- * @see Loader
+ * An object through which axioms can be add or removed to the ontology
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ChangesLoader {
+public interface AxiomLoader {
 
 	/**
+	 * Loads pending axioms using the provided {@code  axiomInserter} for
+	 * inserting axioms and {@code axiomDeleter} for deleting axioms; if called
+	 * twice, the already loaded axioms will not be processed again
+	 * 
 	 * @param axiomInserter
 	 *            an {@link ElkAxiomProcessor} that inserts the axioms that were
 	 *            added
 	 * @param axiomDeleter
 	 *            an {@link ElkAxiomProcessor} that deletes the axioms that were
 	 *            removed
-	 * @return a loader which process the inserted axioms using the given
-	 *         {@code  axiomInserter} and deleted axioms using the given
-	 *         {@code axiomDeleter}
+	 * @throws ElkLoadingException
+	 *             if loading cannot be completed successfully
 	 */
-	public Loader getLoader(ElkAxiomProcessor axiomInserter,
-			ElkAxiomProcessor axiomDeleter);
+	public void load(ElkAxiomProcessor axiomInserter,
+			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException;
 
-	public void registerChangeListener(final AxiomChangeListener listener);
+	/**
+	 * @return {@code true} if the loading is finished, i.e., calling
+	 *         {@link #load()} will have no effect
+	 */
+	public boolean isLoadingFinished();
+
+	/**
+	 * Close resources used by this {@link AxiomLoader}
+	 */
+	public void dispose();
+
 }

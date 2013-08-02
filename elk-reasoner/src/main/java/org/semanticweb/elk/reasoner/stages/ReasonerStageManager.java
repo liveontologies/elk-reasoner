@@ -31,18 +31,19 @@ package org.semanticweb.elk.reasoner.stages;
  */
 public class ReasonerStageManager {
 
-	final AbstractReasonerStage ontologyLoadingStage, changesLoadingStage,
-			propertyInitializationStage, propertyReflexivityComputationStage,
+	final AbstractReasonerStage axiomLoadingStage,
+			propertyInitializationStage,
+			propertyReflexivityComputationStage,
 			propertyHierarchyCompositionComputationStage,
 			datapropertyHierarchyComputationStage,
 			contextInitializationStage, consistencyCheckingStage,
 			classSaturationStage, classTaxonomyComputationStage,
 			incrementalCompletionStage, incrementalDeletionInitializationStage,
 			incrementalDeletionStage,
-			//initializeContextsAfterDeletionsStage,
-			//incrementalContextCleaningStage,
+			// initializeContextsAfterDeletionsStage,
+			// incrementalContextCleaningStage,
 			incrementalContextGapFillingStage,
-			//initializeContextsAfterCleaningStage,
+			// initializeContextsAfterCleaningStage,
 			incrementalAdditionInitializationStage, incrementalAdditionStage,
 			incrementalConsistencyCheckingStage,
 			incrementalTaxonomyCleaningStage,
@@ -56,10 +57,10 @@ public class ReasonerStageManager {
 
 		/* Non-Incremental stages */
 
-		this.ontologyLoadingStage = new OntologyLoadingStage(reasoner);
+		this.axiomLoadingStage = new AxiomLoadingStage(reasoner);
 
 		this.propertyInitializationStage = new PropertyInitializationStage(
-				reasoner, ontologyLoadingStage);
+				reasoner);
 
 		this.propertyReflexivityComputationStage = new PropertyReflexivityComputationStage(
 				reasoner, propertyInitializationStage);
@@ -70,29 +71,27 @@ public class ReasonerStageManager {
 		this.datapropertyHierarchyComputationStage = new DataPropertyHierarchyComputationStage(
 				reasoner, propertyHierarchyCompositionComputationStage);
 
-		this.changesLoadingStage = new ChangesLoadingStage(reasoner,
+		this.contextInitializationStage = new ContextInitializationStage(
+				reasoner, axiomLoadingStage,
 				datapropertyHierarchyComputationStage);
 
-		this.contextInitializationStage = new ContextInitializationStage(
-				reasoner, changesLoadingStage);
-
 		this.consistencyCheckingStage = new ConsistencyCheckingStage(reasoner,
-				contextInitializationStage);
+				axiomLoadingStage, contextInitializationStage);
 
 		this.classSaturationStage = new ClassSaturationStage(reasoner,
 				consistencyCheckingStage);
 
 		this.classTaxonomyComputationStage = new ClassTaxonomyComputationStage(
 				reasoner, consistencyCheckingStage);
-		
+
 		this.instanceTaxonomyComputationStage = new InstanceTaxonomyComputationStage(
 				reasoner, classTaxonomyComputationStage);
-
 
 		/* Incremental stages */
 
 		this.incrementalCompletionStage = new IncrementalCompletionStage(
-				reasoner, changesLoadingStage);
+				reasoner, axiomLoadingStage,
+				propertyHierarchyCompositionComputationStage);
 
 		this.incrementalDeletionInitializationStage = new IncrementalDeletionInitializationStage(
 				reasoner, incrementalCompletionStage);
@@ -100,18 +99,28 @@ public class ReasonerStageManager {
 		this.incrementalDeletionStage = new IncrementalDeletionStage(reasoner,
 				incrementalDeletionInitializationStage);
 
-		/*this.initializeContextsAfterDeletionsStage = new InitializeContextsAfterDeletionsStage(
-				reasoner, incrementalDeletionStage);*/
+		/*
+		 * this.initializeContextsAfterDeletionsStage = new
+		 * InitializeContextsAfterDeletionsStage( reasoner,
+		 * incrementalDeletionStage);
+		 */
 
-		/*this.incrementalContextCleaningStage = new IncrementalContextCleaningStage(
-				reasoner, initializeContextsAfterDeletionsStage);*/
-		this.incrementalContextGapFillingStage = new IncrementalOverdeletionPruningStage(reasoner, incrementalDeletionStage);
+		/*
+		 * this.incrementalContextCleaningStage = new
+		 * IncrementalContextCleaningStage( reasoner,
+		 * initializeContextsAfterDeletionsStage);
+		 */
+		this.incrementalContextGapFillingStage = new IncrementalOverdeletionPruningStage(
+				reasoner, incrementalDeletionStage);
 
-		/*this.initializeContextsAfterCleaningStage = new InitializeContextsAfterCleaningStage(
-				reasoner, incrementalContextGapFillingStage);*/
+		/*
+		 * this.initializeContextsAfterCleaningStage = new
+		 * InitializeContextsAfterCleaningStage( reasoner,
+		 * incrementalContextGapFillingStage);
+		 */
 
 		this.incrementalAdditionInitializationStage = new IncrementalAdditionInitializationStage(
-				reasoner, incrementalContextGapFillingStage/*initializeContextsAfterCleaningStage*/);
+				reasoner, incrementalContextGapFillingStage/* initializeContextsAfterCleaningStage */);
 
 		this.incrementalAdditionStage = new IncrementalAdditionStage(reasoner,
 				incrementalAdditionInitializationStage);

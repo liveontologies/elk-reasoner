@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
 
 /**
@@ -33,10 +32,6 @@ import org.semanticweb.elk.reasoner.consistency.ConsistencyChecking;
  *
  */
 class ConsistencyCheckingStage extends AbstractReasonerStage {
-
-	// logger for this class
-	private static final Logger LOGGER_ = Logger
-			.getLogger(ConsistencyCheckingStage.class);
 
 	/**
 	 * the computation used for this stage
@@ -61,8 +56,6 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.ontologyIndex,
 				reasoner.saturationState);
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		return true;
 	}
 
@@ -78,13 +71,13 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 		reasoner.inconsistentOntology = computation_.isInconsistent();
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
-		
-		//FIXME Obviously needed a better clean-up after inconsistency
+
+		// FIXME Obviously needed a better clean-up after inconsistency
 		if (reasoner.inconsistentOntology) {
 			reasoner.classTaxonomyState.getWriter().clearTaxonomy();
 			reasoner.instanceTaxonomyState.getWriter().clearTaxonomy();
 		}
-		
+
 		this.computation_ = null;
 		return true;
 	}

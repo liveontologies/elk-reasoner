@@ -74,27 +74,27 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 	@Override
 	protected void correctnessCheck(Reasoner standardReasoner,
 			Reasoner incrementalReasoner, long seed) throws ElkException {
-		if (LOGGER_.isDebugEnabled())
-			LOGGER_.debug("======= Computing Expected Taxonomy =======");
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace("======= Computing Expected Taxonomy =======");
 
 		Taxonomy<ElkClass> expected = standardReasoner.getTaxonomyQuietly();
 
-		if (LOGGER_.isDebugEnabled())
-			LOGGER_.debug("======= Computing Incremental Taxonomy =======");
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace("======= Computing Incremental Taxonomy =======");
 
-		Taxonomy<ElkClass> incremental = incrementalReasoner.getTaxonomyQuietly();
+		Taxonomy<ElkClass> incremental = incrementalReasoner
+				.getTaxonomyQuietly();
 
-		try {
+		try {						
 			assertEquals("Seed " + seed, TaxonomyHasher.hash(expected),
 					TaxonomyHasher.hash(incremental));
 		} catch (AssertionError e) {
 			try {
 				Writer writer = new OutputStreamWriter(System.out);
-				System.out.println("======= Expected Taxonomy =======");
 				TaxonomyPrinter.dumpClassTaxomomy(expected, writer, false);
-				System.out.println("======= Incremental Taxonomy =======");
 				TaxonomyPrinter.dumpClassTaxomomy(incremental, writer, false);
 				writer.flush();
+
 				throw e;
 			} catch (IOException ioe) {
 				ioe.printStackTrace();

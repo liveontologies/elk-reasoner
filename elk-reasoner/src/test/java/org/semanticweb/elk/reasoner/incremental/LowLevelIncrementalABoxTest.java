@@ -56,13 +56,11 @@ public class LowLevelIncrementalABoxTest {
 
 	@Test
 	public void testBasicDeletion() throws ElkException, IOException {
-		TestChangesLoader loader = new TestChangesLoader();
-		TestChangesLoader changeLoader = new TestChangesLoader();
+		TestChangesLoader loader = new TestChangesLoader();		
 		Reasoner reasoner = TestReasonerUtils
 				.createTestReasoner(loader, new PostProcessingStageExecutor());
 
-		reasoner.setAllowIncrementalMode(false);
-		reasoner.registerOntologyChangesLoader(changeLoader);
+		reasoner.setAllowIncrementalMode(false);		
 
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
@@ -81,6 +79,9 @@ public class LowLevelIncrementalABoxTest {
 		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().contains(taxonomy.getInstanceNode(ind)));
 		
 		reasoner.setAllowIncrementalMode(true);
+		
+		TestChangesLoader changeLoader = new TestChangesLoader();
+		reasoner.registerAxiomLoader(changeLoader);
 
 		//changeLoader.clear();
 		changeLoader.remove(axASubB);
@@ -101,7 +102,7 @@ public class LowLevelIncrementalABoxTest {
 				.createTestReasoner(loader, new PostProcessingStageExecutor());
 
 		reasoner.setAllowIncrementalMode(false);
-		reasoner.registerOntologyChangesLoader(changeLoader);
+		reasoner.registerAxiomLoader(changeLoader);
 
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
@@ -130,13 +131,11 @@ public class LowLevelIncrementalABoxTest {
 	
 	@Test
 	public void testRemoveIndividual() throws ElkException, IOException {
-		TestChangesLoader loader = new TestChangesLoader();
-		TestChangesLoader changeLoader = new TestChangesLoader();
+		TestChangesLoader loader = new TestChangesLoader();		
 		Reasoner reasoner = TestReasonerUtils
 				.createTestReasoner(loader, new PostProcessingStageExecutor());
 
-		reasoner.setAllowIncrementalMode(false);
-		reasoner.registerOntologyChangesLoader(changeLoader);
+		reasoner.setAllowIncrementalMode(false);		
 
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
@@ -153,6 +152,9 @@ public class LowLevelIncrementalABoxTest {
 		
 		reasoner.setAllowIncrementalMode(true);
 
+		TestChangesLoader changeLoader = new TestChangesLoader();
+		reasoner.registerAxiomLoader(changeLoader);
+		
 		//changeLoader.clear();
 		changeLoader.remove(axiInstA);
 
@@ -162,6 +164,9 @@ public class LowLevelIncrementalABoxTest {
 		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().isEmpty());
 		//check that the individual properly re-appears
 		//changeLoader.clear();
+		
+		reasoner.registerAxiomLoader(changeLoader);
+		
 		changeLoader.add(axiInstA);
 		
 		taxonomy = reasoner.getInstanceTaxonomyQuietly();
@@ -172,13 +177,12 @@ public class LowLevelIncrementalABoxTest {
 	
 	@Test
 	public void testNewIndividual() throws ElkException, IOException {
-		TestChangesLoader loader = new TestChangesLoader();
-		TestChangesLoader changeLoader = new TestChangesLoader();
+		TestChangesLoader loader = new TestChangesLoader();		
 		Reasoner reasoner = TestReasonerUtils
 				.createTestReasoner(loader, new PostProcessingStageExecutor());
 
 		reasoner.setAllowIncrementalMode(false);
-		reasoner.registerOntologyChangesLoader(changeLoader);
+		
 
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
@@ -195,7 +199,9 @@ public class LowLevelIncrementalABoxTest {
 		assertTrue(taxonomy.getTypeNode(A).getDirectInstanceNodes().size() == 1);
 		assertTrue(taxonomy.getTypeNode(B).getAllInstanceNodes().size() == 1);
 		
-		reasoner.setAllowIncrementalMode(true);
+		reasoner.setAllowIncrementalMode(true);		
+		TestChangesLoader changeLoader = new TestChangesLoader();
+		reasoner.registerAxiomLoader(changeLoader);
 
 		//changeLoader.clear();
 		changeLoader.add(axNewInstB);

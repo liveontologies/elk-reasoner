@@ -34,7 +34,7 @@
 options
 {
   UNICODE_INPUT = true;
-  CACHE_TOKENS = true;
+//  CACHE_TOKENS = true;
   STATIC = false;
 }
 

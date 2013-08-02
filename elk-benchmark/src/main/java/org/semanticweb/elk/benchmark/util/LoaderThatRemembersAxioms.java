@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.benchmark.util;
+
 /*
  * #%L
  * ELK Benchmarking Package
@@ -29,7 +30,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.semanticweb.elk.loading.Loader;
+import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
@@ -37,40 +38,39 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class LoaderThatRemembersAxioms extends Owl2StreamLoader implements ElkAxiomProcessor {
+public class LoaderThatRemembersAxioms extends Owl2StreamLoader implements
+		ElkAxiomProcessor {
 
 	private final int limit_;
 	private final List<ElkAxiom> loaded_;
-	
+
 	private ElkAxiomProcessor processor_;
-	
-	public LoaderThatRemembersAxioms(Owl2ParserFactory parserFactory, File file, int maxAxiomsToRemember)
-			throws FileNotFoundException {
+
+	public LoaderThatRemembersAxioms(Owl2ParserFactory parserFactory,
+			File file, int maxAxiomsToRemember) throws FileNotFoundException {
 		super(parserFactory, file);
 		limit_ = maxAxiomsToRemember;
 		loaded_ = new ArrayList<ElkAxiom>(maxAxiomsToRemember);
 	}
-	
-	@Override
-	public Loader getLoader(ElkAxiomProcessor axiomLoader) {
-		processor_ = axiomLoader;
-		
-		return super.getLoader(this);
-	}
 
+	@Override
+	public void load(ElkAxiomProcessor axiomInserter,
+			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
+		processor_ = axiomInserter;
+		super.load(axiomInserter, axiomDeleter);
+	}
 
 	@Override
 	public void visit(ElkAxiom elkAxiom) {
 		processor_.visit(elkAxiom);
-		
+
 		if (loaded_.size() <= limit_) {
 			loaded_.add(elkAxiom);
 		}
 	}
-
 
 	public List<ElkAxiom> getLoadedAxioms() {
 		return loaded_;

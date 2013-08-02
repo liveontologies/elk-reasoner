@@ -45,6 +45,8 @@ import org.semanticweb.elk.util.collections.Operations;
 /**
  * A reusable runner which can be used for both unit tests and benchmarking
  * 
+ * @param T Type of axioms (using the ELK API, the OWL API, or whatever) 
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de

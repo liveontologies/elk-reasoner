@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -33,12 +34,14 @@ import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.datatypes.handlers.ElkDatatypeHandler;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
@@ -61,35 +64,116 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 	private static final Logger LOGGER_ = Logger
 			.getLogger(IndexObjectConverter.class);
 
-	protected IndexedClassExpressionFilter indexedClassFilter;
-	protected IndexedPropertyChainFilter indexedPropertyFilter;
-        protected ElkDatatypeHandler datatypeHandler;
+	/**
+	 * the filter for produced {@link IndexedClassExpression}s
+	 */
+	private final IndexedClassExpressionFilter indexedClassFilter_;
+	/**
+	 * the filter for produced {@link IndexedPropertyChain}
+	 */
+	private final IndexedPropertyChainFilter indexedPropertyFilter_;
+	/**
+	 * the converter for {@link IndexedObject}s of the complementary polarity
+	 */
+	private final IndexObjectConverter complementaryConverter_;
+	
+	protected ElkDatatypeHandler datatypeHandler;
 
 	/**
 	 * @param objectFilter
 	 *            filter that is applied to the indexed objects after
 	 *            construction
 	 */
+
+	/**
+	 * Creates a new {@link IndexObjectConverter}
+	 * 
+	 * @param indexedClassFilter
+	 *            the filter for produced {@link IndexedClassExpression}s
+	 * @param indexedPropertyFilter
+	 *            the filter for produced {@link IndexedPropertyChain}
+	 * @param complementaryConverter
+	 *            the converter for {@link IndexedObject}s of the complementary
+	 *            polarity
+	 */
 	public IndexObjectConverter(
 			IndexedClassExpressionFilter indexedClassFilter,
 			IndexedPropertyChainFilter indexedPropertyFilter,
-                        ElkDatatypeHandler datatypeHandler) {
-		this.indexedClassFilter = indexedClassFilter;
-		this.indexedPropertyFilter = indexedPropertyFilter;
-                this.datatypeHandler = datatypeHandler;
+			IndexObjectConverter complementaryConverter,
+			ElkDatatypeHandler datatypeHandler) {
+		this.indexedClassFilter_ = indexedClassFilter;
+		this.indexedPropertyFilter_ = indexedPropertyFilter;
+		this.complementaryConverter_ = complementaryConverter;
+		this.datatypeHandler = datatypeHandler;
+	}
+
+	/**
+	 * Creates a new {@link IndexObjectConverter} which is also used for
+	 * converting {@link IndexedObject}s of the complementary polarity
+	 * 
+	 * @param indexedClassFilter
+	 *            the filter for produced {@link IndexedClassExpression}s
+	 * @param indexedPropertyFilter
+	 *            the filter for produced {@link IndexedPropertyChain}
+	 */
+	public IndexObjectConverter(
+			IndexedClassExpressionFilter indexedClassFilter,
+			IndexedPropertyChainFilter indexedPropertyFilter,
+			ElkDatatypeHandler datatypeHandler) {
+		this.indexedClassFilter_ = indexedClassFilter;
+		this.indexedPropertyFilter_ = indexedPropertyFilter;
+		this.complementaryConverter_ = this;
+		this.datatypeHandler = datatypeHandler;
+	}
+
+	/**
+	 * Creates a new {@link IndexObjectConverter}
+	 * 
+	 * @param indexedClassFilter
+	 *            the filter for produced {@link IndexedClassExpression}s
+	 * @param indexedPropertyFilter
+	 *            the filter for produced {@link IndexedPropertyChain}
+	 * @param complementaryConverterFactory
+	 *            a {@link IndexObjectConverterFactory}s used to create the
+	 *            converter for the complementary polarity, which itself uses
+	 *            this converter as complementary
+	 */
+	public IndexObjectConverter(
+			IndexedClassExpressionFilter indexedClassFilter,
+			IndexedPropertyChainFilter indexedPropertyFilter,
+			IndexObjectConverterFactory complementaryConverterFactory,
+			ElkDatatypeHandler datatypeHandler) {
+		this.indexedClassFilter_ = indexedClassFilter;
+		this.indexedPropertyFilter_ = indexedPropertyFilter;
+		this.complementaryConverter_ = complementaryConverterFactory
+				.create(this);
+		this.datatypeHandler = datatypeHandler;
+	}
+
+	public IndexObjectConverter getComplementaryConverter() {
+		return complementaryConverter_;
 	}
 
 	@Override
 	public IndexedClass visit(ElkClass elkClass) {
-		return indexedClassFilter.visit(new IndexedClass(elkClass));
+		return indexedClassFilter_.visit(new IndexedClass(elkClass));
 	}
 
 	@Override
 	public IndexedClassExpression visit(ElkObjectHasValue elkObjectHasValue) {
 		IndexedObjectProperty iop = (IndexedObjectProperty) elkObjectHasValue
 				.getProperty().accept(this);
-		return indexedClassFilter.visit(new IndexedObjectSomeValuesFrom(iop,
+		return indexedClassFilter_.visit(new IndexedObjectSomeValuesFrom(iop,
 				elkObjectHasValue.getFiller().accept(this)));
+	}
+
+	@Override
+	public IndexedClassExpression visit(
+			ElkObjectComplementOf elkObjectComplementOf) {
+		IndexedClassExpression negated = elkObjectComplementOf
+				.getClassExpression().accept(complementaryConverter_);
+		return indexedClassFilter_
+				.visit(new IndexedObjectComplementOf(negated));
 	}
 
 	@Override
@@ -105,7 +189,7 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 			if (result == null)
 				result = ice;
 			else
-				result = indexedClassFilter
+				result = indexedClassFilter_
 						.visit(new IndexedObjectIntersectionOf(result, ice));
 		}
 
@@ -117,8 +201,19 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 			ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
 		IndexedObjectProperty iop = (IndexedObjectProperty) elkObjectSomeValuesFrom
 				.getProperty().accept(this);
-		return indexedClassFilter.visit(new IndexedObjectSomeValuesFrom(iop,
+		return indexedClassFilter_.visit(new IndexedObjectSomeValuesFrom(iop,
 				elkObjectSomeValuesFrom.getFiller().accept(this)));
+	}
+
+	@Override
+	public IndexedClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
+		List<IndexedClassExpression> conjuncts = new ArrayList<IndexedClassExpression>(
+				elkObjectUnionOf.getClassExpressions().size());
+		for (ElkClassExpression conjunct : elkObjectUnionOf
+				.getClassExpressions()) {
+			conjuncts.add(conjunct.accept(this));
+		}
+		return indexedClassFilter_.visit(new IndexedObjectUnionOf(conjuncts));
 	}
 
 	@Override
@@ -126,7 +221,7 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 		IndexedDataProperty idp = (IndexedDataProperty) elkDataHasValue
 				.getProperty().accept(this);
 		ValueSpace vs = elkDataHasValue.getFiller().accept(datatypeHandler);
-		return indexedClassFilter.visit(new IndexedDatatypeExpression(idp, vs));
+		return indexedClassFilter_.visit(new IndexedDatatypeExpression(idp, vs));
 	}
 
 	@Override
@@ -137,7 +232,7 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 		if (exps != null && exps.size() == 1) {
 			IndexedDataProperty idp = (IndexedDataProperty) exps.get(0).accept(this);
 			ValueSpace vs = elkDataSomeValuesFrom.getDataRange().accept(datatypeHandler);
-			return indexedClassFilter.visit(new IndexedDatatypeExpression(idp, vs));
+			return indexedClassFilter_.visit(new IndexedDatatypeExpression(idp, vs));
 		} else {
 			throw new ElkIndexingException(
 					ElkDataSomeValuesFrom.class.getSimpleName()
@@ -147,13 +242,13 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 
 	@Override
 	public IndexedPropertyChain visit(ElkObjectProperty elkObjectProperty) {
-		return indexedPropertyFilter.visit(new IndexedObjectProperty(
+		return indexedPropertyFilter_.visit(new IndexedObjectProperty(
 				elkObjectProperty));
 	}
 
 	@Override
 	public IndexedDataProperty visit(ElkDataProperty elkDataProperty) {
-		return indexedPropertyFilter.visit(new IndexedDataProperty(elkDataProperty));
+		return indexedPropertyFilter_.visit(new IndexedDataProperty(elkDataProperty));
 	}
 
 	/*
@@ -184,7 +279,7 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 				continue;
 			}
 
-			result = indexedPropertyFilter
+			result = indexedPropertyFilter_
 					.visit(new IndexedBinaryPropertyChain(iop, result));
 		}
 
@@ -193,7 +288,7 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 
 	@Override
 	public IndexedIndividual visit(ElkNamedIndividual elkNamedIndividual) {
-		return (IndexedIndividual) indexedClassFilter
+		return (IndexedIndividual) indexedClassFilter_
 				.visit(new IndexedIndividual(elkNamedIndividual));
 	}
 }

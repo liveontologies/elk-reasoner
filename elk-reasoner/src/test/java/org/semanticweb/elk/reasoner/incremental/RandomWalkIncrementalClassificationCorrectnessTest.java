@@ -33,7 +33,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.ClassTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
@@ -52,7 +52,8 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  * 
  */
 @RunWith(PolySuite.class)
-public class RandomWalkIncrementalClassificationCorrectnessTest extends BaseRandomWalkIncrementalCorrectnessTest {
+public class RandomWalkIncrementalClassificationCorrectnessTest extends
+		BaseRandomWalkIncrementalCorrectnessTest {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = Logger
@@ -68,16 +69,18 @@ public class RandomWalkIncrementalClassificationCorrectnessTest extends BaseRand
 	@Override
 	protected RandomWalkIncrementalClassificationRunner<ElkAxiom> getRandomWalkRunner(
 			int rounds, int iterations) {
-		return new RandomWalkIncrementalClassificationRunner<ElkAxiom>(rounds, iterations, new ElkAPIBasedIO());
+		return new RandomWalkIncrementalClassificationRunner<ElkAxiom>(rounds,
+				iterations, new ElkAPIBasedIO());
 	}
 
 	@Override
-	protected OntologyLoader getAxiomTrackingLoader(OntologyLoader fileLoader,
+	protected AxiomLoader getAxiomTrackingLoader(AxiomLoader fileLoader,
 			OnOffVector<ElkAxiom> changingAxioms, List<ElkAxiom> staticAxioms) {
-		//return new ClassAxiomTrackingOntologyLoader(fileLoader, changingAxioms, staticAxioms);
+		// return new ClassAxiomTrackingOntologyLoader(fileLoader,
+		// changingAxioms, staticAxioms);
 		return new AllAxiomTrackingOntologyLoader(fileLoader, changingAxioms);
-	}	
-	
+	}
+
 	@Config
 	public static Configuration getConfig() throws URISyntaxException,
 			IOException {
@@ -97,7 +100,5 @@ public class RandomWalkIncrementalClassificationCorrectnessTest extends BaseRand
 							}
 						});
 	}
-
-
 
 }

@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -40,6 +41,10 @@ public class DecompositionRuleApplicationCounter {
 	 */
 	int countIndexedClassDecompositionRule;
 	/**
+	 * counter for {@link IndexedObjectComplementOf}
+	 */
+	int countIndexedObjectComplementOfDecompositionRule;
+	/**
 	 * counter for {@link IndexedObjectIntersectionOf}
 	 */
 	int countIndexedObjectIntersectionOfDecompositionRule;
@@ -57,6 +62,7 @@ public class DecompositionRuleApplicationCounter {
 	 */
 	public void reset() {
 		countIndexedClassDecompositionRule = 0;
+		countIndexedObjectComplementOfDecompositionRule = 0;
 		countIndexedObjectIntersectionOfDecompositionRule = 0;
 		countIndexedObjectSomeValuesFromDecompositionRule = 0;
 		countIndexedDatatypeExpressionDecompositionRule = 0;
@@ -69,14 +75,15 @@ public class DecompositionRuleApplicationCounter {
 	 */
 	public synchronized void add(DecompositionRuleApplicationCounter counter) {
 		countIndexedClassDecompositionRule += counter.countIndexedClassDecompositionRule;
+		countIndexedObjectComplementOfDecompositionRule += counter.countIndexedObjectComplementOfDecompositionRule;
 		countIndexedObjectIntersectionOfDecompositionRule += counter.countIndexedObjectIntersectionOfDecompositionRule;
 		countIndexedObjectSomeValuesFromDecompositionRule += counter.countIndexedObjectSomeValuesFromDecompositionRule;
 		countIndexedDatatypeExpressionDecompositionRule += counter.countIndexedDatatypeExpressionDecompositionRule;
 	}
-	
+
 	public long getTotalRuleAppCount() {
-		return countIndexedClassDecompositionRule + countIndexedObjectIntersectionOfDecompositionRule
-				+ countIndexedObjectSomeValuesFromDecompositionRule + countIndexedDatatypeExpressionDecompositionRule;
+		return countIndexedClassDecompositionRule + countIndexedObjectIntersectionOfDecompositionRule + countIndexedObjectComplementOfDecompositionRule
+			+ countIndexedObjectSomeValuesFromDecompositionRule + countIndexedDatatypeExpressionDecompositionRule;
 	}
 
 }

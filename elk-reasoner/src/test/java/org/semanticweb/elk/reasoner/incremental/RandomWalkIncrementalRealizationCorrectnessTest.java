@@ -30,7 +30,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
@@ -66,7 +66,7 @@ public class RandomWalkIncrementalRealizationCorrectnessTest extends
 	}
 
 	@Override
-	protected OntologyLoader getAxiomTrackingLoader(OntologyLoader fileLoader,
+	protected AxiomLoader getAxiomTrackingLoader(AxiomLoader fileLoader,
 			OnOffVector<ElkAxiom> changingAxioms, List<ElkAxiom> staticAxioms) {
 		//return new ClassAndIndividualAxiomTrackingOntologyLoader(fileLoader, changingAxioms, staticAxioms);
 		return new AllAxiomTrackingOntologyLoader(fileLoader, changingAxioms);

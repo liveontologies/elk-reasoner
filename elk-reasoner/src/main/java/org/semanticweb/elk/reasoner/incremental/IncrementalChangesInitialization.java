@@ -41,8 +41,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
@@ -389,7 +391,6 @@ class ContextInitializationFactory
 			this.context = context;
 		}
 		
-		
 		@Override
 		public Boolean visit(IndexedClass param) {
 			return false;
@@ -427,6 +428,16 @@ class ContextInitializationFactory
 				}
 			}
 			return true;
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectComplementOf element) {
+			return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectUnionOf element) {
+			return false;
 		}
 	}
 	

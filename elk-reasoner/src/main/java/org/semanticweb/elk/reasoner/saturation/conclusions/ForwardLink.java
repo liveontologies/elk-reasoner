@@ -163,6 +163,7 @@ public class ForwardLink extends AbstractConclusion {
 					3);
 		}
 
+		// TODO: hide this method
 		public Multimap<IndexedPropertyChain, Context> getForwardLinksByObjectProperty() {
 			return forwardLinksByObjectProperty_;
 		}

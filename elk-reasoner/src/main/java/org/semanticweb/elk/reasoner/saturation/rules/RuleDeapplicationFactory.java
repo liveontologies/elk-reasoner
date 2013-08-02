@@ -68,37 +68,34 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	public class DeapplicationEngine extends RuleApplicationFactory.BaseEngine {
 
 		private final BasicSaturationStateWriter writer_;
-		
+
 		protected DeapplicationEngine(ContextModificationListener listener) {
 			super(new SaturationStatistics());
-			
-			writer_ = saturationState.getWriter(
-					SaturationUtils.addStatsToContextModificationListener(listener,
+
+			writer_ = saturationState.getWriter(SaturationUtils
+					.addStatsToContextModificationListener(listener,
 							localStatistics.getContextStatistics()),
-							SaturationUtils.addStatsToConclusionVisitor(localStatistics
+					SaturationUtils.addStatsToConclusionVisitor(localStatistics
 							.getConclusionStatistics()));
 		}
 
 		@Override
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
-				BasicSaturationStateWriter saturationStateWriter,
-				SaturationStatistics localStatistics) {
-			
+				BasicSaturationStateWriter saturationStateWriter) {
+
 			return new CombinedConclusionVisitor(
 					new CombinedConclusionVisitor(
 							new ConclusionOccurranceCheckingVisitor(),
-							getUsedConclusionsCountingVisitor(
-									new ConclusionDeapplicationVisitor(
-											saturationStateWriter,
-											SaturationUtils
-													.getStatsAwareCompositionRuleAppVisitor(localStatistics
-															.getRuleStatistics()),
-											SaturationUtils
-													.getStatsAwareDecompositionRuleAppVisitor(
-															getDecompositionRuleApplicationVisitor(),
-															localStatistics
-																	.getRuleStatistics())),
-									localStatistics)),
+							getUsedConclusionsCountingVisitor(new ConclusionDeapplicationVisitor(
+									saturationStateWriter,
+									SaturationUtils
+											.getStatsAwareCompositionRuleAppVisitor(localStatistics
+													.getRuleStatistics()),
+									SaturationUtils
+											.getStatsAwareDecompositionRuleAppVisitor(
+													getDecompositionRuleApplicationVisitor(),
+													localStatistics
+															.getRuleStatistics())))),
 					new ConclusionDeletionVisitor());
 		}
 
@@ -113,8 +110,10 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		@Override
 		protected DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor() {
-			//this decomposition visitor takes the basic writer which cannot create new contexts
-			return new BackwardDecompositionRuleApplicationVisitor(getSaturationStateWriter());
+			// this decomposition visitor takes the basic writer which cannot
+			// create new contexts
+			return new BackwardDecompositionRuleApplicationVisitor(
+					getSaturationStateWriter());
 		}
 	}
 

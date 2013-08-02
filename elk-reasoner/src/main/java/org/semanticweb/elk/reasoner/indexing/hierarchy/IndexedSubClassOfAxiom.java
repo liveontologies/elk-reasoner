@@ -101,7 +101,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		 * Correctness of axioms deletions requires that
 		 * toldSuperClassExpressions is a List.
 		 */
-		private List<IndexedClassExpression> toldSuperClassExpressions_;
+		private final List<IndexedClassExpression> toldSuperClassExpressions_;
 
 		ThisCompositionRule(ChainableRule<Context> tail) {
 			super(tail);
@@ -120,6 +120,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			toldSuperClassExpressions_.add(ice);
 		}
 
+		// TODO: hide this method
 		public Collection<IndexedClassExpression> getToldSuperclasses() {
 			return toldSuperClassExpressions_;
 		}

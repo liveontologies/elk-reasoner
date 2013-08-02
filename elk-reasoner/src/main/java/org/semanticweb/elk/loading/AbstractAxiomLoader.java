@@ -1,11 +1,11 @@
+package org.semanticweb.elk.loading;
 /*
  * #%L
  * ELK Reasoner
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,27 +20,26 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.loading;
 
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * An {@link ChangesLoader} for no changes
+ * A skeletal implementation of the {@link AxiomLoader} that minimizes the
+ * effort to implement the interface.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class EmptyChangesLoader implements ChangesLoader {
+public abstract class AbstractAxiomLoader implements AxiomLoader {
 
 	@Override
-	public Loader getLoader(ElkAxiomProcessor axiomInserter,
-			ElkAxiomProcessor axiomDeleter) {
-		return new EmptyLoader();
-	}
+	public abstract void load(ElkAxiomProcessor axiomInserter,
+			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException;
 
 	@Override
-	public void registerChangeListener(AxiomChangeListener listener) {
-		// does nothing
-	}
+	public abstract boolean isLoadingFinished();
 
+	@Override
+	public void dispose() {
+	}
 }

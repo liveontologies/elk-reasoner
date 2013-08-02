@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,36 +27,38 @@ package org.semanticweb.elk.reasoner.incremental;
 
 import java.util.List;
 
-import org.semanticweb.elk.loading.Loader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
+import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.interfaces.ElkAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * An extension of {@link ClassAxiomTrackingOntologyLoader} which also tracks
- * ABox axioms as changing.
+ * An extension of {@link ClassAxiomTrackingLoader} which also tracks ABox
+ * axioms as changing.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ClassAndIndividualAxiomTrackingOntologyLoader extends
-		ClassAxiomTrackingOntologyLoader {
+public class ClassAndIndividualAxiomTrackingLoader extends
+		ClassAxiomTrackingLoader {
 
-	ClassAndIndividualAxiomTrackingOntologyLoader(OntologyLoader loader) {
+	ClassAndIndividualAxiomTrackingLoader(AxiomLoader loader) {
 		super(loader);
 	}
 
-	public ClassAndIndividualAxiomTrackingOntologyLoader(OntologyLoader loader,
+	public ClassAndIndividualAxiomTrackingLoader(AxiomLoader loader,
 			OnOffVector<ElkAxiom> trackedAxioms, List<ElkAxiom> untrackedAxioms) {
 		super(loader, trackedAxioms, untrackedAxioms);
 	}
 
 	@Override
-	public Loader getLoader(final ElkAxiomProcessor axiomInserter) {
-		final ElkAxiomProcessor processor = new ElkAxiomProcessor() {
+	public void load(final ElkAxiomProcessor axiomInserter,
+			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
+
+		final ElkAxiomProcessor wrappedAxiomInserter = new ElkAxiomProcessor() {
 
 			@Override
 			public void visit(ElkAxiom elkAxiom) {
@@ -69,7 +72,7 @@ public class ClassAndIndividualAxiomTrackingOntologyLoader extends
 			}
 		};
 
-		return loader_.getLoader(processor);
-	}
+		loader_.load(wrappedAxiomInserter, axiomDeleter);
 
+	}
 }

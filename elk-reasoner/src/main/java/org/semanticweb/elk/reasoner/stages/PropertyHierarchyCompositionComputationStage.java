@@ -67,6 +67,7 @@ public class PropertyHierarchyCompositionComputationStage extends
 		if (!super.postExecute())
 			return false;
 		computation_ = null;
+		reasoner.propertyHierarchyUpToDate_ = true;
 		return true;
 	}
 

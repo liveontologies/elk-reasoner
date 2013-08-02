@@ -36,8 +36,12 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.ContextRootIn
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass.OwlThingContextInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
@@ -107,7 +111,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		void checkNew(IndexedClassExpression ice) {
 			if (add(ice)) {
-				LOGGER_.error("Unexpected reachable class expression: " + ice + ", " + ice.printOccurrenceNumbers());
+				LOGGER_.error("Unexpected reachable class expression: " + ice
+						+ ", " + ice.printOccurrenceNumbers());
 			}
 		}
 
@@ -251,7 +256,15 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(
-				org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
+				IndexedObjectComplementOf.ThisCompositionRule thisCompositionRule,
+				BasicSaturationStateWriter writer, Context context) {
+			iceValidator_.checkNew(thisCompositionRule.getNegation());
+
+		}
+
+		@Override
+		public void visit(
+				IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
 				BasicSaturationStateWriter writer, Context context) {
 			for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : thisCompositionRule
 					.getConjunctionsByConjunct().entrySet()) {
@@ -262,7 +275,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(
-				org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom.ThisCompositionRule thisCompositionRule,
+				IndexedSubClassOfAxiom.ThisCompositionRule thisCompositionRule,
 				BasicSaturationStateWriter writer, Context context) {
 			for (IndexedClassExpression ice : thisCompositionRule
 					.getToldSuperclasses()) {
@@ -273,10 +286,20 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(
-				org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom.ThisCompositionRule thisCompositionRule,
+				IndexedObjectSomeValuesFrom.ThisCompositionRule thisCompositionRule,
 				BasicSaturationStateWriter writer, Context context) {
 			for (IndexedClassExpression ice : thisCompositionRule
 					.getNegativeExistentials()) {
+				iceValidator_.checkNew(ice);
+			}
+		}
+
+		@Override
+		public void visit(
+				IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
+				BasicSaturationStateWriter writer, Context context) {
+			for (IndexedClassExpression ice : thisCompositionRule
+					.getDisjunctions()) {
 				iceValidator_.checkNew(ice);
 			}
 		}

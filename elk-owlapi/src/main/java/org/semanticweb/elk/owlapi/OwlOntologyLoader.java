@@ -27,8 +27,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.Loader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AbstractAxiomLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
+import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
@@ -37,13 +38,14 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
 
 /**
- * A {@link Loader} that loads a given {@link OWLOntology} through
- * {@link OwlConverter} into an {@link ElkAxiomProcessor}.
+ * An {@link AxiomLoader} that loads a given {@link OWLOntology} through
+ * {@link OwlConverter}.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class OwlOntologyLoader implements OntologyLoader {
+public class OwlOntologyLoader extends AbstractAxiomLoader implements
+		AxiomLoader {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
@@ -57,11 +59,11 @@ public class OwlOntologyLoader implements OntologyLoader {
 	/**
 	 * the ontology to be loaded
 	 */
-	private final OWLOntology owlOntology;
+	private final OWLOntology owlOntology_;
 	/**
 	 * the monitor to report progress of operations
 	 */
-	private final ProgressMonitor progressMonitor;
+	private final ProgressMonitor progressMonitor_;
 	/**
 	 * the status of the progress monitor
 	 */
@@ -70,110 +72,107 @@ public class OwlOntologyLoader implements OntologyLoader {
 	/**
 	 * the state of the iterator over ontologies in the import closure
 	 */
-	private Iterator<OWLOntology> importsClosureIterator;
+	private Iterator<OWLOntology> importsClosureIterator_;
 	/**
 	 * the number of ontologies in the import closure
 	 */
-	private int importsClosureCount;
+	private int importsClosureCount_;
 	/**
 	 * the current number of processed import closures
 	 */
-	private int importsClosureProcessed;
+	private int importsClosureProcessed_;
 
 	/**
 	 * the state of the iterator over axioms of an ontology
 	 */
-	private Iterator<OWLAxiom> axiomsIterator;
+	private Iterator<OWLAxiom> axiomsIterator_;
 	/**
 	 * the total number of axioms to iterate over
 	 */
-	private int axiomsCount;
+	private int axiomsCount_;
 	/**
 	 * the current number of processed axioms
 	 */
-	private int axiomsProcessed;
+	private int axiomsProcessed_;
 
 	public OwlOntologyLoader(OWLOntology owlOntology,
 			ProgressMonitor progressMonitor) {
-		this.owlOntology = owlOntology;
-		this.progressMonitor = progressMonitor;
+		this.owlOntology_ = owlOntology;
+		this.progressMonitor_ = progressMonitor;
 		initImportsClosure();
 	}
 
 	@Override
-	public Loader getLoader(final ElkAxiomProcessor axiomLoader) {
-		return new Loader() {
-			@Override
-			public void load() {
-				progressMonitor.start(status);
+	public void load(ElkAxiomProcessor axiomInserter,
+			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
+		progressMonitor_.start(status);
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(status);
+		for (;;) {
+			if (Thread.currentThread().isInterrupted())
+				break;
+			if (!axiomsIterator_.hasNext()) {
+				importsClosureProcessed_++;
+				if (!importsClosureIterator_.hasNext())
+					break;
+				progressMonitor_.finish();
+				updateStatus();
+				progressMonitor_.start(status);
 				if (LOGGER_.isTraceEnabled())
 					LOGGER_.trace(status);
-				for (;;) {
-					if (Thread.currentThread().isInterrupted())
-						break;
-					if (!axiomsIterator.hasNext()) {
-						importsClosureProcessed++;
-						if (!importsClosureIterator.hasNext())
-							break;
-						progressMonitor.finish();
-						updateStatus();
-						progressMonitor.start(status);
-						if (LOGGER_.isTraceEnabled())
-							LOGGER_.trace(status);
-						initAxioms(importsClosureIterator.next());
-						continue;
-					}
-					OWLAxiom axiom = axiomsIterator.next();
-					if (LOGGER_.isTraceEnabled())
-						LOGGER_.trace("loading " + axiom);
-					if (OWL_CONVERTER_.isRelevantAxiom(axiom))
-						axiomLoader.visit(OWL_CONVERTER_.convert(axiom));
-					axiomsProcessed++;
-					progressMonitor.report(axiomsProcessed, axiomsCount);
-				}
-				progressMonitor.finish();
+				initAxioms(importsClosureIterator_.next());
+				continue;
 			}
+			OWLAxiom axiom = axiomsIterator_.next();
+			if (LOGGER_.isTraceEnabled())
+				LOGGER_.trace("loading " + axiom);
+			if (OWL_CONVERTER_.isRelevantAxiom(axiom))
+				axiomInserter.visit(OWL_CONVERTER_.convert(axiom));
+			axiomsProcessed_++;
+			progressMonitor_.report(axiomsProcessed_, axiomsCount_);
+		}
+		progressMonitor_.finish();
+	}
 
-			@Override
-			public void dispose() {
-				OwlOntologyLoader.this.dispose();
-			}
-		};
+	@Override
+	public boolean isLoadingFinished() {
+		return !axiomsIterator_.hasNext() && !importsClosureIterator_.hasNext();
+	}
+
+	@Override
+	public void dispose() {
+		importsClosureIterator_ = null;
+		importsClosureProcessed_ = 0;
+		axiomsIterator_ = null;
+		axiomsProcessed_ = 0;
 	}
 
 	private void initImportsClosure() {
-		Set<OWLOntology> importsClosure = owlOntology.getImportsClosure();
-		importsClosureIterator = importsClosure.iterator();
-		importsClosureCount = importsClosure.size();
-		importsClosureProcessed = 0;
+		Set<OWLOntology> importsClosure = owlOntology_.getImportsClosure();
+		importsClosureIterator_ = importsClosure.iterator();
+		importsClosureCount_ = importsClosure.size();
+		importsClosureProcessed_ = 0;
 		updateStatus();
-		if (importsClosureIterator.hasNext())
-			initAxioms(importsClosureIterator.next());
+		if (importsClosureIterator_.hasNext())
+			initAxioms(importsClosureIterator_.next());
 		else
-			axiomsIterator = Collections.<OWLAxiom> emptySet().iterator();
+			axiomsIterator_ = Collections.<OWLAxiom> emptySet().iterator();
 	}
 
 	private void initAxioms(OWLOntology ontology) {
 		Set<OWLAxiom> axioms = ontology.getAxioms();
-		axiomsIterator = axioms.iterator();
-		axiomsCount = axioms.size();
-		axiomsProcessed = 0;
+		axiomsIterator_ = axioms.iterator();
+		axiomsCount_ = axioms.size();
+		axiomsProcessed_ = 0;
 	}
 
 	private void updateStatus() {
-		if (importsClosureCount == 1)
+		if (importsClosureCount_ == 1)
 			status = ReasonerProgressMonitor.LOADING;
 		else
 			status = ReasonerProgressMonitor.LOADING + " "
-					+ (importsClosureProcessed + 1) + " of "
-					+ importsClosureCount;
-	}
-
-	private void dispose() {
-		importsClosureIterator = null;
-		importsClosureProcessed = 0;
-		axiomsIterator = null;
-		axiomsProcessed = 0;
+					+ (importsClosureProcessed_ + 1) + " of "
+					+ importsClosureCount_;
 	}
 
 }

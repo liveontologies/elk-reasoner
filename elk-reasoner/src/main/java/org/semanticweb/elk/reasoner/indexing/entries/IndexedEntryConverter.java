@@ -30,9 +30,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
@@ -68,6 +70,13 @@ public class IndexedEntryConverter<T>
 	}
 
 	@Override
+	public IndexedClassExpressionEntry<T, IndexedObjectComplementOf> visit(
+			IndexedObjectComplementOf element) {
+		return new IndexedObjectComplementOfEntry<T, IndexedObjectComplementOf>(
+				element);
+	}
+	
+	@Override
 	public IndexedClassExpressionEntry<T, IndexedObjectIntersectionOf> visit(
 			IndexedObjectIntersectionOf element) {
 		return new IndexedObjectIntersectionOfEntry<T, IndexedObjectIntersectionOf>(
@@ -92,6 +101,12 @@ public class IndexedEntryConverter<T>
 			IndexedObjectSomeValuesFrom element) {
 		return new IndexedObjectSomeValuesFromEntry<T, IndexedObjectSomeValuesFrom>(
 				element);
+	}
+
+	@Override
+	public KeyEntry<T, ? extends IndexedClassExpression> visit(
+			IndexedObjectUnionOf element) {
+		return new IndexedObjectUnionOfEntry<T, IndexedObjectUnionOf>(element);
 	}
 
 	@Override

@@ -31,8 +31,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import org.semanticweb.elk.io.FileUtils;
-import org.semanticweb.elk.loading.EmptyChangesLoader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -125,11 +124,10 @@ public class ComputeTaxonomyHashCodes {
 
 			System.err.println(ontFile.getName());
 
-			OntologyLoader loader = new Owl2StreamLoader(
+			AxiomLoader loader = new Owl2StreamLoader(
 					new Owl2FunctionalStyleParserFactory(), ontFile);
 			Reasoner reasoner = reasonerFactory.createReasoner(loader,
 					new FailingOnInterruptStageExecutor(), configuraion);
-			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
 
 			int hash = hasher.hash(reasoner);
 			// create the expected result file

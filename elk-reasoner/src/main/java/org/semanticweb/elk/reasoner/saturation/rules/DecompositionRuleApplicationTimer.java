@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -20,9 +21,9 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * limitations under the License.
  * #L%
  */
-
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 
@@ -32,6 +33,10 @@ public class DecompositionRuleApplicationTimer {
 	 * timer for {@link IndexedClass}
 	 */
 	int timeIndexedClass;
+	/**
+	 * timer for {@link IndexedObjectComplementOf}
+	 */
+	int timeIndexedObjectComplementOf;
 	/**
 	 * timer for {@link IndexedObjectIntersectionOf}
 	 */
@@ -50,6 +55,7 @@ public class DecompositionRuleApplicationTimer {
 	 */
 	public void reset() {
 		timeIndexedClass = 0;
+		timeIndexedObjectComplementOf = 0;
 		timeIndexedObjectIntersectionOf = 0;
 		timeIndexedObjectSomeValuesFrom = 0;
 		timeIndexedDatatypeExpression = 0;
@@ -57,19 +63,19 @@ public class DecompositionRuleApplicationTimer {
 
 	/**
 	 * Add the values the corresponding values of the given timer
-	 * 
+	 *
 	 * @param timer
 	 */
 	public synchronized void add(DecompositionRuleApplicationTimer timer) {
 		timeIndexedClass += timer.timeIndexedClass;
+		timeIndexedObjectComplementOf += timer.timeIndexedObjectComplementOf;
 		timeIndexedObjectIntersectionOf += timer.timeIndexedObjectIntersectionOf;
 		timeIndexedObjectSomeValuesFrom += timer.timeIndexedObjectSomeValuesFrom;
 		timeIndexedDatatypeExpression += timer.timeIndexedDatatypeExpression;
 	}
 
 	public int getTotalRuleAppTime() {
-		return timeIndexedClass + timeIndexedObjectIntersectionOf
-				+ timeIndexedObjectSomeValuesFrom + timeIndexedDatatypeExpression;
+		return timeIndexedClass + timeIndexedObjectIntersectionOf + timeIndexedObjectComplementOf
+			+ timeIndexedObjectSomeValuesFrom + timeIndexedDatatypeExpression;
 	}
-
 }

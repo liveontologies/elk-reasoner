@@ -165,6 +165,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			return NAME;
 		}
 
+		// TODO: hide this method
 		public Map<IndexedClassExpression, IndexedObjectIntersectionOf> getConjunctionsByConjunct() {
 			return conjunctionsByConjunct_;
 		}

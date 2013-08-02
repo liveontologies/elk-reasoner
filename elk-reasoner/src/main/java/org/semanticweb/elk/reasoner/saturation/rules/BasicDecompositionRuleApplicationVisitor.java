@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
@@ -43,11 +44,11 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 
 	protected static final Logger LOGGER_ = Logger
 			.getLogger(BasicDecompositionRuleApplicationVisitor.class);
-	
+
 	@Override
 	public void visit(IndexedClass ice, Context context) {
 		BasicSaturationStateWriter writer = getSaturationStateWriter();
-		
+
 		if (ice == getSaturationStateWriter().getOwlNothing()) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Producing contradiction for "
@@ -63,9 +64,16 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 	}
 
 	@Override
+	public void visit(IndexedObjectComplementOf ice, Context context) {
+		BasicSaturationStateWriter writer = getSaturationStateWriter();
+		if (context.getSubsumers().contains(ice.getNegated()))
+			writer.produce(context, Contradiction.getInstance());
+	}
+
+	@Override
 	public void visit(IndexedObjectIntersectionOf ice, Context context) {
 		BasicSaturationStateWriter writer = getSaturationStateWriter();
-		
+
 		writer.produce(context, new PositiveSubsumer(ice.getFirstConjunct()));
 		writer.produce(context, new PositiveSubsumer(ice.getSecondConjunct()));
 	}
