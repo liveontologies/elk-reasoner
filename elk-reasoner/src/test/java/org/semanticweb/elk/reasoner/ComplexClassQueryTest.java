@@ -29,9 +29,11 @@ import static org.junit.Assert.assertTrue;
 import java.util.Set;
 
 import org.junit.Test;
+import org.semanticweb.elk.loading.EmptyAxiomLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
@@ -130,5 +132,20 @@ public class ComplexClassQueryTest {
 			assertTrue(node.getMembers().contains(A));
 		}
 		
+	}
+	
+	@Test
+	public void testEquivalentClasses() throws ElkException {
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
+				new EmptyAxiomLoader(), new SimpleStageExecutor());
+
+		// empty ontology, query for conjunction
+		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
+		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
+		ElkClassExpression queryExpression = objectFactory
+				.getObjectIntersectionOf(A, B);
+		assertEquals(0, reasoner.getEquivalentClasses(queryExpression));
+		// the following has reproduced Issue 23:
+		assertEquals(0, reasoner.getEquivalentClasses(queryExpression));
 	}
 }
