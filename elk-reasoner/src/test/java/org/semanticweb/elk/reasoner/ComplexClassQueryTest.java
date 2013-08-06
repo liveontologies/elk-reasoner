@@ -117,23 +117,23 @@ public class ComplexClassQueryTest {
 		loader.add(objectFactory.getSubClassOfAxiom(A, B)).add(
 				(objectFactory.getSubClassOfAxiom(B, C)));
 		reasoner.getTaxonomy();
-		
+
 		Set<? extends Node<ElkClass>> superClasses = reasoner.getSuperClasses(
 				objectFactory.getObjectIntersectionOf(B, C), true);
 		assertEquals(1, superClasses.size());
 		for (Node<ElkClass> node : superClasses) {
 			assertTrue(node.getMembers().contains(C));
 		}
-		
+
 		Set<? extends Node<ElkClass>> subClasses = reasoner.getSubClasses(
 				objectFactory.getObjectIntersectionOf(B, C), true);
 		assertEquals(1, subClasses.size());
 		for (Node<ElkClass> node : subClasses) {
 			assertTrue(node.getMembers().contains(A));
 		}
-		
+
 	}
-	
+
 	@Test
 	public void testEquivalentClasses() throws ElkException {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
@@ -144,8 +144,10 @@ public class ComplexClassQueryTest {
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
 		ElkClassExpression queryExpression = objectFactory
 				.getObjectIntersectionOf(A, B);
-		assertEquals(0, reasoner.getEquivalentClasses(queryExpression));
+		assertEquals(0, reasoner.getEquivalentClasses(queryExpression)
+				.getMembers().size());
 		// the following has reproduced Issue 23:
-		assertEquals(0, reasoner.getEquivalentClasses(queryExpression));
+		assertEquals(0, reasoner.getEquivalentClasses(queryExpression)
+				.getMembers().size());
 	}
 }
