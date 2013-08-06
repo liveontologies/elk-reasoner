@@ -169,24 +169,27 @@ class ContextInitializationFactory
 				}
 				// apply all changed rules for indexed class expressions
 				Set<IndexedClassExpression> subsumers = context.getSubsumers();
-				if (subsumers.size() > indexChangesKeys_.length >> 2) {
-					// iterate over changes, check subsumers
-					for (int j = 0; j < indexChangesKeys_.length; j++) {
-						IndexedClassExpression changedICE = indexChangesKeys_[j];
-						if (subsumers.contains(changedICE)) {
+				if (datatypeChanges_.isEmpty()) {
+					if (subsumers.size() > indexChangesKeys_.length >> 2) {
+						// iterate over changes, check subsumers
+						for (int j = 0; j < indexChangesKeys_.length; j++) {
+							IndexedClassExpression changedICE = indexChangesKeys_[j];
+							if (subsumers.contains(changedICE)) {
+								applyLocalRules(context, changedICE);
+							}
+						}
+					} else {
+						// iterate over subsumers, check changes
+						for (IndexedClassExpression changedICE : subsumers) {
 							applyLocalRules(context, changedICE);
 						}
 					}
 				} else {
-					// iterate over subsumers, check changes
-					for (IndexedClassExpression changedICE : subsumers) {
-						applyLocalRules(context, changedICE);
+					datatypeChangeApplicationVisitor_.setContext(context);
+					for (IndexedClassExpression subsumer : subsumers) {
+						applyLocalRules(context, subsumer);
+						subsumer.accept(datatypeChangeApplicationVisitor_);
 					}
-				}
-				// iterate over all subsumers, apply relevant datatype changes
-				datatypeChangeApplicationVisitor_.setContext(context);
-				for (IndexedClassExpression subsumer : subsumers) {
-					subsumer.accept(datatypeChangeApplicationVisitor_);
 				}
 			}
 
