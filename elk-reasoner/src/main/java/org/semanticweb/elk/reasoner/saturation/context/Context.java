@@ -117,6 +117,8 @@ public interface Context {
 	public boolean removeBackwardLink(BackwardLink link);
 
 	public boolean containsBackwardLink(BackwardLink link);
+	
+	public boolean containsDatatypeExpressions();
 
 	/**
 	 * Adds the given {@link IndexedClassExpression} to the subsumers of the

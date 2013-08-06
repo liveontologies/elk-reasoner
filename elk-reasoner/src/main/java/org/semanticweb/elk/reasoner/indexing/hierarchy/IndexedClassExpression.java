@@ -227,6 +227,10 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 			}
 		};
 	}
+	
+	public boolean isDatatypeExpression() {
+		return false;
+	}
 
 	@Override
 	public <O> O accept(IndexedObjectVisitor<O> visitor) {

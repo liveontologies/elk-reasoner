@@ -59,6 +59,11 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 	}
 
 	@Override
+	public boolean isDatatypeExpression() {
+		return true;
+	}
+
+	@Override
 	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

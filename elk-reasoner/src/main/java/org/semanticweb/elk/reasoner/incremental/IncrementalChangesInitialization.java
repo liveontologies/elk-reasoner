@@ -185,10 +185,16 @@ class ContextInitializationFactory
 						}
 					}
 				} else {
-					datatypeChangeApplicationVisitor_.setContext(context);
-					for (IndexedClassExpression subsumer : subsumers) {
-						applyLocalRules(context, subsumer);
-						subsumer.accept(datatypeChangeApplicationVisitor_);
+					if (context.containsDatatypeExpressions()) {
+						datatypeChangeApplicationVisitor_.setContext(context);
+						for (IndexedClassExpression subsumer : subsumers) {
+							applyLocalRules(context, subsumer);
+							subsumer.accept(datatypeChangeApplicationVisitor_);
+						}
+					} else {
+						for (IndexedClassExpression subsumer : subsumers) {
+							applyLocalRules(context, subsumer);
+						}
 					}
 				}
 			}

@@ -104,6 +104,8 @@ public class ContextImpl implements Context {
 	 * {@code true} if {@code owl:Nothing} is stored in {@link #subsumers_}
 	 */
 	protected volatile boolean isInconsistent = false;
+	
+	private int datatypeExpressionsCnt = 0;
 
 	/**
 	 * Construct a new {@link Context} for the given root
@@ -141,7 +143,11 @@ public class ContextImpl implements Context {
 
 	@Override
 	public boolean addSubsumer(IndexedClassExpression expression) {
-		return subsumers_.add(expression);
+		boolean added = subsumers_.add(expression);
+		if (expression.isDatatypeExpression() && added) {
+			datatypeExpressionsCnt++;
+		}
+		return added;
 	}
 
 	@Override
@@ -151,7 +157,11 @@ public class ContextImpl implements Context {
 
 	@Override
 	public boolean removeSubsumer(IndexedClassExpression expression) {
-		return subsumers_.remove(expression);
+		boolean removed = subsumers_.remove(expression);
+		if (expression.isDatatypeExpression() && removed) {
+			datatypeExpressionsCnt--;
+		}
+		return removed;
 	}
 
 	@Override
@@ -301,6 +311,11 @@ public class ContextImpl implements Context {
 	@Override
 	public ModifiableLinkRule<BackwardLink> getBackwardLinkRuleHead() {
 		return backwardLinkRules_;
+	}
+	
+	@Override
+	public boolean containsDatatypeExpressions() {
+		return datatypeExpressionsCnt > 0;
 	}
 
 	@Override
