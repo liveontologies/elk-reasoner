@@ -259,14 +259,13 @@ public class Reasoner extends AbstractReasonerState {
 	protected TaxonomyNode<ElkClass> getTaxonomyNode(ElkClass elkClass)
 			throws ElkException {
 		TaxonomyNode<ElkClass> node = getTaxonomy().getNode(elkClass);
-		if (node == null) {
-			if (allowFreshEntities) {
-				node = new FreshTaxonomyNode<ElkClass>(elkClass, getTaxonomy());
-			} else {
-				throw new ElkFreshEntitiesException(elkClass);
-			}
-		}
-		return node;
+		if (node != null)
+			return node;
+		// else
+		if (allowFreshEntities)
+			return new FreshTaxonomyNode<ElkClass>(elkClass, getTaxonomy());
+		// else
+		throw new ElkFreshEntitiesException(elkClass);
 	}
 
 	/**
@@ -281,15 +280,14 @@ public class Reasoner extends AbstractReasonerState {
 			ElkNamedIndividual elkNamedIndividual) throws ElkException {
 		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
 				.getInstanceNode(elkNamedIndividual);
-		if (node == null) {
-			if (allowFreshEntities) {
-				node = new FreshInstanceNode<ElkClass, ElkNamedIndividual>(
-						elkNamedIndividual, getInstanceTaxonomy());
-			} else {
-				throw new ElkFreshEntitiesException(elkNamedIndividual);
-			}
-		}
-		return node;
+		if (node != null)
+			return node;
+		// else
+		if (allowFreshEntities)
+			return new FreshInstanceNode<ElkClass, ElkNamedIndividual>(
+					elkNamedIndividual, getInstanceTaxonomy());
+		// else
+		throw new ElkFreshEntitiesException(elkNamedIndividual);
 	}
 
 	/**
@@ -304,15 +302,14 @@ public class Reasoner extends AbstractReasonerState {
 			ElkClass elkClass) throws ElkException {
 		TypeNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
 				.getTypeNode(elkClass);
-		if (node == null) {
-			if (allowFreshEntities) {
-				node = new FreshTypeNode<ElkClass, ElkNamedIndividual>(
-						elkClass, getInstanceTaxonomy());
-			} else {
-				throw new ElkFreshEntitiesException(elkClass);
-			}
-		}
-		return node;
+		if (node != null)
+			return node;
+		// else
+		if (allowFreshEntities)
+			return new FreshTypeNode<ElkClass, ElkNamedIndividual>(elkClass,
+					getInstanceTaxonomy());
+		// else
+		throw new ElkFreshEntitiesException(elkClass);
 	}
 
 	/**
@@ -367,7 +364,7 @@ public class Reasoner extends AbstractReasonerState {
 				queryClass, classExpression);
 		Node<ElkClass> queryNode = getQueryTaxonomyNode(queryClass,
 				materializedQuery);
-
+		
 		return new SimpleNode<ElkClass>(new LazyCollectionMinusSet<ElkClass>(
 				queryNode.getMembers(), Collections.singleton(queryClass)),
 				Comparators.ELK_CLASS_COMPARATOR);
