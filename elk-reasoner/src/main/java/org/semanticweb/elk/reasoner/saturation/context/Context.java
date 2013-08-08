@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.context;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
@@ -118,7 +120,7 @@ public interface Context {
 
 	public boolean containsBackwardLink(BackwardLink link);
 	
-	public boolean containsDatatypeExpressions();
+	public Multimap<IndexedDataProperty, IndexedDatatypeExpression> getDatatypeExpressions();
 
 	/**
 	 * Adds the given {@link IndexedClassExpression} to the subsumers of the

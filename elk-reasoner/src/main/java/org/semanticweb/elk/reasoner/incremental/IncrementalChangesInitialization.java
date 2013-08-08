@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.incremental;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,16 +36,9 @@ import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.datatypes.index.DatatypeIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -58,6 +51,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
+import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -109,6 +103,7 @@ class ContextInitializationFactory
 	private final Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges_;
 	private final Map<IndexedDataProperty, DatatypeIndex> datatypeChanges_;
 	private final IndexedClassExpression[] indexChangesKeys_;
+	private final Set<IndexedDataProperty> affectedDatatypeProperties_;
 	private final LinkRule<Context> changedGlobalRuleHead_;
 	private AtomicInteger ruleHits = new AtomicInteger(0);
 	private final SaturationStatistics stageStatistics_;
@@ -125,6 +120,7 @@ class ContextInitializationFactory
 		indexChangesKeys_ = new IndexedClassExpression[indexChanges.keySet()
 				.size()];
 		datatypeChanges_ = datatypeChanges;
+		affectedDatatypeProperties_ = datatypeChanges.keySet();
 		indexChanges.keySet().toArray(indexChangesKeys_);
 		changedGlobalRuleHead_ = changedGlobalRuleHead;
 		stageStatistics_ = stageStats;
@@ -146,8 +142,6 @@ class ContextInitializationFactory
 						.getRuleStatistics());
 		final BasicSaturationStateWriter saturationStateWriter = saturationState_
 				.getWriter(ContextModificationListener.DUMMY, conclusionVisitor);
-		final DatatypeChangesApplicationVisitor datatypeChangeApplicationVisitor_ = 
-				new DatatypeChangesApplicationVisitor(datatypeChanges_, saturationStateWriter);
 
 		localStatistics.getConclusionStatistics().startMeasurements();
 
@@ -169,34 +163,51 @@ class ContextInitializationFactory
 				}
 				// apply all changed rules for indexed class expressions
 				Set<IndexedClassExpression> subsumers = context.getSubsumers();
-				if (datatypeChanges_.isEmpty()) {
-					if (subsumers.size() > indexChangesKeys_.length >> 2) {
-						// iterate over changes, check subsumers
-						for (int j = 0; j < indexChangesKeys_.length; j++) {
-							IndexedClassExpression changedICE = indexChangesKeys_[j];
-							if (subsumers.contains(changedICE)) {
-								applyLocalRules(context, changedICE);
-							}
-						}
-					} else {
-						// iterate over subsumers, check changes
-						for (IndexedClassExpression changedICE : subsumers) {
+				if (subsumers.size() > indexChangesKeys_.length >> 2) {
+					// iterate over changes, check subsumers
+					for (int j = 0; j < indexChangesKeys_.length; j++) {
+						IndexedClassExpression changedICE = indexChangesKeys_[j];
+						if (subsumers.contains(changedICE)) {
 							applyLocalRules(context, changedICE);
 						}
 					}
 				} else {
-					if (context.containsDatatypeExpressions()) {
-						datatypeChangeApplicationVisitor_.setContext(context);
-						for (IndexedClassExpression subsumer : subsumers) {
-							applyLocalRules(context, subsumer);
-							subsumer.accept(datatypeChangeApplicationVisitor_);
-						}
-					} else {
-						for (IndexedClassExpression subsumer : subsumers) {
-							applyLocalRules(context, subsumer);
+					for (IndexedClassExpression subsumer : subsumers) {
+						applyLocalRules(context, subsumer);
+					}
+				}
+		
+				//Index of all context subsumers that are dataype expressions (grouped by immidiate datatype property)
+				Multimap<IndexedDataProperty, IndexedDatatypeExpression> dtSubsumers = context.getDatatypeExpressions();
+				
+				//proceed only if there were any changes that envolved datatype expressions and this context contains some
+				if (!datatypeChanges_.isEmpty() && dtSubsumers != null) {
+					
+					//iterate over all datatype properties from the DT-exprs index of this context
+					for (IndexedDataProperty key : dtSubsumers.keySet()) {
+						
+						//for each property perfrom an intersection of its hierarchy 
+						//with a set of properties from changed datatype expressions
+						Iterator<IndexedDataProperty> lsi =
+							new LazySetIntersection<IndexedDataProperty>(
+								key.getSaturated().getSuperProperties(), affectedDatatypeProperties_).iterator();
+						
+						while (lsi.hasNext()) {
+							//get all datatype expression amoung the subsumers of this 
+							//context that could be affected by the chenges
+							Collection<IndexedDatatypeExpression> ides = dtSubsumers.get(key);
+							DatatypeIndex changes = datatypeChanges_.get(lsi.next());
+							
+							//produce conclusions for every subsumption
+							for (IndexedDatatypeExpression ide : ides) {
+								for (IndexedDatatypeExpression expr : changes.getDatatypeExpressionsFor(ide)) {
+									saturationStateWriter.produce(context, new NegativeSubsumer(expr));
+								}
+							}
 						}
 					}
 				}
+				
 			}
 
 			@Override
@@ -382,72 +393,4 @@ class ContextInitializationFactory
 		}
 	}
 
-	private static class DatatypeChangesApplicationVisitor implements IndexedClassExpressionVisitor<Boolean> {
-
-		private final Map<IndexedDataProperty, DatatypeIndex> datatypeChanges_;
-		private final Set<IndexedDataProperty> affectedDatatypeProperties_;
-		private final BasicSaturationStateWriter writer;
-		private Context context;
-
-		public DatatypeChangesApplicationVisitor(Map<IndexedDataProperty, DatatypeIndex> datatypeChanges, 
-				BasicSaturationStateWriter saturationStateWriter) {
-			this.datatypeChanges_ = datatypeChanges;
-			this.affectedDatatypeProperties_ = datatypeChanges.keySet();
-			this.writer = saturationStateWriter;
-		}
-
-		public void setContext(Context context) {
-			this.context = context;
-		}
-		
-		@Override
-		public Boolean visit(IndexedClass param) {
-			return false;
-		}
-
-		@Override
-		public Boolean visit(IndexedIndividual param) {
-			return false;
-		}
-
-		@Override
-		public Boolean visit(IndexedObjectIntersectionOf param) {
-			return false;
-		}
-
-		@Override
-		public Boolean visit(IndexedObjectSomeValuesFrom param) {
-			return false;
-		}
-
-		@Override
-		public Boolean visit(IndexedDatatypeExpression ide) {
-			Set<IndexedDataProperty> ideProperties;
-			if (ide.getProperty().getSaturated() != null) {
-				ideProperties = ide.getProperty().getSaturated().getSuperProperties();
-			} else {
-				ideProperties = Collections.singleton(ide.getProperty());
-			}
-			LazySetIntersection<IndexedDataProperty> lazySetIntersection =
-				new LazySetIntersection<IndexedDataProperty>(ideProperties, affectedDatatypeProperties_);
-			for (IndexedDataProperty affectedDataProperty : lazySetIntersection) {
-				for (IndexedClassExpression expr : 
-					datatypeChanges_.get(affectedDataProperty).getDatatypeExpressionsFor(ide)) {
-					writer.produce(context, new NegativeSubsumer(expr));
-				}
-			}
-			return true;
-		}
-
-		@Override
-		public Boolean visit(IndexedObjectComplementOf element) {
-			return false;
-		}
-
-		@Override
-		public Boolean visit(IndexedObjectUnionOf element) {
-			return false;
-		}
-	}
-	
 }

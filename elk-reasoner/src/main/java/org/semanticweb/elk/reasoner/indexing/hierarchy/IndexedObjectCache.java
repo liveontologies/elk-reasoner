@@ -436,12 +436,12 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		public Boolean visit(IndexedDataProperty element) {
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("Removing " + element);
-
-			if (indexedDataPropertiesLookup.removeEntry(element) != null) {
+			
+//			if (indexedDataPropertiesLookup.removeEntry(element) != null) {
 				indexedDataPropertyCount--;
 				return true;
-			} else
-				return false;
+//			} else
+//				return false;
 		}
 
 		@Override

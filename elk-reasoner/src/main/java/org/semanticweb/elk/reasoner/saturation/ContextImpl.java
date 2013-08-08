@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
@@ -35,6 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
@@ -105,7 +108,10 @@ public class ContextImpl implements Context {
 	 */
 	protected volatile boolean isInconsistent = false;
 	
-	private int datatypeExpressionsCnt = 0;
+	/**
+	 * {@link IndexedDatatypeExpression} that are stored in {@link #subsumers_} of this {@link Context}
+	 */
+	private Multimap<IndexedDataProperty, IndexedDatatypeExpression> datatypeExpressions_ = null;
 
 	/**
 	 * Construct a new {@link Context} for the given root
@@ -145,7 +151,11 @@ public class ContextImpl implements Context {
 	public boolean addSubsumer(IndexedClassExpression expression) {
 		boolean added = subsumers_.add(expression);
 		if (expression.isDatatypeExpression() && added) {
-			datatypeExpressionsCnt++;
+			if (datatypeExpressions_ == null) {
+				datatypeExpressions_ = new HashListMultimap<IndexedDataProperty, IndexedDatatypeExpression>();
+			}
+			IndexedDatatypeExpression ide = (IndexedDatatypeExpression) expression;
+			datatypeExpressions_.add(ide.getProperty(), ide);
 		}
 		return added;
 	}
@@ -159,7 +169,11 @@ public class ContextImpl implements Context {
 	public boolean removeSubsumer(IndexedClassExpression expression) {
 		boolean removed = subsumers_.remove(expression);
 		if (expression.isDatatypeExpression() && removed) {
-			datatypeExpressionsCnt--;
+			IndexedDatatypeExpression ide = (IndexedDatatypeExpression) expression;
+			datatypeExpressions_.add(ide.getProperty(), ide);
+			if (datatypeExpressions_.isEmpty()) {
+				datatypeExpressions_ = null;
+			}
 		}
 		return removed;
 	}
@@ -314,8 +328,8 @@ public class ContextImpl implements Context {
 	}
 	
 	@Override
-	public boolean containsDatatypeExpressions() {
-		return datatypeExpressionsCnt > 0;
+	public Multimap<IndexedDataProperty, IndexedDatatypeExpression> getDatatypeExpressions() {
+		return datatypeExpressions_;
 	}
 
 	@Override
