@@ -16,8 +16,11 @@ will appear in the produced result.
 	</properties>
 	<body>
 	    <release version="${release.version}" date="${buildDate}" description="Current version">
+			<action dev="yevgeny" type="fix" issue="23">
+				Fixed a bug when querying equivalent classes of complex class expressions may include auxiliary classes.				
+			</action>
 			<action dev="yevgeny" type="fix" issue="20">
-			    Fixed a bug when changes were loaded in buffering mode without calling flush()				
+				Fixed a bug when changes were loaded in buffering mode without calling flush().
 			</action>
 	    </release>
 	    <release version="0.4.0" date="2013-07-20" description="Forth public release">
