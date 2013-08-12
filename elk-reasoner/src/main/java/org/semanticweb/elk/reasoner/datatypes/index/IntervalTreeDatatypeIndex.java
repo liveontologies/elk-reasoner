@@ -22,6 +22,7 @@
 package org.semanticweb.elk.reasoner.datatypes.index;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import org.semanticweb.elk.reasoner.datatypes.numbers.AbstractInterval;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
@@ -67,6 +68,9 @@ class IntervalTreeDatatypeIndex implements DatatypeIndex {
 
 	@Override
 	public Collection<IndexedDatatypeExpression> getDatatypeExpressionsFor(IndexedDatatypeExpression ide) {
+		if (tree == null) {
+			return Collections.EMPTY_LIST;
+		}
 		AbstractInterval interval = ide.getValueSpace().accept(intervalSelector);
 		Collection<IndexedDatatypeExpression> ret = tree.searchIncludes(interval);
 		//perform type filtering
@@ -78,7 +82,6 @@ class IntervalTreeDatatypeIndex implements DatatypeIndex {
 			}
 		}
 		return ret;
-
 	}
 
 	@Override
