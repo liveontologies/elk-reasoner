@@ -249,4 +249,13 @@ Prefix(:=<http://example.com/owl/families/>)
    SameIndividual( :John otherOnt:JohnBrown )
    SameIndividual( :Mary otherOnt:MaryBrown )
    DifferentIndividuals( :John :Bill )
+
+   DLSafeRule(Body( ClassAtom(:Woman Variable(:x)) ) 
+              Head( ClassAtom(:Person Variable(:x)) ) )
+
+   DLSafeRule(Body( ObjectPropertyAtom(:hasParent Variable(:x) Variable(:y)) ObjectPropertyAtom(:hasBrother Variable(:y) Variable(:z))) 
+              Head( ObjectPropertyAtom(:hasUncle Variable(:x) Variable(:z)) ) )
+
+   DLSafeRule(Body( ObjectPropertyAtom(:hasParent Variable(:x) Variable(:y)) ObjectPropertyAtom(:hasBrother Variable(:y) Variable(:z))) 
+              Head( ClassAtom(ObjectSomeValuesFrom(:hasUncle :Person) Variable(:x)) ) )
  )

@@ -29,6 +29,7 @@
  *
  * @author Yevgeny Kazakov, Apr 19, 2011
  * @author Markus Kroetzsch
+ * @author Pavel Klinov
  */
 
 options
@@ -134,6 +135,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSWRLRule;
 import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
@@ -333,6 +335,19 @@ TOKEN :
 
 /* Keys */
 | < HAS_KEY: "HasKey" >
+
+/* SWRL Rules (DL Safe) */
+| < SWRL_RULE: "DLSafeRule" >
+| < SWRL_BODY: "Body" >
+| < SWRL_HEAD: "Head" >
+| < SWRL_CLASS_ATOM: "ClassAtom" >
+| < SWRL_DATA_RANGE_ATOM: "DataRangeAtom" >
+| < SWRL_OBJECT_PROPERTY_ATOM: "ObjectPropertyAtom" >
+| < SWRL_DATA_PROPERTY_ATOM: "DataPropertyAtom" >
+| < SWRL_BUILTIN_ATOM: "BuiltInAtom" >
+| < SWRL_SAME_INDIVIDUALS_ATOM: "SameIndividualsAtom" >
+| < SWRL_DIFFERENT_INDIVIDUALS_ATOM: "DifferentIndividualsAtom" >
+| < SWRL_VARIABLE: "Variable" >
 
 /* Assertions */
 | < SAME_INDIVIDUAL: "SameIndividual" >
@@ -1339,6 +1354,7 @@ ElkAxiom axiom():
 	| x = hasKey()
 	| x = assertion()
 	| x = annotationAxiom()
+	| x = dlSafeRule()
 	) { return x; }
 }
 
@@ -1790,6 +1806,31 @@ ElkHasKeyAxiom hasKey():
 		return getElkObjectFactory().getHasKeyAxiom(ce, opexprs, dpexprs);
 	}
 }
+
+/* SWRL Rules, we don't parse them, just skip through */
+ElkSWRLRule dlSafeRule():
+{
+}{
+	<SWRL_RULE> <OPEN_BRACKET>
+		skipToMatchingBrace()
+	{return getElkObjectFactory().getSWRLRule();}
+}
+
+JAVACODE
+    void skipToMatchingBrace() {
+      Token tok;
+      int nesting = 1;
+      while (true) {
+        tok = getNextToken();
+      
+        if (tok.kind == OPEN_BRACKET) nesting++;
+        if (tok.kind == CLOSE_BRACKET) {
+          nesting--;
+          if (nesting == 0) break;
+        }
+      }
+    }
+
 
 /* 9.6 Assertions */
 ElkAssertionAxiom assertion():
