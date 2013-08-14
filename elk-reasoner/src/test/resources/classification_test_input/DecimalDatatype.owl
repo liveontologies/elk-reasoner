@@ -1,0 +1,40 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+EquivalentClasses(DataHasValue(:dp "-1.23"^^xsd:decimal)		:_Value1)
+EquivalentClasses(DataHasValue(:dp "12678967.543233"^^xsd:decimal)	:_Value2)
+EquivalentClasses(DataHasValue(:dp "+100000.00"^^xsd:decimal)		:_Value3)
+EquivalentClasses(DataHasValue(:dp "210"^^xsd:decimal)			:_Value4)
+
+EquivalentClasses(DataHasValue(:dp "0.0"^^xsd:decimal)			:_Zero1)
+EquivalentClasses(DataHasValue(:dp "+0.0"^^xsd:decimal)			:_Zero2)
+EquivalentClasses(DataHasValue(:dp "-0.0"^^xsd:decimal)			:_Zero3)
+EquivalentClasses(DataHasValue(:dp "0"^^xsd:decimal)			:_Zero4)
+EquivalentClasses(DataHasValue(:dp "+0"^^xsd:decimal)			:_Zero5)
+EquivalentClasses(DataHasValue(:dp "-0"^^xsd:decimal)			:_Zero6)
+
+EquivalentClasses(DataHasValue(:dp "10.0"^^xsd:decimal)			:_Ten1)
+EquivalentClasses(DataHasValue(:dp "+10.0"^^xsd:decimal)		:_Ten2)
+EquivalentClasses(DataHasValue(:dp "-10.0"^^xsd:decimal)		:_Ten3)
+EquivalentClasses(DataHasValue(:dp "10"^^xsd:decimal)			:_Ten4)
+EquivalentClasses(DataHasValue(:dp "+10"^^xsd:decimal)			:_Ten5)
+EquivalentClasses(DataHasValue(:dp "-10"^^xsd:decimal)			:_Ten6)
+
+EquivalentClasses(:Decimal_Larger_Or_Equal_Than_10 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:decimal xsd:minInclusive "10"^^xsd:decimal)))
+EquivalentClasses(:Decimal_Larger_Than_10 		DataSomeValuesFrom(:dp DatatypeRestriction(xsd:decimal xsd:minExclusive "10"^^xsd:decimal)))
+EquivalentClasses(:Decimal_Less_Or_Equal_Than10 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:decimal xsd:maxInclusive "10"^^xsd:decimal)))
+EquivalentClasses(:Decimal_LessThan10 			DataSomeValuesFrom(:dp DatatypeRestriction(xsd:decimal xsd:maxExclusive "10"^^xsd:decimal)))
+
+EquivalentClasses(:Decimals_Between_0_and_10_Ex 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:decimal xsd:minExclusive "0"^^xsd:decimal xsd:maxExclusive "10.0"^^xsd:decimal)))
+EquivalentClasses(:Decimals_Between_0_and_10_Inc 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:decimal xsd:minInclusive "0"^^xsd:decimal xsd:maxInclusive "10.0"^^xsd:decimal)))
+EquivalentClasses(:Decimals_Between_0_and_10_IncEx 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:decimal xsd:minInclusive "0"^^xsd:decimal xsd:maxExclusive "10.0"^^xsd:decimal)))
+EquivalentClasses(:Decimals_Between_0_and_10_ExInc 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:decimal xsd:minExclusive "0"^^xsd:decimal xsd:maxInclusive "10.0"^^xsd:decimal)))
+
+EquivalentClasses(:InconsistentDecimal			DataSomeValuesFrom(:dp DatatypeRestriction(xsd:decimal xsd:minExclusive "5"^^xsd:decimal xsd:maxExclusive "0"^^xsd:decimal)))
+)

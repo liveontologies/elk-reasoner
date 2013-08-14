@@ -1,0 +1,32 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+SubClassOf(:Rational_Larger_Than_10		:Rational_Larger_Or_Equal_Than_10)
+SubClassOf(:Rational_LessThan10			:Rational_Less_Or_Equal_Than10)
+SubClassOf(:Rationals_Between_0_and_10_Ex	:Rationals_Between_0_and_10_ExInc)
+SubClassOf(:Rationals_Between_0_and_10_Ex	:Rationals_Between_0_and_10_IncEx)
+SubClassOf(:Rationals_Between_0_and_10_ExInc	:Rationals_Between_0_and_10_Inc)
+SubClassOf(:Rationals_Between_0_and_10_Inc	:Rational_Less_Or_Equal_Than10)
+SubClassOf(:Rationals_Between_0_and_10_IncEx	:Rational_LessThan10)
+SubClassOf(:Rationals_Between_0_and_10_IncEx	:Rationals_Between_0_and_10_Inc)
+SubClassOf(:Rationals_Between_10_and_11_Ex	:Rationals_Between_10_and_11_ExInc)
+SubClassOf(:Rationals_Between_10_and_11_Ex	:Rationals_Between_10_and_11_IncEx)
+SubClassOf(:Rationals_Between_10_and_11_ExInc	:Rational_Larger_Than_10)
+SubClassOf(:Rationals_Between_10_and_11_ExInc	:Rationals_Between_10_and_11_Inc)
+SubClassOf(:Rationals_Between_10_and_11_Inc	:Rational_Larger_Or_Equal_Than_10)
+SubClassOf(:Rationals_Between_10_and_11_IncEx	:Rationals_Between_10_and_11_Inc)
+
+SubClassOf(:_17div3	:Rationals_Between_0_and_10_Ex)
+SubClassOf(:_1div999999 :Rationals_Between_0_and_10_Ex)
+SubClassOf(:_Five	:Rationals_Between_0_and_10_Ex)
+SubClassOf(:_NegFive	:Rational_LessThan10)
+SubClassOf(:_Zero	:Rationals_Between_0_and_10_IncEx)
+
+EquivalentClasses(owl:Nothing :InconsistentRational)
+)

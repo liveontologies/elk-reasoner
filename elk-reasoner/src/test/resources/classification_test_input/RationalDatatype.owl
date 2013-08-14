@@ -1,0 +1,33 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+EquivalentClasses(:Rational_Larger_Or_Equal_Than_10 	DataSomeValuesFrom(:dp DatatypeRestriction(owl:rational xsd:minInclusive "10"^^xsd:integer)))
+EquivalentClasses(:Rational_Larger_Than_10 		DataSomeValuesFrom(:dp DatatypeRestriction(owl:rational xsd:minExclusive "10"^^xsd:integer)))
+EquivalentClasses(:Rational_Less_Or_Equal_Than10 	DataSomeValuesFrom(:dp DatatypeRestriction(owl:rational xsd:maxInclusive "10"^^xsd:integer)))
+EquivalentClasses(:Rational_LessThan10 			DataSomeValuesFrom(:dp DatatypeRestriction(owl:rational xsd:maxExclusive "10"^^xsd:integer)))
+
+EquivalentClasses(:Rationals_Between_0_and_10_Ex 	DataSomeValuesFrom(:dp DatatypeRestriction(owl:rational xsd:minExclusive "0"^^xsd:integer xsd:maxExclusive "10"^^xsd:integer)))
+EquivalentClasses(:Rationals_Between_0_and_10_Inc 	DataSomeValuesFrom(:dp DatatypeRestriction(owl:rational xsd:minInclusive "0"^^xsd:integer xsd:maxInclusive "10"^^xsd:integer)))
+EquivalentClasses(:Rationals_Between_0_and_10_IncEx 	DataSomeValuesFrom(:dp DatatypeRestriction(owl:rational xsd:minInclusive "0"^^xsd:integer xsd:maxExclusive "10"^^xsd:integer)))
+EquivalentClasses(:Rationals_Between_0_and_10_ExInc 	DataSomeValuesFrom(:dp DatatypeRestriction(owl:rational xsd:minExclusive "0"^^xsd:integer xsd:maxInclusive "10"^^xsd:integer)))
+
+EquivalentClasses(:Rationals_Between_10_and_11_Ex	DataSomeValuesFrom(:dp DatatypeRestriction(owl:rational xsd:minExclusive "10/1"^^owl:rational xsd:maxExclusive "11/1"^^owl:rational)))
+EquivalentClasses(:Rationals_Between_10_and_11_Inc	DataSomeValuesFrom(:dp DatatypeRestriction(owl:rational xsd:minInclusive "10/1"^^owl:rational xsd:maxInclusive "11/1"^^owl:rational)))
+EquivalentClasses(:Rationals_Between_10_and_11_ExInc	DataSomeValuesFrom(:dp DatatypeRestriction(owl:rational xsd:minExclusive "10/1"^^owl:rational xsd:maxInclusive "11/1"^^owl:rational)))
+EquivalentClasses(:Rationals_Between_10_and_11_IncEx	DataSomeValuesFrom(:dp DatatypeRestriction(owl:rational xsd:minInclusive "10/1"^^owl:rational xsd:maxExclusive "11/1"^^owl:rational)))
+
+EquivalentClasses(:InconsistentRational			DataSomeValuesFrom(:dp DatatypeRestriction(owl:rational xsd:minExclusive "10"^^xsd:integer xsd:maxExclusive "0"^^xsd:integer)))
+
+EquivalentClasses(DataHasValue(:dp "10/2"^^owl:rational) 	:_Five)
+EquivalentClasses(DataHasValue(:dp "-10/2"^^owl:rational) 	:_NegFive)
+EquivalentClasses(DataHasValue(:dp "+0/1"^^owl:rational) 	:_Zero)
+EquivalentClasses(DataHasValue(:dp "17/3"^^owl:rational) 	:_17div3)
+EquivalentClasses(DataHasValue(:dp "1/999999"^^owl:rational) 	:_1div999999)
+
+)

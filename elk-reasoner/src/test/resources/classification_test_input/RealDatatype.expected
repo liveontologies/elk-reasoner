@@ -1,0 +1,24 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+SubClassOf(:Real_Larger_Than_10			:Real_Larger_Or_Equal_Than_10)
+SubClassOf(:Real_Less_Than_10			:Real_Less_Or_Equal_Than_10)
+SubClassOf(:Reals_Between_0_and_10_Ex		:Reals_Between_0_and_10_ExInc)
+SubClassOf(:Reals_Between_0_and_10_Ex		:Reals_Between_0_and_10_IncEx)
+SubClassOf(:Reals_Between_0_and_10_ExInc	:Reals_Between_0_and_10_Inc)
+SubClassOf(:Reals_Between_0_and_10_Inc		:Real_Less_Or_Equal_Than_10)
+SubClassOf(:Reals_Between_0_and_10_IncEx	:Real_Less_Than_10)
+SubClassOf(:Reals_Between_0_and_10_IncEx	:Reals_Between_0_and_10_Inc)
+SubClassOf(:Reals_Between_1_and_12_Ex		:Reals_Between_1_and_12_ExInc)
+SubClassOf(:Reals_Between_1_and_12_Ex		:Reals_Between_1_and_12_IncEx)
+SubClassOf(:Reals_Between_1_and_12_ExInc	:Reals_Between_1_and_12_Inc)
+SubClassOf(:Reals_Between_1_and_12_IncEx	:Reals_Between_1_and_12_Inc)
+
+EquivalentClasses(owl:Nothing :InconsistentReal)
+)

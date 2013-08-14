@@ -1,0 +1,48 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+SubClassOf(:Decimal_Larger_Than_10		:Decimal_Larger_Or_Equal_Than_10)
+SubClassOf(:Decimal_LessThan10			:Decimal_Less_Or_Equal_Than10)
+SubClassOf(:Decimals_Between_0_and_10_Ex	:Decimals_Between_0_and_10_ExInc)
+SubClassOf(:Decimals_Between_0_and_10_Ex	:Decimals_Between_0_and_10_IncEx)
+SubClassOf(:Decimals_Between_0_and_10_ExInc	:Decimals_Between_0_and_10_Inc)
+SubClassOf(:Decimals_Between_0_and_10_Inc	:Decimal_Less_Or_Equal_Than10)
+SubClassOf(:Decimals_Between_0_and_10_IncEx	:Decimal_LessThan10)
+SubClassOf(:Decimals_Between_0_and_10_IncEx	:Decimals_Between_0_and_10_Inc)
+
+SubClassOf(:_Value1 :Decimal_LessThan10)
+SubClassOf(:_Value2 :Decimal_Larger_Than_10)
+SubClassOf(:_Value3 :Decimal_Larger_Than_10)
+SubClassOf(:_Value4 :Decimal_Larger_Than_10)
+
+EquivalentClasses(:_Zero1 :_Zero2 :_Zero3 :_Zero4 :_Zero5 :_Zero6)
+
+SubClassOf(:_Zero1 :Decimals_Between_0_and_10_IncEx)
+SubClassOf(:_Zero2 :Decimals_Between_0_and_10_IncEx)
+SubClassOf(:_Zero3 :Decimals_Between_0_and_10_IncEx)
+SubClassOf(:_Zero4 :Decimals_Between_0_and_10_IncEx)
+SubClassOf(:_Zero5 :Decimals_Between_0_and_10_IncEx)
+SubClassOf(:_Zero6 :Decimals_Between_0_and_10_IncEx)
+
+EquivalentClasses(:_Ten1 :_Ten2 :_Ten4 :_Ten5)
+EquivalentClasses(:_Ten3 :_Ten6)
+
+SubClassOf(:_Ten1 :Decimal_Larger_Or_Equal_Than_10)
+SubClassOf(:_Ten1 :Decimals_Between_0_and_10_ExInc)
+SubClassOf(:_Ten2 :Decimal_Larger_Or_Equal_Than_10)
+SubClassOf(:_Ten2 :Decimals_Between_0_and_10_ExInc)
+SubClassOf(:_Ten3 :Decimal_LessThan10)
+SubClassOf(:_Ten4 :Decimal_Larger_Or_Equal_Than_10)
+SubClassOf(:_Ten4 :Decimals_Between_0_and_10_ExInc)
+SubClassOf(:_Ten5 :Decimal_Larger_Or_Equal_Than_10)
+SubClassOf(:_Ten5 :Decimals_Between_0_and_10_ExInc)
+SubClassOf(:_Ten6 :Decimal_LessThan10)
+
+EquivalentClasses(owl:Nothing :InconsistentDecimal)
+)

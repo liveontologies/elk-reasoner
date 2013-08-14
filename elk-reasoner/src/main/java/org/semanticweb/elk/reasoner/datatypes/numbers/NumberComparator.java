@@ -139,10 +139,11 @@ public class NumberComparator implements Comparator<Number> {
 				return new BigRational(BigInteger.valueOf(n.longValue()), BigInteger.ONE);
 			case 2:
 				return new BigRational((BigInteger) n, BigInteger.ONE);
-			case 3: {
+			case 3: 
 				BigDecimal decimal = (BigDecimal) n;
 				return new BigRational(decimal.unscaledValue(), BigInteger.TEN.pow(decimal.scale()));
-			}
+			case 4: 
+				return (BigRational) n;
 			default:
 				throw new IllegalArgumentException();
 		}
