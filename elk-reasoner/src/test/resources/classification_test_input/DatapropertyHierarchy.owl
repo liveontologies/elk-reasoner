@@ -1,0 +1,20 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+SubDataPropertyOf(:dp2 :dp1)
+SubDataPropertyOf(:dp3 :dp2)
+
+SubClassOf(:vA	 DataHasValue(:dp1 "5"^^xsd:integer))
+SubClassOf(:vAB	 DataHasValue(:dp2 "5"^^xsd:integer))
+SubClassOf(:vABC DataHasValue(:dp3 "5"^^xsd:integer))
+
+SubClassOf(DataSomeValuesFrom(:dp1 DatatypeRestriction(xsd:integer xsd:minInclusive "0"^^xsd:integer)) :A)
+SubClassOf(DataSomeValuesFrom(:dp2 DatatypeRestriction(xsd:integer xsd:minInclusive "0"^^xsd:integer)) :B)
+SubClassOf(DataSomeValuesFrom(:dp3 DatatypeRestriction(xsd:integer xsd:minInclusive "0"^^xsd:integer)) :C)
+)

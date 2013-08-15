@@ -30,12 +30,14 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkEquivalentDataPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
@@ -95,6 +97,20 @@ public class NonIncrementalChangeCheckingVisitor extends
 		listener_.notify(elkTransitiveObjectPropertyAxiom);
 
 		return super.visit(elkTransitiveObjectPropertyAxiom);
+	}
+
+	@Override
+	public Void visit(ElkSubDataPropertyOfAxiom elkSubDataPropertyOfAxiom) {
+		listener_.notify(elkSubDataPropertyOfAxiom);
+
+		return super.visit(elkSubDataPropertyOfAxiom);
+	}
+
+	@Override
+	public Void visit(ElkEquivalentDataPropertiesAxiom elkEquivalentDataProperties) {
+		listener_.notify(elkEquivalentDataProperties);
+
+		return super.visit(elkEquivalentDataProperties);
 	}
 
 	@Override
