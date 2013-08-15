@@ -30,9 +30,6 @@ package org.semanticweb.elk.util.concurrent.computation;
  * 
  * @param <J>
  *            the type of the jobs used in the job processor
- * @param <P>
- *            the type of the job processor
- * 
  */
 public interface InputProcessorListenerNotifyFinishedJob<J> {
 

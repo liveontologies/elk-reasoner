@@ -135,8 +135,7 @@ public class SaturatedPropertyChain {
 	}
 
 	/**
-	 * @return All sub-properties R of root including root itself. Computed in
-	 *         the {@link ObjectPropertyHierarchyComputationStage}.
+	 * @return All sub-properties R of root including root itself. 
 	 */
 	public Set<IndexedPropertyChain> getSubProperties() {
 		return derivedSubProperties == null ? Collections
@@ -208,7 +207,7 @@ public class SaturatedPropertyChain {
 	 * {@link BackwardLink}s or {@link ForwardLink}s.
 	 * 
 	 * @param ipc
-	 * @return
+	 * @return {@code true} if it can
 	 */
 	public static boolean isRelevant(IndexedPropertyChain ipc) {
 		return !REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES

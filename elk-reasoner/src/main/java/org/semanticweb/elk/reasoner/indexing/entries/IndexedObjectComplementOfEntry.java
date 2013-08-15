@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.entries;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 
 /**
- * Implements an equality view for instances of {@link IndexedObjectComplement}
+ * Implements an equality view for instances of {@link IndexedObjectComplementOf}
  * 
  * @author "Yevgeny Kazakov"
  * 

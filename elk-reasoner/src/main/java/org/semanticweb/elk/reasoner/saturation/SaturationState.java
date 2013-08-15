@@ -33,8 +33,6 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 /**
- * TODO javadoc
- * 
  * Represents the state of saturation which can be changed by applying reasoning
  * rules and processing their conclusions.
  * 
@@ -44,10 +42,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
  */
 public interface SaturationState {
 
-	/**
-	 * 
-	 * @return
-	 */
 	public Collection<Context> getContexts();
 	
 	public Context getContext(IndexedClassExpression ice);

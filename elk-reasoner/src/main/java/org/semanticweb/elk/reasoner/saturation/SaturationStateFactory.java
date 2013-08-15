@@ -27,6 +27,8 @@ package org.semanticweb.elk.reasoner.saturation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 
 /**
+ * A simple factory for creating saturation states
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
@@ -34,9 +36,10 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 public class SaturationStateFactory {
 
 	/**
+	 * Creates a new instance of {@link SaturationStateImpl}
 	 * 
-	 * @param ontologyIndex
-	 * @return
+	 * @param ontologyIndex 
+	 * @return the new state
 	 */
 	public static SaturationState createSaturationState(OntologyIndex ontologyIndex) {
 		return new SaturationStateImpl(ontologyIndex);

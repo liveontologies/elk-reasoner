@@ -37,11 +37,11 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
 
 public class CompositionClosureTest {
@@ -49,9 +49,9 @@ public class CompositionClosureTest {
 	final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 
 	/**
-	 * testing if the flag {@link
-	 * SaturatedPropertyChain.#REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES} is
-	 * working for role composition computation.
+	 * Testing if the flag REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES in
+	 * {@link SaturatedPropertyChain} is working for role composition
+	 * computation.
 	 * 
 	 * @throws ElkException
 	 * @throws InterruptedException

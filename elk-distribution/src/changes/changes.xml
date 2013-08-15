@@ -25,6 +25,9 @@ will appear in the produced result.
 			<action dev="pavel" type="fix" issue="22">
 				Fixed improper handling of parsing exceptions in presence of SWRL rules.
 			</action>
+			<action dev="pavel" type="fix">
+				Numerous javadoc issues fixed.
+			</action>			
 	    </release>
 	    <release version="0.4.0" date="2013-07-20" description="Fourth public release">
 			<action dev="pavel" type="add"  issue="9">

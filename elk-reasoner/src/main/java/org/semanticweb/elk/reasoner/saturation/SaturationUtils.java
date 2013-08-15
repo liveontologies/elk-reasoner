@@ -88,11 +88,6 @@ public class SaturationUtils {
 	public static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
 	public static final boolean COLLECT_PROCESSING_TIMES = LOGGER_.isDebugEnabled();
 	
-	/**
-	 * 
-	 * @param localStatistics
-	 * @return
-	 */
 	public static RuleApplicationVisitor getStatsAwareCompositionRuleAppVisitor(
 			RuleStatistics localStatistics) {
 		RuleApplicationVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
@@ -138,12 +133,6 @@ public class SaturationUtils {
 				: ConclusionVisitor.DUMMY;
 	}
 	
-	/**
-	 * 
-	 * @param ruleProcessor
-	 * @param localStatistics
-	 * @return
-	 */
 	public static ConclusionVisitor<Boolean> getUsedConclusionCountingProcessor(
 			ConclusionVisitor<Boolean> ruleProcessor,
 			SaturationStatistics localStatistics) {
@@ -156,9 +145,6 @@ public class SaturationUtils {
 		return ruleProcessor;
 	}
 	
-	/**
-	 * 
-	 */
 	public static ConclusionVisitor<?> getProcessedConclusionCountingProcessor(
 			ConclusionVisitor<Boolean> conclusionVisitor,
 			SaturationStatistics localStatistics) {

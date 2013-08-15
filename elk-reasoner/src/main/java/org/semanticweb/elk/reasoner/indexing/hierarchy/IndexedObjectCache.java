@@ -44,8 +44,6 @@ import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
- * @seenElkObjectIndexerVisitor
- * 
  */
 public class IndexedObjectCache implements IndexedObjectFilter {
 

@@ -133,7 +133,7 @@ public class ForwardLink extends AbstractConclusion {
 	}
 
 	/**
-	 * A type of {@link ModifiableLinkRule<BackwardLink>} created for
+	 * A type of {@link ModifiableLinkRule} created for
 	 * {@link ForwardLink}s and stored in the {@link Context} where it is
 	 * produced. There can be at most one rule of this type stored in every
 	 * {@link Context}. The rule essentially indexes all {@link ForwardLink}s

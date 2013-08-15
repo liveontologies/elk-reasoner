@@ -51,7 +51,8 @@ public interface AxiomLoader {
 
 	/**
 	 * @return {@code true} if the loading is finished, i.e., calling
-	 *         {@link #load()} will have no effect
+	 *         {@link AxiomLoader#load(ElkAxiomProcessor, ElkAxiomProcessor)}
+	 *         will have no effect
 	 */
 	public boolean isLoadingFinished();
 

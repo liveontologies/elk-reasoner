@@ -134,7 +134,7 @@ public class IndexedPropertyChainSaturationTest {
 	}
 	
 	/**
-	 * Test method for {@link ReflexivityChecker#isReflexive()}.
+	 * Test method for {@link ReflexivePropertyComputation}.
 	 */
 	@Test
 	public void testReflexivity() {

@@ -233,17 +233,8 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 		return accept((IndexedClassExpressionVisitor<O>) visitor);
 	}
 
-	/**
-	 * 
-	 * @param visitor
-	 * @return
-	 */
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
 
-	/**
-	 * 
-	 * @param visitor
-	 */
 	public abstract void accept(DecompositionRuleApplicationVisitor visitor,
 			Context context);
 }

@@ -109,11 +109,9 @@ public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
 	}
 
 	/**
-	 * Returns the property which is composable with the given property in this
-	 * chain
-	 * 
 	 * @param ipc
-	 * @return
+	 * @return the property chain which is composable with the given property in this
+	 * chain or null
 	 */
 	public IndexedPropertyChain getComposable(IndexedPropertyChain ipc) {
 		return ipc == leftProperty_ ? rightProperty_

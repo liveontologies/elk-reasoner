@@ -1420,7 +1420,7 @@ public interface ElkObjectFactory {
 	/**
 	 * No arguments since we don't have a full representation of SWRL rules
 	 * 
-	 * @return
+	 * @return a dummy object
 	 */
 	public ElkSWRLRule getSWRLRule();
 }
