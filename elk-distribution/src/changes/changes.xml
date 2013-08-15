@@ -15,7 +15,9 @@ will appear in the produced result.
 		<title>ELK Reasoner Project</title>
 	</properties>
 	<body>
-	    <release version="${release.version}" date="${buildDate}" description="First maintenance relase after the fourth public release">
+	    <release version="${release.version}" date="${buildDate}" description="">
+	    </release>		
+	    <release version="0.4.1" date="2013-08-15" description="First maintenance relase after the fourth public release">
 			<action dev="yevgeny" type="fix" issue="23">
 				Fixed a bug when querying equivalent classes of complex class expressions may include auxiliary classes.				
 			</action>
