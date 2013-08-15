@@ -1416,4 +1416,11 @@ public interface ElkObjectFactory {
 	 */
 	public ElkFacetRestriction getFacetRestriction(ElkIri iri,
 			ElkLiteral literal);
+	
+	/**
+	 * No arguments since we don't have a full representation of SWRL rules
+	 * 
+	 * @return a dummy object
+	 */
+	public ElkSWRLRule getSWRLRule();
 }

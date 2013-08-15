@@ -1,10 +1,10 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.owl.visitors;
 /*
  * #%L
- * ELK Reasoner
+ * ELK OWL Object Interfaces
  * $Id:$
  * $HeadURL:$
  * %%
@@ -24,24 +24,14 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.owl.interfaces.ElkSWRLRule;
 
 /**
- * A simple factory for creating saturation states
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class SaturationStateFactory {
+public interface ElkSWRLRuleVisitor<O> {
 
-	/**
-	 * Creates a new instance of {@link SaturationStateImpl}
-	 * 
-	 * @param ontologyIndex 
-	 * @return the new state
-	 */
-	public static SaturationState createSaturationState(OntologyIndex ontologyIndex) {
-		return new SaturationStateImpl(ontologyIndex);
-	}
+	O visit(ElkSWRLRule rule);
 }

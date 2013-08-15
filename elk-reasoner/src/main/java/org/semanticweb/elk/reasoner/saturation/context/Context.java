@@ -110,11 +110,8 @@ public interface Context {
 	 */
 	public boolean addBackwardLink(BackwardLink link);
 
-	/**
+	/*
 	 * TODO
-	 * 
-	 * @param link
-	 * @return
 	 */
 	public boolean removeBackwardLink(BackwardLink link);
 
@@ -270,7 +267,7 @@ public interface Context {
 
 	/**
 	 * 
-	 * @return
+	 * @return {@code true} if the context is empty
 	 */
 	public boolean isEmpty();
 

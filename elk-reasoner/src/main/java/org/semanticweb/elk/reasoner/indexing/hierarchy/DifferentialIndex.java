@@ -290,7 +290,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	/**
-	 * @return
+	 * @return the collection of named individuals added to the signature
 	 */
 	public Collection<ElkNamedIndividual> getAddedIndividuals() {
 		return this.addedIndividuals_;

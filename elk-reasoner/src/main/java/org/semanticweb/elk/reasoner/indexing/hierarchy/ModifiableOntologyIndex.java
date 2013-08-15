@@ -81,7 +81,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 * Removes the given {@link ElkClass} from the signature of this
 	 * {@link OntologyIndex}
 	 * 
-	 * @param newClass
+	 * @param oldClass
 	 *            the {@link ElkClass} to be removed
 	 */
 	public void removeClass(ElkClass oldClass)
@@ -91,7 +91,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 * Add the given {@link ElkNamedIndividual} to the signature of this
 	 * {@link OntologyIndex}
 	 * 
-	 * @param newClass
+	 * @param newIndividual
 	 *            the {@link ElkNamedIndividual} to be added
 	 */
 	public void addNamedIndividual(ElkNamedIndividual newIndividual);
@@ -100,7 +100,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 * Removes the given {@link ElkNamedIndividual} from the signature of this
 	 * {@link OntologyIndex}
 	 * 
-	 * @param newClass
+	 * @param oldIndividual
 	 *            the {@link ElkNamedIndividual} to be removed
 	 */
 	public void removeNamedIndividual(ElkNamedIndividual oldIndividual)

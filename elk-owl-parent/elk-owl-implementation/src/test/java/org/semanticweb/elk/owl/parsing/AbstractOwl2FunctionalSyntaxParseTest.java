@@ -70,6 +70,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSWRLRule;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
@@ -259,9 +260,11 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 		expectedCountMap.put(ElkDifferentIndividualsAxiom.class, 1);
 
 		expectedCountMap.put(ElkDeclarationAxiom.class, 43);
+		
+		expectedCountMap.put(ElkSWRLRule.class, 3);
 
 		checkAxiomTypeCounts(counter, expectedCountMap, false);
-		assertEquals(108L, counter.getTotalAxiomCount());
+		assertEquals(111L, counter.getTotalAxiomCount());
 	}
 
 	@Test
@@ -364,6 +367,16 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 	public void testQualifiedNamesInIris() throws Owl2ParseException {
 		String testString = "Prefix(p: = <>)" + "Ontology("
 				+ "SubClassOf(p:Class p:Ontology)" + ")";
+
+		parseOntology(testString);
+	}
+	
+	@Test
+	public void testSWRL() throws Owl2ParseException {
+		String testString = "Prefix(:=<www.example.org>) "
+				+ "Ontology(<www.example.org#swrl-rule-test> " + "DLSafeRule( "
+				+ "Body( " + "ClassAtom(:A Variable(:x)) " + ") " + "Head( "
+				+ "ClassAtom(:B Variable(:x) ) ) ) )";
 
 		parseOntology(testString);
 	}

@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkSWRLRule;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 
 /**
@@ -51,6 +52,11 @@ public abstract class ModelOwl2FunctionalSyntaxPrinterTest {
 		StringBuilder builder = new StringBuilder();
 		
 		for (ElkObject elkObject : elkObjects) {
+			
+			if (elkObject instanceof ElkSWRLRule) {
+				System.out.println("");
+			}
+			
 			OwlFunctionalStylePrinter.append(builder, elkObject);
 			builder.append(System.getProperty("line.separator"));
 		}

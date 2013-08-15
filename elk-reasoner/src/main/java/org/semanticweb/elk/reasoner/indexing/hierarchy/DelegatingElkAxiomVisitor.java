@@ -54,6 +54,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSWRLRule;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubAnnotationPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
@@ -64,7 +65,7 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 
 /**
- * TODO docs
+ * Delegates all visit method calls to the underlying visitor.
  * 
  * @author Pavel Klinov
  *
@@ -286,7 +287,10 @@ public class DelegatingElkAxiomVisitor implements ElkAxiomVisitor<Void>{
 	public Void visit(ElkAnnotationAssertionAxiom annotationAssertionAxiom) {
 		return annotationAssertionAxiom.accept(visitor_);
 	}
-	
 
+	@Override
+	public Void visit(ElkSWRLRule rule) {
+		return rule.accept(visitor_);
+	}
 
 }

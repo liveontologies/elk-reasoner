@@ -109,6 +109,7 @@ import org.semanticweb.elk.owl.interfaces.ElkPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkPropertyRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkPropertyRestrictionQualified;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSWRLRule;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubAnnotationPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
@@ -995,6 +996,13 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 			return null;
 		}
 
+	}
+
+	@Override
+	public Void visit(ElkSWRLRule rule) {
+		// we punt on this
+		write("DLSafeRule(  )");
+		return null;
 	}
 
 }

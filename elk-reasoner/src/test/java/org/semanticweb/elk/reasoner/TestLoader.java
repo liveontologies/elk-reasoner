@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * A simple {@link OntologyLoader} which internally keeps sets of axioms to be
+ * A simple {@link AxiomLoader} which internally keeps sets of axioms to be
  * added
  * 
  * @author Pavel Klinov

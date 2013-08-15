@@ -69,7 +69,7 @@
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-distribution</artifactId>
 			<version>${owlapi.version}</version>
-			<classifier>bin</classifier>
+			<!--classifier>bin</classifier-->
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -250,7 +250,7 @@
 						</property>
 						<property>
 							<name>owlapi-path</name>
-							<value>${net.sourceforge.owlapi:owlapi-distribution:jar:bin}</value>
+							<value>${net.sourceforge.owlapi:owlapi-distribution:jar}</value>
 						</property>
 					</systemProperties>
 				</configuration>

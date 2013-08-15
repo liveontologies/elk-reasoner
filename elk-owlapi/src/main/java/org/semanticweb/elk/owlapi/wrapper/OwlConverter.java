@@ -95,6 +95,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSWRLRule;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
@@ -184,7 +185,15 @@ import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
 import org.semanticweb.owlapi.model.OWLSymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLTransitiveObjectPropertyAxiom;
+import org.semanticweb.owlapi.model.SWRLRule;
 
+/**
+ * 
+ * @author Yevgeny Kazakov
+ * @author Pavel Klinov 
+ *
+ * pavel.klinov@uni-ulm.de
+ */
 public class OwlConverter {
 
 	private static OwlConverter INSTANCE_ = new OwlConverter();
@@ -761,4 +770,7 @@ public class OwlConverter {
 		return axiom.isLogicalAxiom() || axiom.isOfType(AxiomType.DECLARATION);
 	}
 
+	public ElkSWRLRule convert(SWRLRule rule) {
+		return new ElkSWRLRuleWrap();
+	}
 }

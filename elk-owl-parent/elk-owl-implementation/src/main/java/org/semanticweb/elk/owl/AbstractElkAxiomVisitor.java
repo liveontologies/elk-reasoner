@@ -56,6 +56,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSWRLRule;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubAnnotationPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
@@ -313,4 +314,9 @@ public abstract class AbstractElkAxiomVisitor<O> implements ElkAxiomVisitor<O> {
 		return defaultLogicalVisit(elkDeclarationAxiom);
 	}
 
+	@Override
+	public O visit(ElkSWRLRule rule) {
+		return defaultLogicalVisit(rule);
+	}
+	
 }

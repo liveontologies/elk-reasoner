@@ -1,7 +1,5 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.taxonomy.model;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,24 +22,26 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import java.util.Collection;
+import java.util.Comparator;
+
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 
 /**
- * A simple factory for creating saturation states
+ * A {@link Node} created for an anonymous {@link ElkObject} that should not be
+ * listed among its members
  * 
- * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * @author Yevgeny Kazakov
+ * 
+ * @param <T>
  */
-public class SaturationStateFactory {
+public class AnonymousNode<T extends ElkObject> extends SimpleNode<T> implements
+		Node<T> {
 
-	/**
-	 * Creates a new instance of {@link SaturationStateImpl}
-	 * 
-	 * @param ontologyIndex 
-	 * @return the new state
-	 */
-	public static SaturationState createSaturationState(OntologyIndex ontologyIndex) {
-		return new SaturationStateImpl(ontologyIndex);
+	public AnonymousNode(T anonymousMember, Collection<T> allMembers,
+			Comparator<T> cmp) {
+		super(allMembers, cmp);
+		this.members.remove(anonymousMember);
 	}
+
 }

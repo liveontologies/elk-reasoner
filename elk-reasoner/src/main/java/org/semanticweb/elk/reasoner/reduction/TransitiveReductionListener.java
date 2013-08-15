@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
-import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNotifyFinishedJob;
 
 /**
@@ -33,9 +32,6 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNot
  * 
  * @param <J>
  *            the type of input jobs of {@link TransitiveReductionFactory}
- * 
- * @param <P>
- *            the type of the {@link InputProcessor} for the input jobs
  * 
  * @see TransitiveReductionFactory
  */

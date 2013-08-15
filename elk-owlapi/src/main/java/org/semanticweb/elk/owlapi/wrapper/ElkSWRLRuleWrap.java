@@ -1,10 +1,10 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.owlapi.wrapper;
 /*
  * #%L
- * ELK Reasoner
+ * ELK OWL API Binding
  * $Id:$
  * $HeadURL:$
  * %%
@@ -24,24 +24,27 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.owl.interfaces.ElkSWRLRule;
+import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * A simple factory for creating saturation states
+ * Just as dummy as {@link ElkSWRLRule}
  * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class SaturationStateFactory {
+public class ElkSWRLRuleWrap implements ElkSWRLRule {
 
-	/**
-	 * Creates a new instance of {@link SaturationStateImpl}
-	 * 
-	 * @param ontologyIndex 
-	 * @return the new state
-	 */
-	public static SaturationState createSaturationState(OntologyIndex ontologyIndex) {
-		return new SaturationStateImpl(ontologyIndex);
+	@Override
+	public <O> O accept(ElkAxiomVisitor<O> visitor) {
+		return null;
 	}
+
+	@Override
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return null;
+	}
+
 }

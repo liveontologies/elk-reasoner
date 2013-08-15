@@ -93,6 +93,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSWRLRule;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubAnnotationPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
@@ -578,6 +579,11 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	@Override
 	public String visit(ElkLiteral elkLiteral) {
 		return "Literal";
+	}
+
+	@Override
+	public String visit(ElkSWRLRule rule) {
+		return "DLSafeRule";
 	}
 
 }

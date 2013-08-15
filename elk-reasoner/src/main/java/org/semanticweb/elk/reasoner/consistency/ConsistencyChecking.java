@@ -101,8 +101,6 @@ public class ConsistencyChecking
 	 *            the entities to check for consistency
 	 * @param consistencyMonitor
 	 *            the monitor for the consistency status
-	 * @param ontologyIndex
-	 *            the indexed representation of the ontology
 	 * @param executor
 	 *            the executor service used for running the tasks by the
 	 *            reasoner

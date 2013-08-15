@@ -452,7 +452,7 @@ public class ElkTimer {
 	/**
 	 * Returns all registered timers
 	 * 
-	 * @return
+	 * @return an iterable collection of named timers
 	 */
 	public static Iterable<ElkTimer> getNamedTimers() {
 		return registeredTimers.keySet();

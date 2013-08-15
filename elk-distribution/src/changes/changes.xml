@@ -15,12 +15,23 @@ will appear in the produced result.
 		<title>ELK Reasoner Project</title>
 	</properties>
 	<body>
-	    <release version="${release.version}" date="${buildDate}" description="Current version">
-			<action dev="yevgeny" type="fix" issue="20">
-			    Fixed a bug when changes were loaded in buffering mode without calling flush()				
+	    <release version="${release.version}" date="${buildDate}" description="">
+	    </release>		
+	    <release version="0.4.1" date="2013-08-15" description="First maintenance relase after the fourth public release">
+			<action dev="yevgeny" type="fix" issue="23">
+				Fixed a bug when querying equivalent classes of complex class expressions may include auxiliary classes.				
 			</action>
+			<action dev="yevgeny" type="fix" issue="20">
+				Fixed a bug when changes were loaded in buffering mode without calling flush().
+			</action>
+			<action dev="pavel" type="fix" issue="22">
+				Fixed improper handling of parsing exceptions in presence of SWRL rules.
+			</action>
+			<action dev="pavel" type="fix">
+				Numerous javadoc issues fixed.
+			</action>			
 	    </release>
-	    <release version="0.4.0" date="2013-07-20" description="Forth public release">
+	    <release version="0.4.0" date="2013-07-20" description="Fourth public release">
 			<action dev="pavel" type="add"  issue="9">
 				Incremental reasoning. The reasoner can incrementally update the inferred class and instance hierarchies after adding, removing, or modifying axioms. Changes in axioms which may affect the property hierarchy or property chains, e.g., SubObjectPropertyOf, TransitiveObjectProperty, etc., will still trigger full re-classification.
 			</action>

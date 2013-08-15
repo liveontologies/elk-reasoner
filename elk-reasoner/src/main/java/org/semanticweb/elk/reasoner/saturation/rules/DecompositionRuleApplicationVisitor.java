@@ -31,14 +31,15 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * Applies decomposition rules for {@link IndexedClassExpression}s.
  * 
- * This visitor does not take any {@link SaturationStateImpl.Writer} but is
- * rather supposed to encapsulate it. Then it's easier to use restricted
- * writers, e.g. those which can't create new contexts, in subclasses
+ * This visit methods do not take any {@link BasicSaturationStateWriter} but the
+ * visitor is rather supposed to encapsulate it. Then it's easier to use
+ * restricted writers, e.g. those which can't create new contexts, in subclasses
  * 
  * @author Pavel Klinov
  * 

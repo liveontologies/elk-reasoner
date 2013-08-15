@@ -155,7 +155,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	private final ThisStatistics aggregatedStats_;
 
 	/**
-	 * Creates a new saturation engine using the given ontology index, listener
+	 * Creates a new saturation engine using the given saturation state, listener
 	 * for callback functions, and threshold for the number of unprocessed
 	 * contexts. The threshold has influence on the size of the batches of the
 	 * input jobs that are processed simultaneously, which, in turn, has an
@@ -165,8 +165,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * individual job because it is possible to detect that the job is processed
 	 * only when the whole batch of jobs is processed.
 	 * 
-	 * @param ontologyIndex
-	 *            the ontology index used to apply the rules
+	 * @param saturationState
+	 *            the current state of saturation
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 * @param listener
@@ -190,10 +190,9 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	}
 
 	/**
-	 * Creates a new saturation engine using the given ontology index.
+	 * Creates a new saturation factory using the given rule application factory.
 	 * 
-	 * @param ontologyIndex
-	 *            the ontology index used to apply the rules
+	 * @param ruleAppFactory
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 */

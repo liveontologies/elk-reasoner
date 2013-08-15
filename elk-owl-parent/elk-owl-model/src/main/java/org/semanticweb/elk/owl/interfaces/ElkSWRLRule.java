@@ -1,10 +1,10 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.owl.interfaces;
 /*
  * #%L
- * ELK Reasoner
+ * ELK OWL Object Interfaces
  * $Id:$
  * $HeadURL:$
  * %%
@@ -24,24 +24,16 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-
 /**
- * A simple factory for creating saturation states
+ * A dummy interface for SWRL rules. We don't have a proper object
+ * representation of those (with atoms, predicates, etc.), since SWRL isn't
+ * really a part of the OWL 2 spec, but use this dummy interface just to parse
+ * rules in a reasonable way (since SWRL rules do occur in some OWL ontologies).
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class SaturationStateFactory {
+public interface ElkSWRLRule extends ElkAxiom {
 
-	/**
-	 * Creates a new instance of {@link SaturationStateImpl}
-	 * 
-	 * @param ontologyIndex 
-	 * @return the new state
-	 */
-	public static SaturationState createSaturationState(OntologyIndex ontologyIndex) {
-		return new SaturationStateImpl(ontologyIndex);
-	}
 }

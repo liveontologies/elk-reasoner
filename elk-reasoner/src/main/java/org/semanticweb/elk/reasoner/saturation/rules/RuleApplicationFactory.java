@@ -254,7 +254,7 @@ public class RuleApplicationFactory {
 
 	/**
 	 * Default rule application engine which can create new contexts via
-	 * {@link SaturationStateImpl.ExtendedWriter} (either directly when a new
+	 * {@link ExtendedSaturationStateWriter} (either directly when a new
 	 * {@link IndexedClassExpression} is submitted or during decomposition
 	 */
 	public class DefaultEngine extends BaseEngine {
