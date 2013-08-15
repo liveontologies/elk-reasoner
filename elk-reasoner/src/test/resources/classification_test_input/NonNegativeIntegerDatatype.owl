@@ -1,0 +1,33 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+EquivalentClasses(DataHasValue(:dp "0"^^xsd:nonNegativeInteger)		:_Zero1)
+EquivalentClasses(DataHasValue(:dp "+0"^^xsd:nonNegativeInteger)	:_Zero2)
+
+EquivalentClasses(DataHasValue(:dp "10"^^xsd:nonNegativeInteger)	:_Ten1)
+EquivalentClasses(DataHasValue(:dp "+10"^^xsd:nonNegativeInteger)	:_Ten2)
+
+EquivalentClasses(:NNInteger_Larger_Or_Equal_Than_10 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:nonNegativeInteger xsd:minInclusive "10"^^xsd:nonNegativeInteger)))
+EquivalentClasses(:NNInteger_Larger_Than_10 		DataSomeValuesFrom(:dp DatatypeRestriction(xsd:nonNegativeInteger xsd:minExclusive "10"^^xsd:nonNegativeInteger)))
+EquivalentClasses(:NNInteger_Less_Or_Equal_Than10 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:nonNegativeInteger xsd:maxInclusive "10"^^xsd:nonNegativeInteger)))
+EquivalentClasses(:NNInteger_LessThan10 		DataSomeValuesFrom(:dp DatatypeRestriction(xsd:nonNegativeInteger xsd:maxExclusive "10"^^xsd:nonNegativeInteger)))
+
+EquivalentClasses(:NNIntegers_Between_0_and_10_Ex 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:nonNegativeInteger xsd:minExclusive "0"^^xsd:nonNegativeInteger xsd:maxExclusive "10"^^xsd:nonNegativeInteger)))
+EquivalentClasses(:NNIntegers_Between_0_and_10_Inc 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:nonNegativeInteger xsd:minInclusive "0"^^xsd:nonNegativeInteger xsd:maxInclusive "10"^^xsd:nonNegativeInteger)))
+EquivalentClasses(:NNIntegers_Between_0_and_10_IncEx 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:nonNegativeInteger xsd:minInclusive "0"^^xsd:nonNegativeInteger xsd:maxExclusive "+10"^^xsd:nonNegativeInteger)))
+EquivalentClasses(:NNIntegers_Between_0_and_10_ExInc 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:nonNegativeInteger xsd:minExclusive "0"^^xsd:nonNegativeInteger xsd:maxInclusive "+10"^^xsd:nonNegativeInteger)))
+
+EquivalentClasses(:NNIntegers_Between_1_and_9_Ex 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:nonNegativeInteger xsd:minExclusive "1"^^xsd:nonNegativeInteger xsd:maxExclusive "9"^^xsd:nonNegativeInteger)))
+EquivalentClasses(:NNIntegers_Between_1_and_9_Inc 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:nonNegativeInteger xsd:minInclusive "1"^^xsd:nonNegativeInteger xsd:maxInclusive "9"^^xsd:nonNegativeInteger)))
+EquivalentClasses(:NNIntegers_Between_1_and_9_IncEx 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:nonNegativeInteger xsd:minInclusive "1"^^xsd:nonNegativeInteger xsd:maxExclusive "+9"^^xsd:nonNegativeInteger)))
+EquivalentClasses(:NNIntegers_Between_1_and_9_ExInc 	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:nonNegativeInteger xsd:minExclusive "1"^^xsd:nonNegativeInteger xsd:maxInclusive "+9"^^xsd:nonNegativeInteger)))
+
+EquivalentClasses(:InconsistentNNInteger1		DataSomeValuesFrom(:dp DatatypeRestriction(xsd:nonNegativeInteger xsd:minExclusive "5"^^xsd:nonNegativeInteger xsd:maxExclusive "0"^^xsd:nonNegativeInteger)))
+EquivalentClasses(:InconsistentNNInteger2		DataSomeValuesFrom(:dp DatatypeRestriction(xsd:nonNegativeInteger xsd:maxExclusive "0"^^xsd:nonNegativeInteger)))
+)

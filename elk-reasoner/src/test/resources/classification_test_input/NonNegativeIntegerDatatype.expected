@@ -1,0 +1,52 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+EquivalentClasses(:NNInteger_LessThan10			:NNIntegers_Between_0_and_10_IncEx)
+EquivalentClasses(:NNInteger_Less_Or_Equal_Than10	:NNIntegers_Between_0_and_10_Inc)
+EquivalentClasses(:NNIntegers_Between_0_and_10_Ex	:NNIntegers_Between_1_and_9_Inc)
+EquivalentClasses(:NNIntegers_Between_0_and_10_Inc	:NNInteger_Less_Or_Equal_Than10)
+EquivalentClasses(:NNIntegers_Between_0_and_10_IncEx	:NNInteger_LessThan10)
+EquivalentClasses(:NNIntegers_Between_1_and_9_Inc	:NNIntegers_Between_0_and_10_Ex)
+
+SubClassOf(:NNInteger_Larger_Than_10			:NNInteger_Larger_Or_Equal_Than_10)
+SubClassOf(:NNInteger_LessThan10			:NNInteger_Less_Or_Equal_Than10)
+SubClassOf(:NNInteger_LessThan10			:NNIntegers_Between_0_and_10_Inc)
+
+SubClassOf(:NNIntegers_Between_0_and_10_Ex		:NNInteger_LessThan10)
+SubClassOf(:NNIntegers_Between_0_and_10_Ex		:NNIntegers_Between_0_and_10_ExInc)
+SubClassOf(:NNIntegers_Between_0_and_10_Ex		:NNIntegers_Between_0_and_10_IncEx)
+SubClassOf(:NNIntegers_Between_0_and_10_ExInc		:NNInteger_Less_Or_Equal_Than10)
+SubClassOf(:NNIntegers_Between_0_and_10_ExInc		:NNIntegers_Between_0_and_10_Inc)
+SubClassOf(:NNIntegers_Between_0_and_10_IncEx		:NNInteger_Less_Or_Equal_Than10)
+SubClassOf(:NNIntegers_Between_0_and_10_IncEx		:NNIntegers_Between_0_and_10_Inc)
+
+SubClassOf(:NNIntegers_Between_1_and_9_Ex		:NNIntegers_Between_1_and_9_ExInc)
+SubClassOf(:NNIntegers_Between_1_and_9_Ex		:NNIntegers_Between_1_and_9_IncEx)
+SubClassOf(:NNIntegers_Between_1_and_9_ExInc		:NNIntegers_Between_0_and_10_Ex)
+SubClassOf(:NNIntegers_Between_1_and_9_ExInc		:NNIntegers_Between_1_and_9_Inc)
+SubClassOf(:NNIntegers_Between_1_and_9_Inc		:NNInteger_LessThan10)
+SubClassOf(:NNIntegers_Between_1_and_9_Inc		:NNIntegers_Between_0_and_10_ExInc)
+SubClassOf(:NNIntegers_Between_1_and_9_Inc		:NNIntegers_Between_0_and_10_IncEx)
+SubClassOf(:NNIntegers_Between_1_and_9_IncEx		:NNIntegers_Between_0_and_10_Ex)
+SubClassOf(:NNIntegers_Between_1_and_9_IncEx		:NNIntegers_Between_1_and_9_Inc)
+
+EquivalentClasses(:_Ten1 :_Ten2)
+SubClassOf(:_Ten1	:NNInteger_Larger_Or_Equal_Than_10)
+SubClassOf(:_Ten1	:NNIntegers_Between_0_and_10_ExInc)
+SubClassOf(:_Ten2	:NNInteger_Larger_Or_Equal_Than_10)
+SubClassOf(:_Ten2	:NNIntegers_Between_0_and_10_ExInc)
+
+EquivalentClasses(:_Zero1 :_Zero2)
+SubClassOf(:_Zero1	:NNInteger_LessThan10)
+SubClassOf(:_Zero1	:NNIntegers_Between_0_and_10_IncEx)
+SubClassOf(:_Zero2	:NNInteger_LessThan10)
+SubClassOf(:_Zero2	:NNIntegers_Between_0_and_10_IncEx)
+
+EquivalentClasses(:InconsistentNNInteger1 :InconsistentNNInteger2 owl:Nothing)
+)
