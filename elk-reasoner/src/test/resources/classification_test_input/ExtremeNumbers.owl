@@ -1,0 +1,20 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+EquivalentClasses(:Googol1	DataHasValue(:dp "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"^^xsd:integer))
+EquivalentClasses(:Googol2	DataHasValue(:dp "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001"^^xsd:decimal))
+EquivalentClasses(:XLarge	DataHasValue(:dp "+99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"^^xsd:nonNegativeInteger))
+EquivalentClasses(:XSmall	DataHasValue(:dp "-99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"^^xsd:integer))
+EquivalentClasses(:Tiny		DataHasValue(:dp "1/99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"^^owl:rational))
+
+EquivalentClasses(:Real_Larger_Than_0 		DataSomeValuesFrom(:dp DatatypeRestriction(owl:real xsd:minExclusive "0"^^xsd:integer)))
+EquivalentClasses(:Real_Less_Than_10		DataSomeValuesFrom(:dp DatatypeRestriction(owl:real xsd:maxExclusive "10"^^xsd:integer)))
+
+EquivalentClasses(:Reals_Between_0_and_10_Ex 	DataSomeValuesFrom(:dp DatatypeRestriction(owl:real xsd:minExclusive "0"^^xsd:integer xsd:maxExclusive "10"^^xsd:integer)))
+)

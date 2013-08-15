@@ -1,0 +1,19 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+SubClassOf(:Googol1	:Real_Larger_Than_0)
+SubClassOf(:Googol2	:Real_Larger_Than_0)
+
+SubClassOf(:XLarge	:Real_Larger_Than_0)
+SubClassOf(:XSmall	:Real_Less_Than_10)
+
+SubClassOf(:Tiny	:Real_Larger_Than_0)
+SubClassOf(:Tiny	:Real_Less_Than_10)
+SubClassOf(:Tiny	:Reals_Between_0_and_10_Inc)
+)
