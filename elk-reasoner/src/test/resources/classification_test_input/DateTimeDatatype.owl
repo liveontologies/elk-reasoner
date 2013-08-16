@@ -1,0 +1,20 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+EquivalentClasses(:XX_Century		DataSomeValuesFrom(:hasDate DatatypeRestriction(xsd:dateTime xsd:minInclusive "1901-01-01T00:00:00"^^xsd:dateTime xsd:maxInclusive "2000-12-31T12:59:59"^^xsd:dateTime)))
+
+EquivalentClasses(:RomanEmpire		DataSomeValuesFrom(:hasDate DatatypeRestriction(xsd:dateTime xsd:maxInclusive "0476-12-31T12:59:59"^^xsd:dateTime xsd:minInclusive "-0027-01-01T00:00:00"^^xsd:dateTime)))
+EquivalentClasses(:FallOfPompeii	DataHasValue(:hasDate "0079-01-01T00:00:00"^^xsd:dateTime))
+
+EquivalentClasses(:ApolloProgram	DataSomeValuesFrom(:hasDate DatatypeRestriction(xsd:dateTime xsd:maxExclusive "1972-12-31T00:00:00"^^xsd:dateTime xsd:minExclusive "1961-01-01T00:00:00"^^xsd:dateTime)))
+EquivalentClasses(:Apollo11Launch	DataHasValue(:hasDate "1969-07-16T13:32:00"^^xsd:dateTime))
+EquivalentClasses(:Apollo11Splashdown	DataHasValue(:hasDate "1969-07-24T16:51:00"^^xsd:dateTime))
+EquivalentClasses(:FirstStep		DataHasValue(:hasDate "1969-07-21T02:56:15"^^xsd:dateTime))
+EquivalentClasses(:MoonLanding		DataHasValue(:hasDate "1969-07-20T20:17:40Z"^^xsd:dateTime))
+)

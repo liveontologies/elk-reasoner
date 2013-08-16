@@ -1,0 +1,23 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+SubClassOf(:Apollo11Launch_EDT		:ApolloProgram)
+SubClassOf(:Apollo11Launch_UTC		:ApolloProgram)
+SubClassOf(:Apollo11Splashdown_UTC	:ApolloProgram)
+SubClassOf(:FirstStep_Houston		:ApolloProgram)
+SubClassOf(:FirstStep_UTC		:ApolloProgram)
+SubClassOf(:MoonLanding_UTC		:ApolloProgram)
+
+SubClassOf(:ApolloProgram		:XX_Century_CEST)
+SubClassOf(:ApolloProgram		:XX_Century_UTC)
+
+EquivalentClasses(:XX_Century_UTC	:XX_Century_CEST)
+
+SubClassOf(:FallOfPompeii		:RomanEmpire)
+)
