@@ -7,13 +7,14 @@ Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
 
 Ontology(<http://www.semanticweb.org/Test.owl>
 
-SubClassOf(:Googol1	:Real_Larger_Than_0)
-SubClassOf(:Googol2	:Real_Larger_Than_0)
+EquivalentClasses(:A2Facets :ABRef :B3Facets)
+EquivalentClasses(:C2x2Facets :CRef)
 
-SubClassOf(:Reals_Between_0_and_10_Ex :Real_Larger_Than_0)
-SubClassOf(:Reals_Between_0_and_10_Ex :Real_Less_Than_10)
+SubClassOf(:C2x2Facets :A2Facets)
+SubClassOf(:C2x2Facets :ABRef)
+SubClassOf(:C2x2Facets :B3Facets)
 
-SubClassOf(:Tiny	:Reals_Between_0_and_10_Ex)
-SubClassOf(:XLarge	:Real_Larger_Than_0)
-SubClassOf(:XSmall	:Real_Less_Than_10)
+SubClassOf(:CRef :A2Facets)
+SubClassOf(:CRef :ABRef)
+SubClassOf(:CRef :B3Facets)
 )

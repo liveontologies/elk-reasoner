@@ -1,0 +1,16 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+EquivalentClasses(:A2Facets	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:integer xsd:minExclusive "0"^^xsd:integer xsd:minExclusive "10"^^xsd:integer)))
+EquivalentClasses(:B3Facets	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:integer xsd:minExclusive "1"^^xsd:integer xsd:minExclusive "0"^^xsd:integer xsd:minExclusive "10"^^xsd:integer)))
+EquivalentClasses(:C2x2Facets	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:integer xsd:maxInclusive "50"^^xsd:integer xsd:maxInclusive "100"^^xsd:integer xsd:minExclusive "0"^^xsd:integer xsd:minExclusive "10"^^xsd:integer)))
+
+EquivalentClasses(:ABRef	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:integer xsd:minExclusive "10"^^xsd:integer)))
+EquivalentClasses(:CRef		DataSomeValuesFrom(:dp DatatypeRestriction(xsd:integer xsd:maxInclusive "50"^^xsd:integer xsd:minExclusive "10"^^xsd:integer)))
+)
