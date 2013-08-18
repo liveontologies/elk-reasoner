@@ -1,0 +1,29 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+EquivalentClasses(:Any_HTTPS_URI        DataSomeValuesFrom(:dp DatatypeRestriction(xsd:anyURI xsd:pattern "https://.+")))
+EquivalentClasses(:Any_HTTP_URI         DataSomeValuesFrom(:dp DatatypeRestriction(xsd:anyURI xsd:pattern "http(s?)://.+")))
+
+EquivalentClasses(:Any_Long_URI         DataSomeValuesFrom(:dp DatatypeRestriction(xsd:anyURI xsd:minLength "20"^^xsd:integer)))
+EquivalentClasses(:Any_Short_URI        DataSomeValuesFrom(:dp DatatypeRestriction(xsd:anyURI xsd:minLength "1"^^xsd:integer xsd:maxLength "10"^^xsd:integer)))
+
+EquivalentClasses(:_some_FTP_URI        DataHasValue(:dp "ftp://ftp.is.co.za/rfc/rfc1808.txt"^^xsd:anyURI))
+EquivalentClasses(:_some_Gopher_URI     DataHasValue(:dp "gopher://spinaltap.micro.umn.edu/00/Weather/California/Los%20Angeles"^^xsd:anyURI))
+EquivalentClasses(:_some_HTTP_URI_LtoR  DataHasValue(:dp "http://herongyang.com/XSD/index.html?sid=123#sum"^^xsd:anyURI))
+EquivalentClasses(:_some_HTTP_URI_RtoL  DataHasValue(:dp "mus#321=dis?lmth.xedni/DSX/moc.gnaygnoreh//:ptth"^^xsd:anyURI))
+EquivalentClasses(:_some_HTTPs_escaped  DataHasValue(:dp "https://en.wikipedia.org/wiki/Los%20Angeles"^^xsd:anyURI))
+EquivalentClasses(:_some_IPv4           DataHasValue(:dp "127.0.0.1"^^xsd:anyURI))
+EquivalentClasses(:_some_HTTP_IPv6      DataHasValue(:dp "http://[::FFFF:129.144.52.38]:80"^^xsd:anyURI))
+EquivalentClasses(:_some_SIP_URI        DataHasValue(:dp "sip:[fd4d:3b2b:8114:1:d6be:d9ff:fea2:35dc]:5065"^^xsd:anyURI))
+EquivalentClasses(:_some_mailto_URI     DataHasValue(:dp "mailto:mduerst@ifi.unizh.ch"^^xsd:anyURI))
+EquivalentClasses(:_some_news_URI       DataHasValue(:dp "news:comp.infosystems.www.servers.unix"^^xsd:anyURI))
+EquivalentClasses(:_some_relative_URI   DataHasValue(:dp "../../g"^^xsd:anyURI))
+EquivalentClasses(:_some_relative_URI2  DataHasValue(:dp "#s"^^xsd:anyURI))
+EquivalentClasses(:_some_telnet_URI     DataHasValue(:dp "telnet://melvyl.ucop.edu/"^^xsd:anyURI))
+)

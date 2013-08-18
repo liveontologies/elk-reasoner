@@ -1,0 +1,32 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+
+SubClassOf(:Any_HTTPS_URI       :Any_HTTP_URI)
+
+SubClassOf(:_some_HTTP_IPv6     :Any_HTTP_URI)
+SubClassOf(:_some_HTTP_URI_LtoR :Any_HTTP_URI)
+
+SubClassOf(:_some_HTTPs_escaped :Any_HTTPS_URI)
+
+SubClassOf(:_some_relative_URI2 :Any_Short_URI)
+SubClassOf(:_some_IPv4          :Any_Short_URI)
+SubClassOf(:_some_relative_URI  :Any_Short_URI)
+
+SubClassOf(:_some_FTP_URI       :Any_Long_URI)
+SubClassOf(:_some_Gopher_URI    :Any_Long_URI)
+SubClassOf(:_some_HTTP_URI_LtoR :Any_Long_URI)
+SubClassOf(:_some_HTTP_URI_RtoL :Any_Long_URI)
+SubClassOf(:_some_HTTPs_escaped :Any_Long_URI)
+SubClassOf(:_some_HTTP_IPv6     :Any_Long_URI)
+SubClassOf(:_some_SIP_URI       :Any_Long_URI)
+SubClassOf(:_some_mailto_URI    :Any_Long_URI)
+SubClassOf(:_some_news_URI      :Any_Long_URI)
+SubClassOf(:_some_telnet_URI    :Any_Long_URI)
+)
