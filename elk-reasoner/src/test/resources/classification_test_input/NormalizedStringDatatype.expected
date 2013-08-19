@@ -1,0 +1,27 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+SubClassOf(:AllNormalizedStrings	:AllStrings)
+SubClassOf(:AnyNonEmptyNString		:AllNormalizedStrings)
+SubClassOf(:AnyShortNString		:AllNormalizedStrings)
+SubClassOf(:NumericNString		:AnyNonEmptyNString)
+
+SubClassOf(:_valid_string_A :AnyNonEmptyNString)
+SubClassOf(:_valid_string_B :AnyNonEmptyNString)
+SubClassOf(:_valid_string_C :AnyNonEmptyNString)
+SubClassOf(:_valid_string_D :AnyShortNString)
+SubClassOf(:_valid_string_D :NumericNString)
+SubClassOf(:_valid_string_E :AnyShortNString)
+SubClassOf(:_valid_string_F :AnyNonEmptyNString)
+SubClassOf(:_valid_string_G :AnyNonEmptyNString)
+SubClassOf(:_valid_string_H :AllStrings)
+SubClassOf(:_valid_string_I :AllStrings)
+
+EquivalentClasses(:InvalidNStringA :InvalidNStringB :InvalidNStringC owl:Nothing)
+)

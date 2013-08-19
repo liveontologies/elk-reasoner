@@ -1,0 +1,31 @@
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+EquivalentClasses(:_valid_string_A	DataHasValue(:dp "This is a string!"))
+EquivalentClasses(:_valid_string_B	DataHasValue(:dp "Édition française."))
+EquivalentClasses(:_valid_string_C	DataHasValue(:dp "AT&amp;T"))
+EquivalentClasses(:_valid_string_D	DataHasValue(:dp "12.5"))
+EquivalentClasses(:_valid_string_E	DataHasValue(:dp ""))
+EquivalentClasses(:_valid_string_F	DataHasValue(:dp "   Отступ 3 пробела   "))
+EquivalentClasses(:_valid_string_G	DataHasValue(:dp " Отступ 1 пробел "))
+EquivalentClasses(:_valid_string_H	DataHasValue(:dp "	Tabulated text	"))
+EquivalentClasses(:_valid_string_I	DataHasValue(:dp "Multiline 
+									text"))
+
+EquivalentClasses(:AllStrings		DataSomeValuesFrom(:dp xsd:string))
+EquivalentClasses(:AllNormalizedStrings	DataSomeValuesFrom(:dp xsd:normalizedString))
+
+EquivalentClasses(:AnyNonEmptyNString	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:normalizedString xsd:minLength "1"^^xsd:integer)))
+EquivalentClasses(:AnyShortNString	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:normalizedString xsd:minLength "0"^^xsd:integer xsd:maxLength "5"^^xsd:integer)))
+EquivalentClasses(:NumericNString	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:normalizedString xsd:pattern "[0-9., ]+")))
+
+EquivalentClasses(:InvalidNStringA	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:normalizedString xsd:maxLength "5"^^xsd:integer xsd:minLength "10"^^xsd:integer)))
+EquivalentClasses(:InvalidNStringB	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:normalizedString xsd:maxLength "-2"^^xsd:integer)))
+EquivalentClasses(:InvalidNStringC	DataSomeValuesFrom(:dp DatatypeRestriction(xsd:normalizedString xsd:minLength "-10"^^xsd:integer)))
+)

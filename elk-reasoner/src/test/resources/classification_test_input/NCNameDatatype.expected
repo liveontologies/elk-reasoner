@@ -1,0 +1,28 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+SubClassOf(:AllNCNames		:AllStrings)
+SubClassOf(:AnyNonEmptyNCName	:AllNCNames)
+SubClassOf(:AnyShortNCName	:AllNCNames)
+
+SubClassOf(:_valid_string_A	:AllStrings)
+SubClassOf(:_valid_string_B	:AllStrings)
+SubClassOf(:_valid_string_C	:AllStrings)
+SubClassOf(:_valid_string_D	:AllStrings)
+SubClassOf(:_valid_string_E	:AllStrings)
+SubClassOf(:_valid_string_F	:AllStrings)
+SubClassOf(:_valid_string_G	:AllStrings)
+SubClassOf(:_valid_string_H	:AllStrings)
+SubClassOf(:_valid_string_I	:AllStrings)
+SubClassOf(:_valid_string_K	:AllStrings)
+SubClassOf(:_valid_string_J	:AnyNonEmptyNCName)
+SubClassOf(:_valid_string_J	:AnyShortNCName)
+
+EquivalentClasses(:InvalidNCNameA :InvalidNCNameB :InvalidNCNameC :NumericNCName owl:Nothing)
+)
