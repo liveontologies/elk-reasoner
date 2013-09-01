@@ -25,13 +25,14 @@ package org.semanticweb.elk.reasoner.incremental;
  * #L%
  */
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
 
 /**
  * TODO docs
@@ -44,7 +45,7 @@ public interface RandomWalkRunnerIO<T> {
 
 	void revertChanges(Reasoner reasoner, IncrementalChange<T> change);
 
-	void printAxiom(T axiom, Logger logger, Level level);
+	void printAxiom(T axiom, Logger logger, LogLevel level);
 
 	Reasoner createReasoner(Iterable<T> axioms);
 
@@ -79,8 +80,8 @@ public interface RandomWalkRunnerIO<T> {
 		}
 
 		@Override
-		public void printAxiom(ElkAxiom axiom, Logger logger, Level level) {
-			logger.log(level, OwlFunctionalStylePrinter.toString(axiom));
+		public void printAxiom(ElkAxiom axiom, Logger logger, LogLevel level) {
+			LoggerWrap.log(logger, level, OwlFunctionalStylePrinter.toString(axiom));
 		}
 
 		@Override

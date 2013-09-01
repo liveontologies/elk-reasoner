@@ -22,7 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.util.logging.Statistics;
 
@@ -37,7 +38,7 @@ import org.semanticweb.elk.util.logging.Statistics;
 public class LoggingStageExecutor extends AbstractStageExecutor {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(LoggingStageExecutor.class);
 
 	@Override

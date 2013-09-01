@@ -26,7 +26,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -50,7 +51,7 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  */
 public class DifferentialIndex extends DirectIndex {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(DifferentialIndex.class);
 
 	/**

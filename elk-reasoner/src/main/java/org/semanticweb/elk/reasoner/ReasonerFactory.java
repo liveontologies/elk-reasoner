@@ -28,7 +28,8 @@ package org.semanticweb.elk.reasoner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
@@ -46,7 +47,7 @@ import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
  */
 public class ReasonerFactory {
 
-	final static Logger LOGGER_ = Logger.getLogger(ReasonerFactory.class);
+	final static Logger LOGGER_ = LoggerFactory.getLogger(ReasonerFactory.class);
 	final static ReasonerStageExecutor DEFAULT_STAGE_EXECUTOR = new SimpleStageExecutor();
 
 	public Reasoner createReasoner(AxiomLoader axiomLoader) {

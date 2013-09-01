@@ -28,14 +28,15 @@ package org.semanticweb.elk.reasoner.incremental;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
 
 /**
  * TODO docs
@@ -53,7 +54,7 @@ public class RandomWalkIncrementalRealizationRunner<T> extends
 	}
 
 	@Override
-	protected void printResult(Reasoner reasoner, Logger logger, Level level)
+	protected void printResult(Reasoner reasoner, Logger logger, LogLevel level)
 			throws IOException, ElkException {
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = reasoner
 				.getInstanceTaxonomyQuietly();
@@ -62,8 +63,8 @@ public class RandomWalkIncrementalRealizationRunner<T> extends
 		TaxonomyPrinter.dumpInstanceTaxomomy(taxonomy, writer, false);
 		writer.flush();
 
-		logger.log(level, "INSTANCE TAXONOMY");
-		logger.log(level, writer.getBuffer());
+		LoggerWrap.log(logger, level, "INSTANCE TAXONOMY");
+		LoggerWrap.log(logger, level, writer.getBuffer().toString());
 		writer.close();
 	}
 

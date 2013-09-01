@@ -25,7 +25,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -35,7 +36,7 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
 class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SubPropertyExplorer.class);
 
 	final private Set<IndexedPropertyChain> allSubProperties_ = new ArrayHashSet<IndexedPropertyChain>();

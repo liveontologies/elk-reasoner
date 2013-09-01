@@ -31,7 +31,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -87,7 +88,7 @@ class ContextInitializationFactory
 		implements
 		InputProcessorFactory<ArrayList<Context>, InputProcessor<ArrayList<Context>>> {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContextInitializationFactory.class);
 
 	private final SaturationState saturationState_;

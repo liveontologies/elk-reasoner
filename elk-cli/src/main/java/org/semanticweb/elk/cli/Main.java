@@ -56,6 +56,7 @@ import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.logging.Statistics;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -68,7 +69,7 @@ import org.semanticweb.elk.util.logging.Statistics;
  */
 public class Main {
 	// logger for this class
-	private static final Logger LOGGER_ = Logger.getLogger(Main.class);
+	private static final org.slf4j.Logger LOGGER_ = LoggerFactory.getLogger(Main.class);
 
 	/**
 	 * @param args
@@ -147,7 +148,9 @@ public class Main {
 			System.err.println("Cannot set more than one logging level!");
 			return;
 		}
+		// TODO Can we do this with SLF4J?
 		Logger allLoggers = Logger.getLogger("org.semanticweb.elk");
+		
 		if (options.has(logging))
 			allLoggers.setLevel(Level.toLevel(options.valueOf(logging),
 					Level.INFO));

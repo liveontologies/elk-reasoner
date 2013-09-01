@@ -39,8 +39,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,6 +66,8 @@ import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.io.URLTestIO;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -76,6 +76,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -87,7 +89,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 public class OWLAPIRandomWalkIncrementalClassificationTest {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(OWLAPIRandomWalkIncrementalClassificationTest.class);
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
@@ -249,8 +251,8 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		}
 
 		@Override
-		public void printAxiom(OWLAxiom axiom, Logger logger, Level level) {
-			logger.log(level, "Current axiom: " + axiom);
+		public void printAxiom(OWLAxiom axiom, Logger logger, LogLevel level) {
+			LoggerWrap.log(logger, level, "Current axiom: " + axiom);
 		}
 
 		@Override

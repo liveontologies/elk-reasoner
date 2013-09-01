@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
@@ -44,7 +42,10 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainFilter;
-import org.semanticweb.elk.util.logging.ElkMessage;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A converter from {@link ElkClassExpression}s,
@@ -59,7 +60,7 @@ import org.semanticweb.elk.util.logging.ElkMessage;
 public class IndexObjectConverter extends AbstractIndexObjectConverter {
 
 	// logger for events
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexObjectConverter.class);
 
 	/**
@@ -208,10 +209,10 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 
 	@Override
 	public IndexedClassExpression visit(ElkDataHasValue elkDataHasValue) {
-		if (LOGGER_.isEnabledFor(Level.WARN))
-			LOGGER_.warn(new ElkMessage(
-					"ELK supports DataHasValue only partially. Reasoning might be incomplete!",
-					"reasoner.indexing.dataHasValue"));
+		if (LOGGER_.isWarnEnabled()) {
+			LoggerWrap.log(LOGGER_, LogLevel.WARN, "reasoner.indexing.dataHasValue", "ELK supports DataHasValue only partially. Reasoning might be incomplete!");
+		}
+
 		return indexedClassFilter_.visit(new IndexedDataHasValue(
 				elkDataHasValue));
 	}

@@ -58,6 +58,14 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
+		<dependency> 
+        	<groupId>org.slf4j</groupId>
+        	<artifactId>slf4j-api</artifactId>
+      	</dependency>
+      	<dependency> 
+        	<groupId>org.slf4j</groupId>
+        	<artifactId>slf4j-log4j12</artifactId>
+      	</dependency>
 	</dependencies>
 
 	<build>
@@ -94,7 +102,7 @@
 						<Implementation-Title>ELK Reasoner</Implementation-Title>
 						<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
 						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
-						<Export-Package>org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui</Export-Package>
+						<Export-Package>org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui;org.slf4j.*</Export-Package>
 						<Private-Package>org.semanticweb.elk.*;-split-package:=merge-first</Private-Package>
 						<Bundle-SymbolicName>org.semanticweb.elk;singleton:=true</Bundle-SymbolicName>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>

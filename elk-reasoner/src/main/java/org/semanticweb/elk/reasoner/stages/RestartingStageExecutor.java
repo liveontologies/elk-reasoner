@@ -22,7 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.semanticweb.elk.util.logging.Statistics;
@@ -39,7 +40,7 @@ public class RestartingStageExecutor extends SimpleInterrupter implements
 		ReasonerStageExecutor {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RestartingStageExecutor.class);
 
 	@Override

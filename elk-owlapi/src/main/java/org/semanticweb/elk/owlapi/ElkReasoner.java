@@ -30,7 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
@@ -46,7 +45,8 @@ import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.semanticweb.elk.util.logging.ElkMessage;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -79,6 +79,8 @@ import org.semanticweb.owlapi.reasoner.TimeOutException;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNode;
 import org.semanticweb.owlapi.util.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link OWLReasoner} interface implementation for ELK {@link Reasoner}
@@ -88,7 +90,7 @@ import org.semanticweb.owlapi.util.Version;
  */
 public class ElkReasoner implements OWLReasoner {
 	// logger for this class
-	private static final Logger LOGGER_ = Logger.getLogger(ElkReasoner.class);
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(ElkReasoner.class);
 
 	// OWL API related objects
 	private final OWLOntology owlOntology_;
@@ -239,7 +241,8 @@ public class ElkReasoner implements OWLReasoner {
 		 * non-persistent settings for ignoring them, we better use only one
 		 * message type to make it easier to ignore them.
 		 */
-		LOGGER_.warn(new ElkMessage(message, "owlapi.unsupportedMethod"));
+		LoggerWrap.log(LOGGER_, LogLevel.WARN, "owlapi.unsupportedMethod", message);
+		
 		return new UnsupportedOperationException(message);
 	}
 
@@ -257,7 +260,8 @@ public class ElkReasoner implements OWLReasoner {
 			String method, String reason) {
 		String message = "OWL API reasoner method is not fully implemented: "
 				+ method + ": " + reason;
-		LOGGER_.warn(new ElkMessage(message, "owlapi.unsupportedMethod"));
+		LoggerWrap.log(LOGGER_, LogLevel.WARN, "owlapi.unsupportedMethod", message);
+		
 		return new UnsupportedOperationException(message);
 	}
 

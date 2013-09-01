@@ -22,7 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.entries.IndexedEntryConverter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
@@ -48,7 +49,7 @@ import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
 public class IndexedObjectCache implements IndexedObjectFilter {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexedObjectCache.class);
 
 	protected final KeyEntryHashSet<IndexedClassExpression> indexedClassExpressionLookup;

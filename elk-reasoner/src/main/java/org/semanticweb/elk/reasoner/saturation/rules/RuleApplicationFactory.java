@@ -22,7 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
@@ -56,7 +57,7 @@ import org.semanticweb.elk.util.logging.CachedTimeThread;
 public class RuleApplicationFactory {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RuleApplicationFactory.class);
 
 	final SaturationState saturationState;

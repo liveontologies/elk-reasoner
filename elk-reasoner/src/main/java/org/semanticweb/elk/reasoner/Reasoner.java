@@ -26,7 +26,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.loading.AbstractAxiomLoader;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
@@ -70,7 +71,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 public class Reasoner extends AbstractReasonerState {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger.getLogger(Reasoner.class);
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(Reasoner.class);
 
 	/**
 	 * The progress monitor that is used for reporting progress.

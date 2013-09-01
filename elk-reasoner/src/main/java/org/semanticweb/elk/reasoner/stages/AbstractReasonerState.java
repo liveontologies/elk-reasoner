@@ -27,7 +27,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ComposedAxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
@@ -82,7 +83,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 public abstract class AbstractReasonerState {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractReasonerState.class);
 
 	final SaturationState saturationState;

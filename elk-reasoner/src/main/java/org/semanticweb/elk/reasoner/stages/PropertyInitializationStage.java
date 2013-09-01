@@ -24,7 +24,8 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 
@@ -40,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain
 class PropertyInitializationStage extends AbstractReasonerStage {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(PropertyInitializationStage.class);
 
 	/**

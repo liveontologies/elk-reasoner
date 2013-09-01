@@ -24,7 +24,8 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
@@ -52,7 +53,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
  */
 public class SaturationUtils {
 
-	protected static final Logger LOGGER_ = Logger.getLogger(SaturationUtils.class);
+	protected static final Logger LOGGER_ = LoggerFactory.getLogger(SaturationUtils.class);
 	
 	
 	

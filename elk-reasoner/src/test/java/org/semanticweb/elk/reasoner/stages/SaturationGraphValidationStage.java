@@ -30,7 +30,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.ContextRootInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass.OwlThingContextInitializationRule;
@@ -62,7 +63,7 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  */
 public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SaturationGraphValidationStage.class);
 
 	private final OntologyIndex index_;

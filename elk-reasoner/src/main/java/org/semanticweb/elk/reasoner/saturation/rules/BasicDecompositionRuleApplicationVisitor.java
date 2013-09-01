@@ -22,7 +22,8 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
@@ -42,7 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 abstract class BasicDecompositionRuleApplicationVisitor implements
 		DecompositionRuleApplicationVisitor {
 
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(BasicDecompositionRuleApplicationVisitor.class);
 
 	@Override

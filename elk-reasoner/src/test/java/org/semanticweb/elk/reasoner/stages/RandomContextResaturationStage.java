@@ -32,7 +32,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -50,7 +51,7 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  */
 public class RandomContextResaturationStage extends AbstractReasonerStage {
 
-	static final Logger LOGGER_ = Logger
+	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RandomContextResaturationStage.class);
 
 	private final double RATIO_ = 0.2;

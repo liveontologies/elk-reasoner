@@ -24,8 +24,9 @@ package org.semanticweb.elk.reasoner.saturation.context;
  * #L%
  */
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
 
 /**
  * Keeps statistics about the number of created and modified contexts
@@ -74,21 +75,21 @@ public class ContextStatistics {
 		timeContextProcess += stats.timeContextProcess;
 	}
 
-	public void print(Logger logger, Priority level) {
+	public void print(Logger logger, LogLevel level) {
 		if (!logger.isDebugEnabled() || addCounter_ <= 0)
 			return;
 
 		if (countCreatedContexts > 0) {
-			logger.log(level, "Contexts created: " + countCreatedContexts);
+			LoggerWrap.log(logger, level, "Contexts created: " + countCreatedContexts);
 		}
 		
 		if (countProcessedContexts > 0) {
-			logger.log(level, "Contexts processed: " + countProcessedContexts + " (" +
+			LoggerWrap.log(logger, level, "Contexts processed: " + countProcessedContexts + " (" +
 					(timeContextProcess / addCounter_) + " ms)");
 		}
 		
 		if (countModifiedContexts > 0) {
-			logger.log(level, "Contexts modified: " + countModifiedContexts);
+			LoggerWrap.log(logger, level, "Contexts modified: " + countModifiedContexts);
 		}
 	}
 	

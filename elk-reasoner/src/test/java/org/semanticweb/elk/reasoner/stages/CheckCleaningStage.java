@@ -26,7 +26,8 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -41,7 +42,7 @@ import org.semanticweb.elk.util.collections.Multimap;
  */
 public class CheckCleaningStage extends BasePostProcessingStage {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(CheckCleaningStage.class);
 
 	private final AbstractReasonerState reasoner_;

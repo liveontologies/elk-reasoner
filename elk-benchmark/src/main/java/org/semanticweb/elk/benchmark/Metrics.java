@@ -27,8 +27,9 @@ package org.semanticweb.elk.benchmark;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
 
 /**
  * @author Pavel Klinov
@@ -102,7 +103,7 @@ public class Metrics {
 	/**
 	 * @param logger
 	 */
-	public void printAverages(final Logger logger, Priority level) {
+	public void printAverages(final Logger logger, LogLevel level) {
 		StringBuffer buffer = new StringBuffer();
 		String delim = System.getProperty("line.separator");
 		
@@ -117,7 +118,7 @@ public class Metrics {
 			}
 		}
 		
-		logger.log(level, buffer.toString());
+		LoggerWrap.log(logger, level, buffer.toString());
 	}
 	
 	//TODO Remove this debug method

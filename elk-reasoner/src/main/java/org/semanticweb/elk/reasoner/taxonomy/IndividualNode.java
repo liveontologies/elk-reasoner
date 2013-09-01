@@ -36,7 +36,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.util.Comparators;
@@ -59,7 +60,7 @@ public class IndividualNode implements
 		UpdateableInstanceNode<ElkClass, ElkNamedIndividual> {
 
 	// logger for events
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndividualNode.class);
 
 	/**

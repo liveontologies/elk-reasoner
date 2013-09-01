@@ -26,9 +26,10 @@ package org.semanticweb.elk.benchmark;
 
 import java.util.Collection;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.util.logging.ElkTimer;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -40,7 +41,7 @@ import org.semanticweb.elk.util.logging.ElkTimer;
  */
 public class RunAllOnceThenRepeatRunner {
 
-	private static final Logger LOGGER_ = Logger.getLogger(RunAllOnceThenRepeatRunner.class);
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(RunAllOnceThenRepeatRunner.class);
 	
 	protected final int warmups;
 	protected final int runs;
@@ -92,12 +93,12 @@ public class RunAllOnceThenRepeatRunner {
 	
 	public void logStats(TaskCollection collection) {
 		for (ElkTimer timer : ElkTimer.getNamedTimers()) {
-			timer.log(LOGGER_, Level.INFO);
+			timer.log(LOGGER_, LogLevel.INFO);
 		}
 				
 		if (collection.getMetrics() != null) {
 			System.err.println(collection.getMetrics());
-			collection.getMetrics().printAverages(LOGGER_, Level.WARN);
+			collection.getMetrics().printAverages(LOGGER_, LogLevel.WARN);
 		}
 	}
 }

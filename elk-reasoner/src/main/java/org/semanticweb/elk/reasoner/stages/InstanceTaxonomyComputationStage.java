@@ -22,7 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
 
 /**
@@ -35,7 +36,7 @@ import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
 class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(InstanceTaxonomyComputationStage.class);
 
 	/**

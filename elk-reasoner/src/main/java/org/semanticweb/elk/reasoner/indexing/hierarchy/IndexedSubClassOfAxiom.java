@@ -26,7 +26,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
@@ -41,7 +42,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexedSubClassOfAxiom.class);
 
 	private final IndexedClassExpression subClass_, superClass_;

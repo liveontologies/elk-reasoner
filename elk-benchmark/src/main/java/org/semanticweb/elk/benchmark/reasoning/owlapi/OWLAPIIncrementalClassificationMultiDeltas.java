@@ -28,7 +28,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.benchmark.AllFilesTaskCollection;
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
@@ -58,7 +59,7 @@ public abstract class OWLAPIIncrementalClassificationMultiDeltas extends
 		AllFilesTaskCollection {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = Logger.getLogger(IncrementalClassificationMultiDeltas.class);
+	protected static final Logger LOGGER_ = LoggerFactory.getLogger(IncrementalClassificationMultiDeltas.class);
 	
 	private static final String ADDITION_SUFFIX = "delta-plus";
 	private static final String DELETION_SUFFIX = "delta-minus";

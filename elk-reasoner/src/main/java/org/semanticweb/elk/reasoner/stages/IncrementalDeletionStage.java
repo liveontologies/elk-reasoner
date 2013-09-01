@@ -22,7 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
@@ -37,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleDeapplicationFactory;
 public class IncrementalDeletionStage extends AbstractReasonerStage {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IncrementalDeletionStage.class);
 
 	private ClassExpressionNoInputSaturation desaturation_ = null;

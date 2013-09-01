@@ -1,6 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 /*
  * #%L

@@ -29,7 +29,8 @@ import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
@@ -48,7 +49,7 @@ import org.semanticweb.elk.util.collections.Operations;
  */
 public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IncrementalTaxonomyCleaningStage.class);
 
 	private TaxonomyCleaning cleaning_ = null;

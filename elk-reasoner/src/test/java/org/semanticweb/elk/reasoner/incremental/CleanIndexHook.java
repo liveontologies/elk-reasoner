@@ -27,7 +27,8 @@ package org.semanticweb.elk.reasoner.incremental;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
@@ -45,7 +46,7 @@ import org.semanticweb.elk.util.collections.Operations;
  */
 public class CleanIndexHook implements RandomWalkTestHook {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(CleanIndexHook.class);
 
 	@Override

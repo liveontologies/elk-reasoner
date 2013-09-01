@@ -30,7 +30,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.benchmark.AllFilesTaskCollection;
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
@@ -73,7 +74,7 @@ public class IncrementalClassificationMultiDeltas extends
 		AllFilesTaskCollection {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = Logger.getLogger(IncrementalClassificationMultiDeltas.class);
+	protected static final Logger LOGGER_ = LoggerFactory.getLogger(IncrementalClassificationMultiDeltas.class);
 	
 	private static final String ADDITION_SUFFIX = "delta-plus";
 	private static final String DELETION_SUFFIX = "delta-minus";

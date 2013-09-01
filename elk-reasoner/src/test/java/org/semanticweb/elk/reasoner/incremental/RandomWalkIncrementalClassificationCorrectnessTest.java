@@ -30,7 +30,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -55,7 +56,7 @@ public class RandomWalkIncrementalClassificationCorrectnessTest extends
 		BaseRandomWalkIncrementalCorrectnessTest {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RandomWalkIncrementalClassificationCorrectnessTest.class);
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";

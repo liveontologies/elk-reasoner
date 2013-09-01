@@ -32,7 +32,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -68,7 +69,7 @@ import org.semanticweb.elk.util.collections.Operations.FunctorEx;
 public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 	// logger for events
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ConcurrentInstanceTaxonomy.class);
 
 	/** thread safe map from class IRIs to individual nodes */

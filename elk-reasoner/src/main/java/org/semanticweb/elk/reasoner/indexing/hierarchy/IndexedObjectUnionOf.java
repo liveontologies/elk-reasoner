@@ -25,8 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectUnionOfVisitor;
@@ -42,7 +40,10 @@ import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.semanticweb.elk.util.logging.ElkMessage;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkObjectUnionOf} in an ontology.
@@ -51,7 +52,7 @@ import org.semanticweb.elk.util.logging.ElkMessage;
  */
 public class IndexedObjectUnionOf extends IndexedClassExpression {
 
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexedObjectUnionOf.class);
 
 	private final Set<IndexedClassExpression> disjuncts_;
@@ -88,10 +89,13 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 
 		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
 			// first positive occurrence of this expression
-			if (LOGGER_.isEnabledFor(Level.WARN))
-				LOGGER_.warn(new ElkMessage(
-						"ELK does not support positive occurrences of ObjectUnionOf. Reasoning might be incomplete!",
-						"reasoner.indexing.IndexedObjectUnionOf"));
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap
+						.log(LOGGER_,
+								LogLevel.WARN,
+								"reasoner.indexing.IndexedObjectUnionOf",
+								"ELK does not support positive occurrences of ObjectUnionOf. Reasoning might be incomplete!");
+			}
 		}
 
 		positiveOccurrenceNo += positiveIncrement;

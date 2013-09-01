@@ -32,7 +32,8 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
@@ -51,7 +52,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 class SaturationStateImpl implements SaturationState {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SaturationStateImpl.class);
 
 	private final OntologyIndex ontologyIndex_;
