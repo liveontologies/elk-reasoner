@@ -70,8 +70,8 @@ public class ReflexivePropertyComputationFactory
 		SaturatedPropertyChain saturation = SaturatedPropertyChain
 				.getCreate(ipc);
 		if (saturation.setReflexive()) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(ipc + ": set reflexive");
+			LOGGER_.trace("{}: set reflexive", ipc);
+
 			toDo_.add(ipc);
 		}
 	}

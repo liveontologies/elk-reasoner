@@ -138,16 +138,14 @@ public class ConsistencyChecking
 	public static Collection<IndexedClassEntity> getTestEntities(
 			final OntologyIndex ontologyIndex) {
 		if (!ontologyIndex.getIndexedOwlNothing().occursPositively()) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("owl:Nothing does not occur positively; ontology is consistent");
+			LOGGER_.trace("owl:Nothing does not occur positively; ontology is consistent");
 			/*
 			 * if the ontology does not have any positive occurrence of bottom,
 			 * everything is always consistent
 			 */
 			return Collections.emptySet();
 		} else {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("owl:Nothing occurs positively");
+			LOGGER_.trace("owl:Nothing occurs positively");
 			/*
 			 * first consistency is checked for {@code owl:Thing}, then for the
 			 * individuals in the ontology

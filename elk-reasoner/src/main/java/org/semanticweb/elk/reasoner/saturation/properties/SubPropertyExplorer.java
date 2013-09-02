@@ -110,8 +110,9 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 			IndexedPropertyChain property) {
 		Set<IndexedPropertyChain> result = new SubPropertyExplorer(property)
 				.getRelevantSubProperties();
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(property + " relevant subproperties: " + result);
+		
+		LOGGER_.trace("{} relevant subproperties: {}", property, result);
+		
 		return result;
 	}
 

@@ -288,9 +288,8 @@ public class ClassTaxonomyComputationFactory implements
 		@Override
 		public final void submit(Collection<IndexedClass> input) {
 			for (IndexedClass ic : input) {
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(ic + ": taxonomy construction started");
-				}
+				LOGGER_.trace("{}: taxonomy construction started", ic);
+
 				transitiveReductionEngine
 						.submit(new TransitiveReductionJob<IndexedClass>(ic));
 			}

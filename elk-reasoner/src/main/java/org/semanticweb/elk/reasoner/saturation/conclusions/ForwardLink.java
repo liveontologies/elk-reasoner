@@ -177,9 +177,7 @@ public class ForwardLink extends AbstractConclusion {
 		@Override
 		public void apply(BasicSaturationStateWriter engine, BackwardLink link) {
 
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + link);
-			}
+			LOGGER_.trace("Applying {} to {}", NAME, link);
 
 			/* compose the link with all forward links */
 			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link

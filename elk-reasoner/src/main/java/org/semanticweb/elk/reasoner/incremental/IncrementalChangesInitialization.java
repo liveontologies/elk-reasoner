@@ -177,9 +177,8 @@ class ContextInitializationFactory
 				LinkRule<Context> nextLocalRule = indexChanges_.get(changedICE);
 				if (nextLocalRule != null) {
 					localRuleHits++;
-					if (LOGGER_.isTraceEnabled())
-						LOGGER_.trace(context + ": applying rules for "
-								+ changedICE);
+					
+					LOGGER_.trace("{}: applying rules for {}", context, changedICE);
 				}
 				while (nextLocalRule != null) {
 					nextLocalRule.accept(ruleAppVisitor, saturationStateWriter,

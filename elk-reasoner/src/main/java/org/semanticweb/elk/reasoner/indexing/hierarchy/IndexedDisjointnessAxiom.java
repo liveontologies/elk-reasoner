@@ -208,9 +208,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 		@Override
 		public void apply(BasicSaturationStateWriter writer, Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + context);
-			}
+			LOGGER_.trace("Applying {} to {}", NAME, context);
+			
 			for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
 				writer.produce(context, new DisjointnessAxiom(disAxiom));
 		}
@@ -286,9 +285,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 		@Override
 		public void apply(BasicSaturationStateWriter writer, Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + context);
-			}
+			LOGGER_.trace("Applying {} to {}", NAME, context);
+			
 			writer.produce(context, Contradiction.getInstance());
 		}
 

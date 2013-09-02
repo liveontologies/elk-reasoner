@@ -134,13 +134,11 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		private void validate(IndexedClassExpression ice) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Validating class expression " + ice);
-			}
+			LOGGER_.trace("Validating class expression {}", ice);
 
 			// this is the main check
 			if (!ice.occurs()) {
-				LOGGER_.error("Dead class expression: " + ice);
+				LOGGER_.error("Dead class expression: {}", ice);
 			}
 
 			// validating context

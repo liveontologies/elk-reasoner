@@ -60,9 +60,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 			Iterable<ElkAxiom> axioms) throws ElkException {
 		int size = getIndexSize(reasoner);
 
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("initial size is " + size);
-		}
+		LOGGER_.debug("initial size is {}", size);
 
 		// remove everything from the index
 		TestChangesLoader loader = new TestChangesLoader();
@@ -74,9 +72,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 			}
 		}
 
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Cleaning the index...");
-		}
+		LOGGER_.debug("Cleaning the index...");
 
 		reasoner.registerAxiomLoader(loader);
 		reasoner.setAllowIncrementalMode(false);

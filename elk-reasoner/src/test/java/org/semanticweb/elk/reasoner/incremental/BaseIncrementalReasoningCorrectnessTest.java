@@ -137,8 +137,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 			applyChanges(incrementalReasoner, changingAxioms.getOnElements(),
 					IncrementalChangeType.DELETE);
 
-			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("===DELETIONS===");
+			LOGGER_.info("===DELETIONS===");
 
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 
@@ -148,8 +147,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 			applyChanges(incrementalReasoner, changingAxioms.getOnElements(),
 					IncrementalChangeType.ADD);
 
-			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("===ADDITIONS===");
+			LOGGER_.info("===ADDITIONS===");
 
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 		}

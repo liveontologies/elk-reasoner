@@ -232,9 +232,8 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 			throw new ElkUnexpectedIndexingException(this
 					+ ": cannot assign null saturation");
 		saturated_ = saturatedObjectProperty;
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(this + ": saturation assinged");
-		}
+		LOGGER_.trace("{}: saturation assinged", this);
+
 		return null;
 	}
 
@@ -243,9 +242,7 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 	 */
 	public synchronized void resetSaturated() {
 		saturated_ = null;
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(this + ": saturation removed");
-		}
+		LOGGER_.trace("{}: saturation removed", this);
 	}
 
 	/**

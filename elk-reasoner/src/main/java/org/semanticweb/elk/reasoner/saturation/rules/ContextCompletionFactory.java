@@ -348,12 +348,9 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			public void produce(Context context, Conclusion conclusion) {
 
 				if (existsGlobally(context, conclusion)) {
-					if (LOGGER_.isTraceEnabled()) {
-						LOGGER_.trace(context
-								+ ": conclusion "
-								+ conclusion
-								+ " exists in the main context, producing locally");
-					}
+					LOGGER_.trace(
+							"{}: conclusion {} exists in the main context, producing locally",
+							context, conclusion);
 					// produce the conclusion for the local copy of the context
 					produceLocally(context, conclusion);
 				}
@@ -445,12 +442,9 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 			void produceGlobally(Context context, Conclusion conclusion) {
 				// insert to the main context's ToDo
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(context
-							+ ": conclusion "
-							+ conclusion
-							+ " does NOT exist in the main context, insert into TODO");
-				}
+				LOGGER_.trace(
+						"{}: conclusion {} does NOT exist in the main context, insert into TODO",
+						context, conclusion);
 
 				mainStateWriter_.produce(context.getRoot().getContext(),
 						conclusion);

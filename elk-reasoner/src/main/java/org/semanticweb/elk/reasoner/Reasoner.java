@@ -114,8 +114,8 @@ public class Reasoner extends AbstractReasonerState {
 		this.stageExecutor = stageExecutor;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("ELK reasoner was created");
+
+		LOGGER_.info("ELK reasoner was created");
 	}
 
 	/**
@@ -227,8 +227,7 @@ public class Reasoner extends AbstractReasonerState {
 		boolean success = executor_.isShutdown();
 		executor_ = null;
 		if (success) {
-			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("ELK reasoner has shut down");
+			LOGGER_.info("ELK reasoner has shut down");
 		} else {
 			LOGGER_.error("ELK reasoner failed to shut down!");
 		}

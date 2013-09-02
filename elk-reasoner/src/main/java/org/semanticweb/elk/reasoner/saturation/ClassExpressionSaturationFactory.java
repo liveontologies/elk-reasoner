@@ -297,10 +297,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				rootSaturation.setSaturated(true);
 				nextJob.setOutput(rootSaturation);
 				
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(root + ": saturation finished");
-				}
-				
+				LOGGER_.trace("{}: saturation finished", root);
+			
 				localStatistics.jobsProcessedNo++;
 				listener_.notifyFinished(nextJob);
 			}
@@ -478,9 +476,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 														// InterruptedException
 					continue;
 				}
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(root + ": saturation started");
-				}
+
+				LOGGER_.trace("{}: saturation started", root);
 				/*
 				 * submit the job to the rule engine and start processing it
 				 */

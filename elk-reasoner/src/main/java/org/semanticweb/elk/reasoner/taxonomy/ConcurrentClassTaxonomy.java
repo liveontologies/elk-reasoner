@@ -173,9 +173,9 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 			return previous;
 
 		allSatisfiableClassNodes_.add(node);
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("node created: " + node);
-		}
+		
+		LOGGER_.trace("node created: {}", node);
+		
 		for (ElkClass member : members) {
 			if (member != canonical)
 				classNodeLookup_.put(getKey(member), node);
@@ -205,8 +205,8 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 				changed |= classNodeLookup_.remove(getKey(member)) != null;
 			}
 
-			if (changed && LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace(node + ": node removed");
+			if (changed) {
+				LOGGER_.trace("{}: node removed", node);
 			}
 		}
 

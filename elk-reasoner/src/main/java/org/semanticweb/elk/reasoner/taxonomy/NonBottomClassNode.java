@@ -112,10 +112,7 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	 */
 	@Override
 	public synchronized void addDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
-		
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(this + ": new direct super-node " + superNode);
-		}
+		LOGGER_.trace("{}: new direct super-node {}", this, superNode);
 		
 		directSuperNodes_.add(superNode);
 	}
@@ -128,9 +125,7 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	 */
 	@Override
 	public synchronized void addDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(this + ": new direct sub-node " + subNode);
-		}
+		LOGGER_.trace("{}: new direct sub-node {}", this, subNode);
 
 		if (directSubNodes_.isEmpty()) {
 			this.taxonomy_.countNodesWithSubClasses.incrementAndGet();
@@ -224,8 +219,7 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	}
 
 	public void setMembers(Collection<ElkClass> members) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(this + ": updating members to " + members);
+		LOGGER_.trace("{}: updating members to {}", this, members);
 		members_.clear();
 		members_.addAll(members);
 		Collections.sort(this.members_, Comparators.ELK_CLASS_COMPARATOR);
@@ -246,13 +240,12 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	}
 
 	@Override
-	public /*synchronized*/ boolean removeDirectSubNode(
+	public boolean removeDirectSubNode(
 			UpdateableTaxonomyNode<ElkClass> subNode) {
 		boolean changed = directSubNodes_.remove(subNode);
 
-		if (changed && LOGGER_.isTraceEnabled())
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(this + ": removed direct sub-node " + subNode);
+		if (changed)
+			LOGGER_.trace("{}: removed direct sub-node {}", this, subNode);
 
 		if (directSubNodes_.isEmpty()) {
 			taxonomy_.countNodesWithSubClasses.decrementAndGet();
@@ -262,12 +255,11 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	}
 
 	@Override
-	public /*synchronized*/ boolean removeDirectSuperNode(
+	public boolean removeDirectSuperNode(
 			UpdateableTaxonomyNode<ElkClass> superNode) {
 		boolean changed = directSuperNodes_.remove(superNode);
 
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(this + ": removed direct super-node " + superNode);
+		LOGGER_.trace("{}: removed direct super-node {}", this, superNode);
 
 		return changed;
 	}

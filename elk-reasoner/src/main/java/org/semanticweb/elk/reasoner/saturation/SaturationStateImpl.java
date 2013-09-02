@@ -237,8 +237,7 @@ class SaturationStateImpl implements SaturationState {
 
 		@Override
 		public void produce(Context context, Conclusion conclusion) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(context + ": produced conclusion " + conclusion);
+			LOGGER_.trace("{}: produced conclusion {}", context, conclusion);
 			// this may be necessary, e.g., for counting produced conclusions
 			conclusion.accept(producedConclusionVisitor_, context);
 			
@@ -249,9 +248,7 @@ class SaturationStateImpl implements SaturationState {
 		}
 
 		protected void markAsNotSaturatedInternal(Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace(context + ": marked as non-saturated");
-			}
+			LOGGER_.trace("{}: marked as non-saturated", context);
 
 			notSaturatedContexts_.add(context.getRoot());
 			contextModificationListener_.notifyContextModification(context);
@@ -270,8 +267,7 @@ class SaturationStateImpl implements SaturationState {
 
 		@Override
 		public void clearNotSaturatedContexts() {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Clear non-saturated contexts");
+			LOGGER_.trace("Clear non-saturated contexts");
 			notSaturatedContexts_.clear();
 		}
 

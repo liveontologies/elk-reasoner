@@ -60,8 +60,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	protected int indexedObjectPropertyCount = 0;
 
 	public IndexedObjectCache() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Creating new cache");
+		LOGGER_.trace("Creating new cache");
 
 		indexedClassExpressionLookup = new KeyEntryHashSet<IndexedClassExpression>(
 				new IndexedClassExpressionViewFactory(), 1024);
@@ -76,8 +75,8 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	}
 
 	public void clear() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Clear cache");
+		LOGGER_.trace("Clear cache");
+		
 		indexedClassExpressionLookup.clear();
 		indexedPropertyChainLookup.clear();
 		indexedAxiomLookup.clear();
@@ -216,8 +215,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	final IndexedObjectVisitor<Boolean> inserter = new IndexedObjectVisitor<Boolean>() {
 		@Override
 		public Boolean visit(IndexedClass element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
 			if (indexedClassExpressionLookup.add(element)) {
 				indexedClassCount++;
 				return true;
@@ -227,8 +225,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedIndividual element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
 			if (indexedClassExpressionLookup.add(element)) {
 				indexedIndividualCount++;
 				return true;
@@ -238,43 +235,37 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedObjectComplementOf element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
 			return indexedClassExpressionLookup.add(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectIntersectionOf element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
 			return indexedClassExpressionLookup.add(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectSomeValuesFrom element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
 			return indexedClassExpressionLookup.add(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectUnionOf element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
 			return indexedClassExpressionLookup.add(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedDataHasValue element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
 			return indexedClassExpressionLookup.add(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectProperty element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
 			if (indexedPropertyChainLookup.add(element)) {
 				indexedObjectPropertyCount++;
 				if (SaturatedPropertyChain.isRelevant(element))
@@ -286,8 +277,8 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedBinaryPropertyChain element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
+			
 			if (indexedPropertyChainLookup.add(element)) {
 				if (SaturatedPropertyChain.isRelevant(element))
 					SaturatedPropertyChain.getCreate(element);
@@ -304,8 +295,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedDisjointnessAxiom axiom) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + axiom);
+			LOGGER_.trace("Adding {}", axiom);
 			return indexedAxiomLookup.add(axiom);
 		}
 
@@ -315,8 +305,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedClass element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+			LOGGER_.trace("Removing {}", element);
 
 			if (indexedClassExpressionLookup.removeEntry(element) != null) {
 				indexedClassCount--;
@@ -327,8 +316,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedIndividual element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+			LOGGER_.trace("Removing {}", element);
 
 			if (indexedClassExpressionLookup.removeEntry(element) != null) {
 				indexedIndividualCount--;
@@ -339,43 +327,37 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedObjectComplementOf element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+			LOGGER_.trace("Removing {}", element);
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectIntersectionOf element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+			LOGGER_.trace("Removing {}", element);
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectSomeValuesFrom element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+			LOGGER_.trace("Removing {}", element);
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectUnionOf element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+			LOGGER_.trace("Removing {}", element);
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
 		public Boolean visit(IndexedDataHasValue element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+			LOGGER_.trace("Removing {}", element);
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectProperty element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+			LOGGER_.trace("Removing {}", element);
 
 			if (indexedPropertyChainLookup.removeEntry(element) != null) {
 				indexedObjectPropertyCount--;
@@ -386,8 +368,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedBinaryPropertyChain element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+			LOGGER_.trace("Removing {}", element);
 
 			return indexedPropertyChainLookup.removeEntry(element) != null;
 		}
@@ -400,8 +381,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedDisjointnessAxiom axiom) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + axiom);
+			LOGGER_.trace("Removing {}", axiom);
 
 			return indexedAxiomLookup.removeEntry(axiom) != null;
 		}

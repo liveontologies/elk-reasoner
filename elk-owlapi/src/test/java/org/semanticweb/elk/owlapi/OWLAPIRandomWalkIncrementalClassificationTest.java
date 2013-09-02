@@ -133,9 +133,7 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		ElkReasoner incrementalReasoner = null;
 		long seed = RandomSeedProvider.VALUE;
 
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Initial load of test axioms");
-		}
+		LOGGER_.trace("Initial load of test axioms");
 
 		try {
 			stream = manifest.getInput().getInputStream();
@@ -233,16 +231,14 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 			List<OWLOntologyChange> changes = new LinkedList<OWLOntologyChange>();
 			
 			for (OWLAxiom axiom : change.getDeletions()) {
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace("removing: " + axiom);
-				}
+				LOGGER_.trace("removing: {}", axiom);
+
 				changes.addAll(manager.removeAxiom(ontology_, axiom));
 			}
 			
 			for (OWLAxiom axiom : change.getAdditions()) {
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace("adding: " + axiom);
-				}
+				LOGGER_.trace("adding: {}", axiom);
+
 				changes.addAll(manager.addAxiom(ontology_, axiom));
 			}
 			
@@ -262,16 +258,12 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 			List<OWLOntologyChange> changes = new LinkedList<OWLOntologyChange>();
 			
 			for (OWLAxiom axiom : change.getDeletions()) {
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace("adding: " + axiom);
-				}
+				LOGGER_.trace("adding: {}", axiom);
 				changes.addAll(manager.addAxiom(ontology_, axiom));
 			}
 			
 			for (OWLAxiom axiom : change.getAdditions()) {
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace("deleting: " + axiom);
-				}
+				LOGGER_.trace("deleting: {}", axiom);
 				changes.addAll(manager.removeAxiom(ontology_, axiom));
 			}
 

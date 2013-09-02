@@ -76,9 +76,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(
 				reasoner.saturationState);
 
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Starting random contexts cleaning");
-		}
+		LOGGER_.trace("Starting random contexts cleaning");
 
 		ClassExpressionNoInputSaturation cleaning = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(), reasoner.getNumberOfWorkers(),
@@ -97,9 +95,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 				reasoner.getProgressMonitor(), resatFactory,
 				ContextModificationListener.DUMMY);
 
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Starting random contexts resaturation");
-		}
+		LOGGER_.trace("Starting random contexts resaturation");
 
 		saturation.process();
 
@@ -142,9 +138,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 			i++;
 		}
 
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Random contexts picked: " + contexts);
-		}
+		LOGGER_.trace("Random contexts picked: {}", contexts);
 
 		return contexts;
 	}

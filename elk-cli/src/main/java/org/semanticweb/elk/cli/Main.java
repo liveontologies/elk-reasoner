@@ -212,9 +212,8 @@ public class Main {
 
 	static void writeConsistencyToFile(File file, Boolean consistent)
 			throws IOException, ElkException {
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Writing consistency to " + file);
-		}
+		LOGGER_.info("Writing consistency to {}", file);
+
 		FileWriter fstream = new FileWriter(file);
 		BufferedWriter writer = new BufferedWriter(fstream);
 		writer.write(consistent.toString() + "\n");
@@ -225,9 +224,8 @@ public class Main {
 
 	static void writeClassTaxonomyToFile(File file, Taxonomy<ElkClass> taxonomy)
 			throws IOException, ElkInconsistentOntologyException, ElkException {
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Writing taxonomy to " + file);
-		}
+		LOGGER_.info("Writing taxonomy to {}", file);
+
 		Statistics.logOperationStart("Writing taxonomy", LOGGER_);
 		TaxonomyPrinter.dumpClassTaxomomyToFile(taxonomy, file.getPath(), true);
 		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
@@ -236,9 +234,8 @@ public class Main {
 	static void writeInstanceTaxonomyToFile(File file,
 			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy)
 			throws IOException, ElkInconsistentOntologyException, ElkException {
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Writing taxonomy with instances to " + file);
-		}
+		LOGGER_.info("Writing taxonomy with instances to {}", file);
+
 		Statistics
 				.logOperationStart("Writing taxonomy with instances", LOGGER_);
 		TaxonomyPrinter.dumpInstanceTaxomomyToFile(taxonomy, file.getPath(),

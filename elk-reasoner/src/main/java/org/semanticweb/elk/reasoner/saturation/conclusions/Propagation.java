@@ -145,9 +145,8 @@ public class Propagation extends AbstractConclusion {
 
 		@Override
 		public void apply(BasicSaturationStateWriter writer, BackwardLink link) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + link);
-			}
+			LOGGER_.trace("Applying {} to {}", NAME, link);
+			
 			for (IndexedClassExpression carry : propagationsByObjectProperty_
 					.get(link.getRelation()))
 				writer.produce(link.getSource(), new NegativeSubsumer(carry));

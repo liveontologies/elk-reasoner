@@ -235,8 +235,7 @@ public class DifferentialIndex extends DirectIndex {
 	@Override
 	public void remove(IndexedObject oldObject) {
 		if (incrementalMode) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("To remove: " + oldObject);
+			LOGGER_.trace("To remove: {}", oldObject);
 			oldObject.accept(todoDeletions_.inserter);
 		} else {
 			super.remove(oldObject);
@@ -327,9 +326,8 @@ public class DifferentialIndex extends DirectIndex {
 
 		for (IndexedClassExpression target : addedContextRuleHeadByClassExpressions_
 				.keySet()) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Committing context rule additions for " + target);
-			}
+			LOGGER_.trace("Committing context rule additions for {}", target);
+			
 			nextRule = addedContextRuleHeadByClassExpressions_.get(target);
 			chain = target.getCompositionRuleChain();
 			while (nextRule != null) {
@@ -452,8 +450,8 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	void addIndexedObject(IndexedObject iobj) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Adding: " + iobj);
+		LOGGER_.trace("Adding: {}", iobj);
+		
 		if (!iobj.accept(todoDeletions_.deletor))
 			iobj.accept(objectCache.inserter);
 

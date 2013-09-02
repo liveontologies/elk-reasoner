@@ -83,8 +83,8 @@ public class PropertyHierarchyCompositionComputationFactory
 
 		@Override
 		public Void visit(IndexedBinaryPropertyChain element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Computing compositions for " + element);
+			LOGGER_.trace("Computing compositions for {}", element);
+			
 			IndexedObjectProperty left = element.getLeftProperty();
 			IndexedPropertyChain right = element.getRightProperty();
 			Set<IndexedPropertyChain> leftSubProperties = SubPropertyExplorer
@@ -135,11 +135,9 @@ public class PropertyHierarchyCompositionComputationFactory
 					synchronized (compositionsSoFar) {
 						closure.applyTo(compositionsSoFar);
 						// the logger should be within synchronized
-						if (LOGGER_.isTraceEnabled())
-							LOGGER_.trace("updated compositions: "
-									+ leftSubProperty + " o "
-									+ rightSubProperty + " => "
-									+ compositionsSoFar);
+						LOGGER_.trace("updated compositions: {} o {} => {}",
+								leftSubProperty, rightSubProperty,
+								compositionsSoFar);
 					}
 				}
 			}

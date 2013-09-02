@@ -119,9 +119,8 @@ public class Contradiction extends AbstractConclusion {
 
 		@Override
 		public void apply(BasicSaturationStateWriter engine, BackwardLink link) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + link);
-			}
+			LOGGER_.trace("Applying {} to {}", NAME, link);
+			
 			engine.produce(link.getSource(), Contradiction.getInstance());
 		}
 

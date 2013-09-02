@@ -224,10 +224,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 * If saturation is unsatisfiable, return the unsatisfiable output.
 			 */
 			if (saturation.isInconsistent()) {
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(root
-							+ ": transitive reduction finished: inconsistent");
-				}
+				LOGGER_.trace(
+						"{}: transitive reduction finished: inconsistent", root);
+				
 				TransitiveReductionOutput<R> output = new TransitiveReductionOutputUnsatisfiable<R>(
 						root);
 				initiatorJob.setOutput(output);
@@ -295,6 +294,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			TransitiveReductionOutputEquivalentDirect<R> output = state.output;
 			state.initiatorJob.setOutput(state.output);
 			listener.notifyFinished(state.initiatorJob);
+			
 			if (LOGGER_.isTraceEnabled()) {
 				R root = output.root;
 				LOGGER_.trace(root + ": transitive reduction finished");
@@ -410,9 +410,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		@Override
 		public final void submit(J job) {
 			R root = job.getInput();
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace(root + ": transitive reduction started");
-			}
+
+			LOGGER_.trace("{}: transitive reduction started", root);
+
 			Context context = root.getContext();
 			if (context != null && context.isSaturated()) {
 				jobsWithSaturatedRoot.add(job);

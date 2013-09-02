@@ -174,9 +174,8 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		@Override
 		public void apply(BasicSaturationStateWriter writer, Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + context);
-			}
+			LOGGER_.trace("Applying {} to {}", NAME, context);			
+			
 			final Set<IndexedPropertyChain> candidatePropagationProperties = context
 					.getBackwardLinksByObjectProperty().keySet();
 

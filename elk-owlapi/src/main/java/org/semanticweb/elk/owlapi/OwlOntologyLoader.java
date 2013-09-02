@@ -107,8 +107,9 @@ public class OwlOntologyLoader extends AbstractAxiomLoader implements
 	public void load(ElkAxiomProcessor axiomInserter,
 			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
 		progressMonitor_.start(status);
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(status);
+		
+		LOGGER_.trace("{}", status);
+			
 		for (;;) {
 			if (Thread.currentThread().isInterrupted())
 				break;
@@ -119,16 +120,20 @@ public class OwlOntologyLoader extends AbstractAxiomLoader implements
 				progressMonitor_.finish();
 				updateStatus();
 				progressMonitor_.start(status);
-				if (LOGGER_.isTraceEnabled())
-					LOGGER_.trace(status);
+				
+				LOGGER_.trace("{}", status);
+				
 				initAxioms(importsClosureIterator_.next());
 				continue;
 			}
+			
 			OWLAxiom axiom = axiomsIterator_.next();
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("loading " + axiom);
+
+			LOGGER_.trace("loading {}", axiom);
+			
 			if (OWL_CONVERTER_.isRelevantAxiom(axiom))
 				axiomInserter.visit(OWL_CONVERTER_.convert(axiom));
+			
 			axiomsProcessed_++;
 			progressMonitor_.report(axiomsProcessed_, axiomsCount_);
 		}

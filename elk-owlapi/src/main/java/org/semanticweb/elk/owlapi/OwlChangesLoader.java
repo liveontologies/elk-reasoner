@@ -71,8 +71,9 @@ public class OwlChangesLoader extends AbstractAxiomLoader implements
 			String status = "Loading of Changes";
 			progressMonitor.start(status);
 			int changesCount = pendingChanges_.size();
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(status + ": " + changesCount);
+			
+			LOGGER_.trace("{}: {}", status, changesCount);
+			
 			int currentAxiom = 0;
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
@@ -109,9 +110,7 @@ public class OwlChangesLoader extends AbstractAxiomLoader implements
 	}
 
 	synchronized void registerChange(OWLOntologyChange change) {
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Registering change: " + change);
-		}
+		LOGGER_.trace("Registering change: {}", change);
 
 		pendingChanges_.add(change);
 	}

@@ -92,10 +92,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 		int changingAxiomsCount = changingAxioms.size();
 		int rounds = getNumberOfRounds(changingAxiomsCount);
 
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Running " + rounds + " rounds with " + iterations_
-					+ " random changes");
-		}
+		LOGGER_.info("Running {} rounds with {} random changes", iterations_, rounds);
 
 		int changeSize = getInitialChangeSize(changingAxiomsCount);
 		// this tracker is responsible for generating random changes
@@ -103,10 +100,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				changingAxioms, changeSize);
 
 		for (int j = 0; j < rounds; j++) {
-			if (LOGGER_.isInfoEnabled()) {
-				LOGGER_.info("Generating " + iterations_ + " changes of size: "
-						+ changeSize);
-			}
+			LOGGER_.info("Generating {} changes of size: {}", iterations_, changeSize);
 
 			changingAxioms.setAllOn();
 
@@ -142,9 +136,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				}
 			}
 
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Checking the final result");
-			}
+			LOGGER_.trace("Checking the final result");
 
 			String finalResultHash = resultHashHistory.pollLast();
 			Reasoner standardReasoner = io_.createReasoner(Operations.concat(
@@ -166,9 +158,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 
 			standardReasoner.shutdown();
 
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Reverting the changes");
-			}
+			LOGGER_.trace("Reverting the changes");
 
 			for (;;) {
 				IncrementalChange<T> change = tracker.getChangeHistory()

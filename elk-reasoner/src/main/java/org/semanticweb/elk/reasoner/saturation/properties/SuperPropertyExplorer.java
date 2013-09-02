@@ -102,8 +102,9 @@ class SuperPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 			IndexedPropertyChain property) {
 		Set<IndexedPropertyChain> result = new SuperPropertyExplorer(property)
 				.getRelevantSuperProperties();
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(property + " relevant superproperties: " + result);
+		
+		LOGGER_.trace("{} relevant superproperties: {}", property, result);
+		
 		return result;
 	}
 

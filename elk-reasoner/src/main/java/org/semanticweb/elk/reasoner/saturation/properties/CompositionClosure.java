@@ -60,9 +60,8 @@ class CompositionClosure {
 			relevantCompositions = new LinkedList<IndexedPropertyChain>();
 			relevantCompositions.addAll(root.getToldSuperProperties());
 		}
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(root + " relevant compositions: "
-					+ relevantCompositions);
+
+		LOGGER_.trace("{} relevant compositions: {}", root, relevantCompositions);
 	}
 
 	/**

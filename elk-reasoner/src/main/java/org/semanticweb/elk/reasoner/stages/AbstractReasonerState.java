@@ -228,15 +228,14 @@ public abstract class AbstractReasonerState {
 	 * Reset the axiom loading stage and all subsequent stages
 	 */
 	public synchronized void resetAxiomLoading() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Reset axiom loading");
+		LOGGER_.trace("Reset axiom loading");
 		stageManager.axiomLoadingStage.invalidate();
 		stageManager.incrementalCompletionStage.invalidate();
 	}
 
 	public synchronized void registerAxiomLoader(AxiomLoader newAxiomLoader) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Registering new axiom loader");
+		LOGGER_.trace("Registering new axiom loader");
+		
 		resetAxiomLoading();
 
 		if (axiomLoader_ == null || axiomLoader_.isLoadingFinished())
@@ -298,8 +297,8 @@ public abstract class AbstractReasonerState {
 	 * interrupts running reasoning stages
 	 */
 	public synchronized void interrupt() {
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Interrupt requested");
+		LOGGER_.info("Interrupt requested");
+		
 		isInterrupted_ = true;
 		ReasonerStageExecutor stageExecutor = getStageExecutor();
 		if (stageExecutor != null)

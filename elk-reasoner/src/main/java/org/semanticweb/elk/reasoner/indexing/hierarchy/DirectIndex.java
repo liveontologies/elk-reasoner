@@ -300,9 +300,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 
 		@Override
 		public void apply(BasicSaturationStateWriter writer, Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + context);
-			}
+			LOGGER_.trace("Applying {} to {}", NAME, context);
 			
 			writer.produce(context, new PositiveSubsumer(context.getRoot()));
 		}
