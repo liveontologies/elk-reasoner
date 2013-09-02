@@ -133,9 +133,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 		@Override
 		public void apply(BasicSaturationStateWriter writer, Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + toString() + " to " + context);
-			}
+			LOGGER_.trace("Applying {}: {} to {}", NAME, toldSuperClassExpressions_, context);
+			
 			for (IndexedClassExpression implied : toldSuperClassExpressions_) {
 				writer.produce(context, new PositiveSubsumer(implied));
 			}
@@ -148,8 +147,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			boolean changed = false;
 
 			for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-				if (LOGGER_.isTraceEnabled())
-					LOGGER_.trace("Adding " + ice.toString() + " to " + NAME);
+				LOGGER_.trace("Adding {} to {}", ice, NAME);
+				
 				changed |= rule.addToldSuperClassExpression(ice);
 			}
 
@@ -165,18 +164,15 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 			if (rule != null) {
 				for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-					if (LOGGER_.isTraceEnabled())
-						LOGGER_.trace("Removing " + ice.toString() + " from "
-								+ NAME);
+					LOGGER_.trace("Removing {} from {}", ice, NAME);
+					
 					changed |= rule.removeToldSuperClassExpression(ice);
 				}
 
 				if (rule.isEmpty()) {
 					ruleChain.remove(ThisCompositionRule.MATCHER_);
-
-					if (LOGGER_.isTraceEnabled()) {
-						LOGGER_.trace(NAME + ": removed");
-					}
+					
+					LOGGER_.trace("{}: removed ", NAME);
 
 					return true;
 				}
