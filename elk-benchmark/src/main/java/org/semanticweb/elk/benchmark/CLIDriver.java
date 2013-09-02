@@ -44,7 +44,7 @@ public class CLIDriver {
 	 */
 	public static void main(String[] args) throws Exception {
 		BenchmarkUtils.runTask(ClassificationTask.class.getName(),
-				2, 3,
+				2, 5,
 				new String[]{"/home/pavel/ulm/data/snomed/snomedStated_INT_20130131.owl", "4"});
 		/*BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
 				0, 1,
