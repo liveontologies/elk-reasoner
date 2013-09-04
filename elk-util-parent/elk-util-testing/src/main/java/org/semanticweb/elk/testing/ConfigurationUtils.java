@@ -71,12 +71,13 @@ public class ConfigurationUtils {
 			final TestManifestCreator<URLTestIO, EO, AO> creator)
 			throws IOException, URISyntaxException {
 		final URI srcURI = srcClass.getClassLoader().getResource(path).toURI();
+		final boolean loadFromJar = srcURI.isOpaque();
 		// Load inputs and expected results
-		final List<String> inputs = srcURI.isOpaque() ? IOUtils
+		final List<String> inputs = loadFromJar ? IOUtils
 				.getResourceNamesFromJAR(path, inputFileExt, srcClass)
 				: IOUtils.getResourceNamesFromDir(new File(srcURI),
 						inputFileExt);
-		final List<String> results = srcURI.isOpaque() ? IOUtils
+		final List<String> results = loadFromJar ? IOUtils
 				.getResourceNamesFromJAR(path, outputFileExt, srcClass)
 				: IOUtils.getResourceNamesFromDir(new File(srcURI),
 						outputFileExt);
@@ -153,8 +154,9 @@ public class ConfigurationUtils {
 			final TestManifestCreator<URLTestIO, EO, AO> creator)
 			throws IOException, URISyntaxException {
 		final URI srcURI = srcClass.getClassLoader().getResource(path).toURI();
+		final boolean loadFromJar = srcURI.isOpaque();
 		// Load inputs
-		final List<String> inputs = srcURI.isOpaque() ? IOUtils
+		final List<String> inputs = loadFromJar ? IOUtils
 				.getResourceNamesFromJAR(path, inputFileExt, srcClass)
 				: IOUtils.getResourceNamesFromDir(new File(srcURI),
 						inputFileExt);
@@ -185,9 +187,9 @@ public class ConfigurationUtils {
 	 * @author Pavel Klinov
 	 * 
 	 *         pavel.klinov@uni-ulm.de
-	 * @param <I> 
-	 * @param <EO> 
-	 * @param <AO> 
+	 * @param <I>
+	 * @param <EO>
+	 * @param <AO>
 	 * 
 	 */
 	public interface TestManifestCreator<I extends TestInput, EO extends TestOutput, AO extends TestOutput> {

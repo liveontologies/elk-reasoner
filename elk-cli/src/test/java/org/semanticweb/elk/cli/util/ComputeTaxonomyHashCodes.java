@@ -119,8 +119,8 @@ public class ComputeTaxonomyHashCodes {
 		configuraion.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
 				"1");
 
-		for (File ontFile : srcDir.listFiles(FileUtils
-				.getExtBasedFilenameFilter("owl"))) {
+		for (File ontFile : FileUtils.listFilesRecutsively(srcDir,
+				FileUtils.getExtBasedFilenameFilter("owl"))) {
 
 			System.err.println(ontFile.getName());
 

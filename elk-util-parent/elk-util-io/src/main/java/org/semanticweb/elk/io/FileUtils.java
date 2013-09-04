@@ -28,11 +28,15 @@ package org.semanticweb.elk.io;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ *         
+ * @author Yevgeny Kazakov        
  */
 public class FileUtils {
 
@@ -46,6 +50,24 @@ public class FileUtils {
 		};
 	}
 
+	public static void collectFilesRecursively(File dir, FilenameFilter filter,
+			List<File> accu) {
+		for (File file : dir.listFiles()) {
+			if (file.isDirectory())
+				collectFilesRecursively(file, filter, accu);
+			else if (filter.accept(dir, file.getName())) {
+				accu.add(file);
+			}
+		}
+	}
+
+	public static List<File> listFilesRecutsively(File dir,
+			FilenameFilter filter) {
+		List<File> result = new ArrayList<File>();
+		collectFilesRecursively(dir, filter, result);
+		return result;
+	}
+
 	public static String dropExtension(String filename) {
 		int index = -1;
 
@@ -55,7 +77,7 @@ public class FileUtils {
 			return filename.substring(0, index);
 		}
 	}
-	
+
 	public static String dropExtension(String filename, String extension) {
 		int index = -1;
 
@@ -64,7 +86,7 @@ public class FileUtils {
 		} else {
 			return filename.substring(0, index);
 		}
-	}	
+	}
 
 	public static String getFileName(String path) {
 		return new File(path).getName();
@@ -83,11 +105,10 @@ public class FileUtils {
 
 		if (deleteOnExit) {
 			file.deleteOnExit();
-		}
-		else {
+		} else {
 			if (!file.delete()) {
 				throw new IOException("Failed to delete file: " + file);
-			}	
+			}
 		}
 	}
 }

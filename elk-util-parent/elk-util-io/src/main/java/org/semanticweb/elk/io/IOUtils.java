@@ -101,14 +101,13 @@ public class IOUtils {
 
 	public static List<String> getResourceNamesFromDir(File dir,
 			String extension) {
-		List<String> testResources = new ArrayList<String>();
+		List<String> result = new ArrayList<String>();
+		File parentDir = dir.getParentFile();
+		for (File file : FileUtils.listFilesRecutsively(dir,
+				FileUtils.getExtBasedFilenameFilter(extension)))
+			result.add(parentDir.toURI().relativize(file.toURI()).getPath());
 
-		for (String fileName : dir.list(FileUtils
-				.getExtBasedFilenameFilter(extension))) {
-			testResources.add(dir.getName() + "/" + fileName);
-		}
-
-		return testResources;
+		return result;
 	}
 
 	/**
