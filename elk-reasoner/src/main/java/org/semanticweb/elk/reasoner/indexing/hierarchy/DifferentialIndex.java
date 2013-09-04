@@ -87,8 +87,9 @@ public class DifferentialIndex extends DirectIndex {
 	 */
 	private Map<IndexedClassExpression, ChainableRule<Context>> addedContextRuleHeadByClassExpressions_,
 			removedContextRuleHeadByClassExpressions_;
-	
-	private Map<IndexedDataProperty, DatatypeIndex> addedDatatypeExprsByProperty_,removedDatatypeExprsByProperty_;
+
+	private Map<IndexedDataProperty, DatatypeIndex> addedDatatypeExprsByProperty_,
+			removedDatatypeExprsByProperty_;
 
 	public DifferentialIndex(IndexedObjectCache objectCache) {
 		super(objectCache);
@@ -106,9 +107,9 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	public void initClassSignatureChanges() {
-		this.addedClasses_ = new ArrayHashSet<ElkClass>(32);		
+		this.addedClasses_ = new ArrayHashSet<ElkClass>(32);
 	}
-	
+
 	public void initIndividualSignatureChanges() {
 		this.addedIndividuals_ = new ArrayHashSet<ElkNamedIndividual>(32);
 	}
@@ -248,6 +249,42 @@ public class DifferentialIndex extends DirectIndex {
 		}
 	}
 
+	@Override
+	public void add(IndexedDataProperty target, IndexedDatatypeExpression newIde) {
+		if (incrementalMode) {
+			if (removedDatatypeExprsByProperty_.get(target) != null
+					&& removedDatatypeExprsByProperty_.get(target)
+							.removeDatatypeExpression(newIde)) {
+				target.addDatatypeExpression(newIde);
+			} else {
+				getDatatypeIndex(addedDatatypeExprsByProperty_, target)
+						.addDatatypeExpression(newIde);
+			}
+		} else {
+			super.add(target, newIde);
+		}
+	}
+
+	@Override
+	public void remove(IndexedDataProperty target,
+			IndexedDatatypeExpression oldIde)
+			throws ElkUnexpectedIndexingException {
+		if (incrementalMode) {
+			if (addedDatatypeExprsByProperty_.get(target) == null
+					|| !addedDatatypeExprsByProperty_.get(target)
+							.removeDatatypeExpression(oldIde)) {
+				getDatatypeIndex(removedDatatypeExprsByProperty_, target)
+						.addDatatypeExpression(oldIde);
+				if (!target.removeDatatypeExpression(oldIde)) {
+					throw new ElkUnexpectedIndexingException(
+							"Cannot remove datatype rule " + oldIde.toString());
+				}
+			}
+		} else {
+			super.remove(target, oldIde);
+		}
+	}
+
 	/* incremental-specific methods */
 
 	/**
@@ -305,6 +342,24 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	/**
+	 * TODO: Documentation
+	 * 
+	 * @return
+	 */
+	public Map<IndexedDataProperty, DatatypeIndex> getAddedDatatypeExpressionsByProperty() {
+		return addedDatatypeExprsByProperty_;
+	}
+
+	/**
+	 * TODO: Documentation
+	 * 
+	 * @return
+	 */
+	public Map<IndexedDataProperty, DatatypeIndex> getRemovedDatatypeExpressionsByProperty() {
+		return removedDatatypeExprsByProperty_;
+	}
+
+	/**
 	 * Removes the deleted rules from this {@link DifferentialIndex}; these
 	 * rules should be already applied in the main index during their
 	 * registration
@@ -342,13 +397,15 @@ public class DifferentialIndex extends DirectIndex {
 				nextRule = nextRule.next();
 			}
 		}
-		for (IndexedDataProperty target : addedDatatypeExprsByProperty_.keySet()) {
+		for (IndexedDataProperty target : addedDatatypeExprsByProperty_
+				.keySet()) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Committing context rule additions for " + target);
 			}
-			target.addDatatypeExpressions(addedDatatypeExprsByProperty_.get(target));
+			target.addDatatypeExpressions(addedDatatypeExprsByProperty_
+					.get(target));
 		}
-		
+
 		initAdditions();
 	}
 
@@ -363,8 +420,10 @@ public class DifferentialIndex extends DirectIndex {
 						.isEmpty())
 				&& (removedContextRuleHeadByClassExpressions_ == null || removedContextRuleHeadByClassExpressions_
 						.isEmpty())
-				&& (removedDatatypeExprsByProperty_ == null || removedDatatypeExprsByProperty_.isEmpty())
-				&& (addedDatatypeExprsByProperty_ == null || addedDatatypeExprsByProperty_.isEmpty());
+				&& (removedDatatypeExprsByProperty_ == null || removedDatatypeExprsByProperty_
+						.isEmpty())
+				&& (addedDatatypeExprsByProperty_ == null || addedDatatypeExprsByProperty_
+						.isEmpty());
 	}
 
 	/**
@@ -465,52 +524,14 @@ public class DifferentialIndex extends DirectIndex {
 				removedContextRuleHeadByClassExpressions_, target);
 	}
 
-	private DatatypeIndex getDatatypeIndex(Map<IndexedDataProperty, DatatypeIndex> map, IndexedDataProperty key) {
+	private DatatypeIndex getDatatypeIndex(
+			Map<IndexedDataProperty, DatatypeIndex> map, IndexedDataProperty key) {
 		DatatypeIndex index = map.get(key);
 		if (index == null) {
 			index = new SimpleDatatypeIndex();
 			map.put(key, index);
 		}
 		return index;
-	}
-	
-	@Override
-	public void add(IndexedDataProperty target, IndexedDatatypeExpression newIde) {
-		if (incrementalMode) {
-			if (removedDatatypeExprsByProperty_.get(target) != null &&
-				removedDatatypeExprsByProperty_.get(target).removeDatatypeExpression(newIde)) {
-				target.addDatatypeExpression(newIde);
-			} else {
-				getDatatypeIndex(addedDatatypeExprsByProperty_ ,target).addDatatypeExpression(newIde);
-			}
-		} else {
-			super.add(target, newIde);
-		}
-	}
-
-	@Override
-	public void remove(IndexedDataProperty target, IndexedDatatypeExpression oldIde) throws ElkUnexpectedIndexingException {
-		if (incrementalMode) {
-			if (addedDatatypeExprsByProperty_.get(target) == null || 
-				!addedDatatypeExprsByProperty_.get(target).removeDatatypeExpression(oldIde)) {
-				getDatatypeIndex(removedDatatypeExprsByProperty_, target).addDatatypeExpression(oldIde);
-				if (!target.removeDatatypeExpression(oldIde)) {
-					throw new ElkUnexpectedIndexingException(
-						"Cannot remove datatype rule "
-						+ oldIde.toString());
-				}
-			}
-		} else {
-			super.remove(target, oldIde);
-		}
-	}
-
-	public Map<IndexedDataProperty, DatatypeIndex> getAddedDatatypeExpressionsByProperty() {
-		return addedDatatypeExprsByProperty_;
-	}
-
-	public Map<IndexedDataProperty, DatatypeIndex> getRemovedDatatypeExpressionsByProperty() {
-		return removedDatatypeExprsByProperty_;
 	}
 
 	void addIndexedObject(IndexedObject iobj) {

@@ -57,7 +57,7 @@ public interface DatatypeIndex {
 	 * index
 	 * @return a collection of relevant {@link IndexedDatatypeExpression}s
 	 */
-	public Collection<IndexedDatatypeExpression> getDatatypeExpressionsFor(IndexedDatatypeExpression ide);
+	public Collection<IndexedDatatypeExpression> getSubsumersFor(IndexedDatatypeExpression ide);
 
 	/**
 	 * Add all {@link IndexedDatatypeExpression}s from this

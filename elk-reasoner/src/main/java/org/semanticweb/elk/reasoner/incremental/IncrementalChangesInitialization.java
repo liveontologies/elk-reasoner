@@ -200,7 +200,7 @@ class ContextInitializationFactory
 							
 							//produce conclusions for every subsumption
 							for (IndexedDatatypeExpression ide : ides) {
-								for (IndexedDatatypeExpression expr : changes.getDatatypeExpressionsFor(ide)) {
+								for (IndexedDatatypeExpression expr : changes.getSubsumersFor(ide)) {
 									saturationStateWriter.produce(context, new NegativeSubsumer(expr));
 								}
 							}

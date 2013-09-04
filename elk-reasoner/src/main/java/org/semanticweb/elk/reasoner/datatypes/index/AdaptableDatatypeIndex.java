@@ -35,97 +35,112 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.NumericValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
- *
- * @author Pospishnyi Oleksandr
+ * TODO: Documentation
+ * 
+ * @author Oleksandr Pospishnyi
  */
 public class AdaptableDatatypeIndex implements DatatypeIndex {
 
-	private final SimpleDatatypeIndex simpleDatatypeIndex;
-	private final IntervalTreeDatatypeIndex treeDatatypeIndex;
-	private final IndexSelector indexSelector;
+	/**
+	 * TODO: Documentation
+	 */
+	private final SimpleDatatypeIndex simpleDatatypeIndex_;
+
+	/**
+	 * TODO: Documentation
+	 */
+	private final IntervalTreeDatatypeIndex treeDatatypeIndex_;
+
+	/**
+	 * TODO: Documentation
+	 */
+	private final IndexSelector indexSelector_;
 
 	public AdaptableDatatypeIndex() {
-		this.simpleDatatypeIndex = new SimpleDatatypeIndex();
-		this.treeDatatypeIndex = new IntervalTreeDatatypeIndex();
-		this.indexSelector = new IndexSelector();
+		this.simpleDatatypeIndex_ = new SimpleDatatypeIndex();
+		this.treeDatatypeIndex_ = new IntervalTreeDatatypeIndex();
+		this.indexSelector_ = new IndexSelector();
 	}
 
 	@Override
 	public void addDatatypeExpression(IndexedDatatypeExpression ide) {
-		ide.getValueSpace().accept(indexSelector).addDatatypeExpression(ide);
+		ide.getValueSpace().accept(indexSelector_).addDatatypeExpression(ide);
 	}
 
 	@Override
 	public boolean removeDatatypeExpression(IndexedDatatypeExpression ide) {
-		return ide.getValueSpace().accept(indexSelector).removeDatatypeExpression(ide);
+		return ide.getValueSpace().accept(indexSelector_)
+				.removeDatatypeExpression(ide);
 	}
 
 	@Override
-	public Collection<IndexedDatatypeExpression> getDatatypeExpressionsFor(IndexedDatatypeExpression ide) {
-		DatatypeIndex index = ide.getValueSpace().accept(indexSelector);
-		Collection<IndexedDatatypeExpression> ret = index.getDatatypeExpressionsFor(ide);
-		if (index == treeDatatypeIndex) {
-			ret.addAll(simpleDatatypeIndex.getDatatypeExpressionsFor(ide));
+	public Collection<IndexedDatatypeExpression> getSubsumersFor(
+			IndexedDatatypeExpression ide) {
+		DatatypeIndex index = ide.getValueSpace().accept(indexSelector_);
+		Collection<IndexedDatatypeExpression> ret = index
+				.getSubsumersFor(ide);
+		if (index == treeDatatypeIndex_) {
+			ret.addAll(simpleDatatypeIndex_.getSubsumersFor(ide));
 		}
 		return ret;
 	}
 
 	@Override
 	public void appendTo(DatatypeIndex index) {
-		simpleDatatypeIndex.appendTo(index);
-		treeDatatypeIndex.appendTo(index);
+		simpleDatatypeIndex_.appendTo(index);
+		treeDatatypeIndex_.appendTo(index);
 	}
 
 	private class IndexSelector implements ValueSpaceVisitor<DatatypeIndex> {
 
 		@Override
 		public DatatypeIndex visit(EntireValueSpace valueSpace) {
-			return simpleDatatypeIndex;
+			return simpleDatatypeIndex_;
 		}
 
 		@Override
 		public DatatypeIndex visit(EmptyValueSpace valueSpace) {
-			return simpleDatatypeIndex;
+			return simpleDatatypeIndex_;
 		}
 
 		@Override
 		public DatatypeIndex visit(DateTimeIntervalValueSpace valueSpace) {
-			return simpleDatatypeIndex;
+			return simpleDatatypeIndex_;
 		}
 
 		@Override
 		public DatatypeIndex visit(LengthRestrictedValueSpace valueSpace) {
-			return simpleDatatypeIndex;
+			return simpleDatatypeIndex_;
 		}
 
 		@Override
 		public DatatypeIndex visit(NumericIntervalValueSpace valueSpace) {
-			return treeDatatypeIndex;
+			return treeDatatypeIndex_;
 		}
 
 		@Override
 		public DatatypeIndex visit(PatternValueSpace valueSpace) {
-			return simpleDatatypeIndex;
+			return simpleDatatypeIndex_;
 		}
 
 		@Override
 		public DatatypeIndex visit(BinaryValue value) {
-			return simpleDatatypeIndex;
+			return simpleDatatypeIndex_;
 		}
 
 		@Override
 		public DatatypeIndex visit(DateTimeValue value) {
-			return simpleDatatypeIndex;
+			return simpleDatatypeIndex_;
 		}
 
 		@Override
 		public DatatypeIndex visit(LiteralValue value) {
-			return simpleDatatypeIndex;
+			return simpleDatatypeIndex_;
 		}
 
 		@Override
 		public DatatypeIndex visit(NumericValue value) {
-			return treeDatatypeIndex;
+			return treeDatatypeIndex_;
 		}
 	}
 }

@@ -34,6 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.SaturatedDataProperty;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 
 /**
+ * TODO: documentation
  *
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
@@ -94,6 +95,7 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 
 	@Override
 	public String toStringStructural() {
+		// TODO: complete all cases
 		switch (valueSpace.getType()) {
 			case BINARY_VALUE:
 			case DATETIME_VALUE:
@@ -111,27 +113,5 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 				return null;
 		}
 	}
-
-	public void applyRule(Context context, BasicSaturationStateWriter writer) {
-		IndexedDataProperty idp = getProperty();
-		ValueSpace vs = getValueSpace();
-		if (vs == EmptyValueSpace.INSTANCE) {
-			// this means that value space is inconsistent; in this
-			// case we are done
-			writer.produce(context, Contradiction.getInstance());
-		}
-		SaturatedDataProperty saturatedDataProperty = idp.getSaturated();
-		if (saturatedDataProperty != null) {
-			for (IndexedDataProperty superProperty : 
-					saturatedDataProperty.getSuperProperties()) {
-				Collection<IndexedDatatypeExpression> assosiatedDatatypeExprs = 
-					superProperty.getAssosiatedDatatypeExpressions(this);
-				if (assosiatedDatatypeExprs != null) {
-					for (IndexedDatatypeExpression expr : assosiatedDatatypeExprs) {
-						writer.produce(context, new NegativeSubsumer(expr));
-					}
-				}
-			}
-		}
-	}
+	
 }

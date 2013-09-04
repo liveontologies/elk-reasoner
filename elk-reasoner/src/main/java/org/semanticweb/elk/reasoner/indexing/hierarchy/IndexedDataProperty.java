@@ -37,10 +37,11 @@ import org.semanticweb.elk.reasoner.saturation.properties.SaturatedDataProperty;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
+ * TODO: documentation
  * 
- * @author Pospishnyi Olexandr
+ * @author Olexandr Pospishnyi
  */
-public class IndexedDataProperty extends IndexedObject{
+public class IndexedDataProperty extends IndexedObject {
 
 	/**
 	 * The corresponding {@link ElkIri}
@@ -56,9 +57,12 @@ public class IndexedDataProperty extends IndexedObject{
 	 * This counts how often this object occurred in the ontology.
 	 */
 	protected int occurrenceNo = 0;
-	
-	private DatatypeIndex datatypeIndex;
-	
+
+	/**
+	 * TODO: documentation
+	 */
+	private final DatatypeIndex datatypeIndex_;
+
 	/**
 	 * the reference to a {@link SaturatedDataProperty} assigned to this
 	 * {@link IndexedDataProperty}
@@ -67,9 +71,12 @@ public class IndexedDataProperty extends IndexedObject{
 
 	public IndexedDataProperty(ElkDataProperty property) {
 		this.dataPropertyIri = property.getIri();
-		this.datatypeIndex = new AdaptableDatatypeIndex();
+		this.datatypeIndex_ = new AdaptableDatatypeIndex();
 	}
 
+	/**
+	 * TODO: documentation
+	 */
 	public ElkIri getIri() {
 		return this.dataPropertyIri;
 	}
@@ -82,23 +89,38 @@ public class IndexedDataProperty extends IndexedObject{
 		return toldSuperProperties_;
 	}
 
-	protected void addDatatypeExpression(IndexedDatatypeExpression ide) {
-		datatypeIndex.addDatatypeExpression(ide);
-	}
-	
-	protected void addDatatypeExpressions(DatatypeIndex index) {
-		index.appendTo(datatypeIndex);
-	}
-	
-	protected boolean removeDatatypeExpression(IndexedDatatypeExpression ide) {
-		return datatypeIndex.removeDatatypeExpression(ide);
-	}
-	
-	public Collection<IndexedDatatypeExpression> getAssosiatedDatatypeExpressions(IndexedDatatypeExpression ide) {
-		return datatypeIndex.getDatatypeExpressionsFor(ide);
-	}
-	
 	/**
+	 * TODO: documentation
+	 */
+	protected void addDatatypeExpression(IndexedDatatypeExpression ide) {
+		datatypeIndex_.addDatatypeExpression(ide);
+	}
+
+	/**
+	 * TODO: documentation
+	 */
+	protected void addDatatypeExpressions(DatatypeIndex index) {
+		index.appendTo(datatypeIndex_);
+	}
+
+	/**
+	 * TODO: documentation
+	 */
+	protected boolean removeDatatypeExpression(IndexedDatatypeExpression ide) {
+		return datatypeIndex_.removeDatatypeExpression(ide);
+	}
+
+	/**
+	 * TODO: documentation
+	 */
+	public Collection<IndexedDatatypeExpression> getSubsumersFor(
+			IndexedDatatypeExpression ide) {
+		return datatypeIndex_.getSubsumersFor(ide);
+	}
+
+	/**
+	 * TODO: clarify: assigned by whom?
+	 * 
 	 * @return The corresponding {@code SaturatedDataProperty} assigned to this
 	 *         {@link IndexedDataProperty}, or {@code null} if none was
 	 *         assigned.
@@ -122,6 +144,8 @@ public class IndexedDataProperty extends IndexedObject{
 	}
 
 	/**
+	 * TODO: clarify: assigned by whom?
+	 * 
 	 * Resets the assigned {@code SaturatedDataProperty} to {@code null}.
 	 */
 	public void resetSaturated() {
@@ -147,7 +171,7 @@ public class IndexedDataProperty extends IndexedObject{
 	public <O> O accept(IndexedDataPropertyVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-	
+
 	@Override
 	public <O> O accept(IndexedObjectVisitor<O> visitor) {
 		return visitor.visit(this);

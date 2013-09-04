@@ -22,15 +22,22 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedDataProperty;
 
 /**
  * Performs decomposition of all sorts of indexed class expressions
@@ -60,7 +67,27 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 
 	@Override
 	public void visit(IndexedDatatypeExpression ice, Context context) {
-		ice.applyRule(context, getSaturationStateWriter());
+		BasicSaturationStateWriter writer = getSaturationStateWriter();
+		IndexedDataProperty idp = ice.getProperty();
+		ValueSpace vs = ice.getValueSpace();
+		if (vs == EmptyValueSpace.INSTANCE) {
+			// this means that value space is inconsistent; in this
+			// case we are done
+			writer.produce(context, Contradiction.getInstance());
+		}
+		SaturatedDataProperty saturatedDataProperty = idp.getSaturated();
+		if (saturatedDataProperty != null) {
+			for (IndexedDataProperty superProperty : saturatedDataProperty
+					.getSuperProperties()) {
+				Collection<IndexedDatatypeExpression> subsumers = superProperty
+						.getSubsumersFor(ice);
+				if (subsumers != null) {
+					for (IndexedDatatypeExpression expr : subsumers) {
+						writer.produce(context, new NegativeSubsumer(expr));
+					}
+				}
+			}
+		}
 	}
 
 	@Override

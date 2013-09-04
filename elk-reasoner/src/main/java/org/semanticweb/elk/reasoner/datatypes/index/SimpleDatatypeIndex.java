@@ -77,7 +77,7 @@ public class SimpleDatatypeIndex implements DatatypeIndex {
 	}
 
 	@Override
-	public Collection<IndexedDatatypeExpression> getDatatypeExpressionsFor(IndexedDatatypeExpression ide) {
+	public Collection<IndexedDatatypeExpression> getSubsumersFor(IndexedDatatypeExpression ide) {
 		if (datatypeExpressions != null) {
 			ELDatatype rootDatatype =
 				ide.getValueSpace().getDatatype().getRootValueSpaceDatatype();

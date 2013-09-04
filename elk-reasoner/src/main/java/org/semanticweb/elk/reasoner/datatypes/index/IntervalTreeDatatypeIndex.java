@@ -39,12 +39,19 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression
 import org.semanticweb.elk.util.collections.intervals.IntervalTree;
 
 /**
- *
+ * TODO: documentation
+ * 
  * @author Pospishnyi Oleksandr
  */
 class IntervalTreeDatatypeIndex implements DatatypeIndex {
 
+	/**
+	 * TODO: documentation
+	 */
 	protected IntervalTree<AbstractInterval, IndexedDatatypeExpression> tree;
+	/**
+	 * TODO: documentation
+	 */
 	protected IntervalSelector intervalSelector;
 
 	public IntervalTreeDatatypeIndex() {
@@ -56,28 +63,34 @@ class IntervalTreeDatatypeIndex implements DatatypeIndex {
 		if (tree == null) {
 			tree = new IntervalTree<AbstractInterval, IndexedDatatypeExpression>();
 		}
-		AbstractInterval interval = ide.getValueSpace().accept(intervalSelector);
+		AbstractInterval interval = ide.getValueSpace()
+				.accept(intervalSelector);
 		tree.add(interval, ide);
 	}
 
 	@Override
 	public boolean removeDatatypeExpression(IndexedDatatypeExpression ide) {
-		AbstractInterval interval = ide.getValueSpace().accept(intervalSelector);
+		AbstractInterval interval = ide.getValueSpace()
+				.accept(intervalSelector);
 		return tree.remove(interval, ide);
 	}
 
 	@Override
-	public Collection<IndexedDatatypeExpression> getDatatypeExpressionsFor(IndexedDatatypeExpression ide) {
+	public Collection<IndexedDatatypeExpression> getSubsumersFor(
+			IndexedDatatypeExpression ide) {
 		if (tree == null) {
 			return Collections.EMPTY_LIST;
 		}
-		AbstractInterval interval = ide.getValueSpace().accept(intervalSelector);
-		Collection<IndexedDatatypeExpression> ret = tree.searchIncludes(interval);
-		//perform type filtering
+		AbstractInterval interval = ide.getValueSpace()
+				.accept(intervalSelector);
+		Collection<IndexedDatatypeExpression> ret = tree
+				.searchIncludes(interval);
+		// perform type filtering
 		Iterator<IndexedDatatypeExpression> iter = ret.iterator();
 		while (iter.hasNext()) {
 			IndexedDatatypeExpression next = iter.next();
-			if (!ide.getValueSpace().getDatatype().isCompatibleWith(next.getValueSpace().getDatatype())) {
+			if (!ide.getValueSpace().getDatatype()
+					.isCompatibleWith(next.getValueSpace().getDatatype())) {
 				iter.remove();
 			}
 		}
@@ -91,7 +104,8 @@ class IntervalTreeDatatypeIndex implements DatatypeIndex {
 		}
 	}
 
-	private class IntervalSelector implements ValueSpaceVisitor<AbstractInterval> {
+	private class IntervalSelector implements
+			ValueSpaceVisitor<AbstractInterval> {
 
 		@Override
 		public AbstractInterval visit(EntireValueSpace valueSpace) {
