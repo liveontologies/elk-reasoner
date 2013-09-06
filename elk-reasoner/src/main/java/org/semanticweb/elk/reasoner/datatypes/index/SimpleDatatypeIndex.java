@@ -21,6 +21,7 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.index;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -83,29 +84,28 @@ public class SimpleDatatypeIndex implements DatatypeIndex {
 				ide.getValueSpace().getDatatype().getRootValueSpaceDatatype();
 			Set<IndexedDatatypeExpression> expressionsByDatatype =
 				datatypeExpressions.get(rootDatatype);
-			Set<IndexedDatatypeExpression> resultSet;
+			Collection<IndexedDatatypeExpression> resultSet = new ArrayList<IndexedDatatypeExpression>(5);
 
 			if (expressionsByDatatype != null) {
-				resultSet = new HashSet<IndexedDatatypeExpression>(expressionsByDatatype);
-			} else {
-				resultSet = new HashSet<IndexedDatatypeExpression>();
+				for (IndexedDatatypeExpression exp : expressionsByDatatype) {
+					if (exp.getValueSpace().contains(ide.getValueSpace())) {
+						resultSet.add(exp);
+					}
+				}
 			}
 
 			if (rootDatatype != ELDatatype.rdfs_Literal) {
 				//using all expressions for rdfs:Literal datatype
 				Set<IndexedDatatypeExpression> rdfsLiteralExpressions = datatypeExpressions.get(ELDatatype.rdfs_Literal);
 				if (rdfsLiteralExpressions != null) {
-					resultSet.addAll(rdfsLiteralExpressions);
+					for (IndexedDatatypeExpression exp : rdfsLiteralExpressions) {
+						if (exp.getValueSpace().contains(ide.getValueSpace())) {
+							resultSet.add(exp);
+						}
+					}
 				}
 			}
 
-			Iterator<IndexedDatatypeExpression> iterator = resultSet.iterator();
-			while (iterator.hasNext()) {
-				IndexedDatatypeExpression expression = iterator.next();
-				if (!expression.getValueSpace().contains(ide.getValueSpace())) {
-					iterator.remove();
-				}
-			}
 			return resultSet;
 		}
 		return Collections.EMPTY_LIST;
