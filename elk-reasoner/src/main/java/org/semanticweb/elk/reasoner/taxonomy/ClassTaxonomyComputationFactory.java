@@ -26,7 +26,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
@@ -60,7 +61,7 @@ public class ClassTaxonomyComputationFactory implements
 		InputProcessorFactory<Collection<IndexedClass>, Engine> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassTaxonomyComputationFactory.class);
 
 	/**
@@ -287,9 +288,8 @@ public class ClassTaxonomyComputationFactory implements
 		@Override
 		public final void submit(Collection<IndexedClass> input) {
 			for (IndexedClass ic : input) {
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(ic + ": taxonomy construction started");
-				}
+				LOGGER_.trace("{}: taxonomy construction started", ic);
+
 				transitiveReductionEngine
 						.submit(new TransitiveReductionJob<IndexedClass>(ic));
 			}

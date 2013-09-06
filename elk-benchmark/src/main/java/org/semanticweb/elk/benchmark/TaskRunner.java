@@ -25,9 +25,10 @@
  */
 package org.semanticweb.elk.benchmark;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.util.logging.ElkTimer;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -40,7 +41,7 @@ import org.semanticweb.elk.util.logging.ElkTimer;
  */
 public class TaskRunner {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(TaskRunner.class);
 	
 	protected final int warmups;
@@ -89,7 +90,7 @@ public class TaskRunner {
 		System.out.println("Average running time: " + timer.getAvgWallTime() / 1000000 + " ms");
 		
 		if (metrics != null) {
-			metrics.printAverages(LOGGER_, Level.INFO);
+			metrics.printAverages(LOGGER_, LogLevel.INFO);
 		}
 	}
 }

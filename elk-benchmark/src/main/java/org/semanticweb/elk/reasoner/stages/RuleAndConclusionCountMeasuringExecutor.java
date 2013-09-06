@@ -42,7 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 public class RuleAndConclusionCountMeasuringExecutor extends
 		AbstractStageExecutor {
 	
-	//private static final Logger LOGGER_ = Logger.getLogger(RuleAndConclusionCountMeasuringExecutor.class);
+	//private static final Logger LOGGER_ = LoggerFactory.getLogger(RuleAndConclusionCountMeasuringExecutor.class);
 
 	public static final String RULE_COUNT = ".count.rule-applications";
 	public static final String NEW_CONTEXT_COUNT = ".count.new-contexts";

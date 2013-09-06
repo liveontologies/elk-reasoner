@@ -22,8 +22,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectComplementOfVisitor;
@@ -38,7 +36,10 @@ import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.semanticweb.elk.util.logging.ElkMessage;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkObjectComplementOf} in an
@@ -48,7 +49,7 @@ import org.semanticweb.elk.util.logging.ElkMessage;
  */
 public class IndexedObjectComplementOf extends IndexedClassExpression {
 
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexedObjectComplementOf.class);
 
 	private final IndexedClassExpression negated_;
@@ -80,10 +81,13 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			if (LOGGER_.isEnabledFor(Level.WARN))
-				LOGGER_.warn(new ElkMessage(
-						"ELK does not support negative occurrences of ObjectComplementOf. Reasoning might be incomplete!",
-						"reasoner.indexing.IndexedObjectComplementOf"));
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap
+						.log(LOGGER_,
+								LogLevel.WARN,
+								"reasoner.indexing.IndexedObjectComplementOf",
+								"ELK does not support negative occurrences of ObjectComplementOf. Reasoning might be incomplete!");
+			}
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -141,9 +145,8 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 
 		@Override
 		public void apply(BasicSaturationStateWriter writer, Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + context);
-			}
+			LOGGER_.trace("Applying {} to {}", NAME, context);
+			
 			if (negation_ != null && context.getSubsumers().contains(negation_))
 				writer.produce(context, Contradiction.getInstance());
 		}

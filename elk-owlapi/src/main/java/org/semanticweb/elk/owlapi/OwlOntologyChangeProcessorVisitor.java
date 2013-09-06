@@ -21,7 +21,8 @@ package org.semanticweb.elk.owlapi;
  * #L%
  */
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
@@ -40,7 +41,7 @@ class OwlOntologyChangeProcessorVisitor implements
 		OWLOntologyChangeVisitorEx<ElkLoadingException> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(OwlOntologyChangeProcessorVisitor.class);
 
 	private static final OwlConverter OWL_CONVERTER_ = OwlConverter

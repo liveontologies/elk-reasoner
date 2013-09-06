@@ -74,13 +74,11 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 	@Override
 	protected void correctnessCheck(Reasoner standardReasoner,
 			Reasoner incrementalReasoner, long seed) throws ElkException {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("======= Computing Expected Taxonomy =======");
+		LOGGER_.trace("======= Computing Expected Taxonomy =======");
 
 		Taxonomy<ElkClass> expected = standardReasoner.getTaxonomyQuietly();
 
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("======= Computing Incremental Taxonomy =======");
+		LOGGER_.trace("======= Computing Incremental Taxonomy =======");
 
 		Taxonomy<ElkClass> incremental = incrementalReasoner
 				.getTaxonomyQuietly();

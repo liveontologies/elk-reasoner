@@ -24,7 +24,8 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
@@ -53,7 +54,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexedObjectIntersectionOf.class);
 
 	/**
@@ -172,9 +173,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		@Override
 		public void apply(BasicSaturationStateWriter writer, Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + context);
-			}
+			LOGGER_.trace("Applying {} to {}", NAME, context);
+			
 			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 					conjunctionsByConjunct_.keySet(), context.getSubsumers()))
 				writer.produce(context, new NegativeSubsumer(

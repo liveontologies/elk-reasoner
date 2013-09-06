@@ -24,8 +24,9 @@ package org.semanticweb.elk.reasoner.incremental;
  * #L%
  */
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
 
 /**
  * @author Pavel Klinov
@@ -110,12 +111,12 @@ public class IncrementalProcessingStatistics {
 		return numOfMeasurements_ > 0;
 	}
 	
-	public void print(Logger logger, Priority level) {
-		if (!logger.isDebugEnabled() || !measurementsTaken())
+	public void print(Logger logger, LogLevel level) {
+		if (!LoggerWrap.isEnabledFor(logger, level) || !measurementsTaken())
 			return;
 
 		if (changeInitContextProcessingTime > 0) {
-			logger.log(level, "Total context processing time during change initialization: " + changeInitContextProcessingTime / numOfMeasurements_);
+			LoggerWrap.log(logger, level, "Total context processing time during change initialization: " + changeInitContextProcessingTime / numOfMeasurements_);
 		}
 	}
 }

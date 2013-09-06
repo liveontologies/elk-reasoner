@@ -28,7 +28,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
@@ -54,7 +55,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 public abstract class IndexedPropertyChain extends IndexedObject implements
 		Comparable<IndexedPropertyChain> {
 
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexedPropertyChain.class);
 
 	/**
@@ -231,9 +232,8 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 			throw new ElkUnexpectedIndexingException(this
 					+ ": cannot assign null saturation");
 		saturated_ = saturatedObjectProperty;
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(this + ": saturation assinged");
-		}
+		LOGGER_.trace("{}: saturation assinged", this);
+
 		return null;
 	}
 
@@ -242,9 +242,7 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 	 */
 	public synchronized void resetSaturated() {
 		saturated_ = null;
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(this + ": saturation removed");
-		}
+		LOGGER_.trace("{}: saturation removed", this);
 	}
 
 	/**

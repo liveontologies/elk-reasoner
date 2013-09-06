@@ -40,7 +40,8 @@ import java.util.Properties;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.io.IOUtils;
 
 //TODO: Documentation
@@ -55,7 +56,7 @@ public class ConfigurationFactory {
 
 	static final String STANDARD_RESOURCE_NAME = "elk";
 
-	final static Logger LOGGER_ = Logger.getLogger(ConfigurationFactory.class);
+	final static Logger LOGGER_ = LoggerFactory.getLogger(ConfigurationFactory.class);
 
 	/**
 	 * 

@@ -28,7 +28,8 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
@@ -47,7 +48,7 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
  */
 public class XMLLiteralDatatypeHandler extends ElkDatatypeHandler {
 
-	static final Logger LOGGER_ = Logger
+	static final Logger LOGGER_ = LoggerFactory
 		.getLogger(XMLLiteralDatatypeHandler.class);
 
 	@Override

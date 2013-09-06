@@ -27,7 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.loading.AbstractAxiomLoader;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
@@ -50,7 +51,7 @@ public class OwlChangesLoader extends AbstractAxiomLoader implements
 		AxiomLoader {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(OwlChangesLoader.class);
 
 	private final ProgressMonitor progressMonitor;
@@ -70,8 +71,9 @@ public class OwlChangesLoader extends AbstractAxiomLoader implements
 			String status = "Loading of Changes";
 			progressMonitor.start(status);
 			int changesCount = pendingChanges_.size();
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(status + ": " + changesCount);
+			
+			LOGGER_.trace("{}: {}", status, changesCount);
+			
 			int currentAxiom = 0;
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
@@ -82,7 +84,7 @@ public class OwlChangesLoader extends AbstractAxiomLoader implements
 				if (!change.isAxiomChange()) {
 					ElkLoadingException exception = new ElkLoadingException(
 							"Cannot apply non-axiom change!");
-					LOGGER_.error(exception);
+					LOGGER_.error(exception.getMessage(), exception);
 					throw exception;
 				}
 
@@ -91,7 +93,7 @@ public class OwlChangesLoader extends AbstractAxiomLoader implements
 								axiomInserter, axiomDeleter));
 
 				if (error != null) {
-					LOGGER_.error(error);
+					LOGGER_.error(error.getMessage(), error);
 					throw error;
 				}
 
@@ -108,9 +110,7 @@ public class OwlChangesLoader extends AbstractAxiomLoader implements
 	}
 
 	synchronized void registerChange(OWLOntologyChange change) {
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Registering change: " + change);
-		}
+		LOGGER_.trace("Registering change: {}", change);
 
 		pendingChanges_.add(change);
 	}

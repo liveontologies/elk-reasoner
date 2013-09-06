@@ -27,7 +27,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
@@ -46,7 +47,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 class ReducingCompositionClosure extends CompositionClosure {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SubPropertyExplorer.class);
 
 	final Set<IndexedPropertyChain> toRemove;

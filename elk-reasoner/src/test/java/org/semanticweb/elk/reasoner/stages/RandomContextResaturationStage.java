@@ -32,7 +32,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -50,7 +51,7 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  */
 public class RandomContextResaturationStage extends AbstractReasonerStage {
 
-	static final Logger LOGGER_ = Logger
+	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RandomContextResaturationStage.class);
 
 	private final double RATIO_ = 0.2;
@@ -75,9 +76,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(
 				reasoner.saturationState);
 
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Starting random contexts cleaning");
-		}
+		LOGGER_.trace("Starting random contexts cleaning");
 
 		ClassExpressionNoInputSaturation cleaning = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(), reasoner.getNumberOfWorkers(),
@@ -96,9 +95,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 				reasoner.getProgressMonitor(), resatFactory,
 				ContextModificationListener.DUMMY);
 
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Starting random contexts resaturation");
-		}
+		LOGGER_.trace("Starting random contexts resaturation");
 
 		saturation.process();
 
@@ -141,9 +138,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 			i++;
 		}
 
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Random contexts picked: " + contexts);
-		}
+		LOGGER_.trace("Random contexts picked: {}", contexts);
 
 		return contexts;
 	}

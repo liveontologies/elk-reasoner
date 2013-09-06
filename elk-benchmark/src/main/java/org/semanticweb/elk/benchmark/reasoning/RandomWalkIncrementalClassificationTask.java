@@ -29,7 +29,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
 import org.semanticweb.elk.benchmark.Metrics;
@@ -49,6 +48,8 @@ import org.semanticweb.elk.reasoner.incremental.OnOffVector;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkIncrementalClassificationRunner;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkRunnerIO;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TODO docs
@@ -60,7 +61,7 @@ import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 public class RandomWalkIncrementalClassificationTask implements Task {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RandomWalkIncrementalClassificationTask.class);
 
 	protected Reasoner reasoner_;

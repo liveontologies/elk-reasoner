@@ -27,7 +27,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
@@ -49,7 +50,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 public class Propagation extends AbstractConclusion {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger.getLogger(Propagation.class);
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(Propagation.class);
 
 	private final IndexedPropertyChain relation_;
 
@@ -144,9 +145,8 @@ public class Propagation extends AbstractConclusion {
 
 		@Override
 		public void apply(BasicSaturationStateWriter writer, BackwardLink link) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + link);
-			}
+			LOGGER_.trace("Applying {} to {}", NAME, link);
+			
 			for (IndexedClassExpression carry : propagationsByObjectProperty_
 					.get(link.getRelation()))
 				writer.produce(link.getSource(), new NegativeSubsumer(carry));

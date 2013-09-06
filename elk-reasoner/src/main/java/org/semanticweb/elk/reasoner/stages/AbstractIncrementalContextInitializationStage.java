@@ -27,7 +27,8 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
@@ -45,7 +46,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 		AbstractReasonerStage {
 
 	// logger for this class
-	static final Logger LOGGER_ = Logger
+	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractIncrementalContextInitializationStage.class);
 
 	static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();

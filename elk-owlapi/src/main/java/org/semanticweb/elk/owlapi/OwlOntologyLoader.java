@@ -26,7 +26,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.loading.AbstractAxiomLoader;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
@@ -48,7 +49,7 @@ public class OwlOntologyLoader extends AbstractAxiomLoader implements
 		AxiomLoader {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(OwlOntologyLoader.class);
 
 	/**
@@ -106,8 +107,9 @@ public class OwlOntologyLoader extends AbstractAxiomLoader implements
 	public void load(ElkAxiomProcessor axiomInserter,
 			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
 		progressMonitor_.start(status);
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(status);
+		
+		LOGGER_.trace("{}", status);
+			
 		for (;;) {
 			if (Thread.currentThread().isInterrupted())
 				break;
@@ -118,16 +120,20 @@ public class OwlOntologyLoader extends AbstractAxiomLoader implements
 				progressMonitor_.finish();
 				updateStatus();
 				progressMonitor_.start(status);
-				if (LOGGER_.isTraceEnabled())
-					LOGGER_.trace(status);
+				
+				LOGGER_.trace("{}", status);
+				
 				initAxioms(importsClosureIterator_.next());
 				continue;
 			}
+			
 			OWLAxiom axiom = axiomsIterator_.next();
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("loading " + axiom);
+
+			LOGGER_.trace("loading {}", axiom);
+			
 			if (OWL_CONVERTER_.isRelevantAxiom(axiom))
 				axiomInserter.visit(OWL_CONVERTER_.convert(axiom));
+			
 			axiomsProcessed_++;
 			progressMonitor_.report(axiomsProcessed_, axiomsCount_);
 		}

@@ -25,7 +25,8 @@
  */
 package org.semanticweb.elk.owlapi;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.IllegalConfigurationException;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -41,27 +42,26 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 public class ElkReasonerFactory implements OWLReasonerFactory {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ElkReasonerFactory.class);
 
 	@Override
 	public String getReasonerName() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("getReasonerName()");
+		LOGGER_.trace("getReasonerName()");
 		return ElkReasonerFactory.class.getPackage().getImplementationTitle();
 	}
 
 	@Override
 	public OWLReasoner createNonBufferingReasoner(OWLOntology ontology) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("createNonBufferingReasoner(OWLOntology)");
+		LOGGER_.trace("createNonBufferingReasoner(OWLOntology)");
+		
 		return createElkReasoner(ontology, false, null);
 	}
 
 	@Override
 	public OWLReasoner createReasoner(OWLOntology ontology) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("createReasoner(OWLOntology)");
+		LOGGER_.trace("createReasoner(OWLOntology)");
+		
 		return createElkReasoner(ontology, true, null);
 	}
 
@@ -69,8 +69,8 @@ public class ElkReasonerFactory implements OWLReasonerFactory {
 	public OWLReasoner createNonBufferingReasoner(OWLOntology ontology,
 			OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("createNonBufferingReasoner(OWLOntology, OWLReasonerConfiguration)");
+		LOGGER_.trace("createNonBufferingReasoner(OWLOntology, OWLReasonerConfiguration)");
+		
 		return createElkReasoner(ontology, false, config);
 	}
 
@@ -78,8 +78,8 @@ public class ElkReasonerFactory implements OWLReasonerFactory {
 	public OWLReasoner createReasoner(OWLOntology ontology,
 			OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("createReasoner(OWLOntology, OWLReasonerConfiguration)");
+		LOGGER_.trace("createReasoner(OWLOntology, OWLReasonerConfiguration)");
+		
 		return createElkReasoner(ontology, true, config);
 	}
 
@@ -87,8 +87,7 @@ public class ElkReasonerFactory implements OWLReasonerFactory {
 	ElkReasoner createElkReasoner(OWLOntology ontology,
 			boolean isBufferingMode, OWLReasonerConfiguration config)
 			throws IllegalConfigurationException {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("createElkReasoner(OWLOntology, boolean, OWLReasonerConfiguration)");
+		LOGGER_.trace("createElkReasoner(OWLOntology, boolean, OWLReasonerConfiguration)");
 		// here we check if the passed configuration also has ELK's parameters
 		ElkReasonerConfiguration elkReasonerConfig;
 		if (config != null) {

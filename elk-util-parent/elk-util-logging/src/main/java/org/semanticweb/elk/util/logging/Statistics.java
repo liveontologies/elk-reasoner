@@ -23,9 +23,8 @@
 
 package org.semanticweb.elk.util.logging;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
+import org.slf4j.Logger;
+
 
 /**
  * Collection of several static methods that help in taking and logging
@@ -50,7 +49,7 @@ public class Statistics {
 	 * @param logger
 	 */
 	public static void logOperationStart(String operationName, Logger logger) {
-		logOperationStart(operationName, logger, Level.INFO);
+		logOperationStart(operationName, logger, LogLevel.INFO);
 	}
 
 	/**
@@ -65,9 +64,9 @@ public class Statistics {
 	 * @param priority
 	 */
 	public static void logOperationStart(String operationName, Logger logger,
-			Priority priority) {
-		if (logger.isEnabledFor(priority)) {
-			logger.log(priority, operationName + " started");
+			LogLevel priority) {
+		if (LoggerWrap.isEnabledFor(logger, priority)) {
+			LoggerWrap.log(logger, priority, operationName + " started");
 			ElkTimer timer = ElkTimer.getNamedTimer(operationName,
 					ElkTimer.RECORD_WALLTIME);
 			timer.reset(); // needed in case this was done before
@@ -83,7 +82,7 @@ public class Statistics {
 	 * @param logger
 	 */
 	public static void logOperationFinish(String operationName, Logger logger) {
-		logOperationFinish(operationName, logger, Level.INFO);
+		logOperationFinish(operationName, logger, LogLevel.INFO);
 	}
 
 	/**
@@ -95,12 +94,12 @@ public class Statistics {
 	 * @param priority
 	 */
 	public static void logOperationFinish(String operationName, Logger logger,
-			Priority priority) {
-		if (logger.isEnabledFor(priority)) {
+			LogLevel priority) {
+		if (LoggerWrap.isEnabledFor(logger, priority)) {
 			ElkTimer timer = ElkTimer.getNamedTimer(operationName,
 					ElkTimer.RECORD_WALLTIME);
 			timer.stop();
-			logger.log(priority, operationName + " finished in "
+			LoggerWrap.log(logger, priority, operationName + " finished in "
 					+ timer.getTotalWallTime() / 1000000 + " ms");
 		}
 	}
@@ -111,7 +110,7 @@ public class Statistics {
 	 * @param logger
 	 */
 	public static void logMemoryUsage(Logger logger) {
-		logMemoryUsage(logger, Level.DEBUG);
+		logMemoryUsage(logger, LogLevel.DEBUG);
 	}
 
 	/**
@@ -120,11 +119,12 @@ public class Statistics {
 	 * @param logger
 	 * @param priority 
 	 */
-	public static void logMemoryUsage(Logger logger, Priority priority) {
-		if (logger.isEnabledFor(priority)) {
+	public static void logMemoryUsage(Logger logger, LogLevel priority) {
+		if (LoggerWrap.isEnabledFor(logger, priority)) {
 			// Getting the runtime reference from system
 			Runtime runtime = Runtime.getRuntime();
-			logger.log(priority, "Memory (MB) Used/Total/Max: "
+			
+			LoggerWrap.log(logger, priority, "Memory (MB) Used/Total/Max: "
 					+ (runtime.totalMemory() - runtime.freeMemory())
 					/ megaBytes + "/" + runtime.totalMemory() / megaBytes + "/"
 					+ runtime.maxMemory() / megaBytes);

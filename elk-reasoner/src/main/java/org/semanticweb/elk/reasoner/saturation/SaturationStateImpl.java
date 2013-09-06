@@ -32,7 +32,8 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
@@ -51,7 +52,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 class SaturationStateImpl implements SaturationState {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SaturationStateImpl.class);
 
 	private final OntologyIndex ontologyIndex_;
@@ -236,8 +237,7 @@ class SaturationStateImpl implements SaturationState {
 
 		@Override
 		public void produce(Context context, Conclusion conclusion) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(context + ": produced conclusion " + conclusion);
+			LOGGER_.trace("{}: produced conclusion {}", context, conclusion);
 			// this may be necessary, e.g., for counting produced conclusions
 			conclusion.accept(producedConclusionVisitor_, context);
 			
@@ -248,9 +248,7 @@ class SaturationStateImpl implements SaturationState {
 		}
 
 		protected void markAsNotSaturatedInternal(Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace(context + ": marked as non-saturated");
-			}
+			LOGGER_.trace("{}: marked as non-saturated", context);
 
 			notSaturatedContexts_.add(context.getRoot());
 			contextModificationListener_.notifyContextModification(context);
@@ -269,8 +267,7 @@ class SaturationStateImpl implements SaturationState {
 
 		@Override
 		public void clearNotSaturatedContexts() {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Clear non-saturated contexts");
+			LOGGER_.trace("Clear non-saturated contexts");
 			notSaturatedContexts_.clear();
 		}
 

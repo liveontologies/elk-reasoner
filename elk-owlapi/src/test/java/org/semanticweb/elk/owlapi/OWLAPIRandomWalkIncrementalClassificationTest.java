@@ -39,8 +39,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -69,6 +67,8 @@ import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestManifest;
 import org.semanticweb.elk.testing.io.URLTestIO;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -77,6 +77,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -88,7 +90,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 public class OWLAPIRandomWalkIncrementalClassificationTest {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(OWLAPIRandomWalkIncrementalClassificationTest.class);
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
@@ -132,9 +134,7 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		ElkReasoner incrementalReasoner = null;
 		long seed = RandomSeedProvider.VALUE;
 
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Initial load of test axioms");
-		}
+		LOGGER_.trace("Initial load of test axioms");
 
 		try {
 			stream = manifest.getInput().getInputStream();
@@ -232,16 +232,14 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 			List<OWLOntologyChange> changes = new LinkedList<OWLOntologyChange>();
 			
 			for (OWLAxiom axiom : change.getDeletions()) {
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace("removing: " + axiom);
-				}
+				LOGGER_.trace("removing: {}", axiom);
+
 				changes.addAll(manager.removeAxiom(ontology_, axiom));
 			}
 			
 			for (OWLAxiom axiom : change.getAdditions()) {
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace("adding: " + axiom);
-				}
+				LOGGER_.trace("adding: {}", axiom);
+
 				changes.addAll(manager.addAxiom(ontology_, axiom));
 			}
 			
@@ -250,8 +248,8 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 		}
 
 		@Override
-		public void printAxiom(OWLAxiom axiom, Logger logger, Level level) {
-			logger.log(level, "Current axiom: " + axiom);
+		public void printAxiom(OWLAxiom axiom, Logger logger, LogLevel level) {
+			LoggerWrap.log(logger, level, "Current axiom: " + axiom);
 		}
 
 		@Override
@@ -261,16 +259,12 @@ public class OWLAPIRandomWalkIncrementalClassificationTest {
 			List<OWLOntologyChange> changes = new LinkedList<OWLOntologyChange>();
 			
 			for (OWLAxiom axiom : change.getDeletions()) {
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace("adding: " + axiom);
-				}
+				LOGGER_.trace("adding: {}", axiom);
 				changes.addAll(manager.addAxiom(ontology_, axiom));
 			}
 			
 			for (OWLAxiom axiom : change.getAdditions()) {
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace("deleting: " + axiom);
-				}
+				LOGGER_.trace("deleting: {}", axiom);
 				changes.addAll(manager.removeAxiom(ontology_, axiom));
 			}
 

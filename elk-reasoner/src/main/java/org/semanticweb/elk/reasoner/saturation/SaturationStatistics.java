@@ -24,12 +24,12 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.incremental.IncrementalProcessingStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.slf4j.Logger;
 
 /**
  * @author Pavel Klinov
@@ -72,8 +72,8 @@ public class SaturationStatistics {
 
 		conclusionsStatistics_.print(logger);
 		ruleStatistics_.print(logger);
-		contextStatistics_.print(logger, Level.DEBUG);
-		processingStatistics_.print(logger, Level.DEBUG);
+		contextStatistics_.print(logger, LogLevel.DEBUG);
+		processingStatistics_.print(logger, LogLevel.DEBUG);
 	}
 	
 	public RuleStatistics getRuleStatistics() {

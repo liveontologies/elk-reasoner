@@ -24,7 +24,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -45,7 +46,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class Contradiction extends AbstractConclusion {
 
-	private static final Logger LOGGER_ = Logger.getLogger(Contradiction.class);
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(Contradiction.class);
 
 	private static Contradiction INSTANCE_ = new Contradiction();
 
@@ -118,9 +119,8 @@ public class Contradiction extends AbstractConclusion {
 
 		@Override
 		public void apply(BasicSaturationStateWriter engine, BackwardLink link) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + link);
-			}
+			LOGGER_.trace("Applying {} to {}", NAME, link);
+			
 			engine.produce(link.getSource(), Contradiction.getInstance());
 		}
 

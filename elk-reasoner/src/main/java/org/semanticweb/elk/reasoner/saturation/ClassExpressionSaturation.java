@@ -26,7 +26,8 @@ import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -45,7 +46,7 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 		ReasonerComputation<SaturationJob<I>, ClassExpressionSaturationFactory<SaturationJob<I>>> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassExpressionSaturation.class);
 
 	/*

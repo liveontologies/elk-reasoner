@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.util.logging;
+package org.semanticweb.elk.protege.ui;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -39,6 +39,7 @@ import javax.swing.JTextArea;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
+import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
  * A Log4J Appender that creates dialogs in order to "log" messages.
@@ -156,15 +157,15 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 			messageLevel = JOptionPane.INFORMATION_MESSAGE;
 		}
 
-		Object message = event.getMessage();
-		String messageType;
-		if (message instanceof ElkMessage) {
-			messageType = ((ElkMessage) message).getMessageType();
+		ElkMessage elkMessage = ElkMessage.deserialize(event.getRenderedMessage());
+		String messageType = null;
+		
+		if (elkMessage != null) {
+			messageType = elkMessage.getMessageType();
+			
 			if (ignoredMessageTypes.contains(messageType)) {
 				return false;
 			}
-		} else {
-			messageType = null;
 		}
 
 		JPanel panel = new JPanel();
@@ -172,8 +173,10 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 
 		String messageText = event.getRenderedMessage();
 		// truncating too long message text
-		if (messageText.length() > 520)
+		if (messageText.length() > 520) {
 			messageText = messageText.substring(0, 500) + "...";
+		}
+		
 		WrappingLabel label = new WrappingLabel(messageText, 600);
 
 		label.setAlignmentX(Component.LEFT_ALIGNMENT);

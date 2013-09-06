@@ -27,7 +27,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -74,7 +75,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		InputProcessorFactory<J, TransitiveReductionFactory<R, J>.Engine> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(TransitiveReductionFactory.class);
 
 	/**
@@ -223,10 +224,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 * If saturation is unsatisfiable, return the unsatisfiable output.
 			 */
 			if (saturation.isInconsistent()) {
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(root
-							+ ": transitive reduction finished: inconsistent");
-				}
+				LOGGER_.trace(
+						"{}: transitive reduction finished: inconsistent", root);
+				
 				TransitiveReductionOutput<R> output = new TransitiveReductionOutputUnsatisfiable<R>(
 						root);
 				initiatorJob.setOutput(output);
@@ -294,6 +294,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			TransitiveReductionOutputEquivalentDirect<R> output = state.output;
 			state.initiatorJob.setOutput(state.output);
 			listener.notifyFinished(state.initiatorJob);
+			
 			if (LOGGER_.isTraceEnabled()) {
 				R root = output.root;
 				LOGGER_.trace(root + ": transitive reduction finished");
@@ -409,9 +410,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		@Override
 		public final void submit(J job) {
 			R root = job.getInput();
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace(root + ": transitive reduction started");
-			}
+
+			LOGGER_.trace("{}: transitive reduction started", root);
+
 			Context context = root.getContext();
 			if (context != null && context.isSaturated()) {
 				jobsWithSaturatedRoot.add(job);

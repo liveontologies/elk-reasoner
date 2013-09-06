@@ -34,8 +34,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,6 +47,9 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -59,7 +60,7 @@ import org.semanticweb.elk.util.collections.Operations;
 public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends TestOutput, AO extends TestOutput> {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(BaseIncrementalReasoningCorrectnessTest.class);
 
 	final static int REPEAT_NUMBER = 5;
@@ -126,7 +127,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 
 			if (LOGGER_.isDebugEnabled()) {
 				for (T del : changingAxioms.getOnElements()) {
-					dumpChangeToLog(del, Level.DEBUG);
+					dumpChangeToLog(del, LogLevel.DEBUG);
 				}
 			}
 
@@ -136,8 +137,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 			applyChanges(incrementalReasoner, changingAxioms.getOnElements(),
 					IncrementalChangeType.DELETE);
 
-			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("===DELETIONS===");
+			LOGGER_.info("===DELETIONS===");
 
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 
@@ -147,8 +147,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 			applyChanges(incrementalReasoner, changingAxioms.getOnElements(),
 					IncrementalChangeType.ADD);
 
-			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("===ADDITIONS===");
+			LOGGER_.info("===ADDITIONS===");
 
 			correctnessCheck(standardReasoner, incrementalReasoner, seed);
 		}
@@ -169,7 +168,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 	protected abstract void applyChanges(Reasoner reasoner,
 			Iterable<T> changes, IncrementalChangeType type);
 
-	protected abstract void dumpChangeToLog(T change, Level level);
+	protected abstract void dumpChangeToLog(T change, LogLevel level);
 
 	protected abstract void loadAxioms(InputStream stream,
 			List<T> staticAxioms, OnOffVector<T> changingAxioms)

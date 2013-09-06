@@ -27,7 +27,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ComposedAxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
@@ -83,7 +84,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 public abstract class AbstractReasonerState {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractReasonerState.class);
 
 	final SaturationState saturationState;
@@ -232,15 +233,14 @@ public abstract class AbstractReasonerState {
 	 * Reset the axiom loading stage and all subsequent stages
 	 */
 	public synchronized void resetAxiomLoading() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Reset axiom loading");
+		LOGGER_.trace("Reset axiom loading");
 		stageManager.axiomLoadingStage.invalidate();
 		stageManager.incrementalCompletionStage.invalidate();
 	}
 
 	public synchronized void registerAxiomLoader(AxiomLoader newAxiomLoader) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Registering new axiom loader");
+		LOGGER_.trace("Registering new axiom loader");
+		
 		resetAxiomLoading();
 
 		if (axiomLoader_ == null || axiomLoader_.isLoadingFinished())
@@ -302,8 +302,8 @@ public abstract class AbstractReasonerState {
 	 * interrupts running reasoning stages
 	 */
 	public synchronized void interrupt() {
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("Interrupt requested");
+		LOGGER_.info("Interrupt requested");
+		
 		isInterrupted_ = true;
 		ReasonerStageExecutor stageExecutor = getStageExecutor();
 		if (stageExecutor != null)

@@ -46,7 +46,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 
 	// logger for this class
 	// private static final Logger LOGGER_ =
-	// Logger.getLogger(IncrementalCompletionStage.class);
+	// LoggerFactory.getLogger(IncrementalCompletionStage.class);
 
 	private ClassExpressionNoInputSaturation completion_ = null;
 

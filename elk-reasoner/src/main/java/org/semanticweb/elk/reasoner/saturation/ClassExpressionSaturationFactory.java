@@ -26,7 +26,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
@@ -61,7 +62,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		InputProcessorFactory<J, ClassExpressionSaturationFactory<J>.Engine> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassExpressionSaturationFactory.class);
 
 	// TODO: switch to listener factory
@@ -296,10 +297,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				rootSaturation.setSaturated(true);
 				nextJob.setOutput(rootSaturation);
 				
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(root + ": saturation finished");
-				}
-				
+				LOGGER_.trace("{}: saturation finished", root);
+			
 				localStatistics.jobsProcessedNo++;
 				listener_.notifyFinished(nextJob);
 			}
@@ -477,9 +476,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 														// InterruptedException
 					continue;
 				}
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(root + ": saturation started");
-				}
+
+				LOGGER_.trace("{}: saturation started", root);
 				/*
 				 * submit the job to the rule engine and start processing it
 				 */

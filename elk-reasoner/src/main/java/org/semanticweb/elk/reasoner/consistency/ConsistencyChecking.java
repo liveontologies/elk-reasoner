@@ -28,7 +28,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -55,7 +56,7 @@ public class ConsistencyChecking
 		ReasonerComputation<SaturationJob<IndexedClassEntity>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ConsistencyChecking.class);
 
 	/**
@@ -137,16 +138,14 @@ public class ConsistencyChecking
 	public static Collection<IndexedClassEntity> getTestEntities(
 			final OntologyIndex ontologyIndex) {
 		if (!ontologyIndex.getIndexedOwlNothing().occursPositively()) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("owl:Nothing does not occur positively; ontology is consistent");
+			LOGGER_.trace("owl:Nothing does not occur positively; ontology is consistent");
 			/*
 			 * if the ontology does not have any positive occurrence of bottom,
 			 * everything is always consistent
 			 */
 			return Collections.emptySet();
 		} else {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("owl:Nothing occurs positively");
+			LOGGER_.trace("owl:Nothing occurs positively");
 			/*
 			 * first consistency is checked for {@code owl:Thing}, then for the
 			 * individuals in the ontology

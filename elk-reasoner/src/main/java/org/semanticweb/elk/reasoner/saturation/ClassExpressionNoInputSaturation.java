@@ -24,7 +24,8 @@ package org.semanticweb.elk.reasoner.saturation;
 
 import java.util.Collections;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -75,7 +76,7 @@ class ClassExpressionNoInputSaturationFactory
 		implements
 		InputProcessorFactory<IndexedClassExpression, ClassExpressionNoInputSaturationFactory.Engine> {
 	
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassExpressionNoInputSaturationFactory.class);	
 
 	private final RuleApplicationFactory ruleAppFactory_;

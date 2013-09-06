@@ -24,9 +24,10 @@ package org.semanticweb.elk.benchmark;
  * #L%
  */
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.util.logging.ElkTimer;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runs every sub-task the specified number of times, then proceeds to the next
@@ -38,7 +39,7 @@ import org.semanticweb.elk.util.logging.ElkTimer;
  */
 public class RepeatEachTaskRunner {
 
-	private static final Logger LOGGER_ = Logger.getLogger(RepeatEachTaskRunner.class);	
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(RepeatEachTaskRunner.class);	
 	
 	private final TaskRunner runner_;
 	
@@ -52,7 +53,7 @@ public class RepeatEachTaskRunner {
 		}
 		
 		for (Task nextTask : collection.getTasks()) {
-			ElkTimer.getNamedTimer(nextTask.getName()).log(LOGGER_, Level.INFO);
+			ElkTimer.getNamedTimer(nextTask.getName()).log(LOGGER_, LogLevel.INFO);
 		}
 		
 		collection.dispose();

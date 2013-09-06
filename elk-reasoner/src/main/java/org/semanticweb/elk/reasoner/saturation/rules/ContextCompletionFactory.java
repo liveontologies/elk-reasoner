@@ -30,7 +30,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
@@ -70,7 +71,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public class ContextCompletionFactory extends RuleApplicationFactory {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContextCompletionFactory.class);
 
 	private final LocalSaturationState localState_;
@@ -347,12 +348,9 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			public void produce(Context context, Conclusion conclusion) {
 
 				if (existsGlobally(context, conclusion)) {
-					if (LOGGER_.isTraceEnabled()) {
-						LOGGER_.trace(context
-								+ ": conclusion "
-								+ conclusion
-								+ " exists in the main context, producing locally");
-					}
+					LOGGER_.trace(
+							"{}: conclusion {} exists in the main context, producing locally",
+							context, conclusion);
 					// produce the conclusion for the local copy of the context
 					produceLocally(context, conclusion);
 				}
@@ -444,12 +442,9 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 			void produceGlobally(Context context, Conclusion conclusion) {
 				// insert to the main context's ToDo
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(context
-							+ ": conclusion "
-							+ conclusion
-							+ " does NOT exist in the main context, insert into TODO");
-				}
+				LOGGER_.trace(
+						"{}: conclusion {} does NOT exist in the main context, insert into TODO",
+						context, conclusion);
 
 				mainStateWriter_.produce(context.getRoot().getContext(),
 						conclusion);

@@ -26,7 +26,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
@@ -54,7 +55,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexedObjectSomeValuesFrom.class);
 
 	protected final IndexedObjectProperty property;
@@ -173,9 +174,8 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		@Override
 		public void apply(BasicSaturationStateWriter writer, Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + context);
-			}
+			LOGGER_.trace("Applying {} to {}", NAME, context);			
+			
 			final Set<IndexedPropertyChain> candidatePropagationProperties = context
 					.getBackwardLinksByObjectProperty().keySet();
 

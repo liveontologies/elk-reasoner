@@ -25,7 +25,8 @@ package org.semanticweb.elk.reasoner;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
@@ -45,7 +46,7 @@ public class ReasonerComputation<I, F extends InputProcessorFactory<I, ?>>
 		extends ConcurrentComputation<I, F> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ReasonerComputation.class);
 
 	/**

@@ -36,7 +36,8 @@ import java.util.Set;
 
 import javax.xml.bind.DatatypeConverter;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
@@ -66,7 +67,7 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.NumericValue;
  */
 public class NumericDatatypeHandler extends ElkDatatypeHandler {
 
-	static final Logger LOGGER_ = Logger
+	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(NumericDatatypeHandler.class);
 
 	private static final BigInteger BI_MAX_INTEGER = BigInteger

@@ -34,7 +34,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
@@ -61,7 +62,7 @@ import dk.brics.automaton.RegExp;
  */
 public class AnyURIDatatypeHandler extends ElkDatatypeHandler {
 
-	static final Logger LOGGER_ = Logger.getLogger(AnyURIDatatypeHandler.class);
+	static final Logger LOGGER_ = LoggerFactory.getLogger(AnyURIDatatypeHandler.class);
 
 	@Override
 	public Set<ELDatatype> getSupportedDatatypes() {

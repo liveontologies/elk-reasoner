@@ -22,7 +22,8 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 
@@ -35,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 public class ClassSaturationStage extends AbstractReasonerStage {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassSaturationStage.class);
 
 	/**

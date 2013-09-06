@@ -25,7 +25,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -40,7 +41,7 @@ public class PropertyHierarchyCompositionComputationFactory
 		InputProcessorFactory<IndexedPropertyChain, PropertyHierarchyCompositionComputationFactory.Engine> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(PropertyHierarchyCompositionComputationFactory.class);
 
 	@Override
@@ -82,8 +83,8 @@ public class PropertyHierarchyCompositionComputationFactory
 
 		@Override
 		public Void visit(IndexedBinaryPropertyChain element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Computing compositions for " + element);
+			LOGGER_.trace("Computing compositions for {}", element);
+			
 			IndexedObjectProperty left = element.getLeftProperty();
 			IndexedPropertyChain right = element.getRightProperty();
 			Set<IndexedPropertyChain> leftSubProperties = SubPropertyExplorer
@@ -134,11 +135,9 @@ public class PropertyHierarchyCompositionComputationFactory
 					synchronized (compositionsSoFar) {
 						closure.applyTo(compositionsSoFar);
 						// the logger should be within synchronized
-						if (LOGGER_.isTraceEnabled())
-							LOGGER_.trace("updated compositions: "
-									+ leftSubProperty + " o "
-									+ rightSubProperty + " => "
-									+ compositionsSoFar);
+						LOGGER_.trace("updated compositions: {} o {} => {}",
+								leftSubProperty, rightSubProperty,
+								compositionsSoFar);
 					}
 				}
 			}

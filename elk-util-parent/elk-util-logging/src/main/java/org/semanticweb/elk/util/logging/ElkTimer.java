@@ -27,10 +27,8 @@ import java.lang.management.ThreadMXBean;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 import org.semanticweb.elk.util.hashing.HashGenerator;
+import org.slf4j.Logger;
 
 /**
  * Class for keeping CPU and system times.
@@ -228,7 +226,7 @@ public class ElkTimer {
 	 * @param logger
 	 */
 	public void log(Logger logger) {
-		log(logger, Level.DEBUG);
+		log(logger, LogLevel.DEBUG);
 	}
 
 	/**
@@ -240,8 +238,8 @@ public class ElkTimer {
 	 * @param logger
 	 * @param priority
 	 */
-	public void log(Logger logger, Priority priority) {
-		if (logger.isEnabledFor(priority)) {
+	public void log(Logger logger, LogLevel priority) {
+		if (LoggerWrap.isEnabledFor(logger, priority)) {
 			String timerLabel;
 			if (threadId != 0) {
 				timerLabel = name + " (thread " + threadId + ")";
@@ -252,7 +250,7 @@ public class ElkTimer {
 			}
 
 			if (todoFlags == RECORD_NONE) {
-				logger.log(priority, "Timer " + timerLabel + " recorded "
+				LoggerWrap.log(logger, priority, "Timer " + timerLabel + " recorded "
 						+ measurements + " run(s), no times taken");
 			} else {
 				String labels = "";
@@ -293,7 +291,7 @@ public class ElkTimer {
 					}
 				}
 
-				logger.log(priority, "Time for " + timerLabel + " for "
+				LoggerWrap.log(logger, priority, "Time for " + timerLabel + " for "
 						+ measurements + " run(s) " + labels + " (ms): "
 						+ values);
 			}
@@ -529,11 +527,11 @@ public class ElkTimer {
 	}
 
 	public static void logAllNamedTimers(String timerName, Logger logger) {
-		logAllNamedTimers(timerName, logger, Level.DEBUG);
+		logAllNamedTimers(timerName, logger, LogLevel.DEBUG);
 	}
 
 	public static void logAllNamedTimers(String timerName, Logger logger,
-			Priority priority) {
+			LogLevel priority) {
 		for (Map.Entry<ElkTimer, ElkTimer> entry : registeredTimers.entrySet()) {
 			if (entry.getValue().name.equals(timerName)) {
 				entry.getValue().log(logger, priority);

@@ -32,7 +32,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -68,7 +69,7 @@ import org.semanticweb.elk.util.collections.Operations.FunctorEx;
 public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 	// logger for events
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ConcurrentInstanceTaxonomy.class);
 
 	/** thread safe map from class IRIs to individual nodes */
@@ -219,9 +220,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 		IndividualNode node = individualNodeLookup_.get(getKey(instance));
 
 		if (node != null) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Removing the instance node " + node);
-			}
+			LOGGER_.trace("Removing the instance node {}", node);
 			
 			List<UpdateableTypeNode<ElkClass, ElkNamedIndividual>> directTypes = new LinkedList<UpdateableTypeNode<ElkClass, ElkNamedIndividual>>();
 			
@@ -532,9 +531,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 
 		@Override
 		public void addDirectInstanceNode(	UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace(getNode() + ": new direct instance-node " + instanceNode);
-			}
+			LOGGER_.trace("{}: new direct instance-node {}", classNode_, instanceNode);
 			
 			directInstanceNodes_.add(instanceNode);		
 		}
@@ -545,9 +542,7 @@ public class ConcurrentInstanceTaxonomy implements IndividualClassTaxonomy {
 		@Override
 		public void removeDirectInstanceNode(
 				UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace(getNode() + ": direct instance node removed " + instanceNode);
-			}
+			LOGGER_.trace("{}: direct instance node removed {}", classNode_, instanceNode);
 			
 			directInstanceNodes_.remove(instanceNode);
 		}

@@ -24,12 +24,13 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.semanticweb.elk.util.logging.ElkMessage;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Basically an adapter from {@link ElkAxiomIndexingVisitor} to
@@ -42,7 +43,7 @@ import org.semanticweb.elk.util.logging.ElkMessage;
 public class ChangeIndexingProcessor implements ElkAxiomProcessor {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ChangeIndexingProcessor.class);
 
 	private final ElkAxiomIndexingVisitor indexer_;
@@ -62,11 +63,11 @@ public class ChangeIndexingProcessor implements ElkAxiomProcessor {
 						+ (indexer_.getMultiplicity() == 1 ? "addition"
 								: "deletion"));
 		} catch (ElkIndexingUnsupportedException e) {
-			if (LOGGER_.isEnabledFor(Level.WARN))
-				LOGGER_.warn(new ElkMessage(e.getMessage()
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap.log(LOGGER_, LogLevel.WARN, "reasoner.indexing.axiomIgnored", e.getMessage()
 						+ " Axiom ignored:\n"
-						+ OwlFunctionalStylePrinter.toString(elkAxiom),
-						"reasoner.indexing.axiomIgnored"));
+						+ OwlFunctionalStylePrinter.toString(elkAxiom));
+			}
 		}
 	}
 }

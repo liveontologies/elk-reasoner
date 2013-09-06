@@ -24,7 +24,8 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -45,7 +46,7 @@ public class ReflexivePropertyComputationFactory
 		InputProcessorFactory<IndexedObjectProperty, ReflexivePropertyComputationFactory.Engine> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ReflexivePropertyComputationFactory.class);
 
 	/**
@@ -69,8 +70,8 @@ public class ReflexivePropertyComputationFactory
 		SaturatedPropertyChain saturation = SaturatedPropertyChain
 				.getCreate(ipc);
 		if (saturation.setReflexive()) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace(ipc + ": set reflexive");
+			LOGGER_.trace("{}: set reflexive", ipc);
+
 			toDo_.add(ipc);
 		}
 	}

@@ -24,7 +24,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -52,7 +53,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class ForwardLink extends AbstractConclusion {
 
-	private static final Logger LOGGER_ = Logger.getLogger(ForwardLink.class);
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(ForwardLink.class);
 
 	/**
 	 * the {@link IndexedPropertyChain} in the existential restriction
@@ -176,9 +177,7 @@ public class ForwardLink extends AbstractConclusion {
 		@Override
 		public void apply(BasicSaturationStateWriter engine, BackwardLink link) {
 
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + link);
-			}
+			LOGGER_.trace("Applying {} to {}", NAME, link);
 
 			/* compose the link with all forward links */
 			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link

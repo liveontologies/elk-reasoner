@@ -26,7 +26,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.loading.AbstractAxiomLoader;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
@@ -70,7 +71,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 public class Reasoner extends AbstractReasonerState {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger.getLogger(Reasoner.class);
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(Reasoner.class);
 
 	/**
 	 * The progress monitor that is used for reporting progress.
@@ -113,8 +114,8 @@ public class Reasoner extends AbstractReasonerState {
 		this.stageExecutor = stageExecutor;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("ELK reasoner was created");
+
+		LOGGER_.info("ELK reasoner was created");
 	}
 
 	/**
@@ -226,8 +227,7 @@ public class Reasoner extends AbstractReasonerState {
 		boolean success = executor_.isShutdown();
 		executor_ = null;
 		if (success) {
-			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("ELK reasoner has shut down");
+			LOGGER_.info("ELK reasoner has shut down");
 		} else {
 			LOGGER_.error("ELK reasoner failed to shut down!");
 		}

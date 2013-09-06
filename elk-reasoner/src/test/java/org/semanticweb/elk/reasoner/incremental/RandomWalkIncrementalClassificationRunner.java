@@ -33,14 +33,16 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A reusable runner which can be used for both unit tests and benchmarking
@@ -53,7 +55,7 @@ import org.semanticweb.elk.util.collections.Operations;
  */
 public class RandomWalkIncrementalClassificationRunner<T> {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RandomWalkIncrementalClassificationRunner.class);
 
 	private final int maxRounds_;
@@ -90,10 +92,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 		int changingAxiomsCount = changingAxioms.size();
 		int rounds = getNumberOfRounds(changingAxiomsCount);
 
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Running " + rounds + " rounds with " + iterations_
-					+ " random changes");
-		}
+		LOGGER_.info("Running {} rounds with {} random changes", iterations_, rounds);
 
 		int changeSize = getInitialChangeSize(changingAxiomsCount);
 		// this tracker is responsible for generating random changes
@@ -101,10 +100,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				changingAxioms, changeSize);
 
 		for (int j = 0; j < rounds; j++) {
-			if (LOGGER_.isInfoEnabled()) {
-				LOGGER_.info("Generating " + iterations_ + " changes of size: "
-						+ changeSize);
-			}
+			LOGGER_.info("Generating {} changes of size: {}", iterations_, changeSize);
 
 			changingAxioms.setAllOn();
 
@@ -117,9 +113,9 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 					LOGGER_.trace("Change for round " + (j + 1) + " iteration " + (i + 1));
 
 					LOGGER_.trace("Deleted axioms");
-					printCurrentAxioms(change.getDeletions(), Level.TRACE);
+					printCurrentAxioms(change.getDeletions(), LogLevel.TRACE);
 					LOGGER_.trace("Added axioms");
-					printCurrentAxioms(change.getAdditions(), Level.TRACE);
+					printCurrentAxioms(change.getAdditions(), LogLevel.TRACE);
 				}
 				
 				io_.loadChanges(reasoner, change);
@@ -134,15 +130,13 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 					LOGGER_.trace("Current axioms");
 					printCurrentAxioms(Operations.concat(
 							changingAxioms.getOnElements(), staticAxioms),
-							Level.DEBUG);
+							LogLevel.DEBUG);
 					
-					printResult(reasoner, LOGGER_, Level.TRACE);
+					printResult(reasoner, LOGGER_, LogLevel.TRACE);
 				}
 			}
 
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Checking the final result");
-			}
+			LOGGER_.trace("Checking the final result");
 
 			String finalResultHash = resultHashHistory.pollLast();
 			Reasoner standardReasoner = io_.createReasoner(Operations.concat(
@@ -155,18 +149,16 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 						finalResultHash);
 			} catch (AssertionError e) {
 				LOGGER_.error("======= Current Result =======");
-				printResult(reasoner, LOGGER_, Level.DEBUG);
+				printResult(reasoner, LOGGER_, LogLevel.DEBUG);
 				LOGGER_.error("====== Expected Result =======");
-				printResult(standardReasoner, LOGGER_, Level.DEBUG);
+				printResult(standardReasoner, LOGGER_, LogLevel.DEBUG);
 				standardReasoner.shutdown();
 				throw e;
 			}
 
 			standardReasoner.shutdown();
 
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Reverting the changes");
-			}
+			LOGGER_.trace("Reverting the changes");
 
 			for (;;) {
 				IncrementalChange<T> change = tracker.getChangeHistory()
@@ -182,9 +174,9 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				if (LOGGER_.isTraceEnabled()) {
 					LOGGER_.trace("Reverting the next change");
 					LOGGER_.trace("Adding back:");
-					printCurrentAxioms(change.getDeletions(), Level.TRACE);
+					printCurrentAxioms(change.getDeletions(), LogLevel.TRACE);
 					LOGGER_.trace("Deleting:");
-					printCurrentAxioms(change.getAdditions(), Level.TRACE);
+					printCurrentAxioms(change.getAdditions(), LogLevel.TRACE);
 				}				
 
 				String taxonomyHash = getResultHash(reasoner);
@@ -193,7 +185,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 					assertEquals("Seed " + seed, expectedHash, taxonomyHash);
 				} catch (AssertionError e) {
 					// TODO print the taxonomies here?
-					printResult(reasoner, LOGGER_, Level.ERROR);
+					printResult(reasoner, LOGGER_, LogLevel.ERROR);
 
 					throw e;
 				}
@@ -209,7 +201,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 	 * reasoning tasks
 	 */
 
-	protected void printResult(Reasoner reasoner, Logger logger, Level level)
+	protected void printResult(Reasoner reasoner, Logger logger, LogLevel level)
 			throws IOException, ElkException {
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
 		StringWriter writer = new StringWriter();
@@ -217,8 +209,8 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 		TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
 		writer.flush();
 
-		logger.log(level, "CLASS TAXONOMY");
-		logger.log(level, writer.getBuffer());
+		LoggerWrap.log(logger, level, "CLASS TAXONOMY");
+		LoggerWrap.log(logger, level, writer.getBuffer().toString());
 		writer.close();
 	}
 
@@ -242,8 +234,8 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 				2 * (31 - Integer.numberOfLeadingZeros(changingAxiomsCount)));
 	}
 
-	private void printCurrentAxioms(Iterable<T> axioms, Level level) {
-		if (LOGGER_.isEnabledFor(level)) {
+	private void printCurrentAxioms(Iterable<T> axioms, LogLevel level) {
+		if (LoggerWrap.isEnabledFor(LOGGER_, level)) {
 			for (T axiom : axioms) {
 				io_.printAxiom(axiom, LOGGER_, level);
 			}

@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.log4j.Level;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
@@ -44,6 +43,8 @@ import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
 
 /**
  * @author Pavel Klinov
@@ -67,8 +68,8 @@ public class IncrementalRealizationCorrectnessTest extends
 	}
 
 	@Override
-	protected void dumpChangeToLog(ElkAxiom change, Level level) {
-		LOGGER_.log(level, OwlFunctionalStylePrinter.toString(change) + ": deleted");
+	protected void dumpChangeToLog(ElkAxiom change, LogLevel level) {
+		LoggerWrap.log(LOGGER_, level, OwlFunctionalStylePrinter.toString(change) + ": deleted");
 	}
 
 	@Override
