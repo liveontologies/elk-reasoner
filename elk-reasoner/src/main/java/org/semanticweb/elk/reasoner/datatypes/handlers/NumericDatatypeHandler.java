@@ -214,9 +214,8 @@ public class NumericDatatypeHandler extends ElkDatatypeHandler {
 		if (divisorIndx == -1) {
 			LOGGER_.warn("Rational number is missing /");
 		}
-		BigInteger numerator = new BigInteger(literal.substring(0, divisorIndx));
-		BigInteger denominator = new BigInteger(
-				literal.substring(divisorIndx + 1));
+		BigInteger numerator = DatatypeConverter.parseInteger(literal.substring(0, divisorIndx));
+		BigInteger denominator = DatatypeConverter.parseInteger(literal.substring(divisorIndx + 1));
 		if (denominator.compareTo(BigInteger.ZERO) <= 0) {
 			LOGGER_.warn("Denominator is 0");
 		}
