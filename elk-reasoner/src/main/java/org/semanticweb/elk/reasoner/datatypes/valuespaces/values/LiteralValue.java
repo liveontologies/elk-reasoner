@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.util.collections.Pair;
@@ -37,24 +37,24 @@ public class LiteralValue implements ValueSpace {
 
 	public String value;
 	public String language;
-	public ELDatatype datatype;
-	public ELDatatype effectiveDatatype;
+	public ElkDatatype datatype;
+	public ElkDatatype effectiveDatatype;
 
-	public LiteralValue(Pair<String, String> pair, ELDatatype datatype, ELDatatype effectiveDatatype) {
+	public LiteralValue(Pair<String, String> pair, ElkDatatype datatype, ElkDatatype effectiveDatatype) {
 		this.value = pair.getFirst();
 		this.language = pair.getSecond();
 		this.datatype = datatype;
 		this.effectiveDatatype = effectiveDatatype;
 	}
 
-	public LiteralValue(String string, ELDatatype datatype, ELDatatype effectiveDatatype) {
+	public LiteralValue(String string, ElkDatatype datatype, ElkDatatype effectiveDatatype) {
 		this.value = string;
 		this.datatype = datatype;
 		this.effectiveDatatype = effectiveDatatype;
 	}
 
 	@Override
-	public ELDatatype getDatatype() {
+	public ElkDatatype getDatatype() {
 		return effectiveDatatype;
 	}
 

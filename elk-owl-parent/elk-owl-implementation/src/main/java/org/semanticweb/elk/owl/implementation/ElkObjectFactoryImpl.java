@@ -116,6 +116,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.managers.DummyElkObjectRecycler;
+import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
 import org.semanticweb.elk.owl.managers.ElkObjectRecycler;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
@@ -139,9 +140,6 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	protected static final ElkDataProperty ELK_OWL_BOTTOM_DATA_PROPERTY = new ElkDataPropertyImpl(
 			PredefinedElkIri.OWL_BOTTOM_DATA_PROPERTY.get());
-
-	protected static final ElkDatatype ELK_RDF_PLAIN_LITERAL = new ElkDatatypeImpl(
-			PredefinedElkIri.RDF_PLAIN_LITERAL.get());
 
 	protected final ElkObjectRecycler objectRecycler_;
 
@@ -328,12 +326,12 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	@Override
 	public ElkDatatype getDatatype(ElkIri iri) {
-		return (ElkDatatype) objectRecycler_.recycle(new ElkDatatypeImpl(iri));
+		return ElkDatatypeMap.get(iri);
 	}
 
 	@Override
 	public ElkDatatype getDatatypeRdfPlainLiteral() {
-		return ELK_RDF_PLAIN_LITERAL;
+		return ElkDatatypeMap.get(PredefinedElkIri.RDF_PLAIN_LITERAL.get());
 	}
 
 	@Override

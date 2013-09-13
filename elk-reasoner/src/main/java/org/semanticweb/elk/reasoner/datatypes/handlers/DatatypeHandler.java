@@ -22,9 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
-import java.util.Set;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
-import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
+import org.semanticweb.elk.owl.visitors.ElkDataValueSpaceVisitor;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 
 /**
  * Datatype handler interface
@@ -32,17 +31,5 @@ import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
  * @author Pospishnyi Oleksandr
  * @author "Yevgeny Kazakov"
  */
-public interface DatatypeHandler {
-
-	/**
-	 * Get all datatypes supported by this handler
-	 */
-	public Set<ELDatatype> getSupportedDatatypes();
-
-	/**
-	 * Get all restriction facets supported by this handler with respect to it's
-	 * supported datatype family
-	 */
-	public Set<Facet> getSupportedFacets();
-
+public interface DatatypeHandler extends ElkDataValueSpaceVisitor<ValueSpace> {
 }

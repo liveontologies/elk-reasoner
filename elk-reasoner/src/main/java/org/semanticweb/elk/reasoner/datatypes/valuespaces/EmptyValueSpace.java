@@ -22,7 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 
 
@@ -36,8 +38,8 @@ public class EmptyValueSpace implements ValueSpace {
 	public static final EmptyValueSpace INSTANCE = new EmptyValueSpace();
 
 	@Override
-	public ELDatatype getDatatype() {
-		return ELDatatype.rdfs_Literal;
+	public ElkDatatype getDatatype() {
+		return null;
 	}
 
 	@Override

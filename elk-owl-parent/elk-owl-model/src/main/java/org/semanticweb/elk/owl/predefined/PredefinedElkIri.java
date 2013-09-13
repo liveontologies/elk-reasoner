@@ -42,9 +42,63 @@ public enum PredefinedElkIri {
 
 	OWL_BOTTOM_DATA_PROPERTY(new ElkFullIri(PredefinedElkPrefix.OWL.get(),
 			"BottomDataProperty")), //
-
+		
+	RDFS_LITERAL(new ElkFullIri(PredefinedElkPrefix.RDFS.get(),
+			"Literal")),//
+	
+	XSD_DATE_TIME(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"dateTime")),//
+	
+	XSD_DATE_TIME_STAMP(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"dateTimeStamp")),//
+	
+	XSD_BASE_64_BINARY(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"base64Binary")),//
+	
+	XSD_HEX_BINARY(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"hexBinary")),//
+	
+	XSD_ANY_URI(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"anyURI")),//
+	
+	OWL_REAL(new ElkFullIri(PredefinedElkPrefix.OWL.get(),
+			"real")),//
+	
+	OWL_RATIONAL(new ElkFullIri(PredefinedElkPrefix.OWL.get(),
+			"rational")),//
+	
+	XSD_DECIMAL(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"decimal")),//
+	
+	XSD_INTEGER(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"integer")),//
+	
+	XSD_NON_NEGATIVE_INTEGER(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"nonNegativeInteger")),//
+	
 	RDF_PLAIN_LITERAL(new ElkFullIri(PredefinedElkPrefix.RDF.get(),
-			"PlainLiteral"))//
+			"PlainLiteral")),//
+	
+	XSD_STRING(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"string")),//
+	
+	XSD_NORMALIZED_STRING(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"normalizedString")),//
+	
+	XSD_TOKEN(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"token")),//
+	
+	XSD_NAME(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"Name")),//
+	
+	XSD_NMTOCKEN(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"NMTOKEN")),//
+	
+	XSD_NCNAME(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"NCName")),//
+	
+	RDF_XMLITERAL(new ElkFullIri(PredefinedElkPrefix.RDF.get(),
+			"XMLLiteral"))//
 	;
 
 	private final ElkIri iri;
@@ -55,6 +109,21 @@ public enum PredefinedElkIri {
 
 	public ElkIri get() {
 		return this.iri;
+	}
+
+	/**
+	 * Get enum element based on it's IRI
+	 *
+	 * @param iri Predefined IRI
+	 * @return {@link Datatype}
+	 */
+	public static PredefinedElkIri lookup(ElkIri iri) {
+		for (PredefinedElkIri predefinedIri : PredefinedElkIri.values()) {
+			if (predefinedIri.get().equals(iri)) {
+				return predefinedIri;
+			}
+		}
+		return null;
 	}
 
 	/**

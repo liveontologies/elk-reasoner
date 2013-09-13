@@ -22,17 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
-import static org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype.*;
-
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
-import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 
 /**
  * rdfs:Literal datatype handler.
@@ -48,16 +40,8 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
  */
 public class LiteralDatatypeHandler extends ElkDatatypeHandler {
 
-	static final Logger LOGGER_ = LoggerFactory
-		.getLogger(LiteralDatatypeHandler.class);
-
 	@Override
-	public Set<ELDatatype> getSupportedDatatypes() {
-		return EnumSet.of(rdfs_Literal);
-	}
-
-	@Override
-	public Set<Facet> getSupportedFacets() {
-		return Collections.emptySet();
+	public ValueSpace visit(ElkDatatype elkDatatype) {
+		return new EntireValueSpace(elkDatatype);
 	}
 }

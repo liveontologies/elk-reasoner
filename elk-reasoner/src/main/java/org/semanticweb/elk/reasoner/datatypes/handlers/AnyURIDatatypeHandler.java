@@ -22,25 +22,15 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
-import static org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype.*;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.LENGTH;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MAX_LENGTH;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MIN_LENGTH;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.PATTERN;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
-import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.LengthRestrictedValueSpace;
@@ -49,6 +39,8 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
 
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.RegExp;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 
 /**
  * xsd:AnyURI datatype handler
@@ -65,18 +57,8 @@ public class AnyURIDatatypeHandler extends ElkDatatypeHandler {
 	static final Logger LOGGER_ = LoggerFactory.getLogger(AnyURIDatatypeHandler.class);
 
 	@Override
-	public Set<ELDatatype> getSupportedDatatypes() {
-		return EnumSet.of(xsd_anyURI);
-	}
-
-	@Override
-	public Set<Facet> getSupportedFacets() {
-		return EnumSet.of(LENGTH, MIN_LENGTH, MAX_LENGTH, PATTERN);
-	}
-
-	@Override
 	public ValueSpace visit(ElkLiteral elkLiteral) {
-		ELDatatype datatype = elkLiteral.getDatatype().asELDatatype();
+		ElkDatatype datatype = elkLiteral.getDatatype();
 		URI value = parse(elkLiteral.getLexicalForm());
 		if (value != null) {
 			return new LiteralValue(value.toString(), datatype, datatype);
@@ -86,48 +68,54 @@ public class AnyURIDatatypeHandler extends ElkDatatypeHandler {
 	}
 
 	@Override
+	public ValueSpace visit(ElkDatatype elkDatatype) {
+		return new EntireValueSpace(elkDatatype);
+	}
+
+	@Override
 	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
 		Integer minLength = 0;
 		Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
-		ELDatatype datatype = elkDatatypeRestriction.getDatatype().asELDatatype();
+		ElkDatatype datatype = elkDatatypeRestriction.getDatatype();
 
 		List<? extends ElkFacetRestriction> facetRestrictions = elkDatatypeRestriction
-				.getFacetRestrictions();
-		outerloop: for (ElkFacetRestriction facetRestriction : facetRestrictions) {
+			.getFacetRestrictions();
+		outerloop:
+		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
 			Facet facet = Facet.getByIri(facetRestriction
-					.getConstrainingFacet().getFullIriAsString());
+				.getConstrainingFacet().getFullIriAsString());
 			String value = facetRestriction.getRestrictionValue()
-					.getLexicalForm();
+				.getLexicalForm();
 
 			switch (facet) {
-			case LENGTH:
-				minLength = Integer.valueOf(value);
-				maxLength = minLength;
-				break outerloop;
-			case MIN_LENGTH:
-				minLength = Integer.valueOf(value);
-				break;
-			case MAX_LENGTH:
-				maxLength = Integer.valueOf(value);
-				break;
-			case PATTERN:
-				Automaton pattern = new RegExp(value).toAutomaton();
-				pattern.setInfo(value);
-				PatternValueSpace vs = new PatternValueSpace(pattern, datatype,
+				case LENGTH:
+					minLength = Integer.valueOf(value);
+					maxLength = minLength;
+					break outerloop;
+				case MIN_LENGTH:
+					minLength = Integer.valueOf(value);
+					break;
+				case MAX_LENGTH:
+					maxLength = Integer.valueOf(value);
+					break;
+				case PATTERN:
+					Automaton pattern = new RegExp(value).toAutomaton();
+					pattern.setInfo(value);
+					PatternValueSpace vs = new PatternValueSpace(pattern, datatype,
 						datatype);
-				if (vs.isEmptyInterval()) {
-					return EmptyValueSpace.INSTANCE;
-				} else {
-					return vs;
-				}
-			default:
-				LOGGER_.warn("Unsupported facet: " + facet.iri);
-				return null;
+					if (vs.isEmptyInterval()) {
+						return EmptyValueSpace.INSTANCE;
+					} else {
+						return vs;
+					}
+				default:
+					LOGGER_.warn("Unsupported facet: " + facet.iri);
+					return null;
 			}
 
 		}
 		LengthRestrictedValueSpace vs = new LengthRestrictedValueSpace(
-				datatype, minLength, maxLength);
+			datatype, minLength, maxLength);
 		if (vs.isEmptyInterval()) {
 			return EmptyValueSpace.INSTANCE;
 		} else {

@@ -24,7 +24,9 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -37,21 +39,21 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 public class DateTimeValue implements ValueSpace {
 
 	public XMLGregorianCalendar value;
-	public ELDatatype datatype;
-	public ELDatatype effectiveDatatype;
+	public ElkDatatype datatype;
+	public ElkDatatype effectiveDatatype;
 
-	public DateTimeValue(XMLGregorianCalendar value, ELDatatype datatype) {
+	public DateTimeValue(XMLGregorianCalendar value, ElkDatatype datatype) {
 		this.value = value;
 		this.datatype = datatype;
 		if (value.getTimezone() != DatatypeConstants.FIELD_UNDEFINED) {
-			effectiveDatatype = ELDatatype.xsd_dateTimeStamp;
+			effectiveDatatype = ElkDatatypeMap.get(PredefinedElkIri.XSD_DATE_TIME_STAMP.get());
 		} else {
-			effectiveDatatype = ELDatatype.xsd_dateTime;
+			effectiveDatatype = ElkDatatypeMap.get(PredefinedElkIri.XSD_DATE_TIME.get());
 		}
 	}
 
 	@Override
-	public ELDatatype getDatatype() {
+	public ElkDatatype getDatatype() {
 		return effectiveDatatype;
 	}
 

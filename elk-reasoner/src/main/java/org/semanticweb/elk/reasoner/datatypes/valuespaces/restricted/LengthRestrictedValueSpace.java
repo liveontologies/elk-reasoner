@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.BasicOperations;
 import dk.brics.automaton.Datatypes;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
@@ -41,10 +41,10 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 
 	private Integer minLength;
 	private Integer maxLength;
-	private ELDatatype datatype;
+	private ElkDatatype datatype;
 	private Automaton automaton;
 
-	public LengthRestrictedValueSpace(ELDatatype datatype, Integer minLength, Integer maxLength) {
+	public LengthRestrictedValueSpace(ElkDatatype datatype, Integer minLength, Integer maxLength) {
 		this.minLength = minLength;
 		this.maxLength = maxLength;
 		this.datatype = datatype;
@@ -61,7 +61,7 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 	}
 
 	@Override
-	public ELDatatype getDatatype() {
+	public ElkDatatype getDatatype() {
 		return datatype;
 	}
 

@@ -24,7 +24,9 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.numbers.AbstractInterval;
 import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
@@ -40,11 +42,11 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  */
 public class NumericValue extends AbstractInterval implements ValueSpace {
 
-	public ELDatatype datatype;
-	public ELDatatype effectiveDatatype;
+	public ElkDatatype datatype;
+	public ElkDatatype effectiveDatatype;
 	public Number value;
 
-	public NumericValue(ELDatatype datatype, Number value) {
+	public NumericValue(ElkDatatype datatype, Number value) {
 		this.value = value;
 		this.datatype = datatype;
 		this.effectiveDatatype = getCorrespondingDatatype(value);
@@ -53,7 +55,7 @@ public class NumericValue extends AbstractInterval implements ValueSpace {
 	}
 
 	@Override
-	public ELDatatype getDatatype() {
+	public ElkDatatype getDatatype() {
 		return effectiveDatatype;
 	}
 
@@ -67,19 +69,19 @@ public class NumericValue extends AbstractInterval implements ValueSpace {
 		return !effectiveDatatype.isCompatibleWith(datatype);
 	}
 
-	private ELDatatype getCorrespondingDatatype(Number number) {
+	private ElkDatatype getCorrespondingDatatype(Number number) {
 		if (number instanceof Integer || number instanceof Long || number instanceof BigInteger) {
 			if (NumberComparator.INSTANCE.compare(number, Integer.valueOf(0)) >= 0) {
-				return ELDatatype.xsd_nonNegativeInteger;
+				return ElkDatatypeMap.get(PredefinedElkIri.XSD_NON_NEGATIVE_INTEGER.get());
 			} else {
-				return ELDatatype.xsd_integer;
+				return ElkDatatypeMap.get(PredefinedElkIri.XSD_INTEGER.get());
 			}
 		} else if (number instanceof BigDecimal) {
-			return ELDatatype.xsd_decimal;
+			return ElkDatatypeMap.get(PredefinedElkIri.XSD_DECIMAL.get());
 		} else if (number instanceof BigRational) {
-			return ELDatatype.owl_rational;
+			return ElkDatatypeMap.get(PredefinedElkIri.OWL_RATIONAL.get());
 		} else {
-			return ELDatatype.owl_real;
+			return ElkDatatypeMap.get(PredefinedElkIri.OWL_REAL.get());
 		}
 	}
 

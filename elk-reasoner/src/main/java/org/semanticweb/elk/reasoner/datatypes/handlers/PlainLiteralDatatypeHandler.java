@@ -22,24 +22,14 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
-import static org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype.*;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.LENGTH;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MAX_LENGTH;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MIN_LENGTH;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.PATTERN;
-
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
-import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.LengthRestrictedValueSpace;
@@ -50,6 +40,10 @@ import org.semanticweb.elk.util.collections.Pair;
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.Datatypes;
 import dk.brics.automaton.RegExp;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 
 /**
  * rdf:PlainLiteral, xsd:string, xsd:normalizedString, xsd:token, xsd:Name,
@@ -153,20 +147,9 @@ public class PlainLiteralDatatypeHandler extends ElkDatatypeHandler {
 	}
 
 	@Override
-	public Set<ELDatatype> getSupportedDatatypes() {
-		return EnumSet.of(rdf_PlainLiteral, xsd_string, xsd_normalizedString,
-				xsd_token, xsd_Name, xsd_NCName, xsd_NMTOCKEN);
-	}
-
-	@Override
-	public Set<Facet> getSupportedFacets() {
-		return EnumSet.of(LENGTH, MIN_LENGTH, MAX_LENGTH, PATTERN);
-	}
-
-	@Override
 	public ValueSpace visit(ElkLiteral literal) {
-		ELDatatype datatype = literal.getDatatype().asELDatatype();
-		ELDatatype effectiveDatatype = datatype;
+		ElkDatatype datatype = literal.getDatatype();
+		ElkDatatype effectiveDatatype = datatype;
 
 		String lexicalForm = literal.getLexicalForm();
 
@@ -189,13 +172,18 @@ public class PlainLiteralDatatypeHandler extends ElkDatatypeHandler {
 			return null;
 		}
 	}
+	
+	@Override
+	public ValueSpace visit(ElkDatatype elkDatatype) {
+		return new EntireValueSpace(elkDatatype);
+	}
 
 	@Override
 	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
 		Integer minLength = 0;
 		Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
 
-		ELDatatype datatype = elkDatatypeRestriction.getDatatype().asELDatatype();
+		ElkDatatype datatype = elkDatatypeRestriction.getDatatype();
 
 		List<? extends ElkFacetRestriction> facetRestrictions = elkDatatypeRestriction
 				.getFacetRestrictions();
@@ -221,7 +209,7 @@ public class PlainLiteralDatatypeHandler extends ElkDatatypeHandler {
 			case PATTERN:
 				Automaton pattern = new RegExp(value).toAutomaton();
 				pattern.setInfo(value);
-				ELDatatype effectiveDatatype = determineDatatype(pattern);
+				ElkDatatype effectiveDatatype = determineDatatype(pattern);
 				PatternValueSpace vs = new PatternValueSpace(pattern, datatype,
 						effectiveDatatype);
 				if (vs.isEmptyInterval()) {
@@ -262,8 +250,8 @@ public class PlainLiteralDatatypeHandler extends ElkDatatypeHandler {
 	 *            input
 	 * @return most specific {@link Datatype}
 	 */
-	public ELDatatype determineDatatype(String string) {
-		ELDatatype retType = ELDatatype.rdf_PlainLiteral;
+	public ElkDatatype determineDatatype(String string) {
+		ElkDatatype retType = ElkDatatypeMap.get(PredefinedElkIri.RDF_PLAIN_LITERAL.get());
 		if (stringAutomaton.run(string)) {
 			retType = xsd_string;
 		} else {
@@ -304,8 +292,8 @@ public class PlainLiteralDatatypeHandler extends ElkDatatypeHandler {
 	 *            regular expression automaton
 	 * @return most specific {@link Datatype}
 	 */
-	public ELDatatype determineDatatype(Automaton pattern) {
-		ELDatatype retType = ELDatatype.rdf_PlainLiteral;
+	public ElkDatatype determineDatatype(Automaton pattern) {
+		ElkDatatype retType = ElkDatatypeMap.get(PredefinedElkIri.RDF_PLAIN_LITERAL.get());
 		if (!stringAutomaton.intersection(pattern).isEmpty()) {
 			retType = xsd_string;
 		} else {

@@ -34,14 +34,11 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  *
  * @author Markus Kroetzsch
  */
-public class ElkDatatypeImpl extends ElkIriObject implements ElkEntity,
+abstract public class ElkDatatypeImpl extends ElkIriObject implements ElkEntity,
 		ElkDatatype {
 
-	protected ELDatatype elDatatype;
-
-	ElkDatatypeImpl(ElkIri iri) {
+	public ElkDatatypeImpl(ElkIri iri) {
 		super(iri);
-		elDatatype = ELDatatype.getByIri(iri.getFullIriAsString());
 	}
 
 	@Override
@@ -70,7 +67,7 @@ public class ElkDatatypeImpl extends ElkIriObject implements ElkEntity,
 	}
 
 	@Override
-	public ELDatatype asELDatatype() {
-		return elDatatype;
+	public boolean isCompatibleWith(ElkDatatype datatype) {
+		return this.getClass().isAssignableFrom(datatype.getClass());
 	}
 }

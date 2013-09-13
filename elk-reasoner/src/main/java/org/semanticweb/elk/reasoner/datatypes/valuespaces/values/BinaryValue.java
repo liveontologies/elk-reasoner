@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
 
 import java.util.Arrays;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -35,16 +35,16 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  */
 public class BinaryValue implements ValueSpace {
 
-	public ELDatatype datatype;
+	public ElkDatatype datatype;
 	public byte[] value;
 
-	public BinaryValue(byte[] value, ELDatatype datatype) {
+	public BinaryValue(byte[] value, ElkDatatype datatype) {
 		this.datatype = datatype;
 		this.value = value;
 	}
 
 	@Override
-	public ELDatatype getDatatype() {
+	public ElkDatatype getDatatype() {
 		return datatype;
 	}
 

@@ -22,25 +22,18 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
-import static org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype.*;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.LENGTH;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MAX_LENGTH;
-import static org.semanticweb.elk.reasoner.datatypes.enums.Facet.MIN_LENGTH;
-
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.bind.DatatypeConverter;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.reasoner.datatypes.enums.Facet;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.LengthRestrictedValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
@@ -60,18 +53,8 @@ public class BinaryDatatypeHandler extends ElkDatatypeHandler {
 	static final Logger LOGGER_ = LoggerFactory.getLogger(BinaryDatatypeHandler.class);
 
 	@Override
-	public Set<ELDatatype> getSupportedDatatypes() {
-		return EnumSet.of(xsd_hexBinary, xsd_base64Binary);
-	}
-
-	@Override
-	public Set<Facet> getSupportedFacets() {
-		return EnumSet.of(LENGTH, MIN_LENGTH, MAX_LENGTH);
-	}
-
-	@Override
 	public ValueSpace visit(ElkLiteral elkLiteral) {
-		ELDatatype datatype = elkLiteral.getDatatype().asELDatatype();
+		ElkDatatype datatype = elkLiteral.getDatatype();
 		byte[] value = parse(elkLiteral.getLexicalForm(), datatype);
 		if (value != null) {
 			return new BinaryValue(value, datatype);
@@ -81,38 +64,44 @@ public class BinaryDatatypeHandler extends ElkDatatypeHandler {
 	}
 
 	@Override
+	public ValueSpace visit(ElkDatatype elkDatatype) {
+		return new EntireValueSpace(elkDatatype);
+	}
+
+	@Override
 	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
 		Integer minLength = 0;
 		Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
-		ELDatatype datatype = elkDatatypeRestriction.getDatatype().asELDatatype();
+		ElkDatatype datatype = elkDatatypeRestriction.getDatatype();
 
 		List<? extends ElkFacetRestriction> facetRestrictions = elkDatatypeRestriction
-				.getFacetRestrictions();
-		outerloop: for (ElkFacetRestriction facetRestriction : facetRestrictions) {
+			.getFacetRestrictions();
+		outerloop:
+		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
 			Facet facet = Facet.getByIri(facetRestriction
-					.getConstrainingFacet().getFullIriAsString());
+				.getConstrainingFacet().getFullIriAsString());
 			String value = facetRestriction.getRestrictionValue()
-					.getLexicalForm();
+				.getLexicalForm();
 
 			switch (facet) {
-			case LENGTH:
-				minLength = Integer.valueOf(value);
-				maxLength = minLength;
-				break outerloop;
-			case MIN_LENGTH:
-				minLength = Integer.valueOf(value);
-				break;
-			case MAX_LENGTH:
-				maxLength = Integer.valueOf(value);
-				break;
-			default:
-				LOGGER_.warn("Unsupported facet: " + facet.iri);
-				return null;
+				case LENGTH:
+					minLength = Integer.valueOf(value);
+					maxLength = minLength;
+					break outerloop;
+				case MIN_LENGTH:
+					minLength = Integer.valueOf(value);
+					break;
+				case MAX_LENGTH:
+					maxLength = Integer.valueOf(value);
+					break;
+				default:
+					LOGGER_.warn("Unsupported facet: " + facet.iri);
+					return null;
 			}
 
 		}
 		LengthRestrictedValueSpace vs = new LengthRestrictedValueSpace(
-				datatype, minLength, maxLength);
+			datatype, minLength, maxLength);
 		if (vs.isEmptyInterval()) {
 			return EmptyValueSpace.INSTANCE;
 		} else {
@@ -120,14 +109,14 @@ public class BinaryDatatypeHandler extends ElkDatatypeHandler {
 		}
 	}
 
-	private byte[] parse(String literal, ELDatatype datatype) {
+	private byte[] parse(String literal, ElkDatatype datatype) {
 		switch (datatype) {
-		case xsd_base64Binary:
-			return DatatypeConverter.parseBase64Binary(literal);
-		case xsd_hexBinary:
-			return DatatypeConverter.parseHexBinary(literal);
-		default:
-			return null;
+			case xsd_base64Binary:
+				return DatatypeConverter.parseBase64Binary(literal);
+			case xsd_hexBinary:
+				return DatatypeConverter.parseHexBinary(literal);
+			default:
+				return null;
 		}
 	}
 }

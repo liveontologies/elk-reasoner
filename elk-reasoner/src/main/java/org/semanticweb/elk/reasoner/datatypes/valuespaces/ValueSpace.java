@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.util.collections.Subsumable;
 
@@ -46,7 +46,7 @@ public interface ValueSpace extends Subsumable<ValueSpace> {
 	/**
 	 * @return Value space datatype
 	 */
-	public ELDatatype getDatatype();
+	public ElkDatatype getDatatype();
 
 	/**
 	 * @return Value space type

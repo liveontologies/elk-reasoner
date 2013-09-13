@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.numbers.AbstractInterval;
 import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
@@ -44,8 +44,8 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  */
 public class NumericIntervalValueSpace extends AbstractInterval implements ValueSpace {
 
-	public ELDatatype datatype;
-	public ELDatatype effectiveDatatype;
+	public ElkDatatype datatype;
+	public ElkDatatype effectiveDatatype;
 	public Number lowerBound;
 	public boolean lowerInclusive;
 	public Number upperBound;

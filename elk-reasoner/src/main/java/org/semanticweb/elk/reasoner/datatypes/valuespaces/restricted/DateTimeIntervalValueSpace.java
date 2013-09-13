@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.reasoner.datatypes.handlers.DateTimeDatatypeHandler;
 import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
@@ -38,13 +38,13 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  */
 public class DateTimeIntervalValueSpace implements ValueSpace {
 
-	public ELDatatype datatype;
+	public ElkDatatype datatype;
 	public XMLGregorianCalendar lowerBound;
 	public boolean lowerInclusive;
 	public XMLGregorianCalendar upperBound;
 	public boolean upperInclusive;
 
-	public DateTimeIntervalValueSpace(ELDatatype datatype, XMLGregorianCalendar lowerBound, boolean lowerInclusive, XMLGregorianCalendar upperBound, boolean upperInclusive) {
+	public DateTimeIntervalValueSpace(ElkDatatype datatype, XMLGregorianCalendar lowerBound, boolean lowerInclusive, XMLGregorianCalendar upperBound, boolean upperInclusive) {
 		this.datatype = datatype;
 		this.lowerBound = lowerBound;
 		this.lowerInclusive = lowerInclusive;
@@ -74,7 +74,7 @@ public class DateTimeIntervalValueSpace implements ValueSpace {
 	}
 
 	@Override
-	public ELDatatype getDatatype() {
+	public ElkDatatype getDatatype() {
 		return datatype;
 	}
 

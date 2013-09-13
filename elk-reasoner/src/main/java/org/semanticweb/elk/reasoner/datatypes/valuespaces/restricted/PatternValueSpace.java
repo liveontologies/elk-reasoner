@@ -24,8 +24,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.BasicOperations;
-import dk.brics.automaton.RegExp;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
@@ -39,17 +38,17 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
 public class PatternValueSpace implements ValueSpace {
 
 	public Automaton automaton;
-	public ELDatatype datatype;
-	public ELDatatype effectiveDatatype;
+	public ElkDatatype datatype;
+	public ElkDatatype effectiveDatatype;
 
-	public PatternValueSpace(Automaton automaton, ELDatatype datatype, ELDatatype effectiveDatatype) {
+	public PatternValueSpace(Automaton automaton, ElkDatatype datatype, ElkDatatype effectiveDatatype) {
 		this.datatype = datatype;
 		this.automaton = automaton;
 		this.effectiveDatatype = effectiveDatatype;
 	}
 
 	@Override
-	public ELDatatype getDatatype() {
+	public ElkDatatype getDatatype() {
 		return effectiveDatatype;
 	}
 

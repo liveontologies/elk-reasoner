@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
-import org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -33,14 +33,14 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  */
 public class EntireValueSpace implements ValueSpace {
 
-	private ELDatatype datatype;
+	private ElkDatatype datatype;
 
-	public EntireValueSpace(ELDatatype datatype) {
+	public EntireValueSpace(ElkDatatype datatype) {
 		this.datatype = datatype;
 	}
 
 	@Override
-	public ELDatatype getDatatype() {
+	public ElkDatatype getDatatype() {
 		return datatype;
 	}
 
