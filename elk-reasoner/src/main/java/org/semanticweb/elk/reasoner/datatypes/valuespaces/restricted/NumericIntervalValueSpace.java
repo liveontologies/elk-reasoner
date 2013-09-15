@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.numbers.AbstractInterval;
 import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
@@ -37,8 +39,8 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.NumericValue;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
- * Representation of numeric value interval with specified restrictions
- * (lower and upper bound)
+ * Representation of numeric value interval with specified restrictions (lower
+ * and upper bound)
  *
  * @author Pospishnyi Olexandr
  */
@@ -51,10 +53,10 @@ public class NumericIntervalValueSpace extends AbstractInterval implements Value
 	public Number upperBound;
 	public boolean upperInclusive;
 
-	public NumericIntervalValueSpace(ELDatatype datatype, Number lowerBound, boolean lowerInclusive, Number upperBound, boolean upperInclusive) {
+	public NumericIntervalValueSpace(ElkDatatype datatype, Number lowerBound, boolean lowerInclusive, Number upperBound, boolean upperInclusive) {
 		this.datatype = datatype;
 		this.effectiveDatatype = datatype;
-		if (datatype == ELDatatype.xsd_integer || datatype == ELDatatype.xsd_nonNegativeInteger) {
+		if (datatype == ElkDatatypeMap.get(PredefinedElkIri.XSD_INTEGER.get()) || datatype == ElkDatatypeMap.get(PredefinedElkIri.XSD_NON_NEGATIVE_INTEGER.get())) {
 			if (!lowerInclusive) {
 				lowerBound = advance(lowerBound, true);
 				lowerInclusive = true;
@@ -63,9 +65,9 @@ public class NumericIntervalValueSpace extends AbstractInterval implements Value
 				upperBound = advance(upperBound, false);
 				upperInclusive = true;
 			}
-			if (datatype == ELDatatype.xsd_integer
-					&& NumberComparator.INSTANCE.compare(lowerBound, Integer.valueOf(0)) >= 0) {
-				effectiveDatatype = ELDatatype.xsd_nonNegativeInteger;
+			if (datatype == ElkDatatypeMap.get(PredefinedElkIri.XSD_INTEGER.get())
+				&& NumberComparator.INSTANCE.compare(lowerBound, Integer.valueOf(0)) >= 0) {
+				effectiveDatatype = ElkDatatypeMap.get(PredefinedElkIri.XSD_NON_NEGATIVE_INTEGER.get());
 			}
 		}
 		this.lowerBound = lowerBound;
@@ -171,30 +173,30 @@ public class NumericIntervalValueSpace extends AbstractInterval implements Value
 			return true;
 		} else if (boundComparison == 0) {
 			if (!lowerInclusive || !upperInclusive
-					|| lowerBound == NegativeInfinity.INSTANCE
-					|| upperBound == PositiveInfinity.INSTANCE) {
+				|| lowerBound == NegativeInfinity.INSTANCE
+				|| upperBound == PositiveInfinity.INSTANCE) {
 				return true;
 			}
-			ELDatatype mostSpecificDatatype = getCorrespondingDatatype(lowerBound);
+			ElkDatatype mostSpecificDatatype = getCorrespondingDatatype(lowerBound);
 			return !mostSpecificDatatype.isCompatibleWith(datatype);
 		} else {
 			return false;
 		}
 	}
 
-	private ELDatatype getCorrespondingDatatype(Number number) {
+	private ElkDatatype getCorrespondingDatatype(Number number) {
 		if (number instanceof Integer || number instanceof Long || number instanceof BigInteger) {
 			if (NumberComparator.INSTANCE.compare(number, Integer.valueOf(0)) >= 0) {
-				return ELDatatype.xsd_nonNegativeInteger;
+				return ElkDatatypeMap.get(PredefinedElkIri.XSD_NON_NEGATIVE_INTEGER.get());
 			} else {
-				return ELDatatype.xsd_integer;
+				return ElkDatatypeMap.get(PredefinedElkIri.XSD_INTEGER.get());
 			}
 		} else if (number instanceof BigDecimal) {
-			return ELDatatype.xsd_decimal;
+			return ElkDatatypeMap.get(PredefinedElkIri.XSD_DECIMAL.get());
 		} else if (number instanceof BigRational) {
-			return ELDatatype.owl_rational;
+			return ElkDatatypeMap.get(PredefinedElkIri.OWL_RATIONAL.get());
 		} else {
-			return ELDatatype.owl_real;
+			return ElkDatatypeMap.get(PredefinedElkIri.OWL_REAL.get());
 		}
 	}
 
@@ -203,7 +205,7 @@ public class NumericIntervalValueSpace extends AbstractInterval implements Value
 	}
 
 	@Override
-	public ELDatatype getDatatype() {
+	public ElkDatatype getDatatype() {
 		return effectiveDatatype;
 	}
 
@@ -213,9 +215,9 @@ public class NumericIntervalValueSpace extends AbstractInterval implements Value
 	}
 
 	/**
-	 * NumericIntervalValueSpace could contain
-	 * - another NumericIntervalValueSpace if this value space completely includes another
-	 * - NumericValue that is included within specified bounds
+	 * NumericIntervalValueSpace could contain - another
+	 * NumericIntervalValueSpace if this value space completely includes
+	 * another - NumericValue that is included within specified bounds
 	 *
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
@@ -259,8 +261,8 @@ public class NumericIntervalValueSpace extends AbstractInterval implements Value
 				return false;
 		}
 	}
-	
-	public boolean contains(Number value, ELDatatype datatype) {
+
+	public boolean contains(Number value, ElkDatatype datatype) {
 		if (!datatype.isCompatibleWith(this.datatype)) {
 			return false;
 		}
@@ -273,7 +275,7 @@ public class NumericIntervalValueSpace extends AbstractInterval implements Value
 	public boolean isSubsumedBy(ValueSpace valueSpace) {
 		return valueSpace.contains(this);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		if (this == other) {
@@ -298,8 +300,7 @@ public class NumericIntervalValueSpace extends AbstractInterval implements Value
 			this.lowerBound,
 			this.lowerInclusive,
 			this.upperBound,
-			this.upperInclusive
-			);
+			this.upperInclusive);
 	}
 
 	@Override
@@ -308,7 +309,7 @@ public class NumericIntervalValueSpace extends AbstractInterval implements Value
 			+ upperBound.toString() + (upperInclusive ? "]" : ")")
 			+ "^^" + datatype;
 	}
-	
+
 	@Override
 	public <O> O accept(ValueSpaceVisitor<O> visitor) {
 		return visitor.visit(this);

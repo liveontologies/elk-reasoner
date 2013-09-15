@@ -55,7 +55,7 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
  */
-public class PlainLiteralDatatypeHandler extends ElkDatatypeHandler {
+public class PlainLiteralDatatypeHandler extends AbstractDatatypeHandler {
 
 	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(PlainLiteralDatatypeHandler.class);
@@ -253,32 +253,32 @@ public class PlainLiteralDatatypeHandler extends ElkDatatypeHandler {
 	public ElkDatatype determineDatatype(String string) {
 		ElkDatatype retType = ElkDatatypeMap.get(PredefinedElkIri.RDF_PLAIN_LITERAL.get());
 		if (stringAutomaton.run(string)) {
-			retType = xsd_string;
+			retType = ElkDatatypeMap.get(PredefinedElkIri.XSD_STRING.get());
 		} else {
 			return retType;
 		}
 		if (normalizedStringAutomaton.run(string)) {
-			retType = xsd_normalizedString;
+			retType = ElkDatatypeMap.get(PredefinedElkIri.XSD_NORMALIZED_STRING.get());
 		} else {
 			return retType;
 		}
 		if (tokenAutomaton.run(string)) {
-			retType = xsd_token;
+			retType = ElkDatatypeMap.get(PredefinedElkIri.XSD_TOKEN.get());
 		} else {
 			return retType;
 		}
 		if (NMTokenAutomaton.run(string)) {
-			retType = xsd_NMTOCKEN;
+			retType = ElkDatatypeMap.get(PredefinedElkIri.XSD_NMTOCKEN.get());
 		} else {
 			return retType;
 		}
 		if (NameAutomaton.run(string)) {
-			retType = xsd_Name;
+			retType = ElkDatatypeMap.get(PredefinedElkIri.XSD_NAME.get());
 		} else {
 			return retType;
 		}
 		if (NCNameAutomaton.run(string)) {
-			retType = xsd_NCName;
+			retType = ElkDatatypeMap.get(PredefinedElkIri.XSD_NCNAME.get());
 		} else {
 			return retType;
 		}
@@ -295,32 +295,32 @@ public class PlainLiteralDatatypeHandler extends ElkDatatypeHandler {
 	public ElkDatatype determineDatatype(Automaton pattern) {
 		ElkDatatype retType = ElkDatatypeMap.get(PredefinedElkIri.RDF_PLAIN_LITERAL.get());
 		if (!stringAutomaton.intersection(pattern).isEmpty()) {
-			retType = xsd_string;
+			retType = ElkDatatypeMap.get(PredefinedElkIri.XSD_STRING.get());
 		} else {
 			return retType;
 		}
 		if (!normalizedStringAutomaton.intersection(pattern).isEmpty()) {
-			retType = xsd_normalizedString;
+			retType = ElkDatatypeMap.get(PredefinedElkIri.XSD_NORMALIZED_STRING.get());
 		} else {
 			return retType;
 		}
 		if (!tokenAutomaton.intersection(pattern).isEmpty()) {
-			retType = xsd_token;
+			retType = ElkDatatypeMap.get(PredefinedElkIri.XSD_TOKEN.get());
 		} else {
 			return retType;
 		}
 		if (!NMTokenAutomaton.intersection(pattern).isEmpty()) {
-			retType = xsd_NMTOCKEN;
+			retType = ElkDatatypeMap.get(PredefinedElkIri.XSD_NMTOCKEN.get());
 		} else {
 			return retType;
 		}
 		if (!NameAutomaton.intersection(pattern).isEmpty()) {
-			retType = xsd_Name;
+			retType = ElkDatatypeMap.get(PredefinedElkIri.XSD_NAME.get());
 		} else {
 			return retType;
 		}
 		if (!NCNameAutomaton.intersection(pattern).isEmpty()) {
-			retType = xsd_NCName;
+			retType = ElkDatatypeMap.get(PredefinedElkIri.XSD_NCNAME.get());
 		} else {
 			return retType;
 		}

@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.datatypes.handlers;
 import java.util.List;
 
 import javax.xml.bind.DatatypeConverter;
+import org.semanticweb.elk.owl.datatypes.Base64BinaryDatatype;
+import org.semanticweb.elk.owl.datatypes.HexBinaryDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 
 import org.slf4j.Logger;
@@ -48,14 +50,15 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
  */
-public class BinaryDatatypeHandler extends ElkDatatypeHandler {
+public class BinaryDatatypeHandler extends AbstractDatatypeHandler {
 
 	static final Logger LOGGER_ = LoggerFactory.getLogger(BinaryDatatypeHandler.class);
+	private final BinaryParser parser_ = new BinaryParser();
 
 	@Override
 	public ValueSpace visit(ElkLiteral elkLiteral) {
 		ElkDatatype datatype = elkLiteral.getDatatype();
-		byte[] value = parse(elkLiteral.getLexicalForm(), datatype);
+		byte[] value = datatype.accept(parser_, elkLiteral.getLexicalForm());
 		if (value != null) {
 			return new BinaryValue(value, datatype);
 		} else {
@@ -109,14 +112,16 @@ public class BinaryDatatypeHandler extends ElkDatatypeHandler {
 		}
 	}
 
-	private byte[] parse(String literal, ElkDatatype datatype) {
-		switch (datatype) {
-			case xsd_base64Binary:
-				return DatatypeConverter.parseBase64Binary(literal);
-			case xsd_hexBinary:
-				return DatatypeConverter.parseHexBinary(literal);
-			default:
-				return null;
+	private class BinaryParser extends DatatypeValueParser<byte[], String> {
+
+		@Override
+		public byte[] parse(Base64BinaryDatatype datatype, String param) {
+			return DatatypeConverter.parseBase64Binary(param);
+		}
+
+		@Override
+		public byte[] parse(HexBinaryDatatype datatype, String param) {
+			return DatatypeConverter.parseHexBinary(param);
 		}
 	}
 }

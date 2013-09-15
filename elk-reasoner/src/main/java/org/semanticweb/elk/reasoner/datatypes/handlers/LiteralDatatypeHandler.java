@@ -23,8 +23,11 @@
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
+import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingUnsupportedException;
 
 /**
  * rdfs:Literal datatype handler.
@@ -38,10 +41,20 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
  */
-public class LiteralDatatypeHandler extends ElkDatatypeHandler {
+public class LiteralDatatypeHandler extends AbstractDatatypeHandler {
 
 	@Override
 	public ValueSpace visit(ElkDatatype elkDatatype) {
 		return new EntireValueSpace(elkDatatype);
+	}
+
+	@Override
+	public ValueSpace visit(ElkLiteral elkLiteral) {
+		throw new ElkIndexingUnsupportedException(elkLiteral);
+	}
+
+	@Override
+	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
+		throw new ElkIndexingUnsupportedException(elkDatatypeRestriction);
 	}
 }

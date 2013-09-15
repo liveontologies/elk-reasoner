@@ -27,6 +27,10 @@ import java.math.BigInteger;
 import java.util.List;
 
 import javax.xml.bind.DatatypeConverter;
+import org.semanticweb.elk.owl.datatypes.DecimalDatatype;
+import org.semanticweb.elk.owl.datatypes.IntegerDatatype;
+import org.semanticweb.elk.owl.datatypes.NonNegativeIntegerDatatype;
+import org.semanticweb.elk.owl.datatypes.RationalDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 
 import org.slf4j.Logger;
@@ -34,6 +38,8 @@ import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NegativeInfinity;
 import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
@@ -57,10 +63,12 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.NumericValue;
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
  */
-public class NumericDatatypeHandler extends ElkDatatypeHandler {
+public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 
 	static final Logger LOGGER_ = LoggerFactory
 		.getLogger(NumericDatatypeHandler.class);
+	private final NumericValueParser parser_ = new NumericValueParser();
+	
 	private static final BigInteger BI_MAX_INTEGER = BigInteger
 		.valueOf(Integer.MAX_VALUE);
 	private static final BigInteger BI_MIN_INTEGER = BigInteger
@@ -75,7 +83,7 @@ public class NumericDatatypeHandler extends ElkDatatypeHandler {
 	public ValueSpace visit(ElkLiteral elkLiteral) {
 		String lexicalForm = elkLiteral.getLexicalForm();
 		ElkDatatype datatype = elkLiteral.getDatatype();
-		return new NumericValue(datatype, parse(lexicalForm, datatype));
+		return new NumericValue(datatype, datatype.accept(parser_, lexicalForm));
 	}
 
 	@Override
@@ -90,27 +98,18 @@ public class NumericDatatypeHandler extends ElkDatatypeHandler {
 
 		ElkDatatype datatype = elkDatatypeRestriction.getDatatype();
 
-		switch (datatype) {
-			case owl_real:
-			case owl_rational:
-			case xsd_decimal:
-			case xsd_integer:
-				// [-Inf ... +Inf]
-				lowerBound = NegativeInfinity.INSTANCE;
-				upperBound = PositiveInfinity.INSTANCE;
-				lowerInclusive = true;
-				upperInclusive = true;
-				break;
-			case xsd_nonNegativeInteger:
-				// [0 ... +Inf]
-				lowerBound = Integer.valueOf(0);
-				upperBound = PositiveInfinity.INSTANCE;
-				lowerInclusive = true;
-				upperInclusive = true;
-				break;
-			default:
-				LOGGER_.warn("Unsupported numeric datatype: " + datatype.iri);
-				return null;
+		if (datatype == ElkDatatypeMap.get(PredefinedElkIri.XSD_NON_NEGATIVE_INTEGER.get())) {
+			// [0 ... +Inf]
+			lowerBound = Integer.valueOf(0);
+			upperBound = PositiveInfinity.INSTANCE;
+			lowerInclusive = true;
+			upperInclusive = true;
+		} else {
+			// [-Inf ... +Inf]
+			lowerBound = NegativeInfinity.INSTANCE;
+			upperBound = PositiveInfinity.INSTANCE;
+			lowerInclusive = true;
+			upperInclusive = true;
 		}
 
 		// process all facet restrictions
@@ -120,9 +119,8 @@ public class NumericDatatypeHandler extends ElkDatatypeHandler {
 			Facet facet = Facet.getByIri(facetRestriction
 				.getConstrainingFacet().getFullIriAsString());
 			ElkDatatype restrictionDatatype = facetRestriction.getRestrictionValue().getDatatype();
-			Number restrictionValue = parse(facetRestriction
-				.getRestrictionValue().getLexicalForm(),
-				restrictionDatatype);
+			Number restrictionValue = restrictionDatatype.accept(parser_, facetRestriction
+				.getRestrictionValue().getLexicalForm());
 
 			switch (facet) {
 				case MIN_INCLUSIVE: // >=
@@ -170,95 +168,87 @@ public class NumericDatatypeHandler extends ElkDatatypeHandler {
 		}
 	}
 
-	private Number parse(String literal, ElkDatatype datatype) {
-		switch (datatype) {
-			case owl_real:
-				LOGGER_.warn("The owl:real datatype does not directly provide "
-					+ "any lexical forms. Expression will be ignored");
-				return null;
-			case owl_rational:
-				return parseRational(literal);
-			case xsd_decimal:
-				return parseDecimal(literal);
-			case xsd_integer:
-			case xsd_nonNegativeInteger:
-				return parseInteger(literal);
-			default:
-				LOGGER_.warn("Unsupported numeric datatype: " + datatype.iri);
-				return null;
-		}
-	}
+	private class NumericValueParser extends DatatypeValueParser<Number, String> {
 
-	/**
-	 * Parse xsd:decimal literal. Attempt to identify most specific numeric
-	 * type (int - long - BigInteger - BigDecimal - BigRational)
-	 */
-	private Number parseRational(String literal) {
-		int divisorIndx = literal.indexOf('/');
-		if (divisorIndx == -1) {
-			LOGGER_.warn("Rational number is missing /");
+		@Override
+		public Number parse(RationalDatatype datatype, String param) {
+			return parseRational(param);
 		}
-		BigInteger numerator = DatatypeConverter.parseInteger(literal.substring(0, divisorIndx));
-		BigInteger denominator = DatatypeConverter.parseInteger(literal.substring(divisorIndx + 1));
-		if (denominator.compareTo(BigInteger.ZERO) <= 0) {
-			LOGGER_.warn("Denominator is 0");
+
+		@Override
+		public Number parse(DecimalDatatype datatype, String param) {
+			return parseDecimal(param);
 		}
-		BigInteger commonDevisor = numerator.gcd(denominator);
-		numerator = numerator.divide(commonDevisor);
-		denominator = denominator.divide(commonDevisor);
-		if (denominator.equals(BigInteger.ONE)) {
-			int numeratorBitCount = numerator.bitCount();
-			if (numeratorBitCount <= 32) {
-				return numerator.intValue();
+
+		@Override
+		public Number parse(IntegerDatatype datatype, String param) {
+			return parseInteger(param);
+		}
+
+		@Override
+		public Number parse(NonNegativeIntegerDatatype datatype, String param) {
+			return parseInteger(param);
+		}
+
+		private Number parseRational(String literal) {
+			int divisorIndx = literal.indexOf('/');
+			if (divisorIndx == -1) {
+				LOGGER_.warn("Rational number is missing /");
 			}
-			if (numeratorBitCount <= 64) {
-				return numerator.longValue();
+			BigInteger numerator = DatatypeConverter.parseInteger(literal.substring(0, divisorIndx));
+			BigInteger denominator = DatatypeConverter.parseInteger(literal.substring(divisorIndx + 1));
+			if (denominator.compareTo(BigInteger.ZERO) <= 0) {
+				LOGGER_.warn("Denominator is 0");
 			}
-			return numerator;
+			BigInteger commonDevisor = numerator.gcd(denominator);
+			numerator = numerator.divide(commonDevisor);
+			denominator = denominator.divide(commonDevisor);
+			if (denominator.equals(BigInteger.ONE)) {
+				int numeratorBitCount = numerator.bitCount();
+				if (numeratorBitCount <= 32) {
+					return numerator.intValue();
+				}
+				if (numeratorBitCount <= 64) {
+					return numerator.longValue();
+				}
+				return numerator;
+			}
+			try {
+				return new BigDecimal(numerator)
+					.divide(new BigDecimal(denominator));
+			} catch (ArithmeticException e) {
+			}
+			return new BigRational(numerator, denominator);
 		}
-		try {
-			return new BigDecimal(numerator)
-				.divide(new BigDecimal(denominator));
-		} catch (ArithmeticException e) {
-		}
-		return new BigRational(numerator, denominator);
-	}
 
-	/**
-	 * Parse xsd:decimal literal. Attempt to identify most specific numeric
-	 * type (int-long-BigInteger-BigDecimal)
-	 */
-	private Number parseDecimal(String literal) {
-		BigDecimal value = DatatypeConverter.parseDecimal(literal);
-		try {
-			return value.intValueExact();
-		} catch (ArithmeticException e) {
+		private Number parseDecimal(String literal) {
+			BigDecimal value = DatatypeConverter.parseDecimal(literal);
+			try {
+				return value.intValueExact();
+			} catch (ArithmeticException e) {
+			}
+			try {
+				return value.longValueExact();
+			} catch (ArithmeticException e) {
+			}
+			try {
+				return value.toBigIntegerExact();
+			} catch (ArithmeticException e) {
+			}
+			return value.stripTrailingZeros();
 		}
-		try {
-			return value.longValueExact();
-		} catch (ArithmeticException e) {
-		}
-		try {
-			return value.toBigIntegerExact();
-		} catch (ArithmeticException e) {
-		}
-		return value.stripTrailingZeros();
-	}
 
-	/**
-	 * Parse xsd:decimal literal. Attempt to identify most specific numeric
-	 * type (int-long-BigInteger)
-	 */
-	private Number parseInteger(String literal) {
-		BigInteger value = DatatypeConverter.parseInteger(literal);
-		if (value.compareTo(BI_MIN_INTEGER) >= 0
-			&& value.compareTo(BI_MAX_INTEGER) <= 0) {
-			return Integer.valueOf(value.intValue());
+		private Number parseInteger(String literal) {
+			BigInteger value = DatatypeConverter.parseInteger(literal);
+			if (value.compareTo(BI_MIN_INTEGER) >= 0
+				&& value.compareTo(BI_MAX_INTEGER) <= 0) {
+				return Integer.valueOf(value.intValue());
+			}
+			if (value.compareTo(BI_MIN_LONG) >= 0
+				&& value.compareTo(BI_MAX_LONG) <= 0) {
+				return Long.valueOf(value.longValue());
+			}
+			return value;
 		}
-		if (value.compareTo(BI_MIN_LONG) >= 0
-			&& value.compareTo(BI_MAX_LONG) <= 0) {
-			return Long.valueOf(value.longValue());
-		}
-		return value;
 	}
 }

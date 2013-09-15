@@ -22,7 +22,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
-import org.semanticweb.elk.owl.visitors.DatatypeVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDatatypeParser;
+import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
 
 /**
  * Corresponds to a <a href=
@@ -44,7 +45,15 @@ public interface ElkDatatype extends ElkDataRange, ElkEntity {
 	 * @param visitor the visitor that can work with this datatype
 	 * @return the output of the visitor
 	 */
-	public <O> O accept(DatatypeVisitor<O> visitor);
+	public <O> O accept(ElkDatatypeVisitor<O> visitor);
+
+	/**
+	 * Accept an {@link ElkDatatypeParser}.
+	 *
+	 * @param visitor the parser that can work with values of this datatype
+	 * @return the output of the parser
+	 */
+	public <O, P> O accept(ElkDatatypeParser<O, P> parser, P param);
 
 	/**
 	 * Check weather this datatype is derived from another and shares its

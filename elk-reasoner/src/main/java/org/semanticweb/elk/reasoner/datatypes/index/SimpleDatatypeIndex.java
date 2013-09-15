@@ -22,14 +22,15 @@
 package org.semanticweb.elk.reasoner.datatypes.index;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
-import static org.semanticweb.elk.owl.interfaces.ElkDatatype.ELDatatype;
+import org.semanticweb.elk.owl.datatypes.*;
+import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
@@ -41,83 +42,234 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression
  */
 public class SimpleDatatypeIndex implements DatatypeIndex {
 
-	protected EnumMap<ELDatatype, Set<IndexedDatatypeExpression>> datatypeExpressions;
+	private final StorageSelector storage_ = new StorageSelector();
 
 	@Override
 	public void addDatatypeExpression(IndexedDatatypeExpression ide) {
-		if (datatypeExpressions == null) {
-			datatypeExpressions = new EnumMap<ELDatatype, Set<IndexedDatatypeExpression>>(ELDatatype.class);
-		}
-		ELDatatype rootDatatype =
-			ide.getValueSpace().getDatatype().getRootValueSpaceDatatype();
 		Set<IndexedDatatypeExpression> expressionsByDatatype =
-			datatypeExpressions.get(rootDatatype);
-		if (expressionsByDatatype == null) {
-			expressionsByDatatype = new HashSet<IndexedDatatypeExpression>();
-			datatypeExpressions.put(rootDatatype, expressionsByDatatype);
-		}
+			ide.getValueSpace().getDatatype().accept(storage_);
 		expressionsByDatatype.add(ide);
 	}
 
 	@Override
 	public boolean removeDatatypeExpression(IndexedDatatypeExpression ide) {
 		boolean success = false;
-		if (ide != null && datatypeExpressions != null) {
-			ELDatatype rootDatatype =
-				ide.getValueSpace().getDatatype().getRootValueSpaceDatatype();
+		if (ide != null) {
 			Set<IndexedDatatypeExpression> expressionsByDatatype =
-				datatypeExpressions.get(rootDatatype);
-			if (expressionsByDatatype != null) {
-				success = expressionsByDatatype.remove(ide);
-				if (expressionsByDatatype.isEmpty()) {
-					datatypeExpressions.remove(rootDatatype);
-				}
-			}
+				ide.getValueSpace().getDatatype().accept(storage_);
+			success = expressionsByDatatype.remove(ide);
 		}
 		return success;
 	}
 
 	@Override
 	public Collection<IndexedDatatypeExpression> getSubsumersFor(IndexedDatatypeExpression ide) {
-		if (datatypeExpressions != null) {
-			ELDatatype rootDatatype =
-				ide.getValueSpace().getDatatype().getRootValueSpaceDatatype();
-			Set<IndexedDatatypeExpression> expressionsByDatatype =
-				datatypeExpressions.get(rootDatatype);
-			Collection<IndexedDatatypeExpression> resultSet = new ArrayList<IndexedDatatypeExpression>(5);
+		Set<IndexedDatatypeExpression> expressionsByDatatype =
+			ide.getValueSpace().getDatatype().accept(storage_);
+		Collection<IndexedDatatypeExpression> resultSet = new ArrayList<IndexedDatatypeExpression>(5);
 
-			if (expressionsByDatatype != null) {
-				for (IndexedDatatypeExpression exp : expressionsByDatatype) {
-					if (exp.getValueSpace().contains(ide.getValueSpace())) {
-						resultSet.add(exp);
-					}
+		if (expressionsByDatatype != null) {
+			for (IndexedDatatypeExpression exp : expressionsByDatatype) {
+				if (exp.getValueSpace().contains(ide.getValueSpace())) {
+					resultSet.add(exp);
 				}
 			}
-
-			if (rootDatatype != ELDatatype.rdfs_Literal) {
-				//using all expressions for rdfs:Literal datatype
-				Set<IndexedDatatypeExpression> rdfsLiteralExpressions = datatypeExpressions.get(ELDatatype.rdfs_Literal);
-				if (rdfsLiteralExpressions != null) {
-					for (IndexedDatatypeExpression exp : rdfsLiteralExpressions) {
-						if (exp.getValueSpace().contains(ide.getValueSpace())) {
-							resultSet.add(exp);
-						}
-					}
-				}
-			}
-
-			return resultSet;
 		}
-		return Collections.EMPTY_LIST;
+
+		Set<IndexedDatatypeExpression> rdfsLiteralExpressions =
+			ElkDatatypeMap.get(PredefinedElkIri.RDFS_LITERAL.get()).accept(storage_);
+
+		if (!rdfsLiteralExpressions.isEmpty()) {
+			//using all expressions for rdfs:Literal datatype
+			for (IndexedDatatypeExpression exp : rdfsLiteralExpressions) {
+				if (exp.getValueSpace().contains(ide.getValueSpace())) {
+					resultSet.add(exp);
+				}
+			}
+		}
+
+		return resultSet;
 	}
 
 	@Override
 	public void appendTo(DatatypeIndex index) {
-		for (Map.Entry<ELDatatype, Set<IndexedDatatypeExpression>> entry : datatypeExpressions.entrySet()) {
-			Set<IndexedDatatypeExpression> expressions = entry.getValue();
-			for (IndexedDatatypeExpression datatypeExpression : expressions) {
-				index.addDatatypeExpression(datatypeExpression);
+		for (Set<IndexedDatatypeExpression> pool : storage_.getAllPools()) {
+			if (pool != null) {
+				for (IndexedDatatypeExpression datatypeExpression : pool) {
+					index.addDatatypeExpression(datatypeExpression);
+				}
 			}
+		}
+	}
+
+	private class StorageSelector implements ElkDatatypeVisitor<Set<IndexedDatatypeExpression>> {
+
+		private Set<IndexedDatatypeExpression> numericDatatypePool;
+		private Set<IndexedDatatypeExpression> dateTimeDatatypePool;
+		private Set<IndexedDatatypeExpression> binaryDatatypePool;
+		private Set<IndexedDatatypeExpression> stringDatatypePool;
+		private Set<IndexedDatatypeExpression> literalDatatypePool;
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(LiteralDatatype datatype) {
+			if (literalDatatypePool == null) {
+				literalDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return literalDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(DateTimeDatatype datatype) {
+			if (dateTimeDatatypePool == null) {
+				dateTimeDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return dateTimeDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(DateTimeStampDatatype datatype) {
+			if (dateTimeDatatypePool == null) {
+				dateTimeDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return dateTimeDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(Base64BinaryDatatype datatype) {
+			if (binaryDatatypePool == null) {
+				binaryDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return binaryDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(HexBinaryDatatype datatype) {
+			if (binaryDatatypePool == null) {
+				binaryDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return binaryDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(AnyUriDatatype datatype) {
+			if (stringDatatypePool == null) {
+				stringDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return stringDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(RealDatatype datatype) {
+			if (numericDatatypePool == null) {
+				numericDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return numericDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(RationalDatatype datatype) {
+			if (numericDatatypePool == null) {
+				numericDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return numericDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(DecimalDatatype datatype) {
+			if (numericDatatypePool == null) {
+				numericDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return numericDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(IntegerDatatype datatype) {
+			if (numericDatatypePool == null) {
+				numericDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return numericDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(NonNegativeIntegerDatatype datatype) {
+			if (numericDatatypePool == null) {
+				numericDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return numericDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(PlainLiteralDatatype datatype) {
+			if (stringDatatypePool == null) {
+				stringDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return stringDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(StringDatatype datatype) {
+			if (stringDatatypePool == null) {
+				stringDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return stringDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(NormalizedStringDatatype datatype) {
+			if (stringDatatypePool == null) {
+				stringDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return stringDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(TokenDatatype datatype) {
+			if (stringDatatypePool == null) {
+				stringDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return stringDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(NameDatatype datatype) {
+			if (stringDatatypePool == null) {
+				stringDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return stringDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(NcNameDatatype datatype) {
+			if (stringDatatypePool == null) {
+				stringDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return stringDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(NmTokenDatatype datatype) {
+			if (stringDatatypePool == null) {
+				stringDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return stringDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(XmlLiteralDatatype datatype) {
+			if (stringDatatypePool == null) {
+				stringDatatypePool = new HashSet<IndexedDatatypeExpression>();
+			}
+			return stringDatatypePool;
+		}
+
+		@Override
+		public Set<IndexedDatatypeExpression> visit(UndefinedDatatype datatype) {
+			return Collections.EMPTY_SET;
+		}
+
+		private Collection<Set<IndexedDatatypeExpression>> getAllPools() {
+			return Arrays.asList(numericDatatypePool, dateTimeDatatypePool, 
+				binaryDatatypePool, stringDatatypePool, literalDatatypePool);
 		}
 	}
 }

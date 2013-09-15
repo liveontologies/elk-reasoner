@@ -39,6 +39,7 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
 
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.RegExp;
+import org.semanticweb.elk.owl.datatypes.AnyUriDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 
@@ -52,14 +53,15 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
  */
-public class AnyURIDatatypeHandler extends ElkDatatypeHandler {
+public class AnyURIDatatypeHandler extends AbstractDatatypeHandler {
 
 	static final Logger LOGGER_ = LoggerFactory.getLogger(AnyURIDatatypeHandler.class);
+	private final AnyUriParser parser_ = new AnyUriParser();
 
 	@Override
 	public ValueSpace visit(ElkLiteral elkLiteral) {
 		ElkDatatype datatype = elkLiteral.getDatatype();
-		URI value = parse(elkLiteral.getLexicalForm());
+		URI value = datatype.accept(parser_, elkLiteral.getLexicalForm());
 		if (value != null) {
 			return new LiteralValue(value.toString(), datatype, datatype);
 		} else {
@@ -123,12 +125,16 @@ public class AnyURIDatatypeHandler extends ElkDatatypeHandler {
 		}
 	}
 
-	private URI parse(String literal) {
-		try {
-			return new URI(literal);
-		} catch (URISyntaxException ex) {
-			LOGGER_.error("Invalid URI: " + literal);
-			return null;
+	private class AnyUriParser extends DatatypeValueParser<URI, String> {
+
+		@Override
+		public URI parse(AnyUriDatatype datatype, String param) {
+			try {
+				return new URI(param);
+			} catch (URISyntaxException ex) {
+				LOGGER_.error("Invalid URI: " + param);
+				return null;
+			}
 		}
 	}
 }

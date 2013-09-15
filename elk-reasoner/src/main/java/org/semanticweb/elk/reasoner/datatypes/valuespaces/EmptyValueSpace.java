@@ -39,7 +39,7 @@ public class EmptyValueSpace implements ValueSpace {
 
 	@Override
 	public ElkDatatype getDatatype() {
-		return null;
+		return ElkDatatypeMap.get(PredefinedElkIri.RDFS_LITERAL.get());
 	}
 
 	@Override

@@ -27,6 +27,8 @@ import java.util.List;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import org.semanticweb.elk.owl.datatypes.DateTimeDatatype;
+import org.semanticweb.elk.owl.datatypes.DateTimeStampDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 
 import org.slf4j.Logger;
@@ -51,11 +53,12 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.DateTimeValue;
  *
  * @author Pospishnyi Olexandr
  */
-public class DateTimeDatatypeHandler extends ElkDatatypeHandler {
+public class DateTimeDatatypeHandler extends AbstractDatatypeHandler {
 
 	static final Logger LOGGER_ = LoggerFactory
 		.getLogger(DateTimeDatatypeHandler.class);
 	private static final DatatypeFactory datatypeFactory;
+	private final DateTimeValueParser parser_ = new DateTimeValueParser();
 	public static final XMLGregorianCalendar START_OF_TIME;
 	public static final XMLGregorianCalendar END_OF_TIME;
 
@@ -76,7 +79,7 @@ public class DateTimeDatatypeHandler extends ElkDatatypeHandler {
 	public ValueSpace visit(ElkLiteral elkLiteral) {
 		String lexicalForm = elkLiteral.getLexicalForm();
 		ElkDatatype datatype = elkLiteral.getDatatype();
-		XMLGregorianCalendar value = parse(lexicalForm, datatype);
+		XMLGregorianCalendar value = datatype.accept(parser_, lexicalForm);
 		return new DateTimeValue(value, datatype);
 	}
 
@@ -100,9 +103,8 @@ public class DateTimeDatatypeHandler extends ElkDatatypeHandler {
 				.getConstrainingFacet().getFullIriAsString());
 			ElkDatatype restrictionDatatype = facetRestriction
 				.getRestrictionValue().getDatatype();
-			XMLGregorianCalendar restrictionValue = (XMLGregorianCalendar) parse(
-				facetRestriction.getRestrictionValue().getLexicalForm(),
-				restrictionDatatype);
+			XMLGregorianCalendar restrictionValue = 
+				restrictionDatatype.accept(parser_, facetRestriction.getRestrictionValue().getLexicalForm());
 
 			switch (facet) {
 				case MIN_INCLUSIVE: // >=
@@ -149,14 +151,16 @@ public class DateTimeDatatypeHandler extends ElkDatatypeHandler {
 		}
 	}
 
-	private XMLGregorianCalendar parse(String literal, ElkDatatype datatype) {
-		switch (datatype) {
-			case xsd_dateTime:
-			case xsd_dateTimeStamp:
-				return datatypeFactory.newXMLGregorianCalendar(literal.trim());
-			default:
-				LOGGER_.warn("Unsupported datetime datatype: " + datatype.iri);
-				return null;
+	private class DateTimeValueParser extends DatatypeValueParser<XMLGregorianCalendar, String> {
+
+		@Override
+		public XMLGregorianCalendar parse(DateTimeDatatype datatype, String param) {
+			return datatypeFactory.newXMLGregorianCalendar(param.trim());
+		}
+
+		@Override
+		public XMLGregorianCalendar parse(DateTimeStampDatatype datatype, String param) {
+			return datatypeFactory.newXMLGregorianCalendar(param.trim());
 		}
 	}
 }

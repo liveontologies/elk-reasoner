@@ -1,19 +1,25 @@
+package org.semanticweb.elk.owl.visitors;
 /*
- * Copyright 2013 Department of Computer Science, University of Oxford.
- *
+ * #%L
+ * ELK OWL Object Interfaces
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * #L%
  */
-package org.semanticweb.elk.owl.visitors;
 
 import org.semanticweb.elk.owl.datatypes.AnyUriDatatype;
 import org.semanticweb.elk.owl.datatypes.Base64BinaryDatatype;
@@ -40,45 +46,45 @@ import org.semanticweb.elk.owl.datatypes.XmlLiteralDatatype;
  *
  * @author Pospishnyi Olexandr
  */
-public interface DatatypeVisitor<O> {
+public interface ElkDatatypeParser<O, P> {
 
-	O visit(LiteralDatatype datatype);
+	O parse(LiteralDatatype datatype, P param);
 
-	O visit(DateTimeDatatype datatype);
+	O parse(DateTimeDatatype datatype, P param);
 
-	O visit(DateTimeStampDatatype datatype);
+	O parse(DateTimeStampDatatype datatype, P param);
 
-	O visit(Base64BinaryDatatype datatype);
+	O parse(Base64BinaryDatatype datatype, P param);
 
-	O visit(HexBinaryDatatype datatype);
+	O parse(HexBinaryDatatype datatype, P param);
 
-	O visit(AnyUriDatatype datatype);
+	O parse(AnyUriDatatype datatype, P param);
 
-	O visit(RealDatatype datatype);
+	O parse(RealDatatype datatype, P param);
 
-	O visit(RationalDatatype datatype);
+	O parse(RationalDatatype datatype, P param);
 
-	O visit(DecimalDatatype datatype);
+	O parse(DecimalDatatype datatype, P param);
 
-	O visit(IntegerDatatype datatype);
+	O parse(IntegerDatatype datatype, P param);
 
-	O visit(NonNegativeIntegerDatatype datatype);
+	O parse(NonNegativeIntegerDatatype datatype, P param);
 
-	O visit(PlainLiteralDatatype datatype);
+	O parse(PlainLiteralDatatype datatype, P param);
 
-	O visit(StringDatatype datatype);
+	O parse(StringDatatype datatype, P param);
 
-	O visit(NormalizedStringDatatype datatype);
+	O parse(NormalizedStringDatatype datatype, P param);
 
-	O visit(TokenDatatype datatype);
+	O parse(TokenDatatype datatype, P param);
 
-	O visit(NameDatatype datatype);
+	O parse(NameDatatype datatype, P param);
 
-	O visit(NcNameDatatype datatype);
+	O parse(NcNameDatatype datatype, P param);
 
-	O visit(NmTokenDatatype datatype);
+	O parse(NmTokenDatatype datatype, P param);
 
-	O visit(XmlLiteralDatatype datatype);
+	O parse(XmlLiteralDatatype datatype, P param);
 
-	O visit(UndefinedDatatype datatype);
+	O parse(UndefinedDatatype datatype, P param);
 }

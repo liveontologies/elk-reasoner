@@ -75,33 +75,4 @@ public class ElkDatatypeHandler implements DatatypeHandler {
 	public ValueSpace visit(ElkDataOneOf elkDataOneOf) {
 		throw new ElkIndexingUnsupportedException(elkDataOneOf);
 	}
-
-	protected enum Facet {
-		
-		MIN_INCLUSIVE ("http://www.w3.org/2001/XMLSchema#minInclusive", ">="),
-		MIN_EXCLUSIVE ("http://www.w3.org/2001/XMLSchema#minExclusive", ">"),
-		MAX_INCLUSIVE ("http://www.w3.org/2001/XMLSchema#maxInclusive", "<="),
-		MAX_EXCLUSIVE ("http://www.w3.org/2001/XMLSchema#maxExclusive", "<"),
-		MIN_LENGTH    ("http://www.w3.org/2001/XMLSchema#minLength",	"l>"),
-		MAX_LENGTH    ("http://www.w3.org/2001/XMLSchema#maxLength",	"l<"),
-		LENGTH        ("http://www.w3.org/2001/XMLSchema#length",	"l="),
-		PATTERN       ("http://www.w3.org/2001/XMLSchema#pattern",	"regex:");
-		
-		public final String iri;
-		public final String symbol;
-
-		private Facet(String iri, String symbol) {
-			this.iri = iri;
-			this.symbol = symbol;
-		}
-
-		public static Facet getByIri(String iri) {
-			for (Facet facet : Facet.values()) {
-				if (iri.equals(facet.iri)) {
-					return facet;
-				}
-			}
-			return null;
-		}
-	}
 }
