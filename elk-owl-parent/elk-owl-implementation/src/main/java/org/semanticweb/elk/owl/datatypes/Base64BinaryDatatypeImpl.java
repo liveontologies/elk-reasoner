@@ -21,8 +21,7 @@ package org.semanticweb.elk.owl.datatypes;
  * #L%
  */
 
-import org.semanticweb.elk.owl.implementation.ElkDatatypeImpl;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeParser;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
 
@@ -30,10 +29,10 @@ import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
  *
  * @author Pospishnyi Olexandr
  */
-public class Base64BinaryDatatypeImpl extends ElkDatatypeImpl implements Base64BinaryDatatype {
+public class Base64BinaryDatatypeImpl extends LiteralDatatypeImpl implements Base64BinaryDatatype {
 
-	public Base64BinaryDatatypeImpl() {
-		super(PredefinedElkIri.XSD_BASE_64_BINARY.get());
+	public Base64BinaryDatatypeImpl(ElkIri iri) {
+		super(iri);
 	}
 
 	@Override

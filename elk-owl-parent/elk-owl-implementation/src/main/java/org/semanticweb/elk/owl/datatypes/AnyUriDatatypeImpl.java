@@ -21,8 +21,7 @@ package org.semanticweb.elk.owl.datatypes;
  * #L%
  */
 
-import org.semanticweb.elk.owl.implementation.ElkDatatypeImpl;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeParser;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
 
@@ -30,10 +29,10 @@ import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
  *
  * @author Pospishnyi Olexandr
  */
-public class AnyUriDatatypeImpl extends ElkDatatypeImpl implements AnyUriDatatype {
+public class AnyUriDatatypeImpl extends LiteralDatatypeImpl implements AnyUriDatatype {
 
-	public AnyUriDatatypeImpl() {
-		super(PredefinedElkIri.XSD_ANY_URI.get());
+	public AnyUriDatatypeImpl(ElkIri iri) {
+		super(iri);
 	}
 
 	@Override

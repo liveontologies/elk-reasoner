@@ -37,25 +37,25 @@ public class ElkDatatypeMap {
 		new EnumMap<PredefinedElkIri, ElkDatatype>(PredefinedElkIri.class);
 
 	static {
-		map.put(PredefinedElkIri.RDFS_LITERAL,		new LiteralDatatypeImpl());
-		map.put(PredefinedElkIri.XSD_DATE_TIME,		new DateTimeDatatypeImpl());
-		map.put(PredefinedElkIri.XSD_DATE_TIME_STAMP,	new DateTimeStampDatatypeImpl());
-		map.put(PredefinedElkIri.XSD_BASE_64_BINARY,	new Base64BinaryDatatypeImpl());
-		map.put(PredefinedElkIri.XSD_HEX_BINARY,	new HexBinaryDatatypeImpl());
-		map.put(PredefinedElkIri.XSD_ANY_URI,		new AnyUriDatatypeImpl());
-		map.put(PredefinedElkIri.OWL_REAL,		new RealDatatypeImpl());
-		map.put(PredefinedElkIri.OWL_RATIONAL,		new RationalDatatypeImpl());
-		map.put(PredefinedElkIri.XSD_DECIMAL,		new DecimalDatatypeImpl());
-		map.put(PredefinedElkIri.XSD_INTEGER,		new IntegerDatatypeImpl());
-		map.put(PredefinedElkIri.XSD_NON_NEGATIVE_INTEGER, new NonNegativeIntegerDatatypeImpl());
-		map.put(PredefinedElkIri.RDF_PLAIN_LITERAL,	new PlainLiteralDatatypeImpl());
-		map.put(PredefinedElkIri.XSD_STRING,		new StringDatatypeImpl());
-		map.put(PredefinedElkIri.XSD_NORMALIZED_STRING, new NormalizedStringDatatypeImpl());
-		map.put(PredefinedElkIri.XSD_TOKEN,		new TokenDatatypeImpl());
-		map.put(PredefinedElkIri.XSD_NAME,		new NameDatatypeImpl());
-		map.put(PredefinedElkIri.XSD_NMTOCKEN,		new NmTokenDatatypeImpl());
-		map.put(PredefinedElkIri.XSD_NCNAME,		new NcNameDatatypeImpl());
-		map.put(PredefinedElkIri.RDF_XMLITERAL,		new XmlLiteralDatatypeImpl());
+		map.put(PredefinedElkIri.RDFS_LITERAL,		new LiteralDatatypeImpl(PredefinedElkIri.RDFS_LITERAL.get()));
+		map.put(PredefinedElkIri.XSD_DATE_TIME,		new DateTimeDatatypeImpl(PredefinedElkIri.XSD_DATE_TIME.get()));
+		map.put(PredefinedElkIri.XSD_DATE_TIME_STAMP,	new DateTimeStampDatatypeImpl(PredefinedElkIri.XSD_DATE_TIME_STAMP.get()));
+		map.put(PredefinedElkIri.XSD_BASE_64_BINARY,	new Base64BinaryDatatypeImpl(PredefinedElkIri.XSD_BASE_64_BINARY.get()));
+		map.put(PredefinedElkIri.XSD_HEX_BINARY,	new HexBinaryDatatypeImpl(PredefinedElkIri.XSD_HEX_BINARY.get()));
+		map.put(PredefinedElkIri.XSD_ANY_URI,		new AnyUriDatatypeImpl(PredefinedElkIri.XSD_ANY_URI.get()));
+		map.put(PredefinedElkIri.OWL_REAL,		new RealDatatypeImpl(PredefinedElkIri.OWL_REAL.get()));
+		map.put(PredefinedElkIri.OWL_RATIONAL,		new RationalDatatypeImpl(PredefinedElkIri.OWL_RATIONAL.get()));
+		map.put(PredefinedElkIri.XSD_DECIMAL,		new DecimalDatatypeImpl(PredefinedElkIri.XSD_DECIMAL.get()));
+		map.put(PredefinedElkIri.XSD_INTEGER,		new IntegerDatatypeImpl(PredefinedElkIri.XSD_INTEGER.get()));
+		map.put(PredefinedElkIri.XSD_NON_NEGATIVE_INTEGER, new NonNegativeIntegerDatatypeImpl(PredefinedElkIri.XSD_NON_NEGATIVE_INTEGER.get()));
+		map.put(PredefinedElkIri.RDF_PLAIN_LITERAL,	new PlainLiteralDatatypeImpl(PredefinedElkIri.RDF_PLAIN_LITERAL.get()));
+		map.put(PredefinedElkIri.XSD_STRING,		new StringDatatypeImpl(PredefinedElkIri.XSD_STRING.get()));
+		map.put(PredefinedElkIri.XSD_NORMALIZED_STRING, new NormalizedStringDatatypeImpl(PredefinedElkIri.XSD_NORMALIZED_STRING.get()));
+		map.put(PredefinedElkIri.XSD_TOKEN,		new TokenDatatypeImpl(PredefinedElkIri.XSD_TOKEN.get()));
+		map.put(PredefinedElkIri.XSD_NAME,		new NameDatatypeImpl(PredefinedElkIri.XSD_NAME.get()));
+		map.put(PredefinedElkIri.XSD_NMTOCKEN,		new NmTokenDatatypeImpl(PredefinedElkIri.XSD_NMTOCKEN.get()));
+		map.put(PredefinedElkIri.XSD_NCNAME,		new NcNameDatatypeImpl(PredefinedElkIri.XSD_NCNAME.get()));
+		map.put(PredefinedElkIri.RDF_XMLITERAL,		new XmlLiteralDatatypeImpl(PredefinedElkIri.RDF_XMLITERAL.get()));
 	}
 	
 	public static ElkDatatype get(ElkIri iri) {

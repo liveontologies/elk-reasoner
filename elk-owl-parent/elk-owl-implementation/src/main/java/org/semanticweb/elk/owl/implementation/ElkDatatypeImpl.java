@@ -68,6 +68,23 @@ abstract public class ElkDatatypeImpl extends ElkIriObject implements ElkEntity,
 
 	@Override
 	public boolean isCompatibleWith(ElkDatatype datatype) {
-		return this.getClass().isAssignableFrom(datatype.getClass());
+		return datatype.getClass().isAssignableFrom(this.getClass());
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (other instanceof ElkDatatype) {
+			ElkDatatype otherEntry = (ElkDatatype) other;
+			return this.iri.equals(otherEntry.getIri());
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return iri.hashCode(); 
 	}
 }

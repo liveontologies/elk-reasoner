@@ -22,7 +22,7 @@ package org.semanticweb.elk.owl.datatypes;
  */
 
 import org.semanticweb.elk.owl.implementation.ElkDatatypeImpl;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeParser;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
 
@@ -32,8 +32,8 @@ import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
  */
 public class LiteralDatatypeImpl extends ElkDatatypeImpl implements LiteralDatatype {
 
-	public LiteralDatatypeImpl() {
-		super(PredefinedElkIri.RDFS_LITERAL.get());
+	public LiteralDatatypeImpl(ElkIri iri) {
+		super(iri);
 	}
 
 	@Override

@@ -25,16 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import org.semanticweb.elk.reasoner.datatypes.numbers.AbstractInterval;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.DateTimeIntervalValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.LengthRestrictedValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.NumericIntervalValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.PatternValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.DateTimeValue;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.NumericValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 import org.semanticweb.elk.util.collections.intervals.IntervalTree;
 
@@ -49,29 +39,20 @@ class IntervalTreeDatatypeIndex implements DatatypeIndex {
 	 * TODO: documentation
 	 */
 	protected IntervalTree<AbstractInterval, IndexedDatatypeExpression> tree;
-	/**
-	 * TODO: documentation
-	 */
-	protected IntervalSelector intervalSelector;
 
-	public IntervalTreeDatatypeIndex() {
-		intervalSelector = new IntervalSelector();
-	}
 
 	@Override
 	public void addDatatypeExpression(IndexedDatatypeExpression ide) {
 		if (tree == null) {
 			tree = new IntervalTree<AbstractInterval, IndexedDatatypeExpression>();
 		}
-		AbstractInterval interval = ide.getValueSpace()
-				.accept(intervalSelector);
+		AbstractInterval interval = (AbstractInterval) ide.getValueSpace();
 		tree.add(interval, ide);
 	}
 
 	@Override
 	public boolean removeDatatypeExpression(IndexedDatatypeExpression ide) {
-		AbstractInterval interval = ide.getValueSpace()
-				.accept(intervalSelector);
+		AbstractInterval interval = (AbstractInterval) ide.getValueSpace();
 		return tree.remove(interval, ide);
 	}
 
@@ -81,10 +62,8 @@ class IntervalTreeDatatypeIndex implements DatatypeIndex {
 		if (tree == null) {
 			return Collections.EMPTY_LIST;
 		}
-		AbstractInterval interval = ide.getValueSpace()
-				.accept(intervalSelector);
-		Collection<IndexedDatatypeExpression> ret = tree
-				.searchIncludes(interval);
+		AbstractInterval interval = (AbstractInterval) ide.getValueSpace();
+		Collection<IndexedDatatypeExpression> ret = tree.searchIncludes(interval);
 		// perform type filtering
 		Iterator<IndexedDatatypeExpression> iter = ret.iterator();
 		while (iter.hasNext()) {
@@ -104,57 +83,4 @@ class IntervalTreeDatatypeIndex implements DatatypeIndex {
 		}
 	}
 
-	private class IntervalSelector implements
-			ValueSpaceVisitor<AbstractInterval> {
-
-		@Override
-		public AbstractInterval visit(EntireValueSpace valueSpace) {
-			return null;
-		}
-
-		@Override
-		public AbstractInterval visit(EmptyValueSpace valueSpace) {
-			return null;
-		}
-
-		@Override
-		public AbstractInterval visit(DateTimeIntervalValueSpace valueSpace) {
-			return null;
-		}
-
-		@Override
-		public AbstractInterval visit(LengthRestrictedValueSpace valueSpace) {
-			return null;
-		}
-
-		@Override
-		public AbstractInterval visit(NumericIntervalValueSpace valueSpace) {
-			return valueSpace;
-		}
-
-		@Override
-		public AbstractInterval visit(PatternValueSpace valueSpace) {
-			return null;
-		}
-
-		@Override
-		public AbstractInterval visit(BinaryValue value) {
-			return null;
-		}
-
-		@Override
-		public AbstractInterval visit(DateTimeValue value) {
-			return null;
-		}
-
-		@Override
-		public AbstractInterval visit(LiteralValue value) {
-			return null;
-		}
-
-		@Override
-		public AbstractInterval visit(NumericValue value) {
-			return value;
-		}
-	}
 }

@@ -104,6 +104,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotationAxiom;
@@ -418,7 +419,8 @@ public class OwlConverter {
 
 	@SuppressWarnings("static-method")
 	public ElkDatatype convert(OWLDatatype owlDatatype) {
-		return new ElkDatatypeWrap<OWLDatatype>(owlDatatype);
+		ElkIri datatypeIri = convert(owlDatatype.getIRI());
+		return ElkDatatypeMap.get(datatypeIri);
 	}
 
 	@SuppressWarnings("static-method")

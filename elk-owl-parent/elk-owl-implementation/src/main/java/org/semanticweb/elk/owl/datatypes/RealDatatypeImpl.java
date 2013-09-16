@@ -21,8 +21,7 @@ package org.semanticweb.elk.owl.datatypes;
  * #L%
  */
 
-import org.semanticweb.elk.owl.implementation.ElkDatatypeImpl;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeParser;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
 
@@ -30,10 +29,10 @@ import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
  *
  * @author Pospishnyi Olexandr
  */
-public class RealDatatypeImpl extends ElkDatatypeImpl implements RealDatatype {
+public class RealDatatypeImpl extends LiteralDatatypeImpl implements RealDatatype {
 
-	public RealDatatypeImpl() {
-		super(PredefinedElkIri.OWL_REAL.get());
+	public RealDatatypeImpl(ElkIri iri) {
+		super(iri);
 	}
 
 	@Override
