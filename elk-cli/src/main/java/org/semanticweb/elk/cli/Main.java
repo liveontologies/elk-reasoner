@@ -37,7 +37,6 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
@@ -56,6 +55,7 @@ import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.logging.Statistics;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Main {
 	// logger for this class
-	private static final org.slf4j.Logger LOGGER_ = LoggerFactory.getLogger(Main.class);
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(Main.class);
 
 	/**
 	 * @param args
@@ -148,9 +148,11 @@ public class Main {
 			System.err.println("Cannot set more than one logging level!");
 			return;
 		}
-		// TODO Can we do this with SLF4J?
-		Logger allLoggers = Logger.getLogger("org.semanticweb.elk");
-		
+		// SLF4J does not allow setting the logging level; we use a concrete
+		// binding
+		org.apache.log4j.Logger allLoggers = org.apache.log4j.Logger
+				.getLogger("org.semanticweb.elk");
+
 		if (options.has(logging))
 			allLoggers.setLevel(Level.toLevel(options.valueOf(logging),
 					Level.INFO));
