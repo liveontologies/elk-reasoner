@@ -34,10 +34,12 @@ import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkEquivalentDataPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
@@ -93,6 +95,27 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 			else {
 				indexSubObjectPropertyOfAxiom(first, p);
 				indexSubObjectPropertyOfAxiom(p, first);
+			}
+		}
+
+		return null;
+	}
+	
+	/**
+	 * Reduces equivalent data properties to subproperty axioms.
+	 */
+	@Override
+	public Void visit(ElkEquivalentDataPropertiesAxiom axiom) {
+		ElkDataPropertyExpression first = null;
+		for (ElkDataPropertyExpression p : axiom
+				.getDataPropertyExpressions()) {
+			//
+
+			if (first == null)
+				first = p;
+			else {
+				indexSubDataPropertyOfAxiom(first, p);
+				indexSubDataPropertyOfAxiom(p, first);
 			}
 		}
 

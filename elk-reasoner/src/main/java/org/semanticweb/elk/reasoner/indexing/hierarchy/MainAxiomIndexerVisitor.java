@@ -203,7 +203,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 			indexedSubProperty.removeToldSuperProperty(indexedSuperProperty);
 		}
 	}
-
+	
 	@Override
 	public void indexDisjointClassExpressions(
 			List<? extends ElkClassExpression> disjointClasses) {
