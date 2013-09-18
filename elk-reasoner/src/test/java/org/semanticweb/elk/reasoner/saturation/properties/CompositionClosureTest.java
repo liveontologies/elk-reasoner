@@ -64,7 +64,7 @@ public class CompositionClosureTest {
 			return;
 
 		ModifiableOntologyIndex index = new DirectIndex();
-		ElkDatatypeHandler datatypeHandler = new ElkDatatypeHandler();
+		ElkDatatypeHandler datatypeHandler = ElkDatatypeHandler.getInstance();
 		MainAxiomIndexerVisitor indexer = new MainAxiomIndexerVisitor(index, datatypeHandler, true);
 
 		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(
@@ -143,7 +143,7 @@ public class CompositionClosureTest {
 			return;
 
 		ModifiableOntologyIndex index = new DirectIndex();
-		ElkDatatypeHandler datatypeHandler = new ElkDatatypeHandler();
+		ElkDatatypeHandler datatypeHandler = ElkDatatypeHandler.getInstance();
 		MainAxiomIndexerVisitor indexer = new MainAxiomIndexerVisitor(index, datatypeHandler, true);
 
 		ElkObjectProperty r = objectFactory.getObjectProperty(new ElkFullIri(

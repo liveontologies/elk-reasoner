@@ -50,106 +50,163 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingUnsupportedExc
  */
 public class DatatypeHandlerFactory implements ElkDatatypeVisitor<DatatypeHandler> {
 
-	private AnyURIDatatypeHandler anyURIHandler = new AnyURIDatatypeHandler();
-	private BinaryDatatypeHandler binaryHandler = new BinaryDatatypeHandler();
-	private DateTimeDatatypeHandler dateTimeHandler = new DateTimeDatatypeHandler();
-	private LiteralDatatypeHandler literalHandler = new LiteralDatatypeHandler();
-	private NumericDatatypeHandler numericHandler = new NumericDatatypeHandler();
-	private PlainLiteralDatatypeHandler plainLiteralHandler = new PlainLiteralDatatypeHandler();
-	private XMLLiteralDatatypeHandler xmlLiteralHandler = new XMLLiteralDatatypeHandler();
+	private AnyURIDatatypeHandler anyURIHandler;
+	private BinaryDatatypeHandler binaryHandler;
+	private DateTimeDatatypeHandler dateTimeHandler;
+	private LiteralDatatypeHandler literalHandler;
+	private NumericDatatypeHandler numericHandler;
+	private PlainLiteralDatatypeHandler plainLiteralHandler;
+	private XMLLiteralDatatypeHandler xmlLiteralHandler;
 
 	@Override
 	public DatatypeHandler visit(LiteralDatatype datatype) {
+		if (literalHandler == null) {
+			literalHandler = new LiteralDatatypeHandler();
+		}
 		return literalHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(DateTimeDatatype datatype) {
+		if (dateTimeHandler == null) {
+			dateTimeHandler = new DateTimeDatatypeHandler();
+		}
 		return dateTimeHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(DateTimeStampDatatype datatype) {
+		if (dateTimeHandler == null) {
+			dateTimeHandler = new DateTimeDatatypeHandler();
+		}
 		return dateTimeHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(Base64BinaryDatatype datatype) {
+		if (binaryHandler == null) {
+			binaryHandler = new BinaryDatatypeHandler();
+		}
 		return binaryHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(HexBinaryDatatype datatype) {
+		if (binaryHandler == null) {
+			binaryHandler = new BinaryDatatypeHandler();
+		}
 		return binaryHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(AnyUriDatatype datatype) {
+		if (anyURIHandler == null) {
+			anyURIHandler = new AnyURIDatatypeHandler();
+		}
 		return anyURIHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(RealDatatype datatype) {
+		if (numericHandler == null) {
+			numericHandler = new NumericDatatypeHandler();
+		}
 		return numericHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(RationalDatatype datatype) {
+		if (numericHandler == null) {
+			numericHandler = new NumericDatatypeHandler();
+		}
 		return numericHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(DecimalDatatype datatype) {
+		if (numericHandler == null) {
+			numericHandler = new NumericDatatypeHandler();
+		}
 		return numericHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(IntegerDatatype datatype) {
+		if (numericHandler == null) {
+			numericHandler = new NumericDatatypeHandler();
+		}
 		return numericHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(NonNegativeIntegerDatatype datatype) {
+		if (numericHandler == null) {
+			numericHandler = new NumericDatatypeHandler();
+		}
 		return numericHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(PlainLiteralDatatype datatype) {
+		if (plainLiteralHandler == null) {
+			plainLiteralHandler = new PlainLiteralDatatypeHandler();
+		}
 		return plainLiteralHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(StringDatatype datatype) {
+		if (plainLiteralHandler == null) {
+			plainLiteralHandler = new PlainLiteralDatatypeHandler();
+		}
 		return plainLiteralHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(NormalizedStringDatatype datatype) {
+		if (plainLiteralHandler == null) {
+			plainLiteralHandler = new PlainLiteralDatatypeHandler();
+		}
 		return plainLiteralHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(TokenDatatype datatype) {
+		if (plainLiteralHandler == null) {
+			plainLiteralHandler = new PlainLiteralDatatypeHandler();
+		}
 		return plainLiteralHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(NameDatatype datatype) {
+		if (plainLiteralHandler == null) {
+			plainLiteralHandler = new PlainLiteralDatatypeHandler();
+		}
 		return plainLiteralHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(NcNameDatatype datatype) {
+		if (plainLiteralHandler == null) {
+			plainLiteralHandler = new PlainLiteralDatatypeHandler();
+		}
 		return plainLiteralHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(NmTokenDatatype datatype) {
+		if (plainLiteralHandler == null) {
+			plainLiteralHandler = new PlainLiteralDatatypeHandler();
+		}
 		return plainLiteralHandler;
 	}
 
 	@Override
 	public DatatypeHandler visit(XmlLiteralDatatype datatype) {
+		if (xmlLiteralHandler == null) {
+			xmlLiteralHandler = new XMLLiteralDatatypeHandler();
+		}
 		return xmlLiteralHandler;
 	}
 

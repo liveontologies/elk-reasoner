@@ -72,7 +72,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		ModifiableOntologyIndex index = new DirectIndex();
 		ComputationExecutor executor = new ComputationExecutor(16, "test");
-		ElkDatatypeHandler datatypeHandler = new ElkDatatypeHandler();
+		ElkDatatypeHandler datatypeHandler = ElkDatatypeHandler.getInstance();
 
 		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(new MainAxiomIndexerVisitor(index,
 				datatypeHandler, true));
@@ -120,7 +120,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		final ModifiableOntologyIndex index = new DirectIndex();
 		ComputationExecutor executor = new ComputationExecutor(16, "test");
-		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(new MainAxiomIndexerVisitor(index, new ElkDatatypeHandler(),
+		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(new MainAxiomIndexerVisitor(index, ElkDatatypeHandler.getInstance(),
 				true));
 
 		inserter.visit(objectFactory.getSubClassOfAxiom(a, b));
@@ -130,7 +130,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		IndexedObjectCache objectCache = index.getIndexedObjectCache();
 		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
-				objectCache, new ElkDatatypeHandler());
+				objectCache, ElkDatatypeHandler.getInstance());
 
 		IndexedClassExpression A = a.accept(converter);
 		IndexedClassExpression B = b.accept(converter);
@@ -163,7 +163,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		final SaturationStateImpl state = new SaturationStateImpl(index);
 		IndexedObjectCache objectCache = index.getIndexedObjectCache();
 		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
-				objectCache, new ElkDatatypeHandler());
+				objectCache, ElkDatatypeHandler.getInstance());
 		IndexedClassExpression A = a.accept(converter);
 		IndexedClassExpression B = b.accept(converter);
 		IndexedClassExpression C = c.accept(converter);

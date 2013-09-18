@@ -37,6 +37,18 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingUnsupportedExc
 public class ElkDatatypeHandler implements DatatypeHandler {
 
 	private final DatatypeHandlerFactory handlerFactory = new DatatypeHandlerFactory();
+	
+	private ElkDatatypeHandler() {
+	}
+	
+	private static ElkDatatypeHandler instance_;
+
+	public static ElkDatatypeHandler getInstance() {
+		if (instance_ == null) {
+			instance_ = new ElkDatatypeHandler();
+		}
+		return instance_;
+	}
 
 	@Override
 	public ValueSpace visit(ElkLiteral elkLiteral) {

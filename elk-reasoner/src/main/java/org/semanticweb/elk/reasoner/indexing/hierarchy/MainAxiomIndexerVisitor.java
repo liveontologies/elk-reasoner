@@ -109,7 +109,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 				return new IndexObjectConverter(
 						new ClassOccurrenceUpdateFilter(multiplicity_, 0,
 								multiplicity_), propertyOccurrenceUpdateFilter,
-						complementary, new ElkDatatypeHandler());
+						complementary, ElkDatatypeHandler.getInstance());
 			}
 		};
 		this.positiveIndexer = new IndexObjectConverter(

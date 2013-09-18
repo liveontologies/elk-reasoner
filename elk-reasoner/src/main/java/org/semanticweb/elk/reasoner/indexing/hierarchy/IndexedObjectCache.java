@@ -74,7 +74,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 				indexedDataPropertyViewFactory, 128);
 		indexedAxiomLookup = new KeyEntryHashSet<IndexedAxiom>(
 				new IndexedAxiomViewFactory(), 1024);
-                datatypeHandler = new ElkDatatypeHandler();
+                datatypeHandler = ElkDatatypeHandler.getInstance();
 	}
 
 	public IndexObjectConverter getIndexObjectConverter() {

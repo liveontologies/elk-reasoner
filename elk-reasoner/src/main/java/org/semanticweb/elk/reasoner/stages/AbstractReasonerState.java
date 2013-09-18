@@ -177,7 +177,7 @@ public abstract class AbstractReasonerState {
 	protected AbstractReasonerState() {
 		this.objectCache_ = new IndexedObjectCache();
 		this.ontologyIndex = new DifferentialIndex(objectCache_);
-		this.datatypeHandler = new ElkDatatypeHandler();
+		this.datatypeHandler = ElkDatatypeHandler.getInstance();
 		this.axiomInserter_ = new MainAxiomIndexerVisitor(ontologyIndex, datatypeHandler, true);
 		this.axiomDeleter_ = new MainAxiomIndexerVisitor(ontologyIndex, datatypeHandler, false);
 		this.saturationState = SaturationStateFactory.createSaturationState(ontologyIndex);

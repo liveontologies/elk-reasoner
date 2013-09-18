@@ -72,7 +72,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 
 		// index predefined entities
 		MainAxiomIndexerVisitor tmpAxiomInserter = new MainAxiomIndexerVisitor(
-				this, new ElkDatatypeHandler(), true);
+				this, ElkDatatypeHandler.getInstance(), true);
 		// TODO: what to do if someone tries to delete them?
 		this.indexedOwlThing = tmpAxiomInserter
 				.indexClassDeclaration(PredefinedElkClass.OWL_THING);
