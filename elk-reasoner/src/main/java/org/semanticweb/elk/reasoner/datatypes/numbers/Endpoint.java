@@ -54,29 +54,20 @@ public class Endpoint implements Comparable<Endpoint> {
 
 	@Override
 	public int hashCode() {
-		int hash = 7;
-		return hash;
+		return value.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj instanceof Endpoint) {
+			Endpoint e = (Endpoint) obj;
+			return this.value == e.value && this.inclusive == e.inclusive && this.low == e.low;
+		} else {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final Endpoint other = (Endpoint) obj;
-		if (this.value != other.value && (this.value == null || !this.value.equals(other.value))) {
-			return false;
-		}
-		if (this.inclusive != other.inclusive) {
-			return false;
-		}
-		if (this.low != other.low) {
-			return false;
-		}
-		return true;
 	}
 
 	@Override

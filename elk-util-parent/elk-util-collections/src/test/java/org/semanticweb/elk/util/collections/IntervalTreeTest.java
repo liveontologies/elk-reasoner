@@ -321,20 +321,15 @@ public class IntervalTreeTest extends TestCase {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj == null) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj instanceof TestInterval) {
+				TestInterval i = (TestInterval) obj;
+				return this.low.equals(i.low) && this.high.equals(i.high);
+			} else {
 				return false;
 			}
-			if (getClass() != obj.getClass()) {
-				return false;
-			}
-			final TestInterval other = (TestInterval) obj;
-			if (this.low != other.low && (this.low == null || !this.low.equals(other.low))) {
-				return false;
-			}
-			if (this.high != other.high && (this.high == null || !this.high.equals(other.high))) {
-				return false;
-			}
-			return true;
 		}
 
 		@Override
@@ -357,23 +352,15 @@ public class IntervalTreeTest extends TestCase {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj == null) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj instanceof Endpoint) {
+				Endpoint e = (Endpoint) obj;
+				return this.value == e.value && this.inclusive == e.inclusive && this.low == e.low;
+			} else {
 				return false;
 			}
-			if (getClass() != obj.getClass()) {
-				return false;
-			}
-			final Endpoint other = (Endpoint) obj;
-			if (this.value != other.value) {
-				return false;
-			}
-			if (this.inclusive != other.inclusive) {
-				return false;
-			}
-			if (this.low != other.low) {
-				return false;
-			}
-			return true;
 		}
 
 		@Override

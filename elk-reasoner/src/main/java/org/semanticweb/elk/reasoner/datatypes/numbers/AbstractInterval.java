@@ -57,6 +57,12 @@ public abstract class AbstractInterval implements Interval<Endpoint> {
 	}
 
 	@Override
+	abstract public boolean equals(Object obj);
+
+	@Override
+	abstract public int hashCode();
+	
+	@Override
 	public int compareTo(Interval<Endpoint> o) {
 		int cmp = low.compareTo(o.getLow());
 		if (cmp == 0) {
