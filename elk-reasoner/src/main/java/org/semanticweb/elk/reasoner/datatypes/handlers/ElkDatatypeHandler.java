@@ -21,6 +21,7 @@ package org.semanticweb.elk.reasoner.datatypes.handlers;
  * #L%
  */
 
+import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
@@ -85,6 +86,11 @@ public class ElkDatatypeHandler implements DatatypeHandler {
 
 	@Override
 	public ValueSpace visit(ElkDataOneOf elkDataOneOf) {
-		throw new ElkIndexingUnsupportedException(elkDataOneOf);
+		List<? extends ElkLiteral> literals = elkDataOneOf.getLiterals();
+		if (literals.size() != 1) {
+			throw new ElkIndexingUnsupportedException(elkDataOneOf);
+		}
+		ElkLiteral elkLiteral = literals.get(0);
+		return this.visit(elkLiteral);
 	}
 }

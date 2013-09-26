@@ -1,0 +1,34 @@
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(:=<http://www.semanticweb.org/Test.owl#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+Ontology(<http://www.semanticweb.org/Test.owl>
+
+SubClassOf(:Integer_Larger_Than_10		:Integer_Larger_Or_Equal_Than_10)
+SubClassOf(:Integer_LessThan10			:Integer_Less_Or_Equal_Than10)
+SubClassOf(:Integers_Between_0_and_10_Ex	:Integers_Between_0_and_10_ExInc)
+SubClassOf(:Integers_Between_0_and_10_Ex	:Integers_Between_0_and_10_IncEx)
+SubClassOf(:Integers_Between_0_and_10_ExInc	:Integers_Between_0_and_10_Inc)
+SubClassOf(:Integers_Between_0_and_10_Inc	:Integer_Less_Or_Equal_Than10)
+SubClassOf(:Integers_Between_0_and_10_IncEx	:Integer_LessThan10)
+SubClassOf(:Integers_Between_0_and_10_IncEx	:Integers_Between_0_and_10_Inc)
+
+EquivalentClasses(:_Ten1 :_Ten2)
+
+SubClassOf(:_Ten1	:Integer_Larger_Or_Equal_Than_10)
+SubClassOf(:_Ten1	:Integers_Between_0_and_10_ExInc)
+SubClassOf(:_Ten2	:Integer_Larger_Or_Equal_Than_10)
+SubClassOf(:_Ten2	:Integers_Between_0_and_10_ExInc)
+SubClassOf(:_Ten3	:Integer_LessThan10)
+
+EquivalentClasses(:_Zero1 :_Zero2 :_Zero3)
+
+SubClassOf(:_Zero1	:Integers_Between_0_and_10_IncEx)
+SubClassOf(:_Zero2	:Integers_Between_0_and_10_IncEx)
+SubClassOf(:_Zero3	:Integers_Between_0_and_10_IncEx)
+
+EquivalentClasses(:InconsistentInteger owl:Nothing)
+)

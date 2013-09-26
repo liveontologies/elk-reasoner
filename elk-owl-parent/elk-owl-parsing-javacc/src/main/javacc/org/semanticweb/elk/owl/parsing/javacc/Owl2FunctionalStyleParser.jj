@@ -960,7 +960,6 @@ ElkDataOneOf dataOneOf():
 		new Vector<ElkLiteral> ();
 }{
 	<DATA_ONE_OF> <OPEN_BRACKET>
-		x = literal() { v.add(x); }
 		( x = literal() { v.add(x); } )+
 	<CLOSE_BRACKET> {
 		return getElkObjectFactory().getDataOneOf(v);
