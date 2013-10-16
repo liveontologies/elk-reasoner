@@ -39,10 +39,10 @@ public abstract class TransitiveReductionOutput<R extends IndexedClassExpression
 	 * The indexed class expression for which the transitive reduction was
 	 * initiated.
 	 */
-	protected final R root;
+	private final R root_;
 
 	TransitiveReductionOutput(R root) {
-		this.root = root;
+		this.root_ = root;
 	}
 
 	/**
@@ -51,7 +51,7 @@ public abstract class TransitiveReductionOutput<R extends IndexedClassExpression
 	 * @return the indexed class expression for which this output was computed
 	 */
 	public R getRoot() {
-		return root;
+		return root_;
 	}
 
 	public abstract void accept(TransitiveReductionOutputVisitor<R> visitor);

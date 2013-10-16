@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
@@ -151,6 +150,8 @@ public class ClassTaxonomyComputationFactory implements
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
 
+			//LOGGER_.trace("+++ creating node for equivalent classes: " + output.getEquivalent());
+			
 			UpdateableTaxonomyNode<ElkClass> node = taxonomy_
 					.getCreateNode(output.getEquivalent());
 
@@ -162,15 +163,10 @@ public class ClassTaxonomyComputationFactory implements
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
 					.getDirectSubsumers()) {
+							
 				UpdateableTaxonomyNode<ElkClass> superNode = taxonomy_
 						.getCreateNode(directSuperEquivalent.getEquivalent());
 				assignDirectSuperClassNode(node, superNode);
-			}
-			// if there are no direct super nodes, then the top node is the
-			// only direct super node
-			if (node.getDirectSuperNodes().isEmpty()) {
-				UpdateableTaxonomyNode<ElkClass> topNode = getCreateTopNode();
-				assignDirectSuperClassNode(node, topNode);
 			}
 
 			node.trySetModified(false);
@@ -194,25 +190,6 @@ public class ClassTaxonomyComputationFactory implements
 			throw new IllegalArgumentException();
 		}
 
-	}
-
-	/**
-	 * This function is called only when some (non-top) nodes have no direct
-	 * parents. This can happen only when owl:Thing does not occur negatively in
-	 * the ontology, so that owl:Thing is not explicitly derived as a superclass
-	 * of each class. Under these conditions, it is safe to create a singleton
-	 * top node.
-	 * 
-	 */
-	UpdateableTaxonomyNode<ElkClass> getCreateTopNode() {
-		if (topNodeRef_.get() == null) {
-			UpdateableTaxonomyNode<ElkClass> topNode = taxonomy_
-					.getCreateNode(Collections
-							.<ElkClass> singleton(PredefinedElkClass.OWL_THING));
-			topNode.trySetModified(false);
-			topNodeRef_.compareAndSet(null, topNode);
-		}
-		return topNodeRef_.get();
 	}
 
 	/**

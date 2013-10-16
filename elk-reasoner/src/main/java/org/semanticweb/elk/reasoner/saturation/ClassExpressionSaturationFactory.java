@@ -291,7 +291,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				 */
 				J nextJob = jobsInProgress_.poll();
 				IndexedClassExpression root = nextJob.getInput();
-				Context rootSaturation = ruleApplicationFactory_.getSaturationState().getContext(root);//root.getContext();
+				Context rootSaturation = ruleApplicationFactory_.getSaturationState().getContext(root);
 				
 				rootSaturation.setSaturated(true);
 				nextJob.setOutput(rootSaturation);
