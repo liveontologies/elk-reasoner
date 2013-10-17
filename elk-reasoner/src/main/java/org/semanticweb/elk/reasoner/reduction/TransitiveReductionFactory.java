@@ -299,7 +299,13 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			if (state.output.directSubsumers.isEmpty()) {
 				//if there're no direct subsumers, then owl:Thing must be one
 				TransitiveReductionOutputEquivalent<IndexedClass> topOutput = new TransitiveReductionOutputEquivalent<IndexedClass>(
-						null);
+				/*
+				 * Indexed owl:Thing must go in here but we don't propagate it
+				 * inside transitive reduction. Since this state isn't going to
+				 * be updated, we can just pass null (it's the list of
+				 * equivalent classes that's important)
+				 */
+				null);
 				topOutput.equivalent.add(PredefinedElkClass.OWL_THING);
 				state.output.directSubsumers.add(topOutput);
 			}
