@@ -25,9 +25,9 @@ package org.semanticweb.elk.util.collections;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
+
 import junit.framework.TestCase;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+
 import org.semanticweb.elk.util.collections.intervals.Interval;
 import org.semanticweb.elk.util.collections.intervals.IntervalTree;
 
@@ -365,7 +365,8 @@ public class IntervalTreeTest extends TestCase {
 
 		@Override
 		public int compareTo(Endpoint o) {
-			int cmp = Integer.compare(value, o.value);
+			int cmp = value == o.value ? 0 : (value < o.value ? -1 : 1);
+			
 			if (cmp == 0 && inclusive != o.inclusive) {
 				return (low ^ inclusive) ? 1 : -1;
 			} else {
