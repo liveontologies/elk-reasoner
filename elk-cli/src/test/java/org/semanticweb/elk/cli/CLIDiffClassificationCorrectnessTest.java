@@ -28,7 +28,6 @@ package org.semanticweb.elk.cli;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import org.junit.Ignore;
 
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;

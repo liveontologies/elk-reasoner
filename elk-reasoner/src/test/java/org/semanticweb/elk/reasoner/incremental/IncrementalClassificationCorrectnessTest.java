@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefix;

@@ -23,9 +23,10 @@ package org.semanticweb.elk.reasoner.datatypes.index;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
+
 import org.semanticweb.elk.reasoner.datatypes.numbers.AbstractInterval;
+import org.semanticweb.elk.reasoner.datatypes.numbers.Endpoint;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 import org.semanticweb.elk.util.collections.intervals.IntervalTree;
 
@@ -39,13 +40,13 @@ class IntervalTreeDatatypeIndex implements DatatypeIndex {
 	/**
 	 * TODO: documentation
 	 */
-	protected IntervalTree<AbstractInterval, IndexedDatatypeExpression> tree;
+	protected IntervalTree<AbstractInterval, IndexedDatatypeExpression, Endpoint> tree;
 
 
 	@Override
 	public void addDatatypeExpression(IndexedDatatypeExpression ide) {
 		if (tree == null) {
-			tree = new IntervalTree<AbstractInterval, IndexedDatatypeExpression>();
+			tree = new IntervalTree<AbstractInterval, IndexedDatatypeExpression, Endpoint>();
 		}
 		AbstractInterval interval = (AbstractInterval) ide.getValueSpace();
 		tree.add(interval, ide);

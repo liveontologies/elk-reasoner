@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.datatypes.numbers;
  *
  * @author Pospishnyi Olexandr
  */
+@SuppressWarnings("serial")
 public final class PositiveInfinity extends Number {
 
 	public static final PositiveInfinity INSTANCE = new PositiveInfinity();

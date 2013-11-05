@@ -147,6 +147,8 @@ public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 						upperInclusive = false;
 					}
 					break;
+			default:
+				break;
 			}
 		}
 

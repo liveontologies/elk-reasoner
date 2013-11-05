@@ -27,7 +27,7 @@ package org.semanticweb.elk.util.collections.intervals;
  *
  * @author Pospishnyi Oleksandr
  */
-public interface Interval<T extends Comparable> extends Comparable<Interval<T>> {
+public interface Interval<T extends Comparable<T>> extends Comparable<Interval<T>> {
 
 	public T getLow();
 

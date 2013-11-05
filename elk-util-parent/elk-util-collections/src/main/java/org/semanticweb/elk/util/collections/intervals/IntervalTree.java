@@ -22,8 +22,8 @@ package org.semanticweb.elk.util.collections.intervals;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Balanced binary tree data structure capable of storing {@link Interval} keys
@@ -33,9 +33,9 @@ import java.util.Collection;
  *
  * @author Pospishnyi Oleksandr
  */
-public class IntervalTree<K extends Interval, V> {
+public class IntervalTree<K extends Interval<T>, V, T extends Comparable<T>> {
 
-	private Entry<K, V> root = null;
+	private Entry<K, V, T> root = null;
 	private int size = 0;
 
 	public IntervalTree() {
@@ -60,20 +60,20 @@ public class IntervalTree<K extends Interval, V> {
 	 * @param value arbitrary data value
 	 */
 	public void add(K key, V value) {
-		Entry<K, V> t = root;
+		Entry<K, V, T> t = root;
 		if (t == null) {
-			root = new Entry<K, V>(key, value);
+			root = new Entry<K, V, T>(key, value);
 			size = 1;
 			return;
 		}
 		int cmp;
-		Entry<K, V> parent;
+		Entry<K, V, T> parent;
 		if (key == null) {
 			throw new NullPointerException();
 		}
 		size++;
 		Comparable<? super K> k = (Comparable<? super K>) key;
-		Entry<K, V> e = new Entry<K, V>(key, value);
+		Entry<K, V, T> e = new Entry<K, V, T>(key, value);
 		do {
 			parent = t;
 			t.updateMax(e);
@@ -104,7 +104,8 @@ public class IntervalTree<K extends Interval, V> {
 	 * @return boolean flag, indicating the successfulness of the operation
 	 */
 	public boolean remove(K key, V value) {
-		Entry<K, V> e = getEntry(key, value);
+		Entry<K, V, T> e = getEntry(key, value);
+		
 		if (e == null) {
 			return false;
 		}
@@ -116,9 +117,10 @@ public class IntervalTree<K extends Interval, V> {
 		return ret;
 	}
 
-	protected Entry<K, V> getEntry(K key, V value) {
+	protected Entry<K, V, T> getEntry(K key, V value) {
 		Comparable<? super K> k = (Comparable<? super K>) key;
-		Entry<K, V> p = root;
+		Entry<K, V, T> p = root;
+		
 		while (p != null) {
 			int cmp = k.compareTo(p.key);
 			if (cmp < 0) {
@@ -137,7 +139,7 @@ public class IntervalTree<K extends Interval, V> {
 	 */
 	public Collection<V> values() {
 		ArrayList<V> ret = new ArrayList<V>(size);
-		Entry<K, V> e = getFirstEntry();
+		Entry<K, V, T> e = getFirstEntry();
 		if (e != null) {
 			ret.addAll(e.value);
 			while ((e = successor(e)) != null) {
@@ -147,8 +149,8 @@ public class IntervalTree<K extends Interval, V> {
 		return ret;
 	}
 
-	private Entry<K, V> getFirstEntry() {
-		Entry<K, V> p = root;
+	private Entry<K, V, T> getFirstEntry() {
+		Entry<K, V, T> p = root;
 		if (p != null) {
 			while (p.left != null) {
 				p = p.left;
@@ -165,7 +167,7 @@ public class IntervalTree<K extends Interval, V> {
 	 * @return all data values from {@link Interval}s that include the
 	 * {@link Interval} i
 	 */
-	public Collection<V> searchIncludes(Interval i) {
+	public Collection<V> searchIncludes(Interval<T> i) {
 		Collection<V> result = new ArrayList<V>();
 		if (root != null) {
 			search(root, i, result);
@@ -173,7 +175,7 @@ public class IntervalTree<K extends Interval, V> {
 		return result;
 	}
 
-	private boolean search(Entry<K, V> x, Interval i, Collection<V> result) {
+	private boolean search(Entry<K, V, T> x, Interval<T> i, Collection<V> result) {
 		if (x.left != null && x.left.max.compareTo(i.getHigh()) >= 0) {
 			boolean fnd = search(x.left, i, result);
 			if (x.key.contains(i)) {
@@ -206,11 +208,11 @@ public class IntervalTree<K extends Interval, V> {
 		return false;
 	}
 
-	private void deleteEntry(Entry<K, V> z) {
+	private void deleteEntry(Entry<K, V, T> z) {
 		// If strictly internal, copy successor's element to z and then make z
 		// point to successor.
 		if (z.left != null && z.right != null) {
-			Entry<K, V> s = successor(z);
+			Entry<K, V, T> s = successor(z);
 			z.key = s.key;
 			z.value = s.value;
 			propagateMax(z);
@@ -218,7 +220,7 @@ public class IntervalTree<K extends Interval, V> {
 		}
 
 		// Start fixup at replacement node, if it exists.
-		Entry<K, V> replacement = (z.left != null ? z.left : z.right);
+		Entry<K, V, T> replacement = (z.left != null ? z.left : z.right);
 
 		if (replacement != null) {
 			// Link replacement to parent
@@ -261,8 +263,8 @@ public class IntervalTree<K extends Interval, V> {
 		}
 	}
 
-	private void propagateMax(Entry<K, V> z) {
-		Comparable oldMax = z.max;
+	private void propagateMax(Entry<K, V, T> z) {
+		T oldMax = z.max;
 		z.updateMax();
 		if (!oldMax.equals(z.max) && z.parent != null) {
 			propagateMax(z.parent);
@@ -277,23 +279,23 @@ public class IntervalTree<K extends Interval, V> {
 	/*
 	 * Internal Entry class
 	 */
-	protected static final class Entry<K extends Interval, V> {
+	protected static final class Entry<K extends Interval<T>, V, T extends Comparable<T>> {
 
 		K key;
 		Collection<V> value;
-		Comparable max;
-		Entry<K, V> left = null;
-		Entry<K, V> right = null;
-		Entry<K, V> parent;
+		T max;
+		Entry<K, V, T> left = null;
+		Entry<K, V, T> right = null;
+		Entry<K, V, T> parent;
 		boolean color = BLACK;
 
 		Entry(K key, V value) {
 			this.key = key;
-			this.value = Arrays.asList(value);
+			this.value = Collections.singletonList(value);
 			this.max = key.getHigh();
 		}
 
-		public void setParent(Entry<K, V> parent) {
+		public void setParent(Entry<K, V, T> parent) {
 			this.parent = parent;
 		}
 
@@ -323,30 +325,35 @@ public class IntervalTree<K extends Interval, V> {
 			return this.value == null || this.value.isEmpty();
 		}
 
-		protected void updateMax(Entry<K, V> e) {
+		protected void updateMax(Entry<K, V, T> e) {
 			this.max = maxOf(e.max, this.max);
 		}
 
 		protected void updateMax() {
-			this.max = maxOf(left != null ? left.max : null, right != null ? right.max : null, key.getHigh());
+			T leftMaxOrNull = left != null ? left.max : null;
+			T rightMaxOrNull = right != null ? right.max : null;
+			
+			this.max = maxOf(maxOf(leftMaxOrNull, rightMaxOrNull), key.getHigh());
 		}
 
-		protected static <T extends Comparable<T>> T maxOf(T... ts) {
-			T max = null;
-			for (T t : ts) {
-				if (t != null && (max == null || t.compareTo(max) > 0)) {
-					max = t;
-				}
+		protected T maxOf(T t1, T t2) {
+			if (t1 == null) {
+				return t2;
 			}
-			return max;
+			else if (t2 == null) {
+				return t1;
+			}
+			else {
+				return t1.compareTo(t2) > 0 ? t1 : t2;
+			}
 		}
-
+		
 		@Override
 		public boolean equals(Object o) {
 			if (!(o instanceof Entry)) {
 				return false;
 			}
-			Entry<?, ?> e = (Entry<?, ?>) o;
+			Entry<?, ?, ?> e = (Entry<?, ?, ?>) o;
 
 			return valEquals(key, e.key) && valEquals(value, e.value);
 		}
@@ -364,12 +371,13 @@ public class IntervalTree<K extends Interval, V> {
 		}
 	}
 
-	private void fixAfterInsertion(Entry<K, V> z) {
+	private void fixAfterInsertion(Entry<K, V, T> z) {
 		z.color = RED;
 
 		while (z != null && z != root && z.parent.color == RED) {
 			if (parentOf(z) == leftOf(parentOf(parentOf(z)))) {
-				Entry<K, V> y = rightOf(parentOf(parentOf(z)));
+				Entry<K, V, T> y = rightOf(parentOf(parentOf(z)));
+				
 				if (colorOf(y) == RED) {
 					setColor(parentOf(z), BLACK);
 					setColor(y, BLACK);
@@ -385,7 +393,8 @@ public class IntervalTree<K extends Interval, V> {
 					rotateRight(parentOf(parentOf(z)));
 				}
 			} else {
-				Entry<K, V> y = leftOf(parentOf(parentOf(z)));
+				Entry<K, V, T> y = leftOf(parentOf(parentOf(z)));
+				
 				if (colorOf(y) == RED) {
 					setColor(parentOf(z), BLACK);
 					setColor(y, BLACK);
@@ -405,10 +414,10 @@ public class IntervalTree<K extends Interval, V> {
 		root.color = BLACK;
 	}
 
-	private void fixAfterDeletion(Entry<K, V> z) {
+	private void fixAfterDeletion(Entry<K, V, T> z) {
 		while (z != root && colorOf(z) == BLACK) {
 			if (z == leftOf(parentOf(z))) {
-				Entry<K, V> sib = rightOf(parentOf(z));
+				Entry<K, V, T> sib = rightOf(parentOf(z));
 
 				if (colorOf(sib) == RED) {
 					setColor(sib, BLACK);
@@ -435,7 +444,7 @@ public class IntervalTree<K extends Interval, V> {
 					z = root;
 				}
 			} else { // symmetric
-				Entry<K, V> sib = leftOf(parentOf(z));
+				Entry<K, V, T> sib = leftOf(parentOf(z));
 
 				if (colorOf(sib) == RED) {
 					setColor(sib, BLACK);
@@ -470,31 +479,31 @@ public class IntervalTree<K extends Interval, V> {
 	/**
 	 * Balancing operations.
 	 */
-	private boolean colorOf(Entry<K, V> p) {
+	private boolean colorOf(Entry<K, V, T> p) {
 		return (p == null ? BLACK : p.color);
 	}
 
-	private Entry<K, V> parentOf(Entry<K, V> p) {
+	private Entry<K, V, T> parentOf(Entry<K, V, T> p) {
 		return (p == null ? null : p.parent);
 	}
 
-	private void setColor(Entry<K, V> p, boolean c) {
+	private void setColor(Entry<K, V, T> p, boolean c) {
 		if (p != null) {
 			p.color = c;
 		}
 	}
 
-	private Entry<K, V> leftOf(Entry<K, V> p) {
+	private Entry<K, V, T> leftOf(Entry<K, V, T> p) {
 		return (p == null) ? null : p.left;
 	}
 
-	private Entry<K, V> rightOf(Entry<K, V> p) {
+	private Entry<K, V, T> rightOf(Entry<K, V, T> p) {
 		return (p == null) ? null : p.right;
 	}
 
-	private void rotateLeft(Entry<K, V> x) {
+	private void rotateLeft(Entry<K, V, T> x) {
 		if (x != null) {
-			Entry<K, V> y = x.right;
+			Entry<K, V, T> y = x.right;
 			x.right = y.left;
 			if (y.left != null) {
 				y.left.parent = x;
@@ -514,9 +523,9 @@ public class IntervalTree<K extends Interval, V> {
 		}
 	}
 
-	private void rotateRight(Entry<K, V> x) {
+	private void rotateRight(Entry<K, V, T> x) {
 		if (x != null) {
-			Entry<K, V> y = x.left;
+			Entry<K, V, T> y = x.left;
 			x.left = y.right;
 			if (y.right != null) {
 				y.right.parent = x;
@@ -536,18 +545,19 @@ public class IntervalTree<K extends Interval, V> {
 		}
 	}
 
-	Entry<K, V> successor(Entry<K, V> t) {
+	Entry<K, V, T> successor(Entry<K, V, T> t) {
 		if (t == null) {
 			return null;
 		} else if (t.right != null) {
-			Entry<K, V> p = t.right;
+			Entry<K, V, T> p = t.right;
 			while (p.left != null) {
 				p = p.left;
 			}
 			return p;
 		} else {
-			Entry<K, V> p = t.parent;
-			Entry<K, V> ch = t;
+			Entry<K, V, T> p = t.parent;
+			Entry<K, V, T> ch = t;
+			
 			while (p != null && ch == p.right) {
 				ch = p;
 				p = p.parent;
@@ -567,7 +577,7 @@ public class IntervalTree<K extends Interval, V> {
 		printHelper(root, 0, spread);
 	}
 
-	private void printHelper(Entry<K, V> n, int indent, int spread) {
+	private void printHelper(Entry<K, V, T> n, int indent, int spread) {
 		if (n == null) {
 			System.out.print("<nil>");
 			return;

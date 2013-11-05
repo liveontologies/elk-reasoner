@@ -51,7 +51,7 @@ public class IntervalTreeTest extends TestCase {
 		Random rnd = new Random(System.currentTimeMillis());
 
 		//IntervalTree to test
-		IntervalTree<TestInterval, TestInterval> testTree = new IntervalTree<TestInterval, TestInterval>();
+		IntervalTree<TestInterval, TestInterval, Endpoint> testTree = new IntervalTree<TestInterval, TestInterval, Endpoint>();
 
 		//Reference list of intervals (for comparison)
 		ArrayList<TestInterval> intervals = new ArrayList<TestInterval>(datasetSize);
@@ -162,7 +162,7 @@ public class IntervalTreeTest extends TestCase {
 		Random rnd = new Random(System.currentTimeMillis());
 
 		//IntervalTree to test
-		IntervalTree<TestInterval, TestInterval> testTree = new IntervalTree<TestInterval, TestInterval>();
+		IntervalTree<TestInterval, TestInterval, Endpoint> testTree = new IntervalTree<TestInterval, TestInterval, Endpoint>();
 
 		//Reference list of intervals (for comparison)
 		ArrayList<TestInterval> intervals = new ArrayList<TestInterval>(datasetSize);

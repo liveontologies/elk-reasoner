@@ -35,6 +35,7 @@ public class XmlLiteralDatatypeImpl extends LiteralDatatypeImpl implements XmlLi
 		super(iri);
 	}
 
+	@Override
 	public <O> O accept(ElkDatatypeVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

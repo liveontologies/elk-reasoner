@@ -264,9 +264,10 @@ public class SimpleDatatypeIndex implements DatatypeIndex {
 
 		@Override
 		public Set<IndexedDatatypeExpression> visit(UndefinedDatatype datatype) {
-			return Collections.EMPTY_SET;
+			return Collections.emptySet();
 		}
 
+		@SuppressWarnings("unchecked")
 		private Collection<Set<IndexedDatatypeExpression>> getAllPools() {
 			return Arrays.asList(numericDatatypePool, dateTimeDatatypePool, 
 				binaryDatatypePool, stringDatatypePool, literalDatatypePool);

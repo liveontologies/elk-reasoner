@@ -32,6 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
@@ -46,10 +47,6 @@ import org.semanticweb.elk.reasoner.datatypes.handlers.ElkDatatypeHandler;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainFilter;
-import org.semanticweb.elk.util.logging.LogLevel;
-import org.semanticweb.elk.util.logging.LoggerWrap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A converter from {@link ElkClassExpression}s,
@@ -62,10 +59,6 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class IndexObjectConverter extends AbstractIndexObjectConverter {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexObjectConverter.class);
 
 	/**
 	 * the filter for produced {@link IndexedClassExpression}s

@@ -131,6 +131,8 @@ public class DateTimeDatatypeHandler extends AbstractDatatypeHandler {
 						upperInclusive = false;
 					}
 					break;
+			default:
+				break;
 			}
 		}
 
