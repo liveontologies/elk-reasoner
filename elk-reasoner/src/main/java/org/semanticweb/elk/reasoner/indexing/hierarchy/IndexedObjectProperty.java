@@ -41,6 +41,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisito
  */
 
 public class IndexedObjectProperty extends IndexedPropertyChain {
+	
 	protected final ElkObjectProperty elkObjectProperty;
 
 	/**
