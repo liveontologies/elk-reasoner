@@ -70,17 +70,23 @@ public class DataPropertyHierarchyComputationFactory implements
 			Queue<IndexedDataProperty> todo = new ArrayDeque<IndexedDataProperty>();
 			saturated.derivedSuperProperties.add(idp);
 			todo.add(idp);
+			
 			for (;;) {
 				IndexedDataProperty next = todo.poll();
+				
 				if (next == null)
 					break;
+				
 				Iterable<IndexedDataProperty> toldSuperProperties = next
 						.getToldSuperProperties();
 				if (toldSuperProperties == null)
 					break;
-				for (IndexedDataProperty sup : toldSuperProperties)
-					if (saturated.derivedSuperProperties.add(sup))
+				
+				for (IndexedDataProperty sup : toldSuperProperties) {
+					if (saturated.derivedSuperProperties.add(sup)) {
 						todo.add(sup);
+					}
+				}
 			}
 		}
 

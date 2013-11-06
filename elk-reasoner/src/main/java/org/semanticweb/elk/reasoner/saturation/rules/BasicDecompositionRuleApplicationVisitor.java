@@ -67,11 +67,11 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 	}
 
 	@Override
-	public void visit(IndexedDatatypeExpression ice, Context context) {
+	public void visit(IndexedDatatypeExpression ide, Context context) {
 		BasicSaturationStateWriter writer = getSaturationStateWriter();
-		IndexedDataProperty idp = ice.getProperty();
-		ValueSpace vs = ice.getValueSpace();
-		
+		IndexedDataProperty idp = ide.getProperty();
+		ValueSpace vs = ide.getValueSpace();
+
 		if (vs == EmptyValueSpace.INSTANCE) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Producing contradiction due to the empty value space for "
@@ -81,14 +81,15 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 			// case we are done
 			writer.produce(context, Contradiction.getInstance());
 		} else {
-
+			// this is where we iterate over subsuming indexed datatype
+			// expressions and produce subsumers for this context
 			SaturatedDataProperty saturatedDataProperty = idp.getSaturated();
 
 			if (saturatedDataProperty != null) {
 				for (IndexedDataProperty superProperty : saturatedDataProperty
 						.getSuperProperties()) {
 					Collection<IndexedDatatypeExpression> subsumers = superProperty
-							.getSubsumersFor(ice);
+							.getSubsumersFor(ide);
 					if (subsumers != null) {
 						for (IndexedDatatypeExpression expr : subsumers) {
 							writer.produce(context, new NegativeSubsumer(expr));

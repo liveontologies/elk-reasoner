@@ -36,17 +36,17 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  */
 public class SaturatedDataProperty {
 
-	private final IndexedDataProperty root;
+	private final IndexedDataProperty root_;
 
-	protected final Set<IndexedDataProperty> derivedSuperProperties;
+	final Set<IndexedDataProperty> derivedSuperProperties;
 
 	SaturatedDataProperty(IndexedDataProperty root) {
-		this.root = root;
+		this.root_ = root;
 		this.derivedSuperProperties = new ArrayHashSet<IndexedDataProperty>();
 	}
 
 	public IndexedDataProperty getRoot() {
-		return root;
+		return root_;
 	}
 
 	/**
