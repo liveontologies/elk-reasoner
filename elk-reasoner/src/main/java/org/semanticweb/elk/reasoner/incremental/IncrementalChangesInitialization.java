@@ -178,24 +178,24 @@ class ContextInitializationFactory
 					}
 				}
 		
-				//Index of all context subsumers that are dataype expressions (grouped by immidiate datatype property)
+				//Index of all context subsumers that are datatype expressions (grouped by immediate datatype property)
 				Multimap<IndexedDataProperty, IndexedDatatypeExpression> dtSubsumers = context.getDatatypeExpressions();
 				
-				//proceed only if there were any changes that envolved datatype expressions and this context contains some
+				//proceed only if there were any changes that involved datatype expressions and this context contains some
 				if (!datatypeChanges_.isEmpty() && dtSubsumers != null) {
 					
 					//iterate over all datatype properties from the DT-exprs index of this context
 					for (IndexedDataProperty key : dtSubsumers.keySet()) {
 						
-						//for each property perfrom an intersection of its hierarchy 
+						//for each property perform an intersection of its hierarchy 
 						//with a set of properties from changed datatype expressions
 						Iterator<IndexedDataProperty> lsi =
 							new LazySetIntersection<IndexedDataProperty>(
 								key.getSaturated().getSuperProperties(), affectedDatatypeProperties_).iterator();
 						
 						while (lsi.hasNext()) {
-							//get all datatype expression amoung the subsumers of this 
-							//context that could be affected by the chenges
+							//get all datatype expression among the subsumers of this 
+							//context that could be affected by the changes
 							Collection<IndexedDatatypeExpression> ides = dtSubsumers.get(key);
 							DatatypeIndex changes = datatypeChanges_.get(lsi.next());
 							
