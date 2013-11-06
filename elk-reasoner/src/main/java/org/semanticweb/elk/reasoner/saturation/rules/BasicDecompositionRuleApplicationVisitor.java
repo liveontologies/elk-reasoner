@@ -71,20 +71,28 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 		BasicSaturationStateWriter writer = getSaturationStateWriter();
 		IndexedDataProperty idp = ice.getProperty();
 		ValueSpace vs = ice.getValueSpace();
+		
 		if (vs == EmptyValueSpace.INSTANCE) {
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Producing contradiction due to the empty value space for "
+						+ context.getRoot());
+			}
 			// this means that value space is inconsistent; in this
 			// case we are done
 			writer.produce(context, Contradiction.getInstance());
-		}
-		SaturatedDataProperty saturatedDataProperty = idp.getSaturated();
-		if (saturatedDataProperty != null) {
-			for (IndexedDataProperty superProperty : saturatedDataProperty
-					.getSuperProperties()) {
-				Collection<IndexedDatatypeExpression> subsumers = superProperty
-						.getSubsumersFor(ice);
-				if (subsumers != null) {
-					for (IndexedDatatypeExpression expr : subsumers) {
-						writer.produce(context, new NegativeSubsumer(expr));
+		} else {
+
+			SaturatedDataProperty saturatedDataProperty = idp.getSaturated();
+
+			if (saturatedDataProperty != null) {
+				for (IndexedDataProperty superProperty : saturatedDataProperty
+						.getSuperProperties()) {
+					Collection<IndexedDatatypeExpression> subsumers = superProperty
+							.getSubsumersFor(ice);
+					if (subsumers != null) {
+						for (IndexedDatatypeExpression expr : subsumers) {
+							writer.produce(context, new NegativeSubsumer(expr));
+						}
 					}
 				}
 			}
