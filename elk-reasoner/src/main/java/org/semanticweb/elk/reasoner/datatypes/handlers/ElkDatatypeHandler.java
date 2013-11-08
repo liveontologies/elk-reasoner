@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.datatypes.handlers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,6 +26,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
+import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
@@ -33,15 +35,19 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingUnsupportedException;
 
 /**
+ * Visitor that converts the given {@link ElkDataRange} or {@link ElkLiteral}
+ * into an instance of {@link ValueSpace} by first selecting the suitable
+ * {@link DatatypeHandler}.
+ * 
  * @author Pospishnyi Olexandr
  */
 public class ElkDatatypeHandler implements DatatypeHandler {
 
 	private final DatatypeHandlerFactory handlerFactory = new DatatypeHandlerFactory();
-	
+
 	private ElkDatatypeHandler() {
 	}
-	
+
 	private static ElkDatatypeHandler instance_;
 
 	public static ElkDatatypeHandler getInstance() {
@@ -53,7 +59,8 @@ public class ElkDatatypeHandler implements DatatypeHandler {
 
 	@Override
 	public ValueSpace visit(ElkLiteral elkLiteral) {
-		DatatypeHandler handler = elkLiteral.getDatatype().accept(handlerFactory);
+		DatatypeHandler handler = elkLiteral.getDatatype().accept(
+				handlerFactory);
 		return elkLiteral.accept(handler);
 	}
 
@@ -65,7 +72,8 @@ public class ElkDatatypeHandler implements DatatypeHandler {
 
 	@Override
 	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
-		DatatypeHandler handler = elkDatatypeRestriction.getDatatype().accept(handlerFactory);
+		DatatypeHandler handler = elkDatatypeRestriction.getDatatype().accept(
+				handlerFactory);
 		return elkDatatypeRestriction.accept(handler);
 	}
 
