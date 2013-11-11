@@ -62,9 +62,10 @@ public class DateTimeValue implements ValueSpace {
 		return ValueSpaceType.DATETIME_VALUE;
 	}
 
+	//singletons are never empty
 	@Override
-	public boolean isEmptyInterval() {
-		return value != null;
+	public boolean isEmpty() {
+		return false;
 	}
 
 	/**

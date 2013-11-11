@@ -48,7 +48,7 @@ public class EmptyValueSpace implements ValueSpace {
 	}
 
 	@Override
-	public boolean isEmptyInterval() {
+	public boolean isEmpty() {
 		return true;
 	}
 

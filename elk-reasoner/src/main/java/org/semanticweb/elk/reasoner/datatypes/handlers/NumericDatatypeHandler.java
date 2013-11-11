@@ -65,7 +65,7 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.NumericValue;
  */
 public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 
-	static final Logger LOGGER_ = LoggerFactory
+	private static final Logger LOGGER_ = LoggerFactory
 		.getLogger(NumericDatatypeHandler.class);
 	private final NumericValueParser parser_ = new NumericValueParser();
 	
@@ -77,7 +77,7 @@ public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 		.valueOf(Long.MAX_VALUE);
 	private static final BigInteger BI_MIN_LONG = BigInteger
 		.valueOf(Long.MIN_VALUE);
-	private final NumberComparator comparator = NumberComparator.INSTANCE;
+	private final NumberComparator comparator_ = NumberComparator.INSTANCE;
 
 	@Override
 	public ValueSpace visit(ElkLiteral elkLiteral) {
@@ -124,25 +124,25 @@ public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 
 			switch (facet) {
 				case MIN_INCLUSIVE: // >=
-					if (comparator.compare(restrictionValue, lowerBound) >= 0) {
+					if (comparator_.compare(restrictionValue, lowerBound) >= 0) {
 						lowerBound = restrictionValue;
 						lowerInclusive = true;
 					}
 					break;
 				case MIN_EXCLUSIVE: // >
-					if (comparator.compare(restrictionValue, lowerBound) >= 0) {
+					if (comparator_.compare(restrictionValue, lowerBound) >= 0) {
 						lowerBound = restrictionValue;
 						lowerInclusive = false;
 					}
 					break;
 				case MAX_INCLUSIVE: // <=
-					if (comparator.compare(restrictionValue, upperBound) <= 0) {
+					if (comparator_.compare(restrictionValue, upperBound) <= 0) {
 						upperBound = restrictionValue;
 						upperInclusive = true;
 					}
 					break;
 				case MAX_EXCLUSIVE: // <
-					if (comparator.compare(restrictionValue, upperBound) <= 0) {
+					if (comparator_.compare(restrictionValue, upperBound) <= 0) {
 						upperBound = restrictionValue;
 						upperInclusive = false;
 					}
@@ -157,7 +157,7 @@ public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 			datatype, lowerBound, lowerInclusive, upperBound,
 			upperInclusive);
 
-		if (valueSpace.isEmptyInterval()) {
+		if (valueSpace.isEmpty()) {
 			// specified restrictions implies empty value (owl:Nothing)
 			return EmptyValueSpace.INSTANCE;
 		} else {

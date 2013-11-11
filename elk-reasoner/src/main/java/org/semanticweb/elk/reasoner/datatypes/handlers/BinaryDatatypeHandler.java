@@ -105,7 +105,7 @@ public class BinaryDatatypeHandler extends AbstractDatatypeHandler {
 		}
 		LengthRestrictedValueSpace vs = new LengthRestrictedValueSpace(
 			datatype, minLength, maxLength);
-		if (vs.isEmptyInterval()) {
+		if (vs.isEmpty()) {
 			return EmptyValueSpace.INSTANCE;
 		} else {
 			return vs;

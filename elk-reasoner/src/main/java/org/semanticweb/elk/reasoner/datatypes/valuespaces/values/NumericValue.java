@@ -65,7 +65,7 @@ public class NumericValue extends AbstractInterval implements ValueSpace {
 	}
 
 	@Override
-	public boolean isEmptyInterval() {
+	public boolean isEmpty() {
 		return !effectiveDatatype.isCompatibleWith(datatype);
 	}
 

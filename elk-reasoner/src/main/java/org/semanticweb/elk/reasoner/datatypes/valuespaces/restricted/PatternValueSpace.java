@@ -58,7 +58,7 @@ public class PatternValueSpace implements ValueSpace {
 	}
 
 	@Override
-	public boolean isEmptyInterval() {
+	public boolean isEmpty() {
 		return automaton.isEmpty() || !effectiveDatatype.isCompatibleWith(datatype);
 	}
 

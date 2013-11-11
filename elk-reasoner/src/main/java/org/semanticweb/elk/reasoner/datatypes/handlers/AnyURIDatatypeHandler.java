@@ -105,7 +105,7 @@ public class AnyURIDatatypeHandler extends AbstractDatatypeHandler {
 					pattern.setInfo(value);
 					PatternValueSpace vs = new PatternValueSpace(pattern, datatype,
 						datatype);
-					if (vs.isEmptyInterval()) {
+					if (vs.isEmpty()) {
 						return EmptyValueSpace.INSTANCE;
 					} else {
 						return vs;
@@ -118,7 +118,7 @@ public class AnyURIDatatypeHandler extends AbstractDatatypeHandler {
 		}
 		LengthRestrictedValueSpace vs = new LengthRestrictedValueSpace(
 			datatype, minLength, maxLength);
-		if (vs.isEmptyInterval()) {
+		if (vs.isEmpty()) {
 			return EmptyValueSpace.INSTANCE;
 		} else {
 			return vs;

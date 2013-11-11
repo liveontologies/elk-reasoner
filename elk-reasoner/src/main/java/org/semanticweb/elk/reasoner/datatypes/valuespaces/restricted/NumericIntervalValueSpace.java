@@ -167,7 +167,7 @@ public class NumericIntervalValueSpace extends AbstractInterval implements Value
 	}
 
 	@Override
-	public boolean isEmptyInterval() {
+	public boolean isEmpty() {
 		int boundComparison = NumberComparator.INSTANCE.compare(lowerBound, upperBound);
 		if (boundComparison > 0) {
 			return true;

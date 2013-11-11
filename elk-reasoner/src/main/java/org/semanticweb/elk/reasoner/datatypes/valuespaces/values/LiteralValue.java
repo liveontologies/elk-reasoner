@@ -64,7 +64,7 @@ public class LiteralValue implements ValueSpace {
 	}
 
 	@Override
-	public boolean isEmptyInterval() {
+	public boolean isEmpty() {
 		return !effectiveDatatype.isCompatibleWith(datatype);
 	}
 

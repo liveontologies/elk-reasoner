@@ -212,7 +212,7 @@ public class PlainLiteralDatatypeHandler extends AbstractDatatypeHandler {
 				ElkDatatype effectiveDatatype = determineDatatype(pattern);
 				PatternValueSpace vs = new PatternValueSpace(pattern, datatype,
 						effectiveDatatype);
-				if (vs.isEmptyInterval()) {
+				if (vs.isEmpty()) {
 					return EmptyValueSpace.INSTANCE;
 				} else {
 					return vs;
@@ -225,7 +225,7 @@ public class PlainLiteralDatatypeHandler extends AbstractDatatypeHandler {
 
 		LengthRestrictedValueSpace vs = new LengthRestrictedValueSpace(
 				datatype, minLength, maxLength);
-		if (vs.isEmptyInterval()) {
+		if (vs.isEmpty()) {
 			return EmptyValueSpace.INSTANCE;
 		} else {
 			return vs;

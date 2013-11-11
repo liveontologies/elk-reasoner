@@ -68,6 +68,12 @@ public class Owl2FunctionalStyleParserFactory implements Owl2ParserFactory {
 		return new Owl2FunctionalStyleParser(reader, objectFactory_,
 				lexerFactory_);
 	}
+	
+	public Owl2Parser getParser(Reader reader, ElkPrefixDeclarations prefixes) {
+		return new Owl2FunctionalStyleParser(reader, objectFactory_, prefixes,
+				lexerFactory_);
+	}
+	
 
 	
 	/**

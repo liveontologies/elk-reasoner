@@ -71,7 +71,7 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 	}
 
 	@Override
-	public boolean isEmptyInterval() {
+	public boolean isEmpty() {
 		if (minLength == null && maxLength == null) {
 			return true;
 		}

@@ -54,7 +54,7 @@ public class BinaryValue implements ValueSpace {
 	}
 
 	@Override
-	public boolean isEmptyInterval() {
+	public boolean isEmpty() {
 		return value != null;
 	}
 

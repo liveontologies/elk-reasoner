@@ -56,7 +56,7 @@ public interface ValueSpace extends Subsumable<ValueSpace> {
 	/**
 	 * @return is this value space is empty
 	 */
-	public boolean isEmptyInterval();
+	public boolean isEmpty();
 
 	/**
 	 * Check value space subsumption

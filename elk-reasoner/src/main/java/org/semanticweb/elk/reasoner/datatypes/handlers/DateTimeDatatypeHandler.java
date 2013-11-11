@@ -140,7 +140,7 @@ public class DateTimeDatatypeHandler extends AbstractDatatypeHandler {
 			datatype, lowerBound, lowerInclusive, upperBound,
 			upperInclusive);
 
-		if (valueSpace.isEmptyInterval()) {
+		if (valueSpace.isEmpty()) {
 			// specified restrictions implies empty value (owl:Nothing)
 			return EmptyValueSpace.INSTANCE;
 		} else {

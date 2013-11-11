@@ -50,7 +50,7 @@ public class EntireValueSpace implements ValueSpace {
 	}
 
 	@Override
-	public boolean isEmptyInterval() {
+	public boolean isEmpty() {
 		return false;
 	}
 
