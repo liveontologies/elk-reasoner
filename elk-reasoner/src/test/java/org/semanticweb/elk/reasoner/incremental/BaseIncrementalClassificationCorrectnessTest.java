@@ -49,6 +49,7 @@ import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.PolySuite.Config;
 import org.semanticweb.elk.testing.PolySuite.Configuration;
 import org.semanticweb.elk.testing.TestManifest;
+import org.semanticweb.elk.testing.UnexpectedTestFailure;
 import org.semanticweb.elk.testing.io.URLTestIO;
 
 /**
@@ -74,16 +75,22 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 	@Override
 	protected void correctnessCheck(Reasoner standardReasoner,
 			Reasoner incrementalReasoner, long seed) throws ElkException {
-		LOGGER_.trace("======= Computing Expected Taxonomy =======");
 
-		Taxonomy<ElkClass> expected = standardReasoner.getTaxonomyQuietly();
+		Taxonomy<ElkClass> expected, incremental = null;
 
-		LOGGER_.trace("======= Computing Incremental Taxonomy =======");
+		try {
+			LOGGER_.trace("======= Computing Expected Taxonomy =======");
 
-		Taxonomy<ElkClass> incremental = incrementalReasoner
-				.getTaxonomyQuietly();
+			expected = standardReasoner.getTaxonomyQuietly();
 
-		try {						
+			LOGGER_.trace("======= Computing Incremental Taxonomy =======");
+
+			incremental = incrementalReasoner.getTaxonomyQuietly();
+		} catch (Exception e) {
+			throw new UnexpectedTestFailure("Random seed " + seed, e);
+		}
+
+		try {
 			assertEquals("Seed " + seed, TaxonomyHasher.hash(expected),
 					TaxonomyHasher.hash(incremental));
 		} catch (AssertionError e) {

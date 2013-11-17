@@ -22,13 +22,13 @@
  */
 package org.semanticweb.elk.util.collections;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
 import junit.framework.TestCase;
 
-import org.semanticweb.elk.util.collections.intervals.Interval;
 import org.semanticweb.elk.util.collections.intervals.IntervalTree;
 
 /**
@@ -43,37 +43,38 @@ public class IntervalTreeTest extends TestCase {
 
 	/**
 	 * Test interval tree with wide spread of intervals. Produces tree with
-	 * large amount of nodes with 1 value per each.
+	 * a large number of nodes with 1 value per each.
 	 */
 	public void testWideTree() {
 		final int datasetSize = 1000;
-
-		Random rnd = new Random(System.currentTimeMillis());
+		final long seed = System.currentTimeMillis();
+		Random rnd = new Random(seed);
 
 		//IntervalTree to test
-		IntervalTree<TestInterval, TestInterval, Endpoint> testTree = new IntervalTree<TestInterval, TestInterval, Endpoint>();
+		IntervalTree<IntegerInterval, IntegerInterval, Integer> testTree = new IntervalTree<IntegerInterval, IntegerInterval, Integer>(IntegerInterval.INT_COMPARATOR);
 
 		//Reference list of intervals (for comparison)
-		ArrayList<TestInterval> intervals = new ArrayList<TestInterval>(datasetSize);
+		ArrayList<IntegerInterval> intervals = new ArrayList<IntegerInterval>(datasetSize);
 
 		//Reference list of values
-		ArrayList<TestInterval> values = new ArrayList<TestInterval>(datasetSize);
+		ArrayList<IntegerInterval> values = new ArrayList<IntegerInterval>(datasetSize);
 
 		//initial tree construction 
 
 		for (int i = 0; i < datasetSize; i++) {
 			int a = rnd.nextInt();
 			int b = rnd.nextInt();
-			TestInterval testInterval;
+			IntegerInterval testInterval;
 			if (a == b) {
-				testInterval = new TestInterval(a, true, b, true);
+				testInterval = new IntegerInterval(a, true, b, true);
 			} else {
-				testInterval = new TestInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
+				testInterval = new IntegerInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
 			}
 			testTree.add(testInterval, testInterval);
 			intervals.add(testInterval);
 			values.add(testInterval);
-			assertTrue(testInterval.getLow().compareTo(testInterval.getHigh()) <= 0);
+			
+			//assertTrue(testInterval.getLow().compareTo(testInterval.getHigh()) <= 0);
 		}
 
 
@@ -82,7 +83,7 @@ public class IntervalTreeTest extends TestCase {
 		int changeSetSize = Math.round(datasetSize * 0.25f);
 
 		for (int i = 0; i < changeSetSize; i++) {
-			TestInterval del = intervals.get(rnd.nextInt(intervals.size()));
+			IntegerInterval del = intervals.get(rnd.nextInt(intervals.size()));
 			testTree.remove(del, del);
 			intervals.remove(del);
 			values.remove(del);
@@ -94,11 +95,11 @@ public class IntervalTreeTest extends TestCase {
 		for (int i = 0; i < changeSetSize; i++) {
 			int a = rnd.nextInt();
 			int b = rnd.nextInt();
-			TestInterval testInterval;
+			IntegerInterval testInterval;
 			if (a == b) {
-				testInterval = new TestInterval(a, true, b, true);
+				testInterval = new IntegerInterval(a, true, b, true);
 			} else {
-				testInterval = new TestInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
+				testInterval = new IntegerInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
 			}
 			testTree.add(testInterval, testInterval);
 			intervals.add(testInterval);
@@ -112,24 +113,24 @@ public class IntervalTreeTest extends TestCase {
 
 		//test that all values are present in the tree and reference list
 
-		Collection<TestInterval> treeValues = testTree.values();
+		Collection<IntegerInterval> treeValues = testTree.values();
 		assertEquals(treeValues.size(), values.size());
 
-		for (TestInterval value : values) {
+		for (IntegerInterval value : values) {
 			assertTrue(treeValues.contains(value));
 		}
 
 		//test that every stored interval can be retrieved
 
-		for (TestInterval testInterval : intervals) {
+		for (IntegerInterval testInterval : intervals) {
 			assertTrue(testTree.searchIncludes(testInterval).contains(testInterval));
 		}
 
 		//test that every interval was retrieved for every stored interval
 
-		for (TestInterval testInterval : intervals) {
-			Collection<TestInterval> treeAnswer = testTree.searchIncludes(testInterval);
-			Collection<TestInterval> listAnswer = getAllIncludes(intervals, testInterval);
+		for (IntegerInterval testInterval : intervals) {
+			Collection<IntegerInterval> treeAnswer = testTree.searchIncludes(testInterval);
+			Collection<IntegerInterval> listAnswer = getAllIncludes(intervals, testInterval);
 			assertEquals(treeAnswer.size(), listAnswer.size());
 			assertTrue(listAnswer.containsAll(treeAnswer));
 		}
@@ -139,14 +140,14 @@ public class IntervalTreeTest extends TestCase {
 		for (int i = 0; i < datasetSize; i++) {
 			int a = rnd.nextInt();
 			int b = rnd.nextInt();
-			TestInterval testInterval;
+			IntegerInterval testInterval;
 			if (a == b) {
-				testInterval = new TestInterval(a, true, b, true);
+				testInterval = new IntegerInterval(a, true, b, true);
 			} else {
-				testInterval = new TestInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
+				testInterval = new IntegerInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
 			}
-			Collection<TestInterval> treeAnswer = testTree.searchIncludes(testInterval);
-			Collection<TestInterval> listAnswer = getAllIncludes(intervals, testInterval);
+			Collection<IntegerInterval> treeAnswer = testTree.searchIncludes(testInterval);
+			Collection<IntegerInterval> listAnswer = getAllIncludes(intervals, testInterval);
 			assertEquals(treeAnswer.size(), listAnswer.size());
 			assertTrue(listAnswer.containsAll(treeAnswer));
 		}
@@ -155,36 +156,40 @@ public class IntervalTreeTest extends TestCase {
 	/**
 	 * Test interval tree with small spread of intervals. Produces tree with
 	 * small amount of nodes but many values for each.
+	 * @throws IOException 
 	 */
-	public void testNarrowTree() {
+	public void testNarrowTree() throws Exception {
 		final int datasetSize = 1000;
-
-		Random rnd = new Random(System.currentTimeMillis());
+		final long seed = System.currentTimeMillis();
+		Random rnd = new Random(seed);
 
 		//IntervalTree to test
-		IntervalTree<TestInterval, TestInterval, Endpoint> testTree = new IntervalTree<TestInterval, TestInterval, Endpoint>();
+		IntervalTree<IntegerInterval, IntegerInterval, Integer> testTree = new IntervalTree<IntegerInterval, IntegerInterval, Integer>(IntegerInterval.INT_COMPARATOR);
 
 		//Reference list of intervals (for comparison)
-		ArrayList<TestInterval> intervals = new ArrayList<TestInterval>(datasetSize);
+		ArrayList<IntegerInterval> intervals = new ArrayList<IntegerInterval>(datasetSize);
 
 		//Reference list of values
-		ArrayList<TestInterval> values = new ArrayList<TestInterval>(datasetSize);
+		ArrayList<IntegerInterval> values = new ArrayList<IntegerInterval>(datasetSize);
 
 		//initial tree construction 
 
 		for (int i = 0; i < datasetSize; i++) {
 			int a = rnd.nextInt(20);
 			int b = rnd.nextInt(20);
-			TestInterval testInterval;
+			IntegerInterval testInterval;
+			
 			if (a == b) {
-				testInterval = new TestInterval(a, true, b, true);
+				testInterval = new IntegerInterval(a, true, b, true);
 			} else {
-				testInterval = new TestInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
+				testInterval = new IntegerInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
 			}
+			
 			testTree.add(testInterval, testInterval);
 			intervals.add(testInterval);
 			values.add(testInterval);
-			assertTrue(testInterval.getLow().compareTo(testInterval.getHigh()) <= 0);
+			
+			//assertTrue(testInterval.getLow().compareTo(testInterval.getHigh()) <= 0);
 		}
 
 		//remove 25% of intervals and repopulate
@@ -192,7 +197,7 @@ public class IntervalTreeTest extends TestCase {
 		int changeSetSize = Math.round(datasetSize * 0.25f);
 
 		for (int i = 0; i < changeSetSize; i++) {
-			TestInterval del = intervals.get(rnd.nextInt(intervals.size()));
+			IntegerInterval del = intervals.get(rnd.nextInt(intervals.size()));
 			testTree.remove(del, del);
 			intervals.remove(del);
 			values.remove(del);
@@ -204,11 +209,11 @@ public class IntervalTreeTest extends TestCase {
 		for (int i = 0; i < changeSetSize; i++) {
 			int a = rnd.nextInt(20);
 			int b = rnd.nextInt(20);
-			TestInterval testInterval;
+			IntegerInterval testInterval;
 			if (a == b) {
-				testInterval = new TestInterval(a, true, b, true);
+				testInterval = new IntegerInterval(a, true, b, true);
 			} else {
-				testInterval = new TestInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
+				testInterval = new IntegerInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
 			}
 			testTree.add(testInterval, testInterval);
 			intervals.add(testInterval);
@@ -222,24 +227,33 @@ public class IntervalTreeTest extends TestCase {
 
 		//test that all values are present in the tree and reference list
 
-		Collection<TestInterval> treeValues = testTree.values();
+		Collection<IntegerInterval> treeValues = testTree.values();
+		
 		assertEquals(treeValues.size(), values.size());
 
-		for (TestInterval value : values) {
+		for (IntegerInterval value : values) {
 			assertTrue(treeValues.contains(value));
 		}
 
 		//test that every stored interval can be retrieved
 
-		for (TestInterval testInterval : intervals) {
-			assertTrue(testTree.searchIncludes(testInterval).contains(testInterval));
+		for (IntegerInterval testInterval : intervals) {
+				
+				/*OutputStreamWriter writer = new OutputStreamWriter(System.out);
+				
+				testTree.print(writer);
+				writer.flush();*/
+				Collection<IntegerInterval> retrieved = testTree.searchIncludes(testInterval);
+				
+				assertTrue(retrieved + ". " + testInterval.toString(), retrieved.contains(testInterval));
 		}
 
 		//test that every interval was retrieved for every stored interval
 
-		for (TestInterval testInterval : intervals) {
-			Collection<TestInterval> treeAnswer = testTree.searchIncludes(testInterval);
-			Collection<TestInterval> listAnswer = getAllIncludes(intervals, testInterval);
+		for (IntegerInterval testInterval : intervals) {
+			Collection<IntegerInterval> treeAnswer = testTree.searchIncludes(testInterval);
+			Collection<IntegerInterval> listAnswer = getAllIncludes(intervals, testInterval);
+			
 			assertEquals(treeAnswer.size(), listAnswer.size());
 			assertTrue(listAnswer.containsAll(treeAnswer));
 		}
@@ -250,22 +264,25 @@ public class IntervalTreeTest extends TestCase {
 		for (int i = 0; i < datasetSize; i++) {
 			int a = rnd.nextInt(30) - 10;
 			int b = rnd.nextInt(30) - 10;
-			TestInterval testInterval;
+			IntegerInterval testInterval;
+			
 			if (a == b) {
-				testInterval = new TestInterval(a, true, b, true);
+				testInterval = new IntegerInterval(a, true, b, true);
 			} else {
-				testInterval = new TestInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
+				testInterval = new IntegerInterval(a > b ? b : a, rnd.nextBoolean(), a > b ? a : b, rnd.nextBoolean());
 			}
-			Collection<TestInterval> treeAnswer = testTree.searchIncludes(testInterval);
-			Collection<TestInterval> listAnswer = getAllIncludes(intervals, testInterval);
+			
+			Collection<IntegerInterval> treeAnswer = testTree.searchIncludes(testInterval);
+			Collection<IntegerInterval> listAnswer = getAllIncludes(intervals, testInterval);
 			assertEquals(treeAnswer.size(), listAnswer.size());
 			assertTrue(listAnswer.containsAll(treeAnswer));
 		}
 	}
 
-	private Collection<TestInterval> getAllIncludes(Collection<TestInterval> intervals, TestInterval i) {
-		ArrayList<TestInterval> ret = new ArrayList<TestInterval>(50);
-		for (TestInterval testInterval : intervals) {
+	private Collection<IntegerInterval> getAllIncludes(Collection<IntegerInterval> intervals, IntegerInterval i) {
+		ArrayList<IntegerInterval> ret = new ArrayList<IntegerInterval>(50);
+		
+		for (IntegerInterval testInterval : intervals) {
 			if (testInterval.contains(i)) {
 				ret.add(testInterval);
 			}
@@ -273,114 +290,4 @@ public class IntervalTreeTest extends TestCase {
 		return ret;
 	}
 
-	class TestInterval implements Interval<Endpoint> {
-
-		private Endpoint low;
-		private Endpoint high;
-
-		public TestInterval(int low, int high) {
-			this.low = new Endpoint(low, true, true);
-			this.high = new Endpoint(high, true, false);
-		}
-
-		public TestInterval(int low, boolean lowInclusive, int high, boolean highInclusive) {
-			this.low = new Endpoint(low, lowInclusive, true);
-			this.high = new Endpoint(high, highInclusive, false);
-		}
-
-		@Override
-		public Endpoint getLow() {
-			return low;
-		}
-
-		@Override
-		public Endpoint getHigh() {
-			return high;
-		}
-
-		@Override
-		public boolean contains(Interval<Endpoint> interval) {
-			return low.compareTo(interval.getLow()) <= 0 && high.compareTo(interval.getHigh()) >= 0;
-		}
-
-		@Override
-		public int compareTo(Interval<Endpoint> o) {
-			int cmp = low.compareTo(o.getLow());
-			if (cmp == 0) {
-				return high.compareTo(o.getHigh());
-			} else {
-				return cmp;
-			}
-		}
-
-		@Override
-		public int hashCode() {
-			int hash = 7;
-			return hash;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (obj instanceof TestInterval) {
-				TestInterval i = (TestInterval) obj;
-				return this.low.equals(i.low) && this.high.equals(i.high);
-			} else {
-				return false;
-			}
-		}
-
-		@Override
-		public String toString() {
-			return "" + low + ',' + high;
-		}
-	}
-
-	class Endpoint implements Comparable<Endpoint> {
-
-		private int value;
-		private boolean inclusive;
-		private boolean low;
-
-		public Endpoint(int value, boolean inclusive, boolean low) {
-			this.value = value;
-			this.inclusive = inclusive;
-			this.low = low;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (obj instanceof Endpoint) {
-				Endpoint e = (Endpoint) obj;
-				return this.value == e.value && this.inclusive == e.inclusive && this.low == e.low;
-			} else {
-				return false;
-			}
-		}
-
-		@Override
-		public int compareTo(Endpoint o) {
-			int cmp = value == o.value ? 0 : (value < o.value ? -1 : 1);
-			
-			if (cmp == 0 && inclusive != o.inclusive) {
-				return (low ^ inclusive) ? 1 : -1;
-			} else {
-				return cmp;
-			}
-		}
-
-		@Override
-		public String toString() {
-			if (low) {
-				return "" + (inclusive ? "[" : "(") + value;
-			} else {
-				return "" + value + (inclusive ? "]" : ")");
-			}
-		}
-	}
 }

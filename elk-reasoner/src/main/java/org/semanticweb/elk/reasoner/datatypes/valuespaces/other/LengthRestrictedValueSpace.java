@@ -20,35 +20,37 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
+package org.semanticweb.elk.reasoner.datatypes.valuespaces.other;
+
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.BaseValueSpaceContainmentVisitor;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpaceVisitor;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.BasicOperations;
 import dk.brics.automaton.Datatypes;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Representation of any value that satisfies specified length
- *
+ * 
  * @author Pospishnyi Olexandr
  */
-public class LengthRestrictedValueSpace implements ValueSpace {
+public class LengthRestrictedValueSpace implements ValueSpace<ElkDatatype> {
 
-	private Integer minLength;
-	private Integer maxLength;
-	private ElkDatatype datatype;
-	private Automaton automaton;
+	private final Integer minLength;
+	private final Integer maxLength;
+	private final ElkDatatype datatype;
+	private final Automaton automaton;
 
-	public LengthRestrictedValueSpace(ElkDatatype datatype, Integer minLength, Integer maxLength) {
+	public LengthRestrictedValueSpace(ElkDatatype datatype,
+			Integer minLength, Integer maxLength) {
 		this.minLength = minLength;
 		this.maxLength = maxLength;
 		this.datatype = datatype;
 		Automaton anyCharAutomaton = Datatypes.get("Char");
+
 		if (maxLength == Integer.MAX_VALUE) {
 			if (minLength == 0) {
 				automaton = anyCharAutomaton.repeat();
@@ -56,18 +58,14 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 				automaton = BasicOperations.repeat(anyCharAutomaton, minLength);
 			}
 		} else {
-			automaton = BasicOperations.repeat(anyCharAutomaton, minLength, maxLength);
+			automaton = BasicOperations.repeat(anyCharAutomaton, minLength,
+					maxLength);
 		}
 	}
 
 	@Override
 	public ElkDatatype getDatatype() {
 		return datatype;
-	}
-
-	@Override
-	public ValueSpaceType getType() {
-		return ValueSpaceType.LENGTH_RESTRICTED;
 	}
 
 	@Override
@@ -88,8 +86,10 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 	}
 
 	/**
-	 * Finite-state automaton that represents literal length restriction.
-	 * Used to deduce subsumption between LengthRestrictedValueSpace and PatternValueSpace
+	 * Finite-state automaton that represents literal length restriction. Used
+	 * to deduce subsumption between LengthRestrictedValueSpace and
+	 * PatternValueSpace
+	 * 
 	 * @return Automaton
 	 */
 	public Automaton asAutomaton() {
@@ -97,44 +97,51 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 	}
 
 	/**
-	 * LengthRestrictedValueSpace could contain
-	 * - another LengthRestrictedValueSpace within this one
-	 * - LiteralValue that satisfies length restrictions
-	 * - PatternValueSpace that will satisfy length restrictions
-	 * - BinaryValue that satisfies length restrictions
-	 *
+	 * LengthRestrictedValueSpace could contain - another
+	 * LengthRestrictedValueSpace within this one - LiteralValue that satisfies
+	 * length restrictions - PatternValueSpace that will satisfy length
+	 * restrictions - BinaryValue that satisfies length restrictions
+	 * 
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
 	@Override
-	public boolean contains(ValueSpace valueSpace) {
-		boolean typechek = valueSpace.getDatatype().isCompatibleWith(this.datatype);
-		if (typechek != true) {
-			return false;
-		}
-		switch (valueSpace.getType()) {
-			case LENGTH_RESTRICTED:
-				LengthRestrictedValueSpace lrvs = (LengthRestrictedValueSpace) valueSpace;
+	public boolean contains(ValueSpace<?> valueSpace) {
+
+		return valueSpace.getDatatype().isCompatibleWith(datatype) && 
+				valueSpace.accept(new BaseValueSpaceContainmentVisitor() {
+
+			@Override
+			public Boolean visit(LengthRestrictedValueSpace lrvs) {
 				return minLength.compareTo(lrvs.minLength) <= 0
 						&& maxLength.compareTo(lrvs.maxLength) >= 0;
-			case LITERAL_VALUE:
-				LiteralValue lvs = (LiteralValue) valueSpace;
-				return minLength.compareTo(lvs.value.length()) <= 0
-						&& maxLength.compareTo(lvs.value.length()) >= 0;
-			case PATTERN:
-				PatternValueSpace pvs = (PatternValueSpace) valueSpace;
-				return BasicOperations.subsetOf(pvs.automaton.clone(), this.asAutomaton().clone());
-			case BINARY_VALUE:
-				BinaryValue bvs = (BinaryValue) valueSpace;
+			}
+
+			@Override
+			public Boolean visit(PatternValueSpace pvs) {
+				return BasicOperations.subsetOf(pvs.getAutomaton().clone(),
+						asAutomaton().clone());
+			}
+
+			@Override
+			public Boolean visit(BinaryValue bvs) {
 				return minLength.compareTo(bvs.value.length) <= 0
 						&& maxLength.compareTo(bvs.value.length) >= 0;
-			default:
-				return false;
-		}
+			}
+
+			@Override
+			public Boolean visit(LiteralValue lvs) {
+				int len = lvs.getString().length();
+
+				return minLength.compareTo(len) <= 0
+						&& maxLength.compareTo(len) >= 0;
+			}
+
+		});
 	}
 
 	@Override
-	public boolean isSubsumedBy(ValueSpace valueSpace) {
+	public boolean isSubsumedBy(ValueSpace<?> valueSpace) {
 		return valueSpace.contains(this);
 	}
 
@@ -146,27 +153,24 @@ public class LengthRestrictedValueSpace implements ValueSpace {
 		if (other instanceof LengthRestrictedValueSpace) {
 			LengthRestrictedValueSpace otherEntry = (LengthRestrictedValueSpace) other;
 			return this.datatype.equals(otherEntry.datatype)
-				&& this.minLength.equals(otherEntry.minLength)
-				&& this.maxLength.equals(otherEntry.maxLength);
+					&& this.minLength.equals(otherEntry.minLength)
+					&& this.maxLength.equals(otherEntry.maxLength);
 		}
 		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return HashGenerator.combinedHashCode(
-			LengthRestrictedValueSpace.class,
-			this.datatype,
-			this.minLength,
-			this.maxLength
-			);
+		return HashGenerator.combinedHashCode(LengthRestrictedValueSpace.class,
+				this.datatype, this.minLength, this.maxLength);
 	}
 
 	@Override
 	public String toString() {
-		return datatype.toString() + " length: >=" + minLength + " <=" + maxLength;
+		return datatype.toString() + " length: >=" + minLength + " <="
+				+ maxLength;
 	}
-	
+
 	@Override
 	public <O> O accept(ValueSpaceVisitor<O> visitor) {
 		return visitor.visit(this);

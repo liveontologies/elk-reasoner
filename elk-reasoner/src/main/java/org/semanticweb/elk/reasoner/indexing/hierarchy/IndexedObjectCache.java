@@ -22,17 +22,18 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.datatypes.handlers.ElkDatatypeHandler;
 import org.semanticweb.elk.reasoner.indexing.entries.IndexedEntryConverter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedDataProperty;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryFactory;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A cache of {@link IndexedObject}s in the ontology backed by a
@@ -204,13 +205,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 				element);
 	}
         
-	protected void add(IndexedDataProperty idp) {
-		indexedDataPropertiesLookup.merge(idp);
-		if (idp instanceof IndexedDataProperty) {
-			indexedDataPropertyCount++;
-		}
-	}
-
 	@Override
 	public IndexedObjectProperty visit(IndexedObjectProperty element) {
 		return resolveCache(
@@ -226,13 +220,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 				element);
 	}
         
-	protected void remove(IndexedDataProperty idp) {
-		indexedDataPropertiesLookup.remove(idp);
-		if (idp instanceof IndexedDataProperty) {
-			indexedDataPropertyCount--;
-		}
-	}
-
 	@Override
 	public IndexedSubClassOfAxiom visit(IndexedSubClassOfAxiom axiom) {
 		// caching not supported
@@ -297,12 +284,14 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		@Override
 		public Boolean visit(IndexedDatatypeExpression element) {
 			LOGGER_.trace("Adding {}", element);
+			
 			return indexedClassExpressionLookup.add(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectProperty element) {
 			LOGGER_.trace("Adding {}", element);
+			
 			if (indexedPropertyChainLookup.add(element)) {
 				indexedObjectPropertyCount++;
 				if (SaturatedPropertyChain.isRelevant(element))
@@ -312,11 +301,12 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			return false;
 		}
                 
-                @Override
+        @Override
 		public Boolean visit(IndexedDataProperty element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+        	LOGGER_.trace("Adding {}", element);
+        	
 			if (indexedDataPropertiesLookup.add(element)) {
+				SaturatedDataProperty.getCreate(element);
 				indexedDataPropertyCount++;
 				return true;
 			}
@@ -413,16 +403,15 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 				return false;
 		}
                 
-                @Override
+        @Override
 		public Boolean visit(IndexedDataProperty element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+            LOGGER_.trace("Removing {}", element);
 			
-//			if (indexedDataPropertiesLookup.removeEntry(element) != null) {
+			if (indexedDataPropertiesLookup.removeEntry(element) != null) {
 				indexedDataPropertyCount--;
 				return true;
-//			} else
-//				return false;
+			} else
+				return false;
 		}
 
 		@Override

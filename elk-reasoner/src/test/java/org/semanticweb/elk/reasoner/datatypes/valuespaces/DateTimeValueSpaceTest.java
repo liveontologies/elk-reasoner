@@ -2,6 +2,27 @@
  * 
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -9,12 +30,13 @@ import static org.junit.Assert.assertTrue;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.junit.Ignore;
 import org.junit.Test;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.DateTimeIntervalValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.DateTimeValue;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.dates.DateTimeInterval;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.dates.DateTimeValue;
 
 /**
- * Tests for {@link DateTimeValue} and {@link DateTimeIntervalValueSpace}
+ * Tests for {@link DateTimeValue} and {@link DateTimeInterval}
  * 
  * @author Pavel Klinov
  *
@@ -62,6 +84,12 @@ public class DateTimeValueSpaceTest extends AbstractValueSpaceTest {
 	@Test
 	public void contains() throws Exception {
 		assertTrue(contains(
+				"DataOneOf(\"1956-06-25T04:00:00Z\"^^xsd:dateTime)",
+				"DataOneOf(\"1956-06-25T04:00:00Z\"^^xsd:dateTimeStamp)"));
+		assertTrue(contains(
+				"DatatypeRestriction(xsd:dateTimeStamp xsd:minInclusive \"1901-01-01T02:00:00+02:00\"^^xsd:dateTimeStamp xsd:maxInclusive \"2000-12-31T10:59:59-02:00\"^^xsd:dateTimeStamp)",
+				"DatatypeRestriction(xsd:dateTimeStamp xsd:minExclusive \"1961-01-01T00:00:00Z\"^^xsd:dateTimeStamp xsd:maxExclusive \"1972-12-31T00:00:00Z\"^^xsd:dateTimeStamp)"));
+		assertTrue(contains(
 				"DatatypeRestriction(xsd:dateTime xsd:maxInclusive \"1956-01-01T04:00:00\"^^xsd:dateTime)",
 				"DataOneOf(\"1956-01-01T04:00:00\"^^xsd:dateTime)"));
 		assertTrue(contains(
@@ -70,6 +98,9 @@ public class DateTimeValueSpaceTest extends AbstractValueSpaceTest {
 		assertTrue(contains(
 				"DatatypeRestriction(xsd:dateTime xsd:minInclusive \"1956-01-01T04:00:00+14:00\"^^xsd:dateTime xsd:maxInclusive \"1956-01-01T04:00:00-14:00\"^^xsd:dateTime)",
 				"DataOneOf(\"1956-01-01T04:00:00Z\"^^xsd:dateTime)"));
+		assertTrue(contains(
+				"DatatypeRestriction(xsd:dateTime xsd:maxInclusive \"1956-01-01T04:00:00-14:00\"^^xsd:dateTime)",
+				"DatatypeRestriction(xsd:dateTime xsd:maxInclusive \"1956-01-01T04:00:00+14:00\"^^xsd:dateTime)"));
 		assertTrue(contains(
 				"DatatypeRestriction(xsd:dateTime xsd:minInclusive \"1956-01-01T04:00:00+14:00\"^^xsd:dateTime xsd:maxInclusive \"1956-01-01T04:00:00-14:00\"^^xsd:dateTime)",
 				"DatatypeRestriction(xsd:dateTime xsd:minInclusive \"1956-01-01T04:00:00+12:00\"^^xsd:dateTime xsd:maxInclusive \"1956-01-01T04:00:00-12:00\"^^xsd:dateTime)"));
@@ -85,14 +116,20 @@ public class DateTimeValueSpaceTest extends AbstractValueSpaceTest {
 		order(d1, dPlus14);
 		order(dPlus14, dMinus14);*/
 		assertFalse(contains(
+				"DataOneOf(\"1956-06-25T04:00:00-05:00\"^^xsd:dateTime)",
+				"DataOneOf(\"1956-06-25T10:00:00+01:00\"^^xsd:dateTime)"));
+		assertFalse(contains(
+				"DataOneOf(\"1956-06-25T10:00:00+01:00\"^^xsd:dateTime)",
+				"DataOneOf(\"1956-06-25T04:00:00-05:00\"^^xsd:dateTime)"));
+		assertFalse(contains(
 				"DatatypeRestriction(xsd:dateTime xsd:maxInclusive \"1956-01-01T04:00:00-14:00\"^^xsd:dateTime)",
 				"DataOneOf(\"1956-01-01T04:00:00\"^^xsd:dateTime)"));
 		assertFalse(contains(
 				"DatatypeRestriction(xsd:dateTime xsd:maxInclusive \"1956-01-01T04:00:00\"^^xsd:dateTime)",
 				"DataOneOf(\"1956-01-01T04:00:00+14:00\"^^xsd:dateTime)"));
 		assertFalse(contains(
-				"DatatypeRestriction(xsd:dateTime xsd:maxInclusive \"1956-01-01T04:00:00-14:00\"^^xsd:dateTime)",
-				"DatatypeRestriction(xsd:dateTime xsd:maxInclusive \"1956-01-01T04:00:00+14:00\"^^xsd:dateTime)"));
+				"DatatypeRestriction(xsd:dateTime xsd:maxInclusive \"1956-01-01T04:00:00+14:00\"^^xsd:dateTime)",
+				"DatatypeRestriction(xsd:dateTime xsd:maxInclusive \"1956-01-01T04:00:00-14:00\"^^xsd:dateTime)"));
 		assertFalse(contains(
 				"DatatypeRestriction(xsd:dateTime xsd:maxInclusive \"1956-01-01T04:00:00\"^^xsd:dateTime)",
 				"DatatypeRestriction(xsd:dateTime xsd:maxInclusive \"1956-01-01T04:00:00+14:00\"^^xsd:dateTime)"));
@@ -131,6 +168,7 @@ public class DateTimeValueSpaceTest extends AbstractValueSpaceTest {
 	 * )
 	 */
 	@Test
+	@Ignore
 	public void facetRestrictionValues() throws Exception {
 		//xsd:dateTimeStamp must have TZ set
 		assertFalse(tryDataRange("DatatypeRestriction(xsd:dateTimeStamp xsd:maxInclusive \"1956-01-01T04:00:00\"^^xsd:dateTime)"));

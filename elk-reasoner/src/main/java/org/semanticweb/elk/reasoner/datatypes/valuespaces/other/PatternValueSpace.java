@@ -20,46 +20,44 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted;
+package org.semanticweb.elk.reasoner.datatypes.valuespaces.other;
+
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.BaseValueSpaceContainmentVisitor;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpaceVisitor;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.BasicOperations;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.LiteralValue;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Representation of any value that satisfies specified regular expression
  *
  * @author Pospishnyi Olexandr
  */
-public class PatternValueSpace implements ValueSpace {
+public class PatternValueSpace implements ValueSpace<ElkDatatype> {
 
-	public Automaton automaton;
-	public ElkDatatype datatype;
-	public ElkDatatype effectiveDatatype;
+	private final Automaton automaton_;
+	private final ElkDatatype datatype_;
 
-	public PatternValueSpace(Automaton automaton, ElkDatatype datatype, ElkDatatype effectiveDatatype) {
-		this.datatype = datatype;
-		this.automaton = automaton;
-		this.effectiveDatatype = effectiveDatatype;
+	public PatternValueSpace(Automaton automaton, ElkDatatype datatype) {
+		this.datatype_ = datatype;
+		this.automaton_ = automaton;
 	}
 
+	Automaton getAutomaton() {
+		return automaton_;
+	}
+	
 	@Override
 	public ElkDatatype getDatatype() {
-		return effectiveDatatype;
-	}
-
-	@Override
-	public ValueSpaceType getType() {
-		return ValueSpaceType.PATTERN;
+		return datatype_;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return automaton.isEmpty() || !effectiveDatatype.isCompatibleWith(datatype);
+		return automaton_.isEmpty();
 	}
 
 	/**
@@ -76,28 +74,31 @@ public class PatternValueSpace implements ValueSpace {
 	 * Todo: synchronize this block is performance well be an issues
 	 */
 	@Override
-	public boolean contains(ValueSpace valueSpace) {
-		boolean typechek = valueSpace.getDatatype().isCompatibleWith(this.effectiveDatatype);
-		if (typechek != true) {
-			return false;
-		}
-		switch (valueSpace.getType()) {
-			case LITERAL_VALUE:
-				LiteralValue lvs = (LiteralValue) valueSpace;
-				return automaton.run(lvs.value);
-			case PATTERN:
-				PatternValueSpace pvs = (PatternValueSpace) valueSpace;
-				return BasicOperations.subsetOf(pvs.automaton.clone(), this.automaton.clone());
-			case LENGTH_RESTRICTED:
-				LengthRestrictedValueSpace lrvs = (LengthRestrictedValueSpace) valueSpace;
-				return BasicOperations.subsetOf(lrvs.asAutomaton().clone(), this.automaton.clone());
-			default:
-				return false;
-		}
+	public boolean contains(ValueSpace<?> valueSpace) {
+		
+		return valueSpace.getDatatype().isCompatibleWith(datatype_) && 
+				valueSpace.accept(new BaseValueSpaceContainmentVisitor() {
+
+			@Override
+			public Boolean visit(LengthRestrictedValueSpace lrvs) {
+				return BasicOperations.subsetOf(lrvs.asAutomaton().clone(), automaton_.clone());
+			}
+
+			@Override
+			public Boolean visit(PatternValueSpace pvs) {
+				return BasicOperations.subsetOf(pvs.automaton_.clone(), automaton_.clone());
+			}
+
+			@Override
+			public Boolean visit(LiteralValue lvs) {
+				return automaton_.run(lvs.getString());
+			}
+		});
+
 	}
 
 	@Override
-	public boolean isSubsumedBy(ValueSpace valueSpace) {
+	public boolean isSubsumedBy(ValueSpace<?> valueSpace) {
 		return valueSpace.contains(this);
 	}
 
@@ -108,9 +109,8 @@ public class PatternValueSpace implements ValueSpace {
 		}
 		if (other instanceof PatternValueSpace) {
 			PatternValueSpace otherEntry = (PatternValueSpace) other;
-			return this.datatype.equals(otherEntry.datatype)
-				&& this.effectiveDatatype.equals(otherEntry.effectiveDatatype)
-				&& this.automaton.equals(otherEntry.automaton);
+			return this.datatype_.equals(otherEntry.datatype_)
+				&& this.automaton_.equals(otherEntry.automaton_);
 		}
 		return false;
 	}
@@ -119,15 +119,14 @@ public class PatternValueSpace implements ValueSpace {
 	public int hashCode() {
 		return HashGenerator.combinedHashCode(
 			PatternValueSpace.class,
-			this.datatype,
-			this.effectiveDatatype,
-			this.automaton
+			this.datatype_,
+			this.automaton_
 			);
 	}
 
 	@Override
 	public String toString() {
-		return datatype.toString() + " pattern: \"" + automaton.getInfo() + "\"";
+		return datatype_.toString() + " pattern: \"" + automaton_.getInfo() + "\"";
 	}
 	
 	@Override

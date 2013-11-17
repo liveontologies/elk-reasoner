@@ -27,9 +27,28 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import org.semanticweb.elk.owl.datatypes.*;
+
+import org.semanticweb.elk.owl.datatypes.AnyUriDatatype;
+import org.semanticweb.elk.owl.datatypes.Base64BinaryDatatype;
+import org.semanticweb.elk.owl.datatypes.DateTimeDatatype;
+import org.semanticweb.elk.owl.datatypes.DateTimeStampDatatype;
+import org.semanticweb.elk.owl.datatypes.DecimalDatatype;
+import org.semanticweb.elk.owl.datatypes.HexBinaryDatatype;
+import org.semanticweb.elk.owl.datatypes.IntegerDatatype;
+import org.semanticweb.elk.owl.datatypes.LiteralDatatype;
+import org.semanticweb.elk.owl.datatypes.NameDatatype;
+import org.semanticweb.elk.owl.datatypes.NcNameDatatype;
+import org.semanticweb.elk.owl.datatypes.NmTokenDatatype;
+import org.semanticweb.elk.owl.datatypes.NonNegativeIntegerDatatype;
+import org.semanticweb.elk.owl.datatypes.NormalizedStringDatatype;
+import org.semanticweb.elk.owl.datatypes.PlainLiteralDatatype;
+import org.semanticweb.elk.owl.datatypes.RationalDatatype;
+import org.semanticweb.elk.owl.datatypes.RealDatatype;
+import org.semanticweb.elk.owl.datatypes.StringDatatype;
+import org.semanticweb.elk.owl.datatypes.TokenDatatype;
+import org.semanticweb.elk.owl.datatypes.UndefinedDatatype;
+import org.semanticweb.elk.owl.datatypes.XmlLiteralDatatype;
 import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
@@ -76,8 +95,8 @@ public class SimpleDatatypeIndex implements DatatypeIndex {
 			}
 		}
 
-		Set<IndexedDatatypeExpression> rdfsLiteralExpressions =
-			ElkDatatypeMap.get(PredefinedElkIri.RDFS_LITERAL.get()).accept(storage_);
+		Set<IndexedDatatypeExpression> rdfsLiteralExpressions = ElkDatatypeMap.RDFS_LITERAL
+				.accept(storage_);
 
 		if (!rdfsLiteralExpressions.isEmpty()) {
 			//using all expressions for rdfs:Literal datatype

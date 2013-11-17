@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
 import org.semanticweb.elk.util.collections.Subsumable;
 
 
@@ -33,26 +32,15 @@ import org.semanticweb.elk.util.collections.Subsumable;
  *
  * @author Pospishnyi Oleksandr
  */
-public interface ValueSpace extends Subsumable<ValueSpace> {
+public interface ValueSpace<D extends ElkDatatype> extends Subsumable<ValueSpace<?>> {
 
 	/**
-	 * Value space type
+	 * TODO Describe what this method returns exactly.
+	 * 
+	 * @return
 	 */
-	static enum ValueSpaceType {
-
-		EMPTY, ENTIRE, NUMERIC_INTERVAL, DATETIME_INTERVAL, NUMERIC_VALUE, DATETIME_VALUE, LITERAL_VALUE, BINARY_VALUE, LENGTH_RESTRICTED, PATTERN,
-	};
-
-	/**
-	 * @return Value space datatype
-	 */
-	public ElkDatatype getDatatype();
-
-	/**
-	 * @return Value space type
-	 */
-	public ValueSpaceType getType();
-
+	public D getDatatype();
+	
 	/**
 	 * @return is this value space is empty
 	 */
@@ -64,7 +52,8 @@ public interface ValueSpace extends Subsumable<ValueSpace> {
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
-	public boolean contains(ValueSpace valueSpace);
+	public boolean contains(ValueSpace<?> valueSpace);
 	
 	public <O> O accept(ValueSpaceVisitor<O> visitor);
+
 }

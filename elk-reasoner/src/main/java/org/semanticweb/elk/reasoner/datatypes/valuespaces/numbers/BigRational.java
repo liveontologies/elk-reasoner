@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.datatypes.numbers;
+package org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers;
 
 import java.math.BigInteger;
 

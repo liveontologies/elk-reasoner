@@ -21,6 +21,7 @@ package org.semanticweb.elk.reasoner.saturation.properties;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataProperty;
@@ -38,15 +39,22 @@ public class SaturatedDataProperty {
 
 	private final IndexedDataProperty root_;
 
-	final Set<IndexedDataProperty> derivedSuperProperties;
+	private Set<IndexedDataProperty> superProperties_;
 
 	SaturatedDataProperty(IndexedDataProperty root) {
-		this.root_ = root;
-		this.derivedSuperProperties = new ArrayHashSet<IndexedDataProperty>();
+		root_ = root;
 	}
 
 	public IndexedDataProperty getRoot() {
 		return root_;
+	}
+	
+	boolean addSuperProperty(final IndexedDataProperty idp) {
+		if (superProperties_ == null) {
+			superProperties_ = new ArrayHashSet<IndexedDataProperty>(4);
+		}
+		
+		return superProperties_.add(idp);
 	}
 
 	/**
@@ -54,7 +62,19 @@ public class SaturatedDataProperty {
 	 *         Computed in the {@link DataPropertyHierarchyComputationStage}.
 	 */
 	public Set<IndexedDataProperty> getSuperProperties() {
-		return derivedSuperProperties;
+		return superProperties_ == null ? Collections.singleton(root_) : superProperties_;
+	}
+	
+	public static SaturatedDataProperty getCreate(IndexedDataProperty idp) {
+		SaturatedDataProperty saturated = idp.getSaturated();
+		
+		if (saturated == null) {		
+			idp.setSaturated(new SaturatedDataProperty(idp));
+			
+			return idp.getSaturated();
+		}
+
+		return saturated;
 	}
 
 }

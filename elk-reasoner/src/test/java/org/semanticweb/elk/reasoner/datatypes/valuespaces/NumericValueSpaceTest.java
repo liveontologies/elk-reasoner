@@ -2,12 +2,36 @@
  * 
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.semanticweb.elk.reasoner.datatypes.util.NumberUtils;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers.NonNegativeIntegerInterval;
+import org.semanticweb.elk.util.collections.intervals.IntervalUtils;
 
 /**
  * Tests for subsumption, containment, and emptiness for numeric value spaces
@@ -35,7 +59,7 @@ public class NumericValueSpaceTest extends AbstractValueSpaceTest {
 				.isEmpty());
 		assertTrue(dataRange(
 				"DatatypeRestriction(owl:rational xsd:minExclusive \"1/2\"^^owl:rational xsd:maxExclusive \"1/3\"^^owl:rational)")
-				.isEmpty());
+				.isEmpty()); 
 		assertTrue(dataRange(
 				"DatatypeRestriction(owl:rational xsd:minExclusive \"1/2\"^^owl:rational xsd:maxExclusive \"2/4\"^^owl:rational)")
 				.isEmpty());
@@ -65,6 +89,18 @@ public class NumericValueSpaceTest extends AbstractValueSpaceTest {
 
 	@Test
 	public void contains() throws Exception {
+		assertTrue(contains(
+				"DatatypeRestriction(owl:real xsd:minExclusive \"0\"^^xsd:integer)",
+				"DataOneOf( \"10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\"^^xsd:integer )"));
+		assertTrue(contains(
+				"DatatypeRestriction(xsd:nonNegativeInteger xsd:maxExclusive \"5\"^^xsd:integer)",
+				"DataOneOf( \"0/1\"^^owl:rational )"));
+		assertTrue(contains(
+				"xsd:nonNegativeInteger",
+				"DatatypeRestriction(xsd:integer xsd:minExclusive \"0\"^^xsd:integer)"));
+		assertTrue(contains(
+				"owl:real",
+				"DatatypeRestriction(owl:real xsd:minInclusive \"0.0\"^^xsd:decimal xsd:maxExclusive \"1/1\"^^owl:rational)"));
 		// integer intervals
 		assertTrue(contains(
 				"DatatypeRestriction(xsd:integer xsd:minInclusive \"8\"^^xsd:integer xsd:maxInclusive \"12\"^^xsd:integer)",
@@ -111,6 +147,14 @@ public class NumericValueSpaceTest extends AbstractValueSpaceTest {
 		assertFalse(contains(
 				"DatatypeRestriction(xsd:decimal xsd:minInclusive \"8.0\"^^xsd:decimal xsd:maxInclusive \"9.0\"^^xsd:decimal)",
 				"DatatypeRestriction(owl:rational xsd:minInclusive \"8/1\"^^owl:rational xsd:maxInclusive \"9/1\"^^owl:rational)"));
+	}
+	
+	@Test
+	public void equalIntervals() {
+		assertTrue(IntervalUtils.equal(
+				new NonNegativeIntegerInterval(0, true, NumberUtils.POSITIVE_INFINITY, false),
+				new NonNegativeIntegerInterval(0, true, NumberUtils.POSITIVE_INFINITY, false),
+				NumberUtils.COMPARATOR));
 	}
 
 	/*

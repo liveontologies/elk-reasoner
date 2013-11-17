@@ -2,6 +2,27 @@
  * 
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
 import java.io.StringReader;
 
@@ -18,7 +39,7 @@ import org.semanticweb.elk.reasoner.datatypes.handlers.ElkDatatypeHandler;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingException;
 
 /**
- * Abstract super class for low-level testing of {@link ValueSpace}s 
+ * Abstract super class for low-level testing of {@link ValueSpace}s.
  * 
  * @author Pavel Klinov
  *
@@ -31,6 +52,8 @@ public abstract class AbstractValueSpaceTest {
 
 	@Before
 	public void setUpPrefixes() {
+		prefixes_.addPrefix(new ElkPrefix("rdf:", new ElkFullIri(
+				"http://www.w3.org/1999/02/22-rdf-syntax-ns#")));
 		prefixes_.addPrefix(new ElkPrefix("xsd:", new ElkFullIri(
 				"http://www.w3.org/2001/XMLSchema#")));
 		prefixes_.addPrefix(new ElkPrefix("owl:", new ElkFullIri(
@@ -39,10 +62,7 @@ public abstract class AbstractValueSpaceTest {
 	
 	protected boolean contains(String range1, String range2)
 			throws ParseException {
-		ValueSpace dataRange1 = dataRange(range1);
-		ValueSpace dataRange2 = dataRange(range2);
-
-		return dataRange1.contains(dataRange2);
+		return dataRange(range1).contains(dataRange(range2));
 	}
 	
 	/*
@@ -59,12 +79,12 @@ public abstract class AbstractValueSpaceTest {
 	/*
 	 * parses the data range
 	 */
-	protected ValueSpace dataRange(String string) throws ParseException {
+	protected ValueSpace<?> dataRange(String string) throws ParseException {
 		AbstractOwl2FunctionalStyleParser parser = getJavaCCParser(new StringReader(
 				string));
 		ElkDataRange dataRange = parser.dataRange();
 
-		return dataRange.accept(ElkDatatypeHandler.getInstance());
+		return ElkDatatypeHandler.getInstance().createValueSpace(dataRange);
 	}	
 	
 	protected boolean tryDataRange(String string) throws ParseException {

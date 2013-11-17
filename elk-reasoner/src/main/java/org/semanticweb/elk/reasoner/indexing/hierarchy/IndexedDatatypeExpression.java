@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicatio
 
 /**
  * TODO: documentation
- *
+ * 
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
  */
@@ -37,10 +37,10 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 
 	protected final IndexedDataProperty property;
 
-	protected final ValueSpace valueSpace;
+	protected final ValueSpace<?> valueSpace;
 
 	public IndexedDatatypeExpression(IndexedDataProperty property,
-			ValueSpace valueSpace) {
+			ValueSpace<?> valueSpace) {
 		this.property = property;
 		this.valueSpace = valueSpace;
 	}
@@ -49,7 +49,7 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 		return this.property;
 	}
 
-	public ValueSpace getValueSpace() {
+	public ValueSpace<?> getValueSpace() {
 		return this.valueSpace;
 	}
 
@@ -64,12 +64,14 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 	}
 
 	@Override
-	public void accept(DecompositionRuleApplicationVisitor visitor, Context context) {
+	public void accept(DecompositionRuleApplicationVisitor visitor,
+			Context context) {
 		visitor.visit(this, context);
 	}
 
 	@Override
-	void updateOccurrenceNumbers(ModifiableOntologyIndex index, int increment, int positiveIncrement, int negativeIncrement) {
+	void updateOccurrenceNumbers(ModifiableOntologyIndex index, int increment,
+			int positiveIncrement, int negativeIncrement) {
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
 			index.add(property, this);
@@ -86,26 +88,9 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 		}
 	}
 
-
 	@Override
 	public String toStringStructural() {
-		// TODO: complete all cases
-		switch (valueSpace.getType()) {
-			case BINARY_VALUE:
-			case DATETIME_VALUE:
-			case LITERAL_VALUE:
-			case NUMERIC_VALUE:
-				return "DataHasValue(" + valueSpace.toString() + ")";
-			case DATETIME_INTERVAL:
-			case LENGTH_RESTRICTED:
-			case NUMERIC_INTERVAL:
-			case PATTERN:
-			case ENTIRE:
-			case EMPTY:
-				return "DataSomeValuesFrom(" + valueSpace.toString() + ")";
-			default:
-				return null;
-		}
+		return "DataSomeValuesFrom( " + property.toString()  + " " +  valueSpace.toString() + " )";
 	}
-	
+
 }

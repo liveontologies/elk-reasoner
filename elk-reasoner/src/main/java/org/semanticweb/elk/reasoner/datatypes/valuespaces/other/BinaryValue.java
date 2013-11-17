@@ -20,68 +20,66 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.datatypes.valuespaces.values;
+package org.semanticweb.elk.reasoner.datatypes.valuespaces.other;
 
 import java.util.Arrays;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
+
+import org.semanticweb.elk.owl.datatypes.LiteralDatatype;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.BaseValueSpaceContainmentVisitor;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.PointValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpaceVisitor;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
- * Value space that represent single binary value.
- *
+ * Value space that represent single binary value (hex or base64).
+ * 
  * @author Pospishnyi Olexandr
  */
-public class BinaryValue implements ValueSpace {
+public class BinaryValue implements PointValue<LiteralDatatype> {
 
-	public ElkDatatype datatype;
+	public LiteralDatatype datatype;
 	public byte[] value;
 
-	public BinaryValue(byte[] value, ElkDatatype datatype) {
+	public BinaryValue(byte[] value, LiteralDatatype datatype) {
 		this.datatype = datatype;
 		this.value = value;
 	}
 
 	@Override
-	public ElkDatatype getDatatype() {
+	public LiteralDatatype getDatatype() {
 		return datatype;
 	}
 
 	@Override
-	public ValueSpaceType getType() {
-		return ValueSpaceType.BINARY_VALUE;
-	}
-
-	@Override
 	public boolean isEmpty() {
-		return value != null;
+		return false;
 	}
 
 	/**
-	 * BinaryValue could contain only another BinaryValue
-	 * if both value spaces have equal values
-	 *
+	 * BinaryValue could contain only another BinaryValue if both value spaces
+	 * have equal values.
+	 * 
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
 	@Override
-	public boolean contains(ValueSpace valueSpace) {
-		boolean typechek = valueSpace.getDatatype().isCompatibleWith(this.datatype);
-		if (typechek != true) {
-			return false;
-		}
-		switch (valueSpace.getType()) {
-			case BINARY_VALUE:
-				BinaryValue bvs = (BinaryValue) valueSpace;
-				return Arrays.equals(this.value, bvs.value);
-			default:
-				return false;
-		}
+	public boolean contains(ValueSpace<?> valueSpace) {
+
+		return valueSpace.accept(new BaseValueSpaceContainmentVisitor() {
+
+			@Override
+			public Boolean visit(BinaryValue other) {
+				return other.getDatatype().isCompatibleWith(datatype)
+						&& Arrays.equals(value, other.value);
+			}
+
+		});
+
 	}
 
 	@Override
-	public boolean isSubsumedBy(ValueSpace valueSpace) {
+	public boolean isSubsumedBy(ValueSpace<?> valueSpace) {
 		return valueSpace.contains(this);
 	}
 
@@ -93,7 +91,7 @@ public class BinaryValue implements ValueSpace {
 		if (other instanceof BinaryValue) {
 			BinaryValue otherEntry = (BinaryValue) other;
 			return this.datatype.equals(otherEntry.datatype)
-				&& Arrays.equals(this.value, otherEntry.value);
+					&& Arrays.equals(this.value, otherEntry.value);
 
 		}
 		return false;
@@ -101,10 +99,7 @@ public class BinaryValue implements ValueSpace {
 
 	@Override
 	public int hashCode() {
-		return HashGenerator.combinedHashCode(
-			BinaryValue.class,
-			this.value
-			);
+		return HashGenerator.combinedHashCode(BinaryValue.class, this.value);
 	}
 
 	@Override

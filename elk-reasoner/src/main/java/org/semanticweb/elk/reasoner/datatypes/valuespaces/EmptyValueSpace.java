@@ -24,27 +24,19 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
-import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
-
 
 /**
- * Representation of empty value space
- *
+ * Representation of the empty value space. This class always has a single
+ * instance. The reason it was kept as a class is because it's sometimes handy
+ * to check for the empty value space using visitors.
+ * 
  * @author Pospishnyi Olexandr
  */
-public class EmptyValueSpace implements ValueSpace {
-
-	public static final EmptyValueSpace INSTANCE = new EmptyValueSpace();
+public class EmptyValueSpace implements ValueSpace<ElkDatatype> {
 
 	@Override
 	public ElkDatatype getDatatype() {
-		return ElkDatatypeMap.get(PredefinedElkIri.RDFS_LITERAL.get());
-	}
-
-	@Override
-	public ValueSpaceType getType() {
-		return ValueSpaceType.EMPTY;
+		return ElkDatatypeMap.RDFS_LITERAL;
 	}
 
 	@Override
@@ -53,12 +45,12 @@ public class EmptyValueSpace implements ValueSpace {
 	}
 
 	@Override
-	public boolean contains(ValueSpace valueSpace) {
+	public boolean contains(ValueSpace<?> valueSpace) {
 		return false;
 	}
 
 	@Override
-	public boolean isSubsumedBy(ValueSpace valueSpace) {
+	public boolean isSubsumedBy(ValueSpace<?> valueSpace) {
 		return valueSpace.contains(this);
 	}
 
@@ -74,9 +66,11 @@ public class EmptyValueSpace implements ValueSpace {
 	public String toString() {
 		return "Ø";
 	}
-	
+
 	@Override
 	public <O> O accept(ValueSpaceVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
+
+	public static final EmptyValueSpace INSTANCE = new EmptyValueSpace();
 }

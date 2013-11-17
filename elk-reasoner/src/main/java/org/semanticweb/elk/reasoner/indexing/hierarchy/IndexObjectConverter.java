@@ -72,7 +72,7 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 	 * the converter for {@link IndexedObject}s of the complementary polarity
 	 */
 	private final IndexObjectConverter complementaryConverter_;
-	
+
 	protected ElkDatatypeHandler datatypeHandler;
 
 	/**
@@ -216,8 +216,11 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 	public IndexedClassExpression visit(ElkDataHasValue elkDataHasValue) {
 		IndexedDataProperty idp = (IndexedDataProperty) elkDataHasValue
 				.getProperty().accept(this);
-		ValueSpace vs = elkDataHasValue.getFiller().accept(datatypeHandler);
-		return indexedClassFilter_.visit(new IndexedDatatypeExpression(idp, vs));
+		ValueSpace<?> vs = datatypeHandler.createValueSpace(elkDataHasValue
+				.getFiller());
+
+		return indexedClassFilter_
+				.visit(new IndexedDatatypeExpression(idp, vs));
 	}
 
 	@Override
@@ -226,13 +229,17 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 		List<? extends ElkDataPropertyExpression> exps = elkDataSomeValuesFrom
 				.getDataPropertyExpressions();
 		if (exps != null && exps.size() == 1) {
-			IndexedDataProperty idp = (IndexedDataProperty) exps.get(0).accept(this);
-			ValueSpace vs = elkDataSomeValuesFrom.getDataRange().accept(datatypeHandler);
-			return indexedClassFilter_.visit(new IndexedDatatypeExpression(idp, vs));
+			IndexedDataProperty idp = (IndexedDataProperty) exps.get(0).accept(
+					this);
+			ValueSpace<?> vs = datatypeHandler
+					.createValueSpace(elkDataSomeValuesFrom.getDataRange());
+
+			return indexedClassFilter_.visit(new IndexedDatatypeExpression(idp,
+					vs));
 		} else {
 			throw new ElkIndexingException(
 					ElkDataSomeValuesFrom.class.getSimpleName()
-							+ "with multiple properties not supported");
+							+ ": ELK does not support n-ary data ranges at the moment.");
 		}
 	}
 
@@ -244,16 +251,17 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 
 	@Override
 	public IndexedDataProperty visit(ElkDataProperty elkDataProperty) {
-		return indexedPropertyFilter_.visit(new IndexedDataProperty(elkDataProperty));
+		return indexedPropertyFilter_.visit(new IndexedDataProperty(
+				elkDataProperty));
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor
 	 * #visit(org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain)
-	 *
+	 * 
 	 * Binarization of role chains. Order must be preserved.
 	 */
 	@Override

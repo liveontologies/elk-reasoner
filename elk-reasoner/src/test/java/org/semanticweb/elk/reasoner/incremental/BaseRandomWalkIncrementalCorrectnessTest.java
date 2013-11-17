@@ -115,7 +115,6 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 		incrementalReasoner.setAllowIncrementalMode(true);
 
 		try {
-//			incrementalReasoner.loadAxioms();
 			// let the runner run..
 			getRandomWalkRunner(MAX_ROUNDS, ITERATIONS).run(
 					incrementalReasoner, changingAxioms, staticAxioms, seed);

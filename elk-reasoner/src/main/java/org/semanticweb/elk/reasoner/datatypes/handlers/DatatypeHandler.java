@@ -22,14 +22,22 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
-import org.semanticweb.elk.owl.visitors.ElkDataValueSpaceVisitor;
+import org.semanticweb.elk.owl.interfaces.ElkDataRange;
+import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 
 /**
- * Datatype handler interface
- *
+ * Datatype handler interface. The main mission for classes implementing this
+ * interface is to convert single literals and data ranges into the ELKs
+ * internal representation of value space.
+ * 
  * @author Pospishnyi Oleksandr
  * @author "Yevgeny Kazakov"
+ * @author Pavel Klinov
  */
-public interface DatatypeHandler extends ElkDataValueSpaceVisitor<ValueSpace> {
+public interface DatatypeHandler {
+
+	public ValueSpace<?> createValueSpace(ElkLiteral literal);
+
+	public ValueSpace<?> createValueSpace(ElkDataRange dataRange);
 }

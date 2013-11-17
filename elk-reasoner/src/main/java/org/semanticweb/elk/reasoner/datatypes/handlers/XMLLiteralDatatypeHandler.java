@@ -23,11 +23,11 @@
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingUnsupportedException;
 
 /**
  * rdfs:XMLLiteral datatype handler.
@@ -44,17 +44,18 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingUnsupportedExc
 public class XMLLiteralDatatypeHandler extends AbstractDatatypeHandler {
 
 	@Override
-	public ValueSpace visit(ElkDatatype elkDatatype) {
-		return new EntireValueSpace(elkDatatype);
+	protected ElkDatatypeVisitor<ValueSpace<?>> getLiteralConverter(
+			ElkLiteral literal) {
+		return new BaseElkDatatypeVisitor<ValueSpace<?>>(){};
 	}
 
 	@Override
-	public ValueSpace visit(ElkLiteral elkLiteral) {
-		throw new ElkIndexingUnsupportedException(elkLiteral);
-	}
-
-	@Override
-	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
-		throw new ElkIndexingUnsupportedException(elkDatatypeRestriction);
+	protected ElkDataRangeVisitor<ValueSpace<?>> getDataRangeConverter() {
+		return new BaseElkDataRangeVisitor<ValueSpace<?>>() {
+			@Override
+			public ValueSpace<?> visit(ElkDatatype elkDatatype) {
+				return EntireValueSpace.XML_LITERAL;
+			}
+		};
 	}
 }

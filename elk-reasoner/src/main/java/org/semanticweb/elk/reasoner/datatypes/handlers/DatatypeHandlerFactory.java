@@ -49,7 +49,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingUnsupportedExc
  * @author Pospishnyi Olexandr
  */
 public class DatatypeHandlerFactory implements ElkDatatypeVisitor<DatatypeHandler> {
-
+	//TODO shouldn't these be atomic references?
 	private AnyURIDatatypeHandler anyURIHandler;
 	private BinaryDatatypeHandler binaryHandler;
 	private DateTimeDatatypeHandler dateTimeHandler;

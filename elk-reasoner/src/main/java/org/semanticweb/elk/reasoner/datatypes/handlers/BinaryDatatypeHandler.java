@@ -22,26 +22,25 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
-import java.util.List;
-
-import javax.xml.bind.DatatypeConverter;
 import org.semanticweb.elk.owl.datatypes.Base64BinaryDatatype;
 import org.semanticweb.elk.owl.datatypes.HexBinaryDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
+import org.semanticweb.elk.reasoner.datatypes.util.LiteralParser;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.LengthRestrictedValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.other.BinaryValue;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.other.LengthRestrictedValueSpace;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkUnexpectedIndexingException;
 
 /**
- * xsd:hexBinary and xsd:base64Binary datatype handler
+ * xsd:hexBinary and xsd:base64Binary datatype handler.
  * <p>
  * uses {@link BinaryValue} and {@link LengthRestrictedValueSpace} to represent
  * datatype restrictions. Please note that value space of xsd:hexBinary and
@@ -49,79 +48,96 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.BinaryValue;
  *
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
+ * @author Pavel Klinov
  */
 public class BinaryDatatypeHandler extends AbstractDatatypeHandler {
 
-	static final Logger LOGGER_ = LoggerFactory.getLogger(BinaryDatatypeHandler.class);
-	private final BinaryParser parser_ = new BinaryParser();
-
 	@Override
-	public ValueSpace visit(ElkLiteral elkLiteral) {
-		ElkDatatype datatype = elkLiteral.getDatatype();
-		byte[] value = datatype.accept(parser_, elkLiteral.getLexicalForm());
-		if (value != null) {
-			return new BinaryValue(value, datatype);
-		} else {
-			return null;
-		}
-	}
+	protected ElkDatatypeVisitor<ValueSpace<?>> getLiteralConverter(
+			final ElkLiteral literal) {
+		return new BaseElkDatatypeVisitor<ValueSpace<?>>(){
 
-	@Override
-	public ValueSpace visit(ElkDatatype elkDatatype) {
-		return new EntireValueSpace(elkDatatype);
-	}
-
-	@Override
-	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
-		Integer minLength = 0;
-		Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
-		ElkDatatype datatype = elkDatatypeRestriction.getDatatype();
-
-		List<? extends ElkFacetRestriction> facetRestrictions = elkDatatypeRestriction
-			.getFacetRestrictions();
-		outerloop:
-		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
-			Facet facet = Facet.getByIri(facetRestriction
-				.getConstrainingFacet().getFullIriAsString());
-			String value = facetRestriction.getRestrictionValue()
-				.getLexicalForm();
-
-			switch (facet) {
-				case LENGTH:
-					minLength = Integer.valueOf(value);
-					maxLength = minLength;
-					break outerloop;
-				case MIN_LENGTH:
-					minLength = Integer.valueOf(value);
-					break;
-				case MAX_LENGTH:
-					maxLength = Integer.valueOf(value);
-					break;
-				default:
-					LOGGER_.warn("Unsupported facet: " + facet.iri);
-					return null;
+			@Override
+			public ValueSpace<?> visit(Base64BinaryDatatype datatype) {
+				return new BinaryValue(LiteralParser.parseBase64(literal.getLexicalForm()), datatype);
 			}
 
-		}
-		LengthRestrictedValueSpace vs = new LengthRestrictedValueSpace(
-			datatype, minLength, maxLength);
-		if (vs.isEmpty()) {
-			return EmptyValueSpace.INSTANCE;
-		} else {
-			return vs;
-		}
+			@Override
+			public ValueSpace<?> visit(HexBinaryDatatype datatype) {
+				return new BinaryValue(LiteralParser.parseHexBinary(literal.getLexicalForm()), datatype);
+			}
+			
+		};
 	}
 
-	private class BinaryParser extends DatatypeValueParser<byte[], String> {
+	@Override
+	protected ElkDataRangeVisitor<ValueSpace<?>> getDataRangeConverter() {
+		return new BaseElkDataRangeVisitor<ValueSpace<?>>() {
 
-		@Override
-		public byte[] parse(Base64BinaryDatatype datatype, String param) {
-			return DatatypeConverter.parseBase64Binary(param);
-		}
+			@Override
+			public ValueSpace<?> visit(ElkDatatype elkDatatype) {
+				return elkDatatype.accept(new BaseElkDatatypeVisitor<EntireValueSpace<?>>() {
 
-		@Override
-		public byte[] parse(HexBinaryDatatype datatype, String param) {
-			return DatatypeConverter.parseHexBinary(param);
-		}
+					@Override
+					public EntireValueSpace<?> visit(
+							Base64BinaryDatatype datatype) {
+						return EntireValueSpace.XSD_BASE_64;
+					}
+
+					@Override
+					public EntireValueSpace<?> visit(
+							HexBinaryDatatype datatype) {
+						return EntireValueSpace.XSD_HEX_BINARY;
+					}
+					
+				});
+			}
+
+			@Override
+			public ValueSpace<?> visit(
+					ElkDatatypeRestriction elkDatatypeRestriction) {
+				
+				LengthRestrictedValueSpace vs = createValueSpace(elkDatatypeRestriction);
+				
+				if (vs.isEmpty()) {
+					return EmptyValueSpace.INSTANCE;
+				} else {
+					return vs;
+				}
+				
+			}
+			
+			private LengthRestrictedValueSpace createValueSpace(ElkDatatypeRestriction elkDatatypeRestriction) {
+				Integer minLength = 0;
+				Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
+				ElkDatatype datatype = elkDatatypeRestriction.getDatatype();
+			
+				for (ElkFacetRestriction facetRestriction : elkDatatypeRestriction
+						.getFacetRestrictions()) {
+					PredefinedElkIri facet = PredefinedElkIri.lookup(facetRestriction.getConstrainingFacet()); 
+					String value = facetRestriction.getRestrictionValue()
+						.getLexicalForm();
+
+					switch (facet) {
+						case XSD_LENGTH:
+							minLength = Integer.valueOf(value);
+							maxLength = minLength;
+							return new LengthRestrictedValueSpace(datatype, minLength, maxLength);
+						case XSD_MIN_LENGTH:
+							minLength = Integer.valueOf(value);
+							break;
+						case XSD_MAX_LENGTH:
+							maxLength = Integer.valueOf(value);
+							break;
+						default:
+							throw new ElkUnexpectedIndexingException("Unsupported facet: " + facet.get());
+					}
+				}
+				
+				return new LengthRestrictedValueSpace(	datatype, minLength, maxLength);
+			}
+			
+		};
 	}
+
 }

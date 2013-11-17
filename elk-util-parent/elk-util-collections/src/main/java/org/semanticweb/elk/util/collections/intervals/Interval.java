@@ -1,4 +1,5 @@
 package org.semanticweb.elk.util.collections.intervals;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,16 +23,20 @@ package org.semanticweb.elk.util.collections.intervals;
  */
 
 /**
- * Interval interface. Represents a continuous value space with lower and upper
- * bounds.
- *
+ * Interval interface. Represents a value space with lower and upper bounds.
+ * 
  * @author Pospishnyi Oleksandr
+ * @author Pavel Klinov
  */
-public interface Interval<T extends Comparable<T>> extends Comparable<Interval<T>> {
+public interface Interval<T> extends Comparable<Interval<T>> {
 
 	public T getLow();
+	
+	public boolean isLowerInclusive();
 
 	public T getHigh();
+	
+	public boolean isUpperInclusive();
 
 	public boolean contains(Interval<T> interval);
 }

@@ -23,22 +23,22 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.datatypes.index.DatatypeIndex;
 import org.semanticweb.elk.reasoner.datatypes.index.SimpleDatatypeIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An object representing incremental changes in the index. The changes are
@@ -119,7 +119,7 @@ public class DifferentialIndex extends DirectIndex {
 		this.addedContextInitRules_ = null;
 		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				32);
-		this.addedDatatypeExprsByProperty_ = new HashMap<IndexedDataProperty, DatatypeIndex>();
+		this.addedDatatypeExprsByProperty_ = new ArrayHashMap<IndexedDataProperty, DatatypeIndex>();
 	}
 
 	public void initDeletions() {
@@ -127,7 +127,7 @@ public class DifferentialIndex extends DirectIndex {
 		this.todoDeletions_ = new IndexedObjectCache();
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
 				32);
-		this.removedDatatypeExprsByProperty_ = new HashMap<IndexedDataProperty, DatatypeIndex>();
+		this.removedDatatypeExprsByProperty_ = new ArrayHashMap<IndexedDataProperty, DatatypeIndex>();
 	}
 
 	/* read-only methods */
@@ -388,9 +388,10 @@ public class DifferentialIndex extends DirectIndex {
 		for (IndexedClassExpression target : addedContextRuleHeadByClassExpressions_
 				.keySet()) {
 			LOGGER_.trace("Committing context rule additions for {}", target);
-			
+
 			nextRule = addedContextRuleHeadByClassExpressions_.get(target);
 			chain = target.getCompositionRuleChain();
+			
 			while (nextRule != null) {
 				nextRule.addTo(chain);
 				nextRule = nextRule.next();
@@ -398,9 +399,8 @@ public class DifferentialIndex extends DirectIndex {
 		}
 		for (IndexedDataProperty target : addedDatatypeExprsByProperty_
 				.keySet()) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Committing context rule additions for " + target);
-			}
+			LOGGER_.trace("Committing context rule additions for {}", target);
+
 			target.addDatatypeExpressions(addedDatatypeExprsByProperty_
 					.get(target));
 		}
@@ -535,7 +535,7 @@ public class DifferentialIndex extends DirectIndex {
 
 	void addIndexedObject(IndexedObject iobj) {
 		LOGGER_.trace("Adding: {}", iobj);
-		
+
 		if (!iobj.accept(todoDeletions_.deletor))
 			iobj.accept(objectCache.inserter);
 

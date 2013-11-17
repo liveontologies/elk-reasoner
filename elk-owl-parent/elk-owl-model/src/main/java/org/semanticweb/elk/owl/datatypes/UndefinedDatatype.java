@@ -21,11 +21,10 @@ package org.semanticweb.elk.owl.datatypes;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 
 /**
  *
  * @author Pospishnyi Olexandr
  */
-public interface UndefinedDatatype extends ElkDatatype {
+public interface UndefinedDatatype extends LiteralDatatype {
 }

@@ -68,7 +68,8 @@ public class DataPropertyHierarchyComputationFactory implements
 
 			// compute all transitively closed super-properties
 			Queue<IndexedDataProperty> todo = new ArrayDeque<IndexedDataProperty>();
-			saturated.derivedSuperProperties.add(idp);
+			
+			saturated.addSuperProperty(idp);//.derivedSuperProperties_.add(idp);
 			todo.add(idp);
 			
 			for (;;) {
@@ -83,7 +84,7 @@ public class DataPropertyHierarchyComputationFactory implements
 					break;
 				
 				for (IndexedDataProperty sup : toldSuperProperties) {
-					if (saturated.derivedSuperProperties.add(sup)) {
+					if (saturated.addSuperProperty(sup)) {//.derivedSuperProperties_.add(sup)) {
 						todo.add(sup);
 					}
 				}

@@ -24,233 +24,277 @@ package org.semanticweb.elk.reasoner.datatypes.handlers;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.List;
+import java.util.Comparator;
 
-import javax.xml.bind.DatatypeConverter;
 import org.semanticweb.elk.owl.datatypes.DecimalDatatype;
 import org.semanticweb.elk.owl.datatypes.IntegerDatatype;
 import org.semanticweb.elk.owl.datatypes.NonNegativeIntegerDatatype;
 import org.semanticweb.elk.owl.datatypes.RationalDatatype;
+import org.semanticweb.elk.owl.datatypes.RealDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
-import org.semanticweb.elk.reasoner.datatypes.numbers.BigRational;
-import org.semanticweb.elk.reasoner.datatypes.numbers.NegativeInfinity;
-import org.semanticweb.elk.reasoner.datatypes.numbers.NumberComparator;
-import org.semanticweb.elk.reasoner.datatypes.numbers.PositiveInfinity;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
+import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
+import org.semanticweb.elk.reasoner.datatypes.util.LiteralParser;
+import org.semanticweb.elk.reasoner.datatypes.util.NumberUtils;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.PointValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.restricted.NumericIntervalValueSpace;
-import org.semanticweb.elk.reasoner.datatypes.valuespaces.values.NumericValue;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers.ArbitraryIntegerInterval;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers.BigRational;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers.DecimalInterval;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers.DecimalValue;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers.IntegerValue;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers.NonNegativeIntegerInterval;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers.NonNegativeIntegerValue;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers.RationalInterval;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers.RationalValue;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers.RealInterval;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingException;
 
 /**
  * owl:real, owl:rational, xsd:decimal, xsd:integer and xsd:nonNegativeInteger
  * datatype handler
  * <p>
  * Datatype expressions are converted to interval presentation with lower and
- * upper bounds or single numeric value.
+ * upper bounds or a single numeric value.
  * <p>
- * Uses {@link NumericIntervalValueSpace} and {@link NumericValue} to represent
- * datatype restrictions
  *
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
+ * @author Pavel Klinov
  */
 public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 
-	private static final Logger LOGGER_ = LoggerFactory
-		.getLogger(NumericDatatypeHandler.class);
-	private final NumericValueParser parser_ = new NumericValueParser();
+	private final static Comparator<Number> comparator_ = NumberUtils.COMPARATOR;
+
+	private static PointValue<? extends RealDatatype> numberToPointValue(Number number, ElkDatatype datatype) {
 	
-	private static final BigInteger BI_MAX_INTEGER = BigInteger
-		.valueOf(Integer.MAX_VALUE);
-	private static final BigInteger BI_MIN_INTEGER = BigInteger
-		.valueOf(Integer.MIN_VALUE);
-	private static final BigInteger BI_MAX_LONG = BigInteger
-		.valueOf(Long.MAX_VALUE);
-	private static final BigInteger BI_MIN_LONG = BigInteger
-		.valueOf(Long.MIN_VALUE);
-	private final NumberComparator comparator_ = NumberComparator.INSTANCE;
-
-	@Override
-	public ValueSpace visit(ElkLiteral elkLiteral) {
-		String lexicalForm = elkLiteral.getLexicalForm();
-		ElkDatatype datatype = elkLiteral.getDatatype();
-		return new NumericValue(datatype, datatype.accept(parser_, lexicalForm));
-	}
-
-	@Override
-	public ValueSpace visit(ElkDatatype elkDatatype) {
-		return new EntireValueSpace(elkDatatype);
-	}
-
-	@Override
-	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
-		Number lowerBound, upperBound;
-		boolean lowerInclusive, upperInclusive;
-
-		ElkDatatype datatype = elkDatatypeRestriction.getDatatype();
-
-		if (datatype == ElkDatatypeMap.get(PredefinedElkIri.XSD_NON_NEGATIVE_INTEGER.get())) {
-			// [0 ... +Inf]
-			lowerBound = Integer.valueOf(0);
-			upperBound = PositiveInfinity.INSTANCE;
-			lowerInclusive = true;
-			upperInclusive = true;
-		} else {
-			// [-Inf ... +Inf]
-			lowerBound = NegativeInfinity.INSTANCE;
-			upperBound = PositiveInfinity.INSTANCE;
-			lowerInclusive = true;
-			upperInclusive = true;
+		switch(NumberUtils.getRuntimeType(number)) {
+		case Decimal:
+			return new DecimalValue((BigDecimal)number);
+		case Int:
+			return comparator_.compare(number, 0) >= 0 ? new NonNegativeIntegerValue(number.intValue()) : new IntegerValue(number.intValue());
+		case Integer:
+			return comparator_.compare(number, 0) >= 0 ? new NonNegativeIntegerValue((BigInteger)number) : new IntegerValue((BigInteger)number);
+		case Long:
+			return comparator_.compare(number, 0) >= 0 ? new NonNegativeIntegerValue(number.longValue()) : new IntegerValue(number.longValue());
+		case Rational:
+			return new RationalValue((BigRational)number);
+		default:
+			throw new IllegalArgumentException("Unrecognized number type " + number);
 		}
+	}
+	
+	//TODO avoid creating this visitor every time, cache it and pass the literal as a parameter into it
+	@Override
+	protected ElkDatatypeVisitor<ValueSpace<?>> getLiteralConverter(final ElkLiteral literal) {
+		return new BaseElkDatatypeVisitor<ValueSpace<?>>() {
 
-		// process all facet restrictions
-		List<? extends ElkFacetRestriction> facetRestrictions = elkDatatypeRestriction
-			.getFacetRestrictions();
-		for (ElkFacetRestriction facetRestriction : facetRestrictions) {
-			Facet facet = Facet.getByIri(facetRestriction
-				.getConstrainingFacet().getFullIriAsString());
-			ElkDatatype restrictionDatatype = facetRestriction.getRestrictionValue().getDatatype();
-			Number restrictionValue = restrictionDatatype.accept(parser_, facetRestriction
-				.getRestrictionValue().getLexicalForm());
-
-			switch (facet) {
-				case MIN_INCLUSIVE: // >=
-					if (comparator_.compare(restrictionValue, lowerBound) >= 0) {
-						lowerBound = restrictionValue;
-						lowerInclusive = true;
-					}
-					break;
-				case MIN_EXCLUSIVE: // >
-					if (comparator_.compare(restrictionValue, lowerBound) >= 0) {
-						lowerBound = restrictionValue;
-						lowerInclusive = false;
-					}
-					break;
-				case MAX_INCLUSIVE: // <=
-					if (comparator_.compare(restrictionValue, upperBound) <= 0) {
-						upperBound = restrictionValue;
-						upperInclusive = true;
-					}
-					break;
-				case MAX_EXCLUSIVE: // <
-					if (comparator_.compare(restrictionValue, upperBound) <= 0) {
-						upperBound = restrictionValue;
-						upperInclusive = false;
-					}
-					break;
-			default:
-				break;
+			@Override
+			public ValueSpace<? extends RealDatatype> visit(
+					RationalDatatype datatype) {
+				Number num = LiteralParser.parseRational(literal.getLexicalForm());
+				
+				return numberToPointValue(num, datatype);
 			}
+
+			@Override
+			public ValueSpace<? extends RealDatatype> visit(
+					DecimalDatatype datatype) {
+				Number num = LiteralParser.parseDecimal(literal.getLexicalForm());
+				
+				return numberToPointValue(num, datatype);
+			}
+
+			@Override
+			public ValueSpace<? extends RealDatatype> visit(
+					IntegerDatatype datatype) {
+				Number num = LiteralParser.parseInteger(literal.getLexicalForm());
+				
+				return numberToPointValue(num, datatype);
+			}
+
+			@Override
+			public ValueSpace<? extends RealDatatype> visit(
+					NonNegativeIntegerDatatype datatype) {
+				Number num = LiteralParser.parseInteger(literal.getLexicalForm());
+				
+				return numberToPointValue(num, datatype);			}
+			
+		};
+	}
+
+	@Override
+	protected ElkDataRangeVisitor<ValueSpace<?>> getDataRangeConverter() {
+		return dataRangeConverter_;
+	}
+
+	/**
+	 * a stateless visitor for converting data ranges into numerical value spaces.
+	 */
+	private final ElkDataRangeVisitor<ValueSpace<?>> dataRangeConverter_ = new BaseElkDataRangeVisitor<ValueSpace<?>>() {
+		/**
+		 * a stateless visitor for creating entire value spaces for numerical datatypes.
+		 */
+		private final ElkDatatypeVisitor<EntireValueSpace<?>> entireValueSpaceCreator_ = new BaseElkDatatypeVisitor<EntireValueSpace<?>>() {
+
+			@Override
+			public EntireValueSpace<?> visit(
+					RealDatatype datatype) {
+				return EntireValueSpace.OWL_REAL;
+			}
+
+			@Override
+			public EntireValueSpace<?> visit(
+					RationalDatatype datatype) {
+				return EntireValueSpace.OWL_RATIONAL;
+			}
+
+			@Override
+			public EntireValueSpace<?> visit(
+					DecimalDatatype datatype) {
+				return EntireValueSpace.XSD_DECIMAL;
+			}
+
+			@Override
+			public EntireValueSpace<?> visit(
+					IntegerDatatype datatype) {
+				return EntireValueSpace.XSD_INTEGER;
+			}
+			
+			@Override
+			public EntireValueSpace<?> visit(
+					NonNegativeIntegerDatatype datatype) {
+				return EntireValueSpace.XSD_NON_NEGATIVE_INTEGER;
+			}
+			
+		};
+		
+		@Override
+		public ValueSpace<?> visit(ElkDatatype elkDatatype) {
+			return elkDatatype.accept(entireValueSpaceCreator_);
 		}
 
-		// build representing interval
-		NumericIntervalValueSpace valueSpace = new NumericIntervalValueSpace(
-			datatype, lowerBound, lowerInclusive, upperBound,
-			upperInclusive);
+		@Override
+		public ValueSpace<?> visit(
+				ElkDatatypeRestriction elkDatatypeRestriction) {
+			Number lowerBound, upperBound;
+			boolean lowerInclusive, upperInclusive;
+			ElkDatatype lowerDatatype = null;
 
-		if (valueSpace.isEmpty()) {
-			// specified restrictions implies empty value (owl:Nothing)
-			return EmptyValueSpace.INSTANCE;
-		} else {
-			if (valueSpace.isUnipointInterval()) {
-				// specified restriction implies single numeric value
-				return new NumericValue(datatype, valueSpace.lowerBound);
+			ElkDatatype datatype = elkDatatypeRestriction.getDatatype();
+
+			if (datatype == ElkDatatypeMap.XSD_NON_NEGATIVE_INTEGER) {
+				// [0 ... +Inf)
+				lowerBound = Integer.valueOf(0);
+				upperBound = NumberUtils.POSITIVE_INFINITY;
+				lowerInclusive = true;
+				upperInclusive = true;
 			} else {
-				return valueSpace;
+				// [-Inf ... +Inf)
+				lowerBound = NumberUtils.NEGATIVE_INFINITY;
+				upperBound = NumberUtils.POSITIVE_INFINITY;
+				lowerInclusive = true;
+				upperInclusive = true;
 			}
-		}
-	}
 
-	private class NumericValueParser extends DatatypeValueParser<Number, String> {
+			// process all facet restrictions
+			for (ElkFacetRestriction facetRestriction : elkDatatypeRestriction
+					.getFacetRestrictions()) {
+				ElkDatatype restrictionDatatype = facetRestriction.getRestrictionValue().getDatatype();
+				Number restrictionValue = LiteralParser.parseNumber(facetRestriction
+						.getRestrictionValue()); 
 
-		@Override
-		public Number parse(RationalDatatype datatype, String param) {
-			return parseRational(param);
-		}
-
-		@Override
-		public Number parse(DecimalDatatype datatype, String param) {
-			return parseDecimal(param);
-		}
-
-		@Override
-		public Number parse(IntegerDatatype datatype, String param) {
-			return parseInteger(param);
-		}
-
-		@Override
-		public Number parse(NonNegativeIntegerDatatype datatype, String param) {
-			return parseInteger(param);
-		}
-
-		private Number parseRational(String literal) {
-			int divisorIndx = literal.indexOf('/');
-			if (divisorIndx == -1) {
-				LOGGER_.warn("Rational number is missing /");
-			}
-			BigInteger numerator = DatatypeConverter.parseInteger(literal.substring(0, divisorIndx));
-			BigInteger denominator = DatatypeConverter.parseInteger(literal.substring(divisorIndx + 1));
-			if (denominator.compareTo(BigInteger.ZERO) <= 0) {
-				LOGGER_.warn("Denominator is 0");
-			}
-			BigInteger commonDevisor = numerator.gcd(denominator);
-			numerator = numerator.divide(commonDevisor);
-			denominator = denominator.divide(commonDevisor);
-			if (denominator.equals(BigInteger.ONE)) {
-				int numeratorBitCount = numerator.bitCount();
-				if (numeratorBitCount <= 32) {
-					return numerator.intValue();
+				switch (PredefinedElkIri.lookup(facetRestriction.getConstrainingFacet())) {
+					case XSD_MIN_INCLUSIVE: // >=
+						if (comparator_.compare(restrictionValue, lowerBound) >= 0) {
+							lowerBound = restrictionValue;
+							lowerInclusive = true;
+							lowerDatatype = restrictionDatatype;
+						}
+						break;
+					case XSD_MIN_EXCLUSIVE: // >
+						if (comparator_.compare(restrictionValue, lowerBound) >= 0) {
+							lowerBound = restrictionValue;
+							lowerInclusive = false;
+							lowerDatatype = restrictionDatatype;
+						}
+						break;
+					case XSD_MAX_INCLUSIVE: // <=
+						if (comparator_.compare(restrictionValue, upperBound) <= 0) {
+							upperBound = restrictionValue;
+							upperInclusive = true;
+						}
+						break;
+					case XSD_MAX_EXCLUSIVE: // <
+						if (comparator_.compare(restrictionValue, upperBound) <= 0) {
+							upperBound = restrictionValue;
+							upperInclusive = false;
+						}
+						break;
+				default:
+					throw new ElkIndexingException("Unsupported constraining facet: " + facetRestriction.getConstrainingFacet());
 				}
-				if (numeratorBitCount <= 64) {
-					return numerator.longValue();
-				}
-				return numerator;
 			}
-			try {
-				return new BigDecimal(numerator)
-					.divide(new BigDecimal(denominator));
-			} catch (ArithmeticException e) {
+			// build representing interval				
+			if (isUnitInterval(lowerBound, lowerInclusive, upperBound, upperInclusive)) {
+				return numberToPointValue(lowerBound, lowerDatatype);
+			} else {
+				
+				final Number lb = lowerBound, ub = upperBound;
+				final boolean li = lowerInclusive, ui = upperInclusive;
+				
+				return datatype.accept(new BaseElkDatatypeVisitor<ValueSpace<?>>() {
+
+					@Override
+					public ValueSpace<?> visit(RealDatatype datatype) {
+						return new RealInterval(lb, li, ub, ui);
+					}
+					
+					@Override
+					public ValueSpace<?> visit(RationalDatatype datatype) {
+						return new RationalInterval(lb, li, ub, ui);
+					}
+
+					@Override
+					public ValueSpace<?> visit(DecimalDatatype datatype) {
+						return new DecimalInterval(lb, li, ub, ui);
+					}
+
+					@Override
+					public ValueSpace<?> visit(IntegerDatatype datatype) {
+						if (comparator_.compare(lb, 0) >= 0) {
+							return new NonNegativeIntegerInterval(lb, li, ub, ui);
+						}
+						else {
+							return new ArbitraryIntegerInterval(lb, li, ub, ui);
+						} 
+					}
+
+					@Override
+					public ValueSpace<?> visit(
+							NonNegativeIntegerDatatype datatype) {
+						
+						boolean lessThanZero = comparator_.compare(lb, 0) < 0;
+						
+						return new NonNegativeIntegerInterval(lessThanZero ? 0 : lb, lessThanZero ? true : li, ub, ui);
+					}
+					
+				});
 			}
-			return new BigRational(numerator, denominator);
 		}
 
-		private Number parseDecimal(String literal) {
-			BigDecimal value = DatatypeConverter.parseDecimal(literal);
-			try {
-				return value.intValueExact();
-			} catch (ArithmeticException e) {
-			}
-			try {
-				return value.longValueExact();
-			} catch (ArithmeticException e) {
-			}
-			try {
-				return value.toBigIntegerExact();
-			} catch (ArithmeticException e) {
-			}
-			return value.stripTrailingZeros();
+		private boolean isUnitInterval(Number lowerBound,
+				boolean lowerInclusive, Number upperBound,
+				boolean upperInclusive) {
+			return lowerInclusive && upperInclusive
+					&& comparator_.compare(lowerBound, upperBound) == 0;
 		}
-
-		private Number parseInteger(String literal) {
-			BigInteger value = DatatypeConverter.parseInteger(literal);
-			if (value.compareTo(BI_MIN_INTEGER) >= 0
-				&& value.compareTo(BI_MAX_INTEGER) <= 0) {
-				return Integer.valueOf(value.intValue());
-			}
-			if (value.compareTo(BI_MIN_LONG) >= 0
-				&& value.compareTo(BI_MAX_LONG) <= 0) {
-				return Long.valueOf(value.longValue());
-			}
-			return value;
-		}
-	}
+		
+	};
 }

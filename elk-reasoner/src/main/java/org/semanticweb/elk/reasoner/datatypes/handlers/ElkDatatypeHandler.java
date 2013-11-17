@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.datatypes.handlers;
  */
 
 import java.util.List;
+
 import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
@@ -31,19 +32,21 @@ import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingUnsupportedException;
 
 /**
- * Visitor that converts the given {@link ElkDataRange} or {@link ElkLiteral}
+ * Converts the given {@link ElkDataRange} or {@link ElkLiteral}
  * into an instance of {@link ValueSpace} by first selecting the suitable
  * {@link DatatypeHandler}.
  * 
  * @author Pospishnyi Olexandr
+ * @author Pavel Klinov
  */
-public class ElkDatatypeHandler implements DatatypeHandler {
-
-	private final DatatypeHandlerFactory handlerFactory = new DatatypeHandlerFactory();
+public class ElkDatatypeHandler {
+	
+	private final DatatypeHandlerFactory handlerFactory_ = new DatatypeHandlerFactory();
 
 	private ElkDatatypeHandler() {
 	}
@@ -57,48 +60,62 @@ public class ElkDatatypeHandler implements DatatypeHandler {
 		return instance_;
 	}
 
-	@Override
-	public ValueSpace visit(ElkLiteral elkLiteral) {
-		DatatypeHandler handler = elkLiteral.getDatatype().accept(
-				handlerFactory);
-		return elkLiteral.accept(handler);
+	public ValueSpace<?> createValueSpace(ElkLiteral literal) {
+		DatatypeHandler handler = getDatatypeHandler(literal.getDatatype());
+		
+		return handler.createValueSpace(literal);
 	}
+	
+	public ValueSpace<?> createValueSpace(ElkDataRange dataRange) {
+		return dataRange.accept(new ElkDataRangeVisitor<ValueSpace<?>>() {
 
-	@Override
-	public ValueSpace visit(ElkDatatype elkDatatype) {
-		DatatypeHandler handler = elkDatatype.accept(handlerFactory);
-		return elkDatatype.accept(handler);
+			@Override
+			public ValueSpace<?> visit(ElkDataComplementOf elkDataComplementOf) {
+				throw new ElkIndexingUnsupportedException(elkDataComplementOf);
+			}
+
+			@Override
+			public ValueSpace<?> visit(
+					ElkDataIntersectionOf elkDataIntersectionOf) {
+				throw new ElkIndexingUnsupportedException(elkDataIntersectionOf);
+			}
+
+			@Override
+			public ValueSpace<?> visit(ElkDataOneOf elkDataOneOf) {
+				List<? extends ElkLiteral> literals = elkDataOneOf.getLiterals();
+				
+				if (literals.size() != 1) {
+					throw new ElkIndexingUnsupportedException(elkDataOneOf);
+				}
+				else {
+					return createValueSpace(literals.get(0));
+				}
+			}
+
+			@Override
+			public ValueSpace<?> visit(ElkDatatype elkDatatype) {
+				DatatypeHandler handler = getDatatypeHandler(elkDatatype);
+				
+				return handler.createValueSpace(elkDatatype);
+			}
+
+			@Override
+			public ValueSpace<?> visit(
+					ElkDatatypeRestriction elkDatatypeRestriction) {
+				DatatypeHandler handler = getDatatypeHandler(elkDatatypeRestriction.getDatatype());
+				
+				return handler.createValueSpace(elkDatatypeRestriction);
+			}
+
+			@Override
+			public ValueSpace<?> visit(ElkDataUnionOf elkDataUnionOf) {
+				throw new ElkIndexingUnsupportedException(elkDataUnionOf);
+			}
+			
+		});
 	}
-
-	@Override
-	public ValueSpace visit(ElkDatatypeRestriction elkDatatypeRestriction) {
-		DatatypeHandler handler = elkDatatypeRestriction.getDatatype().accept(
-				handlerFactory);
-		return elkDatatypeRestriction.accept(handler);
-	}
-
-	@Override
-	public ValueSpace visit(ElkDataUnionOf elkDataUnionOf) {
-		throw new ElkIndexingUnsupportedException(elkDataUnionOf);
-	}
-
-	@Override
-	public ValueSpace visit(ElkDataComplementOf elkDataComplementOf) {
-		throw new ElkIndexingUnsupportedException(elkDataComplementOf);
-	}
-
-	@Override
-	public ValueSpace visit(ElkDataIntersectionOf elkDataIntersectionOf) {
-		throw new ElkIndexingUnsupportedException(elkDataIntersectionOf);
-	}
-
-	@Override
-	public ValueSpace visit(ElkDataOneOf elkDataOneOf) {
-		List<? extends ElkLiteral> literals = elkDataOneOf.getLiterals();
-		if (literals.size() != 1) {
-			throw new ElkIndexingUnsupportedException(elkDataOneOf);
-		}
-		ElkLiteral elkLiteral = literals.get(0);
-		return this.visit(elkLiteral);
+	
+	private DatatypeHandler getDatatypeHandler(ElkDatatype datatype) {
+		return datatype.accept(handlerFactory_);
 	}
 }

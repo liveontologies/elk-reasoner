@@ -22,52 +22,66 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 
+import org.semanticweb.elk.owl.datatypes.AnyUriDatatype;
+import org.semanticweb.elk.owl.datatypes.Base64BinaryDatatype;
+import org.semanticweb.elk.owl.datatypes.DateTimeDatatype;
+import org.semanticweb.elk.owl.datatypes.DecimalDatatype;
+import org.semanticweb.elk.owl.datatypes.HexBinaryDatatype;
+import org.semanticweb.elk.owl.datatypes.IntegerDatatype;
+import org.semanticweb.elk.owl.datatypes.LiteralDatatype;
+import org.semanticweb.elk.owl.datatypes.NameDatatype;
+import org.semanticweb.elk.owl.datatypes.NcNameDatatype;
+import org.semanticweb.elk.owl.datatypes.NmTokenDatatype;
+import org.semanticweb.elk.owl.datatypes.NonNegativeIntegerDatatype;
+import org.semanticweb.elk.owl.datatypes.NormalizedStringDatatype;
+import org.semanticweb.elk.owl.datatypes.PlainLiteralDatatype;
+import org.semanticweb.elk.owl.datatypes.RationalDatatype;
+import org.semanticweb.elk.owl.datatypes.RealDatatype;
+import org.semanticweb.elk.owl.datatypes.StringDatatype;
+import org.semanticweb.elk.owl.datatypes.TokenDatatype;
+import org.semanticweb.elk.owl.datatypes.XmlLiteralDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-import org.semanticweb.elk.reasoner.datatypes.index.ValueSpaceVisitor;
+import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
- * Representation of entire datatype value space
- *
+ * Representation of the entire value space for a given datatype.
+ * 
  * @author Pospishnyi Olexandr
  */
-public class EntireValueSpace implements ValueSpace {
+public class EntireValueSpace<DT extends ElkDatatype> implements ValueSpace<DT> {
 
-	private ElkDatatype datatype;
+	private DT datatype;
 
-	public EntireValueSpace(ElkDatatype datatype) {
+	private EntireValueSpace(DT datatype) {
 		this.datatype = datatype;
 	}
 
 	@Override
-	public ElkDatatype getDatatype() {
+	public DT getDatatype() {
 		return datatype;
 	}
 
 	@Override
-	public ValueSpaceType getType() {
-		return ValueSpaceType.ENTIRE;
-	}
-
-	@Override
 	public boolean isEmpty() {
+		// can there be a datatype whose entire value space is empty?
 		return false;
 	}
 
 	/**
 	 * EntireValueSpace contains any other value space or value that has
 	 * compatible datatype
-	 *
+	 * 
 	 * @param valueSpace
 	 * @return true if this value space contains {@code valueSpace}
 	 */
 	@Override
-	public boolean contains(ValueSpace valueSpace) {
-		return valueSpace.getDatatype().isCompatibleWith(this.datatype);
+	public boolean contains(ValueSpace<?> valueSpace) {
+		return valueSpace.getDatatype().isCompatibleWith(datatype);
 	}
 
 	@Override
-	public boolean isSubsumedBy(ValueSpace valueSpace) {
+	public boolean isSubsumedBy(ValueSpace<?> valueSpace) {
 		return valueSpace.contains(this);
 	}
 
@@ -77,7 +91,8 @@ public class EntireValueSpace implements ValueSpace {
 			return true;
 		}
 		if (other instanceof EntireValueSpace) {
-			EntireValueSpace otherEntry = (EntireValueSpace) other;
+			EntireValueSpace<?> otherEntry = (EntireValueSpace<?>) other;
+
 			return this.datatype.equals(otherEntry.datatype);
 
 		}
@@ -86,10 +101,8 @@ public class EntireValueSpace implements ValueSpace {
 
 	@Override
 	public int hashCode() {
-		return HashGenerator.combinedHashCode(
-			EntireValueSpace.class,
-			this.datatype
-			);
+		return HashGenerator.combinedHashCode(EntireValueSpace.class,
+				this.datatype);
 	}
 
 	@Override
@@ -101,4 +114,43 @@ public class EntireValueSpace implements ValueSpace {
 	public <O> O accept(ValueSpaceVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
+
+	public static final EntireValueSpace<RealDatatype> OWL_REAL = new EntireValueSpace<RealDatatype>(
+			ElkDatatypeMap.OWL_REAL);
+	public static final EntireValueSpace<RationalDatatype> OWL_RATIONAL = new EntireValueSpace<RationalDatatype>(
+			ElkDatatypeMap.OWL_RATIONAL);
+	public static final EntireValueSpace<DecimalDatatype> XSD_DECIMAL = new EntireValueSpace<DecimalDatatype>(
+			ElkDatatypeMap.XSD_DECIMAL);
+	public static final EntireValueSpace<IntegerDatatype> XSD_INTEGER = new EntireValueSpace<IntegerDatatype>(
+			ElkDatatypeMap.XSD_INTEGER);
+	public static final EntireValueSpace<NonNegativeIntegerDatatype> XSD_NON_NEGATIVE_INTEGER = new EntireValueSpace<NonNegativeIntegerDatatype>(
+			ElkDatatypeMap.XSD_NON_NEGATIVE_INTEGER);
+	public static final EntireValueSpace<AnyUriDatatype> XSD_ANY_URI = new EntireValueSpace<AnyUriDatatype>(
+			ElkDatatypeMap.XSD_ANY_URI);
+	public static final EntireValueSpace<StringDatatype> XSD_STRING = new EntireValueSpace<StringDatatype>(
+			ElkDatatypeMap.XSD_STRING);
+	public static final EntireValueSpace<NormalizedStringDatatype> XSD_NORMALIZED_STRING = new EntireValueSpace<NormalizedStringDatatype>(
+			ElkDatatypeMap.XSD_NORMALIZED_STRING);
+	public static final EntireValueSpace<TokenDatatype> XSD_TOKEN = new EntireValueSpace<TokenDatatype>(
+			ElkDatatypeMap.XSD_TOKEN);
+	public static final EntireValueSpace<NameDatatype> XSD_NAME = new EntireValueSpace<NameDatatype>(
+			ElkDatatypeMap.XSD_NAME);
+	public static final EntireValueSpace<NcNameDatatype> XSD_NCNAME = new EntireValueSpace<NcNameDatatype>(
+			ElkDatatypeMap.XSD_NCNAME);
+	public static final EntireValueSpace<NmTokenDatatype> XSD_NMTOKEN = new EntireValueSpace<NmTokenDatatype>(
+			ElkDatatypeMap.XSD_NMTOKEN);
+	public static final EntireValueSpace<PlainLiteralDatatype> RDF_PLAIN_LITERAL = new EntireValueSpace<PlainLiteralDatatype>(
+			ElkDatatypeMap.RDF_PLAIN_LITERAL);
+	public static final EntireValueSpace<Base64BinaryDatatype> XSD_BASE_64 = new EntireValueSpace<Base64BinaryDatatype>(
+			ElkDatatypeMap.XSD_BASE_64_BINARY);
+	public static final EntireValueSpace<HexBinaryDatatype> XSD_HEX_BINARY = new EntireValueSpace<HexBinaryDatatype>(
+			ElkDatatypeMap.XSD_HEX_BINARY);
+	public static final EntireValueSpace<XmlLiteralDatatype> XML_LITERAL = new EntireValueSpace<XmlLiteralDatatype>(
+			ElkDatatypeMap.RDF_XMLITERAL);
+	public static final EntireValueSpace<LiteralDatatype> RDFS_LITERAL = new EntireValueSpace<LiteralDatatype>(
+			ElkDatatypeMap.RDFS_LITERAL);
+	public static final EntireValueSpace<DateTimeDatatype> ENTIRE_DATE_TIME = new EntireValueSpace<DateTimeDatatype>(
+			ElkDatatypeMap.XSD_DATE_TIME);
+	public static final EntireValueSpace<DateTimeDatatype> ENTIRE_DATE_TIME_STAMP = new EntireValueSpace<DateTimeDatatype>(
+			ElkDatatypeMap.XSD_DATE_TIME_STAMP);
 }

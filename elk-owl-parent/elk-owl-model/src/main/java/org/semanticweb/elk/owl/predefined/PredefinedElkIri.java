@@ -42,63 +42,69 @@ public enum PredefinedElkIri {
 
 	OWL_BOTTOM_DATA_PROPERTY(new ElkFullIri(PredefinedElkPrefix.OWL.get(),
 			"BottomDataProperty")), //
-		
-	RDFS_LITERAL(new ElkFullIri(PredefinedElkPrefix.RDFS.get(),
-			"Literal")),//
-	
-	XSD_DATE_TIME(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
-			"dateTime")),//
-	
+
+	RDFS_LITERAL(new ElkFullIri(PredefinedElkPrefix.RDFS.get(), "Literal")), //
+
+	XSD_DATE_TIME(new ElkFullIri(PredefinedElkPrefix.XSD.get(), "dateTime")), //
+
 	XSD_DATE_TIME_STAMP(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
-			"dateTimeStamp")),//
-	
+			"dateTimeStamp")), //
+
 	XSD_BASE_64_BINARY(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
-			"base64Binary")),//
-	
-	XSD_HEX_BINARY(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
-			"hexBinary")),//
-	
-	XSD_ANY_URI(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
-			"anyURI")),//
-	
-	OWL_REAL(new ElkFullIri(PredefinedElkPrefix.OWL.get(),
-			"real")),//
-	
-	OWL_RATIONAL(new ElkFullIri(PredefinedElkPrefix.OWL.get(),
-			"rational")),//
-	
-	XSD_DECIMAL(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
-			"decimal")),//
-	
-	XSD_INTEGER(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
-			"integer")),//
-	
+			"base64Binary")), //
+
+	XSD_HEX_BINARY(new ElkFullIri(PredefinedElkPrefix.XSD.get(), "hexBinary")), //
+
+	XSD_ANY_URI(new ElkFullIri(PredefinedElkPrefix.XSD.get(), "anyURI")), //
+
+	OWL_REAL(new ElkFullIri(PredefinedElkPrefix.OWL.get(), "real")), //
+
+	OWL_RATIONAL(new ElkFullIri(PredefinedElkPrefix.OWL.get(), "rational")), //
+
+	XSD_DECIMAL(new ElkFullIri(PredefinedElkPrefix.XSD.get(), "decimal")), //
+
+	XSD_INTEGER(new ElkFullIri(PredefinedElkPrefix.XSD.get(), "integer")), //
+
 	XSD_NON_NEGATIVE_INTEGER(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
-			"nonNegativeInteger")),//
-	
+			"nonNegativeInteger")), //
+
 	RDF_PLAIN_LITERAL(new ElkFullIri(PredefinedElkPrefix.RDF.get(),
-			"PlainLiteral")),//
-	
-	XSD_STRING(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
-			"string")),//
-	
+			"PlainLiteral")), //
+
+	XSD_STRING(new ElkFullIri(PredefinedElkPrefix.XSD.get(), "string")), //
+
 	XSD_NORMALIZED_STRING(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
-			"normalizedString")),//
-	
-	XSD_TOKEN(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
-			"token")),//
-	
-	XSD_NAME(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
-			"Name")),//
-	
-	XSD_NMTOCKEN(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
-			"NMTOKEN")),//
-	
-	XSD_NCNAME(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
-			"NCName")),//
-	
-	RDF_XMLITERAL(new ElkFullIri(PredefinedElkPrefix.RDF.get(),
-			"XMLLiteral"))//
+			"normalizedString")), //
+
+	XSD_TOKEN(new ElkFullIri(PredefinedElkPrefix.XSD.get(), "token")), //
+
+	XSD_NAME(new ElkFullIri(PredefinedElkPrefix.XSD.get(), "Name")), //
+
+	XSD_NMTOCKEN(new ElkFullIri(PredefinedElkPrefix.XSD.get(), "NMTOKEN")), //
+
+	XSD_NCNAME(new ElkFullIri(PredefinedElkPrefix.XSD.get(), "NCName")), //
+
+	RDF_XMLITERAL(new ElkFullIri(PredefinedElkPrefix.RDF.get(), "XMLLiteral")), //
+
+	XSD_MIN_INCLUSIVE(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"minInclusive")),
+
+	XSD_MAX_INCLUSIVE(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"maxInclusive")),
+
+	XSD_MIN_EXCLUSIVE(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"minExclusive")),
+
+	XSD_MAX_EXCLUSIVE(new ElkFullIri(PredefinedElkPrefix.XSD.get(),
+			"maxExclusive")),
+
+	XSD_MIN_LENGTH(new ElkFullIri(PredefinedElkPrefix.XSD.get(), "minLength")),
+
+	XSD_MAX_LENGTH(new ElkFullIri(PredefinedElkPrefix.XSD.get(), "maxLength")),
+
+	XSD_LENGTH(new ElkFullIri(PredefinedElkPrefix.XSD.get(), "length")),
+
+	XSD_PATTERN(new ElkFullIri(PredefinedElkPrefix.XSD.get(), "pattern")),
 	;
 
 	private final ElkIri iri;
@@ -113,8 +119,9 @@ public enum PredefinedElkIri {
 
 	/**
 	 * Get enum element based on it's IRI
-	 *
-	 * @param iri Predefined IRI
+	 * 
+	 * @param iri
+	 *            Predefined IRI
 	 * @return {@link Datatype}
 	 */
 	public static PredefinedElkIri lookup(ElkIri iri) {

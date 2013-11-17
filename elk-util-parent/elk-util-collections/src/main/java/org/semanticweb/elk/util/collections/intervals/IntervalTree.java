@@ -21,24 +21,31 @@ package org.semanticweb.elk.util.collections.intervals;
  * #L%
  */
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Balanced binary tree data structure capable of storing {@link Interval} keys
  * and multiple arbitrary values for them. Insertion and deletion are O(log n)
  * operations. Query is O((k+1)log n) operation, where k is the number of
  * intervals that are included by the query interval.
+ * 
+ * TODO support partially ordered elements
  *
  * @author Pospishnyi Oleksandr
  */
-public class IntervalTree<K extends Interval<T>, V, T extends Comparable<T>> {
+public class IntervalTree<K extends Interval<T>, V, T> {
 
 	private Entry<K, V, T> root = null;
 	private int size = 0;
+	private final Comparator<T> comparator_;
 
-	public IntervalTree() {
+	public IntervalTree(Comparator<T> c) {
+		comparator_ = c;
 	}
 
 	/**
@@ -51,6 +58,27 @@ public class IntervalTree<K extends Interval<T>, V, T extends Comparable<T>> {
 	}
 
 	/**
+	 * Prints the tree to the writer.
+	 * @param writer
+	 * @throws IOException
+	 */
+	public void print(Writer writer) throws IOException {
+		print(root, writer, 0);
+	}
+	
+	private void print(Entry<K, V, T> node, Writer writer, int indent) throws IOException {
+		if (node != null) {
+			for (int i = 0; i < indent; i++) {
+				writer.write("  ");
+			}
+			
+			writer.write(node.toString() + "\n");
+			print(node.left, writer, indent + 1);
+			print(node.right, writer, indent + 1);
+		}
+	}
+
+	/**
 	 * Add an interval and an associated data value to the tree. If the
 	 * entry with the specified key already exists in the tree, then the
 	 * value will be appended to it, without replacing the previously stored
@@ -60,24 +88,30 @@ public class IntervalTree<K extends Interval<T>, V, T extends Comparable<T>> {
 	 * @param value arbitrary data value
 	 */
 	public void add(K key, V value) {
+		
+		if (key == null) {
+			throw new IllegalArgumentException("Adding an element with the empty key into the interval tree " + value);
+		}
+		
 		Entry<K, V, T> t = root;
+		int cmp;
+		Entry<K, V, T> parent;
+		
 		if (t == null) {
-			root = new Entry<K, V, T>(key, value);
+			root = new Entry<K, V, T>(key, value,comparator_);
 			size = 1;
 			return;
 		}
-		int cmp;
-		Entry<K, V, T> parent;
-		if (key == null) {
-			throw new NullPointerException();
-		}
+		
+		Entry<K, V, T> e = new Entry<K, V, T>(key, value, comparator_);
+		
 		size++;
-		Comparable<? super K> k = (Comparable<? super K>) key;
-		Entry<K, V, T> e = new Entry<K, V, T>(key, value);
+		
 		do {
 			parent = t;
 			t.updateMax(e);
-			cmp = k.compareTo(t.key);
+			cmp = key.compareTo(t.key);
+			
 			if (cmp < 0) {
 				t = t.left;
 			} else if (cmp > 0) {
@@ -87,12 +121,15 @@ public class IntervalTree<K extends Interval<T>, V, T extends Comparable<T>> {
 				return;
 			}
 		} while (t != null);
+		
 		e.setParent(parent);
+		
 		if (cmp < 0) {
 			parent.left = e;
 		} else {
 			parent.right = e;
 		}
+		
 		fixAfterInsertion(e);
 	}
 
@@ -176,14 +213,15 @@ public class IntervalTree<K extends Interval<T>, V, T extends Comparable<T>> {
 	}
 
 	private boolean search(Entry<K, V, T> x, Interval<T> i, Collection<V> result) {
-		if (x.left != null && x.left.max.compareTo(i.getHigh()) >= 0) {
+		if (x.left != null && IntervalUtils.compareUpperBounds(x.left.max, x.left.isMaxInclusive, i.getHigh(), i.isUpperInclusive(), comparator_) >= 0) { 
+			//search the left subtree
 			boolean fnd = search(x.left, i, result);
 			if (x.key.contains(i)) {
 				result.addAll(x.value);
 				fnd = true;
 			}
 			if (fnd) {
-				if (x.right != null && x.right.max.compareTo(i.getHigh()) >= 0) {
+				if (x.right != null && IntervalUtils.compareUpperBounds(x.right.max, x.right.isMaxInclusive, i.getHigh(), i.isUpperInclusive(), comparator_) >= 0) {
 					return search(x.right, i, result);
 				} else {
 					return true;
@@ -193,14 +231,15 @@ public class IntervalTree<K extends Interval<T>, V, T extends Comparable<T>> {
 			if (x.key.contains(i)) {
 				result.addAll(x.value);
 
-				if (x.right != null && x.right.max.compareTo(i.getHigh()) >= 0) {
+				if (x.right != null && IntervalUtils.compareUpperBounds(x.right.max, x.right.isMaxInclusive, i.getHigh(), i.isUpperInclusive(), comparator_) >= 0) {
+					//search the right subtree
 					return search(x.right, i, result);
 				} else {
 					return true;
 				}
 
 			} else {
-				if (x.right != null && x.right.max.compareTo(i.getHigh()) >= 0) {
+				if (x.right != null && IntervalUtils.compareUpperBounds(x.right.max, x.right.isMaxInclusive, i.getHigh(), i.isUpperInclusive(), comparator_) >= 0) {
 					return search(x.right, i, result);
 				}
 			}
@@ -264,9 +303,19 @@ public class IntervalTree<K extends Interval<T>, V, T extends Comparable<T>> {
 	}
 
 	private void propagateMax(Entry<K, V, T> z) {
-		T oldMax = z.max;
+		/*Endpoint<T> oldMax = z.max;
+		
 		z.updateMax();
+		
 		if (!oldMax.equals(z.max) && z.parent != null) {
+			propagateMax(z.parent);
+		}*/
+		T oldMax = z.max;
+		boolean oldIsMaxInclusive = z.isMaxInclusive;
+		
+		z.updateMax();
+		
+		if ((!oldMax.equals(z.max) || oldIsMaxInclusive != z.isMaxInclusive) && z.parent != null) {
 			propagateMax(z.parent);
 		}
 	}
@@ -276,31 +325,38 @@ public class IntervalTree<K extends Interval<T>, V, T extends Comparable<T>> {
 	private static final boolean RED = false;
 	private static final boolean BLACK = true;
 
-	/*
+	/**
 	 * Internal Entry class
+	 * 
+	 * TODO see if all fields are necessary. For example a more functional-style
+	 * implementation may have the color as an immutable property and use
+	 * sublclasses to avoid storing it.
 	 */
-	protected static final class Entry<K extends Interval<T>, V, T extends Comparable<T>> {
+	private static final class Entry<K extends Interval<T>, V, T> {
 
 		K key;
 		Collection<V> value;
+		// this is always the upper bound
+		// using a structured object here to contain both the value and whether
+		// it's inclusive simplifies the code but is slower.
 		T max;
+		boolean isMaxInclusive;
 		Entry<K, V, T> left = null;
 		Entry<K, V, T> right = null;
 		Entry<K, V, T> parent;
 		boolean color = BLACK;
+		final Comparator<T> comparator_;
 
-		Entry(K key, V value) {
+		Entry(K key, V value, Comparator<T> c) {
 			this.key = key;
 			this.value = Collections.singletonList(value);
 			this.max = key.getHigh();
+			this.isMaxInclusive = key.isUpperInclusive();
+			this.comparator_ = c;
 		}
 
 		public void setParent(Entry<K, V, T> parent) {
 			this.parent = parent;
-		}
-
-		public Collection<V> getValues() {
-			return value;
 		}
 
 		public void setValue(V v) {
@@ -325,26 +381,69 @@ public class IntervalTree<K extends Interval<T>, V, T extends Comparable<T>> {
 			return this.value == null || this.value.isEmpty();
 		}
 
+		private static int LEFT = -1;
+		private static int RIGHT = 1;
+		
 		protected void updateMax(Entry<K, V, T> e) {
-			this.max = maxOf(e.max, this.max);
-		}
-
-		protected void updateMax() {
-			T leftMaxOrNull = left != null ? left.max : null;
-			T rightMaxOrNull = right != null ? right.max : null;
+			//this.max = maxOf(e.max, this.max);
 			
-			this.max = maxOf(maxOf(leftMaxOrNull, rightMaxOrNull), key.getHigh());
+			int cmp = maxOf(e.max, e.isMaxInclusive, max, isMaxInclusive);
+			
+			if (cmp == LEFT && e != null) {
+				max = e.max;
+				isMaxInclusive = e.isMaxInclusive;
+			}
 		}
 
-		protected T maxOf(T t1, T t2) {
-			if (t1 == null) {
-				return t2;
-			}
-			else if (t2 == null) {
-				return t1;
+		/*
+		 * this function updates the max value and whether it's inclusive based on the corresponding values in the children nodes.
+		 * it's ugly because we do not use any structured objects to return both the max value and its isInclusive flag from the maxOf method.
+		 */
+		protected void updateMax() {
+			T leftMax = left != null ? left.max : null;
+			boolean leftMaxInclusive = left != null ? left.isMaxInclusive : false; 
+			T rightMax = right != null ? right.max : null;
+			boolean rightMaxInclusive = right != null ? right.isMaxInclusive : false;
+			// compare children first
+			int leftRightCmp = maxOf(leftMax, leftMaxInclusive, rightMax, rightMaxInclusive);
+			
+			if (leftRightCmp == LEFT) {
+				//the left is bigger, compare it to the key
+				int cmp = maxOf(leftMax, leftMaxInclusive, key.getHigh(), key.isUpperInclusive());
+				
+				if (cmp == LEFT) {
+					max = leftMax;
+					isMaxInclusive = leftMaxInclusive;
+				}
+				else {
+					max = key.getHigh();
+					isMaxInclusive = key.isUpperInclusive();
+				}
 			}
 			else {
-				return t1.compareTo(t2) > 0 ? t1 : t2;
+				//the right is bigger, compare it to the key
+				int cmp = maxOf(rightMax, rightMaxInclusive, key.getHigh(), key.isUpperInclusive());
+				
+				if (cmp == LEFT) {
+					max = rightMax;
+					isMaxInclusive = rightMaxInclusive;
+				}
+				else {
+					max = key.getHigh();
+					isMaxInclusive = key.isUpperInclusive();
+				}
+			}
+		}
+		
+		protected int maxOf(T t1, boolean t1maxInclusive, T t2, boolean t2maxInclusive) {
+			if (t1 == null) {
+				return RIGHT;
+			}
+			else if (t2 == null) {
+				return LEFT;
+			}
+			else {
+				return IntervalUtils.compareUpperBounds(t1, t1maxInclusive, t2, t2maxInclusive, comparator_) > 0 ? LEFT : RIGHT;
 			}
 		}
 		
@@ -367,7 +466,7 @@ public class IntervalTree<K extends Interval<T>, V, T extends Comparable<T>> {
 
 		@Override
 		public String toString() {
-			return key + "=" + value;
+			return key + "=" + value;// + ", max = " + max;
 		}
 	}
 

@@ -25,49 +25,51 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.semanticweb.elk.reasoner.datatypes.numbers.AbstractInterval;
-import org.semanticweb.elk.reasoner.datatypes.numbers.Endpoint;
+import org.semanticweb.elk.reasoner.datatypes.util.NumberUtils;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
+import org.semanticweb.elk.util.collections.intervals.Interval;
 import org.semanticweb.elk.util.collections.intervals.IntervalTree;
 
 /**
- * TODO: documentation
+ * An implementation of {@link DatatypeIndex} which uses an interval tree for
+ * indexing indexed datatype expressions.
+ * 
+ * TODO parameterize to use interval trees for non-numerical datatypes.
  * 
  * @author Pospishnyi Oleksandr
+ * @author Pavel Klinov
  */
 class IntervalTreeDatatypeIndex implements DatatypeIndex {
 
-	/**
-	 * TODO: documentation
-	 */
-	protected IntervalTree<AbstractInterval, IndexedDatatypeExpression, Endpoint> tree;
-
+	private IntervalTree<Interval<Number>, IndexedDatatypeExpression, Number> intervalTree_;
 
 	@Override
 	public void addDatatypeExpression(IndexedDatatypeExpression ide) {
-		if (tree == null) {
-			tree = new IntervalTree<AbstractInterval, IndexedDatatypeExpression, Endpoint>();
+		if (intervalTree_ == null) {
+			intervalTree_ = new IntervalTree<Interval<Number>, IndexedDatatypeExpression, Number>(NumberUtils.COMPARATOR);
 		}
-		AbstractInterval interval = (AbstractInterval) ide.getValueSpace();
-		tree.add(interval, ide);
+		// TODO make IDE generic to avoid this unchecked cast?
+		intervalTree_.add((Interval) ide.getValueSpace(), ide);
 	}
 
 	@Override
 	public boolean removeDatatypeExpression(IndexedDatatypeExpression ide) {
-		AbstractInterval interval = (AbstractInterval) ide.getValueSpace();
-		return tree.remove(interval, ide);
+		return intervalTree_.remove((Interval) ide.getValueSpace(), ide);
 	}
 
 	@Override
 	public Collection<IndexedDatatypeExpression> getSubsumersFor(
 			IndexedDatatypeExpression ide) {
-		if (tree == null) {
+
+		if (intervalTree_ == null) {
 			return new ArrayList<IndexedDatatypeExpression>(1);
 		}
-		AbstractInterval interval = (AbstractInterval) ide.getValueSpace();
-		Collection<IndexedDatatypeExpression> ret = tree.searchIncludes(interval);
+
+		Collection<IndexedDatatypeExpression> ret = intervalTree_
+				.searchIncludes((Interval) ide.getValueSpace());
 		// perform type filtering
 		Iterator<IndexedDatatypeExpression> iter = ret.iterator();
+
 		while (iter.hasNext()) {
 			IndexedDatatypeExpression next = iter.next();
 			if (!ide.getValueSpace().getDatatype()
@@ -80,7 +82,7 @@ class IntervalTreeDatatypeIndex implements DatatypeIndex {
 
 	@Override
 	public void appendTo(DatatypeIndex index) {
-		for (IndexedDatatypeExpression ide : tree.values()) {
+		for (IndexedDatatypeExpression ide : intervalTree_.values()) {
 			index.addDatatypeExpression(ide);
 		}
 	}

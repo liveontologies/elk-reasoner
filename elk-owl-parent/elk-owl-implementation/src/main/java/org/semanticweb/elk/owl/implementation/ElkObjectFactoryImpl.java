@@ -331,7 +331,7 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	@Override
 	public ElkDatatype getDatatypeRdfPlainLiteral() {
-		return ElkDatatypeMap.get(PredefinedElkIri.RDF_PLAIN_LITERAL.get());
+		return ElkDatatypeMap.RDF_PLAIN_LITERAL;
 	}
 
 	@Override
