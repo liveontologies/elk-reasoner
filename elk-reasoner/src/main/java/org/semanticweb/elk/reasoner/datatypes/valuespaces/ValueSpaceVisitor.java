@@ -44,7 +44,9 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.other.PatternValueSpac
  */
 public interface ValueSpaceVisitor<O> {
 	
-	O visit(EntireValueSpace<?> valueSpace);
+	O visit(EntireNumericValueSpace<?> valueSpace);
+	
+	O visit(OtherEntireValueSpace<?> valueSpace);
 	
 	O visit(EmptyValueSpace valueSpace);
 	

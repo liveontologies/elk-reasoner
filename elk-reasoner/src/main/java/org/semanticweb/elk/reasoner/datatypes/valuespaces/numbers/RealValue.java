@@ -82,7 +82,7 @@ public abstract class RealValue<DT extends RealDatatype> extends UnitInterval<Nu
 	}
 
 	protected boolean containsInterval(Interval<Number> interval) {
-		return contains(interval);
+		return subsumes(interval);
 	}
 	
 	protected boolean containsValue(Number value) {

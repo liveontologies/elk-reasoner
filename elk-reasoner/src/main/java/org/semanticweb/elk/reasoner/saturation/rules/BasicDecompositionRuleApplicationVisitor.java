@@ -22,8 +22,6 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import java.util.Collection;
-
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
@@ -84,12 +82,8 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 			// expressions and produce subsumers for this context
 			for (IndexedDataProperty superProperty : idp.getSaturated()
 					.getSuperProperties()) {
-				Collection<IndexedDatatypeExpression> subsumers = superProperty
-						.getSubsumersFor(ide);
-				if (subsumers != null) {
-					for (IndexedDatatypeExpression expr : subsumers) {
-						writer.produce(context, new NegativeSubsumer(expr));
-					}
+				for (IndexedDatatypeExpression subsumer : superProperty.getSubsumersFor(ide)) {
+						writer.produce(context, new NegativeSubsumer(subsumer));
 				}
 			}
 		}

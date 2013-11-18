@@ -71,8 +71,8 @@ class IntegerInterval implements Interval<Integer> {
 	}
 
 	@Override
-	public boolean contains(Interval<Integer> interval) {
-		return IntervalUtils.contains(this, interval, INT_COMPARATOR);
+	public boolean subsumes(Interval<Integer> interval) {
+		return IntervalUtils.subsumes(this, interval, INT_COMPARATOR);
 	}
 
 	@Override

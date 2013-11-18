@@ -21,10 +21,12 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.index;
 
-import java.util.Collection;
+import java.util.Collections;
 
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireNumericValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.OtherEntireValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.dates.DateTimeInterval;
@@ -44,6 +46,7 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.other.LengthRestricted
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.other.LiteralValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.other.PatternValueSpace;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
+import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.intervals.IntervalTree;
 
 /**
@@ -56,6 +59,11 @@ import org.semanticweb.elk.util.collections.intervals.IntervalTree;
 public class AdaptableDatatypeIndex implements DatatypeIndex {
 
 	/**
+	 * A vacuous index for rdfs:Literal because it subsumes both interval and non-interval data ranges. 
+	 * Strictly speaking it'd be sufficient to just maintain a flag whether rdfs:Literal occurred in the ontology but we use the index for uniformity of the representation.
+	 */
+	
+	/**
 	 * Index for datatypes for which there's no efficient indexing yet.
 	 */
 	private final SimpleDatatypeIndex simpleDatatypeIndex_;
@@ -64,6 +72,14 @@ public class AdaptableDatatypeIndex implements DatatypeIndex {
 	 * Index for datatypes for which we use {@link IntervalTree}s.
 	 */
 	private final IntervalTreeDatatypeIndex treeDatatypeIndex_;
+	
+	/**
+	 * If rdfs:Literal occurs in the ontology (for the given property), we know
+	 * that it subsumes all data ranges (for any subproperty). For uniformity
+	 * reasons we may maintain a dedicated index for that case or we can just
+	 * store it as a single value, as we do here.
+	 */
+	private IndexedDatatypeExpression rdfsLiteralExpression_;
 
 	/**
 	 * The visitor which actually selects the right index.
@@ -78,24 +94,43 @@ public class AdaptableDatatypeIndex implements DatatypeIndex {
 
 	@Override
 	public void addDatatypeExpression(IndexedDatatypeExpression ide) {
-		ide.getValueSpace().accept(indexSelector_).addDatatypeExpression(ide);
+		if (ide.getValueSpace() == EntireValueSpace.RDFS_LITERAL) {
+			rdfsLiteralExpression_ = ide;
+		}
+		else {
+			ide.getValueSpace().accept(indexSelector_).addDatatypeExpression(ide);
+		}
 	}
 
 	@Override
 	public boolean removeDatatypeExpression(IndexedDatatypeExpression ide) {
-		return ide.getValueSpace().accept(indexSelector_)
-				.removeDatatypeExpression(ide);
+		if (ide.getValueSpace() == EntireValueSpace.RDFS_LITERAL) {
+			if (rdfsLiteralExpression_ != null) {
+				rdfsLiteralExpression_ = null;
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return ide.getValueSpace().accept(indexSelector_)
+					.removeDatatypeExpression(ide);
+		}
 	}
 
 	@Override
-	public Collection<IndexedDatatypeExpression> getSubsumersFor(
+	public Iterable<IndexedDatatypeExpression> getSubsumersFor(
 			IndexedDatatypeExpression ide) {
 		DatatypeIndex index = ide.getValueSpace().accept(indexSelector_);
-		Collection<IndexedDatatypeExpression> ret = index.getSubsumersFor(ide);
-		if (index == treeDatatypeIndex_) {
-			ret.addAll(simpleDatatypeIndex_.getSubsumersFor(ide));
+		Iterable<IndexedDatatypeExpression> ret = index.getSubsumersFor(ide);
+		
+		if (rdfsLiteralExpression_ != null) {
+			return Operations.concat(ret, Collections.singletonList(rdfsLiteralExpression_));
 		}
-		return ret;
+		else {
+			return ret;
+		}
 	}
 
 	@Override
@@ -113,7 +148,12 @@ public class AdaptableDatatypeIndex implements DatatypeIndex {
 	private class IndexSelector implements ValueSpaceVisitor<DatatypeIndex> {
 
 		@Override
-		public DatatypeIndex visit(EntireValueSpace<?> valueSpace) {
+		public DatatypeIndex visit(EntireNumericValueSpace<?> valueSpace) {
+			return treeDatatypeIndex_;
+		}
+		
+		@Override
+		public DatatypeIndex visit(OtherEntireValueSpace<?> valueSpace) {
 			return simpleDatatypeIndex_;
 		}
 

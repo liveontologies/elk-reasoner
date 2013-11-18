@@ -283,7 +283,7 @@ public class IntervalTreeTest extends TestCase {
 		ArrayList<IntegerInterval> ret = new ArrayList<IntegerInterval>(50);
 		
 		for (IntegerInterval testInterval : intervals) {
-			if (testInterval.contains(i)) {
+			if (testInterval.subsumes(i)) {
 				ret.add(testInterval);
 			}
 		}

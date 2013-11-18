@@ -21,7 +21,6 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.index;
 
-import java.util.Collection;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;
 
 /**
@@ -57,7 +56,7 @@ public interface DatatypeIndex {
 	 * index
 	 * @return a collection of relevant {@link IndexedDatatypeExpression}s
 	 */
-	public Collection<IndexedDatatypeExpression> getSubsumersFor(IndexedDatatypeExpression ide);
+	public Iterable<IndexedDatatypeExpression> getSubsumersFor(IndexedDatatypeExpression ide);
 
 	/**
 	 * Add all {@link IndexedDatatypeExpression}s from this

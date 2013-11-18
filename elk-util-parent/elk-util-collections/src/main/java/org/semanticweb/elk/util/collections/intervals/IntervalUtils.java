@@ -42,7 +42,7 @@ public class IntervalUtils {
 		return (interval.isLowerInclusive() ? "[" : "(") + interval.getLow() + ", " + interval.getHigh() + (interval.isUpperInclusive() ? "]" : ")");
 	}
 	
-	public static <T> boolean contains(Interval<? extends T> int1, Interval<? extends T> int2, Comparator<T> elementComparator) {
+	public static <T> boolean subsumes(Interval<? extends T> int1, Interval<? extends T> int2, Comparator<T> elementComparator) {
 		return compareLowerBounds(int1.getLow(), int1.isLowerInclusive(), int2.getLow(), int2.isLowerInclusive(), elementComparator) <= 0 
 				&& compareUpperBounds(int1.getHigh(), int1.isUpperInclusive(), int2.getHigh(), int2.isUpperInclusive(), elementComparator) >= 0;
 	}

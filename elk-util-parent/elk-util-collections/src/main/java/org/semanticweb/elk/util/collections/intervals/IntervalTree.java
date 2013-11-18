@@ -216,7 +216,7 @@ public class IntervalTree<K extends Interval<T>, V, T> {
 		if (x.left != null && IntervalUtils.compareUpperBounds(x.left.max, x.left.isMaxInclusive, i.getHigh(), i.isUpperInclusive(), comparator_) >= 0) { 
 			//search the left subtree
 			boolean fnd = search(x.left, i, result);
-			if (x.key.contains(i)) {
+			if (x.key.subsumes(i)) {
 				result.addAll(x.value);
 				fnd = true;
 			}
@@ -228,7 +228,7 @@ public class IntervalTree<K extends Interval<T>, V, T> {
 				}
 			}
 		} else {
-			if (x.key.contains(i)) {
+			if (x.key.subsumes(i)) {
 				result.addAll(x.value);
 
 				if (x.right != null && IntervalUtils.compareUpperBounds(x.right.max, x.right.isMaxInclusive, i.getHigh(), i.isUpperInclusive(), comparator_) >= 0) {

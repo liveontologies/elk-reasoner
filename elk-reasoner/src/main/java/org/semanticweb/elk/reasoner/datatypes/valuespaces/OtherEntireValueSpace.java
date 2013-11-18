@@ -1,5 +1,7 @@
-package org.semanticweb.elk.util.collections.intervals;
-
+/**
+ * 
+ */
+package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 /*
  * #%L
  * ELK Reasoner
@@ -22,23 +24,23 @@ package org.semanticweb.elk.util.collections.intervals;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+
 /**
- * Interval interface. Represents a value space with lower and upper bounds.
+ * Entire value space implementation for datatype for which we don't do special handling, like for numbers.
  * 
- * TODO make it extend Subsumable
- * 
- * @author Pospishnyi Oleksandr
  * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public interface Interval<T> extends Comparable<Interval<T>> {
+public class OtherEntireValueSpace<DT extends ElkDatatype> extends EntireValueSpace<DT> {
 
-	public T getLow();
-	
-	public boolean isLowerInclusive();
+	OtherEntireValueSpace(DT datatype) {
+		super(datatype);
+	}
 
-	public T getHigh();
-	
-	public boolean isUpperInclusive();
-
-	public boolean subsumes(Interval<T> interval);
+	@Override
+	public <O> O accept(ValueSpaceVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
 }

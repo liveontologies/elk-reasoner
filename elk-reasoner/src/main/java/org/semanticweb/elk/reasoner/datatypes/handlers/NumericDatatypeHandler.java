@@ -194,13 +194,13 @@ public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 				lowerBound = Integer.valueOf(0);
 				upperBound = NumberUtils.POSITIVE_INFINITY;
 				lowerInclusive = true;
-				upperInclusive = true;
+				upperInclusive = false;
 			} else {
 				// [-Inf ... +Inf)
 				lowerBound = NumberUtils.NEGATIVE_INFINITY;
 				upperBound = NumberUtils.POSITIVE_INFINITY;
-				lowerInclusive = true;
-				upperInclusive = true;
+				lowerInclusive = false;
+				upperInclusive = false;
 			}
 
 			// process all facet restrictions

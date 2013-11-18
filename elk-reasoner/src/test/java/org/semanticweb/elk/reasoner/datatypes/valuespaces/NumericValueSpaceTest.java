@@ -90,6 +90,12 @@ public class NumericValueSpaceTest extends AbstractValueSpaceTest {
 	@Test
 	public void contains() throws Exception {
 		assertTrue(contains(
+				"owl:real",
+				"owl:rational"));
+		assertTrue(contains(
+				"owl:rational",
+				"DatatypeRestriction(owl:rational xsd:minInclusive \"1.01\"^^xsd:decimal)"));		
+		assertTrue(contains(
 				"DatatypeRestriction(owl:real xsd:minExclusive \"0\"^^xsd:integer)",
 				"DataOneOf( \"10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\"^^xsd:integer )"));
 		assertTrue(contains(

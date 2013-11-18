@@ -48,12 +48,13 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * Representation of the entire value space for a given datatype.
  * 
  * @author Pospishnyi Olexandr
+ * @author Pavel Klinov
  */
-public class EntireValueSpace<DT extends ElkDatatype> implements ValueSpace<DT> {
+public abstract class EntireValueSpace<DT extends ElkDatatype> implements ValueSpace<DT> {
 
 	private DT datatype;
 
-	private EntireValueSpace(DT datatype) {
+	protected EntireValueSpace(DT datatype) {
 		this.datatype = datatype;
 	}
 
@@ -64,7 +65,6 @@ public class EntireValueSpace<DT extends ElkDatatype> implements ValueSpace<DT> 
 
 	@Override
 	public boolean isEmpty() {
-		// can there be a datatype whose entire value space is empty?
 		return false;
 	}
 
@@ -110,47 +110,42 @@ public class EntireValueSpace<DT extends ElkDatatype> implements ValueSpace<DT> 
 		return datatype.toString();
 	}
 
-	@Override
-	public <O> O accept(ValueSpaceVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	public static final EntireValueSpace<RealDatatype> OWL_REAL = new EntireValueSpace<RealDatatype>(
+	public static final EntireNumericValueSpace<RealDatatype> OWL_REAL = new EntireNumericValueSpace<RealDatatype>(
 			ElkDatatypeMap.OWL_REAL);
-	public static final EntireValueSpace<RationalDatatype> OWL_RATIONAL = new EntireValueSpace<RationalDatatype>(
+	public static final EntireNumericValueSpace<RationalDatatype> OWL_RATIONAL = new EntireNumericValueSpace<RationalDatatype>(
 			ElkDatatypeMap.OWL_RATIONAL);
-	public static final EntireValueSpace<DecimalDatatype> XSD_DECIMAL = new EntireValueSpace<DecimalDatatype>(
+	public static final EntireNumericValueSpace<DecimalDatatype> XSD_DECIMAL = new EntireNumericValueSpace<DecimalDatatype>(
 			ElkDatatypeMap.XSD_DECIMAL);
-	public static final EntireValueSpace<IntegerDatatype> XSD_INTEGER = new EntireValueSpace<IntegerDatatype>(
+	public static final EntireNumericValueSpace<IntegerDatatype> XSD_INTEGER = new EntireNumericValueSpace<IntegerDatatype>(
 			ElkDatatypeMap.XSD_INTEGER);
-	public static final EntireValueSpace<NonNegativeIntegerDatatype> XSD_NON_NEGATIVE_INTEGER = new EntireValueSpace<NonNegativeIntegerDatatype>(
+	public static final EntireNumericValueSpace<NonNegativeIntegerDatatype> XSD_NON_NEGATIVE_INTEGER = new EntireNumericValueSpace<NonNegativeIntegerDatatype>(
 			ElkDatatypeMap.XSD_NON_NEGATIVE_INTEGER);
-	public static final EntireValueSpace<AnyUriDatatype> XSD_ANY_URI = new EntireValueSpace<AnyUriDatatype>(
+	public static final EntireValueSpace<AnyUriDatatype> XSD_ANY_URI = new OtherEntireValueSpace<AnyUriDatatype>(
 			ElkDatatypeMap.XSD_ANY_URI);
-	public static final EntireValueSpace<StringDatatype> XSD_STRING = new EntireValueSpace<StringDatatype>(
+	public static final EntireValueSpace<StringDatatype> XSD_STRING = new OtherEntireValueSpace<StringDatatype>(
 			ElkDatatypeMap.XSD_STRING);
-	public static final EntireValueSpace<NormalizedStringDatatype> XSD_NORMALIZED_STRING = new EntireValueSpace<NormalizedStringDatatype>(
+	public static final EntireValueSpace<NormalizedStringDatatype> XSD_NORMALIZED_STRING = new OtherEntireValueSpace<NormalizedStringDatatype>(
 			ElkDatatypeMap.XSD_NORMALIZED_STRING);
-	public static final EntireValueSpace<TokenDatatype> XSD_TOKEN = new EntireValueSpace<TokenDatatype>(
+	public static final EntireValueSpace<TokenDatatype> XSD_TOKEN = new OtherEntireValueSpace<TokenDatatype>(
 			ElkDatatypeMap.XSD_TOKEN);
-	public static final EntireValueSpace<NameDatatype> XSD_NAME = new EntireValueSpace<NameDatatype>(
+	public static final EntireValueSpace<NameDatatype> XSD_NAME = new OtherEntireValueSpace<NameDatatype>(
 			ElkDatatypeMap.XSD_NAME);
-	public static final EntireValueSpace<NcNameDatatype> XSD_NCNAME = new EntireValueSpace<NcNameDatatype>(
+	public static final EntireValueSpace<NcNameDatatype> XSD_NCNAME = new OtherEntireValueSpace<NcNameDatatype>(
 			ElkDatatypeMap.XSD_NCNAME);
-	public static final EntireValueSpace<NmTokenDatatype> XSD_NMTOKEN = new EntireValueSpace<NmTokenDatatype>(
+	public static final EntireValueSpace<NmTokenDatatype> XSD_NMTOKEN = new OtherEntireValueSpace<NmTokenDatatype>(
 			ElkDatatypeMap.XSD_NMTOKEN);
-	public static final EntireValueSpace<PlainLiteralDatatype> RDF_PLAIN_LITERAL = new EntireValueSpace<PlainLiteralDatatype>(
+	public static final EntireValueSpace<PlainLiteralDatatype> RDF_PLAIN_LITERAL = new OtherEntireValueSpace<PlainLiteralDatatype>(
 			ElkDatatypeMap.RDF_PLAIN_LITERAL);
-	public static final EntireValueSpace<Base64BinaryDatatype> XSD_BASE_64 = new EntireValueSpace<Base64BinaryDatatype>(
+	public static final EntireValueSpace<Base64BinaryDatatype> XSD_BASE_64 = new OtherEntireValueSpace<Base64BinaryDatatype>(
 			ElkDatatypeMap.XSD_BASE_64_BINARY);
-	public static final EntireValueSpace<HexBinaryDatatype> XSD_HEX_BINARY = new EntireValueSpace<HexBinaryDatatype>(
+	public static final EntireValueSpace<HexBinaryDatatype> XSD_HEX_BINARY = new OtherEntireValueSpace<HexBinaryDatatype>(
 			ElkDatatypeMap.XSD_HEX_BINARY);
-	public static final EntireValueSpace<XmlLiteralDatatype> XML_LITERAL = new EntireValueSpace<XmlLiteralDatatype>(
+	public static final EntireValueSpace<XmlLiteralDatatype> XML_LITERAL = new OtherEntireValueSpace<XmlLiteralDatatype>(
 			ElkDatatypeMap.RDF_XMLITERAL);
-	public static final EntireValueSpace<LiteralDatatype> RDFS_LITERAL = new EntireValueSpace<LiteralDatatype>(
+	public static final EntireValueSpace<LiteralDatatype> RDFS_LITERAL = new OtherEntireValueSpace<LiteralDatatype>(
 			ElkDatatypeMap.RDFS_LITERAL);
-	public static final EntireValueSpace<DateTimeDatatype> ENTIRE_DATE_TIME = new EntireValueSpace<DateTimeDatatype>(
+	public static final EntireValueSpace<DateTimeDatatype> ENTIRE_DATE_TIME = new OtherEntireValueSpace<DateTimeDatatype>(
 			ElkDatatypeMap.XSD_DATE_TIME);
-	public static final EntireValueSpace<DateTimeDatatype> ENTIRE_DATE_TIME_STAMP = new EntireValueSpace<DateTimeDatatype>(
+	public static final EntireValueSpace<DateTimeDatatype> ENTIRE_DATE_TIME_STAMP = new OtherEntireValueSpace<DateTimeDatatype>(
 			ElkDatatypeMap.XSD_DATE_TIME_STAMP);
 }

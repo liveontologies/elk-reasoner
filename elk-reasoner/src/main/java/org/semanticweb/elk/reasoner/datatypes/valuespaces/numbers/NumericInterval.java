@@ -57,12 +57,12 @@ abstract class NumericInterval<DT extends RealDatatype> extends BaseInterval<Num
 	}
 
 	@Override
-	public boolean contains(Interval<Number> interval) {
-		return IntervalUtils.contains(this, interval, NumberUtils.COMPARATOR);
+	public boolean subsumes(Interval<Number> interval) {
+		return IntervalUtils.subsumes(this, interval, NumberUtils.COMPARATOR);
 	}
 	
 	protected boolean containsInterval(Interval<Number> interval) {
-		return contains(interval);
+		return subsumes(interval);
 	}
 	
 	protected boolean containsValue(Number value) {

@@ -32,8 +32,8 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 /**
  * rdfs:Literal datatype handler.
  * <p>
- * This datatype has no practical usage as it has no normative facets and
- * lexical representation.Could only participate in DataSomeValuesFrom
+ * This datatype has no practical usage as it has neither normative facets nor
+ * lexical representation. Could only participate in DataSomeValuesFrom
  * expressions.
  * <p>
  * Uses {@link EntireValueSpace} value space restriction only.

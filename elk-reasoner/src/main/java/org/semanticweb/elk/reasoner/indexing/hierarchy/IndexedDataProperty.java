@@ -23,7 +23,6 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -113,7 +112,7 @@ public class IndexedDataProperty extends IndexedObject {
 	/**
 	 * TODO: documentation
 	 */
-	public Collection<IndexedDatatypeExpression> getSubsumersFor(
+	public Iterable<IndexedDatatypeExpression> getSubsumersFor(
 			IndexedDatatypeExpression ide) {
 		return datatypeIndex_.getSubsumersFor(ide);
 	}

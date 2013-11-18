@@ -60,8 +60,8 @@ public abstract class UnitInterval<T> implements Interval<T> {
 	}
 
 	@Override
-	public boolean contains(Interval<T> interval) {
-		return IntervalUtils.contains(this, interval, getComparator());
+	public boolean subsumes(Interval<T> interval) {
+		return IntervalUtils.subsumes(this, interval, getComparator());
 	}
 
 	@Override

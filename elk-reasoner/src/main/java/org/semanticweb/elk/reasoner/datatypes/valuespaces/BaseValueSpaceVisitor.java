@@ -48,7 +48,9 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.other.PatternValueSpac
  */
 public abstract class BaseValueSpaceVisitor<O> implements ValueSpaceVisitor<O> {
 
-	protected abstract O defaultVisit(ValueSpace<?> valueSpace);
+	protected O defaultVisit(ValueSpace<?> valueSpace) {
+		return null;
+	}
 	
 	@Override
 	public O visit(RealInterval valueSpace) {
@@ -102,7 +104,12 @@ public abstract class BaseValueSpaceVisitor<O> implements ValueSpaceVisitor<O> {
 	}
 
 	@Override
-	public O visit(EntireValueSpace<?> valueSpace) {
+	public O visit(EntireNumericValueSpace<?> valueSpace) {
+		return defaultVisit(valueSpace);
+	}
+	
+	@Override
+	public O visit(OtherEntireValueSpace<?> valueSpace) {
 		return defaultVisit(valueSpace);
 	}
 
@@ -141,4 +148,10 @@ public abstract class BaseValueSpaceVisitor<O> implements ValueSpaceVisitor<O> {
 		return defaultVisit(value);
 	}
 
+	@Override
+	public O visit(EmptyValueSpace valueSpace) {
+		return defaultVisit(valueSpace);
+	}
+
+	
 }
