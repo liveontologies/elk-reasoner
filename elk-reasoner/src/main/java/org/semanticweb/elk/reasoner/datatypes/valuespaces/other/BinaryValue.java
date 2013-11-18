@@ -36,7 +36,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 
  * @author Pospishnyi Olexandr
  */
-public class BinaryValue implements PointValue<LiteralDatatype> {
+public class BinaryValue implements PointValue<LiteralDatatype, byte[]> {
 
 	public LiteralDatatype datatype;
 	public byte[] value;
@@ -110,5 +110,10 @@ public class BinaryValue implements PointValue<LiteralDatatype> {
 	@Override
 	public <O> O accept(ValueSpaceVisitor<O> visitor) {
 		return visitor.visit(this);
+	}
+
+	@Override
+	public byte[] getValue() {
+		return value;
 	}
 }

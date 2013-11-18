@@ -71,7 +71,7 @@ public abstract class UnitInterval<T> implements Interval<T> {
 	
 	@Override
 	public String toString() {
-		return IntervalUtils.print(this);
+		return value.toString();
 	}
 	
 	protected abstract Comparator<T> getComparator();

@@ -36,6 +36,11 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers.BigRational;
  */
 public class NumberUtils {
 
+	public static abstract class Infinity extends Number {
+
+		private static final long serialVersionUID = 1L;
+	}
+	
 	public static enum TYPE {
 
 		Int {
@@ -67,13 +72,19 @@ public class NumberUtils {
 			int order() {
 				return 4;
 			}
+		},
+		Infinity {
+			@Override
+			int order() {
+				return 5;
+			}
 		};
 
 		abstract int order();
 
 	}
 	
-	public static final Number NEGATIVE_INFINITY = new Number() {
+	public static final Infinity NEGATIVE_INFINITY = new Infinity() {
 
 		private static final long serialVersionUID = 1L;
 
@@ -104,7 +115,7 @@ public class NumberUtils {
 
 	};
 	
-	public static final Number POSITIVE_INFINITY = new Number() {
+	public static final Infinity POSITIVE_INFINITY = new Infinity() {
 
 		private static final long serialVersionUID = 1L;
 
@@ -142,7 +153,7 @@ public class NumberUtils {
 	 */
 	public static TYPE getRuntimeType(Number n) {
 		if (n == POSITIVE_INFINITY || n == NEGATIVE_INFINITY) {
-			return TYPE.Integer;
+			return TYPE.Infinity;
 		}
 		else if (n instanceof Integer) {
 			return TYPE.Int;
@@ -213,6 +224,18 @@ public class NumberUtils {
 	
 	public static int compareLongs(long a, long b) {
 	    return (a < b) ? -1 : ((a > b) ? 1 : 0);
+	}
+	
+	public static Infinity toInfinity(Number n) {
+		if (n == NEGATIVE_INFINITY) {
+			return NEGATIVE_INFINITY;
+		}
+		else if (n == POSITIVE_INFINITY) {
+			return POSITIVE_INFINITY;
+		}
+		else {
+			throw new IllegalArgumentException(n + " is not an infinity");
+		}
 	}
 	
 	private static BigInteger toBigInteger(Number n, TYPE nType) {

@@ -35,6 +35,7 @@ import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
 import org.semanticweb.elk.reasoner.datatypes.util.LiteralParser;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.PointValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.dates.AbstractDateTimeInterval;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.dates.DateTimeInterval;
@@ -45,7 +46,7 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.dates.DateTimeValue;
  * xsd:dateTime and xsd:dateTimeStamp datatype handler.
  * <p>
  * Similar to {@link NumericDatatypeHandler}. Uses {@link XMLGregorianCalendar}
- * to represent time instances and compare them.
+ * to represent time instances and intervals.
  * <p>
  * 
  * @author Pospishnyi Olexandr
@@ -147,27 +148,31 @@ public class DateTimeDatatypeHandler extends 	AbstractDatatypeHandler {
 				}
 			}
 			
-			final XMLGregorianCalendar lb = lowerBound;
-			final XMLGregorianCalendar ub = upperBound;
 			final boolean li = lowerInclusive, ui = upperInclusive;
+			final PointValue<?, XMLGregorianCalendar> lb = new DateTimeValue(lowerBound);
+			final PointValue<?, XMLGregorianCalendar> ub = new DateTimeValue(upperBound);
+			// validation
+			validateFacetValue(elkDatatypeRestriction, lb.getDatatype(), lb.toString());
+			validateFacetValue(elkDatatypeRestriction, ub.getDatatype(), ub.toString());
 			
 			AbstractDateTimeInterval<?> valueSpace = datatype.accept(new BaseElkDatatypeVisitor<AbstractDateTimeInterval<?>>() {
 
 				@Override
 				public AbstractDateTimeInterval<?> visit(DateTimeDatatype datatype) {
-					return new DateTimeInterval(lb, li, ub, ui);
+					return new DateTimeInterval(lb.getValue(), li, ub.getValue(), ui);
 				}
 
 				@Override
 				public AbstractDateTimeInterval<?> visit(DateTimeStampDatatype datatype) {
-					return new DateTimeStampInterval(lb, li, ub, ui);
+					return new DateTimeStampInterval(lb.getValue(), li, ub.getValue(), ui);
 				}
 				
 			});
+			
 
 			if (valueSpace.isUnipointInterval()) {
 				// specified restriction implies a single xsd:dateTime or xsd:dateTimeStamp value
-				return new DateTimeValue(valueSpace.lowerBound);
+				return lb;
 			} else {
 				return valueSpace;
 			}

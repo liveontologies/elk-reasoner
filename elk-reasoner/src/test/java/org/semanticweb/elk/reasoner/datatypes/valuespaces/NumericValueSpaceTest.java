@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.elk.reasoner.datatypes.util.NumberUtils;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers.NonNegativeIntegerInterval;
@@ -174,7 +173,6 @@ public class NumericValueSpaceTest extends AbstractValueSpaceTest {
 	 * )
 	 */
 	@Test
-	@Ignore
 	public void facetRestrictionValues() throws Exception {
 		assertFalse(tryDataRange("DatatypeRestriction(xsd:integer xsd:minInclusive \"0.5\"^^xsd:decimal)"));
 		assertFalse(tryDataRange("DatatypeRestriction(xsd:nonNegativeInteger xsd:minInclusive \"-1\"^^xsd:integer)"));

@@ -28,6 +28,7 @@ import java.math.BigInteger;
 
 import org.semanticweb.elk.owl.datatypes.IntegerDatatype;
 import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
+import org.semanticweb.elk.reasoner.datatypes.util.NumberUtils.Infinity;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.BaseValueSpaceContainmentVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpaceVisitor;
@@ -48,6 +49,10 @@ public class IntegerValue extends RealValue<IntegerDatatype> {
 	}
 	
 	public IntegerValue(final Long value) {
+		super(value);
+	}
+	
+	public IntegerValue(final Infinity value) {
 		super(value);
 	}
 

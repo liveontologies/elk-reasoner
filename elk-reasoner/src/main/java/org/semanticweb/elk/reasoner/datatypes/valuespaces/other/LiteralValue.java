@@ -35,7 +35,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 
  * @author Pospishnyi Olexandr
  */
-public class LiteralValue implements PointValue<ElkDatatype> {
+public class LiteralValue implements PointValue<ElkDatatype, String[]> {
 
 	private String string_;
 	private String language_;
@@ -131,5 +131,10 @@ public class LiteralValue implements PointValue<ElkDatatype> {
 	@Override
 	public <O> O accept(ValueSpaceVisitor<O> visitor) {
 		return visitor.visit(this);
+	}
+
+	@Override
+	public String[] getValue() {
+		return language_ == null ? new String[] {string_} : new String[]{string_, language_};
 	}
 }

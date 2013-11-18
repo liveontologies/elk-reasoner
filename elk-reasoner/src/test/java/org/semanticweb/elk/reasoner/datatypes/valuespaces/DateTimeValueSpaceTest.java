@@ -30,7 +30,6 @@ import static org.junit.Assert.assertTrue;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.dates.DateTimeInterval;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.dates.DateTimeValue;
@@ -168,7 +167,6 @@ public class DateTimeValueSpaceTest extends AbstractValueSpaceTest {
 	 * )
 	 */
 	@Test
-	@Ignore
 	public void facetRestrictionValues() throws Exception {
 		//xsd:dateTimeStamp must have TZ set
 		assertFalse(tryDataRange("DatatypeRestriction(xsd:dateTimeStamp xsd:maxInclusive \"1956-01-01T04:00:00\"^^xsd:dateTime)"));

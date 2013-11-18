@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpaceVisitor;
  * @author Pospishnyi Olexandr
  * @author Pavel Klinov
  */
-public class DateTimeValue implements PointValue<DateTimeDatatype> {
+public class DateTimeValue implements PointValue<DateTimeDatatype, XMLGregorianCalendar> {
 
 	private XMLGregorianCalendar value_;
 
@@ -46,6 +46,7 @@ public class DateTimeValue implements PointValue<DateTimeDatatype> {
 		this.value_ = value;
 	}
 
+	@Override
 	public XMLGregorianCalendar getValue() {
 		return value_;
 	}

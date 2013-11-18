@@ -43,12 +43,13 @@ import org.semanticweb.elk.util.collections.intervals.UnitInterval;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public abstract class RealValue<DT extends RealDatatype> extends UnitInterval<Number> implements PointValue<DT> {
+public abstract class RealValue<DT extends RealDatatype> extends UnitInterval<Number> implements PointValue<DT, Number> {
 
 	public RealValue(final Number value) {
 		super(value);
 	}
 
+	@Override
 	public Number getValue() {
 		return value;
 	}

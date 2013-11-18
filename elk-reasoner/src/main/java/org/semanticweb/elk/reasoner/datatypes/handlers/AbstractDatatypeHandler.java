@@ -22,11 +22,16 @@ package org.semanticweb.elk.reasoner.datatypes.handlers;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
+import org.semanticweb.elk.owl.interfaces.ElkDatatype;
+import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingException;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkUnexpectedIndexingException;
 
 /**
  * @author Pospishnyi Olexandr
@@ -34,19 +39,30 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
  */
 abstract class AbstractDatatypeHandler implements DatatypeHandler {
 
-	protected abstract ElkDatatypeVisitor<ValueSpace<?>> getLiteralConverter(ElkLiteral literal);
-	protected abstract ElkDataRangeVisitor<ValueSpace<?>> getDataRangeConverter();
+	protected abstract ElkDatatypeVisitor<ValueSpace<?>> getLiteralConverter(ElkLiteral literal) throws ElkIndexingException;
+	protected abstract ElkDataRangeVisitor<ValueSpace<?>> getDataRangeConverter() throws ElkIndexingException;
 	
 	@Override
-	public ValueSpace<?> createValueSpace(ElkLiteral literal) {
+	public ValueSpace<?> createValueSpace(ElkLiteral literal) throws ElkIndexingException {
 		return literal.getDatatype().accept(getLiteralConverter(literal));
 	}
 
 	@Override
-	public ValueSpace<?> createValueSpace(ElkDataRange dataRange) {
+	public ValueSpace<?> createValueSpace(ElkDataRange dataRange) throws ElkIndexingException {
 		ValueSpace<?> vs = dataRange.accept(getDataRangeConverter());
 		
 		return vs.isEmpty() ? EmptyValueSpace.INSTANCE : vs;
+	}
+	
+	protected static <T> void validateFacetValue(ElkDatatypeRestriction elkDatatypeRestriction, ElkDatatype datatype, T value) throws ElkIndexingException {
+		if (!datatype.isCompatibleWith(elkDatatypeRestriction.getDatatype())) {
+			throw new ElkUnexpectedIndexingException(
+					"The facet value "
+							+ value
+							+ " does not belong to the value space of the datatype restriction "
+							+ OwlFunctionalStylePrinter
+									.toString(elkDatatypeRestriction));
+		}
 	}
 
 }

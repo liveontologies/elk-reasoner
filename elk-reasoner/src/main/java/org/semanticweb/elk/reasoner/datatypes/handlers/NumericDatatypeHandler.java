@@ -72,7 +72,8 @@ public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 
 	private final static Comparator<Number> comparator_ = NumberUtils.COMPARATOR;
 
-	private static PointValue<? extends RealDatatype> numberToPointValue(Number number, ElkDatatype datatype) {
+	//TODO this certainly isn't the most beautiful function ever.... 
+	private static PointValue<? extends RealDatatype, Number> numberToPointValue(Number number) {
 	
 		switch(NumberUtils.getRuntimeType(number)) {
 		case Decimal:
@@ -83,6 +84,8 @@ public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 			return comparator_.compare(number, 0) >= 0 ? new NonNegativeIntegerValue((BigInteger)number) : new IntegerValue((BigInteger)number);
 		case Long:
 			return comparator_.compare(number, 0) >= 0 ? new NonNegativeIntegerValue(number.longValue()) : new IntegerValue(number.longValue());
+		case Infinity:
+			return comparator_.compare(number, 0) >= 0 ? new NonNegativeIntegerValue(NumberUtils.toInfinity(number)) : new IntegerValue(NumberUtils.toInfinity(number));
 		case Rational:
 			return new RationalValue((BigRational)number);
 		default:
@@ -100,7 +103,7 @@ public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 					RationalDatatype datatype) {
 				Number num = LiteralParser.parseRational(literal.getLexicalForm());
 				
-				return numberToPointValue(num, datatype);
+				return numberToPointValue(num);
 			}
 
 			@Override
@@ -108,7 +111,7 @@ public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 					DecimalDatatype datatype) {
 				Number num = LiteralParser.parseDecimal(literal.getLexicalForm());
 				
-				return numberToPointValue(num, datatype);
+				return numberToPointValue(num);
 			}
 
 			@Override
@@ -116,7 +119,7 @@ public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 					IntegerDatatype datatype) {
 				Number num = LiteralParser.parseInteger(literal.getLexicalForm());
 				
-				return numberToPointValue(num, datatype);
+				return numberToPointValue(num);
 			}
 
 			@Override
@@ -124,7 +127,8 @@ public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 					NonNegativeIntegerDatatype datatype) {
 				Number num = LiteralParser.parseInteger(literal.getLexicalForm());
 				
-				return numberToPointValue(num, datatype);			}
+				return numberToPointValue(num);	
+			}
 			
 		};
 	}
@@ -183,56 +187,37 @@ public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 		@Override
 		public ValueSpace<?> visit(
 				ElkDatatypeRestriction elkDatatypeRestriction) {
-			Number lowerBound, upperBound;
-			boolean lowerInclusive, upperInclusive;
-			ElkDatatype lowerDatatype = null;
-
+			Number lowerBound = null, upperBound = null;
+			boolean lowerInclusive = false, upperInclusive = false;
 			ElkDatatype datatype = elkDatatypeRestriction.getDatatype();
-
-			if (datatype == ElkDatatypeMap.XSD_NON_NEGATIVE_INTEGER) {
-				// [0 ... +Inf)
-				lowerBound = Integer.valueOf(0);
-				upperBound = NumberUtils.POSITIVE_INFINITY;
-				lowerInclusive = true;
-				upperInclusive = false;
-			} else {
-				// [-Inf ... +Inf)
-				lowerBound = NumberUtils.NEGATIVE_INFINITY;
-				upperBound = NumberUtils.POSITIVE_INFINITY;
-				lowerInclusive = false;
-				upperInclusive = false;
-			}
 
 			// process all facet restrictions
 			for (ElkFacetRestriction facetRestriction : elkDatatypeRestriction
 					.getFacetRestrictions()) {
-				ElkDatatype restrictionDatatype = facetRestriction.getRestrictionValue().getDatatype();
 				Number restrictionValue = LiteralParser.parseNumber(facetRestriction
 						.getRestrictionValue()); 
 
 				switch (PredefinedElkIri.lookup(facetRestriction.getConstrainingFacet())) {
 					case XSD_MIN_INCLUSIVE: // >=
-						if (comparator_.compare(restrictionValue, lowerBound) >= 0) {
+						if (lowerBound == null || comparator_.compare(restrictionValue, lowerBound) >= 0) {
 							lowerBound = restrictionValue;
 							lowerInclusive = true;
-							lowerDatatype = restrictionDatatype;
 						}
 						break;
 					case XSD_MIN_EXCLUSIVE: // >
-						if (comparator_.compare(restrictionValue, lowerBound) >= 0) {
+						if (lowerBound == null ||comparator_.compare(restrictionValue, lowerBound) >= 0) {
 							lowerBound = restrictionValue;
 							lowerInclusive = false;
-							lowerDatatype = restrictionDatatype;
 						}
 						break;
 					case XSD_MAX_INCLUSIVE: // <=
-						if (comparator_.compare(restrictionValue, upperBound) <= 0) {
+						if (upperBound == null ||comparator_.compare(restrictionValue, upperBound) <= 0) {
 							upperBound = restrictionValue;
 							upperInclusive = true;
 						}
 						break;
 					case XSD_MAX_EXCLUSIVE: // <
-						if (comparator_.compare(restrictionValue, upperBound) <= 0) {
+						if (upperBound == null ||comparator_.compare(restrictionValue, upperBound) <= 0) {
 							upperBound = restrictionValue;
 							upperInclusive = false;
 						}
@@ -241,13 +226,29 @@ public class NumericDatatypeHandler extends AbstractDatatypeHandler {
 					throw new ElkIndexingException("Unsupported constraining facet: " + facetRestriction.getConstrainingFacet());
 				}
 			}
+			// set default bounds, if needed
+			if (lowerBound == null) {
+				lowerBound = datatype == ElkDatatypeMap.XSD_NON_NEGATIVE_INTEGER ? 0 :  NumberUtils.NEGATIVE_INFINITY;
+				lowerInclusive = true;
+			}
+			
+			upperBound = upperBound == null ? NumberUtils.POSITIVE_INFINITY : upperBound;
+			
+			PointValue<?, Number> lowerPoint = numberToPointValue(lowerBound);
+			// validate bound datatypes
+			validateFacetValue(elkDatatypeRestriction, lowerPoint.getDatatype(), lowerPoint.toString());
+			
 			// build representing interval				
 			if (isUnitInterval(lowerBound, lowerInclusive, upperBound, upperInclusive)) {
-				return numberToPointValue(lowerBound, lowerDatatype);
+				return lowerPoint;
 			} else {
 				
+				PointValue<?, Number> upperPoint = numberToPointValue(lowerBound);
 				final Number lb = lowerBound, ub = upperBound;
 				final boolean li = lowerInclusive, ui = upperInclusive;
+
+				// make sure that restriction values belong to the value space of the data range
+				validateFacetValue(elkDatatypeRestriction, upperPoint.getDatatype(), upperPoint.toString());
 				
 				return datatype.accept(new BaseElkDatatypeVisitor<ValueSpace<?>>() {
 

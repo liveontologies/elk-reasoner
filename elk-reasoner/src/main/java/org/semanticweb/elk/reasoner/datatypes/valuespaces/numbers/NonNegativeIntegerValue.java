@@ -28,6 +28,7 @@ import java.math.BigInteger;
 
 import org.semanticweb.elk.owl.datatypes.NonNegativeIntegerDatatype;
 import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
+import org.semanticweb.elk.reasoner.datatypes.util.NumberUtils.Infinity;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpaceVisitor;
 
 /**
@@ -46,6 +47,10 @@ public class NonNegativeIntegerValue extends IntegerValue {
 	}
 	
 	public NonNegativeIntegerValue(final Long value) {
+		super(value);
+	}
+	
+	public NonNegativeIntegerValue(final Infinity value) {
 		super(value);
 	}
 

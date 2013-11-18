@@ -33,6 +33,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDatatype;
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface PointValue<DT extends ElkDatatype> extends ValueSpace<DT> {
+public interface PointValue<DT extends ElkDatatype, T> extends ValueSpace<DT> {
 
+	public T getValue();
 }
