@@ -64,7 +64,9 @@ public class TaskRunner {
 		
 		long wallTimeElapsed = 0;
 		
-		metrics.reset();
+		if (metrics != null) {
+			metrics.reset();
+		}
 		
 		for (int i = 0; i < runs; i++) {
 			System.out.println("Actual run #" + i + " of " + task.getName());
