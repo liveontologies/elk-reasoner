@@ -25,10 +25,11 @@ package org.semanticweb.elk.reasoner.incremental;
  * #L%
  */
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -141,18 +142,19 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 					changingAxioms.getOnElements(), staticAxioms));
 
 			final String expectedResultHash = getResultHash(standardReasoner);
-
-			if (!expectedResultHash.equals(finalResultHash)) {
-				LOGGER_.debug("======= Current Result =======");
-				printResult(reasoner, LOGGER_, LogLevel.DEBUG);
-				LOGGER_.debug("====== Expected Result =======");
-				printResult(standardReasoner, LOGGER_, LogLevel.DEBUG);
-				reasoner.shutdown();
-				standardReasoner.shutdown();
+			
+			if (!expectedResultHash.equals(finalResultHash)){
+				StringWriter writer = new StringWriter();
 				
-				fail("Expected hash code " + expectedResultHash
-						+ ", actual hash code " + finalResultHash + ", seed "
-						+ seed);
+				try {
+					writer.write("EXPECTED TAXONOMY:\n");
+					printResult(standardReasoner, writer);
+					writer.write("\nINCREMENTAL TAXONOMY:\n");
+					printResult(reasoner, writer);
+					writer.flush();
+				} catch (IOException ioe) {	}
+				
+				fail("Seed: " + seed + "\n" + writer.getBuffer().toString());
 			}
 
 			standardReasoner.shutdown();
@@ -199,18 +201,24 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 	 * The next methods should be overridden in subclasses which perform other
 	 * reasoning tasks
 	 */
-
 	protected void printResult(Reasoner reasoner, Logger logger, LogLevel level)
 			throws IOException, ElkException {
-		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
 		StringWriter writer = new StringWriter();
+		
+		printResult(reasoner, writer);
+		LoggerWrap.log(logger, level, "CLASS TAXONOMY");
+		LoggerWrap.log(logger, level, writer.getBuffer().toString());
+
+		writer.close();
+	}
+	
+	protected void printResult(Reasoner reasoner, Writer writer)
+			throws IOException, ElkException {
+		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
 
 		writer.write("CLASS TAXONOMY\n");
 		TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
 		writer.flush();
-
-		LoggerWrap.log(logger, level, writer.getBuffer().toString());
-		writer.close();
 	}
 
 	protected String getResultHash(Reasoner reasoner) throws ElkException {
