@@ -26,9 +26,9 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers;
 
 import java.math.BigInteger;
 
-import org.semanticweb.elk.owl.datatypes.NonNegativeIntegerDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.NonNegativeIntegerDatatype;
 import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
-import org.semanticweb.elk.reasoner.datatypes.util.NumberUtils.Infinity;
+import org.semanticweb.elk.owl.parsing.NumberUtils.Infinity;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpaceVisitor;
 
 /**

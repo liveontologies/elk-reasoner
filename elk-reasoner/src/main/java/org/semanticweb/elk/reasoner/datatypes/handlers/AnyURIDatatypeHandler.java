@@ -22,23 +22,22 @@
  */
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.semanticweb.elk.owl.datatypes.AnyUriDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkAnyUriLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkLiteral;
+import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
-import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
-import org.semanticweb.elk.reasoner.datatypes.util.LiteralParser;
+import org.semanticweb.elk.owl.visitors.ElkLiteralVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.PointValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.other.LengthRestrictedValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.other.LiteralValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.other.PatternValueSpace;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkUnexpectedIndexingException;
 
 import dk.brics.automaton.Automaton;
@@ -59,71 +58,67 @@ import dk.brics.automaton.RegExp;
  */
 public class AnyURIDatatypeHandler extends AbstractDatatypeHandler {
 
-	@Override
-	protected ElkDatatypeVisitor<ValueSpace<?>> getLiteralConverter(
-			final ElkLiteral literal) {
-		return new BaseElkDatatypeVisitor<ValueSpace<?>>() {
+	private final ElkLiteralVisitor<PointValue<?, String[]>> literalConverter_ = new BaseLiteralConverter<String[]>(){
 
-			@Override
-			public ValueSpace<?> visit(AnyUriDatatype datatype) {
-				try {
-					URI value = LiteralParser.parseUri(literal.getLexicalForm());
-					
-					return new LiteralValue(value.toString(), datatype);
+		@Override
+		public PointValue<?, String[]> visit(ElkAnyUriLiteral elkLiteral) {
+			return new LiteralValue(elkLiteral.getLexicalForm(), ElkDatatypeMap.XSD_ANY_URI);
+		}
+
+	};
+	
+	private final ElkDataRangeVisitor<ValueSpace<?>> dataRangeConverter_ = new BaseDataRangeConverter() {
+
+		@Override
+		public ValueSpace<?> visit(ElkDatatype elkDatatype) {
+			return EntireValueSpace.XSD_ANY_URI;
+		}
+
+		@Override
+		public ValueSpace<?> visit(ElkDatatypeRestriction elkDatatypeRestriction) {
+			Integer minLength = 0;
+			Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
+			ElkDatatype datatype = elkDatatypeRestriction.getDatatype();
+
+			for (ElkFacetRestriction facetRestriction : elkDatatypeRestriction.getFacetRestrictions()) {
+				PredefinedElkIri facet = PredefinedElkIri.lookup(facetRestriction.getConstrainingFacet());
+				String value = facetRestriction.getRestrictionValue().getLexicalForm();
+
+				switch (facet) {
+					case XSD_LENGTH:
+						Integer length = Integer.valueOf(value);
+						return new LengthRestrictedValueSpace(datatype, length, length);
+					case XSD_MIN_LENGTH:
+						minLength = Integer.valueOf(value);
+						break;
+					case XSD_MAX_LENGTH:
+						maxLength = Integer.valueOf(value);
+						break;
+					case XSD_PATTERN:
+						Automaton pattern = new RegExp(value).toAutomaton();
+						pattern.setInfo(value);
+						
+						return new PatternValueSpace(pattern, datatype);
+					default:
+						throw new ElkUnexpectedIndexingException("Unsupported facet: " + facet);
 				}
-				catch (URISyntaxException e) {
-					throw new ElkUnexpectedIndexingException("Incorrect URI " + literal.getLexicalForm(), e);
-				}
+
 			}
 			
-		};
+			return new LengthRestrictedValueSpace(datatype, minLength, maxLength);
+		}
+		
+	};
+	
+	@Override
+	public PointValue<?, ?> createValueSpace(ElkLiteral literal) {
+		return literal.accept(literalConverter_);
 	}
 
 	@Override
-	protected ElkDataRangeVisitor<ValueSpace<?>> getDataRangeConverter() {
-		return new BaseElkDataRangeVisitor<ValueSpace<?>>() {
-
-			@Override
-			public ValueSpace<?> visit(ElkDatatype elkDatatype) {
-				return EntireValueSpace.XSD_ANY_URI;
-			}
-
-			@Override
-			public ValueSpace<?> visit(
-					ElkDatatypeRestriction elkDatatypeRestriction) {
-				Integer minLength = 0;
-				Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
-				ElkDatatype datatype = elkDatatypeRestriction.getDatatype();
-
-				for (ElkFacetRestriction facetRestriction : elkDatatypeRestriction.getFacetRestrictions()) {
-					PredefinedElkIri facet = PredefinedElkIri.lookup(facetRestriction.getConstrainingFacet());
-					String value = facetRestriction.getRestrictionValue().getLexicalForm();
-
-					switch (facet) {
-						case XSD_LENGTH:
-							Integer length = Integer.valueOf(value);
-							return new LengthRestrictedValueSpace(datatype, length, length);
-						case XSD_MIN_LENGTH:
-							minLength = Integer.valueOf(value);
-							break;
-						case XSD_MAX_LENGTH:
-							maxLength = Integer.valueOf(value);
-							break;
-						case XSD_PATTERN:
-							Automaton pattern = new RegExp(value).toAutomaton();
-							pattern.setInfo(value);
-							
-							return new PatternValueSpace(pattern, datatype);
-						default:
-							throw new ElkUnexpectedIndexingException("Unsupported facet: " + facet);
-					}
-
-				}
-				
-				return new LengthRestrictedValueSpace(datatype, minLength, maxLength);
-			}
-			
-		};
+	protected ElkDataRangeVisitor<ValueSpace<?>> getDataRangeConverter() throws ElkIndexingException {
+		return dataRangeConverter_;
 	}
+
 
 }

@@ -27,7 +27,6 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.BaseValueSpaceContainm
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.PointValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpaceVisitor;
-import org.semanticweb.elk.util.collections.Pair;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -41,9 +40,9 @@ public class LiteralValue implements PointValue<ElkDatatype, String[]> {
 	private String language_;
 	private ElkDatatype datatype_;
 
-	public LiteralValue(Pair<String, String> pair, ElkDatatype datatype) {
-		this.string_ = pair.getFirst();
-		this.language_ = pair.getSecond();
+	public LiteralValue(String string, String language, ElkDatatype datatype) {
+		this.string_ = string;
+		this.language_ = language;
 		this.datatype_ = datatype;
 	}
 

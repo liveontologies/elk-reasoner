@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.interfaces.literals.ElkLiteral;
 import org.semanticweb.elk.owl.iris.ElkIri;
 
 

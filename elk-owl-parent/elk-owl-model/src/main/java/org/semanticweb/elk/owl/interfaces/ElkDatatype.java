@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeParser;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
 
@@ -34,8 +35,6 @@ import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
  * @author Pospishnyi Olexandr
  */
 public interface ElkDatatype extends ElkDataRange, ElkEntity {
-
-	public String getDatatypeShortname();
 
 	public String getDatatypeIRI();
 
@@ -52,9 +51,9 @@ public interface ElkDatatype extends ElkDataRange, ElkEntity {
 	 *
 	 * @param visitor the parser that can work with values of this datatype
 	 * @return the output of the parser
+	 * @throws E 
 	 */
-	public <O, P> O accept(ElkDatatypeParser<O, P> parser, P param);
-
+	public <O, P, E extends ElkException> O accept(ElkDatatypeParser<O, P, E> parser, P param) throws E;
 	/**
 	 * Check weather this datatype is derived from another and shares its
 	 * value space.

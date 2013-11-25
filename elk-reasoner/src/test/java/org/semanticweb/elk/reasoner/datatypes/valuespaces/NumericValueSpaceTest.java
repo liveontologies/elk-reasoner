@@ -28,7 +28,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.semanticweb.elk.reasoner.datatypes.util.NumberUtils;
+import org.semanticweb.elk.owl.parsing.NumberUtils;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers.NonNegativeIntegerInterval;
 import org.semanticweb.elk.util.collections.intervals.IntervalUtils;
 

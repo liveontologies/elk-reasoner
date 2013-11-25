@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
  * 
  * @author Pospishnyi Olexandr
  */
-public class EmptyValueSpace implements ValueSpace<ElkDatatype> {
+public class EmptyValueSpace implements ValueSpace<ElkDatatype>, PointValue<ElkDatatype, Object> {
 
 	@Override
 	public ElkDatatype getDatatype() {
@@ -73,4 +73,9 @@ public class EmptyValueSpace implements ValueSpace<ElkDatatype> {
 	}
 
 	public static final EmptyValueSpace INSTANCE = new EmptyValueSpace();
+
+	@Override
+	public Object getValue() {
+		return null;
+	}
 }

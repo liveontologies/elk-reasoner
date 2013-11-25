@@ -24,7 +24,8 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.other;
 
 import java.util.Arrays;
 
-import org.semanticweb.elk.owl.datatypes.LiteralDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.BinaryDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.LiteralDatatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.BaseValueSpaceContainmentVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.PointValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
@@ -41,7 +42,7 @@ public class BinaryValue implements PointValue<LiteralDatatype, byte[]> {
 	public LiteralDatatype datatype;
 	public byte[] value;
 
-	public BinaryValue(byte[] value, LiteralDatatype datatype) {
+	public BinaryValue(byte[] value, BinaryDatatype datatype) {
 		this.datatype = datatype;
 		this.value = value;
 	}

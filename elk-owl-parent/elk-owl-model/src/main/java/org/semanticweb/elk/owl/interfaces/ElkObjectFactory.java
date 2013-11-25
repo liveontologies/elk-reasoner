@@ -28,6 +28,8 @@ package org.semanticweb.elk.owl.interfaces;
 import java.util.List;
 import java.util.Set;
 
+import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.interfaces.literals.ElkLiteral;
 import org.semanticweb.elk.owl.iris.ElkIri;
 
 /**
@@ -832,7 +834,7 @@ public interface ElkObjectFactory {
 	 *            the {@link ElkDatatype} for which the object should be created
 	 * @return an {@link ElkLiteral} corresponding to the input
 	 */
-	public ElkLiteral getLiteral(String lexicalForm, ElkDatatype datatype);
+	public ElkLiteral getLiteral(String lexicalForm, ElkDatatype datatype) throws ElkException;
 
 	/**
 	 * Create an {@link ElkNamedIndividual}.

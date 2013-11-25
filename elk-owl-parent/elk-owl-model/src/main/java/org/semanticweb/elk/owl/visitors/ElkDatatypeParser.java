@@ -1,4 +1,5 @@
 package org.semanticweb.elk.owl.visitors;
+
 /*
  * #%L
  * ELK OWL Object Interfaces
@@ -21,70 +22,74 @@ package org.semanticweb.elk.owl.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.owl.datatypes.AnyUriDatatype;
-import org.semanticweb.elk.owl.datatypes.Base64BinaryDatatype;
-import org.semanticweb.elk.owl.datatypes.DateTimeDatatype;
-import org.semanticweb.elk.owl.datatypes.DateTimeStampDatatype;
-import org.semanticweb.elk.owl.datatypes.DecimalDatatype;
-import org.semanticweb.elk.owl.datatypes.HexBinaryDatatype;
-import org.semanticweb.elk.owl.datatypes.IntegerDatatype;
-import org.semanticweb.elk.owl.datatypes.LiteralDatatype;
-import org.semanticweb.elk.owl.datatypes.NameDatatype;
-import org.semanticweb.elk.owl.datatypes.NcNameDatatype;
-import org.semanticweb.elk.owl.datatypes.NmTokenDatatype;
-import org.semanticweb.elk.owl.datatypes.NonNegativeIntegerDatatype;
-import org.semanticweb.elk.owl.datatypes.NormalizedStringDatatype;
-import org.semanticweb.elk.owl.datatypes.PlainLiteralDatatype;
-import org.semanticweb.elk.owl.datatypes.RationalDatatype;
-import org.semanticweb.elk.owl.datatypes.RealDatatype;
-import org.semanticweb.elk.owl.datatypes.StringDatatype;
-import org.semanticweb.elk.owl.datatypes.TokenDatatype;
-import org.semanticweb.elk.owl.datatypes.UndefinedDatatype;
-import org.semanticweb.elk.owl.datatypes.XmlLiteralDatatype;
+import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.interfaces.datatypes.AnyUriDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.Base64BinaryDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.DateTimeDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.DateTimeStampDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.DecimalDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.HexBinaryDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.IntegerDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.LiteralDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.NameDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.NcNameDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.NmTokenDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.NonNegativeIntegerDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.NormalizedStringDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.PlainLiteralDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.RationalDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.RealDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.StringDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.TokenDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.UndefinedDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.XmlLiteralDatatype;
 
 /**
- *
+ * This interface helps parsing the lexical representation of a literal (passed
+ * as the parameter) based on the datatype of that literal.
+ * 
  * @author Pospishnyi Olexandr
+ * @author Pavel Klinov
  */
-public interface ElkDatatypeParser<O, P> {
+public interface ElkDatatypeParser<O, P, E extends ElkException> {
 
-	O parse(LiteralDatatype datatype, P param);
+	O parse(LiteralDatatype datatype, P param) throws E;
 
-	O parse(DateTimeDatatype datatype, P param);
+	O parse(DateTimeDatatype datatype, P param) throws E;
 
-	O parse(DateTimeStampDatatype datatype, P param);
+	O parse(DateTimeStampDatatype datatype, P param) throws E;
 
-	O parse(Base64BinaryDatatype datatype, P param);
+	O parse(Base64BinaryDatatype datatype, P param) throws E;
 
-	O parse(HexBinaryDatatype datatype, P param);
+	O parse(HexBinaryDatatype datatype, P param) throws E;
 
-	O parse(AnyUriDatatype datatype, P param);
+	O parse(AnyUriDatatype datatype, P param) throws E;
 
-	O parse(RealDatatype datatype, P param);
+	O parse(RealDatatype datatype, P param) throws E;
 
-	O parse(RationalDatatype datatype, P param);
+	O parse(RationalDatatype datatype, P param) throws E;
 
-	O parse(DecimalDatatype datatype, P param);
+	O parse(DecimalDatatype datatype, P param) throws E;
 
-	O parse(IntegerDatatype datatype, P param);
+	O parse(IntegerDatatype datatype, P param) throws E;
 
-	O parse(NonNegativeIntegerDatatype datatype, P param);
+	O parse(NonNegativeIntegerDatatype datatype, P param) throws E;
 
-	O parse(PlainLiteralDatatype datatype, P param);
+	O parse(PlainLiteralDatatype datatype, P param) throws E;
 
-	O parse(StringDatatype datatype, P param);
+	O parse(StringDatatype datatype, P param) throws E;
 
-	O parse(NormalizedStringDatatype datatype, P param);
+	O parse(NormalizedStringDatatype datatype, P param) throws E;
 
-	O parse(TokenDatatype datatype, P param);
+	O parse(TokenDatatype datatype, P param) throws E;
 
-	O parse(NameDatatype datatype, P param);
+	O parse(NameDatatype datatype, P param) throws E;
 
-	O parse(NcNameDatatype datatype, P param);
+	O parse(NcNameDatatype datatype, P param) throws E;
 
-	O parse(NmTokenDatatype datatype, P param);
+	O parse(NmTokenDatatype datatype, P param) throws E;
 
-	O parse(XmlLiteralDatatype datatype, P param);
+	O parse(XmlLiteralDatatype datatype, P param) throws E;
 
-	O parse(UndefinedDatatype datatype, P param);
+	O parse(UndefinedDatatype datatype, P param) throws E;
 }

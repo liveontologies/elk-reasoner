@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.datatypes.index;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.semanticweb.elk.reasoner.datatypes.util.NumberUtils;
+import org.semanticweb.elk.owl.parsing.NumberUtils;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.BaseIntervalValueSpaceVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDatatypeExpression;

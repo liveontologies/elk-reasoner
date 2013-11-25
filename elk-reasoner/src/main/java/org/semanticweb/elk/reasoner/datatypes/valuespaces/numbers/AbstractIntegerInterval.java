@@ -24,8 +24,8 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers;
  * #L%
  */
 
-import org.semanticweb.elk.owl.datatypes.IntegerDatatype;
-import org.semanticweb.elk.reasoner.datatypes.util.NumberUtils;
+import org.semanticweb.elk.owl.interfaces.datatypes.IntegerDatatype;
+import org.semanticweb.elk.owl.parsing.NumberUtils;
 
 /**
  *  

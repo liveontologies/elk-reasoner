@@ -23,11 +23,12 @@
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkLiteral;
 import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
-import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.PointValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkUnexpectedIndexingException;
 
 /**
  * rdfs:Literal datatype handler.
@@ -44,18 +45,22 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
  */
 public class LiteralDatatypeHandler extends AbstractDatatypeHandler {
 
-	@Override
-	protected ElkDatatypeVisitor<ValueSpace<?>> getLiteralConverter(final ElkLiteral literal) {
-		return new BaseElkDatatypeVisitor<ValueSpace<?>>(){};
-	}
-
+	private final ElkDataRangeVisitor<ValueSpace<?>> dataRangeConverter_ = new BaseDataRangeConverter() {
+		@Override
+		public ValueSpace<?> visit(ElkDatatype elkDatatype) {
+			return EntireValueSpace.RDFS_LITERAL;
+		}
+	};
+	
+	
 	@Override
 	protected ElkDataRangeVisitor<ValueSpace<?>> getDataRangeConverter() {
-		return new BaseElkDataRangeVisitor<ValueSpace<?>>() {
-			@Override
-			public ValueSpace<?> visit(ElkDatatype elkDatatype) {
-				return EntireValueSpace.RDFS_LITERAL;
-			}
-		};
+		return dataRangeConverter_;
+	}
+
+
+	@Override
+	public PointValue<?, ?> createValueSpace(ElkLiteral literal) {
+		throw new ElkUnexpectedIndexingException("There's no lexical representation of rdfs:Literal in OWL 2");
 	}
 }

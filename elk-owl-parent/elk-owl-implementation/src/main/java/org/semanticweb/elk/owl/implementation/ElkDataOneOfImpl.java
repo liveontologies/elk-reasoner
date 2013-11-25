@@ -25,7 +25,7 @@ package org.semanticweb.elk.owl.implementation;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkLiteral;
 import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 

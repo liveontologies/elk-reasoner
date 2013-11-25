@@ -24,30 +24,39 @@ package org.semanticweb.elk.reasoner.datatypes.handlers;
 
 import java.util.HashMap;
 
-import org.semanticweb.elk.owl.datatypes.NameDatatype;
-import org.semanticweb.elk.owl.datatypes.NcNameDatatype;
-import org.semanticweb.elk.owl.datatypes.NmTokenDatatype;
-import org.semanticweb.elk.owl.datatypes.NormalizedStringDatatype;
-import org.semanticweb.elk.owl.datatypes.PlainLiteralDatatype;
-import org.semanticweb.elk.owl.datatypes.StringDatatype;
-import org.semanticweb.elk.owl.datatypes.TokenDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.interfaces.datatypes.NameDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.NcNameDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.NmTokenDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.NormalizedStringDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.PlainLiteralDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.StringDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.TokenDatatype;
+import org.semanticweb.elk.owl.interfaces.literals.ElkLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkNameLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkNcNameLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkNmTokenLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkNormalizedStringLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkPlainLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkRealLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkStringLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkTokenLiteral;
 import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.visitors.BaseElkLiteralVisitor;
 import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
-import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
-import org.semanticweb.elk.reasoner.datatypes.util.LiteralParser;
+import org.semanticweb.elk.owl.visitors.ElkLiteralVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EmptyValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.EntireValueSpace;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.PointValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.other.LengthRestrictedValueSpace;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.other.LiteralValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.other.PatternValueSpace;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkUnexpectedIndexingException;
-import org.semanticweb.elk.util.collections.Pair;
 
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.Datatypes;
@@ -71,6 +80,159 @@ public class PlainLiteralDatatypeHandler extends AbstractDatatypeHandler {
 	private final Automaton NameAutomaton;
 	private final Automaton NCNameAutomaton;
 	private final Automaton NMTokenAutomaton;
+	
+	private final ElkLiteralVisitor<PointValue<?, ?>> literalConverter_ = new BaseElkLiteralVisitor<PointValue<?, ?>>(){
+
+		@Override
+		protected PointValue<?, ?> defaultVisit(ElkLiteral elkLiteral) {
+			throw new ElkUnexpectedIndexingException("Expecting a literal of a datatype subsumed by rdf:PlainLiteral but got " + elkLiteral);
+		}
+
+		@Override
+		public PointValue<?, ?> visit(ElkPlainLiteral elkLiteral) {
+			return createLiteralValue(elkLiteral.getString(), elkLiteral.getLanguage(), elkLiteral.getDatatype());
+		}
+
+		@Override
+		public PointValue<?, ?> visit(ElkStringLiteral elkLiteral) {
+			return createLiteralValue(elkLiteral.getString(), null, elkLiteral.getDatatype());
+		}
+
+		@Override
+		public PointValue<?, ?> visit(ElkNormalizedStringLiteral elkLiteral) {
+			return createLiteralValue(elkLiteral.getString(), null, elkLiteral.getDatatype());
+		}
+
+		@Override
+		public PointValue<?, ?> visit(ElkTokenLiteral elkLiteral) {
+			return createLiteralValue(elkLiteral.getString(), null, elkLiteral.getDatatype());
+		}
+
+		@Override
+		public PointValue<?, ?> visit(ElkNameLiteral elkLiteral) {
+			return createLiteralValue(elkLiteral.getString(), null, elkLiteral.getDatatype());
+		}
+
+		@Override
+		public PointValue<?, ?> visit(ElkNcNameLiteral elkLiteral) {
+			return createLiteralValue(elkLiteral.getString(), null, elkLiteral.getDatatype());
+		}
+
+		@Override
+		public PointValue<?, ?> visit(ElkNmTokenLiteral elkLiteral) {
+			return createLiteralValue(elkLiteral.getString(), null, elkLiteral.getDatatype());
+		}
+
+		private PointValue<?, ?> createLiteralValue(String string, String lang, ElkDatatype datatype) {
+			ElkDatatype effectiveDatatype = null;
+
+			if (lang != null && !lang.isEmpty()) {
+				effectiveDatatype = ElkDatatypeMap.RDF_PLAIN_LITERAL;
+			} else {
+				effectiveDatatype = determineDatatype(string);
+			}
+			//check that the effective datatype is compatible with the declared datatype
+			if (effectiveDatatype.isCompatibleWith(datatype)) {
+				return new LiteralValue(string, lang, effectiveDatatype);
+			} else {
+				return EmptyValueSpace.INSTANCE;
+			}
+		}
+
+	};
+	
+	private final ElkDataRangeVisitor<ValueSpace<?>> dataRangeConverter_ = new BaseDataRangeConverter() {
+		
+		@Override
+		public ValueSpace<?> visit(ElkDatatype elkDatatype) {
+			return elkDatatype.accept(new BaseDatatypeVisitor<EntireValueSpace<?>>() {
+
+				@Override
+				public EntireValueSpace<?> visit(
+						PlainLiteralDatatype datatype) {
+					return EntireValueSpace.RDF_PLAIN_LITERAL;
+				}
+
+				@Override
+				public EntireValueSpace<?> visit(StringDatatype datatype) {
+					return EntireValueSpace.XSD_STRING;
+				}
+
+				@Override
+				public EntireValueSpace<?> visit(
+						NormalizedStringDatatype datatype) {
+					return EntireValueSpace.XSD_NORMALIZED_STRING;
+				}
+
+				@Override
+				public EntireValueSpace<?> visit(TokenDatatype datatype) {
+					return EntireValueSpace.XSD_TOKEN;
+				}
+
+				@Override
+				public EntireValueSpace<?> visit(NameDatatype datatype) {
+					return EntireValueSpace.XSD_NAME;
+				}
+
+				@Override
+				public EntireValueSpace<?> visit(NcNameDatatype datatype) {
+					return EntireValueSpace.XSD_NCNAME;
+				}
+
+				@Override
+				public EntireValueSpace<?> visit(NmTokenDatatype datatype) {
+					return EntireValueSpace.XSD_NMTOKEN;
+				}
+				
+			});
+		}
+
+		@Override
+		public ValueSpace<?> visit(	ElkDatatypeRestriction elkDatatypeRestriction) {
+			Integer minLength = 0;
+			Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
+
+			for (ElkFacetRestriction facetRestriction : elkDatatypeRestriction
+					.getFacetRestrictions()) {
+				PredefinedElkIri facet = PredefinedElkIri.lookup(facetRestriction.getConstrainingFacet());
+				ElkRealLiteral facetNumericBound = null;
+
+				switch (facet) {
+				case XSD_LENGTH:
+					facetNumericBound = asNumericLiteral(facetRestriction.getRestrictionValue());
+					minLength = facetNumericBound.getNumber().intValue();
+					maxLength = minLength;
+					
+					return new LengthRestrictedValueSpace(elkDatatypeRestriction.getDatatype(), minLength, maxLength);
+				case XSD_MIN_LENGTH:
+					facetNumericBound = asNumericLiteral(facetRestriction.getRestrictionValue());
+					minLength = facetNumericBound.getNumber().intValue();
+					break;
+				case XSD_MAX_LENGTH:
+					facetNumericBound = asNumericLiteral(facetRestriction.getRestrictionValue());
+					maxLength = facetNumericBound.getNumber().intValue();
+					break;
+				case XSD_PATTERN:
+					Automaton pattern = new RegExp(facetRestriction.getRestrictionValue().getLexicalForm()).toAutomaton();
+					pattern.setInfo(facetRestriction.getRestrictionValue().getLexicalForm());
+					ElkDatatype effectiveDatatype = determineDatatype(pattern);
+					
+					if (effectiveDatatype.isCompatibleWith(elkDatatypeRestriction.getDatatype())) {
+						return new PatternValueSpace(pattern, effectiveDatatype);
+					}
+					else {
+						return EmptyValueSpace.INSTANCE;
+					}
+
+				default:
+					throw new ElkUnexpectedIndexingException("Unsupported facet: " + facet);
+				}
+			}
+			
+			return new LengthRestrictedValueSpace(elkDatatypeRestriction.getDatatype(), minLength, maxLength);
+		}
+	};
+
 
 	public PlainLiteralDatatypeHandler() {
 		// building automaton cache for construction of our automatons
@@ -149,167 +311,6 @@ public class PlainLiteralDatatypeHandler extends AbstractDatatypeHandler {
 		 * CombiningChar | Extender Nmtoken ::= (NameChar)+
 		 */
 		NMTokenAutomaton = new RegExp("<NameChar>+").toAutomaton(autoMap);
-	}
-
-	@Override
-	protected ElkDatatypeVisitor<ValueSpace<?>> getLiteralConverter(
-			final ElkLiteral literal) {
-		return new BaseElkDatatypeVisitor<ValueSpace<?>>() {
-
-			@Override
-			public ValueSpace<?> visit(PlainLiteralDatatype datatype) {
-				return createLiteralValue(datatype);
-			}
-
-			@Override
-			public ValueSpace<?> visit(StringDatatype datatype) {
-				return createLiteralValue(datatype);
-			}
-
-			@Override
-			public ValueSpace<?> visit(NormalizedStringDatatype datatype) {
-				return createLiteralValue(datatype);
-			}
-
-			@Override
-			public ValueSpace<?> visit(TokenDatatype datatype) {
-				return createLiteralValue(datatype);
-			}
-
-			@Override
-			public ValueSpace<?> visit(NameDatatype datatype) {
-				return createLiteralValue(datatype);
-			}
-
-			@Override
-			public ValueSpace<?> visit(NcNameDatatype datatype) {
-				return createLiteralValue(datatype);
-			}
-
-			@Override
-			public ValueSpace<?> visit(NmTokenDatatype datatype) {
-				return createLiteralValue(datatype);
-			}
-			
-			private ValueSpace<?> createLiteralValue(ElkDatatype datatype) {
-				String[] parsed = LiteralParser.parseStringLiteral(literal.getLexicalForm());
-				String value = parsed[0];
-				String language = parsed.length > 1 ? parsed[1] : literal.getLanguage();
-				ElkDatatype effectiveDatatype = determineDatatype(value);
-				//check that the effective datatype is compatible with the declared datatype
-				if (effectiveDatatype.isCompatibleWith(datatype)) {
-					if (language != null && !language.isEmpty()) {
-						// language tag is present
-						return new LiteralValue(new Pair<String, String>(value, language), effectiveDatatype);
-					} else {
-						// no language tag for this literal
-						return new LiteralValue(value, effectiveDatatype);
-					}
-				}
-				else {
-					return EmptyValueSpace.INSTANCE;
-				}
-			}
-			
-		};
-	}
-
-
-	@Override
-	protected ElkDataRangeVisitor<ValueSpace<?>> getDataRangeConverter() {
-		return new BaseElkDataRangeVisitor<ValueSpace<?>>() {
-
-			@Override
-			public ValueSpace<?> visit(ElkDatatype elkDatatype) {
-				return elkDatatype.accept(new BaseElkDatatypeVisitor<EntireValueSpace<?>>() {
-
-					@Override
-					public EntireValueSpace<?> visit(
-							PlainLiteralDatatype datatype) {
-						return EntireValueSpace.RDF_PLAIN_LITERAL;
-					}
-
-					@Override
-					public EntireValueSpace<?> visit(StringDatatype datatype) {
-						return EntireValueSpace.XSD_STRING;
-					}
-
-					@Override
-					public EntireValueSpace<?> visit(
-							NormalizedStringDatatype datatype) {
-						return EntireValueSpace.XSD_NORMALIZED_STRING;
-					}
-
-					@Override
-					public EntireValueSpace<?> visit(TokenDatatype datatype) {
-						return EntireValueSpace.XSD_TOKEN;
-					}
-
-					@Override
-					public EntireValueSpace<?> visit(NameDatatype datatype) {
-						return EntireValueSpace.XSD_NAME;
-					}
-
-					@Override
-					public EntireValueSpace<?> visit(NcNameDatatype datatype) {
-						return EntireValueSpace.XSD_NCNAME;
-					}
-
-					@Override
-					public EntireValueSpace<?> visit(NmTokenDatatype datatype) {
-						return EntireValueSpace.XSD_NMTOKEN;
-					}
-					
-				});
-			}
-
-			@Override
-			public ValueSpace<?> visit(
-					ElkDatatypeRestriction elkDatatypeRestriction) {
-				Integer minLength = 0;
-				Integer maxLength = Integer.valueOf(Integer.MAX_VALUE);
-
-				for (ElkFacetRestriction facetRestriction : elkDatatypeRestriction
-						.getFacetRestrictions()) {
-					PredefinedElkIri facet = PredefinedElkIri.lookup(facetRestriction
-							.getConstrainingFacet());
-					String lexicalForm = facetRestriction.getRestrictionValue()
-							.getLexicalForm();
-					String value = LiteralParser.parseStringLiteral(lexicalForm)[0];
-
-					switch (facet) {
-					case XSD_LENGTH:
-						minLength = Integer.valueOf(value);
-						maxLength = minLength;
-						
-						return new LengthRestrictedValueSpace(elkDatatypeRestriction.getDatatype(), minLength, maxLength);
-					case XSD_MIN_LENGTH:
-						minLength = Integer.valueOf(value);
-						break;
-					case XSD_MAX_LENGTH:
-						maxLength = Integer.valueOf(value);
-						break;
-					case XSD_PATTERN:
-						Automaton pattern = new RegExp(value).toAutomaton();
-						pattern.setInfo(value);
-						ElkDatatype effectiveDatatype = determineDatatype(pattern);
-						
-						if (effectiveDatatype.isCompatibleWith(elkDatatypeRestriction.getDatatype())) {
-							return new PatternValueSpace(pattern, effectiveDatatype);
-						}
-						else {
-							return EmptyValueSpace.INSTANCE;
-						}
-
-					default:
-						throw new ElkUnexpectedIndexingException("Unsupported facet: " + facet);
-					}
-				}
-				
-				return new LengthRestrictedValueSpace(elkDatatypeRestriction.getDatatype(), minLength, maxLength);
-			}
-			
-		};
 	}
 
 
@@ -395,6 +396,18 @@ public class PlainLiteralDatatypeHandler extends AbstractDatatypeHandler {
 			return retType;
 		}
 		return retType;
+	}
+
+
+	@Override
+	public PointValue<?, ?> createValueSpace(ElkLiteral literal) {
+		return literal.accept(literalConverter_);
+	}
+
+
+	@Override
+	protected ElkDataRangeVisitor<ValueSpace<?>> getDataRangeConverter() throws ElkIndexingException {
+		return dataRangeConverter_;
 	}
 
 }

@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers;
 
 import java.math.BigDecimal;
 
-import org.semanticweb.elk.owl.datatypes.DecimalDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.DecimalDatatype;
 import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.BaseValueSpaceContainmentVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;

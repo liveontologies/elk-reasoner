@@ -26,8 +26,8 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers;
 
 import java.util.Comparator;
 
-import org.semanticweb.elk.owl.datatypes.RealDatatype;
-import org.semanticweb.elk.reasoner.datatypes.util.NumberUtils;
+import org.semanticweb.elk.owl.interfaces.datatypes.RealDatatype;
+import org.semanticweb.elk.owl.parsing.NumberUtils;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.PointValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.util.collections.intervals.Interval;

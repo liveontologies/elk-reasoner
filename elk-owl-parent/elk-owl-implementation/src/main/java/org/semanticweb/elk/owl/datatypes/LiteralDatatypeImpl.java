@@ -21,7 +21,9 @@ package org.semanticweb.elk.owl.datatypes;
  * #L%
  */
 
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkDatatypeImpl;
+import org.semanticweb.elk.owl.interfaces.datatypes.LiteralDatatype;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeParser;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
@@ -42,7 +44,7 @@ public class LiteralDatatypeImpl extends ElkDatatypeImpl implements LiteralDatat
 	}
 
 	@Override
-	public <O, P> O accept(ElkDatatypeParser<O, P> parser, P param) {
+	public <O, P, E extends ElkException> O accept(ElkDatatypeParser<O, P, E> parser, P param) throws E {
 		return parser.parse(this, param);
 	}
 }

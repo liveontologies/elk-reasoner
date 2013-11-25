@@ -49,6 +49,12 @@ public class PlainLiteralValueSpaceTest extends AbstractValueSpaceTest {
 	@Test
 	public void contains() throws Exception {
 		assertTrue(contains(
+				"DatatypeRestriction(rdf:PlainLiteral xsd:minLength \"3\"^^xsd:integer xsd:maxLength \"3\"^^xsd:integer)",
+				"DataOneOf(\"Foo\"@us)"));
+		assertTrue(contains(
+				"DatatypeRestriction(xsd:string xsd:length \"3\"^^xsd:integer)",
+				"DatatypeRestriction(xsd:string xsd:pattern \"[A-Z]oo\")"));
+		assertTrue(contains(
 				"DatatypeRestriction(xsd:string xsd:pattern \"[a-z]+\")",
 				"DatatypeRestriction(rdf:PlainLiteral xsd:pattern \"foo*\")"));
 		assertTrue(contains(
@@ -58,6 +64,9 @@ public class PlainLiteralValueSpaceTest extends AbstractValueSpaceTest {
 
 	@Test
 	public void doesNotContain() throws Exception {
+		assertFalse(contains(
+				"DatatypeRestriction(xsd:string xsd:minLength \"3\"^^xsd:integer xsd:maxLength \"10\"^^xsd:integer)",
+				"DataOneOf(\"Foo\"@us)"));
 		assertFalse(contains(
 				"DatatypeRestriction(xsd:string xsd:length \"3\"^^xsd:integer)",
 				"DatatypeRestriction(rdf:PlainLiteral xsd:minLength \"3\"^^xsd:integer xsd:maxLength \"3\"^^xsd:integer)"));

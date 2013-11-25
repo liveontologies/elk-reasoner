@@ -8,7 +8,7 @@ Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
 
 Ontology(<http://www.semanticweb.org/Test.owl>
 
-SubClassOf(:DA :DI)
+SubClassOf(:DA :DH)
 SubClassOf(:DB :DI)
 SubClassOf(:DC :DE)
 SubClassOf(:DC :DM)

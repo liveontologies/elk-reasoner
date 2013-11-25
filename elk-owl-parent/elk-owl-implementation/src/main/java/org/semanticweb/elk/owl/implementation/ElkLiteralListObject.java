@@ -24,7 +24,7 @@ package org.semanticweb.elk.owl.implementation;
 
 import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkLiteral;
 
 /**
  * Implementation for ElkObjects that maintain a list of literals.

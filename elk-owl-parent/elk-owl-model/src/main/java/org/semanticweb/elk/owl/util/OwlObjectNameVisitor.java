@@ -67,7 +67,6 @@ import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIrreflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
@@ -101,7 +100,9 @@ import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.literals.ElkLiteral;
 import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.visitors.BaseElkLiteralVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -111,7 +112,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  * @author Frantisek Simancik
  * 
  */
-public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
+public class OwlObjectNameVisitor extends BaseElkLiteralVisitor<String> implements ElkObjectVisitor<String> {
 
 	private static OwlObjectNameVisitor _INSTANCE = new OwlObjectNameVisitor();
 
@@ -577,13 +578,13 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	}
 
 	@Override
-	public String visit(ElkLiteral elkLiteral) {
-		return "Literal";
+	public String visit(ElkSWRLRule rule) {
+		return "DLSafeRule";
 	}
 
 	@Override
-	public String visit(ElkSWRLRule rule) {
-		return "DLSafeRule";
+	protected String defaultVisit(ElkLiteral elkLiteral) {
+		return "Literal";
 	}
 
 }

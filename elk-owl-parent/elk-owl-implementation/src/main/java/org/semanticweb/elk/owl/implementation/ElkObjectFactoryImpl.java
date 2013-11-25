@@ -77,7 +77,6 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIrreflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
@@ -114,10 +113,13 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.literals.ElkLiteral;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.managers.DummyElkObjectRecycler;
 import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
 import org.semanticweb.elk.owl.managers.ElkObjectRecycler;
+import org.semanticweb.elk.owl.parsing.Owl2LiteralParser;
+import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 
@@ -141,7 +143,9 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	protected static final ElkDataProperty ELK_OWL_BOTTOM_DATA_PROPERTY = new ElkDataPropertyImpl(
 			PredefinedElkIri.OWL_BOTTOM_DATA_PROPERTY.get());
 
-	protected final ElkObjectRecycler objectRecycler_;
+	private final ElkObjectRecycler objectRecycler_;
+
+	private final Owl2LiteralParser literalParser_ = new Owl2LiteralParser();
 
 	/**
 	 * Construct an {@link ElkObjectFactoryImpl} that uses the
@@ -564,9 +568,13 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	}
 
 	@Override
-	public ElkLiteral getLiteral(String lexicalForm, ElkDatatype datatype) {
-		return (ElkLiteral) objectRecycler_.recycle(new ElkLiteralImpl(
-				lexicalForm, datatype));
+	public ElkLiteral getLiteral(String lexicalForm, ElkDatatype datatype)
+			throws Owl2ParseException {
+		ElkLiteral literal = literalParser_.createLiteral(lexicalForm, datatype);
+
+		return (ElkLiteral) objectRecycler_.recycle(literal);
+		// return (ElkLiteral) objectRecycler_.recycle(new
+		// ElkLiteralImpl(lexicalForm, datatype));
 	}
 
 	@Override

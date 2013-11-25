@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.numbers;
  * #L%
  */
 
-import org.semanticweb.elk.owl.datatypes.RealDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.RealDatatype;
 import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.BaseValueSpaceContainmentVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;

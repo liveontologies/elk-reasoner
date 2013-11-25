@@ -21,26 +21,26 @@ package org.semanticweb.elk.reasoner.datatypes.handlers;
  * #L%
  */
 
-import org.semanticweb.elk.owl.datatypes.AnyUriDatatype;
-import org.semanticweb.elk.owl.datatypes.Base64BinaryDatatype;
-import org.semanticweb.elk.owl.datatypes.DateTimeDatatype;
-import org.semanticweb.elk.owl.datatypes.DateTimeStampDatatype;
-import org.semanticweb.elk.owl.datatypes.DecimalDatatype;
-import org.semanticweb.elk.owl.datatypes.HexBinaryDatatype;
-import org.semanticweb.elk.owl.datatypes.IntegerDatatype;
-import org.semanticweb.elk.owl.datatypes.LiteralDatatype;
-import org.semanticweb.elk.owl.datatypes.NameDatatype;
-import org.semanticweb.elk.owl.datatypes.NcNameDatatype;
-import org.semanticweb.elk.owl.datatypes.NmTokenDatatype;
-import org.semanticweb.elk.owl.datatypes.NonNegativeIntegerDatatype;
-import org.semanticweb.elk.owl.datatypes.NormalizedStringDatatype;
-import org.semanticweb.elk.owl.datatypes.PlainLiteralDatatype;
-import org.semanticweb.elk.owl.datatypes.RationalDatatype;
-import org.semanticweb.elk.owl.datatypes.RealDatatype;
-import org.semanticweb.elk.owl.datatypes.StringDatatype;
-import org.semanticweb.elk.owl.datatypes.TokenDatatype;
-import org.semanticweb.elk.owl.datatypes.UndefinedDatatype;
-import org.semanticweb.elk.owl.datatypes.XmlLiteralDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.AnyUriDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.Base64BinaryDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.DateTimeDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.DateTimeStampDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.DecimalDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.HexBinaryDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.IntegerDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.LiteralDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.NameDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.NcNameDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.NmTokenDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.NonNegativeIntegerDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.NormalizedStringDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.PlainLiteralDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.RationalDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.RealDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.StringDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.TokenDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.UndefinedDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.XmlLiteralDatatype;
 import org.semanticweb.elk.owl.visitors.ElkDatatypeVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkIndexingUnsupportedException;
 

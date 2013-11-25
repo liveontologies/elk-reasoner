@@ -23,7 +23,8 @@
 package org.semanticweb.elk.reasoner.datatypes.handlers;
 
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkLiteral;
+import org.semanticweb.elk.reasoner.datatypes.valuespaces.PointValue;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 
 /**
@@ -37,7 +38,7 @@ import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
  */
 public interface DatatypeHandler {
 
-	public ValueSpace<?> createValueSpace(ElkLiteral literal);
+	public PointValue<?, ?> createValueSpace(ElkLiteral literal);
 
 	public ValueSpace<?> createValueSpace(ElkDataRange dataRange);
 }

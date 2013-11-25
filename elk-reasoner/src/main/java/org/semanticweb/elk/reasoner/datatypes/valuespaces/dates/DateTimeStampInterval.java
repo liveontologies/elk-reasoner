@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.dates;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.semanticweb.elk.owl.datatypes.DateTimeStampDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.DateTimeStampDatatype;
 import org.semanticweb.elk.owl.managers.ElkDatatypeMap;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.BaseValueSpaceContainmentVisitor;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;

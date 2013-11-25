@@ -102,7 +102,7 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIrreflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
@@ -144,6 +144,7 @@ import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 
 public abstract class AbstractOwl2FunctionalStyleParser implements Owl2Parser {
 
@@ -802,7 +803,13 @@ ElkLiteral literal():
 				lexform = lexform + langtag;
 			}
 		}
-		return getElkObjectFactory().getLiteral(lexform, d);
+		
+		try {
+			return getElkObjectFactory().getLiteral(lexform, d);
+		}
+		catch (ElkException e) {
+			generateParseException();
+		}
 	}
 }
 

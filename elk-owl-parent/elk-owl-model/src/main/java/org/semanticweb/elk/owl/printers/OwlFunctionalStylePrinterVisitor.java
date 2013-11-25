@@ -76,7 +76,6 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIrreflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
@@ -117,8 +116,10 @@ import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.literals.ElkLiteral;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.visitors.BaseElkLiteralVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
@@ -129,7 +130,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  * @author "Yevgeny Kazakov"
  * 
  */
-class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
+class OwlFunctionalStylePrinterVisitor extends BaseElkLiteralVisitor<Void> implements ElkObjectVisitor<Void> {
 
 	private final Appendable writer;
 
@@ -1002,6 +1003,20 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(ElkSWRLRule rule) {
 		// we punt on this
 		write("DLSafeRule(  )");
+		return null;
+	}
+
+	@Override
+	protected Void defaultVisit(ElkLiteral elkLiteral) {
+		write("\"");
+		write(elkLiteral.getLexicalForm());
+		write("\"");
+
+		if (!isPlain(elkLiteral)) {
+			write("^^");
+			write(elkLiteral.getDatatype());
+		}
+
 		return null;
 	}
 

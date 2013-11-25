@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.datatypes.valuespaces.dates;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.semanticweb.elk.owl.datatypes.DateTimeDatatype;
+import org.semanticweb.elk.owl.interfaces.datatypes.DateTimeDatatype;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 

@@ -22,13 +22,33 @@
  */
 package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkAnyUriLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkBase64BinaryLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkDateTimeLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkDateTimeStampLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkDecimalLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkHexBinaryLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkIntLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkIntegerLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkLongLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkNameLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkNcNameLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkNmTokenLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkNormalizedStringLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkPlainLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkRationalLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkRealLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkStringLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkTokenLiteral;
+import org.semanticweb.elk.owl.interfaces.literals.ElkXmlLiteral;
 
 /**
  * Visitor interface for {@link ElkLiteral}.
  * 
  * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"
+ * @author Pavel Klinov
  * 
  * @param <O>
  *            the output type of the visitor
@@ -37,4 +57,41 @@ public interface ElkLiteralVisitor<O> {
 
 	O visit(ElkLiteral elkLiteral);
 
+	O visit(ElkDateTimeLiteral elkLiteral);
+	
+	O visit(ElkDateTimeStampLiteral elkLiteral);
+	
+	O visit(ElkBase64BinaryLiteral elkLiteral);
+	
+	O visit(ElkHexBinaryLiteral elkLiteral);
+	
+	O visit(ElkAnyUriLiteral elkLiteral);
+	
+	O visit(ElkRealLiteral elkLiteral);
+	
+	O visit(ElkRationalLiteral elkLiteral);
+	
+	O visit(ElkDecimalLiteral elkLiteral);
+	
+	O visit(ElkIntegerLiteral elkLiteral);
+	
+	O visit(ElkIntLiteral elkLiteral);
+	
+	O visit(ElkLongLiteral elkLiteral);
+	
+	O visit(ElkPlainLiteral elkLiteral);
+	
+	O visit(ElkStringLiteral elkLiteral);
+	
+	O visit(ElkNormalizedStringLiteral elkLiteral);
+	
+	O visit(ElkTokenLiteral elkLiteral);
+	
+	O visit(ElkNameLiteral elkLiteral);
+	
+	O visit(ElkNcNameLiteral elkLiteral);
+	
+	O visit(ElkNmTokenLiteral elkLiteral);
+	
+	O visit(ElkXmlLiteral elkLiteral);
 }

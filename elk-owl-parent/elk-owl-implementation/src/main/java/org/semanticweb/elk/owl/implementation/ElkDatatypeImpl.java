@@ -57,11 +57,6 @@ abstract public class ElkDatatypeImpl extends ElkIriObject implements ElkEntity,
 	}
 	
 	@Override
-	public String getDatatypeShortname() {
-		return iri.getFullIriAsString().split("#")[1];
-	}
-
-	@Override
 	public String getDatatypeIRI() {
 		return iri.getFullIriAsString();
 	}
