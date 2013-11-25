@@ -167,7 +167,7 @@ public class Owl2LiteralParser implements ElkDatatypeParser<ElkLiteral, String, 
 	public ElkLiteral parse(PlainLiteralDatatype datatype, String lexForm) {
 		String[] parsed = LiteralParser.parseStringLiteral(lexForm);
 		
-		return createPlainLiteral(parsed[0], parsed[1]);
+		return parsed.length > 1 ? createPlainLiteral(parsed[0], parsed[1]) : createPlainLiteral(parsed[0]);
 	}
 
 	@Override

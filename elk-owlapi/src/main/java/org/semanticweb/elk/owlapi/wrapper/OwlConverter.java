@@ -504,7 +504,7 @@ public class OwlConverter {
 	public ElkLiteral convert(OWLLiteral owlLiteral) {
 		OWLDatatype owlDatatype = owlLiteral.getDatatype();
 		
-		if (owlDatatype != null) {
+		if (owlDatatype != null && (owlLiteral.getLang() == null || owlLiteral.getLang().isEmpty())) {
 			ElkDatatype datatype = ElkDatatypeMap.get(PredefinedElkIri.lookup(new ElkFullIri(owlDatatype.getIRI().toString())).get());
 		
 			try {
@@ -514,7 +514,7 @@ public class OwlConverter {
 			}
 		}
 		else {
-			return literalParser_.createPlainLiteral(owlLiteral.getLiteral());
+			return literalParser_.createPlainLiteral(owlLiteral.getLiteral(), owlLiteral.getLang());
 		}
 	}
 
