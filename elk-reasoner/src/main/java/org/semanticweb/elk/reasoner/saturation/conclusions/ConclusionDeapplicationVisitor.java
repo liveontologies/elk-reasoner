@@ -59,6 +59,12 @@ public class ConclusionDeapplicationVisitor implements
 		posSCE.apply(writer_, context, ruleAppVisitor_, decompRuleAppVisitor_);
 		return true;
 	}
+	
+	@Override
+	public Boolean visit(DatatypeSubsumer dtSubsumer, Context context) {
+		dtSubsumer.apply(writer_, context, ruleAppVisitor_);
+		return true;
+	}
 
 	@Override
 	public Boolean visit(BackwardLink link, Context context) {

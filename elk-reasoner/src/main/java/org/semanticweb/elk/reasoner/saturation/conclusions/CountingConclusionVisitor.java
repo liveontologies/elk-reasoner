@@ -67,4 +67,10 @@ public class CountingConclusionVisitor implements ConclusionVisitor<Integer> {
 		return counter_.countDisjointnessAxioms++;
 	}
 
+	@Override
+	public Integer visit(DatatypeSubsumer dtSubsumer, Context context) {
+		// TODO don't count datatype expressions yet
+		return 0;
+	}
+
 }

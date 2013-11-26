@@ -36,7 +36,7 @@ import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
- * Represents all occurrences of an {@link ElkClassExpression} in an ontology.
+ * Represents all occurrences of an {@link ElkClassExpression} in the ontology.
  * 
  * @author "Frantisek Simancik"
  * @author "Markus Kroetzsch"
@@ -229,10 +229,6 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 		};
 	}
 	
-	public boolean isDatatypeExpression() {
-		return false;
-	}
-
 	@Override
 	public <O> O accept(IndexedObjectVisitor<O> visitor) {
 		return accept((IndexedClassExpressionVisitor<O>) visitor);

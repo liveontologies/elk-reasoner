@@ -22,40 +22,37 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.reasoner.datatypes.valuespaces.ValueSpace;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 
 /**
- * TODO: documentation
+ * Represents all occurrences of an {@link ElkDataSomeValuesFrom} in the
+ * ontology.
  * 
  * @author Pospishnyi Olexandr
  * @author "Yevgeny Kazakov"
  */
 public class IndexedDatatypeExpression extends IndexedClassExpression {
 
-	protected final IndexedDataProperty property;
+	private final IndexedDataProperty property_;
 
-	protected final ValueSpace<?> valueSpace;
+	private final ValueSpace<?> valueSpace_;
 
 	public IndexedDatatypeExpression(IndexedDataProperty property,
 			ValueSpace<?> valueSpace) {
-		this.property = property;
-		this.valueSpace = valueSpace;
+		this.property_ = property;
+		this.valueSpace_ = valueSpace;
 	}
 
 	public IndexedDataProperty getProperty() {
-		return this.property;
+		return this.property_;
 	}
 
 	public ValueSpace<?> getValueSpace() {
-		return this.valueSpace;
-	}
-
-	@Override
-	public boolean isDatatypeExpression() {
-		return true;
+		return this.valueSpace_;
 	}
 
 	@Override
@@ -74,7 +71,7 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 			int positiveIncrement, int negativeIncrement) {
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			index.add(property, this);
+			index.add(property_, this);
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -84,13 +81,13 @@ public class IndexedDatatypeExpression extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			index.remove(property, this);
+			index.remove(property_, this);
 		}
 	}
 
 	@Override
 	public String toStringStructural() {
-		return "DataSomeValuesFrom( " + property.toString()  + " " +  valueSpace.toString() + " )";
+		return "DataSomeValuesFrom( " + property_.toString()  + " " +  valueSpace_.toString() + " )";
 	}
 
 }

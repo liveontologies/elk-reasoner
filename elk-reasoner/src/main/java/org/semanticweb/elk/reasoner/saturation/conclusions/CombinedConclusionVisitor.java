@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
+
 /*
  * #%L
  * ELK Reasoner
@@ -42,6 +43,12 @@ public class CombinedConclusionVisitor implements ConclusionVisitor<Boolean> {
 	@Override
 	public Boolean visit(PositiveSubsumer posSCE, Context context) {
 		return first_.visit(posSCE, context) && second_.visit(posSCE, context);
+	}
+
+	@Override
+	public Boolean visit(DatatypeSubsumer dtSubsumer, Context context) {
+		return first_.visit(dtSubsumer, context)
+				&& second_.visit(dtSubsumer, context);
 	}
 
 	@Override

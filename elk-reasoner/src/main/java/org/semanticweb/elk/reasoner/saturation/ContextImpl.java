@@ -149,15 +149,7 @@ public class ContextImpl implements Context {
 
 	@Override
 	public boolean addSubsumer(IndexedClassExpression expression) {
-		boolean added = subsumers_.add(expression);
-		if (expression.isDatatypeExpression() && added) {
-			if (datatypeExpressions_ == null) {
-				datatypeExpressions_ = new HashListMultimap<IndexedDataProperty, IndexedDatatypeExpression>();
-			}
-			IndexedDatatypeExpression ide = (IndexedDatatypeExpression) expression;
-			datatypeExpressions_.add(ide.getProperty(), ide);
-		}
-		return added;
+		return subsumers_.add(expression);
 	}
 
 	@Override
@@ -167,14 +159,36 @@ public class ContextImpl implements Context {
 
 	@Override
 	public boolean removeSubsumer(IndexedClassExpression expression) {
-		boolean removed = subsumers_.remove(expression);
-		if (expression.isDatatypeExpression() && removed) {
-			IndexedDatatypeExpression ide = (IndexedDatatypeExpression) expression;
-			datatypeExpressions_.add(ide.getProperty(), ide);
-			if (datatypeExpressions_.isEmpty()) {
-				datatypeExpressions_ = null;
-			}
+		return subsumers_.remove(expression);
+	}
+	
+	/**
+	 * TODO
+	 * @param ide
+	 * @return
+	 */
+	@Override
+	public boolean addDatatypeExpression(IndexedDatatypeExpression ide) {
+		if (datatypeExpressions_ == null) {
+			datatypeExpressions_ = new HashListMultimap<IndexedDataProperty, IndexedDatatypeExpression>();
 		}
+
+		return datatypeExpressions_.add(ide.getProperty(), ide);
+	}
+	
+	/**
+	 * TODO
+	 * @param ide
+	 * @return
+	 */
+	@Override
+	public boolean removeDatatypeExpression(IndexedDatatypeExpression ide) {
+		boolean removed = datatypeExpressions_.remove(ide.getProperty(), ide);
+		
+		if (datatypeExpressions_.isEmpty()) {
+			datatypeExpressions_ = null;
+		}
+		
 		return removed;
 	}
 

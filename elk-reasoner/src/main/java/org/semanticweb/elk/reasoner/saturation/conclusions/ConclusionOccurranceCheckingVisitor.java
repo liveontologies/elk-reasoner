@@ -36,6 +36,11 @@ public class ConclusionOccurranceCheckingVisitor implements
 	public Boolean visit(PositiveSubsumer posSCE, Context context) {
 		return context.containsSubsumer(posSCE.getExpression());
 	}
+	
+	@Override
+	public Boolean visit(DatatypeSubsumer dtSubsumer, Context context) {
+		return context.containsSubsumer(dtSubsumer.getExpression());
+	}
 
 	@Override
 	public Boolean visit(BackwardLink link, Context context) {

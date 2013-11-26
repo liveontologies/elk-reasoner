@@ -35,6 +35,11 @@ public class ConclusionInsertionVisitor implements ConclusionVisitor<Boolean> {
 	public Boolean visit(PositiveSubsumer posSCE, Context context) {
 		return context.addSubsumer(posSCE.getExpression());
 	}
+	
+	@Override
+	public Boolean visit(DatatypeSubsumer dtSubsumer, Context context) {
+		return context.addDatatypeExpression(dtSubsumer.getExpression());
+	}
 
 	@Override
 	public Boolean visit(BackwardLink link, Context context) {

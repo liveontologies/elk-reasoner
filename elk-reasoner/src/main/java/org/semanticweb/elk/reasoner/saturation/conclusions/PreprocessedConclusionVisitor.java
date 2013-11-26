@@ -46,6 +46,12 @@ public class PreprocessedConclusionVisitor<T> implements ConclusionVisitor<T> {
 		preprocessor_.visit(posSCE, context);
 		return visitor_.visit(posSCE, context);
 	}
+	
+	@Override
+	public T visit(DatatypeSubsumer dtSubsumer, Context context) {
+		preprocessor_.visit(dtSubsumer, context);
+		return visitor_.visit(dtSubsumer, context);
+	}
 
 	@Override
 	public T visit(BackwardLink link, Context context) {

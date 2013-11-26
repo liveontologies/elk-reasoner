@@ -37,6 +37,8 @@ public interface ConclusionVisitor<R> {
 	
 	public R visit(PositiveSubsumer posSCE, Context context);
 	
+	public R visit(DatatypeSubsumer dtSubsumer, Context context);
+	
 	public R visit(BackwardLink link, Context context);
 	
 	public R visit(ForwardLink link, Context context);
@@ -84,6 +86,11 @@ public interface ConclusionVisitor<R> {
 
 		@Override
 		public Object visit(DisjointnessAxiom disjointnessAxiom, Context context) {
+			return null;
+		}
+
+		@Override
+		public Object visit(DatatypeSubsumer dtSubsumer, Context context) {
 			return null;
 		}
 		

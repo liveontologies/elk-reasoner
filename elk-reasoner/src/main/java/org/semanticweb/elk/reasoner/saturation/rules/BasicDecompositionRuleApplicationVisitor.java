@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DatatypeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -68,12 +69,13 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 		BasicSaturationStateWriter writer = getSaturationStateWriter();
 		IndexedDataProperty idp = ide.getProperty();
 		ValueSpace<?> vs = ide.getValueSpace();
+		// giving our conclusion visitors a chance to apply any special handling
+		// of datatype subsumers, e.g., storing them separately or whatever.
+		// this is typically needed for the incremental mode.
+		writer.produce(context, new DatatypeSubsumer(ide));
 
 		if (vs == EmptyValueSpace.INSTANCE) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Producing contradiction due to the empty value space for "
-						+ context.getRoot());
-			}
+			LOGGER_.trace("Producing contradiction due to the empty value space for {}", context);
 			// this means that value space is inconsistent; in this
 			// case we are done
 			writer.produce(context, Contradiction.getInstance());

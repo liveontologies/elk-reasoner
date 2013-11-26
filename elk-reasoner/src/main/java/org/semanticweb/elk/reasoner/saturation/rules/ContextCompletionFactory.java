@@ -51,6 +51,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionOccurranceC
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DatatypeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
@@ -559,6 +560,13 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		public Boolean visit(PositiveSubsumer posSCE, Context context) {
 			posSCE.apply(iterationWriter_, context.getRoot().getContext(),
 					ruleAppVisitor_, iterateDecompRuleAppVisitor_);
+			return true;
+		}
+		
+		@Override
+		public Boolean visit(DatatypeSubsumer dtSubsumer, Context context) {
+			dtSubsumer.apply(iterationWriter_, context.getRoot().getContext(),
+					ruleAppVisitor_);
 			return true;
 		}
 

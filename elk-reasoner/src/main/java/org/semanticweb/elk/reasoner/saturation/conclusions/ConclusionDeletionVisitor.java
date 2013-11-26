@@ -35,6 +35,11 @@ public class ConclusionDeletionVisitor implements ConclusionVisitor<Boolean> {
 	public Boolean visit(PositiveSubsumer posSCE, Context context) {
 		return context.removeSubsumer(posSCE.getExpression());
 	}
+	
+	@Override
+	public Boolean visit(DatatypeSubsumer dtSubsumer, Context context) {
+		return context.removeDatatypeExpression(dtSubsumer.getExpression());
+	}
 
 	@Override
 	public Boolean visit(BackwardLink link, Context context) {

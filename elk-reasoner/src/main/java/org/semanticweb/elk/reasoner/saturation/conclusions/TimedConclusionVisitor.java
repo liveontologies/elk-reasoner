@@ -85,4 +85,10 @@ public class TimedConclusionVisitor implements ConclusionVisitor<Long> {
 		return timer_.timeDisjointnessAxioms += CachedTimeThread.getCurrentTimeMillis();
 	}
 
+	@Override
+	public Long visit(DatatypeSubsumer dtSubsumer, Context context) {
+		// TODO don't time datatype handling yet 
+		return 0L;
+	}
+
 }

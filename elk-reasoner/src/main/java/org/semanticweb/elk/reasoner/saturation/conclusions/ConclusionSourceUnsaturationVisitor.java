@@ -48,24 +48,40 @@ public class ConclusionSourceUnsaturationVisitor implements
 				.markAsNotSaturated(sourceContext) : false;
 	}
 
-	@Override
-	public Boolean visit(NegativeSubsumer negSCE, Context context) {
-		if (negSCE.getExpression().occurs()) {
-			return mark(negSCE, context);
+	Boolean markIfOccurs(Subsumer subsumer, Context context) {
+		if (subsumer.getExpression().occurs()) {
+			return mark(subsumer, context);
 		}
 		else {
 			return false;
 		}
 	}
+	
+	@Override
+	public Boolean visit(NegativeSubsumer negSCE, Context context) {
+		return markIfOccurs(negSCE, context);
+		/*if (negSCE.getExpression().occurs()) {
+			return mark(negSCE, context);
+		}
+		else {
+			return false;
+		}*/
+	}
 
 	@Override
 	public Boolean visit(PositiveSubsumer posSCE, Context context) {
-		if (posSCE.getExpression().occurs()) {
+		return markIfOccurs(posSCE, context);
+		/*if (posSCE.getExpression().occurs()) {
 			return mark(posSCE, context);
 		}
 		else {
 			return false;
-		}
+		}*/
+	}
+	
+	@Override
+	public Boolean visit(DatatypeSubsumer dtSubsumer, Context context) {
+		return markIfOccurs(dtSubsumer, context);
 	}
 
 	@Override

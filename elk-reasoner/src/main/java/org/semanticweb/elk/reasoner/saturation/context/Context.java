@@ -197,6 +197,20 @@ public interface Context {
 	public boolean containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 
 	/**
+	 * Adds one instance of {@link IndexedDatatypeExpression} to this {@link Context}
+	 * @param ide
+	 * @return {@code true} iff the state of the context changed as the result of insertion.
+	 */
+	public boolean addDatatypeExpression(IndexedDatatypeExpression ide);
+	
+	/**
+	 * Removes one instance of {@link IndexedDatatypeExpression} from this {@link Context}
+	 * @param ide
+	 * @return {@code true} iff the state of the context changed as the result of removal.
+	 */
+	public boolean removeDatatypeExpression(IndexedDatatypeExpression ide);
+	
+	/**
 	 * @param axiom
 	 *            the {@link IndexedDisjointnessAxiom} to be checked for causing
 	 *            inconsistency in this {@link Context}
