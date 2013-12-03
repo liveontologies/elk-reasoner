@@ -27,20 +27,21 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule0;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -54,10 +55,10 @@ public class Propagation extends AbstractConclusion {
 
 	private final IndexedPropertyChain relation_;
 
-	private final IndexedClassExpression carry_;
+	private final IndexedObjectSomeValuesFrom carry_;
 
-	public Propagation(final IndexedPropertyChain relation,
-			final IndexedClassExpression carry) {
+	Propagation(final IndexedPropertyChain relation,
+			final IndexedObjectSomeValuesFrom carry) {
 		relation_ = relation;
 		carry_ = carry;
 	}
@@ -65,6 +66,10 @@ public class Propagation extends AbstractConclusion {
 	@Override
 	public String toString() {
 		return "Propagation " + relation_ + "->" + carry_;
+	}
+	
+	public IndexedClassExpression getCarry() {
+		return carry_;
 	}
 
 	public void apply(BasicSaturationStateWriter writer, Context context) {
@@ -120,21 +125,21 @@ public class Propagation extends AbstractConclusion {
 	 * 
 	 */
 	public static class ThisBackwardLinkRule extends
-			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
-			ModifiableLinkRule<BackwardLink> {
+			ModifiableLinkImpl<ModifiableLinkRule0<BackwardLink>> implements
+			ModifiableLinkRule0<BackwardLink> {
 
 		private static final String NAME = "Propagation Over BackwardLink";
 
-		private final Multimap<IndexedPropertyChain, IndexedClassExpression> propagationsByObjectProperty_;
+		private final Multimap<IndexedPropertyChain, IndexedObjectSomeValuesFrom> propagationsByObjectProperty_;
 
-		ThisBackwardLinkRule(ModifiableLinkRule<BackwardLink> tail) {
+		ThisBackwardLinkRule(ModifiableLinkRule0<BackwardLink> tail) {
 			super(tail);
-			this.propagationsByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedClassExpression>(
+			this.propagationsByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedObjectSomeValuesFrom>(
 					1);
 		}
 		
 		// TODO: hide this method
-		public Multimap<IndexedPropertyChain, IndexedClassExpression> getPropagationsByObjectProperty() {
+		public Multimap<IndexedPropertyChain, IndexedObjectSomeValuesFrom> getPropagationsByObjectProperty() {
 			return propagationsByObjectProperty_;
 		}
 
@@ -147,45 +152,47 @@ public class Propagation extends AbstractConclusion {
 		public void apply(BasicSaturationStateWriter writer, BackwardLink link) {
 			LOGGER_.trace("Applying {} to {}", NAME, link);
 			
-			for (IndexedClassExpression carry : propagationsByObjectProperty_
-					.get(link.getRelation()))
-				writer.produce(link.getSource(), new NegativeSubsumer(carry));
+			for (IndexedObjectSomeValuesFrom carry : propagationsByObjectProperty_
+					.get(link.getRelation())) {
+				//writer.produce(link.getSource(), new NegativeSubsumer(carry));
+				writer.produce(link.getSource(), writer.getConclusionFactory().existentialInference(link, carry));
+			}
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor, BasicSaturationStateWriter writer,
+		public void accept(CompositionRuleApplicationVisitor visitor, BasicSaturationStateWriter writer,
 				BackwardLink backwardLink) {
 			visitor.visit(this, writer, backwardLink);
 		}
 
 		private boolean addPropagationByObjectProperty(
 				IndexedPropertyChain propRelation,
-				IndexedClassExpression conclusion) {
+				IndexedObjectSomeValuesFrom conclusion) {
 			return propagationsByObjectProperty_.add(propRelation, conclusion);
 		}
 
 		private boolean removePropagationByObjectProperty(
 				IndexedPropertyChain propRelation,
-				IndexedClassExpression conclusion) {
+				IndexedObjectSomeValuesFrom conclusion) {
 			return propagationsByObjectProperty_.remove(propRelation,
 					conclusion);
 		}
 
 		private boolean containsPropagationByObjectProperty(
 				IndexedPropertyChain propRelation,
-				IndexedClassExpression conclusion) {
+				IndexedObjectSomeValuesFrom conclusion) {
 			return propagationsByObjectProperty_.contains(propRelation,
 					conclusion);
 		}
 
-		private static Matcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule>(
+		private static Matcher<ModifiableLinkRule0<BackwardLink>, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule0<BackwardLink>, ThisBackwardLinkRule>(
 				ThisBackwardLinkRule.class);
 
-		private static ReferenceFactory<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule>() {
+		private static ReferenceFactory<ModifiableLinkRule0<BackwardLink>, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule0<BackwardLink>, ThisBackwardLinkRule>() {
 
 			@Override
 			public ThisBackwardLinkRule create(
-					ModifiableLinkRule<BackwardLink> tail) {
+					ModifiableLinkRule0<BackwardLink> tail) {
 				return new ThisBackwardLinkRule(tail);
 			}
 		};

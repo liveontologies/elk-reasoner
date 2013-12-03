@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 import org.semanticweb.elk.util.collections.chains.Chainable;
 import org.semanticweb.elk.util.collections.chains.ModifiableLink;
 
-public interface ChainableRule<E> extends LinkRule<E>,
-		ModifiableLink<ChainableRule<E>>, Chainable<ChainableRule<E>> {
+public interface ChainableRule<P, E> extends LinkRule<P, E>,
+		ModifiableLink<ChainableRule<P, E>>, Chainable<ChainableRule<P, E>> {
 
 }

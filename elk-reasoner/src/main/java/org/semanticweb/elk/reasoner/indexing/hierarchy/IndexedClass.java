@@ -22,23 +22,22 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule0;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkClass} in an ontology.
@@ -153,12 +152,12 @@ public class IndexedClass extends IndexedClassEntity {
 	 * the ontology.
 	 */
 	public static class OwlThingContextInitializationRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
+			ModifiableLinkImpl<ChainableRule0<Context>> implements
+			ChainableRule0<Context> {
 
 		public static final String NAME = "owl:Thing Introduction";
 
-		private OwlThingContextInitializationRule(ChainableRule<Context> tail) {
+		private OwlThingContextInitializationRule(ChainableRule0<Context> tail) {
 			super(tail);
 		}
 
@@ -175,22 +174,23 @@ public class IndexedClass extends IndexedClassEntity {
 		public void apply(BasicSaturationStateWriter writer, Context context) {
 			LOGGER_.trace("Applying {} to {}", NAME, context);
 			
-			writer.produce(context, new PositiveSubsumer(writer.getOwlThing()));
+			//writer.produce(context, new PositiveSubsumer(writer.getOwlThing()));
+			writer.produce(context, writer.getConclusionFactory().classInitialization(writer.getOwlThing()));
 		}
 
-		private static final Matcher<ChainableRule<Context>, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, OwlThingContextInitializationRule>(
+		private static final Matcher<ChainableRule0<Context>, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule0<Context>, OwlThingContextInitializationRule>(
 				OwlThingContextInitializationRule.class);
 
-		private static final ReferenceFactory<ChainableRule<Context>, OwlThingContextInitializationRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, OwlThingContextInitializationRule>() {
+		private static final ReferenceFactory<ChainableRule0<Context>, OwlThingContextInitializationRule> FACTORY_ = new ReferenceFactory<ChainableRule0<Context>, OwlThingContextInitializationRule>() {
 			@Override
 			public OwlThingContextInitializationRule create(
-					ChainableRule<Context> tail) {
+					ChainableRule0<Context> tail) {
 				return new OwlThingContextInitializationRule(tail);
 			}
 		};
 
 		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean addTo(Chain<ChainableRule0<Context>> ruleChain) {
 			OwlThingContextInitializationRule rule = ruleChain.find(MATCHER_);
 
 			if (rule == null) {
@@ -202,12 +202,12 @@ public class IndexedClass extends IndexedClassEntity {
 		}
 
 		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean removeFrom(Chain<ChainableRule0<Context>> ruleChain) {
 			return ruleChain.remove(MATCHER_) != null;
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor,
+		public void accept(CompositionRuleApplicationVisitor visitor,
 				BasicSaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}

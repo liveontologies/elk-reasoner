@@ -26,11 +26,10 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * Used for decomposing class expressions when rules are applied backwards
+ * Used for decomposing class expressions when rules are de-applied.
  * 
  * @author Pavel Klinov
  *
@@ -48,8 +47,10 @@ public class BackwardDecompositionRuleApplicationVisitor extends
 	@Override
 	public void visit(IndexedObjectSomeValuesFrom ice, Context context) {
 		if (ice.getFiller().getContext() != null) {
+			/*writer_.produce(ice.getFiller().getContext(),
+					new BackwardLink(context, ice.getRelation()));*/	
 			writer_.produce(ice.getFiller().getContext(),
-					new BackwardLink(context, ice.getRelation()));	
+					writer_.getConclusionFactory().backwardLinkInference(ice, context));
 		}
 	}
 

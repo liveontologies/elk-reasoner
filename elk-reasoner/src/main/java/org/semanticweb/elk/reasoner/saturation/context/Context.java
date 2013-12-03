@@ -30,7 +30,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule0;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule0;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -84,7 +85,7 @@ public interface Context {
 	 *         obtained by traversing over {@link LinkRule#next()}; this method
 	 *         should be used to access the rules without modifying them.
 	 */
-	public LinkRule<BackwardLink> getBackwardLinkRuleHead();
+	public LinkRule0<BackwardLink> getBackwardLinkRuleHead();
 
 	/**
 	 * @return the {@link Chain} view of all backward link rules assigned to
@@ -94,7 +95,7 @@ public interface Context {
 	 *         {@link Chain} interface without without worrying about
 	 *         {@code null} values.
 	 */
-	public Chain<ModifiableLinkRule<BackwardLink>> getBackwardLinkRuleChain();
+	public Chain<ModifiableLinkRule0<BackwardLink>> getBackwardLinkRuleChain();
 
 	/**
 	 * Adds the given {@code BackwardLink} to this {@link Context}.

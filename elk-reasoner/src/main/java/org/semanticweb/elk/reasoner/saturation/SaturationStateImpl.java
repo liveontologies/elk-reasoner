@@ -37,10 +37,12 @@ import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SimpleConclusionFactory;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 
 /**
  * TODO docs
@@ -78,6 +80,8 @@ class SaturationStateImpl implements SaturationState {
 	 * inference rules has not yet been finished.
 	 */
 	private final Queue<IndexedClassExpression> notSaturatedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
+	
+	private final ConclusionFactory conclusionFactory_ = new SimpleConclusionFactory();
 
 	/**
 	 * @return the {@link Collection} of {@link Context} stored in this
@@ -139,7 +143,7 @@ class SaturationStateImpl implements SaturationState {
 		return notSaturatedContexts_;
 	}
 
-	private static final RuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicCompositionRuleApplicationVisitor();
+	private static final CompositionRuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicCompositionRuleApplicationVisitor();
 	
 	/**
 	 * 
@@ -189,7 +193,7 @@ class SaturationStateImpl implements SaturationState {
 	public ExtendedSaturationStateWriter getExtendedWriter(
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener,
-			RuleApplicationVisitor ruleAppVisitor,
+			CompositionRuleApplicationVisitor ruleAppVisitor,
 			ConclusionVisitor<?> conclusionVisitor,
 			boolean trackNewContextsAsUnsaturated) {
 		return new ContextCreatingWriter(contextCreationListener,
@@ -276,6 +280,11 @@ class SaturationStateImpl implements SaturationState {
 			resetFirstContext();
 		}
 
+		@Override
+		public ConclusionFactory getConclusionFactory() {
+			return conclusionFactory_;
+		}
+
 	}
 
 	/**
@@ -286,7 +295,7 @@ class SaturationStateImpl implements SaturationState {
 	 */
 	class ContextCreatingWriter extends BasicWriter implements ExtendedSaturationStateWriter {
 
-		private final RuleApplicationVisitor initRuleAppVisitor_;
+		private final CompositionRuleApplicationVisitor initRuleAppVisitor_;
 
 		/**
 		 * If set to true, the writer will put all newly created contexts to
@@ -302,7 +311,7 @@ class SaturationStateImpl implements SaturationState {
 		private ContextCreatingWriter(
 				ContextCreationListener contextCreationListener,
 				ContextModificationListener contextModificationListener,
-				RuleApplicationVisitor ruleAppVisitor,
+				CompositionRuleApplicationVisitor ruleAppVisitor,
 				ConclusionVisitor<?> conclusionVisitor,
 				boolean trackNewContextsAsUnsaturated) {
 			super(contextModificationListener, conclusionVisitor);

@@ -34,8 +34,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 
 /**
  * An object which can be used to measure the methods invocations of a
- * {@link RuleApplicationVisitor}. The fields of the counter correspond to the
- * methods of {@link RuleApplicationVisitor}.
+ * {@link CompositionRuleApplicationVisitor}. The fields of the counter correspond to the
+ * methods of {@link CompositionRuleApplicationVisitor}.
  * 
  * @author "Yevgeny Kazakov"
  */

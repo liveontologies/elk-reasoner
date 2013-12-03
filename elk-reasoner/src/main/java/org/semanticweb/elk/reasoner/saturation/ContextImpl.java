@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule0;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
@@ -87,7 +87,7 @@ public class ContextImpl implements Context {
 	 * the rules that should be applied to each derived {@link BackwardLink} in
 	 * this {@link Context}; can be {@code null}
 	 */
-	private ModifiableLinkRule<BackwardLink> backwardLinkRules_ = null;
+	private ModifiableLinkRule0<BackwardLink> backwardLinkRules_ = null;
 
 	/**
 	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
@@ -253,17 +253,11 @@ public class ContextImpl implements Context {
 		Context source = link.getSource();
 		IndexedPropertyChain relation = link.getRelation();
 
-		if (backwardLinksByObjectProperty_ == null)
+		if (backwardLinksByObjectProperty_ == null) {
 			backwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>();
+		}
 
 		return backwardLinksByObjectProperty_.add(relation, source);
-
-		/*
-		 * if (changed && source.isSaturated()) LOGGER_.error(getRoot() +
-		 * ": adding a backward link to a saturated context: " + link);
-		 * 
-		 * return changed;
-		 */
 	}
 
 	@Override
@@ -283,23 +277,23 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public AbstractChain<ModifiableLinkRule<BackwardLink>> getBackwardLinkRuleChain() {
-		return new AbstractChain<ModifiableLinkRule<BackwardLink>>() {
+	public AbstractChain<ModifiableLinkRule0<BackwardLink>> getBackwardLinkRuleChain() {
+		return new AbstractChain<ModifiableLinkRule0<BackwardLink>>() {
 
 			@Override
-			public ModifiableLinkRule<BackwardLink> next() {
+			public ModifiableLinkRule0<BackwardLink> next() {
 				return backwardLinkRules_;
 			}
 
 			@Override
-			public void setNext(ModifiableLinkRule<BackwardLink> tail) {
+			public void setNext(ModifiableLinkRule0<BackwardLink> tail) {
 				backwardLinkRules_ = tail;
 			}
 		};
 	}
 
 	@Override
-	public ModifiableLinkRule<BackwardLink> getBackwardLinkRuleHead() {
+	public ModifiableLinkRule0<BackwardLink> getBackwardLinkRuleHead() {
 		return backwardLinkRules_;
 	}
 

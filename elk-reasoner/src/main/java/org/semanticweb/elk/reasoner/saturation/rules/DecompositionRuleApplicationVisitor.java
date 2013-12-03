@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  * This visit methods do not take any {@link BasicSaturationStateWriter} but the
  * visitor is rather supposed to encapsulate it. Then it's easier to use
- * restricted writers, e.g. those which can't create new contexts, in subclasses
+ * restricted writers, e.g. those which can't create new contexts, in subclasses.
  * 
  * @author Pavel Klinov
  * 

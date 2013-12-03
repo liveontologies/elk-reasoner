@@ -32,24 +32,25 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * A {@link RuleApplicationVisitor} wrapper for a given
- * {@link RuleApplicationVisitor} that additionally records the number of
+ * A {@link CompositionRuleApplicationVisitor} wrapper for a given
+ * {@link CompositionRuleApplicationVisitor} that additionally records the number of
  * invocations of the methods using the given {@link RuleApplicationCounter}.
  * 
  * @author "Yevgeny Kazakov"
  */
-public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
+public class RuleApplicationCounterVisitor implements CompositionRuleApplicationVisitor {
 
 	/**
 	 * the visitor whose method applications to be counted
 	 */
-	private final RuleApplicationVisitor visitor_;
+	private final CompositionRuleApplicationVisitor visitor_;
 	/**
 	 * the counter used to count the number of method applications of the
 	 * visitor
@@ -70,7 +71,7 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 	 *            the {@link RuleApplicationCounter} used to count the number of
 	 *            method invocations
 	 */
-	public RuleApplicationCounterVisitor(RuleApplicationVisitor visitor,
+	public RuleApplicationCounterVisitor(CompositionRuleApplicationVisitor visitor,
 			RuleApplicationCounter counter) {
 		this.visitor_ = visitor;
 		this.counter_ = counter;
@@ -87,9 +88,9 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 	@Override
 	public void visit(
 			IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
-			BasicSaturationStateWriter writer, Context context) {
+			BasicSaturationStateWriter writer, Conclusion premise, Context context) {
 		counter_.countDisjointnessAxiomCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, writer, premise, context);
 	}
 
 	@Override
@@ -111,33 +112,33 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 	@Override
 	public void visit(
 			IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
-			BasicSaturationStateWriter writer, Context context) {
+			BasicSaturationStateWriter writer, Conclusion premise, Context context) {
 		counter_.countObjectIntersectionOfCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, writer, premise, context);
 	}
 
 	@Override
 	public void visit(
 			IndexedSubClassOfAxiom.ThisCompositionRule thisCompositionRule,
-			BasicSaturationStateWriter writer, Context context) {
+			BasicSaturationStateWriter writer, Conclusion premise, Context context) {
 		counter_.countSubClassOfAxiomCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, writer, premise, context);
 	}
 
 	@Override
 	public void visit(
 			IndexedObjectSomeValuesFrom.ThisCompositionRule thisCompositionRule,
-			BasicSaturationStateWriter writer, Context context) {
+			BasicSaturationStateWriter writer, Conclusion premise, Context context) {
 		counter_.countObjectSomeValuesFromCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, writer, premise, context);
 	}
 
 	@Override
 	public void visit(
 			IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
-			BasicSaturationStateWriter writer, Context context) {
+			BasicSaturationStateWriter writer, Conclusion premise, Context context) {
 		counter_.countObjectUnionOfCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, writer, premise, context);
 	}
 
 	@Override

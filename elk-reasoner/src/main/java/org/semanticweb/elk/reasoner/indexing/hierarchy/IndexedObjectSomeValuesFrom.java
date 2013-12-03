@@ -26,24 +26,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkObjectSomeValuesFrom} in an
@@ -126,7 +125,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	public static void generatePropagations(BasicSaturationStateWriter writer,
-			IndexedPropertyChain property, Context context) {
+			IndexedPropertyChain property, Conclusion premise, Context context) {
 		for (IndexedClassExpression ice : context.getSubsumers()) {
 			ThisCompositionRule rule = ice.getCompositionRuleChain().find(
 					ThisCompositionRule.MATCHER_);
@@ -134,7 +133,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			if (rule == null)
 				continue;
 			
-			rule.apply(writer, property, context);
+			rule.apply(writer, property, premise, context);
 		}
 	}
 
@@ -142,14 +141,14 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	 * 
 	 */
 	public static class ThisCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
+			ModifiableLinkImpl<ChainableRule<Conclusion, Context>> implements
+			ChainableRule<Conclusion, Context> {
 
 		private static final String NAME = "ObjectSomeValuesFrom Introduction";
 
 		private final Collection<IndexedObjectSomeValuesFrom> negExistentials_;
 
-		private ThisCompositionRule(ChainableRule<Context> next) {
+		private ThisCompositionRule(ChainableRule<Conclusion, Context> next) {
 			super(next);
 			this.negExistentials_ = new ArrayList<IndexedObjectSomeValuesFrom>(
 					1);
@@ -173,7 +172,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter writer, Context context) {
+		public void apply(BasicSaturationStateWriter writer, Conclusion premise, Context context) {
 			LOGGER_.trace("Applying {} to {}", NAME, context);			
 			
 			final Set<IndexedPropertyChain> candidatePropagationProperties = context
@@ -195,18 +194,21 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
 						candidatePropagationProperties, relation.getSaturated()
 								.getSubProperties())) {
-					writer.produce(context, new Propagation(property, e));
+					//writer.produce(context, new Propagation(property, e));
+					writer.produce(context, writer.getConclusionFactory().existentialInference(premise, property, e));
 				}
 
 				// TODO: create a composition rule to deal with reflexivity
 				// propagating to the this context if relation is reflexive
-				if (relation.getSaturated().isDerivedReflexive())
-					writer.produce(context, new NegativeSubsumer(e));
+				if (relation.getSaturated().isDerivedReflexive()) {
+					//writer.produce(context, new NegativeSubsumer(e));
+					writer.produce(context, writer.getConclusionFactory().reflexiveInference(e));
+				}
 			}
 		}
 
 		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean addTo(Chain<ChainableRule<Conclusion, Context>> ruleChain) {
 			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 			boolean changed = false;
 
@@ -219,7 +221,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean removeFrom(Chain<ChainableRule<Conclusion, Context>> ruleChain) {
 			boolean changed = false;
 			ThisCompositionRule rule = ruleChain.find(MATCHER_);
 
@@ -239,9 +241,9 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, Context context) {
-			visitor.visit(this, writer, context);
+		public void accept(CompositionRuleApplicationVisitor visitor,
+				BasicSaturationStateWriter writer, Conclusion premise, Context context) {
+			visitor.visit(this, writer, premise, context);
 		}
 
 		private boolean addNegExistential(
@@ -262,23 +264,24 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		private void apply(BasicSaturationStateWriter writer,
-				IndexedPropertyChain property, Context context) {
+				IndexedPropertyChain property, Conclusion premise, Context context) {
 
-			for (IndexedObjectSomeValuesFrom e : negExistentials_) {
-				if (e.getRelation().getSaturated().getSubProperties()
+			for (IndexedObjectSomeValuesFrom carry : negExistentials_) {
+				if (carry.getRelation().getSaturated().getSubProperties()
 						.contains(property)) {
-					writer.produce(context, new Propagation(property, e));
+					//writer.produce(context, new Propagation(property, e));
+					writer.produce(context, writer.getConclusionFactory().existentialInference(premise, property, carry));
 				}
 			}
 
 		}
 
-		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
+		private static final Matcher<ChainableRule<Conclusion, Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Conclusion, Context>, ThisCompositionRule>(
 				ThisCompositionRule.class);
 
-		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
+		private static final ReferenceFactory<ChainableRule<Conclusion, Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Conclusion, Context>, ThisCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(ChainableRule<Context> next) {
+			public ThisCompositionRule create(ChainableRule<Conclusion, Context> next) {
 				return new ThisCompositionRule(next);
 			}
 		};

@@ -26,19 +26,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
@@ -93,8 +93,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	 * 
 	 */
 	public static class ThisCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
+			ModifiableLinkImpl<ChainableRule<Conclusion, Context>> implements
+			ChainableRule<Conclusion, Context> {
 
 		private static final String NAME = "SubClassOf Expansion";
 
@@ -104,7 +104,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		 */
 		private final List<IndexedClassExpression> toldSuperClassExpressions_;
 
-		ThisCompositionRule(ChainableRule<Context> tail) {
+		ThisCompositionRule(ChainableRule<Conclusion, Context> tail) {
 			super(tail);
 			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
 					1);
@@ -132,16 +132,17 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter writer, Context context) {
+		public void apply(BasicSaturationStateWriter writer, Conclusion premise, Context context) {
 			LOGGER_.trace("Applying {}: {} to {}", NAME, toldSuperClassExpressions_, context);
 			
 			for (IndexedClassExpression implied : toldSuperClassExpressions_) {
-				writer.produce(context, new PositiveSubsumer(implied));
+				//writer.produce(context, new PositiveSubsumer(implied));
+				writer.produce(context, writer.getConclusionFactory().subsumptionInference(premise, implied));
 			}
 		}
 
 		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean addTo(Chain<ChainableRule<Conclusion, Context>> ruleChain) {
 			ThisCompositionRule rule = ruleChain.getCreate(
 					ThisCompositionRule.MATCHER_, ThisCompositionRule.FACTORY_);
 			boolean changed = false;
@@ -157,7 +158,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean removeFrom(Chain<ChainableRule<Conclusion, Context>> ruleChain) {
 			ThisCompositionRule rule = ruleChain
 					.find(ThisCompositionRule.MATCHER_);
 			boolean changed = false;
@@ -183,9 +184,9 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, Context context) {
-			visitor.visit(this, writer, context);
+		public void accept(CompositionRuleApplicationVisitor visitor,
+				BasicSaturationStateWriter writer, Conclusion premise, Context context) {
+			visitor.visit(this, writer, premise, context);
 		}
 
 		protected boolean addToldSuperClassExpression(
@@ -214,12 +215,12 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			return getName() + ": " + toldSuperClassExpressions_;
 		}
 
-		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
+		private static final Matcher<ChainableRule<Conclusion, Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Conclusion, Context>, ThisCompositionRule>(
 				ThisCompositionRule.class);
 
-		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
+		private static final ReferenceFactory<ChainableRule<Conclusion, Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Conclusion, Context>, ThisCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(ChainableRule<Context> tail) {
+			public ThisCompositionRule create(ChainableRule<Conclusion, Context> tail) {
 				return new ThisCompositionRule(tail);
 			}
 		};

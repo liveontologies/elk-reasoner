@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
@@ -53,7 +54,7 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 * The first composition rule assigned to this
 	 * {@link IndexedClassExpression}
 	 */
-	ChainableRule<Context> compositionRuleHead;
+	ChainableRule<Conclusion, Context> compositionRuleHead;
 
 	/**
 	 * This counts how often this object occurred positively. Some indexing
@@ -203,7 +204,7 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 *         {@link LinkRule#next()}; this method should be used to access the
 	 *         rules without modifying them.
 	 */
-	public LinkRule<Context> getCompositionRuleHead() {
+	public LinkRule<Conclusion, Context> getCompositionRuleHead() {
 		return compositionRuleHead;
 	}
 
@@ -215,15 +216,15 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 *         {@link Chain} interface without without worrying about
 	 *         {@code null} values.
 	 */
-	Chain<ChainableRule<Context>> getCompositionRuleChain() {
-		return new AbstractChain<ChainableRule<Context>>() {
+	Chain<ChainableRule<Conclusion, Context>> getCompositionRuleChain() {
+		return new AbstractChain<ChainableRule<Conclusion, Context>>() {
 			@Override
-			public ChainableRule<Context> next() {
+			public ChainableRule<Conclusion, Context> next() {
 				return compositionRuleHead;
 			}
 
 			@Override
-			public void setNext(ChainableRule<Context> tail) {
+			public void setNext(ChainableRule<Conclusion, Context> tail) {
 				compositionRuleHead = tail;
 			}
 		};

@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction.ContradictionBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -47,7 +48,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface RuleApplicationVisitor {
+public interface CompositionRuleApplicationVisitor {
 
 	void visit(
 			IndexedClass.OwlThingContextInitializationRule owlThingContextInitializationRule,
@@ -58,7 +59,7 @@ public interface RuleApplicationVisitor {
 
 	void visit(
 			IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
-			BasicSaturationStateWriter writer, Context context);
+			BasicSaturationStateWriter writer, Conclusion premise, Context context);
 
 	void visit(
 			IndexedDisjointnessAxiom.ThisContradictionRule thisContradictionRule,
@@ -70,17 +71,17 @@ public interface RuleApplicationVisitor {
 
 	void visit(
 			IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
-			BasicSaturationStateWriter writer, Context context);
+			BasicSaturationStateWriter writer, Conclusion premise, Context context);
 
 	void visit(IndexedSubClassOfAxiom.ThisCompositionRule thisCompositionRule,
-			BasicSaturationStateWriter writer, Context context);
+			BasicSaturationStateWriter writer, Conclusion premise, Context context);
 
 	void visit(
 			IndexedObjectSomeValuesFrom.ThisCompositionRule thisCompositionRule,
-			BasicSaturationStateWriter writer, Context context);
+			BasicSaturationStateWriter writer, Conclusion premise, Context context);
 
 	void visit(IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
-			BasicSaturationStateWriter writer, Context context);
+			BasicSaturationStateWriter writer, Conclusion premise, Context context);
 
 	void visit(ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
 			BasicSaturationStateWriter writer, BackwardLink backwardLink);

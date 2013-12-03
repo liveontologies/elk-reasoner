@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.util.collections.chains.ModifiableLink;
 
-public interface ModifiableLinkRule<E> extends LinkRule<E>,
-		ModifiableLink<ModifiableLinkRule<E>> {
+public interface ModifiableLinkRule<P, E> extends LinkRule<P, E>,
+		ModifiableLink<ModifiableLinkRule<P, E>> {
 
 }

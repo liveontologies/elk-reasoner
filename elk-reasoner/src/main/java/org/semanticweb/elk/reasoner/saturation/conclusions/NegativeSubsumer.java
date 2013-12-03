@@ -26,7 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 
 /**
  * A {@link Subsumer}, for which the structure of the enclosed
@@ -41,12 +41,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
  */
 public class NegativeSubsumer extends Subsumer {
 
-	public NegativeSubsumer(IndexedClassExpression superClassExpression) {
+	NegativeSubsumer(IndexedClassExpression superClassExpression) {
 		super(superClassExpression);
 	}
 
 	public void apply(BasicSaturationStateWriter writer, Context context,
-			RuleApplicationVisitor ruleAppVisitor) {
+			CompositionRuleApplicationVisitor ruleAppVisitor) {
 		applyCompositionRules(writer, context, ruleAppVisitor);
 	}
 

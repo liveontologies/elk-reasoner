@@ -25,7 +25,9 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule0;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 
 /**
@@ -132,7 +134,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 *            the context initialization rule to be added
 	 * @see OntologyIndex#getContextInitRuleHead()
 	 */
-	public void addContextInitRule(ChainableRule<Context> newRule);
+	public void addContextInitRule(ChainableRule0<Context> newRule);
 
 	/**
 	 * Removes an existing context initialization for this {@link OntologyIndex}
@@ -145,7 +147,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 * 
 	 * @see OntologyIndex#getContextInitRuleHead()
 	 */
-	public void removeContextInitRule(ChainableRule<Context> oldRule)
+	public void removeContextInitRule(ChainableRule0<Context> oldRule)
 			throws ElkUnexpectedIndexingException;
 
 	/**
@@ -157,7 +159,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 *            the context rule to be added
 	 */
 	public void add(IndexedClassExpression target,
-			ChainableRule<Context> newRule);
+			ChainableRule<Conclusion, Context> newRule);
 
 	/**
 	 * Removes an existing context rule for the given
@@ -173,7 +175,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 *             {@link IndexedClassExpression}
 	 */
 	public void remove(IndexedClassExpression target,
-			ChainableRule<Context> oldRule)
+			ChainableRule<Conclusion, Context> oldRule)
 			throws ElkUnexpectedIndexingException;
 
 }

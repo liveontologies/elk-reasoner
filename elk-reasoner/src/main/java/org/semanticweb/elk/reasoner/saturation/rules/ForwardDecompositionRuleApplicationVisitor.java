@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -48,8 +47,10 @@ public class ForwardDecompositionRuleApplicationVisitor extends
 	
 	@Override
 	public void visit(IndexedObjectSomeValuesFrom ice, Context context) {
+		/*writer_.produce(writer_.getCreateContext(ice.getFiller()),
+				new BackwardLink(context, ice.getRelation()));*/
 		writer_.produce(writer_.getCreateContext(ice.getFiller()),
-				new BackwardLink(context, ice.getRelation()));
+				writer_.getConclusionFactory().backwardLinkInference(ice, context));
 	}
 
 	@Override

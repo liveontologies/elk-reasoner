@@ -22,16 +22,16 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Performs decomposition of all sorts of indexed class expressions
@@ -60,9 +60,7 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 	}
 
 	@Override
-	public void visit(IndexedDataHasValue ice, Context context) {
-		// TODO Auto-generated method stub
-	}
+	public void visit(IndexedDataHasValue ice, Context context) {}
 
 	@Override
 	public void visit(IndexedObjectComplementOf ice, Context context) {
@@ -74,9 +72,12 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 	@Override
 	public void visit(IndexedObjectIntersectionOf ice, Context context) {
 		BasicSaturationStateWriter writer = getSaturationStateWriter();
+		ConclusionFactory factory = writer.getConclusionFactory();
 
-		writer.produce(context, new PositiveSubsumer(ice.getFirstConjunct()));
-		writer.produce(context, new PositiveSubsumer(ice.getSecondConjunct()));
+		//writer.produce(context, new PositiveSubsumer(ice.getFirstConjunct()));
+		//writer.produce(context, new PositiveSubsumer(ice.getSecondConjunct()));
+		writer.produce(context, factory.conjunctionDecomposition(ice, ice.getFirstConjunct()));
+		writer.produce(context, factory.conjunctionDecomposition(ice, ice.getSecondConjunct()));
 	}
 
 	protected abstract BasicSaturationStateWriter getSaturationStateWriter();

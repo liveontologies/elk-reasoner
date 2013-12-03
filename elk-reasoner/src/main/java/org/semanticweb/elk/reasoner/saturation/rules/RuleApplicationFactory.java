@@ -135,7 +135,7 @@ public class RuleApplicationFactory {
 			BasicSaturationStateWriter writer = getSaturationStateWriter();
 
 			if (conclusionProcessor_ == null) {
-				conclusionProcessor_ = getConclusionProcessor(writer);
+				conclusionProcessor_ = getConclusionProcessor();
 			}
 
 			for (;;) {
@@ -194,33 +194,7 @@ public class RuleApplicationFactory {
 					ruleProcessor, localStatistics);
 		}
 
-		/**
-		 * Returns the base {@link ConclusionVisitor} that performs processing
-		 * of {@code Conclusion}s within a {@link Context}. This can be further
-		 * wrapped in some other code.
-		 * 
-		 * @param saturationStateWriter
-		 *            the {@link SaturationStateImpl.AbstractWriter} using which
-		 *            one can produce new {@link Conclusion}s in {@link Context}
-		 *            s
-		 * @return the base {@link ConclusionVisitor} that performs processing
-		 *         of {@code Conclusion}s within a {@link Context}
-		 */
-		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
-				BasicSaturationStateWriter saturationStateWriter) {
-
-			return new CombinedConclusionVisitor(
-					new ConclusionInsertionVisitor(),
-					getUsedConclusionsCountingVisitor(new ConclusionApplicationVisitor(
-							saturationStateWriter,
-							SaturationUtils
-									.getStatsAwareCompositionRuleAppVisitor(localStatistics
-											.getRuleStatistics()),
-							SaturationUtils
-									.getStatsAwareDecompositionRuleAppVisitor(
-											getDecompositionRuleApplicationVisitor(),
-											localStatistics.getRuleStatistics()))));
-		}
+		
 
 		/**
 		 * Returns the final {@link ConclusionVisitor} that is used by this
@@ -235,9 +209,10 @@ public class RuleApplicationFactory {
 		 *         {@link DefaultEngine} for processing {@code Conclusion}s
 		 *         within {@link Context}s
 		 */
-		protected ConclusionVisitor<?> getConclusionProcessor(
-				BasicSaturationStateWriter saturationStateWriter) {
-			ConclusionVisitor<Boolean> result = getBaseConclusionProcessor(saturationStateWriter);
+		protected ConclusionVisitor<?> getConclusionProcessor() {
+			BasicSaturationStateWriter saturationStateWriter = getSaturationStateWriter();
+			ConclusionVisitor<Boolean> result = getBaseConclusionProcessor();
+			
 			if (trackModifiedContexts_) {
 				result = new CombinedConclusionVisitor(result,
 						new ConclusionSourceUnsaturationVisitor(
@@ -247,9 +222,25 @@ public class RuleApplicationFactory {
 			return SaturationUtils.getProcessedConclusionCountingProcessor(
 					result, localStatistics);
 		}
+		
+		protected CompositionRuleApplicationVisitor getStatsAwareCompositionRuleAppVisitor(SaturationStatistics stats) {
+			return SaturationUtils.getStatsAwareCompositionRuleAppVisitor(stats.getRuleStatistics());
+		}
+		
+		protected DecompositionRuleApplicationVisitor getStatsAwareDecompositionRuleAppVisitor(DecompositionRuleApplicationVisitor visitor, SaturationStatistics stats) {
+			return SaturationUtils.getStatsAwareDecompositionRuleAppVisitor(visitor, stats.getRuleStatistics());
+		}		
+		
+		/**
+		 * Returns the base {@link ConclusionVisitor} that performs processing
+		 * of {@code Conclusion}s within a {@link Context}. This can be further
+		 * wrapped in some other code.
+		 */
+		protected abstract ConclusionVisitor<Boolean> getBaseConclusionProcessor();
 
-		protected abstract DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor();
-
+		/**
+		 * Returns the saturation state writer for this engine.
+		 */
 		protected abstract BasicSaturationStateWriter getSaturationStateWriter();
 	}
 
@@ -312,6 +303,18 @@ public class RuleApplicationFactory {
 		}
 
 		@Override
+		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor() {
+			BasicSaturationStateWriter saturationStateWriter = getSaturationStateWriter();
+
+			return new CombinedConclusionVisitor(
+					new ConclusionInsertionVisitor(),
+					getUsedConclusionsCountingVisitor(new ConclusionApplicationVisitor(
+							saturationStateWriter,
+							getStatsAwareCompositionRuleAppVisitor(localStatistics),
+							getStatsAwareDecompositionRuleAppVisitor(getDecompositionRuleApplicationVisitor(), localStatistics))));
+		}
+		
+		
 		protected DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor() {
 			// here we need an extended writer to pass to the decomposer which
 			// can create new contexts

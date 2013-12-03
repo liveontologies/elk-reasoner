@@ -36,8 +36,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 
 /**
  * An object which can be used to measure time spent within a methods of a
- * {@link RuleApplicationVisitor}. The fields of the timer correspond to the
- * methods of {@link RuleApplicationVisitor}.
+ * {@link CompositionRuleApplicationVisitor}. The fields of the timer correspond to the
+ * methods of {@link CompositionRuleApplicationVisitor}.
  * 
  * @author "Yevgeny Kazakov"
  * 

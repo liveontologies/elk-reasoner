@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.ContextRootInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass.OwlThingContextInitializationRule;
@@ -45,13 +43,17 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule0;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Inspects all class expressions that are reachable via context rules or
@@ -148,10 +150,10 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			}
 
 			// validating context rules
-			LinkRule<Context> rule = ice.getCompositionRuleHead();
+			LinkRule<Conclusion, Context> rule = ice.getCompositionRuleHead();
 
 			while (rule != null) {
-				rule.accept(ruleValidator_, null, null);
+				rule.accept(ruleValidator_, null, null, null);
 				rule = rule.next();
 			}
 		}
@@ -216,7 +218,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			}
 
 			// validating backward link rules
-			LinkRule<BackwardLink> rule = context.getBackwardLinkRuleHead();
+			LinkRule0<BackwardLink> rule = context.getBackwardLinkRuleHead();
 
 			while (rule != null) {
 				rule.accept(ruleValidator_, null, null);
@@ -228,7 +230,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 	/**
 	 * 
 	 */
-	private class ContextRuleValidator implements RuleApplicationVisitor {
+	private class ContextRuleValidator implements CompositionRuleApplicationVisitor {
 
 		@Override
 		public void visit(
@@ -239,7 +241,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
-				BasicSaturationStateWriter writer, Context context) {
+				BasicSaturationStateWriter writer, Conclusion premise, Context context) {
 			for (IndexedDisjointnessAxiom axiom : thisCompositionRule
 					.getDisjointnessAxioms()) {
 				if (!axiom.occurs()) {
@@ -264,7 +266,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
-				BasicSaturationStateWriter writer, Context context) {
+				BasicSaturationStateWriter writer, Conclusion premise, Context context) {
 			for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : thisCompositionRule
 					.getConjunctionsByConjunct().entrySet()) {
 				iceValidator_.checkNew(entry.getKey());
@@ -275,7 +277,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				IndexedSubClassOfAxiom.ThisCompositionRule thisCompositionRule,
-				BasicSaturationStateWriter writer, Context context) {
+				BasicSaturationStateWriter writer, Conclusion premise, Context context) {
 			for (IndexedClassExpression ice : thisCompositionRule
 					.getToldSuperclasses()) {
 				iceValidator_.checkNew(ice);
@@ -286,7 +288,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				IndexedObjectSomeValuesFrom.ThisCompositionRule thisCompositionRule,
-				BasicSaturationStateWriter writer, Context context) {
+				BasicSaturationStateWriter writer, Conclusion premise, Context context) {
 			for (IndexedClassExpression ice : thisCompositionRule
 					.getNegativeExistentials()) {
 				iceValidator_.checkNew(ice);
@@ -296,7 +298,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
-				BasicSaturationStateWriter writer, Context context) {
+				BasicSaturationStateWriter writer, Conclusion premise, Context context) {
 			for (IndexedClassExpression ice : thisCompositionRule
 					.getDisjunctions()) {
 				iceValidator_.checkNew(ice);

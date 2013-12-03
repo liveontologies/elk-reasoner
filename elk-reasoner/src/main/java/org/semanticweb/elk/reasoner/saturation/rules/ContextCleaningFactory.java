@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
@@ -134,6 +135,11 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 		@Override
 		public void resetContexts() {
 			writer_.resetContexts();
+		}
+
+		@Override
+		public ConclusionFactory getConclusionFactory() {
+			return writer_.getConclusionFactory();
 		}
 	}
 }

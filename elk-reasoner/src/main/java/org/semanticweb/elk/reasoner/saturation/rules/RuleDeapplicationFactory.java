@@ -80,25 +80,19 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
-				BasicSaturationStateWriter saturationStateWriter) {
+		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor() {
+			BasicSaturationStateWriter saturationStateWriter = getSaturationStateWriter();
 
 			return new CombinedConclusionVisitor(
 					new CombinedConclusionVisitor(
 							new ConclusionOccurranceCheckingVisitor(),
 							getUsedConclusionsCountingVisitor(new ConclusionDeapplicationVisitor(
 									saturationStateWriter,
-									SaturationUtils
-											.getStatsAwareCompositionRuleAppVisitor(localStatistics
-													.getRuleStatistics()),
-									SaturationUtils
-											.getStatsAwareDecompositionRuleAppVisitor(
-													getDecompositionRuleApplicationVisitor(),
-													localStatistics
-															.getRuleStatistics())))),
+									getStatsAwareCompositionRuleAppVisitor(localStatistics),
+									getStatsAwareDecompositionRuleAppVisitor(getDecompositionRuleApplicationVisitor(), localStatistics)))),
 					new ConclusionDeletionVisitor());
 		}
-
+		
 		@Override
 		public void submit(IndexedClassExpression job) {
 		}
@@ -108,12 +102,10 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 			return writer_;
 		}
 
-		@Override
 		protected DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor() {
 			// this decomposition visitor takes the basic writer which cannot
 			// create new contexts
-			return new BackwardDecompositionRuleApplicationVisitor(
-					getSaturationStateWriter());
+			return new BackwardDecompositionRuleApplicationVisitor(getSaturationStateWriter());
 		}
 	}
 

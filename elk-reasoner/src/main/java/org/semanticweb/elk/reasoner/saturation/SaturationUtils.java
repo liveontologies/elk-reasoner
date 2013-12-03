@@ -24,8 +24,6 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
@@ -35,14 +33,16 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.TimedConclusionVisito
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationCounterVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationTimerVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule0;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationCounterVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationTimerVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for common saturation tasks
@@ -66,9 +66,9 @@ public class SaturationUtils {
 	 * @param ruleAppVisitor
 	 */
 	public static void initContext(Context context, BasicSaturationStateWriter writer,
-			OntologyIndex index, RuleApplicationVisitor ruleAppVisitor) {
+			OntologyIndex index, CompositionRuleApplicationVisitor ruleAppVisitor) {
 		// apply all context initialization rules
-		LinkRule<Context> initRule = index.getContextInitRuleHead();
+		LinkRule0<Context> initRule = index.getContextInitRuleHead();
 
 		while (initRule != null) {
 			initRule.accept(ruleAppVisitor, writer, context);
@@ -79,7 +79,7 @@ public class SaturationUtils {
 	
 	/*
 	 * ------------------------------------------------------------------------------------
-	 * METHOD WHICH ADD TIMERS AND COUNTERS TO VARIOUS VISITORS AND LISTENERS
+	 * METHODS WHICH ADD TIMERS AND COUNTERS TO VARIOUS VISITORS AND LISTENERS
 	 * ------------------------------------------------------------------------------------
 	 */
 	
@@ -89,9 +89,9 @@ public class SaturationUtils {
 	public static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
 	public static final boolean COLLECT_PROCESSING_TIMES = LOGGER_.isDebugEnabled();
 	
-	public static RuleApplicationVisitor getStatsAwareCompositionRuleAppVisitor(
+	public static CompositionRuleApplicationVisitor getStatsAwareCompositionRuleAppVisitor(
 			RuleStatistics localStatistics) {
-		RuleApplicationVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
+		CompositionRuleApplicationVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
 
 		if (COLLECT_RULE_COUNTS) {
 			ruleAppVisitor = new RuleApplicationCounterVisitor(ruleAppVisitor,

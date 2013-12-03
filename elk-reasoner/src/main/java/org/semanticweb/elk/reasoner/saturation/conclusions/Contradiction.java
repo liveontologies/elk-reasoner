@@ -24,18 +24,18 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule0;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -103,12 +103,12 @@ public class Contradiction extends AbstractConclusion {
 	 * links
 	 */
 	public static class ContradictionBackwardLinkRule extends
-			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
-			ModifiableLinkRule<BackwardLink> {
+			ModifiableLinkImpl<ModifiableLinkRule0<BackwardLink>> implements
+			ModifiableLinkRule0<BackwardLink> {
 
 		private static final String NAME = "Contradiction Existential Propagation";
 
-		ContradictionBackwardLinkRule(ModifiableLinkRule<BackwardLink> tail) {
+		ContradictionBackwardLinkRule(ModifiableLinkRule0<BackwardLink> tail) {
 			super(tail);
 		}
 
@@ -125,18 +125,18 @@ public class Contradiction extends AbstractConclusion {
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor,
+		public void accept(CompositionRuleApplicationVisitor visitor,
 				BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 			visitor.visit(this, writer, backwardLink);
 		}
 
-		private static final Matcher<ModifiableLinkRule<BackwardLink>, ContradictionBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, ContradictionBackwardLinkRule>(
+		private static final Matcher<ModifiableLinkRule0<BackwardLink>, ContradictionBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule0<BackwardLink>, ContradictionBackwardLinkRule>(
 				ContradictionBackwardLinkRule.class);
 
-		private static final ReferenceFactory<ModifiableLinkRule<BackwardLink>, ContradictionBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule<BackwardLink>, ContradictionBackwardLinkRule>() {
+		private static final ReferenceFactory<ModifiableLinkRule0<BackwardLink>, ContradictionBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule0<BackwardLink>, ContradictionBackwardLinkRule>() {
 			@Override
 			public ContradictionBackwardLinkRule create(
-					ModifiableLinkRule<BackwardLink> tail) {
+					ModifiableLinkRule0<BackwardLink> tail) {
 				return new ContradictionBackwardLinkRule(tail);
 			}
 		};

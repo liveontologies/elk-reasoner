@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.util.collections.chains.Link;
 
-public interface LinkRule<P, E> extends Rule<P, E>, Link<LinkRule<P, E>> {
+public interface LinkRule0<E> extends Rule0<E>, Link<LinkRule0<E>> {
 
-	public void accept(CompositionRuleApplicationVisitor visitor, BasicSaturationStateWriter writer, P premise, E element);
+	public void accept(CompositionRuleApplicationVisitor visitor, BasicSaturationStateWriter writer, E element);
 }

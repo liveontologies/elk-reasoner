@@ -26,8 +26,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule0;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from a
@@ -55,7 +55,7 @@ public class BackwardLink implements Conclusion {
 	 */
 	private final IndexedPropertyChain relation_;
 
-	public BackwardLink(Context source, IndexedPropertyChain relation) {
+	BackwardLink(Context source, IndexedPropertyChain relation) {
 		this.relation_ = relation;
 		this.source_ = source;
 	}
@@ -74,17 +74,18 @@ public class BackwardLink implements Conclusion {
 	}
 
 	public void apply(BasicSaturationStateWriter writer, Context context,
-			RuleApplicationVisitor ruleAppVisitor) {
+			CompositionRuleApplicationVisitor ruleAppVisitor) {
 
 		// if this is the first/last backward link for this relation,
 		// generate new propagations for this relation
 		if (context.getBackwardLinksByObjectProperty().get(relation_).size() == 1) {
-			IndexedObjectSomeValuesFrom.generatePropagations(writer, relation_,
+			IndexedObjectSomeValuesFrom.generatePropagations(writer, relation_, this, 
 					context);
 		}
 
 		// apply all backward link rules of the context
-		LinkRule<BackwardLink> backLinkRule = context.getBackwardLinkRuleHead();
+		LinkRule0<BackwardLink> backLinkRule = context.getBackwardLinkRuleHead();
+		
 		while (backLinkRule != null) {
 			backLinkRule.accept(ruleAppVisitor, writer, this);
 			backLinkRule = backLinkRule.next();
@@ -96,7 +97,8 @@ public class BackwardLink implements Conclusion {
 		 */
 		if (!relation_.getSaturated().getCompositionsByLeftSubProperty()
 				.isEmpty()) {
-			writer.produce(source_, new ForwardLink(relation_, context));
+			//writer.produce(source_, new ForwardLink(relation_, context));
+			writer.produce(source_, writer.getConclusionFactory().forwardLinkInference(this, context));
 		}
 	}
 

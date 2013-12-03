@@ -31,8 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -41,16 +39,21 @@ import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule0;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule0;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Goes through the input class expressions and puts each context's superclass
@@ -67,8 +70,8 @@ public class IncrementalChangesInitialization extends
 
 	public IncrementalChangesInitialization(
 			Collection<ArrayList<Context>> inputs,
-			ChainableRule<Context> changedGlobalRules,
-			Map<IndexedClassExpression, ChainableRule<Context>> changes,
+			ChainableRule0<Context> changedGlobalRules,
+			Map<IndexedClassExpression, ChainableRule<Conclusion, Context>> changes,
 			SaturationState state, ComputationExecutor executor,
 			SaturationStatistics stageStats, int maxWorkers,
 			ProgressMonitor progressMonitor) {
@@ -92,16 +95,16 @@ class ContextInitializationFactory
 			.getLogger(ContextInitializationFactory.class);
 
 	private final SaturationState saturationState_;
-	private final Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges_;
+	private final Map<IndexedClassExpression, ? extends LinkRule<Conclusion, Context>> indexChanges_;
 	private final IndexedClassExpression[] indexChangesKeys_;
-	private final LinkRule<Context> changedGlobalRuleHead_;
+	private final LinkRule0<Context> changedGlobalRuleHead_;
 	private AtomicInteger ruleHits = new AtomicInteger(0);
 	private final SaturationStatistics stageStatistics_;
 
 	public ContextInitializationFactory(
 			SaturationState state,
-			Map<IndexedClassExpression, ? extends LinkRule<Context>> indexChanges,
-			LinkRule<Context> changedGlobalRuleHead,
+			Map<IndexedClassExpression, ? extends LinkRule<Conclusion, Context>> indexChanges,
+			LinkRule0<Context> changedGlobalRuleHead,
 			SaturationStatistics stageStats) {
 
 		saturationState_ = state;
@@ -124,7 +127,7 @@ class ContextInitializationFactory
 		final ConclusionVisitor<?> conclusionVisitor = SaturationUtils
 				.addStatsToConclusionVisitor(localStatistics
 						.getConclusionStatistics());
-		final RuleApplicationVisitor ruleAppVisitor = SaturationUtils
+		final CompositionRuleApplicationVisitor ruleAppVisitor = SaturationUtils
 				.getStatsAwareCompositionRuleAppVisitor(localStatistics
 						.getRuleStatistics());
 		final BasicSaturationStateWriter saturationStateWriter = saturationState_
@@ -139,7 +142,8 @@ class ContextInitializationFactory
 			@Override
 			public void process(Context context) {
 				// apply all changed global context rules
-				LinkRule<Context> nextGlobalRule = changedGlobalRuleHead_;
+				LinkRule0<Context> nextGlobalRule = changedGlobalRuleHead_;
+				
 				while (nextGlobalRule != null) {
 					if (LOGGER_.isTraceEnabled())
 						LOGGER_.trace(context + ": applying rule "
@@ -174,14 +178,16 @@ class ContextInitializationFactory
 
 			private void applyLocalRules(Context context,
 					IndexedClassExpression changedICE) {
-				LinkRule<Context> nextLocalRule = indexChanges_.get(changedICE);
+				LinkRule<Conclusion, Context> nextLocalRule = indexChanges_.get(changedICE);
 				if (nextLocalRule != null) {
 					localRuleHits++;
 					
 					LOGGER_.trace("{}: applying rules for {}", context, changedICE);
 				}
 				while (nextLocalRule != null) {
-					nextLocalRule.accept(ruleAppVisitor, saturationStateWriter,
+					//FIXME normally we should pass the conclusion which is the premise for this rule
+					//unfortunately we don't have such a conclusion in the incremental mode, need another solution
+					nextLocalRule.accept(ruleAppVisitor, saturationStateWriter, null,
 							context);
 					nextLocalRule = nextLocalRule.next();
 				}

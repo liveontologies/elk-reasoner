@@ -25,7 +25,7 @@ import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
  */
 
 /**
- * A rule that can be applied to elements of a particular type within a
+ * A rule that have a premise and can be applied to elements of a particular type modifiable by a
  * {@link BasicSaturationStateWriter}.
  * 
  * @author "Yevgeny Kazakov"
@@ -33,18 +33,20 @@ import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
  * @param <E>
  *            the type of elements to which the rule can be applied
  */
-public interface Rule<E> {
+public interface Rule<P, E> {
 
 	/**
-	 * Applying the rule to an element within a {@link BasicSaturationStateWriter}
+	 * Applying the rule to an element modifiable by
+	 * {@link BasicSaturationStateWriter}
 	 * 
-	 * @param engine
-	 *            a {@link BasicSaturationStateWriter} which could be changed as a
-	 *            result of this rule's application
+	 * @param writer
+	 *            a {@link BasicSaturationStateWriter} which could change the
+	 *            element as a result of this rule's application
 	 * @param element
 	 *            the element to which the rule is applied
+	 * @param premise
 	 */
-	public void apply(BasicSaturationStateWriter engine, E element);
+	public void apply(BasicSaturationStateWriter writer, P premise, E element);
 
 	/**
 	 * @return the name of this rule
