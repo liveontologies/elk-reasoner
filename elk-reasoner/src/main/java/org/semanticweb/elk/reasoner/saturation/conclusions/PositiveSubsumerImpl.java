@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 
 /**
  * A {@link Subsumer}, for which the structure of the enclosed
@@ -39,11 +39,25 @@ import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicatio
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface PositiveSubsumer extends Conclusion {
+public class PositiveSubsumerImpl extends Subsumer implements PositiveSubsumer {
 
-	public IndexedClassExpression getExpression();
+	PositiveSubsumerImpl(IndexedClassExpression superClassExpression) {
+		super(superClassExpression);
+	}
 
+	@Override
 	public void apply(BasicSaturationStateWriter writer, Context context,
 			CompositionRuleApplicationVisitor ruleAppVisitor,
-			DecompositionRuleApplicationVisitor decompVisitor);
+			DecompositionRuleApplicationVisitor decompVisitor) {
+		// apply decomposition rules
+		expression.accept(decompVisitor, context);
+		// applying all composition rules
+		applyCompositionRules(writer, context, ruleAppVisitor);
+	}
+
+	@Override
+	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
+		return visitor.visit(this, context);
+	}
+
 }

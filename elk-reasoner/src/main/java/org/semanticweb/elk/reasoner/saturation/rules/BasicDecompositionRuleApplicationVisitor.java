@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionFactory;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,9 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 				LOGGER_.trace("Producing contradiction for "
 						+ context.getRoot());
 			}
-			writer.produce(context, Contradiction.getInstance());
+			
+			//FIXME use the conclusion factory
+			writer.produce(context, ContradictionImpl.getInstance());
 		}
 	}
 
@@ -66,7 +68,7 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 	public void visit(IndexedObjectComplementOf ice, Context context) {
 		BasicSaturationStateWriter writer = getSaturationStateWriter();
 		if (context.getSubsumers().contains(ice.getNegated()))
-			writer.produce(context, Contradiction.getInstance());
+			writer.produce(context, ContradictionImpl.getInstance());
 	}
 
 	@Override

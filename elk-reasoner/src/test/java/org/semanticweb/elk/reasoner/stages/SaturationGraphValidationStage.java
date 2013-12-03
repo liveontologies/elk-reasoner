@@ -44,9 +44,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
@@ -313,7 +313,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(
-				ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
+				ForwardLinkImpl.ThisBackwardLinkRule thisBackwardLinkRule,
 				BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 			for (IndexedPropertyChain prop : thisBackwardLinkRule
 					.getForwardLinksByObjectProperty().keySet()) {
@@ -326,7 +326,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(
-				Propagation.ThisBackwardLinkRule thisBackwardLinkRule,
+				PropagationImpl.ThisBackwardLinkRule thisBackwardLinkRule,
 				BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 			for (IndexedPropertyChain prop : thisBackwardLinkRule
 					.getPropagationsByObjectProperty().keySet()) {
@@ -339,7 +339,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(
-				Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
+				ContradictionImpl.ContradictionBackwardLinkRule bottomBackwardLinkRule,
 				BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		}
 

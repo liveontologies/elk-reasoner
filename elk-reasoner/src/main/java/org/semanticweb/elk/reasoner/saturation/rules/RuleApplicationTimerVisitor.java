@@ -33,9 +33,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
@@ -170,7 +170,7 @@ public class RuleApplicationTimerVisitor implements CompositionRuleApplicationVi
 	}
 
 	@Override
-	public void visit(ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
+	public void visit(ForwardLinkImpl.ThisBackwardLinkRule thisBackwardLinkRule,
 			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		timer_.timeForwardLinkBackwardLinkRule -= CachedTimeThread
 				.getCurrentTimeMillis();
@@ -181,7 +181,7 @@ public class RuleApplicationTimerVisitor implements CompositionRuleApplicationVi
 	}
 
 	@Override
-	public void visit(Propagation.ThisBackwardLinkRule thisBackwardLinkRule,
+	public void visit(PropagationImpl.ThisBackwardLinkRule thisBackwardLinkRule,
 			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		timer_.timePropagationBackwardLinkRule -= CachedTimeThread
 				.getCurrentTimeMillis();
@@ -192,7 +192,7 @@ public class RuleApplicationTimerVisitor implements CompositionRuleApplicationVi
 
 	@Override
 	public void visit(
-			Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
+			ContradictionImpl.ContradictionBackwardLinkRule bottomBackwardLinkRule,
 			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		timer_.timeContradictionBottomBackwardLinkRule -= CachedTimeThread
 				.getCurrentTimeMillis();

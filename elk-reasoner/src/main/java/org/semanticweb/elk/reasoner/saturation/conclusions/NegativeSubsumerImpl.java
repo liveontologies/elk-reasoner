@@ -25,25 +25,40 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 
 /**
  * A {@link Subsumer}, for which the structure of the enclosed
- * {@link IndexedClassExpression} should be taken into account. That is, in
- * addition to composition rules stored with this {@link IndexedClassExpression}
- * , the so-called decomposition rule, which takes into account the topmost
- * constructor of this {@link IndexedClassExpression}, should be applied.
+ * {@link IndexedClassExpression} should not be taken into account when applying
+ * the rules within {@link Context}. That is, only composition rules stored with
+ * this {@link IndexedClassExpression} should be applied to
+ * {@link NegativeSubsumer}s.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface PositiveSubsumer extends Conclusion {
+public class NegativeSubsumerImpl extends Subsumer implements NegativeSubsumer {
 
-	public IndexedClassExpression getExpression();
+	NegativeSubsumerImpl(IndexedClassExpression superClassExpression) {
+		super(superClassExpression);
+	}
 
+	@Override
 	public void apply(BasicSaturationStateWriter writer, Context context,
-			CompositionRuleApplicationVisitor ruleAppVisitor,
-			DecompositionRuleApplicationVisitor decompVisitor);
+			CompositionRuleApplicationVisitor ruleAppVisitor) {
+		applyCompositionRules(writer, context, ruleAppVisitor);
+	}
+
+	@Override
+	public void applyDecompositionRules(Context context,
+			DecompositionRuleApplicationVisitor decompVisitor) {
+		expression.accept(decompVisitor, context);
+	}
+
+	@Override
+	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
+		return visitor.visit(this, context);
+	}
 }

@@ -22,23 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
-import java.util.Collection;
-
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule0;
-import org.semanticweb.elk.util.collections.HashSetMultimap;
-import org.semanticweb.elk.util.collections.LazySetIntersection;
-import org.semanticweb.elk.util.collections.Multimap;
-import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
-import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
-import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from this
@@ -52,207 +38,17 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ForwardLink extends AbstractConclusion {
+public interface ForwardLink extends Conclusion {
 
-	private static final Logger LOGGER_ = LoggerFactory.getLogger(ForwardLink.class);
-
-	/**
-	 * the {@link IndexedPropertyChain} in the existential restriction
-	 * corresponding to this {@link ForwardLink}
-	 */
-	private final IndexedPropertyChain relation_;
-
-	/**
-	 * the {@link Context}, which root is the filler of the existential
-	 * restriction corresponding to this {@link ForwardLink}
-	 */
-	private final Context target_;
-
-	ForwardLink(IndexedPropertyChain relation, Context target) {
-		this.relation_ = relation;
-		this.target_ = target;
-	}
-
-	public IndexedPropertyChain getRelation() {
-		return relation_;
-	}
+	public IndexedPropertyChain getRelation();
 	
-	public Context getTarget() {
-		return target_;
-	}
+	public Context getTarget();
 	
-	public void apply(BasicSaturationStateWriter writer, Context context) {
-		/* compose the link with all backward links */
-		Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
-				.getSaturated().getCompositionsByLeftSubProperty();
-		Multimap<IndexedPropertyChain, Context> backLinks = context
-				.getBackwardLinksByObjectProperty();
-		ConclusionFactory factory = writer.getConclusionFactory();
+	public boolean addToContextBackwardLinkRule(Context context);
 
-		for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-				comps.keySet(), backLinks.keySet())) {
+	public boolean removeFromContextBackwardLinkRule(Context context);
 
-			Collection<IndexedPropertyChain> compositions = comps
-					.get(backwardRelation);
-			Collection<Context> sources = backLinks.get(backwardRelation);
-
-			for (IndexedPropertyChain composition : compositions)
-				for (Context source : sources) {
-					/*writer.produce(target_, new BackwardLink(source,
-							composition));*/
-					writer.produce(target_, factory.chainInference(this, backwardRelation, composition, source));
-				}
-		}
-	}
-
-	@Override
-	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
-		return visitor.visit(this, context);
-	}
-
-	public boolean addToContextBackwardLinkRule(Context context) {
-		return context
-				.getBackwardLinkRuleChain()
-				.getCreate(ThisBackwardLinkRule.MATCHER_,
-						ThisBackwardLinkRule.FACTORY_).addForwardLink(this);
-	}
-
-	public boolean removeFromContextBackwardLinkRule(Context context) {
-		ThisBackwardLinkRule rule = context.getBackwardLinkRuleChain().find(
-				ThisBackwardLinkRule.MATCHER_);
-
-		return rule != null ? rule.removeForwardLink(this) : false;
-	}
-
-	public boolean containsBackwardLinkRule(Context context) {
-		ThisBackwardLinkRule rule = context.getBackwardLinkRuleChain().find(
-				ThisBackwardLinkRule.MATCHER_);
-
-		return rule != null ? rule.containsForwardLink(this) : false;
-	}
-
-	@Override
-	public String toString() {
-		return relation_ + "->" + target_.getRoot();
-	}
-
-	/**
-	 * A type of {@link ModifiableLinkRule} created for
-	 * {@link ForwardLink}s and stored in the {@link Context} where it is
-	 * produced. There can be at most one rule of this type stored in every
-	 * {@link Context}. The rule essentially indexes all {@link ForwardLink}s
-	 * produced in this {@link Context} and applies inferences with every
-	 * produced {@link BackwardLink} in this {@link Context}, such as computing
-	 * implied role chains.
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 * 
-	 */
-	public static class ThisBackwardLinkRule extends
-			ModifiableLinkImpl<ModifiableLinkRule0<BackwardLink>> implements
-			ModifiableLinkRule0<BackwardLink> {
-
-		private static final String NAME = "ForwardLink BackwardLink Composition";
-
-		/**
-		 * the record that stores all {@link ForwardLink}s produced in the
-		 * {@link Context} in which this rule is saved; it stores every
-		 * {@link ForwardLink} by indexing its target by its property
-		 */
-		private final Multimap<IndexedPropertyChain, Context> forwardLinksByObjectProperty_;
-
-		ThisBackwardLinkRule(ModifiableLinkRule0<BackwardLink> tail) {
-			super(tail);
-			this.forwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>(
-					3);
-		}
-
-		// TODO: hide this method
-		public Multimap<IndexedPropertyChain, Context> getForwardLinksByObjectProperty() {
-			return forwardLinksByObjectProperty_;
-		}
-
-		@Override
-		public String getName() {
-			return NAME;
-		}
-
-		@Override
-		public void apply(BasicSaturationStateWriter writer, BackwardLink link) {
-
-			LOGGER_.trace("Applying {} to {}", NAME, link);
-
-			/* compose the link with all forward links */
-			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link
-					.getRelation().getSaturated()
-					.getCompositionsByRightSubProperty();
-			if (comps == null)
-				return;
-
-			Context source = link.getSource();
-
-			for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-					comps.keySet(), forwardLinksByObjectProperty_.keySet())) {
-
-				Collection<IndexedPropertyChain> compositions = comps
-						.get(forwardRelation);
-				Collection<Context> forwardTargets = forwardLinksByObjectProperty_
-						.get(forwardRelation);
-
-				for (IndexedPropertyChain composition : compositions)
-					for (Context forwardTarget : forwardTargets) {
-						/*writer.produce(forwardTarget, new BackwardLink(source,
-								composition));*/
-						writer.produce(forwardTarget, writer.getConclusionFactory().chainInference(link, forwardRelation, composition, source));
-					}
-			}
-
-		}
-
-		@Override
-		public void accept(CompositionRuleApplicationVisitor visitor, BasicSaturationStateWriter writer,
-				BackwardLink backwardLink) {
-			visitor.visit(this, writer, backwardLink);
-		}
-
-		/**
-		 * Updates this rule with the input {@link ForwardLink}.
-		 * 
-		 * @param link
-		 *            a {@link ForwardLink} that should be taken into account in
-		 *            this rule
-		 * @return {@code true} if the rule has changed as a result of this
-		 *         operation
-		 */
-		private boolean addForwardLink(ForwardLink link) {
-			return forwardLinksByObjectProperty_.add(link.relation_,
-					link.target_);
-		}
-
-		private boolean removeForwardLink(ForwardLink link) {
-			return forwardLinksByObjectProperty_.remove(link.relation_,
-					link.target_);
-		}
-
-		private boolean containsForwardLink(ForwardLink link) {
-			return forwardLinksByObjectProperty_.contains(link.relation_,
-					link.target_);
-		}
-
-		private static Matcher<ModifiableLinkRule0<BackwardLink>, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule0<BackwardLink>, ThisBackwardLinkRule>(
-				ThisBackwardLinkRule.class);
-
-		/**
-		 * The factory used for appending a new instance of this rule to a
-		 * {@link ModifiableLinkRule<BackwardLink>} chain
-		 */
-		private static ReferenceFactory<ModifiableLinkRule0<BackwardLink>, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule0<BackwardLink>, ThisBackwardLinkRule>() {
-			@Override
-			public ThisBackwardLinkRule create(
-					ModifiableLinkRule0<BackwardLink> tail) {
-				return new ThisBackwardLinkRule(tail);
-			}
-		};
-
-	}
+	public boolean containsBackwardLinkRule(Context context);	
+	
+	public void apply(BasicSaturationStateWriter writer, Context context);
 }

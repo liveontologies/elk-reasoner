@@ -26,13 +26,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiomImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
@@ -42,6 +41,8 @@ import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Defines the disjointness inference rule for indexed class expressions
@@ -212,7 +213,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			LOGGER_.trace("Applying {} to {}", NAME, context);
 			
 			for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
-				writer.produce(context, new DisjointnessAxiom(disAxiom));
+				//TODO use conclusion factory
+				writer.produce(context, new DisjointnessAxiomImpl(disAxiom));
 		}
 
 		protected boolean isEmpty() {
@@ -287,8 +289,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		@Override
 		public void apply(BasicSaturationStateWriter writer, Conclusion premise, Context context) {
 			LOGGER_.trace("Applying {} to {}", NAME, context);
-			
-			writer.produce(context, Contradiction.getInstance());
+			//TODO use conclusion factory
+			writer.produce(context, ContradictionImpl.getInstance());
 		}
 
 		@Override

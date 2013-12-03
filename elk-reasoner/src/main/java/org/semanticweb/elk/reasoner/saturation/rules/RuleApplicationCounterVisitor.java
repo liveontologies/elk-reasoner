@@ -33,9 +33,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -142,7 +142,7 @@ public class RuleApplicationCounterVisitor implements CompositionRuleApplication
 	}
 
 	@Override
-	public void visit(ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
+	public void visit(ForwardLinkImpl.ThisBackwardLinkRule thisBackwardLinkRule,
 			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		counter_.countForwardLinkBackwardLinkRule++;
 		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
@@ -150,7 +150,7 @@ public class RuleApplicationCounterVisitor implements CompositionRuleApplication
 	}
 
 	@Override
-	public void visit(Propagation.ThisBackwardLinkRule thisBackwardLinkRule,
+	public void visit(PropagationImpl.ThisBackwardLinkRule thisBackwardLinkRule,
 			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		counter_.countPropagationBackwardLinkRule++;
 		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
@@ -158,7 +158,7 @@ public class RuleApplicationCounterVisitor implements CompositionRuleApplication
 
 	@Override
 	public void visit(
-			Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
+			ContradictionImpl.ContradictionBackwardLinkRule bottomBackwardLinkRule,
 			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
 		counter_.countContradictionBottomBackwardLinkRule++;
 		visitor_.visit(bottomBackwardLinkRule, writer, backwardLink);

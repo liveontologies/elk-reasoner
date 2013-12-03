@@ -25,8 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
@@ -35,17 +34,33 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface Propagation extends Conclusion {
+public class DisjointnessAxiomImpl extends AbstractConclusion implements DisjointnessAxiom {
 
-	public IndexedPropertyChain getRelation();
-	
-	public IndexedClassExpression getCarry();
-	
-	public boolean addToContextBackwardLinkRule(Context context);
+	private final IndexedDisjointnessAxiom axiom_;
 
-	public boolean removeFromContextBackwardLinkRule(Context context);
+	public DisjointnessAxiomImpl(IndexedDisjointnessAxiom axiom) {
+		axiom_ = axiom;
+	}
 
-	public boolean containsBackwardLinkRule(Context context);
-	
-	public void apply(BasicSaturationStateWriter writer, Context context);
+	@Override
+	public IndexedDisjointnessAxiom getAxiom() {
+		return axiom_;
+	}
+
+	@Override
+	public void apply(BasicSaturationStateWriter writer, Context context) {
+		if (context.inconsistencyDisjointnessAxiom(axiom_)) {
+			writer.produce(context, ContradictionImpl.getInstance());
+		}
+	}
+
+	@Override
+	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
+		return visitor.visit(this, context);
+	}
+
+	@Override
+	public String toString() {
+		return axiom_.toString();
+	}
 }

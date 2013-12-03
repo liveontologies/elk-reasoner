@@ -35,10 +35,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction.ContradictionBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -83,13 +83,13 @@ public interface CompositionRuleApplicationVisitor {
 	void visit(IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
 			BasicSaturationStateWriter writer, Conclusion premise, Context context);
 
-	void visit(ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
+	void visit(ForwardLinkImpl.ThisBackwardLinkRule thisBackwardLinkRule,
 			BasicSaturationStateWriter writer, BackwardLink backwardLink);
 
-	void visit(Propagation.ThisBackwardLinkRule thisBackwardLinkRule,
+	void visit(PropagationImpl.ThisBackwardLinkRule thisBackwardLinkRule,
 			BasicSaturationStateWriter writer, BackwardLink backwardLink);
 
-	void visit(ContradictionBackwardLinkRule bottomBackwardLinkRule,
+	void visit(ContradictionImpl.ContradictionBackwardLinkRule bottomBackwardLinkRule,
 			BasicSaturationStateWriter writer, BackwardLink backwardLink);
 
 }

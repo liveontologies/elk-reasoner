@@ -34,31 +34,10 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class DisjointnessAxiom extends AbstractConclusion {
+public interface DisjointnessAxiom extends Conclusion {
 
-	private final IndexedDisjointnessAxiom axiom_;
+	public IndexedDisjointnessAxiom getAxiom();
+	
+	public void apply(BasicSaturationStateWriter writer, Context context);
 
-	public DisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
-		axiom_ = axiom;
-	}
-
-	public IndexedDisjointnessAxiom getAxiom() {
-		return axiom_;
-	}
-
-	public void apply(BasicSaturationStateWriter engine, Context context) {
-		if (context.inconsistencyDisjointnessAxiom(axiom_)) {
-			engine.produce(context, Contradiction.getInstance());
-		}
-	}
-
-	@Override
-	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
-		return visitor.visit(this, context);
-	}
-
-	@Override
-	public String toString() {
-		return axiom_.toString();
-	}
 }
