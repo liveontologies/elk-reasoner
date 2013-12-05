@@ -124,7 +124,7 @@ class ContextInitializationFactory
 	private ContextProcessor getBaseContextProcessor() {
 
 		final SaturationStatistics localStatistics = new SaturationStatistics();
-		final ConclusionVisitor<?> conclusionVisitor = SaturationUtils
+		final ConclusionVisitor<?, Context> conclusionVisitor = SaturationUtils
 				.addStatsToConclusionVisitor(localStatistics
 						.getConclusionStatistics());
 		final CompositionRuleApplicationVisitor ruleAppVisitor = SaturationUtils

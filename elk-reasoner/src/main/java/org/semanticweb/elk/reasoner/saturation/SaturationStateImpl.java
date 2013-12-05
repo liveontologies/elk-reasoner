@@ -166,7 +166,7 @@ class SaturationStateImpl implements SaturationState {
 		return ice.getContext();
 	}
 	
-	private ExtendedSaturationStateWriter getDefaultWriter(final ConclusionVisitor<?> conclusionVisitor) {
+	private ExtendedSaturationStateWriter getDefaultWriter(final ConclusionVisitor<?, Context> conclusionVisitor) {
 		return new ContextCreatingWriter(
 				ContextCreationListener.DUMMY, ContextModificationListener.DUMMY,
 				DEFAULT_INIT_RULE_APP_VISITOR, conclusionVisitor, true);
@@ -180,12 +180,12 @@ class SaturationStateImpl implements SaturationState {
 	 *         {@link BasicSaturationStateWriter} are thread safe
 	 */
 	@Override
-	public BasicSaturationStateWriter getWriter(ConclusionVisitor<?> conclusionVisitor) {
+	public BasicSaturationStateWriter getWriter(ConclusionVisitor<?, Context> conclusionVisitor) {
 		return getDefaultWriter(conclusionVisitor);
 	}
 
 	@Override
-	public ExtendedSaturationStateWriter getExtendedWriter(ConclusionVisitor<?> conclusionVisitor) {
+	public ExtendedSaturationStateWriter getExtendedWriter(ConclusionVisitor<?, Context> conclusionVisitor) {
 		return getDefaultWriter(conclusionVisitor);
 	}
 
@@ -194,7 +194,7 @@ class SaturationStateImpl implements SaturationState {
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener,
 			CompositionRuleApplicationVisitor ruleAppVisitor,
-			ConclusionVisitor<?> conclusionVisitor,
+			ConclusionVisitor<?, Context> conclusionVisitor,
 			boolean trackNewContextsAsUnsaturated) {
 		return new ContextCreatingWriter(contextCreationListener,
 				contextModificationListener, ruleAppVisitor, conclusionVisitor,
@@ -203,7 +203,7 @@ class SaturationStateImpl implements SaturationState {
 
 	@Override
 	public BasicSaturationStateWriter getWriter(
-			ContextModificationListener contextModificationListener, ConclusionVisitor<?> conclusionVisitor) {
+			ContextModificationListener contextModificationListener, ConclusionVisitor<?, Context> conclusionVisitor) {
 		return new BasicWriter(contextModificationListener, conclusionVisitor);
 	}
 
@@ -213,13 +213,13 @@ class SaturationStateImpl implements SaturationState {
 	 */
 	class BasicWriter implements BasicSaturationStateWriter {
 
-		private final ConclusionVisitor<?> producedConclusionVisitor_;
+		private final ConclusionVisitor<?, Context> producedConclusionVisitor_;
 		
 		private final ContextModificationListener contextModificationListener_;
 
 		private BasicWriter(
 				ContextModificationListener contextSaturationListener,
-				ConclusionVisitor<?> conclusionVisitor) {
+				ConclusionVisitor<?, Context> conclusionVisitor) {
 			this.contextModificationListener_ = contextSaturationListener;
 			this.producedConclusionVisitor_ = conclusionVisitor;
 		}
@@ -312,7 +312,7 @@ class SaturationStateImpl implements SaturationState {
 				ContextCreationListener contextCreationListener,
 				ContextModificationListener contextModificationListener,
 				CompositionRuleApplicationVisitor ruleAppVisitor,
-				ConclusionVisitor<?> conclusionVisitor,
+				ConclusionVisitor<?, Context> conclusionVisitor,
 				boolean trackNewContextsAsUnsaturated) {
 			super(contextModificationListener, conclusionVisitor);
 

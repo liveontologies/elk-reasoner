@@ -23,11 +23,11 @@ public interface Tracer {
 	 */
 	public interface Reader {
 
-		public Inference getInference(Context context, Conclusion conclusion);
+		public Iterable<Inference> getInferences(Context context, Conclusion conclusion);
 		
-		public Inference getSubsumerInference(Context context, IndexedClassExpression conclusion);
+		public Iterable<Inference> getSubsumerInferences(Context context, IndexedClassExpression conclusion);
 		
-		public Inference getBackwardLinkInference(Context context, IndexedPropertyChain linkRelation, Context linkTarget);
+		public Iterable<Inference> getBackwardLinkInferences(Context context, IndexedPropertyChain linkRelation, Context linkSource);
 	}
 
 	/**

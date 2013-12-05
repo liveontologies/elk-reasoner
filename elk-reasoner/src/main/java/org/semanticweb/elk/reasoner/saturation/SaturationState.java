@@ -64,16 +64,16 @@ public interface SaturationState {
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener,
 			CompositionRuleApplicationVisitor ruleAppVisitor,
-			ConclusionVisitor<?> conclusionVisitor,
+			ConclusionVisitor<?, Context> conclusionVisitor,
 			boolean trackNewContextsAsUnsaturated);
 
 	public BasicSaturationStateWriter getWriter(
 			ContextModificationListener contextModificationListener,
-			ConclusionVisitor<?> conclusionVisitor);
+			ConclusionVisitor<?, Context> conclusionVisitor);
 	
-	public BasicSaturationStateWriter getWriter(ConclusionVisitor<?> conclusionVisitor);
+	public BasicSaturationStateWriter getWriter(ConclusionVisitor<?, Context> conclusionVisitor);
 
-	public ExtendedSaturationStateWriter getExtendedWriter(ConclusionVisitor<?> conclusionVisitor);
+	public ExtendedSaturationStateWriter getExtendedWriter(ConclusionVisitor<?, Context> conclusionVisitor);
 	
 
 }

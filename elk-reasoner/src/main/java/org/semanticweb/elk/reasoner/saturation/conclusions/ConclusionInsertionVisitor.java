@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
-public class ConclusionInsertionVisitor implements ConclusionVisitor<Boolean> {
+public class ConclusionInsertionVisitor implements ConclusionVisitor<Boolean, Context> {
 
 	@Override
 	public Boolean visit(NegativeSubsumer negSCE, Context context) {

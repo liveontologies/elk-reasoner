@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public interface Conclusion {
 
-	public <R> R accept(ConclusionVisitor<R> visitor, Context context);
+	public <R, C> R accept(ConclusionVisitor<R, C> visitor, C parameter);
 	
 	/**
 	 * 

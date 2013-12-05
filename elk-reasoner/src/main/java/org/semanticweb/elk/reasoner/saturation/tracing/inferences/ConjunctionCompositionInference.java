@@ -31,4 +31,9 @@ public class ConjunctionCompositionInference extends AbstractInference {
 	public IndexedClassExpression getConjunct() {
 		return second_;
 	}
+	
+	@Override
+	public String toString() {
+		return "Conjuncting " + first_ + " and " + second_;
+	}
 }

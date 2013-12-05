@@ -31,26 +31,26 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface ConclusionVisitor<R> {
+public interface ConclusionVisitor<R, C> {
 
-	public R visit(NegativeSubsumer negSCE, Context context);
+	public R visit(NegativeSubsumer negSCE, C context);
 	
-	public R visit(PositiveSubsumer posSCE, Context context);
+	public R visit(PositiveSubsumer posSCE, C context);
 	
-	public R visit(BackwardLink link, Context context);
+	public R visit(BackwardLink link, C context);
 	
-	public R visit(ForwardLink link, Context context);
+	public R visit(ForwardLink link, C context);
 	
-	public R visit(Contradiction bot, Context context);
+	public R visit(Contradiction bot, C context);
 
-	public R visit(Propagation propagation, Context context);
+	public R visit(Propagation propagation, C context);
 
-	public R visit(DisjointnessAxiom disjointnessAxiom, Context context);
+	public R visit(DisjointnessAxiom disjointnessAxiom, C context);
 	
 	/**
 	 * A dummy visitor, does nothing
 	 */
-	public static final ConclusionVisitor<?> DUMMY = new ConclusionVisitor<Object>() {
+	public static final ConclusionVisitor<?, Context> DUMMY = new ConclusionVisitor<Object, Context>() {
 
 		@Override
 		public Object visit(NegativeSubsumer negSCE, Context context) {

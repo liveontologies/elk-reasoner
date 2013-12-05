@@ -29,6 +29,9 @@ public class SubClassOfInference extends AbstractInference {
 		return subsumer_;
 	}
 
-	
+	@Override
+	public String toString() {
+		return "Subsumption inference based on previously derived " + subsumer_;
+	}
 	
 }

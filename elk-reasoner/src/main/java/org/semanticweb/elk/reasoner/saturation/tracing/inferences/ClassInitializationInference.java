@@ -5,6 +5,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
 
 
+
 /**
  * Represents a trivial inference of the from A => A
  * 
@@ -14,4 +15,11 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  */
 public class ClassInitializationInference extends AbstractInference {
 
+	@Override
+	public String toString() {
+		return "Inititialization inference";
+	}
+
+	
+	
 }

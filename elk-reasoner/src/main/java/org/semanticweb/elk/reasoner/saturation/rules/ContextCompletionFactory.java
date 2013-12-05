@@ -107,9 +107,9 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		// used for the main gap filling logic
 		private LocalSaturationState.GapFillingWriter mainIterationWriter_;
 		// used to count produced conclusions
-		private final ConclusionVisitor<?> conclusionStatsVisitor_;
+		private final ConclusionVisitor<?, Context> conclusionStatsVisitor_;
 
-		private final ConclusionVisitor<Boolean> conclusionProcessor_;
+		private final ConclusionVisitor<Boolean, Context> conclusionProcessor_;
 		
 		protected ContextCompletionEngine() {
 			super(new SaturationStatistics());
@@ -163,7 +163,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 									.getRuleStatistics()), mainIterationVisitor,
 					auxIterationVisitor);
 
-			conclusionProcessor_ = new CombinedConclusionVisitor(
+			conclusionProcessor_ = new CombinedConclusionVisitor<Context>(
 					new ConclusionInsertionVisitor(),
 					getUsedConclusionsCountingVisitor(gapFiller));
 
@@ -181,7 +181,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor() {
+		protected ConclusionVisitor<Boolean, Context> getBaseConclusionProcessor() {
 			return conclusionProcessor_;
 		}
 
@@ -233,7 +233,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 				ContextCreationListener contextCreationListener,
 				ContextModificationListener contextModificationListener,
 				CompositionRuleApplicationVisitor ruleAppVisitor,
-				ConclusionVisitor<?> conclusionVisitor,
+				ConclusionVisitor<?, Context> conclusionVisitor,
 				boolean trackNewContextsAsUnsaturated) {
 			return new GapFillingWriter(conclusionVisitor,
 					ruleAppVisitor, saturationState.getExtendedWriter(
@@ -245,31 +245,31 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		@Override
 		public BasicSaturationStateWriter getWriter(
 				ContextModificationListener contextModificationListener,
-				ConclusionVisitor<?> conclusionVisitor) {
+				ConclusionVisitor<?, Context> conclusionVisitor) {
 			return getDefaultWriter(conclusionVisitor);
 		}
 
 		@Override
 		public BasicSaturationStateWriter getWriter(
-				ConclusionVisitor<?> conclusionVisitor) {
+				ConclusionVisitor<?, Context> conclusionVisitor) {
 			return getDefaultWriter(conclusionVisitor);
 		}
 
 		@Override
 		public ExtendedSaturationStateWriter getExtendedWriter(
-				ConclusionVisitor<?> conclusionVisitor) {
+				ConclusionVisitor<?, Context> conclusionVisitor) {
 			return getDefaultWriter(conclusionVisitor);
 		}
 
 		private GapFillingWriter getDefaultWriter(
-				ConclusionVisitor<?> conclusionVisitor) {
+				ConclusionVisitor<?, Context> conclusionVisitor) {
 			return new GapFillingWriter(conclusionVisitor,
 					new BasicCompositionRuleApplicationVisitor(),
 					saturationState.getExtendedWriter(conclusionVisitor));
 		}
 
 		private LocalWriter getWriterForDecompositionVisitor(
-				ConclusionVisitor<?> conclusionVisitor,
+				ConclusionVisitor<?, Context> conclusionVisitor,
 				CompositionRuleApplicationVisitor initRuleAppVisitor) {
 			return new LocalWriter(conclusionVisitor,
 					initRuleAppVisitor);
@@ -288,11 +288,11 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 			private final CompositionRuleApplicationVisitor initRuleAppVisitor_;
 			// needed for statistics
-			private final ConclusionVisitor<?> conclusionVisitor_;
+			private final ConclusionVisitor<?, Context> conclusionVisitor_;
 
-			private final ConclusionVisitor<Boolean> checker_;
+			private final ConclusionVisitor<Boolean, Context> checker_;
 
-			LocalWriter(ConclusionVisitor<?> visitor,
+			LocalWriter(ConclusionVisitor<?, Context> visitor,
 					CompositionRuleApplicationVisitor ruleAppVisitor) {
 				conclusionVisitor_ = visitor;
 				checker_ = new ConclusionOccurranceCheckingVisitor();
@@ -419,7 +419,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 			private final ExtendedSaturationStateWriter mainStateWriter_;
 
-			GapFillingWriter(ConclusionVisitor<?> visitor,
+			GapFillingWriter(ConclusionVisitor<?, Context> visitor,
 					CompositionRuleApplicationVisitor ruleAppVisitor,
 					ExtendedSaturationStateWriter writer) {
 				super(visitor, ruleAppVisitor);
@@ -572,7 +572,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	 *         pavel.klinov@uni-ulm.de
 	 */
 	private static class ConclusionGapFillingVisitor implements
-			ConclusionVisitor<Boolean> {
+			ConclusionVisitor<Boolean, Context> {
 
 		private final BasicSaturationStateWriter iterationWriter_;
 		private final CompositionRuleApplicationVisitor ruleAppVisitor_;

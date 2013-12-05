@@ -33,12 +33,9 @@ public class TracingConclusionFactory implements ConclusionFactory {
 	
 	private final InferenceFactory inferenceFactory_;
 	
-	private final Tracer.Reader traceReader_;
-	
-	public TracingConclusionFactory(ConclusionFactory conclusionFactory, InferenceFactory inferenceFactory, Tracer.Reader reader) {
+	public TracingConclusionFactory(ConclusionFactory conclusionFactory, InferenceFactory inferenceFactory) {
 		conclusionFactory_ = conclusionFactory;
 		inferenceFactory_ = inferenceFactory;
-		traceReader_ = reader;
 	}
 	
 	@Override
@@ -78,30 +75,29 @@ public class TracingConclusionFactory implements ConclusionFactory {
 		Inference compositionInference = inferenceFactory_.createCompositionInference(context, backwardLink, forwardLinkChain, forwardLinkTarget);
 		
 		return new TracedBackwardLink(compositionInference, conclusionFactory_.createComposedBackwardLink(context, backwardLink, forwardLinkChain, chain, forwardLinkTarget));
-		
-		//return null;
 	}
 
 	@Override
 	public ForwardLink createForwardLink(BackwardLink backwardLink,
 			Context target) {
 		//figuring out how the subsumer was produced
-		Inference subsumerInference = traceReader_.getBackwardLinkInference(target, backwardLink.getRelation(), backwardLink.getSource());
+		//Inference subsumerInference = traceReader_.getBackwardLinkInference(target, backwardLink.getRelation(), backwardLink.getSource());
 				
-		return new TracedForwardLink(subsumerInference, conclusionFactory_.createForwardLink(backwardLink, target));
-		
-		//return null;
+		//return new TracedForwardLink(subsumerInference, conclusionFactory_.createForwardLink(backwardLink, target));
+		return conclusionFactory_.createForwardLink(backwardLink, target);
+
 	}
 
 	@Override
 	public BackwardLink createBackwardLink(
 			IndexedObjectSomeValuesFrom subsumer, Context target) {
 		//figuring out how the subsumer was produced
-		Inference subsumerInference = traceReader_.getSubsumerInference(target, subsumer);
+		/*Inference subsumerInference = traceReader_.getSubsumerInference(target, subsumer);
+		
+		return new TracedBackwardLink(subsumerInference, conclusionFactory_.createBackwardLink(subsumer, target));*/
+		Inference subsumerInference = inferenceFactory_.createBridgeInference(subsumer);
 		
 		return new TracedBackwardLink(subsumerInference, conclusionFactory_.createBackwardLink(subsumer, target));
-		
-		//return null;
 	}
 
 	@Override

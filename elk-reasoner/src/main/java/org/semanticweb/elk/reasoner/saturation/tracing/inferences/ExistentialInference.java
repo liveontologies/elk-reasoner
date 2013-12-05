@@ -42,4 +42,10 @@ public class ExistentialInference extends AbstractForeignContextInference {
 		return linkSource_;
 	}
 	
+	@Override
+	public String toString() {
+		return "Existential inference from " + context + " => " + subsumer_
+				+ " and " + linkSource_.getRoot() + " => " + linkRelation_
+				+ " some " + context.getRoot();
+	}
 }

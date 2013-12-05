@@ -127,18 +127,18 @@ public class SaturationUtils {
 	}
 	
 	
-	public static ConclusionVisitor<?> addStatsToConclusionVisitor(
+	public static ConclusionVisitor<?, Context> addStatsToConclusionVisitor(
 			ConclusionStatistics localStatistics) {
 		return COLLECT_CONCLUSION_COUNTS ? new CountingConclusionVisitor(
 				localStatistics.getProducedConclusionCounts())
 				: ConclusionVisitor.DUMMY;
 	}
 	
-	public static ConclusionVisitor<Boolean> getUsedConclusionCountingProcessor(
-			ConclusionVisitor<Boolean> ruleProcessor,
+	public static ConclusionVisitor<Boolean, Context> getUsedConclusionCountingProcessor(
+			ConclusionVisitor<Boolean, Context> ruleProcessor,
 			SaturationStatistics localStatistics) {
 		if (COLLECT_CONCLUSION_COUNTS) {
-			return new PreprocessedConclusionVisitor<Boolean>(
+			return new PreprocessedConclusionVisitor<Boolean, Context>(
 					new CountingConclusionVisitor(localStatistics
 							.getConclusionStatistics()
 							.getUsedConclusionCounts()), ruleProcessor);
@@ -146,14 +146,14 @@ public class SaturationUtils {
 		return ruleProcessor;
 	}
 	
-	public static ConclusionVisitor<?> getProcessedConclusionCountingProcessor(
-			ConclusionVisitor<Boolean> conclusionVisitor,
+	public static ConclusionVisitor<?, Context> getProcessedConclusionCountingProcessor(
+			ConclusionVisitor<Boolean, Context> conclusionVisitor,
 			SaturationStatistics localStatistics) {
 		
 		ConclusionStatistics stats = localStatistics.getConclusionStatistics();
 
 		if (COLLECT_CONCLUSION_COUNTS) {
-			conclusionVisitor = new PreprocessedConclusionVisitor<Boolean>(
+			conclusionVisitor = new PreprocessedConclusionVisitor<Boolean, Context>(
 					new CountingConclusionVisitor(
 							stats.getProcessedConclusionCounts()),
 					conclusionVisitor);

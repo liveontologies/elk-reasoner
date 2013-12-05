@@ -22,57 +22,56 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
-public class PreprocessedConclusionVisitor<T> implements ConclusionVisitor<T> {
+public class PreprocessedConclusionVisitor<T, C> implements ConclusionVisitor<T, C> {
 
-	final private ConclusionVisitor<?> preprocessor_;
-	final private ConclusionVisitor<T> visitor_;
+	final private ConclusionVisitor<?, C> preprocessor_;
+	final private ConclusionVisitor<T, C> visitor_;
 
-	public PreprocessedConclusionVisitor(ConclusionVisitor<?> preprocessor,
-			ConclusionVisitor<T> visitor) {
+	public PreprocessedConclusionVisitor(ConclusionVisitor<?, C> preprocessor,
+			ConclusionVisitor<T, C> visitor) {
 		this.preprocessor_ = preprocessor;
 		this.visitor_ = visitor;
 	}
 
 	@Override
-	public T visit(NegativeSubsumer negSCE, Context context) {
+	public T visit(NegativeSubsumer negSCE, C context) {
 		preprocessor_.visit(negSCE, context);
 		return visitor_.visit(negSCE, context);
 	}
 
 	@Override
-	public T visit(PositiveSubsumer posSCE, Context context) {
+	public T visit(PositiveSubsumer posSCE, C context) {
 		preprocessor_.visit(posSCE, context);
 		return visitor_.visit(posSCE, context);
 	}
 
 	@Override
-	public T visit(BackwardLink link, Context context) {
+	public T visit(BackwardLink link, C context) {
 		preprocessor_.visit(link, context);
 		return visitor_.visit(link, context);
 	}
 
 	@Override
-	public T visit(ForwardLink link, Context context) {
+	public T visit(ForwardLink link, C context) {
 		preprocessor_.visit(link, context);
 		return visitor_.visit(link, context);
 	}
 
 	@Override
-	public T visit(Contradiction bot, Context context) {
+	public T visit(Contradiction bot, C context) {
 		preprocessor_.visit(bot, context);
 		return visitor_.visit(bot, context);
 	}
 
 	@Override
-	public T visit(Propagation propagation, Context context) {
+	public T visit(Propagation propagation, C context) {
 		preprocessor_.visit(propagation, context);
 		return visitor_.visit(propagation, context);
 	}
 
 	@Override
-	public T visit(DisjointnessAxiom disjointnessAxiom, Context context) {
+	public T visit(DisjointnessAxiom disjointnessAxiom, C context) {
 		preprocessor_.visit(disjointnessAxiom, context);
 		return visitor_.visit(disjointnessAxiom, context);
 	}

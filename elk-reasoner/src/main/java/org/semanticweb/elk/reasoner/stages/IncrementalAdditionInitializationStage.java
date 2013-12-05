@@ -89,7 +89,7 @@ public class IncrementalAdditionInitializationStage extends
 				.addStatsToContextModificationListener(
 						ContextModificationListener.DUMMY,
 						stageStatistics_.getContextStatistics());
-		ConclusionVisitor<?> conclusionVisitor = SaturationUtils
+		ConclusionVisitor<?, Context> conclusionVisitor = SaturationUtils
 				.addStatsToConclusionVisitor(stageStatistics_
 						.getConclusionStatistics());
 

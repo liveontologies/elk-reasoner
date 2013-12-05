@@ -21,52 +21,51 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
-public class CombinedConclusionVisitor implements ConclusionVisitor<Boolean> {
+public class CombinedConclusionVisitor<C> implements ConclusionVisitor<Boolean, C> {
 
-	final private ConclusionVisitor<Boolean> first_;
-	final private ConclusionVisitor<Boolean> second_;
+	final private ConclusionVisitor<Boolean, C> first_;
+	final private ConclusionVisitor<Boolean, C> second_;
 
-	public CombinedConclusionVisitor(ConclusionVisitor<Boolean> first,
-			ConclusionVisitor<Boolean> second) {
+	public CombinedConclusionVisitor(ConclusionVisitor<Boolean, C> first,
+			ConclusionVisitor<Boolean, C> second) {
 		this.first_ = first;
 		this.second_ = second;
 	}
 
 	@Override
-	public Boolean visit(NegativeSubsumer negSCE, Context context) {
+	public Boolean visit(NegativeSubsumer negSCE, C context) {
 		return first_.visit(negSCE, context) && second_.visit(negSCE, context);
 	}
 
 	@Override
-	public Boolean visit(PositiveSubsumer posSCE, Context context) {
+	public Boolean visit(PositiveSubsumer posSCE, C context) {
 		return first_.visit(posSCE, context) && second_.visit(posSCE, context);
 	}
 
 	@Override
-	public Boolean visit(BackwardLink link, Context context) {
+	public Boolean visit(BackwardLink link, C context) {
 		return first_.visit(link, context) && second_.visit(link, context);
 	}
 
 	@Override
-	public Boolean visit(ForwardLink link, Context context) {
+	public Boolean visit(ForwardLink link, C context) {
 		return first_.visit(link, context) && second_.visit(link, context);
 	}
 
 	@Override
-	public Boolean visit(Contradiction bot, Context context) {
+	public Boolean visit(Contradiction bot, C context) {
 		return first_.visit(bot, context) && second_.visit(bot, context);
 	}
 
 	@Override
-	public Boolean visit(Propagation propagation, Context context) {
+	public Boolean visit(Propagation propagation, C context) {
 		return first_.visit(propagation, context)
 				&& second_.visit(propagation, context);
 	}
 
 	@Override
-	public Boolean visit(DisjointnessAxiom disjointnessAxiom, Context context) {
+	public Boolean visit(DisjointnessAxiom disjointnessAxiom, C context) {
 		return first_.visit(disjointnessAxiom, context)
 				&& second_.visit(disjointnessAxiom, context);
 	}

@@ -24,4 +24,9 @@ public class ReflexiveInference extends AbstractInference {
 	public IndexedPropertyChain getChain() {
 		return reflexiveChain_;
 	}
+	
+	@Override
+	public String toString() {
+		return "Reflexive inference: owl:Thing => " + reflexiveChain_ + " some owl:Thing";
+	}
 }

@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionSourceUnsat
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
+import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
@@ -56,6 +57,11 @@ import org.semanticweb.elk.util.logging.CachedTimeThread;
  */
 public class RuleApplicationFactory {
 
+	/**
+	 * TODO Create a configuration option and propagate to this class as a parameter.
+	 */
+	private static final boolean TRACING = false;
+	
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RuleApplicationFactory.class);
@@ -81,7 +87,7 @@ public class RuleApplicationFactory {
 	public RuleApplicationFactory(final SaturationState saturationState,
 			final boolean trackModifiedContexts) {
 		this.aggregatedStats_ = new SaturationStatistics();
-		this.saturationState = saturationState;
+		this.saturationState = TRACING ? new TracingSaturationState(saturationState) : saturationState;
 		this.trackModifiedContexts_ = trackModifiedContexts;
 	}
 
@@ -112,7 +118,7 @@ public class RuleApplicationFactory {
 	public abstract class BaseEngine implements
 			InputProcessor<IndexedClassExpression>, RuleEngine {
 
-		private ConclusionVisitor<?> conclusionProcessor_;
+		private ConclusionVisitor<?, Context> conclusionProcessor_;
 
 		/**
 		 * Local {@link SaturationStatistics} created for every worker
@@ -188,8 +194,8 @@ public class RuleApplicationFactory {
 		 * @return the input {@link ConclusionVisitor} possibly wrapped with
 		 *         some code for producing statistics
 		 */
-		protected ConclusionVisitor<Boolean> getUsedConclusionsCountingVisitor(
-				ConclusionVisitor<Boolean> ruleProcessor) {
+		protected ConclusionVisitor<Boolean, Context> getUsedConclusionsCountingVisitor(
+				ConclusionVisitor<Boolean, Context> ruleProcessor) {
 			return SaturationUtils.getUsedConclusionCountingProcessor(
 					ruleProcessor, localStatistics);
 		}
@@ -209,12 +215,12 @@ public class RuleApplicationFactory {
 		 *         {@link DefaultEngine} for processing {@code Conclusion}s
 		 *         within {@link Context}s
 		 */
-		protected ConclusionVisitor<?> getConclusionProcessor() {
+		protected ConclusionVisitor<?, Context> getConclusionProcessor() {
 			BasicSaturationStateWriter saturationStateWriter = getSaturationStateWriter();
-			ConclusionVisitor<Boolean> result = getBaseConclusionProcessor();
+			ConclusionVisitor<Boolean, Context> result = getBaseConclusionProcessor();
 			
 			if (trackModifiedContexts_) {
-				result = new CombinedConclusionVisitor(result,
+				result = new CombinedConclusionVisitor<Context>(result,
 						new ConclusionSourceUnsaturationVisitor(
 								saturationStateWriter));
 			}
@@ -236,7 +242,7 @@ public class RuleApplicationFactory {
 		 * of {@code Conclusion}s within a {@link Context}. This can be further
 		 * wrapped in some other code.
 		 */
-		protected abstract ConclusionVisitor<Boolean> getBaseConclusionProcessor();
+		protected abstract ConclusionVisitor<Boolean, Context> getBaseConclusionProcessor();
 
 		/**
 		 * Returns the saturation state writer for this engine.
@@ -303,10 +309,10 @@ public class RuleApplicationFactory {
 		}
 
 		@Override
-		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor() {
+		protected ConclusionVisitor<Boolean, Context> getBaseConclusionProcessor() {
 			BasicSaturationStateWriter saturationStateWriter = getSaturationStateWriter();
 
-			return new CombinedConclusionVisitor(
+			return new CombinedConclusionVisitor<Context>(
 					new ConclusionInsertionVisitor(),
 					getUsedConclusionsCountingVisitor(new ConclusionApplicationVisitor(
 							saturationStateWriter,

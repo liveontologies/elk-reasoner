@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  */
 public class ConclusionSourceUnsaturationVisitor implements
-		ConclusionVisitor<Boolean> {
+		ConclusionVisitor<Boolean, Context> {
 
 	private final BasicSaturationStateWriter writer_;
 

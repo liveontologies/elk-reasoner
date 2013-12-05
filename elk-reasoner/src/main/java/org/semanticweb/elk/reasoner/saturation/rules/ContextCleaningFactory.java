@@ -73,7 +73,7 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 
 		@Override
 		protected BasicSaturationStateWriter getSaturationStateWriter() {
-			ConclusionVisitor<?> visitor = SaturationUtils.addStatsToConclusionVisitor(localStatistics
+			ConclusionVisitor<?, Context> visitor = SaturationUtils.addStatsToConclusionVisitor(localStatistics
 					.getConclusionStatistics());
 			BasicSaturationStateWriter writer = saturationState.getWriter(
 					ContextModificationListener.DUMMY, visitor);

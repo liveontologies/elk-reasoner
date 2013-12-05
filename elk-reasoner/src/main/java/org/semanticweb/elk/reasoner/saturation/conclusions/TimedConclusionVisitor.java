@@ -25,13 +25,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
-public class TimedConclusionVisitor implements ConclusionVisitor<Long> {
+public class TimedConclusionVisitor implements ConclusionVisitor<Long, Context> {
 
 	private final ConclusionTimer timer_;
-	private final ConclusionVisitor<?> processor_;
+	private final ConclusionVisitor<?, Context> processor_;
 
 	public TimedConclusionVisitor(ConclusionTimer timer,
-			ConclusionVisitor<?> processor) {
+			ConclusionVisitor<?, Context> processor) {
 		this.timer_ = timer;
 		this.processor_ = processor;
 	}

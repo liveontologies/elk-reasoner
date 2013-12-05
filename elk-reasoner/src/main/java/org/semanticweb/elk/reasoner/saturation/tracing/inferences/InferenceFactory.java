@@ -71,5 +71,9 @@ public class InferenceFactory {
 	public Inference createReflexiveInference(IndexedPropertyChain reflexiveChain) {
 		return new ReflexiveInference(reflexiveChain);
 	}
+	
+	public Inference createBridgeInference(IndexedClassExpression previous) {
+		return new BridgeInference(previous);
+	}
 
 }

@@ -56,6 +56,9 @@ public class PropertyChainInference extends AbstractForeignContextInference {
 		return forwardLinkTarget_;
 	}
 
-	
+	@Override
+	public String toString() {
+		return "Property chain inference: " + backwardLinkSource_ + " => " + backwardLinkRelation_ + " o " + forwardLinkRelation_ + " some " + context.getRoot();
+	}
 
 }

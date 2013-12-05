@@ -96,7 +96,7 @@ public class IncrementalDeletionInitializationStage extends
 			return false;
 		this.initialization_ = null;
 		// initializing contexts which will be removed
-		final ConclusionVisitor<?> conclusionVisitor = SaturationUtils
+		final ConclusionVisitor<?, Context> conclusionVisitor = SaturationUtils
 				.addStatsToConclusionVisitor(stageStatistics_
 						.getConclusionStatistics());
 		final ExtendedSaturationStateWriter satStateWriter = reasoner.saturationState

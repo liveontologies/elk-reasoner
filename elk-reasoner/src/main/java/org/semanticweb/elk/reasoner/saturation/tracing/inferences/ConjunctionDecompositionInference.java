@@ -24,4 +24,8 @@ public class ConjunctionDecompositionInference extends AbstractInference {
 		return conjunction_;
 	}
 
+	@Override
+	public String toString() {
+		return "Decomposing " + conjunction_;
+	}
 }

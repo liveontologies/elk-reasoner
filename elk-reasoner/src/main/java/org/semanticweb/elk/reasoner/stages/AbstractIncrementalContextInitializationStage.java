@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * @author Pavel Klinov
@@ -79,7 +80,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 		return stage().toString();
 	}
 
-	protected ConclusionVisitor<?> getConclusionVisitor(
+	protected ConclusionVisitor<?, Context> getConclusionVisitor(
 			ConclusionStatistics conclusionStatistics) {
 
 		return COLLECT_CONCLUSION_COUNTS ? new CountingConclusionVisitor(
@@ -91,7 +92,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		final ConclusionVisitor<?> visitor = getConclusionVisitor(stageStatistics_
+		final ConclusionVisitor<?, Context> visitor = getConclusionVisitor(stageStatistics_
 				.getConclusionStatistics());
 		this.writer_ = reasoner.saturationState.getExtendedWriter(visitor);
 		return true;

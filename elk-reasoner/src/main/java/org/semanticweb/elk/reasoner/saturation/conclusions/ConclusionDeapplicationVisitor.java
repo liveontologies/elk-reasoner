@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationV
  * pavel.klinov@uni-ulm.de
  */
 public class ConclusionDeapplicationVisitor implements
-		ConclusionVisitor<Boolean> {
+		ConclusionVisitor<Boolean, Context> {
 
 	private final BasicSaturationStateWriter writer_;
 	private final CompositionRuleApplicationVisitor ruleAppVisitor_;
