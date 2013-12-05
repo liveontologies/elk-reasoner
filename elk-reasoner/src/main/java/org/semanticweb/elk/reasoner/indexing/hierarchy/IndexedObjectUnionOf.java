@@ -169,7 +169,7 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 			
 			for (IndexedClassExpression disjunction : disjunctions_) {
 				//writer.produce(context, new NegativeSubsumer(disjunction));
-				writer.produce(context, writer.getConclusionFactory().subsumptionInference(premise, disjunction));
+				writer.produce(context, writer.getConclusionFactory().createSubsumer(premise, disjunction));
 			}
 		}
 

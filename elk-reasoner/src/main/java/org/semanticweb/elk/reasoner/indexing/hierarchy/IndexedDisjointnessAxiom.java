@@ -277,7 +277,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 
 		ThisContradictionRule() {
-			this((ChainableRule<Conclusion, Context>) null);
+			this(null);
 			this.contradictionCounter_++;
 		}
 

@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -39,7 +39,7 @@ public interface Propagation extends Conclusion {
 
 	public IndexedPropertyChain getRelation();
 	
-	public IndexedClassExpression getCarry();
+	public IndexedObjectSomeValuesFrom getCarry();
 	
 	public boolean addToContextBackwardLinkRule(Context context);
 

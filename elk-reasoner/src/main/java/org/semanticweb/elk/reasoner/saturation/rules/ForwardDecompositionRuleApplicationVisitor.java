@@ -50,7 +50,7 @@ public class ForwardDecompositionRuleApplicationVisitor extends
 		/*writer_.produce(writer_.getCreateContext(ice.getFiller()),
 				new BackwardLink(context, ice.getRelation()));*/
 		writer_.produce(writer_.getCreateContext(ice.getFiller()),
-				writer_.getConclusionFactory().backwardLinkInference(ice, context));
+				writer_.getConclusionFactory().createBackwardLink(ice, context));
 	}
 
 	@Override

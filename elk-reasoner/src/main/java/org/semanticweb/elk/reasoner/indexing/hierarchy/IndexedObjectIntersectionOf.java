@@ -180,7 +180,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 				//writer.produce(context, new NegativeSubsumer(conjunctionsByConjunct_.get(common)));
 				IndexedObjectIntersectionOf conjunction = conjunctionsByConjunct_.get(common);
 				
-				writer.produce(context, writer.getConclusionFactory().conjunctionComposition(premise, common, conjunction));
+				writer.produce(context, writer.getConclusionFactory().createdComposedConjunction(premise, common, conjunction));
 			}
 
 		}

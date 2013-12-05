@@ -107,20 +107,20 @@ public class BasicCompositionRuleApplicationVisitor implements
 
 	@Override
 	public void visit(ForwardLinkImpl.ThisBackwardLinkRule rule,
-			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
-		rule.apply(writer, backwardLink);
+			BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context) {
+		rule.apply(writer, backwardLink, context);
 	}
 
 	@Override
 	public void visit(PropagationImpl.ThisBackwardLinkRule rule,
-			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
-		rule.apply(writer, backwardLink);
+			BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context) {
+		rule.apply(writer, backwardLink, context);
 	}
 
 	@Override
 	public void visit(ContradictionImpl.ContradictionBackwardLinkRule rule,
-			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
-		rule.apply(writer, backwardLink);
+			BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context) {
+		rule.apply(writer, backwardLink, context);
 	}
 
 }

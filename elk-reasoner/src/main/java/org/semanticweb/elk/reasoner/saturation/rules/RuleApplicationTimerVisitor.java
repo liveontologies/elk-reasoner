@@ -171,10 +171,10 @@ public class RuleApplicationTimerVisitor implements CompositionRuleApplicationVi
 
 	@Override
 	public void visit(ForwardLinkImpl.ThisBackwardLinkRule thisBackwardLinkRule,
-			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
+			BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context) {
 		timer_.timeForwardLinkBackwardLinkRule -= CachedTimeThread
 				.getCurrentTimeMillis();
-		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
+		visitor_.visit(thisBackwardLinkRule, writer, backwardLink, context);
 		timer_.timeForwardLinkBackwardLinkRule += CachedTimeThread
 				.getCurrentTimeMillis();
 
@@ -182,10 +182,10 @@ public class RuleApplicationTimerVisitor implements CompositionRuleApplicationVi
 
 	@Override
 	public void visit(PropagationImpl.ThisBackwardLinkRule thisBackwardLinkRule,
-			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
+			BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context) {
 		timer_.timePropagationBackwardLinkRule -= CachedTimeThread
 				.getCurrentTimeMillis();
-		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
+		visitor_.visit(thisBackwardLinkRule, writer, backwardLink, context);
 		timer_.timePropagationBackwardLinkRule += CachedTimeThread
 				.getCurrentTimeMillis();
 	}
@@ -193,10 +193,10 @@ public class RuleApplicationTimerVisitor implements CompositionRuleApplicationVi
 	@Override
 	public void visit(
 			ContradictionImpl.ContradictionBackwardLinkRule bottomBackwardLinkRule,
-			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
+			BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context) {
 		timer_.timeContradictionBottomBackwardLinkRule -= CachedTimeThread
 				.getCurrentTimeMillis();
-		visitor_.visit(bottomBackwardLinkRule, writer, backwardLink);
+		visitor_.visit(bottomBackwardLinkRule, writer, backwardLink, context);
 		timer_.timeContradictionBottomBackwardLinkRule += CachedTimeThread
 				.getCurrentTimeMillis();
 	}

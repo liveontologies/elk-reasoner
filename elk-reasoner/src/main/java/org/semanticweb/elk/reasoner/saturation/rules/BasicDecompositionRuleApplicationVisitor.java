@@ -78,8 +78,8 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 
 		//writer.produce(context, new PositiveSubsumer(ice.getFirstConjunct()));
 		//writer.produce(context, new PositiveSubsumer(ice.getSecondConjunct()));
-		writer.produce(context, factory.conjunctionDecomposition(ice, ice.getFirstConjunct()));
-		writer.produce(context, factory.conjunctionDecomposition(ice, ice.getSecondConjunct()));
+		writer.produce(context, factory.createConjunct(ice, ice.getFirstConjunct()));
+		writer.produce(context, factory.createConjunct(ice, ice.getSecondConjunct()));
 	}
 
 	protected abstract BasicSaturationStateWriter getSaturationStateWriter();

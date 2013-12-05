@@ -1,9 +1,8 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.tracing;
+package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -18,9 +17,5 @@ abstract class AbstractInference implements Inference {
 		return defaultContext;
 	}
 
-	@Override
-	public <O> O accept(ConclusionVisitor<O> conclusionVisitor, Context defaultContext) {
-		return null;
-	}
 
 }

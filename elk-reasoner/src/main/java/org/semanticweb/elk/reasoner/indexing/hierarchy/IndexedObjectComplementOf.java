@@ -129,8 +129,8 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 
 		}
 
-		ThisCompositionRule(IndexedClassExpression complement) {
-			this((ChainableRule<Conclusion, Context>) null);
+		ThisCompositionRule(IndexedObjectComplementOf complement) {
+			super(null);
 			this.negation_ = complement;
 		}
 

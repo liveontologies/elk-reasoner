@@ -1,9 +1,8 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.tracing;
+package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -25,10 +24,4 @@ public interface Inference {
 	 */
 	public Context getContext(Context defaultContext);
 
-	/**
-	 * TODO
-	 * @param conclusionVisitor
-	 * @return
-	 */
-	public <O> O accept(ConclusionVisitor<O> conclusionVisitor, Context defaultContext);
 }

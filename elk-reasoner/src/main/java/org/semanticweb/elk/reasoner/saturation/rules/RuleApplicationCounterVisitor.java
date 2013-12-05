@@ -143,25 +143,25 @@ public class RuleApplicationCounterVisitor implements CompositionRuleApplication
 
 	@Override
 	public void visit(ForwardLinkImpl.ThisBackwardLinkRule thisBackwardLinkRule,
-			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
+			BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context) {
 		counter_.countForwardLinkBackwardLinkRule++;
-		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
+		visitor_.visit(thisBackwardLinkRule, writer, backwardLink, context);
 
 	}
 
 	@Override
 	public void visit(PropagationImpl.ThisBackwardLinkRule thisBackwardLinkRule,
-			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
+			BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context) {
 		counter_.countPropagationBackwardLinkRule++;
-		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
+		visitor_.visit(thisBackwardLinkRule, writer, backwardLink, context);
 	}
 
 	@Override
 	public void visit(
 			ContradictionImpl.ContradictionBackwardLinkRule bottomBackwardLinkRule,
-			BasicSaturationStateWriter writer, BackwardLink backwardLink) {
+			BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context) {
 		counter_.countContradictionBottomBackwardLinkRule++;
-		visitor_.visit(bottomBackwardLinkRule, writer, backwardLink);
+		visitor_.visit(bottomBackwardLinkRule, writer, backwardLink, context);
 	}
 
 	@Override

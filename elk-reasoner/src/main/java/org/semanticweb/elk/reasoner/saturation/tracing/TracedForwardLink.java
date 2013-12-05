@@ -1,23 +1,25 @@
+/**
+ * 
+ */
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 
 /**
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class TracedBackwardLink extends TracedConclusion<BackwardLink> implements BackwardLink {
+public class TracedForwardLink extends TracedConclusion<ForwardLink> implements
+		ForwardLink {
 
-	public TracedBackwardLink(Inference inf, BackwardLink link) {
-		super(inf, link);
+	public TracedForwardLink(Inference inf, ForwardLink cnl) {
+		super(inf, cnl);
 	}
 
 	@Override
@@ -36,14 +38,28 @@ public class TracedBackwardLink extends TracedConclusion<BackwardLink> implement
 	}
 
 	@Override
-	public Context getSource() {
-		return conclusion.getSource();
+	public Context getTarget() {
+		return conclusion.getTarget();
 	}
 
 	@Override
-	public void apply(BasicSaturationStateWriter writer, Context context,
-			CompositionRuleApplicationVisitor ruleAppVisitor) {
-		conclusion.apply(writer, context, ruleAppVisitor);
+	public boolean addToContextBackwardLinkRule(Context context) {
+		return conclusion.addToContextBackwardLinkRule(context);
+	}
+
+	@Override
+	public boolean removeFromContextBackwardLinkRule(Context context) {
+		return conclusion.removeFromContextBackwardLinkRule(context);
+	}
+
+	@Override
+	public boolean containsBackwardLinkRule(Context context) {
+		return conclusion.containsBackwardLinkRule(context);
+	}
+
+	@Override
+	public void apply(BasicSaturationStateWriter writer, Context context) {
+		conclusion.apply(writer, context);
 	}
 
 }

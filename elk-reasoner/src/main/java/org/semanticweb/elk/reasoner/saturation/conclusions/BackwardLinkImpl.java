@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule0;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 
 /**
  * 
@@ -81,10 +81,10 @@ public class BackwardLinkImpl implements BackwardLink {
 		}
 
 		// apply all backward link rules of the context
-		LinkRule0<BackwardLink> backLinkRule = context.getBackwardLinkRuleHead();
+		LinkRule<BackwardLink, Context> backLinkRule = context.getBackwardLinkRuleHead();
 		
 		while (backLinkRule != null) {
-			backLinkRule.accept(ruleAppVisitor, writer, this);
+			backLinkRule.accept(ruleAppVisitor, writer, this, context);
 			backLinkRule = backLinkRule.next();
 		}
 
@@ -94,7 +94,7 @@ public class BackwardLinkImpl implements BackwardLink {
 		 */
 		if (!relation_.getSaturated().getCompositionsByLeftSubProperty()
 				.isEmpty()) {
-			writer.produce(source_, writer.getConclusionFactory().forwardLinkInference(this, context));
+			writer.produce(source_, writer.getConclusionFactory().createForwardLink(this, context));
 		}
 	}
 

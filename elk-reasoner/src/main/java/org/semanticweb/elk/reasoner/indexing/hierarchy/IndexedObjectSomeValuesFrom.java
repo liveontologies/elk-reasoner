@@ -195,14 +195,14 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 						candidatePropagationProperties, relation.getSaturated()
 								.getSubProperties())) {
 					//writer.produce(context, new Propagation(property, e));
-					writer.produce(context, writer.getConclusionFactory().existentialInference(premise, property, e));
+					writer.produce(context, writer.getConclusionFactory().createPropagation(premise, property, e));
 				}
 
 				// TODO: create a composition rule to deal with reflexivity
 				// propagating to the this context if relation is reflexive
 				if (relation.getSaturated().isDerivedReflexive()) {
 					//writer.produce(context, new NegativeSubsumer(e));
-					writer.produce(context, writer.getConclusionFactory().reflexiveInference(e));
+					writer.produce(context, writer.getConclusionFactory().createReflexiveSubsumer(e));
 				}
 			}
 		}
@@ -270,7 +270,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				if (carry.getRelation().getSaturated().getSubProperties()
 						.contains(property)) {
 					//writer.produce(context, new Propagation(property, e));
-					writer.produce(context, writer.getConclusionFactory().existentialInference(premise, property, carry));
+					writer.produce(context, writer.getConclusionFactory().createPropagation(premise, property, carry));
 				}
 			}
 

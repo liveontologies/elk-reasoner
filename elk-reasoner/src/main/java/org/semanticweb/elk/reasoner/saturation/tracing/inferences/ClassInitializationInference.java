@@ -1,7 +1,8 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.tracing;
+package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 
 
 /**

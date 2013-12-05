@@ -1,4 +1,5 @@
-package org.semanticweb.elk.reasoner.saturation.tracing;
+package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 
 /**
  * Represents an inference of the form A => owl:Thing

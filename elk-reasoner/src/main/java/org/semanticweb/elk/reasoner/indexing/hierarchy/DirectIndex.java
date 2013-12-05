@@ -35,8 +35,8 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule0;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule0;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule0;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -304,7 +304,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 			LOGGER_.trace("Applying {} to {}", NAME, context);
 			
 			//writer.produce(context, new PositiveSubsumer(context.getRoot()));
-			writer.produce(context, writer.getConclusionFactory().classInitialization(context.getRoot()));
+			writer.produce(context, writer.getConclusionFactory().createSubsumer(context.getRoot()));
 		}
 
 		private static final Matcher<ChainableRule0<Context>, ContextRootInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule0<Context>, ContextRootInitializationRule>(

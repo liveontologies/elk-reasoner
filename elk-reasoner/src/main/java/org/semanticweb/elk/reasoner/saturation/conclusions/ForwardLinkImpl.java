@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule0;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -103,7 +102,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 				for (Context source : sources) {
 					/*writer.produce(target_, new BackwardLink(source,
 							composition));*/
-					writer.produce(target_, factory.chainInference(this, backwardRelation, composition, source));
+					writer.produce(target_, factory.createComposedBackwardLink(context, this, backwardRelation, composition, source));
 				}
 		}
 	}
@@ -155,8 +154,8 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	 * 
 	 */
 	public static class ThisBackwardLinkRule extends
-			ModifiableLinkImpl<ModifiableLinkRule0<BackwardLink>> implements
-			ModifiableLinkRule0<BackwardLink> {
+			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink, Context>> implements
+			ModifiableLinkRule<BackwardLink, Context> {
 
 		private static final String NAME = "ForwardLink BackwardLink Composition";
 
@@ -167,7 +166,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 		 */
 		private final Multimap<IndexedPropertyChain, Context> forwardLinksByObjectProperty_;
 
-		ThisBackwardLinkRule(ModifiableLinkRule0<BackwardLink> tail) {
+		ThisBackwardLinkRule(ModifiableLinkRule<BackwardLink, Context> tail) {
 			super(tail);
 			this.forwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>(
 					3);
@@ -184,7 +183,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter writer, BackwardLink link) {
+		public void apply(BasicSaturationStateWriter writer, BackwardLink link, Context context) {
 
 			LOGGER_.trace("Applying {} to {}", NAME, link);
 
@@ -192,10 +191,9 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link
 					.getRelation().getSaturated()
 					.getCompositionsByRightSubProperty();
+
 			if (comps == null)
 				return;
-
-			Context source = link.getSource();
 
 			for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
 					comps.keySet(), forwardLinksByObjectProperty_.keySet())) {
@@ -209,7 +207,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 					for (Context forwardTarget : forwardTargets) {
 						/*writer.produce(forwardTarget, new BackwardLink(source,
 								composition));*/
-						writer.produce(forwardTarget, writer.getConclusionFactory().chainInference(link, forwardRelation, composition, source));
+						writer.produce(forwardTarget, writer.getConclusionFactory().createComposedBackwardLink(context, link, forwardRelation, composition, forwardTarget));
 					}
 			}
 
@@ -217,8 +215,8 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 
 		@Override
 		public void accept(CompositionRuleApplicationVisitor visitor, BasicSaturationStateWriter writer,
-				BackwardLink backwardLink) {
-			visitor.visit(this, writer, backwardLink);
+				BackwardLink backwardLink, Context context) {
+			visitor.visit(this, writer, backwardLink, context);
 		}
 
 		/**
@@ -245,17 +243,17 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 					link.getTarget());
 		}
 
-		private static Matcher<ModifiableLinkRule0<BackwardLink>, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule0<BackwardLink>, ThisBackwardLinkRule>(
+		private static Matcher<ModifiableLinkRule<BackwardLink, Context>, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink, Context>, ThisBackwardLinkRule>(
 				ThisBackwardLinkRule.class);
 
 		/**
 		 * The factory used for appending a new instance of this rule to a
 		 * {@link ModifiableLinkRule<BackwardLink>} chain
 		 */
-		private static ReferenceFactory<ModifiableLinkRule0<BackwardLink>, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule0<BackwardLink>, ThisBackwardLinkRule>() {
+		private static ReferenceFactory<ModifiableLinkRule<BackwardLink, Context>, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule<BackwardLink, Context>, ThisBackwardLinkRule>() {
 			@Override
 			public ThisBackwardLinkRule create(
-					ModifiableLinkRule0<BackwardLink> tail) {
+					ModifiableLinkRule<BackwardLink, Context> tail) {
 				return new ThisBackwardLinkRule(tail);
 			}
 		};

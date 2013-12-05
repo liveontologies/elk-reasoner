@@ -175,7 +175,7 @@ public class IndexedClass extends IndexedClassEntity {
 			LOGGER_.trace("Applying {} to {}", NAME, context);
 			
 			//writer.produce(context, new PositiveSubsumer(writer.getOwlThing()));
-			writer.produce(context, writer.getConclusionFactory().classInitialization(writer.getOwlThing()));
+			writer.produce(context, writer.getConclusionFactory().createSubsumer(writer.getOwlThing()));
 		}
 
 		private static final Matcher<ChainableRule0<Context>, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule0<Context>, OwlThingContextInitializationRule>(

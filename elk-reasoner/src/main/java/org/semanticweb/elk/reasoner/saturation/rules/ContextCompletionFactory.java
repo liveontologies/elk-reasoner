@@ -502,7 +502,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			/*localWriter_.produce(fillerContext,
 					new BackwardLink(context, ice.getRelation()));*/
 			localWriter_.produce(fillerContext,
-					localWriter_.getConclusionFactory().backwardLinkInference(ice, context));
+					localWriter_.getConclusionFactory().createBackwardLink(ice, context));
 		}
 
 		@Override
@@ -539,7 +539,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			if (fillerContext != null) {
 				/*localWriter_.produce(fillerContext, new BackwardLink(context,
 						ice.getRelation()));*/
-				localWriter_.produce(fillerContext, localWriter_.getConclusionFactory().backwardLinkInference(ice, context));
+				localWriter_.produce(fillerContext, localWriter_.getConclusionFactory().createBackwardLink(ice, context));
 			}
 		}
 

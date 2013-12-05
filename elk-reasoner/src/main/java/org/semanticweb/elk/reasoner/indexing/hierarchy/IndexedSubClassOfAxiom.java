@@ -137,7 +137,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			
 			for (IndexedClassExpression implied : toldSuperClassExpressions_) {
 				//writer.produce(context, new PositiveSubsumer(implied));
-				writer.produce(context, writer.getConclusionFactory().subsumptionInference(premise, implied));
+				writer.produce(context, writer.getConclusionFactory().createSubsumer(premise, implied));
 			}
 		}
 

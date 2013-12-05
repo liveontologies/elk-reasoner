@@ -1,23 +1,27 @@
+/**
+ * 
+ */
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 
 /**
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class TracedBackwardLink extends TracedConclusion<BackwardLink> implements BackwardLink {
+public class TracedNegativeSubsumer extends TracedConclusion<NegativeSubsumer> implements
+		NegativeSubsumer {
 
-	public TracedBackwardLink(Inference inf, BackwardLink link) {
-		super(inf, link);
+	TracedNegativeSubsumer(Inference inf, NegativeSubsumer cnl) {
+		super(inf, cnl);
 	}
 
 	@Override
@@ -31,19 +35,20 @@ public class TracedBackwardLink extends TracedConclusion<BackwardLink> implement
 	}
 
 	@Override
-	public IndexedPropertyChain getRelation() {
-		return conclusion.getRelation();
-	}
-
-	@Override
-	public Context getSource() {
-		return conclusion.getSource();
+	public IndexedClassExpression getExpression() {
+		return conclusion.getExpression();
 	}
 
 	@Override
 	public void apply(BasicSaturationStateWriter writer, Context context,
 			CompositionRuleApplicationVisitor ruleAppVisitor) {
 		conclusion.apply(writer, context, ruleAppVisitor);
+	}
+
+	@Override
+	public void applyDecompositionRules(Context context,
+			DecompositionRuleApplicationVisitor decompVisitor) {
+		conclusion.applyDecompositionRules(context, decompVisitor);
 	}
 
 }

@@ -84,12 +84,12 @@ public interface CompositionRuleApplicationVisitor {
 			BasicSaturationStateWriter writer, Conclusion premise, Context context);
 
 	void visit(ForwardLinkImpl.ThisBackwardLinkRule thisBackwardLinkRule,
-			BasicSaturationStateWriter writer, BackwardLink backwardLink);
+			BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context);
 
 	void visit(PropagationImpl.ThisBackwardLinkRule thisBackwardLinkRule,
-			BasicSaturationStateWriter writer, BackwardLink backwardLink);
+			BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context);
 
 	void visit(ContradictionImpl.ContradictionBackwardLinkRule bottomBackwardLinkRule,
-			BasicSaturationStateWriter writer, BackwardLink backwardLink);
+			BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context);
 
 }

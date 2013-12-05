@@ -50,7 +50,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule0;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,10 +217,10 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			}
 
 			// validating backward link rules
-			LinkRule0<BackwardLink> rule = context.getBackwardLinkRuleHead();
+			LinkRule<BackwardLink, Context> rule = context.getBackwardLinkRuleHead();
 
 			while (rule != null) {
-				rule.accept(ruleValidator_, null, null);
+				rule.accept(ruleValidator_, null, null, null);
 				rule = rule.next();
 			}
 		}
@@ -314,12 +313,12 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				ForwardLinkImpl.ThisBackwardLinkRule thisBackwardLinkRule,
-				BasicSaturationStateWriter writer, BackwardLink backwardLink) {
+				BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context) {
 			for (IndexedPropertyChain prop : thisBackwardLinkRule
 					.getForwardLinksByObjectProperty().keySet()) {
-				for (Context context : thisBackwardLinkRule
+				for (Context cxt : thisBackwardLinkRule
 						.getForwardLinksByObjectProperty().get(prop)) {
-					contextValidator_.add(context);
+					contextValidator_.add(cxt);
 				}
 			}
 		}
@@ -327,7 +326,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				PropagationImpl.ThisBackwardLinkRule thisBackwardLinkRule,
-				BasicSaturationStateWriter writer, BackwardLink backwardLink) {
+				BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context) {
 			for (IndexedPropertyChain prop : thisBackwardLinkRule
 					.getPropagationsByObjectProperty().keySet()) {
 				for (IndexedClassExpression ice : thisBackwardLinkRule
@@ -340,7 +339,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				ContradictionImpl.ContradictionBackwardLinkRule bottomBackwardLinkRule,
-				BasicSaturationStateWriter writer, BackwardLink backwardLink) {
+				BasicSaturationStateWriter writer, BackwardLink backwardLink, Context context) {
 		}
 
 		@Override

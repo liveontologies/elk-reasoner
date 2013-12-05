@@ -27,8 +27,8 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule0;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule0;
 
 /**
  * Common methods for constructing an {@link OntologyIndex}. They allow addition

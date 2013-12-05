@@ -50,7 +50,7 @@ public class BackwardDecompositionRuleApplicationVisitor extends
 			/*writer_.produce(ice.getFiller().getContext(),
 					new BackwardLink(context, ice.getRelation()));*/	
 			writer_.produce(ice.getFiller().getContext(),
-					writer_.getConclusionFactory().backwardLinkInference(ice, context));
+					writer_.getConclusionFactory().createBackwardLink(ice, context));
 		}
 	}
 
