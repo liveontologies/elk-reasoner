@@ -22,8 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
@@ -35,7 +33,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionSourceUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -43,6 +40,8 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The factory for engines for concurrently computing the saturation of class
@@ -60,7 +59,7 @@ public class RuleApplicationFactory {
 	/**
 	 * TODO Create a configuration option and propagate to this class as a parameter.
 	 */
-	private static final boolean TRACING = false;
+	private static final boolean TRACING = true;
 	
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory
@@ -313,7 +312,7 @@ public class RuleApplicationFactory {
 			BasicSaturationStateWriter saturationStateWriter = getSaturationStateWriter();
 
 			return new CombinedConclusionVisitor<Context>(
-					new ConclusionInsertionVisitor(),
+					saturationStateWriter.getConclusionInserter(),
 					getUsedConclusionsCountingVisitor(new ConclusionApplicationVisitor(
 							saturationStateWriter,
 							getStatsAwareCompositionRuleAppVisitor(localStatistics),

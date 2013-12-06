@@ -141,5 +141,10 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 		public ConclusionFactory getConclusionFactory() {
 			return writer_.getConclusionFactory();
 		}
+		
+		@Override
+		public ConclusionVisitor<Boolean, Context> getConclusionInserter() {
+			return writer_.getConclusionInserter();
+		}
 	}
 }

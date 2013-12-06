@@ -388,19 +388,26 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 			@Override
 			public void initContext(Context context) {
-				SaturationUtils.initContext(context, this, ontologyIndex_,
+				SaturationUtils.initContext(context, this,
+						ontologyIndex_.getContextInitRuleHead(),
 						initRuleAppVisitor_);
-			}
-
-			@Override
-			public void removeContext(Context context) {
-				contextMap_.remove(context.getRoot());
 			}
 
 			@Override
 			public ConclusionFactory getConclusionFactory() {
 				return conclusionFactory_;
 			}
+
+			@Override
+			public ConclusionVisitor<Boolean, Context> getConclusionInserter() {
+				return new ConclusionInsertionVisitor();
+			}
+
+			@Override
+			public Context getCreateContext(IndexedClassExpression root, ConclusionFactory factory) {
+				return getCreateContext(root);
+			}
+			
 		}
 
 		/**

@@ -42,8 +42,6 @@ public class TracingConclusionFactory implements ConclusionFactory {
 	public PositiveSubsumer createSubsumer(IndexedClassExpression ice) {
 		//no premise, must be an initialization inference
 		return new TracedPositiveSubsumer(inferenceFactory_.createInitializationInference(), conclusionFactory_.createSubsumer(ice));
-		
-		//return null;
 	}
 
 	@Override
@@ -53,8 +51,6 @@ public class TracingConclusionFactory implements ConclusionFactory {
 		Inference subsumption = inferenceFactory_.createSubsumptionInference(premise);
 		
 		return new TracedPositiveSubsumer(subsumption, conclusionFactory_.createSubsumer(premise, subsumer));
-		
-		//return null;
 	}
 
 	@Override
@@ -64,8 +60,6 @@ public class TracingConclusionFactory implements ConclusionFactory {
 		Inference compositionInference = inferenceFactory_.createCompositionInference(context, forwardLink, backwardLinkChain, backwardLinkSource);
 		
 		return new TracedBackwardLink(compositionInference, conclusionFactory_.createComposedBackwardLink(context, forwardLink, backwardLinkChain, chain, backwardLinkSource));
-		
-		//return null;
 	}
 
 	@Override
@@ -80,10 +74,7 @@ public class TracingConclusionFactory implements ConclusionFactory {
 	@Override
 	public ForwardLink createForwardLink(BackwardLink backwardLink,
 			Context target) {
-		//figuring out how the subsumer was produced
-		//Inference subsumerInference = traceReader_.getBackwardLinkInference(target, backwardLink.getRelation(), backwardLink.getSource());
-				
-		//return new TracedForwardLink(subsumerInference, conclusionFactory_.createForwardLink(backwardLink, target));
+		// we can always recover the inference for this forward link by the corresponding backward link
 		return conclusionFactory_.createForwardLink(backwardLink, target);
 
 	}
@@ -91,10 +82,6 @@ public class TracingConclusionFactory implements ConclusionFactory {
 	@Override
 	public BackwardLink createBackwardLink(
 			IndexedObjectSomeValuesFrom subsumer, Context target) {
-		//figuring out how the subsumer was produced
-		/*Inference subsumerInference = traceReader_.getSubsumerInference(target, subsumer);
-		
-		return new TracedBackwardLink(subsumerInference, conclusionFactory_.createBackwardLink(subsumer, target));*/
 		Inference subsumerInference = inferenceFactory_.createBridgeInference(subsumer);
 		
 		return new TracedBackwardLink(subsumerInference, conclusionFactory_.createBackwardLink(subsumer, target));
@@ -113,8 +100,6 @@ public class TracingConclusionFactory implements ConclusionFactory {
 		Inference existentialInference = inferenceFactory_.createExistentialInference(context, bwLink, carry.getFiller());
 		
 		return new TracedNegativeSubsumer(existentialInference, conclusionFactory_.createPropagatedSubsumer(bwLink, carry, context));
-		
-		//return null;
 	}
 	
 	@Override
@@ -122,8 +107,6 @@ public class TracingConclusionFactory implements ConclusionFactory {
 		Inference existentialInference = inferenceFactory_.createExistentialInference(context, propagation.getCarry().getFiller(), linkRelation, linkTarget);
 		
 		return new TracedNegativeSubsumer(existentialInference, conclusionFactory_.createPropagatedSubsumer(propagation, linkRelation, linkTarget, context));
-		
-		//return null;
 	}
 
 	@Override
@@ -133,8 +116,6 @@ public class TracingConclusionFactory implements ConclusionFactory {
 		Inference conjunctionInference = inferenceFactory_.createConjunctionInference(subsumer, conjunct);
 		
 		return new TracedNegativeSubsumer(conjunctionInference, conclusionFactory_.createdComposedConjunction(subsumer, conjunct, conjunction));
-		
-		//return null;
 	}
 
 	@Override
@@ -144,8 +125,6 @@ public class TracingConclusionFactory implements ConclusionFactory {
 		Inference conjunctionInference = inferenceFactory_.createConjunctInference(conjunction);
 		
 		return new TracedPositiveSubsumer(conjunctionInference, conclusionFactory_.createConjunct(conjunction, conjunct));
-		
-		//return null;
 	}
 
 	@Override
@@ -154,7 +133,6 @@ public class TracingConclusionFactory implements ConclusionFactory {
 		Inference reflexiveInference = inferenceFactory_.createReflexiveInference(existential.getRelation());
 		
 		return new TracedNegativeSubsumer(reflexiveInference, conclusionFactory_.createReflexiveSubsumer(existential));
-		//return null;
 	}
 
 }

@@ -32,17 +32,18 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SimpleConclusionFactory;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TODO docs
@@ -285,6 +286,11 @@ class SaturationStateImpl implements SaturationState {
 			return conclusionFactory_;
 		}
 
+		@Override
+		public ConclusionVisitor<Boolean, Context> getConclusionInserter() {
+			return new ConclusionInsertionVisitor();
+		}
+
 	}
 
 	/**
@@ -294,7 +300,12 @@ class SaturationStateImpl implements SaturationState {
 	 *         pavel.klinov@uni-ulm.de
 	 */
 	class ContextCreatingWriter extends BasicWriter implements ExtendedSaturationStateWriter {
-
+		/**
+		 * This writer can use a special conclusion factory when creating
+		 * contexts (for producing initialization inferences)
+		 */
+		private ConclusionFactory writerConclusionFactory_;
+		
 		private final CompositionRuleApplicationVisitor initRuleAppVisitor_;
 
 		/**
@@ -365,14 +376,24 @@ class SaturationStateImpl implements SaturationState {
 
 		@Override
 		public void initContext(Context context) {
-			SaturationUtils.initContext(context, this, ontologyIndex_, initRuleAppVisitor_);
+			SaturationUtils.initContext(context, this, ontologyIndex_.getContextInitRuleHead(), initRuleAppVisitor_);
 		}
 
 		@Override
-		public void removeContext(Context context) {
-			// TODO Auto-generated method stub
+		public Context getCreateContext(IndexedClassExpression root, ConclusionFactory factory) {
+			// this isn't nice but works since writers are single-threaded
+			writerConclusionFactory_ = factory;
+			Context context = getCreateContext(root);
+			writerConclusionFactory_ = null;
 			
+			return context;
 		}
+
+		@Override
+		public ConclusionFactory getConclusionFactory() {
+			return writerConclusionFactory_ != null ? writerConclusionFactory_ : conclusionFactory_;
+		}
+
 	}
 	
 }

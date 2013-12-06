@@ -12,6 +12,7 @@ import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
@@ -28,11 +29,14 @@ public class TracingSaturationState implements SaturationState {
 
 	private final SaturationState underlyingState_;
 	
+	private final Tracer tracer_;
+	
 	/**
 	 * 
 	 */
 	public TracingSaturationState(SaturationState state) {
 		underlyingState_ = state;
+		tracer_ = new SimpleCentralizedTracer();
 	}
 
 	@Override
@@ -66,7 +70,7 @@ public class TracingSaturationState implements SaturationState {
 		return new ExtendedTracingWriter(underlyingState_.getExtendedWriter(
 				contextCreationListener, contextModificationListener,
 				ruleAppVisitor, conclusionVisitor,
-				trackNewContextsAsUnsaturated));
+				trackNewContextsAsUnsaturated), tracer_.getWriter());
 	}
 
 	@Override
@@ -74,21 +78,21 @@ public class TracingSaturationState implements SaturationState {
 			ContextModificationListener contextModificationListener,
 			ConclusionVisitor<?, Context> conclusionVisitor) {
 		
-		return new BasicTracingWriter(underlyingState_.getWriter(contextModificationListener, conclusionVisitor));
+		return new BasicTracingWriter(underlyingState_.getWriter(contextModificationListener, conclusionVisitor), tracer_.getWriter());
 	}
 
 	@Override
 	public BasicSaturationStateWriter getWriter(
 			ConclusionVisitor<?, Context> conclusionVisitor) {
 		
-		return new BasicTracingWriter(underlyingState_.getWriter(conclusionVisitor));
+		return new BasicTracingWriter(underlyingState_.getWriter(conclusionVisitor), tracer_.getWriter());
 	}
 
 	@Override
 	public ExtendedSaturationStateWriter getExtendedWriter(
 			ConclusionVisitor<?, Context> conclusionVisitor) {
 		
-		return new ExtendedTracingWriter(underlyingState_.getExtendedWriter(conclusionVisitor));
+		return new ExtendedTracingWriter(underlyingState_.getExtendedWriter(conclusionVisitor), tracer_.getWriter());
 	}
 
 	/**
@@ -100,11 +104,14 @@ public class TracingSaturationState implements SaturationState {
 	private static class BasicTracingWriter implements BasicSaturationStateWriter {
 		
 		protected final BasicSaturationStateWriter underlyingWriter_;
-		private final TracingConclusionFactory factory_;
+		protected final TracingConclusionFactory factory_;
+		private final ConclusionVisitor<Boolean, Context> traceInserter_;
 		
-		BasicTracingWriter(BasicSaturationStateWriter writer) {
+		BasicTracingWriter(BasicSaturationStateWriter writer, Tracer.Writer traceWriter) {
 			underlyingWriter_ = writer;
 			factory_ = new TracingConclusionFactory(underlyingWriter_.getConclusionFactory(), new InferenceFactory());
+			traceInserter_ = new TracingConclusionInsertionVisitor(traceWriter);
+			
 		}
 
 		@Override
@@ -146,6 +153,14 @@ public class TracingSaturationState implements SaturationState {
 		public ConclusionFactory getConclusionFactory() {
 			return factory_;
 		}
+
+		@Override
+		public ConclusionVisitor<Boolean, Context> getConclusionInserter() {
+			// return a combined visitor which first adds the conclusion
+			// inference and then invokes the main inserter.
+			return new CombinedConclusionVisitor<Context>(traceInserter_, underlyingWriter_.getConclusionInserter());
+		}
+		
 	}
 	
 	/**
@@ -153,13 +168,13 @@ public class TracingSaturationState implements SaturationState {
 	 */
 	private static class ExtendedTracingWriter extends BasicTracingWriter implements ExtendedSaturationStateWriter {
 
-		ExtendedTracingWriter(ExtendedSaturationStateWriter writer) {
-			super(writer);
+		ExtendedTracingWriter(ExtendedSaturationStateWriter writer, Tracer.Writer traceWriter) {
+			super(writer, traceWriter);
 		}
 		
 		@Override
 		public Context getCreateContext(IndexedClassExpression root) {
-			return ((ExtendedSaturationStateWriter)underlyingWriter_).getCreateContext(root);
+			return ((ExtendedSaturationStateWriter)underlyingWriter_).getCreateContext(root, factory_);
 		}
 
 		@Override
@@ -167,10 +182,11 @@ public class TracingSaturationState implements SaturationState {
 			((ExtendedSaturationStateWriter)underlyingWriter_).initContext(context);
 		}
 
+
 		@Override
-		public void removeContext(Context context) {
-			((ExtendedSaturationStateWriter)underlyingWriter_).removeContext(context);
+		public Context getCreateContext(IndexedClassExpression root, ConclusionFactory factory) {
+			return getCreateContext(root);
 		}
-		
+
 	}
 }

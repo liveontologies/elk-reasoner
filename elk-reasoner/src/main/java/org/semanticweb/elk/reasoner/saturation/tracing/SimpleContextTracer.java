@@ -3,8 +3,6 @@
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -18,7 +16,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -31,7 +28,7 @@ public class SimpleContextTracer implements ContextTracer {
 	
 	private final Multimap<IndexedClassExpression, Inference> subsumerInferenceMap_;
 	
-	private final Map<IndexedPropertyChain, HashSetMultimap<Context, Inference>> backwardLinkInferenceMap_;
+	private final Map<IndexedPropertyChain, Multimap<Context, Inference>> backwardLinkInferenceMap_;
 	
 	private final ConclusionVisitor<Iterable<Inference>, Void> inferenceReader_ = new BaseConclusionVisitor<Iterable<Inference>, Void>() {
 
@@ -76,7 +73,7 @@ public class SimpleContextTracer implements ContextTracer {
 	 */
 	public SimpleContextTracer() {
 		subsumerInferenceMap_ = new HashSetMultimap<IndexedClassExpression, Inference>();
-		backwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, HashSetMultimap<Context,Inference>>();
+		backwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<Context,Inference>>();
 	}
 	
 
@@ -86,6 +83,11 @@ public class SimpleContextTracer implements ContextTracer {
 		
 		if (infMap == null) {
 			infMap = new HashSetMultimap<Context, Inference>();
+			
+			infMap.add(source, inf);
+			backwardLinkInferenceMap_.put(relation, infMap);
+			
+			return true;
 		}
 		
 		return infMap.add(source, inf);
@@ -93,13 +95,7 @@ public class SimpleContextTracer implements ContextTracer {
 
 
 	protected Boolean addSubsumerInference(IndexedClassExpression ice, Inference inf) {
-		Collection<Inference> inferences = subsumerInferenceMap_.get(ice);
-		
-		if (inferences == null) {
-			inferences = new ArrayHashSet<Inference>();
-		}
-		
-		return inferences.add(inf);
+		return subsumerInferenceMap_.add(ice, inf);
 	}
 
 
@@ -110,9 +106,7 @@ public class SimpleContextTracer implements ContextTracer {
 
 	@Override
 	public Iterable<Inference> getSubsumerInferences(IndexedClassExpression conclusion) {
-		Iterable<Inference> inferences = subsumerInferenceMap_.get(conclusion);
-		
-		return inferences == null ? Collections.<Inference>emptyList() : inferences;
+		return subsumerInferenceMap_.get(conclusion);
 	}
 
 	@Override
@@ -120,7 +114,7 @@ public class SimpleContextTracer implements ContextTracer {
 			IndexedPropertyChain linkRelation, Context linkSource) {
 		Multimap<Context, Inference> infMap = backwardLinkInferenceMap_.get(linkRelation);
 		
-		return infMap == null ? Collections.<Inference>emptyList() : infMap.get(linkSource);
+		return infMap == null ? null : infMap.get(linkSource);
 	}
 
 	@Override

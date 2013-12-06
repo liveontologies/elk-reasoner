@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVisitor;
@@ -66,13 +65,11 @@ public class SaturationUtils {
 	 * @param ruleAppVisitor
 	 */
 	public static void initContext(Context context, BasicSaturationStateWriter writer,
-			OntologyIndex index, CompositionRuleApplicationVisitor ruleAppVisitor) {
+			LinkRule0<Context> initRuleHead, CompositionRuleApplicationVisitor ruleAppVisitor) {
 		// apply all context initialization rules
-		LinkRule0<Context> initRule = index.getContextInitRuleHead();
-
-		while (initRule != null) {
-			initRule.accept(ruleAppVisitor, writer, context);
-			initRule = initRule.next();
+		while (initRuleHead != null) {
+			initRuleHead.accept(ruleAppVisitor, writer, context);
+			initRuleHead = initRuleHead.next();
 		}
 	}
 	

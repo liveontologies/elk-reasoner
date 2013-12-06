@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -53,4 +54,6 @@ public interface BasicSaturationStateWriter {
 	public void resetContexts();
 	
 	public ConclusionFactory getConclusionFactory();
+	
+	public ConclusionVisitor<Boolean, Context> getConclusionInserter();
 }

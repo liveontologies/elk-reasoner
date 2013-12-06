@@ -37,6 +37,11 @@ public abstract class TracedConclusion<S extends Conclusion> {
 	public S getConclusion() {
 		return conclusion;
 	}
+
+	@Override
+	public String toString() {
+		return conclusion.toString();
+	}
 	
 	
 }

@@ -76,7 +76,8 @@ public class SimpleCentralizedTracer implements Tracer {
 			LOGGER_.trace("Adding inference for {} in {}: {}", conclusion, context, inference);
 			
 			if (tracer == null) {
-				tracer = storage_.putIfAbsent(context, new SimpleContextTracer());
+				tracer = new SimpleContextTracer();
+				storage_.putIfAbsent(context, tracer);
 			}
 			
 			return tracer.addInference(conclusion, inference);
