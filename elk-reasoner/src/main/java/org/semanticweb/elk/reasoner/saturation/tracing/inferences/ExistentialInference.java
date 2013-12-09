@@ -48,4 +48,9 @@ public class ExistentialInference extends AbstractForeignContextInference {
 				+ " and " + linkSource_.getRoot() + " => " + linkRelation_
 				+ " some " + context.getRoot();
 	}
+	
+	@Override
+	public <R> R accept(InferenceVisitor<R> visitor) {
+		return visitor.visit(this);
+	}
 }

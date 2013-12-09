@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A conclusion visitor which processes {@link TracedConclusion}s and saves their inferences using a {@link Tracer.Writer}.
+ * A conclusion visitor which processes {@link TracedConclusion}s and saves their inferences using a {@link TraceStore.Writer}.
  * 
  * @author Pavel Klinov
  *
@@ -24,12 +24,12 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 
 	private final static Logger LOGGER_ = LoggerFactory.getLogger(TracingConclusionInsertionVisitor.class);
 	
-	private final Tracer.Writer traceWriter_;
+	private final TraceStore.Writer traceWriter_;
 	
 	/**
 	 * 
 	 */
-	public TracingConclusionInsertionVisitor(Tracer.Writer traceWriter) {
+	public TracingConclusionInsertionVisitor(TraceStore.Writer traceWriter) {
 		traceWriter_ = traceWriter;
 	}
 

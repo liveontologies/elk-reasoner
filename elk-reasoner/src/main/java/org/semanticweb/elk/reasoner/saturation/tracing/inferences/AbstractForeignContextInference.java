@@ -13,7 +13,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class AbstractForeignContextInference extends AbstractInference {
+abstract class AbstractForeignContextInference extends AbstractInference {
 
 	protected final Context context;
 

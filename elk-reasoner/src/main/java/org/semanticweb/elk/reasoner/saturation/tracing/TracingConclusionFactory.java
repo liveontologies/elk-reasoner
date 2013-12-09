@@ -21,7 +21,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InferenceFacto
 /**
  * Not just creates conclusions but also saves information on how the conclusion
  * was produced. That information is represented using instances of
- * {@link Inference} and is saved using a {@link Tracer}.
+ * {@link Inference} and is saved using a {@link TraceStore}.
  * 
  * @author Pavel Klinov
  * 

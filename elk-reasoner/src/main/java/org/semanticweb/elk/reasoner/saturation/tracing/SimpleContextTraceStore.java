@@ -24,7 +24,7 @@ import org.semanticweb.elk.util.collections.Multimap;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class SimpleContextTracer implements ContextTracer {
+public class SimpleContextTraceStore implements ContextTracer {
 	
 	private final Multimap<IndexedClassExpression, Inference> subsumerInferenceMap_;
 	
@@ -71,7 +71,7 @@ public class SimpleContextTracer implements ContextTracer {
 	/**
 	 * 
 	 */
-	public SimpleContextTracer() {
+	public SimpleContextTraceStore() {
 		subsumerInferenceMap_ = new HashSetMultimap<IndexedClassExpression, Inference>();
 		backwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<Context,Inference>>();
 	}

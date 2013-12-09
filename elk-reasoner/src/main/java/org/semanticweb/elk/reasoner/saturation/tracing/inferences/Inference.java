@@ -24,4 +24,5 @@ public interface Inference {
 	 */
 	public Context getContext(Context defaultContext);
 
+	public <R> R accept(InferenceVisitor<R> visitor);
 }

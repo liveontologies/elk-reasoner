@@ -20,6 +20,9 @@ public class ClassInitializationInference extends AbstractInference {
 		return "Inititialization inference";
 	}
 
-	
+	@Override
+	public <R> R accept(InferenceVisitor<R> visitor) {
+		return visitor.visit(this);
+	}
 	
 }

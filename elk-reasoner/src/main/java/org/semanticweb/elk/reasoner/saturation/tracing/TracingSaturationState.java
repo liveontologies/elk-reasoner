@@ -29,14 +29,14 @@ public class TracingSaturationState implements SaturationState {
 
 	private final SaturationState underlyingState_;
 	
-	private final Tracer tracer_;
+	private final TraceStore tracer_;
 	
 	/**
 	 * 
 	 */
 	public TracingSaturationState(SaturationState state) {
 		underlyingState_ = state;
-		tracer_ = new SimpleCentralizedTracer();
+		tracer_ = new SimpleCentralizedTraceStore();
 	}
 
 	@Override
@@ -107,7 +107,7 @@ public class TracingSaturationState implements SaturationState {
 		protected final TracingConclusionFactory factory_;
 		private final ConclusionVisitor<Boolean, Context> traceInserter_;
 		
-		BasicTracingWriter(BasicSaturationStateWriter writer, Tracer.Writer traceWriter) {
+		BasicTracingWriter(BasicSaturationStateWriter writer, TraceStore.Writer traceWriter) {
 			underlyingWriter_ = writer;
 			factory_ = new TracingConclusionFactory(underlyingWriter_.getConclusionFactory(), new InferenceFactory());
 			traceInserter_ = new TracingConclusionInsertionVisitor(traceWriter);
@@ -168,7 +168,7 @@ public class TracingSaturationState implements SaturationState {
 	 */
 	private static class ExtendedTracingWriter extends BasicTracingWriter implements ExtendedSaturationStateWriter {
 
-		ExtendedTracingWriter(ExtendedSaturationStateWriter writer, Tracer.Writer traceWriter) {
+		ExtendedTracingWriter(ExtendedSaturationStateWriter writer, TraceStore.Writer traceWriter) {
 			super(writer, traceWriter);
 		}
 		

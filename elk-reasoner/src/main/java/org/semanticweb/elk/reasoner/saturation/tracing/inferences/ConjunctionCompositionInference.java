@@ -36,4 +36,9 @@ public class ConjunctionCompositionInference extends AbstractInference {
 	public String toString() {
 		return "Conjuncting " + first_ + " and " + second_;
 	}
+	
+	@Override
+	public <R> R accept(InferenceVisitor<R> visitor) {
+		return visitor.visit(this);
+	}
 }

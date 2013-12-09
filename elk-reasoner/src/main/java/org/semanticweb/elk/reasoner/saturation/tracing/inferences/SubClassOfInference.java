@@ -34,4 +34,8 @@ public class SubClassOfInference extends AbstractInference {
 		return "Subsumption inference based on previously derived " + subsumer_;
 	}
 	
+	@Override
+	public <R> R accept(InferenceVisitor<R> visitor) {
+		return visitor.visit(this);
+	}
 }

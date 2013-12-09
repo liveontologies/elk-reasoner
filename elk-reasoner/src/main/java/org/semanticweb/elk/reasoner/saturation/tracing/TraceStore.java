@@ -16,7 +16,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface Tracer {
+public interface TraceStore {
 
 	/**
 	 * 

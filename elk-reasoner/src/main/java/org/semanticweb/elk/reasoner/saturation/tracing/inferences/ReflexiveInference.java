@@ -29,4 +29,9 @@ public class ReflexiveInference extends AbstractInference {
 	public String toString() {
 		return "Reflexive inference: owl:Thing => " + reflexiveChain_ + " some owl:Thing";
 	}
+	
+	@Override
+	public <R> R accept(InferenceVisitor<R> visitor) {
+		return visitor.visit(this);
+	}
 }

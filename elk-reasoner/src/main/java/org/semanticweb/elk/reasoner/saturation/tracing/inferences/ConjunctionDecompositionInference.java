@@ -28,4 +28,9 @@ public class ConjunctionDecompositionInference extends AbstractInference {
 	public String toString() {
 		return "Decomposing " + conjunction_;
 	}
+	
+	@Override
+	public <R> R accept(InferenceVisitor<R> visitor) {
+		return visitor.visit(this);
+	}
 }

@@ -15,26 +15,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A simple {@link Tracer} which uses centralized concurrent data structures to
+ * A simple {@link TraceStore} which uses centralized concurrent data structures to
  * store and retrieve {@link Inference}s.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class SimpleCentralizedTracer implements Tracer {
+public class SimpleCentralizedTraceStore implements TraceStore {
 	
-	private final static Logger LOGGER_ = LoggerFactory.getLogger(SimpleCentralizedTracer.class);	
+	private final static Logger LOGGER_ = LoggerFactory.getLogger(SimpleCentralizedTraceStore.class);	
 
 	private final ConcurrentHashMap<Context, ContextTracer> storage_ = new ConcurrentHashMap<Context, ContextTracer>();
 	
 	@Override
-	public Tracer.Reader getReader() {
+	public TraceStore.Reader getReader() {
 		return new Reader();
 	}
 
 	@Override
-	public Tracer.Writer getWriter() {
+	public TraceStore.Writer getWriter() {
 		return new Writer();
 	}
 	
@@ -42,7 +42,7 @@ public class SimpleCentralizedTracer implements Tracer {
 	 * 
 	 *
 	*/
-	private class Reader implements Tracer.Reader {
+	private class Reader implements TraceStore.Reader {
 
 		@Override
 		public Iterable<Inference> getInferences(Context context, Conclusion conclusion) {
@@ -67,7 +67,7 @@ public class SimpleCentralizedTracer implements Tracer {
 		
 	}
 	
-	private class Writer implements Tracer.Writer {
+	private class Writer implements TraceStore.Writer {
 
 		@Override
 		public boolean addInference(Context context, Conclusion conclusion, Inference inference) {
@@ -76,7 +76,7 @@ public class SimpleCentralizedTracer implements Tracer {
 			LOGGER_.trace("Adding inference for {} in {}: {}", conclusion, context, inference);
 			
 			if (tracer == null) {
-				tracer = new SimpleContextTracer();
+				tracer = new SimpleContextTraceStore();
 				storage_.putIfAbsent(context, tracer);
 			}
 			

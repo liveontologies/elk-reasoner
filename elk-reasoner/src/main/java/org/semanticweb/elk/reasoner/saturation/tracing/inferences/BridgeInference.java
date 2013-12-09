@@ -28,4 +28,9 @@ public class BridgeInference extends AbstractInference {
 	public IndexedClassExpression getConclusion() {
 		return previous_;
 	}
+
+	@Override
+	public <R> R accept(InferenceVisitor<R> visitor) {
+		return visitor.visit(this);
+	}
 }
