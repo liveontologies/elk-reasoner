@@ -29,11 +29,11 @@ public class InferenceFactory {
 	}
 	
 	public Inference createCompositionInference(Context context, ForwardLink forwardLink, IndexedPropertyChain backwardLinkChain, Context linkSource) {
-		return new PropertyChainInference(context, backwardLinkChain, linkSource, forwardLink.getRelation(), forwardLink.getTarget());
+		return new PropertyChainInference(context, backwardLinkChain, linkSource, forwardLink.getRelation());
 	}
 	
-	public Inference createCompositionInference(Context context, BackwardLink backwardLink, IndexedPropertyChain forwardLinkChain, Context forwardLinkTarget) {
-		return new PropertyChainInference(context, backwardLink.getRelation(), backwardLink.getSource(), forwardLinkChain, forwardLinkTarget);
+	public Inference createCompositionInference(Context context, BackwardLink backwardLink, IndexedPropertyChain forwardLinkChain) {
+		return new PropertyChainInference(context, backwardLink.getRelation(), backwardLink.getSource(), forwardLinkChain);
 	}
 	
 	/**

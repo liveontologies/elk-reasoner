@@ -207,7 +207,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 					for (Context forwardTarget : forwardTargets) {
 						/*writer.produce(forwardTarget, new BackwardLink(source,
 								composition));*/
-						writer.produce(forwardTarget, writer.getConclusionFactory().createComposedBackwardLink(context, link, forwardRelation, composition, forwardTarget));
+						writer.produce(forwardTarget, writer.getConclusionFactory().createComposedBackwardLink(context, link, forwardRelation, composition));
 					}
 			}
 

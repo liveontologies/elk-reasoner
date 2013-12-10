@@ -60,10 +60,9 @@ public interface ConclusionFactory {
 	 * @param backwardLink A => R1 some B
 	 * @param forwardLinkChain B => R2 some C
 	 * @param chain R1 o R2
-	 * @param forwardLinkTarget C 
 	 * @return
 	 */
-	public BackwardLink createComposedBackwardLink(Context context, BackwardLink backwardLink, IndexedPropertyChain forwardLinkChain, IndexedPropertyChain chain, Context forwardLinkTarget);
+	public BackwardLink createComposedBackwardLink(Context context, BackwardLink backwardLink, IndexedPropertyChain forwardLinkChain, IndexedPropertyChain chain);
 	
 	/**
 	 * Creates the forward link of the form A -R-> B from a backward link A <-R- B when R can be composed.

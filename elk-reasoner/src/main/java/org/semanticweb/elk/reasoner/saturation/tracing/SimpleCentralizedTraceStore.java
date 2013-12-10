@@ -3,14 +3,12 @@
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
-import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InferenceVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,24 +43,12 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private class Reader implements TraceStore.Reader {
 
 		@Override
-		public Iterable<Inference> getInferences(Context context, Conclusion conclusion) {
+		public void accept(Context context, Conclusion conclusion, InferenceVisitor<?> visitor) {
 			ContextTracer tracer = storage_.get(context);
 			
-			return tracer == null ? Collections.<Inference>emptyList() : tracer.getInference(conclusion);
-		}
-
-		@Override
-		public Iterable<Inference> getSubsumerInferences(Context context, 	IndexedClassExpression conclusion) {
-			ContextTracer tracer = storage_.get(context);
-			
-			return tracer == null ? Collections.<Inference>emptyList() : tracer.getSubsumerInferences(conclusion);
-		}
-
-		@Override
-		public Iterable<Inference> getBackwardLinkInferences(Context context, 	IndexedPropertyChain linkRelation, Context linkSource) {
-			ContextTracer tracer = storage_.get(context);
-			
-			return tracer == null ? Collections.<Inference>emptyList() : tracer.getBackwardLinkInferences(linkRelation, linkSource);
+			if (tracer != null) {
+				tracer.accept(conclusion, visitor);
+			}
 		}
 		
 	}

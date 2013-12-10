@@ -33,7 +33,7 @@ public class SimpleConclusionFactory implements ConclusionFactory {
 	}
 	
 	@Override
-	public BackwardLink createComposedBackwardLink(Context context, BackwardLink backwardLink, IndexedPropertyChain forwardLinkChain, IndexedPropertyChain chain, Context forwardLinkTarget) {
+	public BackwardLink createComposedBackwardLink(Context context, BackwardLink backwardLink, IndexedPropertyChain forwardLinkChain, IndexedPropertyChain chain) {
 		return new BackwardLinkImpl(backwardLink.getSource(), chain);
 	}
 	

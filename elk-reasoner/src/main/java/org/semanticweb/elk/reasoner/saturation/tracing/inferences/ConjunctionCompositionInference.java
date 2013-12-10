@@ -24,12 +24,12 @@ public class ConjunctionCompositionInference extends AbstractInference {
 		second_ = second;
 	}
 
-	public Conclusion getPremise() {
+	public Conclusion getFirstConjunct() {
 		return first_;
 	}
 	
-	public IndexedClassExpression getConjunct() {
-		return second_;
+	public Conclusion getSecondConjunct() {
+		return new SubsumerPremise(second_);
 	}
 	
 	@Override

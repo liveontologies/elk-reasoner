@@ -3,11 +3,10 @@
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InferenceVisitor;
 
 /**
  * The main object responsible for storing and retrieving traces.
@@ -27,26 +26,10 @@ public interface TraceStore {
 		 * 
 		 * @param context
 		 * @param conclusion
-		 * @return
+		 * @param visitor
 		 */
-		public Iterable<Inference> getInferences(Context context, Conclusion conclusion);
+		public void accept(Context context, Conclusion conclusion, InferenceVisitor<?> visitor);
 		
-		/**
-		 * 
-		 * @param context
-		 * @param conclusion
-		 * @return
-		 */
-		public Iterable<Inference> getSubsumerInferences(Context context, IndexedClassExpression conclusion);
-		
-		/**
-		 * 
-		 * @param context
-		 * @param linkRelation
-		 * @param linkSource
-		 * @return
-		 */
-		public Iterable<Inference> getBackwardLinkInferences(Context context, IndexedPropertyChain linkRelation, Context linkSource);
 	}
 
 	/**

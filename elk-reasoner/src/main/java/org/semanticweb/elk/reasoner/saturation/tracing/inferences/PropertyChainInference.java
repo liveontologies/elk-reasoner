@@ -4,6 +4,7 @@
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -25,40 +26,29 @@ public class PropertyChainInference extends AbstractForeignContextInference {
 	private final Context backwardLinkSource_;
 
 	private final IndexedPropertyChain forwardLinkRelation_;
-	
-	private final Context forwardLinkTarget_;
 
 	PropertyChainInference(Context context,
 			IndexedPropertyChain bwLinkRelation,
 			Context bwLinkSource,
-			IndexedPropertyChain fwLinkRelation,
-			Context fwLinkTarget) {
+			IndexedPropertyChain fwLinkRelation) {
 		super(context);
 		backwardLinkRelation_ = bwLinkRelation;
 		backwardLinkSource_ = bwLinkSource;
 		forwardLinkRelation_ = fwLinkRelation;
-		forwardLinkTarget_ = fwLinkTarget;
 	}
 
-	public IndexedPropertyChain getBackwardLinkRelation() {
-		return backwardLinkRelation_;
+	public Conclusion getFirstChain() {
+		return new BackwardLinkPremise(backwardLinkSource_, backwardLinkRelation_);
 	}
-
-	public Context getBackwardLinkSource() {
-		return backwardLinkSource_;
+	
+	public Conclusion getSecondChain() {
+		return new BackwardLinkPremise(context, forwardLinkRelation_);
 	}
-
-	public IndexedPropertyChain getForwardLinkRelation() {
-		return forwardLinkRelation_;
-	}
-
-	public Context getForwardLinkTarget() {
-		return forwardLinkTarget_;
-	}
-
+	
 	@Override
 	public String toString() {
-		return "Property chain inference: " + backwardLinkSource_ + " => " + backwardLinkRelation_ + " o " + forwardLinkRelation_ + " some " + context.getRoot();
+		//we don't store the target of the forward link
+		return "Property chain inference: " + backwardLinkSource_ + " => " + backwardLinkRelation_ + " o " + forwardLinkRelation_ + " some owl:Thing";
 	}
 
 	@Override

@@ -11,7 +11,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
  * pavel.klinov@uni-ulm.de
  */
 public class ReflexiveInference extends AbstractInference {
-
+	//TODO need a kind of Conclusion for this
 	private final IndexedPropertyChain reflexiveChain_;
 	
 	/**

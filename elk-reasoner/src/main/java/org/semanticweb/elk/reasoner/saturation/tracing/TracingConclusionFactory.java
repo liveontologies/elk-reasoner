@@ -64,11 +64,10 @@ public class TracingConclusionFactory implements ConclusionFactory {
 
 	@Override
 	public BackwardLink createComposedBackwardLink(Context context, BackwardLink backwardLink,
-			IndexedPropertyChain forwardLinkChain, IndexedPropertyChain chain,
-			Context forwardLinkTarget) {
-		Inference compositionInference = inferenceFactory_.createCompositionInference(context, backwardLink, forwardLinkChain, forwardLinkTarget);
+			IndexedPropertyChain forwardLinkChain, IndexedPropertyChain chain) {
+		Inference compositionInference = inferenceFactory_.createCompositionInference(context, backwardLink, forwardLinkChain);
 		
-		return new TracedBackwardLink(compositionInference, conclusionFactory_.createComposedBackwardLink(context, backwardLink, forwardLinkChain, chain, forwardLinkTarget));
+		return new TracedBackwardLink(compositionInference, conclusionFactory_.createComposedBackwardLink(context, backwardLink, forwardLinkChain, chain));
 	}
 
 	@Override

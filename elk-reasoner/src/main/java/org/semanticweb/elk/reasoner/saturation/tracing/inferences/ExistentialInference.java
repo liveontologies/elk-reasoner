@@ -5,6 +5,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -30,16 +31,12 @@ public class ExistentialInference extends AbstractForeignContextInference {
 		linkSource_ = linkSource;
 	}
 
-	public IndexedClassExpression getSubsumer() {
-		return subsumer_;
+	public Conclusion getSubsumer() {
+		return new SubsumerPremise(subsumer_);
 	}
 
-	public IndexedPropertyChain getLinkRelation() {
-		return linkRelation_;
-	}
-
-	public Context getLinkSource() {
-		return linkSource_;
+	public Conclusion getBackwardLink() {
+		return new BackwardLinkPremise(linkSource_, linkRelation_);
 	}
 	
 	@Override

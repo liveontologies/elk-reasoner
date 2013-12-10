@@ -4,6 +4,7 @@
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 
 /**
  * Represents an inference of the form A => C_1 \and C_2, thus A => C_i
@@ -20,8 +21,8 @@ public class ConjunctionDecompositionInference extends AbstractInference {
 		conjunction_ = subsumer;
 	}
 	
-	public IndexedObjectIntersectionOf getConjunction() {
-		return conjunction_;
+	public Conclusion getConjunction() {
+		return new SubsumerPremise(conjunction_);
 	}
 
 	@Override
