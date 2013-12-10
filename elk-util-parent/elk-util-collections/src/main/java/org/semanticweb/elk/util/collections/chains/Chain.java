@@ -50,7 +50,7 @@ public interface Chain<T extends ModifiableLink<T>> extends ModifiableLink<T> {
 	/**
 	 * Finds an element in the chain satisfies the provided {@link Matcher}, or
 	 * if no such element is found, creates a new element using the provided
-	 * {@link ReferenceFactory} and inserts it into the chain. In the letter
+	 * {@link ReferenceFactory} and inserts it into the chain. In the latter
 	 * case, the chain is modified.
 	 * 
 	 * @param matcher
