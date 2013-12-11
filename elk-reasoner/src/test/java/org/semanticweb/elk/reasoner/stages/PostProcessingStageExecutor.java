@@ -34,7 +34,6 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
-import org.semanticweb.elk.util.logging.ElkTimer;
 
 /**
  * @author Pavel Klinov
@@ -43,8 +42,10 @@ import org.semanticweb.elk.util.logging.ElkTimer;
  */
 public class PostProcessingStageExecutor extends SimpleStageExecutor {
 
-	static final Multimap<Class<?>, Class<?>> postProcesingMap = new HashListMultimap<Class<?>, Class<?>>();
+	public static final Multimap<Class<?>, Class<?>> STATIC_MAP = new HashListMultimap<Class<?>, Class<?>>();
 
+	public static final Class<ClassTaxonomyComputationStage> CLASS_TAXONOMY_COMPUTATION = ClassTaxonomyComputationStage.class;
+	
 	/*
 	 * STATIC INT
 	 */
@@ -62,12 +63,24 @@ public class PostProcessingStageExecutor extends SimpleStageExecutor {
 		postProcesingMap.add(IncrementalTaxonomyCleaningStage.class,
 				ValidateTaxonomyStage.class);*/
 		
-		postProcesingMap.add(IncrementalDeletionInitializationStage.class,
+		STATIC_MAP.add(IncrementalDeletionInitializationStage.class,
 				EnumerateContextsStage.class);		
 	}
+	
+	private final Multimap<Class<?>, Class<?>> postProcessingMap_;
 
+	public PostProcessingStageExecutor() {
+		postProcessingMap_ = STATIC_MAP;;
+	}
 	
-	
+	public PostProcessingStageExecutor(Class<?>... stageMap) {
+		postProcessingMap_ = new HashListMultimap<Class<?>, Class<?>>();
+		
+		for (int i = 0; i < stageMap.length - 1; i += 2) {
+			postProcessingMap_.add(stageMap[i], stageMap[i + 1]);
+		}
+	}
+
 	@Override
 	public void execute(ReasonerStage stage) throws ElkException {
 		super.execute(stage);
@@ -75,14 +88,14 @@ public class PostProcessingStageExecutor extends SimpleStageExecutor {
 		// FIXME: get rid of casts
 		try {
 			for (PostProcessingStage ppStage : instantiate(
-					postProcesingMap.get(stage.getClass()),
+					postProcessingMap_.get(stage.getClass()),
 					((AbstractReasonerStage) stage).reasoner)) {
 				
-				ElkTimer.getNamedTimer(ppStage.getName()).start();
+				//ElkTimer.getNamedTimer(ppStage.getName()).start();
 				
 				ppStage.execute();
 				
-				ElkTimer.getNamedTimer(ppStage.getName()).stop();
+				//ElkTimer.getNamedTimer(ppStage.getName()).stop();
 			}
 		} catch (Exception e) {
 			throw new ElkRuntimeException(e);

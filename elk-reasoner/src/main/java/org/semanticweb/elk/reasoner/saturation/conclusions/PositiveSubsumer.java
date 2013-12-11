@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationV
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 
 /**
- * A {@link Subsumer}, for which the structure of the enclosed
+ * A {@link SubsumerImpl}, for which the structure of the enclosed
  * {@link IndexedClassExpression} should be taken into account. That is, in
  * addition to composition rules stored with this {@link IndexedClassExpression}
  * , the so-called decomposition rule, which takes into account the topmost
@@ -39,9 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicatio
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface PositiveSubsumer extends Conclusion {
-
-	public IndexedClassExpression getExpression();
+public interface PositiveSubsumer extends Subsumer {
 
 	public void apply(BasicSaturationStateWriter writer, Context context,
 			CompositionRuleApplicationVisitor ruleAppVisitor,

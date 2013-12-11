@@ -30,7 +30,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
@@ -95,7 +94,7 @@ public class ContextImpl implements Context {
 	private final ActivationStack<Conclusion> toDo_;
 
 	/**
-	 * {@code true} if all derived {@link Subsumer} of {@link #root_} have been
+	 * {@code true} if all derived {@link SubsumerImpl} of {@link #root_} have been
 	 * computed.
 	 */
 	protected volatile boolean isSaturated = false;

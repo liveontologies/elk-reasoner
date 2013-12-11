@@ -81,7 +81,9 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  * 
  */
 public abstract class AbstractReasonerState {
-
+	//FIXME get rid of this when tracing can be done on demand
+	public static boolean TRACING = true;
+	
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractReasonerState.class);
@@ -174,8 +176,7 @@ public abstract class AbstractReasonerState {
 		this.ontologyIndex = new DifferentialIndex(objectCache_);
 		this.axiomInserter_ = new MainAxiomIndexerVisitor(ontologyIndex, true);
 		this.axiomDeleter_ = new MainAxiomIndexerVisitor(ontologyIndex, false);
-		this.saturationState = SaturationStateFactory
-				.createSaturationState(ontologyIndex);
+		this.saturationState = TRACING ? SaturationStateFactory.createTracingSaturationState(ontologyIndex) : SaturationStateFactory.createSaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
 	}

@@ -36,10 +36,8 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public class EnumerateContextsStage extends BasePostProcessingStage {
 
-	private final AbstractReasonerState reasoner_;
-
 	public EnumerateContextsStage(AbstractReasonerState reasoner) {
-		reasoner_ = reasoner;
+		super(reasoner);
 	}
 
 	@Override
@@ -51,7 +49,7 @@ public class EnumerateContextsStage extends BasePostProcessingStage {
 	public void execute() throws ElkException {
 		int cnt = 0;
 		
-		for (Context context : reasoner_.saturationState.getContexts()) {
+		for (Context context : reasoner.saturationState.getContexts()) {
 			cnt += context.getSubsumers().size();
 		}
 		

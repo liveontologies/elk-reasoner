@@ -73,6 +73,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 	private final ContextRuleValidator ruleValidator_ = new ContextRuleValidator();
 
 	public SaturationGraphValidationStage(final AbstractReasonerState reasoner) {
+		super(reasoner);
 		index_ = reasoner.ontologyIndex;
 	}
 

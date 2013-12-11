@@ -52,6 +52,7 @@ public class ContextSaturationFlagCheckingStage extends BasePostProcessingStage 
 	private final Set<IndexedClassExpression> nonSaturated_;
 
 	public ContextSaturationFlagCheckingStage(AbstractReasonerState reasoner) {
+		super(reasoner);
 		classes_ = reasoner.ontologyIndex.getIndexedClassExpressions();
 		nonSaturated_ = new ArrayHashSet<IndexedClassExpression>(
 				reasoner.saturationState.getNotSaturatedContexts().size());

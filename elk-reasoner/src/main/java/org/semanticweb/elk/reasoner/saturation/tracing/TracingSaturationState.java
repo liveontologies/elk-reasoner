@@ -38,6 +38,10 @@ public class TracingSaturationState implements SaturationState {
 		underlyingState_ = state;
 		tracer_ = new SimpleCentralizedTraceStore();
 	}
+	
+	public TraceStore.Reader getTraceStoreReader() {
+		return tracer_.getReader();
+	}
 
 	@Override
 	public Collection<Context> getContexts() {

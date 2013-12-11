@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationV
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 
 /**
- * A {@link Subsumer}, for which the structure of the enclosed
+ * A {@link SubsumerImpl}, for which the structure of the enclosed
  * {@link IndexedClassExpression} should not be taken into account when applying
  * the rules within {@link Context}. That is, only composition rules stored with
  * this {@link IndexedClassExpression} should be applied to
@@ -39,9 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicatio
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface NegativeSubsumer extends Conclusion {
-
-	public IndexedClassExpression getExpression();
+public interface NegativeSubsumer extends Subsumer {
 	
 	public void apply(BasicSaturationStateWriter writer, Context context,
 			CompositionRuleApplicationVisitor ruleAppVisitor);

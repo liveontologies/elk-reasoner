@@ -38,11 +38,11 @@ public class PropertyChainInference extends AbstractForeignContextInference {
 	}
 
 	public Conclusion getFirstChain() {
-		return new BackwardLinkPremise(backwardLinkSource_, backwardLinkRelation_);
+		return TracingUtils.getBackwardLinkWrapper(backwardLinkRelation_, backwardLinkSource_);
 	}
 	
 	public Conclusion getSecondChain() {
-		return new BackwardLinkPremise(context, forwardLinkRelation_);
+		return TracingUtils.getBackwardLinkWrapper(forwardLinkRelation_, context);
 	}
 	
 	@Override

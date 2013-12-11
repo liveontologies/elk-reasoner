@@ -22,7 +22,7 @@ public class ConjunctionDecompositionInference extends AbstractInference {
 	}
 	
 	public Conclusion getConjunction() {
-		return new SubsumerPremise(conjunction_);
+		return TracingUtils.getSubsumerWrapper(conjunction_);
 	}
 
 	@Override

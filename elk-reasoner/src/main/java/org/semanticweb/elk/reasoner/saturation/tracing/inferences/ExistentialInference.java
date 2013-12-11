@@ -32,11 +32,11 @@ public class ExistentialInference extends AbstractForeignContextInference {
 	}
 
 	public Conclusion getSubsumer() {
-		return new SubsumerPremise(subsumer_);
+		return TracingUtils.getSubsumerWrapper(subsumer_);
 	}
 
 	public Conclusion getBackwardLink() {
-		return new BackwardLinkPremise(linkSource_, linkRelation_);
+		return TracingUtils.getBackwardLinkWrapper(linkRelation_, linkSource_);
 	}
 	
 	@Override

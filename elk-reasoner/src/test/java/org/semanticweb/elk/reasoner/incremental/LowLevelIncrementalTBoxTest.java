@@ -561,7 +561,7 @@ public class LowLevelIncrementalTBoxTest {
 	 * references it via a backward link. Thus, during the 2nd delete, C is
 	 * removed from (R some B)'s context but D is left there because its changes
 	 * didn't get initialized (since it's not in the index). We should check
-	 * that all contexts to be clean actually are cleaned and throw an error in
+	 * that all contexts to be cleaned actually are cleaned and throw an error in
 	 * this case.
 	 */
 	@Test

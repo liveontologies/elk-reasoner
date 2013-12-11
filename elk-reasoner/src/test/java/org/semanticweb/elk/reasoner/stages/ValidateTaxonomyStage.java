@@ -48,6 +48,7 @@ public class ValidateTaxonomyStage extends BasePostProcessingStage {
 	private final Taxonomy<ElkClass> taxonomy_;
 	
 	public ValidateTaxonomyStage(AbstractReasonerState reasoner) {
+		super(reasoner);
 		taxonomy_ = reasoner.classTaxonomyState.getTaxonomy();
 	}
 	

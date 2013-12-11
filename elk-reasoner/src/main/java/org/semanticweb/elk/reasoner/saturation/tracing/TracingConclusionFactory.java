@@ -17,6 +17,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InferenceFactory;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracingUtils;
 
 /**
  * Not just creates conclusions but also saves information on how the conclusion
@@ -81,7 +82,7 @@ public class TracingConclusionFactory implements ConclusionFactory {
 	@Override
 	public BackwardLink createBackwardLink(
 			IndexedObjectSomeValuesFrom subsumer, Context target) {
-		Inference subsumerInference = inferenceFactory_.createBridgeInference(subsumer);
+		Inference subsumerInference = inferenceFactory_.createBridgeInference(TracingUtils.getSubsumerWrapper(subsumer));
 		
 		return new TracedBackwardLink(subsumerInference, conclusionFactory_.createBackwardLink(subsumer, target));
 	}
@@ -133,5 +134,4 @@ public class TracingConclusionFactory implements ConclusionFactory {
 		
 		return new TracedNegativeSubsumer(reflexiveInference, conclusionFactory_.createReflexiveSubsumer(existential));
 	}
-
 }

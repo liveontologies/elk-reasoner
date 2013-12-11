@@ -45,10 +45,8 @@ public class CheckCleaningStage extends BasePostProcessingStage {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(CheckCleaningStage.class);
 
-	private final AbstractReasonerState reasoner_;
-
 	public CheckCleaningStage(AbstractReasonerState reasoner) {
-		reasoner_ = reasoner;
+		super(reasoner);
 	}
 
 	@Override
@@ -60,7 +58,7 @@ public class CheckCleaningStage extends BasePostProcessingStage {
 	public void execute() throws ElkException {
 		Set<Context> cleanedContexts = new ArrayHashSet<Context>(1024);
 		// checking subsumers of cleaned contexts
-		for (IndexedClassExpression ice : reasoner_.saturationState
+		for (IndexedClassExpression ice : reasoner.saturationState
 				.getNotSaturatedContexts()) {
 			Context context = ice.getContext();
 			if (context == null) {
@@ -75,7 +73,7 @@ public class CheckCleaningStage extends BasePostProcessingStage {
 			}
 		}
 		// checking backward links
-		for (IndexedClassExpression ice : reasoner_
+		for (IndexedClassExpression ice : reasoner
 				.getIndexedClassExpressions()) {
 			Context context = ice.getContext();
 			if (context == null)

@@ -37,7 +37,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionSourceUnsat
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 import org.slf4j.Logger;
@@ -56,11 +55,6 @@ import org.slf4j.LoggerFactory;
  */
 public class RuleApplicationFactory {
 
-	/**
-	 * TODO Create a configuration option and propagate to this class as a parameter.
-	 */
-	private static final boolean TRACING = true;
-	
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RuleApplicationFactory.class);
@@ -86,7 +80,7 @@ public class RuleApplicationFactory {
 	public RuleApplicationFactory(final SaturationState saturationState,
 			final boolean trackModifiedContexts) {
 		this.aggregatedStats_ = new SaturationStatistics();
-		this.saturationState = TRACING ? new TracingSaturationState(saturationState) : saturationState;
+		this.saturationState = saturationState;
 		this.trackModifiedContexts_ = trackModifiedContexts;
 	}
 

@@ -72,7 +72,7 @@ public class InferenceFactory {
 		return new ReflexiveInference(reflexiveChain);
 	}
 	
-	public Inference createBridgeInference(IndexedClassExpression previous) {
+	public Inference createBridgeInference(Conclusion previous) {
 		return new BridgeInference(previous);
 	}
 

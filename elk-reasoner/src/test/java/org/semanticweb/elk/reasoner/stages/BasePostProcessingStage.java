@@ -34,6 +34,12 @@ package org.semanticweb.elk.reasoner.stages;
  */
 public abstract class BasePostProcessingStage implements PostProcessingStage {
 
+	protected final AbstractReasonerState reasoner;
+	
+	public BasePostProcessingStage(AbstractReasonerState r) {
+		reasoner = r;
+	}
+	
 	@Override
 	public void printInfo() {
 	}

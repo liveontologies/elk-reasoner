@@ -45,10 +45,8 @@ public class CheckContextInvariants extends BasePostProcessingStage {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(CheckContextInvariants.class);
 
-	private final AbstractReasonerState reasoner_;
-
 	public CheckContextInvariants(AbstractReasonerState reasoner) {
-		reasoner_ = reasoner;
+		super(reasoner);
 	}
 
 	@Override
@@ -59,7 +57,7 @@ public class CheckContextInvariants extends BasePostProcessingStage {
 	@Override
 	public void execute() throws ElkException {
 		// check roots for all contexts now
-		for (Context context : reasoner_.saturationState.getContexts()) {
+		for (Context context : reasoner.saturationState.getContexts()) {
 			if (!context.getSubsumers().contains(context.getRoot())) {
 				LOGGER_.error(context.getRoot() + (context.isSaturated() ? " [saturated]" : " [modified]") + ": not a subsumer of itself");
 			}

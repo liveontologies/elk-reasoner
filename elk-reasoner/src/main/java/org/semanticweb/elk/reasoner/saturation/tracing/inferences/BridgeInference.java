@@ -3,7 +3,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 
 /**
  * This implementation is used as a "bridge" for auxiliary conclusions produced
@@ -16,16 +16,16 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  */
 public class BridgeInference extends AbstractInference {
 
-	private final IndexedClassExpression previous_;
+	private final Conclusion previous_;
 	
 	/**
 	 * 
 	 */
-	BridgeInference(IndexedClassExpression conclusion) {
+	BridgeInference(Conclusion conclusion) {
 		previous_ = conclusion;
 	}
 
-	public IndexedClassExpression getConclusion() {
+	public Conclusion getConclusion() {
 		return previous_;
 	}
 

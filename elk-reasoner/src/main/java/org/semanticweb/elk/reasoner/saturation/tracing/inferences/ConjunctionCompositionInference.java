@@ -14,7 +14,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
  * pavel.klinov@uni-ulm.de
  */
 public class ConjunctionCompositionInference extends AbstractInference {
-
+	//TODO store this as ICE
 	private final Conclusion first_;
 	
 	private final IndexedClassExpression second_;
@@ -29,7 +29,7 @@ public class ConjunctionCompositionInference extends AbstractInference {
 	}
 	
 	public Conclusion getSecondConjunct() {
-		return new SubsumerPremise(second_);
+		return TracingUtils.getSubsumerWrapper(second_);
 	}
 	
 	@Override
