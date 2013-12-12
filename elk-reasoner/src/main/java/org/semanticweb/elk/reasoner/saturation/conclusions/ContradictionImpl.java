@@ -74,7 +74,7 @@ public class ContradictionImpl extends AbstractConclusion implements Contradicti
 				ContradictionBackwardLinkRule.FACTORY_);
 	}
 
-	private void propagateThroughBackwardLinks(BasicSaturationStateWriter engine,
+	private void propagateThroughBackwardLinks(BasicSaturationStateWriter writer,
 			Context context) {
 
 		final Multimap<IndexedPropertyChain, Context> backLinks = context
@@ -85,7 +85,7 @@ public class ContradictionImpl extends AbstractConclusion implements Contradicti
 			Collection<Context> targets = backLinks.get(propRelation);
 
 			for (Context target : targets) {
-				engine.produce(target, ContradictionImpl.getInstance());
+				writer.produce(target, ContradictionImpl.getInstance());
 			}
 		}
 	}

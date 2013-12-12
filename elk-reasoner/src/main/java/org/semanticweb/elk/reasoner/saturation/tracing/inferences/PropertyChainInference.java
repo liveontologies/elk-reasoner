@@ -26,29 +26,33 @@ public class PropertyChainInference extends AbstractForeignContextInference {
 	private final Context backwardLinkSource_;
 
 	private final IndexedPropertyChain forwardLinkRelation_;
+	
+	private final Context forwardLinkTarget_;
 
 	PropertyChainInference(Context context,
 			IndexedPropertyChain bwLinkRelation,
 			Context bwLinkSource,
-			IndexedPropertyChain fwLinkRelation) {
+			IndexedPropertyChain fwLinkRelation,
+			Context fwLinkTarget) {
 		super(context);
 		backwardLinkRelation_ = bwLinkRelation;
 		backwardLinkSource_ = bwLinkSource;
 		forwardLinkRelation_ = fwLinkRelation;
+		forwardLinkTarget_ = fwLinkTarget;
 	}
 
-	public Conclusion getFirstChain() {
+	public Conclusion getBackwardLink() {
 		return TracingUtils.getBackwardLinkWrapper(backwardLinkRelation_, backwardLinkSource_);
 	}
 	
-	public Conclusion getSecondChain() {
-		return TracingUtils.getBackwardLinkWrapper(forwardLinkRelation_, context);
+	public Conclusion getForwardLink() {
+		return TracingUtils.getForwardLinkWrapper(forwardLinkRelation_, forwardLinkTarget_);
 	}
 	
 	@Override
 	public String toString() {
 		//we don't store the target of the forward link
-		return "Property chain inference: " + backwardLinkSource_ + " => " + backwardLinkRelation_ + " o " + forwardLinkRelation_ + " some owl:Thing";
+		return "Property chain inference: " + backwardLinkSource_ + " => " + backwardLinkRelation_ + " o " + forwardLinkRelation_ + " some " + forwardLinkTarget_;
 	}
 
 	@Override

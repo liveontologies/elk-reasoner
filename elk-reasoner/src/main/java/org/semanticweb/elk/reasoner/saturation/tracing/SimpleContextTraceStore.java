@@ -11,6 +11,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -30,6 +31,8 @@ public class SimpleContextTraceStore implements ContextTracer {
 	private final Multimap<IndexedClassExpression, Inference> subsumerInferenceMap_;
 	
 	private final Map<IndexedPropertyChain, Multimap<Context, Inference>> backwardLinkInferenceMap_;
+	
+	private final Map<IndexedPropertyChain, Multimap<Context, Inference>> forwardLinkInferenceMap_;
 	
 	private final ConclusionVisitor<Void, InferenceVisitor<?>> inferenceReader_ = new BaseConclusionVisitor<Void, InferenceVisitor<?>>() {
 
@@ -57,7 +60,14 @@ public class SimpleContextTraceStore implements ContextTracer {
 
 		@Override
 		public Void visit(BackwardLink link, InferenceVisitor<?> visitor) {
-			visitAll(getBackwardLinkInferences(link.getRelation(), link.getSource()), visitor);
+			visitAll(getLinkInferences(backwardLinkInferenceMap_, link.getRelation(), link.getSource()), visitor);
+			
+			return null;
+		}
+		
+		@Override
+		public Void visit(ForwardLink link, InferenceVisitor<?> visitor) {
+			visitAll(getLinkInferences(forwardLinkInferenceMap_, link.getRelation(), link.getTarget()), visitor);
 			
 			return null;
 		}
@@ -78,7 +88,12 @@ public class SimpleContextTraceStore implements ContextTracer {
 
 		@Override
 		public Boolean visit(BackwardLink link, Inference inf) {
-			return addBackwardLinkInference(link.getRelation(), link.getSource(), inf);
+			return addLinkInference(backwardLinkInferenceMap_, link.getRelation(), link.getSource(), inf);
+		}
+		
+		@Override
+		public Boolean visit(ForwardLink link, Inference inf) {
+			return addLinkInference(forwardLinkInferenceMap_, link.getRelation(), link.getTarget(), inf);
 		}
 		
 	};
@@ -89,18 +104,19 @@ public class SimpleContextTraceStore implements ContextTracer {
 	public SimpleContextTraceStore() {
 		subsumerInferenceMap_ = new HashSetMultimap<IndexedClassExpression, Inference>();
 		backwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<Context,Inference>>();
+		forwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<Context,Inference>>();
 	}
 	
 
-	protected Boolean addBackwardLinkInference(IndexedPropertyChain relation,
+	protected Boolean addLinkInference(Map<IndexedPropertyChain, Multimap<Context, Inference>> linkMap, IndexedPropertyChain relation,
 			Context source, Inference inf) {
-		Multimap<Context, Inference> infMap = backwardLinkInferenceMap_.get(relation);
+		Multimap<Context, Inference> infMap = linkMap.get(relation);
 		
 		if (infMap == null) {
 			infMap = new HashSetMultimap<Context, Inference>();
 			
 			infMap.add(source, inf);
-			backwardLinkInferenceMap_.put(relation, infMap);
+			linkMap.put(relation, infMap);
 			
 			return true;
 		}
@@ -123,9 +139,9 @@ public class SimpleContextTraceStore implements ContextTracer {
 		return subsumerInferenceMap_.get(conclusion);
 	}
 
-	public Iterable<Inference> getBackwardLinkInferences(
+	public Iterable<Inference> getLinkInferences(Map<IndexedPropertyChain, Multimap<Context, Inference>> linkMap, 
 			IndexedPropertyChain linkRelation, Context linkSource) {
-		Multimap<Context, Inference> infMap = backwardLinkInferenceMap_.get(linkRelation);
+		Multimap<Context, Inference> infMap = linkMap.get(linkRelation);
 		
 		return infMap == null ? null : infMap.get(linkSource);
 	}

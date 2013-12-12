@@ -48,7 +48,7 @@ public class TracingSaturationTest {
 		
 		try {
 			stream = getClass().getClassLoader().getResourceAsStream(
-					"classification_test_input/Existentials.owl");
+					"classification_test_input/Disjoint.owl");
 
 			List<ElkAxiom> ontology = loadAxioms(stream);
 			TestChangesLoader initialLoader = new TestChangesLoader();			

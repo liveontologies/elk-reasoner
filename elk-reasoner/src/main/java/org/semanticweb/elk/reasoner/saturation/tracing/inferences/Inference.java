@@ -18,7 +18,12 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public interface Inference {
 
 	/**
-	 * TODO
+	 * Returns the contexts where the inference was actually made. This may be
+	 * different from the context where the inference's conclusion was produced.
+	 * Subclasses whose conclusions are always produced in the same context
+	 * where the inference happened may not store the latter explicitly. In that
+	 * case they will simply return the context passed into this method.
+	 * 
 	 * @param defaultContext
 	 * @return
 	 */

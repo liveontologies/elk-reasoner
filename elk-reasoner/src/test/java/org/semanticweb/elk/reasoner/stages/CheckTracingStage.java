@@ -65,6 +65,10 @@ public class CheckTracingStage extends BasePostProcessingStage {
 				for (IndexedClassExpression subsumer : context.getSubsumers()) {
 					checkTrace(context, TracingUtils.getSubsumerWrapper(subsumer), traceReader);
 				}
+				
+				if (context.isInconsistent()) {
+					checkTrace(context, TracingUtils.getSubsumerWrapper(reasoner.ontologyIndex.getIndexedOwlNothing()), traceReader);
+				}
 			}
 		}
 		
@@ -113,8 +117,10 @@ public class CheckTracingStage extends BasePostProcessingStage {
 
 				@Override
 				public Void visit(PropertyChainInference inference) {
-					addToQueue(infContext, inference.getFirstChain(), toDo, traceReader, seenInferences);
-					addToQueue(infContext, inference.getSecondChain(), toDo, traceReader, seenInferences);
+					System.out.println(inference);
+					
+					addToQueue(infContext, inference.getBackwardLink(), toDo, traceReader, seenInferences);
+					addToQueue(infContext, inference.getForwardLink(), toDo, traceReader, seenInferences);
 					return null;
 				}
 
@@ -144,14 +150,14 @@ public class CheckTracingStage extends BasePostProcessingStage {
 	private void addToQueue(final Context context, final Conclusion conclusion, final Queue<InferenceWrapper> toDo, final TraceStore.Reader traceReader, final Set<Inference> seenInferences) {
 		//just need a mutable flag that can be set from inside the visitor 
 		final AtomicBoolean infFound = new AtomicBoolean(false);
-		
+		//finding all inferences that produced the input conclusion
 		traceReader.accept(context, conclusion, new BaseInferenceVisitor<Void>(){
 
 			@Override
-			protected Void defaultVisit(Inference premiseInference) {
-				if (!seenInferences.contains(premiseInference)) {
-					seenInferences.add(premiseInference);
-					toDo.add(new InferenceWrapper(premiseInference, premiseInference.getContext(context)));
+			protected Void defaultVisit(Inference inference) {
+				if (!seenInferences.contains(inference)) {
+					seenInferences.add(inference);
+					toDo.add(new InferenceWrapper(inference, inference.getContext(context)));
 				}
 				
 				infFound.set(true);
@@ -179,10 +185,6 @@ public class CheckTracingStage extends BasePostProcessingStage {
 			context = cxt;
 		}
 		
-		/*Context getContext() {
-			return inference.getContext(context);
-		}*/
-
 		@Override
 		public String toString() {
 			return inference + " stored in " + context;

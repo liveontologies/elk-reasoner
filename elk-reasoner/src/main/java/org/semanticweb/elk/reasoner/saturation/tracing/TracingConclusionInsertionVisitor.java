@@ -6,6 +6,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -59,6 +60,11 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 
 	@Override
 	public Boolean visit(BackwardLink link, Context context) {
+		return addInference(link, context);
+	}
+	
+	@Override
+	public Boolean visit(ForwardLink link, Context context) {
 		return addInference(link, context);
 	}
 

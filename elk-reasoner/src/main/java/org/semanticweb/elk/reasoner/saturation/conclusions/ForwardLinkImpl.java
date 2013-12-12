@@ -185,7 +185,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 		@Override
 		public void apply(BasicSaturationStateWriter writer, BackwardLink link, Context context) {
 
-			LOGGER_.trace("Applying {} to {}", NAME, link);
+			LOGGER_.trace("Applying {} to {} in {}", NAME, link, context);
 
 			/* compose the link with all forward links */
 			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link
@@ -205,9 +205,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 
 				for (IndexedPropertyChain composition : compositions)
 					for (Context forwardTarget : forwardTargets) {
-						/*writer.produce(forwardTarget, new BackwardLink(source,
-								composition));*/
-						writer.produce(forwardTarget, writer.getConclusionFactory().createComposedBackwardLink(context, link, forwardRelation, composition));
+						writer.produce(forwardTarget, writer.getConclusionFactory().createComposedBackwardLink(context, link, forwardRelation, forwardTarget, composition));
 					}
 			}
 
