@@ -43,12 +43,12 @@ public class TracingSaturationTest {
 	public void testBasicTracing() throws ElkException, IOException {
 		InputStream stream = null;
 		boolean tracingFlag = AbstractReasonerState.TRACING;
-		//TODO this will go as soon as we can trace on-demand
+		//TODO this constant will go as soon as we can trace on-demand
 		AbstractReasonerState.TRACING = true;
 		
 		try {
 			stream = getClass().getClassLoader().getResourceAsStream(
-					"classification_test_input/forest.owl");
+					"classification_test_input/Existentials.owl");
 
 			List<ElkAxiom> ontology = loadAxioms(stream);
 			TestChangesLoader initialLoader = new TestChangesLoader();			

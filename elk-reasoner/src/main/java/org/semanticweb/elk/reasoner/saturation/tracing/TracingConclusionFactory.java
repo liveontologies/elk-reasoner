@@ -81,10 +81,10 @@ public class TracingConclusionFactory implements ConclusionFactory {
 
 	@Override
 	public BackwardLink createBackwardLink(
-			IndexedObjectSomeValuesFrom subsumer, Context target) {
-		Inference subsumerInference = inferenceFactory_.createBridgeInference(TracingUtils.getSubsumerWrapper(subsumer));
+			IndexedObjectSomeValuesFrom subsumer, Context source) {
+		Inference subsumerInference = inferenceFactory_.createBridgeInference(TracingUtils.getSubsumerWrapper(subsumer), source);
 		
-		return new TracedBackwardLink(subsumerInference, conclusionFactory_.createBackwardLink(subsumer, target));
+		return new TracedBackwardLink(subsumerInference, conclusionFactory_.createBackwardLink(subsumer, source));
 	}
 
 	@Override

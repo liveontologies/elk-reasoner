@@ -34,8 +34,10 @@ public class SimpleContextTraceStore implements ContextTracer {
 	private final ConclusionVisitor<Void, InferenceVisitor<?>> inferenceReader_ = new BaseConclusionVisitor<Void, InferenceVisitor<?>>() {
 
 		private void visitAll(Iterable<Inference> inferences, InferenceVisitor<?> visitor) {
-			for (Inference inf : inferences) {
-				inf.accept(visitor);
+			if (inferences != null) {
+				for (Inference inf : inferences) {
+					inf.accept(visitor);
+				}
 			}
 		}
 		

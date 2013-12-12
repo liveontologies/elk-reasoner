@@ -50,5 +50,10 @@ class SubsumerPremise implements PositiveSubsumer {
 			DecompositionRuleApplicationVisitor decompVisitor) {
 		//no-op
 	}
+	
+	@Override
+	public String toString() {
+		return ice_.toString();
+	}
 
 }

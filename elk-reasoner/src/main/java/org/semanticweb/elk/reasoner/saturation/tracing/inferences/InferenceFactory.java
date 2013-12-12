@@ -72,8 +72,8 @@ public class InferenceFactory {
 		return new ReflexiveInference(reflexiveChain);
 	}
 	
-	public Inference createBridgeInference(Conclusion previous) {
-		return new BridgeInference(previous);
+	public Inference createBridgeInference(Conclusion previous, Context cxt) {
+		return new BridgeInference(previous, cxt);
 	}
 
 }

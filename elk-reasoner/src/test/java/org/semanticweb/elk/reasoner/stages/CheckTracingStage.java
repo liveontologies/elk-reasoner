@@ -3,8 +3,11 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -69,8 +72,9 @@ public class CheckTracingStage extends BasePostProcessingStage {
 
 	private void checkTrace(Context context, Conclusion conclusion, final Reader traceReader) {
 		final Queue<InferenceWrapper> toDo = new LinkedList<InferenceWrapper>();
+		final Set<Inference> seenInferences = new HashSet<Inference>();
 		
-		addToQueue(context, conclusion, toDo, traceReader);
+		addToQueue(context, conclusion, toDo, traceReader, seenInferences);
 		
 		for (;;) {
 			InferenceWrapper next = toDo.poll();
@@ -79,7 +83,7 @@ public class CheckTracingStage extends BasePostProcessingStage {
 				break;
 			}
 			
-			final Context infContext = next.getContext();			
+			final Context infContext = next.context;			
 			
 			next.inference.accept(new BaseInferenceVisitor<Void>() {
 
@@ -90,27 +94,27 @@ public class CheckTracingStage extends BasePostProcessingStage {
 
 				@Override
 				public Void visit(SubClassOfInference inference) {
-					addToQueue(infContext, inference.getPremise(), toDo, traceReader);
+					addToQueue(infContext, inference.getPremise(), toDo, traceReader, seenInferences);
 					return null;
 				}
 
 				@Override
 				public Void visit(ConjunctionCompositionInference inference) {
-					addToQueue(infContext, inference.getFirstConjunct(), toDo, traceReader);
-					addToQueue(infContext, inference.getSecondConjunct(), toDo, traceReader);
+					addToQueue(infContext, inference.getFirstConjunct(), toDo, traceReader, seenInferences);
+					addToQueue(infContext, inference.getSecondConjunct(), toDo, traceReader, seenInferences);
 					return null;
 				}
 
 				@Override
 				public Void visit(ConjunctionDecompositionInference inference) {
-					addToQueue(infContext, inference.getConjunction(), toDo, traceReader);
+					addToQueue(infContext, inference.getConjunction(), toDo, traceReader, seenInferences);
 					return null;
 				}
 
 				@Override
 				public Void visit(PropertyChainInference inference) {
-					addToQueue(infContext, inference.getFirstChain(), toDo, traceReader);
-					addToQueue(infContext, inference.getSecondChain(), toDo, traceReader);
+					addToQueue(infContext, inference.getFirstChain(), toDo, traceReader, seenInferences);
+					addToQueue(infContext, inference.getSecondChain(), toDo, traceReader, seenInferences);
 					return null;
 				}
 
@@ -122,14 +126,14 @@ public class CheckTracingStage extends BasePostProcessingStage {
 
 				@Override
 				public Void visit(ExistentialInference inference) {
-					addToQueue(infContext, inference.getBackwardLink(), toDo, traceReader);
-					addToQueue(infContext, inference.getSubsumer(), toDo, traceReader);
+					addToQueue(infContext, inference.getBackwardLink(), toDo, traceReader, seenInferences);
+					addToQueue(infContext, inference.getSubsumer(), toDo, traceReader, seenInferences);
 					return null;
 				}
 
 				@Override
 				public Void visit(BridgeInference inference) {
-					addToQueue(infContext, inference.getConclusion(), toDo, traceReader);
+					addToQueue(infContext, inference.getConclusion(), toDo, traceReader, seenInferences);
 					return null;
 				}
 				
@@ -137,20 +141,27 @@ public class CheckTracingStage extends BasePostProcessingStage {
 		}
 	}
 	
-	private void addToQueue(final Context context, final Conclusion conclusion, final Queue<InferenceWrapper> toDo, final TraceStore.Reader traceReader) {
-		int prevSize = toDo.size();
+	private void addToQueue(final Context context, final Conclusion conclusion, final Queue<InferenceWrapper> toDo, final TraceStore.Reader traceReader, final Set<Inference> seenInferences) {
+		//just need a mutable flag that can be set from inside the visitor 
+		final AtomicBoolean infFound = new AtomicBoolean(false);
 		
 		traceReader.accept(context, conclusion, new BaseInferenceVisitor<Void>(){
 
 			@Override
 			protected Void defaultVisit(Inference premiseInference) {
-				toDo.add(new InferenceWrapper(premiseInference, context));
+				if (!seenInferences.contains(premiseInference)) {
+					seenInferences.add(premiseInference);
+					toDo.add(new InferenceWrapper(premiseInference, premiseInference.getContext(context)));
+				}
+				
+				infFound.set(true);
+				
 				return null;
 			}
 			
 		});
 		
-		if (toDo.size() <= prevSize) {
+		if (!infFound.get()) {
 			LOGGER_.error("No inferences for a conclusion {} in context {}", conclusion, context);
 		}
 	}
@@ -168,8 +179,14 @@ public class CheckTracingStage extends BasePostProcessingStage {
 			context = cxt;
 		}
 		
-		Context getContext() {
+		/*Context getContext() {
 			return inference.getContext(context);
+		}*/
+
+		@Override
+		public String toString() {
+			return inference + " stored in " + context;
 		}
+		
 	}
 }
