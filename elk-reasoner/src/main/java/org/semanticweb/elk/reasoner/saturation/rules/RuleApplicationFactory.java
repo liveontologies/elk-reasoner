@@ -109,7 +109,7 @@ public class RuleApplicationFactory {
 	 * extended if new contexts may need to be created
 	 */
 	public abstract class BaseEngine implements
-			InputProcessor<IndexedClassExpression>, RuleEngine {
+			InputProcessor<IndexedClassExpression> {
 
 		private ConclusionVisitor<?, Context> conclusionProcessor_;
 
