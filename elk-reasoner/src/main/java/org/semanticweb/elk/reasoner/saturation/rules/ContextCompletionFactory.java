@@ -37,6 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
+import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -78,7 +79,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 	private final LocalSaturationState localState_;
 
-	public ContextCompletionFactory(SaturationState saturationState) {
+	public ContextCompletionFactory(ExtendedSaturationState saturationState) {
 		super(saturationState);
 		localState_ = new LocalSaturationState(
 				saturationState.getOntologyIndex());
@@ -124,10 +125,11 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 					.getStatsAwareCompositionRuleAppVisitor(localStatistics.getRuleStatistics());
 			conclusionStatsVisitor_ = SaturationUtils
 					.addStatsToConclusionVisitor(stats);
-			mainIterationWriter_ = localState_.getExtendedWriter(
+			/*mainIterationWriter_ = localState_.getExtendedWriter(
 					ContextCreationListener.DUMMY,
 					ContextModificationListener.DUMMY, initRuleAppVisitor_,
-					conclusionStatsVisitor_, false);
+					conclusionStatsVisitor_, false);*/
+			mainIterationWriter_ = localState_.getExtendedWriter(conclusionStatsVisitor_, initRuleAppVisitor_);
 			/*
 			 * Second, create the auxiliary saturation state writer which only
 			 * writes to local contexts (this one is used only for decomposition
@@ -192,6 +194,8 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	 * cache to avoid infinite looping when iterating over all conclusions which
 	 * belong to a certain context.
 	 * 
+	 * FIXME extend the reusable LocalSaturationState
+	 * 
 	 * @author Pavel Klinov
 	 * 
 	 *         pavel.klinov@uni-ulm.de
@@ -224,48 +228,22 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		public Collection<IndexedClassExpression> getNotSaturatedContexts() {
-			return contextMap_.keySet();
+		public GapFillingWriter getWriter(
+				ConclusionVisitor<?, Context> conclusionVisitor) {
+			return getDefaultWriter(conclusionVisitor, new BasicCompositionRuleApplicationVisitor());
 		}
 
 		@Override
 		public GapFillingWriter getExtendedWriter(
-				ContextCreationListener contextCreationListener,
-				ContextModificationListener contextModificationListener,
-				CompositionRuleApplicationVisitor ruleAppVisitor,
-				ConclusionVisitor<?, Context> conclusionVisitor,
-				boolean trackNewContextsAsUnsaturated) {
-			return new GapFillingWriter(conclusionVisitor,
-					ruleAppVisitor, saturationState.getExtendedWriter(
-							contextCreationListener,
-							contextModificationListener, ruleAppVisitor,
-							conclusionVisitor, trackNewContextsAsUnsaturated));
-		}
-
-		@Override
-		public BasicSaturationStateWriter getWriter(
-				ContextModificationListener contextModificationListener,
-				ConclusionVisitor<?, Context> conclusionVisitor) {
-			return getDefaultWriter(conclusionVisitor);
-		}
-
-		@Override
-		public BasicSaturationStateWriter getWriter(
-				ConclusionVisitor<?, Context> conclusionVisitor) {
-			return getDefaultWriter(conclusionVisitor);
-		}
-
-		@Override
-		public ExtendedSaturationStateWriter getExtendedWriter(
-				ConclusionVisitor<?, Context> conclusionVisitor) {
-			return getDefaultWriter(conclusionVisitor);
+				ConclusionVisitor<?, Context> conclusionVisitor, CompositionRuleApplicationVisitor initRuleAppVisitor) {
+			return getDefaultWriter(conclusionVisitor, initRuleAppVisitor);
 		}
 
 		private GapFillingWriter getDefaultWriter(
-				ConclusionVisitor<?, Context> conclusionVisitor) {
+				ConclusionVisitor<?, Context> conclusionVisitor, CompositionRuleApplicationVisitor initRuleAppVisitor) {
 			return new GapFillingWriter(conclusionVisitor,
-					new BasicCompositionRuleApplicationVisitor(),
-					saturationState.getExtendedWriter(conclusionVisitor));
+					initRuleAppVisitor,
+					saturationState.getExtendedWriter(conclusionVisitor, initRuleAppVisitor));
 		}
 
 		private LocalWriter getWriterForDecompositionVisitor(

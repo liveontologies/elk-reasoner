@@ -36,14 +36,14 @@ import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule0;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule0;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule0;
@@ -72,7 +72,7 @@ public class IncrementalChangesInitialization extends
 			Collection<ArrayList<Context>> inputs,
 			ChainableRule0<Context> changedGlobalRules,
 			Map<IndexedClassExpression, ChainableRule<Conclusion, Context>> changes,
-			SaturationState state, ComputationExecutor executor,
+			ExtendedSaturationState state, ComputationExecutor executor,
 			SaturationStatistics stageStats, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		super(inputs, new ContextInitializationFactory(state, changes,
@@ -94,7 +94,7 @@ class ContextInitializationFactory
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContextInitializationFactory.class);
 
-	private final SaturationState saturationState_;
+	private final ExtendedSaturationState saturationState_;
 	private final Map<IndexedClassExpression, ? extends LinkRule<Conclusion, Context>> indexChanges_;
 	private final IndexedClassExpression[] indexChangesKeys_;
 	private final LinkRule0<Context> changedGlobalRuleHead_;
@@ -102,7 +102,7 @@ class ContextInitializationFactory
 	private final SaturationStatistics stageStatistics_;
 
 	public ContextInitializationFactory(
-			SaturationState state,
+			ExtendedSaturationState state,
 			Map<IndexedClassExpression, ? extends LinkRule<Conclusion, Context>> indexChanges,
 			LinkRule0<Context> changedGlobalRuleHead,
 			SaturationStatistics stageStats) {

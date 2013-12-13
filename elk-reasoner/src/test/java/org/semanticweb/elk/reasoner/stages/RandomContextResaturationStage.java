@@ -32,17 +32,18 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextCleaningFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -106,7 +107,9 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		for (IndexedClassExpression ice : contexts) {
 			if (ice.getContext() != null) {
 				reasoner.saturationState.getExtendedWriter(
-						ConclusionVisitor.DUMMY).initContext(ice.getContext());
+						ConclusionVisitor.DUMMY,
+						SaturationState.DEFAULT_INIT_RULE_APP_VISITOR)
+						.initContext(ice.getContext());
 			}
 		}
 	}

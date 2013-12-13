@@ -40,19 +40,18 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVi
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SimpleConclusionFactory;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO docs
+ * This is the main saturation state maintained by the reasoner.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-class SaturationStateImpl implements SaturationState {
+class SaturationStateImpl implements ExtendedSaturationState {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -144,8 +143,6 @@ class SaturationStateImpl implements SaturationState {
 		return notSaturatedContexts_;
 	}
 
-	private static final CompositionRuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicCompositionRuleApplicationVisitor();
-	
 	/**
 	 * 
 	 * @param index
@@ -167,10 +164,10 @@ class SaturationStateImpl implements SaturationState {
 		return ice.getContext();
 	}
 	
-	private ExtendedSaturationStateWriter getDefaultWriter(final ConclusionVisitor<?, Context> conclusionVisitor) {
+	private ExtendedSaturationStateWriter getDefaultWriter(final ConclusionVisitor<?, Context> conclusionVisitor, CompositionRuleApplicationVisitor initRuleAppVisitor) {
 		return new ContextCreatingWriter(
 				ContextCreationListener.DUMMY, ContextModificationListener.DUMMY,
-				DEFAULT_INIT_RULE_APP_VISITOR, conclusionVisitor, true);
+				initRuleAppVisitor, conclusionVisitor, true);
 	}
 	
 	/**
@@ -182,12 +179,12 @@ class SaturationStateImpl implements SaturationState {
 	 */
 	@Override
 	public BasicSaturationStateWriter getWriter(ConclusionVisitor<?, Context> conclusionVisitor) {
-		return getDefaultWriter(conclusionVisitor);
+		return getDefaultWriter(conclusionVisitor, DEFAULT_INIT_RULE_APP_VISITOR);
 	}
 
 	@Override
-	public ExtendedSaturationStateWriter getExtendedWriter(ConclusionVisitor<?, Context> conclusionVisitor) {
-		return getDefaultWriter(conclusionVisitor);
+	public ExtendedSaturationStateWriter getExtendedWriter(ConclusionVisitor<?, Context> conclusionVisitor, CompositionRuleApplicationVisitor initRuleAppVisitor) {
+		return getDefaultWriter(conclusionVisitor, initRuleAppVisitor);
 	}
 
 	@Override

@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
+import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -59,7 +60,7 @@ public class RuleApplicationFactory {
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RuleApplicationFactory.class);
 
-	final SaturationState saturationState;
+	final ExtendedSaturationState saturationState;
 
 	/**
 	 * The {@link SaturationStatistics} aggregated for all workers
@@ -73,12 +74,12 @@ public class RuleApplicationFactory {
 	 */
 	private final boolean trackModifiedContexts_;
 
-	public RuleApplicationFactory(final SaturationState saturationState) {
+	public RuleApplicationFactory(final ExtendedSaturationState saturationState) {
 		this(saturationState, false);
 	}
 
-	public RuleApplicationFactory(final SaturationState saturationState,
-			final boolean trackModifiedContexts) {
+	public RuleApplicationFactory(ExtendedSaturationState saturationState,
+			boolean trackModifiedContexts) {
 		this.aggregatedStats_ = new SaturationStatistics();
 		this.saturationState = saturationState;
 		this.trackModifiedContexts_ = trackModifiedContexts;

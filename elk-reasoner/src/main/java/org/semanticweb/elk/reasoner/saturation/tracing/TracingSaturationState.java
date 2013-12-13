@@ -8,8 +8,6 @@ import java.util.Collection;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
-import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
@@ -58,7 +56,7 @@ public class TracingSaturationState implements SaturationState {
 		return underlyingState_.getOntologyIndex();
 	}
 
-	@Override
+	/*@Override
 	public Collection<IndexedClassExpression> getNotSaturatedContexts() {
 		return underlyingState_.getNotSaturatedContexts();
 	}
@@ -83,7 +81,7 @@ public class TracingSaturationState implements SaturationState {
 			ConclusionVisitor<?, Context> conclusionVisitor) {
 		
 		return new BasicTracingWriter(underlyingState_.getWriter(contextModificationListener, conclusionVisitor), tracer_.getWriter());
-	}
+	}*/
 
 	@Override
 	public BasicSaturationStateWriter getWriter(
@@ -94,9 +92,8 @@ public class TracingSaturationState implements SaturationState {
 
 	@Override
 	public ExtendedSaturationStateWriter getExtendedWriter(
-			ConclusionVisitor<?, Context> conclusionVisitor) {
-		
-		return new ExtendedTracingWriter(underlyingState_.getExtendedWriter(conclusionVisitor), tracer_.getWriter());
+			ConclusionVisitor<?, Context> conclusionVisitor, CompositionRuleApplicationVisitor initRuleAppVisitor) {
+		return new ExtendedTracingWriter(underlyingState_.getExtendedWriter(conclusionVisitor, initRuleAppVisitor), tracer_.getWriter());
 	}
 
 	/**

@@ -46,7 +46,7 @@ public interface BasicSaturationStateWriter {
 	public Context pollForActiveContext();
 
 	public void produce(Context context, Conclusion conclusion);
-
+	//TODO this and the following methods should belong to a different interface
 	public boolean markAsNotSaturated(Context context);
 
 	public void clearNotSaturatedContexts();

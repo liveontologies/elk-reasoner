@@ -27,8 +27,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ComposedAxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
@@ -53,7 +51,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalChangeCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -70,6 +68,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The execution state of the reasoner containing information about which
@@ -82,13 +82,13 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public abstract class AbstractReasonerState {
 	//FIXME get rid of this when tracing can be done on demand
-	public static boolean TRACING = true;
+	public static boolean TRACING = false;
 	
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractReasonerState.class);
 
-	final SaturationState saturationState;
+	final ExtendedSaturationState saturationState;
 
 	/**
 	 * Accumulated statistics regarding produced conclusions and rule
@@ -176,9 +176,18 @@ public abstract class AbstractReasonerState {
 		this.ontologyIndex = new DifferentialIndex(objectCache_);
 		this.axiomInserter_ = new MainAxiomIndexerVisitor(ontologyIndex, true);
 		this.axiomDeleter_ = new MainAxiomIndexerVisitor(ontologyIndex, false);
-		this.saturationState = TRACING ? SaturationStateFactory.createTracingSaturationState(ontologyIndex) : SaturationStateFactory.createSaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
+		
+		ExtendedSaturationState mainSaturationState = SaturationStateFactory.createMainSaturationState(ontologyIndex);
+		
+		if (!TRACING) {
+			this.saturationState = mainSaturationState;
+		}
+		else {
+			//this.saturationState = new TracingSaturationState(mainSaturationState);
+			throw new IllegalStateException("Tracing coming soon...");
+		}
 	}
 
 	protected AbstractReasonerState(AxiomLoader axiomLoader) {

@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.exceptions.ElkException;
@@ -40,6 +41,7 @@ public class TracingSaturationTest {
 	 * FIXME refactor when tracing becomes lazy
 	 */
 	@Test
+	@Ignore
 	public void testBasicTracing() throws ElkException, IOException {
 		InputStream stream = null;
 		boolean tracingFlag = AbstractReasonerState.TRACING;

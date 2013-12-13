@@ -27,16 +27,17 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Iterator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -94,7 +95,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 			return false;
 		final ConclusionVisitor<?, Context> visitor = getConclusionVisitor(stageStatistics_
 				.getConclusionStatistics());
-		this.writer_ = reasoner.saturationState.getExtendedWriter(visitor);
+		this.writer_ = reasoner.saturationState.getExtendedWriter(visitor, SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
 		return true;
 	}
 

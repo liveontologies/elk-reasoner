@@ -28,19 +28,19 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
+import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ReasonerComputation} for checking consistency of the ontology. This
@@ -112,7 +112,7 @@ public class ConsistencyChecking
 	 */
 	public ConsistencyChecking(Collection<IndexedClassEntity> inputEntities,
 			ConsistencyMonitor consistencyMonitor,
-			SaturationState saturationState, ComputationExecutor executor,
+			ExtendedSaturationState saturationState, ComputationExecutor executor,
 			int maxWorkers, ProgressMonitor progressMonitor) {
 		this(
 				new TodoJobs(inputEntities, consistencyMonitor),
@@ -183,7 +183,7 @@ public class ConsistencyChecking
 	 */
 	public ConsistencyChecking(ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
-			SaturationState saturationState) {
+			ExtendedSaturationState saturationState) {
 		this(getTestEntities(ontologyIndex), new ConsistencyMonitor(),
 				saturationState, executor, maxWorkers, progressMonitor);
 	}

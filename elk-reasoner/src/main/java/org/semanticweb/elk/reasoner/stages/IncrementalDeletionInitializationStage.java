@@ -36,12 +36,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.AbstractIndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule0;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule0;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -100,7 +101,7 @@ public class IncrementalDeletionInitializationStage extends
 				.addStatsToConclusionVisitor(stageStatistics_
 						.getConclusionStatistics());
 		final ExtendedSaturationStateWriter satStateWriter = reasoner.saturationState
-				.getExtendedWriter(conclusionVisitor);
+				.getExtendedWriter(conclusionVisitor, SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
 		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState
 				.getWriter();
 		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState

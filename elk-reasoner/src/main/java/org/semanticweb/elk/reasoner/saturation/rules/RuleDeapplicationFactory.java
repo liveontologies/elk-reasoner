@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
@@ -51,7 +51,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
-	public RuleDeapplicationFactory(final SaturationState saturationState,
+	public RuleDeapplicationFactory(final ExtendedSaturationState saturationState,
 			boolean trackModifiedContexts) {
 		super(saturationState, trackModifiedContexts);
 	}
