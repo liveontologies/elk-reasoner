@@ -98,25 +98,8 @@ public class ReasonerStageManager {
 		this.incrementalDeletionStage = new IncrementalDeletionStage(reasoner,
 				incrementalDeletionInitializationStage);
 
-		/*
-		 * this.initializeContextsAfterDeletionsStage = new
-		 * InitializeContextsAfterDeletionsStage( reasoner,
-		 * incrementalDeletionStage);
-		 */
-
-		/*
-		 * this.incrementalContextCleaningStage = new
-		 * IncrementalContextCleaningStage( reasoner,
-		 * initializeContextsAfterDeletionsStage);
-		 */
 		this.incrementalContextGapFillingStage = new IncrementalOverdeletionPruningStage(
 				reasoner, incrementalDeletionStage);
-
-		/*
-		 * this.initializeContextsAfterCleaningStage = new
-		 * InitializeContextsAfterCleaningStage( reasoner,
-		 * incrementalContextGapFillingStage);
-		 */
 
 		this.incrementalAdditionInitializationStage = new IncrementalAdditionInitializationStage(
 				reasoner, incrementalContextGapFillingStage/* initializeContextsAfterCleaningStage */);
