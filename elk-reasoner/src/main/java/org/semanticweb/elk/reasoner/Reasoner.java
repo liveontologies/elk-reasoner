@@ -48,14 +48,14 @@ import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.model.AnonymousNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.FreshInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.FreshTaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.FreshTypeNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.AnonymousNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.FreshInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.FreshTaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.FreshTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.Node;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.TypeNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**

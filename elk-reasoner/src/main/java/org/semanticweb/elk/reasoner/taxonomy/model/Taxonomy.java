@@ -28,6 +28,7 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.TaxonomyNode;
 
 /**
  * A hierarchy of certain ElkObjects. For each such object, the taxonomy holds a

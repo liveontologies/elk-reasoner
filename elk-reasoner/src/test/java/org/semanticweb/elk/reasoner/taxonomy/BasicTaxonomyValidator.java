@@ -30,7 +30,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.taxonomy.DepthFirstSearch.Direction;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.TaxonomyNode;
 
 /**
  * Applies those validators which are simple visitors

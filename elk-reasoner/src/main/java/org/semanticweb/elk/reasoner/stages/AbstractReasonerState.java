@@ -59,7 +59,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomyOld;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanNode;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanTypeNode;
@@ -595,7 +595,7 @@ public abstract class AbstractReasonerState {
 	}
 
 	public synchronized void initInstanceTaxonomy() {
-		instanceTaxonomyState.initTaxonomy(new ConcurrentInstanceTaxonomy(
+		instanceTaxonomyState.initTaxonomy(new ConcurrentInstanceTaxonomyOld(
 				classTaxonomyState.getTaxonomy()));
 	}
 

@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.taxonomy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
+import org.semanticweb.elk.owl.iris.ElkIri;
 
 /**
  * A marker interface for taxonomy of classes and their instances (individuals).
@@ -33,7 +33,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
  * @author Pavel Klinov
  * 
  */
+public interface IndividualClassTaxonomy
+		extends
+		UpdateableInstanceTaxonomy<ElkIri, ElkClass, ElkIri, ElkNamedIndividual> {
 
-public interface IndividualClassTaxonomy extends UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> {
-	
 }

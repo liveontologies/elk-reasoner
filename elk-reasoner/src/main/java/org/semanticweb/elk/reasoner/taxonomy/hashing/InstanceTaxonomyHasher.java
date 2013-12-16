@@ -22,29 +22,71 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy.hashing;
 
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.Node;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.TypeNode;
 import org.semanticweb.elk.util.hashing.HashGenerator;
+import org.semanticweb.elk.util.hashing.Hasher;
 
 /**
- * A class for computing the structural hash of a
- * Taxonomy. This is mainly useful during testing to check if the reasoner
- * produces the same taxonomy.
+ * A helper class to compute the structural hash code for
+ * {@link InstanceTaxonomy} objects. If two {@link InstanceTaxonomy} objects are
+ * structurally equivalent then {@link #hash(InstanceTaxonomy)} is guaranteed to
+ * return the same values for them. Two {@link InstanceTaxonomy} objects are
+ * structurally equivalent if the sets of their {@link TypeNode}s and
+ * {@link InstanceNode}s are structurally equivalent. Two sets of
+ * {@link TypeNode}s are structurally equivalent if there is a bijection between
+ * the members in the two sets mapping {@link TypeNode}s to structurally
+ * equivalent ones as defined in {@link TypeNodeHasher}. Two sets of
+ * {@link InstanceNode}s are structurally equivalent if there is a bijection
+ * between the members in the two sets mapping {@link InstanceNode}s to
+ * structurally equivalent ones as defined in {@link InstanceNodeHasher}.
  * 
+ * @see TypeNodeHasher
+ * @see InstanceNodeHasher
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <K>
+ *            the type of the keys for the node members
+ * @param <KI>
+ *            the type of the keys for the node instances
  */
-public class InstanceTaxonomyHasher {
+public class InstanceTaxonomyHasher<K, KI> implements
+		Hasher<InstanceTaxonomy<K, ?, KI, ?>> {
 
 	/**
-	 * Compute the hash code of a taxonomy.
-	 * 
-	 * @param taxonomy
-	 * @return hash
+	 * the hasher for {@link TypeNode}s
 	 */
-	public static int hash(InstanceTaxonomy<? extends ElkEntity, ? extends ElkEntity> taxonomy) {
-		int typeHash = HashGenerator.combineMultisetHash(true, taxonomy.getTypeNodes(), TypeNodeHasher.INSTANCE);
-		int instanceHash = HashGenerator.combineMultisetHash(true, taxonomy.getInstanceNodes(), InstanceNodeHasher.INSTANCE);
+	private final Hasher<TypeNode<K, ?, KI, ?>> typeNodeHasher_;
+
+	/**
+	 * the hasher for {@link InstanceNode}s
+	 */
+	private final Hasher<InstanceNode<K, ?, KI, ?>> instanceNodeHasher_;
+
+	public InstanceTaxonomyHasher() {
+		this(new NodeHasher<K>(), new NodeHasher<KI>());
+	}
+
+	private InstanceTaxonomyHasher(Hasher<Node<K, ?>> typeMemberHasher,
+			Hasher<Node<KI, ?>> instanceMemberHasher) {
+
+		this.typeNodeHasher_ = new TypeNodeHasher<K, KI>(
+				new TaxonomyNodeHasher<K>(typeMemberHasher),
+				instanceMemberHasher);
+		this.instanceNodeHasher_ = new InstanceNodeHasher<K, KI>(
+				typeMemberHasher, instanceMemberHasher);
+	}
+
+	@Override
+	public int hash(InstanceTaxonomy<K, ?, KI, ?> taxonomy) {
+		int typeHash = HashGenerator.combineMultisetHash(true,
+				taxonomy.getNodes(), typeNodeHasher_);
+		int instanceHash = HashGenerator.combineMultisetHash(true,
+				taxonomy.getInstanceNodes(), instanceNodeHasher_);
 		return HashGenerator.combineListHash(typeHash, instanceHash);
 	}
 

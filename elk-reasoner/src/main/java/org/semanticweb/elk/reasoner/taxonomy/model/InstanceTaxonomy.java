@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.TypeNode;
 
 /**
  * Extended {@link Taxonomy} that also provides instances for each of its

@@ -23,9 +23,11 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
+import java.util.Map;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionFactory;
@@ -37,11 +39,9 @@ import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputUnsatisfi
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionOutputVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputationFactory.Engine;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.Node;
+import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.Operations.Transformation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
@@ -52,7 +52,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
  * The factory for engines that concurrently construct an
- * {@link InstanceTaxonomy}. The jobs are submitted using the method
+ * {@link GenericInstanceTaxonomy}. The jobs are submitted using the method
  * {@link Engine#submit(IndexedIndividual)}, which require the computation of
  * the {@link Node} for the input {@link IndexedIndividual}.
  * 
@@ -65,7 +65,7 @@ public class InstanceTaxonomyComputationFactory implements
 	/**
 	 * The class taxonomy object into which we write the result
 	 */
-	private final UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy_;
+	private final UpdateableInstanceTaxonomy<ElkIri, ElkClass, ElkIri, ElkNamedIndividual> taxonomy_;
 	/**
 	 * The transitive reduction shared structures used in the taxonomy
 	 * construction
@@ -76,10 +76,6 @@ public class InstanceTaxonomyComputationFactory implements
 	 * transitive reduction
 	 */
 	private final TransitiveReductionOutputProcessor outputProcessor_;
-	/**
-	 * The reference to cache the value of the top node for frequent use
-	 */
-	private final UpdateableTypeNode<ElkClass, ElkNamedIndividual> topNode_;//NonBottomClassNode topNode_;
 
 	/**
 	 * Create a shared engine for the input ontology index and a partially
@@ -98,13 +94,12 @@ public class InstanceTaxonomyComputationFactory implements
 	public InstanceTaxonomyComputationFactory(
 			SaturationState saturationState,
 			int maxWorkers,
-			UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> partialTaxonomy) {
+			UpdateableInstanceTaxonomy<ElkIri, ElkClass, ElkIri, ElkNamedIndividual> partialTaxonomy) {
 		this.taxonomy_ = partialTaxonomy;
 		this.transitiveReductionShared_ = new TransitiveReductionFactory<IndexedIndividual, TransitiveReductionJob<IndexedIndividual>>(
 				saturationState, maxWorkers,
 				new ThisTransitiveReductionListener());
 		this.outputProcessor_ = new TransitiveReductionOutputProcessor();
-		this.topNode_ = partialTaxonomy.getUpdateableTopNode();
 	}
 
 	/**
@@ -136,37 +131,34 @@ public class InstanceTaxonomyComputationFactory implements
 	private class TransitiveReductionOutputProcessor implements
 			TransitiveReductionOutputVisitor<IndexedIndividual> {
 
+		private final Transformation<TransitiveReductionOutputEquivalent<IndexedClass>, Map<ElkIri, ElkClass>> transform_ = new Transformation<TransitiveReductionOutputEquivalent<IndexedClass>, Map<ElkIri, ElkClass>>() {
+			@Override
+			public Map<ElkIri, ElkClass> transform(
+					TransitiveReductionOutputEquivalent<IndexedClass> element) {
+				return new EntityArray<ElkClass>(element.getEquivalent());
+			}
+		};
+
 		@Override
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedIndividual> output) {
-
-			// only supports singleton individuals
-			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy_
-					.getCreateInstanceNode(Collections.singleton(output
-							.getRoot().getElkNamedIndividual()));
-
-			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
-					.getDirectSubsumers()) {
-				UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode = taxonomy_
-						.getCreateTypeNode(directSuperEquivalent
-								.getEquivalent());
-				assignDirectTypeNode(node, superNode);
-			}
-			// if there are no direct type nodes, then the top node is the
-			// only direct type node
-			if (node.getDirectTypeNodes().isEmpty()) {
-				assignDirectTypeNode(node, topNode_);
-			}
-			
-			node.trySetModified(false);
+			Iterable<Map<ElkIri, ElkClass>> directSubsumersIterator = Operations
+					.map(output.getDirectSubsumers(), transform_);
+			// only supports singleton individuals so far
+			taxonomy_.setDirectTypes(
+					new EntityArray<ElkNamedIndividual>(Collections
+							.<ElkNamedIndividual> singleton(output.getRoot()
+									.getElkNamedIndividual())),
+					directSubsumersIterator);
 		}
 
 		@Override
 		public void visit(
 				TransitiveReductionOutputUnsatisfiable<IndexedIndividual> output) {
-			// the ontology is inconsistent, this should have been checked
-			// earlier
-			throw new IllegalArgumentException();
+			ElkNamedIndividual bottomInstance = output.getRoot()
+					.getElkNamedIndividual();
+			taxonomy_
+					.addBottomInstance(bottomInstance.getIri(), bottomInstance);
 		}
 
 		@Override
@@ -180,34 +172,11 @@ public class InstanceTaxonomyComputationFactory implements
 	}
 
 	/**
-	 * Connecting the given pair of nodes in instance/type-node relation. The
-	 * method should not be called concurrently for the same first argument.
-	 * 
-	 * @param instanceNode
-	 *            the node that should be the sub-node of the second node
-	 * 
-	 * @param typeNode
-	 *            the node that should be the super-node of the first node
-	 */
-	private static void assignDirectTypeNode(
-			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode,
-			UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
-		instanceNode.addDirectTypeNode(typeNode);
-		/*
-		 * since type-nodes can be added from different nodes, this call should
-		 * be synchronized
-		 */
-		synchronized (typeNode) {
-			typeNode.addDirectInstanceNode(instanceNode);
-		}
-	}
-
-	/**
 	 * Returns the taxonomy constructed by this engine
 	 * 
 	 * @return the taxonomy constructed by this engine
 	 */
-	public UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
+	public UpdateableInstanceTaxonomy<ElkIri, ElkClass, ElkIri, ElkNamedIndividual> getTaxonomy() {
 		return this.taxonomy_;
 	}
 

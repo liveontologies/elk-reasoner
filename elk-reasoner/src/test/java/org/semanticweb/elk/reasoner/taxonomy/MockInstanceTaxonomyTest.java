@@ -37,7 +37,7 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.util.Comparators;
-import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.TypeNode;
 
 /**
  * Some basic tests for the mock instance taxonomy (which is itself primarily used in tests)

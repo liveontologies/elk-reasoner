@@ -54,7 +54,7 @@ import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.owl.visitors.AbstractElkEntityVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.MockInstanceTaxonomy.MutableTypeNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.TypeNode;
 
 /**
  * @author Pavel Klinov

@@ -32,8 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.Node;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.UpdateableTaxonomy;
 
 /**
  * Stores information about the state of the class taxonomy

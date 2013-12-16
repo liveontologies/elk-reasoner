@@ -27,6 +27,9 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.UpdateableInstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.UpdateableTaxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.UpdateableTypeNode;
 
 /**
  * @author Pavel Klinov

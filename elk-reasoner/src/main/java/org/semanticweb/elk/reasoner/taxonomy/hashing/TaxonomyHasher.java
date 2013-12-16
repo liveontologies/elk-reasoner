@@ -22,29 +22,50 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy.hashing;
 
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.Taxonomy;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.Node;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.TaxonomyNode;
 import org.semanticweb.elk.util.hashing.HashGenerator;
+import org.semanticweb.elk.util.hashing.Hasher;
 
 /**
- * A class for computing the structural hash of a
- * Taxonomy. This is mainly useful during testing to check if the reasoner
- * produces the same taxonomy.
+ * A helper class to compute the structural hash code for {@link Taxonomy}
+ * objects. If two {@link Taxonomy} objects are structurally equivalent then
+ * {@link #hash(Taxonomy)} is guaranteed to return the same values for them. Two
+ * {@link Taxonomy}s are structurally equivalent if the sets of their
+ * {@link TaxonomyNode}s are structurally equivalent. Two sets of
+ * {@link TaxonomyNode}s are structurally equivalent if there is a bijection
+ * between the members in the two sets mapping {@link TaxonomyNode}s to
+ * structurally equivalent ones as defined in {@link TaxonomyNodeHasher}.
  * 
+ * @see TaxonomyNodeHasher
  * 
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <K>
+ *            the type of the keys for the node members
  */
-public class TaxonomyHasher {
+public class TaxonomyHasher<K> implements Hasher<Taxonomy<K, ?>> {
 
 	/**
-	 * Compute the hash code of a taxonomy.
-	 * 
-	 * @param taxonomy
-	 * @return hash
+	 * the hasher for {@link TaxonomyNode}s
 	 */
-	public static int hash(Taxonomy<? extends ElkEntity> taxonomy) {
-		return HashGenerator.combineMultisetHash(true, taxonomy.getNodes(), TaxonomyNodeHasher.INSTANCE);
+	private final Hasher<TaxonomyNode<K, ?>> taxonomyNodeHasher_;
+
+	private TaxonomyHasher(Hasher<Node<K, ?>> nodeHasher) {
+		this.taxonomyNodeHasher_ = new TaxonomyNodeHasher<K>(nodeHasher);
+	}
+
+	public TaxonomyHasher() {
+		this(new NodeHasher<K>());
+	}
+
+	@Override
+	public int hash(Taxonomy<K, ?> taxonomy) {
+		return HashGenerator.combineMultisetHash(true, taxonomy.getNodes(),
+				taxonomyNodeHasher_);
 	}
 
 }

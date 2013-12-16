@@ -29,7 +29,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.TaxonomyNode;
 
 /**
  * @author Pavel Klinov

@@ -43,11 +43,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.stages.ClassTaxonomyState;
 import org.semanticweb.elk.reasoner.stages.InstanceTaxonomyState;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
@@ -83,8 +78,10 @@ class TaxonomyCleaningFactory
 		implements
 		InputProcessorFactory<IndexedClassEntity, InputProcessor<IndexedClassEntity>> {
 
-	/*private static final Logger LOGGER_ = Logger
-			.getLogger(TaxonomyCleaningFactory.class);*/
+	/*
+	 * private static final Logger LOGGER_ = Logger
+	 * .getLogger(TaxonomyCleaningFactory.class);
+	 */
 
 	private final ClassTaxonomyState classTaxonomyState_;
 	private final InstanceTaxonomyState instanceTaxonomyState_;
@@ -148,7 +145,7 @@ class TaxonomyCleaningFactory
 				 * mark as modified) at the same time
 				 */
 				synchronized (classTaxonomy.getBottomNode()) {
-					if (classTaxonomy.getBottomNode().getMembers()
+					if (classTaxonomy.getBottomNode().getMembersLookup()
 							.remove(elkClass)) {
 						classStateWriter_
 								.markClassesForModifiedNode(classTaxonomy
@@ -173,7 +170,7 @@ class TaxonomyCleaningFactory
 
 				// add all its direct satisfiable sub-nodes to the queue
 				synchronized (node) {
-					for (UpdateableTaxonomyNode<ElkClass> subNode : node
+					for (UpdateableGenericTaxonomyNode<ElkClass> subNode : bottomNode
 							.getDirectUpdateableSubNodes()) {
 						if (subNode.trySetModified(true)) {
 							toRemove_.add(subNode);
@@ -204,7 +201,7 @@ class TaxonomyCleaningFactory
 							if (instanceNode.trySetModified(true)) {
 								instanceStateWriter_
 										.markModifiedIndividuals(instanceNode
-												.getMembers());
+												.getMembersLookup());
 								instanceTaxonomy
 										.removeInstanceNode(instanceNode
 												.getCanonicalMember());
@@ -233,16 +230,19 @@ class TaxonomyCleaningFactory
 					ElkNamedIndividual individual = indexedIndividual
 							.getElkNamedIndividual();
 					UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy
-							.getInstanceNode(individual);
+							.convertNonBottomInstanceNode(individual);
 
-					if (node != null && node.trySetModified(true)) {
-						instanceStateWriter_.markModifiedIndividuals(node
-								.getMembers());
-						taxonomy.removeInstanceNode(individual);
-					} else if (node == null) {
+					if (node == null) {
 						instanceStateWriter_
 								.markModifiedIndividuals(Collections
 										.singleton(individual));
+						return;
+					}
+
+					if (node.trySetModified(true)) {
+						instanceStateWriter_.markModifiedIndividuals(node
+								.getMembersLookup());
+						taxonomy.removeInstanceNode(individual);
 					}
 				} else {
 					/*
@@ -267,17 +267,17 @@ class TaxonomyCleaningFactory
 
 					// remove all super-class links
 					synchronized (node) {
-						superNodes = new LinkedList<UpdateableTaxonomyNode<ElkClass>>(
-								node.getDirectUpdateableSuperNodes());
+						superNodes = new LinkedList<UpdateableGenericTaxonomyNode<ElkClass>>(
+								bottomNode.getDirectUpdateableSuperNodes());
 
-						for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
-							node.removeDirectSuperNode(superNode);
+						for (UpdateableGenericTaxonomyNode<ElkClass> superNode : superNodes) {
+							bottomNode.removeDirectSuperNode(superNode);
 						}
 					}
 
 					for (UpdateableTaxonomyNode<ElkClass> superNode : superNodes) {
 						synchronized (superNode) {
-							superNode.removeDirectSubNode(node);
+							superNode.removeDirectSubNode(bottomNode);
 						}
 					}
 				}

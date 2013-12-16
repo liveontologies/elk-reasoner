@@ -39,7 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.Node;
 
 public class ComplexClassQueryTest {
 

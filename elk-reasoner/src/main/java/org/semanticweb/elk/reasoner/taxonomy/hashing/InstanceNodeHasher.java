@@ -22,38 +22,58 @@
  */
 package org.semanticweb.elk.reasoner.taxonomy.hashing;
 
-import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
-import org.semanticweb.elk.reasoner.taxonomy.model.Node;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.InstanceNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.Node;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 import org.semanticweb.elk.util.hashing.Hasher;
 
 /**
- * Helper class for hashing InstanceNodes based on getMembers() and
- * getDirectTypeNodes().
+ * A helper class to compute the structural hash code for {@link InstanceNode}
+ * objects. If two {@link InstanceNode} objects are structurally equivalent then
+ * {@link #hash(InstanceNode)} is guaranteed to return the same values for them.
+ * Two {@link InstanceNode}s are structurally equivalent if they are
+ * structurally equivalent as defined in {@link NodeHasher}, and the set of
+ * their direct type nodes are structurally equivalent. Two sets of {@link Node}
+ * s are structurally equivalent if there is a bijection between the members in
+ * the two sets mapping {@link Node}s to structurally equivalent ones as defined
+ * in {@link NodeHasher}.
+ * 
+ * @see NodeHasher
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
+ * @param <K>
+ *            the type of the keys for the node members
+ * @param <KI>
+ *            the type of the keys for the node instances
  */
-public class InstanceNodeHasher implements
-		Hasher<InstanceNode<? extends ElkEntity, ? extends ElkEntity>> {
+public class InstanceNodeHasher<K, KI> implements
+		Hasher<InstanceNode<K, ?, KI, ?>> {
 
+	private final static int TYPE_OF_HASH_ = "typeOf".hashCode();
 	/**
-	 * We use one static instance for hashing all nodes.
+	 * the hasher for type {@link Node}s based on member keys
 	 */
-	public static InstanceNodeHasher INSTANCE = new InstanceNodeHasher();
+	private final Hasher<Node<K, ?>> typeMemberHasher_;
+	/**
+	 * the hasher for instance {@link Node}s based on member keys
+	 */
+	private final Hasher<Node<KI, ?>> instanceMemberHasher_;
 
-	private InstanceNodeHasher() {
+	public InstanceNodeHasher(Hasher<Node<K, ?>> typeNodeHasher,
+			Hasher<Node<KI, ?>> instanceNodeHasher) {
+		this.typeMemberHasher_ = typeNodeHasher;
+		this.instanceMemberHasher_ = instanceNodeHasher;
 	}
 
 	@Override
-	public int hash(InstanceNode<? extends ElkEntity, ? extends ElkEntity> node) {
-		int memberHash = NodeHasher.INSTANCE.hash(node);
-
-		int typeHash = "typeOf".hashCode();
-		for (Node<? extends ElkEntity> o : node.getDirectTypeNodes()) {
+	public int hash(InstanceNode<K, ?, KI, ?> node) {
+		int memberHash = instanceMemberHasher_.hash(node);
+		int typeHash = TYPE_OF_HASH_;
+		for (Node<K, ?> o : node.getDirectTypeNodes()) {
 			typeHash = HashGenerator.combineMultisetHash(false, typeHash,
-					NodeHasher.INSTANCE.hash(o));
+					typeMemberHasher_.hash(o));
 		}
 
 		return HashGenerator.combineListHash(memberHash, typeHash);

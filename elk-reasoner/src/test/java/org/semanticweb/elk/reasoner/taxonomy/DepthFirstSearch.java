@@ -29,7 +29,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkObject;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
+import org.semanticweb.elk.reasoner.taxonomy.nodes.TaxonomyNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
