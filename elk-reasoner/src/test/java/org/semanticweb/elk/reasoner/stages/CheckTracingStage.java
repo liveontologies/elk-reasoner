@@ -15,7 +15,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore.Reader;
-import org.semanticweb.elk.reasoner.saturation.tracing.GlobalTracingSaturationState;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.BaseInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.BridgeInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInitializationInference;
@@ -56,18 +55,21 @@ public class CheckTracingStage extends BasePostProcessingStage {
 
 	@Override
 	public void execute() throws ElkException {
-		if (reasoner.saturationState instanceof GlobalTracingSaturationState) {
+		TraceStore.Reader traceReader = reasoner.traceState.getTraceStore().getReader();
 			
-			GlobalTracingSaturationState tracingState = (GlobalTracingSaturationState) reasoner.saturationState;
-			TraceStore.Reader traceReader = tracingState.getTraceStoreReader();
-			
-			for (Context context : reasoner.saturationState.getContexts()) {
+		for (Context context : reasoner.saturationState.getContexts()) {
+			if (reasoner.traceState.getSaturationState().isTraced(context)) {
+
 				for (IndexedClassExpression subsumer : context.getSubsumers()) {
-					checkTrace(context, TracingUtils.getSubsumerWrapper(subsumer), traceReader);
+					checkTrace(context,
+							TracingUtils.getSubsumerWrapper(subsumer),
+							traceReader);
 				}
-				
+
 				if (context.isInconsistent()) {
-					checkTrace(context, TracingUtils.getSubsumerWrapper(reasoner.ontologyIndex.getIndexedOwlNothing()), traceReader);
+					checkTrace(context,
+							TracingUtils.getSubsumerWrapper(reasoner.ontologyIndex.getIndexedOwlNothing()),
+							traceReader);
 				}
 			}
 		}
@@ -117,7 +119,7 @@ public class CheckTracingStage extends BasePostProcessingStage {
 
 				@Override
 				public Void visit(PropertyChainInference inference) {
-					System.out.println(inference);
+					//System.out.println(inference);
 					
 					addToQueue(infContext, inference.getBackwardLink(), toDo, traceReader, seenInferences);
 					addToQueue(infContext, inference.getForwardLink(), toDo, traceReader, seenInferences);
@@ -167,7 +169,7 @@ public class CheckTracingStage extends BasePostProcessingStage {
 			
 		});
 		
-		if (!infFound.get()) {
+		if (!infFound.get() && reasoner.traceState.getSaturationState().isTraced(context)) {
 			LOGGER_.error("No inferences for a conclusion {} in context {}", conclusion, context);
 		}
 	}

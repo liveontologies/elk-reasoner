@@ -28,7 +28,8 @@ import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.BaseInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
-import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.CheckTracingStage;
+import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 
 /**
@@ -54,10 +55,10 @@ public class TracingSaturationTest {
 			List<ElkAxiom> ontology = loadAxioms(stream);
 			TestChangesLoader initialLoader = new TestChangesLoader();			
 
-			/*ReasonerStageExecutor executor = new PostProcessingStageExecutor(
-					PostProcessingStageExecutor.CLASS_TAXONOMY_COMPUTATION,
-					CheckTracingStage.class);*/
-			ReasonerStageExecutor executor = new LoggingStageExecutor();
+			ReasonerStageExecutor executor = new PostProcessingStageExecutor(
+					PostProcessingStageExecutor.CONTEXT_TRACING,
+					CheckTracingStage.class);
+			//ReasonerStageExecutor executor = new LoggingStageExecutor();
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader, executor);
 
 			for (ElkAxiom axiom : ontology) {

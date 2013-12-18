@@ -44,7 +44,8 @@ public class PostProcessingStageExecutor extends SimpleStageExecutor {
 
 	public static final Multimap<Class<?>, Class<?>> STATIC_MAP = new HashListMultimap<Class<?>, Class<?>>();
 
-	public static final Class<ClassTaxonomyComputationStage> CLASS_TAXONOMY_COMPUTATION = ClassTaxonomyComputationStage.class;
+	public static final Class<?> CLASS_TAXONOMY_COMPUTATION = ClassTaxonomyComputationStage.class;
+	public static final Class<?> CONTEXT_TRACING = ContextTracingStage.class;
 	
 	/*
 	 * STATIC INT
