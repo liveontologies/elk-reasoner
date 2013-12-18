@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-abstract class BasicDecompositionRuleApplicationVisitor implements
+public abstract class BasicDecompositionRuleApplicationVisitor implements
 		DecompositionRuleApplicationVisitor {
 
 	protected static final Logger LOGGER_ = LoggerFactory
@@ -76,8 +76,6 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 		BasicSaturationStateWriter writer = getSaturationStateWriter();
 		ConclusionFactory factory = writer.getConclusionFactory();
 
-		//writer.produce(context, new PositiveSubsumer(ice.getFirstConjunct()));
-		//writer.produce(context, new PositiveSubsumer(ice.getSecondConjunct()));
 		writer.produce(context, factory.createConjunct(ice, ice.getFirstConjunct()));
 		writer.produce(context, factory.createConjunct(ice, ice.getSecondConjunct()));
 	}

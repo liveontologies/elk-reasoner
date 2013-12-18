@@ -42,16 +42,14 @@ public class ReasonerStageManager {
 			incrementalCompletionStage,
 			incrementalDeletionInitializationStage,
 			incrementalDeletionStage,
-			// initializeContextsAfterDeletionsStage,
-			// incrementalContextCleaningStage,
 			incrementalContextGapFillingStage,
-			// initializeContextsAfterCleaningStage,
 			incrementalAdditionInitializationStage, incrementalAdditionStage,
 			incrementalConsistencyCheckingStage,
 			incrementalTaxonomyCleaningStage,
 			incrementalClassTaxonomyComputationStage,
 			instanceTaxonomyComputationStage,
-			incrementalInstanceTaxonomyComputationStage;
+			incrementalInstanceTaxonomyComputationStage,
+			contextTracingStage;
 
 	ReasonerStageManager(AbstractReasonerState reasoner) {
 
@@ -102,7 +100,7 @@ public class ReasonerStageManager {
 				reasoner, incrementalDeletionStage);
 
 		this.incrementalAdditionInitializationStage = new IncrementalAdditionInitializationStage(
-				reasoner, incrementalContextGapFillingStage/* initializeContextsAfterCleaningStage */);
+				reasoner, incrementalContextGapFillingStage);
 
 		this.incrementalAdditionStage = new IncrementalAdditionStage(reasoner,
 				incrementalAdditionInitializationStage);
@@ -118,6 +116,11 @@ public class ReasonerStageManager {
 
 		this.incrementalInstanceTaxonomyComputationStage = new IncrementalInstanceTaxonomyComputationStage(
 				reasoner, incrementalClassTaxonomyComputationStage);
-
+		
+		/*
+		 * Tracing
+		 */
+		this.contextTracingStage = new ContextTracingStage(
+				reasoner, classTaxonomyComputationStage);
 	}
 }

@@ -34,7 +34,7 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 		traceWriter_ = traceWriter;
 	}
 
-	private boolean addInference(Conclusion conclusion, Context context) {
+	protected boolean addInference(Conclusion conclusion, Context context) {
 		//TODO need a good idea of how to get rid of this cast
 		if (conclusion instanceof TracedConclusion<?>) {
 			Inference inf = ((TracedConclusion<?>) conclusion).getInference();

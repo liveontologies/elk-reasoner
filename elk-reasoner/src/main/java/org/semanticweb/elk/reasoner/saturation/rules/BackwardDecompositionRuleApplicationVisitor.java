@@ -47,8 +47,6 @@ public class BackwardDecompositionRuleApplicationVisitor extends
 	@Override
 	public void visit(IndexedObjectSomeValuesFrom ice, Context context) {
 		if (ice.getFiller().getContext() != null) {
-			/*writer_.produce(ice.getFiller().getContext(),
-					new BackwardLink(context, ice.getRelation()));*/	
 			writer_.produce(ice.getFiller().getContext(),
 					writer_.getConclusionFactory().createBackwardLink(ice, context));
 		}

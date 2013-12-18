@@ -60,7 +60,7 @@ public class RuleApplicationFactory {
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RuleApplicationFactory.class);
 
-	final ExtendedSaturationState saturationState;
+	protected final ExtendedSaturationState saturationState;
 
 	/**
 	 * The {@link SaturationStatistics} aggregated for all workers

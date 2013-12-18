@@ -102,8 +102,8 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private class ContextCompletionEngine extends
-			RuleApplicationFactory.BaseEngine {
+	private class ContextCompletionEngine extends RuleApplicationFactory.BaseEngine {
+		
 		private final CompositionRuleApplicationVisitor initRuleAppVisitor_;
 		// used for the main gap filling logic
 		private LocalSaturationState.GapFillingWriter mainIterationWriter_;
@@ -125,10 +125,6 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 					.getStatsAwareCompositionRuleAppVisitor(localStatistics.getRuleStatistics());
 			conclusionStatsVisitor_ = SaturationUtils
 					.addStatsToConclusionVisitor(stats);
-			/*mainIterationWriter_ = localState_.getExtendedWriter(
-					ContextCreationListener.DUMMY,
-					ContextModificationListener.DUMMY, initRuleAppVisitor_,
-					conclusionStatsVisitor_, false);*/
 			mainIterationWriter_ = localState_.getExtendedWriter(conclusionStatsVisitor_, initRuleAppVisitor_);
 			/*
 			 * Second, create the auxiliary saturation state writer which only
@@ -293,11 +289,13 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			}
 
 			boolean existsGlobally(Context context, Conclusion conclusion) {
-				return conclusion.accept(checker_, context.getRoot()
-						.getContext());
+				// important: we explicitly pass the main (not local) context to the checker
+				return conclusion.accept(checker_, context.getRoot().getContext());
 			}
 
 			void produceLocally(Context context, Conclusion conclusion) {
+				LOGGER_.trace("{}: conclusion {} exists in the main context, producing locally", context, conclusion);
+				
 				Context localContext = getContext(context.getRoot());
 
 				if (localContext == null) {
@@ -323,9 +321,6 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			public void produce(Context context, Conclusion conclusion) {
 
 				if (existsGlobally(context, conclusion)) {
-					LOGGER_.trace(
-							"{}: conclusion {} exists in the main context, producing locally",
-							context, conclusion);
 					// produce the conclusion for the local copy of the context
 					produceLocally(context, conclusion);
 				}
@@ -484,8 +479,6 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			Context fillerContext = mainWriter_.getCreateContext(ice
 					.getFiller());
 
-			/*localWriter_.produce(fillerContext,
-					new BackwardLink(context, ice.getRelation()));*/
 			localWriter_.produce(fillerContext,
 					localWriter_.getConclusionFactory().createBackwardLink(ice, context));
 		}
@@ -517,13 +510,11 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 		@Override
 		public void visit(IndexedObjectSomeValuesFrom ice, Context context) {
-			// may need to create a new main context for the filler
+			// never creates a new main context for the filler
 			Context fillerContext = mainSaturationState_.getContext(ice
 					.getFiller());
 
 			if (fillerContext != null) {
-				/*localWriter_.produce(fillerContext, new BackwardLink(context,
-						ice.getRelation()));*/
 				localWriter_.produce(fillerContext, localWriter_.getConclusionFactory().createBackwardLink(ice, context));
 			}
 		}
@@ -533,24 +524,16 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			return localWriter_;
 		}
 
-}
+	}
 
 	/**
 	 * Applies conclusion rules to the main context of the class expression (not
 	 * the local context).
 	 * 
-	 * This visitor uses two different decomposition rule application visitors:
-	 * One is the main gap filler, which iterates over all conclusions in a
-	 * context and uses {@link GapFillingWriter} to produce conclusions either
-	 * to a local context (if they exist in the main context) or to the main
-	 * context's ToDo. It's important that this iteration does not miss any
-	 * conclusion regardless of the order of rule applications. For that, all
-	 * subsumers, positive and negative, must be decomposed (like during the
-	 * deletion stage). However, the results of decomposition of negative
-	 * subsumers need not be inserted to the main context. As such, positive
-	 * subsumer decomposition is done by another (auxiliary) visitor which
-	 * internally uses {@link LocalWriter} and that one only
-	 * inserts conclusions to local contexts.
+	 * This visitor uses two different decomposition rule application visitors
+	 * for decomposing negative and positive subsumers. Decomposition of
+	 * negative subsumers is important to not miss any conclusions but that
+	 * should not lead to creating new contexts in the main sauration state.
 	 * 
 	 * @author Pavel Klinov
 	 * 

@@ -33,6 +33,7 @@ import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
@@ -56,6 +57,10 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.tracing.SimpleCentralizedTraceStore;
+import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracingUtils;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
@@ -81,9 +86,6 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public abstract class AbstractReasonerState {
-	//FIXME get rid of this when tracing can be done on demand
-	public static boolean TRACING = false;
-	
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractReasonerState.class);
@@ -170,6 +172,8 @@ public abstract class AbstractReasonerState {
 			propertyHierarchyUpToDate_ = false;
 		}
 	};
+	
+	final TraceState traceState;
 
 	protected AbstractReasonerState() {
 		this.objectCache_ = new IndexedObjectCache();
@@ -178,16 +182,8 @@ public abstract class AbstractReasonerState {
 		this.axiomDeleter_ = new MainAxiomIndexerVisitor(ontologyIndex, false);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
-		
-		ExtendedSaturationState mainSaturationState = SaturationStateFactory.createMainSaturationState(ontologyIndex);
-		
-		if (!TRACING) {
-			this.saturationState = mainSaturationState;
-		}
-		else {
-			//this.saturationState = new TracingSaturationState(mainSaturationState);
-			throw new IllegalStateException("Tracing coming soon...");
-		}
+		this.saturationState = SaturationStateFactory.createMainSaturationState(ontologyIndex);
+		this.traceState = new TraceState(new SimpleCentralizedTraceStore(), saturationState);
 	}
 
 	protected AbstractReasonerState(AxiomLoader axiomLoader) {
@@ -609,6 +605,18 @@ public abstract class AbstractReasonerState {
 				classTaxonomyState.getTaxonomy()));
 	}
 
+	public void explainSubsumption(ElkClassExpression sub, ElkClassExpression sup, InferenceVisitor<?> visitor) throws ElkException {
+		IndexedClassExpression subsumee = sub.accept(objectCache_.getIndexObjectConverter());
+		IndexedClassExpression subsumer = sup.accept(objectCache_.getIndexObjectConverter());
+		
+		traceState.submitForTracing(subsumee);
+		stageManager.contextTracingStage.invalidate();
+		//run the tracing stage
+		getStageExecutor().complete(stageManager.contextTracingStage);
+		
+		traceState.getTraceStore().getReader().accept(subsumee.getContext(), TracingUtils.getSubsumerWrapper(subsumer), visitor);
+	}
+	
 	// ////////////////////////////////////////////////////////////////
 	/*
 	 * SOME DEBUG METHODS, FIXME: REMOVE

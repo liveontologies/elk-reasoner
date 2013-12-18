@@ -15,7 +15,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore.Reader;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState;
+import org.semanticweb.elk.reasoner.saturation.tracing.GlobalTracingSaturationState;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.BaseInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.BridgeInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInitializationInference;
@@ -56,9 +56,9 @@ public class CheckTracingStage extends BasePostProcessingStage {
 
 	@Override
 	public void execute() throws ElkException {
-		if (reasoner.saturationState instanceof TracingSaturationState) {
+		if (reasoner.saturationState instanceof GlobalTracingSaturationState) {
 			
-			TracingSaturationState tracingState = (TracingSaturationState) reasoner.saturationState;
+			GlobalTracingSaturationState tracingState = (GlobalTracingSaturationState) reasoner.saturationState;
 			TraceStore.Reader traceReader = tracingState.getTraceStoreReader();
 			
 			for (Context context : reasoner.saturationState.getContexts()) {

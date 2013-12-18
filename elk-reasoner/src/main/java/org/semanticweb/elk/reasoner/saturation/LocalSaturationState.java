@@ -36,7 +36,6 @@ public class LocalSaturationState implements SaturationState {
 		private final ConcurrentHashMap<IndexedClassExpression, Context> contextMap_;
 		private final OntologyIndex ontologyIndex_;
 		private final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
-		private final ConclusionFactory conclusionFactory_ = new SimpleConclusionFactory();
 
 		public LocalSaturationState(OntologyIndex index) {
 			contextMap_ = new ConcurrentHashMap<IndexedClassExpression, Context>();
@@ -67,10 +66,10 @@ public class LocalSaturationState implements SaturationState {
 		@Override
 		public ExtendedSaturationStateWriter getExtendedWriter(
 				ConclusionVisitor<?, Context> conclusionVisitor, CompositionRuleApplicationVisitor initRuleAppVisitor) {
-			return new LocalWriter(conclusionVisitor, initRuleAppVisitor);
+			return new LocalWriter(conclusionVisitor, initRuleAppVisitor, new SimpleConclusionFactory());
 		}
 
-		
+
 		/**
 		 * TODO
 		 * 
@@ -85,12 +84,15 @@ public class LocalSaturationState implements SaturationState {
 			private final ConclusionVisitor<?, Context> conclusionVisitor_;
 
 			private final ConclusionVisitor<Boolean, Context> checker_;
+			
+			private final ConclusionFactory conclusionFactory_;
 
-			LocalWriter(ConclusionVisitor<?, Context> visitor,
-					CompositionRuleApplicationVisitor ruleAppVisitor) {
+			public LocalWriter(ConclusionVisitor<?, Context> visitor,
+					CompositionRuleApplicationVisitor ruleAppVisitor, ConclusionFactory conclusionFactory) {
 				conclusionVisitor_ = visitor;
 				checker_ = new ConclusionOccurranceCheckingVisitor();
 				initRuleAppVisitor_ = ruleAppVisitor;
+				conclusionFactory_ = conclusionFactory;
 			}
 
 			@Override
@@ -109,11 +111,13 @@ public class LocalSaturationState implements SaturationState {
 			}
 			
 			protected boolean existsGlobally(Context context, Conclusion conclusion) {
-				return conclusion.accept(checker_, context.getRoot()
-						.getContext());
+				// important: we explicitly pass the main (not local) context to the checker
+				return conclusion.accept(checker_, context.getRoot().getContext());
 			}
 
 			protected void produceLocally(Context context, Conclusion conclusion) {
+				LOGGER_.trace("{}: conclusion {} exists in the main context, producing locally", context, conclusion);
+				
 				Context localContext = getContext(context.getRoot());
 
 				if (localContext == null) {
@@ -133,9 +137,6 @@ public class LocalSaturationState implements SaturationState {
 			public void produce(Context context, Conclusion conclusion) {
 
 				if (existsGlobally(context, conclusion)) {
-					LOGGER_.trace(
-							"{}: conclusion {} exists in the main context, producing locally",
-							context, conclusion);
 					// produce the conclusion for the local copy of the context
 					produceLocally(context, conclusion);
 				}
