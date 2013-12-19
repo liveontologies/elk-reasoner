@@ -10,10 +10,8 @@ import org.semanticweb.elk.reasoner.saturation.LocalSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SimpleConclusionFactory;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InferenceFactory;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Condition;
 
@@ -85,7 +83,7 @@ public class TracingSaturationState extends LocalSaturationState {
 
 		public TracingWriter(ConclusionVisitor<?, Context> visitor,
 				CompositionRuleApplicationVisitor ruleAppVisitor, Condition<Context> traceCondition) {
-			super(visitor, ruleAppVisitor, new TracingConclusionFactory(new SimpleConclusionFactory(), new InferenceFactory()));
+			super(visitor, ruleAppVisitor, new TracingConclusionFactory());
 			traceCondition_ = traceCondition;
 		}
 

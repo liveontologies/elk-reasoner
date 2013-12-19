@@ -5,8 +5,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InferenceVisitor;
 
 /**
  * The main object responsible for storing and retrieving traces.
@@ -28,7 +26,7 @@ public interface TraceStore {
 		 * @param conclusion
 		 * @param visitor
 		 */
-		public void accept(Context context, Conclusion conclusion, InferenceVisitor<?> visitor);
+		public void accept(Context context, Conclusion conclusion, TracedConclusionVisitor<?,?> visitor);
 		
 	}
 
@@ -44,7 +42,7 @@ public interface TraceStore {
 		 * @param inference
 		 * @return
 		 */
-		public boolean addInference(Context context, Conclusion conclusion, Inference inference);
+		public boolean addInference(Context context, TracedConclusion conclusion);
 	}
 
 	/**

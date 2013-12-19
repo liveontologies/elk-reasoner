@@ -56,7 +56,7 @@ public class PropagationImpl extends AbstractConclusion implements Propagation {
 
 	private final IndexedObjectSomeValuesFrom carry_;
 
-	PropagationImpl(final IndexedPropertyChain relation,
+	protected PropagationImpl(final IndexedPropertyChain relation,
 			final IndexedObjectSomeValuesFrom carry) {
 		relation_ = relation;
 		carry_ = carry;
@@ -86,7 +86,6 @@ public class PropagationImpl extends AbstractConclusion implements Propagation {
 		ConclusionFactory factory = writer.getConclusionFactory();
 
 		for (Context target : targets) {
-			//writer.produce(target, new NegativeSubsumerImpl(carry_));
 			writer.produce(target, factory.createPropagatedSubsumer(this, relation_, target, context));
 		}
 	}
@@ -94,13 +93,6 @@ public class PropagationImpl extends AbstractConclusion implements Propagation {
 	@Override
 	public <R, C> R accept(ConclusionVisitor<R, C> visitor, C context) {
 		return visitor.visit(this, context);
-	}
-	
-	
-
-	@Override
-	public Context getSourceContext(Context contextWhereStored) {
-		return null;
 	}
 
 	@Override

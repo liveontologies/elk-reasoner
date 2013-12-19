@@ -26,8 +26,6 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.BaseInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.stages.CheckTracingStage;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
@@ -70,13 +68,13 @@ public class TracingSaturationTest {
 			ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 			ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
 			
-			reasoner.explainSubsumption(a, d, new BaseInferenceVisitor<Void>() {
+			reasoner.explainSubsumption(a, d, new BaseTracedConclusionVisitor<Void, Void>() {
 
 				@Override
-				protected Void defaultVisit(Inference inf) {
-					System.out.println(inf);
+				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {
+					System.out.println(conclusion);
 					
-					return super.defaultVisit(inf);
+					return super.defaultTracedVisit(conclusion, v);
 				}
 				
 			});

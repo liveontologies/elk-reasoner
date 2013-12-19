@@ -59,8 +59,8 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.SimpleCentralizedTraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracingUtils;
+import org.semanticweb.elk.reasoner.saturation.tracing.TracedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
@@ -605,7 +605,7 @@ public abstract class AbstractReasonerState {
 				classTaxonomyState.getTaxonomy()));
 	}
 
-	public void explainSubsumption(ElkClassExpression sub, ElkClassExpression sup, InferenceVisitor<?> visitor) throws ElkException {
+	public void explainSubsumption(ElkClassExpression sub, ElkClassExpression sup, TracedConclusionVisitor<?,?> visitor) throws ElkException {
 		IndexedClassExpression subsumee = sub.accept(objectCache_.getIndexObjectConverter());
 		IndexedClassExpression subsumer = sup.accept(objectCache_.getIndexObjectConverter());
 		

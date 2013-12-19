@@ -13,19 +13,19 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.BaseTracedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.ComposedBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.ComposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.tracing.DecomposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.tracing.InitializationSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.PropagatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.ReflexiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore.Reader;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.BaseInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.BridgeInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInitializationInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ConjunctionCompositionInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ConjunctionDecompositionInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ExistentialInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracingUtils;
+import org.semanticweb.elk.reasoner.saturation.tracing.TracedConclusion;
+import org.semanticweb.elk.reasoner.saturation.tracing.TracedPropagation;
+import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +78,7 @@ public class CheckTracingStage extends BasePostProcessingStage {
 
 	private void checkTrace(Context context, Conclusion conclusion, final Reader traceReader) {
 		final Queue<InferenceWrapper> toDo = new LinkedList<InferenceWrapper>();
-		final Set<Inference> seenInferences = new HashSet<Inference>();
+		final Set<TracedConclusion> seenInferences = new HashSet<TracedConclusion>();
 		
 		addToQueue(context, conclusion, toDo, traceReader, seenInferences);
 		
@@ -91,34 +91,34 @@ public class CheckTracingStage extends BasePostProcessingStage {
 			
 			final Context infContext = next.context;			
 			
-			next.inference.accept(new BaseInferenceVisitor<Void>() {
+			next.inference.acceptTraced(new BaseTracedConclusionVisitor<Void, Void>() {
 
 				@Override
-				public Void visit(ClassInitializationInference inference) {
+				public Void visit(InitializationSubsumer inference, Void v) {
 					return null;
 				}
 
 				@Override
-				public Void visit(SubClassOfInference inference) {
+				public Void visit(SubClassOfSubsumer inference, Void v) {
 					addToQueue(infContext, inference.getPremise(), toDo, traceReader, seenInferences);
 					return null;
 				}
 
 				@Override
-				public Void visit(ConjunctionCompositionInference inference) {
+				public Void visit(ComposedConjunction inference, Void v) {
 					addToQueue(infContext, inference.getFirstConjunct(), toDo, traceReader, seenInferences);
 					addToQueue(infContext, inference.getSecondConjunct(), toDo, traceReader, seenInferences);
 					return null;
 				}
 
 				@Override
-				public Void visit(ConjunctionDecompositionInference inference) {
+				public Void visit(DecomposedConjunction inference, Void v) {
 					addToQueue(infContext, inference.getConjunction(), toDo, traceReader, seenInferences);
 					return null;
 				}
 
 				@Override
-				public Void visit(PropertyChainInference inference) {
+				public Void visit(ComposedBackwardLink inference, Void v) {
 					//System.out.println(inference);
 					
 					addToQueue(infContext, inference.getBackwardLink(), toDo, traceReader, seenInferences);
@@ -127,39 +127,39 @@ public class CheckTracingStage extends BasePostProcessingStage {
 				}
 
 				@Override
-				public Void visit(ReflexiveInference inference) {
+				public Void visit(ReflexiveSubsumer inference, Void v) {
 					//TODO
 					return null;
 				}
 
 				@Override
-				public Void visit(ExistentialInference inference) {
+				public Void visit(PropagatedSubsumer inference, Void v) {
 					addToQueue(infContext, inference.getBackwardLink(), toDo, traceReader, seenInferences);
 					addToQueue(infContext, inference.getSubsumer(), toDo, traceReader, seenInferences);
 					return null;
 				}
 
 				@Override
-				public Void visit(BridgeInference inference) {
-					addToQueue(infContext, inference.getConclusion(), toDo, traceReader, seenInferences);
+				public Void visit(TracedPropagation inference, Void v) {
+					addToQueue(infContext, inference.getPremise(), toDo, traceReader, seenInferences);
 					return null;
 				}
 				
-			});
+			}, null);
 		}
 	}
 	
-	private void addToQueue(final Context context, final Conclusion conclusion, final Queue<InferenceWrapper> toDo, final TraceStore.Reader traceReader, final Set<Inference> seenInferences) {
+	private void addToQueue(final Context context, final Conclusion conclusion, final Queue<InferenceWrapper> toDo, final TraceStore.Reader traceReader, final Set<TracedConclusion> seenInferences) {
 		//just need a mutable flag that can be set from inside the visitor 
 		final AtomicBoolean infFound = new AtomicBoolean(false);
 		//finding all inferences that produced the input conclusion
-		traceReader.accept(context, conclusion, new BaseInferenceVisitor<Void>(){
+		traceReader.accept(context, conclusion, new BaseTracedConclusionVisitor<Void, Void>(){
 
 			@Override
-			protected Void defaultVisit(Inference inference) {
+			protected Void defaultTracedVisit(TracedConclusion inference, Void v) {
 				if (!seenInferences.contains(inference)) {
 					seenInferences.add(inference);
-					toDo.add(new InferenceWrapper(inference, inference.getContext(context)));
+					toDo.add(new InferenceWrapper(inference, inference.getInferenceContext(context)));
 				}
 				
 				infFound.set(true);
@@ -179,10 +179,10 @@ public class CheckTracingStage extends BasePostProcessingStage {
 	 */
 	private static class InferenceWrapper {
 		
-		final Inference inference;
+		final TracedConclusion inference;
 		final Context context;
 		
-		InferenceWrapper(Inference inf, Context cxt) {
+		InferenceWrapper(TracedConclusion inf, Context cxt) {
 			inference = inf;
 			context = cxt;
 		}

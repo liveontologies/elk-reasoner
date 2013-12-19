@@ -47,11 +47,14 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContextCompletionFactory.class);
 	/**
-	 * encapsulates the tracing saturation state (with local contexts) and a
-	 * trace store which stores inference.
+	 * Encapsulates the tracing saturation state (with local contexts) and a
+	 * trace store which stores traced conclusions.
 	 */
 	private final TraceState traceState_;
 	
+	/**
+	 * Holds iff the context is traced (passed as input into this factory).
+	 */
 	private final Condition<Context> tracingCondition_ = new Condition<Context>() {
 
 		@Override
@@ -95,7 +98,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 			//inserts to the local context and writes inferences
 			ConclusionVisitor<Boolean, Context> inserter = new CombinedConclusionVisitor<Context>(
 					new ConclusionInsertionVisitor(),
-					new InferenceInserter(traceState_.getTraceStore().getWriter()/*traceWriter_*/));
+					new InferenceInserter(traceState_.getTraceStore().getWriter()));
 			//applies rules on the main contexts
 			ConclusionVisitor<Boolean, Context> applicator = new ApplicationVisitor(tracingWriter, SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
 			//combines the inserter and the applicator
@@ -114,11 +117,10 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		@Override
 		protected ExtendedSaturationStateWriter getSaturationStateWriter() {
-			return getSaturationState()/*localState_*/.getTracingWriter(ConclusionVisitor.DUMMY, SaturationState.DEFAULT_INIT_RULE_APP_VISITOR, tracingCondition_);
+			return getSaturationState().getTracingWriter(ConclusionVisitor.DUMMY, SaturationState.DEFAULT_INIT_RULE_APP_VISITOR, tracingCondition_);
 		}
 		
 	}
-
 	
 	/**
 	 * Applies unoptimized rules on main contexts. Depending on whether the
@@ -145,8 +147,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		public Boolean visit(NegativeSubsumer negSCE, Context context) {
-			
+		public Boolean visit(NegativeSubsumer negSCE, Context context) {			
 			negSCE.apply(iterationWriter_, context.getRoot().getContext(), ruleAppVisitor_);
 			negSCE.applyDecompositionRules(context.getRoot().getContext(), mainDecompRuleAppVisitor_);
 			
@@ -154,46 +155,41 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		public Boolean visit(PositiveSubsumer posSCE, Context context) {
-			
+		public Boolean visit(PositiveSubsumer posSCE, Context context) {			
 			posSCE.apply(iterationWriter_, context.getRoot().getContext(),
 					ruleAppVisitor_, mainDecompRuleAppVisitor_);
 			return true;
 		}
 
 		@Override
-		public Boolean visit(BackwardLink link, Context context) {
-			
+		public Boolean visit(BackwardLink link, Context context) {			
 			link.apply(iterationWriter_, context.getRoot().getContext(), ruleAppVisitor_);
 			
 			return true;
 		}
 
 		@Override
-		public Boolean visit(ForwardLink link, Context context) {
-			
+		public Boolean visit(ForwardLink link, Context context) {			
 			link.apply(iterationWriter_, context.getRoot().getContext());
+			
 			return true;
 		}
 
 		@Override
-		public Boolean visit(Contradiction bot, Context context) {
-			
+		public Boolean visit(Contradiction bot, Context context) {		
 			bot.deapply(iterationWriter_, context.getRoot().getContext());
 			return true;
 		}
 
 		@Override
-		public Boolean visit(Propagation propagation, Context context) {
-			
+		public Boolean visit(Propagation propagation, Context context) {			
 			propagation.apply(iterationWriter_, context.getRoot().getContext());
 			return true;
 		}
 
 		@Override
 		public Boolean visit(DisjointnessAxiom disjointnessAxiom,
-				Context context) {
-			
+				Context context) {			
 			disjointnessAxiom.apply(iterationWriter_, context.getRoot().getContext());
 			
 			return true;
@@ -248,8 +244,13 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		protected boolean addInference(Conclusion conclusion, Context context) {
+		protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
+			return super.defaultVisit(conclusion, cxt.getRoot().getContext());
+		}
+		
+		/*@Override
+		protected boolean addInference(TracedConclusion conclusion, Context context) {
 			return super.addInference(conclusion, context.getRoot().getContext());
-		}		
+		}*/		
 	}
 }

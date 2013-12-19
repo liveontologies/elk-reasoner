@@ -4,8 +4,6 @@
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InferenceVisitor;
 
 /**
  * @author Pavel Klinov
@@ -14,7 +12,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InferenceVisit
  */
 public interface ContextTracer {
 
-	public void accept(Conclusion conclusion, InferenceVisitor<?> visitor);
+	public void accept(Conclusion conclusion, TracedConclusionVisitor<?,?> visitor);
 	
-	public boolean addInference(Conclusion conclusion, Inference inference);
+	public boolean addInference(TracedConclusion conclusion);
 }

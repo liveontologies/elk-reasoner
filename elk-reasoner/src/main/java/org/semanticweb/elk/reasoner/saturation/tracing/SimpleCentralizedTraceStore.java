@@ -7,8 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InferenceVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +41,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private class Reader implements TraceStore.Reader {
 
 		@Override
-		public void accept(Context context, Conclusion conclusion, InferenceVisitor<?> visitor) {
+		public void accept(Context context, Conclusion conclusion, TracedConclusionVisitor<?,?> visitor) {
 			ContextTracer tracer = storage_.get(context);
 			
 			if (tracer != null) {
@@ -56,17 +54,19 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private class Writer implements TraceStore.Writer {
 
 		@Override
-		public boolean addInference(Context context, Conclusion conclusion, Inference inference) {
+		public boolean addInference(Context context, TracedConclusion conclusion) {
 			ContextTracer tracer = storage_.get(context);
 			
-			LOGGER_.trace("Adding inference for {} in {}: {}", conclusion, context, inference);
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Writing inference for {} in {}: {}", conclusion, context, conclusion.acceptTraced(new InferencePrinter(), null));
+			}
 			
 			if (tracer == null) {
 				tracer = new SimpleContextTraceStore();
 				storage_.putIfAbsent(context, tracer);
 			}
 			
-			return tracer.addInference(conclusion, inference);
+			return tracer.addInference(conclusion);
 		}
 		
 	}

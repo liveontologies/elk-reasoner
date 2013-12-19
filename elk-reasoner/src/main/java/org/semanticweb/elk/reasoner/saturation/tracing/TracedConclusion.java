@@ -4,44 +4,24 @@
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public abstract class TracedConclusion<S extends Conclusion> {
+public interface TracedConclusion extends Conclusion {
 
-	/**
-	 * How this conclusion was produced
-	 */
-	private final Inference inference_;
-	/**
-	 * The actual conclusion
-	 */
-	protected final S conclusion;
+	public <R, C> R acceptTraced(TracedConclusionVisitor<R, C> visitor, C parameter);
 	
 	/**
+	 * Returns the context in which the inference has been made (may be
+	 * different from the context to which the conclusion logically belongs).
 	 * 
+	 * @param defaultContext
+	 * @return
 	 */
-	public TracedConclusion(Inference inf, S cnl) {
-		inference_ = inf;
-		conclusion = cnl;
-	}
-	
-	public Inference getInference() {
-		return inference_;
-	}
+	public Context getInferenceContext(Context defaultContext);
 
-	public S getConclusion() {
-		return conclusion;
-	}
-
-	@Override
-	public String toString() {
-		return conclusion.toString();
-	}
-	
-	
 }

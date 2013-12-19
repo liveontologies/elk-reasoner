@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationV
  */
 public class PositiveSubsumerImpl extends SubsumerImpl implements PositiveSubsumer {
 
-	PositiveSubsumerImpl(IndexedClassExpression superClassExpression) {
+	protected PositiveSubsumerImpl(IndexedClassExpression superClassExpression) {
 		super(superClassExpression);
 	}
 

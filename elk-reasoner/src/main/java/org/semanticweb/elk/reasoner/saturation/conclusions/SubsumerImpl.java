@@ -34,15 +34,15 @@ import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationV
  *
  * pavel.klinov@uni-ulm.de
  */
-abstract class SubsumerImpl implements Conclusion {
+public abstract class SubsumerImpl implements Conclusion {
 
 	/**
 	 * the implied {@code IndexedClassExpression} represented by this
 	 * {@link SubsumerImpl}
 	 */
-	final IndexedClassExpression expression;
+	protected final IndexedClassExpression expression;
 
-	SubsumerImpl(IndexedClassExpression expression) {
+	protected SubsumerImpl(IndexedClassExpression expression) {
 		this.expression = expression;
 	}
 

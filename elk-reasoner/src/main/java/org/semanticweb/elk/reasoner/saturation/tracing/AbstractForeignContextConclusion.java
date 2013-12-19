@@ -1,8 +1,9 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+package org.semanticweb.elk.reasoner.saturation.tracing;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -13,16 +14,16 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-abstract class AbstractForeignContextInference extends AbstractInference {
+abstract class AbstractForeignContextConclusion implements Conclusion {
 
 	protected final Context context;
 
-	AbstractForeignContextInference(Context cxt) {
+	AbstractForeignContextConclusion(Context cxt) {
 		context = cxt;
 	}
 
 	@Override
-	public Context getContext(Context defaultContext) {
+	public Context getSourceContext(Context defaultContext) {
 		return context;
 	}
 

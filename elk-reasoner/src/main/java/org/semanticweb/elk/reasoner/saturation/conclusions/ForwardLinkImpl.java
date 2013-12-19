@@ -67,7 +67,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	 */
 	private final Context target_;
 
-	ForwardLinkImpl(IndexedPropertyChain relation, Context target) {
+	protected ForwardLinkImpl(IndexedPropertyChain relation, Context target) {
 		this.relation_ = relation;
 		this.target_ = target;
 	}

@@ -49,7 +49,7 @@ public class BackwardLinkImpl implements BackwardLink {
 	 */
 	private final IndexedPropertyChain relation_;
 
-	BackwardLinkImpl(Context source, IndexedPropertyChain relation) {
+	protected BackwardLinkImpl(Context source, IndexedPropertyChain relation) {
 		this.relation_ = relation;
 		this.source_ = source;
 	}

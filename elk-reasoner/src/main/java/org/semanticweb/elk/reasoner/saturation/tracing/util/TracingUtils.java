@@ -1,12 +1,12 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+package org.semanticweb.elk.reasoner.saturation.tracing.util;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
@@ -25,7 +25,7 @@ public class TracingUtils {
 		return new BackwardLinkPremise(source, relation);
 	}
 
-	public static Conclusion getForwardLinkWrapper(IndexedPropertyChain relation, 	Context target) {
+	public static ForwardLink getForwardLinkWrapper(IndexedPropertyChain relation, 	Context target) {
 		return new ForwardLinkPremise(target, relation);
 	}
 }
