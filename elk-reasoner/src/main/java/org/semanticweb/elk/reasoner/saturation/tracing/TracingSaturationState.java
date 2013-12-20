@@ -12,8 +12,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
+import org.semanticweb.elk.util.collections.Condition;
 import org.semanticweb.elk.util.collections.Operations;
-import org.semanticweb.elk.util.collections.Operations.Condition;
 
 /**
  * @author Pavel Klinov
@@ -91,7 +91,7 @@ public class TracingSaturationState extends LocalSaturationState {
 		public void produceLocally(Context context, Conclusion conclusion) {
 			Context sourceContext = conclusion.getSourceContext(context);
 			//no need to iterate over conclusions which belong to non-traced contexts
-			if (sourceContext == null || traceCondition_.holds(sourceContext)) {
+			if (traceCondition_.holds(sourceContext)) {
 				super.produceLocally(context, conclusion);
 			}
 		}

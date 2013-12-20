@@ -135,7 +135,6 @@ public class LocalSaturationState implements SaturationState {
 
 			@Override
 			public void produce(Context context, Conclusion conclusion) {
-
 				if (existsGlobally(context, conclusion)) {
 					// produce the conclusion for the local copy of the context
 					produceLocally(context, conclusion);

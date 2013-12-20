@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 import org.semanticweb.elk.io.IOUtils;
@@ -118,21 +119,22 @@ public class TracingSaturationTest {
 			ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
 			ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 			ElkClassExpression bAndC = factory.getObjectIntersectionOf(b,  c);
+			final AtomicInteger inferenceCounter = new AtomicInteger(0);
 			
 			reasoner.explainSubsumption(a, bAndC, new BaseTracedConclusionVisitor<Void, Void>() {
-
-				private int counter_ = 0;
 				
 				@Override
 				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {
 					System.out.println(InferencePrinter.print(conclusion));
 					
-					assertTrue("Duplicate inferences for " + conclusion, ++counter_ <= 1);
+					inferenceCounter.incrementAndGet();
 					
 					return super.defaultTracedVisit(conclusion, v);
 				}
 				
 			});
+			
+			assertTrue("Must be precisely one inference for " + bAndC, inferenceCounter.get() == 1);
 			
 
 		} finally {
@@ -169,22 +171,22 @@ public class TracingSaturationTest {
 			ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri("http://example.org/R"));
 			ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 			ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
+			final AtomicInteger inferenceCounter = new AtomicInteger(0);
 			
 			reasoner.trace(new ElkClass[]{a,b}, a, rSomeC, new BaseTracedConclusionVisitor<Void, Void>() {
-
-				private int counter_ = 0;
 				
 				@Override
 				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {
 					System.out.println(InferencePrinter.print(conclusion));
 					
-					assertTrue("Duplicate inferences for " + conclusion, ++counter_ <= 1);
+					inferenceCounter.incrementAndGet();
 					
 					return super.defaultTracedVisit(conclusion, v);
 				}
 				
 			});
 			
+			assertTrue("Must be precisely one inference for " + rSomeC, inferenceCounter.get() == 1);
 
 		} finally {
 			IOUtils.closeQuietly(stream);

@@ -3,8 +3,12 @@
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
+import java.util.Set;
+
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
@@ -28,9 +32,15 @@ import org.semanticweb.elk.reasoner.saturation.rules.BasicDecompositionRuleAppli
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextCompletionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore.Writer;
-import org.semanticweb.elk.util.collections.Operations.Condition;
+import org.semanticweb.elk.util.collections.Condition;
+import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.util.collections.MultimapOperations;
+import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.chains.Chain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,9 +134,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	}
 	
 	/**
-	 * Applies unoptimized rules on main contexts. Depending on whether the
-	 * current context is being traced or not, it selects the proper context
-	 * writer.
+	 * Applies unoptimized rules on main contexts. 
 	 * 
 	 * @author Pavel Klinov
 	 * 
@@ -146,52 +154,59 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 			this.mainDecompRuleAppVisitor_ = new LocalDecompositionVisitor(saturationState);
 
 		}
+		
+		Context getHybridContext(IndexedClassExpression root) {
+			//return root.getContext();
+			return new HybridContext(getSaturationState().getContext(root), root.getContext());
+		}
 
 		@Override
-		public Boolean visit(NegativeSubsumer negSCE, Context context) {			
-			negSCE.apply(iterationWriter_, context.getRoot().getContext(), ruleAppVisitor_);
-			negSCE.applyDecompositionRules(context.getRoot().getContext(), mainDecompRuleAppVisitor_);
+		public Boolean visit(NegativeSubsumer negSCE, Context context) {
+			Context cxt = getHybridContext(context.getRoot());
+			
+			negSCE.apply(iterationWriter_, cxt, ruleAppVisitor_);
+			negSCE.applyDecompositionRules(cxt, mainDecompRuleAppVisitor_);
 			
 			return true;
 		}
 
 		@Override
 		public Boolean visit(PositiveSubsumer posSCE, Context context) {			
-			posSCE.apply(iterationWriter_, context.getRoot().getContext(),
+			posSCE.apply(iterationWriter_, getHybridContext(context.getRoot()),
 					ruleAppVisitor_, mainDecompRuleAppVisitor_);
 			return true;
 		}
 
 		@Override
 		public Boolean visit(BackwardLink link, Context context) {			
-			link.apply(iterationWriter_, context.getRoot().getContext(), ruleAppVisitor_);
+			link.apply(iterationWriter_, getHybridContext(context.getRoot()), ruleAppVisitor_);
 			
 			return true;
 		}
 
 		@Override
 		public Boolean visit(ForwardLink link, Context context) {			
-			link.apply(iterationWriter_, context.getRoot().getContext());
+			link.apply(iterationWriter_, getHybridContext(context.getRoot()));
 			
 			return true;
 		}
 
 		@Override
 		public Boolean visit(Contradiction bot, Context context) {		
-			bot.deapply(iterationWriter_, context.getRoot().getContext());
+			bot.deapply(iterationWriter_, getHybridContext(context.getRoot()));
 			return true;
 		}
 
 		@Override
 		public Boolean visit(Propagation propagation, Context context) {			
-			propagation.apply(iterationWriter_, context.getRoot().getContext());
+			propagation.apply(iterationWriter_, getHybridContext(context.getRoot()));
 			return true;
 		}
 
 		@Override
 		public Boolean visit(DisjointnessAxiom disjointnessAxiom,
 				Context context) {			
-			disjointnessAxiom.apply(iterationWriter_, context.getRoot().getContext());
+			disjointnessAxiom.apply(iterationWriter_, getHybridContext(context.getRoot()));
 			
 			return true;
 		}
@@ -204,7 +219,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		 * 
 		 *         pavel.klinov@uni-ulm.de
 		 */
-		private class LocalDecompositionVisitor extends	BasicDecompositionRuleApplicationVisitor {
+		private class LocalDecompositionVisitor extends BasicDecompositionRuleApplicationVisitor {
 
 			private final SaturationState mainSaturationState_;
 
@@ -218,7 +233,11 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 				Context fillerContext = mainSaturationState_.getContext(ice.getFiller());
 
 				if (fillerContext != null) {
-					iterationWriter_.produce(fillerContext, iterationWriter_.getConclusionFactory().createBackwardLink(ice, context));
+					// the passed context is hybrid but we really need to point
+					// the backward link to the main context.
+					Context mainContext = context.getRoot().getContext();
+					
+					iterationWriter_.produce(fillerContext, iterationWriter_.getConclusionFactory().createBackwardLink(ice, mainContext));
 				}
 			}
 
@@ -249,5 +268,197 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 			return super.defaultVisit(conclusion, cxt.getRoot().getContext());
 		}
 	
+	}
+	
+	/**
+	 * Hybrid context is a read-only view over the local and the main context
+	 * for the same root expression. When the outer code requests a conclusion
+	 * (subsumer, backward link, or a backward link rule), it checks if it
+	 * logically belongs to a traced context. If yes, it is retrieved from the
+	 * local copy. If not, from the main context.
+	 * 
+	 * The rationale is to avoid duplicate inferences when iterating over
+	 * conclusions. The duplicates can occur as a result of applying a binary
+	 * rule twice (once for each premise). Hybrid contexts solve this problem
+	 * since when the rule is applied for the first time, the second premise is
+	 * not yet in the local copy (otherwise the rule was already applied for
+	 * it). As such, the rule produces each conclusion only when applied for the
+	 * second premise (when the first premise is already in the local copy).
+	 * 
+	 * The tricky part of implementing hybrid contexts is filtering backward
+	 * links. A context can store any number of backward links which belong to
+	 * other contexts (some of which are traced, others aren't). Thus some
+	 * backward links must be retrieved from the local copy and others from the
+	 * main context. This class uses a generic multimap filtering and merging to
+	 * implement this on the fly.
+	 * 
+	 */
+	private class HybridContext implements Context {
+		
+		private final Context localContext_;
+		
+		private final Context mainContext_;
+		
+		private final Context selectedContext_;
+		
+		HybridContext(Context local, Context main) {
+			localContext_ = local;
+			mainContext_ = main;
+			
+			if (tracingCondition_.holds(localContext_)) {
+				selectedContext_ = localContext_;
+			}
+			else {
+				selectedContext_ = mainContext_;
+			}
+		}
+		
+		@Override
+		public IndexedClassExpression getRoot() {
+			return selectedContext_.getRoot();
+		}
+
+		@Override
+		public Set<IndexedClassExpression> getSubsumers() {
+			return selectedContext_.getSubsumers();
+		}
+
+		@Override
+		public Multimap<IndexedPropertyChain, Context> getBackwardLinksByObjectProperty() {
+			final Multimap<IndexedPropertyChain, Context> localLinks = localContext_.getBackwardLinksByObjectProperty();
+			final Multimap<IndexedPropertyChain, Context> mainLinks = mainContext_.getBackwardLinksByObjectProperty();
+			Condition<IndexedPropertyChain> belongToTracedContext = new Condition<IndexedPropertyChain>(){
+
+				@Override
+				public boolean holds(IndexedPropertyChain chain) {
+					return Operations.exists(mainLinks.get(chain), tracingCondition_);
+				}
+				
+			};
+			
+			Condition<IndexedPropertyChain> doNotBelongToTracedContext = new Condition<IndexedPropertyChain>(){
+
+				@Override
+				public boolean holds(IndexedPropertyChain chain) {
+					return !Operations.exists(mainLinks.get(chain), tracingCondition_);
+				}
+				
+			};
+			
+			//local links which belong to traced contexts
+			Multimap<IndexedPropertyChain, Context> local = MultimapOperations.keyFilter(localLinks, belongToTracedContext);
+			//main links which don't belong to traced contexts
+			Multimap<IndexedPropertyChain, Context> main = MultimapOperations.keyFilter(mainLinks, doNotBelongToTracedContext);
+			
+			return MultimapOperations.union(local, main);
+		}
+
+		@Override
+		public LinkRule<BackwardLink, Context> getBackwardLinkRuleHead() {
+			return selectedContext_.getBackwardLinkRuleHead();
+		}
+
+		@Override
+		public Chain<ModifiableLinkRule<BackwardLink, Context>> getBackwardLinkRuleChain() {
+			return selectedContext_.getBackwardLinkRuleChain();
+		}
+
+		@Override
+		public boolean addBackwardLink(BackwardLink link) {
+			return localContext_.addBackwardLink(link);
+		}
+
+		@Override
+		public boolean removeBackwardLink(BackwardLink link) {
+			return localContext_.removeBackwardLink(link);
+		}
+
+		@Override
+		public boolean containsBackwardLink(BackwardLink link) {
+			return localContext_.containsBackwardLink(link);
+		}
+
+		@Override
+		public boolean addSubsumer(IndexedClassExpression expression) {
+			return localContext_.addSubsumer(expression);
+		}
+
+		@Override
+		public boolean removeSubsumer(IndexedClassExpression expression) {
+			return localContext_.removeSubsumer(expression);
+		}
+
+		@Override
+		public boolean containsSubsumer(IndexedClassExpression expression) {
+			return localContext_.containsSubsumer(expression);
+		}
+
+		@Override
+		public boolean addDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
+			return localContext_.addDisjointnessAxiom(axiom);
+		}
+
+		@Override
+		public boolean removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
+			return localContext_.removeDisjointnessAxiom(axiom);
+		}
+
+		@Override
+		public boolean containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
+			return localContext_.containsDisjointnessAxiom(axiom);
+		}
+
+		@Override
+		public boolean inconsistencyDisjointnessAxiom(	IndexedDisjointnessAxiom axiom) {
+			return localContext_.inconsistencyDisjointnessAxiom(axiom);
+		}
+
+		@Override
+		public boolean addToDo(Conclusion conclusion) {
+			return localContext_.addToDo(conclusion);
+		}
+
+		@Override
+		public Conclusion takeToDo() {
+			return localContext_.takeToDo();
+		}
+
+		@Override
+		public boolean isInconsistent() {
+			return mainContext_.isInconsistent();
+		}
+
+		@Override
+		public boolean isSaturated() {
+			return false;
+		}
+
+		@Override
+		public boolean setInconsistent(boolean consistent) {
+			// no-op
+			return false;
+		}
+
+		@Override
+		public boolean setSaturated(boolean saturated) {
+			//no-op
+			return false;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return localContext_.isEmpty() && mainContext_.isEmpty();
+		}
+
+		@Override
+		public void removeLinks() {
+			//no-op
+		}
+
+		@Override
+		public String toString() {
+			return getRoot() + "[hybrid]";
+		}
+		
 	}
 }

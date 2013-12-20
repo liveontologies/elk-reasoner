@@ -209,7 +209,8 @@ public class Operations {
 
 					@Override
 					public ArrayList<T> next() {
-						final ArrayList<T> nextBatch = new ArrayList<T>(batchSize);
+						final ArrayList<T> nextBatch = new ArrayList<T>(
+								batchSize);
 						int count = 0;
 						while (count++ < batchSize
 								&& elementsIterator.hasNext()) {
@@ -271,25 +272,6 @@ public class Operations {
 				return size;
 			}
 		};
-	}
-
-	/**
-	 * Boolean conditions over some type.
-	 * 
-	 * @param <T>
-	 *            the type of elements which can be used with this condition
-	 * 
-	 */
-	public interface Condition<T> {
-		/**
-		 * Checks if the condition holds for an element
-		 * 
-		 * @param element
-		 *            the element for which to check the condition
-		 * @return {@code true} if the condition holds for the element and
-		 *         otherwise {@code false}
-		 */
-		public boolean holds(T element);
 	}
 
 	/**
@@ -477,6 +459,24 @@ public class Operations {
 	}
 
 	/**
+	 * 
+	 * @param input
+	 * @param condition
+	 * @return true, if the input contains an element which satisfies the
+	 *         condition, false otherwise
+	 */
+	public static <T> boolean exists(final Iterable<T> input,
+			final Condition<? super T> condition) {
+		for (T element : input) {
+			if (condition.holds(element)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Transformations of input values to output values
 	 * 
 	 * @param <I>
@@ -496,7 +496,7 @@ public class Operations {
 	}
 
 	// TODO: get rid of Conditions in favour of transformations
-	
+
 	/**
 	 * Transforms elements using a given {@link Transformation} the output
 	 * elements consist of the result of the transformation in the same order;
@@ -608,37 +608,37 @@ public class Operations {
 
 		public O apply(I element);
 	}
-	
+
 	/**
 	 * An extension of {@link Functor} which can do the reverse transformation
 	 * 
 	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
+	 * 
+	 *         pavel.klinov@uni-ulm.de
 	 */
 	public interface FunctorEx<I, O> extends Functor<I, O> {
-		
+
 		/**
-		 * The reason this method takes Objects rather than instances of O is because
-		 * it's primarily used for an efficient implementation of
+		 * The reason this method takes Objects rather than instances of O is
+		 * because it's primarily used for an efficient implementation of
 		 * {@link Set#contains(Object)}, which takes an Object
 		 * 
 		 * @return Can return null if the transformation is not possible
 		 */
 		public I deapply(Object element);
 	}
-	
+
 	/**
 	 * 
 	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
+	 * 
+	 *         pavel.klinov@uni-ulm.de
 	 */
 	private static class MapIterator<I, O> implements Iterator<O> {
-		
+
 		private final Iterator<? extends I> iter_;
 		private final Functor<I, O> functor_;
-		
+
 		MapIterator(Iterator<? extends I> iter, Functor<I, O> functor) {
 			iter_ = iter;
 			functor_ = functor;
@@ -658,19 +658,20 @@ public class Operations {
 		public void remove() {
 			iter_.remove();
 		}
-		
-		
+
 	}
-	
+
 	/**
 	 * A simple second-order map function
 	 * 
 	 * @param input
 	 * @param functor
-	 * @return a set which contains the results of applying the functor to the elements in the input set
+	 * @return a set which contains the results of applying the functor to the
+	 *         elements in the input set
 	 */
-	public static <I,O> Set<O> map(final Set<? extends I> input, final FunctorEx<I,O> functor) {
-		return new AbstractSet<O>() { 
+	public static <I, O> Set<O> map(final Set<? extends I> input,
+			final FunctorEx<I, O> functor) {
+		return new AbstractSet<O>() {
 
 			@Override
 			public Iterator<O> iterator() {
@@ -680,7 +681,7 @@ public class Operations {
 			@Override
 			public boolean contains(Object o) {
 				I element = functor.deapply(o);
-				
+
 				return element == null ? false : input.contains(element);
 			}
 
@@ -688,7 +689,7 @@ public class Operations {
 			public int size() {
 				return input.size();
 			}
-			
+
 		};
 	}
 }
