@@ -20,6 +20,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
@@ -137,7 +138,58 @@ public class TracingSaturationTest {
 		} finally {
 			IOUtils.closeQuietly(stream);
 		}
+	}
+	
+	@Test
+	public void testDuplicateInferenceOfExistential() throws ElkException, IOException {
+		InputStream stream = null;
+		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		
+		try {
+			stream = getClass().getClassLoader().getResourceAsStream(
+					"tracing/DuplicateExistential.owl");
+
+			List<ElkAxiom> ontology = loadAxioms(stream);
+			TestChangesLoader initialLoader = new TestChangesLoader();			
+
+			/*ReasonerStageExecutor executor = new PostProcessingStageExecutor(
+					PostProcessingStageExecutor.CONTEXT_TRACING,
+					CheckTracingStage.class);*/
+			ReasonerStageExecutor executor = new LoggingStageExecutor();
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader, executor);
+
+			for (ElkAxiom axiom : ontology) {
+				initialLoader.add(axiom);
+			}
+
+			reasoner.getTaxonomy();
+			
+			ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
+			ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri("http://example.org/R"));
+			ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
+			ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
+			
+			reasoner.explainSubsumption(a, rSomeC, new BaseTracedConclusionVisitor<Void, Void>() {
+
+				private int counter_ = 0;
+				
+				@Override
+				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {
+					System.out.println(InferencePrinter.print(conclusion));
+					
+					assertTrue("Duplicate inferences for " + conclusion, ++counter_ <= 1);
+					
+					return super.defaultTracedVisit(conclusion, v);
+				}
+				
+			});
+			
+
+		} finally {
+			IOUtils.closeQuietly(stream);
+		}
 	}	
+	
 
 	private List<ElkAxiom> loadAxioms(InputStream stream) throws IOException,
 			Owl2ParseException {

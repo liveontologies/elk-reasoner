@@ -41,9 +41,9 @@ public class InferencePrinter implements TracedConclusionVisitor<String, Void> {
 
 	@Override
 	public String visit(PropagatedSubsumer conclusion, Void parameter) {
-		return "Existential inference from "
-				+ conclusion.getInferenceContext(null) + " => "
-				+ conclusion.getSubsumer() + " and "
+		return "Existential inference from propagation of "
+				+ conclusion.getPropagation().getCarry() + " in "
+				+ conclusion.getInferenceContext(null) + " and "
 				+ conclusion.getBackwardLink().getSource() + " => "
 				+ conclusion.getBackwardLink().getRelation() + " some "
 				+ conclusion.getInferenceContext(null);

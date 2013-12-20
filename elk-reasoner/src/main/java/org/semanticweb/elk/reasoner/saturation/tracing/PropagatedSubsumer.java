@@ -8,7 +8,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 
@@ -38,9 +37,9 @@ public class PropagatedSubsumer extends NegativeSubsumerImpl implements TracedCo
 		linkRelation_ = linkRelation;
 		inferenceContext_ = context;
 	}
-
-	public Subsumer getSubsumer() {
-		return TracingUtils.getSubsumerWrapper(expression);
+	
+	public Propagation getPropagation() {
+		return TracingUtils.getPropagationWrapper(linkRelation_, (IndexedObjectSomeValuesFrom) expression);
 	}
 
 	public BackwardLink getBackwardLink() {

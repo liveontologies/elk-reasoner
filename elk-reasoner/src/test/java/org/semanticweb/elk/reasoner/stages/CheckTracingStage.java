@@ -135,7 +135,7 @@ public class CheckTracingStage extends BasePostProcessingStage {
 				@Override
 				public Void visit(PropagatedSubsumer inference, Void v) {
 					addToQueue(infContext, inference.getBackwardLink(), toDo, traceReader, seenInferences);
-					addToQueue(infContext, inference.getSubsumer(), toDo, traceReader, seenInferences);
+					addToQueue(infContext, inference.getPropagation(), toDo, traceReader, seenInferences);
 					return null;
 				}
 
