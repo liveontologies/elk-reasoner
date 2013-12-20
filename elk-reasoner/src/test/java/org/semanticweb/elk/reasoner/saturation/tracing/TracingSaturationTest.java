@@ -3,6 +3,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,6 +18,7 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
@@ -27,6 +30,7 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
 import org.semanticweb.elk.reasoner.stages.CheckTracingStage;
+import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 
@@ -84,6 +88,56 @@ public class TracingSaturationTest {
 			IOUtils.closeQuietly(stream);
 		}
 	}
+	
+	@Test
+	public void testDuplicateInferenceOfConjunction() throws ElkException, IOException {
+		InputStream stream = null;
+		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		
+		try {
+			stream = getClass().getClassLoader().getResourceAsStream(
+					"tracing/DuplicateConjunction.owl");
+
+			List<ElkAxiom> ontology = loadAxioms(stream);
+			TestChangesLoader initialLoader = new TestChangesLoader();			
+
+			/*ReasonerStageExecutor executor = new PostProcessingStageExecutor(
+					PostProcessingStageExecutor.CONTEXT_TRACING,
+					CheckTracingStage.class);*/
+			ReasonerStageExecutor executor = new LoggingStageExecutor();
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader, executor);
+
+			for (ElkAxiom axiom : ontology) {
+				initialLoader.add(axiom);
+			}
+
+			reasoner.getTaxonomy();
+			
+			ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
+			ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
+			ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
+			ElkClassExpression bAndC = factory.getObjectIntersectionOf(b,  c);
+			
+			reasoner.explainSubsumption(a, bAndC, new BaseTracedConclusionVisitor<Void, Void>() {
+
+				private int counter_ = 0;
+				
+				@Override
+				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {
+					System.out.println(InferencePrinter.print(conclusion));
+					
+					assertTrue("Duplicate inferences for " + conclusion, ++counter_ <= 1);
+					
+					return super.defaultTracedVisit(conclusion, v);
+				}
+				
+			});
+			
+
+		} finally {
+			IOUtils.closeQuietly(stream);
+		}
+	}	
 
 	private List<ElkAxiom> loadAxioms(InputStream stream) throws IOException,
 			Owl2ParseException {

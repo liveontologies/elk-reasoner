@@ -24,6 +24,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
+/**
+ * Inserts the conclusion into the specified context.
+ * 
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
+ */
 public class ConclusionInsertionVisitor implements ConclusionVisitor<Boolean, Context> {
 
 	@Override

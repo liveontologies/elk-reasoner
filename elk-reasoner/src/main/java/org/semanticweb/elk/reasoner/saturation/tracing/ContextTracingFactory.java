@@ -96,9 +96,10 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 			
 			ExtendedSaturationStateWriter tracingWriter = getSaturationStateWriter();
 			//inserts to the local context and writes inferences
+			//the inference writer should go first so we capture alternative derivations.
 			ConclusionVisitor<Boolean, Context> inserter = new CombinedConclusionVisitor<Context>(
-					new ConclusionInsertionVisitor(),
-					new InferenceInserter(traceState_.getTraceStore().getWriter()));
+					new InferenceInserter(traceState_.getTraceStore().getWriter()),
+					new ConclusionInsertionVisitor());
 			//applies rules on the main contexts
 			ConclusionVisitor<Boolean, Context> applicator = new ApplicationVisitor(tracingWriter, SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
 			//combines the inserter and the applicator
@@ -247,10 +248,6 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
 			return super.defaultVisit(conclusion, cxt.getRoot().getContext());
 		}
-		
-		/*@Override
-		protected boolean addInference(TracedConclusion conclusion, Context context) {
-			return super.addInference(conclusion, context.getRoot().getContext());
-		}*/		
+	
 	}
 }

@@ -13,6 +13,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
  */
 public class InferencePrinter implements TracedConclusionVisitor<String, Void> {
 
+	public static String print(TracedConclusion conclusion) {
+		return conclusion.acceptTraced(new InferencePrinter(), null);
+	}
+	
 	@Override
 	public String visit(InitializationSubsumer conclusion, Void parameter) {
 		return "Root Initialization";
@@ -31,7 +35,7 @@ public class InferencePrinter implements TracedConclusionVisitor<String, Void> {
 
 	@Override
 	public String visit(DecomposedConjunction conclusion, Void parameter) {
-		return "Decomposing " + conclusion.getExpression();
+		return "Decomposing " + conclusion.getConjunction();
 
 	}
 
