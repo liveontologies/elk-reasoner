@@ -165,11 +165,12 @@ public class TracingSaturationTest {
 			reasoner.getTaxonomy();
 			
 			ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
+			ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
 			ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri("http://example.org/R"));
 			ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 			ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 			
-			reasoner.explainSubsumption(a, rSomeC, new BaseTracedConclusionVisitor<Void, Void>() {
+			reasoner.trace(new ElkClass[]{a,b}, a, rSomeC, new BaseTracedConclusionVisitor<Void, Void>() {
 
 				private int counter_ = 0;
 				
