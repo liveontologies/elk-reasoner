@@ -346,32 +346,17 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		@Override
 		public Multimap<IndexedPropertyChain, Context> getBackwardLinksByObjectProperty() {
-			final Multimap<IndexedPropertyChain, Context> localLinks = localContext_.getBackwardLinksByObjectProperty();
-			final Multimap<IndexedPropertyChain, Context> mainLinks = mainContext_.getBackwardLinksByObjectProperty();
-			Condition<IndexedPropertyChain> belongToTracedContext = new Condition<IndexedPropertyChain>(){
-
-				@Override
-				public boolean holds(IndexedPropertyChain chain) {
-					return Operations.exists(mainLinks.get(chain), tracingCondition_);
-				}
-				
-			};
+			/*
+			 * the rules with backward links *currently* produce only
+			 * conclusions that belong to the same contexts as the backward
+			 * links. Therefore, if such rules should be applied during tracing,
+			 * then the contexts to which the backward links belong are traced
+			 * and hence, they should be taken from localContext However, this
+			 * solution is fragile as there can potentially be rules with
+			 * backward links that produce conclusions in other contexts
+			 */
 			
-			Condition<IndexedPropertyChain> doNotBelongToTracedContext = new Condition<IndexedPropertyChain>(){
-
-				@Override
-				public boolean holds(IndexedPropertyChain chain) {
-					return !Operations.exists(mainLinks.get(chain), tracingCondition_);
-				}
-				
-			};
-			
-			//local links which belong to traced contexts
-			Multimap<IndexedPropertyChain, Context> local = MultimapOperations.keyFilter(localLinks, belongToTracedContext);
-			//main links which don't belong to traced contexts
-			Multimap<IndexedPropertyChain, Context> main = MultimapOperations.keyFilter(mainLinks, doNotBelongToTracedContext);
-			
-			return MultimapOperations.union(local, main);
+			return localContext_.getBackwardLinksByObjectProperty();
 		}
 
 		@Override
