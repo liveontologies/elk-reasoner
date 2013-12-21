@@ -229,7 +229,7 @@ public class TracingSaturationTest {
 			ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 			final AtomicInteger inferenceCounter = new AtomicInteger(0);
 			
-			reasoner.trace(new ElkClass[]{a}, a, rSomeC, new BaseTracedConclusionVisitor<Void, Void>() {
+			reasoner.explainSubsumption(a, rSomeC, new BaseTracedConclusionVisitor<Void, Void>() {
 				
 				@Override
 				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {

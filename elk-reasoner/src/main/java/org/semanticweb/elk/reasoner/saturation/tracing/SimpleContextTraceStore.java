@@ -6,6 +6,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
@@ -14,6 +15,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
@@ -31,6 +33,8 @@ public class SimpleContextTraceStore implements ContextTracer {
 	private final Map<IndexedPropertyChain, Multimap<Context, TracedConclusion>> backwardLinkInferenceMap_;
 	
 	private final Map<IndexedPropertyChain, Multimap<Context, TracedConclusion>> forwardLinkInferenceMap_;
+	
+	private final Map<IndexedPropertyChain, Multimap<IndexedObjectSomeValuesFrom, TracedConclusion>> propagationMap_;
 	
 	private final ConclusionVisitor<Void, TracedConclusionVisitor<?,?>> inferenceReader_ = new BaseConclusionVisitor<Void, TracedConclusionVisitor<?,?>>() {
 
@@ -70,6 +74,14 @@ public class SimpleContextTraceStore implements ContextTracer {
 			return null;
 		}
 		
+		@Override
+		public Void visit(Propagation propagation,
+				TracedConclusionVisitor<?, ?> visitor) {
+			visitAll(getLinkInferences(propagationMap_, propagation.getRelation(), propagation.getCarry()), visitor);
+
+			return null;
+		}
+		
 	}; 
 	
 	private final TracedConclusionVisitor<Boolean, ?> inferenceWriter_ = new BaseTracedConclusionVisitor<Boolean, Void>() {
@@ -106,22 +118,22 @@ public class SimpleContextTraceStore implements ContextTracer {
 
 		@Override
 		public Boolean visit(ComposedBackwardLink conclusion, Void param) {
-			return addLinkInference(backwardLinkInferenceMap_, conclusion.getRelation(), conclusion.getSource(), conclusion);
+			return addTracedValue(backwardLinkInferenceMap_, conclusion.getRelation(), conclusion.getSource(), conclusion);
 		}
 
 		@Override
 		public Boolean visit(ReversedBackwardLink conclusion, Void param) {
-			return addLinkInference(forwardLinkInferenceMap_, conclusion.getRelation(), conclusion.getTarget(), conclusion);
+			return addTracedValue(forwardLinkInferenceMap_, conclusion.getRelation(), conclusion.getTarget(), conclusion);
 		}
 
 		@Override
 		public Boolean visit(DecomposedExistential conclusion, Void param) {
-			return addLinkInference(backwardLinkInferenceMap_, conclusion.getRelation(), conclusion.getSource(), conclusion);
+			return addTracedValue(backwardLinkInferenceMap_, conclusion.getRelation(), conclusion.getSource(), conclusion);
 		}
 
 		@Override
 		public Boolean visit(TracedPropagation conclusion, Void param) {
-			return addSubsumerInference(conclusion.getCarry(), conclusion);
+			return addTracedValue(propagationMap_, conclusion.getRelation(), conclusion.getCarry(), conclusion);
 		}
 		
 	};
@@ -133,25 +145,40 @@ public class SimpleContextTraceStore implements ContextTracer {
 		subsumerInferenceMap_ = new HashSetMultimap<IndexedClassExpression, TracedConclusion>();
 		backwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<Context,TracedConclusion>>();
 		forwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<Context,TracedConclusion>>();
+		propagationMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedObjectSomeValuesFrom,TracedConclusion>>();
 	}
 	
 
-	protected Boolean addLinkInference(Map<IndexedPropertyChain, Multimap<Context, TracedConclusion>> linkMap, IndexedPropertyChain relation,
-			Context source, TracedConclusion inf) {
-		Multimap<Context, TracedConclusion> infMap = linkMap.get(relation);
-		
-		if (infMap == null) {
-			infMap = new HashSetMultimap<Context, TracedConclusion>();
-			
-			infMap.add(source, inf);
-			linkMap.put(relation, infMap);
-			
+	/**
+	 * Adds a trace associated with the given key-value pair into the trace
+	 * multimap
+	 * 
+	 * @param traceMultiMap
+	 *            the multimap into which to insert new trace
+	 * @param key
+	 *            the key for which to insert
+	 * @param value
+	 *            the value for which to associate the trace
+	 * @param trace
+	 *            the trace to be associated
+	 * @return {@code true} if the trace multimap has changed as a result of
+	 *         this operation
+	 */
+	protected static <K, V, T> Boolean addTracedValue(
+			Map<K, Multimap<V, T>> traceMultiMap, K key, V value, T trace) {
+		Multimap<V, T> traces = traceMultiMap.get(key);
+
+		if (traces == null) {
+			traces = new HashSetMultimap<V, T>();
+
+			traces.add(value, trace);
+			traceMultiMap.put(key, traces);
+
 			return true;
 		}
-		
-		return infMap.add(source, inf);
-	}
 
+		return traces.add(value, trace);
+	}
 
 	protected Boolean addSubsumerInference(IndexedClassExpression ice, TracedConclusion inf) {
 		return subsumerInferenceMap_.add(ice, inf);
@@ -166,11 +193,11 @@ public class SimpleContextTraceStore implements ContextTracer {
 		return subsumerInferenceMap_.get(conclusion);
 	}
 
-	public Iterable<TracedConclusion> getLinkInferences(Map<IndexedPropertyChain, Multimap<Context, TracedConclusion>> linkMap, 
-			IndexedPropertyChain linkRelation, Context linkSource) {
-		Multimap<Context, TracedConclusion> infMap = linkMap.get(linkRelation);
-		
-		return infMap == null ? null : infMap.get(linkSource);
+	public static <K, V, T> Iterable<T> getLinkInferences(
+			Map<K, Multimap<V, T>> traceMultiMap, K key, V value) {
+		Multimap<V, T> traces = traceMultiMap.get(key);
+
+		return traces == null ? null : traces.get(value);
 	}
 
 	@Override
