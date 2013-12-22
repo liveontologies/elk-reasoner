@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -53,7 +53,7 @@ public class ForwardDecompositionRuleApplicationVisitor extends
 	}
 
 	@Override
-	protected BasicSaturationStateWriter getSaturationStateWriter() {
+	protected SaturationStateWriter getSaturationStateWriter() {
 		return writer_;
 	}
 

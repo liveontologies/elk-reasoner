@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,7 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
@@ -33,29 +34,29 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * Used for decomposing class expressions when rules are applied backwards
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class BackwardDecompositionRuleApplicationVisitor extends
 		BasicDecompositionRuleApplicationVisitor {
-	
-	private final BasicSaturationStateWriter writer_;
 
-	public BackwardDecompositionRuleApplicationVisitor(BasicSaturationStateWriter writer) {
+	private final SaturationStateWriter writer_;
+
+	public BackwardDecompositionRuleApplicationVisitor(
+			SaturationStateWriter writer) {
 		writer_ = writer;
 	}
-	
+
 	@Override
 	public void visit(IndexedObjectSomeValuesFrom ice, Context context) {
 		if (ice.getFiller().getContext() != null) {
-			writer_.produce(ice.getFiller().getContext(),
-					new BackwardLink(context, ice.getRelation()));	
+			writer_.produce(ice.getFiller().getContext(), new BackwardLink(
+					context, ice.getRelation()));
 		}
 	}
 
 	@Override
-	protected BasicSaturationStateWriter getSaturationStateWriter() {
+	protected SaturationStateWriter getSaturationStateWriter() {
 		return writer_;
 	}
-
 }

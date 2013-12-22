@@ -25,12 +25,12 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectComplementOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
@@ -102,8 +102,7 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 	}
 
 	@Override
-	public void accept(DecompositionRuleApplicationVisitor visitor,
-			Context context) {
+	public void accept(SubsumerDecompositionVisitor visitor, Context context) {
 		visitor.visit(this, context);
 	}
 
@@ -119,7 +118,7 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
-		private static final String NAME = "ObjectComplementOf Clash";
+		private static final String NAME_ = "ObjectComplementOf Clash";
 
 		private IndexedClassExpression negation_;
 
@@ -135,7 +134,7 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 
 		@Override
 		public String getName() {
-			return NAME;
+			return NAME_;
 		}
 
 		// TODO: hide this method
@@ -144,9 +143,9 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter writer, Context context) {
-			LOGGER_.trace("Applying {} to {}", NAME, context);
-			
+		public void apply(SaturationStateWriter writer, Context context) {
+			LOGGER_.trace("Applying {} to {}", NAME_, context);
+
 			if (negation_ != null && context.getSubsumers().contains(negation_))
 				writer.produce(context, Contradiction.getInstance());
 		}
@@ -192,7 +191,7 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, Context context) {
+				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 

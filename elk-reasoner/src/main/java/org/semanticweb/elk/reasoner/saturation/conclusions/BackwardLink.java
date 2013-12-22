@@ -24,9 +24,10 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 /**
@@ -55,6 +56,8 @@ public class BackwardLink implements Conclusion {
 	 */
 	private final IndexedPropertyChain relation_;
 
+	private final ThisCompositionRule thisCompositionRule_ = new ThisCompositionRule();
+
 	public BackwardLink(Context source, IndexedPropertyChain relation) {
 		this.relation_ = relation;
 		this.source_ = source;
@@ -73,30 +76,17 @@ public class BackwardLink implements Conclusion {
 		return source_;
 	}
 
-	public void apply(BasicSaturationStateWriter writer, Context context,
-			RuleApplicationVisitor ruleAppVisitor) {
+	@Override
+	public void accept(RuleApplicationVisitor ruleAppVisitor,
+			SaturationStateWriter writer, Context context) {
 
-		// if this is the first/last backward link for this relation,
-		// generate new propagations for this relation
-		if (context.getBackwardLinksByObjectProperty().get(relation_).size() == 1) {
-			IndexedObjectSomeValuesFrom.generatePropagations(writer, relation_,
-					context);
-		}
+		ruleAppVisitor.visit(thisCompositionRule_, writer, context);
 
 		// apply all backward link rules of the context
 		LinkRule<BackwardLink> backLinkRule = context.getBackwardLinkRuleHead();
 		while (backLinkRule != null) {
 			backLinkRule.accept(ruleAppVisitor, writer, this);
 			backLinkRule = backLinkRule.next();
-		}
-
-		/*
-		 * convert backward link to a forward link if it can potentially be
-		 * composed
-		 */
-		if (!relation_.getSaturated().getCompositionsByLeftSubProperty()
-				.isEmpty()) {
-			writer.produce(source_, new ForwardLink(relation_, context));
 		}
 	}
 
@@ -113,5 +103,37 @@ public class BackwardLink implements Conclusion {
 	@Override
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
 		return visitor.visit(this, context);
+	}
+
+	public class ThisCompositionRule implements Rule<Context> {
+
+		private static final String NAME_ = "BackwardLink Registration";
+
+		@Override
+		public String getName() {
+			return NAME_;
+		}
+
+		@Override
+		public void apply(SaturationStateWriter writer, Context context) {
+			// if this is the first/last backward link for this relation,
+			// generate new propagations for this relation
+			if (context.getBackwardLinksByObjectProperty().get(relation_)
+					.size() == 1) {
+				IndexedObjectSomeValuesFrom.generatePropagations(writer,
+						relation_, context);
+			}
+
+			/*
+			 * convert backward link to a forward link if it can potentially be
+			 * composed
+			 */
+			if (!relation_.getSaturated().getCompositionsByLeftSubProperty()
+					.isEmpty()) {
+				writer.produce(source_, new ForwardLink(relation_, context));
+			}
+
+		}
+
 	}
 }

@@ -22,23 +22,23 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkClass} in an ontology.
@@ -137,8 +137,7 @@ public class IndexedClass extends IndexedClassEntity {
 	}
 
 	@Override
-	public void accept(DecompositionRuleApplicationVisitor visitor,
-			Context context) {
+	public void accept(SubsumerDecompositionVisitor visitor, Context context) {
 		visitor.visit(this, context);
 	}
 
@@ -156,7 +155,7 @@ public class IndexedClass extends IndexedClassEntity {
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
-		public static final String NAME = "owl:Thing Introduction";
+		private static final String NAME_ = "owl:Thing Introduction";
 
 		private OwlThingContextInitializationRule(ChainableRule<Context> tail) {
 			super(tail);
@@ -168,14 +167,15 @@ public class IndexedClass extends IndexedClassEntity {
 
 		@Override
 		public String getName() {
-			return NAME;
+			return NAME_;
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter writer, Context context) {
-			LOGGER_.trace("Applying {} to {}", NAME, context);
-			
-			writer.produce(context, new PositiveSubsumer(writer.getOwlThing()));
+		public void apply(SaturationStateWriter writer, Context context) {
+			LOGGER_.trace("Applying {} to {}", NAME_, context);
+
+			writer.produce(context,
+					new DecomposedSubsumer(writer.getOwlThing()));
 		}
 
 		private static final Matcher<ChainableRule<Context>, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, OwlThingContextInitializationRule>(
@@ -208,7 +208,7 @@ public class IndexedClass extends IndexedClassEntity {
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, Context context) {
+				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 

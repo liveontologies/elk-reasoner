@@ -229,7 +229,7 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public boolean inconsistencyDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
+	public boolean inconsistForDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
 		Boolean inconsistency = disjointnessAxioms_.get(axiom);
 		if (inconsistency == null)
 			return false;

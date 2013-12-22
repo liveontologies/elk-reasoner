@@ -31,12 +31,12 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 public class DecompositionRuleApplicationTimerVisitor implements
-		DecompositionRuleApplicationVisitor {
+		SubsumerDecompositionVisitor {
 
 	/**
 	 * the visitor whose methods to be timed
 	 */
-	private final DecompositionRuleApplicationVisitor visitor_;
+	private final SubsumerDecompositionVisitor visitor_;
 
 	/**
 	 * timer used to time the visitor
@@ -44,21 +44,21 @@ public class DecompositionRuleApplicationTimerVisitor implements
 	private final DecompositionRuleApplicationTimer timer_;
 
 	/**
-	 * Creates a new {@link DecompositionRuleApplicationVisitor} that executes
+	 * Creates a new {@link SubsumerDecompositionVisitor} that executes
 	 * the corresponding methods of the given
-	 * {@link DecompositionRuleApplicationVisitor} and measures the time spent
+	 * {@link SubsumerDecompositionVisitor} and measures the time spent
 	 * within the corresponding methods using the given
 	 * {@link DecompositionRuleApplicationTimer}.
 	 * 
 	 * @param visitor
-	 *            the {@link DecompositionRuleApplicationVisitor} used to
+	 *            the {@link SubsumerDecompositionVisitor} used to
 	 *            execute the methods
 	 * @param timer
 	 *            the {@link DecompositionRuleApplicationTimer} used to mesure
 	 *            the time spent within the methods
 	 */
 	public DecompositionRuleApplicationTimerVisitor(
-			DecompositionRuleApplicationVisitor visitor,
+			SubsumerDecompositionVisitor visitor,
 			DecompositionRuleApplicationTimer timer) {
 		this.timer_ = timer;
 		this.visitor_ = visitor;

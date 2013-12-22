@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -71,10 +71,10 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 		}
 
 		@Override
-		protected BasicSaturationStateWriter getSaturationStateWriter() {
+		protected SaturationStateWriter getSaturationStateWriter() {
 			ConclusionVisitor<?> visitor = SaturationUtils.addStatsToConclusionVisitor(localStatistics
 					.getConclusionStatistics());
-			BasicSaturationStateWriter writer = saturationState.getWriter(
+			SaturationStateWriter writer = saturationState.getWriter(
 					ContextModificationListener.DUMMY, visitor);
 
 			return new SaturationCheckingWriter(writer);
@@ -89,11 +89,11 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 	 * 
 	 */
 	private static class SaturationCheckingWriter implements
-			BasicSaturationStateWriter {
+			SaturationStateWriter {
 
-		private final BasicSaturationStateWriter writer_;
+		private final SaturationStateWriter writer_;
 
-		SaturationCheckingWriter(BasicSaturationStateWriter writer) {
+		SaturationCheckingWriter(SaturationStateWriter writer) {
 			writer_ = writer;
 		}
 

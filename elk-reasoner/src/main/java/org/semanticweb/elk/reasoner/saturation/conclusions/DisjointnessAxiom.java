@@ -26,15 +26,21 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.Rule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 /**
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
  */
 public class DisjointnessAxiom extends AbstractConclusion {
+
+	private static ThisCompositionRule THIS_COMPOSITION_RULE_ = new ThisCompositionRule();
 
 	private final IndexedDisjointnessAxiom axiom_;
 
@@ -46,9 +52,11 @@ public class DisjointnessAxiom extends AbstractConclusion {
 		return axiom_;
 	}
 
-	public void apply(BasicSaturationStateWriter engine, Context context) {
-		if (context.inconsistencyDisjointnessAxiom(axiom_)) {
-			engine.produce(context, Contradiction.getInstance());
+	@Override
+	public void accept(RuleApplicationVisitor ruleAppVisitor,
+			SaturationStateWriter writer, Context context) {
+		if (context.inconsistForDisjointnessAxiom(axiom_)) {
+			ruleAppVisitor.visit(THIS_COMPOSITION_RULE_, writer, context);
 		}
 	}
 
@@ -61,4 +69,21 @@ public class DisjointnessAxiom extends AbstractConclusion {
 	public String toString() {
 		return axiom_.toString();
 	}
+
+	public static class ThisCompositionRule implements Rule<Context> {
+
+		private static final String NAME_ = "Contradiction by Disjointness Axiom";
+
+		@Override
+		public String getName() {
+			return NAME_;
+		}
+
+		@Override
+		public void apply(SaturationStateWriter writer, Context context) {
+			writer.produce(context, Contradiction.getInstance());
+		}
+
+	}
+
 }

@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
@@ -46,11 +46,14 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
  */
 public class Propagation extends AbstractConclusion {
 
 	// logger for this class
-	private static final Logger LOGGER_ = LoggerFactory.getLogger(Propagation.class);
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(Propagation.class);
 
 	private final IndexedPropertyChain relation_;
 
@@ -67,7 +70,9 @@ public class Propagation extends AbstractConclusion {
 		return "Propagation " + relation_ + "->" + carry_;
 	}
 
-	public void apply(BasicSaturationStateWriter writer, Context context) {
+	@Override
+	public void accept(RuleApplicationVisitor ruleAppVisitor,
+			SaturationStateWriter writer, Context context) {
 		// propagate over all backward links
 		final Multimap<IndexedPropertyChain, Context> backLinks = context
 				.getBackwardLinksByObjectProperty();
@@ -75,7 +80,7 @@ public class Propagation extends AbstractConclusion {
 		Collection<Context> targets = backLinks.get(relation_);
 
 		for (Context target : targets) {
-			writer.produce(target, new NegativeSubsumer(carry_));
+			writer.produce(target, new ComposedSubsumer(carry_));
 		}
 	}
 
@@ -83,8 +88,6 @@ public class Propagation extends AbstractConclusion {
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
 		return visitor.visit(this, context);
 	}
-	
-	
 
 	@Override
 	public Context getSourceContext(Context contextWhereStored) {
@@ -123,7 +126,7 @@ public class Propagation extends AbstractConclusion {
 			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
 			ModifiableLinkRule<BackwardLink> {
 
-		private static final String NAME = "Propagation Over BackwardLink";
+		private static final String NAME_ = "Propagation Over BackwardLink";
 
 		private final Multimap<IndexedPropertyChain, IndexedClassExpression> propagationsByObjectProperty_;
 
@@ -132,7 +135,7 @@ public class Propagation extends AbstractConclusion {
 			this.propagationsByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedClassExpression>(
 					1);
 		}
-		
+
 		// TODO: hide this method
 		public Multimap<IndexedPropertyChain, IndexedClassExpression> getPropagationsByObjectProperty() {
 			return propagationsByObjectProperty_;
@@ -140,21 +143,21 @@ public class Propagation extends AbstractConclusion {
 
 		@Override
 		public String getName() {
-			return NAME;
+			return NAME_;
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter writer, BackwardLink link) {
-			LOGGER_.trace("Applying {} to {}", NAME, link);
-			
+		public void apply(SaturationStateWriter writer, BackwardLink link) {
+			LOGGER_.trace("Applying {} to {}", NAME_, link);
+
 			for (IndexedClassExpression carry : propagationsByObjectProperty_
 					.get(link.getRelation()))
-				writer.produce(link.getSource(), new NegativeSubsumer(carry));
+				writer.produce(link.getSource(), new ComposedSubsumer(carry));
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor, BasicSaturationStateWriter writer,
-				BackwardLink backwardLink) {
+		public void accept(RuleApplicationVisitor visitor,
+				SaturationStateWriter writer, BackwardLink backwardLink) {
 			visitor.visit(this, writer, backwardLink);
 		}
 

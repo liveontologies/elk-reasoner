@@ -36,13 +36,13 @@ public class PreprocessedConclusionVisitor<T> implements ConclusionVisitor<T> {
 	}
 
 	@Override
-	public T visit(NegativeSubsumer negSCE, Context context) {
+	public T visit(ComposedSubsumer negSCE, Context context) {
 		preprocessor_.visit(negSCE, context);
 		return visitor_.visit(negSCE, context);
 	}
 
 	@Override
-	public T visit(PositiveSubsumer posSCE, Context context) {
+	public T visit(DecomposedSubsumer posSCE, Context context) {
 		preprocessor_.visit(posSCE, context);
 		return visitor_.visit(posSCE, context);
 	}

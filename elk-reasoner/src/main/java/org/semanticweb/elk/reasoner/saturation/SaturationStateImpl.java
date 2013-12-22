@@ -171,12 +171,12 @@ class SaturationStateImpl implements SaturationState {
 	/**
 	 * @param visitor a {@link ConclusionVisitor} which will be invoked for each produced {@link Conclusion}
 	 * 
-	 * @return an {@link BasicSaturationStateWriter} for modifying this
+	 * @return an {@link SaturationStateWriter} for modifying this
 	 *         {@link SaturationState}. The methods of this
-	 *         {@link BasicSaturationStateWriter} are thread safe
+	 *         {@link SaturationStateWriter} are thread safe
 	 */
 	@Override
-	public BasicSaturationStateWriter getWriter(ConclusionVisitor<?> conclusionVisitor) {
+	public SaturationStateWriter getWriter(ConclusionVisitor<?> conclusionVisitor) {
 		return getDefaultWriter(conclusionVisitor);
 	}
 
@@ -198,7 +198,7 @@ class SaturationStateImpl implements SaturationState {
 	}
 
 	@Override
-	public BasicSaturationStateWriter getWriter(
+	public SaturationStateWriter getWriter(
 			ContextModificationListener contextModificationListener, ConclusionVisitor<?> conclusionVisitor) {
 		return new BasicWriter(contextModificationListener, conclusionVisitor);
 	}
@@ -207,7 +207,7 @@ class SaturationStateImpl implements SaturationState {
 	 * 
 	 * 
 	 */
-	class BasicWriter implements BasicSaturationStateWriter {
+	class BasicWriter implements SaturationStateWriter {
 
 		private final ConclusionVisitor<?> producedConclusionVisitor_;
 		

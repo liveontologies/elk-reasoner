@@ -28,12 +28,12 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectUnionOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -111,9 +111,8 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	public void accept(DecompositionRuleApplicationVisitor visitor,
-			Context context) {
-		// disjunctions are not decomposed
+	public void accept(SubsumerDecompositionVisitor visitor, Context context) {
+		visitor.visit(this, context);
 	}
 
 	@Override
@@ -128,7 +127,7 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
-		private static final String NAME = "ObjectUnionOf Introduction";
+		private static final String NAME_ = "ObjectUnionOf Introduction";
 
 		/**
 		 * All disjunctions containing the disjunct for which this rule is
@@ -149,12 +148,12 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 
 		@Override
 		public String getName() {
-			return NAME;
+			return NAME_;
 		}
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, Context context) {
+				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 
@@ -164,11 +163,11 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter writer, Context context) {
-			LOGGER_.trace("Applying {} to {}", NAME, context);
-			
+		public void apply(SaturationStateWriter writer, Context context) {
+			LOGGER_.trace("Applying {} to {}", NAME_, context);
+
 			for (IndexedClassExpression disjunction : disjunctions_)
-				writer.produce(context, new NegativeSubsumer(disjunction));
+				writer.produce(context, new ComposedSubsumer(disjunction));
 		}
 
 		@Override

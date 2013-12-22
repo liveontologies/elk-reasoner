@@ -24,18 +24,16 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -43,6 +41,8 @@ import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkObjectIntersectionOf} in an
@@ -133,8 +133,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	public void accept(DecompositionRuleApplicationVisitor visitor,
-			Context context) {
+	public void accept(SubsumerDecompositionVisitor visitor, Context context) {
 		visitor.visit(this, context);
 	}
 
@@ -145,7 +144,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
-		private static final String NAME = "ObjectIntersectionOf Introduction";
+		private static final String NAME_ = "ObjectIntersectionOf Introduction";
 
 		private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
 
@@ -163,7 +162,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		@Override
 		public String getName() {
-			return NAME;
+			return NAME_;
 		}
 
 		// TODO: hide this method
@@ -172,12 +171,12 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter writer, Context context) {
-			LOGGER_.trace("Applying {} to {}", NAME, context);
-			
+		public void apply(SaturationStateWriter writer, Context context) {
+			LOGGER_.trace("Applying {} to {}", NAME_, context);
+
 			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 					conjunctionsByConjunct_.keySet(), context.getSubsumers()))
-				writer.produce(context, new NegativeSubsumer(
+				writer.produce(context, new ComposedSubsumer(
 						conjunctionsByConjunct_.get(common)));
 
 		}
@@ -219,7 +218,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, Context context) {
+				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 

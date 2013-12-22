@@ -22,18 +22,18 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkClassExpression} in an ontology.
@@ -236,6 +236,6 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
 
-	public abstract void accept(DecompositionRuleApplicationVisitor visitor,
+	public abstract void accept(SubsumerDecompositionVisitor visitor,
 			Context context);
 }

@@ -25,29 +25,29 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * The extended writer for situations when new contexts may need to be
- * created/initialized or removed. With every
- * {@link ExtendedSaturationStateWriter} one can register a
- * {@link ContextCreationListener} that will be executed every time this
- * {@link ExtendedSaturationStateWriter} creates a new {@code Context}. Although
- * all functions of this {@link ExtendedSaturationStateWriter} are thread safe,
- * the function of the {@link ContextCreationListener} might not be, in which
- * the access of functions of {@link ExtendedSaturationStateWriter} should be
- * synchronized between threads.
+ * Functions that can write the saturation state are grouped here.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface ExtendedSaturationStateWriter extends
-		SaturationStateWriter {
+public interface SaturationStateWriter {
 
-	public Context getCreateContext(IndexedClassExpression root);
+	public IndexedClassExpression getOwlThing();
 
-	public void initContext(Context context);
+	public IndexedClassExpression getOwlNothing();
 
-	public void removeContext(Context context);
+	public Context pollForActiveContext();
+
+	public void produce(Context context, Conclusion conclusion);
+
+	public boolean markAsNotSaturated(Context context);
+
+	public void clearNotSaturatedContexts();
+
+	public void resetContexts();
 }

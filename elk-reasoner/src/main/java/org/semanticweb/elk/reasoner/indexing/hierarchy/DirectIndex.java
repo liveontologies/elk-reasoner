@@ -28,14 +28,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
@@ -48,6 +46,8 @@ import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -57,7 +57,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(DirectIndex.class);
-	
+
 	final IndexedClass indexedOwlThing, indexedOwlNothing;
 
 	final IndexedObjectCache objectCache;
@@ -274,8 +274,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 			}
 		};
 	}
-	
-	
+
 	/**
 	 * Adds root to the context
 	 */
@@ -283,7 +282,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
-		public static final String NAME = "Root Introduction";
+		private static final String NAME_ = "Root Introduction";
 
 		private ContextRootInitializationRule(ChainableRule<Context> tail) {
 			super(tail);
@@ -295,14 +294,14 @@ public class DirectIndex implements ModifiableOntologyIndex {
 
 		@Override
 		public String getName() {
-			return NAME;
+			return NAME_;
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter writer, Context context) {
-			LOGGER_.trace("Applying {} to {}", NAME, context);
-			
-			writer.produce(context, new PositiveSubsumer(context.getRoot()));
+		public void apply(SaturationStateWriter writer, Context context) {
+			LOGGER_.trace("Applying {} to {}", NAME_, context);
+
+			writer.produce(context, new DecomposedSubsumer(context.getRoot()));
 		}
 
 		private static final Matcher<ChainableRule<Context>, ContextRootInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ContextRootInitializationRule>(
@@ -335,10 +334,10 @@ public class DirectIndex implements ModifiableOntologyIndex {
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, Context context) {
+				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 
-	}	
+	}
 
 }

@@ -26,14 +26,14 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionDeapplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionRuleApplicationVisitorMax;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionDeletionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionOccurranceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
@@ -67,7 +67,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	 */
 	public class DeapplicationEngine extends RuleApplicationFactory.BaseEngine {
 
-		private final BasicSaturationStateWriter writer_;
+		private final SaturationStateWriter writer_;
 
 		protected DeapplicationEngine(ContextModificationListener listener) {
 			super(new SaturationStatistics());
@@ -81,12 +81,12 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		@Override
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
-				BasicSaturationStateWriter saturationStateWriter) {
+				SaturationStateWriter saturationStateWriter) {
 
 			return new CombinedConclusionVisitor(
 					new CombinedConclusionVisitor(
 							new ConclusionOccurranceCheckingVisitor(),
-							getUsedConclusionsCountingVisitor(new ConclusionDeapplicationVisitor(
+							getUsedConclusionsCountingVisitor(new ConclusionRuleApplicationVisitorMax(
 									saturationStateWriter,
 									SaturationUtils
 											.getStatsAwareCompositionRuleAppVisitor(localStatistics
@@ -104,12 +104,12 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		protected BasicSaturationStateWriter getSaturationStateWriter() {
+		protected SaturationStateWriter getSaturationStateWriter() {
 			return writer_;
 		}
 
 		@Override
-		protected DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor() {
+		protected SubsumerDecompositionVisitor getDecompositionRuleApplicationVisitor() {
 			// this decomposition visitor takes the basic writer which cannot
 			// create new contexts
 			return new BackwardDecompositionRuleApplicationVisitor(

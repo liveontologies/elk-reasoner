@@ -24,18 +24,19 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -46,9 +47,18 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class Contradiction extends AbstractConclusion {
 
-	private static final Logger LOGGER_ = LoggerFactory.getLogger(Contradiction.class);
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(Contradiction.class);
 
+	/**
+	 * we use just one instance of this class
+	 */
 	private static Contradiction INSTANCE_ = new Contradiction();
+
+	/**
+	 * one instance of composition rule is sufficient
+	 */
+	private static ThisCompositionRule THIS_COMPOSITION_RULE_ = new ThisCompositionRule();
 
 	public static Contradiction getInstance() {
 		return INSTANCE_;
@@ -58,34 +68,24 @@ public class Contradiction extends AbstractConclusion {
 		// do not allow creation of instances outside of this class
 	}
 
-	public void deapply(BasicSaturationStateWriter engine, Context context) {
-		propagateThroughBackwardLinks(engine, context);
+	@SuppressWarnings("static-method")
+	public void removeFrom(Context context) {
 		context.getBackwardLinkRuleChain().remove(
 				ContradictionBackwardLinkRule.MATCHER_);
 	}
 
-	public void apply(BasicSaturationStateWriter engine, Context context) {
-		propagateThroughBackwardLinks(engine, context);
+	@SuppressWarnings("static-method")
+	public void addTo(Context context) {
 		// register the backward link rule for propagation of bottom
 		context.getBackwardLinkRuleChain().getCreate(
 				ContradictionBackwardLinkRule.MATCHER_,
 				ContradictionBackwardLinkRule.FACTORY_);
 	}
 
-	private void propagateThroughBackwardLinks(BasicSaturationStateWriter engine,
-			Context context) {
-
-		final Multimap<IndexedPropertyChain, Context> backLinks = context
-				.getBackwardLinksByObjectProperty();
-
-		for (IndexedPropertyChain propRelation : backLinks.keySet()) {
-
-			Collection<Context> targets = backLinks.get(propRelation);
-
-			for (Context target : targets) {
-				engine.produce(target, Contradiction.getInstance());
-			}
-		}
+	@Override
+	public void accept(RuleApplicationVisitor ruleAppVisitor,
+			SaturationStateWriter writer, Context context) {
+		ruleAppVisitor.visit(THIS_COMPOSITION_RULE_, writer, context);
 	}
 
 	@Override
@@ -99,14 +99,46 @@ public class Contradiction extends AbstractConclusion {
 	}
 
 	/**
-	 * A backward link rule to propagate contradiction through any new backward
-	 * links
+	 * A rule propagating the derived contradiction over backward links
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
+	public static class ThisCompositionRule implements Rule<Context> {
+
+		private static final String NAME_ = "Contradiction Propagation over Backward Links";
+
+		@Override
+		public String getName() {
+			return NAME_;
+		}
+
+		@Override
+		public void apply(SaturationStateWriter writer, Context context) {
+			final Multimap<IndexedPropertyChain, Context> backLinks = context
+					.getBackwardLinksByObjectProperty();
+
+			for (IndexedPropertyChain propRelation : backLinks.keySet()) {
+
+				Collection<Context> targets = backLinks.get(propRelation);
+
+				for (Context target : targets) {
+					writer.produce(target, Contradiction.getInstance());
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * A rule propagating contradiction over derived backward links; registered
+	 * for backward links
 	 */
 	public static class ContradictionBackwardLinkRule extends
 			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
 			ModifiableLinkRule<BackwardLink> {
 
-		private static final String NAME = "Contradiction Existential Propagation";
+		private static final String NAME_ = "Backward Link Contradiction Propagation";
 
 		ContradictionBackwardLinkRule(ModifiableLinkRule<BackwardLink> tail) {
 			super(tail);
@@ -114,19 +146,19 @@ public class Contradiction extends AbstractConclusion {
 
 		@Override
 		public String getName() {
-			return NAME;
+			return NAME_;
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter engine, BackwardLink link) {
-			LOGGER_.trace("Applying {} to {}", NAME, link);
-			
+		public void apply(SaturationStateWriter engine, BackwardLink link) {
+			LOGGER_.trace("Applying {} to {}", NAME_, link);
+
 			engine.produce(link.getSource(), Contradiction.getInstance());
 		}
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, BackwardLink backwardLink) {
+				SaturationStateWriter writer, BackwardLink backwardLink) {
 			visitor.visit(this, writer, backwardLink);
 		}
 
@@ -141,4 +173,5 @@ public class Contradiction extends AbstractConclusion {
 			}
 		};
 	}
+
 }

@@ -28,8 +28,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 
 /**
  * An object which can be used to measure the methods invocations of a
- * {@link DecompositionRuleApplicationVisitor}. The fields of the counter
- * correspond to the methods of {@link DecompositionRuleApplicationVisitor}.
+ * {@link SubsumerDecompositionVisitor}. The fields of the counter
+ * correspond to the methods of {@link SubsumerDecompositionVisitor}.
  * 
  * @author "Yevgeny Kazakov"
  * 

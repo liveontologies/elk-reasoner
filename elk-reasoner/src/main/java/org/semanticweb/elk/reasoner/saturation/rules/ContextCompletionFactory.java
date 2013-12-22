@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
@@ -53,8 +53,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
@@ -145,18 +145,18 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		protected DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor() {
+		protected SubsumerDecompositionVisitor getDecompositionRuleApplicationVisitor() {
 			return null;
 		}
 
 		@Override
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
-				BasicSaturationStateWriter saturationStateWriter) {
+				SaturationStateWriter saturationStateWriter) {
 
 			RuleStatistics ruleStats = localStatistics.getRuleStatistics();
 			// this decomposition visitor applies decomposition rules for
 			// iterating over the conclusions
-			DecompositionRuleApplicationVisitor iterationVisitor = SaturationUtils
+			SubsumerDecompositionVisitor iterationVisitor = SaturationUtils
 					.getStatsAwareDecompositionRuleAppVisitor(
 							new GapFillingDecompositionVisitor(
 									iterationWriter_, mainStateWriter_),
@@ -164,7 +164,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			// this decomposition visitor applies decomposition rules for
 			// producing conclusions obtained by decomposing negative subsumers
 			// (those should not be stored in the main contexts)
-			DecompositionRuleApplicationVisitor produceVisitor = SaturationUtils
+			SubsumerDecompositionVisitor produceVisitor = SaturationUtils
 					.getStatsAwareDecompositionRuleAppVisitor(
 							new GapFillingDecompositionVisitor(localState_
 									.getWriterForDecompositionVisitor(
@@ -244,14 +244,14 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		public BasicSaturationStateWriter getWriter(
+		public SaturationStateWriter getWriter(
 				ContextModificationListener contextModificationListener,
 				ConclusionVisitor<?> conclusionVisitor) {
 			return getDefaultWriter(conclusionVisitor);
 		}
 
 		@Override
-		public BasicSaturationStateWriter getWriter(
+		public SaturationStateWriter getWriter(
 				ConclusionVisitor<?> conclusionVisitor) {
 			return getDefaultWriter(conclusionVisitor);
 		}
@@ -483,11 +483,11 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			BasicDecompositionRuleApplicationVisitor {
 		// depending on this writer, results of decompositions may or may not be
 		// produced to main contexts
-		private final BasicSaturationStateWriter localWriter_;
+		private final SaturationStateWriter localWriter_;
 
 		private final ExtendedSaturationStateWriter mainWriter_;
 
-		GapFillingDecompositionVisitor(BasicSaturationStateWriter localWriter,
+		GapFillingDecompositionVisitor(SaturationStateWriter localWriter,
 				ExtendedSaturationStateWriter mainWriter) {
 			localWriter_ = localWriter;
 			mainWriter_ = mainWriter;
@@ -504,7 +504,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		protected BasicSaturationStateWriter getSaturationStateWriter() {
+		protected SaturationStateWriter getSaturationStateWriter() {
 			return localWriter_;
 		}
 
@@ -529,16 +529,16 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	private static class ConclusionGapFillingVisitor implements
 			ConclusionVisitor<Boolean> {
 
-		private final BasicSaturationStateWriter iterationWriter_;
+		private final SaturationStateWriter iterationWriter_;
 		private final RuleApplicationVisitor ruleAppVisitor_;
-		private final DecompositionRuleApplicationVisitor iterateDecompRuleAppVisitor_;
-		private final DecompositionRuleApplicationVisitor produceDecompRuleAppVisitor_;
+		private final SubsumerDecompositionVisitor iterateDecompRuleAppVisitor_;
+		private final SubsumerDecompositionVisitor produceDecompRuleAppVisitor_;
 
 		public ConclusionGapFillingVisitor(
-				BasicSaturationStateWriter enumWriter,
+				SaturationStateWriter enumWriter,
 				RuleApplicationVisitor ruleAppVisitor,
-				DecompositionRuleApplicationVisitor enumVisitor,
-				DecompositionRuleApplicationVisitor produceVisitor) {
+				SubsumerDecompositionVisitor enumVisitor,
+				SubsumerDecompositionVisitor produceVisitor) {
 			this.iterationWriter_ = enumWriter;
 			this.ruleAppVisitor_ = ruleAppVisitor;
 			this.iterateDecompRuleAppVisitor_ = enumVisitor;
@@ -547,7 +547,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		public Boolean visit(NegativeSubsumer negSCE, Context context) {
+		public Boolean visit(ComposedSubsumer negSCE, Context context) {
 			negSCE.apply(iterationWriter_, context.getRoot().getContext(),
 					ruleAppVisitor_);
 			negSCE.applyDecompositionRules(context.getRoot().getContext(),
@@ -556,7 +556,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		public Boolean visit(PositiveSubsumer posSCE, Context context) {
+		public Boolean visit(DecomposedSubsumer posSCE, Context context) {
 			posSCE.apply(iterationWriter_, context.getRoot().getContext(),
 					ruleAppVisitor_, iterateDecompRuleAppVisitor_);
 			return true;
@@ -577,7 +577,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 		@Override
 		public Boolean visit(Contradiction bot, Context context) {
-			bot.deapply(iterationWriter_, context.getRoot().getContext());
+			bot.removeFrom(iterationWriter_, context.getRoot().getContext());
 			return true;
 		}
 

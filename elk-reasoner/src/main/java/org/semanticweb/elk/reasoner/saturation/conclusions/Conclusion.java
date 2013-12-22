@@ -1,6 +1,8 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 /*
  * #%L
@@ -36,13 +38,15 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public interface Conclusion {
 
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context);
-	
+
 	/**
 	 * 
 	 * @param contextWhereStored
-	 * @return The context which this conclusion is logically relevant for, or {@code null} if none
+	 * @return The context which this conclusion is logically relevant for, or
+	 *         {@code null} if none
 	 */
 	public Context getSourceContext(Context contextWhereStored);
-	
 
+	public void accept(RuleApplicationVisitor ruleAppVisitor,
+			SaturationStateWriter writer, Context context);
 }

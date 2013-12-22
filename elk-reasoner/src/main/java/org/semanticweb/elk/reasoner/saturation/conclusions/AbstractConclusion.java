@@ -40,4 +40,5 @@ public abstract class AbstractConclusion implements Conclusion {
 		return contextWhereStored;
 	}
 
+	
 }

@@ -67,11 +67,11 @@ public interface SaturationState {
 			ConclusionVisitor<?> conclusionVisitor,
 			boolean trackNewContextsAsUnsaturated);
 
-	public BasicSaturationStateWriter getWriter(
+	public SaturationStateWriter getWriter(
 			ContextModificationListener contextModificationListener,
 			ConclusionVisitor<?> conclusionVisitor);
 	
-	public BasicSaturationStateWriter getWriter(ConclusionVisitor<?> conclusionVisitor);
+	public SaturationStateWriter getWriter(ConclusionVisitor<?> conclusionVisitor);
 
 	public ExtendedSaturationStateWriter getExtendedWriter(ConclusionVisitor<?> conclusionVisitor);
 	

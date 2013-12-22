@@ -28,16 +28,18 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * Applies decomposition rules for {@link IndexedClassExpression}s.
  * 
- * This visit methods do not take any {@link BasicSaturationStateWriter} but the
+ * This visit methods do not take any {@link SaturationStateWriter} but the
  * visitor is rather supposed to encapsulate it. Then it's easier to use
  * restricted writers, e.g. those which can't create new contexts, in subclasses
  * 
@@ -47,13 +49,17 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface DecompositionRuleApplicationVisitor {
+public interface SubsumerDecompositionVisitor {
 
 	public void visit(IndexedClass ice, Context context);
+
+	public void visit(IndexedIndividual idv, Context context);
 
 	public void visit(IndexedObjectComplementOf ice, Context context);
 
 	public void visit(IndexedObjectIntersectionOf ice, Context context);
+
+	public void visit(IndexedObjectUnionOf ice, Context context);
 
 	public void visit(IndexedObjectSomeValuesFrom ice, Context context);
 

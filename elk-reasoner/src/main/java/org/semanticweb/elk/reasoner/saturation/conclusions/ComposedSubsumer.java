@@ -1,14 +1,11 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation;
 /*
  * #%L
  * ELK Reasoner
- * $Id:$
- * $HeadURL:$
+ * 
+ * $Id$
+ * $HeadURL$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,31 +20,26 @@ package org.semanticweb.elk.reasoner.saturation;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * Functions that can write the saturation state are grouped here.
+ * A {@link Subsumer} created using composition rules.
  * 
- * @author Pavel Klinov
+ * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  * 
- *         pavel.klinov@uni-ulm.de
  */
-public interface BasicSaturationStateWriter {
+public class ComposedSubsumer extends Subsumer {
 
-	public IndexedClassExpression getOwlThing();
+	public ComposedSubsumer(IndexedClassExpression superClassExpression) {
+		super(superClassExpression);
+	}
 
-	public IndexedClassExpression getOwlNothing();
-
-	public Context pollForActiveContext();
-
-	public void produce(Context context, Conclusion conclusion);
-
-	public boolean markAsNotSaturated(Context context);
-
-	public void clearNotSaturatedContexts();
-
-	public void resetContexts();
+	@Override
+	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
+		return visitor.visit(this, context);
+	}
 }

@@ -30,20 +30,20 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * A {@link DecompositionRuleApplicationVisitor} wrapper for a given
- * {@link DecompositionRuleApplicationVisitor} that additionally records the
+ * A {@link SubsumerDecompositionVisitor} wrapper for a given
+ * {@link SubsumerDecompositionVisitor} that additionally records the
  * number of invocations of the methods using the given
  * {@link DecompositionRuleApplicationCounter}.
  * 
  * @author "Yevgeny Kazakov"
  */
 public class DecompositionRuleApplicationCounterVisitor implements
-		DecompositionRuleApplicationVisitor {
+		SubsumerDecompositionVisitor {
 
 	/**
 	 * the visitor whose method applications to be counted
 	 */
-	private final DecompositionRuleApplicationVisitor visitor_;
+	private final SubsumerDecompositionVisitor visitor_;
 	/**
 	 * the counter used to count the number of method applications of the
 	 * visitor
@@ -51,21 +51,21 @@ public class DecompositionRuleApplicationCounterVisitor implements
 	private final DecompositionRuleApplicationCounter counter_;
 
 	/**
-	 * Creates a new {@link DecompositionRuleApplicationVisitor} that executes
+	 * Creates a new {@link SubsumerDecompositionVisitor} that executes
 	 * the corresponding methods of the given
-	 * {@link DecompositionRuleApplicationVisitor} and counts the number of
+	 * {@link SubsumerDecompositionVisitor} and counts the number of
 	 * invocations of the corresponding methods using the given
 	 * {@link DecompositionRuleApplicationCounter}.
 	 * 
 	 * @param visitor
-	 *            the {@link DecompositionRuleApplicationVisitor} used to
+	 *            the {@link SubsumerDecompositionVisitor} used to
 	 *            execute the methods
 	 * @param counter
 	 *            the {@link DecompositionRuleApplicationCounter} used to count
 	 *            the number of method invocations
 	 */
 	public DecompositionRuleApplicationCounterVisitor(
-			DecompositionRuleApplicationVisitor visitor,
+			SubsumerDecompositionVisitor visitor,
 			DecompositionRuleApplicationCounter counter) {
 		this.visitor_ = visitor;
 		this.counter_ = counter;

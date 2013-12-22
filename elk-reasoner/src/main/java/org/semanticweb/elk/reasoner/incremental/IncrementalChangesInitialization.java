@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -127,7 +127,7 @@ class ContextInitializationFactory
 		final RuleApplicationVisitor ruleAppVisitor = SaturationUtils
 				.getStatsAwareCompositionRuleAppVisitor(localStatistics
 						.getRuleStatistics());
-		final BasicSaturationStateWriter saturationStateWriter = saturationState_
+		final SaturationStateWriter saturationStateWriter = saturationState_
 				.getWriter(ContextModificationListener.DUMMY, conclusionVisitor);
 
 		localStatistics.getConclusionStatistics().startMeasurements();

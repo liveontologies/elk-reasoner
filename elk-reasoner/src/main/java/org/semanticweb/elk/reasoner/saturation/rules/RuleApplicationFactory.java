@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionRuleApplicationVisitorMin;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionSourceUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
@@ -132,7 +132,7 @@ public class RuleApplicationFactory {
 			localContextStatistics.timeContextProcess -= CachedTimeThread
 					.getCurrentTimeMillis();
 
-			BasicSaturationStateWriter writer = getSaturationStateWriter();
+			SaturationStateWriter writer = getSaturationStateWriter();
 
 			if (conclusionProcessor_ == null) {
 				conclusionProcessor_ = getConclusionProcessor(writer);
@@ -207,11 +207,11 @@ public class RuleApplicationFactory {
 		 *         of {@code Conclusion}s within a {@link Context}
 		 */
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
-				BasicSaturationStateWriter saturationStateWriter) {
+				SaturationStateWriter saturationStateWriter) {
 
 			return new CombinedConclusionVisitor(
 					new ConclusionInsertionVisitor(),
-					getUsedConclusionsCountingVisitor(new ConclusionApplicationVisitor(
+					getUsedConclusionsCountingVisitor(new ConclusionRuleApplicationVisitorMin(
 							saturationStateWriter,
 							SaturationUtils
 									.getStatsAwareCompositionRuleAppVisitor(localStatistics
@@ -236,7 +236,7 @@ public class RuleApplicationFactory {
 		 *         within {@link Context}s
 		 */
 		protected ConclusionVisitor<?> getConclusionProcessor(
-				BasicSaturationStateWriter saturationStateWriter) {
+				SaturationStateWriter saturationStateWriter) {
 			ConclusionVisitor<Boolean> result = getBaseConclusionProcessor(saturationStateWriter);
 			if (trackModifiedContexts_) {
 				result = new CombinedConclusionVisitor(result,
@@ -248,9 +248,9 @@ public class RuleApplicationFactory {
 					result, localStatistics);
 		}
 
-		protected abstract DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor();
+		protected abstract SubsumerDecompositionVisitor getDecompositionRuleApplicationVisitor();
 
-		protected abstract BasicSaturationStateWriter getSaturationStateWriter();
+		protected abstract SaturationStateWriter getSaturationStateWriter();
 	}
 
 	/**
@@ -312,10 +312,10 @@ public class RuleApplicationFactory {
 		}
 
 		@Override
-		protected DecompositionRuleApplicationVisitor getDecompositionRuleApplicationVisitor() {
+		protected SubsumerDecompositionVisitor getDecompositionRuleApplicationVisitor() {
 			// here we need an extended writer to pass to the decomposer which
 			// can create new contexts
-			DecompositionRuleApplicationVisitor visitor = new ForwardDecompositionRuleApplicationVisitor(
+			SubsumerDecompositionVisitor visitor = new ForwardDecompositionRuleApplicationVisitor(
 					saturationStateWriter_);
 
 			return SaturationUtils.getStatsAwareDecompositionRuleAppVisitor(

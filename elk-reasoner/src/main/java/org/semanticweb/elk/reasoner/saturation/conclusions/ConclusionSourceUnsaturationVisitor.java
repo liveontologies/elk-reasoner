@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -35,9 +35,9 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public class ConclusionSourceUnsaturationVisitor implements
 		ConclusionVisitor<Boolean> {
 
-	private final BasicSaturationStateWriter writer_;
+	private final SaturationStateWriter writer_;
 
-	public ConclusionSourceUnsaturationVisitor(BasicSaturationStateWriter writer) {
+	public ConclusionSourceUnsaturationVisitor(SaturationStateWriter writer) {
 		this.writer_ = writer;
 	}
 
@@ -49,7 +49,7 @@ public class ConclusionSourceUnsaturationVisitor implements
 	}
 
 	@Override
-	public Boolean visit(NegativeSubsumer negSCE, Context context) {
+	public Boolean visit(ComposedSubsumer negSCE, Context context) {
 		if (negSCE.getExpression().occurs()) {
 			return mark(negSCE, context);
 		}
@@ -59,7 +59,7 @@ public class ConclusionSourceUnsaturationVisitor implements
 	}
 
 	@Override
-	public Boolean visit(PositiveSubsumer posSCE, Context context) {
+	public Boolean visit(DecomposedSubsumer posSCE, Context context) {
 		if (posSCE.getExpression().occurs()) {
 			return mark(posSCE, context);
 		}

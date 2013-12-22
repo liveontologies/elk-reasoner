@@ -24,12 +24,11 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -38,6 +37,8 @@ import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from this
@@ -53,7 +54,8 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class ForwardLink extends AbstractConclusion {
 
-	private static final Logger LOGGER_ = LoggerFactory.getLogger(ForwardLink.class);
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ForwardLink.class);
 
 	/**
 	 * the {@link IndexedPropertyChain} in the existential restriction
@@ -67,6 +69,8 @@ public class ForwardLink extends AbstractConclusion {
 	 */
 	private final Context target_;
 
+	private final ThisCompositionRule thisCompositionRule_ = new ThisCompositionRule();
+
 	public ForwardLink(IndexedPropertyChain relation, Context target) {
 		this.relation_ = relation;
 		this.target_ = target;
@@ -75,31 +79,15 @@ public class ForwardLink extends AbstractConclusion {
 	public IndexedPropertyChain getRelation() {
 		return relation_;
 	}
-	
+
 	public Context getTarget() {
 		return target_;
 	}
-	
-	public void apply(BasicSaturationStateWriter engine, Context context) {
-		/* compose the link with all backward links */
-		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
-				.getSaturated().getCompositionsByLeftSubProperty();
-		final Multimap<IndexedPropertyChain, Context> backLinks = context
-				.getBackwardLinksByObjectProperty();
 
-		for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-				comps.keySet(), backLinks.keySet())) {
-
-			Collection<IndexedPropertyChain> compositions = comps
-					.get(backwardRelation);
-			Collection<Context> sources = backLinks.get(backwardRelation);
-
-			for (IndexedPropertyChain composition : compositions)
-				for (Context source : sources) {
-					engine.produce(target_, new BackwardLink(source,
-							composition));
-				}
-		}
+	@Override
+	public void accept(RuleApplicationVisitor ruleAppVisitor,
+			SaturationStateWriter writer, Context context) {
+		ruleAppVisitor.visit(thisCompositionRule_, writer, context);
 	}
 
 	@Override
@@ -133,14 +121,48 @@ public class ForwardLink extends AbstractConclusion {
 		return relation_ + "->" + target_.getRoot();
 	}
 
+	public class ThisCompositionRule implements Rule<Context> {
+
+		private static final String NAME_ = "ForwardLink BackwardLink Composition";
+
+		@Override
+		public String getName() {
+			return NAME_;
+		}
+
+		@Override
+		public void apply(SaturationStateWriter writer, Context context) {
+			/* compose the link with all backward links */
+			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
+					.getSaturated().getCompositionsByLeftSubProperty();
+			final Multimap<IndexedPropertyChain, Context> backLinks = context
+					.getBackwardLinksByObjectProperty();
+
+			for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
+					comps.keySet(), backLinks.keySet())) {
+
+				Collection<IndexedPropertyChain> compositions = comps
+						.get(backwardRelation);
+				Collection<Context> sources = backLinks.get(backwardRelation);
+
+				for (IndexedPropertyChain composition : compositions)
+					for (Context source : sources) {
+						writer.produce(target_, new BackwardLink(source,
+								composition));
+					}
+			}
+		}
+
+	}
+
 	/**
-	 * A type of {@link ModifiableLinkRule} created for
-	 * {@link ForwardLink}s and stored in the {@link Context} where it is
-	 * produced. There can be at most one rule of this type stored in every
-	 * {@link Context}. The rule essentially indexes all {@link ForwardLink}s
-	 * produced in this {@link Context} and applies inferences with every
-	 * produced {@link BackwardLink} in this {@link Context}, such as computing
-	 * implied role chains.
+	 * A type of {@link ModifiableLinkRule} created for {@link ForwardLink}s and
+	 * stored in the {@link Context} where it is produced. There can be at most
+	 * one rule of this type stored in every {@link Context}. The rule
+	 * essentially indexes all {@link ForwardLink}s produced in this
+	 * {@link Context} and applies inferences with every produced
+	 * {@link BackwardLink} in this {@link Context}, such as computing implied
+	 * role chains.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
@@ -149,7 +171,7 @@ public class ForwardLink extends AbstractConclusion {
 			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
 			ModifiableLinkRule<BackwardLink> {
 
-		private static final String NAME = "ForwardLink BackwardLink Composition";
+		private static final String NAME_ = "BackwardLink ForwardLink Composition";
 
 		/**
 		 * the record that stores all {@link ForwardLink}s produced in the
@@ -171,13 +193,13 @@ public class ForwardLink extends AbstractConclusion {
 
 		@Override
 		public String getName() {
-			return NAME;
+			return NAME_;
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter engine, BackwardLink link) {
+		public void apply(SaturationStateWriter engine, BackwardLink link) {
 
-			LOGGER_.trace("Applying {} to {}", NAME, link);
+			LOGGER_.trace("Applying {} to {}", NAME_, link);
 
 			/* compose the link with all forward links */
 			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link
@@ -205,8 +227,8 @@ public class ForwardLink extends AbstractConclusion {
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor, BasicSaturationStateWriter writer,
-				BackwardLink backwardLink) {
+		public void accept(RuleApplicationVisitor visitor,
+				SaturationStateWriter writer, BackwardLink backwardLink) {
 			visitor.visit(this, writer, backwardLink);
 		}
 

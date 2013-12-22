@@ -26,24 +26,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkObjectSomeValuesFrom} in an
@@ -120,20 +120,19 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	@Override
-	public void accept(DecompositionRuleApplicationVisitor visitor,
-			Context context) {
+	public void accept(SubsumerDecompositionVisitor visitor, Context context) {
 		visitor.visit(this, context);
 	}
 
-	public static void generatePropagations(BasicSaturationStateWriter writer,
+	public static void generatePropagations(SaturationStateWriter writer,
 			IndexedPropertyChain property, Context context) {
 		for (IndexedClassExpression ice : context.getSubsumers()) {
 			ThisCompositionRule rule = ice.getCompositionRuleChain().find(
 					ThisCompositionRule.MATCHER_);
-			
+
 			if (rule == null)
 				continue;
-			
+
 			rule.apply(writer, property, context);
 		}
 	}
@@ -145,7 +144,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
-		private static final String NAME = "ObjectSomeValuesFrom Introduction";
+		private static final String NAME_ = "ObjectSomeValuesFrom Introduction";
 
 		private final Collection<IndexedObjectSomeValuesFrom> negExistentials_;
 
@@ -169,13 +168,13 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		@Override
 		public String getName() {
-			return NAME;
+			return NAME_;
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter writer, Context context) {
-			LOGGER_.trace("Applying {} to {}", NAME, context);			
-			
+		public void apply(SaturationStateWriter writer, Context context) {
+			LOGGER_.trace("Applying {} to {}", NAME_, context);
+
 			final Set<IndexedPropertyChain> candidatePropagationProperties = context
 					.getBackwardLinksByObjectProperty().keySet();
 
@@ -201,7 +200,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				// TODO: create a composition rule to deal with reflexivity
 				// propagating to the this context if relation is reflexive
 				if (relation.getSaturated().isDerivedReflexive())
-					writer.produce(context, new NegativeSubsumer(e));
+					writer.produce(context, new ComposedSubsumer(e));
 			}
 		}
 
@@ -240,7 +239,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, Context context) {
+				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 
@@ -261,7 +260,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			return negExistentials_.isEmpty();
 		}
 
-		private void apply(BasicSaturationStateWriter writer,
+		private void apply(SaturationStateWriter writer,
 				IndexedPropertyChain property, Context context) {
 
 			for (IndexedObjectSomeValuesFrom e : negExistentials_) {

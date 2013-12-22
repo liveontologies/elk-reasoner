@@ -29,7 +29,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -172,7 +172,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
-		public static final String NAME = "DisjointClasses Introduction";
+		private static final String NAME_ = "DisjointClasses Introduction";
 
 		/**
 		 * Set of relevant {@link IndexedDisjointnessAxiom}s in which the
@@ -197,18 +197,18 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 		@Override
 		public String getName() {
-			return NAME;
+			return NAME_;
 		}
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, Context context) {
+				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter writer, Context context) {
-			LOGGER_.trace("Applying {} to {}", NAME, context);
+		public void apply(SaturationStateWriter writer, Context context) {
+			LOGGER_.trace("Applying {} to {}", NAME_, context);
 			
 			for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
 				writer.produce(context, new DisjointnessAxiom(disAxiom));
@@ -259,7 +259,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
-		public static final String NAME = "DisjointClasses Contradiction Introduction";
+		public static final String NAME_ = "DisjointClasses Contradiction Introduction";
 
 		/**
 		 * The number of {@link IndexedDisjointnessAxiom}s in which the
@@ -280,12 +280,12 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 		@Override
 		public String getName() {
-			return NAME;
+			return NAME_;
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter writer, Context context) {
-			LOGGER_.trace("Applying {} to {}", NAME, context);
+		public void apply(SaturationStateWriter writer, Context context) {
+			LOGGER_.trace("Applying {} to {}", NAME_, context);
 			
 			writer.produce(context, Contradiction.getInstance());
 		}
@@ -312,7 +312,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, Context context) {
+				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 

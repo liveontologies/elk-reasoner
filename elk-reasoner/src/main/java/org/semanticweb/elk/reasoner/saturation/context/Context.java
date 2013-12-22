@@ -197,10 +197,11 @@ public interface Context {
 	 *            the {@link IndexedDisjointnessAxiom} to be checked for causing
 	 *            inconsistency in this {@link Context}
 	 * 
-	 * @return {@code true} if the given {@link IndexedDisjointnessAxiom} causes
-	 *         inconsistency of this {@link Context}
+	 * @return {@code true} if the given {@link IndexedDisjointnessAxiom} makes
+	 *         this {@link Context} inconsistent, that is, the context contains
+	 *         at least two subsumers listed in this inconsistency axiom
 	 */
-	public boolean inconsistencyDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
+	public boolean inconsistForDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 
 	/**
 	 * Adds the given {@link Conclusion} to be processed within this

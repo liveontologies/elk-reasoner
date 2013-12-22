@@ -26,11 +26,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -41,14 +43,14 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  *         pavel.klinov@uni-ulm.de
  */
 abstract class BasicDecompositionRuleApplicationVisitor implements
-		DecompositionRuleApplicationVisitor {
+		SubsumerDecompositionVisitor {
 
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(BasicDecompositionRuleApplicationVisitor.class);
 
 	@Override
 	public void visit(IndexedClass ice, Context context) {
-		BasicSaturationStateWriter writer = getSaturationStateWriter();
+		SaturationStateWriter writer = getSaturationStateWriter();
 
 		if (ice == getSaturationStateWriter().getOwlNothing()) {
 			if (LOGGER_.isTraceEnabled()) {
@@ -65,20 +67,30 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 	}
 
 	@Override
+	public void visit(IndexedIndividual idv, Context context) {
+		// not supported
+	}
+
+	@Override
+	public void visit(IndexedObjectUnionOf ice, Context context) {
+		// not supported
+	}
+
+	@Override
 	public void visit(IndexedObjectComplementOf ice, Context context) {
-		BasicSaturationStateWriter writer = getSaturationStateWriter();
+		SaturationStateWriter writer = getSaturationStateWriter();
 		if (context.getSubsumers().contains(ice.getNegated()))
 			writer.produce(context, Contradiction.getInstance());
 	}
 
 	@Override
 	public void visit(IndexedObjectIntersectionOf ice, Context context) {
-		BasicSaturationStateWriter writer = getSaturationStateWriter();
+		SaturationStateWriter writer = getSaturationStateWriter();
 
-		writer.produce(context, new PositiveSubsumer(ice.getFirstConjunct()));
-		writer.produce(context, new PositiveSubsumer(ice.getSecondConjunct()));
+		writer.produce(context, new DecomposedSubsumer(ice.getFirstConjunct()));
+		writer.produce(context, new DecomposedSubsumer(ice.getSecondConjunct()));
 	}
 
-	protected abstract BasicSaturationStateWriter getSaturationStateWriter();
+	protected abstract SaturationStateWriter getSaturationStateWriter();
 
 }

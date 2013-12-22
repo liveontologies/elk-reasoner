@@ -26,11 +26,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
@@ -39,6 +37,8 @@ import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
@@ -96,7 +96,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
-		private static final String NAME = "SubClassOf Expansion";
+		private static final String NAME_ = "SubClassOf Expansion";
 
 		/**
 		 * Correctness of axioms deletions requires that
@@ -128,15 +128,16 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 		@Override
 		public String getName() {
-			return NAME;
+			return NAME_;
 		}
 
 		@Override
-		public void apply(BasicSaturationStateWriter writer, Context context) {
-			LOGGER_.trace("Applying {}: {} to {}", NAME, toldSuperClassExpressions_, context);
-			
+		public void apply(SaturationStateWriter writer, Context context) {
+			LOGGER_.trace("Applying {}: {} to {}", NAME_,
+					toldSuperClassExpressions_, context);
+
 			for (IndexedClassExpression implied : toldSuperClassExpressions_) {
-				writer.produce(context, new PositiveSubsumer(implied));
+				writer.produce(context, new DecomposedSubsumer(implied));
 			}
 		}
 
@@ -147,8 +148,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			boolean changed = false;
 
 			for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-				LOGGER_.trace("Adding {} to {}", ice, NAME);
-				
+				LOGGER_.trace("Adding {} to {}", ice, NAME_);
+
 				changed |= rule.addToldSuperClassExpression(ice);
 			}
 
@@ -164,15 +165,15 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 			if (rule != null) {
 				for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-					LOGGER_.trace("Removing {} from {}", ice, NAME);
-					
+					LOGGER_.trace("Removing {} from {}", ice, NAME_);
+
 					changed |= rule.removeToldSuperClassExpression(ice);
 				}
 
 				if (rule.isEmpty()) {
 					ruleChain.remove(ThisCompositionRule.MATCHER_);
-					
-					LOGGER_.trace("{}: removed ", NAME);
+
+					LOGGER_.trace("{}: removed ", NAME_);
 
 					return true;
 				}
@@ -184,7 +185,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 		@Override
 		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, Context context) {
+				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
 
