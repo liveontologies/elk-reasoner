@@ -49,7 +49,7 @@ public interface ConclusionFactory {
 	 * @param ice
 	 * @return
 	 */
-	public PositiveSubsumer createSubsumer(IndexedClassExpression ice);
+	public DecomposedSubsumer createSubsumer(IndexedClassExpression ice);
 	
 	/**
 	 * Inference of the form A => B, B => C is in O, thus A => C
@@ -58,7 +58,7 @@ public interface ConclusionFactory {
 	 * @param subsumer C
 	 * @return C as a conclusion
 	 */
-	public PositiveSubsumer createSubsumer(Conclusion premise, IndexedClassExpression subsumer);
+	public DecomposedSubsumer createSubsumer(Conclusion premise, IndexedClassExpression subsumer);
 	
 	/**
 	 * Inference of the form A => R1 some B, B => R1 some C, thus A => R1 o R2 C.
@@ -118,20 +118,20 @@ public interface ConclusionFactory {
 	 * The second step of handling the inference of the form 
 	 * A => R some B, B => C, thus A => R some C. 
 	 * 
-	 * This method creates an actual {@link NegativeSubsumer} from the previously created propagation when processing the backward link.
+	 * This method creates an actual {@link ComposedSubsumer} from the previously created propagation when processing the backward link.
 	 * 
 	 * @param bwLink A => R some B
 	 * @param carry R some C
 	 * @param context B, the context where the backward link is stored
 	 * @return
 	 */
-	public NegativeSubsumer createPropagatedSubsumer(BackwardLink bwLink, IndexedObjectSomeValuesFrom carry, Context context);
+	public ComposedSubsumer createPropagatedSubsumer(BackwardLink bwLink, IndexedObjectSomeValuesFrom carry, Context context);
 	
 	/**
 	 * The second step of handling the inference of the form 
 	 * A => R some B, B => C, thus A => R some C. 
 	 * 
-	 * This method creates an actual {@link NegativeSubsumer} when processing the previously created propagation.
+	 * This method creates an actual {@link ComposedSubsumer} when processing the previously created propagation.
 	 * 
 	 * @param propagation R some C
 	 * @param linkRelation R
@@ -139,7 +139,7 @@ public interface ConclusionFactory {
 	 * @param context B (where the link is stored)
 	 * @return
 	 */
-	public NegativeSubsumer createPropagatedSubsumer(Propagation propagation, IndexedPropertyChain linkRelation, Context linkTarget, Context context);
+	public ComposedSubsumer createPropagatedSubsumer(Propagation propagation, IndexedPropertyChain linkRelation, Context linkTarget, Context context);
 	
 	/**
 	 * Inference of the form A => B1, A => B2, thus A => B1 and B2
@@ -149,7 +149,7 @@ public interface ConclusionFactory {
 	 * @param conjunction B1 and B2 
 	 * @return 
 	 */
-	public NegativeSubsumer createdComposedConjunction(Conclusion premise, IndexedClassExpression conjunct, IndexedObjectIntersectionOf conjunction);
+	public ComposedSubsumer createdComposedConjunction(Conclusion premise, IndexedClassExpression conjunct, IndexedObjectIntersectionOf conjunction);
 	
 	/**
 	 * Inference of the form A => B1 and B2, thus A => Bi (i = 1 or 2)
@@ -158,12 +158,12 @@ public interface ConclusionFactory {
 	 * @param conjunct Bi
 	 * @return
 	 */
-	public PositiveSubsumer createConjunct(IndexedObjectIntersectionOf conjunction, IndexedClassExpression conjunct);
+	public DecomposedSubsumer createConjunct(IndexedObjectIntersectionOf conjunction, IndexedClassExpression conjunct);
 	
 	/**
 	 * 
 	 * @param existential
 	 * @return
 	 */
-	public NegativeSubsumer createReflexiveSubsumer(IndexedObjectSomeValuesFrom existential);
+	public ComposedSubsumer createReflexiveSubsumer(IndexedObjectSomeValuesFrom existential);
 }

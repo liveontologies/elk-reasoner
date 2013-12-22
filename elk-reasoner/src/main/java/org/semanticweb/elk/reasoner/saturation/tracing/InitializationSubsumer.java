@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class InitializationSubsumer extends PositiveSubsumerImpl implements PositiveSubsumer, TracedConclusion {
+public class InitializationSubsumer extends DecomposedSubsumerImpl implements DecomposedSubsumer, TracedConclusion {
 
 	InitializationSubsumer(IndexedClassExpression expression) {
 		super(expression);

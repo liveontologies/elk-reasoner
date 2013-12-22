@@ -33,9 +33,9 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public interface ConclusionVisitor<R, C> {
 
-	public R visit(NegativeSubsumer negSCE, C context);
+	public R visit(ComposedSubsumer negSCE, C context);
 	
-	public R visit(PositiveSubsumer posSCE, C context);
+	public R visit(DecomposedSubsumer posSCE, C context);
 	
 	public R visit(BackwardLink link, C context);
 	
@@ -53,12 +53,12 @@ public interface ConclusionVisitor<R, C> {
 	public static final ConclusionVisitor<?, Context> DUMMY = new ConclusionVisitor<Object, Context>() {
 
 		@Override
-		public Object visit(NegativeSubsumer negSCE, Context context) {
+		public Object visit(ComposedSubsumer negSCE, Context context) {
 			return null;
 		}
 
 		@Override
-		public Object visit(PositiveSubsumer posSCE, Context context) {
+		public Object visit(DecomposedSubsumer posSCE, Context context) {
 			return null;
 		}
 

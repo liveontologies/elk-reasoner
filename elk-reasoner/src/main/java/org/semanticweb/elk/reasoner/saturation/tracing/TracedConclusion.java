@@ -36,6 +36,7 @@ public interface TracedConclusion extends Conclusion {
 
 	public <R, C> R acceptTraced(TracedConclusionVisitor<R, C> visitor, C parameter);
 	
+	// TODO: do we really need that? Used so far only in tests.
 	/**
 	 * Returns the context in which the inference has been made (may be
 	 * different from the context to which the conclusion logically belongs).

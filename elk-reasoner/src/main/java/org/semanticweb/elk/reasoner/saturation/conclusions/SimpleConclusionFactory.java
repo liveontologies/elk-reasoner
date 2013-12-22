@@ -38,14 +38,14 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public class SimpleConclusionFactory implements ConclusionFactory {
 
 	@Override
-	public PositiveSubsumer createSubsumer(IndexedClassExpression ice) {
-		return new PositiveSubsumerImpl(ice);
+	public DecomposedSubsumer createSubsumer(IndexedClassExpression ice) {
+		return new DecomposedSubsumerImpl(ice);
 	}
 
 	@Override
-	public PositiveSubsumer createSubsumer(Conclusion premise,
+	public DecomposedSubsumer createSubsumer(Conclusion premise,
 			IndexedClassExpression subsumer) {
-		return new PositiveSubsumerImpl(subsumer);
+		return new DecomposedSubsumerImpl(subsumer);
 	}
 
 	@Override
@@ -75,31 +75,31 @@ public class SimpleConclusionFactory implements ConclusionFactory {
 	}
 	
 	@Override
-	public NegativeSubsumer createPropagatedSubsumer(Propagation propagation, IndexedPropertyChain linkRelation, Context linkTarget, Context context) {
-		return new NegativeSubsumerImpl(propagation.getCarry());
+	public ComposedSubsumer createPropagatedSubsumer(Propagation propagation, IndexedPropertyChain linkRelation, Context linkTarget, Context context) {
+		return new ComposedSubsumerImpl(propagation.getCarry());
 	}
 
 	@Override
-	public NegativeSubsumer createPropagatedSubsumer(BackwardLink bwLink, IndexedObjectSomeValuesFrom carry, Context context) {
-		return new NegativeSubsumerImpl(carry);
+	public ComposedSubsumer createPropagatedSubsumer(BackwardLink bwLink, IndexedObjectSomeValuesFrom carry, Context context) {
+		return new ComposedSubsumerImpl(carry);
 	}
 
 	@Override
-	public NegativeSubsumer createdComposedConjunction(Conclusion premise,
+	public ComposedSubsumer createdComposedConjunction(Conclusion premise,
 			IndexedClassExpression conjunct, IndexedObjectIntersectionOf conjunction) {
-		return new NegativeSubsumerImpl(conjunction);
+		return new ComposedSubsumerImpl(conjunction);
 	}
 
 	@Override
-	public PositiveSubsumer createConjunct(IndexedObjectIntersectionOf conjunction,
+	public DecomposedSubsumer createConjunct(IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
-		return new PositiveSubsumerImpl(conjunct);
+		return new DecomposedSubsumerImpl(conjunct);
 	}
 
 	@Override
-	public NegativeSubsumer createReflexiveSubsumer(
+	public ComposedSubsumer createReflexiveSubsumer(
 			IndexedObjectSomeValuesFrom existential) {
-		return new NegativeSubsumerImpl(existential);
+		return new ComposedSubsumerImpl(existential);
 	}
 
 }

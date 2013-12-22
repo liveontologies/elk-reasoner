@@ -53,8 +53,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SimpleConclusionFactory;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -560,7 +560,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		public Boolean visit(NegativeSubsumer negSCE, Context context) {
+		public Boolean visit(ComposedSubsumer negSCE, Context context) {
 			negSCE.apply(iterationWriter_, context.getRoot().getContext(),
 					ruleAppVisitor_);
 			negSCE.applyDecompositionRules(context.getRoot().getContext(),
@@ -569,7 +569,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		public Boolean visit(PositiveSubsumer posSCE, Context context) {
+		public Boolean visit(DecomposedSubsumer posSCE, Context context) {
 			posSCE.apply(iterationWriter_, context.getRoot().getContext(),
 					ruleAppVisitor_, mainDecompRuleAppVisitor_);
 			return true;

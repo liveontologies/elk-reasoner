@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReflexiveSubsumer extends NegativeSubsumerImpl implements TracedConclusion {
+public class ReflexiveSubsumer extends ComposedSubsumerImpl implements TracedConclusion {
 
 	/**
 	 * @param superClassExpression

@@ -32,8 +32,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionFactory;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
@@ -47,13 +47,13 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public class TracingConclusionFactory implements ConclusionFactory {
 
 	@Override
-	public PositiveSubsumer createSubsumer(IndexedClassExpression ice) {
+	public DecomposedSubsumer createSubsumer(IndexedClassExpression ice) {
 		//no premise, must be an initialization inference
 		return new InitializationSubsumer(ice);
 	}
 
 	@Override
-	public PositiveSubsumer createSubsumer(Conclusion premise,
+	public DecomposedSubsumer createSubsumer(Conclusion premise,
 			IndexedClassExpression subsumer) {
 		//a subsumption inference
 		return new SubClassOfSubsumer(premise, subsumer);
@@ -90,32 +90,32 @@ public class TracingConclusionFactory implements ConclusionFactory {
 	}
 
 	@Override
-	public NegativeSubsumer createPropagatedSubsumer(BackwardLink bwLink,
+	public ComposedSubsumer createPropagatedSubsumer(BackwardLink bwLink,
 			IndexedObjectSomeValuesFrom carry, Context context) {
 		return new PropagatedSubsumer(context, bwLink, carry);
 	}
 	
 	@Override
-	public NegativeSubsumer createPropagatedSubsumer(Propagation propagation, IndexedPropertyChain linkSource, Context linkTarget, Context context) {
+	public ComposedSubsumer createPropagatedSubsumer(Propagation propagation, IndexedPropertyChain linkSource, Context linkTarget, Context context) {
 		return new PropagatedSubsumer(context, propagation, linkSource, linkTarget);
 	}
 
 	@Override
-	public NegativeSubsumer createdComposedConjunction(Conclusion subsumer,
+	public ComposedSubsumer createdComposedConjunction(Conclusion subsumer,
 			IndexedClassExpression conjunct,
 			IndexedObjectIntersectionOf conjunction) {
 		return new ComposedConjunction(subsumer, conjunct, conjunction);
 	}
 
 	@Override
-	public PositiveSubsumer createConjunct(
+	public DecomposedSubsumer createConjunct(
 			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
 		return new DecomposedConjunction(conjunction, conjunct);
 	}
 
 	@Override
-	public NegativeSubsumer createReflexiveSubsumer(
+	public ComposedSubsumer createReflexiveSubsumer(
 			IndexedObjectSomeValuesFrom existential) {
 		return new ReflexiveSubsumer(existential);
 	}

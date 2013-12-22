@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -51,17 +52,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Performs checks to verify that tracing information is correct 
+ * Performs checks to verify that tracing information is correct
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class CheckTracingStage extends BasePostProcessingStage {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(CheckTracingStage.class);
-	
+
 	/**
 	 * 
 	 */
@@ -76,8 +77,9 @@ public class CheckTracingStage extends BasePostProcessingStage {
 
 	@Override
 	public void execute() throws ElkException {
-		TraceStore.Reader traceReader = reasoner.traceState.getTraceStore().getReader();
-			
+		TraceStore.Reader traceReader = reasoner.traceState.getTraceStore()
+				.getReader();
+
 		for (Context context : reasoner.saturationState.getContexts()) {
 			if (reasoner.traceState.getSaturationState().isTraced(context)) {
 
@@ -89,129 +91,155 @@ public class CheckTracingStage extends BasePostProcessingStage {
 
 				if (context.isInconsistent()) {
 					checkTrace(context,
-							TracingUtils.getSubsumerWrapper(reasoner.ontologyIndex.getIndexedOwlNothing()),
+							TracingUtils
+									.getSubsumerWrapper(reasoner.ontologyIndex
+											.getIndexedOwlNothing()),
 							traceReader);
 				}
 			}
 		}
-		
+
 	}
 
-	private void checkTrace(Context context, Conclusion conclusion, final Reader traceReader) {
+	private void checkTrace(Context context, Conclusion conclusion,
+			final Reader traceReader) {
 		final Queue<InferenceWrapper> toDo = new LinkedList<InferenceWrapper>();
 		final Set<TracedConclusion> seenInferences = new HashSet<TracedConclusion>();
-		
+
 		addToQueue(context, conclusion, toDo, traceReader, seenInferences);
-		
+
 		for (;;) {
 			InferenceWrapper next = toDo.poll();
-			
+
 			if (next == null) {
 				break;
 			}
-			
-			final Context infContext = next.context;			
-			
-			next.inference.acceptTraced(new BaseTracedConclusionVisitor<Void, Void>() {
 
-				@Override
-				public Void visit(InitializationSubsumer inference, Void v) {
-					return null;
-				}
+			final Context infContext = next.context;
 
-				@Override
-				public Void visit(SubClassOfSubsumer inference, Void v) {
-					addToQueue(infContext, inference.getPremise(), toDo, traceReader, seenInferences);
-					return null;
-				}
+			next.inference.acceptTraced(
+					new BaseTracedConclusionVisitor<Void, Void>() {
 
-				@Override
-				public Void visit(ComposedConjunction inference, Void v) {
-					addToQueue(infContext, inference.getFirstConjunct(), toDo, traceReader, seenInferences);
-					addToQueue(infContext, inference.getSecondConjunct(), toDo, traceReader, seenInferences);
-					return null;
-				}
+						@Override
+						public Void visit(InitializationSubsumer inference,
+								Void v) {
+							return null;
+						}
 
-				@Override
-				public Void visit(DecomposedConjunction inference, Void v) {
-					addToQueue(infContext, inference.getConjunction(), toDo, traceReader, seenInferences);
-					return null;
-				}
+						@Override
+						public Void visit(SubClassOfSubsumer inference, Void v) {
+							addToQueue(infContext, inference.getPremise(),
+									toDo, traceReader, seenInferences);
+							return null;
+						}
 
-				@Override
-				public Void visit(ComposedBackwardLink inference, Void v) {
-					//System.out.println(inference);
-					
-					addToQueue(infContext, inference.getBackwardLink(), toDo, traceReader, seenInferences);
-					addToQueue(infContext, inference.getForwardLink(), toDo, traceReader, seenInferences);
-					return null;
-				}
+						@Override
+						public Void visit(ComposedConjunction inference, Void v) {
+							addToQueue(infContext,
+									inference.getFirstConjunct(), toDo,
+									traceReader, seenInferences);
+							addToQueue(infContext,
+									inference.getSecondConjunct(), toDo,
+									traceReader, seenInferences);
+							return null;
+						}
 
-				@Override
-				public Void visit(ReflexiveSubsumer inference, Void v) {
-					//TODO
-					return null;
-				}
+						@Override
+						public Void visit(DecomposedConjunction inference,
+								Void v) {
+							addToQueue(infContext, inference.getConjunction(),
+									toDo, traceReader, seenInferences);
+							return null;
+						}
 
-				@Override
-				public Void visit(PropagatedSubsumer inference, Void v) {
-					addToQueue(infContext, inference.getBackwardLink(), toDo, traceReader, seenInferences);
-					addToQueue(infContext, inference.getPropagation(), toDo, traceReader, seenInferences);
-					return null;
-				}
+						@Override
+						public Void visit(ComposedBackwardLink inference, Void v) {
+							// System.out.println(inference);
 
-				@Override
-				public Void visit(TracedPropagation inference, Void v) {
-					addToQueue(infContext, inference.getPremise(), toDo, traceReader, seenInferences);
-					return null;
-				}
-				
-			}, null);
+							addToQueue(infContext, inference.getBackwardLink(),
+									toDo, traceReader, seenInferences);
+							addToQueue(infContext, inference.getForwardLink(),
+									toDo, traceReader, seenInferences);
+							return null;
+						}
+
+						@Override
+						public Void visit(ReflexiveSubsumer inference, Void v) {
+							// TODO
+							return null;
+						}
+
+						@Override
+						public Void visit(PropagatedSubsumer inference, Void v) {
+							addToQueue(infContext, inference.getBackwardLink(),
+									toDo, traceReader, seenInferences);
+							addToQueue(infContext, inference.getPropagation(),
+									toDo, traceReader, seenInferences);
+							return null;
+						}
+
+						@Override
+						public Void visit(TracedPropagation inference, Void v) {
+							addToQueue(infContext, inference.getPremise(),
+									toDo, traceReader, seenInferences);
+							return null;
+						}
+
+					}, null);
 		}
 	}
-	
-	private void addToQueue(final Context context, final Conclusion conclusion, final Queue<InferenceWrapper> toDo, final TraceStore.Reader traceReader, final Set<TracedConclusion> seenInferences) {
-		//just need a mutable flag that can be set from inside the visitor 
-		final AtomicBoolean infFound = new AtomicBoolean(false);
-		//finding all inferences that produced the input conclusion
-		traceReader.accept(context, conclusion, new BaseTracedConclusionVisitor<Void, Void>(){
 
-			@Override
-			protected Void defaultTracedVisit(TracedConclusion inference, Void v) {
-				if (!seenInferences.contains(inference)) {
-					seenInferences.add(inference);
-					toDo.add(new InferenceWrapper(inference, inference.getInferenceContext(context)));
-				}
-				
-				infFound.set(true);
-				
-				return null;
-			}
-			
-		});
-		
-		if (!infFound.get() && reasoner.traceState.getSaturationState().isTraced(context)) {
-			LOGGER_.error("No inferences for a conclusion {} in context {}", conclusion, context);
+	private void addToQueue(final Context context, final Conclusion conclusion,
+			final Queue<InferenceWrapper> toDo,
+			final TraceStore.Reader traceReader,
+			final Set<TracedConclusion> seenInferences) {
+		// just need a mutable flag that can be set from inside the visitor
+		final AtomicBoolean infFound = new AtomicBoolean(false);
+		// finding all inferences that produced the input conclusion
+		traceReader.accept(context, conclusion,
+				new BaseTracedConclusionVisitor<Void, Void>() {
+
+					@Override
+					protected Void defaultTracedVisit(
+							TracedConclusion inference, Void v) {
+						if (!seenInferences.contains(inference)) {
+							seenInferences.add(inference);
+							toDo.add(new InferenceWrapper(inference, inference
+									.getInferenceContext(context)));
+						}
+
+						infFound.set(true);
+
+						return null;
+					}
+
+				});
+
+		if (!infFound.get()
+				&& reasoner.traceState.getSaturationState().isTraced(context)) {
+			LOGGER_.error("No inferences for a conclusion {} in context {}",
+					conclusion, context);
 		}
 	}
 
 	/*
-	 * used to propagate context which normally isn't stored within the inference.
+	 * used to propagate context which normally isn't stored within the
+	 * inference.
 	 */
 	private static class InferenceWrapper {
-		
+
 		final TracedConclusion inference;
 		final Context context;
-		
+
 		InferenceWrapper(TracedConclusion inf, Context cxt) {
 			inference = inf;
 			context = cxt;
 		}
-		
+
 		@Override
 		public String toString() {
 			return inference + " stored in " + context;
 		}
-		
+
 	}
 }

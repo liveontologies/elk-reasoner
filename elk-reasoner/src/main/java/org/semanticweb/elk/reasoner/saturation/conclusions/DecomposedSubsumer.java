@@ -22,24 +22,19 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 
 /**
- * A {@link SubsumerImpl}, for which the structure of the enclosed
- * {@link IndexedClassExpression} should be taken into account. That is, in
- * addition to composition rules stored with this {@link IndexedClassExpression}
- * , the so-called decomposition rule, which takes into account the topmost
- * constructor of this {@link IndexedClassExpression}, should be applied.
+ * A {@link Subsumer} derived using decomposition rules.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface PositiveSubsumer extends Subsumer {
+public interface DecomposedSubsumer extends Subsumer {
 
 	public void apply(BasicSaturationStateWriter writer, Context context,
 			CompositionRuleApplicationVisitor ruleAppVisitor,

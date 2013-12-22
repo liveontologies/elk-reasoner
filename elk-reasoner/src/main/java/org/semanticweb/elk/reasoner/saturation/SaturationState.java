@@ -43,7 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationV
  *         pavel.klinov@uni-ulm.de
  */
 public interface SaturationState {
-	
+
 	public static CompositionRuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicCompositionRuleApplicationVisitor();
 
 	public Collection<Context> getContexts();
@@ -54,6 +54,7 @@ public interface SaturationState {
 
 	/**
 	 * TODO
+	 * 
 	 * @param conclusionVisitor
 	 * @return
 	 */
@@ -62,6 +63,7 @@ public interface SaturationState {
 
 	/**
 	 * TODO
+	 * 
 	 * @param conclusionVisitor
 	 * @return
 	 */

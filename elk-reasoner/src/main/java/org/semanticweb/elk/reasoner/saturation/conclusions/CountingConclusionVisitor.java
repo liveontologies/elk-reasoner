@@ -33,12 +33,12 @@ public class CountingConclusionVisitor implements ConclusionVisitor<Integer, Con
 	}
 
 	@Override
-	public Integer visit(NegativeSubsumer negSCE, Context context) {
+	public Integer visit(ComposedSubsumer negSCE, Context context) {
 		return counter_.countNegativeSubsumers++;
 	}
 
 	@Override
-	public Integer visit(PositiveSubsumer posSCE, Context context) {
+	public Integer visit(DecomposedSubsumer posSCE, Context context) {
 		return counter_.countPositiveSubsumers++;
 	}
 

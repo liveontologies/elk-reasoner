@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.util;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicatio
  *
  * pavel.klinov@uni-ulm.de
  */
-class SubsumerPremise implements PositiveSubsumer {
+class SubsumerPremise implements DecomposedSubsumer {
 
 	private final IndexedClassExpression ice_;
 	

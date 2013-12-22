@@ -34,8 +34,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
@@ -68,14 +68,14 @@ public class SimpleContextTraceStore implements ContextTracer {
 		}
 		
 		@Override
-		public Void visit(NegativeSubsumer negSCE, TracedConclusionVisitor<?,?> visitor) {
+		public Void visit(ComposedSubsumer negSCE, TracedConclusionVisitor<?,?> visitor) {
 			visitAll(getSubsumerInferences(negSCE.getExpression()), visitor);
 			
 			return null;
 		}
 
 		@Override
-		public Void visit(PositiveSubsumer posSCE, TracedConclusionVisitor<?,?> visitor) {
+		public Void visit(DecomposedSubsumer posSCE, TracedConclusionVisitor<?,?> visitor) {
 			visitAll(getSubsumerInferences(posSCE.getExpression()), visitor);
 			
 			return null;

@@ -37,14 +37,14 @@ public class TimedConclusionVisitor implements ConclusionVisitor<Long, Context> 
 	}
 
 	@Override
-	public Long visit(NegativeSubsumer negSCE, Context context) {
+	public Long visit(ComposedSubsumer negSCE, Context context) {
 		timer_.timeNegativeSubsumers -= CachedTimeThread.getCurrentTimeMillis();
 		processor_.visit(negSCE, context);
 		return timer_.timeNegativeSubsumers += CachedTimeThread.getCurrentTimeMillis();
 	}
 
 	@Override
-	public Long visit(PositiveSubsumer posSCE, Context context) {
+	public Long visit(DecomposedSubsumer posSCE, Context context) {
 		timer_.timePositiveSubsumers -= CachedTimeThread.getCurrentTimeMillis();
 		processor_.visit(posSCE, context);
 		return timer_.timePositiveSubsumers += CachedTimeThread.getCurrentTimeMillis();

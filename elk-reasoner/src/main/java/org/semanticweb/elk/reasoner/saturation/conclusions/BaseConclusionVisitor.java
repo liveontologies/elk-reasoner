@@ -37,12 +37,12 @@ public class BaseConclusionVisitor<R, C> implements ConclusionVisitor<R, C> {
 	}
 	
 	@Override
-	public R visit(NegativeSubsumer negSCE, C context) {
+	public R visit(ComposedSubsumer negSCE, C context) {
 		return defaultVisit(negSCE, context);
 	}
 
 	@Override
-	public R visit(PositiveSubsumer posSCE, C context) {
+	public R visit(DecomposedSubsumer posSCE, C context) {
 		return defaultVisit(posSCE, context);
 	}
 

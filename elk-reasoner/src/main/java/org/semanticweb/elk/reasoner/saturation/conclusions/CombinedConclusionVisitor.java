@@ -34,12 +34,12 @@ public class CombinedConclusionVisitor<C> implements ConclusionVisitor<Boolean, 
 	}
 
 	@Override
-	public Boolean visit(NegativeSubsumer negSCE, C context) {
+	public Boolean visit(ComposedSubsumer negSCE, C context) {
 		return first_.visit(negSCE, context) && second_.visit(negSCE, context);
 	}
 
 	@Override
-	public Boolean visit(PositiveSubsumer posSCE, C context) {
+	public Boolean visit(DecomposedSubsumer posSCE, C context) {
 		return first_.visit(posSCE, context) && second_.visit(posSCE, context);
 	}
 

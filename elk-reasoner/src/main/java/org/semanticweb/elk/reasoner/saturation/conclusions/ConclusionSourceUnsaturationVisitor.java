@@ -49,7 +49,7 @@ public class ConclusionSourceUnsaturationVisitor implements
 	}
 
 	@Override
-	public Boolean visit(NegativeSubsumer negSCE, Context context) {
+	public Boolean visit(ComposedSubsumer negSCE, Context context) {
 		if (negSCE.getExpression().occurs()) {
 			return mark(negSCE, context);
 		}
@@ -59,7 +59,7 @@ public class ConclusionSourceUnsaturationVisitor implements
 	}
 
 	@Override
-	public Boolean visit(PositiveSubsumer posSCE, Context context) {
+	public Boolean visit(DecomposedSubsumer posSCE, Context context) {
 		if (posSCE.getExpression().occurs()) {
 			return mark(posSCE, context);
 		}

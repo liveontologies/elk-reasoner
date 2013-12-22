@@ -36,13 +36,13 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public interface Conclusion {
 
 	public <R, C> R accept(ConclusionVisitor<R, C> visitor, C parameter);
-	
+
 	/**
 	 * 
 	 * @param contextWhereStored
-	 * @return The context which this conclusion is logically relevant for, or {@code null} if none
+	 * @return The context which this conclusion is logically relevant for. It
+	 *         cannot be {@code null}.
 	 */
 	public Context getSourceContext(Context contextWhereStored);
-	
 
 }

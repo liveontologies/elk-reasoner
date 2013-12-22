@@ -38,6 +38,10 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public interface Subsumer extends Conclusion {
 
+	/**
+	 * @return the subsumer {@link IndexedClassEpression} represented by this
+	 *         {@link Conclusion}
+	 */
 	public IndexedClassExpression getExpression();
 
 }

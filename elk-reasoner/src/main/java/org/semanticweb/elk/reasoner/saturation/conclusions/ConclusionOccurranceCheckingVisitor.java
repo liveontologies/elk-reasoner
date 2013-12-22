@@ -28,12 +28,12 @@ public class ConclusionOccurranceCheckingVisitor implements
 		ConclusionVisitor<Boolean, Context> {
 
 	@Override
-	public Boolean visit(NegativeSubsumer negSCE, Context context) {
+	public Boolean visit(ComposedSubsumer negSCE, Context context) {
 		return context.containsSubsumer(negSCE.getExpression());
 	}
 
 	@Override
-	public Boolean visit(PositiveSubsumer posSCE, Context context) {
+	public Boolean visit(DecomposedSubsumer posSCE, Context context) {
 		return context.containsSubsumer(posSCE.getExpression());
 	}
 

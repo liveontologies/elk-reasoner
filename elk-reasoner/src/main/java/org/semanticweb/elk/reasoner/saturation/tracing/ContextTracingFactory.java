@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
+
 /*
  * #%L
  * ELK Reasoner
@@ -45,8 +46,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicDecompositionRuleApplicationVisitor;
@@ -69,8 +70,8 @@ import org.slf4j.LoggerFactory;
  * TODO
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class ContextTracingFactory extends RuleApplicationFactory {
 
@@ -82,7 +83,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	 * trace store which stores traced conclusions.
 	 */
 	private final TraceState traceState_;
-	
+
 	/**
 	 * Holds iff the context is traced (passed as input into this factory).
 	 */
@@ -90,11 +91,13 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		@Override
 		public boolean holds(Context cxt) {
-			return traceState_.getRootsSubmittedForTracing().contains(cxt.getRoot());
+			return traceState_.getRootsSubmittedForTracing().contains(
+					cxt.getRoot());
 		}
 	};
 
-	public ContextTracingFactory(ExtendedSaturationState mainSaturationState, TraceState traceState) {
+	public ContextTracingFactory(ExtendedSaturationState mainSaturationState,
+			TraceState traceState) {
 		super(mainSaturationState);
 		traceState_ = traceState;
 	}
@@ -110,7 +113,6 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		return traceState_.getSaturationState();
 	}
 
-
 	/**
 	 * 
 	 * @author Pavel Klinov
@@ -121,22 +123,26 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		// processes conclusions taken from the ToDo queue
 		private final ConclusionVisitor<Boolean, Context> conclusionProcessor_;
-		
+
 		protected TracingEngine() {
 			super(new SaturationStatistics());
-			
+
 			ExtendedSaturationStateWriter tracingWriter = getSaturationStateWriter();
-			//inserts to the local context and writes inferences
-			//the inference writer should go first so we capture alternative derivations.
+			// inserts to the local context and writes inferences
+			// the inference writer should go first so we capture alternative
+			// derivations.
 			ConclusionVisitor<Boolean, Context> inserter = new CombinedConclusionVisitor<Context>(
-					new InferenceInserter(traceState_.getTraceStore().getWriter()),
-					new ConclusionInsertionVisitor());
-			//applies rules on the main contexts
-			ConclusionVisitor<Boolean, Context> applicator = new ApplicationVisitor(tracingWriter, SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
-			//combines the inserter and the applicator
-			conclusionProcessor_ = new CombinedConclusionVisitor<Context>(inserter, applicator);
+					new InferenceInserter(traceState_.getTraceStore()
+							.getWriter()), new ConclusionInsertionVisitor());
+			// applies rules on the main contexts
+			ConclusionVisitor<Boolean, Context> applicator = new ApplicationVisitor(
+					tracingWriter,
+					SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
+			// combines the inserter and the applicator
+			conclusionProcessor_ = new CombinedConclusionVisitor<Context>(
+					inserter, applicator);
 		}
-		
+
 		@Override
 		public void submit(IndexedClassExpression root) {
 			getSaturationStateWriter().getCreateContext(root);
@@ -149,89 +155,97 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		@Override
 		protected ExtendedSaturationStateWriter getSaturationStateWriter() {
-			return getSaturationState().getTracingWriter(ConclusionVisitor.DUMMY, SaturationState.DEFAULT_INIT_RULE_APP_VISITOR, tracingCondition_);
+			return getSaturationState().getTracingWriter(
+					ConclusionVisitor.DUMMY,
+					SaturationState.DEFAULT_INIT_RULE_APP_VISITOR,
+					tracingCondition_);
 		}
-		
+
 	}
-	
+
 	/**
-	 * Applies unoptimized rules on main contexts. 
+	 * Applies unoptimized rules on main contexts.
 	 * 
 	 * @author Pavel Klinov
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private class ApplicationVisitor implements ConclusionVisitor<Boolean, Context> {
+	private class ApplicationVisitor implements
+			ConclusionVisitor<Boolean, Context> {
 
 		private final BasicSaturationStateWriter iterationWriter_;
 		private final CompositionRuleApplicationVisitor ruleAppVisitor_;
 		private final DecompositionRuleApplicationVisitor mainDecompRuleAppVisitor_;
 
-		public ApplicationVisitor(
-				BasicSaturationStateWriter iterationWriter,
+		public ApplicationVisitor(BasicSaturationStateWriter iterationWriter,
 				CompositionRuleApplicationVisitor ruleAppVisitor) {
 			this.iterationWriter_ = iterationWriter;
 			this.ruleAppVisitor_ = ruleAppVisitor;
-			this.mainDecompRuleAppVisitor_ = new LocalDecompositionVisitor(saturationState);
+			this.mainDecompRuleAppVisitor_ = new LocalDecompositionVisitor(
+					saturationState);
 
 		}
-		
+
 		Context getHybridContext(IndexedClassExpression root) {
-			//return root.getContext();
-			return new HybridContext(getSaturationState().getContext(root), root.getContext());
+			// return root.getContext();
+			return new HybridContext(getSaturationState().getContext(root),
+					root.getContext());
 		}
 
 		@Override
-		public Boolean visit(NegativeSubsumer negSCE, Context context) {
+		public Boolean visit(ComposedSubsumer negSCE, Context context) {
 			Context cxt = getHybridContext(context.getRoot());
-			
+
 			negSCE.apply(iterationWriter_, cxt, ruleAppVisitor_);
 			negSCE.applyDecompositionRules(cxt, mainDecompRuleAppVisitor_);
-			
+
 			return true;
 		}
 
 		@Override
-		public Boolean visit(PositiveSubsumer posSCE, Context context) {			
+		public Boolean visit(DecomposedSubsumer posSCE, Context context) {
 			posSCE.apply(iterationWriter_, getHybridContext(context.getRoot()),
 					ruleAppVisitor_, mainDecompRuleAppVisitor_);
 			return true;
 		}
 
 		@Override
-		public Boolean visit(BackwardLink link, Context context) {			
-			link.apply(iterationWriter_, getHybridContext(context.getRoot()), ruleAppVisitor_);
-			
+		public Boolean visit(BackwardLink link, Context context) {
+			link.apply(iterationWriter_, getHybridContext(context.getRoot()),
+					ruleAppVisitor_);
+
 			return true;
 		}
 
 		@Override
-		public Boolean visit(ForwardLink link, Context context) {			
+		public Boolean visit(ForwardLink link, Context context) {
 			link.apply(iterationWriter_, getHybridContext(context.getRoot()));
-			
+
 			return true;
 		}
 
 		@Override
-		public Boolean visit(Contradiction bot, Context context) {		
+		public Boolean visit(Contradiction bot, Context context) {
 			bot.deapply(iterationWriter_, getHybridContext(context.getRoot()));
 			return true;
 		}
 
 		@Override
-		public Boolean visit(Propagation propagation, Context context) {			
-			propagation.apply(iterationWriter_, getHybridContext(context.getRoot()));
+		public Boolean visit(Propagation propagation, Context context) {
+			propagation.apply(iterationWriter_,
+					getHybridContext(context.getRoot()));
 			return true;
 		}
 
 		@Override
 		public Boolean visit(DisjointnessAxiom disjointnessAxiom,
-				Context context) {			
-			disjointnessAxiom.apply(iterationWriter_, getHybridContext(context.getRoot()));
-			
+				Context context) {
+			disjointnessAxiom.apply(iterationWriter_,
+					getHybridContext(context.getRoot()));
+
 			return true;
 		}
-		
+
 		/**
 		 * A decomposition visitor which look ups contexts in the main
 		 * saturation state and doesn't create local contexts.
@@ -240,7 +254,8 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		 * 
 		 *         pavel.klinov@uni-ulm.de
 		 */
-		private class LocalDecompositionVisitor extends BasicDecompositionRuleApplicationVisitor {
+		private class LocalDecompositionVisitor extends
+				BasicDecompositionRuleApplicationVisitor {
 
 			private final SaturationState mainSaturationState_;
 
@@ -251,14 +266,17 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 			@Override
 			public void visit(IndexedObjectSomeValuesFrom ice, Context context) {
 				// never creates a new main context for the filler
-				Context fillerContext = mainSaturationState_.getContext(ice.getFiller());
+				Context fillerContext = mainSaturationState_.getContext(ice
+						.getFiller());
 
 				if (fillerContext != null) {
 					// the passed context is hybrid but we really need to point
 					// the backward link to the main context.
 					Context mainContext = context.getRoot().getContext();
-					
-					iterationWriter_.produce(fillerContext, iterationWriter_.getConclusionFactory().createBackwardLink(ice, mainContext));
+
+					iterationWriter_.produce(fillerContext,
+							iterationWriter_.getConclusionFactory()
+									.createBackwardLink(ice, mainContext));
 				}
 			}
 
@@ -270,15 +288,17 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		}
 
 	}
-	
+
+	// TODO: why main contexts are modified at all??
 	/**
 	 * Makes sure that inferences are stored by main contexts.
 	 * 
 	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
+	 * 
+	 *         pavel.klinov@uni-ulm.de
 	 */
-	private static class InferenceInserter extends TracingConclusionInsertionVisitor {
+	private static class InferenceInserter extends
+			TracingConclusionInsertionVisitor {
 
 		public InferenceInserter(Writer traceWriter) {
 			super(traceWriter);
@@ -288,9 +308,9 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
 			return super.defaultVisit(conclusion, cxt.getRoot().getContext());
 		}
-	
+
 	}
-	
+
 	/**
 	 * Hybrid context is a read-only view over the local and the main context
 	 * for the same root expression. When the outer code requests a conclusion
@@ -315,25 +335,24 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	 * 
 	 */
 	private class HybridContext implements Context {
-		
+
 		private final Context localContext_;
-		
+
 		private final Context mainContext_;
-		
+
 		private final Context selectedContext_;
-		
+
 		HybridContext(Context local, Context main) {
 			localContext_ = local;
 			mainContext_ = main;
-			
+
 			if (tracingCondition_.holds(localContext_)) {
 				selectedContext_ = localContext_;
-			}
-			else {
+			} else {
 				selectedContext_ = mainContext_;
 			}
 		}
-		
+
 		@Override
 		public IndexedClassExpression getRoot() {
 			return selectedContext_.getRoot();
@@ -355,7 +374,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 			 * solution is fragile as there can potentially be rules with
 			 * backward links that produce conclusions in other contexts
 			 */
-			
+
 			return localContext_.getBackwardLinksByObjectProperty();
 		}
 
@@ -415,7 +434,8 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		public boolean inconsistencyDisjointnessAxiom(	IndexedDisjointnessAxiom axiom) {
+		public boolean inconsistencyDisjointnessAxiom(
+				IndexedDisjointnessAxiom axiom) {
 			return localContext_.inconsistencyDisjointnessAxiom(axiom);
 		}
 
@@ -447,7 +467,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		@Override
 		public boolean setSaturated(boolean saturated) {
-			//no-op
+			// no-op
 			return false;
 		}
 
@@ -458,13 +478,13 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		@Override
 		public void removeLinks() {
-			//no-op
+			// no-op
 		}
 
 		@Override
 		public String toString() {
 			return getRoot() + "[hybrid]";
 		}
-		
+
 	}
 }

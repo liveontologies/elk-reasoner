@@ -46,13 +46,13 @@ public class ConclusionApplicationVisitor implements ConclusionVisitor<Boolean, 
 	}
 
 	@Override
-	public Boolean visit(NegativeSubsumer negSCE, Context context) {
+	public Boolean visit(ComposedSubsumer negSCE, Context context) {
 		negSCE.apply(writer_, context, ruleAppVisitor_);
 		return true;
 	}
 
 	@Override
-	public Boolean visit(PositiveSubsumer posSCE, Context context) {
+	public Boolean visit(DecomposedSubsumer posSCE, Context context) {
 		posSCE.apply(writer_, context, ruleAppVisitor_, decompRuleAppVisitor_);
 		return true;
 	}

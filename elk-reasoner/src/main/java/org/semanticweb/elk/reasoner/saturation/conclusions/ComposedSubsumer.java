@@ -22,25 +22,20 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 
 /**
- * A {@link SubsumerImpl}, for which the structure of the enclosed
- * {@link IndexedClassExpression} should not be taken into account when applying
- * the rules within {@link Context}. That is, only composition rules stored with
- * this {@link IndexedClassExpression} should be applied to
- * {@link NegativeSubsumer}s.
+ * A {@link Subsumer} derived using composition rules.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface NegativeSubsumer extends Subsumer {
-	
+public interface ComposedSubsumer extends Subsumer {
+
 	public void apply(BasicSaturationStateWriter writer, Context context,
 			CompositionRuleApplicationVisitor ruleAppVisitor);
 

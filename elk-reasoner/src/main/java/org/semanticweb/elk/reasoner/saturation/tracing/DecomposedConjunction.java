@@ -26,8 +26,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DecomposedConjunction extends PositiveSubsumerImpl implements PositiveSubsumer, TracedConclusion {
+public class DecomposedConjunction extends DecomposedSubsumerImpl implements DecomposedSubsumer, TracedConclusion {
 
 	private final IndexedObjectIntersectionOf conjunction_;
 	

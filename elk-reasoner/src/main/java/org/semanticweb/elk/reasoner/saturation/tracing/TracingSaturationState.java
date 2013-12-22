@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
+
 /*
  * #%L
  * ELK Reasoner
@@ -38,40 +39,44 @@ import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class TracingSaturationState extends LocalSaturationState {
 
 	public TracingSaturationState(OntologyIndex index) {
 		super(index);
 	}
-	
+
 	@Override
 	public BasicSaturationStateWriter getWriter(
 			ConclusionVisitor<?, Context> conclusionVisitor) {
-		return getExtendedWriter(conclusionVisitor, SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
+		return getExtendedWriter(conclusionVisitor,
+				SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
 	}
 
 	@Override
 	public ExtendedSaturationStateWriter getExtendedWriter(
 			ConclusionVisitor<?, Context> conclusionVisitor,
 			CompositionRuleApplicationVisitor initRuleAppVisitor) {
-		return new TracingWriter(conclusionVisitor, initRuleAppVisitor, new Condition<Context>(){
-			//by default trace everything
-			@Override
-			public boolean holds(Context element) {
-				return true;
-			}});
+		return new TracingWriter(conclusionVisitor, initRuleAppVisitor,
+				new Condition<Context>() {
+					// by default trace everything
+					@Override
+					public boolean holds(Context element) {
+						return true;
+					}
+				});
 	}
-	
+
 	public TracingWriter getTracingWriter(
 			ConclusionVisitor<?, Context> conclusionVisitor,
 			CompositionRuleApplicationVisitor initRuleAppVisitor,
 			Condition<Context> traceCondition) {
-		return new TracingWriter(conclusionVisitor, initRuleAppVisitor, traceCondition);
+		return new TracingWriter(conclusionVisitor, initRuleAppVisitor,
+				traceCondition);
 	}
-	
+
 	/**
 	 * 
 	 * @param context
@@ -79,31 +84,33 @@ public class TracingSaturationState extends LocalSaturationState {
 	 */
 	public boolean isTraced(Context context) {
 		Context localContext = getContext(context.getRoot());
-		
+
 		return localContext != null && localContext.isSaturated();
 	}
-	
+
 	public Iterable<Context> getTracedContexts() {
 		return Operations.filter(getContexts(), new Condition<Context>() {
 
 			@Override
 			public boolean holds(Context cxt) {
 				return cxt.isSaturated();
-			}});
+			}
+		});
 	}
-	
+
 	/**
 	 * 
 	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
+	 * 
+	 *         pavel.klinov@uni-ulm.de
 	 */
 	private class TracingWriter extends LocalSaturationState.LocalWriter {
-		
+
 		private final Condition<Context> traceCondition_;
 
 		public TracingWriter(ConclusionVisitor<?, Context> visitor,
-				CompositionRuleApplicationVisitor ruleAppVisitor, Condition<Context> traceCondition) {
+				CompositionRuleApplicationVisitor ruleAppVisitor,
+				Condition<Context> traceCondition) {
 			super(visitor, ruleAppVisitor, new TracingConclusionFactory());
 			traceCondition_ = traceCondition;
 		}
@@ -111,7 +118,8 @@ public class TracingSaturationState extends LocalSaturationState {
 		@Override
 		public void produceLocally(Context context, Conclusion conclusion) {
 			Context sourceContext = conclusion.getSourceContext(context);
-			//no need to iterate over conclusions which belong to non-traced contexts
+			// no need to iterate over conclusions which belong to non-traced
+			// contexts
 			if (traceCondition_.holds(sourceContext)) {
 				super.produceLocally(context, conclusion);
 			}

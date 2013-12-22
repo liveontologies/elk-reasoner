@@ -29,35 +29,33 @@ import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicatio
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 
 /**
- * A {@link SubsumerImpl}, for which the structure of the enclosed
- * {@link IndexedClassExpression} should be taken into account. That is, in
- * addition to composition rules stored with this {@link IndexedClassExpression}
- * , the so-called decomposition rule, which takes into account the topmost
- * constructor of this {@link IndexedClassExpression}, should be applied.
+ * The base implementation of {@link ComposedSubsumer}.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
  */
-public class PositiveSubsumerImpl extends SubsumerImpl implements PositiveSubsumer {
+public class ComposedSubsumerImpl extends SubsumerImpl implements
+		ComposedSubsumer {
 
-	protected PositiveSubsumerImpl(IndexedClassExpression superClassExpression) {
+	protected ComposedSubsumerImpl(IndexedClassExpression superClassExpression) {
 		super(superClassExpression);
 	}
 
 	@Override
 	public void apply(BasicSaturationStateWriter writer, Context context,
-			CompositionRuleApplicationVisitor ruleAppVisitor,
-			DecompositionRuleApplicationVisitor decompVisitor) {
-		// apply decomposition rules
-		expression.accept(decompVisitor, context);
-		// applying all composition rules
+			CompositionRuleApplicationVisitor ruleAppVisitor) {
 		applyCompositionRules(writer, context, ruleAppVisitor);
+	}
+
+	@Override
+	public void applyDecompositionRules(Context context,
+			DecompositionRuleApplicationVisitor decompVisitor) {
+		expression.accept(decompVisitor, context);
 	}
 
 	@Override
 	public <R, C> R accept(ConclusionVisitor<R, C> visitor, C context) {
 		return visitor.visit(this, context);
 	}
-
 }

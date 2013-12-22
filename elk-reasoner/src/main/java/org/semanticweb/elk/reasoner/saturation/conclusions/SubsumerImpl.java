@@ -25,16 +25,16 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 
 /**
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public abstract class SubsumerImpl implements Conclusion {
+public abstract class SubsumerImpl implements Subsumer {
 
 	/**
 	 * the implied {@code IndexedClassExpression} represented by this
@@ -46,10 +46,7 @@ public abstract class SubsumerImpl implements Conclusion {
 		this.expression = expression;
 	}
 
-	/**
-	 * @return the {@code IndexedClassExpression} represented by this
-	 *         {@link SubsumerImpl}
-	 */
+	@Override
 	public IndexedClassExpression getExpression() {
 		return expression;
 	}
@@ -62,8 +59,9 @@ public abstract class SubsumerImpl implements Conclusion {
 	protected void applyCompositionRules(BasicSaturationStateWriter writer,
 			Context context, CompositionRuleApplicationVisitor ruleAppVisitor) {
 
-		LinkRule<Conclusion, Context> compositionRule = expression.getCompositionRuleHead();
-		
+		LinkRule<Conclusion, Context> compositionRule = expression
+				.getCompositionRuleHead();
+
 		while (compositionRule != null) {
 			compositionRule.accept(ruleAppVisitor, writer, this, context);
 			compositionRule = compositionRule.next();

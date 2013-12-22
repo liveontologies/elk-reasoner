@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.NegativeSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class PropagatedSubsumer extends NegativeSubsumerImpl implements TracedConclusion {
+public class PropagatedSubsumer extends ComposedSubsumerImpl implements TracedConclusion {
 
 	private final IndexedPropertyChain linkRelation_;
 	
