@@ -45,7 +45,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -124,7 +124,7 @@ class ContextInitializationFactory
 		final ConclusionVisitor<?> conclusionVisitor = SaturationUtils
 				.addStatsToConclusionVisitor(localStatistics
 						.getConclusionStatistics());
-		final RuleApplicationVisitor ruleAppVisitor = SaturationUtils
+		final CompositionRuleVisitor ruleAppVisitor = SaturationUtils
 				.getStatsAwareCompositionRuleAppVisitor(localStatistics
 						.getRuleStatistics());
 		final SaturationStateWriter saturationStateWriter = saturationState_

@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -71,7 +71,7 @@ public class Propagation extends AbstractConclusion {
 	}
 
 	@Override
-	public void accept(RuleApplicationVisitor ruleAppVisitor,
+	public void accept(CompositionRuleVisitor ruleAppVisitor,
 			SaturationStateWriter writer, Context context) {
 		// propagate over all backward links
 		final Multimap<IndexedPropertyChain, Context> backLinks = context
@@ -156,7 +156,7 @@ public class Propagation extends AbstractConclusion {
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor,
+		public void accept(CompositionRuleVisitor visitor,
 				SaturationStateWriter writer, BackwardLink backwardLink) {
 			visitor.visit(this, writer, backwardLink);
 		}

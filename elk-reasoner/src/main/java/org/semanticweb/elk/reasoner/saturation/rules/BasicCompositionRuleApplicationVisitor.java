@@ -49,7 +49,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  *         pavel.klinov@uni-ulm.de
  */
 public class BasicCompositionRuleApplicationVisitor implements
-		RuleApplicationVisitor {
+		CompositionRuleVisitor {
 
 	@Override
 	public void visit(BackwardLink.ThisCompositionRule rule,

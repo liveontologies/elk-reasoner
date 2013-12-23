@@ -27,9 +27,10 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectComplementOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -112,7 +113,12 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 	}
 
 	/**
+	 * The composition rule that should be applied when processing the negated
+	 * {@link IndexedClassExpression} of this {@link IndexedObjectComplementOf}
+	 * in a {@code Context} that produce {@link Contradiction} if this
+	 * {@link IndexedObjectComplementOf} is contained in the {@code Context}.
 	 * 
+	 * @author "Yevgeny Kazakov"
 	 */
 	public static class ThisCompositionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
@@ -190,7 +196,7 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor,
+		public void accept(CompositionRuleVisitor visitor,
 				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}

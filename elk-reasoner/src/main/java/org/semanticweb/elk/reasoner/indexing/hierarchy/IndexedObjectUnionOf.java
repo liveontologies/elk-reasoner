@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -152,7 +152,7 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor,
+		public void accept(CompositionRuleVisitor visitor,
 				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}

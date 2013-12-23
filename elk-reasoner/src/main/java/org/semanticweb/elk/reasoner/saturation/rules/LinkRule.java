@@ -26,5 +26,5 @@ import org.semanticweb.elk.util.collections.chains.Link;
 
 public interface LinkRule<E> extends Rule<E>, Link<LinkRule<E>> {
 
-	public void accept(RuleApplicationVisitor visitor, SaturationStateWriter writer, E element);
+	public void accept(CompositionRuleVisitor visitor, SaturationStateWriter writer, E element);
 }

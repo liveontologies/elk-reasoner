@@ -24,14 +24,14 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 
 /**
  * 
  * A {@link ConclusionVisitor} that applies maximal number of rules for visited
  * {@link Conclusion}s. All composition rules for all {@link Conclusion}s are
- * applied using the provided {@link RuleApplicationVisitor}. In addition,
+ * applied using the provided {@link CompositionRuleVisitor}. In addition,
  * decomposition rules are applied for both {@link ComposedSubsumer}s and
  * {@link DecomposedSubsumer}s using the provided
  * {@link SubsumerDecompositionVisitor}. This is sufficient to ensure that at
@@ -55,7 +55,7 @@ public class ConclusionRuleApplicationVisitorMax extends
 	private final SubsumerDecompositionVisitor decompRuleAppVisitor_;
 
 	public ConclusionRuleApplicationVisitorMax(SaturationStateWriter writer,
-			RuleApplicationVisitor ruleAppVisitor,
+			CompositionRuleVisitor ruleAppVisitor,
 			SubsumerDecompositionVisitor decompVisitor) {
 		super(ruleAppVisitor, writer);
 		this.decompRuleAppVisitor_ = decompVisitor;

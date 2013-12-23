@@ -30,9 +30,10 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -138,7 +139,12 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	/**
+	 * The composition rule that should be applied when processing a conjunction
+	 * of {@link IndexedObjectIntersectionOf} in a {@code Context} that produce
+	 * this {@link IndexedObjectIntersectionOf} if the other conjunction is
+	 * contained in the {@code Context}.
 	 * 
+	 * @author "Yevgeny Kazakov"
 	 */
 	public static class ThisCompositionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
@@ -217,7 +223,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor,
+		public void accept(CompositionRuleVisitor visitor,
 				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}

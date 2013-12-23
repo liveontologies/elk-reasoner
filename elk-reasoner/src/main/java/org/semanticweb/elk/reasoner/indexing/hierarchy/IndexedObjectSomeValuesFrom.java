@@ -30,11 +30,12 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -138,7 +139,14 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	/**
+	 * The composition rule that should be applied when processing the filler of
+	 * {@link IndexedObjectSomeValuesFrom} in a {@code Context} that makes sure
+	 * that this {@link IndexedObjectSomeValuesFrom} is (eventually) produced in
+	 * all the {@link Context}s liked by {@link BackwardLink}s from this
+	 * {@code Context} by a sub-property of the property of this
+	 * {@link IndexedObjectSomeValuesFrom}.
 	 * 
+	 * @author "Yevgeny Kazakov"
 	 */
 	public static class ThisCompositionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
@@ -238,7 +246,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor,
+		public void accept(CompositionRuleVisitor visitor,
 				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}

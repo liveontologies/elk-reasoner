@@ -40,19 +40,19 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
- * A {@link RuleApplicationVisitor} wrapper for a given
- * {@link RuleApplicationVisitor} that additionally records the time spend
+ * A {@link CompositionRuleVisitor} wrapper for a given
+ * {@link CompositionRuleVisitor} that additionally records the time spend
  * within methods in the given {@link RuleApplicationTimer}.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class RuleApplicationTimerVisitor implements RuleApplicationVisitor {
+public class RuleApplicationTimerVisitor implements CompositionRuleVisitor {
 
 	/**
 	 * the visitor whose methods to be timed
 	 */
-	private final RuleApplicationVisitor visitor_;
+	private final CompositionRuleVisitor visitor_;
 
 	/**
 	 * timer used to time the visitor
@@ -72,7 +72,7 @@ public class RuleApplicationTimerVisitor implements RuleApplicationVisitor {
 	 *            the {@link RuleApplicationTimer} used to mesure the time spent
 	 *            within the methods
 	 */
-	public RuleApplicationTimerVisitor(RuleApplicationVisitor visitor,
+	public RuleApplicationTimerVisitor(CompositionRuleVisitor visitor,
 			RuleApplicationTimer timer) {
 		this.timer_ = timer;
 		this.visitor_ = visitor;

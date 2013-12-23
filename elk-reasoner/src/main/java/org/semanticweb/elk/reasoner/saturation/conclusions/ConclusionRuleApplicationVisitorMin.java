@@ -24,14 +24,14 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 
 /**
  * 
  * A {@link ConclusionVisitor} that applies minimal number of rules for visited
  * {@link Conclusion}s. All composition rules for all {@link Conclusion}s are
- * applied using the provided {@link RuleApplicationVisitor}. In addition,
+ * applied using the provided {@link CompositionRuleVisitor}. In addition,
  * decomposition rules are applied but only for {@link DecomposedSubsumer}s
  * using the provided {@link SubsumerDecompositionVisitor}. This is sufficient
  * to ensure completeness when the results of rules are saved in contexts, but
@@ -57,7 +57,7 @@ public class ConclusionRuleApplicationVisitorMin extends
 	private final SubsumerDecompositionVisitor decompRuleAppVisitor_;
 
 	public ConclusionRuleApplicationVisitorMin(
-			RuleApplicationVisitor ruleAppVisitor,
+			CompositionRuleVisitor ruleAppVisitor,
 			SubsumerDecompositionVisitor decompVisitor,
 			SaturationStateWriter writer) {
 		super(ruleAppVisitor, writer);

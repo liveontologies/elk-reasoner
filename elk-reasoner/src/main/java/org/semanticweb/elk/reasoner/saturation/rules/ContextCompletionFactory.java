@@ -98,7 +98,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	 */
 	private class ContextCompletionEngine extends
 			RuleApplicationFactory.BaseEngine {
-		private RuleApplicationVisitor initRuleAppVisitor_;
+		private CompositionRuleVisitor initRuleAppVisitor_;
 		// used for iteration over conclusions
 		private ExtendedSaturationStateWriter iterationWriter_;
 		// used for producing conclusions to the main contexts' ToDo and
@@ -230,7 +230,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		public ExtendedSaturationStateWriter getExtendedWriter(
 				ContextCreationListener contextCreationListener,
 				ContextModificationListener contextModificationListener,
-				RuleApplicationVisitor ruleAppVisitor,
+				CompositionRuleVisitor ruleAppVisitor,
 				ConclusionVisitor<?> conclusionVisitor,
 				boolean trackNewContextsAsUnsaturated) {
 			return new IterationSaturationStateWriter(conclusionVisitor,
@@ -268,7 +268,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 		private ExtendedSaturationStateWriter getWriterForDecompositionVisitor(
 				ConclusionVisitor<?> conclusionVisitor,
-				RuleApplicationVisitor initRuleAppVisitor) {
+				CompositionRuleVisitor initRuleAppVisitor) {
 			return new OptimizedLocalSaturationStateWriter(conclusionVisitor,
 					initRuleAppVisitor);
 		}
@@ -285,7 +285,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		private class OptimizedLocalSaturationStateWriter implements
 				ExtendedSaturationStateWriter {
 
-			private final RuleApplicationVisitor initRuleAppVisitor_;
+			private final CompositionRuleVisitor initRuleAppVisitor_;
 
 			// needed for statistics
 			private final ConclusionVisitor<?> conclusionVisitor_;
@@ -293,7 +293,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			private final ConclusionVisitor<Boolean> checker_;
 
 			OptimizedLocalSaturationStateWriter(ConclusionVisitor<?> visitor,
-					RuleApplicationVisitor ruleAppVisitor) {
+					CompositionRuleVisitor ruleAppVisitor) {
 				conclusionVisitor_ = visitor;
 				checker_ = new ConclusionOccurranceCheckingVisitor();
 				initRuleAppVisitor_ = ruleAppVisitor;
@@ -416,7 +416,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			private final ExtendedSaturationStateWriter mainStateWriter_;
 
 			IterationSaturationStateWriter(ConclusionVisitor<?> visitor,
-					RuleApplicationVisitor ruleAppVisitor,
+					CompositionRuleVisitor ruleAppVisitor,
 					ExtendedSaturationStateWriter writer) {
 				super(visitor, ruleAppVisitor);
 				mainStateWriter_ = writer;
@@ -528,12 +528,12 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			ConclusionVisitor<Boolean> {
 
 		private final SaturationStateWriter iterationWriter_;
-		private final RuleApplicationVisitor ruleAppVisitor_;
+		private final CompositionRuleVisitor ruleAppVisitor_;
 		private final SubsumerDecompositionVisitor iterateDecompRuleAppVisitor_;
 		private final SubsumerDecompositionVisitor produceDecompRuleAppVisitor_;
 
 		public ConclusionGapFillingVisitor(SaturationStateWriter enumWriter,
-				RuleApplicationVisitor ruleAppVisitor,
+				CompositionRuleVisitor ruleAppVisitor,
 				SubsumerDecompositionVisitor enumVisitor,
 				SubsumerDecompositionVisitor produceVisitor) {
 			super(ruleAppVisitor, enumWriter);

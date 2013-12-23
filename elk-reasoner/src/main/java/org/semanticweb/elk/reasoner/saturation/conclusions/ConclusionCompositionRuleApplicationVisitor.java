@@ -23,11 +23,11 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 
 /**
  * A {@link ConclusionVisitor} that applies decomposition rules for visited
- * {@link Conclusion}s using the provided {@link RuleApplicationVisitor} to
+ * {@link Conclusion}s using the provided {@link CompositionRuleVisitor} to
  * track rule applications and {@link SaturationStateWriter} to output the
  * {@link Conclusion}s of the applied rules.
  * 
@@ -38,9 +38,9 @@ public class ConclusionCompositionRuleApplicationVisitor implements
 		ConclusionVisitor<Boolean> {
 
 	/**
-	 * {@link RuleApplicationVisitor} to track rule applications
+	 * {@link CompositionRuleVisitor} to track rule applications
 	 */
-	private final RuleApplicationVisitor ruleAppVisitor_;
+	private final CompositionRuleVisitor ruleAppVisitor_;
 
 	/**
 	 * {@link SaturationStateWriter} to output the {@link Conclusion}s of the
@@ -49,7 +49,7 @@ public class ConclusionCompositionRuleApplicationVisitor implements
 	private final SaturationStateWriter writer_;
 
 	public ConclusionCompositionRuleApplicationVisitor(
-			RuleApplicationVisitor ruleAppVisitor, SaturationStateWriter writer) {
+			CompositionRuleVisitor ruleAppVisitor, SaturationStateWriter writer) {
 		this.writer_ = writer;
 		this.ruleAppVisitor_ = ruleAppVisitor;
 	}

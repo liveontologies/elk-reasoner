@@ -26,21 +26,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Defines the disjointness inference rule for indexed class expressions
@@ -159,9 +159,10 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	/**
-	 * {@link ThisCompositionRule} derives the disjointness axioms as a new kind
-	 * of element. For each subsumer, all disjointness axioms containing this
-	 * subsumer are registered using this rule.
+	 * The composition rule that should be applied when processing non-duplicate
+	 * {@link IndexedClassExpression}s in this {@link IndexedDisjointnessAxiom}
+	 * in a {@code Context} that produce a special {@link DisjointnessAxiom}
+	 * {@link Conclusion}
 	 * 
 	 * @author Pavel Klinov
 	 * 
@@ -201,7 +202,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor,
+		public void accept(CompositionRuleVisitor visitor,
 				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}
@@ -209,7 +210,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		@Override
 		public void apply(SaturationStateWriter writer, Context context) {
 			LOGGER_.trace("Applying {} to {}", NAME_, context);
-			
+
 			for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
 				writer.produce(context, new DisjointnessAxiom(disAxiom));
 		}
@@ -249,11 +250,11 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	/**
-	 * A rule which derives a {@link Contradiction} for inconsistent members of
-	 * this {@link IndexedDisjointnessAxiom}.
+	 * The composition rule that should be applied when processing duplicate
+	 * {@link IndexedClassExpression}s in this {@link IndexedDisjointnessAxiom}
+	 * in a {@code Context} that produce {@link Contradiction}
 	 * 
 	 * @author "Yevgeny Kazakov"
-	 * 
 	 */
 	public static class ThisContradictionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
@@ -286,7 +287,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		@Override
 		public void apply(SaturationStateWriter writer, Context context) {
 			LOGGER_.trace("Applying {} to {}", NAME_, context);
-			
+
 			writer.produce(context, Contradiction.getInstance());
 		}
 
@@ -311,7 +312,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor,
+		public void accept(CompositionRuleVisitor visitor,
 				SaturationStateWriter writer, Context context) {
 			visitor.visit(this, writer, context);
 		}

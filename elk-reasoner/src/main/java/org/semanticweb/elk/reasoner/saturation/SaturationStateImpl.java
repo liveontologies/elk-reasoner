@@ -40,7 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 
 /**
  * TODO docs
@@ -139,7 +139,7 @@ class SaturationStateImpl implements SaturationState {
 		return notSaturatedContexts_;
 	}
 
-	private static final RuleApplicationVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicCompositionRuleApplicationVisitor();
+	private static final CompositionRuleVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicCompositionRuleApplicationVisitor();
 	
 	/**
 	 * 
@@ -189,7 +189,7 @@ class SaturationStateImpl implements SaturationState {
 	public ExtendedSaturationStateWriter getExtendedWriter(
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener,
-			RuleApplicationVisitor ruleAppVisitor,
+			CompositionRuleVisitor ruleAppVisitor,
 			ConclusionVisitor<?> conclusionVisitor,
 			boolean trackNewContextsAsUnsaturated) {
 		return new ContextCreatingWriter(contextCreationListener,
@@ -286,7 +286,7 @@ class SaturationStateImpl implements SaturationState {
 	 */
 	class ContextCreatingWriter extends BasicWriter implements ExtendedSaturationStateWriter {
 
-		private final RuleApplicationVisitor initRuleAppVisitor_;
+		private final CompositionRuleVisitor initRuleAppVisitor_;
 
 		/**
 		 * If set to true, the writer will put all newly created contexts to
@@ -302,7 +302,7 @@ class SaturationStateImpl implements SaturationState {
 		private ContextCreatingWriter(
 				ContextCreationListener contextCreationListener,
 				ContextModificationListener contextModificationListener,
-				RuleApplicationVisitor ruleAppVisitor,
+				CompositionRuleVisitor ruleAppVisitor,
 				ConclusionVisitor<?> conclusionVisitor,
 				boolean trackNewContextsAsUnsaturated) {
 			super(contextModificationListener, conclusionVisitor);

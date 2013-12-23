@@ -2,7 +2,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 
 /*
  * #%L
@@ -47,6 +47,6 @@ public interface Conclusion {
 	 */
 	public Context getSourceContext(Context contextWhereStored);
 
-	public void accept(RuleApplicationVisitor ruleAppVisitor,
+	public void accept(CompositionRuleVisitor ruleAppVisitor,
 			SaturationStateWriter writer, Context context);
 }

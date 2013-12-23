@@ -28,8 +28,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 /**
  * @author Pavel Klinov
@@ -53,7 +53,7 @@ public class DisjointnessAxiom extends AbstractConclusion {
 	}
 
 	@Override
-	public void accept(RuleApplicationVisitor ruleAppVisitor,
+	public void accept(CompositionRuleVisitor ruleAppVisitor,
 			SaturationStateWriter writer, Context context) {
 		if (context.inconsistForDisjointnessAxiom(axiom_)) {
 			ruleAppVisitor.visit(THIS_COMPOSITION_RULE_, writer, context);
@@ -70,6 +70,12 @@ public class DisjointnessAxiom extends AbstractConclusion {
 		return axiom_.toString();
 	}
 
+	/**
+	 * The composition rule that should be applied when processing this
+	 * {@link DisjointnessAxiom} in a {@code Context}
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 */
 	public static class ThisCompositionRule implements Rule<Context> {
 
 		private static final String NAME_ = "Contradiction by Disjointness Axiom";

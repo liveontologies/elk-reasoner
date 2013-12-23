@@ -49,7 +49,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -229,7 +229,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 	/**
 	 * 
 	 */
-	private class ContextRuleValidator implements RuleApplicationVisitor {
+	private class ContextRuleValidator implements CompositionRuleVisitor {
 
 		@Override
 		public void visit(

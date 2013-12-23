@@ -26,9 +26,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from a
@@ -77,7 +77,7 @@ public class BackwardLink implements Conclusion {
 	}
 
 	@Override
-	public void accept(RuleApplicationVisitor ruleAppVisitor,
+	public void accept(CompositionRuleVisitor ruleAppVisitor,
 			SaturationStateWriter writer, Context context) {
 
 		ruleAppVisitor.visit(thisCompositionRule_, writer, context);
@@ -105,6 +105,13 @@ public class BackwardLink implements Conclusion {
 		return visitor.visit(this, context);
 	}
 
+	/**
+	 * The composition rule that should be applied when processing this
+	 * {@link BackwardLink} in a {@code Context}
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
+	 */
 	public class ThisCompositionRule implements Rule<Context> {
 
 		private static final String NAME_ = "BackwardLink Registration";

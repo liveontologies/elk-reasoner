@@ -26,7 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 
 /**
  * A {@link Conclusion} representing a subsumer {@link IndexedClassExpression}
@@ -65,7 +65,7 @@ public abstract class Subsumer implements Conclusion {
 	}
 
 	@Override
-	public void accept(RuleApplicationVisitor ruleAppVisitor,
+	public void accept(CompositionRuleVisitor ruleAppVisitor,
 			SaturationStateWriter writer, Context context) {
 
 		LinkRule<Context> compositionRule = expression_

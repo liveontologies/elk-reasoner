@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisito
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationCounterVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationTimerVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
 
 /**
@@ -66,7 +66,7 @@ public class SaturationUtils {
 	 * @param ruleAppVisitor
 	 */
 	public static void initContext(Context context, SaturationStateWriter writer,
-			OntologyIndex index, RuleApplicationVisitor ruleAppVisitor) {
+			OntologyIndex index, CompositionRuleVisitor ruleAppVisitor) {
 		// apply all context initialization rules
 		LinkRule<Context> initRule = index.getContextInitRuleHead();
 
@@ -89,9 +89,9 @@ public class SaturationUtils {
 	public static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
 	public static final boolean COLLECT_PROCESSING_TIMES = LOGGER_.isDebugEnabled();
 	
-	public static RuleApplicationVisitor getStatsAwareCompositionRuleAppVisitor(
+	public static CompositionRuleVisitor getStatsAwareCompositionRuleAppVisitor(
 			RuleStatistics localStatistics) {
-		RuleApplicationVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
+		CompositionRuleVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
 
 		if (COLLECT_RULE_COUNTS) {
 			ruleAppVisitor = new RuleApplicationCounterVisitor(ruleAppVisitor,

@@ -42,13 +42,16 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
+ * A visitor pattern for all types of composition rules together with the
+ * parameters for which these rules are applied.
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface RuleApplicationVisitor {
+public interface CompositionRuleVisitor {
 
 	void visit(BackwardLink.ThisCompositionRule thisCompositionRule,
 			SaturationStateWriter writer, Context context);

@@ -27,9 +27,9 @@ import java.util.Collection;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -85,7 +85,7 @@ public class ForwardLink extends AbstractConclusion {
 	}
 
 	@Override
-	public void accept(RuleApplicationVisitor ruleAppVisitor,
+	public void accept(CompositionRuleVisitor ruleAppVisitor,
 			SaturationStateWriter writer, Context context) {
 		ruleAppVisitor.visit(thisCompositionRule_, writer, context);
 	}
@@ -121,6 +121,12 @@ public class ForwardLink extends AbstractConclusion {
 		return relation_ + "->" + target_.getRoot();
 	}
 
+	/**
+	 * The composition rule that should be applied when processing this
+	 * {@link ForwardLink} in a {@code Context}
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 */
 	public class ThisCompositionRule implements Rule<Context> {
 
 		private static final String NAME_ = "ForwardLink BackwardLink Composition";
@@ -227,7 +233,7 @@ public class ForwardLink extends AbstractConclusion {
 		}
 
 		@Override
-		public void accept(RuleApplicationVisitor visitor,
+		public void accept(CompositionRuleVisitor visitor,
 				SaturationStateWriter writer, BackwardLink backwardLink) {
 			visitor.visit(this, writer, backwardLink);
 		}
