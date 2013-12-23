@@ -225,7 +225,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			/*
 			 * If saturation is unsatisfiable, return the unsatisfiable output.
 			 */
-			if (saturation.isInconsistent()) {
+			if (saturation.containsContradiction()) {
 				LOGGER_.trace(
 						"{}: transitive reduction finished: inconsistent", root);
 				

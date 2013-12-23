@@ -30,33 +30,30 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionCompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionOccurranceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Applies rules to all conclusions of partially completed contexts to close
@@ -526,7 +523,8 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private static class ConclusionGapFillingVisitor implements
+	private static class ConclusionGapFillingVisitor extends
+			ConclusionCompositionRuleApplicationVisitor implements
 			ConclusionVisitor<Boolean> {
 
 		private final SaturationStateWriter iterationWriter_;
@@ -534,11 +532,11 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		private final SubsumerDecompositionVisitor iterateDecompRuleAppVisitor_;
 		private final SubsumerDecompositionVisitor produceDecompRuleAppVisitor_;
 
-		public ConclusionGapFillingVisitor(
-				SaturationStateWriter enumWriter,
+		public ConclusionGapFillingVisitor(SaturationStateWriter enumWriter,
 				RuleApplicationVisitor ruleAppVisitor,
 				SubsumerDecompositionVisitor enumVisitor,
 				SubsumerDecompositionVisitor produceVisitor) {
+			super(ruleAppVisitor, enumWriter);
 			this.iterationWriter_ = enumWriter;
 			this.ruleAppVisitor_ = ruleAppVisitor;
 			this.iterateDecompRuleAppVisitor_ = enumVisitor;
@@ -547,51 +545,25 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		}
 
 		@Override
+		public Boolean defaultVisit(Conclusion conclusion, Context context) {
+			conclusion.accept(ruleAppVisitor_, iterationWriter_, context
+					.getRoot().getContext());
+			return true;
+		}
+
+		@Override
 		public Boolean visit(ComposedSubsumer negSCE, Context context) {
-			negSCE.apply(iterationWriter_, context.getRoot().getContext(),
-					ruleAppVisitor_);
-			negSCE.applyDecompositionRules(context.getRoot().getContext(),
-					produceDecompRuleAppVisitor_);
+			defaultVisit(negSCE, context);
+			negSCE.getExpression().accept(produceDecompRuleAppVisitor_,
+					context.getRoot().getContext());
 			return true;
 		}
 
 		@Override
 		public Boolean visit(DecomposedSubsumer posSCE, Context context) {
-			posSCE.apply(iterationWriter_, context.getRoot().getContext(),
-					ruleAppVisitor_, iterateDecompRuleAppVisitor_);
-			return true;
-		}
-
-		@Override
-		public Boolean visit(BackwardLink link, Context context) {
-			link.apply(iterationWriter_, context.getRoot().getContext(),
-					ruleAppVisitor_);
-			return true;
-		}
-
-		@Override
-		public Boolean visit(ForwardLink link, Context context) {
-			link.apply(iterationWriter_, context.getRoot().getContext());
-			return true;
-		}
-
-		@Override
-		public Boolean visit(Contradiction bot, Context context) {
-			bot.removeFrom(iterationWriter_, context.getRoot().getContext());
-			return true;
-		}
-
-		@Override
-		public Boolean visit(Propagation propagation, Context context) {
-			propagation.apply(iterationWriter_, context.getRoot().getContext());
-			return true;
-		}
-
-		@Override
-		public Boolean visit(DisjointnessAxiom disjointnessAxiom,
-				Context context) {
-			disjointnessAxiom.apply(iterationWriter_, context.getRoot()
-					.getContext());
+			defaultVisit(posSCE, context);
+			posSCE.getExpression().accept(iterateDecompRuleAppVisitor_,
+					context.getRoot().getContext());
 			return true;
 		}
 

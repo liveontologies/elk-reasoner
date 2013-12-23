@@ -24,9 +24,11 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
@@ -72,6 +74,20 @@ public class DecompositionRuleApplicationTimerVisitor implements
 	}
 
 	@Override
+	public void visit(IndexedDataHasValue ice, Context context) {
+		timer_.timeIndexedDataHasValue -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(ice, context);
+		timer_.timeIndexedDataHasValue += CachedTimeThread
+				.getCurrentTimeMillis();
+	}
+
+	@Override
+	public void visit(IndexedIndividual idv, Context context) {
+		// not supported
+	}
+
+	@Override
 	public void visit(IndexedObjectComplementOf ice, Context context) {
 		timer_.timeIndexedObjectComplementOf -= CachedTimeThread
 				.getCurrentTimeMillis();
@@ -99,12 +115,8 @@ public class DecompositionRuleApplicationTimerVisitor implements
 	}
 
 	@Override
-	public void visit(IndexedDataHasValue ice, Context context) {
-		timer_.timeIndexedDataHasValue -= CachedTimeThread
-				.getCurrentTimeMillis();
-		visitor_.visit(ice, context);
-		timer_.timeIndexedDataHasValue += CachedTimeThread
-				.getCurrentTimeMillis();
+	public void visit(IndexedObjectUnionOf ice, Context context) {
+		// not supported		
 	}
 
 }

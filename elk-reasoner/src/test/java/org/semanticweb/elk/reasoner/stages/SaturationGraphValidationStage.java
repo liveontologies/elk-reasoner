@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.ContextRootInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass.OwlThingContextInitializationRule;
@@ -46,12 +44,15 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Inspects all class expressions that are reachable via context rules or
@@ -307,6 +308,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		public void visit(
 				IndexedDisjointnessAxiom.ThisContradictionRule thisContradictionRule,
 				SaturationStateWriter writer, Context context) {
+			// nothing is stored in the rule
 		}
 
 		@Override
@@ -339,11 +341,40 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		public void visit(
 				Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
 				SaturationStateWriter writer, BackwardLink backwardLink) {
+			// nothing is stored in the rule
 		}
 
 		@Override
 		public void visit(ContextRootInitializationRule rootInitRule,
 				SaturationStateWriter writer, Context context) {
+			// nothing is stored in the rule
+		}
+
+		@Override
+		public void visit(BackwardLink.ThisCompositionRule thisCompositionRule,
+				SaturationStateWriter writer, Context context) {
+			// nothing is stored in the rule
+		}
+
+		@Override
+		public void visit(
+				Contradiction.ThisCompositionRule thisCompositionRule,
+				SaturationStateWriter writer, Context context) {
+			// nothing is stored in the rule
+		}
+
+		@Override
+		public void visit(
+				DisjointnessAxiom.ThisCompositionRule thisCompositionRule,
+				SaturationStateWriter writer, Context context) {
+			// nothing is stored in the rule
+
+		}
+
+		@Override
+		public void visit(ForwardLink.ThisCompositionRule thisCompositionRule,
+				SaturationStateWriter writer, Context context) {
+			// nothing is stored in the rule
 		}
 
 	}

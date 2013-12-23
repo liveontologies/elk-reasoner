@@ -204,6 +204,32 @@ public interface Context {
 	public boolean inconsistForDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
 
 	/**
+	 * Adds a contradiction to this context thus making this context
+	 * inconsistent
+	 * 
+	 * @return {@code true} the state of this {@link Context} has changed as a
+	 *         result of applying this method, i.e., if this context was not
+	 *         inconsistent
+	 */
+	public boolean addContradiction();
+
+	/**
+	 * Removes a contradiction from this context thus making this context
+	 * consistent
+	 * 
+	 * @return {@code true} the state of this {@link Context} has changed as a
+	 *         result of applying this method, i.e., if this context was
+	 *         inconsistent
+	 */
+	public boolean removeConradiction();
+
+	/**
+	 * @return {@code true} if contradiction has been derived in this
+	 *         {@link Context}
+	 */
+	public boolean containsContradiction();
+
+	/**
 	 * Adds the given {@link Conclusion} to be processed within this
 	 * {@link Context}. The method returns {@code true} when this is the first
 	 * unprocessed conclusion added to the context after it is being created or
@@ -233,25 +259,12 @@ public interface Context {
 	public Conclusion takeToDo();
 
 	/**
-	 * @return {@code true} if a contradiction has not been derived for the root
-	 *         {@link IndexedClassExpression}
-	 */
-	public boolean isInconsistent();
-
-	/**
 	 * @return {@code true} if all {@link Conclusion}s for this {@link Context},
 	 *         as determined by the function
 	 *         {@link Conclusion#getSourceContext(Context)}, are already
 	 *         computed.
 	 */
 	public boolean isSaturated();
-
-	/**
-	 * Sets the inconsistency of this {@code Context} to the given value.
-	 * 
-	 * @return the previous inconsistency value
-	 */
-	public boolean setInconsistent(boolean consistent);
 
 	/**
 	 * Marks this {@code Context} as saturated. This means that all all

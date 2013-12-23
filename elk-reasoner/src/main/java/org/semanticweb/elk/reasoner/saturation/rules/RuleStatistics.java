@@ -87,16 +87,16 @@ public class RuleStatistics {
 					+ ruleTimer.timeForwardLinkBackwardLinkRule
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countDisjointnessAxiomContradictionRule > 0)
+		if (ruleCounter.countIndexedDisjointnessAxiomContradictionRule > 0)
 			logger.debug("Disjointness axiom contradiction rules: "
-					+ ruleCounter.countDisjointnessAxiomContradictionRule
-					+ " (" + ruleTimer.timeDisjointnessAxiomContradictionRule
+					+ ruleCounter.countIndexedDisjointnessAxiomContradictionRule
+					+ " (" + ruleTimer.timeIndexedDisjointnessAxiomContradictionRule
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countDisjointnessAxiomCompositionRule > 0)
+		if (ruleCounter.countIndexedDisjointnessAxiomCompositionRule > 0)
 			logger.debug("Disjointness axiom composition rules: "
-					+ ruleCounter.countDisjointnessAxiomCompositionRule + " ("
-					+ ruleTimer.timeDisjointnessAxiomCompositionRule
+					+ ruleCounter.countIndexedDisjointnessAxiomCompositionRule + " ("
+					+ ruleTimer.timeIndexedDisjointnessAxiomCompositionRule
 					/ numOfMeasurements_ + " ms)");
 
 		if (ruleCounter.countOwlThingContextInitializationRule > 0)
@@ -111,10 +111,10 @@ public class RuleStatistics {
 					+ ruleTimer.timeContextRootInitializationRule
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countSubClassOfAxiomCompositionRule > 0)
+		if (ruleCounter.countIndexedSubClassOfAxiomCompositionRule > 0)
 			logger.debug("Subclass expansions: "
-					+ ruleCounter.countSubClassOfAxiomCompositionRule + " ("
-					+ ruleTimer.timeSubClassOfAxiomCompositionRule
+					+ ruleCounter.countIndexedSubClassOfAxiomCompositionRule + " ("
+					+ ruleTimer.timeIndexedSubClassOfAxiomCompositionRule
 					/ numOfMeasurements_ + " ms)");
 
 		if (ruleCounter.countContradictionBottomBackwardLinkRule > 0)
@@ -129,47 +129,47 @@ public class RuleStatistics {
 					+ ruleTimer.timePropagationBackwardLinkRule
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countObjectSomeValuesFromCompositionRule
+		if (ruleCounter.countIndexedObjectSomeValuesFromCompositionRule
 				+ decompositionRuleCounter.countIndexedObjectSomeValuesFromDecompositionRule > 0)
 			logger.debug("ObjectSomeValuesFrom composition/decomposition rules: "
-					+ ruleCounter.countObjectSomeValuesFromCompositionRule
+					+ ruleCounter.countIndexedObjectSomeValuesFromCompositionRule
 					+ "/"
 					+ decompositionRuleCounter.countIndexedObjectSomeValuesFromDecompositionRule
 					+ " ("
-					+ ruleTimer.timeObjectSomeValuesFromCompositionRule
+					+ ruleTimer.timeIndexedObjectSomeValuesFromCompositionRule
 					/ numOfMeasurements_
 					+ "/"
 					+ decompositionRuleTimer.timeIndexedObjectSomeValuesFrom
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countObjectIntersectionOfCompositionRule
+		if (ruleCounter.countIndexedObjectIntersectionOfCompositionRule
 				+ decompositionRuleCounter.countIndexedObjectIntersectionOfDecompositionRule > 0)
 			logger.debug("ObjectIntersectionOf composition/decomposition rules: "
-					+ ruleCounter.countObjectIntersectionOfCompositionRule
+					+ ruleCounter.countIndexedObjectIntersectionOfCompositionRule
 					+ "/"
 					+ decompositionRuleCounter.countIndexedObjectIntersectionOfDecompositionRule
 					+ " ("
-					+ ruleTimer.timeObjectIntersectionOfCompositionRule
+					+ ruleTimer.timeObjectIndexedIntersectionOfCompositionRule
 					/ numOfMeasurements_
 					+ "/"
 					+ decompositionRuleTimer.timeIndexedObjectIntersectionOf
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countObjectComplementOfCompositionRule
+		if (ruleCounter.countIndexedObjectComplementOfCompositionRule
 				+ decompositionRuleCounter.countIndexedObjectComplementOfDecompositionRule > 0)
 			logger.debug("ObjectComplementOf composition/decomposition rules: "
-					+ ruleCounter.countObjectComplementOfCompositionRule
+					+ ruleCounter.countIndexedObjectComplementOfCompositionRule
 					+ "/"
 					+ decompositionRuleCounter.countIndexedObjectComplementOfDecompositionRule
-					+ " (" + ruleTimer.timeObjectComplementOfCompositionRule
+					+ " (" + ruleTimer.timeObjectIndexedComplementOfCompositionRule
 					/ numOfMeasurements_ + "/"
 					+ decompositionRuleTimer.timeIndexedObjectComplementOf
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countObjectUnionOfCompositionRule > 0)
+		if (ruleCounter.countIndexedObjectUnionOfCompositionRule > 0)
 			logger.debug("ObjectUnionOf composition rules: "
-					+ ruleCounter.countObjectUnionOfCompositionRule + " ("
-					+ ruleTimer.timeObjectUnionOfCompositionRule
+					+ ruleCounter.countIndexedObjectUnionOfCompositionRule + " ("
+					+ ruleTimer.timeIndexedObjectUnionOfCompositionRule
 					/ numOfMeasurements_ + " ms)");
 
 		if (decompositionRuleCounter.countIndexedClassDecompositionRule > 0)
@@ -180,17 +180,17 @@ public class RuleStatistics {
 
 		logger.debug("Total rule time: "
 				+ (ruleTimer.timeContradictionBottomBackwardLinkRule
-						+ ruleTimer.timeDisjointnessAxiomCompositionRule
-						+ ruleTimer.timeDisjointnessAxiomContradictionRule
+						+ ruleTimer.timeIndexedDisjointnessAxiomCompositionRule
+						+ ruleTimer.timeIndexedDisjointnessAxiomContradictionRule
 						+ ruleTimer.timeForwardLinkBackwardLinkRule
-						+ ruleTimer.timeObjectIntersectionOfCompositionRule
-						+ ruleTimer.timeObjectSomeValuesFromCompositionRule
-						+ ruleTimer.timeObjectComplementOfCompositionRule
-						+ ruleTimer.timeObjectUnionOfCompositionRule
+						+ ruleTimer.timeObjectIndexedIntersectionOfCompositionRule
+						+ ruleTimer.timeIndexedObjectSomeValuesFromCompositionRule
+						+ ruleTimer.timeObjectIndexedComplementOfCompositionRule
+						+ ruleTimer.timeIndexedObjectUnionOfCompositionRule
 						+ ruleTimer.timeOwlThingContextInitializationRule
 						+ ruleTimer.timeContextRootInitializationRule
 						+ ruleTimer.timePropagationBackwardLinkRule
-						+ ruleTimer.timeSubClassOfAxiomCompositionRule
+						+ ruleTimer.timeIndexedSubClassOfAxiomCompositionRule
 						+ decompositionRuleTimer.timeIndexedClass
 						+ decompositionRuleTimer.timeIndexedDataHasValue
 						+ decompositionRuleTimer.timeIndexedObjectIntersectionOf

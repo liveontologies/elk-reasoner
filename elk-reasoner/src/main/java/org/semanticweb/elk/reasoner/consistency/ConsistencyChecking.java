@@ -229,12 +229,12 @@ public class ConsistencyChecking
 
 		@Override
 		public void notifyFinished(SaturationJob<IndexedClassEntity> job) {
-			if (job.getOutput().isInconsistent())
+			if (job.getOutput().containsContradiction())
 				consistenceMonitor.setInconsistent();
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(job.getInput()
 						+ ": consistency checking finished: "
-						+ (job.getOutput().isInconsistent() ? "inconsistent"
+						+ (job.getOutput().containsContradiction() ? "inconsistent"
 								: "satisfiable"));
 		}
 

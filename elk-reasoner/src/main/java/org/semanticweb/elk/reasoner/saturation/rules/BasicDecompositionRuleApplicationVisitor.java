@@ -86,7 +86,6 @@ abstract class BasicDecompositionRuleApplicationVisitor implements
 	@Override
 	public void visit(IndexedObjectIntersectionOf ice, Context context) {
 		SaturationStateWriter writer = getSaturationStateWriter();
-
 		writer.produce(context, new DecomposedSubsumer(ice.getFirstConjunct()));
 		writer.produce(context, new DecomposedSubsumer(ice.getSecondConjunct()));
 	}

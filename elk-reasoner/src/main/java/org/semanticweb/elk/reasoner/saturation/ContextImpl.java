@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
@@ -121,14 +122,14 @@ public class ContextImpl implements Context {
 	public IndexedClassExpression getRoot() {
 		return root_;
 	}
-	
+
 	@Override
 	public void removeLinks() {
-		//No sync here?
+		// No sync here?
 		if (previous != null) {
 			previous.next = next;
 		}
-		
+
 		if (next != null) {
 			next.previous = previous;
 		}
@@ -155,15 +156,24 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public boolean isInconsistent() {
-		return isInconsistent;
+	public boolean addContradiction() {
+		boolean before = isInconsistent;
+		isInconsistent = true;
+		Contradiction.getInstance().addTo(this);
+		return before != isInconsistent;
 	}
 
 	@Override
-	public boolean setInconsistent(boolean inconsistent) {
-		boolean result = isInconsistent;
-		isInconsistent = inconsistent;
-		return result;
+	public boolean removeConradiction() {
+		boolean before = isInconsistent;
+		isInconsistent = false;
+		Contradiction.getInstance().removeFrom(this);
+		return before != isInconsistent;
+	}
+
+	@Override
+	public boolean containsContradiction() {
+		return isInconsistent;
 	}
 
 	@Override

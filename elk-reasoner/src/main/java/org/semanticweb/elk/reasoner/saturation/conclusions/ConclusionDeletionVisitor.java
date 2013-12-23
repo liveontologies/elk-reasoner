@@ -48,7 +48,7 @@ public class ConclusionDeletionVisitor implements ConclusionVisitor<Boolean> {
 
 	@Override
 	public Boolean visit(Contradiction bot, Context context) {
-		return context.setInconsistent(false);
+		return context.removeConradiction();
 	}
 
 	@Override

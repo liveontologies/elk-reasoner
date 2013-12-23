@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -57,15 +58,14 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 	private final RuleApplicationCounter counter_;
 
 	/**
-	 * Creates a new {@link SubsumerDecompositionVisitor} that executes
-	 * the corresponding methods of the given
-	 * {@link SubsumerDecompositionVisitor} and counts the number of
-	 * invocations of the corresponding methods using the given
-	 * {@link RuleApplicationCounter}.
+	 * Creates a new {@link SubsumerDecompositionVisitor} that executes the
+	 * corresponding methods of the given {@link SubsumerDecompositionVisitor}
+	 * and counts the number of invocations of the corresponding methods using
+	 * the given {@link RuleApplicationCounter}.
 	 * 
 	 * @param visitor
-	 *            the {@link SubsumerDecompositionVisitor} used to
-	 *            execute the methods
+	 *            the {@link SubsumerDecompositionVisitor} used to execute the
+	 *            methods
 	 * @param counter
 	 *            the {@link RuleApplicationCounter} used to count the number of
 	 *            method invocations
@@ -74,6 +74,58 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 			RuleApplicationCounter counter) {
 		this.visitor_ = visitor;
 		this.counter_ = counter;
+	}
+
+	@Override
+	public void visit(BackwardLink.ThisCompositionRule thisCompositionRule,
+			SaturationStateWriter writer, Context context) {
+		counter_.countBackwardLinkCompositionRule++;
+		visitor_.visit(thisCompositionRule, writer, context);
+	}
+
+	@Override
+	public void visit(ContextRootInitializationRule rootInitRule,
+			SaturationStateWriter writer, Context context) {
+		counter_.countContextRootInitializationRule++;
+		visitor_.visit(rootInitRule, writer, context);
+	}
+
+	@Override
+	public void visit(
+			Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
+			SaturationStateWriter writer, BackwardLink backwardLink) {
+		counter_.countContradictionBottomBackwardLinkRule++;
+		visitor_.visit(bottomBackwardLinkRule, writer, backwardLink);
+	}
+
+	@Override
+	public void visit(Contradiction.ThisCompositionRule thisCompositionRule,
+			SaturationStateWriter writer, Context context) {
+		counter_.countContradictionCompositionRule++;
+		visitor_.visit(thisCompositionRule, writer, context);
+	}
+
+	@Override
+	public void visit(
+			DisjointnessAxiom.ThisCompositionRule thisCompositionRule,
+			SaturationStateWriter writer, Context context) {
+		counter_.countDisjointnessAxiomCompositionRule++;
+		visitor_.visit(thisCompositionRule, writer, context);
+	}
+
+	@Override
+	public void visit(ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
+			SaturationStateWriter writer, BackwardLink backwardLink) {
+		counter_.countForwardLinkBackwardLinkRule++;
+		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
+
+	}
+
+	@Override
+	public void visit(ForwardLink.ThisCompositionRule thisCompositionRule,
+			SaturationStateWriter writer, Context context) {
+		counter_.countForwardLinkCompositionRule++;
+		visitor_.visit(thisCompositionRule, writer, context);
 	}
 
 	@Override
@@ -88,7 +140,7 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 	public void visit(
 			IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
 			SaturationStateWriter writer, Context context) {
-		counter_.countDisjointnessAxiomCompositionRule++;
+		counter_.countIndexedDisjointnessAxiomCompositionRule++;
 		visitor_.visit(thisCompositionRule, writer, context);
 	}
 
@@ -96,7 +148,7 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 	public void visit(
 			IndexedDisjointnessAxiom.ThisContradictionRule thisContradictionRule,
 			SaturationStateWriter writer, Context context) {
-		counter_.countDisjointnessAxiomContradictionRule++;
+		counter_.countIndexedDisjointnessAxiomContradictionRule++;
 		visitor_.visit(thisContradictionRule, writer, context);
 	}
 
@@ -104,7 +156,7 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 	public void visit(
 			IndexedObjectComplementOf.ThisCompositionRule thisCompositionRule,
 			SaturationStateWriter writer, Context context) {
-		counter_.countObjectComplementOfCompositionRule++;
+		counter_.countIndexedObjectComplementOfCompositionRule++;
 		visitor_.visit(thisCompositionRule, writer, context);
 	}
 
@@ -112,15 +164,7 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 	public void visit(
 			IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
 			SaturationStateWriter writer, Context context) {
-		counter_.countObjectIntersectionOfCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
-	}
-
-	@Override
-	public void visit(
-			IndexedSubClassOfAxiom.ThisCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
-		counter_.countSubClassOfAxiomCompositionRule++;
+		counter_.countIndexedObjectIntersectionOfCompositionRule++;
 		visitor_.visit(thisCompositionRule, writer, context);
 	}
 
@@ -128,7 +172,7 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 	public void visit(
 			IndexedObjectSomeValuesFrom.ThisCompositionRule thisCompositionRule,
 			SaturationStateWriter writer, Context context) {
-		counter_.countObjectSomeValuesFromCompositionRule++;
+		counter_.countIndexedObjectSomeValuesFromCompositionRule++;
 		visitor_.visit(thisCompositionRule, writer, context);
 	}
 
@@ -136,16 +180,16 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 	public void visit(
 			IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
 			SaturationStateWriter writer, Context context) {
-		counter_.countObjectUnionOfCompositionRule++;
+		counter_.countIndexedObjectUnionOfCompositionRule++;
 		visitor_.visit(thisCompositionRule, writer, context);
 	}
 
 	@Override
-	public void visit(ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
-			SaturationStateWriter writer, BackwardLink backwardLink) {
-		counter_.countForwardLinkBackwardLinkRule++;
-		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
-
+	public void visit(
+			IndexedSubClassOfAxiom.ThisCompositionRule thisCompositionRule,
+			SaturationStateWriter writer, Context context) {
+		counter_.countIndexedSubClassOfAxiomCompositionRule++;
+		visitor_.visit(thisCompositionRule, writer, context);
 	}
 
 	@Override
@@ -153,21 +197,6 @@ public class RuleApplicationCounterVisitor implements RuleApplicationVisitor {
 			SaturationStateWriter writer, BackwardLink backwardLink) {
 		counter_.countPropagationBackwardLinkRule++;
 		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
-	}
-
-	@Override
-	public void visit(
-			Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
-			SaturationStateWriter writer, BackwardLink backwardLink) {
-		counter_.countContradictionBottomBackwardLinkRule++;
-		visitor_.visit(bottomBackwardLinkRule, writer, backwardLink);
-	}
-
-	@Override
-	public void visit(ContextRootInitializationRule rootInitRule,
-			SaturationStateWriter writer, Context context) {
-		counter_.countContextRootInitializationRule++;
-		visitor_.visit(rootInitRule, writer, context);
 	}
 
 }

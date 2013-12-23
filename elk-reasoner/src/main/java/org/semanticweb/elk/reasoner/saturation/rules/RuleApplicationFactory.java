@@ -212,14 +212,14 @@ public class RuleApplicationFactory {
 			return new CombinedConclusionVisitor(
 					new ConclusionInsertionVisitor(),
 					getUsedConclusionsCountingVisitor(new ConclusionRuleApplicationVisitorMin(
-							saturationStateWriter,
 							SaturationUtils
 									.getStatsAwareCompositionRuleAppVisitor(localStatistics
 											.getRuleStatistics()),
 							SaturationUtils
 									.getStatsAwareDecompositionRuleAppVisitor(
 											getDecompositionRuleApplicationVisitor(),
-											localStatistics.getRuleStatistics()))));
+											localStatistics.getRuleStatistics()),
+							saturationStateWriter)));
 		}
 
 		/**

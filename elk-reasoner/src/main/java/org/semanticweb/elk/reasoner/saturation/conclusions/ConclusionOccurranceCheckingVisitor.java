@@ -49,7 +49,7 @@ public class ConclusionOccurranceCheckingVisitor implements
 
 	@Override
 	public Boolean visit(Contradiction bot, Context context) {
-		return context.isInconsistent();
+		return context.containsContradiction();
 	}
 
 	@Override

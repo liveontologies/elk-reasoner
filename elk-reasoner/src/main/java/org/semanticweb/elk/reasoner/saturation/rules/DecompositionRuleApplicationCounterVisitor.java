@@ -24,9 +24,11 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -78,6 +80,17 @@ public class DecompositionRuleApplicationCounterVisitor implements
 	}
 
 	@Override
+	public void visit(IndexedDataHasValue ice, Context context) {
+		counter_.countIndexedDataHasValueDecompositionRule++;
+		visitor_.visit(ice, context);
+	}
+
+	@Override
+	public void visit(IndexedIndividual idv, Context context) {
+		// not supported		
+	}
+
+	@Override
 	public void visit(IndexedObjectComplementOf ice, Context context) {
 		counter_.countIndexedObjectComplementOfDecompositionRule++;
 		visitor_.visit(ice, context);
@@ -96,9 +109,9 @@ public class DecompositionRuleApplicationCounterVisitor implements
 	}
 
 	@Override
-	public void visit(IndexedDataHasValue ice, Context context) {
-		counter_.countIndexedDataHasValueDecompositionRule++;
-		visitor_.visit(ice, context);
+	public void visit(IndexedObjectUnionOf ice, Context context) {
+		// not supported
+		
 	}
 
 }

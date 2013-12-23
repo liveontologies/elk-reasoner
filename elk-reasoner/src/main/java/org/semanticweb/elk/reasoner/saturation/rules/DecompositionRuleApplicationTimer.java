@@ -51,17 +51,6 @@ public class DecompositionRuleApplicationTimer {
 	int timeIndexedDataHasValue;
 
 	/**
-	 * Reset all timers zero.
-	 */
-	public void reset() {
-		timeIndexedClass = 0;
-		timeIndexedObjectComplementOf = 0;
-		timeIndexedObjectIntersectionOf = 0;
-		timeIndexedObjectSomeValuesFrom = 0;
-		timeIndexedDataHasValue = 0;
-	}
-
-	/**
 	 * Add the values the corresponding values of the given timer
 	 * 
 	 * @param timer
@@ -78,6 +67,17 @@ public class DecompositionRuleApplicationTimer {
 		return timeIndexedClass + timeIndexedObjectComplementOf
 				+ timeIndexedObjectIntersectionOf
 				+ timeIndexedObjectSomeValuesFrom + timeIndexedDataHasValue;
+	}
+
+	/**
+	 * Reset all timers zero.
+	 */
+	public void reset() {
+		timeIndexedClass = 0;
+		timeIndexedObjectComplementOf = 0;
+		timeIndexedObjectIntersectionOf = 0;
+		timeIndexedObjectSomeValuesFrom = 0;
+		timeIndexedDataHasValue = 0;
 	}
 
 }

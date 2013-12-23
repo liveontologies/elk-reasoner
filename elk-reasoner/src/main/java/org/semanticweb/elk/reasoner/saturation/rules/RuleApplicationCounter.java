@@ -22,13 +22,17 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 
@@ -54,37 +58,37 @@ public class RuleApplicationCounter {
 	/**
 	 * counter for {@link IndexedDisjointnessAxiom.ThisCompositionRule}
 	 */
-	int countDisjointnessAxiomCompositionRule;
+	int countIndexedDisjointnessAxiomCompositionRule;
 
 	/**
 	 * counter for {@link IndexedDisjointnessAxiom.ThisContradictionRule}
 	 */
-	int countDisjointnessAxiomContradictionRule;
+	int countIndexedDisjointnessAxiomContradictionRule;
 
 	/**
 	 * counter for {@link IndexedObjectComplementOf.ThisCompositionRule}
 	 */
-	int countObjectComplementOfCompositionRule;
+	int countIndexedObjectComplementOfCompositionRule;
 
 	/**
 	 * counter for {@link IndexedObjectIntersectionOf.ThisCompositionRule}
 	 */
-	int countObjectIntersectionOfCompositionRule;
+	int countIndexedObjectIntersectionOfCompositionRule;
 
 	/**
 	 * counter for {@link IndexedSubClassOfAxiom.ThisCompositionRule}
 	 */
-	int countSubClassOfAxiomCompositionRule;
+	int countIndexedSubClassOfAxiomCompositionRule;
 
 	/**
 	 * counter for {@link IndexedObjectSomeValuesFrom.ThisCompositionRule}
 	 */
-	int countObjectSomeValuesFromCompositionRule;
+	int countIndexedObjectSomeValuesFromCompositionRule;
 
 	/**
 	 * counter for {@link IndexedObjectUnionOf.ThisCompositionRule}
 	 */
-	int countObjectUnionOfCompositionRule;
+	int countIndexedObjectUnionOfCompositionRule;
 
 	/**
 	 * counter for {@link ForwardLink.ThisBackwardLinkRule}
@@ -102,22 +106,24 @@ public class RuleApplicationCounter {
 	int countContradictionBottomBackwardLinkRule;
 
 	/**
-	 * Reset all counters to zero.
+	 * counter for {@link BackwardLink.ThisCompositionRule}
 	 */
-	public void reset() {
-		countOwlThingContextInitializationRule = 0;
-		countContextRootInitializationRule = 0;
-		countDisjointnessAxiomCompositionRule = 0;
-		countDisjointnessAxiomContradictionRule = 0;
-		countObjectComplementOfCompositionRule = 0;
-		countObjectIntersectionOfCompositionRule = 0;
-		countSubClassOfAxiomCompositionRule = 0;
-		countObjectSomeValuesFromCompositionRule = 0;
-		countObjectUnionOfCompositionRule = 0;
-		countForwardLinkBackwardLinkRule = 0;
-		countPropagationBackwardLinkRule = 0;
-		countContradictionBottomBackwardLinkRule = 0;
-	}
+	int countBackwardLinkCompositionRule;
+
+	/**
+	 * counter for {@link Contradiction.ThisCompositionRule}
+	 */
+	int countContradictionCompositionRule;
+
+	/**
+	 * counter for {@link DisjointnessAxiom.ThisCompositionRule}
+	 */
+	int countDisjointnessAxiomCompositionRule;
+
+	/**
+	 * counter for {@link ForwardLink.ThisCompositionRule}
+	 */
+	int countForwardLinkCompositionRule;
 
 	/**
 	 * Add the values the corresponding values of the given counter
@@ -127,30 +133,61 @@ public class RuleApplicationCounter {
 	public synchronized void add(RuleApplicationCounter counter) {
 		countOwlThingContextInitializationRule += counter.countOwlThingContextInitializationRule;
 		countContextRootInitializationRule += counter.countContextRootInitializationRule;
-		countDisjointnessAxiomCompositionRule += counter.countDisjointnessAxiomCompositionRule;
-		countDisjointnessAxiomContradictionRule += counter.countDisjointnessAxiomContradictionRule;
-		countObjectComplementOfCompositionRule += counter.countObjectComplementOfCompositionRule;
-		countObjectIntersectionOfCompositionRule += counter.countObjectIntersectionOfCompositionRule;
-		countSubClassOfAxiomCompositionRule += counter.countSubClassOfAxiomCompositionRule;
-		countObjectSomeValuesFromCompositionRule += counter.countObjectSomeValuesFromCompositionRule;
-		countObjectUnionOfCompositionRule += counter.countObjectUnionOfCompositionRule;
+		countIndexedDisjointnessAxiomCompositionRule += counter.countIndexedDisjointnessAxiomCompositionRule;
+		countIndexedDisjointnessAxiomContradictionRule += counter.countIndexedDisjointnessAxiomContradictionRule;
+		countIndexedObjectComplementOfCompositionRule += counter.countIndexedObjectComplementOfCompositionRule;
+		countIndexedObjectIntersectionOfCompositionRule += counter.countIndexedObjectIntersectionOfCompositionRule;
+		countIndexedSubClassOfAxiomCompositionRule += counter.countIndexedSubClassOfAxiomCompositionRule;
+		countIndexedObjectSomeValuesFromCompositionRule += counter.countIndexedObjectSomeValuesFromCompositionRule;
+		countIndexedObjectUnionOfCompositionRule += counter.countIndexedObjectUnionOfCompositionRule;
 		countForwardLinkBackwardLinkRule += counter.countForwardLinkBackwardLinkRule;
 		countPropagationBackwardLinkRule += counter.countPropagationBackwardLinkRule;
 		countContradictionBottomBackwardLinkRule += counter.countContradictionBottomBackwardLinkRule;
+		countBackwardLinkCompositionRule += counter.countBackwardLinkCompositionRule;
+		countContradictionCompositionRule += counter.countContradictionCompositionRule;
+		countDisjointnessAxiomCompositionRule += counter.countDisjointnessAxiomCompositionRule;
+		countForwardLinkCompositionRule += counter.countForwardLinkCompositionRule;
 	}
 
 	public long getTotalRuleAppCount() {
 		return countOwlThingContextInitializationRule
 				+ countContextRootInitializationRule
-				+ countDisjointnessAxiomCompositionRule
-				+ countDisjointnessAxiomContradictionRule
-				+ countObjectComplementOfCompositionRule
-				+ countObjectIntersectionOfCompositionRule
-				+ countSubClassOfAxiomCompositionRule
-				+ countObjectSomeValuesFromCompositionRule
-				+ countObjectUnionOfCompositionRule
+				+ countIndexedDisjointnessAxiomCompositionRule
+				+ countIndexedDisjointnessAxiomContradictionRule
+				+ countIndexedObjectComplementOfCompositionRule
+				+ countIndexedObjectIntersectionOfCompositionRule
+				+ countIndexedSubClassOfAxiomCompositionRule
+				+ countIndexedObjectSomeValuesFromCompositionRule
+				+ countIndexedObjectUnionOfCompositionRule
 				+ countForwardLinkBackwardLinkRule
 				+ countPropagationBackwardLinkRule
-				+ countContradictionBottomBackwardLinkRule;
+				+ countContradictionBottomBackwardLinkRule
+				+ countBackwardLinkCompositionRule
+				+ countContradictionCompositionRule
+				+ countDisjointnessAxiomCompositionRule
+				+ countForwardLinkCompositionRule;
+	}
+
+	/**
+	 * Reset all counters to zero.
+	 */
+	public void reset() {
+		countOwlThingContextInitializationRule = 0;
+		countContextRootInitializationRule = 0;
+		countIndexedDisjointnessAxiomCompositionRule = 0;
+		countIndexedDisjointnessAxiomContradictionRule = 0;
+		countIndexedObjectComplementOfCompositionRule = 0;
+		countIndexedObjectIntersectionOfCompositionRule = 0;
+		countIndexedSubClassOfAxiomCompositionRule = 0;
+		countIndexedObjectSomeValuesFromCompositionRule = 0;
+		countIndexedObjectUnionOfCompositionRule = 0;
+		countForwardLinkBackwardLinkRule = 0;
+		countPropagationBackwardLinkRule = 0;
+		countContradictionBottomBackwardLinkRule = 0;
+		countBackwardLinkCompositionRule = 0;
+		countContradictionCompositionRule = 0;
+		countDisjointnessAxiomCompositionRule = 0;
+		countForwardLinkCompositionRule = 0;
+
 	}
 }
