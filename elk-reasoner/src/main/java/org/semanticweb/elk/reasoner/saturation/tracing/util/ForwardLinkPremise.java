@@ -89,6 +89,11 @@ class ForwardLinkPremise implements ForwardLink {
 		//no-op
 	}
 
+	@Override
+	public void applyLocally(BasicSaturationStateWriter writer, Context context) {
+		//no-op
+	}
+
 	
 
 }

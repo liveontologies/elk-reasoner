@@ -40,14 +40,14 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicDecompositionRuleApplicationVisitor;
@@ -58,10 +58,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore.Writer;
-import org.semanticweb.elk.util.collections.Condition;
 import org.semanticweb.elk.util.collections.Multimap;
-import org.semanticweb.elk.util.collections.MultimapOperations;
-import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,18 +80,6 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	 * trace store which stores traced conclusions.
 	 */
 	private final TraceState traceState_;
-
-	/**
-	 * Holds iff the context is traced (passed as input into this factory).
-	 */
-	private final Condition<Context> tracingCondition_ = new Condition<Context>() {
-
-		@Override
-		public boolean holds(Context cxt) {
-			return traceState_.getRootsSubmittedForTracing().contains(
-					cxt.getRoot());
-		}
-	};
 
 	public ContextTracingFactory(ExtendedSaturationState mainSaturationState,
 			TraceState traceState) {
@@ -128,11 +113,12 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 			super(new SaturationStatistics());
 
 			ExtendedSaturationStateWriter tracingWriter = getSaturationStateWriter();
-			// inserts to the local context and writes inferences
+			//ExtendedSaturationStateWriter sameContextWriter = getSameContextWriter();
+			// inserts to the local context and writes inferences.
 			// the inference writer should go first so we capture alternative
 			// derivations.
 			ConclusionVisitor<Boolean, Context> inserter = new CombinedConclusionVisitor<Context>(
-					new InferenceInserter(traceState_.getTraceStore()
+					new TracingInserter(traceState_.getTraceStore()
 							.getWriter()), new ConclusionInsertionVisitor());
 			// applies rules on the main contexts
 			ConclusionVisitor<Boolean, Context> applicator = new ApplicationVisitor(
@@ -145,7 +131,9 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		@Override
 		public void submit(IndexedClassExpression root) {
-			getSaturationStateWriter().getCreateContext(root);
+			Context cxt = getSaturationStateWriter().getCreateContext(root);
+			//manual init
+			getSaturationStateWriter().initContext(cxt);
 		}
 
 		@Override
@@ -157,8 +145,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		protected ExtendedSaturationStateWriter getSaturationStateWriter() {
 			return getSaturationState().getTracingWriter(
 					ConclusionVisitor.DUMMY,
-					SaturationState.DEFAULT_INIT_RULE_APP_VISITOR,
-					tracingCondition_);
+					SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
 		}
 
 	}
@@ -173,30 +160,36 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	private class ApplicationVisitor implements
 			ConclusionVisitor<Boolean, Context> {
 
-		private final BasicSaturationStateWriter iterationWriter_;
+		private final BasicSaturationStateWriter localWriter_;
 		private final CompositionRuleApplicationVisitor ruleAppVisitor_;
 		private final DecompositionRuleApplicationVisitor mainDecompRuleAppVisitor_;
 
 		public ApplicationVisitor(BasicSaturationStateWriter iterationWriter,
 				CompositionRuleApplicationVisitor ruleAppVisitor) {
-			this.iterationWriter_ = iterationWriter;
+			this.localWriter_ = iterationWriter;
 			this.ruleAppVisitor_ = ruleAppVisitor;
 			this.mainDecompRuleAppVisitor_ = new LocalDecompositionVisitor(
 					saturationState);
 
 		}
 
-		Context getHybridContext(IndexedClassExpression root) {
-			// return root.getContext();
-			return new HybridContext(getSaturationState().getContext(root),
-					root.getContext());
+		Context getContext(Conclusion conclusion, Context context) {
+			IndexedClassExpression root = context.getRoot();
+			
+			if (context == conclusion.getSourceContext(context)) {
+				return getSaturationState().getContext(root);
+			}
+			else {
+				return root.getContext();
+				//return new HybridContext(getSaturationState().getContext(root),root.getContext());
+			}
 		}
 
 		@Override
 		public Boolean visit(ComposedSubsumer negSCE, Context context) {
-			Context cxt = getHybridContext(context.getRoot());
+			Context cxt = getContext(negSCE, context);
 
-			negSCE.apply(iterationWriter_, cxt, ruleAppVisitor_);
+			negSCE.apply(localWriter_, cxt, ruleAppVisitor_);
 			negSCE.applyDecompositionRules(cxt, mainDecompRuleAppVisitor_);
 
 			return true;
@@ -204,14 +197,14 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		@Override
 		public Boolean visit(DecomposedSubsumer posSCE, Context context) {
-			posSCE.apply(iterationWriter_, getHybridContext(context.getRoot()),
+			posSCE.apply(localWriter_, getContext(posSCE, context),
 					ruleAppVisitor_, mainDecompRuleAppVisitor_);
 			return true;
 		}
 
 		@Override
 		public Boolean visit(BackwardLink link, Context context) {
-			link.apply(iterationWriter_, getHybridContext(context.getRoot()),
+			link.applyLocally(localWriter_, getContext(link, context),
 					ruleAppVisitor_);
 
 			return true;
@@ -219,29 +212,29 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		@Override
 		public Boolean visit(ForwardLink link, Context context) {
-			link.apply(iterationWriter_, getHybridContext(context.getRoot()));
+			link.applyLocally(localWriter_, getContext(link, context));
 
 			return true;
 		}
 
 		@Override
 		public Boolean visit(Contradiction bot, Context context) {
-			bot.deapply(iterationWriter_, getHybridContext(context.getRoot()));
+			bot.deapply(localWriter_, getContext(bot, context));
 			return true;
 		}
 
 		@Override
 		public Boolean visit(Propagation propagation, Context context) {
-			propagation.apply(iterationWriter_,
-					getHybridContext(context.getRoot()));
+			propagation.applyLocally(localWriter_,
+					getContext(propagation, context));
 			return true;
 		}
 
 		@Override
 		public Boolean visit(DisjointnessAxiom disjointnessAxiom,
 				Context context) {
-			disjointnessAxiom.apply(iterationWriter_,
-					getHybridContext(context.getRoot()));
+			disjointnessAxiom.apply(localWriter_,
+					getContext(disjointnessAxiom, context));
 
 			return true;
 		}
@@ -265,42 +258,40 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 			@Override
 			public void visit(IndexedObjectSomeValuesFrom ice, Context context) {
-				// never creates a new main context for the filler
-				Context fillerContext = mainSaturationState_.getContext(ice
-						.getFiller());
+				//this call won't ever create a context in the main saturation state
+				Context fillerContext = mainSaturationState_.getContext(ice.getFiller());
 
 				if (fillerContext != null) {
 					// the passed context is hybrid but we really need to point
 					// the backward link to the main context.
 					Context mainContext = context.getRoot().getContext();
 
-					iterationWriter_.produce(fillerContext,
-							iterationWriter_.getConclusionFactory()
+					localWriter_.produce(fillerContext,
+							localWriter_.getConclusionFactory()
 									.createBackwardLink(ice, mainContext));
 				}
 			}
 
 			@Override
 			protected BasicSaturationStateWriter getSaturationStateWriter() {
-				return iterationWriter_;
+				return localWriter_;
 			}
 
 		}
 
 	}
 
-	// TODO: why main contexts are modified at all??
 	/**
-	 * Makes sure that inferences are stored by main contexts.
+	 * Inserts traces into the trace store but passes the main context so that the traces can be retrieved by main contexts.
 	 * 
 	 * @author Pavel Klinov
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private static class InferenceInserter extends
+	private static class TracingInserter extends
 			TracingConclusionInsertionVisitor {
 
-		public InferenceInserter(Writer traceWriter) {
+		public TracingInserter(Writer traceWriter) {
 			super(traceWriter);
 		}
 
@@ -310,6 +301,8 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		}
 
 	}
+	
+	//TODO Do we need hybrid contexts?
 
 	/**
 	 * Hybrid context is a read-only view over the local and the main context
@@ -340,27 +333,19 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		private final Context mainContext_;
 
-		private final Context selectedContext_;
-
 		HybridContext(Context local, Context main) {
 			localContext_ = local;
 			mainContext_ = main;
-
-			if (tracingCondition_.holds(localContext_)) {
-				selectedContext_ = localContext_;
-			} else {
-				selectedContext_ = mainContext_;
-			}
 		}
 
 		@Override
 		public IndexedClassExpression getRoot() {
-			return selectedContext_.getRoot();
+			return mainContext_.getRoot();
 		}
 
 		@Override
 		public Set<IndexedClassExpression> getSubsumers() {
-			return selectedContext_.getSubsumers();
+			return mainContext_.getSubsumers();
 		}
 
 		@Override
@@ -380,12 +365,12 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		@Override
 		public LinkRule<BackwardLink, Context> getBackwardLinkRuleHead() {
-			return selectedContext_.getBackwardLinkRuleHead();
+			return mainContext_.getBackwardLinkRuleHead();
 		}
 
 		@Override
 		public Chain<ModifiableLinkRule<BackwardLink, Context>> getBackwardLinkRuleChain() {
-			return selectedContext_.getBackwardLinkRuleChain();
+			return mainContext_.getBackwardLinkRuleChain();
 		}
 
 		@Override

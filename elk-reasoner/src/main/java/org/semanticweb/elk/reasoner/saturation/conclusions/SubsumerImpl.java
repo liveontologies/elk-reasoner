@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public abstract class SubsumerImpl implements Subsumer {
+public abstract class SubsumerImpl extends AbstractConclusion implements Subsumer {
 
 	/**
 	 * the implied {@code IndexedClassExpression} represented by this
@@ -68,8 +68,4 @@ public abstract class SubsumerImpl implements Subsumer {
 		}
 	}
 
-	@Override
-	public Context getSourceContext(Context contextWhereStored) {
-		return contextWhereStored;
-	}
 }

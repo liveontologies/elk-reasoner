@@ -27,10 +27,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.LocalSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
@@ -55,26 +53,10 @@ public class TracingSaturationState extends LocalSaturationState {
 				SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
 	}
 
-	@Override
-	public ExtendedSaturationStateWriter getExtendedWriter(
-			ConclusionVisitor<?, Context> conclusionVisitor,
-			CompositionRuleApplicationVisitor initRuleAppVisitor) {
-		return new TracingWriter(conclusionVisitor, initRuleAppVisitor,
-				new Condition<Context>() {
-					// by default trace everything
-					@Override
-					public boolean holds(Context element) {
-						return true;
-					}
-				});
-	}
-
 	public TracingWriter getTracingWriter(
 			ConclusionVisitor<?, Context> conclusionVisitor,
-			CompositionRuleApplicationVisitor initRuleAppVisitor,
-			Condition<Context> traceCondition) {
-		return new TracingWriter(conclusionVisitor, initRuleAppVisitor,
-				traceCondition);
+			CompositionRuleApplicationVisitor initRuleAppVisitor) {
+		return new TracingWriter(conclusionVisitor, initRuleAppVisitor);
 	}
 
 	/**
@@ -99,6 +81,8 @@ public class TracingSaturationState extends LocalSaturationState {
 	}
 
 	/**
+	 * The same as {@link LocalSaturationState.LocalWriter} but uses
+	 * {@link TracingConclusionFactory}.
 	 * 
 	 * @author Pavel Klinov
 	 * 
@@ -106,23 +90,11 @@ public class TracingSaturationState extends LocalSaturationState {
 	 */
 	private class TracingWriter extends LocalSaturationState.LocalWriter {
 
-		private final Condition<Context> traceCondition_;
-
 		public TracingWriter(ConclusionVisitor<?, Context> visitor,
-				CompositionRuleApplicationVisitor ruleAppVisitor,
-				Condition<Context> traceCondition) {
+				CompositionRuleApplicationVisitor ruleAppVisitor) {
 			super(visitor, ruleAppVisitor, new TracingConclusionFactory());
-			traceCondition_ = traceCondition;
 		}
-
-		@Override
-		public void produceLocally(Context context, Conclusion conclusion) {
-			Context sourceContext = conclusion.getSourceContext(context);
-			// no need to iterate over conclusions which belong to non-traced
-			// contexts
-			if (traceCondition_.holds(sourceContext)) {
-				super.produceLocally(context, conclusion);
-			}
-		}
+		
 	}
+
 }

@@ -51,6 +51,9 @@ public interface BackwardLink extends Conclusion {
 	 */
 	public Context getSource();
 	
+	public void applyLocally(BasicSaturationStateWriter writer, Context context,
+			CompositionRuleApplicationVisitor ruleAppVisitor);
+	
 	public void apply(BasicSaturationStateWriter writer, Context context,
 			CompositionRuleApplicationVisitor ruleAppVisitor);
 }

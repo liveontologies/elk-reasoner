@@ -3,4 +3,5 @@ Ontology(
 SubClassOf(:B :C)
 SubClassOf(:A ObjectSomeValuesFrom(:R :B))
 SubClassOf(ObjectSomeValuesFrom(:R :C) :D)
+SubClassOf(:E ObjectSomeValuesFrom(:R :B))
 )

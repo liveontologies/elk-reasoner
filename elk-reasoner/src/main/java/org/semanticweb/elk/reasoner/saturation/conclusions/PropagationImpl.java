@@ -78,6 +78,18 @@ public class PropagationImpl extends AbstractConclusion implements Propagation {
 	}
 
 	@Override
+	public void applyLocally(BasicSaturationStateWriter writer, Context context) {
+		// propagate if there's a reflexive backward link
+		Multimap<IndexedPropertyChain, Context> backLinks = context.getBackwardLinksByObjectProperty();
+		ConclusionFactory factory = writer.getConclusionFactory();
+
+		if (backLinks.get(relation_).contains(context)) {
+			writer.produce(context, factory.createPropagatedSubsumer(this,
+					relation_, context, context));
+		}
+	}
+	
+	@Override
 	public void apply(BasicSaturationStateWriter writer, Context context) {
 		// propagate over all backward links
 		Multimap<IndexedPropertyChain, Context> backLinks = context
@@ -154,9 +166,7 @@ public class PropagationImpl extends AbstractConclusion implements Propagation {
 		public void apply(BasicSaturationStateWriter writer, BackwardLink link, Context context) {
 			LOGGER_.trace("Applying {} to {}", NAME, link);
 			
-			for (IndexedObjectSomeValuesFrom carry : propagationsByObjectProperty_
-					.get(link.getRelation())) {
-				//writer.produce(link.getSource(), new NegativeSubsumer(carry));
+			for (IndexedObjectSomeValuesFrom carry : propagationsByObjectProperty_.get(link.getRelation())) {
 				writer.produce(link.getSource(), writer.getConclusionFactory().createPropagatedSubsumer(link, carry, context));
 			}
 		}

@@ -78,4 +78,10 @@ class BackwardLinkPremise implements BackwardLink {
 		return visitor.visit(this, context);
 	}
 
+	@Override
+	public void applyLocally(BasicSaturationStateWriter writer,
+			Context context, CompositionRuleApplicationVisitor ruleAppVisitor) {
+		//no-op
+	}
+
 }

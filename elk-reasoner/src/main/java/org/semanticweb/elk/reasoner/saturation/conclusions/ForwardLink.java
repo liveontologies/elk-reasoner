@@ -50,5 +50,7 @@ public interface ForwardLink extends Conclusion {
 
 	public boolean containsBackwardLinkRule(Context context);	
 	
+	public void applyLocally(BasicSaturationStateWriter writer, Context context);
+	
 	public void apply(BasicSaturationStateWriter writer, Context context);
 }

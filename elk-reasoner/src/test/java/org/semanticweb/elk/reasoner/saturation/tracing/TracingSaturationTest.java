@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  */
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -110,7 +111,7 @@ public class TracingSaturationTest {
 					return super.defaultTracedVisit(conclusion, v);
 				}
 				
-			});
+			}, true);
 			
 
 		} finally {
@@ -159,7 +160,7 @@ public class TracingSaturationTest {
 					return super.defaultTracedVisit(conclusion, v);
 				}
 				
-			});
+			}, true);
 			
 			assertEquals("Must be precisely one inference for " + bAndC, 1, inferenceCounter.get());
 			
@@ -180,10 +181,6 @@ public class TracingSaturationTest {
 
 			List<ElkAxiom> ontology = loadAxioms(stream);
 			TestChangesLoader initialLoader = new TestChangesLoader();			
-
-			/*ReasonerStageExecutor executor = new PostProcessingStageExecutor(
-					PostProcessingStageExecutor.CONTEXT_TRACING,
-					CheckTracingStage.class);*/
 			ReasonerStageExecutor executor = new LoggingStageExecutor();
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader, executor);
 
@@ -200,7 +197,122 @@ public class TracingSaturationTest {
 			ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 			final AtomicInteger inferenceCounter = new AtomicInteger(0);
 			
-			reasoner.trace(new ElkClass[]{a, b}, a, rSomeC, new BaseTracedConclusionVisitor<Void, Void>() {
+			TracedConclusionVisitor<Void, Void> aTraceChecker = new BaseTracedConclusionVisitor<Void, Void>() {
+				
+				@Override
+				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {
+					LOGGER_.trace("traced inference: {}", InferencePrinter.print(conclusion));
+					
+					inferenceCounter.incrementAndGet();
+					
+					return super.defaultTracedVisit(conclusion, v);
+				}
+				
+			};
+			
+			reasoner.explainSubsumption(a, rSomeC, aTraceChecker, true);
+			assertEquals("Must be precisely one inference for " + rSomeC, 1, inferenceCounter.get());
+			
+			reasoner.explainSubsumption(b, c, new BaseTracedConclusionVisitor<Void, Void>() {
+				
+				@Override
+				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {
+					LOGGER_.trace("traced inference: {}", InferencePrinter.print(conclusion));
+					return super.defaultTracedVisit(conclusion, v);
+				}
+				
+			}, true);
+			// now check that we didn't get a duplicate inference in A due to tracing B
+			inferenceCounter.set(0);
+			
+			reasoner.explainSubsumption(a, rSomeC, aTraceChecker, false);
+			assertEquals("Must be precisely one inference for " + rSomeC, 1, inferenceCounter.get());
+
+		} finally {
+			IOUtils.closeQuietly(stream);
+		}
+	}
+	
+	@Test
+	public void testDontTraceOtherContexts() throws ElkException, IOException {
+		InputStream stream = null;
+		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		
+		try {
+			stream = getClass().getClassLoader().getResourceAsStream(
+					"tracing/DuplicateExistential.owl");
+
+			List<ElkAxiom> ontology = loadAxioms(stream);
+			TestChangesLoader initialLoader = new TestChangesLoader();			
+			ReasonerStageExecutor executor = new LoggingStageExecutor();
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader, executor);
+
+			for (ElkAxiom axiom : ontology) {
+				initialLoader.add(axiom);
+			}
+
+			reasoner.getTaxonomy();
+			
+			ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
+			ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
+			ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri("http://example.org/R"));
+			ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
+			ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);			
+			
+			reasoner.explainSubsumption(a, rSomeC, new BaseTracedConclusionVisitor<Void, Void>() {
+				
+				@Override
+				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {
+					LOGGER_.trace("traced inference: {}", InferencePrinter.print(conclusion));
+					
+					return super.defaultTracedVisit(conclusion, v);
+				}
+				
+			}, true);
+			
+			reasoner.explainSubsumption(b, b, new BaseTracedConclusionVisitor<Void, Void>() {
+				
+				@Override
+				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {
+					fail("This context should not be traced");
+					return null;
+				}
+				
+			}, false/*do not trace B, we're checking if it's been unintentionally traced when we traced A*/);
+
+		} finally {
+			IOUtils.closeQuietly(stream);
+		}
+	}
+	
+	@Test
+	public void testDuplicateInferenceViaComposition() throws ElkException, IOException {
+		InputStream stream = null;
+		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		
+		try {
+			stream = getClass().getClassLoader().getResourceAsStream(
+					"tracing/DuplicateComposition.owl");
+
+			List<ElkAxiom> ontology = loadAxioms(stream);
+			TestChangesLoader initialLoader = new TestChangesLoader();			
+			ReasonerStageExecutor executor = new LoggingStageExecutor();
+			Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader, executor);
+
+			for (ElkAxiom axiom : ontology) {
+				initialLoader.add(axiom);
+			}
+
+			reasoner.getTaxonomy();
+			
+			ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
+			ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
+			ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri("http://example.org/R"));
+			ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
+			ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
+			final AtomicInteger inferenceCounter = new AtomicInteger(0);
+			
+			reasoner.trace(new ElkClass[]{a}, a, rSomeC, new BaseTracedConclusionVisitor<Void, Void>() {
 				
 				@Override
 				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {
@@ -213,12 +325,25 @@ public class TracingSaturationTest {
 				
 			});
 			
+			reasoner.trace(new ElkClass[]{b}, b, b, new BaseTracedConclusionVisitor<Void, Void>() {
+				
+				@Override
+				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {
+					LOGGER_.trace("traced inference: {}", InferencePrinter.print(conclusion));
+					
+					//inferenceCounter.incrementAndGet();
+					
+					return super.defaultTracedVisit(conclusion, v);
+				}
+				
+			});
+			
 			assertEquals("Must be precisely one inference for " + rSomeC, 1, inferenceCounter.get());
 
 		} finally {
 			IOUtils.closeQuietly(stream);
 		}
-	}	
+	}
 	
 	@Test
 	public void testDuplicateInferenceOfReflexiveExistential() throws ElkException, IOException {
@@ -231,10 +356,6 @@ public class TracingSaturationTest {
 
 			List<ElkAxiom> ontology = loadAxioms(stream);
 			TestChangesLoader initialLoader = new TestChangesLoader();			
-
-			/*ReasonerStageExecutor executor = new PostProcessingStageExecutor(
-					PostProcessingStageExecutor.CONTEXT_TRACING,
-					CheckTracingStage.class);*/
 			ReasonerStageExecutor executor = new LoggingStageExecutor();
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader, executor);
 
@@ -261,7 +382,7 @@ public class TracingSaturationTest {
 					return super.defaultTracedVisit(conclusion, v);
 				}
 				
-			});
+			}, true);
 			
 			assertEquals("Must be precisely one inference for " + rSomeC, 1, inferenceCounter.get());
 

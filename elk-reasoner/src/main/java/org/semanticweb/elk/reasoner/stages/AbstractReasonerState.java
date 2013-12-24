@@ -605,14 +605,16 @@ public abstract class AbstractReasonerState {
 				classTaxonomyState.getTaxonomy()));
 	}
 
-	public void explainSubsumption(ElkClassExpression sub, ElkClassExpression sup, TracedConclusionVisitor<?,?> visitor) throws ElkException {
+	public void explainSubsumption(ElkClassExpression sub, ElkClassExpression sup, TracedConclusionVisitor<?,?> visitor, boolean trace) throws ElkException {
 		IndexedClassExpression subsumee = sub.accept(objectCache_.getIndexObjectConverter());
 		IndexedClassExpression subsumer = sup.accept(objectCache_.getIndexObjectConverter());
 		
-		traceState.submitForTracing(subsumee);
-		stageManager.contextTracingStage.invalidate();
-		//run the tracing stage
-		getStageExecutor().complete(stageManager.contextTracingStage);
+		if (trace && !traceState.getSaturationState().isTraced(subsumee.getContext())) {
+			traceState.submitForTracing(subsumee);
+			stageManager.contextTracingStage.invalidate();
+			// run the tracing stage
+			getStageExecutor().complete(stageManager.contextTracingStage);
+		}
 		
 		traceState.getTraceStore().getReader().accept(subsumee.getContext(), TracingUtils.getSubsumerWrapper(subsumer), visitor);
 	}

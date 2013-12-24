@@ -179,12 +179,10 @@ public class LocalSaturationState implements SaturationState {
 			
 			@Override
 			public Context getCreateContext(IndexedClassExpression root) {
-				Context context = new ContextImpl(root);
+				Context context = newContext(root);
 				Context oldContext = contextMap_.putIfAbsent(root, context);
 
 				if (oldContext == null) {
-					initContext(context);
-
 					if (LOGGER_.isTraceEnabled()) {
 						LOGGER_.trace(context.getRoot()
 								+ ": local context created");
@@ -193,6 +191,10 @@ public class LocalSaturationState implements SaturationState {
 					return context;
 				}
 				return oldContext;
+			}
+			
+			protected Context newContext(IndexedClassExpression root) {
+				return new ContextImpl(root);
 			}
 
 			@Override

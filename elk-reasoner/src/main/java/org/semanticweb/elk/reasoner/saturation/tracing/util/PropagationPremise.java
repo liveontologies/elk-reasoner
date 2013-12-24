@@ -88,4 +88,9 @@ public class PropagationPremise extends AbstractConclusion implements Propagatio
 		// no-op
 	}
 
+	@Override
+	public void applyLocally(BasicSaturationStateWriter writer, Context context) {
+		// no-op
+	}
+
 }

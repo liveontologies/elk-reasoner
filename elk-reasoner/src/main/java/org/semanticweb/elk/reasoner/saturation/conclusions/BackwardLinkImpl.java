@@ -70,6 +70,21 @@ public class BackwardLinkImpl implements BackwardLink {
 	}
 
 	@Override
+	public void applyLocally(BasicSaturationStateWriter writer,
+			Context context, CompositionRuleApplicationVisitor ruleAppVisitor) {
+		// apply all backward link rules of the context
+		LinkRule<BackwardLink, Context> backLinkRule = context
+				.getBackwardLinkRuleHead();
+
+		while (backLinkRule != null) {
+			backLinkRule.accept(ruleAppVisitor, writer, this, context);
+			backLinkRule = backLinkRule.next();
+		}
+
+		
+	}
+	
+	@Override
 	public void apply(BasicSaturationStateWriter writer, Context context,
 			CompositionRuleApplicationVisitor ruleAppVisitor) {
 
@@ -80,21 +95,16 @@ public class BackwardLinkImpl implements BackwardLink {
 					context);
 		}
 
-		// apply all backward link rules of the context
-		LinkRule<BackwardLink, Context> backLinkRule = context.getBackwardLinkRuleHead();
+		applyLocally(writer, context, ruleAppVisitor);
 		
-		while (backLinkRule != null) {
-			backLinkRule.accept(ruleAppVisitor, writer, this, context);
-			backLinkRule = backLinkRule.next();
-		}
-
 		/*
 		 * convert backward link to a forward link if it can potentially be
 		 * composed
 		 */
 		if (!relation_.getSaturated().getCompositionsByLeftSubProperty()
 				.isEmpty()) {
-			writer.produce(source_, writer.getConclusionFactory().createForwardLink(this, context));
+			writer.produce(source_, writer.getConclusionFactory()
+					.createForwardLink(this, context));
 		}
 	}
 

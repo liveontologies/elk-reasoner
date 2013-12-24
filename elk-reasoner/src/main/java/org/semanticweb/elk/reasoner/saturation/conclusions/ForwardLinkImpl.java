@@ -83,6 +83,25 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	}
 	
 	@Override
+	public void applyLocally(BasicSaturationStateWriter writer, Context context) {
+		Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
+				.getSaturated().getCompositionsByLeftSubProperty();
+		Multimap<IndexedPropertyChain, Context> backLinks = context
+				.getBackwardLinksByObjectProperty();
+		ConclusionFactory factory = writer.getConclusionFactory();
+	
+		for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
+				comps.keySet(), backLinks.keySet())) {
+			//compose only with reflexive backward links
+			if (backLinks.get(backwardRelation).contains(context)) {
+				for (IndexedPropertyChain composition : comps.get(backwardRelation)) {
+					writer.produce(target_, factory.createComposedBackwardLink(context, this, backwardRelation, composition, context));
+				}
+			}
+		}
+	}
+	
+	@Override
 	public void apply(BasicSaturationStateWriter writer, Context context) {
 		/* compose the link with all backward links */
 		Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
@@ -100,8 +119,6 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 
 			for (IndexedPropertyChain composition : compositions)
 				for (Context source : sources) {
-					/*writer.produce(target_, new BackwardLink(source,
-							composition));*/
 					writer.produce(target_, factory.createComposedBackwardLink(context, this, backwardRelation, composition, source));
 				}
 		}
