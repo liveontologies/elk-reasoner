@@ -57,7 +57,7 @@ public class ConclusionInsertionVisitor implements ConclusionVisitor<Boolean> {
 	}
 
 	@Override
-	public Boolean visit(DisjointnessAxiom disjointnessAxiom, Context context) {
+	public Boolean visit(DisjointSubsumer disjointnessAxiom, Context context) {
 		return context.addDisjointnessAxiom(disjointnessAxiom.getAxiom());
 	}
 

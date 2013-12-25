@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectUnionOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
@@ -121,7 +122,10 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 	}
 
 	/**
+	 * The composition rule producing {@link Subsumer} for an
+	 * {@link IndexedObjectUnionOf} when processing one of its disjuncts
 	 * 
+	 * @author "Yevgeny Kazakov"
 	 */
 	public static class ThisCompositionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements

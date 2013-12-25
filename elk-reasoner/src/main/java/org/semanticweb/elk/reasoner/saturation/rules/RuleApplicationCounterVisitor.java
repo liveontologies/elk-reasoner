@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.ContextRootInitializationRule;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -84,7 +84,7 @@ public class RuleApplicationCounterVisitor implements CompositionRuleVisitor {
 	}
 
 	@Override
-	public void visit(ContextRootInitializationRule rootInitRule,
+	public void visit(RootContextInitializationRule rootInitRule,
 			SaturationStateWriter writer, Context context) {
 		counter_.countContextRootInitializationRule++;
 		visitor_.visit(rootInitRule, writer, context);
@@ -99,7 +99,7 @@ public class RuleApplicationCounterVisitor implements CompositionRuleVisitor {
 	}
 
 	@Override
-	public void visit(Contradiction.ThisCompositionRule thisCompositionRule,
+	public void visit(Contradiction.ContradictionPropagationRule thisCompositionRule,
 			SaturationStateWriter writer, Context context) {
 		counter_.countContradictionCompositionRule++;
 		visitor_.visit(thisCompositionRule, writer, context);
@@ -107,7 +107,7 @@ public class RuleApplicationCounterVisitor implements CompositionRuleVisitor {
 
 	@Override
 	public void visit(
-			DisjointnessAxiom.ThisCompositionRule thisCompositionRule,
+			DisjointSubsumer.ContradicitonCompositionRule thisCompositionRule,
 			SaturationStateWriter writer, Context context) {
 		counter_.countDisjointnessAxiomCompositionRule++;
 		visitor_.visit(thisCompositionRule, writer, context);
@@ -122,7 +122,7 @@ public class RuleApplicationCounterVisitor implements CompositionRuleVisitor {
 	}
 
 	@Override
-	public void visit(ForwardLink.ThisCompositionRule thisCompositionRule,
+	public void visit(ForwardLink.BackwardLinkCompositionRule thisCompositionRule,
 			SaturationStateWriter writer, Context context) {
 		counter_.countForwardLinkCompositionRule++;
 		visitor_.visit(thisCompositionRule, writer, context);
@@ -146,7 +146,7 @@ public class RuleApplicationCounterVisitor implements CompositionRuleVisitor {
 
 	@Override
 	public void visit(
-			IndexedDisjointnessAxiom.ThisContradictionRule thisContradictionRule,
+			IndexedDisjointnessAxiom.ContradictionCompositionRule thisContradictionRule,
 			SaturationStateWriter writer, Context context) {
 		counter_.countIndexedDisjointnessAxiomContradictionRule++;
 		visitor_.visit(thisContradictionRule, writer, context);
@@ -154,7 +154,7 @@ public class RuleApplicationCounterVisitor implements CompositionRuleVisitor {
 
 	@Override
 	public void visit(
-			IndexedObjectComplementOf.ThisCompositionRule thisCompositionRule,
+			IndexedObjectComplementOf.ContradictionCompositionRule thisCompositionRule,
 			SaturationStateWriter writer, Context context) {
 		counter_.countIndexedObjectComplementOfCompositionRule++;
 		visitor_.visit(thisCompositionRule, writer, context);
@@ -170,7 +170,7 @@ public class RuleApplicationCounterVisitor implements CompositionRuleVisitor {
 
 	@Override
 	public void visit(
-			IndexedObjectSomeValuesFrom.ThisCompositionRule thisCompositionRule,
+			IndexedObjectSomeValuesFrom.PropagationCompositionRule thisCompositionRule,
 			SaturationStateWriter writer, Context context) {
 		counter_.countIndexedObjectSomeValuesFromCompositionRule++;
 		visitor_.visit(thisCompositionRule, writer, context);
@@ -186,14 +186,14 @@ public class RuleApplicationCounterVisitor implements CompositionRuleVisitor {
 
 	@Override
 	public void visit(
-			IndexedSubClassOfAxiom.ThisCompositionRule thisCompositionRule,
+			IndexedSubClassOfAxiom.SubsumerCompositionRule thisCompositionRule,
 			SaturationStateWriter writer, Context context) {
 		counter_.countIndexedSubClassOfAxiomCompositionRule++;
 		visitor_.visit(thisCompositionRule, writer, context);
 	}
 
 	@Override
-	public void visit(Propagation.ThisBackwardLinkRule thisBackwardLinkRule,
+	public void visit(Propagation.SubsumerBackwardLinkRule thisBackwardLinkRule,
 			SaturationStateWriter writer, BackwardLink backwardLink) {
 		counter_.countPropagationBackwardLinkRule++;
 		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);

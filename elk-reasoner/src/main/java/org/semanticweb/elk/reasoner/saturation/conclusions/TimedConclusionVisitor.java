@@ -79,7 +79,7 @@ public class TimedConclusionVisitor implements ConclusionVisitor<Long> {
 	}
 
 	@Override
-	public Long visit(DisjointnessAxiom disjointnessAxiom, Context context) {
+	public Long visit(DisjointSubsumer disjointnessAxiom, Context context) {
 		timer_.timeDisjointnessAxioms -= CachedTimeThread.getCurrentTimeMillis();
 		processor_.visit(disjointnessAxiom, context);
 		return timer_.timeDisjointnessAxioms += CachedTimeThread.getCurrentTimeMillis();

@@ -101,7 +101,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
 			// register the composition rule for the filler
-			index.add(filler, new ThisCompositionRule(this));
+			index.add(filler, new PropagationCompositionRule(this));
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -109,7 +109,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			index.remove(filler, new ThisCompositionRule(this));
+			index.remove(filler, new PropagationCompositionRule(this));
 		}
 
 	}
@@ -128,8 +128,8 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	public static void generatePropagations(SaturationStateWriter writer,
 			IndexedPropertyChain property, Context context) {
 		for (IndexedClassExpression ice : context.getSubsumers()) {
-			ThisCompositionRule rule = ice.getCompositionRuleChain().find(
-					ThisCompositionRule.MATCHER_);
+			PropagationCompositionRule rule = ice.getCompositionRuleChain().find(
+					PropagationCompositionRule.MATCHER_);
 
 			if (rule == null)
 				continue;
@@ -139,16 +139,15 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	/**
-	 * The composition rule that should be applied when processing the filler of
-	 * {@link IndexedObjectSomeValuesFrom} in a {@code Context} that makes sure
-	 * that this {@link IndexedObjectSomeValuesFrom} is (eventually) produced in
-	 * all the {@link Context}s liked by {@link BackwardLink}s from this
-	 * {@code Context} by a sub-property of the property of this
-	 * {@link IndexedObjectSomeValuesFrom}.
+	 * The composition rule producing {@link Propagation} of an
+	 * {@link IndexedObjectSomeValuesFrom} over {@link BackwardLink}s when
+	 * processing the filler of this {@link IndexedObjectSomeValuesFrom}
+	 * provided it can be used with at least one {@link BackwardLink} in this
+	 * {@link Context}
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
-	public static class ThisCompositionRule extends
+	public static class PropagationCompositionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
@@ -156,13 +155,13 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		private final Collection<IndexedObjectSomeValuesFrom> negExistentials_;
 
-		private ThisCompositionRule(ChainableRule<Context> next) {
+		private PropagationCompositionRule(ChainableRule<Context> next) {
 			super(next);
 			this.negExistentials_ = new ArrayList<IndexedObjectSomeValuesFrom>(
 					1);
 		}
 
-		ThisCompositionRule(IndexedObjectSomeValuesFrom negExistential) {
+		PropagationCompositionRule(IndexedObjectSomeValuesFrom negExistential) {
 			super(null);
 			this.negExistentials_ = new ArrayList<IndexedObjectSomeValuesFrom>(
 					1);
@@ -214,7 +213,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		@Override
 		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
-			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
+			PropagationCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 			boolean changed = false;
 
 			for (IndexedObjectSomeValuesFrom negExistential : negExistentials_) {
@@ -228,7 +227,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		@Override
 		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
 			boolean changed = false;
-			ThisCompositionRule rule = ruleChain.find(MATCHER_);
+			PropagationCompositionRule rule = ruleChain.find(MATCHER_);
 
 			if (rule != null) {
 				for (IndexedObjectSomeValuesFrom negExistential : negExistentials_) {
@@ -268,6 +267,14 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			return negExistentials_.isEmpty();
 		}
 
+		/**
+		 * Produces propagations for sub-properties of the given
+		 * {@link IndexedPropertyChain} in the given {@link Context}
+		 * 
+		 * @param writer
+		 * @param property
+		 * @param context
+		 */
 		private void apply(SaturationStateWriter writer,
 				IndexedPropertyChain property, Context context) {
 
@@ -280,13 +287,13 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		}
 
-		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
-				ThisCompositionRule.class);
+		private static final Matcher<ChainableRule<Context>, PropagationCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, PropagationCompositionRule>(
+				PropagationCompositionRule.class);
 
-		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
+		private static final ReferenceFactory<ChainableRule<Context>, PropagationCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, PropagationCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(ChainableRule<Context> next) {
-				return new ThisCompositionRule(next);
+			public PropagationCompositionRule create(ChainableRule<Context> next) {
+				return new PropagationCompositionRule(next);
 			}
 		};
 

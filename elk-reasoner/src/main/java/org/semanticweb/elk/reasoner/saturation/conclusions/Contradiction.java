@@ -58,7 +58,7 @@ public class Contradiction extends AbstractConclusion {
 	/**
 	 * one instance of composition rule is sufficient
 	 */
-	private static ThisCompositionRule THIS_COMPOSITION_RULE_ = new ThisCompositionRule();
+	private static ContradictionPropagationRule THIS_COMPOSITION_RULE_ = new ContradictionPropagationRule();
 
 	public static Contradiction getInstance() {
 		return INSTANCE_;
@@ -99,13 +99,14 @@ public class Contradiction extends AbstractConclusion {
 	}
 
 	/**
-	 * The composition rule that should be applied when processing this
-	 * {@link Contradiction} in a {@code Context}
+	 * The composition rule applied when processing {@link Contradiction}
+	 * producing {@link Contradiction} in all contexts linked by
+	 * {@link BackwardLink}s in a {@code Context}
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	public static class ThisCompositionRule implements Rule<Context> {
+	public static class ContradictionPropagationRule implements Rule<Context> {
 
 		private static final String NAME_ = "Contradiction Propagation over Backward Links";
 
@@ -132,9 +133,9 @@ public class Contradiction extends AbstractConclusion {
 	}
 
 	/**
-	 * The composition rule that should be applied when processing
-	 * {@link BackwardLink}s in a context that contains this
-	 * {@link Contradiction}s
+	 * The composition rule applied when processing {@link BackwardLink} that
+	 * produces {@link Contradiction} in the context linked by this
+	 * {@link BackwardLink}
 	 */
 	public static class ContradictionBackwardLinkRule extends
 			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements

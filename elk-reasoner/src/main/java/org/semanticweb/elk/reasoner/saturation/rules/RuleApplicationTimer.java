@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 
@@ -52,7 +52,7 @@ public class RuleApplicationTimer {
 	int timeOwlThingContextInitializationRule;
 
 	/**
-	 * timer for {@link DirectIndex.ContextRootInitializationRule}
+	 * timer for {@link DirectIndex.RootContextInitializationRule}
 	 */
 	int timeContextRootInitializationRule;
 
@@ -62,12 +62,12 @@ public class RuleApplicationTimer {
 	int timeIndexedDisjointnessAxiomCompositionRule;
 
 	/**
-	 * timer for {@link IndexedDisjointnessAxiom.ThisContradictionRule}
+	 * timer for {@link IndexedDisjointnessAxiom.ContradictionCompositionRule}
 	 */
 	int timeIndexedDisjointnessAxiomContradictionRule;
 
 	/**
-	 * timer for {@link IndexedObjectComplementOf.ThisCompositionRule}
+	 * timer for {@link IndexedObjectComplementOf.ContradictionCompositionRule}
 	 */
 	int timeObjectIndexedComplementOfCompositionRule;
 
@@ -77,12 +77,12 @@ public class RuleApplicationTimer {
 	int timeObjectIndexedIntersectionOfCompositionRule;
 
 	/**
-	 * timer for {@link IndexedSubClassOfAxiom.ThisCompositionRule}
+	 * timer for {@link IndexedSubClassOfAxiom.SubsumerCompositionRule}
 	 */
 	public int timeIndexedSubClassOfAxiomCompositionRule;
 
 	/**
-	 * timer for {@link IndexedObjectSomeValuesFrom.ThisCompositionRule}
+	 * timer for {@link IndexedObjectSomeValuesFrom.PropagationCompositionRule}
 	 */
 	int timeIndexedObjectSomeValuesFromCompositionRule;
 
@@ -97,7 +97,7 @@ public class RuleApplicationTimer {
 	int timeForwardLinkBackwardLinkRule;
 
 	/**
-	 * timer for {@link Propagation.ThisBackwardLinkRule}
+	 * timer for {@link Propagation.SubsumerBackwardLinkRule}
 	 */
 	int timePropagationBackwardLinkRule;
 
@@ -112,17 +112,17 @@ public class RuleApplicationTimer {
 	int timeBackwardLinkCompositionRule;
 
 	/**
-	 * time for {@link Contradiction.ThisCompositionRule}
+	 * time for {@link Contradiction.ContradictionPropagationRule}
 	 */
 	int timeContradictionCompositionRule;
 
 	/**
-	 * time for {@link DisjointnessAxiom.ThisCompositionRule}
+	 * time for {@link DisjointSubsumer.ContradicitonCompositionRule}
 	 */
 	int timeDisjointnessAxiomCompositionRule;
 
 	/**
-	 * time for {@link ForwardLink.ThisCompositionRule}
+	 * time for {@link ForwardLink.BackwardLinkCompositionRule}
 	 */
 	int timeForwardLinkCompositionRule;
 

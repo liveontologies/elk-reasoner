@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
@@ -139,10 +139,9 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	/**
-	 * The composition rule that should be applied when processing a conjunction
-	 * of {@link IndexedObjectIntersectionOf} in a {@code Context} that produce
-	 * this {@link IndexedObjectIntersectionOf} if the other conjunction is
-	 * contained in the {@code Context}.
+	 * The composition rule producing {@link Subsumer} for an
+	 * {@link IndexedObjectIntersectionOf} when processing one of its conjunct
+	 * and when the other conjunct is contained in the {@link Context}
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */

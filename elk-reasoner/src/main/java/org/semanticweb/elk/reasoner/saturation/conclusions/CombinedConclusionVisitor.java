@@ -66,7 +66,7 @@ public class CombinedConclusionVisitor implements ConclusionVisitor<Boolean> {
 	}
 
 	@Override
-	public Boolean visit(DisjointnessAxiom disjointnessAxiom, Context context) {
+	public Boolean visit(DisjointSubsumer disjointnessAxiom, Context context) {
 		return first_.visit(disjointnessAxiom, context)
 				&& second_.visit(disjointnessAxiom, context);
 	}

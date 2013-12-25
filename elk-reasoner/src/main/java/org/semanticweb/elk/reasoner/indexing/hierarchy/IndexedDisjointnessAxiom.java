@@ -29,7 +29,7 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
@@ -144,7 +144,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 	private void registerCompositionRule(ModifiableOntologyIndex index) {
 		for (IndexedClassExpression ice : inconsistentMembers_)
-			index.add(ice, new ThisContradictionRule());
+			index.add(ice, new ContradictionCompositionRule());
 		for (IndexedClassExpression ice : disjointMembers_) {
 			index.add(ice, new ThisCompositionRule(this));
 		}
@@ -152,17 +152,16 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 	private void deregisterCompositionRule(ModifiableOntologyIndex index) {
 		for (IndexedClassExpression ice : inconsistentMembers_)
-			index.remove(ice, new ThisContradictionRule());
+			index.remove(ice, new ContradictionCompositionRule());
 		for (IndexedClassExpression ice : disjointMembers_) {
 			index.remove(ice, new ThisCompositionRule(this));
 		}
 	}
 
 	/**
-	 * The composition rule that should be applied when processing non-duplicate
-	 * {@link IndexedClassExpression}s in this {@link IndexedDisjointnessAxiom}
-	 * in a {@code Context} that produce a special {@link DisjointnessAxiom}
-	 * {@link Conclusion}
+	 * The composition rule producing {@link DisjointSubsumer} when processing
+	 * an {@link IndexedClassExpression} that is present in an
+	 * {@link IndexedDisjointnessAxiom} exactly once.
 	 * 
 	 * @author Pavel Klinov
 	 * 
@@ -212,7 +211,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			LOGGER_.trace("Applying {} to {}", NAME_, context);
 
 			for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
-				writer.produce(context, new DisjointnessAxiom(disAxiom));
+				writer.produce(context, new DisjointSubsumer(disAxiom));
 		}
 
 		protected boolean isEmpty() {
@@ -250,13 +249,13 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	/**
-	 * The composition rule that should be applied when processing duplicate
-	 * {@link IndexedClassExpression}s in this {@link IndexedDisjointnessAxiom}
-	 * in a {@code Context} that produce {@link Contradiction}
+	 * The composition rule producing {@link Contradiction} when processing an
+	 * {@link IndexedClassExpression} that is present in an
+	 * {@link IndexedDisjointnessAxiom} at least twice.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
-	public static class ThisContradictionRule extends
+	public static class ContradictionCompositionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
@@ -269,12 +268,12 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		 */
 		private int contradictionCounter_;
 
-		public ThisContradictionRule(ChainableRule<Context> tail) {
+		public ContradictionCompositionRule(ChainableRule<Context> tail) {
 			super(tail);
 			this.contradictionCounter_ = 0;
 		}
 
-		ThisContradictionRule() {
+		ContradictionCompositionRule() {
 			this((ChainableRule<Context>) null);
 			this.contradictionCounter_++;
 		}
@@ -293,15 +292,15 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 		@Override
 		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
-			ThisContradictionRule rule = ruleChain
-					.getCreate(MATCHER_, FACTORY_);
+			ContradictionCompositionRule rule = ruleChain.getCreate(MATCHER_,
+					FACTORY_);
 			rule.contradictionCounter_ += this.contradictionCounter_;
 			return this.contradictionCounter_ != 0;
 		}
 
 		@Override
 		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
-			ThisContradictionRule rule = ruleChain.find(MATCHER_);
+			ContradictionCompositionRule rule = ruleChain.find(MATCHER_);
 			if (rule == null) {
 				return false;
 			}
@@ -321,13 +320,14 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return this.contradictionCounter_ == 0;
 		}
 
-		private static Matcher<ChainableRule<Context>, ThisContradictionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisContradictionRule>(
-				ThisContradictionRule.class);
+		private static Matcher<ChainableRule<Context>, ContradictionCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ContradictionCompositionRule>(
+				ContradictionCompositionRule.class);
 
-		private static ReferenceFactory<ChainableRule<Context>, ThisContradictionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisContradictionRule>() {
+		private static ReferenceFactory<ChainableRule<Context>, ContradictionCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ContradictionCompositionRule>() {
 			@Override
-			public ThisContradictionRule create(ChainableRule<Context> tail) {
-				return new ThisContradictionRule(tail);
+			public ContradictionCompositionRule create(
+					ChainableRule<Context> tail) {
+				return new ContradictionCompositionRule(tail);
 			}
 		};
 

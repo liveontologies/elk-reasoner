@@ -27,7 +27,6 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectComplementOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
@@ -77,7 +76,7 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 			int positiveIncrement, int negativeIncrement) {
 		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
 			// first positive occurrence of this expression
-			index.add(negated_, new ThisCompositionRule(this));
+			index.add(negated_, new ContradictionCompositionRule(this));
 		}
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
@@ -98,7 +97,7 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 
 		if (positiveOccurrenceNo == 0 && positiveIncrement < 0) {
 			// no positive occurrences of this expression left
-			index.remove(negated_, new ThisCompositionRule(this));
+			index.remove(negated_, new ContradictionCompositionRule(this));
 		}
 	}
 
@@ -111,16 +110,16 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 	public String toStringStructural() {
 		return "ObjectComplementOf(" + this.negated_ + ')';
 	}
-
+	
 	/**
-	 * The composition rule that should be applied when processing the negated
-	 * {@link IndexedClassExpression} of this {@link IndexedObjectComplementOf}
-	 * in a {@code Context} that produce {@link Contradiction} if this
+	 * The composition rule producing {@link Contradiction} when processing the
+	 * negated {@link IndexedClassExpression} of an
+	 * {@link IndexedObjectComplementOf} if this
 	 * {@link IndexedObjectComplementOf} is contained in the {@code Context}.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
-	public static class ThisCompositionRule extends
+	public static class ContradictionCompositionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
@@ -128,12 +127,12 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 
 		private IndexedClassExpression negation_;
 
-		private ThisCompositionRule(ChainableRule<Context> tail) {
+		private ContradictionCompositionRule(ChainableRule<Context> tail) {
 			super(tail);
 
 		}
 
-		ThisCompositionRule(IndexedClassExpression complement) {
+		ContradictionCompositionRule(IndexedClassExpression complement) {
 			this((ChainableRule<Context>) null);
 			this.negation_ = complement;
 		}
@@ -158,7 +157,8 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 
 		@Override
 		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
-			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
+			ContradictionCompositionRule rule = ruleChain
+					.getCreate(MATCHER_, FACTORY_);
 			boolean changed = false;
 
 			if (negation_ != null && rule.negation_ != negation_) {
@@ -177,7 +177,7 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 
 		@Override
 		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
-			ThisCompositionRule rule = ruleChain.find(MATCHER_);
+			ContradictionCompositionRule rule = ruleChain.find(MATCHER_);
 			boolean changed = false;
 
 			if (rule != null) {
@@ -208,13 +208,13 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 			return negation_ == null;
 		}
 
-		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
-				ThisCompositionRule.class);
+		private static final Matcher<ChainableRule<Context>, ContradictionCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ContradictionCompositionRule>(
+				ContradictionCompositionRule.class);
 
-		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
+		private static final ReferenceFactory<ChainableRule<Context>, ContradictionCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ContradictionCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(ChainableRule<Context> tail) {
-				return new ThisCompositionRule(tail);
+			public ContradictionCompositionRule create(ChainableRule<Context> tail) {
+				return new ContradictionCompositionRule(tail);
 			}
 		};
 

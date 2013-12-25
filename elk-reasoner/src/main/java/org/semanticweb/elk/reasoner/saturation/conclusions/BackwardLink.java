@@ -106,11 +106,12 @@ public class BackwardLink implements Conclusion {
 	}
 
 	/**
-	 * The composition rule that should be applied when processing this
-	 * {@link BackwardLink} in a {@code Context}
+	 * The composition rule applied when processing when processing this
+	 * {@link BackwardLink} producing new {@link Propagation}s that can be
+	 * propagated over this {@link BackwardLink} and the corresponding
+	 * {@link ForwardLink} if it can be used with property chain axioms.
 	 * 
 	 * @author "Yevgeny Kazakov"
-	 * 
 	 */
 	public class ThisCompositionRule implements Rule<Context> {
 

@@ -69,7 +69,7 @@ public class ForwardLink extends AbstractConclusion {
 	 */
 	private final Context target_;
 
-	private final ThisCompositionRule thisCompositionRule_ = new ThisCompositionRule();
+	private final BackwardLinkCompositionRule thisCompositionRule_ = new BackwardLinkCompositionRule();
 
 	public ForwardLink(IndexedPropertyChain relation, Context target) {
 		this.relation_ = relation;
@@ -122,12 +122,14 @@ public class ForwardLink extends AbstractConclusion {
 	}
 
 	/**
-	 * The composition rule that should be applied when processing this
-	 * {@link ForwardLink} in a {@code Context}
+	 * The composition rule applied when processing this {@link ForwardLink}
+	 * producing {@link BackwardLink}s resulted by composition of this
+	 * {@link ForwardLink} with existing {@link BackwardLink}s using property
+	 * chain axioms
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
-	public class ThisCompositionRule implements Rule<Context> {
+	public class BackwardLinkCompositionRule implements Rule<Context> {
 
 		private static final String NAME_ = "ForwardLink BackwardLink Composition";
 
@@ -162,13 +164,10 @@ public class ForwardLink extends AbstractConclusion {
 	}
 
 	/**
-	 * A type of {@link ModifiableLinkRule} created for {@link ForwardLink}s and
-	 * stored in the {@link Context} where it is produced. There can be at most
-	 * one rule of this type stored in every {@link Context}. The rule
-	 * essentially indexes all {@link ForwardLink}s produced in this
-	 * {@link Context} and applies inferences with every produced
-	 * {@link BackwardLink} in this {@link Context}, such as computing implied
-	 * role chains.
+	 * The composition rule applied when processing a {@link BackwardLink}
+	 * producing {@link BackwardLink}s resulted by composing the processed
+	 * {@link BackwardLink} with {@link ForwardLink}s contained in the
+	 * {@link Context} using property chain axioms
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 

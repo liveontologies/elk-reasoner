@@ -32,19 +32,24 @@ import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 
 /**
+ * A {@code Conclusion} representing that some member of an
+ * {@link IndexedDisjointnessAxiom} was derived as a subsumer in the
+ * {@link Context}. In other words, the (disjoint) union of the
+ * {@link IndexedDisjointnessAxiom} members is derived as a subsumer.
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  * 
  * @author "Yevgeny Kazakov"
  */
-public class DisjointnessAxiom extends AbstractConclusion {
+public class DisjointSubsumer extends AbstractConclusion {
 
-	private static ThisCompositionRule THIS_COMPOSITION_RULE_ = new ThisCompositionRule();
+	private static ContradicitonCompositionRule THIS_COMPOSITION_RULE_ = new ContradicitonCompositionRule();
 
 	private final IndexedDisjointnessAxiom axiom_;
 
-	public DisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
+	public DisjointSubsumer(IndexedDisjointnessAxiom axiom) {
 		axiom_ = axiom;
 	}
 
@@ -71,12 +76,13 @@ public class DisjointnessAxiom extends AbstractConclusion {
 	}
 
 	/**
-	 * The composition rule that should be applied when processing this
-	 * {@link DisjointnessAxiom} in a {@code Context}
+	 * The composition rule applied when processing a {@link DisjointSubsumer}
+	 * producing {@link Contradiction} caused by violation of disjointness
+	 * constrains of this {@link DisjointSubsumer}
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
-	public static class ThisCompositionRule implements Rule<Context> {
+	public static class ContradicitonCompositionRule implements Rule<Context> {
 
 		private static final String NAME_ = "Contradiction by Disjointness Axiom";
 

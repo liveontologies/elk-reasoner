@@ -45,7 +45,7 @@ public interface ConclusionVisitor<R> {
 
 	public R visit(Propagation propagation, Context context);
 
-	public R visit(DisjointnessAxiom disjointnessAxiom, Context context);
+	public R visit(DisjointSubsumer disjointnessAxiom, Context context);
 	
 	/**
 	 * A dummy visitor, does nothing
@@ -83,7 +83,7 @@ public interface ConclusionVisitor<R> {
 		}
 
 		@Override
-		public Object visit(DisjointnessAxiom disjointnessAxiom, Context context) {
+		public Object visit(DisjointSubsumer disjointnessAxiom, Context context) {
 			return null;
 		}
 		

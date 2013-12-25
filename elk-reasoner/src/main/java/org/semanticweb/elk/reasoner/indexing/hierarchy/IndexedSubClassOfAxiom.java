@@ -29,6 +29,7 @@ import java.util.List;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
@@ -83,16 +84,22 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
 			final int increment) {
 		if (increment > 0) {
-			index.add(subClass_, new ThisCompositionRule(superClass_));
+			index.add(subClass_, new SubsumerCompositionRule(superClass_));
 		} else {
-			index.remove(subClass_, new ThisCompositionRule(superClass_));
+			index.remove(subClass_, new SubsumerCompositionRule(superClass_));
 		}
 	}
 
 	/**
 	 * 
+	 * The composition rule producing {@link Subsumer} for the super class of
+	 * {@link IndexedSubClassAxiom} when processing one of its conjunct and when
+	 * the other conjunct is contained in the {@link Context}
+	 * 
+	 * @author "Yevgeny Kazakov"
+	 * 
 	 */
-	public static class ThisCompositionRule extends
+	public static class SubsumerCompositionRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
@@ -104,7 +111,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		 */
 		private final List<IndexedClassExpression> toldSuperClassExpressions_;
 
-		ThisCompositionRule(ChainableRule<Context> tail) {
+		SubsumerCompositionRule(ChainableRule<Context> tail) {
 			super(tail);
 			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
 					1);
@@ -113,7 +120,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		/*
 		 * used for registration
 		 */
-		ThisCompositionRule(IndexedClassExpression ice) {
+		SubsumerCompositionRule(IndexedClassExpression ice) {
 			super(null);
 			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
 					1);
@@ -143,8 +150,9 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 		@Override
 		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
-			ThisCompositionRule rule = ruleChain.getCreate(
-					ThisCompositionRule.MATCHER_, ThisCompositionRule.FACTORY_);
+			SubsumerCompositionRule rule = ruleChain.getCreate(
+					SubsumerCompositionRule.MATCHER_,
+					SubsumerCompositionRule.FACTORY_);
 			boolean changed = false;
 
 			for (IndexedClassExpression ice : toldSuperClassExpressions_) {
@@ -159,8 +167,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 		@Override
 		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
-			ThisCompositionRule rule = ruleChain
-					.find(ThisCompositionRule.MATCHER_);
+			SubsumerCompositionRule rule = ruleChain
+					.find(SubsumerCompositionRule.MATCHER_);
 			boolean changed = false;
 
 			if (rule != null) {
@@ -171,7 +179,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 				}
 
 				if (rule.isEmpty()) {
-					ruleChain.remove(ThisCompositionRule.MATCHER_);
+					ruleChain.remove(SubsumerCompositionRule.MATCHER_);
 
 					LOGGER_.trace("{}: removed ", NAME_);
 
@@ -215,13 +223,13 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			return getName() + ": " + toldSuperClassExpressions_;
 		}
 
-		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
-				ThisCompositionRule.class);
+		private static final Matcher<ChainableRule<Context>, SubsumerCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, SubsumerCompositionRule>(
+				SubsumerCompositionRule.class);
 
-		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
+		private static final ReferenceFactory<ChainableRule<Context>, SubsumerCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, SubsumerCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(ChainableRule<Context> tail) {
-				return new ThisCompositionRule(tail);
+			public SubsumerCompositionRule create(ChainableRule<Context> tail) {
+				return new SubsumerCompositionRule(tail);
 			}
 		};
 

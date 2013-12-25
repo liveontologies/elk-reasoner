@@ -30,6 +30,7 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -97,32 +98,36 @@ public class Propagation extends AbstractConclusion {
 	public boolean addToContextBackwardLinkRule(Context context) {
 		return context
 				.getBackwardLinkRuleChain()
-				.getCreate(ThisBackwardLinkRule.MATCHER_,
-						ThisBackwardLinkRule.FACTORY_)
+				.getCreate(SubsumerBackwardLinkRule.MATCHER_,
+						SubsumerBackwardLinkRule.FACTORY_)
 				.addPropagationByObjectProperty(relation_, carry_);
 	}
 
 	public boolean removeFromContextBackwardLinkRule(Context context) {
-		ThisBackwardLinkRule rule = context.getBackwardLinkRuleChain().find(
-				ThisBackwardLinkRule.MATCHER_);
+		SubsumerBackwardLinkRule rule = context.getBackwardLinkRuleChain()
+				.find(SubsumerBackwardLinkRule.MATCHER_);
 
 		return rule != null ? rule.removePropagationByObjectProperty(relation_,
 				carry_) : false;
 	}
 
 	public boolean containsBackwardLinkRule(Context context) {
-		ThisBackwardLinkRule rule = context.getBackwardLinkRuleChain().find(
-				ThisBackwardLinkRule.MATCHER_);
+		SubsumerBackwardLinkRule rule = context.getBackwardLinkRuleChain()
+				.find(SubsumerBackwardLinkRule.MATCHER_);
 
 		return rule != null ? rule.containsPropagationByObjectProperty(
 				relation_, carry_) : false;
 	}
 
 	/**
+	 * The composition rule producing {@link Subsumer}s when processing
+	 * {@link BackwardLink}s that are propagated over them using
+	 * {@link Propagation}s contained in the {@link Context}
 	 * 
+	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	public static class ThisBackwardLinkRule extends
+	public static class SubsumerBackwardLinkRule extends
 			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
 			ModifiableLinkRule<BackwardLink> {
 
@@ -130,7 +135,7 @@ public class Propagation extends AbstractConclusion {
 
 		private final Multimap<IndexedPropertyChain, IndexedClassExpression> propagationsByObjectProperty_;
 
-		ThisBackwardLinkRule(ModifiableLinkRule<BackwardLink> tail) {
+		SubsumerBackwardLinkRule(ModifiableLinkRule<BackwardLink> tail) {
 			super(tail);
 			this.propagationsByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedClassExpression>(
 					1);
@@ -181,15 +186,15 @@ public class Propagation extends AbstractConclusion {
 					conclusion);
 		}
 
-		private static Matcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule>(
-				ThisBackwardLinkRule.class);
+		private static Matcher<ModifiableLinkRule<BackwardLink>, SubsumerBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, SubsumerBackwardLinkRule>(
+				SubsumerBackwardLinkRule.class);
 
-		private static ReferenceFactory<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule<BackwardLink>, ThisBackwardLinkRule>() {
+		private static ReferenceFactory<ModifiableLinkRule<BackwardLink>, SubsumerBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule<BackwardLink>, SubsumerBackwardLinkRule>() {
 
 			@Override
-			public ThisBackwardLinkRule create(
+			public SubsumerBackwardLinkRule create(
 					ModifiableLinkRule<BackwardLink> tail) {
-				return new ThisBackwardLinkRule(tail);
+				return new SubsumerBackwardLinkRule(tail);
 			}
 		};
 

@@ -72,7 +72,7 @@ public class PreprocessedConclusionVisitor<T> implements ConclusionVisitor<T> {
 	}
 
 	@Override
-	public T visit(DisjointnessAxiom disjointnessAxiom, Context context) {
+	public T visit(DisjointSubsumer disjointnessAxiom, Context context) {
 		preprocessor_.visit(disjointnessAxiom, context);
 		return visitor_.visit(disjointnessAxiom, context);
 	}

@@ -33,13 +33,12 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
@@ -64,7 +63,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 
 	final IndexedObjectCache objectCache;
 	// the context root initialization rule is always registered
-	private ChainableRule<Context> contextInitRules_ = new ContextRootInitializationRule();
+	private ChainableRule<Context> contextInitRules_ = new RootContextInitializationRule();
 
 	private final Set<IndexedObjectProperty> reflexiveObjectProperties_;
 
@@ -278,20 +277,22 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	/**
-	 * The composition rule that should be applied for each newly created
-	 * {@link Context}
+	 * The composition rule applied when processing a {@link Context} that
+	 * produces initial root {@link Subsumer} in this {@link Context}
+	 * 
+	 * @author "Yevgeny Kazakov"
 	 */
-	public static class ContextRootInitializationRule extends
+	public static class RootContextInitializationRule extends
 			ModifiableLinkImpl<ChainableRule<Context>> implements
 			ChainableRule<Context> {
 
 		private static final String NAME_ = "Root Introduction";
 
-		private ContextRootInitializationRule(ChainableRule<Context> tail) {
+		private RootContextInitializationRule(ChainableRule<Context> tail) {
 			super(tail);
 		}
 
-		public ContextRootInitializationRule() {
+		public RootContextInitializationRule() {
 			super(null);
 		}
 
@@ -307,27 +308,26 @@ public class DirectIndex implements ModifiableOntologyIndex {
 			writer.produce(context, new DecomposedSubsumer(context.getRoot()));
 		}
 
-		private static final Matcher<ChainableRule<Context>, ContextRootInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ContextRootInitializationRule>(
-				ContextRootInitializationRule.class);
+		private static final Matcher<ChainableRule<Context>, RootContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, RootContextInitializationRule>(
+				RootContextInitializationRule.class);
 
-		private static final ReferenceFactory<ChainableRule<Context>, ContextRootInitializationRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ContextRootInitializationRule>() {
+		private static final ReferenceFactory<ChainableRule<Context>, RootContextInitializationRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, RootContextInitializationRule>() {
 			@Override
-			public ContextRootInitializationRule create(
+			public RootContextInitializationRule create(
 					ChainableRule<Context> tail) {
-				return new ContextRootInitializationRule(tail);
+				return new RootContextInitializationRule(tail);
 			}
 		};
 
 		@Override
 		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
-			ContextRootInitializationRule rule = ruleChain.find(MATCHER_);
+			RootContextInitializationRule rule = ruleChain.find(MATCHER_);
 
 			if (rule == null) {
 				ruleChain.getCreate(MATCHER_, FACTORY_);
 				return true;
-			} else {
-				return false;
 			}
+			return false;
 		}
 
 		@Override

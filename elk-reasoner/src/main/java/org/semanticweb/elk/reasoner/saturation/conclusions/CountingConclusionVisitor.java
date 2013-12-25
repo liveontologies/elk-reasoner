@@ -63,7 +63,7 @@ public class CountingConclusionVisitor implements ConclusionVisitor<Integer> {
 	}
 
 	@Override
-	public Integer visit(DisjointnessAxiom disjointnessAxiom, Context context) {
+	public Integer visit(DisjointSubsumer disjointnessAxiom, Context context) {
 		return counter_.countDisjointnessAxioms++;
 	}
 

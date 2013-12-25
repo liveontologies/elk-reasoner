@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 
@@ -51,7 +51,7 @@ public class RuleApplicationCounter {
 	int countOwlThingContextInitializationRule;
 
 	/**
-	 * counter for {@link DirectIndex.ContextRootInitializationRule}
+	 * counter for {@link DirectIndex.RootContextInitializationRule}
 	 */
 	int countContextRootInitializationRule;
 
@@ -61,12 +61,12 @@ public class RuleApplicationCounter {
 	int countIndexedDisjointnessAxiomCompositionRule;
 
 	/**
-	 * counter for {@link IndexedDisjointnessAxiom.ThisContradictionRule}
+	 * counter for {@link IndexedDisjointnessAxiom.ContradictionCompositionRule}
 	 */
 	int countIndexedDisjointnessAxiomContradictionRule;
 
 	/**
-	 * counter for {@link IndexedObjectComplementOf.ThisCompositionRule}
+	 * counter for {@link IndexedObjectComplementOf.ContradictionCompositionRule}
 	 */
 	int countIndexedObjectComplementOfCompositionRule;
 
@@ -76,12 +76,12 @@ public class RuleApplicationCounter {
 	int countIndexedObjectIntersectionOfCompositionRule;
 
 	/**
-	 * counter for {@link IndexedSubClassOfAxiom.ThisCompositionRule}
+	 * counter for {@link IndexedSubClassOfAxiom.SubsumerCompositionRule}
 	 */
 	int countIndexedSubClassOfAxiomCompositionRule;
 
 	/**
-	 * counter for {@link IndexedObjectSomeValuesFrom.ThisCompositionRule}
+	 * counter for {@link IndexedObjectSomeValuesFrom.PropagationCompositionRule}
 	 */
 	int countIndexedObjectSomeValuesFromCompositionRule;
 
@@ -96,7 +96,7 @@ public class RuleApplicationCounter {
 	int countForwardLinkBackwardLinkRule;
 
 	/**
-	 * counter for {@link Propagation.ThisBackwardLinkRule}
+	 * counter for {@link Propagation.SubsumerBackwardLinkRule}
 	 */
 	int countPropagationBackwardLinkRule;
 
@@ -111,17 +111,17 @@ public class RuleApplicationCounter {
 	int countBackwardLinkCompositionRule;
 
 	/**
-	 * counter for {@link Contradiction.ThisCompositionRule}
+	 * counter for {@link Contradiction.ContradictionPropagationRule}
 	 */
 	int countContradictionCompositionRule;
 
 	/**
-	 * counter for {@link DisjointnessAxiom.ThisCompositionRule}
+	 * counter for {@link DisjointSubsumer.ContradicitonCompositionRule}
 	 */
 	int countDisjointnessAxiomCompositionRule;
 
 	/**
-	 * counter for {@link ForwardLink.ThisCompositionRule}
+	 * counter for {@link ForwardLink.BackwardLinkCompositionRule}
 	 */
 	int countForwardLinkCompositionRule;
 

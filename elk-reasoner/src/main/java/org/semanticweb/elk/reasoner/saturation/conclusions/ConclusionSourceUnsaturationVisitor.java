@@ -89,7 +89,7 @@ public class ConclusionSourceUnsaturationVisitor implements
 	}
 
 	@Override
-	public Boolean visit(DisjointnessAxiom disjointnessAxiom, Context context) {
+	public Boolean visit(DisjointSubsumer disjointnessAxiom, Context context) {
 		return mark(disjointnessAxiom, context);
 	}
 

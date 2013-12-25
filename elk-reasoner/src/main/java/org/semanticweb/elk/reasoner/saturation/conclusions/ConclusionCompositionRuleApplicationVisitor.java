@@ -90,7 +90,7 @@ public class ConclusionCompositionRuleApplicationVisitor implements
 	}
 
 	@Override
-	public Boolean visit(DisjointnessAxiom disjointnessAxiom, Context context) {
+	public Boolean visit(DisjointSubsumer disjointnessAxiom, Context context) {
 		return defaultVisit(disjointnessAxiom, context);
 	}
 
