@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
@@ -147,17 +148,17 @@ public class IndexedClass extends IndexedClassEntity {
 	}
 
 	/**
-	 * Adds {@code owl:Thing} to the context. It should be registered as a
-	 * context initialization rule iff {@code owl:Thing} occurs negatively in
-	 * the ontology.
+	 * A context initialization rule that produces {@link Subsumer}
+	 * {@code owl:Thing} in a context. It should be applied only if
+	 * {@code owl:Thing} occurs negatively in the ontology.
 	 */
 	public static class OwlThingContextInitializationRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
+			ModifiableLinkImpl<ChainableRule<Void>> implements
+			ChainableRule<Void> {
 
 		private static final String NAME_ = "owl:Thing Introduction";
 
-		private OwlThingContextInitializationRule(ChainableRule<Context> tail) {
+		private OwlThingContextInitializationRule(ChainableRule<Void> tail) {
 			super(tail);
 		}
 
@@ -171,45 +172,45 @@ public class IndexedClass extends IndexedClassEntity {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter writer, Context context) {
+		public void apply(Void premise, Context context,
+				SaturationStateWriter writer) {
 			LOGGER_.trace("Applying {} to {}", NAME_, context);
 
 			writer.produce(context,
 					new DecomposedSubsumer(writer.getOwlThing()));
 		}
 
-		private static final Matcher<ChainableRule<Context>, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, OwlThingContextInitializationRule>(
+		private static final Matcher<ChainableRule<Void>, OwlThingContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Void>, OwlThingContextInitializationRule>(
 				OwlThingContextInitializationRule.class);
 
-		private static final ReferenceFactory<ChainableRule<Context>, OwlThingContextInitializationRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, OwlThingContextInitializationRule>() {
+		private static final ReferenceFactory<ChainableRule<Void>, OwlThingContextInitializationRule> FACTORY_ = new ReferenceFactory<ChainableRule<Void>, OwlThingContextInitializationRule>() {
 			@Override
 			public OwlThingContextInitializationRule create(
-					ChainableRule<Context> tail) {
+					ChainableRule<Void> tail) {
 				return new OwlThingContextInitializationRule(tail);
 			}
 		};
 
 		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean addTo(Chain<ChainableRule<Void>> ruleChain) {
 			OwlThingContextInitializationRule rule = ruleChain.find(MATCHER_);
 
 			if (rule == null) {
 				ruleChain.getCreate(MATCHER_, FACTORY_);
 				return true;
-			} else {
-				return false;
 			}
+			return false;
 		}
 
 		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean removeFrom(Chain<ChainableRule<Void>> ruleChain) {
 			return ruleChain.remove(MATCHER_) != null;
 		}
 
 		@Override
-		public void accept(CompositionRuleVisitor visitor,
-				SaturationStateWriter writer, Context context) {
-			visitor.visit(this, writer, context);
+		public void accept(CompositionRuleVisitor visitor, Void premise,
+				Context context, SaturationStateWriter writer) {
+			visitor.visit(this, context, writer);
 		}
 
 	}

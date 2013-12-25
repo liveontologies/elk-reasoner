@@ -80,12 +80,12 @@ public class BackwardLink implements Conclusion {
 	public void accept(CompositionRuleVisitor ruleAppVisitor,
 			SaturationStateWriter writer, Context context) {
 
-		ruleAppVisitor.visit(thisCompositionRule_, writer, context);
+		ruleAppVisitor.visit(thisCompositionRule_, this, context, writer);
 
 		// apply all backward link rules of the context
 		LinkRule<BackwardLink> backLinkRule = context.getBackwardLinkRuleHead();
 		while (backLinkRule != null) {
-			backLinkRule.accept(ruleAppVisitor, writer, this);
+			backLinkRule.accept(ruleAppVisitor, this, context, writer);
 			backLinkRule = backLinkRule.next();
 		}
 	}
@@ -113,7 +113,7 @@ public class BackwardLink implements Conclusion {
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
-	public class ThisCompositionRule implements Rule<Context> {
+	public static class ThisCompositionRule implements Rule<BackwardLink> {
 
 		private static final String NAME_ = "BackwardLink Registration";
 
@@ -123,22 +123,25 @@ public class BackwardLink implements Conclusion {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter writer, Context context) {
+		public void apply(BackwardLink premise, Context context,
+				SaturationStateWriter writer) {
+			IndexedPropertyChain premiseRelation = premise.getRelation();
 			// if this is the first/last backward link for this relation,
 			// generate new propagations for this relation
-			if (context.getBackwardLinksByObjectProperty().get(relation_)
+			if (context.getBackwardLinksByObjectProperty().get(premiseRelation)
 					.size() == 1) {
 				IndexedObjectSomeValuesFrom.generatePropagations(writer,
-						relation_, context);
+						premiseRelation, context);
 			}
 
 			/*
 			 * convert backward link to a forward link if it can potentially be
 			 * composed
 			 */
-			if (!relation_.getSaturated().getCompositionsByLeftSubProperty()
-					.isEmpty()) {
-				writer.produce(source_, new ForwardLink(relation_, context));
+			if (!premiseRelation.getSaturated()
+					.getCompositionsByLeftSubProperty().isEmpty()) {
+				writer.produce(premise.getSource(), new ForwardLink(
+						premiseRelation, context));
 			}
 
 		}

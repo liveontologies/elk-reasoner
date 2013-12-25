@@ -123,13 +123,14 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 
 	/**
 	 * The composition rule producing {@link Subsumer} for an
-	 * {@link IndexedObjectUnionOf} when processing one of its disjuncts
+	 * {@link IndexedObjectUnionOf} when processing one of its disjunct
+	 * {@link IndexedClassExpression}
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
 	public static class ThisCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
+			ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
+			ChainableRule<IndexedClassExpression> {
 
 		private static final String NAME_ = "ObjectUnionOf Introduction";
 
@@ -139,14 +140,14 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 		 */
 		private final Set<IndexedClassExpression> disjunctions_;
 
-		private ThisCompositionRule(ChainableRule<Context> tail) {
+		private ThisCompositionRule(ChainableRule<IndexedClassExpression> tail) {
 			super(tail);
 			disjunctions_ = new ArrayHashSet<IndexedClassExpression>();
 
 		}
 
 		ThisCompositionRule(IndexedClassExpression disjunction) {
-			this((ChainableRule<Context>) null);
+			this((ChainableRule<IndexedClassExpression>) null);
 			this.disjunctions_.add(disjunction);
 		}
 
@@ -157,8 +158,9 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 
 		@Override
 		public void accept(CompositionRuleVisitor visitor,
-				SaturationStateWriter writer, Context context) {
-			visitor.visit(this, writer, context);
+				IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
+			visitor.visit(this, premise, context, writer);
 		}
 
 		// TODO: hide this method
@@ -167,7 +169,8 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter writer, Context context) {
+		public void apply(IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
 			LOGGER_.trace("Applying {} to {}", NAME_, context);
 
 			for (IndexedClassExpression disjunction : disjunctions_)
@@ -175,13 +178,15 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean addTo(
+				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
 			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 			return rule.disjunctions_.addAll(this.disjunctions_);
 		}
 
 		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean removeFrom(
+				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
 			ThisCompositionRule rule = ruleChain.find(MATCHER_);
 			boolean changed = false;
 			if (rule != null) {
@@ -199,12 +204,13 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 			return disjunctions_.isEmpty();
 		}
 
-		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
+		private static final Matcher<ChainableRule<IndexedClassExpression>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, ThisCompositionRule>(
 				ThisCompositionRule.class);
 
-		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
+		private static final ReferenceFactory<ChainableRule<IndexedClassExpression>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, ThisCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(ChainableRule<Context> tail) {
+			public ThisCompositionRule create(
+					ChainableRule<IndexedClassExpression> tail) {
 				return new ThisCompositionRule(tail);
 			}
 		};

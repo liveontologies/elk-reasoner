@@ -53,7 +53,7 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 * The first composition rule assigned to this
 	 * {@link IndexedClassExpression}
 	 */
-	ChainableRule<Context> compositionRuleHead;
+	ChainableRule<IndexedClassExpression> compositionRuleHead;
 
 	/**
 	 * This counts how often this object occurred positively. Some indexing
@@ -203,7 +203,7 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 *         {@link LinkRule#next()}; this method should be used to access the
 	 *         rules without modifying them.
 	 */
-	public LinkRule<Context> getCompositionRuleHead() {
+	public LinkRule<IndexedClassExpression> getCompositionRuleHead() {
 		return compositionRuleHead;
 	}
 
@@ -215,15 +215,15 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 *         {@link Chain} interface without without worrying about
 	 *         {@code null} values.
 	 */
-	Chain<ChainableRule<Context>> getCompositionRuleChain() {
-		return new AbstractChain<ChainableRule<Context>>() {
+	Chain<ChainableRule<IndexedClassExpression>> getCompositionRuleChain() {
+		return new AbstractChain<ChainableRule<IndexedClassExpression>>() {
 			@Override
-			public ChainableRule<Context> next() {
+			public ChainableRule<IndexedClassExpression> next() {
 				return compositionRuleHead;
 			}
 
 			@Override
-			public void setNext(ChainableRule<Context> tail) {
+			public void setNext(ChainableRule<IndexedClassExpression> tail) {
 				compositionRuleHead = tail;
 			}
 		};

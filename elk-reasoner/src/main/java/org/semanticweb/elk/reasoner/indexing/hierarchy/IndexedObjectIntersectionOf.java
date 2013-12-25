@@ -141,19 +141,20 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	/**
 	 * The composition rule producing {@link Subsumer} for an
 	 * {@link IndexedObjectIntersectionOf} when processing one of its conjunct
-	 * and when the other conjunct is contained in the {@link Context}
+	 * {@link IndexedClassExpression} and when the other conjunct is contained
+	 * in the {@link Context}
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
 	public static class ThisCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
+			ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
+			ChainableRule<IndexedClassExpression> {
 
 		private static final String NAME_ = "ObjectIntersectionOf Introduction";
 
 		private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
 
-		private ThisCompositionRule(ChainableRule<Context> tail) {
+		private ThisCompositionRule(ChainableRule<IndexedClassExpression> tail) {
 			super(tail);
 			this.conjunctionsByConjunct_ = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
 					4);
@@ -176,7 +177,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter writer, Context context) {
+		public void apply(IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
 			LOGGER_.trace("Applying {} to {}", NAME_, context);
 
 			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
@@ -187,7 +189,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean addTo(
+				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
 			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 			boolean changed = false;
 
@@ -202,7 +205,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean removeFrom(
+				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
 			ThisCompositionRule rule = ruleChain.find(MATCHER_);
 			boolean changed = false;
 
@@ -223,8 +227,9 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 
 		@Override
 		public void accept(CompositionRuleVisitor visitor,
-				SaturationStateWriter writer, Context context) {
-			visitor.visit(this, writer, context);
+				IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
+			visitor.visit(this, premise, context, writer);
 		}
 
 		private boolean addConjunctionByConjunct(
@@ -252,12 +257,13 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			return conjunctionsByConjunct_.isEmpty();
 		}
 
-		private static final Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
+		private static final Matcher<ChainableRule<IndexedClassExpression>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, ThisCompositionRule>(
 				ThisCompositionRule.class);
 
-		private static final ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
+		private static final ReferenceFactory<ChainableRule<IndexedClassExpression>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, ThisCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(ChainableRule<Context> tail) {
+			public ThisCompositionRule create(
+					ChainableRule<IndexedClassExpression> tail) {
 				return new ThisCompositionRule(tail);
 			}
 		};

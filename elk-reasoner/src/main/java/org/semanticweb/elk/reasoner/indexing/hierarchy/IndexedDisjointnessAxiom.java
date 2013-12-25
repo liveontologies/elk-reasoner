@@ -161,7 +161,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	/**
 	 * The composition rule producing {@link DisjointSubsumer} when processing
 	 * an {@link IndexedClassExpression} that is present in an
-	 * {@link IndexedDisjointnessAxiom} exactly once.
+	 * {@link IndexedDisjointnessAxiom} of this {@link DisjointSubsumer} exactly
+	 * once.
 	 * 
 	 * @author Pavel Klinov
 	 * 
@@ -169,8 +170,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	 * @author "Yevgeny Kazakov"
 	 */
 	public static class ThisCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
+			ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
+			ChainableRule<IndexedClassExpression> {
 
 		private static final String NAME_ = "DisjointClasses Introduction";
 
@@ -180,13 +181,13 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		 */
 		private final Set<IndexedDisjointnessAxiom> disjointnessAxioms_;
 
-		private ThisCompositionRule(ChainableRule<Context> tail) {
+		private ThisCompositionRule(ChainableRule<IndexedClassExpression> tail) {
 			super(tail);
 			disjointnessAxioms_ = new ArrayHashSet<IndexedDisjointnessAxiom>();
 		}
 
 		ThisCompositionRule(IndexedDisjointnessAxiom axiom) {
-			this((ChainableRule<Context>) null);
+			this((ChainableRule<IndexedClassExpression>) null);
 			disjointnessAxioms_.add(axiom);
 		}
 
@@ -202,12 +203,14 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 		@Override
 		public void accept(CompositionRuleVisitor visitor,
-				SaturationStateWriter writer, Context context) {
-			visitor.visit(this, writer, context);
+				IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
+			visitor.visit(this, premise, context, writer);
 		}
 
 		@Override
-		public void apply(SaturationStateWriter writer, Context context) {
+		public void apply(IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
 			LOGGER_.trace("Applying {} to {}", NAME_, context);
 
 			for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
@@ -219,13 +222,15 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean addTo(
+				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
 			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
 			return rule.disjointnessAxioms_.addAll(this.disjointnessAxioms_);
 		}
 
 		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean removeFrom(
+				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
 			ThisCompositionRule rule = ruleChain.find(MATCHER_);
 			boolean changed = false;
 			if (rule != null) {
@@ -237,27 +242,28 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 			return changed;
 		}
 
-		private static Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
+		private static Matcher<ChainableRule<IndexedClassExpression>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, ThisCompositionRule>(
 				ThisCompositionRule.class);
 
-		private static ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
+		private static ReferenceFactory<ChainableRule<IndexedClassExpression>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, ThisCompositionRule>() {
 			@Override
-			public ThisCompositionRule create(ChainableRule<Context> tail) {
+			public ThisCompositionRule create(
+					ChainableRule<IndexedClassExpression> tail) {
 				return new ThisCompositionRule(tail);
 			}
 		};
 	}
 
 	/**
-	 * The composition rule producing {@link Contradiction} when processing an
+	 * The composition rule producing {@link Contradiction} when processing a an
 	 * {@link IndexedClassExpression} that is present in an
 	 * {@link IndexedDisjointnessAxiom} at least twice.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
 	public static class ContradictionCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
+			ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
+			ChainableRule<IndexedClassExpression> {
 
 		public static final String NAME_ = "DisjointClasses Contradiction Introduction";
 
@@ -268,13 +274,14 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		 */
 		private int contradictionCounter_;
 
-		public ContradictionCompositionRule(ChainableRule<Context> tail) {
+		public ContradictionCompositionRule(
+				ChainableRule<IndexedClassExpression> tail) {
 			super(tail);
 			this.contradictionCounter_ = 0;
 		}
 
 		ContradictionCompositionRule() {
-			this((ChainableRule<Context>) null);
+			this((ChainableRule<IndexedClassExpression>) null);
 			this.contradictionCounter_++;
 		}
 
@@ -284,14 +291,16 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter writer, Context context) {
+		public void apply(IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
 			LOGGER_.trace("Applying {} to {}", NAME_, context);
 
 			writer.produce(context, Contradiction.getInstance());
 		}
 
 		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean addTo(
+				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
 			ContradictionCompositionRule rule = ruleChain.getCreate(MATCHER_,
 					FACTORY_);
 			rule.contradictionCounter_ += this.contradictionCounter_;
@@ -299,7 +308,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean removeFrom(
+				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
 			ContradictionCompositionRule rule = ruleChain.find(MATCHER_);
 			if (rule == null) {
 				return false;
@@ -312,21 +322,22 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 		@Override
 		public void accept(CompositionRuleVisitor visitor,
-				SaturationStateWriter writer, Context context) {
-			visitor.visit(this, writer, context);
+				IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
+			visitor.visit(this, premise, context, writer);
 		}
 
 		protected boolean isEmpty() {
 			return this.contradictionCounter_ == 0;
 		}
 
-		private static Matcher<ChainableRule<Context>, ContradictionCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ContradictionCompositionRule>(
+		private static Matcher<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule>(
 				ContradictionCompositionRule.class);
 
-		private static ReferenceFactory<ChainableRule<Context>, ContradictionCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ContradictionCompositionRule>() {
+		private static ReferenceFactory<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule>() {
 			@Override
 			public ContradictionCompositionRule create(
-					ChainableRule<Context> tail) {
+					ChainableRule<IndexedClassExpression> tail) {
 				return new ContradictionCompositionRule(tail);
 			}
 		};

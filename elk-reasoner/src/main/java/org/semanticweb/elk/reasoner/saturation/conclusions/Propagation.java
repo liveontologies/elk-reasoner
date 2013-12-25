@@ -27,21 +27,20 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import java.util.Collection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -152,18 +151,20 @@ public class Propagation extends AbstractConclusion {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter writer, BackwardLink link) {
-			LOGGER_.trace("Applying {} to {}", NAME_, link);
+		public void apply(BackwardLink premise, Context context,
+				SaturationStateWriter writer) {
+			LOGGER_.trace("Applying {} to {}", NAME_, premise);
 
 			for (IndexedClassExpression carry : propagationsByObjectProperty_
-					.get(link.getRelation()))
-				writer.produce(link.getSource(), new ComposedSubsumer(carry));
+					.get(premise.getRelation()))
+				writer.produce(premise.getSource(), new ComposedSubsumer(carry));
 		}
 
 		@Override
 		public void accept(CompositionRuleVisitor visitor,
-				SaturationStateWriter writer, BackwardLink backwardLink) {
-			visitor.visit(this, writer, backwardLink);
+				BackwardLink premise, Context context,
+				SaturationStateWriter writer) {
+			visitor.visit(this, premise, context, writer);
 		}
 
 		private boolean addPropagationByObjectProperty(

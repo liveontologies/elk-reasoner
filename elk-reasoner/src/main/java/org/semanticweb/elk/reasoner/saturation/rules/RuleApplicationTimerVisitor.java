@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
@@ -79,34 +80,91 @@ public class RuleApplicationTimerVisitor implements CompositionRuleVisitor {
 	}
 
 	@Override
+	public void visit(BackwardLink.ThisCompositionRule thisCompositionRule,
+			BackwardLink premise, Context context, SaturationStateWriter writer) {
+		timer_.timeBackwardLinkCompositionRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(thisCompositionRule, premise, context, writer);
+		timer_.timeBackwardLinkCompositionRule += CachedTimeThread
+				.getCurrentTimeMillis();
+	}
+
+	@Override
+	public void visit(
+			Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
+			BackwardLink premise, Context context, SaturationStateWriter writer) {
+		timer_.timeContradictionBottomBackwardLinkRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(bottomBackwardLinkRule, premise, context, writer);
+		timer_.timeContradictionBottomBackwardLinkRule += CachedTimeThread
+				.getCurrentTimeMillis();
+	}
+
+	@Override
+	public void visit(
+			Contradiction.ContradictionPropagationRule thisCompositionRule,
+			Contradiction premise, Context context, SaturationStateWriter writer) {
+		timer_.timeContradictionCompositionRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(thisCompositionRule, premise, context, writer);
+		timer_.timeContradictionCompositionRule += CachedTimeThread
+				.getCurrentTimeMillis();
+
+	}
+
+	@Override
+	public void visit(
+			DisjointSubsumer.ContradicitonCompositionRule thisCompositionRule,
+			DisjointSubsumer premise, Context context,
+			SaturationStateWriter writer) {
+		timer_.timeDisjointnessAxiomCompositionRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(thisCompositionRule, premise, context, writer);
+		timer_.timeDisjointnessAxiomCompositionRule += CachedTimeThread
+				.getCurrentTimeMillis();
+	}
+
+	@Override
+	public void visit(
+			ForwardLink.BackwardLinkCompositionRule thisCompositionRule,
+			ForwardLink premise, Context context, SaturationStateWriter writer) {
+		timer_.timeForwardLinkCompositionRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(thisCompositionRule, premise, context, writer);
+		timer_.timeForwardLinkCompositionRule += CachedTimeThread
+				.getCurrentTimeMillis();
+	}
+
+	@Override
+	public void visit(ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
+			BackwardLink premise, Context context, SaturationStateWriter writer) {
+		timer_.timeForwardLinkBackwardLinkRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(thisBackwardLinkRule, premise, context, writer);
+		timer_.timeForwardLinkBackwardLinkRule += CachedTimeThread
+				.getCurrentTimeMillis();
+
+	}
+
+	@Override
 	public void visit(
 			IndexedClass.OwlThingContextInitializationRule owlThingContextInitializationRule,
-			SaturationStateWriter writer, Context context) {
+			Context context, SaturationStateWriter writer) {
 		timer_.timeOwlThingContextInitializationRule -= CachedTimeThread
 				.getCurrentTimeMillis();
-		visitor_.visit(owlThingContextInitializationRule, writer, context);
+		visitor_.visit(owlThingContextInitializationRule, context, writer);
 		timer_.timeOwlThingContextInitializationRule += CachedTimeThread
 				.getCurrentTimeMillis();
 	}
 
 	@Override
 	public void visit(
-			IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
-		timer_.timeIndexedDisjointnessAxiomCompositionRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		visitor_.visit(thisCompositionRule, writer, context);
-		timer_.timeIndexedDisjointnessAxiomCompositionRule += CachedTimeThread
-				.getCurrentTimeMillis();
-	}
-
-	@Override
-	public void visit(
 			IndexedDisjointnessAxiom.ContradictionCompositionRule thisContradictionRule,
-			SaturationStateWriter writer, Context context) {
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer) {
 		timer_.timeIndexedDisjointnessAxiomContradictionRule -= CachedTimeThread
 				.getCurrentTimeMillis();
-		visitor_.visit(thisContradictionRule, writer, context);
+		visitor_.visit(thisContradictionRule, premise, context, writer);
 		timer_.timeIndexedDisjointnessAxiomContradictionRule += CachedTimeThread
 				.getCurrentTimeMillis();
 
@@ -114,11 +172,24 @@ public class RuleApplicationTimerVisitor implements CompositionRuleVisitor {
 
 	@Override
 	public void visit(
+			IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer) {
+		timer_.timeIndexedDisjointnessAxiomCompositionRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(thisCompositionRule, premise, context, writer);
+		timer_.timeIndexedDisjointnessAxiomCompositionRule += CachedTimeThread
+				.getCurrentTimeMillis();
+	}
+
+	@Override
+	public void visit(
 			IndexedObjectComplementOf.ContradictionCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer) {
 		timer_.timeObjectIndexedComplementOfCompositionRule -= CachedTimeThread
 				.getCurrentTimeMillis();
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, premise, context, writer);
 		timer_.timeObjectIndexedComplementOfCompositionRule += CachedTimeThread
 				.getCurrentTimeMillis();
 	}
@@ -126,23 +197,49 @@ public class RuleApplicationTimerVisitor implements CompositionRuleVisitor {
 	@Override
 	public void visit(
 			IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer) {
 		timer_.timeObjectIndexedIntersectionOfCompositionRule -= CachedTimeThread
 				.getCurrentTimeMillis();
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, premise, context, writer);
 		timer_.timeObjectIndexedIntersectionOfCompositionRule += CachedTimeThread
 				.getCurrentTimeMillis();
 	}
 
 	@Override
 	public void visit(
+			IndexedObjectSomeValuesFrom.PropagationCompositionRule thisCompositionRule,
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer) {
+		timer_.timeIndexedObjectSomeValuesFromCompositionRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(thisCompositionRule, premise, context, writer);
+		timer_.timeIndexedObjectSomeValuesFromCompositionRule += CachedTimeThread
+				.getCurrentTimeMillis();
+	}
+
+	@Override
+	public void visit(
+			IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer) {
+		timer_.timeIndexedObjectUnionOfCompositionRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(thisCompositionRule, premise, context, writer);
+		timer_.timeIndexedObjectUnionOfCompositionRule += CachedTimeThread
+				.getCurrentTimeMillis();
+	}
+
+	@Override
+	public void visit(
 			IndexedSubClassOfAxiom.SubsumerCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer) {
 		timer_.timeIndexedSubClassOfAxiomCompositionRule -= CachedTimeThread
 				.getCurrentTimeMillis();
 		// long ts = System.nanoTime();
 
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, premise, context, writer);
 		timer_.timeIndexedSubClassOfAxiomCompositionRule += CachedTimeThread
 				.getCurrentTimeMillis();
 
@@ -152,107 +249,22 @@ public class RuleApplicationTimerVisitor implements CompositionRuleVisitor {
 
 	@Override
 	public void visit(
-			IndexedObjectSomeValuesFrom.PropagationCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
-		timer_.timeIndexedObjectSomeValuesFromCompositionRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		visitor_.visit(thisCompositionRule, writer, context);
-		timer_.timeIndexedObjectSomeValuesFromCompositionRule += CachedTimeThread
-				.getCurrentTimeMillis();
-	}
-
-	@Override
-	public void visit(
-			IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
-		timer_.timeIndexedObjectUnionOfCompositionRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		visitor_.visit(thisCompositionRule, writer, context);
-		timer_.timeIndexedObjectUnionOfCompositionRule += CachedTimeThread
-				.getCurrentTimeMillis();
-	}
-
-	@Override
-	public void visit(ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
-			SaturationStateWriter writer, BackwardLink backwardLink) {
-		timer_.timeForwardLinkBackwardLinkRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
-		timer_.timeForwardLinkBackwardLinkRule += CachedTimeThread
-				.getCurrentTimeMillis();
-
-	}
-
-	@Override
-	public void visit(Propagation.SubsumerBackwardLinkRule thisBackwardLinkRule,
-			SaturationStateWriter writer, BackwardLink backwardLink) {
+			Propagation.SubsumerBackwardLinkRule thisBackwardLinkRule,
+			BackwardLink premise, Context context, SaturationStateWriter writer) {
 		timer_.timePropagationBackwardLinkRule -= CachedTimeThread
 				.getCurrentTimeMillis();
-		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
+		visitor_.visit(thisBackwardLinkRule, premise, context, writer);
 		timer_.timePropagationBackwardLinkRule += CachedTimeThread
 				.getCurrentTimeMillis();
 	}
 
 	@Override
-	public void visit(
-			Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
-			SaturationStateWriter writer, BackwardLink backwardLink) {
-		timer_.timeContradictionBottomBackwardLinkRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		visitor_.visit(bottomBackwardLinkRule, writer, backwardLink);
-		timer_.timeContradictionBottomBackwardLinkRule += CachedTimeThread
-				.getCurrentTimeMillis();
-	}
-
-	@Override
 	public void visit(RootContextInitializationRule rootInitRule,
-			SaturationStateWriter writer, Context context) {
+			Context context, SaturationStateWriter writer) {
 		timer_.timeContextRootInitializationRule -= CachedTimeThread
 				.getCurrentTimeMillis();
-		visitor_.visit(rootInitRule, writer, context);
+		visitor_.visit(rootInitRule, context, writer);
 		timer_.timeContextRootInitializationRule += CachedTimeThread
-				.getCurrentTimeMillis();
-	}
-
-	@Override
-	public void visit(BackwardLink.ThisCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
-		timer_.timeBackwardLinkCompositionRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		visitor_.visit(thisCompositionRule, writer, context);
-		timer_.timeBackwardLinkCompositionRule += CachedTimeThread
-				.getCurrentTimeMillis();
-	}
-
-	@Override
-	public void visit(Contradiction.ContradictionPropagationRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
-		timer_.timeContradictionCompositionRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		visitor_.visit(thisCompositionRule, writer, context);
-		timer_.timeContradictionCompositionRule += CachedTimeThread
-				.getCurrentTimeMillis();
-
-	}
-
-	@Override
-	public void visit(
-			DisjointSubsumer.ContradicitonCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
-		timer_.timeDisjointnessAxiomCompositionRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		visitor_.visit(thisCompositionRule, writer, context);
-		timer_.timeDisjointnessAxiomCompositionRule += CachedTimeThread
-				.getCurrentTimeMillis();
-	}
-
-	@Override
-	public void visit(ForwardLink.BackwardLinkCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
-		timer_.timeForwardLinkCompositionRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		visitor_.visit(thisCompositionRule, writer, context);
-		timer_.timeForwardLinkCompositionRule += CachedTimeThread
 				.getCurrentTimeMillis();
 	}
 

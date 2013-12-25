@@ -48,8 +48,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,36 +63,6 @@ import org.slf4j.LoggerFactory;
  *         pavel.klinov@uni-ulm.de
  */
 public class SaturationGraphValidationStage extends BasePostProcessingStage {
-
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(SaturationGraphValidationStage.class);
-
-	private final OntologyIndex index_;
-	private final ClassExpressionValidator iceValidator_ = new ClassExpressionValidator();
-	private final ContextValidator contextValidator_ = new ContextValidator();
-	private final ContextRuleValidator ruleValidator_ = new ContextRuleValidator();
-
-	public SaturationGraphValidationStage(final AbstractReasonerState reasoner) {
-		index_ = reasoner.ontologyIndex;
-	}
-
-	@Override
-	public String getName() {
-		return "Saturation graph validation";
-	}
-
-	@Override
-	public void execute() {
-		// starting from indexed class expressions
-		for (IndexedClassExpression ice : index_.getIndexedClassExpressions()) {
-			iceValidator_.add(ice);
-		}
-		for (;;) {
-			if (iceValidator_.validate() || contextValidator_.validate())
-				continue;
-			break;
-		}
-	}
 
 	/**
 	 * 
@@ -149,13 +119,182 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			}
 
 			// validating context rules
-			LinkRule<Context> rule = ice.getCompositionRuleHead();
+			LinkRule<IndexedClassExpression> rule = ice
+					.getCompositionRuleHead();
 
 			while (rule != null) {
-				rule.accept(ruleValidator_, null, null);
+				rule.accept(ruleValidator_, ice, null, null);
 				rule = rule.next();
 			}
 		}
+	}
+
+	/**
+	 * 
+	 */
+	private class ContextRuleValidator implements CompositionRuleVisitor {
+
+		@Override
+		public void visit(BackwardLink.ThisCompositionRule thisCompositionRule,
+				BackwardLink premise, Context context,
+				SaturationStateWriter writer) {
+			// nothing is stored in the rule
+		}
+
+		@Override
+		public void visit(
+				Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
+				BackwardLink premise, Context context,
+				SaturationStateWriter writer) {
+			// nothing is stored in the rule
+		}
+
+		@Override
+		public void visit(
+				Contradiction.ContradictionPropagationRule thisCompositionRule,
+				Contradiction premise, Context context,
+				SaturationStateWriter writer) {
+			// nothing is stored in the rule
+		}
+
+		@Override
+		public void visit(
+				DisjointSubsumer.ContradicitonCompositionRule thisCompositionRule,
+				DisjointSubsumer premise, Context context,
+				SaturationStateWriter writer) {
+			// nothing is stored in the rule
+
+		}
+
+		@Override
+		public void visit(
+				ForwardLink.BackwardLinkCompositionRule thisCompositionRule,
+				ForwardLink premise, Context context,
+				SaturationStateWriter writer) {
+			// nothing is stored in the rule
+		}
+
+		@Override
+		public void visit(
+				ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
+				BackwardLink premise, Context context,
+				SaturationStateWriter writer) {
+			for (IndexedPropertyChain prop : thisBackwardLinkRule
+					.getForwardLinksByObjectProperty().keySet()) {
+				for (Context target : thisBackwardLinkRule
+						.getForwardLinksByObjectProperty().get(prop)) {
+					contextValidator_.add(target);
+				}
+			}
+		}
+
+		@Override
+		public void visit(
+				IndexedDisjointnessAxiom.ContradictionCompositionRule thisContradictionRule,
+				IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
+			// nothing is stored in the rule
+		}
+
+		@Override
+		public void visit(
+				IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
+				IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
+			for (IndexedDisjointnessAxiom axiom : thisCompositionRule
+					.getDisjointnessAxioms()) {
+				if (!axiom.occurs()) {
+					LOGGER_.error("Dead disjointness axiom: " + axiom);
+				}
+
+				for (IndexedClassExpression ice : axiom.getDisjointMembers()) {
+					iceValidator_.checkNew(ice);
+				}
+			}
+
+		}
+
+		@Override
+		public void visit(
+				IndexedObjectComplementOf.ContradictionCompositionRule thisCompositionRule,
+				IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
+			iceValidator_.checkNew(thisCompositionRule.getNegation());
+
+		}
+
+		@Override
+		public void visit(
+				IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
+				IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
+			for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : thisCompositionRule
+					.getConjunctionsByConjunct().entrySet()) {
+				iceValidator_.checkNew(entry.getKey());
+				iceValidator_.checkNew(entry.getValue());
+			}
+		}
+
+		@Override
+		public void visit(
+				IndexedObjectSomeValuesFrom.PropagationCompositionRule thisCompositionRule,
+				IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
+			for (IndexedClassExpression ice : thisCompositionRule
+					.getNegativeExistentials()) {
+				iceValidator_.checkNew(ice);
+			}
+		}
+
+		@Override
+		public void visit(
+				IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
+				IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
+			for (IndexedClassExpression ice : thisCompositionRule
+					.getDisjunctions()) {
+				iceValidator_.checkNew(ice);
+			}
+		}
+
+		@Override
+		public void visit(
+				IndexedSubClassOfAxiom.SubsumerCompositionRule thisCompositionRule,
+				IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
+			for (IndexedClassExpression ice : thisCompositionRule
+					.getToldSuperclasses()) {
+				iceValidator_.checkNew(ice);
+			}
+
+		}
+
+		@Override
+		public void visit(
+				OwlThingContextInitializationRule owlThingContextInitializationRule,
+				Context context, SaturationStateWriter writer) {
+		}
+
+		@Override
+		public void visit(
+				Propagation.SubsumerBackwardLinkRule thisBackwardLinkRule,
+				BackwardLink premise, Context context,
+				SaturationStateWriter writer) {
+			for (IndexedPropertyChain prop : thisBackwardLinkRule
+					.getPropagationsByObjectProperty().keySet()) {
+				for (IndexedClassExpression ice : thisBackwardLinkRule
+						.getPropagationsByObjectProperty().get(prop)) {
+					iceValidator_.checkNew(ice);
+				}
+			}
+		}
+
+		@Override
+		public void visit(RootContextInitializationRule rootInitRule,
+				Context context, SaturationStateWriter writer) {
+			// nothing is stored in the rule
+		}
+
 	}
 
 	/**
@@ -220,163 +359,42 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			LinkRule<BackwardLink> rule = context.getBackwardLinkRuleHead();
 
 			while (rule != null) {
-				rule.accept(ruleValidator_, null, null);
+				rule.accept(ruleValidator_, null, null, null);
 				rule = rule.next();
 			}
 		}
 	}
 
-	/**
-	 * 
-	 */
-	private class ContextRuleValidator implements CompositionRuleVisitor {
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(SaturationGraphValidationStage.class);
+	private final OntologyIndex index_;
 
-		@Override
-		public void visit(
-				OwlThingContextInitializationRule owlThingContextInitializationRule,
-				SaturationStateWriter writer, Context context) {
+	private final ClassExpressionValidator iceValidator_ = new ClassExpressionValidator();
+
+	private final ContextValidator contextValidator_ = new ContextValidator();
+
+	private final ContextRuleValidator ruleValidator_ = new ContextRuleValidator();
+
+	public SaturationGraphValidationStage(final AbstractReasonerState reasoner) {
+		index_ = reasoner.ontologyIndex;
+	}
+
+	@Override
+	public void execute() {
+		// starting from indexed class expressions
+		for (IndexedClassExpression ice : index_.getIndexedClassExpressions()) {
+			iceValidator_.add(ice);
 		}
-
-		@Override
-		public void visit(
-				IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
-				SaturationStateWriter writer, Context context) {
-			for (IndexedDisjointnessAxiom axiom : thisCompositionRule
-					.getDisjointnessAxioms()) {
-				if (!axiom.occurs()) {
-					LOGGER_.error("Dead disjointness axiom: " + axiom);
-				}
-
-				for (IndexedClassExpression ice : axiom.getDisjointMembers()) {
-					iceValidator_.checkNew(ice);
-				}
-			}
-
+		for (;;) {
+			if (iceValidator_.validate() || contextValidator_.validate())
+				continue;
+			break;
 		}
+	}
 
-		@Override
-		public void visit(
-				IndexedObjectComplementOf.ContradictionCompositionRule thisCompositionRule,
-				SaturationStateWriter writer, Context context) {
-			iceValidator_.checkNew(thisCompositionRule.getNegation());
-
-		}
-
-		@Override
-		public void visit(
-				IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
-				SaturationStateWriter writer, Context context) {
-			for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : thisCompositionRule
-					.getConjunctionsByConjunct().entrySet()) {
-				iceValidator_.checkNew(entry.getKey());
-				iceValidator_.checkNew(entry.getValue());
-			}
-		}
-
-		@Override
-		public void visit(
-				IndexedSubClassOfAxiom.SubsumerCompositionRule thisCompositionRule,
-				SaturationStateWriter writer, Context context) {
-			for (IndexedClassExpression ice : thisCompositionRule
-					.getToldSuperclasses()) {
-				iceValidator_.checkNew(ice);
-			}
-
-		}
-
-		@Override
-		public void visit(
-				IndexedObjectSomeValuesFrom.PropagationCompositionRule thisCompositionRule,
-				SaturationStateWriter writer, Context context) {
-			for (IndexedClassExpression ice : thisCompositionRule
-					.getNegativeExistentials()) {
-				iceValidator_.checkNew(ice);
-			}
-		}
-
-		@Override
-		public void visit(
-				IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
-				SaturationStateWriter writer, Context context) {
-			for (IndexedClassExpression ice : thisCompositionRule
-					.getDisjunctions()) {
-				iceValidator_.checkNew(ice);
-			}
-		}
-
-		@Override
-		public void visit(
-				IndexedDisjointnessAxiom.ContradictionCompositionRule thisContradictionRule,
-				SaturationStateWriter writer, Context context) {
-			// nothing is stored in the rule
-		}
-
-		@Override
-		public void visit(
-				ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
-				SaturationStateWriter writer, BackwardLink backwardLink) {
-			for (IndexedPropertyChain prop : thisBackwardLinkRule
-					.getForwardLinksByObjectProperty().keySet()) {
-				for (Context context : thisBackwardLinkRule
-						.getForwardLinksByObjectProperty().get(prop)) {
-					contextValidator_.add(context);
-				}
-			}
-		}
-
-		@Override
-		public void visit(
-				Propagation.SubsumerBackwardLinkRule thisBackwardLinkRule,
-				SaturationStateWriter writer, BackwardLink backwardLink) {
-			for (IndexedPropertyChain prop : thisBackwardLinkRule
-					.getPropagationsByObjectProperty().keySet()) {
-				for (IndexedClassExpression ice : thisBackwardLinkRule
-						.getPropagationsByObjectProperty().get(prop)) {
-					iceValidator_.checkNew(ice);
-				}
-			}
-		}
-
-		@Override
-		public void visit(
-				Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
-				SaturationStateWriter writer, BackwardLink backwardLink) {
-			// nothing is stored in the rule
-		}
-
-		@Override
-		public void visit(RootContextInitializationRule rootInitRule,
-				SaturationStateWriter writer, Context context) {
-			// nothing is stored in the rule
-		}
-
-		@Override
-		public void visit(BackwardLink.ThisCompositionRule thisCompositionRule,
-				SaturationStateWriter writer, Context context) {
-			// nothing is stored in the rule
-		}
-
-		@Override
-		public void visit(
-				Contradiction.ContradictionPropagationRule thisCompositionRule,
-				SaturationStateWriter writer, Context context) {
-			// nothing is stored in the rule
-		}
-
-		@Override
-		public void visit(
-				DisjointSubsumer.ContradicitonCompositionRule thisCompositionRule,
-				SaturationStateWriter writer, Context context) {
-			// nothing is stored in the rule
-
-		}
-
-		@Override
-		public void visit(ForwardLink.BackwardLinkCompositionRule thisCompositionRule,
-				SaturationStateWriter writer, Context context) {
-			// nothing is stored in the rule
-		}
-
+	@Override
+	public String getName() {
+		return "Saturation graph validation";
 	}
 
 }

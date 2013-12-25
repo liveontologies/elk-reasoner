@@ -73,8 +73,8 @@ public class IncrementalAdditionInitializationStage extends
 			return false;
 
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
-		ChainableRule<Context> changedInitRules = null;
-		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
+		ChainableRule<Void> changedInitRules = null;
+		Map<IndexedClassExpression, ChainableRule<IndexedClassExpression>> changedRulesByCE = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 		CompositionRuleVisitor initRuleAppVisitor = SaturationUtils
 				.getStatsAwareCompositionRuleAppVisitor(stageStatistics_

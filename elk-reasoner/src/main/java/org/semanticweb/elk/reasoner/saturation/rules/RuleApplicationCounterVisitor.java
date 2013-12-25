@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
@@ -78,125 +79,136 @@ public class RuleApplicationCounterVisitor implements CompositionRuleVisitor {
 
 	@Override
 	public void visit(BackwardLink.ThisCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
+			BackwardLink premise, Context context, SaturationStateWriter writer) {
 		counter_.countBackwardLinkCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
-	}
-
-	@Override
-	public void visit(RootContextInitializationRule rootInitRule,
-			SaturationStateWriter writer, Context context) {
-		counter_.countContextRootInitializationRule++;
-		visitor_.visit(rootInitRule, writer, context);
+		visitor_.visit(thisCompositionRule, premise, context, writer);
 	}
 
 	@Override
 	public void visit(
 			Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
-			SaturationStateWriter writer, BackwardLink backwardLink) {
+			BackwardLink premise, Context context, SaturationStateWriter writer) {
 		counter_.countContradictionBottomBackwardLinkRule++;
-		visitor_.visit(bottomBackwardLinkRule, writer, backwardLink);
+		visitor_.visit(bottomBackwardLinkRule, premise, context, writer);
 	}
 
 	@Override
-	public void visit(Contradiction.ContradictionPropagationRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
+	public void visit(
+			Contradiction.ContradictionPropagationRule thisCompositionRule,
+			Contradiction premise, Context context, SaturationStateWriter writer) {
 		counter_.countContradictionCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, premise, context, writer);
 	}
 
 	@Override
 	public void visit(
 			DisjointSubsumer.ContradicitonCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
+			DisjointSubsumer premise, Context context,
+			SaturationStateWriter writer) {
 		counter_.countDisjointnessAxiomCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, premise, context, writer);
+	}
+
+	@Override
+	public void visit(
+			ForwardLink.BackwardLinkCompositionRule thisCompositionRule,
+			ForwardLink premise, Context context, SaturationStateWriter writer) {
+		counter_.countForwardLinkCompositionRule++;
+		visitor_.visit(thisCompositionRule, premise, context, writer);
 	}
 
 	@Override
 	public void visit(ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
-			SaturationStateWriter writer, BackwardLink backwardLink) {
+			BackwardLink premise, Context context, SaturationStateWriter writer) {
 		counter_.countForwardLinkBackwardLinkRule++;
-		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
+		visitor_.visit(thisBackwardLinkRule, premise, context, writer);
 
-	}
-
-	@Override
-	public void visit(ForwardLink.BackwardLinkCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
-		counter_.countForwardLinkCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
 	}
 
 	@Override
 	public void visit(
 			IndexedClass.OwlThingContextInitializationRule owlThingContextInitializationRule,
-			SaturationStateWriter writer, Context context) {
+			Context context, SaturationStateWriter writer) {
 		counter_.countOwlThingContextInitializationRule++;
-		visitor_.visit(owlThingContextInitializationRule, writer, context);
-	}
-
-	@Override
-	public void visit(
-			IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
-		counter_.countIndexedDisjointnessAxiomCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(owlThingContextInitializationRule, context, writer);
 	}
 
 	@Override
 	public void visit(
 			IndexedDisjointnessAxiom.ContradictionCompositionRule thisContradictionRule,
-			SaturationStateWriter writer, Context context) {
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer) {
 		counter_.countIndexedDisjointnessAxiomContradictionRule++;
-		visitor_.visit(thisContradictionRule, writer, context);
+		visitor_.visit(thisContradictionRule, premise, context, writer);
+	}
+
+	@Override
+	public void visit(
+			IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer) {
+		counter_.countIndexedDisjointnessAxiomCompositionRule++;
+		visitor_.visit(thisCompositionRule, premise, context, writer);
 	}
 
 	@Override
 	public void visit(
 			IndexedObjectComplementOf.ContradictionCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer) {
 		counter_.countIndexedObjectComplementOfCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, premise, context, writer);
 	}
 
 	@Override
 	public void visit(
 			IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer) {
 		counter_.countIndexedObjectIntersectionOfCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, premise, context, writer);
 	}
 
 	@Override
 	public void visit(
 			IndexedObjectSomeValuesFrom.PropagationCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer) {
 		counter_.countIndexedObjectSomeValuesFromCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, premise, context, writer);
 	}
 
 	@Override
 	public void visit(
 			IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer) {
 		counter_.countIndexedObjectUnionOfCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, premise, context, writer);
 	}
 
 	@Override
 	public void visit(
 			IndexedSubClassOfAxiom.SubsumerCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context) {
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer) {
 		counter_.countIndexedSubClassOfAxiomCompositionRule++;
-		visitor_.visit(thisCompositionRule, writer, context);
+		visitor_.visit(thisCompositionRule, premise, context, writer);
 	}
 
 	@Override
-	public void visit(Propagation.SubsumerBackwardLinkRule thisBackwardLinkRule,
-			SaturationStateWriter writer, BackwardLink backwardLink) {
+	public void visit(
+			Propagation.SubsumerBackwardLinkRule thisBackwardLinkRule,
+			BackwardLink premise, Context context, SaturationStateWriter writer) {
 		counter_.countPropagationBackwardLinkRule++;
-		visitor_.visit(thisBackwardLinkRule, writer, backwardLink);
+		visitor_.visit(thisBackwardLinkRule, premise, context, writer);
+	}
+
+	@Override
+	public void visit(RootContextInitializationRule rootInitRule,
+			Context context, SaturationStateWriter writer) {
+		counter_.countContextRootInitializationRule++;
+		visitor_.visit(rootInitRule, context, writer);
 	}
 
 }

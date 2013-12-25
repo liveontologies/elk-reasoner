@@ -61,7 +61,7 @@ public class DisjointSubsumer extends AbstractConclusion {
 	public void accept(CompositionRuleVisitor ruleAppVisitor,
 			SaturationStateWriter writer, Context context) {
 		if (context.inconsistForDisjointnessAxiom(axiom_)) {
-			ruleAppVisitor.visit(THIS_COMPOSITION_RULE_, writer, context);
+			ruleAppVisitor.visit(THIS_COMPOSITION_RULE_, this, context, writer);
 		}
 	}
 
@@ -82,7 +82,8 @@ public class DisjointSubsumer extends AbstractConclusion {
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
-	public static class ContradicitonCompositionRule implements Rule<Context> {
+	public static class ContradicitonCompositionRule implements
+			Rule<DisjointSubsumer> {
 
 		private static final String NAME_ = "Contradiction by Disjointness Axiom";
 
@@ -92,7 +93,8 @@ public class DisjointSubsumer extends AbstractConclusion {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter writer, Context context) {
+		public void apply(DisjointSubsumer premise, Context context,
+				SaturationStateWriter writer) {
 			writer.produce(context, Contradiction.getInstance());
 		}
 

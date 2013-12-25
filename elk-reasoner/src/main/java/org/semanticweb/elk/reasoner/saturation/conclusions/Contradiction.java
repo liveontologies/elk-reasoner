@@ -85,7 +85,7 @@ public class Contradiction extends AbstractConclusion {
 	@Override
 	public void accept(CompositionRuleVisitor ruleAppVisitor,
 			SaturationStateWriter writer, Context context) {
-		ruleAppVisitor.visit(THIS_COMPOSITION_RULE_, writer, context);
+		ruleAppVisitor.visit(THIS_COMPOSITION_RULE_, this, context, writer);
 	}
 
 	@Override
@@ -106,7 +106,8 @@ public class Contradiction extends AbstractConclusion {
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	public static class ContradictionPropagationRule implements Rule<Context> {
+	public static class ContradictionPropagationRule implements
+			Rule<Contradiction> {
 
 		private static final String NAME_ = "Contradiction Propagation over Backward Links";
 
@@ -116,7 +117,8 @@ public class Contradiction extends AbstractConclusion {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter writer, Context context) {
+		public void apply(Contradiction premise, Context context,
+				SaturationStateWriter writer) {
 			final Multimap<IndexedPropertyChain, Context> backLinks = context
 					.getBackwardLinksByObjectProperty();
 
@@ -125,7 +127,7 @@ public class Contradiction extends AbstractConclusion {
 				Collection<Context> targets = backLinks.get(propRelation);
 
 				for (Context target : targets) {
-					writer.produce(target, Contradiction.getInstance());
+					writer.produce(target, premise);
 				}
 			}
 		}
@@ -153,16 +155,18 @@ public class Contradiction extends AbstractConclusion {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter engine, BackwardLink link) {
-			LOGGER_.trace("Applying {} to {}", NAME_, link);
+		public void apply(BackwardLink premise, Context contex,
+				SaturationStateWriter engine) {
+			LOGGER_.trace("Applying {} to {}", NAME_, premise);
 
-			engine.produce(link.getSource(), Contradiction.getInstance());
+			engine.produce(premise.getSource(), Contradiction.getInstance());
 		}
 
 		@Override
 		public void accept(CompositionRuleVisitor visitor,
-				SaturationStateWriter writer, BackwardLink backwardLink) {
-			visitor.visit(this, writer, backwardLink);
+				BackwardLink premise, Context context,
+				SaturationStateWriter writer) {
+			visitor.visit(this, premise, context, writer);
 		}
 
 		private static final Matcher<ModifiableLinkRule<BackwardLink>, ContradictionBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, ContradictionBackwardLinkRule>(

@@ -87,7 +87,7 @@ public class ForwardLink extends AbstractConclusion {
 	@Override
 	public void accept(CompositionRuleVisitor ruleAppVisitor,
 			SaturationStateWriter writer, Context context) {
-		ruleAppVisitor.visit(thisCompositionRule_, writer, context);
+		ruleAppVisitor.visit(thisCompositionRule_, this, context, writer);
 	}
 
 	@Override
@@ -129,7 +129,7 @@ public class ForwardLink extends AbstractConclusion {
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
-	public class BackwardLinkCompositionRule implements Rule<Context> {
+	public class BackwardLinkCompositionRule implements Rule<ForwardLink> {
 
 		private static final String NAME_ = "ForwardLink BackwardLink Composition";
 
@@ -139,7 +139,8 @@ public class ForwardLink extends AbstractConclusion {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter writer, Context context) {
+		public void apply(ForwardLink premise, Context context,
+				SaturationStateWriter writer) {
 			/* compose the link with all backward links */
 			final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = relation_
 					.getSaturated().getCompositionsByLeftSubProperty();
@@ -166,7 +167,7 @@ public class ForwardLink extends AbstractConclusion {
 	/**
 	 * The composition rule applied when processing a {@link BackwardLink}
 	 * producing {@link BackwardLink}s resulted by composing the processed
-	 * {@link BackwardLink} with {@link ForwardLink}s contained in the
+	 * {@link BackwardLink} with the {@link ForwardLink}s contained in the
 	 * {@link Context} using property chain axioms
 	 * 
 	 * @author "Yevgeny Kazakov"
@@ -202,7 +203,8 @@ public class ForwardLink extends AbstractConclusion {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter engine, BackwardLink link) {
+		public void apply(BackwardLink link, Context context,
+				SaturationStateWriter engine) {
 
 			LOGGER_.trace("Applying {} to {}", NAME_, link);
 
@@ -233,8 +235,9 @@ public class ForwardLink extends AbstractConclusion {
 
 		@Override
 		public void accept(CompositionRuleVisitor visitor,
-				SaturationStateWriter writer, BackwardLink backwardLink) {
-			visitor.visit(this, writer, backwardLink);
+				BackwardLink premise, Context context,
+				SaturationStateWriter writer) {
+			visitor.visit(this, premise, context, writer);
 		}
 
 		/**

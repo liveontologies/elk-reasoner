@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
@@ -54,58 +55,66 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public interface CompositionRuleVisitor {
 
 	void visit(BackwardLink.ThisCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context);
+			BackwardLink premise, Context context, SaturationStateWriter writer);
 
 	void visit(Contradiction.ContradictionBackwardLinkRule rule,
-			SaturationStateWriter writer, BackwardLink backwardLink);
+			BackwardLink premise, Context context, SaturationStateWriter writer);
 
 	void visit(Contradiction.ContradictionPropagationRule rule,
-			SaturationStateWriter writer, Context context);
+			Contradiction premise, Context context, SaturationStateWriter writer);
 
 	void visit(DirectIndex.RootContextInitializationRule rootInitRule,
-			SaturationStateWriter writer, Context context);
+			Context context, SaturationStateWriter writer);
 
 	void visit(DisjointSubsumer.ContradicitonCompositionRule rule,
-			SaturationStateWriter writer, Context context);
+			DisjointSubsumer premise, Context context,
+			SaturationStateWriter writer);
 
 	void visit(ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
-			SaturationStateWriter writer, BackwardLink backwardLink);
+			BackwardLink premise, Context context, SaturationStateWriter writer);
 
 	void visit(ForwardLink.BackwardLinkCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context);
+			ForwardLink premise, Context context, SaturationStateWriter writer);
 
 	void visit(
 			IndexedClass.OwlThingContextInitializationRule owlThingContextInitializationRule,
-			SaturationStateWriter writer, Context context);
+			Context context, SaturationStateWriter writer);
 
 	void visit(
 			IndexedDisjointnessAxiom.ContradictionCompositionRule thisContradictionRule,
-			SaturationStateWriter writer, Context context);
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer);
 
 	void visit(
 			IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context);
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer);
 
 	void visit(
 			IndexedObjectComplementOf.ContradictionCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context);
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer);
 
 	void visit(
 			IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context);
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer);
 
 	void visit(
 			IndexedObjectSomeValuesFrom.PropagationCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context);
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer);
 
 	void visit(IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context);
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer);
 
 	void visit(
 			IndexedSubClassOfAxiom.SubsumerCompositionRule thisCompositionRule,
-			SaturationStateWriter writer, Context context);
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer);
 
 	void visit(Propagation.SubsumerBackwardLinkRule thisBackwardLinkRule,
-			SaturationStateWriter writer, BackwardLink backwardLink);
+			BackwardLink premise, Context context, SaturationStateWriter writer);
 
 }

@@ -63,7 +63,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 
 	final IndexedObjectCache objectCache;
 	// the context root initialization rule is always registered
-	private ChainableRule<Context> contextInitRules_ = new RootContextInitializationRule();
+	private ChainableRule<Void> contextInitRules_ = new RootContextInitializationRule();
 
 	private final Set<IndexedObjectProperty> reflexiveObjectProperties_;
 
@@ -90,7 +90,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	/* read-only methods required by the interface */
 
 	@Override
-	public LinkRule<Context> getContextInitRuleHead() {
+	public LinkRule<Void> getContextInitRuleHead() {
 		return contextInitRules_;
 	}
 
@@ -198,12 +198,12 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	@Override
-	public void addContextInitRule(ChainableRule<Context> newRule) {
+	public void addContextInitRule(ChainableRule<Void> newRule) {
 		newRule.addTo(getContextInitRuleChain());
 	}
 
 	@Override
-	public void removeContextInitRule(ChainableRule<Context> oldRule) {
+	public void removeContextInitRule(ChainableRule<Void> oldRule) {
 		if (!oldRule.removeFrom(getContextInitRuleChain()))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove context initialization rule "
@@ -211,13 +211,14 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	@Override
-	public void add(IndexedClassExpression target, ChainableRule<Context> rule) {
+	public void add(IndexedClassExpression target,
+			ChainableRule<IndexedClassExpression> rule) {
 		rule.addTo(target.getCompositionRuleChain());
 	}
 
 	@Override
 	public void remove(IndexedClassExpression target,
-			ChainableRule<Context> rule) {
+			ChainableRule<IndexedClassExpression> rule) {
 		if (!rule.removeFrom(target.getCompositionRuleChain()))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove composition rule " + rule.getName()
@@ -261,34 +262,36 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	 *         this {@link OntologyIndex}; it can be used for inserting new
 	 *         rules or deleting existing ones
 	 */
-	public Chain<ChainableRule<Context>> getContextInitRuleChain() {
-		return new AbstractChain<ChainableRule<Context>>() {
+	public Chain<ChainableRule<Void>> getContextInitRuleChain() {
+		return new AbstractChain<ChainableRule<Void>>() {
 
 			@Override
-			public ChainableRule<Context> next() {
+			public ChainableRule<Void> next() {
 				return contextInitRules_;
 			}
 
 			@Override
-			public void setNext(ChainableRule<Context> tail) {
+			public void setNext(ChainableRule<Void> tail) {
 				contextInitRules_ = tail;
 			}
 		};
 	}
 
 	/**
-	 * The composition rule applied when processing a {@link Context} that
-	 * produces initial root {@link Subsumer} in this {@link Context}
+	 * A context initialization rule that produces produces a {@link Subsumer}
+	 * in the root of the {@link Context}
+	 * 
+	 * @see Context#getRoot()
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
 	public static class RootContextInitializationRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
+			ModifiableLinkImpl<ChainableRule<Void>> implements
+			ChainableRule<Void> {
 
 		private static final String NAME_ = "Root Introduction";
 
-		private RootContextInitializationRule(ChainableRule<Context> tail) {
+		private RootContextInitializationRule(ChainableRule<Void> tail) {
 			super(tail);
 		}
 
@@ -302,25 +305,25 @@ public class DirectIndex implements ModifiableOntologyIndex {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter writer, Context context) {
+		public void apply(Void premise, Context context,
+				SaturationStateWriter writer) {
 			LOGGER_.trace("Applying {} to {}", NAME_, context);
 
 			writer.produce(context, new DecomposedSubsumer(context.getRoot()));
 		}
 
-		private static final Matcher<ChainableRule<Context>, RootContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, RootContextInitializationRule>(
+		private static final Matcher<ChainableRule<Void>, RootContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Void>, RootContextInitializationRule>(
 				RootContextInitializationRule.class);
 
-		private static final ReferenceFactory<ChainableRule<Context>, RootContextInitializationRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, RootContextInitializationRule>() {
+		private static final ReferenceFactory<ChainableRule<Void>, RootContextInitializationRule> FACTORY_ = new ReferenceFactory<ChainableRule<Void>, RootContextInitializationRule>() {
 			@Override
-			public RootContextInitializationRule create(
-					ChainableRule<Context> tail) {
+			public RootContextInitializationRule create(ChainableRule<Void> tail) {
 				return new RootContextInitializationRule(tail);
 			}
 		};
 
 		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean addTo(Chain<ChainableRule<Void>> ruleChain) {
 			RootContextInitializationRule rule = ruleChain.find(MATCHER_);
 
 			if (rule == null) {
@@ -331,14 +334,14 @@ public class DirectIndex implements ModifiableOntologyIndex {
 		}
 
 		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean removeFrom(Chain<ChainableRule<Void>> ruleChain) {
 			return ruleChain.remove(MATCHER_) != null;
 		}
 
 		@Override
-		public void accept(CompositionRuleVisitor visitor,
-				SaturationStateWriter writer, Context context) {
-			visitor.visit(this, writer, context);
+		public void accept(CompositionRuleVisitor visitor, Void premise,
+				Context context, SaturationStateWriter writer) {
+			visitor.visit(this, context, writer);
 		}
 
 	}

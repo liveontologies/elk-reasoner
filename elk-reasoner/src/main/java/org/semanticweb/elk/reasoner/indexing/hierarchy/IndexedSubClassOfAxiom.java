@@ -93,15 +93,18 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	/**
 	 * 
 	 * The composition rule producing {@link Subsumer} for the super class of
-	 * {@link IndexedSubClassAxiom} when processing one of its conjunct and when
-	 * the other conjunct is contained in the {@link Context}
+	 * {@link IndexedSubClassOfAxiom} when processing its sub class
+	 * {@link IndexedClassExpression}
+	 * 
+	 * @see IndexedSubClassOfAxiom#getSuperClass()
+	 * @see IndexedSubClassOfAxiom#getSubClass()
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
 	public static class SubsumerCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
+			ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
+			ChainableRule<IndexedClassExpression> {
 
 		private static final String NAME_ = "SubClassOf Expansion";
 
@@ -111,7 +114,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		 */
 		private final List<IndexedClassExpression> toldSuperClassExpressions_;
 
-		SubsumerCompositionRule(ChainableRule<Context> tail) {
+		SubsumerCompositionRule(ChainableRule<IndexedClassExpression> tail) {
 			super(tail);
 			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
 					1);
@@ -139,7 +142,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter writer, Context context) {
+		public void apply(IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
 			LOGGER_.trace("Applying {}: {} to {}", NAME_,
 					toldSuperClassExpressions_, context);
 
@@ -149,7 +153,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean addTo(
+				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
 			SubsumerCompositionRule rule = ruleChain.getCreate(
 					SubsumerCompositionRule.MATCHER_,
 					SubsumerCompositionRule.FACTORY_);
@@ -166,7 +171,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 		}
 
 		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean removeFrom(
+				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
 			SubsumerCompositionRule rule = ruleChain
 					.find(SubsumerCompositionRule.MATCHER_);
 			boolean changed = false;
@@ -193,8 +199,9 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 		@Override
 		public void accept(CompositionRuleVisitor visitor,
-				SaturationStateWriter writer, Context context) {
-			visitor.visit(this, writer, context);
+				IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
+			visitor.visit(this, premise, context, writer);
 		}
 
 		protected boolean addToldSuperClassExpression(
@@ -223,12 +230,13 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			return getName() + ": " + toldSuperClassExpressions_;
 		}
 
-		private static final Matcher<ChainableRule<Context>, SubsumerCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, SubsumerCompositionRule>(
+		private static final Matcher<ChainableRule<IndexedClassExpression>, SubsumerCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, SubsumerCompositionRule>(
 				SubsumerCompositionRule.class);
 
-		private static final ReferenceFactory<ChainableRule<Context>, SubsumerCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, SubsumerCompositionRule>() {
+		private static final ReferenceFactory<ChainableRule<IndexedClassExpression>, SubsumerCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, SubsumerCompositionRule>() {
 			@Override
-			public SubsumerCompositionRule create(ChainableRule<Context> tail) {
+			public SubsumerCompositionRule create(
+					ChainableRule<IndexedClassExpression> tail) {
 				return new SubsumerCompositionRule(tail);
 			}
 		};

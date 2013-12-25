@@ -110,7 +110,7 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 	public String toStringStructural() {
 		return "ObjectComplementOf(" + this.negated_ + ')';
 	}
-	
+
 	/**
 	 * The composition rule producing {@link Contradiction} when processing the
 	 * negated {@link IndexedClassExpression} of an
@@ -120,20 +120,21 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 	 * @author "Yevgeny Kazakov"
 	 */
 	public static class ContradictionCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
+			ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
+			ChainableRule<IndexedClassExpression> {
 
 		private static final String NAME_ = "ObjectComplementOf Clash";
 
 		private IndexedClassExpression negation_;
 
-		private ContradictionCompositionRule(ChainableRule<Context> tail) {
+		private ContradictionCompositionRule(
+				ChainableRule<IndexedClassExpression> tail) {
 			super(tail);
 
 		}
 
 		ContradictionCompositionRule(IndexedClassExpression complement) {
-			this((ChainableRule<Context>) null);
+			this((ChainableRule<IndexedClassExpression>) null);
 			this.negation_ = complement;
 		}
 
@@ -148,7 +149,8 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter writer, Context context) {
+		public void apply(IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
 			LOGGER_.trace("Applying {} to {}", NAME_, context);
 
 			if (negation_ != null && context.getSubsumers().contains(negation_))
@@ -156,9 +158,10 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
-			ContradictionCompositionRule rule = ruleChain
-					.getCreate(MATCHER_, FACTORY_);
+		public boolean addTo(
+				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+			ContradictionCompositionRule rule = ruleChain.getCreate(MATCHER_,
+					FACTORY_);
 			boolean changed = false;
 
 			if (negation_ != null && rule.negation_ != negation_) {
@@ -176,7 +179,8 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 		}
 
 		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean removeFrom(
+				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
 			ContradictionCompositionRule rule = ruleChain.find(MATCHER_);
 			boolean changed = false;
 
@@ -197,8 +201,9 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 
 		@Override
 		public void accept(CompositionRuleVisitor visitor,
-				SaturationStateWriter writer, Context context) {
-			visitor.visit(this, writer, context);
+				IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
+			visitor.visit(this, premise, context, writer);
 		}
 
 		/**
@@ -208,12 +213,13 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 			return negation_ == null;
 		}
 
-		private static final Matcher<ChainableRule<Context>, ContradictionCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ContradictionCompositionRule>(
+		private static final Matcher<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule>(
 				ContradictionCompositionRule.class);
 
-		private static final ReferenceFactory<ChainableRule<Context>, ContradictionCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ContradictionCompositionRule>() {
+		private static final ReferenceFactory<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule>() {
 			@Override
-			public ContradictionCompositionRule create(ChainableRule<Context> tail) {
+			public ContradictionCompositionRule create(
+					ChainableRule<IndexedClassExpression> tail) {
 				return new ContradictionCompositionRule(tail);
 			}
 		};

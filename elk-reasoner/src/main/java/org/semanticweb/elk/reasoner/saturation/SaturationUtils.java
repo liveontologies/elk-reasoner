@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,8 +25,6 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
@@ -35,28 +34,29 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.TimedConclusionVisito
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationCounterVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationTimerVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationCounterVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationTimerVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
+import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for common saturation tasks
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class SaturationUtils {
 
-	protected static final Logger LOGGER_ = LoggerFactory.getLogger(SaturationUtils.class);
-	
-	
-	
+	protected static final Logger LOGGER_ = LoggerFactory
+			.getLogger(SaturationUtils.class);
+
 	/**
 	 * Applies all initialization rules to the context
 	 * 
@@ -65,30 +65,35 @@ public class SaturationUtils {
 	 * @param index
 	 * @param ruleAppVisitor
 	 */
-	public static void initContext(Context context, SaturationStateWriter writer,
-			OntologyIndex index, CompositionRuleVisitor ruleAppVisitor) {
+	public static void initContext(Context context,
+			SaturationStateWriter writer, OntologyIndex index,
+			CompositionRuleVisitor ruleAppVisitor) {
 		// apply all context initialization rules
-		LinkRule<Context> initRule = index.getContextInitRuleHead();
+		LinkRule<Void> initRule = index.getContextInitRuleHead();
 
 		while (initRule != null) {
-			initRule.accept(ruleAppVisitor, writer, context);
+			initRule.accept(ruleAppVisitor, null, context, writer);
 			initRule = initRule.next();
 		}
 	}
-	
-	
+
 	/*
-	 * ------------------------------------------------------------------------------------
-	 * METHOD WHICH ADD TIMERS AND COUNTERS TO VARIOUS VISITORS AND LISTENERS
-	 * ------------------------------------------------------------------------------------
+	 * --------------------------------------------------------------------------
+	 * ---------- METHOD WHICH ADD TIMERS AND COUNTERS TO VARIOUS VISITORS AND
+	 * LISTENERS
+	 * ----------------------------------------------------------------
+	 * --------------------
 	 */
-	
-	public static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
-	public static final boolean COLLECT_CONCLUSION_TIMES = LOGGER_.isDebugEnabled();
+
+	public static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_
+			.isDebugEnabled();
+	public static final boolean COLLECT_CONCLUSION_TIMES = LOGGER_
+			.isDebugEnabled();
 	public static final boolean COLLECT_RULE_COUNTS = LOGGER_.isDebugEnabled();
 	public static final boolean COLLECT_RULE_TIMES = LOGGER_.isDebugEnabled();
-	public static final boolean COLLECT_PROCESSING_TIMES = LOGGER_.isDebugEnabled();
-	
+	public static final boolean COLLECT_PROCESSING_TIMES = LOGGER_
+			.isDebugEnabled();
+
 	public static CompositionRuleVisitor getStatsAwareCompositionRuleAppVisitor(
 			RuleStatistics localStatistics) {
 		CompositionRuleVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
@@ -100,7 +105,7 @@ public class SaturationUtils {
 
 		if (COLLECT_RULE_TIMES) {
 			localStatistics.startMeasurements();
-			
+
 			ruleAppVisitor = new RuleApplicationTimerVisitor(ruleAppVisitor,
 					localStatistics.ruleTimer);
 		}
@@ -113,27 +118,28 @@ public class SaturationUtils {
 			RuleStatistics localStatistics) {
 		if (COLLECT_RULE_COUNTS) {
 			decompRuleAppVisitor = new DecompositionRuleApplicationCounterVisitor(
-					decompRuleAppVisitor, localStatistics.decompositionRuleCounter);
+					decompRuleAppVisitor,
+					localStatistics.decompositionRuleCounter);
 		}
 
 		if (COLLECT_RULE_TIMES) {
 			localStatistics.startMeasurements();
-			
+
 			decompRuleAppVisitor = new DecompositionRuleApplicationTimerVisitor(
-					decompRuleAppVisitor, localStatistics.decompositionRuleTimer);
+					decompRuleAppVisitor,
+					localStatistics.decompositionRuleTimer);
 		}
 
 		return decompRuleAppVisitor;
 	}
-	
-	
+
 	public static ConclusionVisitor<?> addStatsToConclusionVisitor(
 			ConclusionStatistics localStatistics) {
 		return COLLECT_CONCLUSION_COUNTS ? new CountingConclusionVisitor(
 				localStatistics.getProducedConclusionCounts())
 				: ConclusionVisitor.DUMMY;
 	}
-	
+
 	public static ConclusionVisitor<Boolean> getUsedConclusionCountingProcessor(
 			ConclusionVisitor<Boolean> ruleProcessor,
 			SaturationStatistics localStatistics) {
@@ -145,11 +151,11 @@ public class SaturationUtils {
 		}
 		return ruleProcessor;
 	}
-	
+
 	public static ConclusionVisitor<?> getProcessedConclusionCountingProcessor(
 			ConclusionVisitor<Boolean> conclusionVisitor,
 			SaturationStatistics localStatistics) {
-		
+
 		ConclusionStatistics stats = localStatistics.getConclusionStatistics();
 
 		if (COLLECT_CONCLUSION_COUNTS) {
@@ -165,9 +171,8 @@ public class SaturationUtils {
 					conclusionVisitor);
 		}
 		return conclusionVisitor;
-	}	
-	
-	
+	}
+
 	public static ContextCreationListener addStatsToContextCreationListener(
 			final ContextCreationListener listener,
 			final ContextStatistics contextStats) {
@@ -179,7 +184,7 @@ public class SaturationUtils {
 			}
 		};
 	}
-	
+
 	public static ContextModificationListener addStatsToContextModificationListener(
 			final ContextModificationListener listener,
 			final ContextStatistics contextStats) {
@@ -190,5 +195,5 @@ public class SaturationUtils {
 				listener.notifyContextModification(context);
 			}
 		};
-	}	
+	}
 }

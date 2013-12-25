@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
@@ -128,8 +129,8 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	public static void generatePropagations(SaturationStateWriter writer,
 			IndexedPropertyChain property, Context context) {
 		for (IndexedClassExpression ice : context.getSubsumers()) {
-			PropagationCompositionRule rule = ice.getCompositionRuleChain().find(
-					PropagationCompositionRule.MATCHER_);
+			PropagationCompositionRule rule = ice.getCompositionRuleChain()
+					.find(PropagationCompositionRule.MATCHER_);
 
 			if (rule == null)
 				continue;
@@ -139,23 +140,24 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	/**
-	 * The composition rule producing {@link Propagation} of an
-	 * {@link IndexedObjectSomeValuesFrom} over {@link BackwardLink}s when
-	 * processing the filler of this {@link IndexedObjectSomeValuesFrom}
-	 * provided it can be used with at least one {@link BackwardLink} in this
-	 * {@link Context}
+	 * The composition rule producing {@link Propagation} of a {@link Subsumer}
+	 * {@link IndexedObjectSomeValuesFrom} over {@link BackwardLink}s when the
+	 * {@link IndexedClassExpression} filler of this
+	 * {@link IndexedObjectSomeValuesFrom} provided it can be used with at least
+	 * one {@link BackwardLink} in this {@link Context}
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 */
 	public static class PropagationCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
+			ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
+			ChainableRule<IndexedClassExpression> {
 
 		private static final String NAME_ = "ObjectSomeValuesFrom Introduction";
 
 		private final Collection<IndexedObjectSomeValuesFrom> negExistentials_;
 
-		private PropagationCompositionRule(ChainableRule<Context> next) {
+		private PropagationCompositionRule(
+				ChainableRule<IndexedClassExpression> next) {
 			super(next);
 			this.negExistentials_ = new ArrayList<IndexedObjectSomeValuesFrom>(
 					1);
@@ -179,7 +181,8 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public void apply(SaturationStateWriter writer, Context context) {
+		public void apply(IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
 			LOGGER_.trace("Applying {} to {}", NAME_, context);
 
 			final Set<IndexedPropertyChain> candidatePropagationProperties = context
@@ -212,8 +215,10 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
-			PropagationCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
+		public boolean addTo(
+				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+			PropagationCompositionRule rule = ruleChain.getCreate(MATCHER_,
+					FACTORY_);
 			boolean changed = false;
 
 			for (IndexedObjectSomeValuesFrom negExistential : negExistentials_) {
@@ -225,7 +230,8 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 		}
 
 		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
+		public boolean removeFrom(
+				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
 			boolean changed = false;
 			PropagationCompositionRule rule = ruleChain.find(MATCHER_);
 
@@ -246,8 +252,9 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		@Override
 		public void accept(CompositionRuleVisitor visitor,
-				SaturationStateWriter writer, Context context) {
-			visitor.visit(this, writer, context);
+				IndexedClassExpression premise, Context context,
+				SaturationStateWriter writer) {
+			visitor.visit(this, premise, context, writer);
 		}
 
 		private boolean addNegExistential(
@@ -287,12 +294,13 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 		}
 
-		private static final Matcher<ChainableRule<Context>, PropagationCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, PropagationCompositionRule>(
+		private static final Matcher<ChainableRule<IndexedClassExpression>, PropagationCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, PropagationCompositionRule>(
 				PropagationCompositionRule.class);
 
-		private static final ReferenceFactory<ChainableRule<Context>, PropagationCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, PropagationCompositionRule>() {
+		private static final ReferenceFactory<ChainableRule<IndexedClassExpression>, PropagationCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, PropagationCompositionRule>() {
 			@Override
-			public PropagationCompositionRule create(ChainableRule<Context> next) {
+			public PropagationCompositionRule create(
+					ChainableRule<IndexedClassExpression> next) {
 				return new PropagationCompositionRule(next);
 			}
 		};

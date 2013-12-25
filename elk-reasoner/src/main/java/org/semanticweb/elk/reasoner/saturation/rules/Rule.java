@@ -1,6 +1,8 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /*
  * #%L
@@ -25,26 +27,32 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
  */
 
 /**
- * A rule that can be applied to elements of a particular type within a
- * {@link SaturationStateWriter}.
+ * A rule that can be applied to a given premise within a {@link Context} that
+ * produces {@link Conclusion}s using the given {@link SaturationStateWriter}.
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <E>
- *            the type of elements to which the rule can be applied
+ * @param <P>
+ *            the type of premises to which the rule can be applied
  */
-public interface Rule<E> {
+public interface Rule<P> {
 
 	/**
-	 * Applying the rule to an element within a {@link SaturationStateWriter}
+	 * Applying the rule to the given premise within the given {@link Context}
+	 * and producing {@link Conclusion}s using the given
+	 * {@link SaturationStateWriter}
 	 * 
-	 * @param engine
-	 *            a {@link SaturationStateWriter} which could be changed as a
-	 *            result of this rule's application
-	 * @param element
+	 * @param premise
 	 *            the element to which the rule is applied
+	 * @param context
+	 *            the {@link Context} from which other matching premises of the
+	 *            rule are taken
+	 * @param engine
+	 *            a {@link SaturationStateWriter} which is used to produce
+	 *            {@link Conclusion}s of the inferences
+	 * 
 	 */
-	public void apply(SaturationStateWriter engine, E element);
+	public void apply(P premise, Context context, SaturationStateWriter engine);
 
 	/**
 	 * @return the name of this rule
