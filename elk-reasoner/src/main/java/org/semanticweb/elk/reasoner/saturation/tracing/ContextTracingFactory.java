@@ -25,12 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import java.util.Set;
-
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
@@ -54,12 +50,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.BasicDecompositionRuleAppli
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextCompletionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore.Writer;
-import org.semanticweb.elk.util.collections.Multimap;
-import org.semanticweb.elk.util.collections.chains.Chain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,8 +160,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 				CompositionRuleApplicationVisitor ruleAppVisitor) {
 			this.localWriter_ = iterationWriter;
 			this.ruleAppVisitor_ = ruleAppVisitor;
-			this.mainDecompRuleAppVisitor_ = new LocalDecompositionVisitor(
-					saturationState);
+			this.mainDecompRuleAppVisitor_ = new LocalDecompositionVisitor(saturationState);
 
 		}
 
@@ -177,11 +168,13 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 			IndexedClassExpression root = context.getRoot();
 			
 			if (context == conclusion.getSourceContext(context)) {
+				// this will be the hybrid context which will return all local
+				// conclusions except of the backward links which belong to
+				// other contexts. Those will be retrieved from the main
+				// context.
 				return getSaturationState().getContext(root);
-			}
-			else {
+			} else {
 				return root.getContext();
-				//return new HybridContext(getSaturationState().getContext(root),root.getContext());
 			}
 		}
 
@@ -302,174 +295,4 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 	}
 	
-	//TODO Do we need hybrid contexts?
-
-	/**
-	 * Hybrid context is a read-only view over the local and the main context
-	 * for the same root expression. When the outer code requests a conclusion
-	 * (subsumer, backward link, or a backward link rule), it checks if it
-	 * logically belongs to a traced context. If yes, it is retrieved from the
-	 * local copy. If not, from the main context.
-	 * 
-	 * The rationale is to avoid duplicate inferences when iterating over
-	 * conclusions. The duplicates can occur as a result of applying a binary
-	 * rule twice (once for each premise). Hybrid contexts solve this problem
-	 * since when the rule is applied for the first time, the second premise is
-	 * not yet in the local copy (otherwise the rule was already applied for
-	 * it). As such, the rule produces each conclusion only when applied for the
-	 * second premise (when the first premise is already in the local copy).
-	 * 
-	 * The tricky part of implementing hybrid contexts is filtering backward
-	 * links. A context can store any number of backward links which belong to
-	 * other contexts (some of which are traced, others aren't). Thus some
-	 * backward links must be retrieved from the local copy and others from the
-	 * main context. This class uses a generic multimap filtering and merging to
-	 * implement this on the fly.
-	 * 
-	 */
-	private class HybridContext implements Context {
-
-		private final Context localContext_;
-
-		private final Context mainContext_;
-
-		HybridContext(Context local, Context main) {
-			localContext_ = local;
-			mainContext_ = main;
-		}
-
-		@Override
-		public IndexedClassExpression getRoot() {
-			return mainContext_.getRoot();
-		}
-
-		@Override
-		public Set<IndexedClassExpression> getSubsumers() {
-			return mainContext_.getSubsumers();
-		}
-
-		@Override
-		public Multimap<IndexedPropertyChain, Context> getBackwardLinksByObjectProperty() {
-			/*
-			 * the rules with backward links *currently* produce only
-			 * conclusions that belong to the same contexts as the backward
-			 * links. Therefore, if such rules should be applied during tracing,
-			 * then the contexts to which the backward links belong are traced
-			 * and hence, they should be taken from localContext However, this
-			 * solution is fragile as there can potentially be rules with
-			 * backward links that produce conclusions in other contexts
-			 */
-
-			return localContext_.getBackwardLinksByObjectProperty();
-		}
-
-		@Override
-		public LinkRule<BackwardLink, Context> getBackwardLinkRuleHead() {
-			return mainContext_.getBackwardLinkRuleHead();
-		}
-
-		@Override
-		public Chain<ModifiableLinkRule<BackwardLink, Context>> getBackwardLinkRuleChain() {
-			return mainContext_.getBackwardLinkRuleChain();
-		}
-
-		@Override
-		public boolean addBackwardLink(BackwardLink link) {
-			return localContext_.addBackwardLink(link);
-		}
-
-		@Override
-		public boolean removeBackwardLink(BackwardLink link) {
-			return localContext_.removeBackwardLink(link);
-		}
-
-		@Override
-		public boolean containsBackwardLink(BackwardLink link) {
-			return localContext_.containsBackwardLink(link);
-		}
-
-		@Override
-		public boolean addSubsumer(IndexedClassExpression expression) {
-			return localContext_.addSubsumer(expression);
-		}
-
-		@Override
-		public boolean removeSubsumer(IndexedClassExpression expression) {
-			return localContext_.removeSubsumer(expression);
-		}
-
-		@Override
-		public boolean containsSubsumer(IndexedClassExpression expression) {
-			return localContext_.containsSubsumer(expression);
-		}
-
-		@Override
-		public boolean addDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
-			return localContext_.addDisjointnessAxiom(axiom);
-		}
-
-		@Override
-		public boolean removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
-			return localContext_.removeDisjointnessAxiom(axiom);
-		}
-
-		@Override
-		public boolean containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
-			return localContext_.containsDisjointnessAxiom(axiom);
-		}
-
-		@Override
-		public boolean inconsistencyDisjointnessAxiom(
-				IndexedDisjointnessAxiom axiom) {
-			return localContext_.inconsistencyDisjointnessAxiom(axiom);
-		}
-
-		@Override
-		public boolean addToDo(Conclusion conclusion) {
-			return localContext_.addToDo(conclusion);
-		}
-
-		@Override
-		public Conclusion takeToDo() {
-			return localContext_.takeToDo();
-		}
-
-		@Override
-		public boolean isInconsistent() {
-			return mainContext_.isInconsistent();
-		}
-
-		@Override
-		public boolean isSaturated() {
-			return false;
-		}
-
-		@Override
-		public boolean setInconsistent(boolean consistent) {
-			// no-op
-			return false;
-		}
-
-		@Override
-		public boolean setSaturated(boolean saturated) {
-			// no-op
-			return false;
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return localContext_.isEmpty() && mainContext_.isEmpty();
-		}
-
-		@Override
-		public void removeLinks() {
-			// no-op
-		}
-
-		@Override
-		public String toString() {
-			return getRoot() + "[hybrid]";
-		}
-
-	}
 }
