@@ -22,28 +22,14 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
-import org.semanticweb.elk.util.collections.chains.Chain;
-import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
-import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
-import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
-	private static final Logger LOGGER_ = LoggerFactory
+	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexedSubClassOfAxiom.class);
 
 	private final IndexedClassExpression subClass_, superClass_;
@@ -84,163 +70,10 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
 			final int increment) {
 		if (increment > 0) {
-			index.add(subClass_, new SubsumerCompositionRule(superClass_));
+			SuperClassFromSubClassRule.addRuleFor(this, index);
 		} else {
-			index.remove(subClass_, new SubsumerCompositionRule(superClass_));
+			SuperClassFromSubClassRule.removeRuleFor(this, index);
 		}
-	}
-
-	/**
-	 * 
-	 * The composition rule producing {@link Subsumer} for the super class of
-	 * {@link IndexedSubClassOfAxiom} when processing its sub class
-	 * {@link IndexedClassExpression}
-	 * 
-	 * @see IndexedSubClassOfAxiom#getSuperClass()
-	 * @see IndexedSubClassOfAxiom#getSubClass()
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 * 
-	 */
-	public static class SubsumerCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
-			ChainableRule<IndexedClassExpression> {
-
-		private static final String NAME_ = "SubClassOf Expansion";
-
-		/**
-		 * Correctness of axioms deletions requires that
-		 * toldSuperClassExpressions is a List.
-		 */
-		private final List<IndexedClassExpression> toldSuperClassExpressions_;
-
-		SubsumerCompositionRule(ChainableRule<IndexedClassExpression> tail) {
-			super(tail);
-			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
-					1);
-		}
-
-		/*
-		 * used for registration
-		 */
-		SubsumerCompositionRule(IndexedClassExpression ice) {
-			super(null);
-			this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
-					1);
-
-			toldSuperClassExpressions_.add(ice);
-		}
-
-		// TODO: hide this method
-		public Collection<IndexedClassExpression> getToldSuperclasses() {
-			return toldSuperClassExpressions_;
-		}
-
-		@Override
-		public String getName() {
-			return NAME_;
-		}
-
-		@Override
-		public void apply(IndexedClassExpression premise, Context context,
-				SaturationStateWriter writer) {
-			LOGGER_.trace("Applying {}: {} to {}", NAME_,
-					toldSuperClassExpressions_, context);
-
-			for (IndexedClassExpression implied : toldSuperClassExpressions_) {
-				writer.produce(context, new DecomposedSubsumer(implied));
-			}
-		}
-
-		@Override
-		public boolean addTo(
-				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
-			SubsumerCompositionRule rule = ruleChain.getCreate(
-					SubsumerCompositionRule.MATCHER_,
-					SubsumerCompositionRule.FACTORY_);
-			boolean changed = false;
-
-			for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-				LOGGER_.trace("Adding {} to {}", ice, NAME_);
-
-				changed |= rule.addToldSuperClassExpression(ice);
-			}
-
-			return changed;
-
-		}
-
-		@Override
-		public boolean removeFrom(
-				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
-			SubsumerCompositionRule rule = ruleChain
-					.find(SubsumerCompositionRule.MATCHER_);
-			boolean changed = false;
-
-			if (rule != null) {
-				for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-					LOGGER_.trace("Removing {} from {}", ice, NAME_);
-
-					changed |= rule.removeToldSuperClassExpression(ice);
-				}
-
-				if (rule.isEmpty()) {
-					ruleChain.remove(SubsumerCompositionRule.MATCHER_);
-
-					LOGGER_.trace("{}: removed ", NAME_);
-
-					return true;
-				}
-			}
-
-			return changed;
-
-		}
-
-		@Override
-		public void accept(CompositionRuleVisitor visitor,
-				IndexedClassExpression premise, Context context,
-				SaturationStateWriter writer) {
-			visitor.visit(this, premise, context, writer);
-		}
-
-		protected boolean addToldSuperClassExpression(
-				IndexedClassExpression superClassExpression) {
-			return toldSuperClassExpressions_.add(superClassExpression);
-		}
-
-		/**
-		 * @param superClassExpression
-		 * @return true if successfully removed
-		 */
-		protected boolean removeToldSuperClassExpression(
-				IndexedClassExpression superClassExpression) {
-			return toldSuperClassExpressions_.remove(superClassExpression);
-		}
-
-		/**
-		 * @return {@code true} if this rule never does anything
-		 */
-		private boolean isEmpty() {
-			return toldSuperClassExpressions_.isEmpty();
-		}
-
-		@Override
-		public String toString() {
-			return getName() + ": " + toldSuperClassExpressions_;
-		}
-
-		private static final Matcher<ChainableRule<IndexedClassExpression>, SubsumerCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, SubsumerCompositionRule>(
-				SubsumerCompositionRule.class);
-
-		private static final ReferenceFactory<ChainableRule<IndexedClassExpression>, SubsumerCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, SubsumerCompositionRule>() {
-			@Override
-			public SubsumerCompositionRule create(
-					ChainableRule<IndexedClassExpression> tail) {
-				return new SubsumerCompositionRule(tail);
-			}
-		};
-
 	}
 
 }

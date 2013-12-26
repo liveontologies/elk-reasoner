@@ -212,8 +212,8 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 *         {@link IndexedClassExpression}; this is always not {@code null}.
 	 *         This method can be used for convenient search and modification
 	 *         (addition and deletion) of the rules using the methods of the
-	 *         {@link Chain} interface without without worrying about
-	 *         {@code null} values.
+	 *         {@link Chain} interface without worrying about {@code null}
+	 *         values.
 	 */
 	Chain<ChainableRule<IndexedClassExpression>> getCompositionRuleChain() {
 		return new AbstractChain<ChainableRule<IndexedClassExpression>>() {

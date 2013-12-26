@@ -27,18 +27,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.collections.chains.Chain;
-import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
-import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
-import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,205 +134,13 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	private void registerCompositionRule(ModifiableOntologyIndex index) {
-		for (IndexedClassExpression ice : inconsistentMembers_)
-			index.add(ice, new ContradictionCompositionRule());
-		for (IndexedClassExpression ice : disjointMembers_) {
-			index.add(ice, new ThisCompositionRule(this));
-		}
+		ContradictionFromDisjointnessRule.addRulesFor(this, index);
+		DisjointSubsumerFromMemberRule.addRulesFor(this, index);
 	}
 
 	private void deregisterCompositionRule(ModifiableOntologyIndex index) {
-		for (IndexedClassExpression ice : inconsistentMembers_)
-			index.remove(ice, new ContradictionCompositionRule());
-		for (IndexedClassExpression ice : disjointMembers_) {
-			index.remove(ice, new ThisCompositionRule(this));
-		}
-	}
-
-	/**
-	 * The composition rule producing {@link DisjointSubsumer} when processing
-	 * an {@link IndexedClassExpression} that is present in an
-	 * {@link IndexedDisjointnessAxiom} of this {@link DisjointSubsumer} exactly
-	 * once.
-	 * 
-	 * @author Pavel Klinov
-	 * 
-	 *         pavel.klinov@uni-ulm.de
-	 * @author "Yevgeny Kazakov"
-	 */
-	public static class ThisCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
-			ChainableRule<IndexedClassExpression> {
-
-		private static final String NAME_ = "DisjointClasses Introduction";
-
-		/**
-		 * Set of relevant {@link IndexedDisjointnessAxiom}s in which the
-		 * member, for which this rule is registered, appears.
-		 */
-		private final Set<IndexedDisjointnessAxiom> disjointnessAxioms_;
-
-		private ThisCompositionRule(ChainableRule<IndexedClassExpression> tail) {
-			super(tail);
-			disjointnessAxioms_ = new ArrayHashSet<IndexedDisjointnessAxiom>();
-		}
-
-		ThisCompositionRule(IndexedDisjointnessAxiom axiom) {
-			this((ChainableRule<IndexedClassExpression>) null);
-			disjointnessAxioms_.add(axiom);
-		}
-
-		// TODO: hide this method
-		public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
-			return disjointnessAxioms_;
-		}
-
-		@Override
-		public String getName() {
-			return NAME_;
-		}
-
-		@Override
-		public void accept(CompositionRuleVisitor visitor,
-				IndexedClassExpression premise, Context context,
-				SaturationStateWriter writer) {
-			visitor.visit(this, premise, context, writer);
-		}
-
-		@Override
-		public void apply(IndexedClassExpression premise, Context context,
-				SaturationStateWriter writer) {
-			LOGGER_.trace("Applying {} to {}", NAME_, context);
-
-			for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
-				writer.produce(context, new DisjointSubsumer(disAxiom));
-		}
-
-		protected boolean isEmpty() {
-			return disjointnessAxioms_.isEmpty();
-		}
-
-		@Override
-		public boolean addTo(
-				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
-			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
-			return rule.disjointnessAxioms_.addAll(this.disjointnessAxioms_);
-		}
-
-		@Override
-		public boolean removeFrom(
-				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
-			ThisCompositionRule rule = ruleChain.find(MATCHER_);
-			boolean changed = false;
-			if (rule != null) {
-				changed = rule.disjointnessAxioms_
-						.removeAll(this.disjointnessAxioms_);
-				if (rule.isEmpty())
-					ruleChain.remove(MATCHER_);
-			}
-			return changed;
-		}
-
-		private static Matcher<ChainableRule<IndexedClassExpression>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, ThisCompositionRule>(
-				ThisCompositionRule.class);
-
-		private static ReferenceFactory<ChainableRule<IndexedClassExpression>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, ThisCompositionRule>() {
-			@Override
-			public ThisCompositionRule create(
-					ChainableRule<IndexedClassExpression> tail) {
-				return new ThisCompositionRule(tail);
-			}
-		};
-	}
-
-	/**
-	 * The composition rule producing {@link Contradiction} when processing a an
-	 * {@link IndexedClassExpression} that is present in an
-	 * {@link IndexedDisjointnessAxiom} at least twice.
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 */
-	public static class ContradictionCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
-			ChainableRule<IndexedClassExpression> {
-
-		public static final String NAME_ = "DisjointClasses Contradiction Introduction";
-
-		/**
-		 * The number of {@link IndexedDisjointnessAxiom}s in which the
-		 * {@link IndexedClassExpression}, for which this rule is registered,
-		 * occurs more than once.
-		 */
-		private int contradictionCounter_;
-
-		public ContradictionCompositionRule(
-				ChainableRule<IndexedClassExpression> tail) {
-			super(tail);
-			this.contradictionCounter_ = 0;
-		}
-
-		ContradictionCompositionRule() {
-			this((ChainableRule<IndexedClassExpression>) null);
-			this.contradictionCounter_++;
-		}
-
-		@Override
-		public String getName() {
-			return NAME_;
-		}
-
-		@Override
-		public void apply(IndexedClassExpression premise, Context context,
-				SaturationStateWriter writer) {
-			LOGGER_.trace("Applying {} to {}", NAME_, context);
-
-			writer.produce(context, Contradiction.getInstance());
-		}
-
-		@Override
-		public boolean addTo(
-				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
-			ContradictionCompositionRule rule = ruleChain.getCreate(MATCHER_,
-					FACTORY_);
-			rule.contradictionCounter_ += this.contradictionCounter_;
-			return this.contradictionCounter_ != 0;
-		}
-
-		@Override
-		public boolean removeFrom(
-				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
-			ContradictionCompositionRule rule = ruleChain.find(MATCHER_);
-			if (rule == null) {
-				return false;
-			}
-			rule.contradictionCounter_ -= this.contradictionCounter_;
-			if (rule.isEmpty())
-				ruleChain.remove(MATCHER_);
-			return this.contradictionCounter_ != 0;
-		}
-
-		@Override
-		public void accept(CompositionRuleVisitor visitor,
-				IndexedClassExpression premise, Context context,
-				SaturationStateWriter writer) {
-			visitor.visit(this, premise, context, writer);
-		}
-
-		protected boolean isEmpty() {
-			return this.contradictionCounter_ == 0;
-		}
-
-		private static Matcher<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule>(
-				ContradictionCompositionRule.class);
-
-		private static ReferenceFactory<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule>() {
-			@Override
-			public ContradictionCompositionRule create(
-					ChainableRule<IndexedClassExpression> tail) {
-				return new ContradictionCompositionRule(tail);
-			}
-		};
-
+		ContradictionFromDisjointnessRule.removeRulesFor(this, index);
+		DisjointSubsumerFromMemberRule.removeRulesFor(this, index);
 	}
 
 }

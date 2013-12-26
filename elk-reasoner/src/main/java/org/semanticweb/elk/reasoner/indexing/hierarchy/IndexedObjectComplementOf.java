@@ -25,17 +25,9 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectComplementOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
-import org.semanticweb.elk.util.collections.chains.Chain;
-import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
-import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
-import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
@@ -76,7 +68,7 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 			int positiveIncrement, int negativeIncrement) {
 		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
 			// first positive occurrence of this expression
-			index.add(negated_, new ContradictionCompositionRule(this));
+			ContradictionFromNegationRule.addRulesFor(this, index);
 		}
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
@@ -97,7 +89,7 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 
 		if (positiveOccurrenceNo == 0 && positiveIncrement < 0) {
 			// no positive occurrences of this expression left
-			index.remove(negated_, new ContradictionCompositionRule(this));
+			ContradictionFromNegationRule.removeRulesFor(this, index);
 		}
 	}
 
@@ -109,121 +101,6 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 	@Override
 	public String toStringStructural() {
 		return "ObjectComplementOf(" + this.negated_ + ')';
-	}
-
-	/**
-	 * The composition rule producing {@link Contradiction} when processing the
-	 * negated {@link IndexedClassExpression} of an
-	 * {@link IndexedObjectComplementOf} if this
-	 * {@link IndexedObjectComplementOf} is contained in the {@code Context}.
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 */
-	public static class ContradictionCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
-			ChainableRule<IndexedClassExpression> {
-
-		private static final String NAME_ = "ObjectComplementOf Clash";
-
-		private IndexedClassExpression negation_;
-
-		private ContradictionCompositionRule(
-				ChainableRule<IndexedClassExpression> tail) {
-			super(tail);
-
-		}
-
-		ContradictionCompositionRule(IndexedClassExpression complement) {
-			this((ChainableRule<IndexedClassExpression>) null);
-			this.negation_ = complement;
-		}
-
-		@Override
-		public String getName() {
-			return NAME_;
-		}
-
-		// TODO: hide this method
-		public IndexedClassExpression getNegation() {
-			return negation_;
-		}
-
-		@Override
-		public void apply(IndexedClassExpression premise, Context context,
-				SaturationStateWriter writer) {
-			LOGGER_.trace("Applying {} to {}", NAME_, context);
-
-			if (negation_ != null && context.getSubsumers().contains(negation_))
-				writer.produce(context, Contradiction.getInstance());
-		}
-
-		@Override
-		public boolean addTo(
-				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
-			ContradictionCompositionRule rule = ruleChain.getCreate(MATCHER_,
-					FACTORY_);
-			boolean changed = false;
-
-			if (negation_ != null && rule.negation_ != negation_) {
-				if (rule.negation_ == null)
-					rule.negation_ = negation_;
-				else
-					throw new ElkUnexpectedIndexingException(getName()
-							+ " complement value " + rule.negation_
-							+ " cannot be overwritten with " + negation_);
-				changed = true;
-			}
-
-			return changed;
-
-		}
-
-		@Override
-		public boolean removeFrom(
-				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
-			ContradictionCompositionRule rule = ruleChain.find(MATCHER_);
-			boolean changed = false;
-
-			if (rule != null) {
-				if (negation_ != null && rule.negation_ == negation_) {
-					rule.negation_ = null;
-					changed = true;
-				}
-
-				if (rule.isEmpty()) {
-					ruleChain.remove(MATCHER_);
-				}
-			}
-
-			return changed;
-
-		}
-
-		@Override
-		public void accept(CompositionRuleVisitor visitor,
-				IndexedClassExpression premise, Context context,
-				SaturationStateWriter writer) {
-			visitor.visit(this, premise, context, writer);
-		}
-
-		/**
-		 * @return {@code true} if this rule never does anything
-		 */
-		private boolean isEmpty() {
-			return negation_ == null;
-		}
-
-		private static final Matcher<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule>(
-				ContradictionCompositionRule.class);
-
-		private static final ReferenceFactory<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, ContradictionCompositionRule>() {
-			@Override
-			public ContradictionCompositionRule create(
-					ChainableRule<IndexedClassExpression> tail) {
-				return new ContradictionCompositionRule(tail);
-			}
-		};
-
 	}
 
 }

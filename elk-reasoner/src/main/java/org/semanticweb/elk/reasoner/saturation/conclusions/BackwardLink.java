@@ -130,8 +130,8 @@ public class BackwardLink implements Conclusion {
 			// generate new propagations for this relation
 			if (context.getBackwardLinksByObjectProperty().get(premiseRelation)
 					.size() == 1) {
-				IndexedObjectSomeValuesFrom.generatePropagations(writer,
-						premiseRelation, context);
+				IndexedObjectSomeValuesFrom.generatePropagations(
+						premiseRelation, context, writer);
 			}
 
 			/*

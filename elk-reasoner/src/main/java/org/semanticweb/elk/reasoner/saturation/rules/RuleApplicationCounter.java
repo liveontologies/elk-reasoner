@@ -24,17 +24,17 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 
 /**
  * An object which can be used to measure the methods invocations of a
@@ -56,37 +56,37 @@ public class RuleApplicationCounter {
 	int countContextRootInitializationRule;
 
 	/**
-	 * counter for {@link IndexedDisjointnessAxiom.ThisCompositionRule}
+	 * counter for {@link DisjointSubsumerFromMemberRule}
 	 */
 	int countIndexedDisjointnessAxiomCompositionRule;
 
 	/**
-	 * counter for {@link IndexedDisjointnessAxiom.ContradictionCompositionRule}
+	 * counter for {@link ContradictionFromDisjointnessRule}
 	 */
 	int countIndexedDisjointnessAxiomContradictionRule;
 
 	/**
-	 * counter for {@link IndexedObjectComplementOf.ContradictionCompositionRule}
+	 * counter for {@link ContradictionFromDisjointnessRule}
 	 */
 	int countIndexedObjectComplementOfCompositionRule;
 
 	/**
-	 * counter for {@link IndexedObjectIntersectionOf.ThisCompositionRule}
+	 * counter for {@link ObjectIntersectionFromConjunctRule}
 	 */
 	int countIndexedObjectIntersectionOfCompositionRule;
 
 	/**
-	 * counter for {@link IndexedSubClassOfAxiom.SubsumerCompositionRule}
+	 * counter for {@link SuperClassFromSubClassRule}
 	 */
 	int countIndexedSubClassOfAxiomCompositionRule;
 
 	/**
-	 * counter for {@link IndexedObjectSomeValuesFrom.PropagationCompositionRule}
+	 * counter for {@link PropagationFromExistentialFillerRule}
 	 */
 	int countIndexedObjectSomeValuesFromCompositionRule;
 
 	/**
-	 * counter for {@link IndexedObjectUnionOf.ThisCompositionRule}
+	 * counter for {@link ObjectUnionFromDisjunctRule}
 	 */
 	int countIndexedObjectUnionOfCompositionRule;
 

@@ -22,26 +22,12 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.Map;
-
-import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
-import org.semanticweb.elk.util.collections.ArrayHashMap;
-import org.semanticweb.elk.util.collections.LazySetIntersection;
-import org.semanticweb.elk.util.collections.chains.Chain;
-import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
-import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
-import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +48,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	 * The conjunction has only two conjuncts. To ensure uniqueness of a
 	 * conjunction for the conjuncts, the conjuncts are sorted according to the
 	 * comparator of {@link IndexedClassExpression}. This is required for
-	 * correct construction of {@link ThisCompositionRule} because conjunctions
-	 * (A & B) and (B & A) result in the same rules.
+	 * correct construction of {@link ObjectIntersectionFromConjunctRule} because
+	 * conjunctions (A & B) and (B & A) result in the same rules.
 	 */
 	private final IndexedClassExpression firstConjunct_, secondConjunct_;
 
@@ -101,13 +87,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 			int increment, int positiveIncrement, int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
-			// first negative occurrence of this expression
-			index.add(firstConjunct_, new ThisCompositionRule(secondConjunct_,
-					this));
-			// if both conjuncts are the same, do not index the second time
-			if (!secondConjunct_.equals(firstConjunct_))
-				index.add(secondConjunct_, new ThisCompositionRule(
-						firstConjunct_, this));
+			ObjectIntersectionFromConjunctRule.addRulesFor(this, index);
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -116,13 +96,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		checkOccurrenceNumbers();
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
-			// no negative occurrences of this conjunction left
-			index.remove(firstConjunct_, new ThisCompositionRule(
-					secondConjunct_, this));
-			// if both conjuncts are the same, do not de-index the second time
-			if (!secondConjunct_.equals(firstConjunct_))
-				index.remove(secondConjunct_, new ThisCompositionRule(
-						firstConjunct_, this));
+			ObjectIntersectionFromConjunctRule.removeRulesFor(this, index);
 		}
 
 	}
@@ -136,137 +110,5 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	@Override
 	public void accept(SubsumerDecompositionVisitor visitor, Context context) {
 		visitor.visit(this, context);
-	}
-
-	/**
-	 * The composition rule producing {@link Subsumer} for an
-	 * {@link IndexedObjectIntersectionOf} when processing one of its conjunct
-	 * {@link IndexedClassExpression} and when the other conjunct is contained
-	 * in the {@link Context}
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 */
-	public static class ThisCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
-			ChainableRule<IndexedClassExpression> {
-
-		private static final String NAME_ = "ObjectIntersectionOf Introduction";
-
-		private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
-
-		private ThisCompositionRule(ChainableRule<IndexedClassExpression> tail) {
-			super(tail);
-			this.conjunctionsByConjunct_ = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
-					4);
-		}
-
-		ThisCompositionRule(IndexedClassExpression conjunct,
-				IndexedObjectIntersectionOf conjunction) {
-			this(null);
-			this.conjunctionsByConjunct_.put(conjunct, conjunction);
-		}
-
-		@Override
-		public String getName() {
-			return NAME_;
-		}
-
-		// TODO: hide this method
-		public Map<IndexedClassExpression, IndexedObjectIntersectionOf> getConjunctionsByConjunct() {
-			return conjunctionsByConjunct_;
-		}
-
-		@Override
-		public void apply(IndexedClassExpression premise, Context context,
-				SaturationStateWriter writer) {
-			LOGGER_.trace("Applying {} to {}", NAME_, context);
-
-			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-					conjunctionsByConjunct_.keySet(), context.getSubsumers()))
-				writer.produce(context, new ComposedSubsumer(
-						conjunctionsByConjunct_.get(common)));
-
-		}
-
-		@Override
-		public boolean addTo(
-				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
-			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
-			boolean changed = false;
-
-			for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : conjunctionsByConjunct_
-					.entrySet()) {
-				changed |= rule.addConjunctionByConjunct(entry.getValue(),
-						entry.getKey());
-			}
-
-			return changed;
-
-		}
-
-		@Override
-		public boolean removeFrom(
-				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
-			ThisCompositionRule rule = ruleChain.find(MATCHER_);
-			boolean changed = false;
-
-			if (rule != null) {
-				for (IndexedClassExpression conjunct : conjunctionsByConjunct_
-						.keySet()) {
-					changed |= rule.removeConjunctionByConjunct(conjunct);
-				}
-
-				if (rule.isEmpty()) {
-					ruleChain.remove(MATCHER_);
-				}
-			}
-
-			return changed;
-
-		}
-
-		@Override
-		public void accept(CompositionRuleVisitor visitor,
-				IndexedClassExpression premise, Context context,
-				SaturationStateWriter writer) {
-			visitor.visit(this, premise, context, writer);
-		}
-
-		private boolean addConjunctionByConjunct(
-				IndexedObjectIntersectionOf conjunction,
-				IndexedClassExpression conjunct) {
-			Object previous = conjunctionsByConjunct_
-					.put(conjunct, conjunction);
-
-			if (previous == null)
-				return true;
-
-			throw new ElkRuntimeException("Conjunction " + conjunction
-					+ "is already indexed: " + previous);
-		}
-
-		private boolean removeConjunctionByConjunct(
-				IndexedClassExpression conjunct) {
-			return conjunctionsByConjunct_.remove(conjunct) != null;
-		}
-
-		/**
-		 * @return {@code true} if this rule never does anything
-		 */
-		private boolean isEmpty() {
-			return conjunctionsByConjunct_.isEmpty();
-		}
-
-		private static final Matcher<ChainableRule<IndexedClassExpression>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, ThisCompositionRule>(
-				ThisCompositionRule.class);
-
-		private static final ReferenceFactory<ChainableRule<IndexedClassExpression>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, ThisCompositionRule>() {
-			@Override
-			public ThisCompositionRule create(
-					ChainableRule<IndexedClassExpression> tail) {
-				return new ThisCompositionRule(tail);
-			}
-		};
-
 	}
 }

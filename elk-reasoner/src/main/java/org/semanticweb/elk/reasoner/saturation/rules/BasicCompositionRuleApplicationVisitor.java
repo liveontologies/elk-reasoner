@@ -28,12 +28,6 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass.OwlThingContextInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
@@ -41,6 +35,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 
 /**
  * @author Pavel Klinov
@@ -90,52 +91,49 @@ public class BasicCompositionRuleApplicationVisitor implements
 	}
 
 	@Override
-	public void visit(
-			IndexedDisjointnessAxiom.ContradictionCompositionRule rule,
+	public void visit(ContradictionFromDisjointnessRule rule,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer) {
 		rule.apply(premise, context, writer);
 	}
 
 	@Override
-	public void visit(IndexedDisjointnessAxiom.ThisCompositionRule rule,
+	public void visit(DisjointSubsumerFromMemberRule rule,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer) {
 		rule.apply(premise, context, writer);
 	}
 
 	@Override
-	public void visit(
-			IndexedObjectComplementOf.ContradictionCompositionRule rule,
+	public void visit(ContradictionFromNegationRule rule,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer) {
 		rule.apply(premise, context, writer);
 	}
 
 	@Override
-	public void visit(IndexedObjectIntersectionOf.ThisCompositionRule rule,
+	public void visit(ObjectIntersectionFromConjunctRule rule,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer) {
 		rule.apply(premise, context, writer);
 	}
 
 	@Override
-	public void visit(
-			IndexedObjectSomeValuesFrom.PropagationCompositionRule rule,
+	public void visit(PropagationFromExistentialFillerRule rule,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer) {
 		rule.apply(premise, context, writer);
 	}
 
 	@Override
-	public void visit(IndexedObjectUnionOf.ThisCompositionRule rule,
+	public void visit(ObjectUnionFromDisjunctRule rule,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer) {
 		rule.apply(premise, context, writer);
 	}
 
 	@Override
-	public void visit(IndexedSubClassOfAxiom.SubsumerCompositionRule rule,
+	public void visit(SuperClassFromSubClassRule rule,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer) {
 		rule.apply(premise, context, writer);

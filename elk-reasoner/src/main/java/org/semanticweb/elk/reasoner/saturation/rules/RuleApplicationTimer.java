@@ -24,17 +24,17 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 
 /**
  * An object which can be used to measure time spent within a methods of a
@@ -57,37 +57,37 @@ public class RuleApplicationTimer {
 	int timeContextRootInitializationRule;
 
 	/**
-	 * timer for {@link IndexedDisjointnessAxiom.ThisCompositionRule}
+	 * timer for {@link DisjointSubsumerFromMemberRule}
 	 */
 	int timeIndexedDisjointnessAxiomCompositionRule;
 
 	/**
-	 * timer for {@link IndexedDisjointnessAxiom.ContradictionCompositionRule}
+	 * timer for {@link ContradictionFromDisjointnessRule}
 	 */
 	int timeIndexedDisjointnessAxiomContradictionRule;
 
 	/**
-	 * timer for {@link IndexedObjectComplementOf.ContradictionCompositionRule}
+	 * timer for {@link ContradictionFromDisjointnessRule}
 	 */
 	int timeObjectIndexedComplementOfCompositionRule;
 
 	/**
-	 * timer for {@link IndexedObjectIntersectionOf.ThisCompositionRule}
+	 * timer for {@link ObjectIntersectionFromConjunctRule}
 	 */
 	int timeObjectIndexedIntersectionOfCompositionRule;
 
 	/**
-	 * timer for {@link IndexedSubClassOfAxiom.SubsumerCompositionRule}
+	 * timer for {@link SuperClassFromSubClassRule}
 	 */
 	public int timeIndexedSubClassOfAxiomCompositionRule;
 
 	/**
-	 * timer for {@link IndexedObjectSomeValuesFrom.PropagationCompositionRule}
+	 * timer for {@link PropagationFromExistentialFillerRule}
 	 */
 	int timeIndexedObjectSomeValuesFromCompositionRule;
 
 	/**
-	 * timer for {@link IndexedObjectUnionOf.ThisCompositionRule}
+	 * timer for {@link ObjectUnionFromDisjunctRule}
 	 */
 	int timeIndexedObjectUnionOfCompositionRule;
 

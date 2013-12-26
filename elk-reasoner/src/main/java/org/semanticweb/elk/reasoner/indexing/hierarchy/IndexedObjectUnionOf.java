@@ -28,19 +28,10 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectUnionOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.collections.chains.Chain;
-import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
-import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
-import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
@@ -84,8 +75,7 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			for (IndexedClassExpression disjunct : disjuncts_)
-				index.add(disjunct, new ThisCompositionRule(this));
+			ObjectUnionFromDisjunctRule.addRulesFor(this, index);
 		}
 
 		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
@@ -106,8 +96,7 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			for (IndexedClassExpression disjunct : disjuncts_)
-				index.remove(disjunct, new ThisCompositionRule(this));
+			ObjectUnionFromDisjunctRule.removeRulesFor(this, index);
 		}
 	}
 
@@ -119,102 +108,6 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 	@Override
 	public String toStringStructural() {
 		return "ObjectUnionOf(" + disjuncts_ + ')';
-	}
-
-	/**
-	 * The composition rule producing {@link Subsumer} for an
-	 * {@link IndexedObjectUnionOf} when processing one of its disjunct
-	 * {@link IndexedClassExpression}
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 */
-	public static class ThisCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
-			ChainableRule<IndexedClassExpression> {
-
-		private static final String NAME_ = "ObjectUnionOf Introduction";
-
-		/**
-		 * All disjunctions containing the disjunct for which this rule is
-		 * registered
-		 */
-		private final Set<IndexedClassExpression> disjunctions_;
-
-		private ThisCompositionRule(ChainableRule<IndexedClassExpression> tail) {
-			super(tail);
-			disjunctions_ = new ArrayHashSet<IndexedClassExpression>();
-
-		}
-
-		ThisCompositionRule(IndexedClassExpression disjunction) {
-			this((ChainableRule<IndexedClassExpression>) null);
-			this.disjunctions_.add(disjunction);
-		}
-
-		@Override
-		public String getName() {
-			return NAME_;
-		}
-
-		@Override
-		public void accept(CompositionRuleVisitor visitor,
-				IndexedClassExpression premise, Context context,
-				SaturationStateWriter writer) {
-			visitor.visit(this, premise, context, writer);
-		}
-
-		// TODO: hide this method
-		public Set<IndexedClassExpression> getDisjunctions() {
-			return disjunctions_;
-		}
-
-		@Override
-		public void apply(IndexedClassExpression premise, Context context,
-				SaturationStateWriter writer) {
-			LOGGER_.trace("Applying {} to {}", NAME_, context);
-
-			for (IndexedClassExpression disjunction : disjunctions_)
-				writer.produce(context, new ComposedSubsumer(disjunction));
-		}
-
-		@Override
-		public boolean addTo(
-				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
-			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
-			return rule.disjunctions_.addAll(this.disjunctions_);
-		}
-
-		@Override
-		public boolean removeFrom(
-				Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
-			ThisCompositionRule rule = ruleChain.find(MATCHER_);
-			boolean changed = false;
-			if (rule != null) {
-				changed = rule.disjunctions_.removeAll(this.disjunctions_);
-				if (rule.isEmpty())
-					ruleChain.remove(MATCHER_);
-			}
-			return changed;
-		}
-
-		/**
-		 * @return {@code true} if this rule never does anything
-		 */
-		private boolean isEmpty() {
-			return disjunctions_.isEmpty();
-		}
-
-		private static final Matcher<ChainableRule<IndexedClassExpression>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, ThisCompositionRule>(
-				ThisCompositionRule.class);
-
-		private static final ReferenceFactory<ChainableRule<IndexedClassExpression>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, ThisCompositionRule>() {
-			@Override
-			public ThisCompositionRule create(
-					ChainableRule<IndexedClassExpression> tail) {
-				return new ThisCompositionRule(tail);
-			}
-		};
-
 	}
 
 }

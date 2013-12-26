@@ -35,12 +35,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.RootContextIn
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass.OwlThingContextInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
@@ -50,6 +46,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +138,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 	private class ContextRuleValidator implements CompositionRuleVisitor {
 
 		@Override
-		public void visit(BackwardLink.ThisCompositionRule thisCompositionRule,
+		public void visit(BackwardLink.ThisCompositionRule rule,
 				BackwardLink premise, Context context,
 				SaturationStateWriter writer) {
 			// nothing is stored in the rule
@@ -150,16 +153,14 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
-		public void visit(
-				Contradiction.ContradictionPropagationRule thisCompositionRule,
+		public void visit(Contradiction.ContradictionPropagationRule rule,
 				Contradiction premise, Context context,
 				SaturationStateWriter writer) {
 			// nothing is stored in the rule
 		}
 
 		@Override
-		public void visit(
-				DisjointSubsumer.ContradicitonCompositionRule thisCompositionRule,
+		public void visit(DisjointSubsumer.ContradicitonCompositionRule rule,
 				DisjointSubsumer premise, Context context,
 				SaturationStateWriter writer) {
 			// nothing is stored in the rule
@@ -167,22 +168,20 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
-		public void visit(
-				ForwardLink.BackwardLinkCompositionRule thisCompositionRule,
+		public void visit(ForwardLink.BackwardLinkCompositionRule rule,
 				ForwardLink premise, Context context,
 				SaturationStateWriter writer) {
 			// nothing is stored in the rule
 		}
 
 		@Override
-		public void visit(
-				ForwardLink.ThisBackwardLinkRule thisBackwardLinkRule,
+		public void visit(ForwardLink.ThisBackwardLinkRule rule,
 				BackwardLink premise, Context context,
 				SaturationStateWriter writer) {
-			for (IndexedPropertyChain prop : thisBackwardLinkRule
+			for (IndexedPropertyChain prop : rule
 					.getForwardLinksByObjectProperty().keySet()) {
-				for (Context target : thisBackwardLinkRule
-						.getForwardLinksByObjectProperty().get(prop)) {
+				for (Context target : rule.getForwardLinksByObjectProperty()
+						.get(prop)) {
 					contextValidator_.add(target);
 				}
 			}
@@ -190,19 +189,17 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(
-				IndexedDisjointnessAxiom.ContradictionCompositionRule thisContradictionRule,
+				ContradictionFromDisjointnessRule thisContradictionRule,
 				IndexedClassExpression premise, Context context,
 				SaturationStateWriter writer) {
 			// nothing is stored in the rule
 		}
 
 		@Override
-		public void visit(
-				IndexedDisjointnessAxiom.ThisCompositionRule thisCompositionRule,
+		public void visit(DisjointSubsumerFromMemberRule rule,
 				IndexedClassExpression premise, Context context,
 				SaturationStateWriter writer) {
-			for (IndexedDisjointnessAxiom axiom : thisCompositionRule
-					.getDisjointnessAxioms()) {
+			for (IndexedDisjointnessAxiom axiom : rule.getDisjointnessAxioms()) {
 				if (!axiom.occurs()) {
 					LOGGER_.error("Dead disjointness axiom: " + axiom);
 				}
@@ -215,20 +212,18 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
-		public void visit(
-				IndexedObjectComplementOf.ContradictionCompositionRule thisCompositionRule,
+		public void visit(ContradictionFromNegationRule rule,
 				IndexedClassExpression premise, Context context,
 				SaturationStateWriter writer) {
-			iceValidator_.checkNew(thisCompositionRule.getNegation());
+			iceValidator_.checkNew(rule.getNegation());
 
 		}
 
 		@Override
-		public void visit(
-				IndexedObjectIntersectionOf.ThisCompositionRule thisCompositionRule,
+		public void visit(ObjectIntersectionFromConjunctRule rule,
 				IndexedClassExpression premise, Context context,
 				SaturationStateWriter writer) {
-			for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : thisCompositionRule
+			for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : rule
 					.getConjunctionsByConjunct().entrySet()) {
 				iceValidator_.checkNew(entry.getKey());
 				iceValidator_.checkNew(entry.getValue());
@@ -236,53 +231,45 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
-		public void visit(
-				IndexedObjectSomeValuesFrom.PropagationCompositionRule thisCompositionRule,
+		public void visit(PropagationFromExistentialFillerRule rule,
 				IndexedClassExpression premise, Context context,
 				SaturationStateWriter writer) {
-			for (IndexedClassExpression ice : thisCompositionRule
-					.getNegativeExistentials()) {
+			for (IndexedClassExpression ice : rule.getNegativeExistentials()) {
 				iceValidator_.checkNew(ice);
 			}
 		}
 
 		@Override
-		public void visit(
-				IndexedObjectUnionOf.ThisCompositionRule thisCompositionRule,
+		public void visit(ObjectUnionFromDisjunctRule rule,
 				IndexedClassExpression premise, Context context,
 				SaturationStateWriter writer) {
-			for (IndexedClassExpression ice : thisCompositionRule
-					.getDisjunctions()) {
+			for (IndexedClassExpression ice : rule.getDisjunctions()) {
 				iceValidator_.checkNew(ice);
 			}
 		}
 
 		@Override
-		public void visit(
-				IndexedSubClassOfAxiom.SubsumerCompositionRule thisCompositionRule,
+		public void visit(SuperClassFromSubClassRule rule,
 				IndexedClassExpression premise, Context context,
 				SaturationStateWriter writer) {
-			for (IndexedClassExpression ice : thisCompositionRule
-					.getToldSuperclasses()) {
+			for (IndexedClassExpression ice : rule.getToldSuperclasses()) {
 				iceValidator_.checkNew(ice);
 			}
 
 		}
 
 		@Override
-		public void visit(
-				OwlThingContextInitializationRule owlThingContextInitializationRule,
+		public void visit(OwlThingContextInitializationRule rule,
 				Context context, SaturationStateWriter writer) {
 		}
 
 		@Override
-		public void visit(
-				Propagation.SubsumerBackwardLinkRule thisBackwardLinkRule,
+		public void visit(Propagation.SubsumerBackwardLinkRule rule,
 				BackwardLink premise, Context context,
 				SaturationStateWriter writer) {
-			for (IndexedPropertyChain prop : thisBackwardLinkRule
+			for (IndexedPropertyChain prop : rule
 					.getPropagationsByObjectProperty().keySet()) {
-				for (IndexedClassExpression ice : thisBackwardLinkRule
+				for (IndexedClassExpression ice : rule
 						.getPropagationsByObjectProperty().get(prop)) {
 					iceValidator_.checkNew(ice);
 				}
@@ -290,8 +277,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
-		public void visit(RootContextInitializationRule rootInitRule,
-				Context context, SaturationStateWriter writer) {
+		public void visit(RootContextInitializationRule rule, Context context,
+				SaturationStateWriter writer) {
 			// nothing is stored in the rule
 		}
 
