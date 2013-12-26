@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -66,7 +67,7 @@ public class IncrementalDeletionInitializationStage extends
 
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		ChainableRule<Void> changedInitRules = null;
-		Map<IndexedClassExpression, ChainableRule<IndexedClassExpression>> changedRulesByCE = null;
+		Map<IndexedClassExpression, ChainableSubsumerRule> changedRulesByCE = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 
 		changedInitRules = diffIndex.getRemovedContextInitRules();
@@ -77,14 +78,14 @@ public class IncrementalDeletionInitializationStage extends
 			inputs = Operations.split(reasoner.saturationState.getContexts(),
 					8 * workerNo);
 		}
-		
-		//System.err.println(changedRulesByCE.keySet().size());
+
+		// System.err.println(changedRulesByCE.keySet().size());
 
 		this.initialization_ = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
 				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
 				reasoner.getProgressMonitor());
-		
+
 		return true;
 	}
 

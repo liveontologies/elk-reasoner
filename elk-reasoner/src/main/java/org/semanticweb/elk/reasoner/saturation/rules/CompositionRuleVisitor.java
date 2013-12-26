@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
@@ -35,8 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerRuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRuleVisitor;
 
 /**
  * A visitor pattern for all types of composition rules together with the
@@ -48,7 +46,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSub
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface CompositionRuleVisitor extends SubsumerRuleVisitor {
+public interface CompositionRuleVisitor extends LinkedSubsumerRuleVisitor {
 
 	void visit(BackwardLink.ThisCompositionRule rule, BackwardLink premise,
 			Context context, SaturationStateWriter writer);
@@ -73,9 +71,6 @@ public interface CompositionRuleVisitor extends SubsumerRuleVisitor {
 			ForwardLink premise, Context context, SaturationStateWriter writer);
 
 	void visit(IndexedClass.OwlThingContextInitializationRule rule,
-			Context context, SaturationStateWriter writer);
-
-	void visit(SuperClassFromSubClassRule rule, IndexedClassExpression premise,
 			Context context, SaturationStateWriter writer);
 
 	void visit(Propagation.SubsumerBackwardLinkRule rule, BackwardLink premise,

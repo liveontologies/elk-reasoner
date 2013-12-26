@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -27,8 +28,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
@@ -38,15 +37,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The composition rule producing {@link Contradiction} when processing a an
+ * The rule producing {@link Contradiction} when processing a an
  * {@link IndexedClassExpression} that is present in an
  * {@link IndexedDisjointnessAxiom} at least twice.
  * 
  * @author "Yevgeny Kazakov"
  */
 public class ContradictionFromDisjointnessRule extends
-		ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
-		ChainableRule<IndexedClassExpression> {
+		ModifiableLinkImpl<ChainableSubsumerRule> implements
+		ChainableSubsumerRule {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -61,14 +60,13 @@ public class ContradictionFromDisjointnessRule extends
 	 */
 	private int contradictionCounter_;
 
-	private ContradictionFromDisjointnessRule(
-			ChainableRule<IndexedClassExpression> tail) {
+	private ContradictionFromDisjointnessRule(ChainableSubsumerRule tail) {
 		super(tail);
 		this.contradictionCounter_ = 0;
 	}
 
 	private ContradictionFromDisjointnessRule() {
-		this((ChainableRule<IndexedClassExpression>) null);
+		this((ChainableSubsumerRule) null);
 		this.contradictionCounter_++;
 	}
 
@@ -98,7 +96,7 @@ public class ContradictionFromDisjointnessRule extends
 	}
 
 	@Override
-	public boolean addTo(Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
 		ContradictionFromDisjointnessRule rule = ruleChain.getCreate(MATCHER_,
 				FACTORY_);
 		rule.contradictionCounter_ += this.contradictionCounter_;
@@ -106,8 +104,7 @@ public class ContradictionFromDisjointnessRule extends
 	}
 
 	@Override
-	public boolean removeFrom(
-			Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
 		ContradictionFromDisjointnessRule rule = ruleChain.find(MATCHER_);
 		if (rule == null) {
 			return false;
@@ -119,7 +116,7 @@ public class ContradictionFromDisjointnessRule extends
 	}
 
 	@Override
-	public void accept(CompositionRuleVisitor visitor,
+	public void accept(LinkedSubsumerRuleVisitor visitor,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer) {
 		visitor.visit(this, premise, context, writer);
@@ -129,13 +126,13 @@ public class ContradictionFromDisjointnessRule extends
 		return this.contradictionCounter_ == 0;
 	}
 
-	private static Matcher<ChainableRule<IndexedClassExpression>, ContradictionFromDisjointnessRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, ContradictionFromDisjointnessRule>(
+	private static Matcher<ChainableSubsumerRule, ContradictionFromDisjointnessRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableSubsumerRule, ContradictionFromDisjointnessRule>(
 			ContradictionFromDisjointnessRule.class);
 
-	private static ReferenceFactory<ChainableRule<IndexedClassExpression>, ContradictionFromDisjointnessRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, ContradictionFromDisjointnessRule>() {
+	private static ReferenceFactory<ChainableSubsumerRule, ContradictionFromDisjointnessRule> FACTORY_ = new ReferenceFactory<ChainableSubsumerRule, ContradictionFromDisjointnessRule>() {
 		@Override
 		public ContradictionFromDisjointnessRule create(
-				ChainableRule<IndexedClassExpression> tail) {
+				ChainableSubsumerRule tail) {
 			return new ContradictionFromDisjointnessRule(tail);
 		}
 	};

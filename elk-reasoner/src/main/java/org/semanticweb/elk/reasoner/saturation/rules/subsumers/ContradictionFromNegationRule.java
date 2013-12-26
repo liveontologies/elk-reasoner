@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -28,8 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
@@ -39,16 +38,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The composition rule producing {@link Contradiction} when processing the
- * negated {@link IndexedClassExpression} of an
- * {@link IndexedObjectComplementOf} if this {@link IndexedObjectComplementOf}
- * is contained in the {@code Context}.
+ * The rule producing {@link Contradiction} when processing the negated
+ * {@link IndexedClassExpression} of an {@link IndexedObjectComplementOf} if
+ * this {@link IndexedObjectComplementOf} is contained in the {@code Context}.
  * 
  * @author "Yevgeny Kazakov"
  */
 public class ContradictionFromNegationRule extends
-		ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
-		ChainableRule<IndexedClassExpression> {
+		ModifiableLinkImpl<ChainableSubsumerRule> implements
+		ChainableSubsumerRule {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -58,14 +56,13 @@ public class ContradictionFromNegationRule extends
 
 	private IndexedClassExpression negation_;
 
-	private ContradictionFromNegationRule(
-			ChainableRule<IndexedClassExpression> tail) {
+	private ContradictionFromNegationRule(ChainableSubsumerRule tail) {
 		super(tail);
 
 	}
 
 	private ContradictionFromNegationRule(IndexedClassExpression complement) {
-		this((ChainableRule<IndexedClassExpression>) null);
+		this((ChainableSubsumerRule) null);
 		this.negation_ = complement;
 	}
 
@@ -101,7 +98,7 @@ public class ContradictionFromNegationRule extends
 	}
 
 	@Override
-	public boolean addTo(Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
 		ContradictionFromNegationRule rule = ruleChain.getCreate(MATCHER_,
 				FACTORY_);
 		boolean changed = false;
@@ -121,8 +118,7 @@ public class ContradictionFromNegationRule extends
 	}
 
 	@Override
-	public boolean removeFrom(
-			Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
 		ContradictionFromNegationRule rule = ruleChain.find(MATCHER_);
 		boolean changed = false;
 
@@ -142,7 +138,7 @@ public class ContradictionFromNegationRule extends
 	}
 
 	@Override
-	public void accept(CompositionRuleVisitor visitor,
+	public void accept(LinkedSubsumerRuleVisitor visitor,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer) {
 		visitor.visit(this, premise, context, writer);
@@ -155,13 +151,12 @@ public class ContradictionFromNegationRule extends
 		return negation_ == null;
 	}
 
-	private static final Matcher<ChainableRule<IndexedClassExpression>, ContradictionFromNegationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, ContradictionFromNegationRule>(
+	private static final Matcher<ChainableSubsumerRule, ContradictionFromNegationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableSubsumerRule, ContradictionFromNegationRule>(
 			ContradictionFromNegationRule.class);
 
-	private static final ReferenceFactory<ChainableRule<IndexedClassExpression>, ContradictionFromNegationRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, ContradictionFromNegationRule>() {
+	private static final ReferenceFactory<ChainableSubsumerRule, ContradictionFromNegationRule> FACTORY_ = new ReferenceFactory<ChainableSubsumerRule, ContradictionFromNegationRule>() {
 		@Override
-		public ContradictionFromNegationRule create(
-				ChainableRule<IndexedClassExpression> tail) {
+		public ContradictionFromNegationRule create(ChainableSubsumerRule tail) {
 			return new ContradictionFromNegationRule(tail);
 		}
 	};

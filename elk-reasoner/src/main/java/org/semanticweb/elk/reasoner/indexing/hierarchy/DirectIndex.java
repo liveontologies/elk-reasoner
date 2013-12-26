@@ -39,6 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
@@ -211,14 +212,12 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	@Override
-	public void add(IndexedClassExpression target,
-			ChainableRule<IndexedClassExpression> rule) {
+	public void add(IndexedClassExpression target, ChainableSubsumerRule rule) {
 		rule.addTo(target.getCompositionRuleChain());
 	}
 
 	@Override
-	public void remove(IndexedClassExpression target,
-			ChainableRule<IndexedClassExpression> rule) {
+	public void remove(IndexedClassExpression target, ChainableSubsumerRule rule) {
 		if (!rule.removeFrom(target.getCompositionRuleChain()))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove composition rule " + rule.getName()

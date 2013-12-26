@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -32,8 +33,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
@@ -44,7 +43,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 
- * The composition rule producing {@link Subsumer} for the super class of
+ * The rule producing {@link Subsumer} for the super class of
  * {@link IndexedSubClassOfAxiom} when processing its sub class
  * {@link IndexedClassExpression}
  * 
@@ -55,8 +54,8 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class SuperClassFromSubClassRule extends
-		ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
-		ChainableRule<IndexedClassExpression> {
+		ModifiableLinkImpl<ChainableSubsumerRule> implements
+		ChainableSubsumerRule {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -70,8 +69,7 @@ public class SuperClassFromSubClassRule extends
 	 */
 	private final List<IndexedClassExpression> toldSuperClassExpressions_;
 
-	private SuperClassFromSubClassRule(
-			ChainableRule<IndexedClassExpression> tail) {
+	private SuperClassFromSubClassRule(ChainableSubsumerRule tail) {
 		super(tail);
 		this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
 				1);
@@ -119,7 +117,7 @@ public class SuperClassFromSubClassRule extends
 	}
 
 	@Override
-	public boolean addTo(Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
 		SuperClassFromSubClassRule rule = ruleChain.getCreate(
 				SuperClassFromSubClassRule.MATCHER_,
 				SuperClassFromSubClassRule.FACTORY_);
@@ -136,8 +134,7 @@ public class SuperClassFromSubClassRule extends
 	}
 
 	@Override
-	public boolean removeFrom(
-			Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
 		SuperClassFromSubClassRule rule = ruleChain
 				.find(SuperClassFromSubClassRule.MATCHER_);
 		boolean changed = false;
@@ -163,7 +160,7 @@ public class SuperClassFromSubClassRule extends
 	}
 
 	@Override
-	public void accept(CompositionRuleVisitor visitor,
+	public void accept(LinkedSubsumerRuleVisitor visitor,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer) {
 		visitor.visit(this, premise, context, writer);
@@ -195,13 +192,12 @@ public class SuperClassFromSubClassRule extends
 		return getName() + ": " + toldSuperClassExpressions_;
 	}
 
-	private static final Matcher<ChainableRule<IndexedClassExpression>, SuperClassFromSubClassRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, SuperClassFromSubClassRule>(
+	private static final Matcher<ChainableSubsumerRule, SuperClassFromSubClassRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableSubsumerRule, SuperClassFromSubClassRule>(
 			SuperClassFromSubClassRule.class);
 
-	private static final ReferenceFactory<ChainableRule<IndexedClassExpression>, SuperClassFromSubClassRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, SuperClassFromSubClassRule>() {
+	private static final ReferenceFactory<ChainableSubsumerRule, SuperClassFromSubClassRule> FACTORY_ = new ReferenceFactory<ChainableSubsumerRule, SuperClassFromSubClassRule>() {
 		@Override
-		public SuperClassFromSubClassRule create(
-				ChainableRule<IndexedClassExpression> tail) {
+		public SuperClassFromSubClassRule create(ChainableSubsumerRule tail) {
 			return new SuperClassFromSubClassRule(tail);
 		}
 	};

@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -30,8 +31,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -42,15 +41,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The composition rule producing {@link Subsumer} for an
- * {@link IndexedObjectUnionOf} when processing one of its disjunct
- * {@link IndexedClassExpression}
+ * The rule producing {@link Subsumer} for an {@link IndexedObjectUnionOf} when
+ * processing one of its disjunct {@link IndexedClassExpression}
  * 
  * @author "Yevgeny Kazakov"
  */
 public class ObjectUnionFromDisjunctRule extends
-		ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
-		ChainableRule<IndexedClassExpression> {
+		ModifiableLinkImpl<ChainableSubsumerRule> implements
+		ChainableSubsumerRule {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -64,15 +62,14 @@ public class ObjectUnionFromDisjunctRule extends
 	 */
 	private final Set<IndexedClassExpression> disjunctions_;
 
-	private ObjectUnionFromDisjunctRule(
-			ChainableRule<IndexedClassExpression> tail) {
+	private ObjectUnionFromDisjunctRule(ChainableSubsumerRule tail) {
 		super(tail);
 		disjunctions_ = new ArrayHashSet<IndexedClassExpression>();
 
 	}
 
 	private ObjectUnionFromDisjunctRule(IndexedClassExpression disjunction) {
-		this((ChainableRule<IndexedClassExpression>) null);
+		this((ChainableSubsumerRule) null);
 		this.disjunctions_.add(disjunction);
 	}
 
@@ -94,7 +91,7 @@ public class ObjectUnionFromDisjunctRule extends
 	}
 
 	@Override
-	public void accept(CompositionRuleVisitor visitor,
+	public void accept(LinkedSubsumerRuleVisitor visitor,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer) {
 		visitor.visit(this, premise, context, writer);
@@ -115,15 +112,14 @@ public class ObjectUnionFromDisjunctRule extends
 	}
 
 	@Override
-	public boolean addTo(Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
 		ObjectUnionFromDisjunctRule rule = ruleChain.getCreate(MATCHER_,
 				FACTORY_);
 		return rule.disjunctions_.addAll(this.disjunctions_);
 	}
 
 	@Override
-	public boolean removeFrom(
-			Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
 		ObjectUnionFromDisjunctRule rule = ruleChain.find(MATCHER_);
 		boolean changed = false;
 		if (rule != null) {
@@ -141,13 +137,12 @@ public class ObjectUnionFromDisjunctRule extends
 		return disjunctions_.isEmpty();
 	}
 
-	private static final Matcher<ChainableRule<IndexedClassExpression>, ObjectUnionFromDisjunctRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, ObjectUnionFromDisjunctRule>(
+	private static final Matcher<ChainableSubsumerRule, ObjectUnionFromDisjunctRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableSubsumerRule, ObjectUnionFromDisjunctRule>(
 			ObjectUnionFromDisjunctRule.class);
 
-	private static final ReferenceFactory<ChainableRule<IndexedClassExpression>, ObjectUnionFromDisjunctRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, ObjectUnionFromDisjunctRule>() {
+	private static final ReferenceFactory<ChainableSubsumerRule, ObjectUnionFromDisjunctRule> FACTORY_ = new ReferenceFactory<ChainableSubsumerRule, ObjectUnionFromDisjunctRule>() {
 		@Override
-		public ObjectUnionFromDisjunctRule create(
-				ChainableRule<IndexedClassExpression> tail) {
+		public ObjectUnionFromDisjunctRule create(ChainableSubsumerRule tail) {
 			return new ObjectUnionFromDisjunctRule(tail);
 		}
 	};

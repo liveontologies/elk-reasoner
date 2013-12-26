@@ -44,6 +44,8 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -68,7 +70,7 @@ public class IncrementalChangesInitialization extends
 	public IncrementalChangesInitialization(
 			Collection<ArrayList<Context>> inputs,
 			ChainableRule<Void> changedGlobalRules,
-			Map<IndexedClassExpression, ChainableRule<IndexedClassExpression>> changes,
+			Map<IndexedClassExpression, ChainableSubsumerRule> changes,
 			SaturationState state, ComputationExecutor executor,
 			SaturationStatistics stageStats, int maxWorkers,
 			ProgressMonitor progressMonitor) {
@@ -92,7 +94,7 @@ class ContextInitializationFactory
 			.getLogger(ContextInitializationFactory.class);
 
 	private final SaturationState saturationState_;
-	private final Map<IndexedClassExpression, ? extends LinkRule<IndexedClassExpression>> indexChanges_;
+	private final Map<IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges_;
 	private final IndexedClassExpression[] indexChangesKeys_;
 	private final LinkRule<Void> changedGlobalRuleHead_;
 	private AtomicInteger ruleHits = new AtomicInteger(0);
@@ -100,7 +102,7 @@ class ContextInitializationFactory
 
 	public ContextInitializationFactory(
 			SaturationState state,
-			Map<IndexedClassExpression, ? extends LinkRule<IndexedClassExpression>> indexChanges,
+			Map<IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges,
 			LinkRule<Void> changedGlobalRuleHead,
 			SaturationStatistics stageStats) {
 
@@ -174,8 +176,7 @@ class ContextInitializationFactory
 
 			private void applyLocalRules(Context context,
 					IndexedClassExpression changedICE) {
-				LinkRule<IndexedClassExpression> nextLocalRule = indexChanges_
-						.get(changedICE);
+				LinkedSubsumerRule nextLocalRule = indexChanges_.get(changedICE);
 				if (nextLocalRule != null) {
 					localRuleHits++;
 
@@ -196,9 +197,9 @@ class ContextInitializationFactory
 		if (SaturationUtils.COLLECT_PROCESSING_TIMES) {
 			return new TimedContextCollectionProcessor(baseProcessor,
 					stageStatistics_.getIncrementalProcessingStatistics());
-		} else {
-			return new ContextCollectionProcessor(baseProcessor);
 		}
+		// else
+		return new ContextCollectionProcessor(baseProcessor);
 
 	}
 

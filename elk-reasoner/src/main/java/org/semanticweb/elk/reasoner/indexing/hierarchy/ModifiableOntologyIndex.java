@@ -26,6 +26,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 
 /**
  * Common methods for constructing an {@link OntologyIndex}. They allow addition
@@ -155,8 +156,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 * @param newRule
 	 *            the context rule to be added
 	 */
-	public void add(IndexedClassExpression target,
-			ChainableRule<IndexedClassExpression> newRule);
+	public void add(IndexedClassExpression target, ChainableSubsumerRule newRule);
 
 	/**
 	 * Removes an existing context rule for the given
@@ -171,8 +171,7 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 *             if the given rule was not registered with this
 	 *             {@link IndexedClassExpression}
 	 */
-	public void remove(IndexedClassExpression target,
-			ChainableRule<IndexedClassExpression> oldRule)
+	public void remove(IndexedClassExpression target, ChainableSubsumerRule oldRule)
 			throws ElkUnexpectedIndexingException;
 
 }

@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -27,18 +28,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * A visitor pattern for rules applied to {@link IndexedClassExpression}s used
- * to be used when processing {@link Subsumer}s in a {@link Context}
+ * A visitor pattern for {@link LinkedSubsumerRule}s
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface SubsumerRuleVisitor {
+public interface LinkedSubsumerRuleVisitor {
 
 	void visit(ContradictionFromDisjointnessRule rule,
-			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer);
-
-	void visit(DisjointSubsumerFromMemberRule rule,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer);
 
@@ -46,7 +42,15 @@ public interface SubsumerRuleVisitor {
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer);
 
+	void visit(DisjointSubsumerFromMemberRule rule,
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer);
+
 	void visit(ObjectIntersectionFromConjunctRule rule,
+			IndexedClassExpression premise, Context context,
+			SaturationStateWriter writer);
+
+	void visit(ObjectUnionFromDisjunctRule rule,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer);
 
@@ -54,8 +58,7 @@ public interface SubsumerRuleVisitor {
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer);
 
-	void visit(ObjectUnionFromDisjunctRule rule,
-			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer);
+	void visit(SuperClassFromSubClassRule rule, IndexedClassExpression premise,
+			Context context, SaturationStateWriter writer);
 
 }

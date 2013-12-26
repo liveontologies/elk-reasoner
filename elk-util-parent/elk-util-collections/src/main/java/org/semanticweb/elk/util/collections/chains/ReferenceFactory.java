@@ -32,7 +32,7 @@ package org.semanticweb.elk.util.collections.chains;
  * @param <O>
  *            the type of the output references
  */
-public interface ReferenceFactory<T, O extends ModifiableLink<T>> {
+public interface ReferenceFactory<T, O> {
 
 	/**
 	 * Creates a references to the given object

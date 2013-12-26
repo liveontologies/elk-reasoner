@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -35,8 +36,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -47,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The composition rule producing {@link Propagation} of a {@link Subsumer}
+ * The rule producing {@link Propagation} of a {@link Subsumer}
  * {@link IndexedObjectSomeValuesFrom} over {@link BackwardLink}s when the
  * {@link IndexedClassExpression} filler of this
  * {@link IndexedObjectSomeValuesFrom} provided it can be used with at least one
@@ -56,8 +55,8 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class PropagationFromExistentialFillerRule extends
-		ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
-		ChainableRule<IndexedClassExpression> {
+		ModifiableLinkImpl<ChainableSubsumerRule> implements
+		ChainableSubsumerRule {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -67,8 +66,7 @@ public class PropagationFromExistentialFillerRule extends
 
 	private final Collection<IndexedObjectSomeValuesFrom> negExistentials_;
 
-	private PropagationFromExistentialFillerRule(
-			ChainableRule<IndexedClassExpression> next) {
+	private PropagationFromExistentialFillerRule(ChainableSubsumerRule next) {
 		super(next);
 		this.negExistentials_ = new ArrayList<IndexedObjectSomeValuesFrom>(1);
 	}
@@ -110,7 +108,7 @@ public class PropagationFromExistentialFillerRule extends
 		final Set<IndexedPropertyChain> candidatePropagationProperties = context
 				.getBackwardLinksByObjectProperty().keySet();
 
-		// TODO: deal with reflexive roles using another composition
+		// TODO: deal with reflexive roles using another
 		// rule and uncomment this
 
 		// if (candidatePropagationProperties.isEmpty()) {
@@ -136,7 +134,7 @@ public class PropagationFromExistentialFillerRule extends
 	}
 
 	@Override
-	public boolean addTo(Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
 		PropagationFromExistentialFillerRule rule = ruleChain.getCreate(
 				MATCHER_, FACTORY_);
 		boolean changed = false;
@@ -150,8 +148,7 @@ public class PropagationFromExistentialFillerRule extends
 	}
 
 	@Override
-	public boolean removeFrom(
-			Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
 		boolean changed = false;
 		PropagationFromExistentialFillerRule rule = ruleChain.find(MATCHER_);
 
@@ -171,7 +168,7 @@ public class PropagationFromExistentialFillerRule extends
 	}
 
 	@Override
-	public void accept(CompositionRuleVisitor visitor,
+	public void accept(LinkedSubsumerRuleVisitor visitor,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer) {
 		visitor.visit(this, premise, context, writer);
@@ -212,8 +209,7 @@ public class PropagationFromExistentialFillerRule extends
 
 	}
 
-	public static void applyForProperty(
-			Chain<ChainableRule<IndexedClassExpression>> ruleChain,
+	public static void applyForProperty(Chain<ChainableSubsumerRule> ruleChain,
 			IndexedPropertyChain property, Context context,
 			SaturationStateWriter writer) {
 		PropagationFromExistentialFillerRule rule = ruleChain.find(MATCHER_);
@@ -225,13 +221,13 @@ public class PropagationFromExistentialFillerRule extends
 
 	}
 
-	private static final Matcher<ChainableRule<IndexedClassExpression>, PropagationFromExistentialFillerRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, PropagationFromExistentialFillerRule>(
+	private static final Matcher<ChainableSubsumerRule, PropagationFromExistentialFillerRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableSubsumerRule, PropagationFromExistentialFillerRule>(
 			PropagationFromExistentialFillerRule.class);
 
-	private static final ReferenceFactory<ChainableRule<IndexedClassExpression>, PropagationFromExistentialFillerRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, PropagationFromExistentialFillerRule>() {
+	private static final ReferenceFactory<ChainableSubsumerRule, PropagationFromExistentialFillerRule> FACTORY_ = new ReferenceFactory<ChainableSubsumerRule, PropagationFromExistentialFillerRule>() {
 		@Override
 		public PropagationFromExistentialFillerRule create(
-				ChainableRule<IndexedClassExpression> next) {
+				ChainableSubsumerRule next) {
 			return new PropagationFromExistentialFillerRule(next);
 		}
 	};

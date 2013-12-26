@@ -22,23 +22,17 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.Rule;
+import org.semanticweb.elk.util.collections.chains.Link;
 
 /**
- * 
- * A {@link Rule} applied when processing {@link IndexedClassExpression}s of
- * {@link Subsumer}s in a {@link Context}
+ * A {@link SubsumerRule} that is linked to other such
+ * {@link LinkedSubsumerRule}s, thus representing a chain of
+ * {@link SubsumerRule}s
  * 
  * @author "Yevgeny Kazakov"
+ * 
  */
-public interface SubsumerRule extends Rule<IndexedClassExpression> {
-
-	public void accept(LinkedSubsumerRuleVisitor visitor,
-			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer);
+public interface LinkedSubsumerRule extends SubsumerRule,
+		Link<LinkedSubsumerRule> {
 
 }

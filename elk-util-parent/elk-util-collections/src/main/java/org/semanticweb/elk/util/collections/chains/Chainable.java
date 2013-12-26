@@ -44,7 +44,8 @@ public interface Chainable<T extends ModifiableLink<T>> {
 	/**
 	 * Removes this element from the given {@link Chain}
 	 * 
-	 * @param chain to be removed
+	 * @param chain
+	 *            to be removed
 	 * @return {@code true} if the input {@link Chain} has been modified
 	 */
 	public boolean removeFrom(Chain<T> chain);

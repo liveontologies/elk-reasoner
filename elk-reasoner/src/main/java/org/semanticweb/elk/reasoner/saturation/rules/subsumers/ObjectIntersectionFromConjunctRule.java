@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -31,8 +32,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -44,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The composition rule producing {@link Subsumer} for an
+ * The rule producing {@link Subsumer} for an
  * {@link IndexedObjectIntersectionOf} when processing one of its conjunct
  * {@link IndexedClassExpression} and when the other conjunct is contained in
  * the {@link Context}
@@ -52,8 +51,8 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class ObjectIntersectionFromConjunctRule extends
-		ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
-		ChainableRule<IndexedClassExpression> {
+		ModifiableLinkImpl<ChainableSubsumerRule> implements
+		ChainableSubsumerRule {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -63,8 +62,7 @@ public class ObjectIntersectionFromConjunctRule extends
 
 	private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
 
-	private ObjectIntersectionFromConjunctRule(
-			ChainableRule<IndexedClassExpression> tail) {
+	private ObjectIntersectionFromConjunctRule(ChainableSubsumerRule tail) {
 		super(tail);
 		this.conjunctionsByConjunct_ = new ArrayHashMap<IndexedClassExpression, IndexedObjectIntersectionOf>(
 				4);
@@ -119,8 +117,9 @@ public class ObjectIntersectionFromConjunctRule extends
 				secondConjunct, conjunct));
 		// if both conjuncts are the same, do not index the second time
 		if (!secondConjunct.equals(firstConjunct))
-			index.remove(secondConjunct, new ObjectIntersectionFromConjunctRule(
-					firstConjunct, conjunct));
+			index.remove(secondConjunct,
+					new ObjectIntersectionFromConjunctRule(firstConjunct,
+							conjunct));
 	}
 
 	// TODO: hide this method
@@ -141,7 +140,7 @@ public class ObjectIntersectionFromConjunctRule extends
 	}
 
 	@Override
-	public boolean addTo(Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
 		ObjectIntersectionFromConjunctRule rule = ruleChain.getCreate(MATCHER_,
 				FACTORY_);
 		boolean changed = false;
@@ -157,8 +156,7 @@ public class ObjectIntersectionFromConjunctRule extends
 	}
 
 	@Override
-	public boolean removeFrom(
-			Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
 		ObjectIntersectionFromConjunctRule rule = ruleChain.find(MATCHER_);
 		boolean changed = false;
 
@@ -178,7 +176,7 @@ public class ObjectIntersectionFromConjunctRule extends
 	}
 
 	@Override
-	public void accept(CompositionRuleVisitor visitor,
+	public void accept(LinkedSubsumerRuleVisitor visitor,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer) {
 		visitor.visit(this, premise, context, writer);
@@ -207,13 +205,13 @@ public class ObjectIntersectionFromConjunctRule extends
 		return conjunctionsByConjunct_.isEmpty();
 	}
 
-	private static final Matcher<ChainableRule<IndexedClassExpression>, ObjectIntersectionFromConjunctRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, ObjectIntersectionFromConjunctRule>(
+	private static final Matcher<ChainableSubsumerRule, ObjectIntersectionFromConjunctRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableSubsumerRule, ObjectIntersectionFromConjunctRule>(
 			ObjectIntersectionFromConjunctRule.class);
 
-	private static final ReferenceFactory<ChainableRule<IndexedClassExpression>, ObjectIntersectionFromConjunctRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, ObjectIntersectionFromConjunctRule>() {
+	private static final ReferenceFactory<ChainableSubsumerRule, ObjectIntersectionFromConjunctRule> FACTORY_ = new ReferenceFactory<ChainableSubsumerRule, ObjectIntersectionFromConjunctRule>() {
 		@Override
 		public ObjectIntersectionFromConjunctRule create(
-				ChainableRule<IndexedClassExpression> tail) {
+				ChainableSubsumerRule tail) {
 			return new ObjectIntersectionFromConjunctRule(tail);
 		}
 	};

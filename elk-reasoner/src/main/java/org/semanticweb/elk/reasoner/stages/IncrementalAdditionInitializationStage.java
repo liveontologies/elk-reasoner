@@ -48,6 +48,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -74,7 +75,7 @@ public class IncrementalAdditionInitializationStage extends
 
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		ChainableRule<Void> changedInitRules = null;
-		Map<IndexedClassExpression, ChainableRule<IndexedClassExpression>> changedRulesByCE = null;
+		Map<IndexedClassExpression, ChainableSubsumerRule> changedRulesByCE = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 		CompositionRuleVisitor initRuleAppVisitor = SaturationUtils
 				.getStatsAwareCompositionRuleAppVisitor(stageStatistics_

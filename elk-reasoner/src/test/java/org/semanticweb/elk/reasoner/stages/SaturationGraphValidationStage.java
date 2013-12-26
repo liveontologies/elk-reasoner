@@ -50,8 +50,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
@@ -122,8 +123,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			}
 
 			// validating context rules
-			LinkRule<IndexedClassExpression> rule = ice
-					.getCompositionRuleHead();
+			LinkedSubsumerRule rule = ice.getCompositionRuleHead();
 
 			while (rule != null) {
 				rule.accept(ruleValidator_, ice, null, null);
@@ -261,6 +261,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(OwlThingContextInitializationRule rule,
 				Context context, SaturationStateWriter writer) {
+			// nothing is stored in the rule
 		}
 
 		@Override

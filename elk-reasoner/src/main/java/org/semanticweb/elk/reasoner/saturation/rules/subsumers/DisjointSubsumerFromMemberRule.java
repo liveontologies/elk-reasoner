@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -29,8 +30,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -41,7 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The composition rule producing {@link DisjointSubsumer} when processing an
+ * The rule producing {@link DisjointSubsumer} when processing an
  * {@link IndexedClassExpression} that is present in an
  * {@link IndexedDisjointnessAxiom} of this {@link DisjointSubsumer} exactly
  * once.
@@ -52,8 +51,8 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class DisjointSubsumerFromMemberRule extends
-		ModifiableLinkImpl<ChainableRule<IndexedClassExpression>> implements
-		ChainableRule<IndexedClassExpression> {
+		ModifiableLinkImpl<ChainableSubsumerRule> implements
+		ChainableSubsumerRule {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -67,14 +66,13 @@ public class DisjointSubsumerFromMemberRule extends
 	 */
 	private final Set<IndexedDisjointnessAxiom> disjointnessAxioms_;
 
-	private DisjointSubsumerFromMemberRule(
-			ChainableRule<IndexedClassExpression> tail) {
+	private DisjointSubsumerFromMemberRule(ChainableSubsumerRule tail) {
 		super(tail);
 		disjointnessAxioms_ = new ArrayHashSet<IndexedDisjointnessAxiom>();
 	}
 
 	private DisjointSubsumerFromMemberRule(IndexedDisjointnessAxiom axiom) {
-		this((ChainableRule<IndexedClassExpression>) null);
+		this((ChainableSubsumerRule) null);
 		disjointnessAxioms_.add(axiom);
 	}
 
@@ -101,7 +99,7 @@ public class DisjointSubsumerFromMemberRule extends
 	}
 
 	@Override
-	public void accept(CompositionRuleVisitor visitor,
+	public void accept(LinkedSubsumerRuleVisitor visitor,
 			IndexedClassExpression premise, Context context,
 			SaturationStateWriter writer) {
 		visitor.visit(this, premise, context, writer);
@@ -121,15 +119,14 @@ public class DisjointSubsumerFromMemberRule extends
 	}
 
 	@Override
-	public boolean addTo(Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
 		DisjointSubsumerFromMemberRule rule = ruleChain.getCreate(MATCHER_,
 				FACTORY_);
 		return rule.disjointnessAxioms_.addAll(this.disjointnessAxioms_);
 	}
 
 	@Override
-	public boolean removeFrom(
-			Chain<ChainableRule<IndexedClassExpression>> ruleChain) {
+	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
 		DisjointSubsumerFromMemberRule rule = ruleChain.find(MATCHER_);
 		boolean changed = false;
 		if (rule != null) {
@@ -141,13 +138,12 @@ public class DisjointSubsumerFromMemberRule extends
 		return changed;
 	}
 
-	private static Matcher<ChainableRule<IndexedClassExpression>, DisjointSubsumerFromMemberRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<IndexedClassExpression>, DisjointSubsumerFromMemberRule>(
+	private static Matcher<ChainableSubsumerRule, DisjointSubsumerFromMemberRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableSubsumerRule, DisjointSubsumerFromMemberRule>(
 			DisjointSubsumerFromMemberRule.class);
 
-	private static ReferenceFactory<ChainableRule<IndexedClassExpression>, DisjointSubsumerFromMemberRule> FACTORY_ = new ReferenceFactory<ChainableRule<IndexedClassExpression>, DisjointSubsumerFromMemberRule>() {
+	private static ReferenceFactory<ChainableSubsumerRule, DisjointSubsumerFromMemberRule> FACTORY_ = new ReferenceFactory<ChainableSubsumerRule, DisjointSubsumerFromMemberRule>() {
 		@Override
-		public DisjointSubsumerFromMemberRule create(
-				ChainableRule<IndexedClassExpression> tail) {
+		public DisjointSubsumerFromMemberRule create(ChainableSubsumerRule tail) {
 			return new DisjointSubsumerFromMemberRule(tail);
 		}
 	};

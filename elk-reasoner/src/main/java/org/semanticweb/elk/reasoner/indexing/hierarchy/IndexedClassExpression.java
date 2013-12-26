@@ -26,9 +26,10 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -53,7 +54,7 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 * The first composition rule assigned to this
 	 * {@link IndexedClassExpression}
 	 */
-	ChainableRule<IndexedClassExpression> compositionRuleHead;
+	ChainableSubsumerRule compositionRuleHead;
 
 	/**
 	 * This counts how often this object occurred positively. Some indexing
@@ -203,7 +204,7 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 *         {@link LinkRule#next()}; this method should be used to access the
 	 *         rules without modifying them.
 	 */
-	public LinkRule<IndexedClassExpression> getCompositionRuleHead() {
+	public LinkedSubsumerRule getCompositionRuleHead() {
 		return compositionRuleHead;
 	}
 
@@ -215,15 +216,15 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 *         {@link Chain} interface without worrying about {@code null}
 	 *         values.
 	 */
-	Chain<ChainableRule<IndexedClassExpression>> getCompositionRuleChain() {
-		return new AbstractChain<ChainableRule<IndexedClassExpression>>() {
+	Chain<ChainableSubsumerRule> getCompositionRuleChain() {
+		return new AbstractChain<ChainableSubsumerRule>() {
 			@Override
-			public ChainableRule<IndexedClassExpression> next() {
+			public ChainableSubsumerRule next() {
 				return compositionRuleHead;
 			}
 
 			@Override
-			public void setNext(ChainableRule<IndexedClassExpression> tail) {
+			public void setNext(ChainableSubsumerRule tail) {
 				compositionRuleHead = tail;
 			}
 		};
