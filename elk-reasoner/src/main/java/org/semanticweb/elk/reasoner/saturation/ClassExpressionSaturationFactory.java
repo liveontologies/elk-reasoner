@@ -26,13 +26,13 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The factory for engines that concurrently submit, process, and post-process
@@ -124,7 +124,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	private final AtomicInteger countContextsFinished_ = new AtomicInteger(0);
 	/**
 	 * The threshold used to submit new jobs. The job is successfully submitted
-	 * if difference between {@link #countContextsCreated_} and {
+	 * if the difference between {@link #countContextsCreated_} and
 	 * {@link #countContextsProcessed_} is less than {@link #threshold_};
 	 * otherwise the computation is suspended, and will resume only when all
 	 * possible rules are applied.
@@ -156,15 +156,15 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	private final ThisStatistics aggregatedStats_;
 
 	/**
-	 * Creates a new saturation engine using the given saturation state, listener
-	 * for callback functions, and threshold for the number of unprocessed
-	 * contexts. The threshold has influence on the size of the batches of the
-	 * input jobs that are processed simultaneously, which, in turn, has an
-	 * effect on throughput and latency of the saturation: in general, the
-	 * larger the threshold is, the faster it takes (in theory) to perform the
-	 * overall processing of jobs, but it might take longer to process an
-	 * individual job because it is possible to detect that the job is processed
-	 * only when the whole batch of jobs is processed.
+	 * Creates a new saturation engine using the given saturation state,
+	 * listener for callback functions, and threshold for the number of
+	 * unprocessed contexts. The threshold has influence on the size of the
+	 * batches of the input jobs that are processed simultaneously, which, in
+	 * turn, has an effect on throughput and latency of the saturation: in
+	 * general, the larger the threshold is, the faster it takes (in theory) to
+	 * perform the overall processing of jobs, but it might take longer to
+	 * process an individual job because it is possible to detect that the job
+	 * is processed only when the whole batch of jobs is processed.
 	 * 
 	 * @param saturationState
 	 *            the current state of saturation
@@ -191,7 +191,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	}
 
 	/**
-	 * Creates a new saturation factory using the given rule application factory.
+	 * Creates a new saturation factory using the given rule application
+	 * factory.
 	 * 
 	 * @param ruleAppFactory
 	 * @param maxWorkers
@@ -266,10 +267,10 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			}
 			if (countContextsFinished_.compareAndSet(shapshotContextsFinished,
 					shapshotContextsFinished + 1)) {
-				
+
 				Context nextContext = nonSaturatedContexts_.poll();
-				
-				nextContext.setSaturated(true);				 
+
+				nextContext.setSaturated(true);
 			}
 		}
 		for (;;) {
@@ -292,13 +293,14 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				 */
 				J nextJob = jobsInProgress_.poll();
 				IndexedClassExpression root = nextJob.getInput();
-				Context rootSaturation = ruleApplicationFactory_.getSaturationState().getContext(root);
-				
+				Context rootSaturation = ruleApplicationFactory_
+						.getSaturationState().getContext(root);
+
 				rootSaturation.setSaturated(true);
 				nextJob.setOutput(rootSaturation);
-				
+
 				LOGGER_.trace("{}: saturation finished", root);
-			
+
 				localStatistics.jobsProcessedNo++;
 				listener_.notifyFinished(nextJob);
 			}
@@ -374,7 +376,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 
 	public class Engine implements InputProcessor<J> {
 
-		private final RuleApplicationFactory.BaseEngine ruleApplicationEngine_ = ruleApplicationFactory_
+		private final InputProcessor<IndexedClassExpression> ruleApplicationEngine_ = ruleApplicationFactory_
 				.getDefaultEngine(new ContextCreationListener() {
 					@Override
 					public void notifyContextCreation(Context newContext) {
@@ -467,8 +469,9 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				 * if the context is already assigned and saturated, this job is
 				 * already complete
 				 */
-				Context rootContext = ruleApplicationFactory_.getSaturationState().getContext(root);//root.getContext();
-				
+				Context rootContext = ruleApplicationFactory_
+						.getSaturationState().getContext(root);// root.getContext();
+
 				if (rootContext != null && rootContext.isSaturated()) {
 					nextJob.setOutput(rootContext);
 					stats_.jobsAlreadyDoneNo++;
@@ -486,12 +489,12 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				countJobsSubmitted_.incrementAndGet();
 				ruleApplicationEngine_.submit(root);
 				ruleApplicationEngine_.process();
-				
+
 				if (Thread.currentThread().isInterrupted()) {
 					updateIfSmaller(lastInterruptStartedWorkersSnapshot_,
 							countStartedWorkers_.get());
 				}
-				
+
 				updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
 				processFinishedCounters(stats_); // can throw
 													// InterruptedException

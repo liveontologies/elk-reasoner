@@ -23,9 +23,9 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 
 /**
@@ -35,10 +35,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface SubsumerRule extends Rule<IndexedClassExpression> {
+public interface SubsumerRule<P extends IndexedClassExpression> extends Rule<P> {
 
-	public void accept(LinkedSubsumerRuleVisitor visitor,
-			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer);
+	public void accept(SubsumerRuleVisitor visitor, P premise, Context context,
+			ConclusionProducer producer);
 
 }

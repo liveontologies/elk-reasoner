@@ -29,15 +29,15 @@ import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyCleaning;
 import org.semanticweb.elk.util.collections.Operations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used to clean both class and instance taxonomies (removed nodes which
@@ -69,7 +69,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		if (!super.preExecute()) {
 			return false;
 		}
-		
+
 		final Collection<IndexedClassEntity> modified = new ContextRootCollection(
 				reasoner.saturationState.getNotSaturatedContexts());
 		final Collection<IndexedClassEntity> removedClasses = new ContextRootCollection(
@@ -77,8 +77,10 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		final Collection<IndexedClassEntity> removedIndividuals = new ContextRootCollection(
 				reasoner.instanceTaxonomyState.getRemovedIndividuals());
 		Collection<IndexedClassEntity> inputs = Operations.getCollection(
-				Operations.concat(Operations.concat(removedClasses, modified), removedIndividuals),
-				removedClasses.size() + modified.size() + removedIndividuals.size());
+				Operations.concat(Operations.concat(removedClasses, modified),
+						removedIndividuals),
+				removedClasses.size() + modified.size()
+						+ removedIndividuals.size());
 
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("Taxonomy nodes to be cleaned for modified contexts: "
@@ -88,11 +90,10 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			LOGGER_.trace("Instance taxonomy nodes to be cleaned for removed individuals: "
 					+ removedIndividuals);
 		}
-		
-		cleaning_ = new TaxonomyCleaning(inputs,
-				reasoner.classTaxonomyState, reasoner.instanceTaxonomyState,
-				reasoner.getProcessExecutor(), workerNo, progressMonitor);
-		
+
+		cleaning_ = new TaxonomyCleaning(inputs, reasoner.classTaxonomyState,
+				reasoner.instanceTaxonomyState, reasoner.getProcessExecutor(),
+				workerNo, progressMonitor);
 
 		return true;
 	}
@@ -117,12 +118,13 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			return false;
 		}
 		// at this point we're done with unsaturated contexts
-		reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY)
+		reasoner.saturationState
+				.getWriter(DummyConclusionVisitor.getInstance())
 				.clearNotSaturatedContexts();
 		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
 		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
 		this.cleaning_ = null;
-		
+
 		return true;
 	}
 

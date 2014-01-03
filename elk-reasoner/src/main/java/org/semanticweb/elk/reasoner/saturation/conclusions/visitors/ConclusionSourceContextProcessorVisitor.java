@@ -1,0 +1,76 @@
+package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
+
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextProcessor;
+
+/**
+ * A {@link ConclusionVisitor} that processes the source {@link Context} of the
+ * {@link Conclusion} using the given {@link ContextProcessor} if the
+ * {@link Conclusion} can potentially be re-derived. The visit method returns
+ * {@link true} only if the source {@link Context} has changed in this way.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+public class ConclusionSourceContextProcessorVisitor extends
+		AbstractConclusionVisitor<Boolean> {
+
+	private final ContextProcessor processor_;
+
+	public ConclusionSourceContextProcessorVisitor(ContextProcessor processor) {
+		this.processor_ = processor;
+	}
+
+	@Override
+	Boolean defaultVisit(Conclusion conclusion, Context context) {
+		Context sourceContext = conclusion.getSourceContext(context);
+		return sourceContext == null ? false : processor_
+				.process(sourceContext);
+	}
+
+	Boolean defaultVisit(Subsumer conclusion, Context context) {
+		// if the subsumer does not occur in the ontology anymore, it cannot be
+		// re-derived, and thus, the context should not be modified
+		// TODO: extend this check to other types of conclusions
+		if (!conclusion.getExpression().occurs())
+			return false;
+		// else
+		return defaultVisit((Conclusion) conclusion, context);
+	}
+
+	@Override
+	public Boolean visit(ComposedSubsumer conclusion, Context context) {
+		return defaultVisit(conclusion, context);
+	}
+
+	@Override
+	public Boolean visit(DecomposedSubsumer conclusion, Context context) {
+		return defaultVisit(conclusion, context);
+	}
+}

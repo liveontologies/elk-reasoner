@@ -34,10 +34,8 @@ import org.slf4j.Logger;
 public class RuleStatistics {
 
 	// TODO: limit access
-	public final RuleApplicationCounter ruleCounter = new RuleApplicationCounter();
+	public final RuleCounter ruleCounter = new RuleCounter();
 	public final RuleApplicationTimer ruleTimer = new RuleApplicationTimer();
-	public final DecompositionRuleApplicationCounter decompositionRuleCounter = new DecompositionRuleApplicationCounter();
-	public final DecompositionRuleApplicationTimer decompositionRuleTimer = new DecompositionRuleApplicationTimer();
 
 	/**
 	 * The number of times measurements were taken in different threads. Used to
@@ -59,8 +57,6 @@ public class RuleStatistics {
 	 * Reset all timers to zero.
 	 */
 	public void reset() {
-		decompositionRuleCounter.reset();
-		decompositionRuleTimer.reset();
 		ruleCounter.reset();
 		ruleTimer.reset();
 		numOfMeasurements_ = 0;
@@ -69,8 +65,6 @@ public class RuleStatistics {
 	public synchronized void add(RuleStatistics stats) {
 		if (stats.measurementsTaken()) {
 			numOfMeasurements_ += stats.numOfMeasurements_;
-			decompositionRuleCounter.add(stats.decompositionRuleCounter);
-			decompositionRuleTimer.add(stats.decompositionRuleTimer);
 			ruleCounter.add(stats.ruleCounter);
 			ruleTimer.add(stats.ruleTimer);
 		}
@@ -81,135 +75,119 @@ public class RuleStatistics {
 		if (!logger.isDebugEnabled() || !measurementsTaken())
 			return;
 
-		if (ruleCounter.countForwardLinkBackwardLinkRule > 0)
+		if (ruleCounter.countBackwardLinkChainFromBackwardLinkRule > 0)
 			logger.debug("Forward link from backward link rules: "
-					+ ruleCounter.countForwardLinkBackwardLinkRule + " ("
-					+ ruleTimer.timeForwardLinkBackwardLinkRule
+					+ ruleCounter.countBackwardLinkChainFromBackwardLinkRule
+					+ " ("
+					+ ruleTimer.timeBackwardLinkChainFromBackwardLinkRule
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countIndexedDisjointnessAxiomContradictionRule > 0)
+		if (ruleCounter.countContradictionFromDisjointnessRule > 0)
 			logger.debug("Disjointness axiom contradiction rules: "
-					+ ruleCounter.countIndexedDisjointnessAxiomContradictionRule
-					+ " (" + ruleTimer.timeIndexedDisjointnessAxiomContradictionRule
+					+ ruleCounter.countContradictionFromDisjointnessRule + " ("
+					+ ruleTimer.timeContradictionFromDisjointnessRule
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countIndexedDisjointnessAxiomCompositionRule > 0)
+		if (ruleCounter.countDisjointSubsumerFromMemberRule > 0)
 			logger.debug("Disjointness axiom composition rules: "
-					+ ruleCounter.countIndexedDisjointnessAxiomCompositionRule + " ("
-					+ ruleTimer.timeIndexedDisjointnessAxiomCompositionRule
+					+ ruleCounter.countDisjointSubsumerFromMemberRule + " ("
+					+ ruleTimer.timeDisjointSubsumerFromMemberRule
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countOwlThingContextInitializationRule > 0)
+		if (ruleCounter.countOwlThingContextInitRule > 0)
 			logger.debug("owl:Thing context init rules: "
-					+ ruleCounter.countOwlThingContextInitializationRule + " ("
-					+ ruleTimer.timeOwlThingContextInitializationRule
+					+ ruleCounter.countOwlThingContextInitRule + " ("
+					+ ruleTimer.timeOwlThingContextInitRule
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countContextRootInitializationRule > 0)
+		if (ruleCounter.countRootContextInitializationRule > 0)
 			logger.debug("Context root init rules: "
-					+ ruleCounter.countContextRootInitializationRule + " ("
-					+ ruleTimer.timeContextRootInitializationRule
+					+ ruleCounter.countRootContextInitializationRule + " ("
+					+ ruleTimer.timeRootContextInitializationRule
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countIndexedSubClassOfAxiomCompositionRule > 0)
+		if (ruleCounter.countSuperClassFromSubClassRule > 0)
 			logger.debug("Subclass expansions: "
-					+ ruleCounter.countIndexedSubClassOfAxiomCompositionRule + " ("
-					+ ruleTimer.timeIndexedSubClassOfAxiomCompositionRule
+					+ ruleCounter.countSuperClassFromSubClassRule + " ("
+					+ ruleTimer.timeSuperClassFromSubClassRule
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countContradictionBottomBackwardLinkRule > 0)
+		if (ruleCounter.countContradictionOverBackwardLinkRule > 0)
 			logger.debug("Propagations of inconsistency: "
-					+ ruleCounter.countContradictionBottomBackwardLinkRule
-					+ " (" + ruleTimer.timeContradictionBottomBackwardLinkRule
+					+ ruleCounter.countContradictionOverBackwardLinkRule + " ("
+					+ ruleTimer.timeContradictionOverBackwardLinkRule
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countPropagationBackwardLinkRule > 0)
+		if (ruleCounter.countSubsumerBackwardLinkRule > 0)
 			logger.debug("Propagations via backward links: "
-					+ ruleCounter.countPropagationBackwardLinkRule + " ("
-					+ ruleTimer.timePropagationBackwardLinkRule
+					+ ruleCounter.countSubsumerBackwardLinkRule + " ("
+					+ ruleTimer.timeSubsumerBackwardLinkRule
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countIndexedObjectSomeValuesFromCompositionRule
-				+ decompositionRuleCounter.countIndexedObjectSomeValuesFromDecompositionRule > 0)
+		if (ruleCounter.countPropagationFromExistentialFillerRule
+				+ ruleCounter.countIndexedObjectSomeValuesFromDecomposition > 0)
 			logger.debug("ObjectSomeValuesFrom composition/decomposition rules: "
-					+ ruleCounter.countIndexedObjectSomeValuesFromCompositionRule
+					+ ruleCounter.countPropagationFromExistentialFillerRule
 					+ "/"
-					+ decompositionRuleCounter.countIndexedObjectSomeValuesFromDecompositionRule
+					+ ruleCounter.countIndexedObjectSomeValuesFromDecomposition
 					+ " ("
-					+ ruleTimer.timeIndexedObjectSomeValuesFromCompositionRule
+					+ ruleTimer.timePropagationFromExistentialFillerRule
 					/ numOfMeasurements_
 					+ "/"
-					+ decompositionRuleTimer.timeIndexedObjectSomeValuesFrom
+					+ ruleTimer.timeIndexedObjectSomeValuesFromDecomposition
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countIndexedObjectIntersectionOfCompositionRule
-				+ decompositionRuleCounter.countIndexedObjectIntersectionOfDecompositionRule > 0)
+		if (ruleCounter.countObjectIntersectionFromConjunctRule
+				+ ruleCounter.countIndexedObjectIntersectionOfDecomposition > 0)
 			logger.debug("ObjectIntersectionOf composition/decomposition rules: "
-					+ ruleCounter.countIndexedObjectIntersectionOfCompositionRule
+					+ ruleCounter.countObjectIntersectionFromConjunctRule
 					+ "/"
-					+ decompositionRuleCounter.countIndexedObjectIntersectionOfDecompositionRule
+					+ ruleCounter.countIndexedObjectIntersectionOfDecomposition
 					+ " ("
-					+ ruleTimer.timeObjectIndexedIntersectionOfCompositionRule
+					+ ruleTimer.timeObjectIntersectionFromConjunctRule
 					/ numOfMeasurements_
 					+ "/"
-					+ decompositionRuleTimer.timeIndexedObjectIntersectionOf
+					+ ruleTimer.timeIndexedObjectIntersectionOfDecomposition
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countIndexedObjectComplementOfCompositionRule
-				+ decompositionRuleCounter.countIndexedObjectComplementOfDecompositionRule > 0)
+		if (ruleCounter.countContradictionFromNegationRule
+				+ ruleCounter.countIndexedObjectComplementOfDecomposition > 0)
 			logger.debug("ObjectComplementOf composition/decomposition rules: "
-					+ ruleCounter.countIndexedObjectComplementOfCompositionRule
-					+ "/"
-					+ decompositionRuleCounter.countIndexedObjectComplementOfDecompositionRule
-					+ " (" + ruleTimer.timeObjectIndexedComplementOfCompositionRule
+					+ ruleCounter.countContradictionFromNegationRule + "/"
+					+ ruleCounter.countIndexedObjectComplementOfDecomposition
+					+ " (" + ruleTimer.timeContradictionFromNegationRule
 					/ numOfMeasurements_ + "/"
-					+ decompositionRuleTimer.timeIndexedObjectComplementOf
+					+ ruleTimer.timeIndexedObjectComplementOfDecomposition
 					/ numOfMeasurements_ + " ms)");
 
-		if (ruleCounter.countIndexedObjectUnionOfCompositionRule > 0)
+		if (ruleCounter.countObjectUnionFromDisjunctRule > 0)
 			logger.debug("ObjectUnionOf composition rules: "
-					+ ruleCounter.countIndexedObjectUnionOfCompositionRule + " ("
-					+ ruleTimer.timeIndexedObjectUnionOfCompositionRule
-					/ numOfMeasurements_ + " ms)");
-
-		if (decompositionRuleCounter.countIndexedClassDecompositionRule > 0)
-			logger.debug("Class decomposition rules: "
-					+ decompositionRuleCounter.countIndexedClassDecompositionRule
-					+ " (" + decompositionRuleTimer.timeIndexedClass
+					+ ruleCounter.countObjectUnionFromDisjunctRule + " ("
+					+ ruleTimer.timeObjectUnionFromDisjunctRule
 					/ numOfMeasurements_ + " ms)");
 
 		logger.debug("Total rule time: "
-				+ (ruleTimer.timeContradictionBottomBackwardLinkRule
-						+ ruleTimer.timeIndexedDisjointnessAxiomCompositionRule
-						+ ruleTimer.timeIndexedDisjointnessAxiomContradictionRule
-						+ ruleTimer.timeForwardLinkBackwardLinkRule
-						+ ruleTimer.timeObjectIndexedIntersectionOfCompositionRule
-						+ ruleTimer.timeIndexedObjectSomeValuesFromCompositionRule
-						+ ruleTimer.timeObjectIndexedComplementOfCompositionRule
-						+ ruleTimer.timeIndexedObjectUnionOfCompositionRule
-						+ ruleTimer.timeOwlThingContextInitializationRule
-						+ ruleTimer.timeContextRootInitializationRule
-						+ ruleTimer.timePropagationBackwardLinkRule
-						+ ruleTimer.timeIndexedSubClassOfAxiomCompositionRule
-						+ decompositionRuleTimer.timeIndexedClass
-						+ decompositionRuleTimer.timeIndexedDataHasValue
-						+ decompositionRuleTimer.timeIndexedObjectIntersectionOf
-						+ decompositionRuleTimer.timeIndexedObjectSomeValuesFrom + decompositionRuleTimer.timeIndexedObjectComplementOf)
-				/ numOfMeasurements_ + " ms");
+				+ (ruleTimer.timeContradictionOverBackwardLinkRule
+						+ ruleTimer.timeDisjointSubsumerFromMemberRule
+						+ ruleTimer.timeContradictionFromDisjointnessRule
+						+ ruleTimer.timeBackwardLinkChainFromBackwardLinkRule
+						+ ruleTimer.timeObjectIntersectionFromConjunctRule
+						+ ruleTimer.timePropagationFromExistentialFillerRule
+						+ ruleTimer.timeContradictionFromNegationRule
+						+ ruleTimer.timeObjectUnionFromDisjunctRule
+						+ ruleTimer.timeOwlThingContextInitRule
+						+ ruleTimer.timeRootContextInitializationRule
+						+ ruleTimer.timeSubsumerBackwardLinkRule
+						+ ruleTimer.timeSuperClassFromSubClassRule
+						/ numOfMeasurements_ + " ms"));
 	}
 
 	public long getTotalRuleAppCount() {
-		return ruleCounter.getTotalRuleAppCount()
-				+ decompositionRuleCounter.getTotalRuleAppCount();
+		return ruleCounter.getTotalRuleAppCount();
 	}
 
 	public double getTotalRuleTime() {
-		double compTotal = numOfMeasurements_ == 0 ? 0 : 1d
+		return numOfMeasurements_ == 0 ? 0 : 1d
 				* ruleTimer.getTotalRuleAppTime() / numOfMeasurements_;
-		double decompTotal = numOfMeasurements_ == 0 ? 0 : 1d
-				* decompositionRuleTimer.getTotalRuleAppTime()
-				/ numOfMeasurements_;
-
-		return compTotal + decompTotal;
 	}
 }

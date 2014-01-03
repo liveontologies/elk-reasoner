@@ -30,16 +30,21 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
+import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
 
 /**
@@ -88,7 +93,7 @@ public class ContextImpl implements Context {
 	 * the rules that should be applied to each derived {@link BackwardLink} in
 	 * this {@link Context}; can be {@code null}
 	 */
-	private ModifiableLinkRule<BackwardLink> backwardLinkRules_ = null;
+	private LinkableBackwardLinkRule backwardLinkRules_ = null;
 
 	/**
 	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
@@ -159,7 +164,7 @@ public class ContextImpl implements Context {
 	public boolean addContradiction() {
 		boolean before = isInconsistent;
 		isInconsistent = true;
-		Contradiction.getInstance().addTo(this);
+		ContradictionOverBackwardLinkRule.addTo(this);
 		return before != isInconsistent;
 	}
 
@@ -167,7 +172,7 @@ public class ContextImpl implements Context {
 	public boolean removeConradiction() {
 		boolean before = isInconsistent;
 		isInconsistent = false;
-		Contradiction.getInstance().removeFrom(this);
+		ContradictionOverBackwardLinkRule.removeFrom(this);
 		return before != isInconsistent;
 	}
 
@@ -293,23 +298,54 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public AbstractChain<ModifiableLinkRule<BackwardLink>> getBackwardLinkRuleChain() {
-		return new AbstractChain<ModifiableLinkRule<BackwardLink>>() {
+	public boolean addForwardLink(ForwardLink link) {
+		return BackwardLinkChainFromBackwardLinkRule.addRuleFor(link, this);
+	}
+
+	@Override
+	public boolean removeForwardLink(ForwardLink link) {
+		return BackwardLinkChainFromBackwardLinkRule.removeRuleFor(link, this);
+	}
+
+	@Override
+	public boolean containsForwardLink(ForwardLink link) {
+		return BackwardLinkChainFromBackwardLinkRule
+				.containsRuleFor(link, this);
+	}
+
+	@Override
+	public boolean addPropagation(Propagation propagation) {
+		return SubsumerBackwardLinkRule.addRuleFor(propagation, this);
+	}
+
+	@Override
+	public boolean removePropagation(Propagation propagation) {
+		return SubsumerBackwardLinkRule.removeRuleFor(propagation, this);
+	}
+
+	@Override
+	public boolean containsPropagation(Propagation propagation) {
+		return SubsumerBackwardLinkRule.containsRuleFor(propagation, this);
+	}
+
+	@Override
+	public Chain<LinkableBackwardLinkRule> getBackwardLinkRuleChain() {
+		return new AbstractChain<LinkableBackwardLinkRule>() {
 
 			@Override
-			public ModifiableLinkRule<BackwardLink> next() {
+			public LinkableBackwardLinkRule next() {
 				return backwardLinkRules_;
 			}
 
 			@Override
-			public void setNext(ModifiableLinkRule<BackwardLink> tail) {
+			public void setNext(LinkableBackwardLinkRule tail) {
 				backwardLinkRules_ = tail;
 			}
 		};
 	}
 
 	@Override
-	public ModifiableLinkRule<BackwardLink> getBackwardLinkRuleHead() {
+	public LinkableBackwardLinkRule getBackwardLinkRuleHead() {
 		return backwardLinkRules_;
 	}
 

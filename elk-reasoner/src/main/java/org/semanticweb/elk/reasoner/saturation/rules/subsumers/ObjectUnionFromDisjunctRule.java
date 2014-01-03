@@ -27,28 +27,26 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The rule producing {@link Subsumer} for an {@link IndexedObjectUnionOf} when
- * processing one of its disjunct {@link IndexedClassExpression}
+ * A {@link ChainableSubsumerRule} producing {@link Subsumer} for an
+ * {@link IndexedObjectUnionOf} when processing one of its disjunct
+ * {@link IndexedClassExpression}
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ObjectUnionFromDisjunctRule extends
-		ModifiableLinkImpl<ChainableSubsumerRule> implements
-		ChainableSubsumerRule {
+public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -93,8 +91,8 @@ public class ObjectUnionFromDisjunctRule extends
 	@Override
 	public void accept(LinkedSubsumerRuleVisitor visitor,
 			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer) {
-		visitor.visit(this, premise, context, writer);
+			ConclusionProducer producer) {
+		visitor.visit(this, premise, context, producer);
 	}
 
 	// TODO: hide this method
@@ -104,11 +102,11 @@ public class ObjectUnionFromDisjunctRule extends
 
 	@Override
 	public void apply(IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer) {
+			ConclusionProducer producer) {
 		LOGGER_.trace("Applying {} to {}", NAME_, context);
 
 		for (IndexedClassExpression disjunction : disjunctions_)
-			writer.produce(context, new ComposedSubsumer(disjunction));
+			producer.produce(context, new ComposedSubsumer(disjunction));
 	}
 
 	@Override

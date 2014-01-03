@@ -26,8 +26,6 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 
 /**
  * Represents all occurrences of an {@link ElkIndividual} in an ontology.
@@ -90,11 +88,6 @@ public class IndexedIndividual extends IndexedClassEntity {
 	public String toStringStructural() {
 		return "ObjectOneOf(<"
 				+ elkNamedIndividual_.getIri().getFullIriAsString() + ">)";
-	}
-
-	@Override
-	public void accept(SubsumerDecompositionVisitor visitor, Context context) {
-		visitor.visit(this, context);
 	}
 
 }

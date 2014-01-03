@@ -39,6 +39,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 
 /**
  * An object representing the compiled logical information about the ontology
@@ -120,6 +121,6 @@ public interface OntologyIndex {
 	 *         all other rules can be obtained by traversing over
 	 *         {@link LinkRule#next()}
 	 */
-	LinkRule<Void> getContextInitRuleHead();
+	LinkedContextInitRule getContextInitRuleHead();
 
 }

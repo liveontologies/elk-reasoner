@@ -28,8 +28,6 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 
 /**
  * Represents all occurrences of an {@link ElkObjectHasValue} in an ontology.
@@ -81,8 +79,4 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 				+ ">)";
 	}
 
-	@Override
-	public void accept(SubsumerDecompositionVisitor visitor, Context context) {
-		visitor.visit(this, context);
-	}
 }

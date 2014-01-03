@@ -26,27 +26,28 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkUnexpectedIndexingExce
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The rule producing {@link Contradiction} when processing the negated
- * {@link IndexedClassExpression} of an {@link IndexedObjectComplementOf} if
- * this {@link IndexedObjectComplementOf} is contained in the {@code Context}.
+ * A {@link ChainableSubsumerRule} producing {@link Contradiction} when
+ * processing the negated {@link IndexedClassExpression} of an
+ * {@link IndexedObjectComplementOf} that is contained in the {@code Context} .
+ * 
+ * @see IndexedObjectComplementOf#getNegated()
+ * @see IndexedObjectIntersectionOfDecomposition
  * 
  * @author "Yevgeny Kazakov"
  */
 public class ContradictionFromNegationRule extends
-		ModifiableLinkImpl<ChainableSubsumerRule> implements
-		ChainableSubsumerRule {
+		AbstractChainableSubsumerRule {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -54,16 +55,16 @@ public class ContradictionFromNegationRule extends
 
 	private static final String NAME_ = "ObjectComplementOf Clash";
 
-	private IndexedClassExpression negation_;
+	private IndexedObjectComplementOf negation_;
 
 	private ContradictionFromNegationRule(ChainableSubsumerRule tail) {
 		super(tail);
 
 	}
 
-	private ContradictionFromNegationRule(IndexedClassExpression complement) {
+	private ContradictionFromNegationRule(IndexedObjectComplementOf negation) {
 		this((ChainableSubsumerRule) null);
-		this.negation_ = complement;
+		this.negation_ = negation;
 	}
 
 	public static void addRulesFor(IndexedObjectComplementOf negation,
@@ -90,11 +91,10 @@ public class ContradictionFromNegationRule extends
 
 	@Override
 	public void apply(IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer) {
+			ConclusionProducer producer) {
 		LOGGER_.trace("Applying {} to {}", NAME_, context);
-
 		if (negation_ != null && context.getSubsumers().contains(negation_))
-			writer.produce(context, Contradiction.getInstance());
+			producer.produce(context, Contradiction.getInstance());
 	}
 
 	@Override
@@ -140,8 +140,8 @@ public class ContradictionFromNegationRule extends
 	@Override
 	public void accept(LinkedSubsumerRuleVisitor visitor,
 			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer) {
-		visitor.visit(this, premise, context, writer);
+			ConclusionProducer producer) {
+		visitor.visit(this, premise, context, producer);
 	}
 
 	/**

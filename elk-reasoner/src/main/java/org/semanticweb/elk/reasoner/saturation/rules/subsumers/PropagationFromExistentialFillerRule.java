@@ -30,33 +30,31 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The rule producing {@link Propagation} of a {@link Subsumer}
- * {@link IndexedObjectSomeValuesFrom} over {@link BackwardLink}s when the
- * {@link IndexedClassExpression} filler of this
+ * A {@link ChainableSubsumerRule} producing {@link Propagation} of a
+ * {@link Subsumer} {@link IndexedObjectSomeValuesFrom} over
+ * {@link BackwardLink}s when the {@link IndexedClassExpression} filler of this
  * {@link IndexedObjectSomeValuesFrom} provided it can be used with at least one
  * {@link BackwardLink} in this {@link Context}
  * 
  * @author "Yevgeny Kazakov"
  */
 public class PropagationFromExistentialFillerRule extends
-		ModifiableLinkImpl<ChainableSubsumerRule> implements
-		ChainableSubsumerRule {
+		AbstractChainableSubsumerRule {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -102,7 +100,7 @@ public class PropagationFromExistentialFillerRule extends
 
 	@Override
 	public void apply(IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer) {
+			ConclusionProducer producer) {
 		LOGGER_.trace("Applying {} to {}", NAME_, context);
 
 		final Set<IndexedPropertyChain> candidatePropagationProperties = context
@@ -123,13 +121,13 @@ public class PropagationFromExistentialFillerRule extends
 			for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
 					candidatePropagationProperties, relation.getSaturated()
 							.getSubProperties())) {
-				writer.produce(context, new Propagation(property, e));
+				producer.produce(context, new Propagation(property, e));
 			}
 
 			// TODO: create a composition rule to deal with reflexivity
 			// propagating to the this context if relation is reflexive
 			if (relation.getSaturated().isDerivedReflexive())
-				writer.produce(context, new ComposedSubsumer(e));
+				producer.produce(context, new ComposedSubsumer(e));
 		}
 	}
 
@@ -170,8 +168,8 @@ public class PropagationFromExistentialFillerRule extends
 	@Override
 	public void accept(LinkedSubsumerRuleVisitor visitor,
 			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer) {
-		visitor.visit(this, premise, context, writer);
+			ConclusionProducer producer) {
+		visitor.visit(this, premise, context, producer);
 	}
 
 	private boolean addNegExistential(IndexedObjectSomeValuesFrom existential) {
@@ -195,15 +193,15 @@ public class PropagationFromExistentialFillerRule extends
 	 * 
 	 * @param property
 	 * @param context
-	 * @param writer
+	 * @param producer
 	 */
 	void applyForProperty(IndexedPropertyChain property, Context context,
-			SaturationStateWriter writer) {
+			ConclusionProducer producer) {
 
 		for (IndexedObjectSomeValuesFrom e : negExistentials_) {
 			if (e.getRelation().getSaturated().getSubProperties()
 					.contains(property)) {
-				writer.produce(context, new Propagation(property, e));
+				producer.produce(context, new Propagation(property, e));
 			}
 		}
 
@@ -211,13 +209,13 @@ public class PropagationFromExistentialFillerRule extends
 
 	public static void applyForProperty(Chain<ChainableSubsumerRule> ruleChain,
 			IndexedPropertyChain property, Context context,
-			SaturationStateWriter writer) {
+			ConclusionProducer producer) {
 		PropagationFromExistentialFillerRule rule = ruleChain.find(MATCHER_);
 
 		if (rule == null)
 			return;
 
-		rule.applyForProperty(property, context, writer);
+		rule.applyForProperty(property, context, producer);
 
 	}
 

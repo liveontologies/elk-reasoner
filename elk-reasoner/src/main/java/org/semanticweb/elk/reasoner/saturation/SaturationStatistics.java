@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.incremental.IncrementalProcessingStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
 import org.semanticweb.elk.util.logging.LogLevel;

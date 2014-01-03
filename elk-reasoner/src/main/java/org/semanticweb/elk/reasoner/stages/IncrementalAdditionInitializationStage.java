@@ -44,10 +44,10 @@ import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.util.collections.Operations;
 
@@ -74,12 +74,11 @@ public class IncrementalAdditionInitializationStage extends
 			return false;
 
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
-		ChainableRule<Void> changedInitRules = null;
+		LinkedContextInitRule changedInitRules = null;
 		Map<IndexedClassExpression, ChainableSubsumerRule> changedRulesByCE = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
-		CompositionRuleVisitor initRuleAppVisitor = SaturationUtils
-				.getStatsAwareCompositionRuleAppVisitor(stageStatistics_
-						.getRuleStatistics());
+		RuleVisitor initRuleAppVisitor = SaturationUtils
+				.getStatsAwareRuleVisitor(stageStatistics_.getRuleStatistics());
 		ContextCreationListener contextCreationListener = SaturationUtils
 				.addStatsToContextCreationListener(
 						ContextCreationListener.DUMMY,

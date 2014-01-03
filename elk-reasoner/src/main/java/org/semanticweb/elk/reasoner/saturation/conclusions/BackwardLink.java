@@ -22,13 +22,14 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.Rule;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ForwardLinkFromBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkedBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.PropagationFromBackwardLinkRule;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from a
@@ -56,13 +57,15 @@ public class BackwardLink implements Conclusion {
 	 */
 	private final IndexedPropertyChain relation_;
 
-	private final ThisCompositionRule thisCompositionRule_ = new ThisCompositionRule();
-
 	public BackwardLink(Context source, IndexedPropertyChain relation) {
 		this.relation_ = relation;
 		this.source_ = source;
 	}
 
+	/**
+	 * @return the {@link IndexedPropertyChain} that is the relation of this
+	 *         {@link BackwardLink}
+	 */
 	public IndexedPropertyChain getRelation() {
 		return relation_;
 	}
@@ -77,17 +80,26 @@ public class BackwardLink implements Conclusion {
 	}
 
 	@Override
-	public void accept(CompositionRuleVisitor ruleAppVisitor,
-			SaturationStateWriter writer, Context context) {
+	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
+			Context context, ConclusionProducer producer) {
 
-		ruleAppVisitor.visit(thisCompositionRule_, this, context, writer);
+		ruleAppVisitor.visit(PropagationFromBackwardLinkRule.getInstance(),
+				this, context, producer);
+		ruleAppVisitor.visit(ForwardLinkFromBackwardLinkRule.getInstance(),
+				this, context, producer);
 
 		// apply all backward link rules of the context
-		LinkRule<BackwardLink> backLinkRule = context.getBackwardLinkRuleHead();
+		LinkedBackwardLinkRule backLinkRule = context.getBackwardLinkRuleHead();
 		while (backLinkRule != null) {
-			backLinkRule.accept(ruleAppVisitor, this, context, writer);
+			backLinkRule.accept(ruleAppVisitor, this, context, producer);
 			backLinkRule = backLinkRule.next();
 		}
+	}
+
+	@Override
+	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
+			Context context, ConclusionProducer producer) {
+		// no redundant rules for BackwardLink
 	}
 
 	@Override
@@ -103,48 +115,5 @@ public class BackwardLink implements Conclusion {
 	@Override
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
 		return visitor.visit(this, context);
-	}
-
-	/**
-	 * The composition rule applied when processing when processing this
-	 * {@link BackwardLink} producing new {@link Propagation}s that can be
-	 * propagated over this {@link BackwardLink} and the corresponding
-	 * {@link ForwardLink} if it can be used with property chain axioms.
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 */
-	public static class ThisCompositionRule implements Rule<BackwardLink> {
-
-		private static final String NAME_ = "BackwardLink Registration";
-
-		@Override
-		public String getName() {
-			return NAME_;
-		}
-
-		@Override
-		public void apply(BackwardLink premise, Context context,
-				SaturationStateWriter writer) {
-			IndexedPropertyChain premiseRelation = premise.getRelation();
-			// if this is the first/last backward link for this relation,
-			// generate new propagations for this relation
-			if (context.getBackwardLinksByObjectProperty().get(premiseRelation)
-					.size() == 1) {
-				IndexedObjectSomeValuesFrom.generatePropagations(
-						premiseRelation, context, writer);
-			}
-
-			/*
-			 * convert backward link to a forward link if it can potentially be
-			 * composed
-			 */
-			if (!premiseRelation.getSaturated()
-					.getCompositionsByLeftSubProperty().isEmpty()) {
-				writer.produce(premise.getSource(), new ForwardLink(
-						premiseRelation, context));
-			}
-
-		}
-
 	}
 }

@@ -22,19 +22,11 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
-import java.util.Collection;
-
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.Rule;
-import org.semanticweb.elk.util.collections.Multimap;
-import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
-import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
-import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,18 +39,12 @@ import org.slf4j.LoggerFactory;
  */
 public class Contradiction extends AbstractConclusion {
 
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(Contradiction.class);
+	static final Logger LOGGER_ = LoggerFactory.getLogger(Contradiction.class);
 
 	/**
 	 * we use just one instance of this class
 	 */
 	private static Contradiction INSTANCE_ = new Contradiction();
-
-	/**
-	 * one instance of composition rule is sufficient
-	 */
-	private static ContradictionPropagationRule THIS_COMPOSITION_RULE_ = new ContradictionPropagationRule();
 
 	public static Contradiction getInstance() {
 		return INSTANCE_;
@@ -68,24 +54,17 @@ public class Contradiction extends AbstractConclusion {
 		// do not allow creation of instances outside of this class
 	}
 
-	@SuppressWarnings("static-method")
-	public void removeFrom(Context context) {
-		context.getBackwardLinkRuleChain().remove(
-				ContradictionBackwardLinkRule.MATCHER_);
-	}
-
-	@SuppressWarnings("static-method")
-	public void addTo(Context context) {
-		// register the backward link rule for propagation of bottom
-		context.getBackwardLinkRuleChain().getCreate(
-				ContradictionBackwardLinkRule.MATCHER_,
-				ContradictionBackwardLinkRule.FACTORY_);
+	@Override
+	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
+			Context context, ConclusionProducer producer) {
+		ruleAppVisitor.visit(ContradictionPropagationRule.getInstance(), this,
+				context, producer);
 	}
 
 	@Override
-	public void accept(CompositionRuleVisitor ruleAppVisitor,
-			SaturationStateWriter writer, Context context) {
-		ruleAppVisitor.visit(THIS_COMPOSITION_RULE_, this, context, writer);
+	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
+			Context context, ConclusionProducer producer) {
+		// no redundant rules
 	}
 
 	@Override
@@ -96,89 +75,6 @@ public class Contradiction extends AbstractConclusion {
 	@Override
 	public String toString() {
 		return "Contradiction";
-	}
-
-	/**
-	 * The composition rule applied when processing {@link Contradiction}
-	 * producing {@link Contradiction} in all contexts linked by
-	 * {@link BackwardLink}s in a {@code Context}
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 * 
-	 */
-	public static class ContradictionPropagationRule implements
-			Rule<Contradiction> {
-
-		private static final String NAME_ = "Contradiction Propagation over Backward Links";
-
-		@Override
-		public String getName() {
-			return NAME_;
-		}
-
-		@Override
-		public void apply(Contradiction premise, Context context,
-				SaturationStateWriter writer) {
-			final Multimap<IndexedPropertyChain, Context> backLinks = context
-					.getBackwardLinksByObjectProperty();
-
-			for (IndexedPropertyChain propRelation : backLinks.keySet()) {
-
-				Collection<Context> targets = backLinks.get(propRelation);
-
-				for (Context target : targets) {
-					writer.produce(target, premise);
-				}
-			}
-		}
-
-	}
-
-	/**
-	 * The composition rule applied when processing {@link BackwardLink} that
-	 * produces {@link Contradiction} in the context linked by this
-	 * {@link BackwardLink}
-	 */
-	public static class ContradictionBackwardLinkRule extends
-			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
-			ModifiableLinkRule<BackwardLink> {
-
-		private static final String NAME_ = "Backward Link Contradiction Propagation";
-
-		ContradictionBackwardLinkRule(ModifiableLinkRule<BackwardLink> tail) {
-			super(tail);
-		}
-
-		@Override
-		public String getName() {
-			return NAME_;
-		}
-
-		@Override
-		public void apply(BackwardLink premise, Context contex,
-				SaturationStateWriter engine) {
-			LOGGER_.trace("Applying {} to {}", NAME_, premise);
-
-			engine.produce(premise.getSource(), Contradiction.getInstance());
-		}
-
-		@Override
-		public void accept(CompositionRuleVisitor visitor,
-				BackwardLink premise, Context context,
-				SaturationStateWriter writer) {
-			visitor.visit(this, premise, context, writer);
-		}
-
-		private static final Matcher<ModifiableLinkRule<BackwardLink>, ContradictionBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, ContradictionBackwardLinkRule>(
-				ContradictionBackwardLinkRule.class);
-
-		private static final ReferenceFactory<ModifiableLinkRule<BackwardLink>, ContradictionBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule<BackwardLink>, ContradictionBackwardLinkRule>() {
-			@Override
-			public ContradictionBackwardLinkRule create(
-					ModifiableLinkRule<BackwardLink> tail) {
-				return new ContradictionBackwardLinkRule(tail);
-			}
-		};
 	}
 
 }

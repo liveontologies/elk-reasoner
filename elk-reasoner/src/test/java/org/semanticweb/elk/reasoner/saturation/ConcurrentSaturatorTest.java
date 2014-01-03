@@ -44,9 +44,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.BasicRuleVisitor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 public class ConcurrentSaturatorTest extends TestCase {
@@ -169,7 +169,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ExtendedSaturationStateWriter writer = state.getExtendedWriter(
 				ContextCreationListener.DUMMY,
 				ContextModificationListener.DUMMY,
-				new BasicCompositionRuleApplicationVisitor(),
+				new BasicRuleVisitor(),
 				new ConclusionInsertionVisitor(), false);
 		
 		Context cA = writer.getCreateContext(A);

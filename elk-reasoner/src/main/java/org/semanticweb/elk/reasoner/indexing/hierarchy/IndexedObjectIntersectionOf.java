@@ -25,8 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +46,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	 * The conjunction has only two conjuncts. To ensure uniqueness of a
 	 * conjunction for the conjuncts, the conjuncts are sorted according to the
 	 * comparator of {@link IndexedClassExpression}. This is required for
-	 * correct construction of {@link ObjectIntersectionFromConjunctRule} because
-	 * conjunctions (A & B) and (B & A) result in the same rules.
+	 * correct construction of {@link ObjectIntersectionFromConjunctRule}
+	 * because conjunctions (A & B) and (B & A) result in the same rules.
 	 */
 	private final IndexedClassExpression firstConjunct_, secondConjunct_;
 
@@ -107,8 +105,4 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 				+ this.secondConjunct_ + ')';
 	}
 
-	@Override
-	public void accept(SubsumerDecompositionVisitor visitor, Context context) {
-		visitor.visit(this, context);
-	}
 }

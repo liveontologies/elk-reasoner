@@ -23,10 +23,11 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecompositionVisitor;
 
 /**
  * A {@link Conclusion} representing a subsumer {@link IndexedClassExpression}
@@ -48,6 +49,8 @@ public abstract class Subsumer implements Conclusion {
 	private final IndexedClassExpression expression_;
 
 	public Subsumer(IndexedClassExpression expression) {
+		if (expression == null)
+			throw new NullPointerException("Subsumer cannot be null!");
 		this.expression_ = expression;
 	}
 
@@ -61,19 +64,24 @@ public abstract class Subsumer implements Conclusion {
 
 	@Override
 	public String toString() {
-		return expression_.toString() + ": " + expression_.hashCode();
+		return "Subsumer(" + expression_.toString() + ")";
 	}
 
-	@Override
-	public void accept(CompositionRuleVisitor ruleAppVisitor,
-			SaturationStateWriter writer, Context context) {
-
-		LinkedSubsumerRule compositionRule = expression_.getCompositionRuleHead();
+	void applyCompositionRules(RuleVisitor ruleAppVisitor, Context context,
+			ConclusionProducer producer) {
+		LinkedSubsumerRule compositionRule = expression_
+				.getCompositionRuleHead();
 		while (compositionRule != null) {
-			compositionRule
-					.accept(ruleAppVisitor, expression_, context, writer);
+			compositionRule.accept(ruleAppVisitor, expression_, context,
+					producer);
 			compositionRule = compositionRule.next();
 		}
+	}
+
+	void applyDecompositionRules(RuleVisitor ruleAppVisitor, Context context,
+			ConclusionProducer producer) {
+		expression_.accept(new SubsumerDecompositionVisitor(ruleAppVisitor,
+				context, producer));
 	}
 
 	@Override

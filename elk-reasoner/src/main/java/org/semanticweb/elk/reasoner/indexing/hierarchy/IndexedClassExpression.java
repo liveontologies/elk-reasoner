@@ -27,7 +27,6 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
@@ -236,7 +235,4 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	}
 
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
-
-	public abstract void accept(SubsumerDecompositionVisitor visitor,
-			Context context);
 }

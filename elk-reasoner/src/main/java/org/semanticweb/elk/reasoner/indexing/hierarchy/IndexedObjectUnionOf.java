@@ -28,8 +28,6 @@ import java.util.Set;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectUnionOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.logging.LogLevel;
@@ -98,11 +96,6 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 			// no negative occurrences of this expression left
 			ObjectUnionFromDisjunctRule.removeRulesFor(this, index);
 		}
-	}
-
-	@Override
-	public void accept(SubsumerDecompositionVisitor visitor, Context context) {
-		visitor.visit(this, context);
 	}
 
 	@Override

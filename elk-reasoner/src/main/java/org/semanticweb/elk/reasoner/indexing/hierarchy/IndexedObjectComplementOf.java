@@ -25,8 +25,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectComplementOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
@@ -91,11 +89,6 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 			// no positive occurrences of this expression left
 			ContradictionFromNegationRule.removeRulesFor(this, index);
 		}
-	}
-
-	@Override
-	public void accept(SubsumerDecompositionVisitor visitor, Context context) {
-		visitor.visit(this, context);
 	}
 
 	@Override

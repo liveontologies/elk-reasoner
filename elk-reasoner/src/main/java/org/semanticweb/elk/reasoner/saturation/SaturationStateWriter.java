@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,8 +26,8 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
 /**
  * Functions that can write the saturation state are grouped here.
@@ -35,15 +36,13 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface SaturationStateWriter {
+public interface SaturationStateWriter extends ConclusionProducer {
 
 	public IndexedClassExpression getOwlThing();
 
 	public IndexedClassExpression getOwlNothing();
 
 	public Context pollForActiveContext();
-
-	public void produce(Context context, Conclusion conclusion);
 
 	public boolean markAsNotSaturated(Context context);
 

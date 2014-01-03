@@ -38,6 +38,11 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public interface Rule<P> {
 
 	/**
+	 * @return the name of this rule
+	 */
+	public String getName();
+
+	/**
 	 * Applying the rule to the given premise within the given {@link Context}
 	 * and producing {@link Conclusion}s using the given
 	 * {@link SaturationStateWriter}
@@ -47,16 +52,14 @@ public interface Rule<P> {
 	 * @param context
 	 *            the {@link Context} from which other matching premises of the
 	 *            rule are taken
-	 * @param engine
-	 *            a {@link SaturationStateWriter} which is used to produce
-	 *            {@link Conclusion}s of the inferences
+	 * @param producer
+	 *            the {@link ConclusionProducer} using which {@link Conclusion}s
+	 *            of the inferences are produced
 	 * 
 	 */
-	public void apply(P premise, Context context, SaturationStateWriter engine);
+	public void apply(P premise, Context context, ConclusionProducer producer);
 
-	/**
-	 * @return the name of this rule
-	 */
-	public String getName();
+	public void accept(RuleVisitor visitor, P premise, Context context,
+			ConclusionProducer producer);
 
 }

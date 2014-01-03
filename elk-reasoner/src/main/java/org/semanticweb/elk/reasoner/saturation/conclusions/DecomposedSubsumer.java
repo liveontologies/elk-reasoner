@@ -23,7 +23,10 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
  * A {@link Subsumer} created by decomposition rules.
@@ -34,13 +37,32 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public class DecomposedSubsumer extends Subsumer {
 
-	public DecomposedSubsumer(IndexedClassExpression superClassExpression) {
-		super(superClassExpression);
+	public DecomposedSubsumer(IndexedClassExpression subsumer) {
+		super(subsumer);
+	}
+
+	@Override
+	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
+			Context context, ConclusionProducer producer) {
+		applyCompositionRules(ruleAppVisitor, context, producer);
+		applyDecompositionRules(ruleAppVisitor, context, producer);
+
+	}
+
+	@Override
+	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
+			Context context, ConclusionProducer producer) {
+		// no redundant rules
 	}
 
 	@Override
 	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
 		return visitor.visit(this, context);
+	}
+
+	@Override
+	public String toString() {
+		return "Decomposed" + super.toString();
 	}
 
 }

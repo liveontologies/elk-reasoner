@@ -32,15 +32,15 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.BasicRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TODO docs
@@ -115,7 +115,7 @@ class SaturationStateImpl implements SaturationState {
 
 				};
 			}
-			
+
 			@Override
 			public boolean isEmpty() {
 				return firstContext.next == null;
@@ -131,7 +131,7 @@ class SaturationStateImpl implements SaturationState {
 	}
 
 	private void resetFirstContext() {
-		firstContext = new ContextImpl(null);//a dummy first context
+		firstContext = new ContextImpl(null);// a dummy first context
 	}
 
 	@Override
@@ -139,8 +139,8 @@ class SaturationStateImpl implements SaturationState {
 		return notSaturatedContexts_;
 	}
 
-	private static final CompositionRuleVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicCompositionRuleApplicationVisitor();
-	
+	private static final RuleVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicRuleVisitor();
+
 	/**
 	 * 
 	 * @param index
@@ -156,32 +156,37 @@ class SaturationStateImpl implements SaturationState {
 	public OntologyIndex getOntologyIndex() {
 		return ontologyIndex_;
 	}
-	
+
 	@Override
 	public Context getContext(IndexedClassExpression ice) {
 		return ice.getContext();
 	}
-	
-	private ExtendedSaturationStateWriter getDefaultWriter(final ConclusionVisitor<?> conclusionVisitor) {
-		return new ContextCreatingWriter(
-				ContextCreationListener.DUMMY, ContextModificationListener.DUMMY,
+
+	private ExtendedSaturationStateWriter getDefaultWriter(
+			final ConclusionVisitor<?> conclusionVisitor) {
+		return new ContextCreatingWriter(ContextCreationListener.DUMMY,
+				ContextModificationListener.DUMMY,
 				DEFAULT_INIT_RULE_APP_VISITOR, conclusionVisitor, true);
 	}
-	
+
 	/**
-	 * @param visitor a {@link ConclusionVisitor} which will be invoked for each produced {@link Conclusion}
+	 * @param visitor
+	 *            a {@link ConclusionVisitor} which will be invoked for each
+	 *            produced {@link Conclusion}
 	 * 
 	 * @return an {@link SaturationStateWriter} for modifying this
 	 *         {@link SaturationState}. The methods of this
 	 *         {@link SaturationStateWriter} are thread safe
 	 */
 	@Override
-	public SaturationStateWriter getWriter(ConclusionVisitor<?> conclusionVisitor) {
+	public SaturationStateWriter getWriter(
+			ConclusionVisitor<?> conclusionVisitor) {
 		return getDefaultWriter(conclusionVisitor);
 	}
 
 	@Override
-	public ExtendedSaturationStateWriter getExtendedWriter(ConclusionVisitor<?> conclusionVisitor) {
+	public ExtendedSaturationStateWriter getExtendedWriter(
+			ConclusionVisitor<?> conclusionVisitor) {
 		return getDefaultWriter(conclusionVisitor);
 	}
 
@@ -189,8 +194,7 @@ class SaturationStateImpl implements SaturationState {
 	public ExtendedSaturationStateWriter getExtendedWriter(
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener,
-			CompositionRuleVisitor ruleAppVisitor,
-			ConclusionVisitor<?> conclusionVisitor,
+			RuleVisitor ruleAppVisitor, ConclusionVisitor<?> conclusionVisitor,
 			boolean trackNewContextsAsUnsaturated) {
 		return new ContextCreatingWriter(contextCreationListener,
 				contextModificationListener, ruleAppVisitor, conclusionVisitor,
@@ -199,7 +203,8 @@ class SaturationStateImpl implements SaturationState {
 
 	@Override
 	public SaturationStateWriter getWriter(
-			ContextModificationListener contextModificationListener, ConclusionVisitor<?> conclusionVisitor) {
+			ContextModificationListener contextModificationListener,
+			ConclusionVisitor<?> conclusionVisitor) {
 		return new BasicWriter(contextModificationListener, conclusionVisitor);
 	}
 
@@ -210,7 +215,7 @@ class SaturationStateImpl implements SaturationState {
 	class BasicWriter implements SaturationStateWriter {
 
 		private final ConclusionVisitor<?> producedConclusionVisitor_;
-		
+
 		private final ContextModificationListener contextModificationListener_;
 
 		private BasicWriter(
@@ -232,7 +237,9 @@ class SaturationStateImpl implements SaturationState {
 
 		@Override
 		public Context pollForActiveContext() {
-			return activeContexts_.poll();
+			Context result = activeContexts_.poll();
+			LOGGER_.trace("pollForActiveContext() : {}", result);
+			return result;
 		}
 
 		@Override
@@ -240,8 +247,9 @@ class SaturationStateImpl implements SaturationState {
 			LOGGER_.trace("{}: produced conclusion {}", context, conclusion);
 			// this may be necessary, e.g., for counting produced conclusions
 			conclusion.accept(producedConclusionVisitor_, context);
-			
+
 			if (context.addToDo(conclusion)) {
+				LOGGER_.trace("{}: activated", context);
 				// context was activated
 				activeContexts_.add(context);
 			}
@@ -260,9 +268,8 @@ class SaturationStateImpl implements SaturationState {
 				markAsNotSaturatedInternal(context);
 
 				return true;
-			} else {
-				return false;
 			}
+			return false;
 		}
 
 		@Override
@@ -276,6 +283,12 @@ class SaturationStateImpl implements SaturationState {
 			resetFirstContext();
 		}
 
+		@Override
+		public void produce(IndexedClassExpression root, Conclusion conclusion) {
+			// TODO: this assumes that we are working with the main contexts!
+			produce(root.getContext(), conclusion);
+		}
+
 	}
 
 	/**
@@ -284,9 +297,10 @@ class SaturationStateImpl implements SaturationState {
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	class ContextCreatingWriter extends BasicWriter implements ExtendedSaturationStateWriter {
+	class ContextCreatingWriter extends BasicWriter implements
+			ExtendedSaturationStateWriter {
 
-		private final CompositionRuleVisitor initRuleAppVisitor_;
+		private final RuleVisitor initRuleAppVisitor_;
 
 		/**
 		 * If set to true, the writer will put all newly created contexts to
@@ -302,7 +316,7 @@ class SaturationStateImpl implements SaturationState {
 		private ContextCreatingWriter(
 				ContextCreationListener contextCreationListener,
 				ContextModificationListener contextModificationListener,
-				CompositionRuleVisitor ruleAppVisitor,
+				RuleVisitor ruleAppVisitor,
 				ConclusionVisitor<?> conclusionVisitor,
 				boolean trackNewContextsAsUnsaturated) {
 			super(contextModificationListener, conclusionVisitor);
@@ -315,7 +329,7 @@ class SaturationStateImpl implements SaturationState {
 		@Override
 		public Context getCreateContext(IndexedClassExpression root) {
 			Context context = root.getContext();
-			
+
 			if (context != null)
 				return context;
 			// else try to assign a new context
@@ -335,16 +349,16 @@ class SaturationStateImpl implements SaturationState {
 				markAsNotSaturatedInternal(newContext);
 			}
 
-			/* 
-			 * linking contexts
-			 * TODO how much contention are we going to get here? 
-			*/
-			synchronized(firstContext) {
+			/*
+			 * linking contexts TODO how much contention are we going to get
+			 * here?
+			 */
+			synchronized (firstContext) {
 				ContextImpl oldHead = firstContext.next;
-				
+
 				firstContext.next = newContext;
 				newContext.previous = firstContext;
-				
+
 				if (oldHead != null) {
 					newContext.next = oldHead;
 					oldHead.previous = newContext;
@@ -355,15 +369,21 @@ class SaturationStateImpl implements SaturationState {
 		}
 
 		@Override
+		public void produce(IndexedClassExpression root, Conclusion conclusion) {
+			produce(getCreateContext(root), conclusion);
+		}
+
+		@Override
 		public void initContext(Context context) {
-			SaturationUtils.initContext(context, this, ontologyIndex_, initRuleAppVisitor_);
+			SaturationUtils.initContext(ontologyIndex_, initRuleAppVisitor_,
+					context, this);
 		}
 
 		@Override
 		public void removeContext(Context context) {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
-	
+
 }

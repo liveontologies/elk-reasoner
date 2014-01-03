@@ -1,8 +1,9 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /*
  * #%L
@@ -47,6 +48,30 @@ public interface Conclusion {
 	 */
 	public Context getSourceContext(Context contextWhereStored);
 
-	public void accept(CompositionRuleVisitor ruleAppVisitor,
-			SaturationStateWriter writer, Context context);
+	/**
+	 * Apply all non-redundant inferences for this {@link Conclusion} in a
+	 * {@link Context}
+	 * 
+	 * @see #applyRedundantRules(RuleVisitor, Context, ConclusionProducer)
+	 * 
+	 * @param ruleAppVisitor
+	 * @param context
+	 * @param producer
+	 */
+	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
+			Context context, ConclusionProducer producer);
+
+	/**
+	 * Apply all redundant rules for this {@link Conclusion} in a
+	 * {@link Context}. A rule is redundant if its application is not necessary
+	 * for completeness. Redundancy of a rule depends on other conclusions
+	 * contained in the {@link Context}: a non-redundant rule might become
+	 * redundant when other {@link Conclusion} are added to the {@link Context}.
+	 * 
+	 * @param ruleAppVisitor
+	 * @param context
+	 * @param producer
+	 */
+	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
+			Context context, ConclusionProducer producer);
 }

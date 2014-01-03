@@ -23,9 +23,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
 /**
  * A visitor pattern for {@link LinkedSubsumerRule}s
@@ -36,29 +35,32 @@ public interface LinkedSubsumerRuleVisitor {
 
 	void visit(ContradictionFromDisjointnessRule rule,
 			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer);
+			ConclusionProducer producer);
 
 	void visit(ContradictionFromNegationRule rule,
 			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer);
+			ConclusionProducer producer);
+
+	void visit(ContradictionFromOwlNothingRule rule,
+			IndexedClassExpression premise, Context context,
+			ConclusionProducer producer);
 
 	void visit(DisjointSubsumerFromMemberRule rule,
 			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer);
+			ConclusionProducer producer);
 
 	void visit(ObjectIntersectionFromConjunctRule rule,
 			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer);
+			ConclusionProducer producer);
 
 	void visit(ObjectUnionFromDisjunctRule rule,
 			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer);
+			ConclusionProducer producer);
 
 	void visit(PropagationFromExistentialFillerRule rule,
 			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer);
+			ConclusionProducer producer);
 
 	void visit(SuperClassFromSubClassRule rule, IndexedClassExpression premise,
-			Context context, SaturationStateWriter writer);
-
+			Context context, ConclusionProducer producer);
 }

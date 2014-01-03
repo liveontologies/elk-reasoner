@@ -28,9 +28,9 @@ import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
  * Represents the state of saturation which can be changed by applying reasoning
@@ -63,7 +63,7 @@ public interface SaturationState {
 	public ExtendedSaturationStateWriter getExtendedWriter(
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener,
-			CompositionRuleVisitor ruleAppVisitor,
+			RuleVisitor ruleAppVisitor,
 			ConclusionVisitor<?> conclusionVisitor,
 			boolean trackNewContextsAsUnsaturated);
 

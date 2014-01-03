@@ -39,11 +39,10 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
@@ -56,7 +55,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Goes through the input class expressions and puts each context's superclass
- * for which there're changes into the ToDo queue
+ * for which there are changes into the ToDo queue
  * 
  * @author Pavel Klinov
  * 
@@ -69,13 +68,13 @@ public class IncrementalChangesInitialization extends
 
 	public IncrementalChangesInitialization(
 			Collection<ArrayList<Context>> inputs,
-			ChainableRule<Void> changedGlobalRules,
+			LinkedContextInitRule changedInitRules,
 			Map<IndexedClassExpression, ChainableSubsumerRule> changes,
 			SaturationState state, ComputationExecutor executor,
 			SaturationStatistics stageStats, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		super(inputs, new ContextInitializationFactory(state, changes,
-				changedGlobalRules, stageStats), executor, maxWorkers,
+				changedInitRules, stageStats), executor, maxWorkers,
 				progressMonitor);
 	}
 }
@@ -96,14 +95,14 @@ class ContextInitializationFactory
 	private final SaturationState saturationState_;
 	private final Map<IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges_;
 	private final IndexedClassExpression[] indexChangesKeys_;
-	private final LinkRule<Void> changedGlobalRuleHead_;
+	private final LinkedContextInitRule changedGlobalRuleHead_;
 	private AtomicInteger ruleHits = new AtomicInteger(0);
 	private final SaturationStatistics stageStatistics_;
 
 	public ContextInitializationFactory(
 			SaturationState state,
 			Map<IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges,
-			LinkRule<Void> changedGlobalRuleHead,
+			LinkedContextInitRule changedGlobalRuleHead,
 			SaturationStatistics stageStats) {
 
 		saturationState_ = state;
@@ -126,9 +125,8 @@ class ContextInitializationFactory
 		final ConclusionVisitor<?> conclusionVisitor = SaturationUtils
 				.addStatsToConclusionVisitor(localStatistics
 						.getConclusionStatistics());
-		final CompositionRuleVisitor ruleAppVisitor = SaturationUtils
-				.getStatsAwareCompositionRuleAppVisitor(localStatistics
-						.getRuleStatistics());
+		final RuleVisitor ruleAppVisitor = SaturationUtils
+				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());
 		final SaturationStateWriter saturationStateWriter = saturationState_
 				.getWriter(ContextModificationListener.DUMMY, conclusionVisitor);
 
@@ -141,7 +139,7 @@ class ContextInitializationFactory
 			@Override
 			public void process(Context context) {
 				// apply all changed global context rules
-				LinkRule<Void> nextGlobalRule = changedGlobalRuleHead_;
+				LinkedContextInitRule nextGlobalRule = changedGlobalRuleHead_;
 				while (nextGlobalRule != null) {
 					if (LOGGER_.isTraceEnabled())
 						LOGGER_.trace(context + ": applying rule "
@@ -176,7 +174,8 @@ class ContextInitializationFactory
 
 			private void applyLocalRules(Context context,
 					IndexedClassExpression changedICE) {
-				LinkedSubsumerRule nextLocalRule = indexChanges_.get(changedICE);
+				LinkedSubsumerRule nextLocalRule = indexChanges_
+						.get(changedICE);
 				if (nextLocalRule != null) {
 					localRuleHits++;
 

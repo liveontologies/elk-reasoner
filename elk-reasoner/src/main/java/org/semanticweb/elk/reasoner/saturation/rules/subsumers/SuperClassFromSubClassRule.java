@@ -29,13 +29,12 @@ import java.util.List;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 import org.slf4j.Logger;
@@ -43,8 +42,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 
- * The rule producing {@link Subsumer} for the super class of
- * {@link IndexedSubClassOfAxiom} when processing its sub class
+ * A {@link ChainableSubsumerRule} producing {@link Subsumer} for the super
+ * class of {@link IndexedSubClassOfAxiom} when processing its sub class
  * {@link IndexedClassExpression}
  * 
  * @see IndexedSubClassOfAxiom#getSuperClass()
@@ -53,9 +52,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class SuperClassFromSubClassRule extends
-		ModifiableLinkImpl<ChainableSubsumerRule> implements
-		ChainableSubsumerRule {
+public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -107,12 +104,12 @@ public class SuperClassFromSubClassRule extends
 
 	@Override
 	public void apply(IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer) {
+			ConclusionProducer producer) {
 		LOGGER_.trace("Applying {}: {} to {}", NAME_,
 				toldSuperClassExpressions_, context);
 
 		for (IndexedClassExpression implied : toldSuperClassExpressions_) {
-			writer.produce(context, new DecomposedSubsumer(implied));
+			producer.produce(context, new DecomposedSubsumer(implied));
 		}
 	}
 
@@ -162,8 +159,8 @@ public class SuperClassFromSubClassRule extends
 	@Override
 	public void accept(LinkedSubsumerRuleVisitor visitor,
 			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer) {
-		visitor.visit(this, premise, context, writer);
+			ConclusionProducer producer) {
+		visitor.visit(this, premise, context, producer);
 	}
 
 	protected boolean addToldSuperClassExpression(

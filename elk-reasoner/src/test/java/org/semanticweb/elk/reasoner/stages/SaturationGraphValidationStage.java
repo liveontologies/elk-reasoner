@@ -31,8 +31,6 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex.RootContextInitializationRule;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass.OwlThingContextInitializationRule;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
@@ -42,10 +40,18 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.PropagationFromBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
@@ -135,10 +141,10 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 	/**
 	 * 
 	 */
-	private class ContextRuleValidator implements CompositionRuleVisitor {
+	private class ContextRuleValidator implements RuleVisitor {
 
 		@Override
-		public void visit(BackwardLink.ThisCompositionRule rule,
+		public void visit(PropagationFromBackwardLinkRule rule,
 				BackwardLink premise, Context context,
 				SaturationStateWriter writer) {
 			// nothing is stored in the rule
@@ -146,21 +152,21 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(
-				Contradiction.ContradictionBackwardLinkRule bottomBackwardLinkRule,
+				ContradictionOverBackwardLinkRule bottomBackwardLinkRule,
 				BackwardLink premise, Context context,
 				SaturationStateWriter writer) {
 			// nothing is stored in the rule
 		}
 
 		@Override
-		public void visit(Contradiction.ContradictionPropagationRule rule,
+		public void visit(ContradictionPropagationRule rule,
 				Contradiction premise, Context context,
 				SaturationStateWriter writer) {
 			// nothing is stored in the rule
 		}
 
 		@Override
-		public void visit(DisjointSubsumer.ContradicitonCompositionRule rule,
+		public void visit(ContradicitonCompositionRule rule,
 				DisjointSubsumer premise, Context context,
 				SaturationStateWriter writer) {
 			// nothing is stored in the rule
@@ -168,14 +174,14 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
-		public void visit(ForwardLink.BackwardLinkCompositionRule rule,
+		public void visit(BackwardLinkCompositionRule rule,
 				ForwardLink premise, Context context,
 				SaturationStateWriter writer) {
 			// nothing is stored in the rule
 		}
 
 		@Override
-		public void visit(ForwardLink.ThisBackwardLinkRule rule,
+		public void visit(BackwardLinkChainFromBackwardLinkRule rule,
 				BackwardLink premise, Context context,
 				SaturationStateWriter writer) {
 			for (IndexedPropertyChain prop : rule
@@ -259,13 +265,13 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
-		public void visit(OwlThingContextInitializationRule rule,
+		public void visit(OwlThingContextInitRule rule,
 				Context context, SaturationStateWriter writer) {
 			// nothing is stored in the rule
 		}
 
 		@Override
-		public void visit(Propagation.SubsumerBackwardLinkRule rule,
+		public void visit(SubsumerBackwardLinkRule rule,
 				BackwardLink premise, Context context,
 				SaturationStateWriter writer) {
 			for (IndexedPropertyChain prop : rule

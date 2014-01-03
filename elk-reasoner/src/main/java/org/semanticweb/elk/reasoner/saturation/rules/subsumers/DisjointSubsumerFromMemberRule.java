@@ -27,21 +27,20 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The rule producing {@link DisjointSubsumer} when processing an
- * {@link IndexedClassExpression} that is present in an
+ * A {@link ChainableSubsumerRule} producing {@link DisjointSubsumer} when
+ * processing an {@link IndexedClassExpression} that is present in an
  * {@link IndexedDisjointnessAxiom} of this {@link DisjointSubsumer} exactly
  * once.
  * 
@@ -51,8 +50,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class DisjointSubsumerFromMemberRule extends
-		ModifiableLinkImpl<ChainableSubsumerRule> implements
-		ChainableSubsumerRule {
+		AbstractChainableSubsumerRule {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -101,17 +99,17 @@ public class DisjointSubsumerFromMemberRule extends
 	@Override
 	public void accept(LinkedSubsumerRuleVisitor visitor,
 			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer) {
-		visitor.visit(this, premise, context, writer);
+			ConclusionProducer producer) {
+		visitor.visit(this, premise, context, producer);
 	}
 
 	@Override
 	public void apply(IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer) {
+			ConclusionProducer producer) {
 		LOGGER_.trace("Applying {} to {}", NAME_, context);
 
 		for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
-			writer.produce(context, new DisjointSubsumer(disAxiom));
+			producer.produce(context, new DisjointSubsumer(disAxiom));
 	}
 
 	protected boolean isEmpty() {

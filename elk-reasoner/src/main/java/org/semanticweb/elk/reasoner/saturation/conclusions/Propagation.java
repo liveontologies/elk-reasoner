@@ -29,16 +29,11 @@ import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
-import org.semanticweb.elk.util.collections.HashSetMultimap;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.collections.Multimap;
-import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
-import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
-import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +47,7 @@ import org.slf4j.LoggerFactory;
 public class Propagation extends AbstractConclusion {
 
 	// logger for this class
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(Propagation.class);
+	static final Logger LOGGER_ = LoggerFactory.getLogger(Propagation.class);
 
 	private final IndexedPropertyChain relation_;
 
@@ -65,14 +59,30 @@ public class Propagation extends AbstractConclusion {
 		carry_ = carry;
 	}
 
+	/**
+	 * @return the {@link IndexedPropertyChain} that is the relation over which
+	 *         this {@link Propagation} is applied
+	 */
+	public IndexedPropertyChain getRelation() {
+		return this.relation_;
+	}
+
+	/**
+	 * @return the {@link IndexedClassExpression} that is propagated by this
+	 *         {@link Propagation}
+	 */
+	public IndexedClassExpression getCarry() {
+		return this.carry_;
+	}
+
 	@Override
 	public String toString() {
 		return "Propagation " + relation_ + "->" + carry_;
 	}
 
 	@Override
-	public void accept(CompositionRuleVisitor ruleAppVisitor,
-			SaturationStateWriter writer, Context context) {
+	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
+			Context context, ConclusionProducer producer) {
 		// propagate over all backward links
 		final Multimap<IndexedPropertyChain, Context> backLinks = context
 				.getBackwardLinksByObjectProperty();
@@ -80,8 +90,14 @@ public class Propagation extends AbstractConclusion {
 		Collection<Context> targets = backLinks.get(relation_);
 
 		for (Context target : targets) {
-			writer.produce(target, new ComposedSubsumer(carry_));
+			producer.produce(target, new ComposedSubsumer(carry_));
 		}
+	}
+
+	@Override
+	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
+			Context context, ConclusionProducer producer) {
+		// no redundant rules
 	}
 
 	@Override
@@ -94,110 +110,4 @@ public class Propagation extends AbstractConclusion {
 		return null;
 	}
 
-	public boolean addToContextBackwardLinkRule(Context context) {
-		return context
-				.getBackwardLinkRuleChain()
-				.getCreate(SubsumerBackwardLinkRule.MATCHER_,
-						SubsumerBackwardLinkRule.FACTORY_)
-				.addPropagationByObjectProperty(relation_, carry_);
-	}
-
-	public boolean removeFromContextBackwardLinkRule(Context context) {
-		SubsumerBackwardLinkRule rule = context.getBackwardLinkRuleChain()
-				.find(SubsumerBackwardLinkRule.MATCHER_);
-
-		return rule != null ? rule.removePropagationByObjectProperty(relation_,
-				carry_) : false;
-	}
-
-	public boolean containsBackwardLinkRule(Context context) {
-		SubsumerBackwardLinkRule rule = context.getBackwardLinkRuleChain()
-				.find(SubsumerBackwardLinkRule.MATCHER_);
-
-		return rule != null ? rule.containsPropagationByObjectProperty(
-				relation_, carry_) : false;
-	}
-
-	/**
-	 * The composition rule producing {@link Subsumer}s when processing
-	 * {@link BackwardLink}s that are propagated over them using
-	 * {@link Propagation}s contained in the {@link Context}
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 * 
-	 */
-	public static class SubsumerBackwardLinkRule extends
-			ModifiableLinkImpl<ModifiableLinkRule<BackwardLink>> implements
-			ModifiableLinkRule<BackwardLink> {
-
-		private static final String NAME_ = "Propagation Over BackwardLink";
-
-		private final Multimap<IndexedPropertyChain, IndexedClassExpression> propagationsByObjectProperty_;
-
-		SubsumerBackwardLinkRule(ModifiableLinkRule<BackwardLink> tail) {
-			super(tail);
-			this.propagationsByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedClassExpression>(
-					1);
-		}
-
-		// TODO: hide this method
-		public Multimap<IndexedPropertyChain, IndexedClassExpression> getPropagationsByObjectProperty() {
-			return propagationsByObjectProperty_;
-		}
-
-		@Override
-		public String getName() {
-			return NAME_;
-		}
-
-		@Override
-		public void apply(BackwardLink premise, Context context,
-				SaturationStateWriter writer) {
-			LOGGER_.trace("Applying {} to {}", NAME_, premise);
-
-			for (IndexedClassExpression carry : propagationsByObjectProperty_
-					.get(premise.getRelation()))
-				writer.produce(premise.getSource(), new ComposedSubsumer(carry));
-		}
-
-		@Override
-		public void accept(CompositionRuleVisitor visitor,
-				BackwardLink premise, Context context,
-				SaturationStateWriter writer) {
-			visitor.visit(this, premise, context, writer);
-		}
-
-		private boolean addPropagationByObjectProperty(
-				IndexedPropertyChain propRelation,
-				IndexedClassExpression conclusion) {
-			return propagationsByObjectProperty_.add(propRelation, conclusion);
-		}
-
-		private boolean removePropagationByObjectProperty(
-				IndexedPropertyChain propRelation,
-				IndexedClassExpression conclusion) {
-			return propagationsByObjectProperty_.remove(propRelation,
-					conclusion);
-		}
-
-		private boolean containsPropagationByObjectProperty(
-				IndexedPropertyChain propRelation,
-				IndexedClassExpression conclusion) {
-			return propagationsByObjectProperty_.contains(propRelation,
-					conclusion);
-		}
-
-		private static Matcher<ModifiableLinkRule<BackwardLink>, SubsumerBackwardLinkRule> MATCHER_ = new SimpleTypeBasedMatcher<ModifiableLinkRule<BackwardLink>, SubsumerBackwardLinkRule>(
-				SubsumerBackwardLinkRule.class);
-
-		private static ReferenceFactory<ModifiableLinkRule<BackwardLink>, SubsumerBackwardLinkRule> FACTORY_ = new ReferenceFactory<ModifiableLinkRule<BackwardLink>, SubsumerBackwardLinkRule>() {
-
-			@Override
-			public SubsumerBackwardLinkRule create(
-					ModifiableLinkRule<BackwardLink> tail) {
-				return new SubsumerBackwardLinkRule(tail);
-			}
-		};
-
-	}
 }

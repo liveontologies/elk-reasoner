@@ -32,22 +32,15 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
-import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
-import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
-import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,13 +56,15 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	final IndexedClass indexedOwlThing, indexedOwlNothing;
 
 	final IndexedObjectCache objectCache;
-	// the context root initialization rule is always registered
-	private ChainableRule<Void> contextInitRules_ = new RootContextInitializationRule();
+	private ChainableContextInitRule contextInitRules_;
 
 	private final Set<IndexedObjectProperty> reflexiveObjectProperties_;
 
 	public DirectIndex(IndexedObjectCache objectCache) {
 		this.objectCache = objectCache;
+
+		// the context root initialization rule is always registered
+		RootContextInitializationRule.addRuleFor(this);
 
 		// index predefined entities
 		MainAxiomIndexerVisitor tmpAxiomInserter = new MainAxiomIndexerVisitor(
@@ -91,7 +86,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	/* read-only methods required by the interface */
 
 	@Override
-	public LinkRule<Void> getContextInitRuleHead() {
+	public LinkedContextInitRule getContextInitRuleHead() {
 		return contextInitRules_;
 	}
 
@@ -199,12 +194,12 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	@Override
-	public void addContextInitRule(ChainableRule<Void> newRule) {
+	public void addContextInitRule(ChainableContextInitRule newRule) {
 		newRule.addTo(getContextInitRuleChain());
 	}
 
 	@Override
-	public void removeContextInitRule(ChainableRule<Void> oldRule) {
+	public void removeContextInitRule(ChainableContextInitRule oldRule) {
 		if (!oldRule.removeFrom(getContextInitRuleChain()))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove context initialization rule "
@@ -261,88 +256,19 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	 *         this {@link OntologyIndex}; it can be used for inserting new
 	 *         rules or deleting existing ones
 	 */
-	public Chain<ChainableRule<Void>> getContextInitRuleChain() {
-		return new AbstractChain<ChainableRule<Void>>() {
+	public Chain<ChainableContextInitRule> getContextInitRuleChain() {
+		return new AbstractChain<ChainableContextInitRule>() {
 
 			@Override
-			public ChainableRule<Void> next() {
+			public ChainableContextInitRule next() {
 				return contextInitRules_;
 			}
 
 			@Override
-			public void setNext(ChainableRule<Void> tail) {
+			public void setNext(ChainableContextInitRule tail) {
 				contextInitRules_ = tail;
 			}
 		};
-	}
-
-	/**
-	 * A context initialization rule that produces produces a {@link Subsumer}
-	 * in the root of the {@link Context}
-	 * 
-	 * @see Context#getRoot()
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 */
-	public static class RootContextInitializationRule extends
-			ModifiableLinkImpl<ChainableRule<Void>> implements
-			ChainableRule<Void> {
-
-		private static final String NAME_ = "Root Introduction";
-
-		private RootContextInitializationRule(ChainableRule<Void> tail) {
-			super(tail);
-		}
-
-		public RootContextInitializationRule() {
-			super(null);
-		}
-
-		@Override
-		public String getName() {
-			return NAME_;
-		}
-
-		@Override
-		public void apply(Void premise, Context context,
-				SaturationStateWriter writer) {
-			LOGGER_.trace("Applying {} to {}", NAME_, context);
-
-			writer.produce(context, new DecomposedSubsumer(context.getRoot()));
-		}
-
-		private static final Matcher<ChainableRule<Void>, RootContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Void>, RootContextInitializationRule>(
-				RootContextInitializationRule.class);
-
-		private static final ReferenceFactory<ChainableRule<Void>, RootContextInitializationRule> FACTORY_ = new ReferenceFactory<ChainableRule<Void>, RootContextInitializationRule>() {
-			@Override
-			public RootContextInitializationRule create(ChainableRule<Void> tail) {
-				return new RootContextInitializationRule(tail);
-			}
-		};
-
-		@Override
-		public boolean addTo(Chain<ChainableRule<Void>> ruleChain) {
-			RootContextInitializationRule rule = ruleChain.find(MATCHER_);
-
-			if (rule == null) {
-				ruleChain.getCreate(MATCHER_, FACTORY_);
-				return true;
-			}
-			return false;
-		}
-
-		@Override
-		public boolean removeFrom(Chain<ChainableRule<Void>> ruleChain) {
-			return ruleChain.remove(MATCHER_) != null;
-		}
-
-		@Override
-		public void accept(CompositionRuleVisitor visitor, Void premise,
-				Context context, SaturationStateWriter writer) {
-			visitor.visit(this, context, writer);
-		}
-
 	}
 
 }

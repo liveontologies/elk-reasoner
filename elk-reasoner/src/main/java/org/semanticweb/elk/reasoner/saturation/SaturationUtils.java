@@ -26,26 +26,27 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PreprocessedConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.TimedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CountingConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.PreprocessedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.TimedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
-import org.semanticweb.elk.reasoner.saturation.rules.BasicCompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationCounterVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationTimerVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationCounterVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.BasicRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationTimerVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleCounterVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
-import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * TODO: refactor, document
+ * 
  * Utilities for common saturation tasks
  * 
  * @author Pavel Klinov
@@ -60,19 +61,19 @@ public class SaturationUtils {
 	/**
 	 * Applies all initialization rules to the context
 	 * 
-	 * @param context
-	 * @param writer
 	 * @param index
 	 * @param ruleAppVisitor
+	 * @param context
+	 * @param producer
 	 */
-	public static void initContext(Context context,
-			SaturationStateWriter writer, OntologyIndex index,
-			CompositionRuleVisitor ruleAppVisitor) {
+	public static void initContext(OntologyIndex index,
+			RuleVisitor ruleAppVisitor, Context context,
+			ConclusionProducer producer) {
 		// apply all context initialization rules
-		LinkRule<Void> initRule = index.getContextInitRuleHead();
+		LinkedContextInitRule initRule = index.getContextInitRuleHead();
 
 		while (initRule != null) {
-			initRule.accept(ruleAppVisitor, null, context, writer);
+			initRule.accept(ruleAppVisitor, context, producer);
 			initRule = initRule.next();
 		}
 	}
@@ -94,12 +95,12 @@ public class SaturationUtils {
 	public static final boolean COLLECT_PROCESSING_TIMES = LOGGER_
 			.isDebugEnabled();
 
-	public static CompositionRuleVisitor getStatsAwareCompositionRuleAppVisitor(
+	public static RuleVisitor getStatsAwareRuleVisitor(
 			RuleStatistics localStatistics) {
-		CompositionRuleVisitor ruleAppVisitor = new BasicCompositionRuleApplicationVisitor();
+		RuleVisitor ruleAppVisitor = new BasicRuleVisitor();
 
 		if (COLLECT_RULE_COUNTS) {
-			ruleAppVisitor = new RuleApplicationCounterVisitor(ruleAppVisitor,
+			ruleAppVisitor = new RuleCounterVisitor(ruleAppVisitor,
 					localStatistics.ruleCounter);
 		}
 
@@ -113,31 +114,11 @@ public class SaturationUtils {
 		return ruleAppVisitor;
 	}
 
-	public static SubsumerDecompositionVisitor getStatsAwareDecompositionRuleAppVisitor(
-			SubsumerDecompositionVisitor decompRuleAppVisitor,
-			RuleStatistics localStatistics) {
-		if (COLLECT_RULE_COUNTS) {
-			decompRuleAppVisitor = new DecompositionRuleApplicationCounterVisitor(
-					decompRuleAppVisitor,
-					localStatistics.decompositionRuleCounter);
-		}
-
-		if (COLLECT_RULE_TIMES) {
-			localStatistics.startMeasurements();
-
-			decompRuleAppVisitor = new DecompositionRuleApplicationTimerVisitor(
-					decompRuleAppVisitor,
-					localStatistics.decompositionRuleTimer);
-		}
-
-		return decompRuleAppVisitor;
-	}
-
 	public static ConclusionVisitor<?> addStatsToConclusionVisitor(
 			ConclusionStatistics localStatistics) {
 		return COLLECT_CONCLUSION_COUNTS ? new CountingConclusionVisitor(
 				localStatistics.getProducedConclusionCounts())
-				: ConclusionVisitor.DUMMY;
+				: DummyConclusionVisitor.getInstance();
 	}
 
 	public static ConclusionVisitor<Boolean> getUsedConclusionCountingProcessor(

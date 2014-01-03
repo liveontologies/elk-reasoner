@@ -28,22 +28,21 @@ import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The rule producing {@link Subsumer} for an
+ * A {@link ChainableSubsumerRule} producing {@link Subsumer} for an
  * {@link IndexedObjectIntersectionOf} when processing one of its conjunct
  * {@link IndexedClassExpression} and when the other conjunct is contained in
  * the {@link Context}
@@ -51,8 +50,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class ObjectIntersectionFromConjunctRule extends
-		ModifiableLinkImpl<ChainableSubsumerRule> implements
-		ChainableSubsumerRule {
+		AbstractChainableSubsumerRule {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -129,12 +127,12 @@ public class ObjectIntersectionFromConjunctRule extends
 
 	@Override
 	public void apply(IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer) {
+			ConclusionProducer producer) {
 		LOGGER_.trace("Applying {} to {}", NAME_, context);
 
 		for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 				conjunctionsByConjunct_.keySet(), context.getSubsumers()))
-			writer.produce(context, new ComposedSubsumer(
+			producer.produce(context, new ComposedSubsumer(
 					conjunctionsByConjunct_.get(common)));
 
 	}
@@ -178,8 +176,8 @@ public class ObjectIntersectionFromConjunctRule extends
 	@Override
 	public void accept(LinkedSubsumerRuleVisitor visitor,
 			IndexedClassExpression premise, Context context,
-			SaturationStateWriter writer) {
-		visitor.visit(this, premise, context, writer);
+			ConclusionProducer producer) {
+		visitor.visit(this, premise, context, producer);
 	}
 
 	private boolean addConjunctionByConjunct(

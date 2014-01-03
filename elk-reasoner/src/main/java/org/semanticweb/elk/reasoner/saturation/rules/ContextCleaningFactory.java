@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -60,8 +60,8 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 	}
 
 	/**
-	 * A {@link RuleDeapplicationFactory} that its own saturation state riter that does not produce conclusions if
-	 * their source is marked as saturated.
+	 * A {@link RuleDeapplicationFactory} that its own saturation state writer
+	 * that does not produce conclusions if their source is marked as saturated.
 	 */
 	public class CleaningEngine extends
 			RuleDeapplicationFactory.DeapplicationEngine {
@@ -71,9 +71,10 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 		}
 
 		@Override
-		protected SaturationStateWriter getSaturationStateWriter() {
-			ConclusionVisitor<?> visitor = SaturationUtils.addStatsToConclusionVisitor(localStatistics
-					.getConclusionStatistics());
+		protected ConclusionProducer getConclusionProducer() {
+			ConclusionVisitor<?> visitor = SaturationUtils
+					.addStatsToConclusionVisitor(localStatistics
+							.getConclusionStatistics());
 			SaturationStateWriter writer = saturationState.getWriter(
 					ContextModificationListener.DUMMY, visitor);
 
@@ -82,8 +83,8 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 	}
 
 	/**
-	 * A writer that does not produce conclusions if their source
-	 * context is already saturated.
+	 * A writer that does not produce conclusions if their source context is
+	 * already saturated.
 	 * 
 	 * @author Pavel Klinov
 	 * 

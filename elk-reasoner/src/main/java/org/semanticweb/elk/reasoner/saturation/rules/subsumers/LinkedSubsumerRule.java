@@ -22,6 +22,9 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Link;
 
 /**
@@ -32,7 +35,11 @@ import org.semanticweb.elk.util.collections.chains.Link;
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface LinkedSubsumerRule extends SubsumerRule,
-		Link<LinkedSubsumerRule> {
+public interface LinkedSubsumerRule extends
+		SubsumerRule<IndexedClassExpression>, Link<LinkedSubsumerRule> {
+
+	public void accept(LinkedSubsumerRuleVisitor visitor,
+			IndexedClassExpression premise, Context context,
+			ConclusionProducer producer);
 
 }

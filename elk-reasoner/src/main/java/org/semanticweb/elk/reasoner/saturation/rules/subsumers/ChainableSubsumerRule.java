@@ -22,17 +22,17 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  * #L%
  */
 
+import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Chainable;
-import org.semanticweb.elk.util.collections.chains.ModifiableLink;
 
 /**
  * A {@link LinkedSubsumerRule} which can be added or removed to {@link Chain}s
- * of such {@link ChainableSubsumerRule} rules
+ * of such {@link ChainableSubsumerRule}s
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
 public interface ChainableSubsumerRule extends LinkedSubsumerRule,
-		ModifiableLink<ChainableSubsumerRule>, Chainable<ChainableSubsumerRule> {
+		Chainable<ChainableSubsumerRule> {
 
 }

@@ -42,15 +42,15 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionCompositionRuleApplicationVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionOccurranceCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CombinedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurranceCheckingVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +80,8 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	}
 
 	@Override
-	public BaseEngine getDefaultEngine(ContextCreationListener listener,
+	public AbstractLocalRuleEngine getDefaultEngine(
+			ContextCreationListener listener,
 			ContextModificationListener modListener) {
 		return new ContextCompletionEngine();
 	}
@@ -96,9 +97,8 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private class ContextCompletionEngine extends
-			RuleApplicationFactory.BaseEngine {
-		private CompositionRuleVisitor initRuleAppVisitor_;
+	private class ContextCompletionEngine extends AbstractLocalRuleEngine {
+		private RuleVisitor initRuleAppVisitor_;
 		// used for iteration over conclusions
 		private ExtendedSaturationStateWriter iterationWriter_;
 		// used for producing conclusions to the main contexts' ToDo and
@@ -108,23 +108,23 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		private ConclusionVisitor<?> conclusionStatsVisitor_;
 
 		protected ContextCompletionEngine() {
-			super(new SaturationStatistics());
+			super(ruleApplicationFactory, new SaturationStatistics());
 		}
 
 		@Override
 		public void submit(IndexedClassExpression root) {
 			// create a local context for this ICE
-			getSaturationStateWriter().getCreateContext(root);
+			getConclusionProducer().getCreateContext(root);
 		}
 
 		@Override
-		protected ExtendedSaturationStateWriter getSaturationStateWriter() {
+		protected ConclusionProducer getConclusionProducer() {
 			if (iterationWriter_ == null) {
 				ConclusionStatistics stats = localStatistics
 						.getConclusionStatistics();
 
 				initRuleAppVisitor_ = SaturationUtils
-						.getStatsAwareCompositionRuleAppVisitor(localStatistics
+						.getStatsAwareRuleVisitor(localStatistics
 								.getRuleStatistics());
 				conclusionStatsVisitor_ = SaturationUtils
 						.addStatsToConclusionVisitor(stats);
@@ -142,13 +142,8 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		protected SubsumerDecompositionVisitor getDecompositionRuleApplicationVisitor() {
-			return null;
-		}
-
-		@Override
 		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
-				SaturationStateWriter saturationStateWriter) {
+				ConclusionProducer producer) {
 
 			RuleStatistics ruleStats = localStatistics.getRuleStatistics();
 			// this decomposition visitor applies decomposition rules for
@@ -171,10 +166,9 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			// this visitor applies rules to fill all gaps in the
 			// deductive closure
 			ConclusionGapFillingVisitor gapFiller = new ConclusionGapFillingVisitor(
-					saturationStateWriter,
-					SaturationUtils
-							.getStatsAwareCompositionRuleAppVisitor(localStatistics
-									.getRuleStatistics()), iterationVisitor,
+					producer,
+					SaturationUtils.getStatsAwareRuleVisitor(localStatistics
+							.getRuleStatistics()), iterationVisitor,
 					produceVisitor);
 
 			return new CombinedConclusionVisitor(
@@ -230,7 +224,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		public ExtendedSaturationStateWriter getExtendedWriter(
 				ContextCreationListener contextCreationListener,
 				ContextModificationListener contextModificationListener,
-				CompositionRuleVisitor ruleAppVisitor,
+				RuleVisitor ruleAppVisitor,
 				ConclusionVisitor<?> conclusionVisitor,
 				boolean trackNewContextsAsUnsaturated) {
 			return new IterationSaturationStateWriter(conclusionVisitor,
@@ -262,13 +256,13 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		private IterationSaturationStateWriter getDefaultWriter(
 				ConclusionVisitor<?> conclusionVisitor) {
 			return new IterationSaturationStateWriter(conclusionVisitor,
-					new BasicCompositionRuleApplicationVisitor(),
+					new BasicRuleVisitor(),
 					saturationState.getExtendedWriter(conclusionVisitor));
 		}
 
 		private ExtendedSaturationStateWriter getWriterForDecompositionVisitor(
 				ConclusionVisitor<?> conclusionVisitor,
-				CompositionRuleVisitor initRuleAppVisitor) {
+				RuleVisitor initRuleAppVisitor) {
 			return new OptimizedLocalSaturationStateWriter(conclusionVisitor,
 					initRuleAppVisitor);
 		}
@@ -285,7 +279,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		private class OptimizedLocalSaturationStateWriter implements
 				ExtendedSaturationStateWriter {
 
-			private final CompositionRuleVisitor initRuleAppVisitor_;
+			private final RuleVisitor initRuleAppVisitor_;
 
 			// needed for statistics
 			private final ConclusionVisitor<?> conclusionVisitor_;
@@ -293,7 +287,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			private final ConclusionVisitor<Boolean> checker_;
 
 			OptimizedLocalSaturationStateWriter(ConclusionVisitor<?> visitor,
-					CompositionRuleVisitor ruleAppVisitor) {
+					RuleVisitor ruleAppVisitor) {
 				conclusionVisitor_ = visitor;
 				checker_ = new ConclusionOccurranceCheckingVisitor();
 				initRuleAppVisitor_ = ruleAppVisitor;
@@ -388,8 +382,8 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 			@Override
 			public void initContext(Context context) {
-				SaturationUtils.initContext(context, this, ontologyIndex_,
-						initRuleAppVisitor_);
+				SaturationUtils.initContext(ontologyIndex_,
+						initRuleAppVisitor_, context, this);
 			}
 
 			@Override
@@ -416,7 +410,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			private final ExtendedSaturationStateWriter mainStateWriter_;
 
 			IterationSaturationStateWriter(ConclusionVisitor<?> visitor,
-					CompositionRuleVisitor ruleAppVisitor,
+					RuleVisitor ruleAppVisitor,
 					ExtendedSaturationStateWriter writer) {
 				super(visitor, ruleAppVisitor);
 				mainStateWriter_ = writer;
@@ -501,7 +495,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		protected SaturationStateWriter getSaturationStateWriter() {
+		protected ConclusionProducer getConclusionProducer() {
 			return localWriter_;
 		}
 
@@ -524,16 +518,16 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	 *         pavel.klinov@uni-ulm.de
 	 */
 	private static class ConclusionGapFillingVisitor extends
-			ConclusionCompositionRuleApplicationVisitor implements
+			NonRedundantRuleApplicationConclusionVisitor implements
 			ConclusionVisitor<Boolean> {
 
 		private final SaturationStateWriter iterationWriter_;
-		private final CompositionRuleVisitor ruleAppVisitor_;
+		private final RuleVisitor ruleAppVisitor_;
 		private final SubsumerDecompositionVisitor iterateDecompRuleAppVisitor_;
 		private final SubsumerDecompositionVisitor produceDecompRuleAppVisitor_;
 
 		public ConclusionGapFillingVisitor(SaturationStateWriter enumWriter,
-				CompositionRuleVisitor ruleAppVisitor,
+				RuleVisitor ruleAppVisitor,
 				SubsumerDecompositionVisitor enumVisitor,
 				SubsumerDecompositionVisitor produceVisitor) {
 			super(ruleAppVisitor, enumWriter);
@@ -546,8 +540,8 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 		@Override
 		public Boolean defaultVisit(Conclusion conclusion, Context context) {
-			conclusion.accept(ruleAppVisitor_, iterationWriter_, context
-					.getRoot().getContext());
+			conclusion.applyNonRedundantRules(ruleAppVisitor_, context
+					.getRoot().getContext(), iterationWriter_);
 			return true;
 		}
 

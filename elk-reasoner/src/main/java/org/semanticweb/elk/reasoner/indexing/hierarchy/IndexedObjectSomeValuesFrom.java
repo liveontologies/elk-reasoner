@@ -25,10 +25,9 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.SubsumerDecompositionVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,13 +105,13 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	 * 
 	 * @param property
 	 * @param context
-	 * @param writer
+	 * @param producer
 	 */
 	public static void generatePropagations(IndexedPropertyChain property,
-			Context context, SaturationStateWriter writer) {
+			Context context, ConclusionProducer producer) {
 		for (IndexedClassExpression ice : context.getSubsumers()) {
 			PropagationFromExistentialFillerRule.applyForProperty(
-					ice.getCompositionRuleChain(), property, context, writer);
+					ice.getCompositionRuleChain(), property, context, producer);
 		}
 	}
 
@@ -120,11 +119,6 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	public String toStringStructural() {
 		return "ObjectSomeValuesFrom(" + this.property + ' ' + this.filler
 				+ ')';
-	}
-
-	@Override
-	public void accept(SubsumerDecompositionVisitor visitor, Context context) {
-		visitor.visit(this, context);
 	}
 
 }

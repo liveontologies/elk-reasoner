@@ -27,15 +27,16 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Iterator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CountingConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -84,7 +85,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 
 		return COLLECT_CONCLUSION_COUNTS ? new CountingConclusionVisitor(
 				conclusionStatistics.getProducedConclusionCounts())
-				: ConclusionVisitor.DUMMY;
+				: DummyConclusionVisitor.getInstance();
 	}
 
 	@Override

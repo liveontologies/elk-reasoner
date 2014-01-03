@@ -29,8 +29,8 @@ import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.rules.AbstractLocalRuleEngine;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory.BaseEngine;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
@@ -48,14 +48,14 @@ public class ClassExpressionNoInputSaturation
 		ReasonerComputation<IndexedClassExpression, ClassExpressionNoInputSaturationFactory> {
 
 	public ClassExpressionNoInputSaturation(final ComputationExecutor executor,
-			final int maxWorkers,
-			final ProgressMonitor progressMonitor,
+			final int maxWorkers, final ProgressMonitor progressMonitor,
 			final RuleApplicationFactory ruleAppFactory,
 			final ContextModificationListener contextModificationListener) {
 
 		super(Collections.<IndexedClassExpression> emptyList(),
-				new ClassExpressionNoInputSaturationFactory(ruleAppFactory, contextModificationListener),
-				executor, maxWorkers, progressMonitor);
+				new ClassExpressionNoInputSaturationFactory(ruleAppFactory,
+						contextModificationListener), executor, maxWorkers,
+				progressMonitor);
 	}
 
 	/**
@@ -75,12 +75,12 @@ public class ClassExpressionNoInputSaturation
 class ClassExpressionNoInputSaturationFactory
 		implements
 		InputProcessorFactory<IndexedClassExpression, ClassExpressionNoInputSaturationFactory.Engine> {
-	
+
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ClassExpressionNoInputSaturationFactory.class);	
+			.getLogger(ClassExpressionNoInputSaturationFactory.class);
 
 	private final RuleApplicationFactory ruleAppFactory_;
-	
+
 	private final ContextModificationListener contextModificationListener_;
 
 	public ClassExpressionNoInputSaturationFactory(
@@ -122,12 +122,13 @@ class ClassExpressionNoInputSaturationFactory
 
 		@Override
 		public void process() throws InterruptedException {
-			BaseEngine engine = ruleAppFactory_.getDefaultEngine(ContextCreationListener.DUMMY, contextModificationListener_);
-			
+			InputProcessor<IndexedClassExpression> engine = ruleAppFactory_
+					.getDefaultEngine(ContextCreationListener.DUMMY,
+							contextModificationListener_);
+
 			try {
 				engine.process();
-			}
-			finally {
+			} finally {
 				engine.finish();
 			}
 		}
@@ -135,7 +136,7 @@ class ClassExpressionNoInputSaturationFactory
 		@Override
 		public void finish() {
 			ruleAppFactory_.finish();
-			//System.err.println(ruleAppFactory_.getStatistics().getRuleStatistics().getTotalRuleAppCount());
+			// System.err.println(ruleAppFactory_.getStatistics().getRuleStatistics().getTotalRuleAppCount());
 		}
 
 	}

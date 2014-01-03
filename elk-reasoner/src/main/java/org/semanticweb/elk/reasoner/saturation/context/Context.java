@@ -29,9 +29,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
@@ -84,7 +86,7 @@ public interface Context {
 	 *         obtained by traversing over {@link LinkRule#next()}; this method
 	 *         should be used to access the rules without modifying them.
 	 */
-	public LinkRule<BackwardLink> getBackwardLinkRuleHead();
+	public LinkableBackwardLinkRule getBackwardLinkRuleHead();
 
 	/**
 	 * @return the {@link Chain} view of all backward link rules assigned to
@@ -94,7 +96,7 @@ public interface Context {
 	 *         {@link Chain} interface without without worrying about
 	 *         {@code null} values.
 	 */
-	public Chain<ModifiableLinkRule<BackwardLink>> getBackwardLinkRuleChain();
+	public Chain<LinkableBackwardLinkRule> getBackwardLinkRuleChain();
 
 	/**
 	 * Adds the given {@code BackwardLink} to this {@link Context}.
@@ -114,6 +116,18 @@ public interface Context {
 	public boolean removeBackwardLink(BackwardLink link);
 
 	public boolean containsBackwardLink(BackwardLink link);
+
+	public boolean addForwardLink(ForwardLink link);
+
+	public boolean removeForwardLink(ForwardLink link);
+
+	public boolean containsForwardLink(ForwardLink link);
+
+	public boolean addPropagation(Propagation propagation);
+
+	public boolean removePropagation(Propagation propagation);
+
+	public boolean containsPropagation(Propagation propagation);
 
 	/**
 	 * Adds the given {@link IndexedClassExpression} to the subsumers of the

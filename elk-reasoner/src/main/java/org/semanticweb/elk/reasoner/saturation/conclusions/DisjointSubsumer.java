@@ -26,10 +26,11 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.Rule;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
 
 /**
  * A {@code Conclusion} representing that some member of an
@@ -58,11 +59,18 @@ public class DisjointSubsumer extends AbstractConclusion {
 	}
 
 	@Override
-	public void accept(CompositionRuleVisitor ruleAppVisitor,
-			SaturationStateWriter writer, Context context) {
+	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
+			Context context, ConclusionProducer producer) {
 		if (context.inconsistForDisjointnessAxiom(axiom_)) {
-			ruleAppVisitor.visit(THIS_COMPOSITION_RULE_, this, context, writer);
+			ruleAppVisitor.visit(THIS_COMPOSITION_RULE_, this, context,
+					producer);
 		}
+	}
+
+	@Override
+	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
+			Context context, ConclusionProducer producer) {
+		// no redundant rules
 	}
 
 	@Override
@@ -73,31 +81,6 @@ public class DisjointSubsumer extends AbstractConclusion {
 	@Override
 	public String toString() {
 		return axiom_.toString();
-	}
-
-	/**
-	 * The composition rule applied when processing a {@link DisjointSubsumer}
-	 * producing {@link Contradiction} caused by violation of disjointness
-	 * constrains of this {@link DisjointSubsumer}
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 */
-	public static class ContradicitonCompositionRule implements
-			Rule<DisjointSubsumer> {
-
-		private static final String NAME_ = "Contradiction by Disjointness Axiom";
-
-		@Override
-		public String getName() {
-			return NAME_;
-		}
-
-		@Override
-		public void apply(DisjointSubsumer premise, Context context,
-				SaturationStateWriter writer) {
-			writer.produce(context, Contradiction.getInstance());
-		}
-
 	}
 
 }

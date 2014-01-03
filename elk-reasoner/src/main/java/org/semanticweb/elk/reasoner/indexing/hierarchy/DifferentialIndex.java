@@ -28,8 +28,8 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -78,7 +78,7 @@ public class DifferentialIndex extends DirectIndex {
 	/**
 	 * The added and removed initialization {@link Rule}s
 	 */
-	private ChainableRule<Void> addedContextInitRules_,
+	private ChainableContextInitRule addedContextInitRules_,
 			removedContextInitRules_;
 
 	/**
@@ -167,8 +167,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	@Override
-	public void add(IndexedClassExpression target,
-			ChainableSubsumerRule newRule) {
+	public void add(IndexedClassExpression target, ChainableSubsumerRule newRule) {
 		if (incrementalMode) {
 			if (newRule.removeFrom(getRemovedContextRuleChain(target))) {
 				newRule.addTo(target.getCompositionRuleChain());
@@ -196,7 +195,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	@Override
-	public void addContextInitRule(ChainableRule<Void> newRule) {
+	public void addContextInitRule(ChainableContextInitRule newRule) {
 		if (incrementalMode) {
 			if (newRule.removeFrom(getRemovedContextInitRuleChain())) {
 				newRule.addTo(getContextInitRuleChain());
@@ -209,7 +208,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	@Override
-	public void removeContextInitRule(ChainableRule<Void> oldRule) {
+	public void removeContextInitRule(ChainableContextInitRule oldRule) {
 		if (incrementalMode) {
 			if (!oldRule.removeFrom(getAddedContextInitRuleChain())) {
 				oldRule.addTo(getRemovedContextInitRuleChain());
@@ -248,7 +247,7 @@ public class DifferentialIndex extends DirectIndex {
 	 * @return the context initialization rules added during the last
 	 *         incremental session
 	 */
-	public ChainableRule<Void> getAddedContextInitRules() {
+	public ChainableContextInitRule getAddedContextInitRules() {
 		return addedContextInitRules_;
 	}
 
@@ -256,7 +255,7 @@ public class DifferentialIndex extends DirectIndex {
 	 * @return the context initialization rules removed during the last
 	 *         incremental session
 	 */
-	public ChainableRule<Void> getRemovedContextInitRules() {
+	public ChainableContextInitRule getRemovedContextInitRules() {
 		return removedContextInitRules_;
 	}
 
@@ -314,8 +313,8 @@ public class DifferentialIndex extends DirectIndex {
 	 */
 	public void commitAddedRules() {
 		// commit changes in the context initialization rules
-		ChainableRule<Void> nextContextInitRule;
-		Chain<ChainableRule<Void>> contextInitRuleChain;
+		ChainableContextInitRule nextContextInitRule;
+		Chain<ChainableContextInitRule> contextInitRuleChain;
 
 		nextContextInitRule = addedContextInitRules_;
 		contextInitRuleChain = getContextInitRuleChain();
@@ -389,16 +388,16 @@ public class DifferentialIndex extends DirectIndex {
 	 * @return the chain of added context initialization rules suitable for
 	 *         modifications (addition or deletions) of rules
 	 */
-	private Chain<ChainableRule<Void>> getAddedContextInitRuleChain() {
-		return new AbstractChain<ChainableRule<Void>>() {
+	private Chain<ChainableContextInitRule> getAddedContextInitRuleChain() {
+		return new AbstractChain<ChainableContextInitRule>() {
 
 			@Override
-			public ChainableRule<Void> next() {
+			public ChainableContextInitRule next() {
 				return addedContextInitRules_;
 			}
 
 			@Override
-			public void setNext(ChainableRule<Void> tail) {
+			public void setNext(ChainableContextInitRule tail) {
 				addedContextInitRules_ = tail;
 			}
 		};
@@ -408,16 +407,16 @@ public class DifferentialIndex extends DirectIndex {
 	 * @return the chain of removed context initialization rules suitable for
 	 *         modifications (addition or deletions) of rules
 	 */
-	private Chain<ChainableRule<Void>> getRemovedContextInitRuleChain() {
-		return new AbstractChain<ChainableRule<Void>>() {
+	private Chain<ChainableContextInitRule> getRemovedContextInitRuleChain() {
+		return new AbstractChain<ChainableContextInitRule>() {
 
 			@Override
-			public ChainableRule<Void> next() {
+			public ChainableContextInitRule next() {
 				return removedContextInitRules_;
 			}
 
 			@Override
-			public void setNext(ChainableRule<Void> tail) {
+			public void setNext(ChainableContextInitRule tail) {
 				removedContextInitRules_ = tail;
 			}
 		};
