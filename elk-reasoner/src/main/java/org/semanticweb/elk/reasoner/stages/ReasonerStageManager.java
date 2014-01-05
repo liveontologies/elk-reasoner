@@ -49,7 +49,8 @@ public class ReasonerStageManager {
 			incrementalClassTaxonomyComputationStage,
 			instanceTaxonomyComputationStage,
 			incrementalInstanceTaxonomyComputationStage,
-			contextTracingStage;
+			contextTracingStage,
+			recursiveContextTracingStage;
 
 	ReasonerStageManager(AbstractReasonerState reasoner) {
 
@@ -121,6 +122,9 @@ public class ReasonerStageManager {
 		 * Tracing
 		 */
 		this.contextTracingStage = new ContextTracingStage(
+				reasoner, classTaxonomyComputationStage);
+		
+		this.recursiveContextTracingStage = new RecursiveContextTracingStage(
 				reasoner, classTaxonomyComputationStage);
 	}
 }

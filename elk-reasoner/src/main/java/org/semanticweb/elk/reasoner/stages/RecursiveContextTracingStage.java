@@ -25,11 +25,7 @@ package org.semanticweb.elk.reasoner.stages;
  */
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
-import org.semanticweb.elk.reasoner.saturation.tracing.ContextTracingFactory;
-import org.semanticweb.elk.reasoner.saturation.tracing.ContextTracingListener;
+import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveContextTracing;
 
 /**
  
@@ -38,11 +34,11 @@ import org.semanticweb.elk.reasoner.saturation.tracing.ContextTracingListener;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ContextTracingStage extends AbstractReasonerStage {
+public class RecursiveContextTracingStage extends AbstractReasonerStage {
 
-	private ClassExpressionSaturation<IndexedClassExpression> tracing_;
+	private RecursiveContextTracing tracing_;
 
-	public ContextTracingStage(AbstractReasonerState reasoner,
+	public RecursiveContextTracingStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
 	}
@@ -65,11 +61,14 @@ public class ContextTracingStage extends AbstractReasonerStage {
 			return false;
 		}
 
-		RuleApplicationFactory ruleAppFactory = new ContextTracingFactory(reasoner.saturationState, reasoner.traceState, ContextTracingListener.DUMMY);
+		/*RuleApplicationFactory ruleAppFactory = new ContextTracingFactory(reasoner.saturationState, reasoner.traceState);
 		
 		tracing_ = new ClassExpressionSaturation<IndexedClassExpression>(
 				reasoner.traceState.getRootsSubmittedForTracing(), reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), ruleAppFactory);
+				reasoner.getProgressMonitor(), ruleAppFactory);*/
+		tracing_ = new RecursiveContextTracing(reasoner.traceState.getRootsSubmittedForTracing(),
+				reasoner.getProcessExecutor(), workerNo, reasoner.getProgressMonitor(),
+				reasoner.saturationState, reasoner.traceState);
 
 		return true;
 	}

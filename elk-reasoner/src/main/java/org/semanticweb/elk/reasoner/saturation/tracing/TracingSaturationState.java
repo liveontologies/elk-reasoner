@@ -70,16 +70,21 @@ public class TracingSaturationState extends LocalSaturationState {
 			CompositionRuleApplicationVisitor initRuleAppVisitor) {
 		return new TracingWriter(conclusionVisitor, initRuleAppVisitor);
 	}
-
+	
+	@Override
+	public HybridContext getContext(IndexedClassExpression ice) {
+		return (HybridContext) super.getContext(ice);
+	}
+	
 	/**
 	 * 
 	 * @param context
 	 * @return true if the context has been traced
 	 */
 	public boolean isTraced(Context context) {
-		Context localContext = getContext(context.getRoot());
+		HybridContext localContext = getContext(context.getRoot());
 
-		return localContext != null && localContext.isSaturated();
+		return localContext != null && localContext.isInitialized();
 	}
 
 	public Iterable<Context> getTracedContexts() {
@@ -131,7 +136,14 @@ public class TracingSaturationState extends LocalSaturationState {
 			localContext_ = local;
 			mainContext_ = main;
 		}
-
+		
+		boolean isInitialized() {
+			// TODO it's safer to maintain a flag for this (the current check
+			// relies on the fact that our initialization rules produce at least
+			// one subsumer)
+			return !localContext_.getSubsumers().isEmpty();
+		}
+		
 		@Override
 		public IndexedClassExpression getRoot() {
 			return localContext_.getRoot();
@@ -249,19 +261,17 @@ public class TracingSaturationState extends LocalSaturationState {
 
 		@Override
 		public boolean isSaturated() {
-			return false;
+			return localContext_.isSaturated();
 		}
 
 		@Override
 		public boolean setInconsistent(boolean consistent) {
-			// no-op
-			return false;
+			return localContext_.setInconsistent(consistent);
 		}
 
 		@Override
 		public boolean setSaturated(boolean saturated) {
-			// no-op
-			return false;
+			return localContext_.setSaturated(saturated);
 		}
 
 		@Override

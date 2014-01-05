@@ -58,6 +58,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.SimpleCentralizedTraceStore;
+import org.semanticweb.elk.reasoner.saturation.tracing.TRACE_MODE;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
@@ -605,15 +606,23 @@ public abstract class AbstractReasonerState {
 				classTaxonomyState.getTaxonomy()));
 	}
 
-	public void explainSubsumption(ElkClassExpression sub, ElkClassExpression sup, TracedConclusionVisitor<?,?> visitor, boolean trace) throws ElkException {
+	public void explainSubsumption(ElkClassExpression sub,
+			ElkClassExpression sup, TracedConclusionVisitor<?, ?> visitor,
+			TRACE_MODE traceMode) throws ElkException {
 		IndexedClassExpression subsumee = sub.accept(objectCache_.getIndexObjectConverter());
 		IndexedClassExpression subsumer = sup.accept(objectCache_.getIndexObjectConverter());
 		
-		if (trace && !traceState.getSaturationState().isTraced(subsumee.getContext())) {
+		if (traceMode != TRACE_MODE.NO_TRACING && !traceState.getSaturationState().isTraced(subsumee.getContext())) {
 			traceState.submitForTracing(subsumee);
-			stageManager.contextTracingStage.invalidate();
-			// run the tracing stage
-			getStageExecutor().complete(stageManager.contextTracingStage);
+			
+			if (traceMode == TRACE_MODE.NON_RECURSIVE) {
+				stageManager.contextTracingStage.invalidate();
+				getStageExecutor().complete(stageManager.contextTracingStage);
+			} else if (traceMode == TRACE_MODE.RECURSIVE) {
+				stageManager.recursiveContextTracingStage.invalidate();
+				getStageExecutor().complete(
+						stageManager.recursiveContextTracingStage);
+			}
 		}
 		
 		traceState.getTraceStore().getReader().accept(subsumee.getContext(), TracingUtils.getSubsumerWrapper(subsumer), visitor);

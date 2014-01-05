@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
+import org.semanticweb.elk.reasoner.saturation.DelegatingBasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -72,11 +73,14 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	 * trace store which stores traced conclusions.
 	 */
 	private final TraceState traceState_;
+	
+	private final ContextTracingListener listener_;
 
 	public ContextTracingFactory(ExtendedSaturationState mainSaturationState,
-			TraceState traceState) {
+			TraceState traceState, ContextTracingListener listener) {
 		super(mainSaturationState);
 		traceState_ = traceState;
+		listener_ = listener;
 	}
 
 	@Override
@@ -96,7 +100,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private class TracingEngine extends RuleApplicationFactory.BaseEngine {
+	class TracingEngine extends RuleApplicationFactory.BaseEngine {
 
 		// processes conclusions taken from the ToDo queue
 		private final ConclusionVisitor<Boolean, Context> conclusionProcessor_;
@@ -124,8 +128,11 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		@Override
 		public void submit(IndexedClassExpression root) {
 			Context cxt = getSaturationStateWriter().getCreateContext(root);
-			//manual init
-			getSaturationStateWriter().initContext(cxt);
+
+			if (!cxt.isSaturated()) {
+				//Manual initialization. Initialized = traced.
+				getSaturationStateWriter().initContext(cxt);
+			}
 		}
 
 		@Override
@@ -177,12 +184,27 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 				return root.getContext();
 			}
 		}
+		
+		BasicSaturationStateWriter getWriter(Conclusion conclusion,
+				Context context) {
+			if (context != conclusion.getSourceContext(context)) {
+				/*
+				 * if we're making an inference in a context different from the
+				 * one being traced, we might need to notify the caller that the
+				 * context needs to be traced, too (i.e. recursively)
+				 */
+				return new NotificationWriter(localWriter_, context);
+			} else {
+				return localWriter_;
+			}
+		}
 
 		@Override
 		public Boolean visit(ComposedSubsumer negSCE, Context context) {
 			Context cxt = getContext(negSCE, context);
+			BasicSaturationStateWriter writer = getWriter(negSCE, context);
 
-			negSCE.apply(localWriter_, cxt, ruleAppVisitor_);
+			negSCE.apply(writer, cxt, ruleAppVisitor_);
 			negSCE.applyDecompositionRules(cxt, mainDecompRuleAppVisitor_);
 
 			return true;
@@ -190,43 +212,54 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		@Override
 		public Boolean visit(DecomposedSubsumer posSCE, Context context) {
-			posSCE.apply(localWriter_, getContext(posSCE, context),
+			BasicSaturationStateWriter writer = getWriter(posSCE, context);
+			
+			posSCE.apply(writer, getContext(posSCE, context),
 					ruleAppVisitor_, mainDecompRuleAppVisitor_);
 			return true;
 		}
 
 		@Override
-		public Boolean visit(BackwardLink link, Context context) {
-			link.applyLocally(localWriter_, getContext(link, context),
-					ruleAppVisitor_);
+		public Boolean visit(BackwardLink link, Context inferenceContext) {
+			BasicSaturationStateWriter writer = getWriter(link, inferenceContext);
+			
+			link.applyLocally(writer, getContext(link, inferenceContext), ruleAppVisitor_);
 
 			return true;
 		}
 
 		@Override
-		public Boolean visit(ForwardLink link, Context context) {
-			link.applyLocally(localWriter_, getContext(link, context));
+		public Boolean visit(ForwardLink link, Context inferenceContext) {
+			BasicSaturationStateWriter writer = getWriter(link, inferenceContext);
+			
+			link.applyLocally(writer, getContext(link, inferenceContext));
 
 			return true;
 		}
 
 		@Override
 		public Boolean visit(Contradiction bot, Context context) {
-			bot.deapply(localWriter_, getContext(bot, context));
+			BasicSaturationStateWriter writer = getWriter(bot, context);
+			
+			bot.deapply(writer, getContext(bot, context));
 			return true;
 		}
 
 		@Override
-		public Boolean visit(Propagation propagation, Context context) {
-			propagation.applyLocally(localWriter_,
-					getContext(propagation, context));
+		public Boolean visit(Propagation propagation, final Context inferenceContext) {
+			BasicSaturationStateWriter writer = getWriter(propagation, inferenceContext);
+			
+			propagation.applyLocally(writer,
+					getContext(propagation, inferenceContext));
 			return true;
 		}
 
 		@Override
 		public Boolean visit(DisjointnessAxiom disjointnessAxiom,
 				Context context) {
-			disjointnessAxiom.apply(localWriter_,
+			BasicSaturationStateWriter writer = getWriter(disjointnessAxiom, context);
+			
+			disjointnessAxiom.apply(writer,
 					getContext(disjointnessAxiom, context));
 
 			return true;
@@ -275,7 +308,8 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	}
 
 	/**
-	 * Inserts traces into the trace store but passes the main context so that the traces can be retrieved by main contexts.
+	 * Inserts traces into the trace store but passes the main context so that
+	 * the traces can be retrieved by main contexts.
 	 * 
 	 * @author Pavel Klinov
 	 * 
@@ -291,6 +325,38 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		@Override
 		protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
 			return super.defaultVisit(conclusion, cxt.getRoot().getContext());
+		}
+
+	}
+	
+	/**
+	 * Notifies the listener that the context in which the current inference has
+	 * been produced has not been submitted for tracing yet.
+	 * 
+	 * @author Pavel Klinov
+	 * 
+	 *         pavel.klinov@uni-ulm.de
+	 */
+	private class NotificationWriter extends
+			DelegatingBasicSaturationStateWriter {
+
+		private final Context inferenceContext_;
+
+		public NotificationWriter(BasicSaturationStateWriter writer,
+				Context inferenceContext) {
+			super(writer);
+			inferenceContext_ = inferenceContext;
+		}
+
+		@Override
+		public void produce(Context targetContext, Conclusion conclusion) {
+			// TODO isTraced may potentially be expensive.
+			if (targetContext.getRoot() != inferenceContext_.getRoot()
+					&& !getSaturationState().isTraced(inferenceContext_)) {
+				listener_.notifyNonTraced(inferenceContext_);
+			}
+
+			super.produce(targetContext, conclusion);
 		}
 
 	}
