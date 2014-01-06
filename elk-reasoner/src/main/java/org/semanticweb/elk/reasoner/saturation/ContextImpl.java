@@ -91,7 +91,7 @@ public class ContextImpl implements Context {
 	/**
 	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
 	 */
-	private final ActivationStack<Conclusion> toDo_;
+	private transient final ActivationStack<Conclusion> toDo_;
 
 	/**
 	 * {@code true} if all derived {@link SubsumerImpl} of {@link #root_} have been

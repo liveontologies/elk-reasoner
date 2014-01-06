@@ -60,6 +60,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain
 import org.semanticweb.elk.reasoner.saturation.tracing.SimpleCentralizedTraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TRACE_MODE;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
+import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
@@ -644,6 +645,10 @@ public abstract class AbstractReasonerState {
 		getStageExecutor().complete(stageManager.contextTracingStage);
 		
 		traceState.getTraceStore().getReader().accept(subsumee.getContext(), TracingUtils.getSubsumerWrapper(subsumer), visitor);
+	}
+	
+	public TraceStore getTraceStore() {
+		return traceState.getTraceStore();
 	}
 	
 	// ////////////////////////////////////////////////////////////////

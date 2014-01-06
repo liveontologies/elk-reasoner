@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.owl.iris;
 
+import java.io.Serializable;
+
 
 /**
  * This class represents a prefix declaration. It holds both the prefix
@@ -29,7 +31,7 @@ package org.semanticweb.elk.owl.iris;
  * 
  * @author Frantisek Simancik
  */
-public class ElkPrefix {
+public class ElkPrefix implements Serializable {
 	
 	protected final String name;
 	protected final ElkFullIri iri;

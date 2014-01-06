@@ -25,6 +25,7 @@
  */
 package org.semanticweb.elk.util.collections;
 
+import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,7 +47,7 @@ import java.util.Set;
  * 
  */
 public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
-		DirectAccess<E> {
+		DirectAccess<E>, Serializable {
 
 	/**
 	 * The default initial capacity - MUST be a power of two.

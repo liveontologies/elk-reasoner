@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -48,6 +49,10 @@ public interface TraceStore {
 		 * @param visitor
 		 */
 		public void accept(Context context, Conclusion conclusion, TracedConclusionVisitor<?,?> visitor);
+		
+		public Iterable<Context> getContexts();
+		
+		public void visitConclusions(Context context, ConclusionVisitor<?, ?> visitor);
 		
 	}
 

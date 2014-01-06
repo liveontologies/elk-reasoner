@@ -24,6 +24,7 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.Set;
@@ -47,7 +48,7 @@ import org.semanticweb.elk.util.collections.Operations;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class SaturatedPropertyChain {
+public class SaturatedPropertyChain implements Serializable {
 
 	/**
 	 * If set to true, then binary property chains that do not occur on the

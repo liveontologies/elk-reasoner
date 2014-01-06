@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.context;
  * #L%
  */
 
+import java.io.Serializable;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -46,7 +47,7 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  * @see RuleApplicationFactory
  * 
  */
-public interface Context {
+public interface Context extends Serializable {
 
 	/**
 	 * @return the {@link IndexedClassExpression} for which this {@link Context}

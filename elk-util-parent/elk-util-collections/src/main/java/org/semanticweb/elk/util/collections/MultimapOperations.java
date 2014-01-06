@@ -43,6 +43,11 @@ public class MultimapOperations {
 	public static <K, V> Multimap<K, V> union(final Multimap<K, V> first, final Multimap<K, V> second) {
 		return new Multimap<K, V>() {
 
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -4849093954291571340L;
+
 			@Override
 			public boolean contains(K key, V value) {
 				return first.contains(key, value) || second.contains(key, value);
@@ -84,6 +89,11 @@ public class MultimapOperations {
 	public static <K, V> Multimap<K, V> keyFilter(final Multimap<K, V> input, final Condition<? super K> condition) {
 		return new Multimap<K, V>() {
 
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -5672998220011330630L;
+
 			@Override
 			public boolean contains(K key, V value) {
 				return condition.holds(key) && input.contains(key, value);
@@ -124,6 +134,11 @@ public class MultimapOperations {
 	
 	public static <K, V> Multimap<K, V> valueFilter(final Multimap<K, V> input, final Condition<? super V> condition) {
 		return new Multimap<K, V>() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -7786448209953043322L;
 
 			@Override
 			public boolean contains(K key, V value) {

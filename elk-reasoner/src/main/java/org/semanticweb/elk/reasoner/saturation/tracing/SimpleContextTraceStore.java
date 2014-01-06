@@ -31,13 +31,14 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -224,6 +225,40 @@ public class SimpleContextTraceStore implements ContextTracer {
 	@Override
 	public boolean addInference(TracedConclusion conclusion) {
 		return conclusion.acceptTraced(inferenceWriter_, null);
+	}
+
+	@Override
+	public void visitConclusions(ConclusionVisitor<?, ?> visitor) {
+		// subsumers
+		for (IndexedClassExpression ice : subsumerInferenceMap_.keySet()) {
+			TracingUtils.getSubsumerWrapper(ice).accept(visitor, null);
+		}
+		// backward links
+		for (IndexedPropertyChain linkRelation : backwardLinkInferenceMap_
+				.keySet()) {
+			for (Context source : backwardLinkInferenceMap_.get(linkRelation)
+					.keySet()) {
+				TracingUtils.getBackwardLinkWrapper(linkRelation, source)
+						.accept(visitor, null);
+			}
+		}
+		// forward links
+		for (IndexedPropertyChain linkRelation : forwardLinkInferenceMap_
+				.keySet()) {
+			for (Context target : forwardLinkInferenceMap_.get(linkRelation)
+					.keySet()) {
+				TracingUtils.getBackwardLinkWrapper(linkRelation, target)
+						.accept(visitor, null);
+			}
+		}
+		// propagations
+		for (IndexedPropertyChain propRelation : propagationMap_.keySet()) {
+			for (IndexedObjectSomeValuesFrom carry : propagationMap_.get(
+					propRelation).keySet()) {
+				TracingUtils.getPropagationWrapper(propRelation, carry).accept(
+						visitor, null);
+			}
+		}
 	}
 
 }

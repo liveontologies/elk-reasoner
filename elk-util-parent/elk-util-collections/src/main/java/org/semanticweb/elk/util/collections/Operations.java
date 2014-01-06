@@ -44,6 +44,11 @@ public class Operations {
 
 	public static final Multimap<?, ?> EMPTY_MULTIMAP = new Multimap<Object, Object>() {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -8714440769082182569L;
+
 		@Override
 		public boolean contains(Object key, Object value) {
 			return false;

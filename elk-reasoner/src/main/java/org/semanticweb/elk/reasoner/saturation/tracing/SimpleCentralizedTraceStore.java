@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +68,20 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 			
 			if (tracer != null) {
 				tracer.accept(conclusion, visitor);
+			}
+		}
+
+		@Override
+		public Iterable<Context> getContexts() {
+			return storage_.keySet();
+		}
+
+		@Override
+		public void visitConclusions(Context context, ConclusionVisitor<?, ?> visitor) {
+			ContextTracer tracer = storage_.get(context);
+			
+			if (tracer != null) {
+				tracer.visitConclusions(visitor);
 			}
 		}
 		

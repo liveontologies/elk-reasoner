@@ -38,6 +38,11 @@ import java.util.Collections;
 public abstract class AbstractHashMultimap<Key, Value> extends
 		ArrayHashMap<Key, Collection<Value>> implements Multimap<Key, Value> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2756382368342593383L;
+
 	protected abstract Collection<Value> newRecord();
 
 	public AbstractHashMultimap() {

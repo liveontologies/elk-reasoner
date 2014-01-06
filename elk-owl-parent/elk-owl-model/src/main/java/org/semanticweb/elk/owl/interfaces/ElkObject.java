@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import java.io.Serializable;
+
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -32,7 +34,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  * @author Frantisek Simancik
  *
  */
-public interface ElkObject {
+public interface ElkObject extends Serializable {
 
 	public <O> O accept(ElkObjectVisitor<O> visitor);
 
