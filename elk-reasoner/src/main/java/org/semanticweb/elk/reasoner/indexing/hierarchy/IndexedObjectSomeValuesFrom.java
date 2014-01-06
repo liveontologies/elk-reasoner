@@ -185,8 +185,8 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			// return;
 			// }
 
-			for (IndexedObjectSomeValuesFrom e : negExistentials_) {
-				IndexedPropertyChain relation = e.getRelation();
+			for (IndexedObjectSomeValuesFrom carry : negExistentials_) {
+				IndexedPropertyChain relation = carry.getRelation();
 				/*
 				 * creating propagations for relevant sub-properties of the
 				 * relation
@@ -194,15 +194,13 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
 						candidatePropagationProperties, relation.getSaturated()
 								.getSubProperties())) {
-					//writer.produce(context, new Propagation(property, e));
-					writer.produce(context, writer.getConclusionFactory().createPropagation(premise, property, e));
+					writer.produce(context, writer.getConclusionFactory().createPropagation(premise, property, carry));
 				}
 
 				// TODO: create a composition rule to deal with reflexivity
 				// propagating to the this context if relation is reflexive
 				if (relation.getSaturated().isDerivedReflexive()) {
-					//writer.produce(context, new NegativeSubsumer(e));
-					writer.produce(context, writer.getConclusionFactory().createReflexiveSubsumer(e));
+					writer.produce(context, writer.getConclusionFactory().createReflexiveSubsumer(carry));
 				}
 			}
 		}
@@ -269,7 +267,6 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 			for (IndexedObjectSomeValuesFrom carry : negExistentials_) {
 				if (carry.getRelation().getSaturated().getSubProperties()
 						.contains(property)) {
-					//writer.produce(context, new Propagation(property, e));
 					writer.produce(context, writer.getConclusionFactory().createPropagation(premise, property, carry));
 				}
 			}
