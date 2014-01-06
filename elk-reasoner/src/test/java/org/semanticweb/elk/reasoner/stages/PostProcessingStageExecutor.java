@@ -46,6 +46,7 @@ public class PostProcessingStageExecutor extends SimpleStageExecutor {
 
 	public static final Class<?> CLASS_TAXONOMY_COMPUTATION = ClassTaxonomyComputationStage.class;
 	public static final Class<?> CONTEXT_TRACING = ContextTracingStage.class;
+	public static final Class<?> RECURSIVE_CONTEXT_TRACING = RecursiveContextTracingStage.class;
 	
 	/*
 	 * STATIC INT

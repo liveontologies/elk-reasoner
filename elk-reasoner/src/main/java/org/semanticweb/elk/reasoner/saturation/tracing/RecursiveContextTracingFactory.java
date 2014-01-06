@@ -125,11 +125,12 @@ public class RecursiveContextTracingFactory implements
 	}
 
 	/**
-	 * Gets notifications when new yet-not-traced context need to be traced and submits new jobs to the context tracing queue.
+	 * Gets notifications when new yet-not-traced context needs to be traced and
+	 * submits new jobs to the context tracing queue.
 	 * 
 	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
+	 * 
+	 *         pavel.klinov@uni-ulm.de
 	 */
 	private class RecursiveContextTracingListener implements ContextTracingListener {
 

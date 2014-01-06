@@ -82,13 +82,15 @@ public class TracingSaturationTest {
 		
 		try {
 			stream = getClass().getClassLoader().getResourceAsStream(
-					"classification_test_input/Existentials.owl");
+					"classification_test_input/PropertyChains.owl");
 
 			List<ElkAxiom> ontology = loadAxioms(stream);
 			TestChangesLoader initialLoader = new TestChangesLoader();			
 
 			ReasonerStageExecutor executor = new PostProcessingStageExecutor(
 					PostProcessingStageExecutor.CONTEXT_TRACING,
+					CheckTracingStage.class,
+					PostProcessingStageExecutor.RECURSIVE_CONTEXT_TRACING,
 					CheckTracingStage.class);
 			//ReasonerStageExecutor executor = new LoggingStageExecutor();
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader, executor);
@@ -111,7 +113,7 @@ public class TracingSaturationTest {
 					return super.defaultTracedVisit(conclusion, v);
 				}
 				
-			}, TRACE_MODE.NON_RECURSIVE);
+			}, TRACE_MODE.RECURSIVE);
 			
 
 		} finally {
@@ -131,9 +133,6 @@ public class TracingSaturationTest {
 			List<ElkAxiom> ontology = loadAxioms(stream);
 			TestChangesLoader initialLoader = new TestChangesLoader();			
 
-			/*ReasonerStageExecutor executor = new PostProcessingStageExecutor(
-					PostProcessingStageExecutor.CONTEXT_TRACING,
-					CheckTracingStage.class);*/
 			ReasonerStageExecutor executor = new LoggingStageExecutor();
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader, executor);
 

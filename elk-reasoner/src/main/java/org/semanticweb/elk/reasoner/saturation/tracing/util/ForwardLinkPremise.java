@@ -94,6 +94,9 @@ class ForwardLinkPremise implements ForwardLink {
 		//no-op
 	}
 
-	
+	@Override
+	public String toString() {
+		return relation_ + "->" + target_.getRoot();
+	}
 
 }

@@ -216,7 +216,7 @@ public class CheckTracingStage extends BasePostProcessingStage {
 				});
 
 		if (!infFound.get()
-				&& reasoner.traceState.getSaturationState().isTraced(context)) {
+				/*&& reasoner.traceState.getSaturationState().isTraced(context)*/) {
 			LOGGER_.error("No inferences for a conclusion {} in context {}",
 					conclusion, context);
 		}

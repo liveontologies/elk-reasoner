@@ -81,7 +81,15 @@ public class BackwardLinkImpl implements BackwardLink {
 			backLinkRule = backLinkRule.next();
 		}
 
-		
+		/*
+		 * convert backward link to a forward link if it can potentially be
+		 * composed
+		 */
+		if (!relation_.getSaturated().getCompositionsByLeftSubProperty()
+				.isEmpty()) {
+			writer.produce(source_, writer.getConclusionFactory()
+					.createForwardLink(this, context));
+		}		
 	}
 	
 	@Override
@@ -97,15 +105,7 @@ public class BackwardLinkImpl implements BackwardLink {
 
 		applyLocally(writer, context, ruleAppVisitor);
 		
-		/*
-		 * convert backward link to a forward link if it can potentially be
-		 * composed
-		 */
-		if (!relation_.getSaturated().getCompositionsByLeftSubProperty()
-				.isEmpty()) {
-			writer.produce(source_, writer.getConclusionFactory()
-					.createForwardLink(this, context));
-		}
+		
 	}
 
 	@Override
