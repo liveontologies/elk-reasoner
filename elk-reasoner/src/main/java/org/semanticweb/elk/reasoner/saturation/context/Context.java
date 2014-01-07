@@ -270,7 +270,20 @@ public interface Context {
 	 *         one, or {@code null} if there is no such {@link Conclusion}
 	 * @see #addToDo(Conclusion)
 	 */
-	public Conclusion takeToDo();
+	 public Conclusion takeToDo();
+
+	/**
+	 * Call the given {@link ConclusionProcessor} exactly once for every
+	 * unprocessed {@link Conclusion} that was added using the method
+	 * {@link #addToDo(Conclusion)} and removes such {@link Conclusion}s. This
+	 * method is thread safe and can be used concurrently with the method
+	 * {@link #addToDo(Conclusion)}.
+	 * 
+	 * @param processor
+	 *            the {@link ConclusionProcessor} to be called on unprocessed
+	 *            {@link Conclusion}s of this {@link Context}
+	 */
+//	public void processPendingConclusions(ConclusionProcessor processor);
 
 	/**
 	 * @return {@code true} if all {@link Conclusion}s for this {@link Context},
@@ -299,6 +312,6 @@ public interface Context {
 	 * removes links to the next and previous contexts, effectively removing
 	 * this {@link Context} from the chain of contexts
 	 */
-	public void removeLinks(); // TODO: find a way to hide this
+	// public void removeLinks(); // TODO: find a way to hide this
 
 }

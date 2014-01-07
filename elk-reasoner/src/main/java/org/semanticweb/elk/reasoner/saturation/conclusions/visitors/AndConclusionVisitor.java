@@ -42,7 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class CombinedConclusionVisitor implements ConclusionVisitor<Boolean> {
+public class AndConclusionVisitor implements ConclusionVisitor<Boolean> {
 
 	final private ConclusionVisitor<Boolean> first_;
 
@@ -62,47 +62,52 @@ public class CombinedConclusionVisitor implements ConclusionVisitor<Boolean> {
 	 * @param second
 	 *            The {@link ConclusionVisitor} that should be used second
 	 */
-	public CombinedConclusionVisitor(ConclusionVisitor<Boolean> first,
+	public AndConclusionVisitor(ConclusionVisitor<Boolean> first,
 			ConclusionVisitor<Boolean> second) {
 		this.first_ = first;
 		this.second_ = second;
 	}
 
 	@Override
-	public Boolean visit(BackwardLink link, Context context) {
-		return first_.visit(link, context) && second_.visit(link, context);
+	public Boolean visit(BackwardLink conclusion, Context context) {
+		return first_.visit(conclusion, context)
+				&& second_.visit(conclusion, context);
 	}
 
 	@Override
-	public Boolean visit(ComposedSubsumer cSub, Context context) {
-		return first_.visit(cSub, context) && second_.visit(cSub, context);
+	public Boolean visit(ComposedSubsumer conclusion, Context context) {
+		return first_.visit(conclusion, context)
+				&& second_.visit(conclusion, context);
 	}
 
 	@Override
-	public Boolean visit(Contradiction bot, Context context) {
-		return first_.visit(bot, context) && second_.visit(bot, context);
+	public Boolean visit(Contradiction conclusion, Context context) {
+		return first_.visit(conclusion, context)
+				&& second_.visit(conclusion, context);
 	}
 
 	@Override
-	public Boolean visit(DecomposedSubsumer dSub, Context context) {
-		return first_.visit(dSub, context) && second_.visit(dSub, context);
+	public Boolean visit(DecomposedSubsumer conclusion, Context context) {
+		return first_.visit(conclusion, context)
+				&& second_.visit(conclusion, context);
 	}
 
 	@Override
-	public Boolean visit(DisjointSubsumer disjoint, Context context) {
-		return first_.visit(disjoint, context)
-				&& second_.visit(disjoint, context);
+	public Boolean visit(DisjointSubsumer conclusion, Context context) {
+		return first_.visit(conclusion, context)
+				&& second_.visit(conclusion, context);
 	}
 
 	@Override
-	public Boolean visit(ForwardLink link, Context context) {
-		return first_.visit(link, context) && second_.visit(link, context);
+	public Boolean visit(ForwardLink conclusion, Context context) {
+		return first_.visit(conclusion, context)
+				&& second_.visit(conclusion, context);
 	}
 
 	@Override
-	public Boolean visit(Propagation propagation, Context context) {
-		return first_.visit(propagation, context)
-				&& second_.visit(propagation, context);
+	public Boolean visit(Propagation conclusion, Context context) {
+		return first_.visit(conclusion, context)
+				&& second_.visit(conclusion, context);
 	}
 
 }

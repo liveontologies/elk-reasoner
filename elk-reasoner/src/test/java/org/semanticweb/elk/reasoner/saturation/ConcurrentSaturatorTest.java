@@ -153,43 +153,43 @@ public class ConcurrentSaturatorTest extends TestCase {
 		assertTrue("A contains D", context.getSubsumers().contains(D));
 	}
 	
-	public void testContextLinking() {
-		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
-		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
-		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
-		final ModifiableOntologyIndex index = new DirectIndex();
-		final SaturationStateImpl state = new SaturationStateImpl(index);
-		IndexedObjectCache objectCache = index.getIndexedObjectCache();
-		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
-				objectCache);
-		IndexedClassExpression A = a.accept(converter);
-		IndexedClassExpression B = b.accept(converter);
-		IndexedClassExpression C = c.accept(converter);
-		
-		ExtendedSaturationStateWriter writer = state.getExtendedWriter(
-				ContextCreationListener.DUMMY,
-				ContextModificationListener.DUMMY,
-				new BasicRuleVisitor(),
-				new ConclusionInsertionVisitor(), false);
-		
-		Context cA = writer.getCreateContext(A);
-		Context cB = writer.getCreateContext(B);
-		Context cC = writer.getCreateContext(C);
-		
-		assertEquals(3, getRoots(state.getContexts()).size());
-		
-		cC.removeLinks();
-		
-		assertEquals(2, getRoots(state.getContexts()).size());
-		
-		cA.removeLinks();
-		
-		assertEquals(1, getRoots(state.getContexts()).size());
-		
-		cB.removeLinks();
-		
-		assertTrue(state.getContexts().isEmpty());
-	}
+//	public void testContextLinking() {
+//		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
+//		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
+//		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
+//		final ModifiableOntologyIndex index = new DirectIndex();
+//		final SaturationStateImpl state = new SaturationStateImpl(index);
+//		IndexedObjectCache objectCache = index.getIndexedObjectCache();
+//		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
+//				objectCache);
+//		IndexedClassExpression A = a.accept(converter);
+//		IndexedClassExpression B = b.accept(converter);
+//		IndexedClassExpression C = c.accept(converter);
+//		
+//		ExtendedSaturationStateWriter writer = state.getExtendedWriter(
+//				ContextCreationListener.DUMMY,
+//				ContextModificationListener.DUMMY,
+//				new BasicRuleVisitor(),
+//				new ConclusionInsertionVisitor(), false);
+//		
+//		Context cA = writer.getCreateContext(A);
+//		Context cB = writer.getCreateContext(B);
+//		Context cC = writer.getCreateContext(C);
+//		
+//		assertEquals(3, getRoots(state.getContexts()).size());
+//		
+//		cC.removeLinks();
+//		
+//		assertEquals(2, getRoots(state.getContexts()).size());
+//		
+//		cA.removeLinks();
+//		
+//		assertEquals(1, getRoots(state.getContexts()).size());
+//		
+//		cB.removeLinks();
+//		
+//		assertTrue(state.getContexts().isEmpty());
+//	}
 	
 	private Collection<IndexedClassExpression> getRoots(Iterable<Context> contexts) {
 		List<IndexedClassExpression> roots = new ArrayList<IndexedClassExpression>();

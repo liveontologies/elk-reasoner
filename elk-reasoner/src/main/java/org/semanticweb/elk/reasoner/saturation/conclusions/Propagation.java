@@ -105,9 +105,4 @@ public class Propagation extends AbstractConclusion {
 		return visitor.visit(this, context);
 	}
 
-	@Override
-	public Context getSourceContext(Context contextWhereStored) {
-		return null;
-	}
-
 }

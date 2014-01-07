@@ -70,7 +70,7 @@ public class ContextImpl implements Context {
 	 * references to the next and previous contexts so that the contexts can be
 	 * chained
 	 */
-	volatile ContextImpl next, previous;
+//	volatile ContextImpl next, previous;
 
 	/**
 	 * the derived {@link IndexedClassExpression}s that are subsumers (i.e,
@@ -128,17 +128,17 @@ public class ContextImpl implements Context {
 		return root_;
 	}
 
-	@Override
-	public void removeLinks() {
-		// No sync here?
-		if (previous != null) {
-			previous.next = next;
-		}
-
-		if (next != null) {
-			next.previous = previous;
-		}
-	}
+//	@Override
+//	public void removeLinks() {
+//		// No sync here?
+//		if (previous != null) {
+//			previous.next = next;
+//		}
+//
+//		if (next != null) {
+//			next.previous = previous;
+//		}
+//	}
 
 	@Override
 	public Set<IndexedClassExpression> getSubsumers() {

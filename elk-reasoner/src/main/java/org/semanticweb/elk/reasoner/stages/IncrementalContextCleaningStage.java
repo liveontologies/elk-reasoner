@@ -31,6 +31,8 @@ import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.rules.ContextCleaningFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 
+
+// TODO: obsolete?
 /**
  * @author Pavel Klinov
  * 

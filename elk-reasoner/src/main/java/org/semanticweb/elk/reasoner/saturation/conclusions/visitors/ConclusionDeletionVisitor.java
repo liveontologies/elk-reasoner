@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * {@link Conclusion} was contained in the {@link Context}.
  * 
  * @see ConclusionInsertionVisitor
- * @see ConclusionOccurranceCheckingVisitor
+ * @see ConclusionOccurrenceCheckingVisitor
  * 
  * @author "Yevgeny Kazakov"
  */

@@ -32,11 +32,14 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CombinedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AllRuleApplicationConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AndConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionDeletionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurranceCheckingVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecompositionVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * Creates an engine which applies rules backwards, e.g., removes conclusions
@@ -63,58 +66,69 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	}
 
 	/**
+	 * @param ruleVisitor
+	 *            A {@link RuleVisitor} used for rule application
+	 * @param writer
+	 *            A {@link SaturationStateWriter} to be used for rule
+	 *            applications
+	 * @return {@link ConclusionVisitor} that applies all rules to the
+	 *         {@link Conclusion} if it occurs in the {@link Context}, and
+	 *         deletes this {@link Conclusion} from the {@link Context}
+	 */
+	private static ConclusionVisitor<Boolean> getDeletionConclusionProcessor(
+			RuleVisitor ruleVisitor, SaturationStateWriter writer) {
+		return new AndConclusionVisitor(new AndConclusionVisitor(
+		// check if conclusion occurs in the context
+				new ConclusionOccurrenceCheckingVisitor(),
+				// if so, apply the rules, including those that are
+				// redundant
+				new AllRuleApplicationConclusionVisitor(ruleVisitor, writer)),
+				new AndConclusionVisitor(
+				// after processing, delete the conclusion
+						new ConclusionDeletionVisitor(),
+						// and mark the source context as non-saturated
+						new ConclusionSourceContextUnsaturationVisitor(writer)));
+	}
+
+	/**
 	 * 
 	 */
-	public class DeapplicationEngine extends AbstractLocalRuleEngine {
+	public class DeapplicationEngine extends AbstractRuleEngineWithStatistics {
 
 		private final SaturationStateWriter writer_;
 
-		protected DeapplicationEngine(ContextModificationListener listener) {
-			super(new SaturationStatistics());
+		DeapplicationEngine(SaturationStateWriter saturationStateWriter,
+				SaturationStatistics localStatistics) {
+			super(getDeletionConclusionProcessor(
+					SaturationUtils.getStatsAwareRuleVisitor(localStatistics
+							.getRuleStatistics()), saturationStateWriter),
+					aggregatedStats, localStatistics);
+			writer_ = saturationStateWriter;
+		}
 
-			writer_ = saturationState.getWriter(SaturationUtils
+		protected DeapplicationEngine(ContextModificationListener listener,
+				SaturationStatistics localStatistics) {
+			this(saturationState.getWriter(SaturationUtils
 					.addStatsToContextModificationListener(listener,
 							localStatistics.getContextStatistics()),
 					SaturationUtils.addStatsToConclusionVisitor(localStatistics
-							.getConclusionStatistics()));
+							.getConclusionStatistics())), localStatistics);
 		}
 
-		@Override
-		protected ConclusionVisitor<Boolean> getBaseConclusionProcessor(
-				ConclusionProducer producer) {
-
-			return new CombinedConclusionVisitor(
-					new CombinedConclusionVisitor(
-							new ConclusionOccurranceCheckingVisitor(),
-							getUsedConclusionsCountingVisitor(new ConclusionRuleApplicationVisitorMax(
-									producer,
-									SaturationUtils
-											.getStatsAwareRuleVisitor(localStatistics
-													.getRuleStatistics()),
-									SaturationUtils
-											.getStatsAwareDecompositionRuleAppVisitor(
-													getDecompositionRuleApplicationVisitor(),
-													localStatistics
-															.getRuleStatistics())))),
-					new ConclusionDeletionVisitor());
+		protected DeapplicationEngine(ContextModificationListener listener) {
+			this(listener, new SaturationStatistics());
 		}
 
 		@Override
 		public void submit(IndexedClassExpression job) {
+			// new jobs cannot be submitted
 		}
 
 		@Override
-		protected ConclusionProducer getConclusionProducer() {
-			return writer_;
+		Context getNextActiveContext() {
+			return writer_.pollForActiveContext();
 		}
 
-		@Override
-		protected SubsumerDecompositionVisitor getDecompositionRuleApplicationVisitor() {
-			// this decomposition visitor takes the basic writer which cannot
-			// create new contexts
-			return new BackwardDecompositionRuleApplicationVisitor(
-					getConclusionProducer());
-		}
 	}
 
 }

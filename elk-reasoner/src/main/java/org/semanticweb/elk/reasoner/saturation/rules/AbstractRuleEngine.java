@@ -38,22 +38,40 @@ public abstract class AbstractRuleEngine implements
 	 * Process all pending {@link Conclusions} the given {@link Context}
 	 * 
 	 * @param context
-	 *            the context in which to process the scheduled items
+	 *            the active {@link Context} with unprocessed
+	 *            {@link Conclusions}
 	 */
 	protected void process(Context context) {
+		Context targetContext = getContextToProcess(context);
 		for (;;) {
-			Conclusion conclusion = context.takeToDo();			
+			Conclusion conclusion = context.takeToDo();
 			if (conclusion == null)
 				return;
 			LOGGER_.trace("{}: processing conclusion {}", context, conclusion);
-			conclusion.accept(conclusionProcessor_, context);
+			conclusion.accept(conclusionProcessor_, targetContext);
 		}
 	}
 
 	/**
-	 * @return the next {@link Context} to be processed by this
+	 * Removes and returns the next active {@link Context} that has unprocessed
+	 * {@link Conclusion}s. The letter can be retrieved using
+	 * {@link #getNextConclusion(Context)}
+	 * 
+	 * @return the next active {@link Context} to be processed by this
 	 *         {@link RuleEngine}
 	 */
 	abstract Context getNextActiveContext();
+
+	/**
+	 * @param activeContext
+	 *            the {@link Context} containing unprocessed {@link Conclusion}s
+	 * 
+	 * @return the {@link Context} in which the unprocessed {@link Conclusion}s
+	 *         should be processed; could be different from the argument
+	 */
+	@SuppressWarnings("static-method")
+	Context getContextToProcess(Context activeContext) {
+		return activeContext;
+	}
 
 }

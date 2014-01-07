@@ -149,19 +149,23 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	}
 
 	/**
-	 * Sets the corresponding context if none was yet assigned.
+	 * Assign the given {@link Context} to this {@link IndexedClassExpression}
+	 * if none was yet assigned.
 	 * 
 	 * @param context
 	 *            the {@link Context} which will be assigned to this
 	 *            {@link IndexedClassExpression}
 	 * 
-	 * @return {@code true} if the operation succeeded.
+	 * @return the previously assigned {@link Context} or {@code null} if none
+	 *         was assigned (in which case the new {@link Context} will be
+	 *         assigned)
 	 */
-	public synchronized boolean setContext(Context context) {
+	public synchronized Context setContextIfAbsent(Context context) {
 		if (context_ != null)
-			return false;
+			return context_;
+		// else
 		context_ = context;
-		return true;
+		return null;
 	}
 
 	/**

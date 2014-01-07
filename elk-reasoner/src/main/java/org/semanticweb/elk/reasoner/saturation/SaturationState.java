@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation;
+
 /*
  * #%L
  * ELK Reasoner
@@ -28,6 +29,7 @@ import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
@@ -42,12 +44,16 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  */
 public interface SaturationState {
 
+	/**
+	 * @return the {@link Collection} of {@link Context} stored in this
+	 *         {@link SaturationState}
+	 */
 	public Collection<Context> getContexts();
-	
+
 	public Context getContext(IndexedClassExpression ice);
-	
+
 	public OntologyIndex getOntologyIndex();
-	
+
 	public Collection<IndexedClassExpression> getNotSaturatedContexts();
 
 	/**
@@ -63,17 +69,26 @@ public interface SaturationState {
 	public ExtendedSaturationStateWriter getExtendedWriter(
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener,
-			RuleVisitor ruleAppVisitor,
-			ConclusionVisitor<?> conclusionVisitor,
+			RuleVisitor ruleAppVisitor, ConclusionVisitor<?> conclusionVisitor,
 			boolean trackNewContextsAsUnsaturated);
 
 	public SaturationStateWriter getWriter(
 			ContextModificationListener contextModificationListener,
 			ConclusionVisitor<?> conclusionVisitor);
-	
-	public SaturationStateWriter getWriter(ConclusionVisitor<?> conclusionVisitor);
 
-	public ExtendedSaturationStateWriter getExtendedWriter(ConclusionVisitor<?> conclusionVisitor);
-	
+	/**
+	 * @param visitor
+	 *            a {@link ConclusionVisitor} which will be invoked for each
+	 *            produced {@link Conclusion}
+	 * 
+	 * @return an {@link SaturationStateWriter} for modifying this
+	 *         {@link SaturationState}. The methods of this
+	 *         {@link SaturationStateWriter} are thread safe
+	 */
+	public SaturationStateWriter getWriter(
+			ConclusionVisitor<?> conclusionVisitor);
+
+	public ExtendedSaturationStateWriter getExtendedWriter(
+			ConclusionVisitor<?> conclusionVisitor);
 
 }

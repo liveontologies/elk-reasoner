@@ -26,13 +26,13 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -66,20 +66,18 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 	public class CleaningEngine extends
 			RuleDeapplicationFactory.DeapplicationEngine {
 
+		CleaningEngine(SaturationStatistics localStatistics) {
+			super(new SaturationCheckingWriter(saturationState.getWriter(
+					ContextModificationListener.DUMMY, SaturationUtils
+							.addStatsToConclusionVisitor(localStatistics
+									.getConclusionStatistics()))),
+					localStatistics);
+		}
+
 		protected CleaningEngine() {
-			super(ContextModificationListener.DUMMY);
+			this(new SaturationStatistics());
 		}
 
-		@Override
-		protected ConclusionProducer getConclusionProducer() {
-			ConclusionVisitor<?> visitor = SaturationUtils
-					.addStatsToConclusionVisitor(localStatistics
-							.getConclusionStatistics());
-			SaturationStateWriter writer = saturationState.getWriter(
-					ContextModificationListener.DUMMY, visitor);
-
-			return new SaturationCheckingWriter(writer);
-		}
 	}
 
 	/**
@@ -108,14 +106,19 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 		}
 
 		@Override
-		public IndexedClassExpression getOwlThing() {
-			return writer_.getOwlThing();
+		public void produce(IndexedClassExpression root, Conclusion conclusion) {
+			produce(root.getContext(), conclusion);
 		}
 
-		@Override
-		public IndexedClassExpression getOwlNothing() {
-			return writer_.getOwlNothing();
-		}
+//		@Override
+//		public IndexedClassExpression getOwlThing() {
+//			return writer_.getOwlThing();
+//		}
+//
+//		@Override
+//		public IndexedClassExpression getOwlNothing() {
+//			return writer_.getOwlNothing();
+//		}
 
 		@Override
 		public Context pollForActiveContext() {
@@ -136,5 +139,6 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 		public void resetContexts() {
 			writer_.resetContexts();
 		}
+
 	}
 }

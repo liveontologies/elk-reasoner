@@ -22,36 +22,35 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.context.ContextProcessor;
 
 /**
- * A {@link ConclusionVisitor} that processes the source {@link Context} of the
- * {@link Conclusion} using the given {@link ContextProcessor} if the
- * {@link Conclusion} can potentially be re-derived. The visit method returns
- * {@link true} only if the source {@link Context} has changed in this way.
+ * A {@link ConclusionVisitor} that marks the source {@link Context} of the
+ * {@link Conclusion} as not saturated if the {@link Conclusion} can potentially
+ * be re-derived. The visit method returns {@link true} only if the source
+ * {@link Context} has changed in this way.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ConclusionSourceContextProcessorVisitor extends
+public class ConclusionSourceContextUnsaturationVisitor extends
 		AbstractConclusionVisitor<Boolean> {
 
-	private final ContextProcessor processor_;
+	private final SaturationStateWriter writer_;
 
-	public ConclusionSourceContextProcessorVisitor(ContextProcessor processor) {
-		this.processor_ = processor;
+	public ConclusionSourceContextUnsaturationVisitor(
+			SaturationStateWriter writer) {
+		this.writer_ = writer;
 	}
 
 	@Override
 	Boolean defaultVisit(Conclusion conclusion, Context context) {
-		Context sourceContext = conclusion.getSourceContext(context);
-		return sourceContext == null ? false : processor_
-				.process(sourceContext);
+		return writer_.markAsNotSaturated(conclusion.getSourceContext(context));
 	}
 
 	Boolean defaultVisit(Subsumer conclusion, Context context) {

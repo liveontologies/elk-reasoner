@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
@@ -33,35 +32,20 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * {@link RuleVisitor} to track rule applications and {@link ConclusionProducer}
  * to output the {@link Conclusion}s of the applied rules. The methods always
  * return {@link true}. This is used to conveniently compose them using a
- * {@link CombinedConclusionVisitor}
+ * {@link AndConclusionVisitor}
+ * 
+ * @see NonRedundantRuleApplicationConclusionVisitor
+ * @see HybridRuleApplicationConclusionVisitor
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
 public class AllRuleApplicationConclusionVisitor extends
-		AbstractConclusionVisitor<Boolean> {
+		HybridRuleApplicationConclusionVisitor {
 
-	/**
-	 * {@link RuleVisitor} to track rule applications
-	 */
-	private final RuleVisitor ruleAppVisitor_;
-
-	/**
-	 * {@link ConclusionProducer} to produce the {@link Conclusion}s of the
-	 * applied rules
-	 */
-	private final ConclusionProducer producer_;
-
-	public AllRuleApplicationConclusionVisitor(RuleVisitor ruleAppVisitor,
+	public AllRuleApplicationConclusionVisitor(RuleVisitor ruleVisitor,
 			ConclusionProducer producer) {
-		this.producer_ = producer;
-		this.ruleAppVisitor_ = ruleAppVisitor;
+		super(ruleVisitor, ruleVisitor, producer, producer);
 	}
 
-	@Override
-	public Boolean defaultVisit(Conclusion conclusion, Context context) {
-		conclusion.applyNonRedundantRules(ruleAppVisitor_, context, producer_);
-		conclusion.applyRedundantRules(ruleAppVisitor_, context, producer_);
-		return true;
-	}
 }

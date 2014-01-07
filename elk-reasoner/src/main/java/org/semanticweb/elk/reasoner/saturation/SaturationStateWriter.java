@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
@@ -38,9 +37,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  */
 public interface SaturationStateWriter extends ConclusionProducer {
 
-	public IndexedClassExpression getOwlThing();
-
-	public IndexedClassExpression getOwlNothing();
+//	public IndexedClassExpression getOwlThing();
+//
+//	public IndexedClassExpression getOwlNothing();
 
 	public Context pollForActiveContext();
 

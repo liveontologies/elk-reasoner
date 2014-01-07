@@ -22,16 +22,15 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.entries.IndexedEntryConverter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryFactory;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A cache of {@link IndexedObject}s in the ontology backed by a
@@ -109,9 +108,9 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			if (ice.getCompositionRuleHead() != null)
 				throw new ElkUnexpectedIndexingException(
 						"Deleting object with registered rules: " + ice);
-			Context context = ice.getContext();
-			if (context != null)
-				context.removeLinks();
+//			Context context = ice.getContext();
+//			if (context != null)
+//				context.removeLinks();
 			if (!ice.accept(deletor))
 				throw new ElkUnexpectedIndexingException(
 						"Cannot remove indexed object from the cache " + ice);

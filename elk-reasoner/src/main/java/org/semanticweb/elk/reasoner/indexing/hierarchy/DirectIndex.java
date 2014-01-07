@@ -32,7 +32,6 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
@@ -229,12 +228,12 @@ public class DirectIndex implements ModifiableOntologyIndex {
 		if (!oldObject.accept(objectCache.deletor))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove indexed object from the cache " + oldObject);
-		if (oldObject instanceof IndexedClassExpression) {
-			IndexedClassExpression ice = (IndexedClassExpression) oldObject;
-			Context context = ice.getContext();
-			if (context != null)
-				context.removeLinks();
-		}
+//		if (oldObject instanceof IndexedClassExpression) {
+//			IndexedClassExpression ice = (IndexedClassExpression) oldObject;
+//			Context context = ice.getContext();
+//			if (context != null)
+//				context.removeLinks();
+//		}
 	}
 
 	@Override

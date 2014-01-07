@@ -40,10 +40,11 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  * @see ConclusionInsertionVisitor
  * @see ConclusionDeletionVisitor
+ * @see MirrorConclusionOccurrenceCheckingVisitor
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ConclusionOccurranceCheckingVisitor implements
+public class ConclusionOccurrenceCheckingVisitor implements
 		ConclusionVisitor<Boolean> {
 
 	@Override

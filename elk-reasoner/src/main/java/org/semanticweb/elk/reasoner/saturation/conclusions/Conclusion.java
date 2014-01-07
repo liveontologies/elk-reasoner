@@ -43,8 +43,8 @@ public interface Conclusion {
 	/**
 	 * 
 	 * @param contextWhereStored
-	 * @return The context which this conclusion is logically relevant for, or
-	 *         {@code null} if none
+	 * @return The context which this conclusion is logically relevant for; it
+	 *         cannot be {@code null}
 	 */
 	public Context getSourceContext(Context contextWhereStored);
 
