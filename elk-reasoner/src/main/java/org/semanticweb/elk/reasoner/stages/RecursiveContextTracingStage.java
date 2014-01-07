@@ -28,7 +28,6 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveContextTracing;
 
 /**
- 
  * 
  * @author Pavel Klinov
  * 
@@ -45,7 +44,7 @@ public class RecursiveContextTracingStage extends AbstractReasonerStage {
 
 	@Override
 	public String getName() {
-		return "Context Tracing";
+		return "Recursive Context Tracing";
 	}
 
 	@Override
@@ -61,11 +60,6 @@ public class RecursiveContextTracingStage extends AbstractReasonerStage {
 			return false;
 		}
 
-		/*RuleApplicationFactory ruleAppFactory = new ContextTracingFactory(reasoner.saturationState, reasoner.traceState);
-		
-		tracing_ = new ClassExpressionSaturation<IndexedClassExpression>(
-				reasoner.traceState.getRootsSubmittedForTracing(), reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), ruleAppFactory);*/
 		tracing_ = new RecursiveContextTracing(reasoner.traceState.getRootsSubmittedForTracing(),
 				reasoner.getProcessExecutor(), workerNo, reasoner.getProgressMonitor(),
 				reasoner.saturationState, reasoner.traceState);
@@ -89,7 +83,7 @@ public class RecursiveContextTracingStage extends AbstractReasonerStage {
 			return false;
 		}
 		
-		//reasoner.ruleAndConclusionStats.add(tracing_.getRuleAndConclusionStatistics());
+		reasoner.ruleAndConclusionStats.add(tracing_.getRuleAndConclusionStatistics());
 		reasoner.traceState.flushQueue();
 		tracing_ = null;
 
