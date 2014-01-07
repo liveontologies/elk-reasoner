@@ -43,7 +43,8 @@ public class ContextStatistics {
 	public int countCreatedContexts;
 	
 	/**
-	 * the number of times a context has been processed
+	 * the number of times a context has been processed (the same context can be
+	 * activated multiple times)
 	 */
 	public int countProcessedContexts;
 
