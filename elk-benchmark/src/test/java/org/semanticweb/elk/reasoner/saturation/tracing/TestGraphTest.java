@@ -2,6 +2,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -48,13 +50,18 @@ public class TestGraphTest {
 	public void testSerializeDeserializeTestGraph() throws Exception {
 		TraceStore traceStore = traceSubsumption("tracing/PropertyChains.owl", "http://example.org/A", "http://example.org/D");
 		TraceGraph graph = new TraceGraph(traceStore.getReader());
-		String file = "/home/pavel/tmp/graph.out";
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		
-		TraceGraphSerializer.serialize(graph, file);
+		TraceGraphSerializer.serialize(graph, out);
+		out.flush();
+		out.close();
 		
-		TraceGraph deserialized = TraceGraphSerializer.deserialize(file);
+		byte[] bytes = out.toByteArray();
+		ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+		TraceGraph deserialized = TraceGraphSerializer.deserialize(in);
 		
 		assertEquals(graph.getInitializationInferences().size(), deserialized.getInitializationInferences().size());
+		in.close();
 	}
 	
 	private TraceStore traceSubsumption(String ontologyResource, String subsumee, String subsumer) throws Exception {
