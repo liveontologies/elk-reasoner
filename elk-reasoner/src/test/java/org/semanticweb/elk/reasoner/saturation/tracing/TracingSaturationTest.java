@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  */
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -33,6 +34,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
@@ -277,7 +279,7 @@ public class TracingSaturationTest {
 					return null;
 				}
 				
-			}, TRACE_MODE.NO_TRACING/*do not trace B, we're checking if it's been unintentionally traced when we traced A*/);
+			}, TRACE_MODE.NO_TRACING/*do not trace B, we're checking if it's been unintentionally traced when we non-recursively traced A*/);
 
 		} finally {
 			IOUtils.closeQuietly(stream);
@@ -311,7 +313,7 @@ public class TracingSaturationTest {
 			ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 			final AtomicInteger inferenceCounter = new AtomicInteger(0);
 			
-			reasoner.trace(new ElkClass[]{a, b}, a, rSomeC, new BaseTracedConclusionVisitor<Void, Void>() {
+			reasoner.explainSubsumption(a, rSomeC, new BaseTracedConclusionVisitor<Void, Void>() {
 				
 				@Override
 				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {
@@ -322,8 +324,24 @@ public class TracingSaturationTest {
 					return super.defaultTracedVisit(conclusion, v);
 				}
 				
-			});
+			}, TRACE_MODE.RECURSIVE);
 			
+			final AtomicBoolean bTraced = new AtomicBoolean(false);
+			
+			reasoner.explainSubsumption(b, b, new BaseTracedConclusionVisitor<Void, Void>() {
+				
+				@Override
+				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {
+					LOGGER_.trace("traced inference: {}", InferencePrinter.print(conclusion));
+					
+					bTraced.set(true);
+					
+					return super.defaultTracedVisit(conclusion, v);
+				}
+				
+			}, TRACE_MODE.NO_TRACING);
+
+			assertTrue("B must be traced recursively", bTraced.get());
 			assertEquals("Must be precisely one inference for " + rSomeC, 1, inferenceCounter.get());
 
 		} finally {

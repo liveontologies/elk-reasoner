@@ -629,24 +629,6 @@ public abstract class AbstractReasonerState {
 		traceState.getTraceStore().getReader().accept(subsumee.getContext(), TracingUtils.getSubsumerWrapper(subsumer), visitor);
 	}
 	
-	/*
-	 * TODO this is a temporary method, should go once we implement the recursive context tracing
-	 */
-	public void trace(ElkClassExpression[] toTrace, ElkClassExpression sub, ElkClassExpression sup, TracedConclusionVisitor<?,?> visitor) throws ElkException {
-		IndexedClassExpression subsumee = sub.accept(objectCache_.getIndexObjectConverter());
-		IndexedClassExpression subsumer = sup.accept(objectCache_.getIndexObjectConverter());
-		
-		for (ElkClassExpression expr : toTrace) {
-			traceState.submitForTracing(expr.accept(objectCache_.getIndexObjectConverter()));
-		}
-		
-		stageManager.contextTracingStage.invalidate();
-		//run the tracing stage
-		getStageExecutor().complete(stageManager.contextTracingStage);
-		
-		traceState.getTraceStore().getReader().accept(subsumee.getContext(), TracingUtils.getSubsumerWrapper(subsumer), visitor);
-	}
-	
 	public TraceStore getTraceStore() {
 		return traceState.getTraceStore();
 	}
