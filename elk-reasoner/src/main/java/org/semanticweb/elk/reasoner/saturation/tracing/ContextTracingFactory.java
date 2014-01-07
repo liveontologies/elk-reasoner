@@ -108,21 +108,20 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		protected TracingEngine() {
 			super(new SaturationStatistics());
 
-			ExtendedSaturationStateWriter tracingWriter = getSaturationStateWriter();
-			//ExtendedSaturationStateWriter sameContextWriter = getSameContextWriter();
+			TraceStore.Writer traceWriter = traceState_.getTraceStore().getWriter();
+			ExtendedSaturationStateWriter localContextWriter = getSaturationStateWriter();
 			// inserts to the local context and writes inferences.
 			// the inference writer should go first so we capture alternative
 			// derivations.
 			ConclusionVisitor<Boolean, Context> inserter = new CombinedConclusionVisitor<Context>(
-					new TracingInserter(traceState_.getTraceStore()
-							.getWriter()), new ConclusionInsertionVisitor());
-			// applies rules on the main contexts
+					new TracingInserter(traceWriter), new ConclusionInsertionVisitor());
+			// applies rules
 			ConclusionVisitor<Boolean, Context> applicator = new ApplicationVisitor(
-					tracingWriter,
+					localContextWriter,
 					SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
 			// combines the inserter and the applicator
 			conclusionProcessor_ = new CombinedConclusionVisitor<Context>(
-					inserter, applicator);
+					inserter, getUsedConclusionsCountingVisitor(applicator));
 		}
 
 		@Override
