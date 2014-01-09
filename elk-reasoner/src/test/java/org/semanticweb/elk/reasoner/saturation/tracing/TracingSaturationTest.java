@@ -55,9 +55,7 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
-import org.semanticweb.elk.reasoner.stages.CheckTracingStage;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
-import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,13 +86,7 @@ public class TracingSaturationTest {
 
 			List<ElkAxiom> ontology = loadAxioms(stream);
 			TestChangesLoader initialLoader = new TestChangesLoader();			
-
-			ReasonerStageExecutor executor = new PostProcessingStageExecutor(
-					PostProcessingStageExecutor.CONTEXT_TRACING,
-					CheckTracingStage.class,
-					PostProcessingStageExecutor.RECURSIVE_CONTEXT_TRACING,
-					CheckTracingStage.class);
-			//ReasonerStageExecutor executor = new LoggingStageExecutor();
+			ReasonerStageExecutor executor = new LoggingStageExecutor();
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader, executor);
 
 			for (ElkAxiom axiom : ontology) {

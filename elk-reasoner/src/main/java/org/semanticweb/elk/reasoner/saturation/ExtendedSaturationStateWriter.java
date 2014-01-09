@@ -48,7 +48,7 @@ public interface ExtendedSaturationStateWriter extends
 
 	public Context getCreateContext(IndexedClassExpression root);
 	/*
-	 * TODO find a way to get rid of this method.
+	 * TODO probably isn't needed since intialization is done manually
 	 * 
 	 * It was introduced to let writer wrappers (e.g., the tracing writer)
 	 * propagate its conclusion factory to the underlying writer. It was

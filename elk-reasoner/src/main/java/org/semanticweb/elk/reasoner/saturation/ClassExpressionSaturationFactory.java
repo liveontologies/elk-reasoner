@@ -467,7 +467,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				 * if the context is already assigned and saturated, this job is
 				 * already complete
 				 */
-				Context rootContext = ruleApplicationFactory_.getSaturationState().getContext(root);//root.getContext();
+				Context rootContext = ruleApplicationFactory_.getSaturationState().getContext(root);
 				
 				if (rootContext != null && rootContext.isSaturated()) {
 					nextJob.setOutput(rootContext);

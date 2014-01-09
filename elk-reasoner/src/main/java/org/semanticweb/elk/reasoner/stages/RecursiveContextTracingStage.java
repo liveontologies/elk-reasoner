@@ -60,7 +60,7 @@ public class RecursiveContextTracingStage extends AbstractReasonerStage {
 			return false;
 		}
 
-		tracing_ = new RecursiveContextTracing(reasoner.traceState.getRootsSubmittedForTracing(),
+		tracing_ = new RecursiveContextTracing(reasoner.traceState.getTracingQueue(),
 				reasoner.getProcessExecutor(), workerNo, reasoner.getProgressMonitor(),
 				reasoner.saturationState, reasoner.traceState);
 

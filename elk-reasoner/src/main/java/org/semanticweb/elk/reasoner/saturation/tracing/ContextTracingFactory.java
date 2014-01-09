@@ -30,7 +30,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.DelegatingBasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -53,11 +52,14 @@ import org.semanticweb.elk.reasoner.saturation.rules.ContextCompletionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore.Writer;
+import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState.TracedContext;
+import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState.TracingWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO
+ * Non-recursive context tracing factory. Traces only conclusion which logically
+ * belong to the context submitted for tracing.
  * 
  * @author Pavel Klinov
  * 
@@ -73,14 +75,11 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	 * trace store which stores traced conclusions.
 	 */
 	private final TraceState traceState_;
-	
-	private final ContextTracingListener listener_;
 
 	public ContextTracingFactory(ExtendedSaturationState mainSaturationState,
-			TraceState traceState, ContextTracingListener listener) {
+			TraceState traceState) {
 		super(mainSaturationState);
 		traceState_ = traceState;
-		listener_ = listener;
 	}
 
 	@Override
@@ -126,12 +125,18 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		@Override
 		public void submit(IndexedClassExpression root) {
-			Context cxt = getSaturationStateWriter().getCreateContext(root);
-
+			TracedContext cxt = getSaturationStateWriter().getCreateContext(root);
+			//trace if it's not been traced
 			if (!cxt.isSaturated()) {
-				//Manual initialization. Initialized = traced.
+				localStatistics.getContextStatistics().countModifiedContexts++;
+				
 				getSaturationStateWriter().initContext(cxt);
 			}
+		}
+
+		@Override
+		protected void process(Context context) {
+			super.process(context);
 		}
 
 		@Override
@@ -140,7 +145,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		}
 
 		@Override
-		protected ExtendedSaturationStateWriter getSaturationStateWriter() {
+		protected TracingWriter getSaturationStateWriter() {
 			return getSaturationState().getTracingWriter(
 					ConclusionVisitor.DUMMY,
 					SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
@@ -183,72 +188,47 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 				return root.getContext();
 			}
 		}
-		
-		BasicSaturationStateWriter getWriter(Conclusion conclusion,
-				Context context) {
-			if (context != conclusion.getSourceContext(context)) {
-				/*
-				 * if we're making an inference in a context different from the
-				 * one being traced, we might need to notify the caller that the
-				 * context needs to be traced, too (i.e. recursively)
-				 */
-				return new NotificationWriter(localWriter_, context);
-			} else {
-				return localWriter_;
-			}
-		}
 
 		@Override
 		public Boolean visit(ComposedSubsumer negSCE, Context context) {
 			Context cxt = getContext(negSCE, context);
-			BasicSaturationStateWriter writer = getWriter(negSCE, context);
 
-			negSCE.apply(writer, cxt, ruleAppVisitor_);
+			negSCE.apply(localWriter_, cxt, ruleAppVisitor_);
 			negSCE.applyDecompositionRules(cxt, mainDecompRuleAppVisitor_);
 
 			return true;
 		}
 
 		@Override
-		public Boolean visit(DecomposedSubsumer posSCE, Context context) {
-			BasicSaturationStateWriter writer = getWriter(posSCE, context);
-			
-			posSCE.apply(writer, getContext(posSCE, context),
+		public Boolean visit(DecomposedSubsumer posSCE, Context context) {			
+			posSCE.apply(localWriter_, getContext(posSCE, context),
 					ruleAppVisitor_, mainDecompRuleAppVisitor_);
 			return true;
 		}
 
 		@Override
 		public Boolean visit(BackwardLink link, Context inferenceContext) {
-			BasicSaturationStateWriter writer = getWriter(link, inferenceContext);
-			
-			link.applyLocally(writer, getContext(link, inferenceContext), ruleAppVisitor_);
+			link.applyLocally(localWriter_, getContext(link, inferenceContext), ruleAppVisitor_);
 
 			return true;
 		}
 
 		@Override
 		public Boolean visit(ForwardLink link, Context inferenceContext) {
-			BasicSaturationStateWriter writer = getWriter(link, inferenceContext);
-			
-			link.applyLocally(writer, getContext(link, inferenceContext));
+			link.applyLocally(localWriter_, getContext(link, inferenceContext));
 
 			return true;
 		}
 
 		@Override
 		public Boolean visit(Contradiction bot, Context context) {
-			BasicSaturationStateWriter writer = getWriter(bot, context);
-			
-			bot.deapply(writer, getContext(bot, context));
+			bot.deapply(localWriter_, getContext(bot, context));
 			return true;
 		}
 
 		@Override
 		public Boolean visit(Propagation propagation, final Context inferenceContext) {
-			BasicSaturationStateWriter writer = getWriter(propagation, inferenceContext);
-			
-			propagation.applyLocally(writer,
+			propagation.applyLocally(localWriter_,
 					getContext(propagation, inferenceContext));
 			return true;
 		}
@@ -256,9 +236,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		@Override
 		public Boolean visit(DisjointnessAxiom disjointnessAxiom,
 				Context context) {
-			BasicSaturationStateWriter writer = getWriter(disjointnessAxiom, context);
-			
-			disjointnessAxiom.apply(writer,
+			disjointnessAxiom.apply(localWriter_,
 					getContext(disjointnessAxiom, context));
 
 			return true;
@@ -314,8 +292,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private static class TracingInserter extends
-			TracingConclusionInsertionVisitor {
+	private static class TracingInserter extends TracingConclusionInsertionVisitor {
 
 		public TracingInserter(Writer traceWriter) {
 			super(traceWriter);
@@ -324,38 +301,6 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		@Override
 		protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
 			return super.defaultVisit(conclusion, cxt.getRoot().getContext());
-		}
-
-	}
-	
-	/**
-	 * Notifies the listener that the context in which the current inference has
-	 * been produced has not been submitted for tracing yet.
-	 * 
-	 * @author Pavel Klinov
-	 * 
-	 *         pavel.klinov@uni-ulm.de
-	 */
-	private class NotificationWriter extends
-			DelegatingBasicSaturationStateWriter {
-
-		private final Context inferenceContext_;
-
-		public NotificationWriter(BasicSaturationStateWriter writer,
-				Context inferenceContext) {
-			super(writer);
-			inferenceContext_ = inferenceContext;
-		}
-
-		@Override
-		public void produce(Context targetContext, Conclusion conclusion) {
-			// TODO isTraced may potentially be expensive.
-			if (targetContext.getRoot() != inferenceContext_.getRoot()
-					&& !getSaturationState().isTraced(inferenceContext_)) {
-				listener_.notifyNonTraced(inferenceContext_);
-			}
-
-			super.produce(targetContext, conclusion);
 		}
 
 	}

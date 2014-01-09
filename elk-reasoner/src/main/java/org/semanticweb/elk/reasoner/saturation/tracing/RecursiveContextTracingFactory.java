@@ -8,54 +8,61 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
-import org.semanticweb.elk.reasoner.saturation.DummyClassExpressionSaturationListener;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
-import org.semanticweb.elk.reasoner.saturation.SaturationJob;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionOccurranceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveContextTracingFactory.Engine;
+import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState.TracedContext;
+import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState.TracingWriter;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Uses a listener to get notified when a non-traced context is used to produce
- * a conclusion to a traced context and recursively submits the former for
- * tracing.
+ * Traces contexts using a non-recursive factory and then unwinds the computed
+ * trace until it hits a conclusion which belongs to a non-traced contexts. Then
+ * the latter is recursively submitted for tracing.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class RecursiveContextTracingFactory implements
-		InputProcessorFactory<IndexedClassExpression, Engine> {
+public class RecursiveContextTracingFactory implements InputProcessorFactory<TracingJob, Engine> {
 	
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveContextTracingFactory.class);
 	
 	/**
 	 * Factory for non-recursive context tracing.
 	 */
-	private final ClassExpressionSaturationFactory<SaturationJob<IndexedClassExpression>> tracingFactory_;
+	private final ClassExpressionSaturationFactory<TracingJob> tracingFactory_;
+	/**
+	 * queue of tracing jobs to complete
+	 */
+	private final Queue<TracingJob> toTraceQueue_;
 	
-	private final Queue<SaturationJob<IndexedClassExpression>> toTraceQueue_;
+	private final TraceState traceState_;
 	
-	private final TracingSaturationState tracingSaturationState_;
+	private final TracedContextProcessor traceUnwinder_;
 
 	/**
 	 * 
 	 */
 	public RecursiveContextTracingFactory(
 			ExtendedSaturationState saturationState, TraceState traceState, int maxWorkers) {
-		RuleApplicationFactory ruleTracingFactory = new ContextTracingFactory(saturationState, traceState, new RecursiveContextTracingListener());
+		RuleApplicationFactory ruleTracingFactory = new ContextTracingFactory(saturationState, traceState);
 		
-		toTraceQueue_ = new ConcurrentLinkedQueue<SaturationJob<IndexedClassExpression>>();
-		tracingSaturationState_ = traceState.getSaturationState();
-		tracingFactory_ = new ClassExpressionSaturationFactory<SaturationJob<IndexedClassExpression>>(
+		toTraceQueue_ = new ConcurrentLinkedQueue<TracingJob>();
+		traceState_ = traceState;
+		tracingFactory_ = new ClassExpressionSaturationFactory<TracingJob>(
 				ruleTracingFactory, maxWorkers,
-				new DummyClassExpressionSaturationListener<SaturationJob<IndexedClassExpression>>());
- 
+				new ThisClassExpressionSaturationListener());
+		traceUnwinder_ = new TracedContextProcessor();
 	}
 	
 	@Override
@@ -78,6 +85,12 @@ public class RecursiveContextTracingFactory implements
 	public SaturationStatistics getRuleAndConclusionStatistics() {
 		return tracingFactory_.getRuleAndConclusionStatistics();
 	}	
+	
+	private void scheduleTraceUnwinding(TracedContext context, Conclusion target) {
+		LOGGER_.trace("{}: scheduling unwinding for {}", context, target);
+		
+		context.addConclusionToTrace(target);
+	}	
 
 	/**
 	 * 
@@ -85,19 +98,43 @@ public class RecursiveContextTracingFactory implements
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	public class Engine implements InputProcessor<IndexedClassExpression> {
+	public class Engine implements InputProcessor<TracingJob> {
 
-		private final ClassExpressionSaturationFactory<SaturationJob<IndexedClassExpression>>.Engine tracingEngine_ = tracingFactory_.getEngine();
+		private final ClassExpressionSaturationFactory<TracingJob>.Engine tracingEngine_ = tracingFactory_.getEngine();
+		
+		private final TracingWriter tracingContextWriter_ = traceState_.getSaturationState().getTracingWriter();
 		
 		@Override
-		public void submit(IndexedClassExpression root) {
-			LOGGER_.trace("{}: recursive context tracing started", root);
-
-			Context context = tracingSaturationState_.getContext(root);
+		public void submit(TracingJob job) {
+			IndexedClassExpression root = job.getInput();
+			Conclusion target = job.getConclusion();
 			
-			if (context == null || !context.isSaturated()) {
-				tracingEngine_.submit(new SaturationJob<IndexedClassExpression>(root));
+			if (entailed(root, target)) {
+				submitInternal(job);
 			}
+			else {
+				LOGGER_.trace("{}: tracing skipped, target not entailed: {}", root, target);
+			}
+		}
+		
+		private void submitInternal(TracingJob job) {
+			IndexedClassExpression root = job.getInput();
+			Conclusion target = job.getConclusion();
+			TracedContext context = tracingContextWriter_.getCreateContext(root);
+			// here we decide if the context needs to be traced or just some
+			// traces need to be unwound
+			if (context.beingTracedCompareAndSet(false, true)) {
+				LOGGER_.trace("{}: recursive context tracing started, target: {}", root, target);
+
+				tracingEngine_.submit(job);	
+			}
+			else {
+				scheduleTraceUnwinding(context, target);
+			}
+		}
+
+		private boolean entailed(IndexedClassExpression root, Conclusion target) {
+			return target.accept(new ConclusionOccurranceCheckingVisitor(), root.getContext());
 		}
 
 		@Override
@@ -108,12 +145,13 @@ public class RecursiveContextTracingFactory implements
 
 				tracingEngine_.process();
 				
-				SaturationJob<IndexedClassExpression> nextJob = toTraceQueue_.poll();
+				TracingJob nextJob = toTraceQueue_.poll();
 				
-				if (nextJob == null)
+				if (nextJob == null) {
 					break;
+				}
 				
-				tracingEngine_.submit(nextJob);
+				submitInternal(nextJob);
 			}
 		}
 
@@ -125,27 +163,74 @@ public class RecursiveContextTracingFactory implements
 	}
 
 	/**
-	 * Gets notifications when new yet-not-traced context needs to be traced and
-	 * submits new jobs to the context tracing queue.
+	 * Processes contexts that have been traced and unwinds its traced
+	 * conclusions.
 	 * 
 	 * @author Pavel Klinov
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private class RecursiveContextTracingListener implements ContextTracingListener {
+	private class TracedContextProcessor {
+		//this explorer should be thread-safe, it only keeps a reference to a thread-safe trace reader.
+		private final RecursiveTraceExplorer traceExplorer_ = new RecursiveTraceExplorer(traceState_.getTraceStore().getReader());
+	
+		void process(final TracedContext context) {
+			for (;;) {
+				final IndexedClassExpression root = context.getRoot();
+				final Conclusion next = context.pollForConclusionToTrace();
+				
+				if (next == null) {
+					break;
+				}
+				
+				LOGGER_.trace("{}: unwinding the trace for {}", root, next);
+				
+				traceExplorer_.accept(root.getContext(), next, new BaseConclusionVisitor<Boolean, Context>() {
+
+					@Override
+					protected Boolean defaultVisit(Conclusion conclusion, 	Context cxt) {
+						Context conclusionContext = conclusion.getSourceContext(cxt);
+						
+						if (conclusionContext.getRoot() == root) {
+							return true;
+						}
+						
+						Context tracingContext = traceState_.getSaturationState().getContext(conclusionContext.getRoot());
+						
+						if (!tracingContext.isSaturated()) {
+							LOGGER_.trace("{}: recursively submitted for tracing, target: {}", context, conclusion);
+							
+							toTraceQueue_.add(new TracingJob(tracingContext.getRoot(), conclusion));
+							/*stop unwinding because the tracing information may not yet be computed for that context.*/
+							return false;
+						}
+						//keep unwinding
+						return true;
+					}
+					
+				});
+			}
+		}
+	}
+	
+	/**
+	 * Used to trigger unwinding of the context which just finished tracing. 
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private class ThisClassExpressionSaturationListener implements ClassExpressionSaturationListener<TracingJob> {
 
 		@Override
-		public void notifyNonTraced(Context context) {
-			/*
-			 * this context hasn't yet been submitted for tracing but was used
-			 * to produce a conclusion for a traced context. Thus we should
-			 * trace it recursively.
-			 */
-			LOGGER_.trace("{}: recursively submitted for tracing", context);
+		public void notifyFinished(TracingJob job) throws InterruptedException {
+			final IndexedClassExpression root = job.getInput();
+			final TracedContext context = traceState_.getSaturationState().getContext(root);
 			
-			toTraceQueue_.add(new SaturationJob<IndexedClassExpression>(context.getRoot()));
-		}
-		
+			context.beingTracedCompareAndSet(true, false);
+			scheduleTraceUnwinding(context, job.getConclusion());
+			traceUnwinder_.process(context);
+		}		
 	}
 	
 }

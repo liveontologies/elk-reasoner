@@ -107,13 +107,23 @@ public class LocalSaturationState implements SaturationState {
 			private final ConclusionVisitor<Boolean, Context> checker_;
 			
 			private final ConclusionFactory conclusionFactory_;
+			
+			private final ContextCreationListener newContextListener_;
 
 			public LocalWriter(ConclusionVisitor<?, Context> visitor,
 					CompositionRuleApplicationVisitor ruleAppVisitor, ConclusionFactory conclusionFactory) {
+				this(visitor, ruleAppVisitor, conclusionFactory, ContextCreationListener.DUMMY);
+			}
+			
+			public LocalWriter(ConclusionVisitor<?, Context> visitor,
+					CompositionRuleApplicationVisitor ruleAppVisitor,
+					ConclusionFactory conclusionFactory,
+					ContextCreationListener newCxtListener) {
 				conclusionVisitor_ = visitor;
 				checker_ = new ConclusionOccurranceCheckingVisitor();
 				initRuleAppVisitor_ = ruleAppVisitor;
 				conclusionFactory_ = conclusionFactory;
+				newContextListener_ = newCxtListener;
 			}
 
 			@Override
@@ -150,8 +160,12 @@ public class LocalSaturationState implements SaturationState {
 
 				if (localContext.addToDo(conclusion)) {
 					// context was activated
-					activeContexts_.add(localContext);
+					activate(localContext);
 				}
+			}
+			
+			protected void activate(Context context) {
+				activeContexts_.add(context);
 			}
 
 			@Override
@@ -188,6 +202,8 @@ public class LocalSaturationState implements SaturationState {
 								+ ": local context created");
 					}
 
+					newContextListener_.notifyContextCreation(context);
+					
 					return context;
 				}
 				return oldContext;

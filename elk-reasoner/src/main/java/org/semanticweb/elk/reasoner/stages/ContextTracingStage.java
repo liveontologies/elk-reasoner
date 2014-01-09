@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.ContextTracingFactory;
-import org.semanticweb.elk.reasoner.saturation.tracing.ContextTracingListener;
 
 /**
  
@@ -65,10 +64,10 @@ public class ContextTracingStage extends AbstractReasonerStage {
 			return false;
 		}
 
-		RuleApplicationFactory ruleAppFactory = new ContextTracingFactory(reasoner.saturationState, reasoner.traceState, ContextTracingListener.DUMMY);
+		RuleApplicationFactory ruleAppFactory = new ContextTracingFactory(reasoner.saturationState, reasoner.traceState);
 		
 		tracing_ = new ClassExpressionSaturation<IndexedClassExpression>(
-				reasoner.traceState.getRootsSubmittedForTracing(), reasoner.getProcessExecutor(), workerNo,
+				reasoner.traceState.getTracingQueue().keySet(), reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), ruleAppFactory);
 
 		return true;
@@ -90,7 +89,7 @@ public class ContextTracingStage extends AbstractReasonerStage {
 			return false;
 		}
 		
-		//reasoner.ruleAndConclusionStats.add(tracing_.getRuleAndConclusionStatistics());
+		reasoner.ruleAndConclusionStats.add(tracing_.getRuleAndConclusionStatistics());
 		reasoner.traceState.flushQueue();
 		tracing_ = null;
 

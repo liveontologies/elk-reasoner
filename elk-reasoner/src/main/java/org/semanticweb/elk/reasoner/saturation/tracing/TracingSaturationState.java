@@ -25,7 +25,10 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -46,6 +49,7 @@ import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.MultimapOperations;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.Chain;
+import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
 
 /**
  * @author Pavel Klinov
@@ -71,9 +75,13 @@ public class TracingSaturationState extends LocalSaturationState {
 		return new TracingWriter(conclusionVisitor, initRuleAppVisitor);
 	}
 	
+	TracingWriter getTracingWriter() {
+		return getTracingWriter(ConclusionVisitor.DUMMY, SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
+	}
+	
 	@Override
-	public HybridContext getContext(IndexedClassExpression ice) {
-		return (HybridContext) super.getContext(ice);
+	public TracedContext getContext(IndexedClassExpression ice) {
+		return (TracedContext) super.getContext(ice);
 	}
 	
 	/**
@@ -82,7 +90,7 @@ public class TracingSaturationState extends LocalSaturationState {
 	 * @return true if the context has been traced
 	 */
 	public boolean isTraced(Context context) {
-		HybridContext localContext = getContext(context.getRoot());
+		TracedContext localContext = getContext(context.getRoot());
 
 		return localContext != null && localContext.isInitialized();
 	}
@@ -105,7 +113,7 @@ public class TracingSaturationState extends LocalSaturationState {
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private class TracingWriter extends LocalSaturationState.LocalWriter {
+	class TracingWriter extends LocalSaturationState.LocalWriter {
 
 		public TracingWriter(ConclusionVisitor<?, Context> visitor,
 				CompositionRuleApplicationVisitor ruleAppVisitor) {
@@ -113,8 +121,13 @@ public class TracingSaturationState extends LocalSaturationState {
 		}
 
 		@Override
-		protected Context newContext(IndexedClassExpression root) {
-			return new HybridContext(super.newContext(root), root.getContext());
+		protected TracedContext newContext(IndexedClassExpression root) {
+			return new TracedContext(super.newContext(root), root.getContext());
+		}
+
+		@Override
+		public TracedContext getCreateContext(IndexedClassExpression root) {
+			return (TracedContext) super.getCreateContext(root);
 		}
 		
 	}
@@ -126,15 +139,41 @@ public class TracingSaturationState extends LocalSaturationState {
 	 *
 	 * pavel.klinov@uni-ulm.de
 	 */
-	private static class HybridContext implements Context {
+	static class TracedContext implements Context {
 
 		private final Context localContext_;
 
 		private final Context mainContext_;
-
-		HybridContext(Context local, Context main) {
+		/**
+		 * set to {@code true} immediately before submitting for tracing (via
+		 * saturation) and set to {@code false} once that is done. This flag
+		 * ensures that only one worker traces the context and all other
+		 * processing (including "reading" e.g. unwinding the traces) must wait
+		 * until that is done.
+		 */
+		private final AtomicBoolean beingTraced_;
+		/**
+		 * TODO
+		 */
+		private final ActivationStack<Conclusion> traceExploreQueue_;
+		
+		TracedContext(Context local, Context main) {
 			localContext_ = local;
 			mainContext_ = main;
+			beingTraced_ = new AtomicBoolean(false);
+			traceExploreQueue_ = new ActivationStack<Conclusion>();
+		}
+		
+		boolean addConclusionToTrace(Conclusion conclusion) {
+			return traceExploreQueue_.push(conclusion);
+		}
+		
+		Conclusion pollForConclusionToTrace() {
+			return traceExploreQueue_.pop();
+		}
+		
+		boolean beingTracedCompareAndSet(boolean expect, boolean update) {
+			return beingTraced_.compareAndSet(expect, update);
 		}
 		
 		boolean isInitialized() {

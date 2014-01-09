@@ -175,7 +175,7 @@ public abstract class AbstractReasonerState {
 		}
 	};
 	
-	final TraceState traceState;
+	TraceState traceState;
 
 	protected AbstractReasonerState() {
 		this.objectCache_ = new IndexedObjectCache();
@@ -614,7 +614,7 @@ public abstract class AbstractReasonerState {
 		IndexedClassExpression subsumer = sup.accept(objectCache_.getIndexObjectConverter());
 		
 		if (traceMode != TRACE_MODE.NO_TRACING && !traceState.getSaturationState().isTraced(subsumee.getContext())) {
-			traceState.submitForTracing(subsumee);
+			traceState.submitForTracing(subsumee, subsumer);
 			
 			if (traceMode == TRACE_MODE.NON_RECURSIVE) {
 				stageManager.contextTracingStage.invalidate();
@@ -631,6 +631,10 @@ public abstract class AbstractReasonerState {
 	
 	public TraceStore getTraceStore() {
 		return traceState.getTraceStore();
+	}
+	
+	public void resetTraceState() {
+		traceState = new TraceState(new SimpleCentralizedTraceStore(), saturationState);
 	}
 	
 	// ////////////////////////////////////////////////////////////////

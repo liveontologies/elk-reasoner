@@ -93,4 +93,8 @@ public class PropagationPremise extends AbstractConclusion implements Propagatio
 		// no-op
 	}
 
+	@Override
+	public String toString() {
+		return "Propagation " + propagationRelation_ + "->" + carry_;
+	}
 }

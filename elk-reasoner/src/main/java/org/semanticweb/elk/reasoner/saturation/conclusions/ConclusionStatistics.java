@@ -99,7 +99,7 @@ public class ConclusionStatistics {
 		}
 	}
 
-	private static String ERR_MSG_MORE_USED = ": more used that processed!";
+	private static String ERR_MSG_MORE_USED = ": more used than processed!";
 
 	public void check(Logger logger) {
 		if (usedConclusionCounts_.countPositiveSubsumers > processedConclusionCounts_.countPositiveSubsumers)

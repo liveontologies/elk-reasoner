@@ -168,6 +168,9 @@ public class RuleApplicationFactory {
 		 */
 		protected void process(Context context) {
 			localContextStatistics.countProcessedContexts++;
+			
+			//LOGGER_.trace("Processing context {}", context);			
+			
 			for (;;) {
 				Conclusion conclusion = context.takeToDo();
 

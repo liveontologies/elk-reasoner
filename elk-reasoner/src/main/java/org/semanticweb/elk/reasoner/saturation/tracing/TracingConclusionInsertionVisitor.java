@@ -28,6 +28,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A conclusion visitor which processes {@link TracedConclusion}s and saves
@@ -37,21 +39,71 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TracingConclusionInsertionVisitor extends
-		BaseConclusionVisitor<Boolean, Context> {
+public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boolean, Context> {
 
+	protected static final Logger LOGGER_ = LoggerFactory.getLogger(TracingConclusionInsertionVisitor.class);
+	
 	private final TraceStore.Writer traceWriter_;
 
 	private final TracedConclusionVisitor<Boolean, Context> tracedVisitor_ = new BaseTracedConclusionVisitor<Boolean, Context>() {
 
 		@Override
-		protected Boolean defaultTracedVisit(TracedConclusion conclusion,
-				Context context) {
+		protected Boolean defaultTracedVisit(TracedConclusion conclusion, Context context) {
 			traceWriter_.addInference(context, conclusion);
 
 			return true;
 		}
 
+		
+		/*@Override
+		public Boolean visit(SubClassOfSubsumer conclusion, Context context) {
+			if (conclusion.getExpression() != context.getRoot()) {
+				defaultTracedVisit(conclusion, context);
+			}
+			else {
+				LOGGER_.warn("SubclassOf inference for the root {}", conclusion);
+			}
+			
+			return true;
+		}
+
+		@Override
+		public Boolean visit(ComposedConjunction conclusion, Context context) {
+			if (conclusion.getExpression() != context.getRoot()) {
+				defaultTracedVisit(conclusion, context);
+			}
+			else {
+				LOGGER_.warn("Conjunction+ inference for the root {}", conclusion);
+			}
+			
+			return true;
+		}
+
+		@Override
+		public Boolean visit(DecomposedConjunction conclusion, Context context) {
+			if (conclusion.getExpression() != context.getRoot()) {
+				defaultTracedVisit(conclusion, context);
+			}
+			else {
+				LOGGER_.warn("Conjunction- inference for the root {}", conclusion);
+			}
+			
+			return true;
+		}
+
+		@Override
+		public Boolean visit(PropagatedSubsumer conclusion, Context context) {
+			if (conclusion.getExpression() != context.getRoot()) {
+				defaultTracedVisit(conclusion, context);
+			}
+			else {
+				LOGGER_.warn("Propagation inference for the root {}", conclusion);
+			}
+			
+			return true;
+		}*/
+
+		
 	};
 
 	/**
@@ -63,8 +115,7 @@ public class TracingConclusionInsertionVisitor extends
 
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
-		return ((TracedConclusion) conclusion)
-				.acceptTraced(tracedVisitor_, cxt);
+		return ((TracedConclusion) conclusion).acceptTraced(tracedVisitor_, cxt);
 	}
 
 }
