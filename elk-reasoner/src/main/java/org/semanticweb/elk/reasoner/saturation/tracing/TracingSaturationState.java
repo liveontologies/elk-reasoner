@@ -25,9 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -89,8 +87,8 @@ public class TracingSaturationState extends LocalSaturationState {
 	 * @param context
 	 * @return true if the context has been traced
 	 */
-	public boolean isTraced(Context context) {
-		TracedContext localContext = getContext(context.getRoot());
+	public boolean isTraced(IndexedClassExpression root) {
+		TracedContext localContext = getContext(root);
 
 		return localContext != null && localContext.isInitialized();
 	}

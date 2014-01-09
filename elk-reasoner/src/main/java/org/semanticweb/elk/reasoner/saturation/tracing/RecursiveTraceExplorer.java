@@ -25,10 +25,13 @@ public class RecursiveTraceExplorer {
 	//private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveTraceExplorer.class);
 	
 	private final TraceStore.Reader traceReader_;
-	
+	/*
+	 * TODO so far we use notifications that some conclusion isn't traced only
+	 * for testing, perhaps we may get rid of this.
+	 */
 	private final UntracedConclusionListener listener_;
-	
-	RecursiveTraceExplorer(TraceStore.Reader reader) {
+
+	public RecursiveTraceExplorer(TraceStore.Reader reader) {
 		this(reader, UntracedConclusionListener.DUMMY);
 	}
 	
@@ -37,11 +40,20 @@ public class RecursiveTraceExplorer {
 		listener_ = listener;
 	}
 	
-	void accept(Context context, Conclusion conclusion, final ConclusionVisitor<Boolean, Context> visitor) {
+	/**
+	 * 
+	 * @param context
+	 * @param conclusion
+	 * @param premiseVisitor Visitor over all conclusions which were used as premises
+	 * @param inferenceVisitor Visitor over all
+	 */
+	public void accept(Context context,
+			final Conclusion conclusion,
+			final ConclusionVisitor<Boolean, Context> premiseVisitor) {
 		final Queue<InferenceWrapper> toDo = new LinkedList<InferenceWrapper>();
 		final Set<TracedConclusion> seenInferences = new HashSet<TracedConclusion>();
 
-		addToQueue(context, conclusion, toDo, seenInferences, visitor);
+		addToQueue(context, conclusion, toDo, seenInferences, premiseVisitor);
 
 		for (;;) {
 			InferenceWrapper next = toDo.poll();
@@ -64,7 +76,7 @@ public class RecursiveTraceExplorer {
 						@Override
 						public Void visit(SubClassOfSubsumer inference, Void v) {
 							addToQueue(infContext, inference.getPremise(),
-									toDo, seenInferences, visitor);
+									toDo, seenInferences, premiseVisitor);
 							return null;
 						}
 
@@ -72,10 +84,10 @@ public class RecursiveTraceExplorer {
 						public Void visit(ComposedConjunction inference, Void v) {
 							addToQueue(infContext,
 									inference.getFirstConjunct(), toDo,
-									seenInferences, visitor);
+									seenInferences, premiseVisitor);
 							addToQueue(infContext,
 									inference.getSecondConjunct(), toDo,
-									seenInferences, visitor);
+									seenInferences, premiseVisitor);
 							return null;
 						}
 
@@ -83,16 +95,16 @@ public class RecursiveTraceExplorer {
 						public Void visit(DecomposedConjunction inference,
 								Void v) {
 							addToQueue(infContext, inference.getConjunction(),
-									toDo, seenInferences, visitor);
+									toDo, seenInferences, premiseVisitor);
 							return null;
 						}
 
 						@Override
 						public Void visit(ComposedBackwardLink inference, Void v) {
 							addToQueue(infContext, inference.getBackwardLink(),
-									toDo,  seenInferences, visitor);
+									toDo,  seenInferences, premiseVisitor);
 							addToQueue(infContext, inference.getForwardLink(),
-									toDo, seenInferences, visitor);
+									toDo, seenInferences, premiseVisitor);
 							return null;
 						}
 
@@ -105,16 +117,16 @@ public class RecursiveTraceExplorer {
 						@Override
 						public Void visit(PropagatedSubsumer inference, Void v) {
 							addToQueue(infContext, inference.getBackwardLink(),
-									toDo, seenInferences, visitor);
+									toDo, seenInferences, premiseVisitor);
 							addToQueue(infContext, inference.getPropagation(),
-									toDo, seenInferences, visitor);
+									toDo, seenInferences, premiseVisitor);
 							return null;
 						}
 
 						@Override
 						public Void visit(TracedPropagation inference, Void v) {
 							addToQueue(infContext, inference.getPremise(),
-									toDo, seenInferences, visitor);
+									toDo, seenInferences, premiseVisitor);
 							return null;
 						}
 
@@ -142,8 +154,10 @@ public class RecursiveTraceExplorer {
 					@Override
 					protected Void defaultTracedVisit(TracedConclusion inference, Void v) {
 						if (!seenInferences.contains(inference)) {
+							Context inferenceContext = inference.getInferenceContext(context);
+							
 							seenInferences.add(inference);
-							toDo.add(new InferenceWrapper(inference, inference.getInferenceContext(context)));
+							toDo.add(new InferenceWrapper(inference, inferenceContext));
 						}
 
 						traced.set(true);

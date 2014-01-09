@@ -201,7 +201,7 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 							LOGGER_.trace("{}: recursively submitted for tracing, target: {}", context, conclusion);
 							
 							toTraceQueue_.add(new TracingJob(tracingContext.getRoot(), conclusion));
-							/*stop unwinding because the tracing information may not yet be computed for that context.*/
+							//stop unwinding because the tracing information may not yet be computed for that context.
 							return false;
 						}
 						//keep unwinding
@@ -209,6 +209,33 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 					}
 					
 				});
+				/*traceExplorer_.accept(root.getContext(), next, new BaseTracedConclusionVisitor<Boolean, Context>() {
+
+					@Override
+					protected Boolean defaultTracedVisit(final TracedConclusion traced, final Context infCxt) {
+						final Context inferenceContext = traceState_.getSaturationState().getContext(infCxt.getRoot());
+						
+						if (inferenceContext.getRoot() != root && !inferenceContext.isSaturated()) {
+							
+							traced.visitPremises(new BaseConclusionVisitor<Void, Void>() {
+								@Override
+								public Void defaultVisit(Conclusion premise, Void _ignored) {
+									if (premise.getSourceContext(inferenceContext) == inferenceContext) {
+										LOGGER_.trace("{}: recursively submitted for tracing, target: {}", inferenceContext, premise);
+										toTraceQueue_.add(new TracingJob(inferenceContext.getRoot(), premise));
+									}
+									
+									return null;
+								}
+							});		
+							//stop unwinding because the tracing information may not yet be computed for that context.
+							return false;
+						}
+						//keep unwinding
+						return true;
+					}
+					
+				});*/
 			}
 		}
 	}

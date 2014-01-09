@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
@@ -63,5 +64,10 @@ public class DecomposedExistential extends BackwardLinkImpl implements TracedCon
 	@Override
 	public Context getInferenceContext(Context defaultContext) {
 		return inferenceContext_;
+	}
+
+	@Override
+	public void visitPremises(ConclusionVisitor<?, ?> visitor) {
+		getExistential().accept(visitor, null);
 	}
 }

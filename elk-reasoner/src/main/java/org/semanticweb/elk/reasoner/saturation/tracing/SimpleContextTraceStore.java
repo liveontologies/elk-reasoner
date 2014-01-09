@@ -40,7 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
-import org.semanticweb.elk.util.collections.HashSetMultimap;
+import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
@@ -164,7 +164,7 @@ public class SimpleContextTraceStore implements ContextTracer {
 	 * 
 	 */
 	public SimpleContextTraceStore() {
-		subsumerInferenceMap_ = new HashSetMultimap<IndexedClassExpression, TracedConclusion>();
+		subsumerInferenceMap_ = new HashListMultimap<IndexedClassExpression, TracedConclusion>();
 		backwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<Context,TracedConclusion>>();
 		forwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<Context,TracedConclusion>>();
 		propagationMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedObjectSomeValuesFrom,TracedConclusion>>();
@@ -191,7 +191,7 @@ public class SimpleContextTraceStore implements ContextTracer {
 		Multimap<V, T> traces = traceMultiMap.get(key);
 
 		if (traces == null) {
-			traces = new HashSetMultimap<V, T>();
+			traces = new HashListMultimap<V, T>();
 
 			traces.add(value, trace);
 			traceMultiMap.put(key, traces);

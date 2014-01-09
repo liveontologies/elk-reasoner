@@ -1,7 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
-import java.io.Serializable;
-
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /*
@@ -35,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface Conclusion extends Serializable {
+public interface Conclusion {
 
 	public <R, C> R accept(ConclusionVisitor<R, C> visitor, C parameter);
 

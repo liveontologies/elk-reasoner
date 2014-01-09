@@ -26,12 +26,9 @@
 package org.semanticweb.elk.benchmark.reasoning.tracing;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
 import org.semanticweb.elk.benchmark.Metrics;
@@ -42,18 +39,25 @@ import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionTracingTests;
+import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceExplorer;
 import org.semanticweb.elk.reasoner.saturation.tracing.TRACE_MODE;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
+import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestUtils;
+import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
+import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.reasoner.stages.RuleAndConclusionCountMeasuringExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +87,7 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 		// classify the ontology and instantiate tracing tasks
 		Taxonomy<ElkClass> taxonomy = loadAndClassify(ontologyFile_);
 		
-		if (LOGGER_.isTraceEnabled()) {
+		/*if (LOGGER_.isTraceEnabled()) {
 			StringWriter writer = new StringWriter();
 			
 			try {
@@ -93,62 +97,23 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 			}
 			
 			writer.flush();
-			LOGGER_.debug("{}", writer.getBuffer().toString());
-		}
+		}*/
 		
-		// TODO lazy task collection would be better for performance
-		return createTracingTasks(taxonomy);
-	}
-	
-	private Collection<Task> createTracingTasks(Taxonomy<ElkClass> taxonomy) {
-		List<Task> tasks = new LinkedList<Task>();
-		Queue<TaxonomyNode<ElkClass>> toDo = new LinkedList<TaxonomyNode<ElkClass>>();
+		// TODO lazy task collection would be better for performance, fix TaskCollection interface
+		final List<Task> tasks = new LinkedList<Task>();
 		
-		toDo.add(taxonomy.getBottomNode());
-		
-		for (;;) {
-			TaxonomyNode<ElkClass> next = toDo.poll();
+		new ComprehensiveSubsumptionTracingTests(taxonomy).accept(new TracingTestVisitor() {
 			
-			if (next == null) {
-				break;
+			@Override
+			public boolean visit(ElkClassExpression subsumee, 	ElkClassExpression subsumer) {
+				
+				tasks.add(new VerifiedTracingTask(reasoner_, subsumee, subsumer));
+				
+				return true;
 			}
-			
-			addEquivalentClassesTracingTasks(next, tasks);
-			
-			for (TaxonomyNode<ElkClass> superNode : next.getDirectSuperNodes()) {
-				addTracingTasksForDirectSuperClasses(next, superNode, tasks);
-				toDo.add(superNode);
-			}
-		}
-		
-		LOGGER_.debug("{} subsumptions to trace", tasks.size());
+		});
 		
 		return tasks;
-	}
-
-	private void addTracingTasksForDirectSuperClasses(
-			TaxonomyNode<ElkClass> node, TaxonomyNode<ElkClass> superNode,
-			List<Task> tasks) {
-		for (ElkClass sub : node.getMembers()) {
-			if (sub.getIri() == PredefinedElkIri.OWL_NOTHING.get()) {
-				continue;
-			}
-			
-			for (ElkClass sup : superNode.getMembers()) {
-				if (sub.getIri() == PredefinedElkIri.OWL_THING.get()) {
-					continue;
-				}
-				
-				if (sub != sup) {
-					tasks.add(new TracingTask(reasoner_, sub, sup));
-				}
-			}
-		}
-		
-	}
-
-	private void addEquivalentClassesTracingTasks(TaxonomyNode<ElkClass> node, List<Task> tasks) {
-		addTracingTasksForDirectSuperClasses(node, node, tasks);
 	}
 
 	private Taxonomy<ElkClass> loadAndClassify(String ontologyFile) throws TaskException {
@@ -157,7 +122,7 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 
 			AxiomLoader loader = new Owl2StreamLoader(
 					new Owl2FunctionalStyleParserFactory(), ontFile);
-			//TODO subclass the executor to measure the number of traced contexts
+			
 			reasoner_ = new ReasonerFactory().createReasoner(loader,
 					//new SimpleStageExecutor(),
 					new RuleAndConclusionCountMeasuringExecutor( new SimpleStageExecutor(), metrics_),
@@ -191,30 +156,32 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 	 */
 	private static class TracingTask implements Task {
 
-		private final Reasoner reasoner_;
-		private final ElkClass subsumee_;
-		private final ElkClass subsumer_;
+		final Reasoner reasoner;
+		final ElkClassExpression subsumee;
+		final ElkClassExpression subsumer;
 		
-		TracingTask(Reasoner r, ElkClass sub, ElkClass sup) {
-			reasoner_ = r;
-			subsumee_ = sub;
-			subsumer_ = sup;
+		TracingTask(Reasoner r, ElkClassExpression sub, ElkClassExpression sup) {
+			reasoner = r;
+			subsumee = sub;
+			subsumer = sup;
 		}
 		
 		@Override
 		public String getName() {
-			return "Subsumption tracing";// + subsumee_ + " => " + subsumer_;
+			return "Subsumption tracing";
 		}
 
 		@Override
 		public void prepare() throws TaskException {
-			reasoner_.resetTraceState();
+			reasoner.resetTraceState();
 		}
 
 		@Override
 		public void run() throws TaskException {
 			try {
-				reasoner_.explainSubsumption(subsumee_, subsumer_, TracedConclusionVisitor.DUMMY, TRACE_MODE.RECURSIVE);
+				reasoner.explainSubsumption(subsumee, subsumer, TRACE_MODE.RECURSIVE);
+				
+				TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner);
 			} catch (ElkException e) {
 				throw new TaskException(e);
 			}
@@ -228,7 +195,55 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 		public Metrics getMetrics() {
 			return null;
 		}
-		
 	}
 
+	/**
+	 * Adds some verification checks to make sure our tracing is correct and complete.
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private static class VerifiedTracingTask extends TracingTask {
+
+		VerifiedTracingTask(Reasoner r, ElkClassExpression sub, ElkClassExpression sup) {
+			super(r, sub, sup);
+		}
+
+		@Override
+		public void run() throws TaskException {
+			super.run();
+			TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner);
+			TracingTestUtils.checkTracingMinimality(subsumee, subsumer, reasoner);
+			
+			//logInferences(10);
+			
+		}
+
+		private void logInferences(int contextNoThreshold) {
+			Context cxt = ReasonerStateAccessor.transform(reasoner, subsumee).getContext();
+			Conclusion conclusion = TracingUtils.getSubsumerWrapper(ReasonerStateAccessor.transform(reasoner, subsumer));
+			TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
+			int cxtNo = 0;
+			
+			for (@SuppressWarnings("unused") Context traced : traceState.getSaturationState().getTracedContexts()) {
+				cxtNo++;
+			}	
+			
+			if (cxtNo > contextNoThreshold) {
+				new RecursiveTraceExplorer(traceState.getTraceStore().getReader()).accept(cxt, conclusion, new BaseConclusionVisitor<Boolean, Context>() {
+
+					@Override
+					protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
+						
+						LOGGER_.info("{} in {}", conclusion, cxt);
+						
+						return true;
+					}
+					
+				});	
+			}
+		}
+		
+	}
 }

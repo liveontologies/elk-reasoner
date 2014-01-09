@@ -28,14 +28,10 @@ import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
 import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 
 public class TestGraphTest {
 	
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(TestGraphTest.class);
-
 	@Test
 	public void testBuildTraceGraph() throws Exception {
 		TraceStore traceStore = traceSubsumption("tracing/PropertyChains.owl", "http://example.org/A", "http://example.org/D");
@@ -85,18 +81,9 @@ public class TestGraphTest {
 			
 			ElkClass sub = factory.getClass(new ElkFullIri(subsumee));
 			ElkClass sup = factory.getClass(new ElkFullIri(subsumer));
-			reasoner.explainSubsumption(sub, sup, new BaseTracedConclusionVisitor<Void, Void>() {
-
-				@Override
-				protected Void defaultTracedVisit(TracedConclusion conclusion, Void v) {
-					LOGGER_.trace("traced inference: {}", InferencePrinter.print(conclusion));
-					
-					return super.defaultTracedVisit(conclusion, v);
-				}
-				
-			}, TRACE_MODE.RECURSIVE);
+			reasoner.explainSubsumption(sub, sup, TRACE_MODE.RECURSIVE);
 			
-			return reasoner.getTraceStore();
+			return ReasonerStateAccessor.getTraceState(reasoner).getTraceStore();
 
 		} finally {
 			IOUtils.closeQuietly(stream);

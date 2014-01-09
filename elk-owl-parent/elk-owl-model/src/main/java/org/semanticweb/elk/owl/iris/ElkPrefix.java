@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.owl.iris;
 
-import java.io.Serializable;
 
 
 /**
@@ -31,7 +30,7 @@ import java.io.Serializable;
  * 
  * @author Frantisek Simancik
  */
-public class ElkPrefix implements Serializable {
+public class ElkPrefix {
 	
 	protected final String name;
 	protected final ElkFullIri iri;

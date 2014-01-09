@@ -55,13 +55,14 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalChangeCheck
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceExplorer;
 import org.semanticweb.elk.reasoner.saturation.tracing.SimpleCentralizedTraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TRACE_MODE;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
@@ -607,30 +608,63 @@ public abstract class AbstractReasonerState {
 				classTaxonomyState.getTaxonomy()));
 	}
 
+	/*---------------------------------------------------
+	 * TRACING METHODS
+	 * TODO clients should not have to work with contexts and conclusions. we
+	 * need to represent the trace graphs in a way that is completely detached
+	 * from the index or saturation data structures (like the taxonomies).
+	 *---------------------------------------------------*/
+	
+	public TraceStore.Reader explainSubsumption(ElkClassExpression sub,
+			ElkClassExpression sup,	TRACE_MODE traceMode) throws ElkException {
+		IndexedClassExpression subsumee = sub.accept(objectCache_.getIndexObjectConverter());
+		IndexedClassExpression subsumer = sup.accept(objectCache_.getIndexObjectConverter());
+		
+		trace(subsumee, subsumer, traceMode);
+		
+		return traceState.getTraceStore().getReader();
+	}
+	
+	/*
+	 * the visitor recursively visits all conclusions which was used when deriving the subsumption.
+	 */
 	public void explainSubsumption(ElkClassExpression sub,
-			ElkClassExpression sup, TracedConclusionVisitor<?, ?> visitor,
+			ElkClassExpression sup, ConclusionVisitor<Boolean, Context> visitor,
 			TRACE_MODE traceMode) throws ElkException {
 		IndexedClassExpression subsumee = sub.accept(objectCache_.getIndexObjectConverter());
 		IndexedClassExpression subsumer = sup.accept(objectCache_.getIndexObjectConverter());
 		
-		if (traceMode != TRACE_MODE.NO_TRACING && !traceState.getSaturationState().isTraced(subsumee.getContext())) {
-			traceState.submitForTracing(subsumee, subsumer);
-			
-			if (traceMode == TRACE_MODE.NON_RECURSIVE) {
-				stageManager.contextTracingStage.invalidate();
-				getStageExecutor().complete(stageManager.contextTracingStage);
-			} else if (traceMode == TRACE_MODE.RECURSIVE) {
-				stageManager.recursiveContextTracingStage.invalidate();
-				getStageExecutor().complete(
-						stageManager.recursiveContextTracingStage);
-			}
-		}
+		trace(subsumee, subsumer, traceMode);
 		
-		traceState.getTraceStore().getReader().accept(subsumee.getContext(), TracingUtils.getSubsumerWrapper(subsumer), visitor);
+		new RecursiveTraceExplorer(traceState.getTraceStore().getReader()).accept(subsumee.getContext(), TracingUtils.getSubsumerWrapper(subsumer), visitor);
 	}
 	
-	public TraceStore getTraceStore() {
+	private void trace(IndexedClassExpression subsumee, IndexedClassExpression subsumer, TRACE_MODE traceMode) throws ElkException {
+		AbstractReasonerStage tracingStage = null;
+		
+		if (!traceState.getSaturationState().isTraced(subsumee)) {
+			
+			switch (traceMode) {
+			case NON_RECURSIVE:
+				tracingStage = stageManager.contextTracingStage;
+				break;
+			case RECURSIVE:
+				tracingStage = stageManager.recursiveContextTracingStage;	
+				break;
+			}
+			
+			traceState.submitForTracing(subsumee, subsumer);
+			tracingStage.invalidate();
+			getStageExecutor().complete(tracingStage);
+		}
+	}
+	
+	TraceStore getTraceStore() {
 		return traceState.getTraceStore();
+	}
+	
+	IndexedClassExpression transform(ElkClassExpression ce) {
+		return ce.accept(objectCache_.getIndexObjectConverter());
 	}
 	
 	public void resetTraceState() {

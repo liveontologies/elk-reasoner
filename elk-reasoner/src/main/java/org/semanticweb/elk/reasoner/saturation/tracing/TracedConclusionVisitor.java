@@ -53,5 +53,5 @@ public interface TracedConclusionVisitor<R, C> {
 	
 	public R visit(TracedPropagation conclusion, C parameter);
 	
-	public static final TracedConclusionVisitor<Void, Void> DUMMY = new BaseTracedConclusionVisitor<Void, Void>() {};
+	public static final TracedConclusionVisitor<?, ?> DUMMY = new BaseTracedConclusionVisitor<Void, Void>() {};
 }

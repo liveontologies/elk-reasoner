@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
@@ -57,5 +58,10 @@ public class ReversedBackwardLink extends ForwardLinkImpl implements TracedConcl
 	@Override
 	public Context getInferenceContext(Context defaultContext) {
 		return getTarget();
+	}
+
+	@Override
+	public void visitPremises(ConclusionVisitor<?, ?> visitor) {
+		getSourceLink().accept(visitor, null);
 	}
 }

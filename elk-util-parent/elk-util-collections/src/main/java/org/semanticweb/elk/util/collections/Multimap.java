@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.util.collections;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 
@@ -37,7 +36,7 @@ import java.util.Set;
  * @param <Value>
  *            the values of the multimap
  */
-public interface Multimap<Key, Value> extends Serializable {
+public interface Multimap<Key, Value> {
 
 	/**
 	 * Tests if the key-value pair occurs in this multimap
@@ -59,7 +58,7 @@ public interface Multimap<Key, Value> extends Serializable {
 	 * @param value
 	 *            the value of the pair
 	 * @return <tt>true</tt> if the multimap has changed as a result of the
-	 *         operation, <tt>fase</tt> otherwise
+	 *         operation, <tt>false</tt> otherwise
 	 */
 	boolean add(Key key, Value value);
 	

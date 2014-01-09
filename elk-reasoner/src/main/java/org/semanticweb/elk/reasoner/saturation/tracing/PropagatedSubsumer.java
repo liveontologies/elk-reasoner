@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
@@ -75,6 +76,12 @@ public class PropagatedSubsumer extends ComposedSubsumerImpl implements TracedCo
 	@Override
 	public Context getInferenceContext(Context defaultContext) {
 		return inferenceContext_;
+	}
+
+	@Override
+	public void visitPremises(ConclusionVisitor<?, ?> visitor) {
+		getPropagation().accept(visitor, null);
+		getBackwardLink().accept(visitor, null);
 	}
 
 }

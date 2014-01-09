@@ -1,7 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import java.io.Serializable;
-
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 
 /*
@@ -35,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
  * @param <E>
  *            the type of elements to which the rule can be applied
  */
-public interface Rule<P, E> extends Serializable {
+public interface Rule<P, E> {
 
 	/**
 	 * Applying the rule to an element modifiable by

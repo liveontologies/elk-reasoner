@@ -22,8 +22,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-import java.io.Serializable;
-
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 
 /**
@@ -32,7 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class IndexedObject implements Serializable {
+public abstract class IndexedObject {
 
 	/**
 	 * @return {@code true} if this {@link IndexedObject} occur in the ontology
