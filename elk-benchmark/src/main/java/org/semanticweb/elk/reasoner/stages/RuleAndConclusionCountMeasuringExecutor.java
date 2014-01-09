@@ -94,9 +94,6 @@ public class RuleAndConclusionCountMeasuringExecutor extends
 				.getIncrementalProcessingStatistics().getContextCount());
 		metrics.updateLongMetric(prefix + CONTEXT_SUBSUMER_COUNT, stats
 				.getIncrementalProcessingStatistics().getSubsumersPerContextCount());
-		/*metrics.updateLongMetric(prefix + CHANGE_INIT_CONTEX_COLLECTION_PROC_TIME, stats
-				.getIncrementalProcessingStatistics()
-				.getChangeInitContextCollectionProcessingTime());*/
 		metrics.updateDoubleMetric(prefix + TOTAL_RULE_TIME,
 				stats.getRuleStatistics().getTotalRuleTime());
 		

@@ -32,7 +32,7 @@ import java.util.Collection;
  * pavel.klinov@uni-ulm.de
  */
 public interface TaskCollection {
-
+	//TODO it may be more convenient to accept a task visitor to avoid creating collections eagerly
 	public Collection<Task> getTasks() throws TaskException;
 	public Metrics getMetrics();
 	public void dispose();

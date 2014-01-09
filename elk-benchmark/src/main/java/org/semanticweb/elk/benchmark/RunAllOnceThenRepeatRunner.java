@@ -65,6 +65,9 @@ public class RunAllOnceThenRepeatRunner {
 			task.run();
 			timer.stop();
 			
+			//FIXME
+			if (cnt > 200) break;
+			
 			//logStats(collection);
 		}
 	}

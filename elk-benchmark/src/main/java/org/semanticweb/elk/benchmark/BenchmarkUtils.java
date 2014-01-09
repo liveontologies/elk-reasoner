@@ -140,6 +140,7 @@ public class BenchmarkUtils {
 		}
 	}
 	
+	//TODO need a better name
 	public static void runTaskCollection2(String taskClass, int warmups, int runs, String[] params) throws Exception {
 		TaskCollection collection = TaskFactory.createTaskCollection(taskClass, params);
 		RunAllOnceThenRepeatRunner runner = new RunAllOnceThenRepeatRunner(warmups, runs);

@@ -76,7 +76,7 @@ public class TraceGraph implements Serializable {
 
 	void addInference(final Context context, Conclusion conclusion,
 			TraceStore.Reader traceReader) {
-				
+		//TODO we don't really have to store context with each inference
 		traceReader.accept(context, conclusion,
 				new TracedConclusionVisitor<Void, Void>() {
 
