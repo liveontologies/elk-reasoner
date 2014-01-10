@@ -55,15 +55,12 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalChangeCheck
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceExplorer;
 import org.semanticweb.elk.reasoner.saturation.tracing.SimpleCentralizedTraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TRACE_MODE;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
@@ -625,20 +622,6 @@ public abstract class AbstractReasonerState {
 		return traceState.getTraceStore().getReader();
 	}
 	
-	/*
-	 * the visitor recursively visits all conclusions which was used when deriving the subsumption.
-	 */
-	public void explainSubsumption(ElkClassExpression sub,
-			ElkClassExpression sup, ConclusionVisitor<Boolean, Context> visitor,
-			TRACE_MODE traceMode) throws ElkException {
-		IndexedClassExpression subsumee = sub.accept(objectCache_.getIndexObjectConverter());
-		IndexedClassExpression subsumer = sup.accept(objectCache_.getIndexObjectConverter());
-		
-		trace(subsumee, subsumer, traceMode);
-		
-		new RecursiveTraceExplorer(traceState.getTraceStore().getReader()).accept(subsumee.getContext(), TracingUtils.getSubsumerWrapper(subsumer), visitor);
-	}
-	
 	private void trace(IndexedClassExpression subsumee, IndexedClassExpression subsumer, TRACE_MODE traceMode) throws ElkException {
 		AbstractReasonerStage tracingStage = null;
 		
@@ -657,10 +640,6 @@ public abstract class AbstractReasonerState {
 			tracingStage.invalidate();
 			getStageExecutor().complete(tracingStage);
 		}
-	}
-	
-	TraceStore getTraceStore() {
-		return traceState.getTraceStore();
 	}
 	
 	IndexedClassExpression transform(ElkClassExpression ce) {
