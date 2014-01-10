@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -36,8 +35,6 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public interface TracedConclusion extends Conclusion {
 
 	public <R, C> R acceptTraced(TracedConclusionVisitor<R, C> visitor, C parameter);
-	
-	public void visitPremises(ConclusionVisitor<?, ?> visitor);
 	
 	// TODO: do we really need that?
 	/**

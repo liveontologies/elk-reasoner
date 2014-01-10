@@ -7,8 +7,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -23,6 +24,10 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public class RecursiveTraceExplorer {
 
 	//private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveTraceExplorer.class);
+	/**
+	 * the expolorer won't explore more inferences for a conclusion as it unwinds the trace.
+	 */
+	private static final int INFERENCES_TO_UNWIND = Integer.MAX_VALUE;
 	
 	private final TraceStore.Reader traceReader_;
 	/*
@@ -56,81 +61,21 @@ public class RecursiveTraceExplorer {
 		addToQueue(context, conclusion, toDo, seenInferences, premiseVisitor);
 
 		for (;;) {
-			InferenceWrapper next = toDo.poll();
+			final InferenceWrapper next = toDo.poll();
 
 			if (next == null) {
 				break;
 			}
+			//visiting all premises and putting them into the todo queue
+			next.inference.acceptTraced(new PremiseVisitor<Void, Void>(new BaseConclusionVisitor<Void, Void>(){
 
-			final Context infContext = next.context;
-
-			next.inference.acceptTraced(
-					new BaseTracedConclusionVisitor<Void, Void>() {
-
-						@Override
-						public Void visit(InitializationSubsumer inference,
-								Void v) {
-							return null;
-						}
-
-						@Override
-						public Void visit(SubClassOfSubsumer inference, Void v) {
-							addToQueue(infContext, inference.getPremise(),
-									toDo, seenInferences, premiseVisitor);
-							return null;
-						}
-
-						@Override
-						public Void visit(ComposedConjunction inference, Void v) {
-							addToQueue(infContext,
-									inference.getFirstConjunct(), toDo,
-									seenInferences, premiseVisitor);
-							addToQueue(infContext,
-									inference.getSecondConjunct(), toDo,
-									seenInferences, premiseVisitor);
-							return null;
-						}
-
-						@Override
-						public Void visit(DecomposedConjunction inference,
-								Void v) {
-							addToQueue(infContext, inference.getConjunction(),
-									toDo, seenInferences, premiseVisitor);
-							return null;
-						}
-
-						@Override
-						public Void visit(ComposedBackwardLink inference, Void v) {
-							addToQueue(infContext, inference.getBackwardLink(),
-									toDo,  seenInferences, premiseVisitor);
-							addToQueue(infContext, inference.getForwardLink(),
-									toDo, seenInferences, premiseVisitor);
-							return null;
-						}
-
-						@Override
-						public Void visit(ReflexiveSubsumer inference, Void v) {
-							// TODO
-							return null;
-						}
-
-						@Override
-						public Void visit(PropagatedSubsumer inference, Void v) {
-							addToQueue(infContext, inference.getBackwardLink(),
-									toDo, seenInferences, premiseVisitor);
-							addToQueue(infContext, inference.getPropagation(),
-									toDo, seenInferences, premiseVisitor);
-							return null;
-						}
-
-						@Override
-						public Void visit(TracedPropagation inference, Void v) {
-							addToQueue(infContext, inference.getPremise(),
-									toDo, seenInferences, premiseVisitor);
-							return null;
-						}
-
-					}, null);
+				@Override
+				protected Void defaultVisit(Conclusion premise, Void cxt) {
+					addToQueue(next.context, premise, toDo, seenInferences, premiseVisitor);
+					return null;
+				}
+				
+			}), null);
 		}
 	}
 
@@ -144,7 +89,7 @@ public class RecursiveTraceExplorer {
 			return;
 		}
 		
-		final AtomicBoolean traced = new AtomicBoolean(false);
+		final AtomicInteger traced = new AtomicInteger(0);
 		// finding all inferences that produced the given conclusion (if we are
 		// here, the inference must have premises, i.e. it's not an
 		// initialization inference)
@@ -153,21 +98,21 @@ public class RecursiveTraceExplorer {
 
 					@Override
 					protected Void defaultTracedVisit(TracedConclusion inference, Void v) {
-						if (!seenInferences.contains(inference)) {
+						if (!seenInferences.contains(inference) && traced.get() < INFERENCES_TO_UNWIND) {
 							Context inferenceContext = inference.getInferenceContext(context);
 							
 							seenInferences.add(inference);
 							toDo.add(new InferenceWrapper(inference, inferenceContext));
 						}
 
-						traced.set(true);
-
+						traced.incrementAndGet();
+						
 						return null;
 					}
 
 				});
 		
-		if (!traced.get()) {
+		if (traced.get() == 0) {
 			listener_.notifyUntraced(conclusion, context);
 		}
 	}

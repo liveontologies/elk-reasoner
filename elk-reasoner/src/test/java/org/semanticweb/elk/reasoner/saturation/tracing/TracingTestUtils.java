@@ -22,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * A collection of utility methods to test correctness of saturation tracing.
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de

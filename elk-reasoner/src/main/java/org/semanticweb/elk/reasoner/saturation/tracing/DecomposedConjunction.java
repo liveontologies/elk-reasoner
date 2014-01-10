@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
@@ -59,11 +58,6 @@ public class DecomposedConjunction extends DecomposedSubsumerImpl implements Dec
 	@Override
 	public Context getInferenceContext(Context defaultContext) {
 		return defaultContext;
-	}
-
-	@Override
-	public void visitPremises(ConclusionVisitor<?, ?> visitor) {
-		getConjunction().accept(visitor, null);
 	}
 
 }

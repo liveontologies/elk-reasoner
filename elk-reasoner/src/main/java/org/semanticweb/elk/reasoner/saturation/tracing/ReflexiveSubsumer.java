@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -56,11 +55,6 @@ public class ReflexiveSubsumer extends ComposedSubsumerImpl implements TracedCon
 	@Override
 	public Context getInferenceContext(Context defaultContext) {
 		return defaultContext;
-	}
-
-	@Override
-	public void visitPremises(ConclusionVisitor<?, ?> visitor) {
-		//no-op
 	}
 
 }

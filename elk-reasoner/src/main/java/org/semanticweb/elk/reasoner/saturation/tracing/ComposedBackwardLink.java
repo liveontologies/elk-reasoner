@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
@@ -79,12 +78,6 @@ public class ComposedBackwardLink extends BackwardLinkImpl implements TracedConc
 	@Override
 	public Context getInferenceContext(Context defaultContext) {
 		return inferenceContext_;
-	}
-
-	@Override
-	public void visitPremises(ConclusionVisitor<?, ?> visitor) {
-		getBackwardLink().accept(visitor, null);
-		getForwardLink().accept(visitor, null);
 	}
 
 }

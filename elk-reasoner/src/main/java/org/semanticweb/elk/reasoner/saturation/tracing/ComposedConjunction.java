@@ -26,9 +26,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 
@@ -68,12 +67,6 @@ public class ComposedConjunction extends ComposedSubsumerImpl implements TracedC
 	@Override
 	public Context getInferenceContext(Context defaultContext) {
 		return defaultContext;
-	}
-
-	@Override
-	public void visitPremises(ConclusionVisitor<?, ?> visitor) {
-		getFirstConjunct().accept(visitor, null);
-		getSecondConjunct().accept(visitor, null);
 	}
 
 }

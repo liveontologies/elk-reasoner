@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -49,11 +48,6 @@ public class InitializationSubsumer extends DecomposedSubsumerImpl implements De
 	@Override
 	public Context getInferenceContext(Context defaultContext) {
 		return defaultContext;
-	}
-
-	@Override
-	public void visitPremises(ConclusionVisitor<?, ?> visitor) {
-		//no-op
 	}
 
 }

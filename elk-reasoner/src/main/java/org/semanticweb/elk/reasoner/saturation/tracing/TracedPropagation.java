@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -58,8 +57,4 @@ public class TracedPropagation extends PropagationImpl implements TracedConclusi
 		return defaultContext;
 	}
 
-	@Override
-	public void visitPremises(ConclusionVisitor<?, ?> visitor) {
-		getPremise().accept(visitor, null);
-	}
 }
