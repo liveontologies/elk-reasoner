@@ -5,6 +5,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
@@ -146,9 +147,10 @@ public abstract class AbstractRuleVisitor implements RuleVisitor {
 	}
 
 	@Override
-	public void visit(OwlThingContextInitRule rule, Context context,
+	public void visit(OwlThingContextInitRule rule,
+			ContextInitialization premise, Context context,
 			ConclusionProducer producer) {
-		defaultVisit(rule, null, context, producer);
+		defaultVisit(rule, premise, context, producer);
 	}
 
 	@Override
@@ -165,9 +167,10 @@ public abstract class AbstractRuleVisitor implements RuleVisitor {
 	}
 
 	@Override
-	public void visit(RootContextInitializationRule rule, Context context,
+	public void visit(RootContextInitializationRule rule,
+			ContextInitialization premise, Context context,
 			ConclusionProducer producer) {
-		defaultVisit(rule, null, context, producer);
+		defaultVisit(rule, premise, context, producer);
 	}
 
 	@Override

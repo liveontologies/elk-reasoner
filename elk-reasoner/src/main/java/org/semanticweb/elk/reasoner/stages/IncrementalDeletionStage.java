@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleDeapplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleDeapplicationFactory;
 
 /**
  * Reverts inferences

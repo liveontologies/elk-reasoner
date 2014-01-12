@@ -87,7 +87,6 @@ public class ContradictionFromOwlNothingRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, Context context,
 			ConclusionProducer producer) {
-		LOGGER_.trace("Applying {} to {}", NAME_, context);
 		producer.produce(context, Contradiction.getInstance());
 	}
 

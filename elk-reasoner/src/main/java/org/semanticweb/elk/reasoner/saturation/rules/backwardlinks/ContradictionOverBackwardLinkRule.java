@@ -56,7 +56,6 @@ public class ContradictionOverBackwardLinkRule extends
 	@Override
 	public void apply(BackwardLink premise, Context contex,
 			ConclusionProducer producer) {
-		LOGGER_.trace("Applying {} to {}", NAME_, premise);
 		producer.produce(premise.getSource(), Contradiction.getInstance());
 	}
 

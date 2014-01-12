@@ -29,10 +29,16 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
@@ -46,6 +52,8 @@ import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Context implementation that is used for EL reasoning. It provides data
@@ -59,35 +67,19 @@ import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
  */
 public class ContextImpl implements Context {
 
-	/**
-	 * the root {@link IndexedClassExpression} for which the {@link #subsumers_}
-	 * are computed
-	 * 
-	 */
-	private final IndexedClassExpression root_;
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ContextImpl.class);
+
+	private static final ConclusionVisitor<ContextImpl, Boolean> CONCLUSION_INSERTER_ = new ConclusionInserter();
+	private static final ConclusionVisitor<ContextImpl, Boolean> CONCLUSION_DELETER_ = new ConclusionDeleter();
+	private static final ConclusionVisitor<ContextImpl, Boolean> CONCLUSION_OCCURRENCE_CHECKER_ = new ConclusionOccurrenceChecker();
 
 	/**
 	 * references to the next and previous contexts so that the contexts can be
 	 * chained
 	 */
-//	volatile ContextImpl next, previous;
-
-	/**
-	 * the derived {@link IndexedClassExpression}s that are subsumers (i.e,
-	 * super-classes) of {@link #root_}
-	 */
-	private final Set<IndexedClassExpression> subsumers_;
-
-	/**
-	 * the indexed representation of all derived {@link BackwardLink}s computed
-	 * for this {@link Context}; can be {@code null}
-	 */
-	private Multimap<IndexedPropertyChain, Context> backwardLinksByObjectProperty_ = null;
-
-	/**
-	 * 
-	 */
-	private Map<IndexedDisjointnessAxiom, Boolean> disjointnessAxioms_;
+	// volatile ContextImpl next, previous;
 
 	/**
 	 * the rules that should be applied to each derived {@link BackwardLink} in
@@ -96,9 +88,21 @@ public class ContextImpl implements Context {
 	private LinkableBackwardLinkRule backwardLinkRules_ = null;
 
 	/**
-	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
+	 * the indexed representation of all derived {@link BackwardLink}s computed
+	 * for this {@link Context}; can be {@code null}
 	 */
-	private final ActivationStack<Conclusion> toDo_;
+	private Multimap<IndexedPropertyChain, Context> backwardLinksByObjectProperty_ = null;
+
+	/**
+	 * the derived {@link IndexedClassExpression} subsumers by
+	 * {@link IndexedDisjointnessAxiom}s in which they occur as members
+	 */
+	private Map<IndexedDisjointnessAxiom, IndexedClassExpression[]> disjointnessAxioms_;
+
+	/**
+	 * {@code true} if {@code owl:Nothing} is stored in {@link #subsumers_}
+	 */
+	protected volatile boolean isInconsistent = false;
 
 	/**
 	 * {@code true} if all derived {@link Subsumer} of {@link #root_} have been
@@ -107,9 +111,28 @@ public class ContextImpl implements Context {
 	protected volatile boolean isSaturated = false;
 
 	/**
-	 * {@code true} if {@code owl:Nothing} is stored in {@link #subsumers_}
+	 * the root {@link IndexedClassExpression} for which the {@link #subsumers_}
+	 * are computed
+	 * 
 	 */
-	protected volatile boolean isInconsistent = false;
+	private final IndexedClassExpression root_;
+
+	/**
+	 * the derived {@link IndexedClassExpression}s that are subsumers (i.e,
+	 * super-classes) of {@link #root_}
+	 */
+	private final Set<IndexedClassExpression> subsumers_;
+
+	/**
+	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
+	 */
+	private final ActivationStack<Conclusion> toDo_;
+
+	/**
+	 * {@code true} if this {@link Context} is initialized, i.e., contains
+	 * {@link ContextInitialization}
+	 */
+	private boolean isInitialized_ = false;
 
 	/**
 	 * Construct a new {@link Context} for the given root
@@ -123,209 +146,40 @@ public class ContextImpl implements Context {
 		this.subsumers_ = new ArrayHashSet<IndexedClassExpression>(13);
 	}
 
-	@Override
-	public IndexedClassExpression getRoot() {
-		return root_;
-	}
-
-//	@Override
-//	public void removeLinks() {
-//		// No sync here?
-//		if (previous != null) {
-//			previous.next = next;
-//		}
-//
-//		if (next != null) {
-//			next.previous = previous;
-//		}
-//	}
+	// @Override
+	// public void removeLinks() {
+	// // No sync here?
+	// if (previous != null) {
+	// previous.next = next;
+	// }
+	//
+	// if (next != null) {
+	// next.previous = previous;
+	// }
+	// }
 
 	@Override
-	public Set<IndexedClassExpression> getSubsumers() {
-		return subsumers_;
-	}
-
-	@Override
-	public boolean addSubsumer(IndexedClassExpression expression) {
-		return subsumers_.add(expression);
+	public boolean addConclusion(Conclusion conclusion) {
+		// if (conclusion.getSourceContext(this).isSaturated())
+		// LOGGER_.error(
+		// "{}: adding conclusion belonging to a saturated context {}",
+		// conclusion);
+		return conclusion.accept(CONCLUSION_INSERTER_, this);
 	}
 
 	@Override
-	public boolean containsSubsumer(IndexedClassExpression expression) {
-		return subsumers_.contains(expression);
+	public boolean removeConclusion(Conclusion conclusion) {
+		return conclusion.accept(CONCLUSION_DELETER_, this);
 	}
 
 	@Override
-	public boolean removeSubsumer(IndexedClassExpression expression) {
-		return subsumers_.remove(expression);
+	public boolean containsConclusion(Conclusion conclusion) {
+		return conclusion.accept(CONCLUSION_OCCURRENCE_CHECKER_, this);
 	}
 
 	@Override
-	public boolean addContradiction() {
-		boolean before = isInconsistent;
-		isInconsistent = true;
-		ContradictionOverBackwardLinkRule.addTo(this);
-		return before != isInconsistent;
-	}
-
-	@Override
-	public boolean removeConradiction() {
-		boolean before = isInconsistent;
-		isInconsistent = false;
-		ContradictionOverBackwardLinkRule.removeFrom(this);
-		return before != isInconsistent;
-	}
-
-	@Override
-	public boolean containsContradiction() {
-		return isInconsistent;
-	}
-
-	@Override
-	public Multimap<IndexedPropertyChain, Context> getBackwardLinksByObjectProperty() {
-		if (backwardLinksByObjectProperty_ == null)
-			return Operations.emptyMultimap();
-		return backwardLinksByObjectProperty_;
-	}
-
-	@Override
-	public boolean containsBackwardLink(BackwardLink link) {
-		if (backwardLinksByObjectProperty_ != null) {
-			return backwardLinksByObjectProperty_.contains(link.getRelation(),
-					link.getSource());
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean addDisjointnessAxiom(
-			IndexedDisjointnessAxiom disjointnessAxiom) {
-		if (disjointnessAxioms_ == null) {
-			disjointnessAxioms_ = new ArrayHashMap<IndexedDisjointnessAxiom, Boolean>();
-		}
-		Boolean inconsistency = disjointnessAxioms_.get(disjointnessAxiom);
-		if (inconsistency == null)
-			inconsistency = false;
-		else if (inconsistency == true)
-			// nothing changes
-			return false;
-		else
-			// inconsistency == false;
-			inconsistency = true;
-		disjointnessAxioms_.put(disjointnessAxiom, inconsistency);
-		return true;
-	}
-
-	@Override
-	public boolean removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
-		if (disjointnessAxioms_ == null) {
-			return false;
-		}
-		Boolean inconcistency = disjointnessAxioms_.get(axiom);
-		if (inconcistency == null)
-			return false;
-		if (inconcistency)
-			disjointnessAxioms_.put(axiom, false);
-		else {
-			// inconcistency = false
-			disjointnessAxioms_.remove(axiom);
-			if (disjointnessAxioms_.isEmpty())
-				disjointnessAxioms_ = null;
-		}
-		return true;
-	}
-
-	@Override
-	public boolean containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
-		if (disjointnessAxioms_ == null)
-			return false;
-		return disjointnessAxioms_.containsKey(axiom);
-	}
-
-	@Override
-	public boolean inconsistForDisjointnessAxiom(IndexedDisjointnessAxiom axiom) {
-		Boolean inconsistency = disjointnessAxioms_.get(axiom);
-		if (inconsistency == null)
-			return false;
-		return inconsistency;
-	}
-
-	@Override
-	public boolean setSaturated(boolean saturated) {
-		boolean result = isSaturated;
-		isSaturated = saturated;
-		return result;
-	}
-
-	@Override
-	public boolean isSaturated() {
-		return isSaturated;
-	}
-
-	@Override
-	public boolean addBackwardLink(BackwardLink link) {
-		Context source = link.getSource();
-		IndexedPropertyChain relation = link.getRelation();
-
-		if (backwardLinksByObjectProperty_ == null)
-			backwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>();
-
-		return backwardLinksByObjectProperty_.add(relation, source);
-
-		/*
-		 * if (changed && source.isSaturated()) LOGGER_.error(getRoot() +
-		 * ": adding a backward link to a saturated context: " + link);
-		 * 
-		 * return changed;
-		 */
-	}
-
-	@Override
-	public boolean removeBackwardLink(BackwardLink link) {
-		boolean changed = false;
-
-		if (backwardLinksByObjectProperty_ != null) {
-			changed = backwardLinksByObjectProperty_.remove(link.getRelation(),
-					link.getSource());
-
-			if (backwardLinksByObjectProperty_.isEmpty()) {
-				backwardLinksByObjectProperty_ = null;
-			}
-		}
-
-		return changed;
-	}
-
-	@Override
-	public boolean addForwardLink(ForwardLink link) {
-		return BackwardLinkChainFromBackwardLinkRule.addRuleFor(link, this);
-	}
-
-	@Override
-	public boolean removeForwardLink(ForwardLink link) {
-		return BackwardLinkChainFromBackwardLinkRule.removeRuleFor(link, this);
-	}
-
-	@Override
-	public boolean containsForwardLink(ForwardLink link) {
-		return BackwardLinkChainFromBackwardLinkRule
-				.containsRuleFor(link, this);
-	}
-
-	@Override
-	public boolean addPropagation(Propagation propagation) {
-		return SubsumerBackwardLinkRule.addRuleFor(propagation, this);
-	}
-
-	@Override
-	public boolean removePropagation(Propagation propagation) {
-		return SubsumerBackwardLinkRule.removeRuleFor(propagation, this);
-	}
-
-	@Override
-	public boolean containsPropagation(Propagation propagation) {
-		return SubsumerBackwardLinkRule.containsRuleFor(propagation, this);
+	public boolean addToDo(Conclusion conclusion) {
+		return toDo_.push(conclusion);
 	}
 
 	@Override
@@ -350,8 +204,52 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public boolean addToDo(Conclusion conclusion) {
-		return toDo_.push(conclusion);
+	public Multimap<IndexedPropertyChain, Context> getBackwardLinksByObjectProperty() {
+		if (backwardLinksByObjectProperty_ == null)
+			return Operations.emptyMultimap();
+		return backwardLinksByObjectProperty_;
+	}
+
+	@Override
+	public IndexedClassExpression getRoot() {
+		return root_;
+	}
+
+	@Override
+	public Set<IndexedClassExpression> getSubsumers() {
+		return subsumers_;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return (subsumers_ == null || subsumers_.isEmpty())
+				&& (backwardLinksByObjectProperty_ == null || backwardLinksByObjectProperty_
+						.isEmpty()) && getBackwardLinkRuleHead() == null;
+	}
+
+	@Override
+	public boolean isInconsistForDisjointnessAxiom(
+			IndexedDisjointnessAxiom axiom) {
+		if (disjointnessAxioms_ == null)
+			return false;
+		IndexedClassExpression[] members = disjointnessAxioms_.get(axiom);
+		if (members == null)
+			return false;
+		// check if both members are not null; this is always when the second
+		// member is not null
+		return (members[1] != null);
+	}
+
+	@Override
+	public boolean isSaturated() {
+		return isSaturated;
+	}
+
+	@Override
+	public boolean setSaturated(boolean saturated) {
+		boolean result = isSaturated;
+		isSaturated = saturated;
+		return result;
 	}
 
 	@Override
@@ -364,11 +262,254 @@ public class ContextImpl implements Context {
 		return root_.toString() + (this != root_.getContext() ? "[local]" : "");
 	}
 
-	@Override
-	public boolean isEmpty() {
-		return (subsumers_ == null || subsumers_.isEmpty())
-				&& (backwardLinksByObjectProperty_ == null || backwardLinksByObjectProperty_
-						.isEmpty()) && getBackwardLinkRuleHead() == null;
+	private static class ConclusionInserter implements
+			ConclusionVisitor<ContextImpl, Boolean> {
+
+		static Boolean visit(Subsumer conclusion, ContextImpl input) {
+			return input.subsumers_.add(conclusion.getExpression());
+		}
+
+		@Override
+		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
+			Context source = conclusion.getSource();
+			IndexedPropertyChain relation = conclusion.getRelation();
+
+			if (input.backwardLinksByObjectProperty_ == null)
+				input.backwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>();
+
+			return input.backwardLinksByObjectProperty_.add(relation, source);
+		}
+
+		@Override
+		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
+			return visit((Subsumer) conclusion, input);
+		}
+
+		@Override
+		public Boolean visit(ContextInitialization conclusion, ContextImpl input) {
+			if (input.isInitialized_)
+				// nothing changes
+				return false;
+			// else
+			input.isInitialized_ = true;
+			return true;
+		}
+
+		@Override
+		public Boolean visit(Contradiction conclusion, ContextImpl input) {
+			boolean before = input.isInconsistent;
+			input.isInconsistent = true;
+			ContradictionOverBackwardLinkRule.addTo(input);
+			return before != input.isInconsistent;
+		}
+
+		@Override
+		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
+			return visit((Subsumer) conclusion, input);
+		}
+
+		@Override
+		public Boolean visit(DisjointSubsumer conclusion, ContextImpl input) {
+			if (input.disjointnessAxioms_ == null) {
+				input.disjointnessAxioms_ = new ArrayHashMap<IndexedDisjointnessAxiom, IndexedClassExpression[]>();
+			}
+			IndexedDisjointnessAxiom axiom = conclusion.getAxiom();
+			IndexedClassExpression member = conclusion.getMember();
+			IndexedClassExpression[] members = input.disjointnessAxioms_
+					.get(axiom);
+			if (members == null) {
+				// at most two members are stored; it is sufficient to detect
+				// inconsistency
+				members = new IndexedClassExpression[2];
+				input.disjointnessAxioms_.put(axiom, members);
+			}
+			if (members[0] == null) {
+				members[0] = member;
+				return true;
+			}
+			if (members[0] == member) {
+				return false;
+			}
+			if (members[1] == null) {
+				members[1] = member;
+				return true;
+			}
+			// else
+			return false;
+		}
+
+		@Override
+		public Boolean visit(ForwardLink conclusion, ContextImpl input) {
+			return BackwardLinkChainFromBackwardLinkRule.addRuleFor(conclusion,
+					input);
+		}
+
+		@Override
+		public Boolean visit(Propagation conclusion, ContextImpl input) {
+			return SubsumerBackwardLinkRule.addRuleFor(conclusion, input);
+		}
+
 	}
 
+	private static class ConclusionDeleter implements
+			ConclusionVisitor<ContextImpl, Boolean> {
+
+		@Override
+		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
+			boolean changed = false;
+			if (input.backwardLinksByObjectProperty_ != null) {
+				changed = input.backwardLinksByObjectProperty_.remove(
+						conclusion.getRelation(), conclusion.getSource());
+				if (input.backwardLinksByObjectProperty_.isEmpty()) {
+					input.backwardLinksByObjectProperty_ = null;
+				}
+			}
+			return changed;
+		}
+
+		static boolean visit(Subsumer conclusion, ContextImpl input) {
+			return input.subsumers_.remove(conclusion.getExpression());
+		}
+
+		@Override
+		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
+			return visit((Subsumer) conclusion, input);
+		}
+
+		@Override
+		public Boolean visit(ContextInitialization conclusion, ContextImpl input) {
+			if (!input.isInitialized_)
+				// nothing changes
+				return false;
+			// else
+			input.isInitialized_ = false;
+			return true;
+		}
+
+		@Override
+		public Boolean visit(Contradiction conclusion, ContextImpl input) {
+			boolean before = input.isInconsistent;
+			input.isInconsistent = false;
+			ContradictionOverBackwardLinkRule.removeFrom(input);
+			return before != input.isInconsistent;
+		}
+
+		@Override
+		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
+			return visit((Subsumer) conclusion, input);
+		}
+
+		@Override
+		public Boolean visit(DisjointSubsumer conclusion, ContextImpl input) {
+			if (input.disjointnessAxioms_ == null) {
+				return false;
+			}
+			IndexedDisjointnessAxiom axiom = conclusion.getAxiom();
+			IndexedClassExpression member = conclusion.getMember();
+			IndexedClassExpression[] members = input.disjointnessAxioms_
+					.get(axiom);
+			if (members == null)
+				return false;
+			if (members[0] == null)
+				return false;
+			if (members[0] == member) {
+				if (members[1] == null) {
+					// delete the record
+					input.disjointnessAxioms_.remove(axiom);
+					if (input.disjointnessAxioms_.isEmpty())
+						input.disjointnessAxioms_ = null;
+				} else {
+					// shift
+					members[0] = members[1];
+					members[1] = null;
+				}
+				return true;
+			}
+			if (members[1] == null)
+				return false;
+			if (members[1] == member) {
+				members[1] = null;
+				return true;
+			}
+			// else
+			return false;
+		}
+
+		@Override
+		public Boolean visit(ForwardLink conclusion, ContextImpl input) {
+			return BackwardLinkChainFromBackwardLinkRule.removeRuleFor(
+					conclusion, input);
+		}
+
+		@Override
+		public Boolean visit(Propagation conclusion, ContextImpl input) {
+			return SubsumerBackwardLinkRule.removeRuleFor(conclusion, input);
+		}
+
+	}
+
+	private static class ConclusionOccurrenceChecker implements
+			ConclusionVisitor<ContextImpl, Boolean> {
+
+		/* adding, removing, checking conclusions */
+
+		static boolean visit(Subsumer conclusion, ContextImpl input) {
+			return input.subsumers_.contains(conclusion.getExpression());
+		}
+
+		@Override
+		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
+			if (input.backwardLinksByObjectProperty_ != null) {
+				return input.backwardLinksByObjectProperty_.contains(
+						conclusion.getRelation(), conclusion.getSource());
+			}
+			return false;
+		}
+
+		@Override
+		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
+			return visit((Subsumer) conclusion, input);
+		}
+
+		@Override
+		public Boolean visit(ContextInitialization conclusion, ContextImpl input) {
+			return input.isInitialized_;
+		}
+
+		@Override
+		public Boolean visit(Contradiction conclusion, ContextImpl input) {
+			return input.isInconsistent;
+		}
+
+		@Override
+		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
+			return visit((Subsumer) conclusion, input);
+		}
+
+		@Override
+		public Boolean visit(DisjointSubsumer conclusion, ContextImpl input) {
+			if (input.disjointnessAxioms_ == null) {
+				return false;
+			}
+			IndexedDisjointnessAxiom axiom = conclusion.getAxiom();
+			IndexedClassExpression member = conclusion.getMember();
+			IndexedClassExpression[] members = input.disjointnessAxioms_
+					.get(axiom);
+			if (members == null)
+				return false;
+			return (members[0] == member || members[1] == member);
+		}
+
+		@Override
+		public Boolean visit(ForwardLink conclusion, ContextImpl input) {
+			return BackwardLinkChainFromBackwardLinkRule.containsRuleFor(
+					conclusion, input);
+		}
+
+		@Override
+		public Boolean visit(Propagation conclusion, ContextImpl input) {
+			return SubsumerBackwardLinkRule.containsRuleFor(conclusion, input);
+		}
+
+	}
 }

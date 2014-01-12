@@ -39,7 +39,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
@@ -122,13 +121,13 @@ class ContextInitializationFactory
 	private ContextProcessor getBaseContextProcessor() {
 
 		final SaturationStatistics localStatistics = new SaturationStatistics();
-		final ConclusionVisitor<?> conclusionVisitor = SaturationUtils
-				.addStatsToConclusionVisitor(localStatistics
-						.getConclusionStatistics());
+
 		final RuleVisitor ruleAppVisitor = SaturationUtils
 				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());
-		final SaturationStateWriter saturationStateWriter = saturationState_
-				.getWriter(ContextModificationListener.DUMMY, conclusionVisitor);
+		final SaturationStateWriter saturationStateWriter = SaturationUtils
+				.getStatAwareWriter(saturationState_
+						.getWriter(ContextModificationListener.DUMMY),
+						localStatistics);
 
 		localStatistics.getConclusionStatistics().startMeasurements();
 
@@ -138,7 +137,8 @@ class ContextInitializationFactory
 
 			@Override
 			public void process(Context context) {
-				// apply all changed global context rules
+				// apply all changed context initialization rules
+				// TODO: do the initialization using the context initialization conclusion
 				LinkedContextInitRule nextGlobalRule = changedGlobalRuleHead_;
 				while (nextGlobalRule != null) {
 					if (LOGGER_.isTraceEnabled())

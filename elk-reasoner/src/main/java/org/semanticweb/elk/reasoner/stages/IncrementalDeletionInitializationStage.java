@@ -37,7 +37,6 @@ import org.semanticweb.elk.reasoner.indexing.visitors.AbstractIndexedClassEntity
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
@@ -95,11 +94,10 @@ public class IncrementalDeletionInitializationStage extends
 			return false;
 		this.initialization_ = null;
 		// initializing contexts which will be removed
-		final ConclusionVisitor<?> conclusionVisitor = SaturationUtils
-				.addStatsToConclusionVisitor(stageStatistics_
-						.getConclusionStatistics());
-		final ExtendedSaturationStateWriter satStateWriter = reasoner.saturationState
-				.getExtendedWriter(conclusionVisitor);
+		final ExtendedSaturationStateWriter satStateWriter = SaturationUtils
+				.getStatsAwareWriter(
+						reasoner.saturationState.getExtendedWriter(),
+						stageStatistics_);
 		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState
 				.getWriter();
 		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState
@@ -122,14 +120,15 @@ public class IncrementalDeletionInitializationStage extends
 		for (IndexedClassExpression ice : reasoner.ontologyIndex
 				.getRemovedClassExpressions()) {
 
-			if (ice.getContext() != null) {
-				satStateWriter.initContext(ice.getContext());
+			Context context = reasoner.saturationState.getContext(ice);
+			if (context != null) {
+				satStateWriter.initContext(context);
 				// otherwise it may not be cleaned
 				// we could use writer.markContextAsNotSaturated
 				// but then the context will end up in the queue
 				// for not saturated contexts, which isn't needed here
-				ice.getContext().setSaturated(false);
-				ice.getContext().getRoot().accept(rootVisitor);
+				context.setSaturated(false);
+				ice.accept(rootVisitor);
 			}
 		}
 

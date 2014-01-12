@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
 /*
  * #%L
@@ -33,11 +33,18 @@ import org.semanticweb.elk.reasoner.saturation.MapSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AndConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CombinedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextNotSaturatedCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.HybridRuleApplicationConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalizedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.CombinedConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.LocalizedConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,29 +73,46 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	}
 
 	@Override
-	public SaturationState getSaturationState() {
-		return localState_;
-	}
-
-	@Override
 	public InputProcessor<IndexedClassExpression> getDefaultEngine(
 			ContextCreationListener listener,
 			ContextModificationListener modListener) {
 		return new ContextCompletionEngine(listener, modListener);
 	}
 
-	private static ConclusionVisitor<Boolean> getGapFillingConclusionProcessor(
+	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, ConclusionProducer mainProducer,
 			ConclusionProducer trackingProducer) {
-		return new AndConclusionVisitor(
-		// check if conclusion occurs in the main saturation state
-				new ConclusionOccurrenceCheckingVisitor(),
-				// if so, apply the non-redundant rules using both producers
-				// and redundant using only the tracking producer
-				new HybridRuleApplicationConclusionVisitor(ruleVisitor,
-						ruleVisitor, new CombinedConclusionProducer(
-								mainProducer, trackingProducer),
-						trackingProducer));
+		// TODO: we need hybrid contexts!
+		// since we process context and conclusions coming from the tracing
+		// state, we need to localize them when producing to the main state
+		ConclusionProducer localizedMainProducer = new LocalizedConclusionProducer(
+				mainProducer, saturationState);
+		return new CombinedConclusionVisitor<Context>(
+				// checking the conclusion against the main saturation state
+				new LocalizedConclusionVisitor(
+						new CombinedConclusionVisitor<Context>(
+						// the source context of the conclusion is not saturated
+						// TODO: make sure that such conclusions are never
+						// processed at all
+								new ConclusionSourceContextNotSaturatedCheckingVisitor(),
+								// and the conclusion already occurs there
+								new ConclusionOccurrenceCheckingVisitor()),
+						saturationState),
+				// if all fine,
+				new CombinedConclusionVisitor<Context>(
+				// insert the conclusion
+						new ConclusionInsertionVisitor(),
+						// apply the rules
+						new HybridRuleApplicationConclusionVisitor(ruleVisitor,
+								ruleVisitor,
+								// the conclusions of redundant rules are
+								// inserted
+								// to both main and tracing saturation states
+								new CombinedConclusionProducer(
+										localizedMainProducer, trackingProducer),
+								// whereas the conclusion of redundant rules are
+								// needed only for tracking
+								trackingProducer)));
 	}
 
 	/**
@@ -100,17 +124,15 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	private class ContextCompletionEngine extends
 			AbstractRuleEngineWithStatistics {
 
-		private final ExtendedSaturationStateWriter mainWriter_;
 		private final ExtendedSaturationStateWriter trackingWriter_;
 
 		ContextCompletionEngine(ExtendedSaturationStateWriter mainWriter,
 				ExtendedSaturationStateWriter trackingWriter,
 				SaturationStatistics localStatistics) {
-			super(getGapFillingConclusionProcessor(
+			super(getConclusionProcessor(
 					SaturationUtils.getStatsAwareRuleVisitor(localStatistics
 							.getRuleStatistics()), mainWriter, trackingWriter),
 					aggregatedStats, localStatistics);
-			mainWriter_ = mainWriter;
 			trackingWriter_ = trackingWriter;
 		}
 
@@ -119,38 +141,26 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 				final SaturationStatistics localStatistics) {
 
 			this(
-					// mainWriter
-					saturationState
-							.getExtendedWriter(
-									SaturationUtils
-											.addStatsToContextCreationListener(
-													listener,
-													localStatistics
-															.getContextStatistics()),
-									SaturationUtils
-											.addStatsToContextModificationListener(
-													modificationListener,
-													localStatistics
-															.getContextStatistics()),
-									SaturationUtils
-											.getStatsAwareRuleVisitor(localStatistics
-													.getRuleStatistics()),
-									SaturationUtils
-											.addStatsToConclusionVisitor(localStatistics
-													.getConclusionStatistics()),
-									trackModifiedContexts_),
+					// mainWriter with statistics
+					SaturationUtils
+							.getStatsAwareWriter(
+									saturationState.getExtendedWriter(
+											SaturationUtils
+													.addStatsToContextCreationListener(
+															listener,
+															localStatistics
+																	.getContextStatistics()),
+											SaturationUtils
+													.addStatsToContextModificationListener(
+															modificationListener,
+															localStatistics
+																	.getContextStatistics()),
+											trackModifiedContexts_),
+									localStatistics),
 					// trackingWriter
-					localState_
-							.getExtendedWriter(
-									ContextCreationListener.DUMMY,
-									ContextModificationListener.DUMMY,
-									SaturationUtils
-											.getStatsAwareRuleVisitor(localStatistics
-													.getRuleStatistics()),
-									SaturationUtils
-											.addStatsToConclusionVisitor(localStatistics
-													.getConclusionStatistics()),
-									false),
+					localState_.getExtendedWriter(
+							ContextCreationListener.DUMMY,
+							ContextModificationListener.DUMMY, false),
 					// localStatistics
 					localStatistics);
 
@@ -164,19 +174,13 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 		@Override
 		public void submit(IndexedClassExpression job) {
-			trackingWriter_.getCreateContext(job);
+			LOGGER_.trace("{}: to complete",
+					trackingWriter_.getCreateContext(job));
 		}
 
 		@Override
 		Context getNextActiveContext() {
 			return trackingWriter_.pollForActiveContext();
-		}
-
-		@Override
-		Context getContextToProcess(Context activeContext) {
-			// return the corresponding context in the main saturationState, or
-			// create one if it does not exist
-			return mainWriter_.getCreateContext(activeContext.getRoot());
 		}
 
 	}

@@ -106,10 +106,8 @@ public class DisjointSubsumerFromMemberRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, Context context,
 			ConclusionProducer producer) {
-		LOGGER_.trace("Applying {} to {}", NAME_, context);
-
 		for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
-			producer.produce(context, new DisjointSubsumer(disAxiom));
+			producer.produce(context, new DisjointSubsumer(disAxiom, premise));
 	}
 
 	protected boolean isEmpty() {

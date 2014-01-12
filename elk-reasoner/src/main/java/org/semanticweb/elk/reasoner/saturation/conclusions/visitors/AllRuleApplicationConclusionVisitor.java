@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * {@link RuleVisitor} to track rule applications and {@link ConclusionProducer}
  * to output the {@link Conclusion}s of the applied rules. The methods always
  * return {@link true}. This is used to conveniently compose them using a
- * {@link AndConclusionVisitor}
+ * {@link CombinedConclusionVisitor}
  * 
  * @see NonRedundantRuleApplicationConclusionVisitor
  * @see HybridRuleApplicationConclusionVisitor

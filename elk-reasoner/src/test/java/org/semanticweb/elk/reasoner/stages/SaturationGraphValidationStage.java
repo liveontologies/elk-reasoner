@@ -38,6 +38,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersection
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
@@ -286,7 +287,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
-		public void visit(OwlThingContextInitRule rule, Context context,
+		public void visit(OwlThingContextInitRule rule,
+				ContextInitialization premise, Context context,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 		}
@@ -308,7 +310,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
-		public void visit(RootContextInitializationRule rule, Context context,
+		public void visit(RootContextInitializationRule rule,
+				ContextInitialization premise, Context context,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 		}

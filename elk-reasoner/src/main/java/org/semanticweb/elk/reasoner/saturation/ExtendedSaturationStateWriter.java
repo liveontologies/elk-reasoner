@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation;
+
 /*
  * #%L
  * ELK Reasoner
@@ -42,8 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface ExtendedSaturationStateWriter extends
-		SaturationStateWriter {
+public interface ExtendedSaturationStateWriter extends SaturationStateWriter {
 
 	public Context getCreateContext(IndexedClassExpression root);
 

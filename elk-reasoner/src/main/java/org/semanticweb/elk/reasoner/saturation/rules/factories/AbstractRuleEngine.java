@@ -1,9 +1,10 @@
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleEngine;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +16,9 @@ public abstract class AbstractRuleEngine implements
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractRuleEngine.class);
 
-	private final ConclusionVisitor<?> conclusionProcessor_;
+	private final ConclusionVisitor<Context, ?> conclusionProcessor_;
 
-	public AbstractRuleEngine(ConclusionVisitor<?> conclusionProcessor) {
+	public AbstractRuleEngine(ConclusionVisitor<Context, ?> conclusionProcessor) {
 		this.conclusionProcessor_ = conclusionProcessor;
 	}
 
@@ -42,13 +43,12 @@ public abstract class AbstractRuleEngine implements
 	 *            {@link Conclusions}
 	 */
 	protected void process(Context context) {
-		Context targetContext = getContextToProcess(context);
 		for (;;) {
 			Conclusion conclusion = context.takeToDo();
 			if (conclusion == null)
 				return;
 			LOGGER_.trace("{}: processing conclusion {}", context, conclusion);
-			conclusion.accept(conclusionProcessor_, targetContext);
+			conclusion.accept(conclusionProcessor_, context);
 		}
 	}
 
@@ -61,17 +61,5 @@ public abstract class AbstractRuleEngine implements
 	 *         {@link RuleEngine}
 	 */
 	abstract Context getNextActiveContext();
-
-	/**
-	 * @param activeContext
-	 *            the {@link Context} containing unprocessed {@link Conclusion}s
-	 * 
-	 * @return the {@link Context} in which the unprocessed {@link Conclusion}s
-	 *         should be processed; could be different from the argument
-	 */
-	@SuppressWarnings("static-method")
-	Context getContextToProcess(Context activeContext) {
-		return activeContext;
-	}
 
 }

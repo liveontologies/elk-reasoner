@@ -101,8 +101,8 @@ public class Propagation extends AbstractConclusion {
 	}
 
 	@Override
-	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
-		return visitor.visit(this, context);
+	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 
 }

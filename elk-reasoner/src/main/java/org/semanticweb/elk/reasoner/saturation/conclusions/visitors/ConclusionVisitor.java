@@ -27,32 +27,43 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
+ * A visitor pattern for {@link Conclusions} together with additional input and
+ * output parameters
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <I>
+ *            the type of input parameter with which this visitor works
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public interface ConclusionVisitor<R> {
+public interface ConclusionVisitor<I, O> {
 
-	public R visit(BackwardLink link, Context context);
+	public O visit(BackwardLink conclusion, I input);
 
-	public R visit(ComposedSubsumer cSub, Context context);
+	public O visit(ComposedSubsumer conclusion, I input);
 
-	public R visit(Contradiction bot, Context context);
+	public O visit(ContextInitialization conclusion, I input);
 
-	public R visit(DecomposedSubsumer dSub, Context context);
+	public O visit(Contradiction conclusion, I input);
 
-	public R visit(DisjointSubsumer disjoint, Context context);
+	public O visit(DecomposedSubsumer conclusion, I input);
 
-	public R visit(ForwardLink link, Context context);
+	public O visit(DisjointSubsumer conclusion, I input);
 
-	public R visit(Propagation propagation, Context context);
+	public O visit(ForwardLink conclusion, I input);
+
+	public O visit(Propagation conclusion, I input);
 
 }

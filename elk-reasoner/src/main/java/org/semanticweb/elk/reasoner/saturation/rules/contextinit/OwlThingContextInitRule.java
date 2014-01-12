@@ -3,6 +3,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -47,6 +48,7 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 	 */
 	public static void addRuleFor(IndexedClass owlThing,
 			ModifiableOntologyIndex index) {
+		LOGGER_.trace("Adding {} to {}", owlThing, NAME_);
 		index.addContextInitRule(new OwlThingContextInitRule(owlThing));
 	}
 
@@ -68,9 +70,8 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 	}
 
 	@Override
-	public void apply(Void premise, Context context, ConclusionProducer producer) {
-		LOGGER_.trace("Applying {} to {}", NAME_, context);
-
+	public void apply(ContextInitialization premise, Context context,
+			ConclusionProducer producer) {
 		producer.produce(context, new DecomposedSubsumer(owlThing_));
 	}
 
@@ -92,9 +93,10 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 	}
 
 	@Override
-	public void accept(LinkedContextInitRuleVisitor visitor, Context context,
+	public void accept(LinkedContextInitRuleVisitor visitor,
+			ContextInitialization premise, Context context,
 			ConclusionProducer producer) {
-		visitor.visit(this, context, producer);
+		visitor.visit(this, premise, context, producer);
 	}
 
 	private static final Matcher<ChainableContextInitRule, OwlThingContextInitRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableContextInitRule, OwlThingContextInitRule>(

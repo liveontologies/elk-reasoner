@@ -29,8 +29,7 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 
 /**
  * Completes saturation of all contexts which are not saturated at this point.
@@ -95,9 +94,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 		 * the non saturated contexts are not cleaned at all during incremental
 		 * consistency checking. Something needs to be done about it.
 		 */
-		reasoner.saturationState
-				.getWriter(DummyConclusionVisitor.getInstance())
-				.clearNotSaturatedContexts();
+		reasoner.saturationState.getWriter().clearNotSaturatedContexts();
 		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
 		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
 		completion_ = null;

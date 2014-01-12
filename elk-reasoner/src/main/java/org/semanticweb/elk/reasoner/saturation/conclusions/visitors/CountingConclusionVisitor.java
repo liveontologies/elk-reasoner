@@ -24,14 +24,15 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
-public class CountingConclusionVisitor implements ConclusionVisitor<Integer> {
+public class CountingConclusionVisitor<I> implements
+		ConclusionVisitor<I, Integer> {
 
 	private final ConclusionCounter counter_;
 
@@ -40,38 +41,43 @@ public class CountingConclusionVisitor implements ConclusionVisitor<Integer> {
 	}
 
 	@Override
-	public Integer visit(ComposedSubsumer negSCE, Context context) {
-		return counter_.countNegativeSubsumers++;
-	}
-
-	@Override
-	public Integer visit(DecomposedSubsumer posSCE, Context context) {
-		return counter_.countPositiveSubsumers++;
-	}
-
-	@Override
-	public Integer visit(BackwardLink link, Context context) {
+	public Integer visit(BackwardLink conclusion, I input) {
 		return counter_.countBackwardLinks++;
 	}
 
 	@Override
-	public Integer visit(ForwardLink link, Context context) {
-		return counter_.countForwardLinks++;
+	public Integer visit(ComposedSubsumer conclusion, I input) {
+		return counter_.countNegativeSubsumers++;
 	}
 
 	@Override
-	public Integer visit(Contradiction bot, Context context) {
+	public Integer visit(ContextInitialization conclusion, I input) {
+		return counter_.countContextInitializations++;
+	}
+
+	@Override
+	public Integer visit(Contradiction conclusion, I input) {
 		return counter_.countContradictions++;
 	}
 
 	@Override
-	public Integer visit(Propagation propagation, Context context) {
-		return counter_.countPropagations++;
+	public Integer visit(DecomposedSubsumer conclusion, I input) {
+		return counter_.countPositiveSubsumers++;
 	}
 
 	@Override
-	public Integer visit(DisjointSubsumer disjointnessAxiom, Context context) {
-		return counter_.countDisjointnessAxioms++;
+	public Integer visit(DisjointSubsumer conclusion, I input) {
+		return counter_.countDisjointSubsumers++;
+	}
+
+	@Override
+	public Integer visit(ForwardLink conclusion, I input) {
+		return counter_.countForwardLinks++;
+	}
+
+	@Override
+	public Integer visit(Propagation conclusion, I input) {
+		return counter_.countPropagations++;
 	}
 
 }

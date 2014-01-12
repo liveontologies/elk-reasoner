@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  */
 public interface Conclusion {
 
-	public <R> R accept(ConclusionVisitor<R> visitor, Context context);
+	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input);
 
 	/**
 	 * 

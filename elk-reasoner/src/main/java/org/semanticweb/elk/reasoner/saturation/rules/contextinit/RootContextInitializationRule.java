@@ -1,6 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -65,8 +66,8 @@ public class RootContextInitializationRule extends
 	}
 
 	@Override
-	public void apply(Void premise, Context context, ConclusionProducer producer) {
-		LOGGER_.trace("Applying {} to {}", NAME_, context);
+	public void apply(ContextInitialization premise, Context context,
+			ConclusionProducer producer) {
 		producer.produce(context, new DecomposedSubsumer(context.getRoot()));
 	}
 
@@ -87,9 +88,10 @@ public class RootContextInitializationRule extends
 	}
 
 	@Override
-	public void accept(LinkedContextInitRuleVisitor visitor, Context context,
+	public void accept(LinkedContextInitRuleVisitor visitor,
+			ContextInitialization premise, Context context,
 			ConclusionProducer producer) {
-		visitor.visit(this, context, producer);
+		visitor.visit(this, premise, context, producer);
 	}
 
 	private static final Matcher<ChainableContextInitRule, RootContextInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableContextInitRule, RootContextInitializationRule>(

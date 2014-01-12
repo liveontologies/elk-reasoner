@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRuleVisitor;
 
 /**
  * Represents the state of saturation which can be changed by applying reasoning
@@ -62,19 +62,17 @@ public interface SaturationState {
 	 * {@link ContextCreationListener}. If {@link ContextCreationListener} is
 	 * not thread safe, the calls of the methods should be synchronized
 	 * 
-	 * The passed rule application visitor is used to apply initialization rules
-	 * to the newly created contexts
+	 * The passed {@link ContextInitRuleVisitor} is used to apply initialization
+	 * rules to the newly created contexts
 	 * 
 	 */
 	public ExtendedSaturationStateWriter getExtendedWriter(
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener,
-			RuleVisitor ruleAppVisitor, ConclusionVisitor<?> conclusionVisitor,
 			boolean trackNewContextsAsUnsaturated);
 
 	public SaturationStateWriter getWriter(
-			ContextModificationListener contextModificationListener,
-			ConclusionVisitor<?> conclusionVisitor);
+			ContextModificationListener contextModificationListener);
 
 	/**
 	 * @param visitor
@@ -85,10 +83,8 @@ public interface SaturationState {
 	 *         {@link SaturationState}. The methods of this
 	 *         {@link SaturationStateWriter} are thread safe
 	 */
-	public SaturationStateWriter getWriter(
-			ConclusionVisitor<?> conclusionVisitor);
+	public SaturationStateWriter getWriter();
 
-	public ExtendedSaturationStateWriter getExtendedWriter(
-			ConclusionVisitor<?> conclusionVisitor);
+	public ExtendedSaturationStateWriter getExtendedWriter();
 
 }

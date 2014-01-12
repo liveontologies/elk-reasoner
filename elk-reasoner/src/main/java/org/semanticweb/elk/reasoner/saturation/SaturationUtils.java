@@ -25,22 +25,18 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CountingConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.PreprocessedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.TimedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.BasicRuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationTimerVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleCounterVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,26 +53,6 @@ public class SaturationUtils {
 
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SaturationUtils.class);
-
-	/**
-	 * Applies all initialization rules to the context
-	 * 
-	 * @param index
-	 * @param ruleAppVisitor
-	 * @param context
-	 * @param producer
-	 */
-	public static void initContext(OntologyIndex index,
-			RuleVisitor ruleAppVisitor, Context context,
-			ConclusionProducer producer) {
-		// apply all context initialization rules
-		LinkedContextInitRule initRule = index.getContextInitRuleHead();
-
-		while (initRule != null) {
-			initRule.accept(ruleAppVisitor, context, producer);
-			initRule = initRule.next();
-		}
-	}
 
 	/*
 	 * --------------------------------------------------------------------------
@@ -114,18 +90,26 @@ public class SaturationUtils {
 		return ruleAppVisitor;
 	}
 
-	public static ConclusionVisitor<?> addStatsToConclusionVisitor(
-			ConclusionStatistics localStatistics) {
-		return COLLECT_CONCLUSION_COUNTS ? new CountingConclusionVisitor(
-				localStatistics.getProducedConclusionCounts())
-				: DummyConclusionVisitor.getInstance();
+	public static SaturationStateWriter getStatAwareWriter(
+			SaturationStateWriter writer, SaturationStatistics localStatistics) {
+		return COLLECT_CONCLUSION_COUNTS ? new CountingSaturationStateWriter<SaturationStateWriter>(
+				writer, localStatistics.getConclusionStatistics()
+						.getProducedConclusionCounts()) : writer;
 	}
 
-	public static ConclusionVisitor<Boolean> getUsedConclusionCountingProcessor(
-			ConclusionVisitor<Boolean> ruleProcessor,
+	public static ExtendedSaturationStateWriter getStatsAwareWriter(
+			ExtendedSaturationStateWriter writer,
+			SaturationStatistics localStatistics) {
+		return COLLECT_CONCLUSION_COUNTS ? new CountingExtendedSaturationStateWriter<ExtendedSaturationStateWriter>(
+				writer, localStatistics.getConclusionStatistics()
+						.getProducedConclusionCounts()) : writer;
+	}
+
+	public static ConclusionVisitor<Context, Boolean> getUsedConclusionCountingProcessor(
+			ConclusionVisitor<Context, Boolean> ruleProcessor,
 			SaturationStatistics localStatistics) {
 		if (COLLECT_CONCLUSION_COUNTS) {
-			return new PreprocessedConclusionVisitor<Boolean>(
+			return new PreprocessedConclusionVisitor<Context, Boolean>(
 					new CountingConclusionVisitor(localStatistics
 							.getConclusionStatistics()
 							.getUsedConclusionCounts()), ruleProcessor);
@@ -133,14 +117,14 @@ public class SaturationUtils {
 		return ruleProcessor;
 	}
 
-	public static ConclusionVisitor<?> getProcessedConclusionCountingProcessor(
-			ConclusionVisitor<Boolean> conclusionVisitor,
+	public static ConclusionVisitor<Context, ?> getProcessedConclusionCountingProcessor(
+			ConclusionVisitor<Context, Boolean> conclusionVisitor,
 			SaturationStatistics localStatistics) {
 
 		ConclusionStatistics stats = localStatistics.getConclusionStatistics();
 
 		if (COLLECT_CONCLUSION_COUNTS) {
-			conclusionVisitor = new PreprocessedConclusionVisitor<Boolean>(
+			conclusionVisitor = new PreprocessedConclusionVisitor<Context, Boolean>(
 					new CountingConclusionVisitor(
 							stats.getProcessedConclusionCounts()),
 					conclusionVisitor);

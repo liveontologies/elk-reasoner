@@ -57,7 +57,7 @@ public class ChangeIndexingProcessor implements ElkAxiomProcessor {
 		try {
 			elkAxiom.accept(indexer_);
 			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("indexing "
+				LOGGER_.trace("$$ indexing "
 						+ OwlFunctionalStylePrinter.toString(elkAxiom)
 						+ " for "
 						+ (indexer_.getMultiplicity() == 1 ? "addition"

@@ -3,59 +3,67 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * A skeleton for implementation of {@link ConclusionVisitor}s using a common
- * (default) methods
+ * (default) method
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <R>
+ * @param <I>
+ *            the type of input parameter with which this visitor works
+ * @param <O>
+ *            the type of output parameter with which this visitor works
  */
-public abstract class AbstractConclusionVisitor<R> implements
-		ConclusionVisitor<R> {
+public abstract class AbstractConclusionVisitor<I, O> implements
+		ConclusionVisitor<I, O> {
 
-	abstract R defaultVisit(Conclusion conclusion, Context context);
+	abstract O defaultVisit(Conclusion conclusion, I input);
 
 	@Override
-	public R visit(BackwardLink link, Context context) {
-		return defaultVisit(link, context);
+	public O visit(BackwardLink conclusion, I input) {
+		return defaultVisit(conclusion, input);
 	}
 
 	@Override
-	public R visit(ComposedSubsumer cSub, Context context) {
-		return defaultVisit(cSub, context);
+	public O visit(ComposedSubsumer conclusion, I input) {
+		return defaultVisit(conclusion, input);
 	}
 
 	@Override
-	public R visit(Contradiction bot, Context context) {
-		return defaultVisit(bot, context);
+	public O visit(ContextInitialization conclusion, I input) {
+		return defaultVisit(conclusion, input);
 	}
 
 	@Override
-	public R visit(DecomposedSubsumer dSub, Context context) {
-		return defaultVisit(dSub, context);
+	public O visit(Contradiction conclusion, I input) {
+		return defaultVisit(conclusion, input);
 	}
 
 	@Override
-	public R visit(DisjointSubsumer disjoint, Context context) {
-		return defaultVisit(disjoint, context);
+	public O visit(DecomposedSubsumer conclusion, I input) {
+		return defaultVisit(conclusion, input);
 	}
 
 	@Override
-	public R visit(ForwardLink link, Context context) {
-		return defaultVisit(link, context);
+	public O visit(DisjointSubsumer conclusion, I input) {
+		return defaultVisit(conclusion, input);
 	}
 
 	@Override
-	public R visit(Propagation propagation, Context context) {
-		return defaultVisit(propagation, context);
+	public O visit(ForwardLink conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(Propagation conclusion, I input) {
+		return defaultVisit(conclusion, input);
 	}
 
 }

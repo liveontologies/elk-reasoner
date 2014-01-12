@@ -24,19 +24,41 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 public class ConclusionTimer {
 
+	long timeBackwardLinks;
+
+	long timeContextInitializations;
+
+	long timeContradictions;
+
+	long timeDisjointSubsumers;
+
+	long timeForwardLinks;
+
 	long timeNegativeSubsumers;
 
 	long timePositiveSubsumers;
 
-	long timeBackwardLinks;
-
-	long timeForwardLinks;
-
-	long timeContradictions;
-
 	long timePropagations;
 
-	long timeDisjointnessAxioms;
+	public long getTimeBackwardLinks() {
+		return timeBackwardLinks;
+	}
+
+	public long getTimeBottoms() {
+		return timeContradictions;
+	}
+
+	public long getTimeContextInitializations() {
+		return timeContextInitializations;
+	}
+
+	public long getTimeDisjointnessAxioms() {
+		return timeDisjointSubsumers;
+	}
+
+	public long getTimeForwardLinks() {
+		return timeForwardLinks;
+	}
 
 	public long getTimeNegativeSubsumers() {
 		return timeNegativeSubsumers;
@@ -46,43 +68,15 @@ public class ConclusionTimer {
 		return timePositiveSubsumers;
 	}
 
-	public long getTimeBackwardLinks() {
-		return timeBackwardLinks;
-	}
-
-	public long getTimeForwardLinks() {
-		return timeForwardLinks;
-	}
-
-	public long getTimeBottoms() {
-		return timeContradictions;
-	}
-
 	public long getTimePropagations() {
 		return timePropagations;
-	}
-
-	public long getTimeDisjointnessAxioms() {
-		return timeDisjointnessAxioms;
 	}
 
 	public long getTotalTime() {
 		return timeNegativeSubsumers + timePositiveSubsumers
 				+ timeBackwardLinks + timeForwardLinks + timePropagations
-				+ timeContradictions + timeDisjointnessAxioms;
-	}
-
-	/**
-	 * Reset all times to zero.
-	 */
-	public void reset() {
-		timeNegativeSubsumers = 0;
-		timePositiveSubsumers = 0;
-		timeBackwardLinks = 0;
-		timeForwardLinks = 0;
-		timeContradictions = 0;
-		timePropagations = 0;
-		timeDisjointnessAxioms = 0;
+				+ timeContradictions + timeDisjointSubsumers
+				+ timeContextInitializations;
 	}
 
 	/**
@@ -101,7 +95,22 @@ public class ConclusionTimer {
 		this.timeForwardLinks += timer.timeForwardLinks;
 		this.timeContradictions += timer.timeContradictions;
 		this.timePropagations += timer.timePropagations;
-		this.timeDisjointnessAxioms += timer.timeDisjointnessAxioms;
+		this.timeDisjointSubsumers += timer.timeDisjointSubsumers;
+		this.timeContextInitializations += timer.timeContextInitializations;
+	}
+
+	/**
+	 * Reset all times to zero.
+	 */
+	public void reset() {
+		timeNegativeSubsumers = 0;
+		timePositiveSubsumers = 0;
+		timeBackwardLinks = 0;
+		timeForwardLinks = 0;
+		timeContradictions = 0;
+		timePropagations = 0;
+		timeDisjointSubsumers = 0;
+		timeContextInitializations = 0;
 	}
 
 }

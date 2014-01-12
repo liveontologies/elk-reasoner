@@ -43,7 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.PropagationFr
  * @author "Yevgeny Kazakov"
  * 
  */
-public class BackwardLink implements Conclusion {
+public class BackwardLink extends AbstractConclusion {
 
 	/**
 	 * the source {@link Context} of this {@link BackwardLink}; the root of the
@@ -113,7 +113,7 @@ public class BackwardLink implements Conclusion {
 	}
 
 	@Override
-	public <R> R accept(ConclusionVisitor<R> visitor, Context context) {
-		return visitor.visit(this, context);
+	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 }

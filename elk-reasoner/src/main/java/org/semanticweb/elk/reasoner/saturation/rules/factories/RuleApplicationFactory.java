@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
@@ -31,12 +31,13 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AndConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,15 +112,21 @@ public class RuleApplicationFactory {
 	 * @param writer
 	 *            A {@link SaturationStateWriter} to be used for rule
 	 *            applications
-	 * @return {@link ConclusionVisitor} that inserts given {@link Conclusion}s
-	 *         to the {@link Context}, and if it was new, applies all
-	 *         non-redundant rules to
+	 * @return {@link ConclusionVisitor} that perform processing of
+	 *         {@link Conclusion}s in {@link Context}s
 	 */
-	private static ConclusionVisitor<Boolean> getInsertionConclusionProcessor(
+	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer) {
-		return new AndConclusionVisitor(
+		// the visitor used for inserting conclusion
+		ConclusionVisitor<Context, Boolean> insertionVisitor = new ConclusionInsertionVisitor();
+		if (trackModifiedContexts_)
+			// after insertion, mark contexts as modified
+			insertionVisitor = new CombinedConclusionVisitor<Context>(
+					insertionVisitor,
+					new ConclusionSourceContextUnsaturationVisitor(writer));
+		return new CombinedConclusionVisitor<Context>(
 		// add conclusion to the context
-				new ConclusionInsertionVisitor(),
+				insertionVisitor,
 				// if new, apply the rules
 				new NonRedundantRuleApplicationConclusionVisitor(ruleVisitor,
 						writer));
@@ -136,7 +143,7 @@ public class RuleApplicationFactory {
 
 		DefaultEngine(ExtendedSaturationStateWriter saturationStateWriter,
 				SaturationStatistics localStatistics) {
-			super(getInsertionConclusionProcessor(
+			super(getConclusionProcessor(
 					SaturationUtils.getStatsAwareRuleVisitor(localStatistics
 							.getRuleStatistics()), saturationStateWriter),
 					aggregatedStats, localStatistics);
@@ -147,17 +154,17 @@ public class RuleApplicationFactory {
 				final ContextModificationListener modificationListener,
 				final SaturationStatistics localStatistics) {
 
-			this(saturationState.getExtendedWriter(SaturationUtils
-					.addStatsToContextCreationListener(listener,
-							localStatistics.getContextStatistics()),
-					SaturationUtils.addStatsToContextModificationListener(
-							modificationListener,
-							localStatistics.getContextStatistics()),
-					SaturationUtils.getStatsAwareRuleVisitor(localStatistics
-							.getRuleStatistics()), SaturationUtils
-							.addStatsToConclusionVisitor(localStatistics
-									.getConclusionStatistics()),
-					trackModifiedContexts_), localStatistics);
+			this(SaturationUtils.getStatsAwareWriter(saturationState
+					.getExtendedWriter(SaturationUtils
+							.addStatsToContextCreationListener(listener,
+									localStatistics.getContextStatistics()),
+							SaturationUtils
+									.addStatsToContextModificationListener(
+											modificationListener,
+											localStatistics
+													.getContextStatistics()),
+							trackModifiedContexts_), localStatistics),
+					localStatistics);
 
 		}
 

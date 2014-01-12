@@ -25,12 +25,12 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * A {@link ConclusionVisitor} that combines two given {@link ConclusionVisitor}
@@ -42,11 +42,12 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class AndConclusionVisitor implements ConclusionVisitor<Boolean> {
+public class CombinedConclusionVisitor<I> implements
+		ConclusionVisitor<I, Boolean> {
 
-	final private ConclusionVisitor<Boolean> first_;
+	final private ConclusionVisitor<I, Boolean> first_;
 
-	final private ConclusionVisitor<Boolean> second_;
+	final private ConclusionVisitor<I, Boolean> second_;
 
 	/**
 	 * Creates a new {@link ConclusionVisitor} that combines two given
@@ -62,52 +63,58 @@ public class AndConclusionVisitor implements ConclusionVisitor<Boolean> {
 	 * @param second
 	 *            The {@link ConclusionVisitor} that should be used second
 	 */
-	public AndConclusionVisitor(ConclusionVisitor<Boolean> first,
-			ConclusionVisitor<Boolean> second) {
+	public CombinedConclusionVisitor(ConclusionVisitor<I, Boolean> first,
+			ConclusionVisitor<I, Boolean> second) {
 		this.first_ = first;
 		this.second_ = second;
 	}
 
 	@Override
-	public Boolean visit(BackwardLink conclusion, Context context) {
-		return first_.visit(conclusion, context)
-				&& second_.visit(conclusion, context);
+	public Boolean visit(BackwardLink conclusion, I input) {
+		return first_.visit(conclusion, input)
+				&& second_.visit(conclusion, input);
 	}
 
 	@Override
-	public Boolean visit(ComposedSubsumer conclusion, Context context) {
-		return first_.visit(conclusion, context)
-				&& second_.visit(conclusion, context);
+	public Boolean visit(ComposedSubsumer conclusion, I input) {
+		return first_.visit(conclusion, input)
+				&& second_.visit(conclusion, input);
 	}
 
 	@Override
-	public Boolean visit(Contradiction conclusion, Context context) {
-		return first_.visit(conclusion, context)
-				&& second_.visit(conclusion, context);
+	public Boolean visit(ContextInitialization conclusion, I input) {
+		return first_.visit(conclusion, input)
+				&& second_.visit(conclusion, input);
 	}
 
 	@Override
-	public Boolean visit(DecomposedSubsumer conclusion, Context context) {
-		return first_.visit(conclusion, context)
-				&& second_.visit(conclusion, context);
+	public Boolean visit(Contradiction conclusion, I input) {
+		return first_.visit(conclusion, input)
+				&& second_.visit(conclusion, input);
 	}
 
 	@Override
-	public Boolean visit(DisjointSubsumer conclusion, Context context) {
-		return first_.visit(conclusion, context)
-				&& second_.visit(conclusion, context);
+	public Boolean visit(DecomposedSubsumer conclusion, I input) {
+		return first_.visit(conclusion, input)
+				&& second_.visit(conclusion, input);
 	}
 
 	@Override
-	public Boolean visit(ForwardLink conclusion, Context context) {
-		return first_.visit(conclusion, context)
-				&& second_.visit(conclusion, context);
+	public Boolean visit(DisjointSubsumer conclusion, I input) {
+		return first_.visit(conclusion, input)
+				&& second_.visit(conclusion, input);
 	}
 
 	@Override
-	public Boolean visit(Propagation conclusion, Context context) {
-		return first_.visit(conclusion, context)
-				&& second_.visit(conclusion, context);
+	public Boolean visit(ForwardLink conclusion, I input) {
+		return first_.visit(conclusion, input)
+				&& second_.visit(conclusion, input);
+	}
+
+	@Override
+	public Boolean visit(Propagation conclusion, I input) {
+		return first_.visit(conclusion, input)
+				&& second_.visit(conclusion, input);
 	}
 
 }

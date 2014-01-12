@@ -24,64 +24,71 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
-public class PreprocessedConclusionVisitor<T> implements ConclusionVisitor<T> {
+public class PreprocessedConclusionVisitor<I, O> implements
+		ConclusionVisitor<I, O> {
 
-	final private ConclusionVisitor<?> preprocessor_;
-	final private ConclusionVisitor<T> visitor_;
+	final private ConclusionVisitor<I, ?> preprocessor_;
+	final private ConclusionVisitor<I, O> visitor_;
 
-	public PreprocessedConclusionVisitor(ConclusionVisitor<?> preprocessor,
-			ConclusionVisitor<T> visitor) {
+	public PreprocessedConclusionVisitor(ConclusionVisitor<I, ?> preprocessor,
+			ConclusionVisitor<I, O> visitor) {
 		this.preprocessor_ = preprocessor;
 		this.visitor_ = visitor;
 	}
 
 	@Override
-	public T visit(ComposedSubsumer negSCE, Context context) {
-		preprocessor_.visit(negSCE, context);
-		return visitor_.visit(negSCE, context);
+	public O visit(BackwardLink conclusion, I input) {
+		preprocessor_.visit(conclusion, input);
+		return visitor_.visit(conclusion, input);
 	}
 
 	@Override
-	public T visit(DecomposedSubsumer posSCE, Context context) {
-		preprocessor_.visit(posSCE, context);
-		return visitor_.visit(posSCE, context);
+	public O visit(ComposedSubsumer conclusion, I input) {
+		preprocessor_.visit(conclusion, input);
+		return visitor_.visit(conclusion, input);
 	}
 
 	@Override
-	public T visit(BackwardLink link, Context context) {
-		preprocessor_.visit(link, context);
-		return visitor_.visit(link, context);
+	public O visit(ContextInitialization conclusion, I input) {
+		preprocessor_.visit(conclusion, input);
+		return visitor_.visit(conclusion, input);
 	}
 
 	@Override
-	public T visit(ForwardLink link, Context context) {
-		preprocessor_.visit(link, context);
-		return visitor_.visit(link, context);
+	public O visit(Contradiction conclusion, I input) {
+		preprocessor_.visit(conclusion, input);
+		return visitor_.visit(conclusion, input);
 	}
 
 	@Override
-	public T visit(Contradiction bot, Context context) {
-		preprocessor_.visit(bot, context);
-		return visitor_.visit(bot, context);
+	public O visit(DecomposedSubsumer conclusion, I input) {
+		preprocessor_.visit(conclusion, input);
+		return visitor_.visit(conclusion, input);
 	}
 
 	@Override
-	public T visit(Propagation propagation, Context context) {
-		preprocessor_.visit(propagation, context);
-		return visitor_.visit(propagation, context);
+	public O visit(DisjointSubsumer conclusion, I input) {
+		preprocessor_.visit(conclusion, input);
+		return visitor_.visit(conclusion, input);
 	}
 
 	@Override
-	public T visit(DisjointSubsumer disjointnessAxiom, Context context) {
-		preprocessor_.visit(disjointnessAxiom, context);
-		return visitor_.visit(disjointnessAxiom, context);
+	public O visit(ForwardLink conclusion, I input) {
+		preprocessor_.visit(conclusion, input);
+		return visitor_.visit(conclusion, input);
+	}
+
+	@Override
+	public O visit(Propagation conclusion, I input) {
+		preprocessor_.visit(conclusion, input);
+		return visitor_.visit(conclusion, input);
 	}
 
 }

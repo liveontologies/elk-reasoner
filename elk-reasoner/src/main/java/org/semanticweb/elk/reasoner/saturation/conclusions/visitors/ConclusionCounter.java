@@ -24,60 +24,21 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 public class ConclusionCounter {
 
+	int countBackwardLinks;
+
+	int countContextInitializations;
+
+	int countContradictions;
+
+	int countDisjointSubsumers;
+
+	int countForwardLinks;
+
 	int countNegativeSubsumers;
 
 	int countPositiveSubsumers;
 
-	int countBackwardLinks;
-
-	int countForwardLinks;
-
-	int countContradictions;
-
 	int countPropagations;
-
-	int countDisjointnessAxioms;
-
-	public int getCountNegativeSubsumers() {
-		return countNegativeSubsumers;
-	}
-
-	public int getCountPositiveSubsumers() {
-		return countPositiveSubsumers;
-	}
-
-	public int getCountBackwardLinks() {
-		return countBackwardLinks;
-	}
-
-	public int getCountForwardLinks() {
-		return countForwardLinks;
-	}
-
-	public int getCountBottoms() {
-		return countContradictions;
-	}
-
-	public int getCountPropagations() {
-		return countPropagations;
-	}
-
-	public int getCountDisjointnessAxioms() {
-		return countDisjointnessAxioms;
-	}
-
-	/**
-	 * Reset all counters to zero.
-	 */
-	public void reset() {
-		countNegativeSubsumers = 0;
-		countPositiveSubsumers = 0;
-		countBackwardLinks = 0;
-		countForwardLinks = 0;
-		countContradictions = 0;
-		countPropagations = 0;
-		countDisjointnessAxioms = 0;
-	}
 
 	/**
 	 * Adds all counters of the argument to the corresponding counters of this
@@ -95,13 +56,61 @@ public class ConclusionCounter {
 		this.countForwardLinks += counter.countForwardLinks;
 		this.countContradictions += counter.countContradictions;
 		this.countPropagations += counter.countPropagations;
-		this.countDisjointnessAxioms += counter.countDisjointnessAxioms;
+		this.countDisjointSubsumers += counter.countDisjointSubsumers;
+		this.countContextInitializations += counter.countContextInitializations;
+	}
+
+	public int getCountBackwardLinks() {
+		return countBackwardLinks;
+	}
+
+	public int getCountBottoms() {
+		return countContradictions;
+	}
+
+	public int getCountContextInitializations() {
+		return countContextInitializations;
+	}
+
+	public int getCountDisjointSubsumers() {
+		return countDisjointSubsumers;
+	}
+
+	public int getCountForwardLinks() {
+		return countForwardLinks;
+	}
+
+	public int getCountNegativeSubsumers() {
+		return countNegativeSubsumers;
+	}
+
+	public int getCountPositiveSubsumers() {
+		return countPositiveSubsumers;
+	}
+
+	public int getCountPropagations() {
+		return countPropagations;
 	}
 
 	public long getTotalCount() {
 		return countNegativeSubsumers + countPositiveSubsumers
 				+ countBackwardLinks + countForwardLinks + countContradictions
-				+ countPropagations + countDisjointnessAxioms;
+				+ countPropagations + countDisjointSubsumers
+				+ countContextInitializations;
+	}
+
+	/**
+	 * Reset all counters to zero.
+	 */
+	public void reset() {
+		countNegativeSubsumers = 0;
+		countPositiveSubsumers = 0;
+		countBackwardLinks = 0;
+		countForwardLinks = 0;
+		countContradictions = 0;
+		countPropagations = 0;
+		countDisjointSubsumers = 0;
+		countContextInitializations = 0;
 	}
 
 }

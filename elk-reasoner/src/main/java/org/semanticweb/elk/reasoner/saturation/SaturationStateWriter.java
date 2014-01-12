@@ -34,12 +34,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author "Yevgeny Kazakov"
  */
 public interface SaturationStateWriter extends ConclusionProducer {
-
-//	public IndexedClassExpression getOwlThing();
-//
-//	public IndexedClassExpression getOwlNothing();
 
 	public Context pollForActiveContext();
 

@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DirectIndex implements ModifiableOntologyIndex {
 
-	protected static final Logger LOGGER_ = LoggerFactory
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(DirectIndex.class);
 
 	final IndexedClass indexedOwlThing, indexedOwlNothing;

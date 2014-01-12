@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
 /*
  * #%L
@@ -34,12 +34,13 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AllRuleApplicationConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AndConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionDeletionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
  * Creates an engine which applies rules backwards, e.g., removes conclusions
@@ -75,15 +76,17 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	 *         {@link Conclusion} if it occurs in the {@link Context}, and
 	 *         deletes this {@link Conclusion} from the {@link Context}
 	 */
-	private static ConclusionVisitor<Boolean> getDeletionConclusionProcessor(
+	private static ConclusionVisitor<Context, Boolean> getDeletionConclusionProcessor(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer) {
-		return new AndConclusionVisitor(new AndConclusionVisitor(
-		// check if conclusion occurs in the context
-				new ConclusionOccurrenceCheckingVisitor(),
-				// if so, apply the rules, including those that are
-				// redundant
-				new AllRuleApplicationConclusionVisitor(ruleVisitor, writer)),
-				new AndConclusionVisitor(
+		return new CombinedConclusionVisitor<Context>(
+				new CombinedConclusionVisitor<Context>(
+				// check if conclusion occurs in the context
+						new ConclusionOccurrenceCheckingVisitor(),
+						// if so, apply the rules, including those that are
+						// redundant
+						new AllRuleApplicationConclusionVisitor(ruleVisitor,
+								writer)),
+				new CombinedConclusionVisitor<Context>(
 				// after processing, delete the conclusion
 						new ConclusionDeletionVisitor(),
 						// and mark the source context as non-saturated
@@ -108,11 +111,11 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		protected DeapplicationEngine(ContextModificationListener listener,
 				SaturationStatistics localStatistics) {
-			this(saturationState.getWriter(SaturationUtils
-					.addStatsToContextModificationListener(listener,
-							localStatistics.getContextStatistics()),
-					SaturationUtils.addStatsToConclusionVisitor(localStatistics
-							.getConclusionStatistics())), localStatistics);
+			this(SaturationUtils.getStatAwareWriter(saturationState
+					.getWriter(SaturationUtils
+							.addStatsToContextModificationListener(listener,
+									localStatistics.getContextStatistics())),
+					localStatistics), localStatistics);
 		}
 
 		protected DeapplicationEngine(ContextModificationListener listener) {

@@ -103,8 +103,6 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 	@Override
 	public void apply(IndexedClassExpression premise, Context context,
 			ConclusionProducer producer) {
-		LOGGER_.trace("Applying {} to {}", NAME_, context);
-
 		for (IndexedClassExpression disjunction : disjunctions_)
 			producer.produce(context, new ComposedSubsumer(disjunction));
 	}

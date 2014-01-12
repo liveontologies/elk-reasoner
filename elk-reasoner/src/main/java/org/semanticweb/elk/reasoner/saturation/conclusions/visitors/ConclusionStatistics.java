@@ -114,7 +114,7 @@ public class ConclusionStatistics {
 			logger.error("Propagations" + ERR_MSG_MORE_USED);
 		if (usedConclusionCounts_.countContradictions > processedConclusionCounts_.countContradictions)
 			logger.error("Contradictions" + ERR_MSG_MORE_USED);
-		if (usedConclusionCounts_.countDisjointnessAxioms > processedConclusionCounts_.countDisjointnessAxioms)
+		if (usedConclusionCounts_.countDisjointSubsumers > processedConclusionCounts_.countDisjointSubsumers)
 			logger.error("Disjointness Axioms" + ERR_MSG_MORE_USED);
 	}
 
@@ -169,12 +169,12 @@ public class ConclusionStatistics {
 					+ usedConclusionCounts_.countContradictions + " ("
 					+ conclusionProcessingTimer_.timeContradictions
 					/ numOfMeasurements_ + " ms)");
-		if (processedConclusionCounts_.countDisjointnessAxioms > 0
-				|| conclusionProcessingTimer_.timeDisjointnessAxioms > 0)
+		if (processedConclusionCounts_.countDisjointSubsumers > 0
+				|| conclusionProcessingTimer_.timeDisjointSubsumers > 0)
 			logger.debug("Disjointness Axioms produced/used: "
-					+ processedConclusionCounts_.countDisjointnessAxioms + "/"
-					+ usedConclusionCounts_.countDisjointnessAxioms + " ("
-					+ conclusionProcessingTimer_.timeDisjointnessAxioms
+					+ processedConclusionCounts_.countDisjointSubsumers + "/"
+					+ usedConclusionCounts_.countDisjointSubsumers + " ("
+					+ conclusionProcessingTimer_.timeDisjointSubsumers
 					/ numOfMeasurements_ + " ms)");
 		long totalTime = conclusionProcessingTimer_.getTotalTime();
 		if (totalTime > 0)

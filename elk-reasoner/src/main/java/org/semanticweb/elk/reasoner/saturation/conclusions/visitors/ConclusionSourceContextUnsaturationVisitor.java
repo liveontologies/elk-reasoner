@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  */
 public class ConclusionSourceContextUnsaturationVisitor extends
-		AbstractConclusionVisitor<Boolean> {
+		AbstractConclusionVisitor<Context, Boolean> {
 
 	private final SaturationStateWriter writer_;
 
@@ -50,17 +50,17 @@ public class ConclusionSourceContextUnsaturationVisitor extends
 
 	@Override
 	Boolean defaultVisit(Conclusion conclusion, Context context) {
-		return writer_.markAsNotSaturated(conclusion.getSourceContext(context));
+		writer_.markAsNotSaturated(conclusion.getSourceContext(context));
+		return true;
 	}
 
 	Boolean defaultVisit(Subsumer conclusion, Context context) {
 		// if the subsumer does not occur in the ontology anymore, it cannot be
 		// re-derived, and thus, the context should not be modified
 		// TODO: extend this check to other types of conclusions
-		if (!conclusion.getExpression().occurs())
-			return false;
-		// else
-		return defaultVisit((Conclusion) conclusion, context);
+		if (conclusion.getExpression().occurs())
+			return defaultVisit((Conclusion) conclusion, context);
+		return true;
 	}
 
 	@Override

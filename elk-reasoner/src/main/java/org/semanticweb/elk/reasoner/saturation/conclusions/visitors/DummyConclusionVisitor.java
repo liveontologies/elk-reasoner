@@ -1,7 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * A {@link ConclusionVisitor} that does nothing
@@ -13,20 +12,11 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class DummyConclusionVisitor extends AbstractConclusionVisitor<Void> {
-
-	private final static DummyConclusionVisitor INSTANCE_ = new DummyConclusionVisitor();
-
-	private DummyConclusionVisitor() {
-
-	}
-
-	public static ConclusionVisitor<Void> getInstance() {
-		return INSTANCE_;
-	}
+public class DummyConclusionVisitor<I> extends
+		AbstractConclusionVisitor<I, Void> {
 
 	@Override
-	Void defaultVisit(Conclusion conclusion, Context context) {
+	Void defaultVisit(Conclusion conclusion, I input) {
 		return null;
 	}
 

@@ -44,9 +44,7 @@ import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.util.collections.Operations;
@@ -77,8 +75,6 @@ public class IncrementalAdditionInitializationStage extends
 		LinkedContextInitRule changedInitRules = null;
 		Map<IndexedClassExpression, ChainableSubsumerRule> changedRulesByCE = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
-		RuleVisitor initRuleAppVisitor = SaturationUtils
-				.getStatsAwareRuleVisitor(stageStatistics_.getRuleStatistics());
 		ContextCreationListener contextCreationListener = SaturationUtils
 				.addStatsToContextCreationListener(
 						ContextCreationListener.DUMMY,
@@ -87,17 +83,15 @@ public class IncrementalAdditionInitializationStage extends
 				.addStatsToContextModificationListener(
 						ContextModificationListener.DUMMY,
 						stageStatistics_.getContextStatistics());
-		ConclusionVisitor<?> conclusionVisitor = SaturationUtils
-				.addStatsToConclusionVisitor(stageStatistics_
-						.getConclusionStatistics());
 
 		// first, create and init contexts for new classes
 		final IndexObjectConverter converter = reasoner.objectCache_
 				.getIndexObjectConverter();
-		final ExtendedSaturationStateWriter writer = reasoner.saturationState
+		final ExtendedSaturationStateWriter writer =
+
+		SaturationUtils.getStatsAwareWriter(reasoner.saturationState
 				.getExtendedWriter(contextCreationListener,
-						contextModificationListener, initRuleAppVisitor,
-						conclusionVisitor, true);
+						contextModificationListener, true), stageStatistics_);
 
 		for (ElkEntity newEntity : Operations.concat(
 				reasoner.ontologyIndex.getAddedClasses(),
@@ -141,7 +135,8 @@ public class IncrementalAdditionInitializationStage extends
 						}
 					});
 
-			if (ice.getContext() == null) {
+			Context context = reasoner.saturationState.getContext(ice);
+			if (context == null) {
 				writer.getCreateContext(ice);
 			}
 		}

@@ -1,5 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
@@ -9,9 +10,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.Rule;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface ContextInitRule extends Rule<Void> {
+public interface ContextInitRule extends Rule<ContextInitialization> {
 
-	public void accept(ContextInitRuleVisitor visitor, Context context,
+	public void accept(ContextInitRuleVisitor visitor,
+			ContextInitialization premise, Context context,
 			ConclusionProducer producer);
 
 }

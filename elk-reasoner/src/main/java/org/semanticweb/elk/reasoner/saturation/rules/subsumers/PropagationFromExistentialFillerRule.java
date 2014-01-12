@@ -101,8 +101,6 @@ public class PropagationFromExistentialFillerRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, Context context,
 			ConclusionProducer producer) {
-		LOGGER_.trace("Applying {} to {}", NAME_, context);
-
 		final Set<IndexedPropertyChain> candidatePropagationProperties = context
 				.getBackwardLinksByObjectProperty().keySet();
 

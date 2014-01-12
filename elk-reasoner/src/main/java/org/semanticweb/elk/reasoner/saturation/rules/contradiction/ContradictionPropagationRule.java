@@ -8,6 +8,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.Multimap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ContradictionRule} applied when processing {@link Contradiction}
@@ -18,6 +20,10 @@ import org.semanticweb.elk.util.collections.Multimap;
  * 
  */
 public class ContradictionPropagationRule extends AbstractContradictionRule {
+
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ContradictionPropagationRule.class);
 
 	private static final ContradictionPropagationRule INSTANCE_ = new ContradictionPropagationRule();
 
@@ -41,7 +47,6 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 			ConclusionProducer producer) {
 		final Multimap<IndexedPropertyChain, Context> backLinks = context
 				.getBackwardLinksByObjectProperty();
-
 		for (IndexedPropertyChain propRelation : backLinks.keySet()) {
 
 			Collection<Context> targets = backLinks.get(propRelation);

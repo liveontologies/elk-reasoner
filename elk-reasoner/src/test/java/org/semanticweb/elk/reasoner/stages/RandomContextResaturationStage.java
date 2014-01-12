@@ -32,18 +32,17 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextCleaningFactory;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.ContextCleaningFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -106,8 +105,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 	private void initContexts(Collection<IndexedClassExpression> contexts) {
 		for (IndexedClassExpression ice : contexts) {
 			if (ice.getContext() != null) {
-				reasoner.saturationState.getExtendedWriter(
-						DummyConclusionVisitor.getInstance()).initContext(
+				reasoner.saturationState.getExtendedWriter().initContext(
 						ice.getContext());
 			}
 		}
@@ -130,9 +128,8 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		for (IndexedClassExpression ice : ices) {
 			if (indexes.contains(i)) {
 				if (ice.getContext() != null) {
-					reasoner.saturationState.getWriter(
-							DummyConclusionVisitor.getInstance())
-							.markAsNotSaturated(ice.getContext());
+					reasoner.saturationState.getWriter().markAsNotSaturated(
+							ice.getContext());
 				}
 
 				contexts.add(ice);

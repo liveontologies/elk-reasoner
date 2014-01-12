@@ -110,8 +110,6 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 	public void apply(BackwardLink link, Context context,
 			ConclusionProducer producer) {
 
-		LOGGER_.trace("Applying {} to {}", NAME_, link);
-
 		/* compose the link with all forward links */
 		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = link
 				.getRelation().getSaturated()

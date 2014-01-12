@@ -117,6 +117,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 		correctnessCheck(standardReasoner, incrementalReasoner, -1);
 
 		long seed = RandomSeedProvider.VALUE;
+		seed = 1389556790848L;
 		Random rnd = new Random(seed);
 
 		for (int i = 0; i < REPEAT_NUMBER; i++) {

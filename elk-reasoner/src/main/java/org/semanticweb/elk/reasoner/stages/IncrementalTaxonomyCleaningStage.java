@@ -33,7 +33,6 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyCleaning;
 import org.semanticweb.elk.util.collections.Operations;
 import org.slf4j.Logger;
@@ -118,9 +117,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			return false;
 		}
 		// at this point we're done with unsaturated contexts
-		reasoner.saturationState
-				.getWriter(DummyConclusionVisitor.getInstance())
-				.clearNotSaturatedContexts();
+		reasoner.saturationState.getWriter().clearNotSaturatedContexts();
 		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
 		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
 		this.cleaning_ = null;
@@ -156,13 +153,12 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 				public boolean hasNext() {
 					if (curr_ != null) {
 						return true;
-					} else {
-						while (curr_ == null && iter_.hasNext()) {
-							IndexedClassExpression expr = iter_.next();
+					}
+					while (curr_ == null && iter_.hasNext()) {
+						IndexedClassExpression expr = iter_.next();
 
-							if (expr instanceof IndexedClassEntity) {
-								curr_ = (IndexedClassEntity) expr;
-							}
+						if (expr instanceof IndexedClassEntity) {
+							curr_ = (IndexedClassEntity) expr;
 						}
 					}
 

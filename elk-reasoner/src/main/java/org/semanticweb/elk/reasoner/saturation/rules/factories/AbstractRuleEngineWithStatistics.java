@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.rules;
+package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -28,7 +28,7 @@ public abstract class AbstractRuleEngineWithStatistics extends
 	protected final ContextStatistics localContextStatistics;
 
 	public AbstractRuleEngineWithStatistics(
-			ConclusionVisitor<?> conclusionProcessor,
+			ConclusionVisitor<Context, ?> conclusionProcessor,
 			SaturationStatistics aggregatedStats,
 			SaturationStatistics localStatistics) {
 		super(conclusionProcessor);

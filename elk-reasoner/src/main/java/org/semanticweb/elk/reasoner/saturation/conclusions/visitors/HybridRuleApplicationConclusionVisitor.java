@@ -44,7 +44,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * 
  */
 public class HybridRuleApplicationConclusionVisitor extends
-		AbstractConclusionVisitor<Boolean> {
+		AbstractConclusionVisitor<Context, Boolean> {
 
 	/**
 	 * {@link RuleVisitor} for non-redundant rule applications

@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,14 +27,14 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Multimap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -62,22 +63,22 @@ public class CheckCleaningStage extends BasePostProcessingStage {
 		// checking subsumers of cleaned contexts
 		for (IndexedClassExpression ice : reasoner_.saturationState
 				.getNotSaturatedContexts()) {
-			Context context = ice.getContext();
+			Context context = reasoner_.saturationState.getContext(ice);
 			if (context == null) {
 				LOGGER_.error("Context removed for " + ice);
 				continue;
 			}
 			cleanedContexts.add(context);
-			if (ice.getContext().getSubsumers().size() > 0) {
+			if (context.getSubsumers().size() > 0) {
 				LOGGER_.error("Context not cleaned: " + ice.toString() + "\n"
-						+ ice.getContext().getSubsumers().size()
-						+ " subsumers: " + ice.getContext().getSubsumers());
+						+ context.getSubsumers().size() + " subsumers: "
+						+ context.getSubsumers());
 			}
 		}
 		// checking backward links
 		for (IndexedClassExpression ice : reasoner_
 				.getIndexedClassExpressions()) {
-			Context context = ice.getContext();
+			Context context = reasoner_.saturationState.getContext(ice);
 			if (context == null)
 				continue;
 			Multimap<IndexedPropertyChain, Context> backwardLinks = context
@@ -91,5 +92,4 @@ public class CheckCleaningStage extends BasePostProcessingStage {
 			}
 		}
 	}
-
 }

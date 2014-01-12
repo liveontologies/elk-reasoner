@@ -1,5 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
@@ -21,15 +22,16 @@ abstract class AbstractChainableContextInitRule extends
 	}
 
 	@Override
-	public void accept(RuleVisitor visitor, Void premise, Context context,
-			ConclusionProducer producer) {
-		accept(visitor, context, producer);
+	public void accept(RuleVisitor visitor, ContextInitialization premise,
+			Context context, ConclusionProducer producer) {
+		accept((ContextInitRuleVisitor) visitor, premise, context, producer);
 	}
 
 	@Override
-	public void accept(ContextInitRuleVisitor visitor, Context context,
+	public void accept(ContextInitRuleVisitor visitor,
+			ContextInitialization premise, Context context,
 			ConclusionProducer producer) {
-		accept((LinkedContextInitRuleVisitor) visitor, context, producer);
+		accept((LinkedContextInitRuleVisitor) visitor, premise, context,
+				producer);
 	}
-
 }

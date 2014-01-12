@@ -75,8 +75,6 @@ public class SubsumerBackwardLinkRule extends AbstractLinkableBackwardLinkRule {
 	@Override
 	public void apply(BackwardLink premise, Context context,
 			ConclusionProducer producer) {
-		LOGGER_.trace("Applying {} to {}", NAME_, premise);
-
 		for (IndexedClassExpression carry : propagationsByObjectProperty_
 				.get(premise.getRelation()))
 			producer.produce(premise.getSource(), new ComposedSubsumer(carry));

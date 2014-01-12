@@ -29,8 +29,8 @@ import java.util.Collection;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextCompletionFactory;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.ContextCompletionFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 
 /**
  * Prunes the set of deleted conclusions by re-deriving those having alternative

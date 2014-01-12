@@ -7,10 +7,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.BasicRuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,18 +28,17 @@ public abstract class AbstractSaturationState implements SaturationState {
 
 	final OntologyIndex ontologyIndex;
 
-	private static final RuleVisitor DEFAULT_INIT_RULE_APP_VISITOR = new BasicRuleVisitor();
-
-	/**
-	 * Cached constants
-	 */
-	// private final IndexedClassExpression owlThing_, owlNothing_;
-
 	/**
 	 * The queue containing all activated contexts. Every activated context
 	 * occurs exactly once.
 	 */
 	private final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
+
+	/**
+	 * The {@link Conclusion} used to initialize contexts using
+	 * {@link ContextInitRule}s
+	 */
+	private final Conclusion ContextInitConclusion_;
 
 	/**
 	 * The queue of all contexts for which computation of the closure under
@@ -48,9 +47,8 @@ public abstract class AbstractSaturationState implements SaturationState {
 	private final Queue<IndexedClassExpression> notSaturatedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
 
 	public AbstractSaturationState(OntologyIndex index) {
-		ontologyIndex = index;
-		// owlThing_ = index.getIndexedOwlThing();
-		// owlNothing_ = index.getIndexedOwlNothing();
+		this.ontologyIndex = index;
+		this.ContextInitConclusion_ = new ContextInitialization(index);
 	}
 
 	@Override
@@ -67,30 +65,25 @@ public abstract class AbstractSaturationState implements SaturationState {
 	public ExtendedSaturationStateWriter getExtendedWriter(
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener,
-			RuleVisitor ruleAppVisitor, ConclusionVisitor<?> conclusionVisitor,
 			boolean trackNewContextsAsUnsaturated) {
 		return new ExtendedWriter(contextCreationListener,
-				contextModificationListener, ruleAppVisitor, conclusionVisitor,
-				trackNewContextsAsUnsaturated);
+				contextModificationListener, trackNewContextsAsUnsaturated);
 	}
 
 	@Override
 	public SaturationStateWriter getWriter(
-			ContextModificationListener contextModificationListener,
-			ConclusionVisitor<?> conclusionVisitor) {
-		return new BasicWriter(contextModificationListener, conclusionVisitor);
+			ContextModificationListener contextModificationListener) {
+		return new BasicWriter(contextModificationListener);
 	}
 
 	@Override
-	public SaturationStateWriter getWriter(
-			ConclusionVisitor<?> conclusionVisitor) {
-		return getDefaultWriter(conclusionVisitor);
+	public SaturationStateWriter getWriter() {
+		return getDefaultWriter();
 	}
 
 	@Override
-	public ExtendedSaturationStateWriter getExtendedWriter(
-			ConclusionVisitor<?> conclusionVisitor) {
-		return getDefaultWriter(conclusionVisitor);
+	public ExtendedSaturationStateWriter getExtendedWriter() {
+		return getDefaultWriter();
 	}
 
 	abstract void resetContexts();
@@ -110,11 +103,8 @@ public abstract class AbstractSaturationState implements SaturationState {
 	 */
 	abstract Context setIfAbsent(Context context);
 
-	private ExtendedSaturationStateWriter getDefaultWriter(
-			final ConclusionVisitor<?> conclusionVisitor) {
-		return new ExtendedWriter(ContextCreationListener.DUMMY,
-				ContextModificationListener.DUMMY,
-				DEFAULT_INIT_RULE_APP_VISITOR, conclusionVisitor, true);
+	private ExtendedSaturationStateWriter getDefaultWriter() {
+		return new ExtendedWriter();
 	}
 
 	/**
@@ -123,40 +113,22 @@ public abstract class AbstractSaturationState implements SaturationState {
 	 */
 	class BasicWriter implements SaturationStateWriter {
 
-		private final ConclusionVisitor<?> producedConclusionVisitor_;
-
 		private final ContextModificationListener contextModificationListener_;
 
 		private BasicWriter(
-				ContextModificationListener contextSaturationListener,
-				ConclusionVisitor<?> conclusionVisitor) {
+				ContextModificationListener contextSaturationListener) {
 			this.contextModificationListener_ = contextSaturationListener;
-			this.producedConclusionVisitor_ = conclusionVisitor;
 		}
-
-		// @Override
-		// public IndexedClassExpression getOwlThing() {
-		// return owlThing_;
-		// }
-		//
-		// @Override
-		// public IndexedClassExpression getOwlNothing() {
-		// return owlNothing_;
-		// }
 
 		@Override
 		public Context pollForActiveContext() {
 			Context result = activeContexts_.poll();
-			LOGGER_.trace("pollForActiveContext() : {}", result);
 			return result;
 		}
 
 		@Override
 		public void produce(Context context, Conclusion conclusion) {
 			LOGGER_.trace("{}: produced conclusion {}", context, conclusion);
-			// this may be necessary, e.g., for counting produced conclusions
-			conclusion.accept(producedConclusionVisitor_, context);
-
 			if (context.addToDo(conclusion)) {
 				LOGGER_.trace("{}: activated", context);
 				// context was activated
@@ -196,6 +168,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 		public void resetContexts() {
 			AbstractSaturationState.this.resetContexts();
 		}
+
 	}
 
 	/**
@@ -206,8 +179,6 @@ public abstract class AbstractSaturationState implements SaturationState {
 	 */
 	protected class ExtendedWriter extends BasicWriter implements
 			ExtendedSaturationStateWriter {
-
-		private final RuleVisitor initRuleAppVisitor_;
 
 		/**
 		 * If set to true, the writer will put all newly created contexts to
@@ -223,14 +194,17 @@ public abstract class AbstractSaturationState implements SaturationState {
 		protected ExtendedWriter(
 				ContextCreationListener contextCreationListener,
 				ContextModificationListener contextModificationListener,
-				RuleVisitor ruleAppVisitor,
-				ConclusionVisitor<?> conclusionVisitor,
 				boolean trackNewContextsAsUnsaturated) {
-			super(contextModificationListener, conclusionVisitor);
+			super(contextModificationListener);
 
 			this.contextCreationListener_ = contextCreationListener;
-			this.initRuleAppVisitor_ = ruleAppVisitor;
 			this.trackNewContextsAsUnsaturated_ = trackNewContextsAsUnsaturated;
+		}
+
+		protected ExtendedWriter() {
+			super(ContextModificationListener.DUMMY);
+			this.contextCreationListener_ = ContextCreationListener.DUMMY;
+			this.trackNewContextsAsUnsaturated_ = true;
 		}
 
 		@Override
@@ -240,8 +214,8 @@ public abstract class AbstractSaturationState implements SaturationState {
 
 		@Override
 		public void initContext(Context context) {
-			SaturationUtils.initContext(ontologyIndex, initRuleAppVisitor_,
-					context, this);
+			LOGGER_.trace("{}: initializing", context);
+			produce(context, ContextInitConclusion_);
 		}
 
 		@Override
@@ -251,7 +225,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 
 		@Override
 		public Context getCreateContext(IndexedClassExpression root) {
-			Context context = root.getContext();
+			Context context = getContext(root);
 			if (context != null)
 				return context;
 			// else try to assign a new context
@@ -260,13 +234,11 @@ public abstract class AbstractSaturationState implements SaturationState {
 			if (previous != null)
 				// the context is already assigned meanwhile
 				return previous;
-			// else the context is new
+
+			// else the context is new; it should be initialized
 			initContext(newContext);
 			contextCreationListener_.notifyContextCreation(newContext);
-
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace(newContext.getRoot() + ": context created");
-			}
+			LOGGER_.trace("{}: context created", newContext);
 
 			if (trackNewContextsAsUnsaturated_) {
 				markAsNotSaturatedInternal(newContext);

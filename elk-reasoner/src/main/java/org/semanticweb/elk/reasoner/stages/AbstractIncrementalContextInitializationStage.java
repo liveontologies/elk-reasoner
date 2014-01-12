@@ -31,10 +31,12 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CountingConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,8 +51,6 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	// logger for this class
 	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractIncrementalContextInitializationStage.class);
-
-	static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
 
 	protected final SaturationStatistics stageStatistics_ = new SaturationStatistics();
 
@@ -80,21 +80,12 @@ abstract class AbstractIncrementalContextInitializationStage extends
 		return stage().toString();
 	}
 
-	protected ConclusionVisitor<?> getConclusionVisitor(
-			ConclusionStatistics conclusionStatistics) {
-
-		return COLLECT_CONCLUSION_COUNTS ? new CountingConclusionVisitor(
-				conclusionStatistics.getProducedConclusionCounts())
-				: DummyConclusionVisitor.getInstance();
-	}
-
 	@Override
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		final ConclusionVisitor<?> visitor = getConclusionVisitor(stageStatistics_
-				.getConclusionStatistics());
-		this.writer_ = reasoner.saturationState.getExtendedWriter(visitor);
+		this.writer_ = SaturationUtils.getStatsAwareWriter(
+				reasoner.saturationState.getExtendedWriter(), stageStatistics_);
 		return true;
 	}
 
@@ -105,8 +96,9 @@ abstract class AbstractIncrementalContextInitializationStage extends
 				break;
 			IndexedClassExpression ice = todo.next();
 
-			if (ice.getContext() != null) {
-				writer_.initContext(ice.getContext());
+			Context context = reasoner.saturationState.getContext(ice);
+			if (context != null) {
+				writer_.initContext(context);
 			}
 
 			initContexts++;

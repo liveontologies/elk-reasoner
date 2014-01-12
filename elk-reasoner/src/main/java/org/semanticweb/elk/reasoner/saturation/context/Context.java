@@ -27,13 +27,11 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
@@ -48,7 +46,7 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  * @see RuleApplicationFactory
  * 
  */
-public interface Context {
+public interface Context extends ConclusionSet {
 
 	/**
 	 * @return the {@link IndexedClassExpression} for which this {@link Context}
@@ -99,151 +97,6 @@ public interface Context {
 	public Chain<LinkableBackwardLinkRule> getBackwardLinkRuleChain();
 
 	/**
-	 * Adds the given {@code BackwardLink} to this {@link Context}.
-	 * 
-	 * @param link
-	 *            the {@code BackwardLink} being added to this {@link Context}
-	 * @return {@code true} if this {@link Context} has changed as the result
-	 *         this method, i.e., the given {@code BackwardLink} has not been
-	 *         added before to this {@link Context}. This method is not thread
-	 *         safe.
-	 */
-	public boolean addBackwardLink(BackwardLink link);
-
-	/*
-	 * TODO
-	 */
-	public boolean removeBackwardLink(BackwardLink link);
-
-	public boolean containsBackwardLink(BackwardLink link);
-
-	public boolean addForwardLink(ForwardLink link);
-
-	public boolean removeForwardLink(ForwardLink link);
-
-	public boolean containsForwardLink(ForwardLink link);
-
-	public boolean addPropagation(Propagation propagation);
-
-	public boolean removePropagation(Propagation propagation);
-
-	public boolean containsPropagation(Propagation propagation);
-
-	/**
-	 * Adds the given {@link IndexedClassExpression} to the subsumers of the
-	 * root {@link IndexedClassExpression} of this {@link Context}.
-	 * 
-	 * @param expression
-	 *            the {@link IndexedClassExpression} to be added as a susbumer
-	 *            of the root {@link IndexedClassExpression} of this
-	 *            {@link Context}.
-	 * @return {@code true} if the set of subsumers of this {@link Context} has
-	 *         changed as the result of calling this method, i.e., the input
-	 *         {@code IndexedClassExpression} was not a subsumer before. This
-	 *         method is not thread safe.
-	 */
-	public boolean addSubsumer(IndexedClassExpression expression);
-
-	/**
-	 * Removes the given {@link IndexedClassExpression} from the subsumers of
-	 * the root {@link IndexedClassExpression} of this {@link Context}.
-	 * 
-	 * @param expression
-	 *            the {@link IndexedClassExpression} to be removed from the
-	 *            subsumers of the root in this {@link Context}
-	 * @return {@code true} if the set of subsumers of this {@link Context} has
-	 *         changed as the result of calling this method, i.e., the input
-	 *         {@code IndexedClassExpression} was a subsumer before. This method
-	 *         is not thread safe.
-	 */
-	public boolean removeSubsumer(IndexedClassExpression expression);
-
-	/**
-	 * Tests whether the given {@link IndexedClassExpression} is a subsumer of
-	 * the root {@link IndexedClassExpression} of this {@link Context}.
-	 * 
-	 * @param expression
-	 *            the {@link IndexedClassExpression} to be tested for this
-	 *            {@link Context}
-	 * @return {@code true} if the given {@link IndexedClassExpression} is a
-	 *         subsumer of the root in this {@link Context}. This method is not
-	 *         thread safe.
-	 */
-	public boolean containsSubsumer(IndexedClassExpression expression);
-
-	/**
-	 * Adds one instance of {@link IndexedDisjointnessAxiom} to this
-	 * {@link Context}.
-	 * 
-	 * @param axiom
-	 *            the {@link IndexedDisjointnessAxiom} to be added to this
-	 *            {@link Context}
-	 * @return {@code true} if adding the axiom changes the state of this
-	 *         {@link Context}, i.e., some rules need to be applied
-	 */
-	public boolean addDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
-
-	/**
-	 * Removes one instance of the given {@link IndexedDisjointnessAxiom} from
-	 * this {@link Context}.
-	 * 
-	 * @param axiom
-	 *            the {@link IndexedDisjointnessAxiom} to be removed from this
-	 *            {@link Context}
-	 * @return {@code true} if the state of this {@link Context} has changed as
-	 *         the result of calling this method, i.e., the context has
-	 *         contained this {@link IndexedDisjointnessAxiom}
-	 */
-	public boolean removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
-
-	/**
-	 * @param axiom
-	 *            the {@link IndexedDisjointnessAxiom} to be checked for
-	 *            occurrences in this {@link Context}
-	 * 
-	 * @return {@code true} if the given {@link IndexedDisjointnessAxiom} occurs
-	 *         in this {@link Context}
-	 */
-	public boolean containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
-
-	/**
-	 * @param axiom
-	 *            the {@link IndexedDisjointnessAxiom} to be checked for causing
-	 *            inconsistency in this {@link Context}
-	 * 
-	 * @return {@code true} if the given {@link IndexedDisjointnessAxiom} makes
-	 *         this {@link Context} inconsistent, that is, the context contains
-	 *         at least two subsumers listed in this inconsistency axiom
-	 */
-	public boolean inconsistForDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
-
-	/**
-	 * Adds a contradiction to this context thus making this context
-	 * inconsistent
-	 * 
-	 * @return {@code true} the state of this {@link Context} has changed as a
-	 *         result of applying this method, i.e., if this context was not
-	 *         inconsistent
-	 */
-	public boolean addContradiction();
-
-	/**
-	 * Removes a contradiction from this context thus making this context
-	 * consistent
-	 * 
-	 * @return {@code true} the state of this {@link Context} has changed as a
-	 *         result of applying this method, i.e., if this context was
-	 *         inconsistent
-	 */
-	public boolean removeConradiction();
-
-	/**
-	 * @return {@code true} if contradiction has been derived in this
-	 *         {@link Context}
-	 */
-	public boolean containsContradiction();
-
-	/**
 	 * Adds the given {@link Conclusion} to be processed within this
 	 * {@link Context}. The method returns {@code true} when this is the first
 	 * unprocessed conclusion added to the context after it is being created or
@@ -270,7 +123,7 @@ public interface Context {
 	 *         one, or {@code null} if there is no such {@link Conclusion}
 	 * @see #addToDo(Conclusion)
 	 */
-	 public Conclusion takeToDo();
+	public Conclusion takeToDo();
 
 	/**
 	 * Call the given {@link ConclusionProcessor} exactly once for every
@@ -283,7 +136,7 @@ public interface Context {
 	 *            the {@link ConclusionProcessor} to be called on unprocessed
 	 *            {@link Conclusion}s of this {@link Context}
 	 */
-//	public void processPendingConclusions(ConclusionProcessor processor);
+	// public void processPendingConclusions(ConclusionProcessor processor);
 
 	/**
 	 * @return {@code true} if all {@link Conclusion}s for this {@link Context},
@@ -307,6 +160,19 @@ public interface Context {
 	 * @return {@code true} if the context is empty
 	 */
 	public boolean isEmpty();
+
+	/**
+	 * @param axiom
+	 *            the {@link IndexedDisjointnessAxiom} to be checked for causing
+	 *            inconsistency in this {@link Context}
+	 * 
+	 * @return {@code true} if the given {@link IndexedDisjointnessAxiom} makes
+	 *         this {@link Context} inconsistent, that is, this context contains
+	 *         at least two different {@link DisjointSubsumer}s for this
+	 *         {@link IndexedDisjointnessAxiom}
+	 */
+	public boolean isInconsistForDisjointnessAxiom(
+			IndexedDisjointnessAxiom axiom);
 
 	/**
 	 * removes links to the next and previous contexts, effectively removing

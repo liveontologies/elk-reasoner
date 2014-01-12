@@ -92,7 +92,6 @@ public class ContradictionFromNegationRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, Context context,
 			ConclusionProducer producer) {
-		LOGGER_.trace("Applying {} to {}", NAME_, context);
 		if (negation_ != null && context.getSubsumers().contains(negation_))
 			producer.produce(context, Contradiction.getInstance());
 	}

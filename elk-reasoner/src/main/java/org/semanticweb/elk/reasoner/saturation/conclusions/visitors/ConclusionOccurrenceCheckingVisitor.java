@@ -22,15 +22,10 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ConclusionVisitor} that checks if visited {@link Conclusion} is
@@ -44,42 +39,21 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ConclusionOccurrenceCheckingVisitor implements
-		ConclusionVisitor<Boolean> {
+public class ConclusionOccurrenceCheckingVisitor extends
+		AbstractConclusionVisitor<Context, Boolean> {
 
-	@Override
-	public Boolean visit(ComposedSubsumer negSCE, Context context) {
-		return context.containsSubsumer(negSCE.getExpression());
-	}
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ConclusionOccurrenceCheckingVisitor.class);
 
+	// TODO: make this by combining the visitor in order to avoid overheads when
+	// logging is switched off
 	@Override
-	public Boolean visit(DecomposedSubsumer posSCE, Context context) {
-		return context.containsSubsumer(posSCE.getExpression());
-	}
-
-	@Override
-	public Boolean visit(BackwardLink link, Context context) {
-		return context.containsBackwardLink(link);
-	}
-
-	@Override
-	public Boolean visit(ForwardLink link, Context context) {
-		return context.containsForwardLink(link);
-	}
-
-	@Override
-	public Boolean visit(Contradiction bot, Context context) {
-		return context.containsContradiction();
-	}
-
-	@Override
-	public Boolean visit(Propagation propagation, Context context) {
-		return context.containsPropagation(propagation);
-	}
-
-	@Override
-	public Boolean visit(DisjointSubsumer disjointnessAxiom, Context context) {
-		return context.containsDisjointnessAxiom(disjointnessAxiom.getAxiom());
+	Boolean defaultVisit(Conclusion conclusion, Context context) {
+		boolean result = context.containsConclusion(conclusion);
+		LOGGER_.trace("{}: check occurrence of {}: {}", context, conclusion,
+				result ? "success" : "failure");
+		return result;
 	}
 
 }

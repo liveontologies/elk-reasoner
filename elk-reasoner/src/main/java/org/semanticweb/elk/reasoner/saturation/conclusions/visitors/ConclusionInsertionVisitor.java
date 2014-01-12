@@ -22,14 +22,10 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ConclusionVisitor} that adds the visited {@link Conclusion} into the
@@ -42,41 +38,20 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ConclusionInsertionVisitor implements ConclusionVisitor<Boolean> {
+public class ConclusionInsertionVisitor extends
+		AbstractConclusionVisitor<Context, Boolean> {
 
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ConclusionInsertionVisitor.class);
+
+	// TODO: make this by combining the visitor in order to avoid overheads when
+	// logging is switched off
 	@Override
-	public Boolean visit(ComposedSubsumer negSCE, Context context) {
-		return context.addSubsumer(negSCE.getExpression());
+	Boolean defaultVisit(Conclusion conclusion, Context context) {
+		boolean result = context.addConclusion(conclusion);
+		LOGGER_.trace("{}: inserting {}: {}", context, conclusion,
+				result ? "success" : "failure");
+		return result;
 	}
-
-	@Override
-	public Boolean visit(DecomposedSubsumer posSCE, Context context) {
-		return context.addSubsumer(posSCE.getExpression());
-	}
-
-	@Override
-	public Boolean visit(BackwardLink link, Context context) {
-		return context.addBackwardLink(link);
-	}
-
-	@Override
-	public Boolean visit(ForwardLink link, Context context) {
-		return context.addForwardLink(link);
-	}
-
-	@Override
-	public Boolean visit(Contradiction bot, Context context) {
-		return context.addContradiction();
-	}
-
-	@Override
-	public Boolean visit(Propagation propagation, Context context) {
-		return context.addPropagation(propagation);
-	}
-
-	@Override
-	public Boolean visit(DisjointSubsumer disjointnessAxiom, Context context) {
-		return context.addDisjointnessAxiom(disjointnessAxiom.getAxiom());
-	}
-
 }

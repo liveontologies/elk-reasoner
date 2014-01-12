@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Iterator;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,9 +99,7 @@ class ContextInitializationStage extends AbstractReasonerStage {
 		if (!super.postExecute())
 			return false;
 		// reasoner.saturationState.resetFirstContext();
-		reasoner.saturationState
-				.getWriter(DummyConclusionVisitor.getInstance())
-				.resetContexts();
+		reasoner.saturationState.getWriter().resetContexts();
 		todo_ = null;
 		return true;
 	}

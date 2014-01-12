@@ -25,12 +25,12 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * A {@link ConclusionVisitor} that implements an if-then-else statement over
@@ -42,13 +42,14 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class IfThenElseConclusionVisitor<R> implements ConclusionVisitor<R> {
+public class IfThenElseConclusionVisitor<I, O> implements
+		ConclusionVisitor<I, O> {
 
-	final private ConclusionVisitor<Boolean> check_;
+	final private ConclusionVisitor<I, Boolean> check_;
 
-	final private ConclusionVisitor<R> doTrue_;
+	final private ConclusionVisitor<I, O> doFalse_;
 
-	final private ConclusionVisitor<R> doFalse_;
+	final private ConclusionVisitor<I, O> doTrue_;
 
 	/**
 	 * Creates a new {@link ConclusionVisitor} that implements an if-then-else
@@ -69,53 +70,59 @@ public class IfThenElseConclusionVisitor<R> implements ConclusionVisitor<R> {
 	 *            The {@link ConclusionVisitor} that is called when the
 	 *            condition is evaluated {@code false}
 	 */
-	public IfThenElseConclusionVisitor(ConclusionVisitor<Boolean> check,
-			ConclusionVisitor<R> doTrue, ConclusionVisitor<R> doFalse) {
+	public IfThenElseConclusionVisitor(ConclusionVisitor<I, Boolean> check,
+			ConclusionVisitor<I, O> doTrue, ConclusionVisitor<I, O> doFalse) {
 		this.check_ = check;
 		this.doTrue_ = doTrue;
 		this.doFalse_ = doFalse;
 	}
 
 	@Override
-	public R visit(BackwardLink conclusion, Context context) {
-		return check_.visit(conclusion, context) ? doTrue_.visit(conclusion,
-				context) : doFalse_.visit(conclusion, context);
+	public O visit(BackwardLink conclusion, I input) {
+		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
+				input) : doFalse_.visit(conclusion, input);
 	}
 
 	@Override
-	public R visit(ComposedSubsumer conclusion, Context context) {
-		return check_.visit(conclusion, context) ? doTrue_.visit(conclusion,
-				context) : doFalse_.visit(conclusion, context);
+	public O visit(ComposedSubsumer conclusion, I input) {
+		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
+				input) : doFalse_.visit(conclusion, input);
 	}
 
 	@Override
-	public R visit(Contradiction conclusion, Context context) {
-		return check_.visit(conclusion, context) ? doTrue_.visit(conclusion,
-				context) : doFalse_.visit(conclusion, context);
+	public O visit(ContextInitialization conclusion, I input) {
+		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
+				input) : doFalse_.visit(conclusion, input);
 	}
 
 	@Override
-	public R visit(DecomposedSubsumer conclusion, Context context) {
-		return check_.visit(conclusion, context) ? doTrue_.visit(conclusion,
-				context) : doFalse_.visit(conclusion, context);
+	public O visit(Contradiction conclusion, I input) {
+		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
+				input) : doFalse_.visit(conclusion, input);
 	}
 
 	@Override
-	public R visit(DisjointSubsumer conclusion, Context context) {
-		return check_.visit(conclusion, context) ? doTrue_.visit(conclusion,
-				context) : doFalse_.visit(conclusion, context);
+	public O visit(DecomposedSubsumer conclusion, I input) {
+		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
+				input) : doFalse_.visit(conclusion, input);
 	}
 
 	@Override
-	public R visit(ForwardLink conclusion, Context context) {
-		return check_.visit(conclusion, context) ? doTrue_.visit(conclusion,
-				context) : doFalse_.visit(conclusion, context);
+	public O visit(DisjointSubsumer conclusion, I input) {
+		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
+				input) : doFalse_.visit(conclusion, input);
 	}
 
 	@Override
-	public R visit(Propagation conclusion, Context context) {
-		return check_.visit(conclusion, context) ? doTrue_.visit(conclusion,
-				context) : doFalse_.visit(conclusion, context);
+	public O visit(ForwardLink conclusion, I input) {
+		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
+				input) : doFalse_.visit(conclusion, input);
+	}
+
+	@Override
+	public O visit(Propagation conclusion, I input) {
+		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
+				input) : doFalse_.visit(conclusion, input);
 	}
 
 }
