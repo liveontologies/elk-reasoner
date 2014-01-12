@@ -113,7 +113,7 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 				submitInternal(job);
 			}
 			else {
-				LOGGER_.trace("{}: tracing skipped, target not entailed: {}", root, target);
+				LOGGER_.info("{}: tracing skipped, target not entailed: {}", root, target);
 			}
 		}
 		
@@ -172,7 +172,7 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 	 */
 	private class TracedContextProcessor {
 		//this explorer should be thread-safe, it only keeps a reference to a thread-safe trace reader.
-		private final RecursiveTraceExplorer traceExplorer_ = new RecursiveTraceExplorer(traceState_.getTraceStore().getReader());
+		private final RecursiveTraceExplorer traceExplorer_ = new RecursiveTraceExplorer(traceState_.getTraceStore().getReader(), traceState_.getSaturationState());
 	
 		void process(final TracedContext context) {
 			for (;;) {
@@ -189,53 +189,23 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 
 					@Override
 					protected Boolean defaultVisit(Conclusion conclusion, 	Context cxt) {
-						Context conclusionContext = conclusion.getSourceContext(cxt);
-						
-						if (conclusionContext.getRoot() == root) {
+						if (cxt.getRoot() == root) {
 							return true;
 						}
 						
+						Context conclusionContext = conclusion.getSourceContext(cxt);
 						Context tracingContext = traceState_.getSaturationState().getContext(conclusionContext.getRoot());
 						
 						if (!tracingContext.isSaturated()) {
 							LOGGER_.trace("{}: recursively submitted for tracing, target: {}", tracingContext, conclusion);
 							
 							toTraceQueue_.add(new TracingJob(tracingContext.getRoot(), conclusion));
-							//stop unwinding because the tracing information may not yet be computed for that context.
-							return false;
 						}
-						//keep unwinding
+
 						return true;
 					}
 					
 				});
-				/*traceExplorer_.accept(root.getContext(), next, new BaseTracedConclusionVisitor<Boolean, Context>() {
-
-					@Override
-					protected Boolean defaultTracedVisit(final TracedConclusion traced, final Context infCxt) {
-						final Context inferenceContext = traceState_.getSaturationState().getContext(infCxt.getRoot());
-						
-						if (inferenceContext.getRoot() != root && !inferenceContext.isSaturated()) {
-							
-							traced.visitPremises(new BaseConclusionVisitor<Void, Void>() {
-								@Override
-								public Void defaultVisit(Conclusion premise, Void _ignored) {
-									if (premise.getSourceContext(inferenceContext) == inferenceContext) {
-										LOGGER_.trace("{}: recursively submitted for tracing, target: {}", inferenceContext, premise);
-										toTraceQueue_.add(new TracingJob(inferenceContext.getRoot(), premise));
-									}
-									
-									return null;
-								}
-							});		
-							//stop unwinding because the tracing information may not yet be computed for that context.
-							return false;
-						}
-						//keep unwinding
-						return true;
-					}
-					
-				});*/
 			}
 		}
 	}

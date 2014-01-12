@@ -288,6 +288,10 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	 * Inserts traces into the trace store but passes the main context so that
 	 * the traces can be retrieved by main contexts.
 	 * 
+	 * TODO It may be better to always index the traces by the tracing (local)
+	 * contexts. Then we won't need to look up local contexts during trace
+	 * processing (such as unwinding).
+	 * 
 	 * @author Pavel Klinov
 	 * 
 	 *         pavel.klinov@uni-ulm.de

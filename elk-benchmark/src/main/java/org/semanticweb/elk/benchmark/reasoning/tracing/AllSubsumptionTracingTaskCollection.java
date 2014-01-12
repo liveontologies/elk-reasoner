@@ -93,7 +93,7 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 		// TODO lazy task collection would be better for performance, fix TaskCollection interface
 		final List<Task> tasks = new LinkedList<Task>();
 		
-		/*new ComprehensiveSubsumptionTracingTests(taxonomy).accept(new TracingTestVisitor() {
+		new ComprehensiveSubsumptionTracingTests(taxonomy).accept(new TracingTestVisitor() {
 			
 			@Override
 			public boolean visit(ElkClassExpression subsumee, 	ElkClassExpression subsumer) {
@@ -102,9 +102,9 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 				
 				return true;
 			}
-		});*/
+		});
 		
-		tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#HortonArteritis", "http://www.co-ode.org/ontologies/galen#PeripheralArterialDisease"));
+		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#HortonArteritis", "http://www.co-ode.org/ontologies/galen#PeripheralArterialDisease"));
 		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#ProstatismSymptom", "http://www.co-ode.org/ontologies/galen#UrinarySymptom"));
 		
 		return tasks;
@@ -214,7 +214,7 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 			TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner);
 			TracingTestUtils.checkTracingMinimality(subsumee, subsumer, reasoner);
 			
-			logInferences(0, 100);
+			//logInferences(0, 100);
 			
 		}
 
@@ -234,7 +234,7 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 				
 				LOGGER_.info("Complicated subsumption {} => {}", subsumee, subsumer);
 				
-				new RecursiveTraceExplorer(traceState.getTraceStore().getReader()).accept(cxt, conclusion, new BaseConclusionVisitor<Boolean, Context>() {
+				new RecursiveTraceExplorer(traceState.getTraceStore().getReader(), traceState.getSaturationState()).accept(cxt, conclusion, new BaseConclusionVisitor<Boolean, Context>() {
 
 					@Override
 					protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {

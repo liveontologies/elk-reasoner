@@ -44,6 +44,12 @@ import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
+ * This class synchronizes access to the backward link map because backward links may belong to other contexts. Thus the same map
+ * may store links which belong to contexts being traced and contexts already traced. A concurrent modification may occur if
+ * a trace for a traced context is read when a trace for context being traced in written.
+ * 
+ * TODO: better to create a synchronized multimap
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
@@ -68,6 +74,20 @@ public class SimpleContextTraceStore implements ContextTracer {
 			}
 		}
 		
+		private void visitBackwardLinkInferences(IndexedPropertyChain relation, Context source, TracedConclusionVisitor<?, ?> visitor) {
+			synchronized (relation) {
+				Multimap<Context, TracedConclusion> sourceToInferenceMap = backwardLinkInferenceMap_.get(relation);
+
+				if (sourceToInferenceMap != null) {
+					synchronized (source) {
+						for (TracedConclusion inference : sourceToInferenceMap.get(source)) {
+							inference.acceptTraced(visitor, null);
+						}
+					}
+				}
+			}
+		}
+		
 		@Override
 		public Void visit(ComposedSubsumer negSCE, TracedConclusionVisitor<?,?> visitor) {
 			visitAll(getSubsumerInferences(negSCE.getExpression()), visitor);
@@ -84,11 +104,12 @@ public class SimpleContextTraceStore implements ContextTracer {
 
 		@Override
 		public Void visit(BackwardLink link, TracedConclusionVisitor<?,?> visitor) {
-			visitAll(getLinkInferences(backwardLinkInferenceMap_, link.getRelation(), link.getSource()), visitor);
+			//visitAll(getLinkInferences(backwardLinkInferenceMap_, link.getRelation(), link.getSource()), visitor);
+			visitBackwardLinkInferences(link.getRelation(), link.getSource(), visitor);
 			
 			return null;
 		}
-		
+
 		@Override
 		public Void visit(ForwardLink link, TracedConclusionVisitor<?,?> visitor) {
 			visitAll(getLinkInferences(forwardLinkInferenceMap_, link.getRelation(), link.getTarget()), visitor);
@@ -140,7 +161,8 @@ public class SimpleContextTraceStore implements ContextTracer {
 
 		@Override
 		public Boolean visit(ComposedBackwardLink conclusion, Void param) {
-			return addTracedValue(backwardLinkInferenceMap_, conclusion.getRelation(), conclusion.getSource(), conclusion);
+			//return addTracedValue(backwardLinkInferenceMap_, conclusion.getRelation(), conclusion.getSource(), conclusion);
+			return addTracedBackwardLink(conclusion.getRelation(), conclusion.getSource(), conclusion);
 		}
 
 		@Override
@@ -150,7 +172,8 @@ public class SimpleContextTraceStore implements ContextTracer {
 
 		@Override
 		public Boolean visit(DecomposedExistential conclusion, Void param) {
-			return addTracedValue(backwardLinkInferenceMap_, conclusion.getRelation(), conclusion.getSource(), conclusion);
+			//return addTracedValue(backwardLinkInferenceMap_, conclusion.getRelation(), conclusion.getSource(), conclusion);
+			return addTracedBackwardLink(conclusion.getRelation(), conclusion.getSource(), conclusion);
 		}
 
 		@Override
@@ -170,6 +193,26 @@ public class SimpleContextTraceStore implements ContextTracer {
 		propagationMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedObjectSomeValuesFrom,TracedConclusion>>();
 	}
 	
+
+	protected Boolean addTracedBackwardLink(IndexedPropertyChain relation, Context source, TracedConclusion link) {
+		//TODO need a synchronized multimap here
+		synchronized (relation) {
+			Multimap<Context, TracedConclusion> sourceToInferenceMap = backwardLinkInferenceMap_.get(relation);
+			
+			synchronized (source) {
+				if (sourceToInferenceMap == null) {
+					sourceToInferenceMap = new HashListMultimap<Context, TracedConclusion>();
+					sourceToInferenceMap.add(source, link);
+					backwardLinkInferenceMap_.put(relation, sourceToInferenceMap);
+
+					return true;
+				}
+
+				return sourceToInferenceMap.add(source, link);
+			}
+		}
+	}
+
 
 	/**
 	 * Adds a trace associated with the given key-value pair into the trace

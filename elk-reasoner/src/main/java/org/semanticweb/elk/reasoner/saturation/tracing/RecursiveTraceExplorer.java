@@ -24,8 +24,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.collections.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Recursively visits all conclusions which were used to produce a given conclusion
@@ -36,26 +34,29 @@ import org.slf4j.LoggerFactory;
  */
 public class RecursiveTraceExplorer {
 
-	private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveTraceExplorer.class);
+	//private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveTraceExplorer.class);
 	/**
 	 * the expolorer won't explore more inferences for a conclusion as it unwinds the trace.
 	 */
 	private static final int INFERENCES_TO_UNWIND = Integer.MAX_VALUE;
 	
 	private final TraceStore.Reader traceReader_;
+	
+	private final TracingSaturationState tracingState_;
 	/*
 	 * TODO so far we use notifications that some conclusion isn't traced only
 	 * for testing, perhaps we may get rid of this.
 	 */
 	private final UntracedConclusionListener listener_;
 
-	public RecursiveTraceExplorer(TraceStore.Reader reader) {
-		this(reader, UntracedConclusionListener.DUMMY);
+	public RecursiveTraceExplorer(TraceStore.Reader reader, TracingSaturationState state) {
+		this(reader, state, UntracedConclusionListener.DUMMY);
 	}
 	
-	RecursiveTraceExplorer(TraceStore.Reader reader, UntracedConclusionListener listener) {
+	RecursiveTraceExplorer(TraceStore.Reader reader, TracingSaturationState state, UntracedConclusionListener listener) {
 		traceReader_ = reader;
 		listener_ = listener;
+		tracingState_ = state;
 	}
 	
 	/**
@@ -73,7 +74,7 @@ public class RecursiveTraceExplorer {
 
 		addToQueue(context, conclusion, toDo, seenInferences, premiseVisitor);
 		// this visitor visits all premises and putting them into the todo queue
-		SideConditionCollector tracedVisitor = new SideConditionCollector(new BaseConclusionVisitor<Void, Context>(){
+		PremiseVisitor<Void, Context> tracedVisitor = new PremiseVisitor<Void, Context>/*SideConditionCollector*/(new BaseConclusionVisitor<Void, Context>(){
 			@Override
 			protected Void defaultVisit(Conclusion premise, Context cxt) {
 				// the context passed into this method is the context where the inference has been made
@@ -97,8 +98,8 @@ public class RecursiveTraceExplorer {
 			LOGGER_.info("{} => {}", pair.getFirst(), pair.getSecond());
 		}*/
 		
-		LOGGER_.info("{} subclassof axioms used", tracedVisitor.getSubClassOfAxioms().size());
-		LOGGER_.info("{} fillers occurred in existentials", tracedVisitor.getFillers().size());
+		//LOGGER_.info("{} subclassof axioms used", tracedVisitor.getSubClassOfAxioms().size());
+		//LOGGER_.info("{} fillers occurred in existentials", tracedVisitor.getFillers().size());
 	}
 
 	private void addToQueue(final Context context, 
@@ -107,8 +108,13 @@ public class RecursiveTraceExplorer {
 			final Set<TracedConclusion> seenInferences,
 			final ConclusionVisitor<Boolean, Context> visitor) {
 		
-		if (!conclusion.accept(visitor, context)) {
-			//must stop here
+		Context tracedContext = tracingState_.getContext(conclusion.getSourceContext(context).getRoot());
+		
+		conclusion.accept(visitor, tracedContext);
+		
+		if (!tracedContext.isSaturated()) {
+			//must stop unwinding because the context to which the next conclusion belongs isn't yet traced
+			//LOGGER_.trace("Stopping unwinding because {} isn't yet traced", tracedContext);			
 			return;
 		}
 		
@@ -123,6 +129,7 @@ public class RecursiveTraceExplorer {
 					protected Void defaultTracedVisit(TracedConclusion inference, Void v) {
 						if (!seenInferences.contains(inference) && traced.get() < INFERENCES_TO_UNWIND) {
 							Context inferenceContext = inference.getInferenceContext(context);
+							//Context inferenceContext = inference.getSourceContext(context);
 							
 							seenInferences.add(inference);
 							toDo.add(new InferenceWrapper(inference, inferenceContext));
@@ -236,11 +243,11 @@ public class RecursiveTraceExplorer {
 			}
 		}
 
-		Set<Pair<Conclusion, Conclusion>> getSubClassOfAxioms() {
+		public Set<Pair<Conclusion, Conclusion>> getSubClassOfAxioms() {
 			return subclassAxioms_;
 		}
 		
-		Set<IndexedClassExpression> getFillers() {
+		public Set<IndexedClassExpression> getFillers() {
 			return fillers_;
 		}
 	}

@@ -64,7 +64,7 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 				defaultTracedVisit(conclusion, context);
 			}
 			else {
-				LOGGER_.warn("SubclassOf inference for the root {}", conclusion);
+				LOGGER_.trace("SubclassOf inference for the root {}", conclusion);
 			}
 			
 			return true;
@@ -76,7 +76,7 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 				defaultTracedVisit(conclusion, context);
 			}
 			else {
-				LOGGER_.warn("Conjunction+ inference for the root {}", conclusion);
+				LOGGER_.trace("Conjunction+ inference for the root {}", conclusion);
 			}
 			
 			return true;
@@ -88,7 +88,7 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 				defaultTracedVisit(conclusion, context);
 			}
 			else {
-				LOGGER_.warn("Conjunction- inference for the root {}", conclusion);
+				LOGGER_.trace("Conjunction- inference for the root {}", conclusion);
 			}
 			
 			return true;
@@ -100,7 +100,7 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 				defaultTracedVisit(conclusion, context);
 			}
 			else {
-				LOGGER_.warn("Propagation inference for the root {}", conclusion);
+				LOGGER_.trace("Propagation inference for the root {}", conclusion);
 			}
 			
 			return true;

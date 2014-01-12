@@ -44,6 +44,7 @@ public class TracingTestUtils {
 		Context cxt = ReasonerStateAccessor.transform(reasoner, sub).getContext();
 		Conclusion conclusion = TracingUtils.getSubsumerWrapper(ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
+		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 		ConclusionVisitor<Boolean, Context> counter = new BaseConclusionVisitor<Boolean, Context>() {
 
 			@Override
@@ -54,7 +55,7 @@ public class TracingTestUtils {
 			}
 		};
 		
-		new RecursiveTraceExplorer(ReasonerStateAccessor.getTraceState(reasoner).getTraceStore().getReader(), UNTRACED_LISTENER).accept(cxt, conclusion, counter);
+		new RecursiveTraceExplorer(traceState.getTraceStore().getReader(), traceState.getSaturationState(), UNTRACED_LISTENER).accept(cxt, conclusion, counter);
 		
 		return conclusionCount.get();
 	}
@@ -65,7 +66,7 @@ public class TracingTestUtils {
 		TracedContextsCollector collector = new TracedContextsCollector();
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 		
-		new RecursiveTraceExplorer(traceState.getTraceStore().getReader(), UNTRACED_LISTENER).accept(cxt, conclusion, collector);
+		new RecursiveTraceExplorer(traceState.getTraceStore().getReader(), traceState.getSaturationState(), UNTRACED_LISTENER).accept(cxt, conclusion, collector);
 
 		for (Context traced : traceState.getSaturationState().getTracedContexts()) {
 			IndexedClassExpression root = traced.getRoot();

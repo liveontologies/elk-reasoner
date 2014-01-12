@@ -4,7 +4,4 @@ SubClassOf(:A ObjectSomeValuesFrom(:R :B))
 SubClassOf(:B ObjectSomeValuesFrom(:R :C))
 TransitiveObjectProperty(:R)
 SubClassOf(ObjectSomeValuesFrom(:R :C) :D)
-
-#SubClassOf(:A ObjectSomeValuesFrom(:R :B))
-#SubClassOf(ObjectSomeValuesFrom(:R :B) :C)
 )
