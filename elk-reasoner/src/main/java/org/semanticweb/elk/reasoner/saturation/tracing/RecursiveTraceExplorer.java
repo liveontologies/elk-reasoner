@@ -9,10 +9,23 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.util.collections.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Recursively visits all conclusions which were used to produce a given conclusion
@@ -23,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public class RecursiveTraceExplorer {
 
-	//private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveTraceExplorer.class);
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveTraceExplorer.class);
 	/**
 	 * the expolorer won't explore more inferences for a conclusion as it unwinds the trace.
 	 */
@@ -59,6 +72,16 @@ public class RecursiveTraceExplorer {
 		final Set<TracedConclusion> seenInferences = new HashSet<TracedConclusion>();
 
 		addToQueue(context, conclusion, toDo, seenInferences, premiseVisitor);
+		// this visitor visits all premises and putting them into the todo queue
+		SideConditionCollector tracedVisitor = new SideConditionCollector(new BaseConclusionVisitor<Void, Context>(){
+			@Override
+			protected Void defaultVisit(Conclusion premise, Context cxt) {
+				// the context passed into this method is the context where the inference has been made
+				addToQueue(cxt, premise, toDo, seenInferences, premiseVisitor);
+				return null;
+			}
+			
+		});
 
 		for (;;) {
 			final InferenceWrapper next = toDo.poll();
@@ -66,20 +89,20 @@ public class RecursiveTraceExplorer {
 			if (next == null) {
 				break;
 			}
-			//visiting all premises and putting them into the todo queue
-			next.inference.acceptTraced(new PremiseVisitor<Void, Void>(new BaseConclusionVisitor<Void, Void>(){
 
-				@Override
-				protected Void defaultVisit(Conclusion premise, Void cxt) {
-					addToQueue(next.context, premise, toDo, seenInferences, premiseVisitor);
-					return null;
-				}
-				
-			}), null);
+			next.inference.acceptTraced(tracedVisitor, next.context);
 		}
+		
+		/*for (Pair<Conclusion, Conclusion> pair : tracedVisitor.getSubClassOfAxioms()) {
+			LOGGER_.info("{} => {}", pair.getFirst(), pair.getSecond());
+		}*/
+		
+		LOGGER_.info("{} subclassof axioms used", tracedVisitor.getSubClassOfAxioms().size());
+		LOGGER_.info("{} fillers occurred in existentials", tracedVisitor.getFillers().size());
 	}
 
-	private void addToQueue(final Context context, final Conclusion conclusion,
+	private void addToQueue(final Context context, 
+			final Conclusion conclusion,
 			final Queue<InferenceWrapper> toDo,
 			final Set<TracedConclusion> seenInferences,
 			final ConclusionVisitor<Boolean, Context> visitor) {
@@ -135,6 +158,91 @@ public class RecursiveTraceExplorer {
 			return inference + " stored in " + context;
 		}
 
+	}
+	
+	/*
+	 * FIXME currently used for testing only
+	 */
+	private static class SideConditionCollector extends PremiseVisitor<Void, Context> {
+
+		private final Set<Pair<Conclusion, Conclusion>> subclassAxioms_ = new HashSet<Pair<Conclusion, Conclusion>>();
+		
+		private final Set<IndexedClassExpression> fillers_ = new HashSet<IndexedClassExpression>();
+		
+		public SideConditionCollector(ConclusionVisitor<Void, Context> v) {
+			super(v);
+		}
+
+		@Override
+		public Void visit(SubClassOfSubsumer conclusion, Context cxt) {
+			subclassAxioms_.add(new Pair<Conclusion, Conclusion>(conclusion.getPremise(), conclusion));
+			
+			checkIfExistential(conclusion.getPremise());
+			checkIfExistential(conclusion);
+			
+			return super.visit(conclusion, cxt);
+		}
+		
+		//collecting all fillers used in some existential restrictions
+		private void checkIfExistential(Conclusion c) {
+			if (c instanceof Subsumer) {
+				IndexedClassExpression ice = ((Subsumer)c).getExpression();
+				
+				ice.accept(new IndexedClassExpressionVisitor<Void>() {
+
+					@Override
+					public Void visit(IndexedClass element) {
+						return null;
+					}
+
+					@Override
+					public Void visit(IndexedIndividual element) {
+						return null;
+					}
+
+					@Override
+					public Void visit(IndexedObjectComplementOf element) {
+						return element.getNegated().accept(this);
+					}
+
+					@Override
+					public Void visit(IndexedObjectIntersectionOf element) {
+						element.getFirstConjunct().accept(this);
+						element.getSecondConjunct().accept(this);
+						return null;
+					}
+
+					@Override
+					public Void visit(IndexedObjectSomeValuesFrom element) {
+						fillers_.add(element.getFiller());
+						element.getFiller().accept(this);
+						return null;
+					}
+
+					@Override
+					public Void visit(IndexedObjectUnionOf element) {
+						for (IndexedClassExpression disjunct : element.getDisjuncts()) {
+							disjunct.accept(this);
+						}
+						return null;
+					}
+
+					@Override
+					public Void visit(IndexedDataHasValue element) {
+						return null;
+					}
+					
+				});
+			}
+		}
+
+		Set<Pair<Conclusion, Conclusion>> getSubClassOfAxioms() {
+			return subclassAxioms_;
+		}
+		
+		Set<IndexedClassExpression> getFillers() {
+			return fillers_;
+		}
 	}
 
 }

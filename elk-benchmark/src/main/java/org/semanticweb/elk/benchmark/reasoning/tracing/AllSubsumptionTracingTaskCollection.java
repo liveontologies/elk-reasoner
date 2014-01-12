@@ -38,8 +38,11 @@ import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
@@ -87,22 +90,10 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 		// classify the ontology and instantiate tracing tasks
 		Taxonomy<ElkClass> taxonomy = loadAndClassify(ontologyFile_);
 		
-		/*if (LOGGER_.isTraceEnabled()) {
-			StringWriter writer = new StringWriter();
-			
-			try {
-				TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
-			} catch (IOException e) {
-				throw new TaskException(e);
-			}
-			
-			writer.flush();
-		}*/
-		
 		// TODO lazy task collection would be better for performance, fix TaskCollection interface
 		final List<Task> tasks = new LinkedList<Task>();
 		
-		new ComprehensiveSubsumptionTracingTests(taxonomy).accept(new TracingTestVisitor() {
+		/*new ComprehensiveSubsumptionTracingTests(taxonomy).accept(new TracingTestVisitor() {
 			
 			@Override
 			public boolean visit(ElkClassExpression subsumee, 	ElkClassExpression subsumer) {
@@ -111,9 +102,18 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 				
 				return true;
 			}
-		});
+		});*/
+		
+		tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#HortonArteritis", "http://www.co-ode.org/ontologies/galen#PeripheralArterialDisease"));
+		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#ProstatismSymptom", "http://www.co-ode.org/ontologies/galen#UrinarySymptom"));
 		
 		return tasks;
+	}
+	
+	TracingTask createSpecificTask(String sub, String sup) {
+		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		
+		return new VerifiedTracingTask(reasoner_, factory.getClass(new ElkFullIri(sub)), factory.getClass(new ElkFullIri(sup)));
 	}
 
 	private Taxonomy<ElkClass> loadAndClassify(String ontologyFile) throws TaskException {
@@ -124,9 +124,7 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 					new Owl2FunctionalStyleParserFactory(), ontFile);
 			
 			reasoner_ = new ReasonerFactory().createReasoner(loader,
-					//new SimpleStageExecutor(),
 					new RuleAndConclusionCountMeasuringExecutor( new SimpleStageExecutor(), metrics_),
-					//new TimingStageExecutor(new SimpleStageExecutor(), metrics_),
 					reasonerConfig_);
 			
 			return reasoner_.getTaxonomy();
@@ -216,27 +214,32 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 			TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner);
 			TracingTestUtils.checkTracingMinimality(subsumee, subsumer, reasoner);
 			
-			//logInferences(10);
+			logInferences(0, 100);
 			
 		}
 
-		private void logInferences(int contextNoThreshold) {
+		private void logInferences(int contextNoLowThreshold, int contextNoUpperThreshold) {
 			Context cxt = ReasonerStateAccessor.transform(reasoner, subsumee).getContext();
 			Conclusion conclusion = TracingUtils.getSubsumerWrapper(ReasonerStateAccessor.transform(reasoner, subsumer));
 			TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 			int cxtNo = 0;
 			
-			for (@SuppressWarnings("unused") Context traced : traceState.getSaturationState().getTracedContexts()) {
+			for (Context traced : traceState.getSaturationState().getTracedContexts()) {
 				cxtNo++;
+				
+				LOGGER_.info("{}", traced);
 			}	
 			
-			if (cxtNo > contextNoThreshold) {
+			if (cxtNo >= contextNoLowThreshold && cxtNo <= contextNoUpperThreshold) {
+				
+				LOGGER_.info("Complicated subsumption {} => {}", subsumee, subsumer);
+				
 				new RecursiveTraceExplorer(traceState.getTraceStore().getReader()).accept(cxt, conclusion, new BaseConclusionVisitor<Boolean, Context>() {
 
 					@Override
 					protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
 						
-						LOGGER_.info("{} in {}", conclusion, cxt);
+						//LOGGER_.info("{} in {}", conclusion, cxt);
 						
 						return true;
 					}

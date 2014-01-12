@@ -54,8 +54,11 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 			return true;
 		}
 
+		/*-----------------------------------------------------------------------
+		 * FIXME Hack to not store alternative inference of the context's root
+		 ------------------------------------------------------------------------*/
 		
-		/*@Override
+		@Override
 		public Boolean visit(SubClassOfSubsumer conclusion, Context context) {
 			if (conclusion.getExpression() != context.getRoot()) {
 				defaultTracedVisit(conclusion, context);
@@ -101,8 +104,11 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 			}
 			
 			return true;
-		}*/
+		}
 
+		/*-----------------------------------------------------------------------
+		 * FIXME Hack to not store alternative inference of the context's root
+		 ------------------------------------------------------------------------*/
 		
 	};
 

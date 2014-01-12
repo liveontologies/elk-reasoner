@@ -75,13 +75,13 @@ public class TracingTestUtils {
 	}
 	
 	public static void checkNumberOfInferences(ElkClassExpression sub, ElkClassExpression sup, Reasoner reasoner, int expected) {
-		Context cxt = ReasonerStateAccessor.transform(reasoner, sub).getContext();
+		final Context cxt = ReasonerStateAccessor.transform(reasoner, sub).getContext();
 		Conclusion conclusion = TracingUtils.getSubsumerWrapper(ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger inferenceCount = new AtomicInteger(0);
 		TracedConclusionVisitor<Boolean, Context> counter = new BaseTracedConclusionVisitor<Boolean, Context>() {
 
 			@Override
-			protected Boolean defaultTracedVisit(TracedConclusion conclusion, Context cxt) {
+			protected Boolean defaultTracedVisit(TracedConclusion conclusion, Context context) {
 				
 				LOGGER_.trace("{}: traced inference {}", cxt, conclusion);
 				

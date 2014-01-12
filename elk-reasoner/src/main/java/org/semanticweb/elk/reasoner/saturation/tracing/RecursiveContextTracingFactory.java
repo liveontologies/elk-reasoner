@@ -198,7 +198,7 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 						Context tracingContext = traceState_.getSaturationState().getContext(conclusionContext.getRoot());
 						
 						if (!tracingContext.isSaturated()) {
-							LOGGER_.trace("{}: recursively submitted for tracing, target: {}", context, conclusion);
+							LOGGER_.trace("{}: recursively submitted for tracing, target: {}", tracingContext, conclusion);
 							
 							toTraceQueue_.add(new TracingJob(tracingContext.getRoot(), conclusion));
 							//stop unwinding because the tracing information may not yet be computed for that context.

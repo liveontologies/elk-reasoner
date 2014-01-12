@@ -11,7 +11,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
  * pavel.klinov@uni-ulm.de
  */
 public class PremiseVisitor<R, C> implements TracedConclusionVisitor<R, C> {
-
+	
 	private final ConclusionVisitor<R, C> visitor_;
 	
 	public PremiseVisitor(ConclusionVisitor<R, C> v) {
@@ -24,8 +24,8 @@ public class PremiseVisitor<R, C> implements TracedConclusionVisitor<R, C> {
 	}
 
 	@Override
-	public R visit(SubClassOfSubsumer conclusion, C parameter) {
-		conclusion.getPremise().accept(visitor_, parameter);
+	public R visit(SubClassOfSubsumer conclusion, C cxt) {
+		conclusion.getPremise().accept(visitor_, cxt);
 		return null;
 	}
 

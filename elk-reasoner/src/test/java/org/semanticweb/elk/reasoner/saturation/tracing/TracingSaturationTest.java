@@ -181,6 +181,20 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkNumberOfInferences(b, b, reasoner, 1);
 	}	
 	
+	@Test
+	public void testTraceUnnecessaryContextsDueToTrivialPropagations() throws Exception {
+		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		Reasoner reasoner = load("tracing/TrivialPropagation.owl");
+		
+		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
+		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
+		ElkClass e = factory.getClass(new ElkFullIri("http://example.org/E"));
+		
+		reasoner.explainSubsumption(a, b, TRACE_MODE.RECURSIVE);
+		TracingTestUtils.checkNumberOfInferences(a, b, reasoner, 1);
+		TracingTestUtils.checkNumberOfInferences(e, e, reasoner, 0);
+	}
+	
 	private Reasoner load(String resource) throws Exception {
 		Reasoner reasoner = null;
 		InputStream stream = null;
