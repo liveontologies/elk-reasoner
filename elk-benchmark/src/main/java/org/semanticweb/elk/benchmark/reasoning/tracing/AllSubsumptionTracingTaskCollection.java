@@ -27,8 +27,10 @@ package org.semanticweb.elk.benchmark.reasoning.tracing;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
 import org.semanticweb.elk.benchmark.Metrics;
@@ -47,11 +49,23 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.BaseTracedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionTracingTests;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceExplorer;
+import org.semanticweb.elk.reasoner.saturation.tracing.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.TRACE_MODE;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestUtils;
@@ -61,6 +75,7 @@ import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.reasoner.stages.RuleAndConclusionCountMeasuringExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.util.collections.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,6 +139,7 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 					new Owl2FunctionalStyleParserFactory(), ontFile);
 			
 			reasoner_ = new ReasonerFactory().createReasoner(loader,
+					//new SimpleStageExecutor(),
 					new RuleAndConclusionCountMeasuringExecutor( new SimpleStageExecutor(), metrics_),
 					reasonerConfig_);
 			
@@ -153,10 +169,13 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 	 * 
 	 */
 	private static class TracingTask implements Task {
+		
+		public static final String SUBCLASSOF_AXIOM_COUNT = "Distinct SubClassOf axioms used";
 
 		final Reasoner reasoner;
 		final ElkClassExpression subsumee;
 		final ElkClassExpression subsumer;
+		final Metrics metrics = new Metrics();
 		
 		TracingTask(Reasoner r, ElkClassExpression sub, ElkClassExpression sup) {
 			reasoner = r;
@@ -171,18 +190,41 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 
 		@Override
 		public void prepare() throws TaskException {
-			reasoner.resetTraceState();
+			metrics.reset();
 		}
 
 		@Override
 		public void run() throws TaskException {
 			try {
 				reasoner.explainSubsumption(subsumee, subsumer, TRACE_MODE.RECURSIVE);
-				
-				TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner);
 			} catch (ElkException e) {
 				throw new TaskException(e);
 			}
+		}
+		
+		@Override
+		public void postRun() throws TaskException {
+			try {
+				TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
+				IndexedClassExpression sub = ReasonerStateAccessor.transform(reasoner, subsumee);
+				IndexedClassExpression sup = ReasonerStateAccessor.transform(reasoner, subsumer);
+				Conclusion subsumerConclusion = TracingUtils.getSubsumerWrapper(sup);
+				RecursiveTraceExplorer traceUnwinder = new RecursiveTraceExplorer(traceState.getTraceStore().getReader(), traceState.getSaturationState());
+				SideConditionCollector collector = new SideConditionCollector();
+				
+				traceUnwinder.accept(sub.getContext(), subsumerConclusion, new BaseConclusionVisitor<Boolean, Context>(), collector);
+				
+				metrics.updateLongMetric(SUBCLASSOF_AXIOM_COUNT, collector.getSubClassOfAxioms().size());
+				
+				TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner);
+			} catch (Exception e) {
+				throw new TaskException(e);
+			}
+			finally {
+				reasoner.resetTraceState();
+			}
+			
+			
 		}
 
 		@Override
@@ -191,7 +233,94 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 
 		@Override
 		public Metrics getMetrics() {
-			return null;
+			return metrics;
+		}
+	}
+	
+	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private static class SideConditionCollector extends BaseTracedConclusionVisitor<Void, Context> {
+
+		private final Set<Pair<Conclusion, Conclusion>> subclassAxioms_ = new HashSet<Pair<Conclusion, Conclusion>>();
+		
+		private final Set<IndexedClassExpression> fillers_ = new HashSet<IndexedClassExpression>();
+		
+		@Override
+		public Void visit(SubClassOfSubsumer conclusion, Context cxt) {
+			subclassAxioms_.add(new Pair<Conclusion, Conclusion>(conclusion.getPremise(), conclusion));
+				//metrics_.updateLongMetric(SUBCLASSOF_AXIOM_COUNT, 1);
+			//}
+			
+			//checkIfExistential(conclusion.getPremise());
+			//checkIfExistential(conclusion);
+			
+			return super.visit(conclusion, cxt);
+		}
+		
+		//collecting all fillers used in some existential restrictions
+		private void checkIfExistential(Conclusion c) {
+			if (c instanceof Subsumer) {
+				IndexedClassExpression ice = ((Subsumer)c).getExpression();
+				
+				ice.accept(new IndexedClassExpressionVisitor<Void>() {
+
+					@Override
+					public Void visit(IndexedClass element) {
+						return null;
+					}
+
+					@Override
+					public Void visit(IndexedIndividual element) {
+						return null;
+					}
+
+					@Override
+					public Void visit(IndexedObjectComplementOf element) {
+						return element.getNegated().accept(this);
+					}
+
+					@Override
+					public Void visit(IndexedObjectIntersectionOf element) {
+						element.getFirstConjunct().accept(this);
+						element.getSecondConjunct().accept(this);
+						return null;
+					}
+
+					@Override
+					public Void visit(IndexedObjectSomeValuesFrom element) {
+						fillers_.add(element.getFiller());
+						element.getFiller().accept(this);
+						return null;
+					}
+
+					@Override
+					public Void visit(IndexedObjectUnionOf element) {
+						for (IndexedClassExpression disjunct : element.getDisjuncts()) {
+							disjunct.accept(this);
+						}
+						return null;
+					}
+
+					@Override
+					public Void visit(IndexedDataHasValue element) {
+						return null;
+					}
+					
+				});
+			}
+		}
+
+		public Set<Pair<Conclusion, Conclusion>> getSubClassOfAxioms() {
+			return subclassAxioms_;
+		}
+		
+		public Set<IndexedClassExpression> getFillers() {
+			return fillers_;
 		}
 	}
 

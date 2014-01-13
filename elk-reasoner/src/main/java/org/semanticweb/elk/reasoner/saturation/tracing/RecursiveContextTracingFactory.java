@@ -171,7 +171,7 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 	 *         pavel.klinov@uni-ulm.de
 	 */
 	private class TracedContextProcessor {
-		//this explorer should be thread-safe, it only keeps a reference to a thread-safe trace reader.
+
 		private final RecursiveTraceExplorer traceExplorer_ = new RecursiveTraceExplorer(traceState_.getTraceStore().getReader(), traceState_.getSaturationState());
 	
 		void process(final TracedContext context) {

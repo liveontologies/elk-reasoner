@@ -203,6 +203,9 @@ public abstract class OWLAPIIncrementalClassificationMultiDeltas extends
 		public Metrics getMetrics() {
 			return metrics;
 		}
+		
+		@Override
+		public void postRun() throws TaskException {}
 	}
 
 	/**
@@ -286,6 +289,9 @@ public abstract class OWLAPIIncrementalClassificationMultiDeltas extends
 		public Metrics getMetrics() {
 			return metrics;
 		}
+		
+		@Override
+		public void postRun() throws TaskException {}
 		
 	}
 }

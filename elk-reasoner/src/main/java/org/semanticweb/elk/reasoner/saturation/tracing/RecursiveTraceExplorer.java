@@ -9,21 +9,9 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * Recursively visits all conclusions which were used to produce a given conclusion
@@ -48,6 +36,8 @@ public class RecursiveTraceExplorer {
 	 * for testing, perhaps we may get rid of this.
 	 */
 	private final UntracedConclusionListener listener_;
+	
+	private final static TracedConclusionVisitor<?, Context> DUMMY_INFERENCE_VISITOR = new BaseTracedConclusionVisitor<Void, Context>();
 
 	public RecursiveTraceExplorer(TraceStore.Reader reader, TracingSaturationState state) {
 		this(reader, state, UntracedConclusionListener.DUMMY);
@@ -59,6 +49,12 @@ public class RecursiveTraceExplorer {
 		tracingState_ = state;
 	}
 	
+	public void accept(Context context,
+			final Conclusion conclusion,
+			final ConclusionVisitor<Boolean, Context> premiseVisitor) {
+		accept(context, conclusion, premiseVisitor, DUMMY_INFERENCE_VISITOR);
+	}
+	
 	/**
 	 * 
 	 * @param context
@@ -68,21 +64,22 @@ public class RecursiveTraceExplorer {
 	 */
 	public void accept(Context context,
 			final Conclusion conclusion,
-			final ConclusionVisitor<Boolean, Context> premiseVisitor) {
+			final ConclusionVisitor<Boolean, Context> premiseVisitor,
+			final TracedConclusionVisitor<?, Context> inferenceVisitor) {
 		final Queue<InferenceWrapper> toDo = new LinkedList<InferenceWrapper>();
 		final Set<TracedConclusion> seenInferences = new HashSet<TracedConclusion>();
 
-		addToQueue(context, conclusion, toDo, seenInferences, premiseVisitor);
+		addToQueue(context, conclusion, toDo, seenInferences, premiseVisitor, inferenceVisitor);
 		// this visitor visits all premises and putting them into the todo queue
-		PremiseVisitor<Void, Context> tracedVisitor = new PremiseVisitor<Void, Context>/*SideConditionCollector*/(new BaseConclusionVisitor<Void, Context>(){
+		PremiseVisitor<?, Context> tracedVisitor = new PremiseVisitor<Void, Context>() {
+
 			@Override
 			protected Void defaultVisit(Conclusion premise, Context cxt) {
 				// the context passed into this method is the context where the inference has been made
-				addToQueue(cxt, premise, toDo, seenInferences, premiseVisitor);
+				addToQueue(cxt, premise, toDo, seenInferences, premiseVisitor, inferenceVisitor);
 				return null;
 			}
-			
-		});
+		};
 
 		for (;;) {
 			final InferenceWrapper next = toDo.poll();
@@ -93,20 +90,14 @@ public class RecursiveTraceExplorer {
 
 			next.inference.acceptTraced(tracedVisitor, next.context);
 		}
-		
-		/*for (Pair<Conclusion, Conclusion> pair : tracedVisitor.getSubClassOfAxioms()) {
-			LOGGER_.info("{} => {}", pair.getFirst(), pair.getSecond());
-		}*/
-		
-		//LOGGER_.info("{} subclassof axioms used", tracedVisitor.getSubClassOfAxioms().size());
-		//LOGGER_.info("{} fillers occurred in existentials", tracedVisitor.getFillers().size());
 	}
 
 	private void addToQueue(final Context context, 
 			final Conclusion conclusion,
 			final Queue<InferenceWrapper> toDo,
 			final Set<TracedConclusion> seenInferences,
-			final ConclusionVisitor<Boolean, Context> visitor) {
+			final ConclusionVisitor<Boolean, Context> visitor,
+			final TracedConclusionVisitor<?, Context> inferenceVisitor) {
 		
 		Context tracedContext = tracingState_.getContext(conclusion.getSourceContext(context).getRoot());
 		
@@ -129,7 +120,8 @@ public class RecursiveTraceExplorer {
 					protected Void defaultTracedVisit(TracedConclusion inference, Void v) {
 						if (!seenInferences.contains(inference) && traced.get() < INFERENCES_TO_UNWIND) {
 							Context inferenceContext = inference.getInferenceContext(context);
-							//Context inferenceContext = inference.getSourceContext(context);
+							
+							inference.acceptTraced(inferenceVisitor, inferenceContext);
 							
 							seenInferences.add(inference);
 							toDo.add(new InferenceWrapper(inference, inferenceContext));
@@ -165,91 +157,6 @@ public class RecursiveTraceExplorer {
 			return inference + " stored in " + context;
 		}
 
-	}
-	
-	/*
-	 * FIXME currently used for testing only
-	 */
-	private static class SideConditionCollector extends PremiseVisitor<Void, Context> {
-
-		private final Set<Pair<Conclusion, Conclusion>> subclassAxioms_ = new HashSet<Pair<Conclusion, Conclusion>>();
-		
-		private final Set<IndexedClassExpression> fillers_ = new HashSet<IndexedClassExpression>();
-		
-		public SideConditionCollector(ConclusionVisitor<Void, Context> v) {
-			super(v);
-		}
-
-		@Override
-		public Void visit(SubClassOfSubsumer conclusion, Context cxt) {
-			subclassAxioms_.add(new Pair<Conclusion, Conclusion>(conclusion.getPremise(), conclusion));
-			
-			checkIfExistential(conclusion.getPremise());
-			checkIfExistential(conclusion);
-			
-			return super.visit(conclusion, cxt);
-		}
-		
-		//collecting all fillers used in some existential restrictions
-		private void checkIfExistential(Conclusion c) {
-			if (c instanceof Subsumer) {
-				IndexedClassExpression ice = ((Subsumer)c).getExpression();
-				
-				ice.accept(new IndexedClassExpressionVisitor<Void>() {
-
-					@Override
-					public Void visit(IndexedClass element) {
-						return null;
-					}
-
-					@Override
-					public Void visit(IndexedIndividual element) {
-						return null;
-					}
-
-					@Override
-					public Void visit(IndexedObjectComplementOf element) {
-						return element.getNegated().accept(this);
-					}
-
-					@Override
-					public Void visit(IndexedObjectIntersectionOf element) {
-						element.getFirstConjunct().accept(this);
-						element.getSecondConjunct().accept(this);
-						return null;
-					}
-
-					@Override
-					public Void visit(IndexedObjectSomeValuesFrom element) {
-						fillers_.add(element.getFiller());
-						element.getFiller().accept(this);
-						return null;
-					}
-
-					@Override
-					public Void visit(IndexedObjectUnionOf element) {
-						for (IndexedClassExpression disjunct : element.getDisjuncts()) {
-							disjunct.accept(this);
-						}
-						return null;
-					}
-
-					@Override
-					public Void visit(IndexedDataHasValue element) {
-						return null;
-					}
-					
-				});
-			}
-		}
-
-		public Set<Pair<Conclusion, Conclusion>> getSubClassOfAxioms() {
-			return subclassAxioms_;
-		}
-		
-		public Set<IndexedClassExpression> getFillers() {
-			return fillers_;
-		}
 	}
 
 }

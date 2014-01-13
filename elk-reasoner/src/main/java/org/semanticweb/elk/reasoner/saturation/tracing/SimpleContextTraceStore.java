@@ -48,7 +48,7 @@ import org.semanticweb.elk.util.collections.Multimap;
  * may store links which belong to contexts being traced and contexts already traced. A concurrent modification may occur if
  * a trace for a traced context is read when a trace for context being traced in written.
  * 
- * TODO: better to create a synchronized multimap
+ * TODO: better to create a synchronized multimap (or even store inference for backward links by their source contexts?)
  * 
  * @author Pavel Klinov
  *
@@ -270,6 +270,7 @@ public class SimpleContextTraceStore implements ContextTracer {
 		return conclusion.acceptTraced(inferenceWriter_, null);
 	}
 
+	//TODO why do we need this method?
 	@Override
 	public void visitConclusions(ConclusionVisitor<?, ?> visitor) {
 		// subsumers

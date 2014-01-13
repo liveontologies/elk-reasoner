@@ -117,4 +117,6 @@ public class ClassificationTask implements Task {
 		return metrics_;
 	}
 
+	@Override
+	public void postRun() throws TaskException {}
 }

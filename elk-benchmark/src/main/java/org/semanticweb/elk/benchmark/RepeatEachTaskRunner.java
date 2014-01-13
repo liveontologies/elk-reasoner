@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Runs every sub-task the specified number of times, then proceeds to the next
- * task, and so on
+ * task, and so on.
  * 
  * @author Pavel Klinov
  * 

@@ -53,63 +53,6 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 
 			return true;
 		}
-
-		/*-----------------------------------------------------------------------
-		 * FIXME Hack to not store alternative inference of the context's root
-		 ------------------------------------------------------------------------*/
-		
-		@Override
-		public Boolean visit(SubClassOfSubsumer conclusion, Context context) {
-			if (conclusion.getExpression() != context.getRoot()) {
-				defaultTracedVisit(conclusion, context);
-			}
-			else {
-				LOGGER_.trace("SubclassOf inference for the root {}", conclusion);
-			}
-			
-			return true;
-		}
-
-		@Override
-		public Boolean visit(ComposedConjunction conclusion, Context context) {
-			if (conclusion.getExpression() != context.getRoot()) {
-				defaultTracedVisit(conclusion, context);
-			}
-			else {
-				LOGGER_.trace("Conjunction+ inference for the root {}", conclusion);
-			}
-			
-			return true;
-		}
-
-		@Override
-		public Boolean visit(DecomposedConjunction conclusion, Context context) {
-			if (conclusion.getExpression() != context.getRoot()) {
-				defaultTracedVisit(conclusion, context);
-			}
-			else {
-				LOGGER_.trace("Conjunction- inference for the root {}", conclusion);
-			}
-			
-			return true;
-		}
-
-		@Override
-		public Boolean visit(PropagatedSubsumer conclusion, Context context) {
-			if (conclusion.getExpression() != context.getRoot()) {
-				defaultTracedVisit(conclusion, context);
-			}
-			else {
-				LOGGER_.trace("Propagation inference for the root {}", conclusion);
-			}
-			
-			return true;
-		}
-
-		/*-----------------------------------------------------------------------
-		 * FIXME Hack to not store alternative inference of the context's root
-		 ------------------------------------------------------------------------*/
-		
 	};
 
 	/**
@@ -119,9 +62,13 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 		traceWriter_ = traceWriter;
 	}
 
+	protected TracedConclusionVisitor<Boolean, Context> getTracedConclusionVisitor() {
+		return tracedVisitor_;
+	}
+	
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
-		return ((TracedConclusion) conclusion).acceptTraced(tracedVisitor_, cxt);
+		return ((TracedConclusion) conclusion).acceptTraced(getTracedConclusionVisitor(), cxt);
 	}
 
 }

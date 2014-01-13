@@ -254,6 +254,9 @@ public class IncrementalClassificationMultiDeltas extends
 		public Metrics getMetrics() {
 			return metrics;
 		}
+		
+		@Override
+		public void postRun() throws TaskException {}
 	}
 
 	/**
@@ -377,6 +380,9 @@ public class IncrementalClassificationMultiDeltas extends
 		public Metrics getMetrics() {
 			return metrics;
 		}
+		
+		@Override
+		public void postRun() throws TaskException {}
 		
 		/*
 		 * 

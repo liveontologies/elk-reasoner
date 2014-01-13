@@ -34,11 +34,13 @@ import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
@@ -101,36 +103,52 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	 */
 	class TracingEngine extends RuleApplicationFactory.BaseEngine {
 
+		private final CompositionRuleApplicationVisitor initRuleAppVisitor_;
+		
+		// used to count produced conclusions
+		private final ConclusionVisitor<?, Context> conclusionStatsVisitor_;
+		
 		// processes conclusions taken from the ToDo queue
 		private final ConclusionVisitor<Boolean, Context> conclusionProcessor_;
 
 		protected TracingEngine() {
 			super(new SaturationStatistics());
+			
+			ConclusionStatistics stats = localStatistics.getConclusionStatistics();
+			
+			initRuleAppVisitor_ = SaturationUtils.getStatsAwareCompositionRuleAppVisitor(localStatistics.getRuleStatistics());
+			conclusionStatsVisitor_ = SaturationUtils.addStatsToConclusionVisitor(stats);
 
-			TraceStore.Writer traceWriter = traceState_.getTraceStore().getWriter();
 			ExtendedSaturationStateWriter localContextWriter = getSaturationStateWriter();
 			// inserts to the local context and writes inferences.
 			// the inference writer should go first so we capture alternative
 			// derivations.
 			ConclusionVisitor<Boolean, Context> inserter = new CombinedConclusionVisitor<Context>(
-					new TracingInserter(traceWriter), new ConclusionInsertionVisitor());
+					getTraceInserter(), new ConclusionInsertionVisitor());
 			// applies rules
 			ConclusionVisitor<Boolean, Context> applicator = new ApplicationVisitor(
 					localContextWriter,
 					SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
 			// combines the inserter and the applicator
-			conclusionProcessor_ = new CombinedConclusionVisitor<Context>(
-					inserter, getUsedConclusionsCountingVisitor(applicator));
+			conclusionProcessor_ = new CombinedConclusionVisitor<Context>(inserter, applicator);
 		}
 
+		private TraceInserter getTraceInserter() {
+			TraceStore.Writer traceWriter = traceState_.getTraceStore().getWriter();
+			
+			return new TraceInserter(traceWriter);
+			//return new IgnoreSecondaryRootInferences(traceWriter);
+		}
+		
 		@Override
 		public void submit(IndexedClassExpression root) {
-			TracedContext cxt = getSaturationStateWriter().getCreateContext(root);
+			TracingWriter tracingWriter = getSaturationState().getTracingWriter(conclusionStatsVisitor_, initRuleAppVisitor_); 
+			TracedContext cxt = tracingWriter.getCreateContext(root);
 			//trace if it's not been traced
 			if (!cxt.isSaturated()) {
 				localStatistics.getContextStatistics().countModifiedContexts++;
 				
-				getSaturationStateWriter().initContext(cxt);
+				tracingWriter.initContext(cxt);
 			}
 		}
 
@@ -146,9 +164,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 
 		@Override
 		protected TracingWriter getSaturationStateWriter() {
-			return getSaturationState().getTracingWriter(
-					ConclusionVisitor.DUMMY,
-					SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
+			return getSaturationState().getTracingWriter(conclusionStatsVisitor_, initRuleAppVisitor_);
 		}
 
 	}
@@ -160,8 +176,7 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private class ApplicationVisitor implements
-			ConclusionVisitor<Boolean, Context> {
+	private class ApplicationVisitor implements ConclusionVisitor<Boolean, Context> {
 
 		private final BasicSaturationStateWriter localWriter_;
 		private final CompositionRuleApplicationVisitor ruleAppVisitor_;
@@ -296,9 +311,9 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private static class TracingInserter extends TracingConclusionInsertionVisitor {
+	private static class TraceInserter extends TracingConclusionInsertionVisitor {
 
-		public TracingInserter(Writer traceWriter) {
+		public TraceInserter(Writer traceWriter) {
 			super(traceWriter);
 		}
 
@@ -308,5 +323,81 @@ public class ContextTracingFactory extends RuleApplicationFactory {
 		}
 
 	}
-	
+
+	/**
+	 * An experimental inserter which ignores all inferences for the root of a
+	 * context except of initializations.
+	 * 
+	 * @author Pavel Klinov
+	 * 
+	 *         pavel.klinov@uni-ulm.de
+	 */
+	private static class IgnoreSecondaryRootInferences extends TraceInserter {
+		
+		public IgnoreSecondaryRootInferences(Writer traceWriter) {
+			super(traceWriter);
+		}
+		
+		@Override
+		protected TracedConclusionVisitor<Boolean, Context> getTracedConclusionVisitor() {
+			final TracedConclusionVisitor<Boolean, Context> superTracedVisitor = super.getTracedConclusionVisitor();
+			
+			return new BaseTracedConclusionVisitor<Boolean, Context>() {
+				
+				@Override
+				protected Boolean defaultTracedVisit(TracedConclusion conclusion, Context context) {
+					return conclusion.acceptTraced(superTracedVisitor, context);
+				}
+				
+				@Override
+				public Boolean visit(SubClassOfSubsumer conclusion, Context context) {
+					if (conclusion.getExpression() != context.getRoot()) {
+						defaultTracedVisit(conclusion, context);
+					}
+					else {
+						LOGGER_.trace("SubclassOf inference for the root {}", conclusion);
+					}
+					
+					return true;
+				}
+
+				@Override
+				public Boolean visit(ComposedConjunction conclusion, Context context) {
+					if (conclusion.getExpression() != context.getRoot()) {
+						defaultTracedVisit(conclusion, context);
+					}
+					else {
+						LOGGER_.trace("Conjunction+ inference for the root {}", conclusion);
+					}
+					
+					return true;
+				}
+
+				@Override
+				public Boolean visit(DecomposedConjunction conclusion, Context context) {
+					if (conclusion.getExpression() != context.getRoot()) {
+						defaultTracedVisit(conclusion, context);
+					}
+					else {
+						LOGGER_.trace("Conjunction- inference for the root {}", conclusion);
+					}
+					
+					return true;
+				}
+
+				@Override
+				public Boolean visit(PropagatedSubsumer conclusion, Context context) {
+					if (conclusion.getExpression() != context.getRoot()) {
+						defaultTracedVisit(conclusion, context);
+					}
+					else {
+						LOGGER_.trace("Propagation inference for the root {}", conclusion);
+					}
+					
+					return true;
+				}
+			};
+		}
+	}
+
 }

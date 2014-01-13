@@ -121,14 +121,28 @@ public class Metrics {
 		LoggerWrap.log(logger, level, buffer.toString());
 	}
 	
-	//TODO Remove this debug method
-	/*public void printAverage(String name) {
-		MetricBean mb = metricMap_.get(name);
-
-		if (mb.total > 0.0) {
-			System.err.println(mb.printAverage());
+	public void add(Metrics metrics) {
+		incrementRunCount();
+		
+		for (Map.Entry<String, MetricBean> entry : metricMap_.entrySet()) {
+			MetricBean other = metrics.getMetric(entry.getKey());
+			
+			if (other != null) {
+				entry.getValue().add(other);
+			}
 		}
-	}*/
+		
+		for (Map.Entry<String, MetricBean> entry : metrics.getMetricsMap().entrySet()) {
+			MetricBean our = metricMap_.get(entry.getKey());
+			
+			if (our == null) {
+				MetricBean bean = new MetricBean();
+				
+				bean.add(entry.getValue());
+				metricMap_.put(entry.getKey(), bean);
+			}
+		}
+	}
 	
 	/**
 	 * 
@@ -156,6 +170,12 @@ public class Metrics {
 			return format(total/count) + " [" + format(min) + "--" + format(max) + "] (" + count + ")";
 		}
 		
+		public void add(MetricBean bean) {
+			count += bean.count;
+			total += bean.total;
+			min = Math.min(min, bean.min);
+			max = Math.max(max, bean.max);
+		}
 	}
 }
 

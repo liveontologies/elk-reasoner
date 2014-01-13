@@ -145,6 +145,9 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public void postRun() throws TaskException {}
 
 	protected AxiomLoader getAxiomTrackingLoader(AxiomLoader fileLoader,
 			OnOffVector<ElkAxiom> changingAxioms, List<ElkAxiom> staticAxioms) {

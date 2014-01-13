@@ -107,5 +107,8 @@ public class FuncSyntaxParsingTask implements Task {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void postRun() throws TaskException {}
 	
 }

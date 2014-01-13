@@ -56,19 +56,26 @@ public class RunAllOnceThenRepeatRunner {
 		Collection<Task> tasks = collection.getTasks();
 		
 		for (Task task : tasks) {
+			//FIXME
+			if (cnt >= 50) break;
+			
+			cnt++;
+			
 			ElkTimer timer = ElkTimer.getNamedTimer(task.getName());
 			
-			System.err.println("Running " + task.getName() + ", " + (++cnt) + "/" + tasks.size());
+			System.err.println("Running " + task.getName() + ", " + cnt + "/" + tasks.size());
 			
 			task.prepare();
+			
 			timer.start();
 			task.run();
 			timer.stop();
 			
-			//FIXME
-			if (cnt > 200) break;
+			task.postRun();
 			
-			//logStats(collection);
+			if (task.getMetrics() != null && collection.getMetrics() != null) {
+				collection.getMetrics().add(task.getMetrics());
+			}
 		}
 	}
 	
@@ -100,7 +107,7 @@ public class RunAllOnceThenRepeatRunner {
 		}
 				
 		if (collection.getMetrics() != null) {
-			System.err.println(collection.getMetrics());
+			//System.err.println(collection.getMetrics());
 			collection.getMetrics().printAverages(LOGGER_, LogLevel.WARN);
 		}
 	}

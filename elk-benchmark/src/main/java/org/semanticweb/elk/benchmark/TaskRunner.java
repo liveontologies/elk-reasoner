@@ -60,6 +60,7 @@ public class TaskRunner {
 			System.out.println("Warm-up run #" + i);
 			task.prepare();
 			task.run();
+			task.postRun();
 		}
 		
 		long wallTimeElapsed = 0;
@@ -73,6 +74,8 @@ public class TaskRunner {
 			timer.start();
 			task.run();			
 			timer.stop();
+			
+			task.postRun();
 			
 			long wallRuntime = (timer.getTotalWallTime() - wallTimeElapsed)/1000000;
 			
