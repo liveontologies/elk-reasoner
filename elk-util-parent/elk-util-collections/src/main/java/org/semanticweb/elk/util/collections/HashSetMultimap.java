@@ -36,11 +36,6 @@ import java.util.Collection;
 
 public class HashSetMultimap<Key, Value> extends AbstractHashMultimap<Key, Value> {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1305425052783786759L;
-
 	public HashSetMultimap() {
 		super();
 	}
