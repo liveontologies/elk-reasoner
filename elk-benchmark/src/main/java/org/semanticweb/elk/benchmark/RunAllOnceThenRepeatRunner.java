@@ -51,13 +51,12 @@ public class RunAllOnceThenRepeatRunner {
 		this.runs = runs;
 	}
 	
-	private void runOnce(TaskCollection collection) throws TaskException {
+	private void runOnce(Collection<Task> tasks, Metrics aggregateMetrics) throws TaskException {
 		int cnt = 0;
-		Collection<Task> tasks = collection.getTasks();
 		
 		for (Task task : tasks) {
 			//FIXME
-			if (cnt >= 50) break;
+			if (cnt >= 200) break;
 			
 			cnt++;
 			
@@ -73,17 +72,19 @@ public class RunAllOnceThenRepeatRunner {
 			
 			task.postRun();
 			
-			if (task.getMetrics() != null && collection.getMetrics() != null) {
-				collection.getMetrics().add(task.getMetrics());
+			if (task.getMetrics() != null && aggregateMetrics != null) {
+				aggregateMetrics.add(task.getMetrics());
 			}
 		}
 	}
 	
 	public void run(TaskCollection collection) throws TaskException {
+		Collection<Task> tasks = collection.getTasks();
+		
 		for (int i = 0; i < warmups; i++) {
 			System.out.println("Warm-up run #" + i);
 			
-			runOnce(collection);
+			runOnce(tasks, null);
 		}
 		
 		for (ElkTimer timer : ElkTimer.getNamedTimers()) {
@@ -94,7 +95,7 @@ public class RunAllOnceThenRepeatRunner {
 		for (int i = 0; i < runs; i++) {
 			System.out.println("Actual run #" + i);
 			
-			runOnce(collection);
+			runOnce(tasks, collection.getMetrics());
 		}
 		
 		logStats(collection);		
