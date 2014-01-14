@@ -121,6 +121,8 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 		
 		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#HortonArteritis", "http://www.co-ode.org/ontologies/galen#PeripheralArterialDisease"));
 		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#ProstatismSymptom", "http://www.co-ode.org/ontologies/galen#UrinarySymptom"));
+		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#LeftAnteriorEthmoidSinus", "http://www.co-ode.org/ontologies/galen#LeftEthmoidSinus"));
+		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#SquamoColumnarJunctionOfCervix", "http://www.co-ode.org/ontologies/galen#ComponentOfUterineCervix"));
 		
 		return tasks;
 	}
@@ -185,7 +187,7 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 		
 		@Override
 		public String getName() {
-			return "Subsumption tracing";
+			return "Subsumption tracing";// + subsumee + " => " + subsumer;
 		}
 
 		@Override
@@ -253,8 +255,6 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 		@Override
 		public Void visit(SubClassOfSubsumer conclusion, Context cxt) {
 			subclassAxioms_.add(new Pair<Conclusion, Conclusion>(conclusion.getPremise(), conclusion));
-				//metrics_.updateLongMetric(SUBCLASSOF_AXIOM_COUNT, 1);
-			//}
 			
 			//checkIfExistential(conclusion.getPremise());
 			//checkIfExistential(conclusion);

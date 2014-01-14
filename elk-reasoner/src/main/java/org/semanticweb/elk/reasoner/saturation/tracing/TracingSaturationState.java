@@ -25,7 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -37,6 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.LocalSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStore;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
@@ -47,7 +50,6 @@ import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.MultimapOperations;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.Chain;
-import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
 
 /**
  * @author Pavel Klinov
@@ -151,23 +153,43 @@ public class TracingSaturationState extends LocalSaturationState {
 		 */
 		private final AtomicBoolean beingTraced_;
 		/**
-		 * TODO
+		 * The queue of tracing goals for this context.
 		 */
-		private final ActivationStack<Conclusion> traceExploreQueue_;
+		private final Queue<Conclusion> toTraceQueue_;
+		/**
+		 * The cached set of all conclusions which have been scheduled as
+		 * tracing goals for this context (have been put into the
+		 * toTraceQueue_). This set helps to avoid multiple trace unwindings for
+		 * the same conclusion in the same context.
+		 */
+		private final ConclusionStore tracedConclusions_;
 		
 		TracedContext(Context local, Context main) {
 			localContext_ = local;
 			mainContext_ = main;
 			beingTraced_ = new AtomicBoolean(false);
-			traceExploreQueue_ = new ActivationStack<Conclusion>();
+			toTraceQueue_ = new ConcurrentLinkedQueue<Conclusion>();
+			tracedConclusions_ = new ConclusionStore();
 		}
 		
 		boolean addConclusionToTrace(Conclusion conclusion) {
-			return traceExploreQueue_.push(conclusion);
+			if (addTracedConclusion(conclusion)) {
+				return toTraceQueue_.add(conclusion);
+			} else {
+				return false;
+			}
 		}
 		
 		Conclusion pollForConclusionToTrace() {
-			return traceExploreQueue_.pop();
+			return toTraceQueue_.poll();
+		}
+		
+		boolean addTracedConclusion(Conclusion conclusion) {
+			return tracedConclusions_.add(conclusion);
+		}
+		
+		boolean isTraced(Conclusion conclusion) {
+			return tracedConclusions_.contains(conclusion);
 		}
 		
 		boolean beingTracedCompareAndSet(boolean expect, boolean update) {

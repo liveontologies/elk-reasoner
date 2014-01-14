@@ -86,10 +86,15 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 		return tracingFactory_.getRuleAndConclusionStatistics();
 	}	
 	
-	private void scheduleTraceUnwinding(TracedContext context, Conclusion target) {
-		LOGGER_.trace("{}: scheduling unwinding for {}", context, target);
-		
-		context.addConclusionToTrace(target);
+	private boolean scheduleTraceUnwinding(TracedContext context, Conclusion target) {
+		if (context.addConclusionToTrace(target) ) {
+			LOGGER_.trace("{}: scheduling trace unwinding for {}", context, target);
+			
+			return true;
+		}
+		else {
+			return false;
+		}
 	}	
 
 	/**
@@ -121,15 +126,15 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 			IndexedClassExpression root = job.getInput();
 			Conclusion target = job.getConclusion();
 			TracedContext context = tracingContextWriter_.getCreateContext(root);
-			// here we decide if the context needs to be traced or just some
-			// traces need to be unwound
-			if (context.beingTracedCompareAndSet(false, true)) {
-				LOGGER_.trace("{}: recursive context tracing started, target: {}", root, target);
+			
+			if (scheduleTraceUnwinding(context, target)) {
+				// here we decide if the context needs to be traced or just some
+				// traces need to be unwound
+				if (context.beingTracedCompareAndSet(false, true)) {
+					LOGGER_.trace("{} submitted for tracing, target: {}", root, target);
 
-				tracingEngine_.submit(job);	
-			}
-			else {
-				scheduleTraceUnwinding(context, target);
+					tracingEngine_.submit(job);	
+				}
 			}
 		}
 
@@ -172,8 +177,16 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 	 */
 	private class TracedContextProcessor {
 
-		private final RecursiveTraceExplorer traceExplorer_ = new RecursiveTraceExplorer(traceState_.getTraceStore().getReader(), traceState_.getSaturationState());
+		private final RecursiveTraceExplorer traceExplorer_;
 	
+		TracedContextProcessor() {
+			//TraceStore.Reader traceReader = traceState_.getTraceStore().getReader();
+			TraceStore.Reader traceReader = new FirstNInferencesReader(traceState_.getTraceStore().getReader(), 1);
+			TracingSaturationState traceState = traceState_.getSaturationState();
+			
+			traceExplorer_ = new RecursiveTraceExplorer(traceReader, traceState);
+		}
+		
 		void process(final TracedContext context) {
 			for (;;) {
 				final IndexedClassExpression root = context.getRoot();
@@ -194,9 +207,11 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 						}
 						
 						Context conclusionContext = conclusion.getSourceContext(cxt);
-						Context tracingContext = traceState_.getSaturationState().getContext(conclusionContext.getRoot());
-						
-						if (!tracingContext.isSaturated()) {
+						TracedContext tracingContext = traceState_.getSaturationState().getContext(conclusionContext.getRoot());
+						//schedule tracing if the context (to which this conclusion belongs) hasn't been traced. 
+						//the second condition isn't necessary for correctness but helps to avoid multiple stack unwindings
+						//for the same conclusion.
+						if (!tracingContext.isSaturated() && !tracingContext.isTraced(conclusion)) {
 							LOGGER_.trace("{}: recursively submitted for tracing, target: {}", tracingContext, conclusion);
 							
 							toTraceQueue_.add(new TracingJob(tracingContext.getRoot(), conclusion));
@@ -225,7 +240,6 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 			final TracedContext context = traceState_.getSaturationState().getContext(root);
 			
 			context.beingTracedCompareAndSet(true, false);
-			scheduleTraceUnwinding(context, job.getConclusion());
 			traceUnwinder_.process(context);
 		}		
 	}

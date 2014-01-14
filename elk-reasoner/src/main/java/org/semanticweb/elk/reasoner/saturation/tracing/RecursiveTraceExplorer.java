@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import org.semanticweb.elk.MutableInteger;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -23,10 +23,6 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public class RecursiveTraceExplorer {
 
 	//private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveTraceExplorer.class);
-	/**
-	 * the expolorer won't explore more inferences for a conclusion as it unwinds the trace.
-	 */
-	private static final int INFERENCES_TO_UNWIND = Integer.MAX_VALUE;
 	
 	private final TraceStore.Reader traceReader_;
 	
@@ -109,7 +105,7 @@ public class RecursiveTraceExplorer {
 			return;
 		}
 		
-		final AtomicInteger traced = new AtomicInteger(0);
+		final MutableInteger traced = new MutableInteger(0);
 		// finding all inferences that produced the given conclusion (if we are
 		// here, the inference must have premises, i.e. it's not an
 		// initialization inference)
@@ -118,7 +114,7 @@ public class RecursiveTraceExplorer {
 
 					@Override
 					protected Void defaultTracedVisit(TracedConclusion inference, Void v) {
-						if (!seenInferences.contains(inference) && traced.get() < INFERENCES_TO_UNWIND) {
+						if (!seenInferences.contains(inference)) {
 							Context inferenceContext = inference.getInferenceContext(context);
 							
 							inference.acceptTraced(inferenceVisitor, inferenceContext);
@@ -127,7 +123,7 @@ public class RecursiveTraceExplorer {
 							toDo.add(new InferenceWrapper(inference, inferenceContext));
 						}
 
-						traced.incrementAndGet();
+						traced.increment();
 						
 						return null;
 					}
