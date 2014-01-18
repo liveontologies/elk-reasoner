@@ -14,11 +14,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * Recursively visits all conclusions which were used to produce a given conclusion
+ * Recursively visits all conclusions which were used to produce a given
+ * conclusion. Never traces a non-traced context but stops there without
+ * attempting to read traces from it.
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class RecursiveTraceExplorer {
 

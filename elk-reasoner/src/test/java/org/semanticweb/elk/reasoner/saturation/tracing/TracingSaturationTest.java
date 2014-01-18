@@ -72,6 +72,19 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkTracingMinimality(a, d, reasoner);
 	}*/
 	
+	/*@Test
+	public void testGalen() throws Exception {
+		Reasoner reasoner = load("tracing/EL-GALEN.owl");
+		ElkObjectFactory factory = new ElkObjectFactoryImpl();
+		IndexedClassExpression clazz = ReasonerStateAccessor.transform(reasoner, factory.getClass(new ElkFullIri("http://www.co-ode.org/ontologies/galen#IndexFingerNail")));
+		TraceState state = ReasonerStateAccessor.getTraceState(reasoner);
+		
+		InputProcessor<ContextTracingJob> engine = state.getContextTracingFactory().getEngine();
+		engine.submit(new ContextTracingJob(clazz));
+		engine.process();
+	}*/
+	
+	
 	@Test
 	public void testDuplicateInferenceOfConjunction() throws Exception {
 		Reasoner reasoner = load("tracing/DuplicateConjunction.owl");
@@ -84,6 +97,7 @@ public class TracingSaturationTest {
 		reasoner.explainSubsumption(a, bAndC, TRACE_MODE.NON_RECURSIVE);
 		TracingTestUtils.checkNumberOfInferences(a, bAndC, reasoner, 1);
 	}
+	
 	
 	@Test
 	public void testDuplicateInferenceOfExistential() throws Exception {
@@ -103,6 +117,7 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 	}
 	
+	@Ignore
 	@Test
 	public void testDontTraceOtherContexts() throws Exception {
 		Reasoner reasoner = load("tracing/DuplicateExistential.owl");
@@ -117,6 +132,7 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 		TracingTestUtils.checkNumberOfInferences(b, b, reasoner, 0);
 	}
+	
 	
 	@Test
 	public void testDuplicateInferenceViaComposition() throws Exception {
@@ -135,6 +151,7 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkNumberOfInferences(b, b, reasoner, 1);
 	}
 	
+	
 	@Test
 	public void testDuplicateInferenceOfReflexiveExistential() throws Exception {
 		Reasoner reasoner = load("tracing/DuplicateReflexiveExistential.owl");
@@ -149,6 +166,7 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 	}
 	
+	//
 	@Test
 	public void testRecursiveTracingExistential() throws Exception {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
@@ -165,6 +183,7 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 		TracingTestUtils.checkNumberOfInferences(b, c, reasoner, 1);
 	}
+	
 	
 	@Test
 	public void testRecursiveTracingComposition() throws Exception {
@@ -183,21 +202,19 @@ public class TracingSaturationTest {
 	}	
 	
 	/*
-	 * This test will fail if the root of a context is derived by non-initialization inferences
 	 */
-	@Ignore
 	@Test
-	public void testTraceUnnecessaryContextsDueToTrivialPropagations() throws Exception {
+	public void testAvoidTracingDueToCyclicInferences() throws Exception {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		Reasoner reasoner = load("tracing/TrivialPropagation.owl");
 		
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
-		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
-		ElkClass e = factory.getClass(new ElkFullIri("http://example.org/E"));
+		ElkClass a1 = factory.getClass(new ElkFullIri("http://example.org/A1"));
+		//ElkClass b1 = factory.getClass(new ElkFullIri("http://example.org/B1"));
+		ElkClass b2 = factory.getClass(new ElkFullIri("http://example.org/B2"));
 		
-		reasoner.explainSubsumption(a, b, TRACE_MODE.RECURSIVE);
-		TracingTestUtils.checkNumberOfInferences(a, b, reasoner, 1);
-		TracingTestUtils.checkNumberOfInferences(e, e, reasoner, 0);
+		reasoner.explainSubsumption(a, a1, TRACE_MODE.RECURSIVE);
+		TracingTestUtils.checkNumberOfInferences(b2, b2, reasoner, 0);
 	}
 	
 	private Reasoner load(String resource) throws Exception {

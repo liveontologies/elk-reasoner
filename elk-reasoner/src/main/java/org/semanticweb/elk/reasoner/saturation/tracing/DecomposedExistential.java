@@ -64,4 +64,9 @@ public class DecomposedExistential extends BackwardLinkImpl implements TracedCon
 	public Context getInferenceContext(Context defaultContext) {
 		return inferenceContext_;
 	}
+	
+	@Override
+	public String toString() {
+		return super.toString() + " (decomposition)";
+	}
 }

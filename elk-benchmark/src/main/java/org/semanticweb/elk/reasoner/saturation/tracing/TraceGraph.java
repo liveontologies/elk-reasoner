@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.collections.HashListMultimap;
@@ -54,7 +53,7 @@ public class TraceGraph implements Serializable {
 	}
 
 	private void buildGraph(final TraceStore.Reader traceReader) {
-		for (final Context context : traceReader.getContexts()) {
+		/*for (final Context context : traceReader.getContexts()) {
 			
 			LOGGER_.trace("Adding inferences for context {}", context);
 			
@@ -71,7 +70,7 @@ public class TraceGraph implements Serializable {
 						}
 
 					});
-		}
+		}*/
 	}
 
 	void addInference(final Context context, Conclusion conclusion,

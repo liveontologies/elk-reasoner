@@ -1,5 +1,5 @@
 Prefix( : = <http://example.org/> ) 
 Ontology(
-EquivalentClasses(:A ObjectIntersectionOf(:B ObjectSomeValuesFrom(:R :C)))
-EquivalentClasses(:C ObjectIntersectionOf(:D ObjectSomeValuesFrom(:R :E)))
+EquivalentClasses(:A ObjectIntersectionOf(:A1 ObjectSomeValuesFrom(:R :B1)))
+EquivalentClasses(:A1 ObjectIntersectionOf(:A2 ObjectSomeValuesFrom(:R :B2)))
 )

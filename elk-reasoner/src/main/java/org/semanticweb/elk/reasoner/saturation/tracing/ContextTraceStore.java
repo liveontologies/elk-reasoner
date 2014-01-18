@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface ContextTracer {
+public interface ContextTraceStore {
 
 	public void accept(Conclusion conclusion, TracedConclusionVisitor<?,?> visitor);
 	

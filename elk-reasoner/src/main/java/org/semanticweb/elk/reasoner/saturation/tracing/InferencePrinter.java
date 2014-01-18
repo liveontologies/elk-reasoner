@@ -62,12 +62,9 @@ public class InferencePrinter implements TracedConclusionVisitor<String, Void> {
 
 	@Override
 	public String visit(PropagatedSubsumer conclusion, Void parameter) {
-		return "Existential inference from propagation of "
-				+ conclusion.getPropagation().getCarry() + " in "
-				+ conclusion.getInferenceContext(null) + " and "
-				+ conclusion.getBackwardLink().getSource() + " => "
-				+ conclusion.getBackwardLink().getRelation() + " some "
-				+ conclusion.getInferenceContext(null);
+		return "Existential inference from "
+				+ conclusion.getPropagation() + " and "
+				+ conclusion.getBackwardLink();
 	}
 
 	@Override
@@ -80,14 +77,12 @@ public class InferencePrinter implements TracedConclusionVisitor<String, Void> {
 		BackwardLink bwLink = conclusion.getBackwardLink();
 		ForwardLink fwLink = conclusion.getForwardLink();
 
-		return "Property chain inference: " + bwLink.getSource() + " => "
-				+ bwLink.getRelation() + " o " + fwLink.getRelation()
-				+ " some " + fwLink.getTarget();
+		return "Property chain inference from " + bwLink + " and " + fwLink;
 	}
 
 	@Override
 	public String visit(ReversedBackwardLink conclusion, Void parameter) {
-		return "Reversing backward link " + conclusion;
+		return "Reversing backward link " + conclusion.getSourceLink();
 	}
 
 	@Override

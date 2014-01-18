@@ -77,4 +77,8 @@ public class PropagatedSubsumer extends ComposedSubsumerImpl implements TracedCo
 		return inferenceContext_;
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + " (propagation)";
+	}
 }

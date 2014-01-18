@@ -1,0 +1,64 @@
+/**
+ * 
+ */
+package org.semanticweb.elk.reasoner.saturation.tracing;
+
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState.TracedContext;
+import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState.TracingWriter;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+
+/**
+ * Non-recursively visits all inferences for a given conclusion and traces the
+ * context, if necessary. This implementation is single-threaded.
+ * 
+ * @author Pavel Klinov
+ * 
+ *         pavel.klinov@uni-ulm.de
+ */
+public class OnDemandTracingReader implements TraceStore.Reader {
+	
+	//private static final Logger LOGGER_ = LoggerFactory.getLogger(OnDemandTracingReader.class);
+
+	private final TracingWriter tracingContextWriter_;
+	
+	private final TraceStore.Reader inferenceReader_;
+	
+	private final ContextTracingFactory tracingFactory_;
+	
+	public OnDemandTracingReader(
+			TracingSaturationState tracingState,
+			TraceStore.Reader inferenceReader,
+			ContextTracingFactory tracingFactory) {
+		inferenceReader_ = inferenceReader;
+		tracingContextWriter_  = tracingState.getTracingWriter();
+		tracingFactory_ = tracingFactory;
+	}
+	
+	@Override
+	public void accept(final Context context, final Conclusion conclusion, final TracedConclusionVisitor<?, ?> visitor) {
+		TracedContext tracedContext = tracingContextWriter_.getCreateContext(context.getRoot());	
+		
+		while (!tracedContext.isSaturated()) {
+			InputProcessor<ContextTracingJob> tracingEngine = tracingFactory_.getEngine();
+			//the context needs to be traced.
+			//we don't care if it is *being* traced since the factory will handle it. 
+			tracingEngine.submit(new ContextTracingJob(context.getRoot()));
+
+			try {
+				tracingEngine.process();
+			} catch (InterruptedException e) {
+				return;
+			}
+			finally {
+				tracingEngine.finish();
+			}
+			
+			//System.err.println("traced " + context);
+		}
+		
+		inferenceReader_.accept(context, conclusion, visitor);
+	}
+
+}

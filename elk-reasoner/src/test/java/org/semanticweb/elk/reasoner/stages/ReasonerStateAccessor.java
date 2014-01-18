@@ -17,7 +17,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 public class ReasonerStateAccessor {
 	
 	public static TraceState getTraceState(AbstractReasonerState reasoner) {
-		return reasoner.traceState;
+		return reasoner.getTraceState();
 	}
 	
 	public static IndexedClassExpression transform(AbstractReasonerState reasoner, ElkClassExpression ce) {

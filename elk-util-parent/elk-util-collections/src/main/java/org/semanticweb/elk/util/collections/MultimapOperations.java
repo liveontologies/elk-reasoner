@@ -77,6 +77,11 @@ public class MultimapOperations {
 			public void clear() {
 				immutableError();
 			}
+
+			@Override
+			public Collection<V> remove(Object key) {
+				return immutableError();
+			}
 			
 		};
 	}
@@ -118,6 +123,11 @@ public class MultimapOperations {
 			@Override
 			public void clear() {
 				immutableError();
+			}
+
+			@Override
+			public Collection<V> remove(Object key) {
+				return immutableError();
 			}
 			
 		};
@@ -169,6 +179,11 @@ public class MultimapOperations {
 			@Override
 			public void clear() {
 				immutableError();
+			}
+
+			@Override
+			public Collection<V> remove(Object key) {
+				return immutableError();
 			}
 			
 		};

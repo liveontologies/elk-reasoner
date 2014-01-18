@@ -85,7 +85,7 @@ public class SimpleConclusionFactory implements ConclusionFactory {
 	}
 
 	@Override
-	public ComposedSubsumer createdComposedConjunction(Conclusion premise,
+	public ComposedSubsumer createdComposedConjunction(Subsumer premise,
 			IndexedClassExpression conjunct, IndexedObjectIntersectionOf conjunction) {
 		return new ComposedSubsumerImpl(conjunction);
 	}

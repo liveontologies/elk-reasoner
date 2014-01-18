@@ -54,7 +54,7 @@ import org.semanticweb.elk.util.collections.Multimap;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class SimpleContextTraceStore implements ContextTracer {
+public class SimpleContextTraceStore implements ContextTraceStore {
 	
 	private final Multimap<IndexedClassExpression, TracedConclusion> subsumerInferenceMap_;
 	
@@ -161,7 +161,6 @@ public class SimpleContextTraceStore implements ContextTracer {
 
 		@Override
 		public Boolean visit(ComposedBackwardLink conclusion, Void param) {
-			//return addTracedValue(backwardLinkInferenceMap_, conclusion.getRelation(), conclusion.getSource(), conclusion);
 			return addTracedBackwardLink(conclusion.getRelation(), conclusion.getSource(), conclusion);
 		}
 
@@ -172,7 +171,6 @@ public class SimpleContextTraceStore implements ContextTracer {
 
 		@Override
 		public Boolean visit(DecomposedExistential conclusion, Void param) {
-			//return addTracedValue(backwardLinkInferenceMap_, conclusion.getRelation(), conclusion.getSource(), conclusion);
 			return addTracedBackwardLink(conclusion.getRelation(), conclusion.getSource(), conclusion);
 		}
 

@@ -80,4 +80,10 @@ public class ComposedBackwardLink extends BackwardLinkImpl implements TracedConc
 		return inferenceContext_;
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + " (composition)";
+	}
+
+	
 }

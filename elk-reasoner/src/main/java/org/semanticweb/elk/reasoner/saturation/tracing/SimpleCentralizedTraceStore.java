@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +43,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	
 	private final static Logger LOGGER_ = LoggerFactory.getLogger(SimpleCentralizedTraceStore.class);	
 
-	private final ConcurrentHashMap<Context, ContextTracer> storage_ = new ConcurrentHashMap<Context, ContextTracer>();
+	private final ConcurrentHashMap<Context, ContextTraceStore> storage_ = new ConcurrentHashMap<Context, ContextTraceStore>();
 	
 	@Override
 	public TraceStore.Reader getReader() {
@@ -64,14 +63,14 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 
 		@Override
 		public void accept(Context context, Conclusion conclusion, TracedConclusionVisitor<?,?> visitor) {
-			ContextTracer tracer = storage_.get(context);
+			ContextTraceStore tracer = storage_.get(context);
 			
 			if (tracer != null) {
 				tracer.accept(conclusion, visitor);
 			}
 		}
 
-		@Override
+		/*@Override
 		public Iterable<Context> getContexts() {
 			return storage_.keySet();
 		}
@@ -83,7 +82,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 			if (tracer != null) {
 				tracer.visitConclusions(visitor);
 			}
-		}
+		}*/
 		
 	}
 	
@@ -91,7 +90,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 
 		@Override
 		public boolean addInference(Context context, TracedConclusion conclusion) {
-			ContextTracer tracer = storage_.get(context);
+			ContextTraceStore tracer = storage_.get(context);
 			
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Writing inference for {} in {}: {}", conclusion, context, conclusion.acceptTraced(new InferencePrinter(), null));

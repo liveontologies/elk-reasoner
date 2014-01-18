@@ -38,21 +38,21 @@ import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
  */
 public class ComposedConjunction extends ComposedSubsumerImpl implements TracedConclusion {
 	//TODO store this as ICE
-	private final Conclusion first_;
+	private final IndexedClassExpression first_;
 	
 	private final IndexedClassExpression second_;
 	
 	/**
 	 * @param superClassExpression
 	 */
-	public ComposedConjunction(Conclusion subsumer, IndexedClassExpression conjunct, IndexedObjectIntersectionOf conjunction) {
+	public ComposedConjunction(IndexedClassExpression subsumer, IndexedClassExpression conjunct, IndexedObjectIntersectionOf conjunction) {
 		super(conjunction);
 		first_ = subsumer;
 		second_ = conjunct;
 	}
 
 	public Conclusion getFirstConjunct() {
-		return first_;
+		return TracingUtils.getSubsumerWrapper(first_);
 	}
 	
 	public Conclusion getSecondConjunct() {
@@ -67,6 +67,11 @@ public class ComposedConjunction extends ComposedSubsumerImpl implements TracedC
 	@Override
 	public Context getInferenceContext(Context defaultContext) {
 		return defaultContext;
+	}
+	
+	@Override
+	public String toString() {
+		return super.toString() + " (conjunction+)";
 	}
 
 }

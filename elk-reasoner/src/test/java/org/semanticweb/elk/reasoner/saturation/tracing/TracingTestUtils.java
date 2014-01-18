@@ -55,7 +55,9 @@ public class TracingTestUtils {
 			}
 		};
 		
-		new RecursiveTraceExplorer(traceState.getTraceStore().getReader(), traceState.getSaturationState(), UNTRACED_LISTENER).accept(cxt, conclusion, counter);
+		RecursiveTraceExplorer explorer = new RecursiveTraceExplorer(traceState.getTraceStore().getReader(), traceState.getSaturationState(), UNTRACED_LISTENER);
+		
+		explorer.accept(cxt, conclusion, counter);
 		
 		return conclusionCount.get();
 	}

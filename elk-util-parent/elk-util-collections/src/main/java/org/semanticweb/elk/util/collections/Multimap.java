@@ -99,4 +99,11 @@ public interface Multimap<Key, Value> {
 	 * Removes all key-value pairs of this multimap
 	 */
 	void clear();
+	
+	/**
+	 * Removes all values for the given key
+	 * @param key
+	 * @return
+	 */
+	Collection<Value> remove(Object key);
 }

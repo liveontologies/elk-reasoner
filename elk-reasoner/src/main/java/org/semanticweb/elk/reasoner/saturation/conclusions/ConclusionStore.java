@@ -74,6 +74,45 @@ public class ConclusionStore {
 		}
 	};
 	
+	private final ConclusionVisitor<Boolean, ?> deleter_ = new ConclusionVisitor<Boolean, Void>() {
+		@Override
+		public Boolean visit(ComposedSubsumer negSCE, Void context) {
+			return subsumers_.remove(negSCE.getExpression());
+		}
+
+		@Override
+		public Boolean visit(DecomposedSubsumer posSCE, Void context) {
+			return subsumers_.remove(posSCE.getExpression());
+		}
+
+		@Override
+		public Boolean visit(BackwardLink link, Void context) {
+			return backwardLinkMap_.remove(link.getRelation(), link.getSource().getRoot());
+		}
+
+		@Override
+		public Boolean visit(ForwardLink link, Void context) {
+			return forwardLinkMap_.remove(link.getRelation(), link.getTarget().getRoot());
+		}
+
+		@Override
+		public Boolean visit(Contradiction bot, Void context) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public Boolean visit(Propagation propagation, Void context) {
+			return propagationMap_.remove(propagation.getRelation(), propagation.getCarry());
+		}
+
+		@Override
+		public Boolean visit(DisjointnessAxiom disjointnessAxiom, Void context) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+	};	
+	
 	private final ConclusionVisitor<Boolean, ?> checker_ = new ConclusionVisitor<Boolean, Void>() {
 		@Override
 		public Boolean visit(ComposedSubsumer negSCE, Void context) {
@@ -123,8 +162,26 @@ public class ConclusionStore {
 	public boolean add(Conclusion conclusion) {
 		return conclusion.accept(inserter_, null);
 	}
+	
+	public boolean remove(Conclusion conclusion) {
+		return conclusion.accept(deleter_, null);
+	}
 
 	public boolean contains(Conclusion conclusion) {
 		return conclusion.accept(checker_, null);
+	}
+
+	public int size() {
+		return subsumers_.size() + size(backwardLinkMap_) + size(forwardLinkMap_) + size(propagationMap_);
+	}
+
+	private int size(Multimap<IndexedPropertyChain, ? extends IndexedClassExpression> multimap) {
+		int size = 0;
+		
+		for (IndexedPropertyChain relation : multimap.keySet()) {
+			size += multimap.get(relation).size();
+		}
+		
+		return size;
 	}
 }

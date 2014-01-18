@@ -28,7 +28,8 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
-import org.semanticweb.elk.reasoner.saturation.tracing.ContextTracingFactory;
+import org.semanticweb.elk.reasoner.saturation.tracing.TracingEnabledRuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState;
 
 /**
  
@@ -63,8 +64,10 @@ public class ContextTracingStage extends AbstractReasonerStage {
 		if (!super.preExecute()) {
 			return false;
 		}
-
-		RuleApplicationFactory ruleAppFactory = new ContextTracingFactory(reasoner.saturationState, reasoner.traceState);
+		
+		TracingSaturationState tracingState = reasoner.traceState.getSaturationState();
+		//TraceStore.Writer inferenceWriter = reasoner.traceState.getTraceStore().getWriter();
+		RuleApplicationFactory ruleAppFactory = new TracingEnabledRuleApplicationFactory(reasoner.saturationState, tracingState, reasoner.traceState.getTraceStore());
 		
 		tracing_ = new ClassExpressionSaturation<IndexedClassExpression>(
 				reasoner.traceState.getTracingQueue().keySet(), reasoner.getProcessExecutor(), workerNo,

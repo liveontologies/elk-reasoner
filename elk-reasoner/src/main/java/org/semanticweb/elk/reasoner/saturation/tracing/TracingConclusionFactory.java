@@ -29,12 +29,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersection
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionFactory;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -101,10 +102,10 @@ public class TracingConclusionFactory implements ConclusionFactory {
 	}
 
 	@Override
-	public ComposedSubsumer createdComposedConjunction(Conclusion subsumer,
+	public ComposedSubsumer createdComposedConjunction(Subsumer subsumer,
 			IndexedClassExpression conjunct,
 			IndexedObjectIntersectionOf conjunction) {
-		return new ComposedConjunction(subsumer, conjunct, conjunction);
+		return new ComposedConjunction(subsumer.getExpression(), conjunct, conjunction);
 	}
 
 	@Override

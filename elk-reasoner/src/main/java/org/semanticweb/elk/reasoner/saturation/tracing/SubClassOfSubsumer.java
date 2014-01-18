@@ -58,4 +58,8 @@ public class SubClassOfSubsumer extends DecomposedSubsumerImpl implements Decomp
 		return defaultContext;
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + " (subclassof)";
+	}
 }

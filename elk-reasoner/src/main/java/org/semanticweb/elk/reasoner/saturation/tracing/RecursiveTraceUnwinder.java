@@ -1,0 +1,97 @@
+/**
+ * 
+ */
+package org.semanticweb.elk.reasoner.saturation.tracing;
+
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.util.collections.Pair;
+
+/**
+ * Recursively visits all conclusions which were used to produce a given
+ * conclusion.
+ * 
+ * TODO concurrently request inferences for conclusions from the trace reader.
+ * 
+ * @author Pavel Klinov
+ * 
+ *         pavel.klinov@uni-ulm.de
+ */
+public class RecursiveTraceUnwinder {
+
+	private final TraceStore.Reader traceReader_;
+	
+	private final static TracedConclusionVisitor<?, Context> DUMMY_INFERENCE_VISITOR = new BaseTracedConclusionVisitor<Void, Context>();
+
+	public RecursiveTraceUnwinder(TraceStore.Reader reader) {
+		traceReader_ = reader;
+	}
+	
+	public void accept(Context context,
+			final Conclusion conclusion,
+			final ConclusionVisitor<Boolean, Context> premiseVisitor) {
+		accept(context, conclusion, premiseVisitor, DUMMY_INFERENCE_VISITOR);
+	}
+	
+	/**
+	 * 
+	 * @param context
+	 * @param conclusion
+	 * @param conclusionVisitor Visitor over all conclusions which were used as premises
+	 * @param inferenceVisitor Visitor over all
+	 */
+	public void accept(Context context,
+			final Conclusion conclusion,
+			final ConclusionVisitor<Boolean, Context> conclusionVisitor,
+			final TracedConclusionVisitor<?, Context> inferenceVisitor) {
+		final TraceUnwindingState unwindingState = new TraceUnwindingState();
+		
+		unwindingState.addToUnwindingQueue(conclusion, context);
+		
+		for (;;) {
+			Pair<Conclusion, Context> next = unwindingState.pollFromUnwindingQueue();
+
+			if (next == null) {
+				break;
+			}
+
+			unwind(next.getFirst(), next.getSecond(), unwindingState, conclusionVisitor, inferenceVisitor);
+		}
+	}
+
+	private void unwind(Conclusion conclusion, 
+			final Context contextWhereStored,
+			final TraceUnwindingState unwindingState,
+			final ConclusionVisitor<Boolean, Context> conclusionVisitor,
+			final TracedConclusionVisitor<?, Context> inferenceVisitor) {
+		
+		final PremiseVisitor<?, Context> premiseVisitor = new PremiseVisitor<Void, Context>() {
+
+			@Override
+			protected Void defaultVisit(Conclusion premise, Context inferenceContext) {
+				unwindingState.addToUnwindingQueue(premise, inferenceContext);
+				return null;
+			}
+		};
+		
+		traceReader_.accept(contextWhereStored, conclusion,
+				new BaseTracedConclusionVisitor<Void, Void>() {
+
+					@Override
+					protected Void defaultTracedVisit(TracedConclusion inference, Void v) {
+						if (unwindingState.addToProcessed(inference)) {
+							Context inferenceContext = inference.getInferenceContext(contextWhereStored);
+							//visit the premises so they can be put into the queue
+							inference.acceptTraced(premiseVisitor, inferenceContext);
+							//for the calling code
+							inference.acceptTraced(inferenceVisitor, inferenceContext);
+						}
+					
+						return null;
+					}
+
+				});
+	}
+
+}

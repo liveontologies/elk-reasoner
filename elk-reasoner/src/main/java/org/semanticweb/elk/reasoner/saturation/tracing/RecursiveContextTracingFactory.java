@@ -55,7 +55,7 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 	 */
 	public RecursiveContextTracingFactory(
 			ExtendedSaturationState saturationState, TraceState traceState, int maxWorkers) {
-		RuleApplicationFactory ruleTracingFactory = new ContextTracingFactory(saturationState, traceState);
+		RuleApplicationFactory ruleTracingFactory = new TracingEnabledRuleApplicationFactory(saturationState, traceState.getSaturationState(), traceState.getTraceStore());
 		
 		toTraceQueue_ = new ConcurrentLinkedQueue<TracingJob>();
 		traceState_ = traceState;
@@ -180,8 +180,9 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 		private final RecursiveTraceExplorer traceExplorer_;
 	
 		TracedContextProcessor() {
-			//TraceStore.Reader traceReader = traceState_.getTraceStore().getReader();
-			TraceStore.Reader traceReader = new FirstNInferencesReader(traceState_.getTraceStore().getReader(), 1);
+			TraceStore.Reader traceReader = traceState_.getTraceStore().getReader();
+			//TraceStore.Reader traceReader = new FirstNInferencesReader(traceState_.getTraceStore().getReader(), 1);
+			//TraceStore.Reader traceReader = new AvoidTrivialPropagationReader(traceState_.getTraceStore().getReader());
 			TracingSaturationState traceState = traceState_.getSaturationState();
 			
 			traceExplorer_ = new RecursiveTraceExplorer(traceReader, traceState);

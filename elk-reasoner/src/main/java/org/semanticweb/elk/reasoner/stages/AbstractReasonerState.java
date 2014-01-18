@@ -55,12 +55,16 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalChangeCheck
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.tracing.OnDemandTracingReader;
+import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.SimpleCentralizedTraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TRACE_MODE;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
+import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
@@ -183,7 +187,7 @@ public abstract class AbstractReasonerState {
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
 		this.saturationState = SaturationStateFactory.createMainSaturationState(ontologyIndex);
-		this.traceState = new TraceState(new SimpleCentralizedTraceStore(), saturationState);
+		this.traceState = null;
 	}
 
 	protected AbstractReasonerState(AxiomLoader axiomLoader) {
@@ -614,15 +618,26 @@ public abstract class AbstractReasonerState {
 	
 	public TraceStore.Reader explainSubsumption(ElkClassExpression sub,
 			ElkClassExpression sup,	TRACE_MODE traceMode) throws ElkException {
+		
+		if (traceState == null) {
+			resetTraceState();
+		}
+		
 		IndexedClassExpression subsumee = sub.accept(objectCache_.getIndexObjectConverter());
 		IndexedClassExpression subsumer = sup.accept(objectCache_.getIndexObjectConverter());
 		
-		trace(subsumee, subsumer, traceMode);
+		//trace(subsumee, subsumer, traceMode);
+		RecursiveTraceUnwinder unwinder = new RecursiveTraceUnwinder(
+				new OnDemandTracingReader(traceState.getSaturationState(),
+						traceState.getTraceStore().getReader(),
+						traceState.getContextTracingFactory()));
+		
+		unwinder.accept(subsumee.getContext(), TracingUtils.getSubsumerWrapper(subsumer), new BaseConclusionVisitor<Boolean, Context>());
 		
 		return traceState.getTraceStore().getReader();
 	}
 	
-	private void trace(IndexedClassExpression subsumee, IndexedClassExpression subsumer, TRACE_MODE traceMode) throws ElkException {
+	/*private void trace(IndexedClassExpression subsumee, IndexedClassExpression subsumer, TRACE_MODE traceMode) throws ElkException {
 		AbstractReasonerStage tracingStage = null;
 		
 		if (!traceState.getSaturationState().isTraced(subsumee)) {
@@ -640,14 +655,22 @@ public abstract class AbstractReasonerState {
 			tracingStage.invalidate();
 			getStageExecutor().complete(tracingStage);
 		}
-	}
+	}*/
 	
 	IndexedClassExpression transform(ElkClassExpression ce) {
 		return ce.accept(objectCache_.getIndexObjectConverter());
 	}
 	
 	public void resetTraceState() {
-		traceState = new TraceState(new SimpleCentralizedTraceStore(), saturationState);
+		traceState = new TraceState(new SimpleCentralizedTraceStore(), saturationState, getNumberOfWorkers());
+	}
+	
+	TraceState getTraceState() {
+		if (traceState == null) {
+			resetTraceState();
+		}
+		
+		return traceState;
 	}
 	
 	// ////////////////////////////////////////////////////////////////

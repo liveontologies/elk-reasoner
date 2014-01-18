@@ -59,5 +59,10 @@ public class DecomposedConjunction extends DecomposedSubsumerImpl implements Dec
 	public Context getInferenceContext(Context defaultContext) {
 		return defaultContext;
 	}
+	
+	@Override
+	public String toString() {
+		return super.toString() + " (conjunction-)";
+	}
 
 }

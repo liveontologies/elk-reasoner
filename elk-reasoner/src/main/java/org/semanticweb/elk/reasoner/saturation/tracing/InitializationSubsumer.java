@@ -50,4 +50,8 @@ public class InitializationSubsumer extends DecomposedSubsumerImpl implements De
 		return defaultContext;
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + " (init)";
+	}
 }

@@ -149,7 +149,7 @@ public interface ConclusionFactory {
 	 * @param conjunction B1 and B2 
 	 * @return 
 	 */
-	public ComposedSubsumer createdComposedConjunction(Conclusion premise, IndexedClassExpression conjunct, IndexedObjectIntersectionOf conjunction);
+	public ComposedSubsumer createdComposedConjunction(Subsumer premise, IndexedClassExpression conjunct, IndexedObjectIntersectionOf conjunction);
 	
 	/**
 	 * Inference of the form A => B1 and B2, thus A => Bi (i = 1 or 2)

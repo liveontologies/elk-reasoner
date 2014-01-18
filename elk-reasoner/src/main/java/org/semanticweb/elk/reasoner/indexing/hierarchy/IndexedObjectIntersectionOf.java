@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
@@ -179,8 +180,8 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 					conjunctionsByConjunct_.keySet(), context.getSubsumers())) {
 				//writer.produce(context, new NegativeSubsumer(conjunctionsByConjunct_.get(common)));
 				IndexedObjectIntersectionOf conjunction = conjunctionsByConjunct_.get(common);
-				
-				writer.produce(context, writer.getConclusionFactory().createdComposedConjunction(premise, common, conjunction));
+				//FIXME: get rid of cast, this rule should take only subsumers as the premise
+				writer.produce(context, writer.getConclusionFactory().createdComposedConjunction((Subsumer)premise, common, conjunction));
 			}
 
 		}

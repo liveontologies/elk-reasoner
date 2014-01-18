@@ -58,16 +58,19 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersection
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.AcyclicRecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.BaseTracedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionTracingTests;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceExplorer;
 import org.semanticweb.elk.reasoner.saturation.tracing.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.TRACE_MODE;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
+import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestUtils;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
@@ -123,6 +126,8 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#ProstatismSymptom", "http://www.co-ode.org/ontologies/galen#UrinarySymptom"));
 		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#LeftAnteriorEthmoidSinus", "http://www.co-ode.org/ontologies/galen#LeftEthmoidSinus"));
 		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#SquamoColumnarJunctionOfCervix", "http://www.co-ode.org/ontologies/galen#ComponentOfUterineCervix"));
+		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#SkinOfBack", "http://www.co-ode.org/ontologies/galen#SurfaceStructureOfBack"));
+		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#BedOfIndexFingerNail", "http://www.co-ode.org/ontologies/galen#Anonymous-716"));
 		
 		return tasks;
 	}
@@ -173,6 +178,8 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 	private static class TracingTask implements Task {
 		
 		public static final String SUBCLASSOF_AXIOM_COUNT = "Distinct SubClassOf axioms used";
+		public static final String RULES_APPLIED = "Number of rules applied during tracing";
+		public static final String CONTEXTS_TRACED = "Number of contexts traced";
 
 		final Reasoner reasoner;
 		final ElkClassExpression subsumee;
@@ -187,7 +194,7 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 		
 		@Override
 		public String getName() {
-			return "Subsumption tracing";// + subsumee + " => " + subsumer;
+			return "Subsumption tracing ";// + subsumee + " => " + subsumer;
 		}
 
 		@Override
@@ -212,11 +219,16 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection {
 				IndexedClassExpression sup = ReasonerStateAccessor.transform(reasoner, subsumer);
 				Conclusion subsumerConclusion = TracingUtils.getSubsumerWrapper(sup);
 				RecursiveTraceExplorer traceUnwinder = new RecursiveTraceExplorer(traceState.getTraceStore().getReader(), traceState.getSaturationState());
+				//TraceStore.Reader inferenceReader = traceState.getTraceStore().getReader(); 
+				//AcyclicRecursiveTraceUnwinder traceUnwinder = new AcyclicRecursiveTraceUnwinder(inferenceReader);
 				SideConditionCollector collector = new SideConditionCollector();
+				SaturationStatistics stats = traceState.getContextTracingFactory().getStatistics();
 				
 				traceUnwinder.accept(sub.getContext(), subsumerConclusion, new BaseConclusionVisitor<Boolean, Context>(), collector);
 				
 				metrics.updateLongMetric(SUBCLASSOF_AXIOM_COUNT, collector.getSubClassOfAxioms().size());
+				metrics.updateLongMetric(RULES_APPLIED, stats.getConclusionStatistics().getProducedConclusionCounts().getTotalCount());
+				metrics.updateLongMetric(CONTEXTS_TRACED, stats.getContextStatistics().countModifiedContexts);
 				
 				TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner);
 			} catch (Exception e) {
