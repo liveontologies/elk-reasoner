@@ -58,7 +58,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.tracing.FirstNInferencesReader;
 import org.semanticweb.elk.reasoner.saturation.tracing.OnDemandTracingReader;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.SimpleCentralizedTraceStore;
@@ -95,6 +94,8 @@ public abstract class AbstractReasonerState {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractReasonerState.class);
 
+	final static boolean FULL_TRACING = false; 
+	
 	final ExtendedSaturationState saturationState;
 
 	/**
@@ -187,8 +188,17 @@ public abstract class AbstractReasonerState {
 		this.axiomDeleter_ = new MainAxiomIndexerVisitor(ontologyIndex, false);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
-		this.saturationState = SaturationStateFactory.createMainSaturationState(ontologyIndex);
 		this.traceState = null;
+		
+		ExtendedSaturationState mainSaturationState = SaturationStateFactory.createMainSaturationState(ontologyIndex); 
+		
+		if (FULL_TRACING) {
+			createTraceState(mainSaturationState);
+			saturationState = SaturationStateFactory.createTracingSaturationState(ontologyIndex, traceState.getTraceStore());
+		}
+		else {
+			saturationState = mainSaturationState;
+		}
 	}
 
 	protected AbstractReasonerState(AxiomLoader axiomLoader) {
@@ -399,8 +409,9 @@ public abstract class AbstractReasonerState {
 					stageManager.incrementalClassTaxonomyComputationStage);
 		} else {
 			setNonIncrementalMode();
+			
 			getStageExecutor().complete(
-					stageManager.classTaxonomyComputationStage);
+						stageManager.classTaxonomyComputationStage);
 			stageManager.incrementalClassTaxonomyComputationStage
 					.setCompleted();
 		}
@@ -457,6 +468,7 @@ public abstract class AbstractReasonerState {
 					stageManager.incrementalInstanceTaxonomyComputationStage);
 		} else {
 			setNonIncrementalMode();
+			
 			getStageExecutor().complete(
 					stageManager.instanceTaxonomyComputationStage);
 			stageManager.incrementalInstanceTaxonomyComputationStage
@@ -612,9 +624,11 @@ public abstract class AbstractReasonerState {
 
 	/*---------------------------------------------------
 	 * TRACING METHODS
-	 * TODO clients should not have to work with contexts and conclusions. we
+	 * TODO; clients should not have to work with contexts and conclusions. we
 	 * need to represent the trace graphs in a way that is completely detached
 	 * from the index or saturation data structures (like the taxonomies).
+	 * 
+	 * TODO#2: check if FULL_TRACING is on 
 	 *---------------------------------------------------*/
 	
 	public TraceStore.Reader explainSubsumption(ElkClassExpression sub,
@@ -631,8 +645,8 @@ public abstract class AbstractReasonerState {
 		TraceStore.Reader onDemandTracer = new OnDemandTracingReader(traceState.getSaturationState(),
 				traceState.getTraceStore().getReader(),
 				traceState.getContextTracingFactory());
-		TraceStore.Reader inferenceReader = new FirstNInferencesReader(onDemandTracer, 1);
-		//TraceStore.Reader inferenceReader = onDemandTracer;
+		//TraceStore.Reader inferenceReader = new FirstNInferencesReader(onDemandTracer, 1);
+		TraceStore.Reader inferenceReader = onDemandTracer;
 		RecursiveTraceUnwinder unwinder = new RecursiveTraceUnwinder(inferenceReader);
 		unwinder.accept(subsumee.getContext(), TracingUtils.getSubsumerWrapper(subsumer), new BaseConclusionVisitor<Boolean, Context>());
 		
@@ -664,7 +678,11 @@ public abstract class AbstractReasonerState {
 	}
 	
 	public void resetTraceState() {
-		traceState = new TraceState(new SimpleCentralizedTraceStore(), saturationState, getNumberOfWorkers());
+		createTraceState(saturationState);
+	}
+	
+	private void createTraceState(ExtendedSaturationState state) {
+		traceState = new TraceState(new SimpleCentralizedTraceStore(), state, getNumberOfWorkers());
 	}
 	
 	TraceState getTraceState() {

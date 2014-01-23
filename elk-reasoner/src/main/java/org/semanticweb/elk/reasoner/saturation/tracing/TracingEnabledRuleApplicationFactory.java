@@ -62,6 +62,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This factory should be used for tracing already made inferences whose
+ * conclusions are stored in the main contexts.
+ * 
  * Applies rule and records inferences. Traces only conclusions which logically
  * belong to the context submitted for tracing.
  * 

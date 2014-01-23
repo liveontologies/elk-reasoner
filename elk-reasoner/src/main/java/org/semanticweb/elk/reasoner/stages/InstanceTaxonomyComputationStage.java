@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
 
 /**
@@ -49,6 +50,10 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 		super(reasoner, preStages);
 	}
 
+	protected ExtendedSaturationState getSaturationState() {
+		return reasoner.saturationState;
+	}
+	
 	@Override
 	public String getName() {
 		return "Instance Taxonomy Computation";
@@ -65,7 +70,8 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 			computation_ = new InstanceTaxonomyComputation(
 					reasoner.ontologyIndex.getIndexedIndividuals(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.saturationState, reasoner.instanceTaxonomyState.getTaxonomy());
+					getSaturationState(),
+					reasoner.instanceTaxonomyState.getTaxonomy());
 		}
 
 		if (LOGGER_.isInfoEnabled()) {

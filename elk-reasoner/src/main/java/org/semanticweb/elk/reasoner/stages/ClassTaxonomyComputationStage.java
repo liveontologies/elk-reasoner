@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
 
@@ -44,6 +45,10 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		super(reasoner, preStages);
 	}
 
+	protected ExtendedSaturationState getSaturationState() {
+		return reasoner.saturationState;
+	}
+	
 	@Override
 	public String getName() {
 		return "Class Taxonomy Computation";
@@ -60,7 +65,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		this.computation_ = new ClassTaxonomyComputation(Operations.split(
 				reasoner.ontologyIndex.getIndexedClasses(), 64),
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,
-				reasoner.saturationState,
+				getSaturationState(),
 				reasoner.classTaxonomyState.getTaxonomy());
 		return true;
 	}

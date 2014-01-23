@@ -167,7 +167,7 @@ class SaturationStateImpl implements ExtendedSaturationState {
 	private ExtendedSaturationStateWriter getDefaultWriter(final ConclusionVisitor<?, Context> conclusionVisitor, CompositionRuleApplicationVisitor initRuleAppVisitor) {
 		return new ContextCreatingWriter(
 				ContextCreationListener.DUMMY, ContextModificationListener.DUMMY,
-				initRuleAppVisitor, conclusionVisitor, true);
+				initRuleAppVisitor, conclusionVisitor, conclusionFactory_, true);
 	}
 	
 	/**
@@ -193,10 +193,24 @@ class SaturationStateImpl implements ExtendedSaturationState {
 			ContextModificationListener contextModificationListener,
 			CompositionRuleApplicationVisitor ruleAppVisitor,
 			ConclusionVisitor<?, Context> conclusionVisitor,
+			ConclusionFactory conclusionFactory,
 			boolean trackNewContextsAsUnsaturated) {
 		return new ContextCreatingWriter(contextCreationListener,
 				contextModificationListener, ruleAppVisitor, conclusionVisitor,
+				conclusionFactory,
 				trackNewContextsAsUnsaturated);
+	}
+	
+	@Override
+	public ExtendedSaturationStateWriter getExtendedWriter(
+			ContextCreationListener contextCreationListener,
+			ContextModificationListener contextModificationListener,
+			CompositionRuleApplicationVisitor ruleAppVisitor,
+			ConclusionVisitor<?, Context> conclusionVisitor,
+			boolean trackNewContextsAsUnsaturated) {
+		return new ContextCreatingWriter(contextCreationListener,
+				contextModificationListener, ruleAppVisitor, conclusionVisitor,
+				conclusionFactory_, trackNewContextsAsUnsaturated);
 	}
 
 	@Override
@@ -310,18 +324,22 @@ class SaturationStateImpl implements ExtendedSaturationState {
 		private final boolean trackNewContextsAsUnsaturated_;
 
 		private final ContextCreationListener contextCreationListener_;
+		
+		private final ConclusionFactory writerConclusionFactory_;
 
 		private ContextCreatingWriter(
 				ContextCreationListener contextCreationListener,
 				ContextModificationListener contextModificationListener,
 				CompositionRuleApplicationVisitor ruleAppVisitor,
 				ConclusionVisitor<?, Context> conclusionVisitor,
+				ConclusionFactory conclusionFactory,
 				boolean trackNewContextsAsUnsaturated) {
 			super(contextModificationListener, conclusionVisitor);
 
 			this.contextCreationListener_ = contextCreationListener;
 			this.initRuleAppVisitor_ = ruleAppVisitor;
 			this.trackNewContextsAsUnsaturated_ = trackNewContextsAsUnsaturated;
+			this.writerConclusionFactory_ = conclusionFactory;
 		}
 
 		@Override
@@ -369,6 +387,11 @@ class SaturationStateImpl implements ExtendedSaturationState {
 		@Override
 		public void initContext(Context context) {
 			SaturationUtils.initContext(context, this, ontologyIndex_.getContextInitRuleHead(), initRuleAppVisitor_);
+		}
+
+		@Override
+		public ConclusionFactory getConclusionFactory() {
+			return writerConclusionFactory_;
 		}
 
 	}

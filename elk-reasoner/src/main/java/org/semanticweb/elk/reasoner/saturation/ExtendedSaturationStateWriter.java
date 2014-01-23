@@ -46,18 +46,22 @@ public interface ExtendedSaturationStateWriter extends
 		BasicSaturationStateWriter {
 
 	public Context getCreateContext(IndexedClassExpression root);
+	
+	public void initContext(Context context);
 	/*
-	 * TODO probably isn't needed since intialization is done manually
 	 * 
-	 * It was introduced to let writer wrappers (e.g., the tracing writer)
+	 * The following two methods introduced to let writer wrappers (e.g., the tracing writer)
 	 * propagate its conclusion factory to the underlying writer. It was
 	 * necessary because otherwise the wrapper won't be able to make sure that
 	 * its factory will be used when a context is initialized since the
 	 * initContext() method is called directly by the underlying writer from inside of
 	 * getCreateContext().
+	 * 
+	 * Currently only used for full tracing
+	 * TODO: find a better solution
 	 */
 	//public Context getCreateContext(IndexedClassExpression root, ConclusionFactory factory);
-
-	public void initContext(Context context);
+	
+	//public void initContext(Context context, ConclusionFactory factory);
 	
 }

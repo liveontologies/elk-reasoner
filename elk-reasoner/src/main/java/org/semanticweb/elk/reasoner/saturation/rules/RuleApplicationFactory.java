@@ -292,9 +292,9 @@ public class RuleApplicationFactory {
 											.addStatsToConclusionVisitor(localStatistics
 													.getConclusionStatistics()),
 									trackModifiedContexts_), localStatistics);
-
 		}
 
+		
 		@Override
 		public void submit(IndexedClassExpression job) {
 			saturationStateWriter_.getCreateContext(job);

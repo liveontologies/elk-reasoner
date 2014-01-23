@@ -49,7 +49,9 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 
 		@Override
 		protected Boolean defaultTracedVisit(TracedConclusion conclusion, Context context) {
-			return traceWriter_.addInference(context, conclusion);
+			traceWriter_.addInference(context, conclusion);
+			
+			return true;
 		}
 	};
 
@@ -66,7 +68,14 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 	
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
-		return ((TracedConclusion) conclusion).acceptTraced(getTracedConclusionVisitor(), cxt);
+		if (conclusion instanceof TracedConclusion) {
+			return ((TracedConclusion) conclusion).acceptTraced(getTracedConclusionVisitor(), cxt);	
+		}
+		else {
+			LOGGER_.warn("Tracing is one but {} is not traced", conclusion);
+			
+			return true;
+		}
 	}
 
 }

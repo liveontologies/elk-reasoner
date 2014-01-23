@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.tracing.GlobalTracingSaturationState;
+import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 
 /**
  * A simple factory for creating saturation states
@@ -45,8 +47,8 @@ public class SaturationStateFactory {
 		return new SaturationStateImpl(ontologyIndex);
 	}
 	
-	public static SaturationState createLocalSaturationState(OntologyIndex ontologyIndex) {
-		return new LocalSaturationState(ontologyIndex);
+	public static ExtendedSaturationState createTracingSaturationState(OntologyIndex ontologyIndex, TraceStore traceStore) {
+		return new GlobalTracingSaturationState(createMainSaturationState(ontologyIndex), traceStore.getWriter());
 	}
 
 }

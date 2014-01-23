@@ -4,7 +4,9 @@
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
@@ -30,9 +32,10 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 	
 	@Override
 	public void accept(TracingTestVisitor visitor) throws Exception {
+		Set<TaxonomyNode<ElkClass>> visited = new HashSet<TaxonomyNode<ElkClass>>();
 		Deque<TaxonomyNode<ElkClass>> toDo = new LinkedList<TaxonomyNode<ElkClass>>();
 		
-		toDo.add(classTaxonomy_.getBottomNode());
+		toDo.add(classTaxonomy_.getTopNode());
 		
 		for (;;) {
 			TaxonomyNode<ElkClass> next = toDo.poll();
@@ -42,33 +45,34 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 			}
 			
 			visitEquivalentClassesTracingTasks(next, visitor);
-
-			for (TaxonomyNode<ElkClass> superNode : next.getDirectSuperNodes()) {
-				if (next != classTaxonomy_.getBottomNode()) {
-					visitTracingTasksForDirectSuperClasses(next, superNode, visitor);
+	
+			for (TaxonomyNode<ElkClass> subNode : next.getDirectSubNodes()) {
+				if (subNode != classTaxonomy_.getBottomNode() && next != classTaxonomy_.getTopNode()) {
+					visitTracingTasksForDirectSubClasses(subNode, next, visitor);
 				}
-				toDo.push(superNode);
+				
+				if (visited.add(subNode)) {
+					toDo.push(subNode);
+				}
 			}
 		}
 	}
 	
-	private void visitTracingTasksForDirectSuperClasses(
+	private void visitTracingTasksForDirectSubClasses(
 			TaxonomyNode<ElkClass> node, TaxonomyNode<ElkClass> superNode,
 			TracingTestVisitor visitor) throws Exception {
+		
 		for (ElkClass sub : node.getMembers()) {
-			if (sub.getIri() == PredefinedElkIri.OWL_NOTHING.get()) {
+			if (sub.getIri().equals(PredefinedElkIri.OWL_NOTHING.get())) {
 				continue;
 			}
 			
 			for (ElkClass sup : superNode.getMembers()) {
-				if (sup.getIri() == PredefinedElkIri.OWL_THING.get()) {
+				if (sup.getIri().equals(PredefinedElkIri.OWL_THING.get())) {
 					continue;
 				}
 				
 				if (sub != sup) {
-					//tasks.add(new TracingTask(reasoner_, sub, sup));
-					//LOGGER_.trace("Tracing test created: {} => {}", sub, sup);
-					
 					visitor.visit(sub, sup);
 				}
 			}
@@ -77,6 +81,41 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 	}
 
 	private void visitEquivalentClassesTracingTasks(TaxonomyNode<ElkClass> node, TracingTestVisitor visitor) throws Exception {
-		visitTracingTasksForDirectSuperClasses(node, node, visitor);
-	}	
+		visitTracingTasksForDirectSubClasses(node, node, visitor);
+	}
+
+	/*@Override
+	public void accept(TracingTestVisitor visitor) throws Exception {
+		Set<ElkClass> canonicalElkClasses = new HashSet<ElkClass>();
+		
+		for (TaxonomyNode<ElkClass> classNode : classTaxonomy_.getNodes()) {
+			canonicalElkClasses.add(classNode.getCanonicalMember());
+		}
+
+		for (ElkClass elkClass : canonicalElkClasses) {
+			TaxonomyNode<ElkClass> classNode = classTaxonomy_.getNode(elkClass);
+
+			for (TaxonomyNode<ElkClass> childNode : classNode.getDirectSubNodes()) {
+				if (childNode != classTaxonomy_.getBottomNode() && classNode != classTaxonomy_.getTopNode()) {
+					visitor.visit(childNode.getCanonicalMember(), classNode.getCanonicalMember());
+				}
+			}
+
+			for (ElkClass sub : classNode.getMembers()) {
+				if (sub.getIri().equals(PredefinedElkIri.OWL_NOTHING.get())) {
+					continue;
+				}
+				
+				for (ElkClass sup : classNode.getMembers()) {
+					if (sup.getIri().equals(PredefinedElkIri.OWL_THING.get())) {
+						continue;
+					}
+					
+					if (sub != sup) {
+						visitor.visit(sub, sup);
+					}
+				}
+			}
+		}
+	}*/	
 }
