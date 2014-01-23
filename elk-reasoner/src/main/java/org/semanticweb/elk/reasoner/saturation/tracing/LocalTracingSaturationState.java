@@ -52,13 +52,15 @@ import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
+ * TODO
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TracingSaturationState extends LocalSaturationState {
+public class LocalTracingSaturationState extends LocalSaturationState {
 
-	public TracingSaturationState(OntologyIndex index) {
+	public LocalTracingSaturationState(OntologyIndex index) {
 		super(index);
 	}
 
@@ -345,7 +347,7 @@ public class TracingSaturationState extends LocalSaturationState {
 
 		@Override
 		public String toString() {
-			return getRoot() + "[hybrid]";
+			return getRoot() + "[traced]";
 		}
 
 	}

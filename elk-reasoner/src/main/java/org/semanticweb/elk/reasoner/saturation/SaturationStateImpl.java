@@ -297,11 +297,6 @@ class SaturationStateImpl implements ExtendedSaturationState {
 	 *         pavel.klinov@uni-ulm.de
 	 */
 	class ContextCreatingWriter extends BasicWriter implements ExtendedSaturationStateWriter {
-		/**
-		 * This writer can use a special conclusion factory when creating
-		 * contexts (for producing initialization inferences)
-		 */
-		private ConclusionFactory writerConclusionFactory_;
 		
 		private final CompositionRuleApplicationVisitor initRuleAppVisitor_;
 
@@ -374,21 +369,6 @@ class SaturationStateImpl implements ExtendedSaturationState {
 		@Override
 		public void initContext(Context context) {
 			SaturationUtils.initContext(context, this, ontologyIndex_.getContextInitRuleHead(), initRuleAppVisitor_);
-		}
-
-		@Override
-		public Context getCreateContext(IndexedClassExpression root, ConclusionFactory factory) {
-			// this isn't nice but works since writers are single-threaded
-			writerConclusionFactory_ = factory;
-			Context context = getCreateContext(root);
-			writerConclusionFactory_ = null;
-			
-			return context;
-		}
-
-		@Override
-		public ConclusionFactory getConclusionFactory() {
-			return writerConclusionFactory_ != null ? writerConclusionFactory_ : conclusionFactory_;
 		}
 
 	}

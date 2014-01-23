@@ -11,8 +11,8 @@ import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener
 import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState.TracedContext;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState.TracingWriter;
+import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
+import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracingWriter;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -39,7 +39,7 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 	 */
 	private final ClassExpressionSaturationFactory<ContextTracingJob> tracingFactory_;
 	
-	private final TracingSaturationState tracingState_;
+	private final LocalTracingSaturationState tracingState_;
 	/**
 	 * Pending tracing jobs indexed by the context roots (there could be more
 	 * than one job for the same context)
@@ -48,7 +48,7 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 	
 	public NonRecursiveContextTracingFactory(
 			ExtendedSaturationState saturationState,
-			TracingSaturationState tracingState,
+			LocalTracingSaturationState tracingState,
 			TraceStore traceStore,
 			int maxWorkers) {
 		RuleApplicationFactory ruleTracingFactory = new TracingEnabledRuleApplicationFactory(saturationState, tracingState, traceStore);

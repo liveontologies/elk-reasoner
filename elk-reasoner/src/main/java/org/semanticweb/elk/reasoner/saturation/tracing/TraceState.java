@@ -43,7 +43,7 @@ public class TraceState {
 
 	private final TraceStore traceStore_;
 
-	private final TracingSaturationState tracingSaturationState_;
+	private final LocalTracingSaturationState tracingSaturationState_;
 	
 	private final Multimap<IndexedClassExpression, Conclusion> toTraceQueue_;
 	
@@ -52,7 +52,7 @@ public class TraceState {
 	public TraceState(TraceStore store, ExtendedSaturationState mainState, int maxWorkers) {
 		traceStore_ = new SimpleCentralizedTraceStore();
 		toTraceQueue_ = new HashListMultimap<IndexedClassExpression, Conclusion>();
-		tracingSaturationState_ = new TracingSaturationState(mainState.getOntologyIndex());
+		tracingSaturationState_ = new LocalTracingSaturationState(mainState.getOntologyIndex());
 		tracingFactory_ = new NonRecursiveContextTracingFactory(mainState, tracingSaturationState_, traceStore_, maxWorkers);
 	}
 
@@ -72,7 +72,7 @@ public class TraceState {
 		return traceStore_;
 	}
 	
-	public TracingSaturationState getSaturationState() {
+	public LocalTracingSaturationState getSaturationState() {
 		return tracingSaturationState_;
 	}
 	

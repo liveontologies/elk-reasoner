@@ -12,5 +12,5 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
  */
 public interface TracingTestVisitor {
 
-	public boolean visit(ElkClassExpression subsumee, ElkClassExpression subsumer);
+	public boolean visit(ElkClassExpression subsumee, ElkClassExpression subsumer) throws Exception;
 }

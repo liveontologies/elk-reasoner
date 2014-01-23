@@ -5,8 +5,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState.TracedContext;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState.TracingWriter;
+import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
+import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracingWriter;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
@@ -28,7 +28,7 @@ public class OnDemandTracingReader implements TraceStore.Reader {
 	private final ContextTracingFactory tracingFactory_;
 	
 	public OnDemandTracingReader(
-			TracingSaturationState tracingState,
+			LocalTracingSaturationState tracingState,
 			TraceStore.Reader inferenceReader,
 			ContextTracingFactory tracingFactory) {
 		inferenceReader_ = inferenceReader;
@@ -54,8 +54,6 @@ public class OnDemandTracingReader implements TraceStore.Reader {
 			finally {
 				tracingEngine.finish();
 			}
-			
-			//System.err.println("traced " + context);
 		}
 		
 		inferenceReader_.accept(context, conclusion, visitor);

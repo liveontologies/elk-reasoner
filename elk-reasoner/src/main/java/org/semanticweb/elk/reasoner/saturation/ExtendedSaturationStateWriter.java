@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionFactory;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -57,7 +56,7 @@ public interface ExtendedSaturationStateWriter extends
 	 * initContext() method is called directly by the underlying writer from inside of
 	 * getCreateContext().
 	 */
-	public Context getCreateContext(IndexedClassExpression root, ConclusionFactory factory);
+	//public Context getCreateContext(IndexedClassExpression root, ConclusionFactory factory);
 
 	public void initContext(Context context);
 	

@@ -375,11 +375,6 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 			public ConclusionVisitor<Boolean, Context> getConclusionInserter() {
 				return new ConclusionInsertionVisitor();
 			}
-
-			@Override
-			public Context getCreateContext(IndexedClassExpression root, ConclusionFactory factory) {
-				return getCreateContext(root);
-			}
 			
 		}
 

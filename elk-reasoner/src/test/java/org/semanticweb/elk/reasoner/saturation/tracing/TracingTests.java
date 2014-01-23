@@ -8,5 +8,5 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  */
 public interface TracingTests {
 
-	public void accept(TracingTestVisitor visitor);
+	public void accept(TracingTestVisitor visitor) throws Exception;
 }

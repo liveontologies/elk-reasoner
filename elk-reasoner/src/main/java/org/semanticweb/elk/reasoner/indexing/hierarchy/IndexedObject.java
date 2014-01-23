@@ -46,7 +46,7 @@ public abstract class IndexedObject {
 	@Override
 	public String toString() {
 		// use in debugging to identify the object uniquely (more or less)
-		return toStringStructural() + "#" + hashCode();
+		return toStringStructural();// + "#" + hashCode();
 	}
 
 	public abstract <O> O accept(IndexedObjectVisitor<O> visitor);

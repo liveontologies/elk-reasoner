@@ -3,15 +3,13 @@
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
+import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Queue;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Visits all atomic subsumptions in a class taxonomy using a {@link TracingTestVisitor}. Used for tracng tests and benchmarking.
@@ -22,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 
-	private static final Logger LOGGER_ = LoggerFactory.getLogger(ComprehensiveSubsumptionTracingTests.class);	
+	//private static final Logger LOGGER_ = LoggerFactory.getLogger(ComprehensiveSubsumptionTracingTests.class);	
 	
 	private final Taxonomy<ElkClass> classTaxonomy_;
 	
@@ -31,8 +29,8 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 	}
 	
 	@Override
-	public void accept(TracingTestVisitor visitor) {
-		Queue<TaxonomyNode<ElkClass>> toDo = new LinkedList<TaxonomyNode<ElkClass>>();
+	public void accept(TracingTestVisitor visitor) throws Exception {
+		Deque<TaxonomyNode<ElkClass>> toDo = new LinkedList<TaxonomyNode<ElkClass>>();
 		
 		toDo.add(classTaxonomy_.getBottomNode());
 		
@@ -44,17 +42,19 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 			}
 			
 			visitEquivalentClassesTracingTasks(next, visitor);
-			
+
 			for (TaxonomyNode<ElkClass> superNode : next.getDirectSuperNodes()) {
-				visitTracingTasksForDirectSuperClasses(next, superNode, visitor);
-				toDo.add(superNode);
+				if (next != classTaxonomy_.getBottomNode()) {
+					visitTracingTasksForDirectSuperClasses(next, superNode, visitor);
+				}
+				toDo.push(superNode);
 			}
 		}
 	}
 	
 	private void visitTracingTasksForDirectSuperClasses(
 			TaxonomyNode<ElkClass> node, TaxonomyNode<ElkClass> superNode,
-			TracingTestVisitor visitor) {
+			TracingTestVisitor visitor) throws Exception {
 		for (ElkClass sub : node.getMembers()) {
 			if (sub.getIri() == PredefinedElkIri.OWL_NOTHING.get()) {
 				continue;
@@ -67,7 +67,7 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 				
 				if (sub != sup) {
 					//tasks.add(new TracingTask(reasoner_, sub, sup));
-					LOGGER_.trace("Tracing test created: {} => {}", sub, sup);
+					//LOGGER_.trace("Tracing test created: {} => {}", sub, sup);
 					
 					visitor.visit(sub, sup);
 				}
@@ -76,7 +76,7 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 		
 	}
 
-	private void visitEquivalentClassesTracingTasks(TaxonomyNode<ElkClass> node, TracingTestVisitor visitor) {
+	private void visitEquivalentClassesTracingTasks(TaxonomyNode<ElkClass> node, TracingTestVisitor visitor) throws Exception {
 		visitTracingTasksForDirectSuperClasses(node, node, visitor);
 	}	
 }

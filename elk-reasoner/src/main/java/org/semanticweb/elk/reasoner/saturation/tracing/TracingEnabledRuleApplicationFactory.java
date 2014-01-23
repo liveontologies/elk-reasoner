@@ -56,8 +56,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.BasicDecompositionRuleAppli
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState.TracedContext;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState.TracingWriter;
+import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
+import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracingWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,14 +81,14 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory	.getLogger(TracingEnabledRuleApplicationFactory.class);
 	
-	private final TracingSaturationState tracingState_;
+	private final LocalTracingSaturationState tracingState_;
 	
 	private final TraceStore.Writer inferenceWriter_;
 	
 	private final TraceStore.Reader inferenceReader_;
 
 	public TracingEnabledRuleApplicationFactory(ExtendedSaturationState mainSaturationState,
-			TracingSaturationState traceState, TraceStore traceStore) {
+			LocalTracingSaturationState traceState, TraceStore traceStore) {
 		super(mainSaturationState);
 		tracingState_ = traceState;
 		inferenceWriter_ = traceStore.getWriter();
@@ -102,7 +102,7 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 	}
 
 	@Override
-	public TracingSaturationState getSaturationState() {
+	public LocalTracingSaturationState getSaturationState() {
 		return tracingState_;
 	}
 

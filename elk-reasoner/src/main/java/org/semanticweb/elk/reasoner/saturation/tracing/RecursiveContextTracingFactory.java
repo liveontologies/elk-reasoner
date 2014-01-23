@@ -17,8 +17,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionOccurranceC
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveContextTracingFactory.Engine;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState.TracedContext;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracingSaturationState.TracingWriter;
+import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
+import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracingWriter;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.slf4j.Logger;
@@ -183,7 +183,7 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 			TraceStore.Reader traceReader = traceState_.getTraceStore().getReader();
 			//TraceStore.Reader traceReader = new FirstNInferencesReader(traceState_.getTraceStore().getReader(), 1);
 			//TraceStore.Reader traceReader = new AvoidTrivialPropagationReader(traceState_.getTraceStore().getReader());
-			TracingSaturationState traceState = traceState_.getSaturationState();
+			LocalTracingSaturationState traceState = traceState_.getSaturationState();
 			
 			traceExplorer_ = new RecursiveTraceExplorer(traceReader, traceState);
 		}

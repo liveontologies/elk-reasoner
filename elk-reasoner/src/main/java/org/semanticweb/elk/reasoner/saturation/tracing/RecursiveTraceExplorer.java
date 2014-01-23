@@ -28,7 +28,7 @@ public class RecursiveTraceExplorer {
 	
 	private final TraceStore.Reader traceReader_;
 	
-	private final TracingSaturationState tracingState_;
+	private final LocalTracingSaturationState tracingState_;
 	/*
 	 * TODO so far we use notifications that some conclusion isn't traced only
 	 * for testing, perhaps we may get rid of this.
@@ -37,11 +37,11 @@ public class RecursiveTraceExplorer {
 	
 	private final static TracedConclusionVisitor<?, Context> DUMMY_INFERENCE_VISITOR = new BaseTracedConclusionVisitor<Void, Context>();
 
-	public RecursiveTraceExplorer(TraceStore.Reader reader, TracingSaturationState state) {
+	public RecursiveTraceExplorer(TraceStore.Reader reader, LocalTracingSaturationState state) {
 		this(reader, state, UntracedConclusionListener.DUMMY);
 	}
 	
-	RecursiveTraceExplorer(TraceStore.Reader reader, TracingSaturationState state, UntracedConclusionListener listener) {
+	RecursiveTraceExplorer(TraceStore.Reader reader, LocalTracingSaturationState state, UntracedConclusionListener listener) {
 		traceReader_ = reader;
 		listener_ = listener;
 		tracingState_ = state;

@@ -58,6 +58,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.tracing.FirstNInferencesReader;
 import org.semanticweb.elk.reasoner.saturation.tracing.OnDemandTracingReader;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.SimpleCentralizedTraceStore;
@@ -627,11 +628,12 @@ public abstract class AbstractReasonerState {
 		IndexedClassExpression subsumer = sup.accept(objectCache_.getIndexObjectConverter());
 		
 		//trace(subsumee, subsumer, traceMode);
-		RecursiveTraceUnwinder unwinder = new RecursiveTraceUnwinder(
-				new OnDemandTracingReader(traceState.getSaturationState(),
-						traceState.getTraceStore().getReader(),
-						traceState.getContextTracingFactory()));
-		
+		TraceStore.Reader onDemandTracer = new OnDemandTracingReader(traceState.getSaturationState(),
+				traceState.getTraceStore().getReader(),
+				traceState.getContextTracingFactory());
+		TraceStore.Reader inferenceReader = new FirstNInferencesReader(onDemandTracer, 1);
+		//TraceStore.Reader inferenceReader = onDemandTracer;
+		RecursiveTraceUnwinder unwinder = new RecursiveTraceUnwinder(inferenceReader);
 		unwinder.accept(subsumee.getContext(), TracingUtils.getSubsumerWrapper(subsumer), new BaseConclusionVisitor<Boolean, Context>());
 		
 		return traceState.getTraceStore().getReader();
