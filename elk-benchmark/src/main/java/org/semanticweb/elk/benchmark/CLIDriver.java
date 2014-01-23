@@ -59,6 +59,10 @@ public class CLIDriver {
 				new String[]{"/home/pavel/ulm/data/VFB/fbbt_FC_all_clustered_ind.owl"});*/
 		BenchmarkUtils.runTaskCollection2(AllSubsumptionTracingTaskCollection.class.getName(),
 				0, 1,
-				new String[]{"/home/pavel/ulm/data/galens/EL-GALEN.owl", "4"});
+				//new String[]{"/home/pavel/ulm/data/galens/EL-GALEN.owl", "4"});
+				//new String[]{"/home/pavel/ulm/data/go/go.r14858.fss.owl", "4"});
+				//new String[]{"/home/pavel/ulm/data/go/go.r7991.fss.owl", "4"});
+				//new String[]{"/home/pavel/ulm/data/go/go_merged.owl", "4"});
+				new String[]{"/home/pavel/ulm/data/snomed/snomedStated_INT_20130731.owl", "4"});
 	}
 }

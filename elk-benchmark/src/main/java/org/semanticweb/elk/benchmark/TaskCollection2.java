@@ -3,7 +3,6 @@
  */
 package org.semanticweb.elk.benchmark;
 
-import java.util.Collection;
 /*
  * #%L
  * ELK Benchmarking Package
@@ -27,14 +26,12 @@ import java.util.Collection;
  */
 
 /**
- * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-@Deprecated//in favor of TaskCollection2
-public interface TaskCollection {
-	public Collection<Task> getTasks() throws TaskException;
+public interface TaskCollection2 {
+	public void visitTasks(TaskVisitor visitor) throws TaskException;
 	public Metrics getMetrics();
 	public void dispose();
 }

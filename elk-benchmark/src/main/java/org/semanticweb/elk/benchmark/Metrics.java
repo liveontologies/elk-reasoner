@@ -24,6 +24,7 @@ package org.semanticweb.elk.benchmark;
  * #L%
  */
 
+import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -122,24 +123,27 @@ public class Metrics {
 	}
 	
 	public void add(Metrics metrics) {
-		incrementRunCount();
+		runCount_ += metrics.runCount_;
 		
-		for (Map.Entry<String, MetricBean> entry : metricMap_.entrySet()) {
-			MetricBean other = metrics.getMetric(entry.getKey());
-			
-			if (other != null) {
-				entry.getValue().add(other);
+		if (metrics.runCount_ > 0) {
+			for (Map.Entry<String, MetricBean> entry : metricMap_.entrySet()) {
+				MetricBean other = metrics.getMetric(entry.getKey());
+
+				if (other != null) {
+					entry.getValue().add(other);
+				}
 			}
-		}
-		
-		for (Map.Entry<String, MetricBean> entry : metrics.getMetricsMap().entrySet()) {
-			MetricBean our = metricMap_.get(entry.getKey());
-			
-			if (our == null) {
-				MetricBean bean = new MetricBean();
-				
-				bean.add(entry.getValue());
-				metricMap_.put(entry.getKey(), bean);
+
+			for (Map.Entry<String, MetricBean> entry : metrics.getMetricsMap()
+					.entrySet()) {
+				MetricBean our = metricMap_.get(entry.getKey());
+
+				if (our == null) {
+					MetricBean bean = new MetricBean();
+
+					bean.add(entry.getValue());
+					metricMap_.put(entry.getKey(), bean);
+				}
 			}
 		}
 	}
@@ -152,6 +156,8 @@ public class Metrics {
 	 */
 	private static class MetricBean {
 		
+		static DecimalFormat FORMAT = new DecimalFormat("#.##");
+		
 		double total = 0;
 		double min = Double.MAX_VALUE;
 		double max = Double.MIN_VALUE;
@@ -163,7 +169,7 @@ public class Metrics {
 		}
 		
 		public String format(double value) {
-			return String.format("%.0f", value);
+			return FORMAT.format(value);//String.format("%.00f", value);
 		}
 		
 		public String printAverage() {
