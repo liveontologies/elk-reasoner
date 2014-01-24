@@ -21,11 +21,12 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 
 /**
- * TODO
+ * An implementation of {@code ExtendedSaturationState} used for full tracing of
+ * the entire saturation state.
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class GlobalTracingSaturationState implements ExtendedSaturationState {
 

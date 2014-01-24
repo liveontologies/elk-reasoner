@@ -4,6 +4,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * Checks if they conclusions should be considered logically equal.
@@ -14,6 +15,14 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  */
 public class ConclusionEqualityChecker implements ConclusionVisitor<Boolean, Conclusion> {
 
+	public static boolean equal(Conclusion first, Conclusion second, Context context) {
+		if (first.getSourceContext(context).getRoot() != second.getSourceContext(context).getRoot()) {
+			return false;
+		}
+		
+		return first.accept(new ConclusionEqualityChecker(), second);
+	}
+	
 	@Override
 	public Boolean visit(ComposedSubsumer negSCE, Conclusion other) {
 		return other.accept(new BaseBooleanConclusionVisitor<IndexedClassExpression>(){

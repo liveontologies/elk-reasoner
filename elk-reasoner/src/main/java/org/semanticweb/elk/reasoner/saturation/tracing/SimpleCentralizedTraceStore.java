@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 public class SimpleCentralizedTraceStore implements TraceStore {
 	
 	private final static Logger LOGGER_ = LoggerFactory.getLogger(SimpleCentralizedTraceStore.class);	
-
+	//TODO: use context roots as keys instead
 	private final ConcurrentHashMap<Context, ContextTraceStore> storage_ = new ConcurrentHashMap<Context, ContextTraceStore>();
 	
 	@Override

@@ -4,5 +4,5 @@ Ontology(
 SubClassOf(:A :B) 
 SubClassOf(:A :C)
 
-SubClassOf(ObjectIntersectionOf(:B :C) :BC)
+SubClassOf(ObjectIntersectionOf(:B :C) :D)
 )

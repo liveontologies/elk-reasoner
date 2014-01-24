@@ -60,7 +60,7 @@ import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 public class TracingSaturationTest {
 	
 	
-	/*@Test
+	@Test
 	public void testBasicTracing() throws Exception {
 		Reasoner reasoner = load("tracing/DuplicateExistential.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
@@ -70,7 +70,7 @@ public class TracingSaturationTest {
 		reasoner.explainSubsumption(a, d, TRACE_MODE.RECURSIVE);
 		TracingTestUtils.checkTracingCompleteness(a, d, reasoner);
 		TracingTestUtils.checkTracingMinimality(a, d, reasoner);
-	}*/
+	}
 	
 	/*@Test
 	public void testGalen() throws Exception {
@@ -210,7 +210,6 @@ public class TracingSaturationTest {
 		
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass a1 = factory.getClass(new ElkFullIri("http://example.org/A1"));
-		//ElkClass b1 = factory.getClass(new ElkFullIri("http://example.org/B1"));
 		ElkClass b2 = factory.getClass(new ElkFullIri("http://example.org/B2"));
 		
 		reasoner.explainSubsumption(a, a1, TRACE_MODE.RECURSIVE);

@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 
@@ -51,11 +51,11 @@ public class ComposedConjunction extends ComposedSubsumerImpl implements TracedC
 		second_ = conjunct;
 	}
 
-	public Conclusion getFirstConjunct() {
+	public Subsumer getFirstConjunct() {
 		return TracingUtils.getSubsumerWrapper(first_);
 	}
 	
-	public Conclusion getSecondConjunct() {
+	public Subsumer getSecondConjunct() {
 		return TracingUtils.getSubsumerWrapper(second_);
 	}
 	

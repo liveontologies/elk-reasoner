@@ -69,20 +69,16 @@ import org.slf4j.LoggerFactory;
  * belong to the context submitted for tracing.
  * 
  * Implements a special trick to avoid trivial one-step inference cycles (e.g. A
- * and B => (A, B) => A and B). When a conclusion is first produced, only rules
- * which do NOT derive any of its premises are applied. When it is derived the
- * second time, only rules which haven't been applied the first time are applied
- * ( because now there is a new acycic proof of its premises). This logic is
- * implemented via two special context writers.
+ * and B => (A, B) => A and B). TODO explain
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory {
+public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactory {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = LoggerFactory	.getLogger(TracingEnabledRuleApplicationFactory.class);
+	protected static final Logger LOGGER_ = LoggerFactory	.getLogger(TracingEnabledRuleApplicationFactory2.class);
 	
 	private final LocalTracingSaturationState tracingState_;
 	
@@ -90,7 +86,7 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 	
 	private final TraceStore.Reader inferenceReader_;
 
-	public TracingEnabledRuleApplicationFactory(ExtendedSaturationState mainSaturationState,
+	public TracingEnabledRuleApplicationFactory2(ExtendedSaturationState mainSaturationState,
 			LocalTracingSaturationState traceState, TraceStore traceStore) {
 		super(mainSaturationState);
 		tracingState_ = traceState;
@@ -137,18 +133,13 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 			// inserts to the local context and writes inferences.
 			// the inference writer should go first so we capture alternative
 			// derivations.
-			//ConclusionVisitor<Boolean, Context> inserter = new CombinedConclusionVisitor<Context>(getTraceInserter(), new ConclusionInsertionVisitor());
 			ConclusionVisitor<Integer, Context> inserter = new TracedConclusionInserter(new ConclusionInsertionVisitor());
-			// applies rules when a conclusion is inserted the first time
-			ConclusionVisitor<Boolean, Context> firstApplicator = new ApplicationVisitor(
-					new FirstTimeWriter(localContextWriter),
-					SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
-			// applies rules when a conclusion is inserted the second time
-			ConclusionVisitor<Boolean, Context> secondApplicator = new ApplicationVisitor(
-					new SecondTimeWriter(localContextWriter),
+			// applies rules when a conclusion is inserted the first time or the second time
+			ConclusionVisitor<Boolean, Context> applicator = new ApplicationVisitor(
+					new SmartWriter(localContextWriter),
 					SaturationState.DEFAULT_INIT_RULE_APP_VISITOR);
 			// combines the inserter and the applicator
-			conclusionProcessor_ = new InserterApplicatorCombinator(inserter, firstApplicator, secondApplicator);
+			conclusionProcessor_ = new InserterApplicatorCombinator(inserter, applicator);
 		}
 		
 		@Override
@@ -189,11 +180,11 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 	 */
 	private class ApplicationVisitor implements ConclusionVisitor<Boolean, Context> {
 
-		private final PremiseBasedWriter localWriter_;
+		private final BasicSaturationStateWriter localWriter_;
 		private final CompositionRuleApplicationVisitor ruleAppVisitor_;
 		private final DecompositionRuleApplicationVisitor mainDecompRuleAppVisitor_;
 
-		public ApplicationVisitor(PremiseBasedWriter iterationWriter,
+		public ApplicationVisitor(BasicSaturationStateWriter iterationWriter,
 				CompositionRuleApplicationVisitor ruleAppVisitor) {
 			this.localWriter_ = iterationWriter;
 			this.ruleAppVisitor_ = ruleAppVisitor;
@@ -219,7 +210,6 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 		public Boolean visit(ComposedSubsumer negSCE, Context context) {
 			Context cxt = getContext(negSCE, context);
 			
-			localWriter_.setPremise((TracedConclusion) negSCE);
 			negSCE.apply(localWriter_, cxt, ruleAppVisitor_);
 			negSCE.applyDecompositionRules(cxt, mainDecompRuleAppVisitor_);
 
@@ -228,7 +218,6 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 
 		@Override
 		public Boolean visit(DecomposedSubsumer posSCE, Context context) {
-			localWriter_.setPremise((TracedConclusion) posSCE);
 			posSCE.apply(localWriter_, getContext(posSCE, context),
 					ruleAppVisitor_, mainDecompRuleAppVisitor_);
 			return true;
@@ -236,7 +225,6 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 
 		@Override
 		public Boolean visit(BackwardLink link, Context inferenceContext) {
-			localWriter_.setPremise((TracedConclusion) link);
 			link.applyLocally(localWriter_, getContext(link, inferenceContext), ruleAppVisitor_);
 
 			return true;
@@ -244,7 +232,6 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 
 		@Override
 		public Boolean visit(ForwardLink link, Context inferenceContext) {
-			localWriter_.setPremise((TracedConclusion) link);
 			link.applyLocally(localWriter_, getContext(link, inferenceContext));
 
 			return true;
@@ -252,14 +239,12 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 
 		@Override
 		public Boolean visit(Contradiction bot, Context context) {
-			localWriter_.setPremise(null);
 			bot.deapply(localWriter_, getContext(bot, context));
 			return true;
 		}
 
 		@Override
 		public Boolean visit(Propagation propagation, final Context inferenceContext) {
-			localWriter_.setPremise((TracedConclusion) propagation);
 			propagation.applyLocally(localWriter_,
 					getContext(propagation, inferenceContext));
 			return true;
@@ -268,7 +253,6 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 		@Override
 		public Boolean visit(DisjointnessAxiom disjointnessAxiom,
 				Context context) {
-			localWriter_.setPremise(null);
 			disjointnessAxiom.apply(localWriter_,
 					getContext(disjointnessAxiom, context));
 
@@ -337,8 +321,9 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 		@Override
 		protected Integer defaultVisit(Conclusion conclusion, Context cxt) {
 			Context mainContext = cxt.getRoot().getContext();
-			
+			//write the inference
 			conclusion.accept(inferenceInserter_, mainContext);
+			//insert the conclusion into context
 			conclusion.accept(contextInserter_, cxt);
 			//counting the number of inferences for the just inserted conclusion
 			final MutableInteger inferenceCount = new MutableInteger(0);
@@ -360,10 +345,7 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 	}
 	
 	/**
-	 * Applies the first applicator if the conclusion was not derived
-	 * before (according to the inserter). Applies the second applicator if
-	 * the conclusion was derived the second time. Otherwise doesn't apply
-	 * rules (this guarantees termination).
+	 * Applies rules if the conclusion has been derived no more than two times.
 	 * 
 	 * @author Pavel Klinov
 	 * 
@@ -373,25 +355,19 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 
 		private final ConclusionVisitor<Integer, Context> inserter_;
 		
-		private final ConclusionVisitor<Boolean, Context> firstTimeApplicator_;
+		private final ConclusionVisitor<Boolean, Context> applicator_;
 		
-		private final ConclusionVisitor<Boolean, Context> secondTimeApplicator_;
-		
-		InserterApplicatorCombinator(ConclusionVisitor<Integer, Context> ins, ConclusionVisitor<Boolean, Context> first, ConclusionVisitor<Boolean, Context> second) {
+		InserterApplicatorCombinator(ConclusionVisitor<Integer, Context> ins, ConclusionVisitor<Boolean, Context> applicator) {
 			inserter_ = ins;
-			firstTimeApplicator_ = first;
-			secondTimeApplicator_ = second;
+			applicator_ = applicator;
 		}
 		
 		@Override
 		protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
 			Integer cnt = conclusion.accept(inserter_, cxt);
 			
-			if (cnt.intValue() == 1) {
-				return conclusion.accept(firstTimeApplicator_, cxt);
-			}
-			else if (cnt.intValue() == 2) {
-				return conclusion.accept(secondTimeApplicator_, cxt);
+			if (cnt.intValue() <= 2) {
+				return conclusion.accept(applicator_, cxt);
 			}
 			else {
 				return false;
@@ -401,95 +377,133 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 	}
 	
 	/**
-	 * The base class for writers which produce a conclusion depending on
-	 * whether it's the same as one of the premises of its premise.
-	 * 
-	 * @author Pavel Klinov
-	 * 
-	 *         pavel.klinov@uni-ulm.de
-	 */
-	private abstract class PremiseBasedWriter extends DelegatingBasicSaturationStateWriter {
-		
-		private TracedConclusion premise;
-		private final ConclusionEqualityChecker equalityChecker_ = new ConclusionEqualityChecker();
-		
-		public PremiseBasedWriter(BasicSaturationStateWriter writer) {
-			super(writer);
-		}
-		
-		/*
-		 * returns true if the conclusion is equal to one of the premises of the premise
-		 */
-		boolean sameAsPremise(final Conclusion conclusion, final Context context) {
-			if (premise == null || premise.getInferenceContext(context).getRoot() != context.getRoot()) {
-				return false;
-			}
-			// compare the conclusion with all premises of the conclusion
-			// which produced it
-			final MutableBoolean same = new MutableBoolean(false);
-			
-			premise.acceptTraced(new PremiseVisitor<Void, Void>() {
-
-				@Override
-				protected Void defaultVisit(Conclusion premiseOfPremise, Void ignored) {
-					if (premiseOfPremise.accept(equalityChecker_, conclusion)) {
-						same.set(true);
-					}
-					
-					return null;
-				}
-				
-			}, null);
-			
-			return same.get();
-		}
-		
-		void setPremise(TracedConclusion premise) {
-			this.premise = premise;
-		}
-	}
-	
-	/**
-	 * Used when rules are applied for a conclusion inserted the first time.
-	 * 
-	 * @author Pavel Klinov
-	 * 
-	 *         pavel.klinov@uni-ulm.de
-	 */
-	private class FirstTimeWriter extends PremiseBasedWriter {
-
-		public FirstTimeWriter(BasicSaturationStateWriter writer) {
-			super(writer);
-		}
-
-		@Override
-		public void produce(Context context, Conclusion conclusion) {
-			if (!sameAsPremise(conclusion, context)) {
-				super.produce(context, conclusion);
-			}
-		}
-		
-	}
-	
-	/**
-	 * Used when rules are applied for a conclusion inserted the second time.
+	 * TODO: explain the method produce *very* carefully
 	 * 
 	 * @author Pavel Klinov
 	 *
 	 * pavel.klinov@uni-ulm.de
 	 */
-	private class SecondTimeWriter extends PremiseBasedWriter {
-
-		public SecondTimeWriter(BasicSaturationStateWriter writer) {
+	private class SmartWriter extends DelegatingBasicSaturationStateWriter {
+		
+		private final ConclusionEqualityChecker conclusionEqualityChecker_ = new ConclusionEqualityChecker();
+		
+		public SmartWriter(BasicSaturationStateWriter writer) {
 			super(writer);
 		}
-		
-		
+
+		// TODO: this is spaghetti code, too many nested visitors, need to
+		// create higher level constructs to iterate over premises and
+		// inferences rather than using visitors
 		@Override
-		public void produce(Context context, Conclusion conclusion) {
-			if (sameAsPremise(conclusion, context)) {
-				super.produce(context, conclusion);
+		public void produce(final Context context, final Conclusion conclusionBeingProduced) {
+			TracedConclusion inference = (TracedConclusion) conclusionBeingProduced;
+			// first, check if this inference has been made before
+			if (!isNew(inference, context)) {
+				return;
 			}
+			//FIXME
+			/*if (conclusion.toString().equals("<http://www.co-ode.org/ontologies/galen#LocativeAttribute>-><http://www.co-ode.org/ontologies/galen#MusculoSkeletalSystem>")
+					&& context.getRoot().toString().equals("<http://www.co-ode.org/ontologies/galen#StaggeringGait>")) {
+				System.err.println();
+			}*/
+			
+			// second, check if all premises have been produced by at least one
+			// conclusion different from the one being produced now
+			Context inferenceContext = inference.getInferenceContext(context).getRoot().getContext();
+			
+			final MutableBoolean allPremisesHaveAlternativeInference = new MutableBoolean(true);
+			
+			//going through all premises
+			inference.acceptTraced(new PremiseVisitor<Void, Context>(){
+
+				@Override
+				protected Void defaultVisit(Conclusion premise, final Context contextWherePremiseStored) {
+					// go through all inferences which produced this premise and
+					// compare their premises with the conclusion being produced
+					final MutableBoolean hasAnyInference = new MutableBoolean(false);
+					final MutableBoolean hasAlternativeInference = new MutableBoolean(false);
+
+					inferenceReader_.accept(contextWherePremiseStored, premise, new BaseTracedConclusionVisitor<Void, Void>(){
+
+						@Override
+						public Void visit(InitializationSubsumer premiseInference, Void ignored) {
+							//initialization inference is obviously not cyclic
+							hasAnyInference.set(true);
+							hasAlternativeInference.set(true);
+							
+							return null;
+						}
+
+						@Override
+						protected Void defaultTracedVisit(final TracedConclusion premiseInference, Void ignored) {
+							final MutableBoolean allPremisesDifferentFromCurrent = new MutableBoolean(true);
+							
+							hasAnyInference.set(true);
+
+							premiseInference.acceptTraced(new PremiseVisitor<Void, Context>() {
+
+								@Override
+								protected Void defaultVisit(Conclusion premiseOfPremise, Context contextWherePremiseOfPremiseStored) {
+									
+									if (contextWherePremiseOfPremiseStored.getRoot() == context.getRoot() &&
+											premiseOfPremise.accept(conclusionEqualityChecker_, conclusionBeingProduced)) {
+										allPremisesDifferentFromCurrent.set(false);
+									}
+									
+									return null;
+								}
+								
+							}, premiseInference.getInferenceContext(contextWherePremiseStored));
+							
+							hasAlternativeInference.set(allPremisesDifferentFromCurrent.get());
+							
+							return null;
+						}
+						
+					});
+					
+					if (hasAnyInference.get()) {
+						allPremisesHaveAlternativeInference.and(hasAlternativeInference.get());
+					}
+					else {
+						// the premise has no inferences at all, probably it
+						// belongs to another context. Either way, it could
+						// not have been inferred via the conclusion being
+						// produced (and that's all we care about)
+					}
+					
+					return null;
+				}
+				
+			}, inferenceContext);
+			
+			if (allPremisesHaveAlternativeInference.get()) {
+				//all checks passed
+				super.produce(context, conclusionBeingProduced);
+			}
+		}
+
+		/**
+		 * Returns true if the conclusion has been derived via the same inference 
+		 */
+		private boolean isNew(final TracedConclusion conclusion, final Context context) {
+			final MutableBoolean inferenceFound = new MutableBoolean(false);
+			
+			inferenceReader_.accept(context.getRoot().getContext(), conclusion, new BaseTracedConclusionVisitor<Void, Void>(){
+
+				@Override
+				protected Void defaultTracedVisit(TracedConclusion inference, Void ignored) {
+					
+					if (TracedConclusionEqualityChecker.equal(inference, conclusion, context)) {
+						inferenceFound.set(true);
+					}
+					
+					return null;
+				}
+				
+			});
+			
+			return !inferenceFound.get();
 		}
 	}
 

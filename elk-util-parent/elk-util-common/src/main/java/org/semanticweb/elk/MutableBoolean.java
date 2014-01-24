@@ -37,6 +37,18 @@ public class MutableBoolean {
 		return value_;
 	}
 	
+	public boolean and(boolean i) {
+		value_ &= i;
+		
+		return value_;
+	}
+	
+	public boolean or(boolean i) {
+		value_ |= i;
+		
+		return value_;
+	}
+	
 	@Override
 	public String toString() {
 		return String.valueOf(value_);
