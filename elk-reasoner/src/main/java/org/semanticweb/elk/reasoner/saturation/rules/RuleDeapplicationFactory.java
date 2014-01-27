@@ -33,15 +33,15 @@ import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionDeapplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionUnoptimizedApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionDeletionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionOccurranceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * Creates an engine which applies rules backwards, e.g., removes conclusions
- * from the context instead of adding them
+ * Creates an engine which applies unoptimized rules and never creates new
+ * contexts (when decomposing existentials).
  * 
  * @author Pavel Klinov
  * 
@@ -87,7 +87,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 			return new CombinedConclusionVisitor<Context>(
 					new CombinedConclusionVisitor<Context>(
 							new ConclusionOccurranceCheckingVisitor(),
-							getUsedConclusionsCountingVisitor(new ConclusionDeapplicationVisitor(
+							getUsedConclusionsCountingVisitor(new ConclusionUnoptimizedApplicationVisitor(
 									saturationStateWriter,
 									getStatsAwareCompositionRuleAppVisitor(localStatistics),
 									getStatsAwareDecompositionRuleAppVisitor(getDecompositionRuleApplicationVisitor(), localStatistics)))),

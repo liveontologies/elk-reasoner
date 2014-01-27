@@ -192,8 +192,12 @@ public class Reasoner extends AbstractReasonerState {
 
 	@Override
 	protected ComputationExecutor getProcessExecutor() {
-		if (executor_ == null)
+		if (executor_ == null) {
 			executor_ = new ComputationExecutor(workerNo_, "elk-reasoner");
+			//HACK
+			executor_.setKeepAliveTime(1, TimeUnit.MINUTES);
+			executor_.allowCoreThreadTimeOut(true);
+		}
 		return executor_;
 	}
 

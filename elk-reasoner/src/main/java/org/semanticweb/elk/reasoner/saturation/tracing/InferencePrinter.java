@@ -45,7 +45,7 @@ public class InferencePrinter implements TracedConclusionVisitor<String, Void> {
 
 	@Override
 	public String visit(SubClassOfSubsumer conclusion, Void parameter) {
-		return "SubClassOf, premise: " + conclusion.getPremise();
+		return "SubClassOf( " + conclusion.getPremise() + " " + conclusion.getExpression() + " )";
 	}
 
 	@Override

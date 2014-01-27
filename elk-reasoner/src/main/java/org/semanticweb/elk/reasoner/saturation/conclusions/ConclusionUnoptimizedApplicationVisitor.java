@@ -28,19 +28,19 @@ import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicatio
 import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationVisitor;
 
 /**
+ * Applies unoptimized rules.
  * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ConclusionDeapplicationVisitor implements
-		ConclusionVisitor<Boolean, Context> {
+public class ConclusionUnoptimizedApplicationVisitor implements ConclusionVisitor<Boolean, Context> {
 
 	private final BasicSaturationStateWriter writer_;
 	private final CompositionRuleApplicationVisitor ruleAppVisitor_;
 	private final DecompositionRuleApplicationVisitor decompRuleAppVisitor_;
 
-	public ConclusionDeapplicationVisitor(BasicSaturationStateWriter writer, CompositionRuleApplicationVisitor ruleAppVisitor, DecompositionRuleApplicationVisitor decompVisitor) {
+	public ConclusionUnoptimizedApplicationVisitor(BasicSaturationStateWriter writer, CompositionRuleApplicationVisitor ruleAppVisitor, DecompositionRuleApplicationVisitor decompVisitor) {
 		this.writer_ = writer;
 		this.ruleAppVisitor_ = ruleAppVisitor;
 		this.decompRuleAppVisitor_ = decompVisitor;

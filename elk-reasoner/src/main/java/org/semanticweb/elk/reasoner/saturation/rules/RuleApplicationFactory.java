@@ -34,6 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionUnoptimizedApplicationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionSourceUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -55,10 +56,14 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class RuleApplicationFactory {
-
+	/**
+	 * if On (should be by default), subsumers produced by composition rules
+	 * will not be decomposed.
+	 */
+	private final boolean APPLY_OPTIMIZED_RULES = false;
+	
 	// logger for this class
-	protected static final Logger LOGGER_ = LoggerFactory
-			.getLogger(RuleApplicationFactory.class);
+	protected static final Logger LOGGER_ = LoggerFactory	.getLogger(RuleApplicationFactory.class);
 
 	protected final ExtendedSaturationState saturationState;
 
@@ -308,13 +313,26 @@ public class RuleApplicationFactory {
 		@Override
 		protected ConclusionVisitor<Boolean, Context> getBaseConclusionProcessor() {
 			BasicSaturationStateWriter saturationStateWriter = getSaturationStateWriter();
+			CompositionRuleApplicationVisitor compRuleApplier = getStatsAwareCompositionRuleAppVisitor(localStatistics);
+			DecompositionRuleApplicationVisitor decompRuleApplier = getStatsAwareDecompositionRuleAppVisitor(getDecompositionRuleApplicationVisitor(), localStatistics);
+			ConclusionVisitor<Boolean, Context> conclusionRuleApplier = null;
+			
+			if (APPLY_OPTIMIZED_RULES) {
+				conclusionRuleApplier = new ConclusionApplicationVisitor(saturationStateWriter, compRuleApplier, decompRuleApplier);
+			}
+			else {
+				conclusionRuleApplier = new ConclusionUnoptimizedApplicationVisitor(saturationStateWriter, compRuleApplier, decompRuleApplier);
+			}
 
-			return new CombinedConclusionVisitor<Context>(
+			/*return new CombinedConclusionVisitor<Context>(
 					saturationStateWriter.getConclusionInserter(),
 					getUsedConclusionsCountingVisitor(new ConclusionApplicationVisitor(
 							saturationStateWriter,
 							getStatsAwareCompositionRuleAppVisitor(localStatistics),
-							getStatsAwareDecompositionRuleAppVisitor(getDecompositionRuleApplicationVisitor(), localStatistics))));
+							getStatsAwareDecompositionRuleAppVisitor(getDecompositionRuleApplicationVisitor(), localStatistics))));*/
+			return new CombinedConclusionVisitor<Context>(
+					saturationStateWriter.getConclusionInserter(),
+					getUsedConclusionsCountingVisitor(conclusionRuleApplier));
 		}
 		
 		

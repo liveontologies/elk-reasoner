@@ -7,7 +7,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionEqualityChe
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * TODO
+ * Determines equality between two inferences.
  * 
  * @author Pavel Klinov
  *
@@ -41,7 +41,9 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 
 			@Override
 			public Boolean visit(SubClassOfSubsumer first, SubClassOfSubsumer second) {
-				return first.getExpression() == second.getExpression();
+				ConclusionEqualityChecker checker = new ConclusionEqualityChecker();
+				
+				return first.getPremise().accept(checker, second.getPremise()) && first.getExpression() == second.getExpression();
 			}
 			
 		}, conclusion);
@@ -65,7 +67,8 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 
 			@Override
 			public Boolean visit(DecomposedConjunction first, DecomposedConjunction second) {
-				return first.getConjunction() == second.getConjunction();
+				return first.getConjunction() == second.getConjunction() 
+						&& first.getExpression() == second.getExpression();
 			}
 			
 		}, conclusion);
@@ -134,7 +137,8 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 
 			@Override
 			public Boolean visit(DecomposedExistential first, DecomposedExistential second) {
-				return first.getExistential() == second.getExistential();
+				return first.getExistential() == second.getExistential() 
+						&& first.getSource().getRoot() == second.getSource().getRoot();
 			}
 			
 		}, conclusion);
@@ -146,7 +150,11 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 
 			@Override
 			public Boolean visit(TracedPropagation first, TracedPropagation second) {
-				return first.getCarry() == second.getCarry() && first.getRelation() == second.getRelation();
+				ConclusionEqualityChecker checker = new ConclusionEqualityChecker();
+				
+				return first.getPremise().accept(checker, second.getPremise()) 
+						&& first.getCarry() == second.getCarry() 
+						&& first.getRelation() == second.getRelation();
 			}
 			
 		}, conclusion);

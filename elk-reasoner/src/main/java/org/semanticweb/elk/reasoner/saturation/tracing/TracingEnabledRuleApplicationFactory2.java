@@ -58,6 +58,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicatio
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracingWriter;
+import org.semanticweb.elk.util.collections.HashListMultimap;
+import org.semanticweb.elk.util.collections.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +79,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactory {
 
+	private static final boolean CYCLE_AVOIDANCE = true;
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory	.getLogger(TracingEnabledRuleApplicationFactory2.class);
 	
@@ -115,7 +118,7 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 
 		private final CompositionRuleApplicationVisitor initRuleAppVisitor_;
 		
-		// used to count produced conclusions
+		// used to count produced conclusions before they go into the ToDo queue
 		private final ConclusionVisitor<?, Context> conclusionStatsVisitor_;
 		
 		// processes conclusions taken from the ToDo queue
@@ -324,7 +327,10 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 			//write the inference
 			conclusion.accept(inferenceInserter_, mainContext);
 			//insert the conclusion into context
-			conclusion.accept(contextInserter_, cxt);
+			if (conclusion.accept(contextInserter_, cxt)) {
+				//the first insertion
+				return 1;
+			}
 			//counting the number of inferences for the just inserted conclusion
 			final MutableInteger inferenceCount = new MutableInteger(0);
 			
@@ -366,7 +372,7 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 		protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
 			Integer cnt = conclusion.accept(inserter_, cxt);
 			
-			if (cnt.intValue() <= 2) {
+			if (cnt.intValue() <= (CYCLE_AVOIDANCE ? 2 : 1)) {
 				return conclusion.accept(applicator_, cxt);
 			}
 			else {
@@ -396,19 +402,18 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 		// inferences rather than using visitors
 		@Override
 		public void produce(final Context context, final Conclusion conclusionBeingProduced) {
-			TracedConclusion inference = (TracedConclusion) conclusionBeingProduced;
-			// first, check if this inference has been made before
-			if (!isNew(inference, context)) {
+			if (!CYCLE_AVOIDANCE) {
+				super.produce(context, conclusionBeingProduced);
 				return;
 			}
-			//FIXME
-			/*if (conclusion.toString().equals("<http://www.co-ode.org/ontologies/galen#LocativeAttribute>-><http://www.co-ode.org/ontologies/galen#MusculoSkeletalSystem>")
-					&& context.getRoot().toString().equals("<http://www.co-ode.org/ontologies/galen#StaggeringGait>")) {
-				System.err.println();
-			}*/
 			
+			TracedConclusion inference = (TracedConclusion) conclusionBeingProduced;
+			// first, check if this inference has been applied before
+			/*if (!isNew(inference, context)) {
+				return;
+			}*/			
 			// second, check if all premises have been produced by at least one
-			// conclusion different from the one being produced now
+			// inference in which all premises are different from the expression being produced now
 			Context inferenceContext = inference.getInferenceContext(context).getRoot().getContext();
 			
 			final MutableBoolean allPremisesHaveAlternativeInference = new MutableBoolean(true);
@@ -436,41 +441,30 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 
 						@Override
 						protected Void defaultTracedVisit(final TracedConclusion premiseInference, Void ignored) {
-							final MutableBoolean allPremisesDifferentFromCurrent = new MutableBoolean(true);
-							
 							hasAnyInference.set(true);
-
-							premiseInference.acceptTraced(new PremiseVisitor<Void, Context>() {
-
-								@Override
-								protected Void defaultVisit(Conclusion premiseOfPremise, Context contextWherePremiseOfPremiseStored) {
-									
-									if (contextWherePremiseOfPremiseStored.getRoot() == context.getRoot() &&
-											premiseOfPremise.accept(conclusionEqualityChecker_, conclusionBeingProduced)) {
-										allPremisesDifferentFromCurrent.set(false);
-									}
-									
-									return null;
-								}
-								
-							}, premiseInference.getInferenceContext(contextWherePremiseStored));
 							
-							hasAlternativeInference.set(allPremisesDifferentFromCurrent.get());
+							boolean isAlternative = allPremisesDifferentFrom(premiseInference,
+									conclusionBeingProduced,
+									premiseInference.getInferenceContext(contextWherePremiseStored),
+									context); 
+							
+							hasAlternativeInference.or(isAlternative);
+							
+							//FIXME
+							/*for (TracedConclusion equi : equiMap.get(premiseInference)) {
+								boolean equiIsAlternative = allPremisesDifferentFrom(equi, conclusionBeingProduced, equi.getInferenceContext(contextWherePremiseStored), context);
+									
+								if (equiIsAlternative != isAlternative) {
+									throw new RuntimeException();
+								}
+							}*/
 							
 							return null;
 						}
 						
 					});
-					
-					if (hasAnyInference.get()) {
-						allPremisesHaveAlternativeInference.and(hasAlternativeInference.get());
-					}
-					else {
-						// the premise has no inferences at all, probably it
-						// belongs to another context. Either way, it could
-						// not have been inferred via the conclusion being
-						// produced (and that's all we care about)
-					}
+					//if the premise doesn't have any inference yet, it can't be a part of a cycle
+					allPremisesHaveAlternativeInference.and(hasAlternativeInference.get() || !hasAnyInference.get());
 					
 					return null;
 				}
@@ -481,6 +475,39 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 				//all checks passed
 				super.produce(context, conclusionBeingProduced);
 			}
+			else {
+				System.err.println(conclusionBeingProduced);
+				//FIXME
+				//blocked.add(inference);
+			}
+		}
+		
+		/**
+		 * Returns true if all premises of the inference are not equivalent to
+		 * the given conclusion.
+		 */
+		private boolean allPremisesDifferentFrom(final TracedConclusion inference,
+				final Conclusion conclusion,
+				final Context whereInferenceMade,
+				final Context whereConclusionStored) {
+			final MutableBoolean allPremisesDifferentFromCurrent = new MutableBoolean(true);
+			
+			inference.acceptTraced(new PremiseVisitor<Void, Context>() {
+
+				@Override
+				protected Void defaultVisit(Conclusion premise, Context wherePremiseStored) {
+					
+					if (wherePremiseStored.getRoot() == whereConclusionStored.getRoot() &&
+							premise.accept(conclusionEqualityChecker_, conclusion)) {
+						allPremisesDifferentFromCurrent.set(false);
+					}
+					
+					return null;
+				}
+				
+			}, whereInferenceMade);
+			
+			return allPremisesDifferentFromCurrent.get();
 		}
 
 		/**
@@ -495,6 +522,11 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 				protected Void defaultTracedVisit(TracedConclusion inference, Void ignored) {
 					
 					if (TracedConclusionEqualityChecker.equal(inference, conclusion, context)) {
+						//FIXME
+						//LOGGER_.info("duplicate inferences detected:\n{}\n{}", InferencePrinter.print(conclusion), InferencePrinter.print(inference));
+						equiMap.add(inference, conclusion);
+						equiMap.add(conclusion, inference);
+						
 						inferenceFound.set(true);
 					}
 					
@@ -506,5 +538,10 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 			return !inferenceFound.get();
 		}
 	}
-
+	
+	//FIXME
+	private final Multimap<TracedConclusion, TracedConclusion> equiMap = new HashListMultimap<TracedConclusion, TracedConclusion>();
+	//static Set<TracedConclusion> blocked = new HashSet<TracedConclusion>();
+	//static Multimap<IndexedClassExpression, TracedConclusion> allBlocked = new HashSetMultimap<IndexedClassExpression, TracedConclusion>();
+	
 }
