@@ -57,10 +57,10 @@ import org.slf4j.LoggerFactory;
  */
 public class RuleApplicationFactory {
 	/**
-	 * if On (should be by default), subsumers produced by composition rules
+	 * if set to true (should be by default), subsumers produced by composition rules
 	 * will not be decomposed.
 	 */
-	private final boolean APPLY_OPTIMIZED_RULES = false;
+	private final boolean APPLY_OPTIMIZED_RULES = true;
 	
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory	.getLogger(RuleApplicationFactory.class);
@@ -313,26 +313,20 @@ public class RuleApplicationFactory {
 		@Override
 		protected ConclusionVisitor<Boolean, Context> getBaseConclusionProcessor() {
 			BasicSaturationStateWriter saturationStateWriter = getSaturationStateWriter();
-			CompositionRuleApplicationVisitor compRuleApplier = getStatsAwareCompositionRuleAppVisitor(localStatistics);
-			DecompositionRuleApplicationVisitor decompRuleApplier = getStatsAwareDecompositionRuleAppVisitor(getDecompositionRuleApplicationVisitor(), localStatistics);
-			ConclusionVisitor<Boolean, Context> conclusionRuleApplier = null;
+			CompositionRuleApplicationVisitor compRuleApplicator = getStatsAwareCompositionRuleAppVisitor(localStatistics);
+			DecompositionRuleApplicationVisitor decompRuleApplicator = getStatsAwareDecompositionRuleAppVisitor(getDecompositionRuleApplicationVisitor(), localStatistics);
+			ConclusionVisitor<Boolean, Context> conclusionRuleApplicator = null;
 			
 			if (APPLY_OPTIMIZED_RULES) {
-				conclusionRuleApplier = new ConclusionApplicationVisitor(saturationStateWriter, compRuleApplier, decompRuleApplier);
+				conclusionRuleApplicator = new ConclusionApplicationVisitor(saturationStateWriter, compRuleApplicator, decompRuleApplicator);
 			}
 			else {
-				conclusionRuleApplier = new ConclusionUnoptimizedApplicationVisitor(saturationStateWriter, compRuleApplier, decompRuleApplier);
+				conclusionRuleApplicator = new ConclusionUnoptimizedApplicationVisitor(saturationStateWriter, compRuleApplicator, decompRuleApplicator);
 			}
 
-			/*return new CombinedConclusionVisitor<Context>(
-					saturationStateWriter.getConclusionInserter(),
-					getUsedConclusionsCountingVisitor(new ConclusionApplicationVisitor(
-							saturationStateWriter,
-							getStatsAwareCompositionRuleAppVisitor(localStatistics),
-							getStatsAwareDecompositionRuleAppVisitor(getDecompositionRuleApplicationVisitor(), localStatistics))));*/
 			return new CombinedConclusionVisitor<Context>(
 					saturationStateWriter.getConclusionInserter(),
-					getUsedConclusionsCountingVisitor(conclusionRuleApplier));
+					getUsedConclusionsCountingVisitor(conclusionRuleApplicator));
 		}
 		
 		

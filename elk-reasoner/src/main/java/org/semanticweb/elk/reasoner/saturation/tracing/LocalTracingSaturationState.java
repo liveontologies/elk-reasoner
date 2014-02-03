@@ -52,7 +52,7 @@ import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
- * TODO
+ * A specialization of {@link LocalSaturationState} for inference tracing.
  * 
  * @author Pavel Klinov
  * 

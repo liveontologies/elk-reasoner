@@ -8,9 +8,12 @@ import org.semanticweb.elk.reasoner.saturation.SaturationJob;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 
 /**
+ * A job for tracing a specific {@link Conclusion} in a specific {@link Context}
+ * (represented by its root).
+ * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class TracingJob extends SaturationJob<IndexedClassExpression> {
 

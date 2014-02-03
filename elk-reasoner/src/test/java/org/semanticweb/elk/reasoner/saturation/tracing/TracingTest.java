@@ -110,12 +110,10 @@ public class TracingTest {
 					reasoner.resetTraceState();
 					
 					try {
-						//if (((ElkClass)subsumer).getIri() == PredefinedElkIri.OWL_THING.get()) {
-						reasoner.explainSubsumption(subsumee, subsumer, TRACE_MODE.RECURSIVE);
+						reasoner.explainSubsumption(subsumee, subsumer);
 							
 						TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner);
 						TracingTestUtils.checkTracingMinimality(subsumee, subsumer, reasoner);
-						//}
 					} catch (ElkException e) {
 						throw new RuntimeException(e);
 					}

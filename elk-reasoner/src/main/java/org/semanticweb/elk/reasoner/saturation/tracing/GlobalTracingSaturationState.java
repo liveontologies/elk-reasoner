@@ -22,7 +22,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationV
 
 /**
  * An implementation of {@code ExtendedSaturationState} used for full tracing of
- * the entire saturation state.
+ * all conclusions in the entire saturation state.
  * 
  * @author Pavel Klinov
  * 
@@ -133,10 +133,12 @@ public class GlobalTracingSaturationState implements ExtendedSaturationState {
 	}
 	
 	/**
+	 * Uses a special conclusion inserter which first writes inferences and then
+	 * inserts conclusions into contexts.
 	 * 
 	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
+	 * 
+	 *         pavel.klinov@uni-ulm.de
 	 */
 	private class ExtendedWriter extends DelegatingExtendedSaturationStateWriter {
 

@@ -12,7 +12,12 @@ import org.semanticweb.elk.util.collections.Pair;
  * Recursively visits all conclusions which were used to produce a given
  * conclusion.
  * 
- * TODO concurrently request inferences for conclusions from the trace reader.
+ * Works similarly to {@link RecursiveTraceExplorer} but is simpler. It does not
+ * know anything about which contexts are traced or how inferences are read. It
+ * uses the given {@link TraceStore.Reader} as an oracle providing access to
+ * inferences.
+ * 
+ * TODO concurrently request and process inferences from the trace reader.
  * 
  * @author Pavel Klinov
  * 

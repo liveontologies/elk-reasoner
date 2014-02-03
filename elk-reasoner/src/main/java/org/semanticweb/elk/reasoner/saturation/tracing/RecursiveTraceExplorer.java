@@ -18,14 +18,17 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * conclusion. Never traces a non-traced context but stops there without
  * attempting to read traces from it.
  * 
+ * Works analogously to {@link RecursiveTraceUnwinder} except that, first, it
+ * can notify the caller if some visited conclusion has not been traced (this is
+ * useful for testing) and, second, it will not attempt to visit inferences for
+ * a conclusion which belongs to not yet traced context.
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
 public class RecursiveTraceExplorer {
 
-	//private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveTraceExplorer.class);
-	
 	private final TraceStore.Reader traceReader_;
 	
 	private final LocalTracingSaturationState tracingState_;
@@ -103,7 +106,6 @@ public class RecursiveTraceExplorer {
 		
 		if (!tracedContext.isSaturated()) {
 			//must stop unwinding because the context to which the next conclusion belongs isn't yet traced
-			//LOGGER_.trace("Stopping unwinding because {} isn't yet traced", tracedContext);			
 			return;
 		}
 		

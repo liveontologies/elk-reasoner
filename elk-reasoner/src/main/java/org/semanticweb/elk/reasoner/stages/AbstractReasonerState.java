@@ -58,11 +58,9 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.tracing.FirstNInferencesReader;
 import org.semanticweb.elk.reasoner.saturation.tracing.OnDemandTracingReader;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.SimpleCentralizedTraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.TRACE_MODE;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
@@ -634,9 +632,7 @@ public abstract class AbstractReasonerState {
 	 * TODO#2: check if FULL_TRACING is on 
 	 *---------------------------------------------------*/
 	
-	public TraceStore.Reader explainSubsumption(ElkClassExpression sub,
-			ElkClassExpression sup,	TRACE_MODE traceMode) throws ElkException {
-		
+	public TraceStore.Reader explainSubsumption(ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
 		if (traceState == null) {
 			resetTraceState();
 		}
@@ -644,7 +640,6 @@ public abstract class AbstractReasonerState {
 		IndexedClassExpression subsumee = sub.accept(objectCache_.getIndexObjectConverter());
 		IndexedClassExpression subsumer = sup.accept(objectCache_.getIndexObjectConverter());
 		
-		//trace(subsumee, subsumer, traceMode);
 		TraceStore.Reader onDemandTracer = new OnDemandTracingReader(traceState.getSaturationState(),
 				traceState.getTraceStore().getReader(),
 				traceState.getContextTracingFactory());

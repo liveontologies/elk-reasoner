@@ -72,7 +72,7 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 			return ((TracedConclusion) conclusion).acceptTraced(getTracedConclusionVisitor(), cxt);	
 		}
 		else {
-			LOGGER_.warn("Tracing is one but {} is not traced", conclusion);
+			LOGGER_.warn("Tracing is ON but {} is not traced", conclusion);
 			
 			return true;
 		}

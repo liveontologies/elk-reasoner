@@ -51,7 +51,7 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 			LocalTracingSaturationState tracingState,
 			TraceStore traceStore,
 			int maxWorkers) {
-		RuleApplicationFactory ruleTracingFactory = new TracingEnabledRuleApplicationFactory2(saturationState, tracingState, traceStore);
+		RuleApplicationFactory ruleTracingFactory = new TracingEnabledRuleApplicationFactory(saturationState, tracingState, traceStore);
 		
 		tracingState_ = tracingState;
 		tracingFactory_ = new ClassExpressionSaturationFactory<ContextTracingJob>(

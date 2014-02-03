@@ -29,6 +29,9 @@ import org.slf4j.LoggerFactory;
  * trace until it hits a conclusion which belongs to a non-traced contexts. Then
  * the latter is recursively submitted for tracing.
  * 
+ * This factory supports concurrent tracing of contexts during processing of the
+ * same tracing job.
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
@@ -98,6 +101,7 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 	}	
 
 	/**
+	 * TODO
 	 * 
 	 * @author Pavel Klinov
 	 * 
@@ -181,8 +185,6 @@ public class RecursiveContextTracingFactory implements InputProcessorFactory<Tra
 	
 		TracedContextProcessor() {
 			TraceStore.Reader traceReader = traceState_.getTraceStore().getReader();
-			//TraceStore.Reader traceReader = new FirstNInferencesReader(traceState_.getTraceStore().getReader(), 1);
-			//TraceStore.Reader traceReader = new AvoidTrivialPropagationReader(traceState_.getTraceStore().getReader());
 			LocalTracingSaturationState traceState = traceState_.getSaturationState();
 			
 			traceExplorer_ = new RecursiveTraceExplorer(traceReader, traceState);

@@ -31,7 +31,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
@@ -60,17 +59,17 @@ import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 public class TracingSaturationTest {
 	
 	
-	@Test
+	/*@Test
 	public void testBasicTracing() throws Exception {
 		Reasoner reasoner = load("tracing/DuplicateExistential.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
 			
-		reasoner.explainSubsumption(a, d, TRACE_MODE.RECURSIVE);
+		reasoner.explainSubsumption(a, d);
 		TracingTestUtils.checkTracingCompleteness(a, d, reasoner);
 		TracingTestUtils.checkTracingMinimality(a, d, reasoner);
-	}
+	}*/
 	
 	/*@Test
 	public void testGalen() throws Exception {
@@ -94,7 +93,7 @@ public class TracingSaturationTest {
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression bAndC = factory.getObjectIntersectionOf(b,  c);
 			
-		reasoner.explainSubsumption(a, bAndC, TRACE_MODE.NON_RECURSIVE);
+		reasoner.explainSubsumption(a, bAndC);
 		TracingTestUtils.checkNumberOfInferences(a, bAndC, reasoner, 1);
 	}
 	
@@ -110,29 +109,12 @@ public class TracingSaturationTest {
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 		
-		reasoner.explainSubsumption(a, rSomeC, TRACE_MODE.NON_RECURSIVE);
+		reasoner.explainSubsumption(a, rSomeC);
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
-		reasoner.explainSubsumption(b, c, TRACE_MODE.NON_RECURSIVE);
+		reasoner.explainSubsumption(b, c);
 		// now check that we didn't get a duplicate inference in A due to tracing B
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 	}
-	
-	@Ignore
-	@Test
-	public void testDontTraceOtherContexts() throws Exception {
-		Reasoner reasoner = load("tracing/DuplicateExistential.owl");
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
-		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
-		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri("http://example.org/R"));
-		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
-		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);			
-		
-		reasoner.explainSubsumption(a, rSomeC, TRACE_MODE.NON_RECURSIVE);
-		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
-		TracingTestUtils.checkNumberOfInferences(b, b, reasoner, 0);
-	}
-	
 	
 	@Test
 	public void testDuplicateInferenceViaComposition() throws Exception {
@@ -145,7 +127,7 @@ public class TracingSaturationTest {
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 			
-		reasoner.explainSubsumption(a, rSomeC, TRACE_MODE.RECURSIVE);
+		reasoner.explainSubsumption(a, rSomeC);
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 		//B must be traced recursively
 		TracingTestUtils.checkNumberOfInferences(b, b, reasoner, 1);
@@ -162,7 +144,7 @@ public class TracingSaturationTest {
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 
-		reasoner.explainSubsumption(a, rSomeC, TRACE_MODE.NON_RECURSIVE);
+		reasoner.explainSubsumption(a, rSomeC);
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 	}
 	
@@ -179,7 +161,7 @@ public class TracingSaturationTest {
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 
-		reasoner.explainSubsumption(a, rSomeC, TRACE_MODE.RECURSIVE);
+		reasoner.explainSubsumption(a, rSomeC);
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 		TracingTestUtils.checkNumberOfInferences(b, c, reasoner, 1);
 	}
@@ -196,7 +178,7 @@ public class TracingSaturationTest {
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 		
-		reasoner.explainSubsumption(a, rSomeC, TRACE_MODE.RECURSIVE);
+		reasoner.explainSubsumption(a, rSomeC);
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 		TracingTestUtils.checkNumberOfInferences(b, b, reasoner, 1);
 	}	
@@ -212,7 +194,7 @@ public class TracingSaturationTest {
 		ElkClass a1 = factory.getClass(new ElkFullIri("http://example.org/A1"));
 		ElkClass b2 = factory.getClass(new ElkFullIri("http://example.org/B2"));
 		
-		reasoner.explainSubsumption(a, a1, TRACE_MODE.RECURSIVE);
+		reasoner.explainSubsumption(a, a1);
 		TracingTestUtils.checkNumberOfInferences(b2, b2, reasoner, 0);
 	}
 	

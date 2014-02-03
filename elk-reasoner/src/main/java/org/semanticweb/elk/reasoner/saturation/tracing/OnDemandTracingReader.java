@@ -60,8 +60,7 @@ public class OnDemandTracingReader implements TraceStore.Reader {
 				tracingEngine.finish();
 			}
 		}
-		
+
 		inferenceReader_.accept(context, conclusion, visitor);
 	}
-
 }
