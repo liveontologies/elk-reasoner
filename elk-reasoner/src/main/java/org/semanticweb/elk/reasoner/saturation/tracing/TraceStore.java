@@ -24,11 +24,12 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * The main object responsible for storing and retrieving traces.
+ * The main object responsible for storing and retrieving inferences for {@link Conclusion}s.
+ * Inferences are represented using {@link TracedConclusion}.
  * 
  * @author Pavel Klinov
  * 
@@ -47,12 +48,7 @@ public interface TraceStore {
 		 * @param conclusion
 		 * @param visitor
 		 */
-		public void accept(Context context, Conclusion conclusion, TracedConclusionVisitor<?,?> visitor);
-		
-		//public Iterable<Context> getContexts();
-		
-		//public void visitConclusions(Context context, ConclusionVisitor<?, ?> visitor);
-		
+		public void accept(IndexedClassExpression root, Conclusion conclusion, TracedConclusionVisitor<?,?> visitor);
 	}
 
 	/**
@@ -67,7 +63,7 @@ public interface TraceStore {
 		 * @param inference
 		 * @return
 		 */
-		public boolean addInference(Context context, TracedConclusion conclusion);
+		public boolean addInference(IndexedClassExpression root, TracedConclusion conclusion);
 	}
 
 	/**

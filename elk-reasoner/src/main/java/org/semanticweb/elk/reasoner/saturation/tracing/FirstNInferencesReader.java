@@ -4,8 +4,8 @@
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.MutableInteger;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * Visits only the first N inferences provided by the underlying
@@ -27,10 +27,10 @@ public class FirstNInferencesReader implements TraceStore.Reader {
 	}
 	
 	@Override
-	public void accept(Context context, Conclusion conclusion, final TracedConclusionVisitor<?, ?> visitor) {
+	public void accept(IndexedClassExpression root, Conclusion conclusion, final TracedConclusionVisitor<?, ?> visitor) {
 		final MutableInteger counter = new MutableInteger(0);
 		
-		reader_.accept(context, conclusion, new BaseTracedConclusionVisitor<Void, Void>() {
+		reader_.accept(root, conclusion, new BaseTracedConclusionVisitor<Void, Void>() {
 
 			@Override
 			protected Void defaultTracedVisit(TracedConclusion inference,	Void ignored) {

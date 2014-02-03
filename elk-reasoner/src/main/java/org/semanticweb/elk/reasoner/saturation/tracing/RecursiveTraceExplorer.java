@@ -113,7 +113,7 @@ public class RecursiveTraceExplorer {
 		// finding all inferences that produced the given conclusion (if we are
 		// here, the inference must have premises, i.e. it's not an
 		// initialization inference)
-		traceReader_.accept(context, conclusion,
+		traceReader_.accept(context.getRoot(), conclusion,
 				new BaseTracedConclusionVisitor<Void, Void>() {
 
 					@Override

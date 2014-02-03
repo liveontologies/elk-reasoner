@@ -3,6 +3,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
@@ -13,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Non-recursively visits all inferences for a given conclusion and traces the
- * context, if necessary. This implementation is single-threaded.
+ * context, if necessary. This implementation is single-threaded and synchronous.
  * 
  * @author Pavel Klinov
  * 
@@ -39,17 +40,17 @@ public class OnDemandTracingReader implements TraceStore.Reader {
 	}
 	
 	@Override
-	public void accept(final Context context, final Conclusion conclusion, final TracedConclusionVisitor<?, ?> visitor) {
-		Context conclusionContext = conclusion.getSourceContext(context);
+	public void accept(final IndexedClassExpression root, final Conclusion conclusion, final TracedConclusionVisitor<?, ?> visitor) {
+		Context conclusionContext = conclusion.getSourceContext(root.getContext());
 		TracedContext tracedContext = tracingContextWriter_.getCreateContext(conclusionContext.getRoot());	
 		
 		while (!tracedContext.isSaturated()) {
-			LOGGER_.trace("Need to trace {} to read inferences for {}", context, conclusion);
+			LOGGER_.trace("Need to trace {} to read inferences for {}", tracedContext, conclusion);
 			
 			InputProcessor<ContextTracingJob> tracingEngine = tracingFactory_.getEngine();
 			//the context needs to be traced.
 			//we don't care if it is *being* traced since the factory will handle it. 
-			tracingEngine.submit(new ContextTracingJob(context.getRoot()));
+			tracingEngine.submit(new ContextTracingJob(tracedContext.getRoot()));
 
 			try {
 				tracingEngine.process();
@@ -61,6 +62,6 @@ public class OnDemandTracingReader implements TraceStore.Reader {
 			}
 		}
 
-		inferenceReader_.accept(context, conclusion, visitor);
+		inferenceReader_.accept(root, conclusion, visitor);
 	}
 }

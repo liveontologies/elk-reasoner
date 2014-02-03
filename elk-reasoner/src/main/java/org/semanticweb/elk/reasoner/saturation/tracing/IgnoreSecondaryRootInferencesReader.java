@@ -3,6 +3,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
@@ -23,8 +24,8 @@ public class IgnoreSecondaryRootInferencesReader implements TraceStore.Reader {
 	}
 
 	@Override
-	public void accept(final Context context, final Conclusion conclusion, final TracedConclusionVisitor<?, ?> visitor) {
-		reader_.accept(context, conclusion, new BaseTracedConclusionVisitor<Boolean, Context>() {
+	public void accept(final IndexedClassExpression root, final Conclusion conclusion, final TracedConclusionVisitor<?, ?> visitor) {
+		reader_.accept(root, conclusion, new BaseTracedConclusionVisitor<Boolean, Context>() {
 
 			@Override
 			protected Boolean defaultTracedVisit(TracedConclusion conclusion, Context context) {

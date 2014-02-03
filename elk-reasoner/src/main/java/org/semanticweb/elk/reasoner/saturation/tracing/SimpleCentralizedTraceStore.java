@@ -26,8 +26,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	
 	private final static Logger LOGGER_ = LoggerFactory.getLogger(SimpleCentralizedTraceStore.class);	
 	//TODO: use context roots as keys instead
-	private final ConcurrentHashMap<Context, ContextTraceStore> storage_ = new ConcurrentHashMap<Context, ContextTraceStore>();
+	private final ConcurrentHashMap<IndexedClassExpression, ContextTraceStore> storage_ = new ConcurrentHashMap<IndexedClassExpression, ContextTraceStore>();
 	
 	@Override
 	public TraceStore.Reader getReader() {
@@ -62,8 +62,8 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private class Reader implements TraceStore.Reader {
 
 		@Override
-		public void accept(Context context, Conclusion conclusion, TracedConclusionVisitor<?,?> visitor) {
-			ContextTraceStore tracer = storage_.get(context);
+		public void accept(IndexedClassExpression root, Conclusion conclusion, TracedConclusionVisitor<?,?> visitor) {
+			ContextTraceStore tracer = storage_.get(root);
 			
 			if (tracer != null) {
 				tracer.accept(conclusion, visitor);
@@ -89,16 +89,16 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private class Writer implements TraceStore.Writer {
 
 		@Override
-		public boolean addInference(Context context, TracedConclusion conclusion) {
-			ContextTraceStore tracer = storage_.get(context);
+		public boolean addInference(IndexedClassExpression root, TracedConclusion conclusion) {
+			ContextTraceStore tracer = storage_.get(root);
 			
 			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Writing inference for {} in {}: {}", conclusion, context, conclusion.acceptTraced(new InferencePrinter(), null));
+				LOGGER_.trace("Writing inference for {} in {}: {}", conclusion, root, conclusion.acceptTraced(new InferencePrinter(), null));
 			}
 			
 			if (tracer == null) {
 				tracer = new SimpleContextTraceStore();
-				storage_.putIfAbsent(context, tracer);
+				storage_.putIfAbsent(root, tracer);
 			}
 			
 			return tracer.addInference(conclusion);

@@ -80,7 +80,7 @@ public class RecursiveTraceUnwinder {
 			}
 		};
 		
-		traceReader_.accept(contextWhereStored, conclusion,
+		traceReader_.accept(contextWhereStored.getRoot(), conclusion,
 				new BaseTracedConclusionVisitor<Void, Void>() {
 
 					@Override

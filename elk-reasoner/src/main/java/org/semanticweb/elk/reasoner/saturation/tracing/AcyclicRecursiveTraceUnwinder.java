@@ -4,6 +4,7 @@
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.MutableBoolean;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionByContextStore;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
@@ -41,20 +42,20 @@ public class AcyclicRecursiveTraceUnwinder implements TraceUnwinder {
 		traceReader_ = reader;
 	}
 
-	public void accept(Context context, final Conclusion conclusion,
+	public void accept(IndexedClassExpression root, final Conclusion conclusion,
 			final ConclusionVisitor<?, Context> premiseVisitor) {
-		accept(context, conclusion, premiseVisitor, DUMMY_INFERENCE_VISITOR);
+		accept(root, conclusion, premiseVisitor, DUMMY_INFERENCE_VISITOR);
 	}
 	
 	@Override
-	public void accept(Context context, 
+	public void accept(IndexedClassExpression root, 
 			final Conclusion conclusion,
 			final ConclusionVisitor<?, Context> conclusionVisitor,
 			final TracedConclusionVisitor<?, Context> inferenceVisitor) {
 		
 		ConclusionByContextStore conclusionsToBeAvoided = new ConclusionByContextStore();
 		
-		traceConclusion(context, conclusion, conclusionsToBeAvoided, conclusionVisitor, inferenceVisitor);
+		traceConclusion(root.getContext(), conclusion, conclusionsToBeAvoided, conclusionVisitor, inferenceVisitor);
 	}
 
 	private boolean traceConclusion(
@@ -70,7 +71,7 @@ public class AcyclicRecursiveTraceUnwinder implements TraceUnwinder {
 			
 			final MutableBoolean traced = new MutableBoolean(false);
 
-			traceReader_.accept(context, conclusion,
+			traceReader_.accept(context.getRoot(), conclusion,
 					new BaseTracedConclusionVisitor<Void, Void>() {
 
 						@Override

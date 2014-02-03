@@ -362,7 +362,7 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 				final MutableBoolean hasAnyInference = new MutableBoolean(false);
 				final MutableBoolean hasAlternativeInference = new MutableBoolean(false);
 
-				inferenceReader_.accept(contextWherePremiseStored, premise, new BaseTracedConclusionVisitor<Void, Void>(){
+				inferenceReader_.accept(contextWherePremiseStored.getRoot(), premise, new BaseTracedConclusionVisitor<Void, Void>(){
 
 					@Override
 					public Void visit(InitializationSubsumer premiseInference, Void ignored) {
@@ -435,7 +435,7 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 	private boolean isNew(final TracedConclusion conclusion, final Context context) {
 		final MutableBoolean inferenceFound = new MutableBoolean(false);
 		
-		inferenceReader_.accept(context.getRoot().getContext(), conclusion, new BaseTracedConclusionVisitor<Void, Void>(){
+		inferenceReader_.accept(context.getRoot(), conclusion, new BaseTracedConclusionVisitor<Void, Void>(){
 
 			@Override
 			protected Void defaultTracedVisit(TracedConclusion inference, Void ignored) {

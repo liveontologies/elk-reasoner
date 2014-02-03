@@ -49,7 +49,7 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 
 		@Override
 		protected Boolean defaultTracedVisit(TracedConclusion conclusion, Context context) {
-			traceWriter_.addInference(context, conclusion);
+			traceWriter_.addInference(context.getRoot(), conclusion);
 			
 			return true;
 		}
