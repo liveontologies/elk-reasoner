@@ -31,7 +31,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContext
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
-import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
@@ -59,9 +62,9 @@ public class RuleCounter {
 	int countBackwardLinkChainFromBackwardLinkRule;
 
 	/**
-	 * counter for {@link BackwardLinkCompositionRule}
+	 * counter for {@link NonReflexiveBackwardLinkCompositionRule}
 	 */
-	int countBackwardLinkCompositionRule;
+	int countNonReflexiveBackwardLinkCompositionRule;
 
 	/**
 	 * counter for {@link ContradicitonCompositionRule}
@@ -119,6 +122,11 @@ public class RuleCounter {
 	int countIndexedObjectSomeValuesFromDecomposition;
 
 	/**
+	 * counter for {@link NonReflexivePropagationRule}
+	 */
+	int countNonReflexivePropagationRule;
+
+	/**
 	 * counter for {@link ObjectIntersectionFromConjunctRule}
 	 */
 	int countObjectIntersectionFromConjunctRule;
@@ -144,6 +152,11 @@ public class RuleCounter {
 	int countPropagationFromExistentialFillerRule;
 
 	/**
+	 * counter for {@link ReflexivePropagationRule}
+	 */
+	int countReflexivePropagationRule;
+
+	/**
 	 * counter for {@link RootContextInitializationRule}
 	 */
 	int countRootContextInitializationRule;
@@ -157,6 +170,11 @@ public class RuleCounter {
 	 * counter for {@link SuperClassFromSubClassRule}
 	 */
 	int countSuperClassFromSubClassRule;
+
+	/**
+	 * counter for {@link ReflexiveBackwardLinkCompositionRule}
+	 */
+	int countReflexiveBackwardLinkCompositionRule;
 
 	/**
 	 * Add the values the corresponding values of the given counter
@@ -179,12 +197,16 @@ public class RuleCounter {
 		countPropagationFromBackwardLinkRule += counter.countPropagationFromBackwardLinkRule;
 		countContradictionPropagationRule += counter.countContradictionPropagationRule;
 		countContradicitonCompositionRule += counter.countContradicitonCompositionRule;
-		countBackwardLinkCompositionRule += counter.countBackwardLinkCompositionRule;
+		countNonReflexiveBackwardLinkCompositionRule += counter.countNonReflexiveBackwardLinkCompositionRule;
 		countIndexedObjectIntersectionOfDecomposition += counter.countIndexedObjectIntersectionOfDecomposition;
 		countIndexedObjectSomeValuesFromDecomposition += counter.countIndexedObjectSomeValuesFromDecomposition;
 		countForwardLinkFromBackwardLinkRule += counter.countForwardLinkFromBackwardLinkRule;
 		countIndexedObjectComplementOfDecomposition += counter.countIndexedObjectComplementOfDecomposition;
 		countContradictionFromOwlNothingRule += counter.countContradictionFromOwlNothingRule;
+		countNonReflexivePropagationRule += counter.countNonReflexivePropagationRule;
+		countReflexivePropagationRule += counter.countReflexivePropagationRule;
+		countReflexiveBackwardLinkCompositionRule += counter.countReflexiveBackwardLinkCompositionRule;
+
 	}
 
 	public long getTotalRuleAppCount() {
@@ -203,12 +225,15 @@ public class RuleCounter {
 				+ countPropagationFromBackwardLinkRule
 				+ countContradictionPropagationRule
 				+ countContradicitonCompositionRule
-				+ countBackwardLinkCompositionRule
+				+ countNonReflexiveBackwardLinkCompositionRule
+				+ countReflexiveBackwardLinkCompositionRule
 				+ countIndexedObjectIntersectionOfDecomposition
 				+ countIndexedObjectSomeValuesFromDecomposition
 				+ countForwardLinkFromBackwardLinkRule
 				+ countIndexedObjectComplementOfDecomposition
-				+ countContradictionFromOwlNothingRule;
+				+ countContradictionFromOwlNothingRule
+				+ countNonReflexivePropagationRule
+				+ countReflexivePropagationRule;
 	}
 
 	/**
@@ -230,11 +255,14 @@ public class RuleCounter {
 		countPropagationFromBackwardLinkRule = 0;
 		countContradictionPropagationRule = 0;
 		countContradicitonCompositionRule = 0;
-		countBackwardLinkCompositionRule = 0;
+		countNonReflexiveBackwardLinkCompositionRule = 0;
+		countReflexiveBackwardLinkCompositionRule = 0;
 		countIndexedObjectIntersectionOfDecomposition = 0;
 		countIndexedObjectSomeValuesFromDecomposition = 0;
 		countForwardLinkFromBackwardLinkRule = 0;
 		countIndexedObjectComplementOfDecomposition = 0;
 		countContradictionFromOwlNothingRule = 0;
+		countNonReflexivePropagationRule = 0;
+		countReflexivePropagationRule = 0;
 	}
 }

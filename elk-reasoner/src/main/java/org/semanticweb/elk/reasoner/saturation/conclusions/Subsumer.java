@@ -40,7 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecomposi
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class Subsumer implements Conclusion {
+public abstract class Subsumer extends AbstractConclusion {
 
 	/**
 	 * the implied {@code IndexedClassExpression} represented by this

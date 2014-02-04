@@ -27,7 +27,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVi
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,9 +60,6 @@ public class ForwardLink extends AbstractConclusion {
 	 */
 	final Context target_;
 
-	private final BackwardLinkCompositionRule thisCompositionRule_ = BackwardLinkCompositionRule
-			.getRuleFor(this);
-
 	public ForwardLink(IndexedPropertyChain relation, Context target) {
 		this.relation_ = relation;
 		this.target_ = target;
@@ -78,13 +76,28 @@ public class ForwardLink extends AbstractConclusion {
 	@Override
 	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
 			Context context, ConclusionProducer producer) {
-		ruleAppVisitor.visit(thisCompositionRule_, this, context, producer);
+		// compose with all backward links
+		ruleAppVisitor.visit(
+				NonReflexiveBackwardLinkCompositionRule.getRuleFor(this), this,
+				context, producer);
+		ruleAppVisitor.visit(
+				ReflexiveBackwardLinkCompositionRule.getRuleFor(this), this,
+				context, producer);
 	}
 
 	@Override
 	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
 			Context context, ConclusionProducer producer) {
 		// no redundant rules
+	}
+
+	@Override
+	public void applyAllLocalRules(RuleVisitor ruleAppVisitor, Context context,
+			ConclusionProducer producer) {
+		// compose only with reflexive backward links
+		ruleAppVisitor.visit(
+				ReflexiveBackwardLinkCompositionRule.getRuleFor(this), this,
+				context, producer);
 	}
 
 	@Override

@@ -103,6 +103,24 @@ public class BackwardLink extends AbstractConclusion {
 	}
 
 	@Override
+	public void applyAllLocalRules(RuleVisitor ruleAppVisitor, Context context,
+			ConclusionProducer producer) {
+		if (isLocalFor(context))
+			// generate propagations only if this link is local
+			ruleAppVisitor.visit(PropagationFromBackwardLinkRule.getInstance(),
+					this, context, producer);
+		ruleAppVisitor.visit(ForwardLinkFromBackwardLinkRule.getInstance(),
+				this, context, producer);
+
+		// apply all backward link rules of the context
+		LinkedBackwardLinkRule backLinkRule = context.getBackwardLinkRuleHead();
+		while (backLinkRule != null) {
+			backLinkRule.accept(ruleAppVisitor, this, context, producer);
+			backLinkRule = backLinkRule.next();
+		}
+	}
+
+	@Override
 	public Context getSourceContext(Context contextWhereStored) {
 		return source_;
 	}

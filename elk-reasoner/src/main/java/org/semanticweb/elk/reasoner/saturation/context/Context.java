@@ -62,21 +62,37 @@ public interface Context extends ConclusionSet {
 	public Set<IndexedClassExpression> getSubsumers();
 
 	/**
-	 * @return the {@link Context}s from which there exists an (implied)
-	 *         "existential relation" with this {@link Context} indexed by the
-	 *         {@link IndexedPropertyChain} of this relation. For example, if
-	 *         the input ontology contains an axiom
-	 *         {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B)} then an
+	 * @return the {@link Context}s different from this {@link Context} from
+	 *         which there exists an (implied) "existential relation" with this
+	 *         {@link Context} indexed by the {@link IndexedPropertyChain} of
+	 *         this relation. For example, if the input ontology contains an
+	 *         axiom {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B)} then an
 	 *         existential link between the context with root {@code :A} and the
 	 *         context with root {@code :B} with property {@code :r} will be
 	 *         created. For technical reasons, this link is stored in the
 	 *         context for {@code :B}, as a "backward link" {@code <:r, :A>}
 	 *         indexed by {@code :r} in the {@link Multimap} returned by this
-	 *         method. The returned {@link Multimap} is not thread safe and
-	 *         should be accessed from at most one thread at a time. This is
+	 *         method. This link is saved only if {@code :A} is different from
+	 *         {@code :B}. If they are the same, then the property {@code :r} is
+	 *         saved as a local reflexive property in the context
+	 *         {@code :B = :A}. The returned {@link Multimap} is not thread safe
+	 *         and concurrent access should be properly synchronized. This is
 	 *         never {@code null}.
+	 * 
+	 * @see #getLocalReflexiveObjectProperties()
 	 */
 	public Multimap<IndexedPropertyChain, Context> getBackwardLinksByObjectProperty();
+
+	/**
+	 * @return the {@link IndexedPropertyChain}s representing all derived
+	 *         "local reflexive" existential restrictions, i.e., conclusions of
+	 *         the form {@code SubClassOf(:A ObjectSomeValuesFrom(:r :A)}. In
+	 *         this case {@code :r} is saved as a reflexive property in the
+	 *         context {@code :A}. The returned {@link Set} is not thread safe
+	 *         and concurrent access should be properly synchronized. It is
+	 *         never {@code null}.
+	 */
+	public Set<IndexedPropertyChain> getLocalReflexiveObjectProperties();
 
 	/**
 	 * @return the first backward link rule assigned to this {@link Context}, or

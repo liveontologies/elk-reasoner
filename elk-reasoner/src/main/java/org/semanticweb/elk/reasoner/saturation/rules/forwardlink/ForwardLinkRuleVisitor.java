@@ -13,7 +13,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.contradiction.Contradiction
  */
 public interface ForwardLinkRuleVisitor {
 
-	void visit(BackwardLinkCompositionRule rule, ForwardLink premise,
+	void visit(ReflexiveBackwardLinkCompositionRule rule, ForwardLink premise,
 			Context context, ConclusionProducer producer);
+
+	void visit(NonReflexiveBackwardLinkCompositionRule rule,
+			ForwardLink premise, Context context, ConclusionProducer producer);
 
 }

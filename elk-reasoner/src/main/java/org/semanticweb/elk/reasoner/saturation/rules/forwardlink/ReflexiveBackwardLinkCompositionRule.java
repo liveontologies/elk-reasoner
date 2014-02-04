@@ -1,6 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
@@ -13,12 +14,16 @@ import org.semanticweb.elk.util.collections.Multimap;
 /**
  * A {@link ForwardLinkRule} applied when processing this {@link ForwardLink}
  * producing {@link BackwardLink}s resulted by composition of this
- * {@link ForwardLink} with existing {@link BackwardLink}s using property chain
- * axioms
+ * {@link ForwardLink} with existing reflexive {@link BackwardLink}s using
+ * property chain axioms
+ * 
+ * @see NonReflexiveBackwardLinkCompositionRule
  * 
  * @author "Yevgeny Kazakov"
+ * 
  */
-public class BackwardLinkCompositionRule extends AbstractForwardLinkRule {
+public class ReflexiveBackwardLinkCompositionRule extends
+		AbstractForwardLinkRule {
 
 	/**
 	 * 
@@ -28,20 +33,21 @@ public class BackwardLinkCompositionRule extends AbstractForwardLinkRule {
 	/**
 	 * @param forwardLink
 	 */
-	private BackwardLinkCompositionRule(ForwardLink forwardLink) {
+	private ReflexiveBackwardLinkCompositionRule(ForwardLink forwardLink) {
 		this.forwardLink_ = forwardLink;
 	}
 
-	private static final String NAME_ = "ForwardLink BackwardLink Composition";
+	private static final String NAME_ = "ForwardLink Reflexive BackwardLink Composition";
 
 	/**
 	 * @param link
 	 *            a {@link ForwardLink} for which to create the rule
-	 * @return {@link BackwardLinkCompositionRule}s for the given
+	 * @return {@link ReflexiveBackwardLinkCompositionRule}s for the given
 	 *         {@link ForwardLink}
 	 */
-	public static BackwardLinkCompositionRule getRuleFor(ForwardLink link) {
-		return new BackwardLinkCompositionRule(link);
+	public static ReflexiveBackwardLinkCompositionRule getRuleFor(
+			ForwardLink link) {
+		return new ReflexiveBackwardLinkCompositionRule(link);
 	}
 
 	@Override
@@ -52,25 +58,22 @@ public class BackwardLinkCompositionRule extends AbstractForwardLinkRule {
 	@Override
 	public void apply(ForwardLink premise, Context context,
 			ConclusionProducer producer) {
-		/* compose the link with all backward links */
+		/* compose the link with all reflexive backward links */
 		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = this.forwardLink_
 				.getRelation().getSaturated()
 				.getCompositionsByLeftSubProperty();
-		final Multimap<IndexedPropertyChain, Context> backLinks = context
-				.getBackwardLinksByObjectProperty();
+		final Set<IndexedPropertyChain> reflexiveBackwardRelations = context
+				.getLocalReflexiveObjectProperties();
 
 		for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-				comps.keySet(), backLinks.keySet())) {
+				comps.keySet(), reflexiveBackwardRelations)) {
 
 			Collection<IndexedPropertyChain> compositions = comps
 					.get(backwardRelation);
-			Collection<Context> sources = backLinks.get(backwardRelation);
 
 			for (IndexedPropertyChain composition : compositions)
-				for (Context source : sources) {
-					producer.produce(this.forwardLink_.getTarget(),
-							new BackwardLink(source, composition));
-				}
+				producer.produce(this.forwardLink_.getTarget(),
+						new BackwardLink(context, composition));
 		}
 	}
 

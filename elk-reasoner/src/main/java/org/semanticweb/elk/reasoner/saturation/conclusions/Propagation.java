@@ -25,15 +25,14 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-import java.util.Collection;
-
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,20 +83,24 @@ public class Propagation extends AbstractConclusion {
 	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
 			Context context, ConclusionProducer producer) {
 		// propagate over all backward links
-		final Multimap<IndexedPropertyChain, Context> backLinks = context
-				.getBackwardLinksByObjectProperty();
-
-		Collection<Context> targets = backLinks.get(relation_);
-
-		for (Context target : targets) {
-			producer.produce(target, new ComposedSubsumer(carry_));
-		}
+		ruleAppVisitor.visit(ReflexivePropagationRule.getInstance(), this,
+				context, producer);
+		ruleAppVisitor.visit(NonReflexivePropagationRule.getInstance(), this,
+				context, producer);
 	}
 
 	@Override
 	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
 			Context context, ConclusionProducer producer) {
 		// no redundant rules
+	}
+
+	@Override
+	public void applyAllLocalRules(RuleVisitor ruleAppVisitor, Context context,
+			ConclusionProducer producer) {
+		// propagate only over reflexive backward links
+		ruleAppVisitor.visit(ReflexivePropagationRule.getInstance(), this,
+				context, producer);
 	}
 
 	@Override

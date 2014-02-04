@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
@@ -41,7 +42,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContext
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
-import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
@@ -104,16 +108,6 @@ public class RuleApplicationTimerVisitor implements RuleVisitor {
 		timer_.timeBackwardLinkChainFromBackwardLinkRule += CachedTimeThread
 				.getCurrentTimeMillis();
 
-	}
-
-	@Override
-	public void visit(BackwardLinkCompositionRule rule, ForwardLink premise,
-			Context context, ConclusionProducer producer) {
-		timer_.timeBackwardLinkCompositionRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		visitor_.visit(rule, premise, context, producer);
-		timer_.timeBackwardLinkCompositionRule += CachedTimeThread
-				.getCurrentTimeMillis();
 	}
 
 	@Override
@@ -240,6 +234,27 @@ public class RuleApplicationTimerVisitor implements RuleVisitor {
 	}
 
 	@Override
+	public void visit(NonReflexiveBackwardLinkCompositionRule rule,
+			ForwardLink premise, Context context, ConclusionProducer producer) {
+		timer_.timeNonReflexiveBackwardLinkCompositionRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(rule, premise, context, producer);
+		timer_.timeNonReflexiveBackwardLinkCompositionRule += CachedTimeThread
+				.getCurrentTimeMillis();
+	}
+
+	@Override
+	public void visit(NonReflexivePropagationRule rule, Propagation premise,
+			Context context, ConclusionProducer producer) {
+		timer_.timeNonReflexivePropagationRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(rule, premise, context, producer);
+		timer_.timeNonReflexivePropagationRule += CachedTimeThread
+				.getCurrentTimeMillis();
+
+	}
+
+	@Override
 	public void visit(ObjectIntersectionFromConjunctRule rule,
 			IndexedClassExpression premise, Context context,
 			ConclusionProducer producer) {
@@ -291,6 +306,27 @@ public class RuleApplicationTimerVisitor implements RuleVisitor {
 		visitor_.visit(rule, premise, context, producer);
 		timer_.timePropagationFromExistentialFillerRule += CachedTimeThread
 				.getCurrentTimeMillis();
+	}
+
+	@Override
+	public void visit(ReflexiveBackwardLinkCompositionRule rule,
+			ForwardLink premise, Context context, ConclusionProducer producer) {
+		timer_.timeReflexiveBackwardLinkCompositionRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(rule, premise, context, producer);
+		timer_.timeReflexiveBackwardLinkCompositionRule += CachedTimeThread
+				.getCurrentTimeMillis();
+	}
+
+	@Override
+	public void visit(ReflexivePropagationRule rule, Propagation premise,
+			Context context, ConclusionProducer producer) {
+		timer_.timeReflexivePropagationRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(rule, premise, context, producer);
+		timer_.timeReflexivePropagationRule += CachedTimeThread
+				.getCurrentTimeMillis();
+
 	}
 
 	@Override

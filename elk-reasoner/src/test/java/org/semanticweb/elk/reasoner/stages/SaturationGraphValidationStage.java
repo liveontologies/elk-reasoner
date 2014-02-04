@@ -42,6 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
@@ -55,7 +56,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContext
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
-import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
@@ -165,13 +169,6 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
-		public void visit(BackwardLinkCompositionRule rule,
-				ForwardLink premise, Context context,
-				ConclusionProducer producer) {
-			// nothing is stored in the rule
-		}
-
-		@Override
 		public void visit(ContradicitonCompositionRule rule,
 				DisjointSubsumer premise, Context context,
 				ConclusionProducer producer) {
@@ -267,6 +264,21 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
+		public void visit(NonReflexiveBackwardLinkCompositionRule rule,
+				ForwardLink premise, Context context,
+				ConclusionProducer producer) {
+			// nothing is stored in the rule
+		}
+
+		@Override
+		public void visit(NonReflexivePropagationRule rule,
+				Propagation premise, Context context,
+				ConclusionProducer producer) {
+			// nothing is stored in the rule
+
+		}
+
+		@Override
 		public void visit(ObjectIntersectionFromConjunctRule rule,
 				IndexedClassExpression premise, Context context,
 				ConclusionProducer producer) {
@@ -307,6 +319,21 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			for (IndexedClassExpression ice : rule.getNegativeExistentials()) {
 				iceValidator_.checkNew(ice);
 			}
+		}
+
+		@Override
+		public void visit(ReflexiveBackwardLinkCompositionRule rule,
+				ForwardLink premise, Context context,
+				ConclusionProducer producer) {
+			// nothing is stored in the rule
+
+		}
+
+		@Override
+		public void visit(ReflexivePropagationRule rule, Propagation premise,
+				Context context, ConclusionProducer producer) {
+			// nothing is stored in the rule
+
 		}
 
 		@Override

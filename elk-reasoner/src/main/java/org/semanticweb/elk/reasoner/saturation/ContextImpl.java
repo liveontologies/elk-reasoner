@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -88,8 +89,18 @@ public class ContextImpl implements Context {
 	private LinkableBackwardLinkRule backwardLinkRules_ = null;
 
 	/**
-	 * the indexed representation of all derived {@link BackwardLink}s computed
-	 * for this {@link Context}; can be {@code null}
+	 * the indexed representation of all derived reflexive {@link BackwardLink}
+	 * s, i.e., the {@link BackwardLink}s whose source is this {@link Context};
+	 * can be {@code null}
+	 * 
+	 * @see BackwardLink#getSource()
+	 */
+	private Set<IndexedPropertyChain> reflexiveBackwardLinks_ = null;
+
+	/**
+	 * the indexed representation of all derived non-reflexive
+	 * {@link BackwardLink}s computed for this {@link Context}; can be
+	 * {@code null}
 	 */
 	private Multimap<IndexedPropertyChain, Context> backwardLinksByObjectProperty_ = null;
 
@@ -205,9 +216,15 @@ public class ContextImpl implements Context {
 
 	@Override
 	public Multimap<IndexedPropertyChain, Context> getBackwardLinksByObjectProperty() {
-		if (backwardLinksByObjectProperty_ == null)
-			return Operations.emptyMultimap();
-		return backwardLinksByObjectProperty_;
+		return backwardLinksByObjectProperty_ == null ? Operations
+				.<IndexedPropertyChain, Context> emptyMultimap()
+				: backwardLinksByObjectProperty_;
+	}
+
+	@Override
+	public Set<IndexedPropertyChain> getLocalReflexiveObjectProperties() {
+		return reflexiveBackwardLinks_ == null ? Collections
+				.<IndexedPropertyChain> emptySet() : reflexiveBackwardLinks_;
 	}
 
 	@Override
@@ -273,10 +290,17 @@ public class ContextImpl implements Context {
 		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
 			Context source = conclusion.getSource();
 			IndexedPropertyChain relation = conclusion.getRelation();
-
+			if (conclusion.isLocalFor(input)) {
+				// reflexive
+				if (input.reflexiveBackwardLinks_ == null) {
+					input.reflexiveBackwardLinks_ = new ArrayHashSet<IndexedPropertyChain>(
+							3);
+				}
+				return input.reflexiveBackwardLinks_.add(relation);
+			}
+			// else non-reflexive
 			if (input.backwardLinksByObjectProperty_ == null)
 				input.backwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>();
-
 			return input.backwardLinksByObjectProperty_.add(relation, source);
 		}
 
@@ -357,6 +381,17 @@ public class ContextImpl implements Context {
 		@Override
 		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
 			boolean changed = false;
+			if (conclusion.isLocalFor(input)) {
+				// link is reflexive
+				if (input.reflexiveBackwardLinks_ != null) {
+					changed = input.reflexiveBackwardLinks_.remove(conclusion
+							.getRelation());
+					if (input.reflexiveBackwardLinks_.isEmpty()) {
+						input.reflexiveBackwardLinks_ = null;
+					}
+				}
+			} else
+			// link is not reflexive
 			if (input.backwardLinksByObjectProperty_ != null) {
 				changed = input.backwardLinksByObjectProperty_.remove(
 						conclusion.getRelation(), conclusion.getSource());
@@ -459,6 +494,13 @@ public class ContextImpl implements Context {
 
 		@Override
 		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
+			if (conclusion.isLocalFor(input)) {
+				// reflexive
+				if (input.reflexiveBackwardLinks_ != null)
+					return input.reflexiveBackwardLinks_.contains(conclusion
+							.getRelation());
+			} else
+			// non-reflexive
 			if (input.backwardLinksByObjectProperty_ != null) {
 				return input.backwardLinksByObjectProperty_.contains(
 						conclusion.getRelation(), conclusion.getSource());

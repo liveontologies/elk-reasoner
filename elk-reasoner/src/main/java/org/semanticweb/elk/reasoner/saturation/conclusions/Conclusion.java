@@ -49,6 +49,18 @@ public interface Conclusion {
 	public Context getSourceContext(Context contextWhereStored);
 
 	/**
+	 * @param contextWhereStored
+	 *            the {@code Context} for which to check locality of this
+	 *            {@link BackwardLink}
+	 * @return {@code true} if the source context of this {@link BackwardLink}
+	 *         is the same the given {@link Context}
+	 * 
+	 * @see BackwardLink#getSourceContext(Context)
+	 * @see Context#getRoot()
+	 */
+	public boolean isLocalFor(Context contextWhereStored);
+
+	/**
 	 * Apply all non-redundant inferences for this {@link Conclusion} in a
 	 * {@link Context}
 	 * 
@@ -74,4 +86,16 @@ public interface Conclusion {
 	 */
 	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
 			Context context, ConclusionProducer producer);
+
+	/**
+	 * Apply all (redundant and non-redundant) rules that produce
+	 * {@link Conclusion}s that logically belong to the same {@link Context} as
+	 * this {@link Conclusion}
+	 * 
+	 * @param ruleAppVisitor
+	 * @param context
+	 * @param producer
+	 */
+	public void applyAllLocalRules(RuleVisitor ruleAppVisitor, Context context,
+			ConclusionProducer producer);
 }

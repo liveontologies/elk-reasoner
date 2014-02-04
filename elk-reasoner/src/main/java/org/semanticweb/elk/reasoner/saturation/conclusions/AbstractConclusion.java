@@ -26,6 +26,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  */
 
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
  * @author Pavel Klinov
@@ -34,11 +36,23 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public abstract class AbstractConclusion implements Conclusion {
 
-
 	@Override
 	public Context getSourceContext(Context contextWhereStored) {
+		// by default the context where the conclusion is stored
 		return contextWhereStored;
 	}
 
-	
+	@Override
+	public boolean isLocalFor(Context contextWhereStored) {
+		return (getSourceContext(contextWhereStored) == contextWhereStored);
+	}
+
+	@Override
+	public void applyAllLocalRules(RuleVisitor ruleAppVisitor, Context context,
+			ConclusionProducer producer) {
+		// by default all rules are local
+		applyNonRedundantRules(ruleAppVisitor, context, producer);
+		applyRedundantRules(ruleAppVisitor, context, producer);
+	}
+
 }
