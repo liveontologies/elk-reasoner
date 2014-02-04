@@ -26,17 +26,10 @@
 package org.semanticweb.elk.benchmark.reasoning.tracing;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
-import org.semanticweb.elk.benchmark.TaskCollection;
 import org.semanticweb.elk.benchmark.TaskCollection2;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.benchmark.TaskVisitor;
@@ -52,26 +45,13 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.BaseTracedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionTracingTests;
-import org.semanticweb.elk.reasoner.saturation.tracing.FirstNInferencesReader;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
-import org.semanticweb.elk.reasoner.saturation.tracing.SubClassOfSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.TRACE_MODE;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestUtils;
@@ -80,9 +60,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.util.collections.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A task to trace all atomic subsumptions
@@ -91,13 +68,13 @@ import org.slf4j.LoggerFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class AllSubsumptionTracingTaskCollection implements TaskCollection, TaskCollection2 {
+public class AllSubsumptionTracingTaskCollection implements TaskCollection2 {
 
-	private static final Logger LOGGER_ = LoggerFactory.getLogger(AllSubsumptionTracingTaskCollection.class);
+	//private static final Logger LOGGER_ = LoggerFactory.getLogger(AllSubsumptionTracingTaskCollection.class);
 	
-	private final String ontologyFile_;
-	private Reasoner reasoner_;
-	private final ReasonerConfiguration reasonerConfig_;
+	final String ontologyFile_;
+	Reasoner reasoner_;
+	final ReasonerConfiguration reasonerConfig_;
 	private final Metrics metrics_ = new Metrics();
 	
 	public AllSubsumptionTracingTaskCollection(String... args) {
@@ -116,14 +93,25 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection, Task
 				@Override
 				public boolean visit(ElkClassExpression subsumee, 	ElkClassExpression subsumer) throws Exception {
 					
-					visitor.visit(new TracingTask(reasoner_, subsumee, subsumer));
+					visitor.visit(createSpecificTask(subsumee, subsumer));
 					
 					return true;
 				}
 			});
 			
-			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0039693", "http://purl.obolibrary.org/obo/GO_0044034"));
-			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0006176", "http://purl.obolibrary.org/obo/GO_0046031"));
+			//visitor.visit(createSpecificTask("http://www.co-ode.org/ontologies/galen#CerebellarSyndrome", "http://www.co-ode.org/ontologies/galen#Anonymous-757"));
+			
+			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0039693", "http://purl.obolibrary.org/obo/GO_0044034")); //55 axioms, now 15
+			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0006176", "http://purl.obolibrary.org/obo/GO_0046031")); //197 axioms, now 19
+			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0034223", "http://purl.obolibrary.org/obo/GO_0034307"));
+			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_1901548", "http://purl.obolibrary.org/obo/GO_0032849"));
+			
+			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0048684", "http://purl.obolibrary.org/obo/GO_0048672"));
+			
+			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0048685", "http://purl.obolibrary.org/obo/GO_0048671"));
+			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0048685", "http://purl.obolibrary.org/obo/GO_0048683"));
+			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0048684", "http://purl.obolibrary.org/obo/GO_0048683"));
+			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0048685", "http://purl.obolibrary.org/obo/GO_0048681"));
 		} 
 		catch (TaskException e) {
 			throw e;
@@ -133,59 +121,17 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection, Task
 		}
 	}
 	
-	@Override
-	public Collection<Task> getTasks() throws TaskException {
-		// classify the ontology and instantiate tracing tasks
-		Taxonomy<ElkClass> taxonomy = loadAndClassify(ontologyFile_);
-		
-		LOGGER_.info("Ontology classified, creating tracing tasks..");
-		
-		// TODO lazy task collection would be better for performance, fix TaskCollection interface
-		final List<Task> tasks = new LinkedList<Task>();
-		
-		try {
-			new ComprehensiveSubsumptionTracingTests(taxonomy).accept(new TracingTestVisitor() {
-				
-				@Override
-				public boolean visit(ElkClassExpression subsumee, 	ElkClassExpression subsumer) {
-					
-					tasks.add(new TracingTask(reasoner_, subsumee, subsumer));
-					
-					return true;
-				}
-			});
-		} catch (TaskException e) {
-			throw e;
-		}
-		catch (Exception e) {
-			throw new TaskException(e);
-		}
-		
-		LOGGER_.info("Tasks created, re-shuffling..");
-		
-		Collections.shuffle(tasks);
-		
-		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#HortonArteritis", "http://www.co-ode.org/ontologies/galen#PeripheralArterialDisease"));
-		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#ProstatismSymptom", "http://www.co-ode.org/ontologies/galen#UrinarySymptom"));
-		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#LeftAnteriorEthmoidSinus", "http://www.co-ode.org/ontologies/galen#LeftEthmoidSinus"));
-		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#SquamoColumnarJunctionOfCervix", "http://www.co-ode.org/ontologies/galen#ComponentOfUterineCervix"));
-		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#SkinOfBack", "http://www.co-ode.org/ontologies/galen#SurfaceStructureOfBack"));
-		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#BedOfIndexFingerNail", "http://www.co-ode.org/ontologies/galen#Anonymous-716"));
-		//tasks.add(createSpecificTask("http://www.co-ode.org/ontologies/galen#T6Dermatome", "http://www.co-ode.org/ontologies/galen#Anonymous-716"));
-		
-		/*GO-EXT r7991*/
-		//tasks.add(createSpecificTask("http://purl.obolibrary.org/obo/GO_0001801", "http://purl.obolibrary.org/obo/GO_0002894"));
-		
-		return tasks;
+	TracingTask createSpecificTask(ElkClassExpression sub, ElkClassExpression sup) {
+		return new TracingTask(reasoner_, sub, sup);
 	}
-	
+
 	TracingTask createSpecificTask(String sub, String sup) {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		
-		return new TracingTask(reasoner_, factory.getClass(new ElkFullIri(sub)), factory.getClass(new ElkFullIri(sup)));
+		return createSpecificTask(factory.getClass(new ElkFullIri(sub)), factory.getClass(new ElkFullIri(sup)));
 	}
 
-	private Taxonomy<ElkClass> loadAndClassify(String ontologyFile) throws TaskException {
+	Taxonomy<ElkClass> loadAndClassify(String ontologyFile) throws TaskException {
 		try {
 			File ontFile = BenchmarkUtils.getFile(ontologyFile);
 
@@ -195,7 +141,11 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection, Task
 			reasoner_ = new ReasonerFactory().createReasoner(loader,
 					new SimpleStageExecutor(), reasonerConfig_);
 			
-			return reasoner_.getTaxonomy();
+			Taxonomy<ElkClass> taxonomy = reasoner_.getTaxonomy();
+			
+			//TaxonomyPrinter.dumpClassTaxomomyToFile(taxonomy, "/home/pavel/tmp/galen.taxonomy", false);
+			
+			return taxonomy;
 			
 		} catch (Exception e) {
 			throw new TaskException(e);
@@ -219,13 +169,14 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection, Task
 
 	/**
 	 * 
-	 */
-	private static class TracingTask implements Task {
+	 **/
+	static class TracingTask implements Task {
 		
+		public static final String USED_INFERENCES_COUNT = "used inferences";
 		public static final String SUBCLASSOF_AXIOM_COUNT = "Distinct SubClassOf axioms used";
 		public static final String RULES_APPLIED = "Number of rules applied during tracing";
 		public static final String CONTEXTS_TRACED = "Number of contexts traced";
-		public static final int MIN_SUBCLASS_AXIOM_NO = 0;
+		public static final int MIN_SUBCLASS_AXIOM_NO = 10;
 		public static final int MAX_SUBCLASS_AXIOM_NO = Integer.MAX_VALUE;
 
 		final Reasoner reasoner;
@@ -253,7 +204,7 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection, Task
 		public void run() throws TaskException {
 			try {
 				reasoner.resetTraceState();
-				reasoner.explainSubsumption(subsumee, subsumer, TRACE_MODE.RECURSIVE);
+				reasoner.explainSubsumption(subsumee, subsumer);
 			} catch (ElkException e) {
 				throw new TaskException(e);
 			}
@@ -266,26 +217,23 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection, Task
 				IndexedClassExpression sub = ReasonerStateAccessor.transform(reasoner, subsumee);
 				IndexedClassExpression sup = ReasonerStateAccessor.transform(reasoner, subsumer);
 				Conclusion subsumerConclusion = TracingUtils.getSubsumerWrapper(sup);
-				//TraceStore.Reader inferenceReader = traceState.getTraceStore().getReader();
-				TraceStore.Reader inferenceReader = new FirstNInferencesReader(traceState.getTraceStore().getReader(), 1);
+				TraceStore.Reader inferenceReader = traceState.getTraceStore().getReader();
+				//TraceStore.Reader inferenceReader = new FirstNInferencesReader(traceState.getTraceStore().getReader(), 1);
 				RecursiveTraceUnwinder traceUnwinder = new RecursiveTraceUnwinder(inferenceReader);
-				SideConditionCollector collector = new SideConditionCollector();
+				SideConditionCollector counter = new SideConditionCollector();
 				SaturationStatistics stats = traceState.getContextTracingFactory().getStatistics();
 				
-				traceUnwinder.accept(sub.getContext(), subsumerConclusion, new BaseConclusionVisitor<Boolean, Context>(), collector);
+				traceUnwinder.accept(sub.getContext(), subsumerConclusion, new BaseConclusionVisitor<Boolean, Context>(), counter);
 				
-				int subClassAxiomNo = collector.getSubClassOfAxioms().size();
+				int subClassAxiomNo = counter.getSubClassOfAxioms().size();
 				
-				/*for (Pair<IndexedClassExpression, IndexedClassExpression> ax : collector.getSubClassOfAxioms()) {
-					System.err.println("SubClassOf( " + ax.getFirst() +" " + ax.getSecond() + " )");
-				}*/
-				
-				//if (!collector.getSubClassOfAxioms().contains(new Pair<IndexedClassExpression, IndexedClassExpression>(sub, sup))) {
-				if (subClassAxiomNo >= MIN_SUBCLASS_AXIOM_NO && subClassAxiomNo <= MAX_SUBCLASS_AXIOM_NO) {
+				if ((subClassAxiomNo >= MIN_SUBCLASS_AXIOM_NO) && (subClassAxiomNo <= MAX_SUBCLASS_AXIOM_NO)) {
 					metrics.incrementRunCount();
-					metrics.updateLongMetric(SUBCLASSOF_AXIOM_COUNT, collector.getSubClassOfAxioms().size());
-					metrics.updateLongMetric(RULES_APPLIED, stats.getConclusionStatistics().getProducedConclusionCounts().getTotalCount());
-					metrics.updateLongMetric(CONTEXTS_TRACED, stats.getContextStatistics().countModifiedContexts);	
+					metrics.updateLongMetric(SUBCLASSOF_AXIOM_COUNT, subClassAxiomNo);
+					//metrics.updateLongMetric(RULES_APPLIED, stats.getConclusionStatistics().getProducedConclusionCounts().getTotalCount());
+					metrics.updateLongMetric("inserted conclusions", stats.getConclusionStatistics().getUsedConclusionCounts().getTotalCount());
+					metrics.updateLongMetric(CONTEXTS_TRACED, stats.getContextStatistics().countModifiedContexts);
+					metrics.updateLongMetric(USED_INFERENCES_COUNT, counter.getInferenceCount());
 				}
 				else {
 					//ignoring the results
@@ -296,8 +244,6 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection, Task
 				}
 				
 				TracingTestUtils.checkTracingMinimality(subsumee, subsumer, reasoner);
-				
-				collector.resetSubClassOfAxioms();
 				
 			} catch (Exception e) {
 				throw new TaskException(e);
@@ -312,100 +258,6 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection, Task
 		@Override
 		public Metrics getMetrics() {
 			return metrics;
-		}
-	}
-	
-	
-	/**
-	 * 
-	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
-	 */
-	private static class SideConditionCollector extends BaseTracedConclusionVisitor<Void, Context> {
-
-		private Set<Pair<IndexedClassExpression, IndexedClassExpression>> subclassAxioms_ = new HashSet<Pair<IndexedClassExpression, IndexedClassExpression>>();
-		
-		//private final Set<IndexedClassExpression> fillers_ = new HashSet<IndexedClassExpression>();
-		
-		//private final Set<TracedConclusion> inferences = new HashSet<TracedConclusion>();
-		
-		@Override
-		public Void visit(SubClassOfSubsumer conclusion, Context cxt) {
-			subclassAxioms_.add(new Pair<IndexedClassExpression, IndexedClassExpression>(((Subsumer)conclusion.getPremise()).getExpression(), conclusion.getExpression()));
-			
-			//checkIfExistential(conclusion.getPremise());
-			//checkIfExistential(conclusion);
-			//inferences.add(conclusion);
-			
-			return super.visit(conclusion, cxt);
-		}
-		
-		//collecting all fillers used in some existential restrictions
-		private void checkIfExistential(Conclusion c) {
-			if (c instanceof Subsumer) {
-				IndexedClassExpression ice = ((Subsumer)c).getExpression();
-				
-				ice.accept(new IndexedClassExpressionVisitor<Void>() {
-
-					@Override
-					public Void visit(IndexedClass element) {
-						return null;
-					}
-
-					@Override
-					public Void visit(IndexedIndividual element) {
-						return null;
-					}
-
-					@Override
-					public Void visit(IndexedObjectComplementOf element) {
-						return element.getNegated().accept(this);
-					}
-
-					@Override
-					public Void visit(IndexedObjectIntersectionOf element) {
-						element.getFirstConjunct().accept(this);
-						element.getSecondConjunct().accept(this);
-						return null;
-					}
-
-					@Override
-					public Void visit(IndexedObjectSomeValuesFrom element) {
-						//fillers_.add(element.getFiller());
-						element.getFiller().accept(this);
-						return null;
-					}
-
-					@Override
-					public Void visit(IndexedObjectUnionOf element) {
-						for (IndexedClassExpression disjunct : element.getDisjuncts()) {
-							disjunct.accept(this);
-						}
-						return null;
-					}
-
-					@Override
-					public Void visit(IndexedDataHasValue element) {
-						return null;
-					}
-					
-				});
-			}
-		}
-
-		public Set<Pair<IndexedClassExpression, IndexedClassExpression>> getSubClassOfAxioms() {
-			//System.err.println(subclassAxioms_.size());
-			
-			return subclassAxioms_;
-		}
-		
-		public void resetSubClassOfAxioms() {
-			subclassAxioms_ = null;
-		}
-		
-		public Set<IndexedClassExpression> getFillers() {
-			return null;//fillers_;
 		}
 	}
 

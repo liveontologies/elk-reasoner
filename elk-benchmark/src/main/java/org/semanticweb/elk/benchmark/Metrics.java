@@ -113,9 +113,8 @@ public class Metrics {
 		for (Map.Entry<String, MetricBean> entry : metricMap_.entrySet()) {
 			MetricBean value = entry.getValue();
 
-			if (value.total > 0.0) {
-				buffer.append("Average " + entry.getKey()).append(" : ")
-						.append(value.printAverage()).append(delim);
+			if (value.count > 0 && value.total > 0d) {
+				buffer.append("Average " + entry.getKey()).append(" : ").append(value.printAverage()).append(delim);
 			}
 		}
 		
@@ -169,7 +168,7 @@ public class Metrics {
 		}
 		
 		public String format(double value) {
-			return FORMAT.format(value);//String.format("%.00f", value);
+			return FORMAT.format(value);
 		}
 		
 		public String printAverage() {

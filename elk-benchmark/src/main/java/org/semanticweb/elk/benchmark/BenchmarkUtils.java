@@ -164,10 +164,14 @@ public class BenchmarkUtils {
 	}
 	
 	public static ReasonerConfiguration getReasonerConfiguration(String[] args) {
+		return getReasonerConfiguration(args, 1);
+	}
+	
+	public static ReasonerConfiguration getReasonerConfiguration(String[] args, int firstArgIndex) {
 		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
 		
-		if (args.length > 1) {
-			config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS, args[1]);
+		if (args.length > firstArgIndex) {
+			config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS, args[firstArgIndex]);
 		}
 		
 		return config;

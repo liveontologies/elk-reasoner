@@ -81,7 +81,7 @@ public class TestGraphTest {
 			
 			ElkClass sub = factory.getClass(new ElkFullIri(subsumee));
 			ElkClass sup = factory.getClass(new ElkFullIri(subsumer));
-			reasoner.explainSubsumption(sub, sup, TRACE_MODE.RECURSIVE);
+			reasoner.explainSubsumption(sub, sup);
 			
 			return ReasonerStateAccessor.getTraceState(reasoner).getTraceStore();
 

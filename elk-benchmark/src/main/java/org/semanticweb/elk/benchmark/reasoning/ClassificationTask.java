@@ -39,8 +39,8 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.stages.RuleAndConclusionCountMeasuringExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
-import org.semanticweb.elk.reasoner.stages.TimingStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
@@ -78,9 +78,9 @@ public class ClassificationTask implements Task {
 			AxiomLoader loader = new Owl2StreamLoader(
 					new Owl2FunctionalStyleParserFactory(), ontologyFile);
 			reasoner_ = new ReasonerFactory().createReasoner(loader,
-					//new SimpleStageExecutor(),
-					//new RuleAndConclusionCountMeasuringExecutor( new SimpleStageExecutor(), metrics_),
-					new TimingStageExecutor(new SimpleStageExecutor(), metrics_),
+					//new LoggingStageExecutor(),
+					new RuleAndConclusionCountMeasuringExecutor( new SimpleStageExecutor(), metrics_),
+					//new TimingStageExecutor(new SimpleStageExecutor(), metrics_),
 					reasonerConfig_);
 		} catch (Exception e) {
 			throw new TaskException(e);

@@ -59,14 +59,16 @@ public class RunAllOnceThenRepeatRunner {
 			public void visit(Task task) throws TaskException {
 				cnt.increment();
 				//FIXME
-				/*if (cnt.get() > 1000) {
+				/*if (cnt.get() > 10000) {
 					logStats(collection);
 					throw new RuntimeException("enough");
 				}*/
 				
 				ElkTimer timer = ElkTimer.getNamedTimer(task.getName());
 				
+				//if (cnt.get() % 10000 == 0) {
 				System.err.println("Running " + task.getName() + ", " + cnt);
+				//}
 				
 				task.prepare();
 				
@@ -110,12 +112,12 @@ public class RunAllOnceThenRepeatRunner {
 	
 	public void logStats(TaskCollection2 collection) {
 		for (ElkTimer timer : ElkTimer.getNamedTimers()) {
-			timer.log(LOGGER_, LogLevel.INFO);
+			timer.log(LOGGER_, LogLevel.ERROR);
 		}
 				
 		if (collection.getMetrics() != null) {
 			//System.err.println(collection.getMetrics());
-			collection.getMetrics().printAverages(LOGGER_, LogLevel.WARN);
+			collection.getMetrics().printAverages(LOGGER_, LogLevel.ERROR);
 		}
 	}
 }
