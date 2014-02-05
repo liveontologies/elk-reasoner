@@ -3,9 +3,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +45,8 @@ public class DummyRuleVisitor extends AbstractRuleVisitor {
 	@Override
 	<P> void defaultVisit(Rule<P> rule, P premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		LOGGER_.trace("ignore {} by {} in {}", premise, rule.getName(), premises);
+		LOGGER_.trace("ignore {} by {} in {}", premise, rule.getName(),
+				premises);
 		// do nothing
 	}
 

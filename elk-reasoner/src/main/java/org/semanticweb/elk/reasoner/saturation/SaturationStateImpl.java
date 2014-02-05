@@ -33,8 +33,6 @@ import java.util.NoSuchElementException;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * TODO docs
@@ -46,8 +44,8 @@ import org.slf4j.LoggerFactory;
 class SaturationStateImpl extends AbstractSaturationState {
 
 	// logger for this class
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(SaturationStateImpl.class);
+	//private static final Logger LOGGER_ = LoggerFactory
+	//		.getLogger(SaturationStateImpl.class);
 
 	/**
 	 * 
