@@ -27,6 +27,7 @@ import org.semanticweb.elk.util.collections.chains.Link;
 
 public interface LinkRule<P> extends Rule<P>, Link<LinkRule<P>> {
 
+	@Override
 	public void accept(RuleVisitor visitor, P premise, Context context,
 			ConclusionProducer producer);
 }

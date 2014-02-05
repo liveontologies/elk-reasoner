@@ -10,7 +10,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

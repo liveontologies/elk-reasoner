@@ -6,10 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import sun.util.logging.resources.logging;
 
 /**
  * A {@link SaturationState} backed by a map from {@link IndexedClassExpression}
@@ -21,8 +17,8 @@ import sun.util.logging.resources.logging;
 public class MapSaturationState extends AbstractSaturationState {
 
 	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(MapSaturationState.class);
+	//private static final Logger LOGGER_ = LoggerFactory
+	//		.getLogger(MapSaturationState.class);
 
 	private final ConcurrentHashMap<IndexedClassExpression, Context> contextAssignment_;
 

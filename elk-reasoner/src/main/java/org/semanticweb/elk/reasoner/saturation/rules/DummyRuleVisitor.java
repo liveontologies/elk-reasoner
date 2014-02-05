@@ -3,9 +3,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

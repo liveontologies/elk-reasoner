@@ -53,8 +53,6 @@ import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Context implementation that is used for EL reasoning. It provides data
@@ -69,8 +67,8 @@ import org.slf4j.LoggerFactory;
 public class ContextImpl implements Context {
 
 	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ContextImpl.class);
+	//private static final Logger LOGGER_ = LoggerFactory
+	//		.getLogger(ContextImpl.class);
 
 	private static final ConclusionVisitor<ContextImpl, Boolean> CONCLUSION_INSERTER_ = new ConclusionInserter();
 	private static final ConclusionVisitor<ContextImpl, Boolean> CONCLUSION_DELETER_ = new ConclusionDeleter();
