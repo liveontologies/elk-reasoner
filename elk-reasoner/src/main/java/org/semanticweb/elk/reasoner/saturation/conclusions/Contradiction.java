@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
@@ -56,14 +56,14 @@ public class Contradiction extends AbstractConclusion {
 
 	@Override
 	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
-			Context context, ConclusionProducer producer) {
+			ContextPremises premises, ConclusionProducer producer) {
 		ruleAppVisitor.visit(ContradictionPropagationRule.getInstance(), this,
-				context, producer);
+				premises, producer);
 	}
 
 	@Override
 	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
-			Context context, ConclusionProducer producer) {
+			ContextPremises premises, ConclusionProducer producer) {
 		// no redundant rules
 	}
 

@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
@@ -43,15 +43,15 @@ public class DecomposedSubsumer extends Subsumer {
 
 	@Override
 	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
-			Context context, ConclusionProducer producer) {
-		applyCompositionRules(ruleAppVisitor, context, producer);
-		applyDecompositionRules(ruleAppVisitor, context, producer);
+			ContextPremises premises, ConclusionProducer producer) {
+		applyCompositionRules(ruleAppVisitor, premises, producer);
+		applyDecompositionRules(ruleAppVisitor, premises, producer);
 
 	}
 
 	@Override
 	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
-			Context context, ConclusionProducer producer) {
+			ContextPremises premises, ConclusionProducer producer) {
 		// no redundant rules
 	}
 

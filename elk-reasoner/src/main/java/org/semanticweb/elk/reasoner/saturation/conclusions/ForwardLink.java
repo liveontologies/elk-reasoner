@@ -22,9 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
@@ -34,11 +35,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from this
- * source {@link Context} to a target {@link Context}. Intuitively, if a
- * subclass axiom {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))} is derived
- * by inference rules, then a {@link ForwardLink} with the relation {@code :r}
- * and the target {@code :B} can be produced for the source context with root
- * {@code :A}.
+ * source {@link IndexedClassExpression} to a target
+ * {@link IndexedClassExpression}. Intuitively, if a subclass axiom
+ * {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))} is derived by inference
+ * rules, then a {@link ForwardLink} with the relation {@code :r} and the target
+ * {@code :B} can be produced for {@code :A}.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
@@ -55,12 +56,13 @@ public class ForwardLink extends AbstractConclusion {
 	final IndexedPropertyChain relation_;
 
 	/**
-	 * the {@link Context}, which root is the filler of the existential
-	 * restriction corresponding to this {@link ForwardLink}
+	 * the {@link IndexedClassExpression}, which root is the filler of the
+	 * existential restriction corresponding to this {@link ForwardLink}
 	 */
-	final Context target_;
+	final IndexedClassExpression target_;
 
-	public ForwardLink(IndexedPropertyChain relation, Context target) {
+	public ForwardLink(IndexedPropertyChain relation,
+			IndexedClassExpression target) {
 		this.relation_ = relation;
 		this.target_ = target;
 	}
@@ -69,35 +71,35 @@ public class ForwardLink extends AbstractConclusion {
 		return relation_;
 	}
 
-	public Context getTarget() {
+	public IndexedClassExpression getTarget() {
 		return target_;
 	}
 
 	@Override
 	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
-			Context context, ConclusionProducer producer) {
+			ContextPremises premises, ConclusionProducer producer) {
 		// compose with all backward links
 		ruleAppVisitor.visit(
 				NonReflexiveBackwardLinkCompositionRule.getRuleFor(this), this,
-				context, producer);
+				premises, producer);
 		ruleAppVisitor.visit(
 				ReflexiveBackwardLinkCompositionRule.getRuleFor(this), this,
-				context, producer);
+				premises, producer);
 	}
 
 	@Override
 	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
-			Context context, ConclusionProducer producer) {
+			ContextPremises premises, ConclusionProducer producer) {
 		// no redundant rules
 	}
 
 	@Override
-	public void applyAllLocalRules(RuleVisitor ruleAppVisitor, Context context,
-			ConclusionProducer producer) {
+	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor,
+			ContextPremises premises, ConclusionProducer producer) {
 		// compose only with reflexive backward links
 		ruleAppVisitor.visit(
 				ReflexiveBackwardLinkCompositionRule.getRuleFor(this), this,
-				context, producer);
+				premises, producer);
 	}
 
 	@Override
@@ -107,6 +109,6 @@ public class ForwardLink extends AbstractConclusion {
 
 	@Override
 	public String toString() {
-		return relation_ + "->" + target_.getRoot();
+		return relation_ + "->" + target_;
 	}
 }

@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
@@ -77,16 +78,16 @@ public class DisjointSubsumer extends AbstractConclusion {
 
 	@Override
 	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
-			Context context, ConclusionProducer producer) {
-		if (context.isInconsistForDisjointnessAxiom(axiom_)) {
-			ruleAppVisitor.visit(THIS_COMPOSITION_RULE_, this, context,
+			ContextPremises premises, ConclusionProducer producer) {
+		if (premises.isInconsistForDisjointnessAxiom(axiom_)) {
+			ruleAppVisitor.visit(THIS_COMPOSITION_RULE_, this, premises,
 					producer);
 		}
 	}
 
 	@Override
 	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
-			Context context, ConclusionProducer producer) {
+			ContextPremises premises, ConclusionProducer producer) {
 		// no redundant rules
 	}
 

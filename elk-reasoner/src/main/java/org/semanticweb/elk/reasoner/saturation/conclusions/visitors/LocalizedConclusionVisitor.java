@@ -1,5 +1,27 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -7,15 +29,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ConclusionVisitor} that localizes the input {@link Conclusion} and
- * {@link Context} within the given {@link SaturationState} and passes them to
- * the given internal {@link ConclusionVisitor}. Localization means that all
- * {@link Context}s (including those occurring in the {@link Conclusion}s are
+ * A {@link ConclusionVisitor} that localizes the input {@link Context} within
+ * the given {@link SaturationState} and passes it to the given internal
+ * {@link ConclusionVisitor}. Localization means that the {@link Context} is
  * converted to the corresponding {@link Context}s of the given
  * {@link SaturationState} (i.e., with the same root). If the localized context
  * does not exist, the visitor returns {@code false}
  * 
- * @see ConclusionLocalizer
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -26,8 +46,6 @@ public class LocalizedConclusionVisitor extends
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(LocalizedConclusionVisitor.class);
-
-	private static ConclusionVisitor<SaturationState, Conclusion> CONCLUSION_LOCALIZER_ = new ConclusionLocalizer();
 
 	/**
 	 * the {@link ConclusionVisitor} to be localized
@@ -48,13 +66,6 @@ public class LocalizedConclusionVisitor extends
 			LOGGER_.trace("{}: local context does not exist", input);
 			return false;
 		}
-		Conclusion localConclusion = conclusion.accept(CONCLUSION_LOCALIZER_,
-				state_);
-		if (localConclusion == null) {
-			LOGGER_.trace("{}: conclusion cannot be localized", input);
-			return false;
-		}
-		LOGGER_.trace("{}: localized {}", localContext, localConclusion);
-		return localConclusion.accept(visitor_, localContext);
+		return conclusion.accept(visitor_, localContext);
 	}
 }

@@ -102,7 +102,7 @@ public class ContextImpl implements Context {
 	 * {@link BackwardLink}s computed for this {@link Context}; can be
 	 * {@code null}
 	 */
-	private Multimap<IndexedPropertyChain, Context> backwardLinksByObjectProperty_ = null;
+	private Multimap<IndexedPropertyChain, IndexedClassExpression> backwardLinksByObjectProperty_ = null;
 
 	/**
 	 * the derived {@link IndexedClassExpression} subsumers by
@@ -215,9 +215,9 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public Multimap<IndexedPropertyChain, Context> getBackwardLinksByObjectProperty() {
+	public Multimap<IndexedPropertyChain, IndexedClassExpression> getBackwardLinksByObjectProperty() {
 		return backwardLinksByObjectProperty_ == null ? Operations
-				.<IndexedPropertyChain, Context> emptyMultimap()
+				.<IndexedPropertyChain, IndexedClassExpression> emptyMultimap()
 				: backwardLinksByObjectProperty_;
 	}
 
@@ -288,9 +288,9 @@ public class ContextImpl implements Context {
 
 		@Override
 		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
-			Context source = conclusion.getSource();
+			IndexedClassExpression source = conclusion.getSource();
 			IndexedPropertyChain relation = conclusion.getRelation();
-			if (conclusion.isLocalFor(input)) {
+			if (conclusion.isLocalFor(input.root_)) {
 				// reflexive
 				if (input.reflexiveBackwardLinks_ == null) {
 					input.reflexiveBackwardLinks_ = new ArrayHashSet<IndexedPropertyChain>(
@@ -300,7 +300,7 @@ public class ContextImpl implements Context {
 			}
 			// else non-reflexive
 			if (input.backwardLinksByObjectProperty_ == null)
-				input.backwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, Context>();
+				input.backwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedClassExpression>();
 			return input.backwardLinksByObjectProperty_.add(relation, source);
 		}
 
@@ -381,7 +381,7 @@ public class ContextImpl implements Context {
 		@Override
 		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
 			boolean changed = false;
-			if (conclusion.isLocalFor(input)) {
+			if (conclusion.isLocalFor(input.root_)) {
 				// link is reflexive
 				if (input.reflexiveBackwardLinks_ != null) {
 					changed = input.reflexiveBackwardLinks_.remove(conclusion
@@ -494,7 +494,7 @@ public class ContextImpl implements Context {
 
 		@Override
 		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
-			if (conclusion.isLocalFor(input)) {
+			if (conclusion.isLocalFor(input.root_)) {
 				// reflexive
 				if (input.reflexiveBackwardLinks_ != null)
 					return input.reflexiveBackwardLinks_.contains(conclusion

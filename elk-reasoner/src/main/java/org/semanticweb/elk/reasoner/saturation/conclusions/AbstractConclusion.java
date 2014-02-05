@@ -25,7 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
@@ -37,22 +38,28 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 public abstract class AbstractConclusion implements Conclusion {
 
 	@Override
-	public Context getSourceContext(Context contextWhereStored) {
+	public IndexedClassExpression getSourceRoot(IndexedClassExpression rootWhereStored) {
 		// by default the context where the conclusion is stored
-		return contextWhereStored;
+		return rootWhereStored;
 	}
 
 	@Override
-	public boolean isLocalFor(Context contextWhereStored) {
-		return (getSourceContext(contextWhereStored) == contextWhereStored);
+	public boolean isLocalFor(IndexedClassExpression rootWhereStored) {
+		return (getSourceRoot(rootWhereStored) == rootWhereStored);
 	}
 
 	@Override
-	public void applyAllLocalRules(RuleVisitor ruleAppVisitor, Context context,
-			ConclusionProducer producer) {
-		// by default all rules are local
-		applyNonRedundantRules(ruleAppVisitor, context, producer);
-		applyRedundantRules(ruleAppVisitor, context, producer);
+	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor,
+			ContextPremises premises, ConclusionProducer producer) {
+		// by default all non-rules are local
+		applyNonRedundantRules(ruleAppVisitor, premises, producer);
+	}
+
+	@Override
+	public void applyRedundantLocalRules(RuleVisitor ruleAppVisitor,
+			ContextPremises premises, ConclusionProducer producer) {
+		// by default all redundant rules are local
+		applyRedundantRules(ruleAppVisitor, premises, producer);
 	}
 
 }

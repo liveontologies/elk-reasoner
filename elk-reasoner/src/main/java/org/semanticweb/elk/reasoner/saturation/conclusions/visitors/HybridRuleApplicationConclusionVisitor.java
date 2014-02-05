@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
@@ -32,9 +33,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * s using the provided {@link RuleVisitor}s and {@link ConclusionProducer}s for
  * respectively non-redundant and redundant rule applications. Essentially, it
  * just calls
- * {@link Conclusion#applyNonRedundantRules(RuleVisitor, Context, ConclusionProducer)}
+ * {@link Conclusion#applyNonRedundantRules(RuleVisitor, ContextPremises, ConclusionProducer)}
  * and
- * {@link Conclusion#applyRedundantRules(RuleVisitor, Context, ConclusionProducer)}
+ * {@link Conclusion#applyRedundantRules(RuleVisitor, ContextPremises, ConclusionProducer)}
  * using the respective parameters.
  * 
  * @see AllRuleApplicationConclusionVisitor

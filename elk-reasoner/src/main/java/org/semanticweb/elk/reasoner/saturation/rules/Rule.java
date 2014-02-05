@@ -3,6 +3,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 
 /*
  * #%L
@@ -49,7 +50,7 @@ public interface Rule<P> {
 	 * 
 	 * @param premise
 	 *            the element to which the rule is applied
-	 * @param context
+	 * @param premises
 	 *            the {@link Context} from which other matching premises of the
 	 *            rule are taken
 	 * @param producer
@@ -57,9 +58,9 @@ public interface Rule<P> {
 	 *            of the inferences are produced
 	 * 
 	 */
-	public void apply(P premise, Context context, ConclusionProducer producer);
+	public void apply(P premise, ContextPremises premises, ConclusionProducer producer);
 
-	public void accept(RuleVisitor visitor, P premise, Context context,
+	public void accept(RuleVisitor visitor, P premise, ContextPremises premises,
 			ConclusionProducer producer);
 
 }

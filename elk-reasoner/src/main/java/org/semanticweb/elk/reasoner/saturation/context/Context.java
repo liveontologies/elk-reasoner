@@ -22,17 +22,10 @@ package org.semanticweb.elk.reasoner.saturation.context;
  * #L%
  */
 
-import java.util.Set;
-
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
-import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
@@ -46,66 +39,12 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  * @see RuleApplicationFactory
  * 
  */
-public interface Context extends ConclusionSet {
-
-	/**
-	 * @return the {@link IndexedClassExpression} for which this {@link Context}
-	 *         is assigned. This may never been {@code null}.
-	 */
-	public IndexedClassExpression getRoot();
-
-	/**
-	 * @return the object representing all derived (implied)
-	 *         {@link IndexedClassExpression}s that subsume the root
-	 *         {@link IndexedClassExpression}
-	 */
-	public Set<IndexedClassExpression> getSubsumers();
-
-	/**
-	 * @return the {@link Context}s different from this {@link Context} from
-	 *         which there exists an (implied) "existential relation" with this
-	 *         {@link Context} indexed by the {@link IndexedPropertyChain} of
-	 *         this relation. For example, if the input ontology contains an
-	 *         axiom {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B)} then an
-	 *         existential link between the context with root {@code :A} and the
-	 *         context with root {@code :B} with property {@code :r} will be
-	 *         created. For technical reasons, this link is stored in the
-	 *         context for {@code :B}, as a "backward link" {@code <:r, :A>}
-	 *         indexed by {@code :r} in the {@link Multimap} returned by this
-	 *         method. This link is saved only if {@code :A} is different from
-	 *         {@code :B}. If they are the same, then the property {@code :r} is
-	 *         saved as a local reflexive property in the context
-	 *         {@code :B = :A}. The returned {@link Multimap} is not thread safe
-	 *         and concurrent access should be properly synchronized. This is
-	 *         never {@code null}.
-	 * 
-	 * @see #getLocalReflexiveObjectProperties()
-	 */
-	public Multimap<IndexedPropertyChain, Context> getBackwardLinksByObjectProperty();
-
-	/**
-	 * @return the {@link IndexedPropertyChain}s representing all derived
-	 *         "local reflexive" existential restrictions, i.e., conclusions of
-	 *         the form {@code SubClassOf(:A ObjectSomeValuesFrom(:r :A)}. In
-	 *         this case {@code :r} is saved as a reflexive property in the
-	 *         context {@code :A}. The returned {@link Set} is not thread safe
-	 *         and concurrent access should be properly synchronized. It is
-	 *         never {@code null}.
-	 */
-	public Set<IndexedPropertyChain> getLocalReflexiveObjectProperties();
-
-	/**
-	 * @return the first backward link rule assigned to this {@link Context}, or
-	 *         {@code null} if there no such rules; all other rules can be
-	 *         obtained by traversing over {@link LinkRule#next()}; this method
-	 *         should be used to access the rules without modifying them.
-	 */
-	public LinkableBackwardLinkRule getBackwardLinkRuleHead();
+public interface Context extends ConclusionSet, ContextPremises {
 
 	/**
 	 * @return the {@link Chain} view of all backward link rules assigned to
-	 *         this {@link Context}; this is always not {@code null}. This
-	 *         method can be used for convenient search and modification
+	 *         this {@link ContextPremises}; this is always not {@code null}.
+	 *         This method can be used for convenient search and modification
 	 *         (addition and deletion) of the rules using the methods of the
 	 *         {@link Chain} interface without without worrying about
 	 *         {@code null} values.
@@ -157,8 +96,8 @@ public interface Context extends ConclusionSet {
 	/**
 	 * @return {@code true} if all {@link Conclusion}s for this {@link Context},
 	 *         as determined by the function
-	 *         {@link Conclusion#getSourceContext(Context)}, are already
-	 *         computed.
+	 *         {@link Conclusion#getSourceRoot(IndexedClassExpression)}, are
+	 *         already computed.
 	 */
 	public boolean isSaturated();
 
@@ -176,19 +115,6 @@ public interface Context extends ConclusionSet {
 	 * @return {@code true} if the context is empty
 	 */
 	public boolean isEmpty();
-
-	/**
-	 * @param axiom
-	 *            the {@link IndexedDisjointnessAxiom} to be checked for causing
-	 *            inconsistency in this {@link Context}
-	 * 
-	 * @return {@code true} if the given {@link IndexedDisjointnessAxiom} makes
-	 *         this {@link Context} inconsistent, that is, this context contains
-	 *         at least two different {@link DisjointSubsumer}s for this
-	 *         {@link IndexedDisjointnessAxiom}
-	 */
-	public boolean isInconsistForDisjointnessAxiom(
-			IndexedDisjointnessAxiom axiom);
 
 	/**
 	 * removes links to the next and previous contexts, effectively removing

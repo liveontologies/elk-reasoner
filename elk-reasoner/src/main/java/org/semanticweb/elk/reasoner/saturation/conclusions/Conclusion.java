@@ -1,7 +1,9 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
@@ -42,60 +44,82 @@ public interface Conclusion {
 
 	/**
 	 * 
-	 * @param contextWhereStored
-	 * @return The context which this conclusion is logically relevant for; it
-	 *         cannot be {@code null}
+	 * @param rootWhereStored
+	 * @return The {@link IndexedClassExpression} for which this conclusion is
+	 *         logically relevant for; it cannot be {@code null}
 	 */
-	public Context getSourceContext(Context contextWhereStored);
+	public IndexedClassExpression getSourceRoot(
+			IndexedClassExpression rootWhereStored);
 
 	/**
-	 * @param contextWhereStored
+	 * @param rootWhereStored
 	 *            the {@code Context} for which to check locality of this
 	 *            {@link BackwardLink}
 	 * @return {@code true} if the source context of this {@link BackwardLink}
 	 *         is the same the given {@link Context}
 	 * 
-	 * @see BackwardLink#getSourceContext(Context)
+	 * @see BackwardLink#getSourceRoot(IndexedClassExpression)
 	 * @see Context#getRoot()
 	 */
-	public boolean isLocalFor(Context contextWhereStored);
+	public boolean isLocalFor(IndexedClassExpression rootWhereStored);
 
 	/**
-	 * Apply all non-redundant inferences for this {@link Conclusion} in a
-	 * {@link Context}
+	 * Apply all non-redundant inferences for this {@link Conclusion} with other
+	 * {@link ContextPremises}
 	 * 
-	 * @see #applyRedundantRules(RuleVisitor, Context, ConclusionProducer)
+	 * @see #applyRedundantRules(RuleVisitor, ContextPremises, ConclusionProducer)
 	 * 
 	 * @param ruleAppVisitor
-	 * @param context
+	 * @param premises
 	 * @param producer
 	 */
 	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
-			Context context, ConclusionProducer producer);
+			ContextPremises premises, ConclusionProducer producer);
 
 	/**
-	 * Apply all redundant rules for this {@link Conclusion} in a
-	 * {@link Context}. A rule is redundant if its application is not necessary
-	 * for completeness. Redundancy of a rule depends on other conclusions
-	 * contained in the {@link Context}: a non-redundant rule might become
-	 * redundant when other {@link Conclusion} are added to the {@link Context}.
+	 * Apply all redundant rules for this {@link Conclusion} and given
+	 * {@link ContextPremises}. A rule is redundant if its application is not
+	 * necessary for completeness. Redundancy of a rule depends on other
+	 * {@link ContextPremises}: a non-redundant rule might become redundant when
+	 * other {@link ContextPremises} are added.
+	 * 
+	 * @see #applyNonRedundantRules(RuleVisitor, ContextPremises,
+	 *      ConclusionProducer)
 	 * 
 	 * @param ruleAppVisitor
-	 * @param context
+	 * @param premises
 	 * @param producer
 	 */
 	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
-			Context context, ConclusionProducer producer);
+			ContextPremises premises, ConclusionProducer producer);
 
 	/**
-	 * Apply all (redundant and non-redundant) rules that produce
-	 * {@link Conclusion}s that logically belong to the same {@link Context} as
-	 * this {@link Conclusion}
+	 * Apply all non-redundant rules that produce {@link Conclusion}s that
+	 * logically belong to the same root as this {@link Conclusion}
+	 * 
+	 * @see #isLocalFor(IndexedClassExpression)
+	 * @see #applyRedundantLocalRules(RuleVisitor, ContextPremises,
+	 *      ConclusionProducer)
 	 * 
 	 * @param ruleAppVisitor
-	 * @param context
+	 * @param premises
 	 * @param producer
 	 */
-	public void applyAllLocalRules(RuleVisitor ruleAppVisitor, Context context,
-			ConclusionProducer producer);
+	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor,
+			ContextPremises premises, ConclusionProducer producer);
+
+	/**
+	 * Apply all redundant rules that produce {@link Conclusion}s that logically
+	 * belong to the same root as this {@link Conclusion}
+	 * 
+	 * @see #applyNonRedundantLocalRules(RuleVisitor, ContextPremises,
+	 *      ConclusionProducer)
+	 * 
+	 * @param ruleAppVisitor
+	 * @param premises
+	 * @param producer
+	 */
+	public void applyRedundantLocalRules(RuleVisitor ruleAppVisitor,
+			ContextPremises premises, ConclusionProducer producer);
+
 }

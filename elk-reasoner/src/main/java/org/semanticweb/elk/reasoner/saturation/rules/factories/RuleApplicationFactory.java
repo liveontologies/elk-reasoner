@@ -120,10 +120,11 @@ public class RuleApplicationFactory {
 		// the visitor used for inserting conclusion
 		ConclusionVisitor<Context, Boolean> insertionVisitor = new ConclusionInsertionVisitor();
 		if (trackModifiedContexts_)
-			// after insertion, mark contexts as modified
+			// after insertion, mark the source context as modified
 			insertionVisitor = new CombinedConclusionVisitor<Context>(
 					insertionVisitor,
-					new ConclusionSourceContextUnsaturationVisitor(writer));
+					new ConclusionSourceContextUnsaturationVisitor(
+							saturationState, writer));
 		return new CombinedConclusionVisitor<Context>(
 		// add conclusion to the context
 				insertionVisitor,

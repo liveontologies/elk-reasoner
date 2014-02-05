@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.slf4j.Logger;
@@ -100,18 +101,19 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	/**
-	 * Generates {@link Propagation}s in the {@link Context} that apply for the
-	 * given {@link IndexedPropertyChain}
+	 * Generates {@link Propagation}s for the {@link ContextPremises} that apply
+	 * for the given {@link IndexedPropertyChain}
 	 * 
 	 * @param property
-	 * @param context
+	 * @param premises
 	 * @param producer
 	 */
 	public static void generatePropagations(IndexedPropertyChain property,
-			Context context, ConclusionProducer producer) {
-		for (IndexedClassExpression ice : context.getSubsumers()) {
-			PropagationFromExistentialFillerRule.applyForProperty(
-					ice.getCompositionRuleChain(), property, context, producer);
+			ContextPremises premises, ConclusionProducer producer) {
+		for (IndexedClassExpression ice : premises.getSubsumers()) {
+			PropagationFromExistentialFillerRule
+					.applyForProperty(ice.getCompositionRuleChain(), property,
+							premises, producer);
 		}
 	}
 

@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
@@ -41,16 +42,20 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public class ConclusionSourceContextUnsaturationVisitor extends
 		AbstractConclusionVisitor<Context, Boolean> {
 
+	private final SaturationState state_;
+
 	private final SaturationStateWriter writer_;
 
-	public ConclusionSourceContextUnsaturationVisitor(
+	public ConclusionSourceContextUnsaturationVisitor(SaturationState state,
 			SaturationStateWriter writer) {
+		this.state_ = state;
 		this.writer_ = writer;
 	}
 
 	@Override
 	Boolean defaultVisit(Conclusion conclusion, Context context) {
-		writer_.markAsNotSaturated(conclusion.getSourceContext(context));
+		writer_.markAsNotSaturated(state_.getContext(conclusion
+				.getSourceRoot(context.getRoot())));
 		return true;
 	}
 

@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -90,9 +90,9 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 
 	@Override
 	public void accept(LinkedSubsumerRuleVisitor visitor,
-			IndexedClassExpression premise, Context context,
+			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		visitor.visit(this, premise, context, producer);
+		visitor.visit(this, premise, premises, producer);
 	}
 
 	// TODO: hide this method
@@ -101,10 +101,11 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 	}
 
 	@Override
-	public void apply(IndexedClassExpression premise, Context context,
+	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		for (IndexedClassExpression disjunction : disjunctions_)
-			producer.produce(context, new ComposedSubsumer(disjunction));
+			producer.produce(premises.getRoot(), new ComposedSubsumer(
+					disjunction));
 	}
 
 	@Override

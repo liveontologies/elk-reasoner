@@ -3,7 +3,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * A {@link RuleVisitor} which simply applies the rules that it visits to the
  * given arguments.
  * 
- * @see {@link Rule#apply(Object, Context, ConclusionProducer)}
+ * @see {@link Rule#apply(Object, ContextPremises, ConclusionProducer)}
  * 
  * @author Pavel Klinov
  * 
@@ -47,9 +47,9 @@ public class BasicRuleVisitor extends AbstractRuleVisitor {
 			.getLogger(BasicRuleVisitor.class);
 
 	@Override
-	<P> void defaultVisit(Rule<P> rule, P premise, Context context,
+	<P> void defaultVisit(Rule<P> rule, P premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		LOGGER_.trace("{}: process {} by {}", context, premise, rule.getName());
-		rule.apply(premise, context, producer);
+		LOGGER_.trace("{}: process {} by {}", premises, premise, rule.getName());
+		rule.apply(premise, premises, producer);
 	}
 }

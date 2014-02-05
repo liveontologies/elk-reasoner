@@ -44,6 +44,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
@@ -157,20 +158,20 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(BackwardLinkChainFromBackwardLinkRule rule,
-				BackwardLink premise, Context context,
+				BackwardLink premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			for (IndexedPropertyChain prop : rule
 					.getForwardLinksByObjectProperty().keySet()) {
-				for (Context target : rule.getForwardLinksByObjectProperty()
-						.get(prop)) {
-					contextValidator_.add(target);
+				for (IndexedClassExpression target : rule
+						.getForwardLinksByObjectProperty().get(prop)) {
+					iceValidator_.checkNew(target);
 				}
 			}
 		}
 
 		@Override
 		public void visit(ContradicitonCompositionRule rule,
-				DisjointSubsumer premise, Context context,
+				DisjointSubsumer premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 
@@ -179,14 +180,14 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				ContradictionFromDisjointnessRule thisContradictionRule,
-				IndexedClassExpression premise, Context context,
+				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 		}
 
 		@Override
 		public void visit(ContradictionFromNegationRule rule,
-				IndexedClassExpression premise, Context context,
+				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			iceValidator_.checkNew(rule.getNegation());
 
@@ -194,7 +195,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(ContradictionFromOwlNothingRule rule,
-				IndexedClassExpression premise, Context context,
+				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 
@@ -203,21 +204,21 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(
 				ContradictionOverBackwardLinkRule bottomBackwardLinkRule,
-				BackwardLink premise, Context context,
+				BackwardLink premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 		}
 
 		@Override
 		public void visit(ContradictionPropagationRule rule,
-				Contradiction premise, Context context,
+				Contradiction premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 		}
 
 		@Override
 		public void visit(DisjointSubsumerFromMemberRule rule,
-				IndexedClassExpression premise, Context context,
+				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			for (IndexedDisjointnessAxiom axiom : rule.getDisjointnessAxioms()) {
 				if (!axiom.occurs()) {
@@ -233,7 +234,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(ForwardLinkFromBackwardLinkRule rule,
-				BackwardLink premise, Context context,
+				BackwardLink premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 
@@ -241,7 +242,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(IndexedObjectComplementOfDecomposition rule,
-				IndexedObjectComplementOf premise, Context context,
+				IndexedObjectComplementOf premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 
@@ -249,7 +250,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(IndexedObjectIntersectionOfDecomposition rule,
-				IndexedObjectIntersectionOf premise, Context context,
+				IndexedObjectIntersectionOf premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 
@@ -257,7 +258,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(IndexedObjectSomeValuesFromDecomposition rule,
-				IndexedObjectSomeValuesFrom premise, Context context,
+				IndexedObjectSomeValuesFrom premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 
@@ -265,14 +266,14 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(NonReflexiveBackwardLinkCompositionRule rule,
-				ForwardLink premise, Context context,
+				ForwardLink premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 		}
 
 		@Override
 		public void visit(NonReflexivePropagationRule rule,
-				Propagation premise, Context context,
+				Propagation premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 
@@ -280,7 +281,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(ObjectIntersectionFromConjunctRule rule,
-				IndexedClassExpression premise, Context context,
+				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : rule
 					.getConjunctionsByConjunct().entrySet()) {
@@ -291,7 +292,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(ObjectUnionFromDisjunctRule rule,
-				IndexedClassExpression premise, Context context,
+				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			for (IndexedClassExpression ice : rule.getDisjunctions()) {
 				iceValidator_.checkNew(ice);
@@ -300,21 +301,21 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(OwlThingContextInitRule rule,
-				ContextInitialization premise, Context context,
+				ContextInitialization premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 		}
 
 		@Override
 		public void visit(PropagationFromBackwardLinkRule rule,
-				BackwardLink premise, Context context,
+				BackwardLink premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 		}
 
 		@Override
 		public void visit(PropagationFromExistentialFillerRule rule,
-				IndexedClassExpression premise, Context context,
+				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			for (IndexedClassExpression ice : rule.getNegativeExistentials()) {
 				iceValidator_.checkNew(ice);
@@ -323,7 +324,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(ReflexiveBackwardLinkCompositionRule rule,
-				ForwardLink premise, Context context,
+				ForwardLink premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 
@@ -331,21 +332,21 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(ReflexivePropagationRule rule, Propagation premise,
-				Context context, ConclusionProducer producer) {
+				ContextPremises premises, ConclusionProducer producer) {
 			// nothing is stored in the rule
 
 		}
 
 		@Override
 		public void visit(RootContextInitializationRule rule,
-				ContextInitialization premise, Context context,
+				ContextInitialization premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
 		}
 
 		@Override
 		public void visit(SubsumerBackwardLinkRule rule, BackwardLink premise,
-				Context context, ConclusionProducer producer) {
+				ContextPremises premises, ConclusionProducer producer) {
 			for (IndexedPropertyChain prop : rule
 					.getPropagationsByObjectProperty().keySet()) {
 				for (IndexedClassExpression ice : rule
@@ -357,7 +358,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
 		@Override
 		public void visit(SuperClassFromSubClassRule rule,
-				IndexedClassExpression premise, Context context,
+				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			for (IndexedClassExpression ice : rule.getToldSuperclasses()) {
 				iceValidator_.checkNew(ice);
@@ -419,9 +420,9 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			// validating backward links
 			for (IndexedPropertyChain prop : context
 					.getBackwardLinksByObjectProperty().keySet()) {
-				for (Context linkedContext : context
+				for (IndexedClassExpression source : context
 						.getBackwardLinksByObjectProperty().get(prop)) {
-					add(linkedContext);
+					iceValidator_.checkNew(source);
 				}
 			}
 

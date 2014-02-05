@@ -1,12 +1,34 @@
 package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
 
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -70,9 +92,9 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 	}
 
 	@Override
-	public void apply(ContextInitialization premise, Context context,
+	public void apply(ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		producer.produce(context, new DecomposedSubsumer(owlThing_));
+		producer.produce(premises.getRoot(), new DecomposedSubsumer(owlThing_));
 	}
 
 	@Override
@@ -94,9 +116,9 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 
 	@Override
 	public void accept(LinkedContextInitRuleVisitor visitor,
-			ContextInitialization premise, Context context,
+			ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		visitor.visit(this, premise, context, producer);
+		visitor.visit(this, premise, premises, producer);
 	}
 
 	private static final Matcher<ChainableContextInitRule, OwlThingContextInitRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableContextInitRule, OwlThingContextInitRule>(

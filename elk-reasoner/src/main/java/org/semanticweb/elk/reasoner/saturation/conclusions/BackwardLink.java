@@ -22,9 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ForwardLinkFromBackwardLinkRule;
@@ -33,11 +34,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.PropagationFr
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from a
- * source {@link Context} to this target {@link Context}. Intuitively, if a
- * subclass axiom {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))} is derived
- * by inference rules, then a {@link BackwardLink} with the source {@code :A}
- * and the relation {@code :r} can be produced for the target context with root
- * {@code :B}.
+ * source {@link IndexedClassExpression} to this target
+ * {@link IndexedClassExpression}. Intuitively, if a subclass axiom
+ * {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))} is derived by inference
+ * rules, then a {@link BackwardLink} with the source {@code :A} and the
+ * relation {@code :r} can be produced for the target {@code :B}.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
@@ -46,10 +47,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.PropagationFr
 public class BackwardLink extends AbstractConclusion {
 
 	/**
-	 * the source {@link Context} of this {@link BackwardLink}; the root of the
-	 * source implies this link.
+	 * the source {@link IndexedClassExpression} of this {@link BackwardLink};
+	 * the root of the source implies this link.
 	 */
-	private final Context source_;
+	private final IndexedClassExpression source_;
 
 	/**
 	 * the {@link IndexedPropertyChain} in the existential restriction
@@ -57,7 +58,8 @@ public class BackwardLink extends AbstractConclusion {
 	 */
 	private final IndexedPropertyChain relation_;
 
-	public BackwardLink(Context source, IndexedPropertyChain relation) {
+	public BackwardLink(IndexedClassExpression source,
+			IndexedPropertyChain relation) {
 		this.relation_ = relation;
 		this.source_ = source;
 	}
@@ -72,56 +74,59 @@ public class BackwardLink extends AbstractConclusion {
 
 	/**
 	 * @return the source of this {@link BackwardLink}, that is, the
-	 *         {@link Context} from which the existential restriction
-	 *         corresponding to this {@link BackwardLink} follows
+	 *         {@link IndexedClassExpression} from which the existential
+	 *         restriction corresponding to this {@link BackwardLink} follows
 	 */
-	public Context getSource() {
+	public IndexedClassExpression getSource() {
 		return source_;
 	}
 
 	@Override
 	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
-			Context context, ConclusionProducer producer) {
+			ContextPremises premises, ConclusionProducer producer) {
 
 		ruleAppVisitor.visit(PropagationFromBackwardLinkRule.getInstance(),
-				this, context, producer);
+				this, premises, producer);
 		ruleAppVisitor.visit(ForwardLinkFromBackwardLinkRule.getInstance(),
-				this, context, producer);
+				this, premises, producer);
 
 		// apply all backward link rules of the context
-		LinkedBackwardLinkRule backLinkRule = context.getBackwardLinkRuleHead();
+		LinkedBackwardLinkRule backLinkRule = premises
+				.getBackwardLinkRuleHead();
 		while (backLinkRule != null) {
-			backLinkRule.accept(ruleAppVisitor, this, context, producer);
+			backLinkRule.accept(ruleAppVisitor, this, premises, producer);
 			backLinkRule = backLinkRule.next();
 		}
 	}
 
 	@Override
 	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
-			Context context, ConclusionProducer producer) {
+			ContextPremises premises, ConclusionProducer producer) {
 		// no redundant rules for BackwardLink
 	}
 
 	@Override
-	public void applyAllLocalRules(RuleVisitor ruleAppVisitor, Context context,
-			ConclusionProducer producer) {
-		if (isLocalFor(context))
+	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor,
+			ContextPremises premises, ConclusionProducer producer) {
+		if (isLocalFor(premises.getRoot()))
 			// generate propagations only if this link is local
 			ruleAppVisitor.visit(PropagationFromBackwardLinkRule.getInstance(),
-					this, context, producer);
+					this, premises, producer);
 		ruleAppVisitor.visit(ForwardLinkFromBackwardLinkRule.getInstance(),
-				this, context, producer);
+				this, premises, producer);
 
 		// apply all backward link rules of the context
-		LinkedBackwardLinkRule backLinkRule = context.getBackwardLinkRuleHead();
+		LinkedBackwardLinkRule backLinkRule = premises
+				.getBackwardLinkRuleHead();
 		while (backLinkRule != null) {
-			backLinkRule.accept(ruleAppVisitor, this, context, producer);
+			backLinkRule.accept(ruleAppVisitor, this, premises, producer);
 			backLinkRule = backLinkRule.next();
 		}
 	}
 
 	@Override
-	public Context getSourceContext(Context contextWhereStored) {
+	public IndexedClassExpression getSourceRoot(
+			IndexedClassExpression rootWhereStored) {
 		return source_;
 	}
 

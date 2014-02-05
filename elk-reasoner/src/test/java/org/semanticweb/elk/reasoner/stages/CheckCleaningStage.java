@@ -81,10 +81,10 @@ public class CheckCleaningStage extends BasePostProcessingStage {
 			Context context = reasoner_.saturationState.getContext(ice);
 			if (context == null)
 				continue;
-			Multimap<IndexedPropertyChain, Context> backwardLinks = context
+			Multimap<IndexedPropertyChain, IndexedClassExpression> backwardLinks = context
 					.getBackwardLinksByObjectProperty();
 			for (IndexedPropertyChain ipc : backwardLinks.keySet()) {
-				for (Context target : backwardLinks.get(ipc))
+				for (IndexedClassExpression target : backwardLinks.get(ipc))
 					if (cleanedContexts.contains(target))
 						LOGGER_.error("Backward link in " + context
 								+ " via property " + ipc

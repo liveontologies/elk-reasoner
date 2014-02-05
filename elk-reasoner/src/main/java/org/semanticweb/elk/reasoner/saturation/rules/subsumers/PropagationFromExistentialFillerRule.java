@@ -35,6 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -99,9 +100,9 @@ public class PropagationFromExistentialFillerRule extends
 	}
 
 	@Override
-	public void apply(IndexedClassExpression premise, Context context,
+	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		final Set<IndexedPropertyChain> candidatePropagationProperties = context
+		final Set<IndexedPropertyChain> candidatePropagationProperties = premises
 				.getBackwardLinksByObjectProperty().keySet();
 
 		// TODO: deal with reflexive roles using another
@@ -119,13 +120,14 @@ public class PropagationFromExistentialFillerRule extends
 			for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
 					candidatePropagationProperties, relation.getSaturated()
 							.getSubProperties())) {
-				producer.produce(context, new Propagation(property, e));
+				producer.produce(premises.getRoot(), new Propagation(property,
+						e));
 			}
 
 			// TODO: create a composition rule to deal with reflexivity
 			// propagating to the this context if relation is reflexive
 			if (relation.getSaturated().isDerivedReflexive())
-				producer.produce(context, new ComposedSubsumer(e));
+				producer.produce(premises.getRoot(), new ComposedSubsumer(e));
 		}
 	}
 
@@ -165,9 +167,9 @@ public class PropagationFromExistentialFillerRule extends
 
 	@Override
 	public void accept(LinkedSubsumerRuleVisitor visitor,
-			IndexedClassExpression premise, Context context,
+			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		visitor.visit(this, premise, context, producer);
+		visitor.visit(this, premise, premises, producer);
 	}
 
 	private boolean addNegExistential(IndexedObjectSomeValuesFrom existential) {
@@ -190,30 +192,31 @@ public class PropagationFromExistentialFillerRule extends
 	 * {@link IndexedPropertyChain} in the given {@link Context}
 	 * 
 	 * @param property
-	 * @param context
+	 * @param premises
 	 * @param producer
 	 */
-	void applyForProperty(IndexedPropertyChain property, Context context,
-			ConclusionProducer producer) {
+	void applyForProperty(IndexedPropertyChain property,
+			ContextPremises premises, ConclusionProducer producer) {
 
 		for (IndexedObjectSomeValuesFrom e : negExistentials_) {
 			if (e.getRelation().getSaturated().getSubProperties()
 					.contains(property)) {
-				producer.produce(context, new Propagation(property, e));
+				producer.produce(premises.getRoot(), new Propagation(property,
+						e));
 			}
 		}
 
 	}
 
 	public static void applyForProperty(Chain<ChainableSubsumerRule> ruleChain,
-			IndexedPropertyChain property, Context context,
+			IndexedPropertyChain property, ContextPremises premises,
 			ConclusionProducer producer) {
 		PropagationFromExistentialFillerRule rule = ruleChain.find(MATCHER_);
 
 		if (rule == null)
 			return;
 
-		rule.applyForProperty(property, context, producer);
+		rule.applyForProperty(property, premises, producer);
 
 	}
 

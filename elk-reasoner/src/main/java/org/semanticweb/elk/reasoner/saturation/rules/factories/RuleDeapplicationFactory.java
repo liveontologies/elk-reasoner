@@ -76,7 +76,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	 *         {@link Conclusion} if it occurs in the {@link Context}, and
 	 *         deletes this {@link Conclusion} from the {@link Context}
 	 */
-	private static ConclusionVisitor<Context, Boolean> getDeletionConclusionProcessor(
+	private ConclusionVisitor<Context, Boolean> getDeletionConclusionProcessor(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer) {
 		return new CombinedConclusionVisitor<Context>(
 				new CombinedConclusionVisitor<Context>(
@@ -90,7 +90,8 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 				// after processing, delete the conclusion
 						new ConclusionDeletionVisitor(),
 						// and mark the source context as non-saturated
-						new ConclusionSourceContextUnsaturationVisitor(writer)));
+						new ConclusionSourceContextUnsaturationVisitor(
+								saturationState, writer)));
 	}
 
 	/**

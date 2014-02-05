@@ -22,11 +22,11 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.util.collections.chains.Link;
 
 public interface LinkRule<P> extends Rule<P>, Link<LinkRule<P>> {
 
-	public void accept(RuleVisitor visitor, P premise, Context context,
+	public void accept(RuleVisitor visitor, P premise, ContextPremises premises,
 			ConclusionProducer producer);
 }

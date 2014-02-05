@@ -36,14 +36,12 @@ import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextNotSaturatedCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.HybridRuleApplicationConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.HybridLocalRuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalizedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CombinedConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.rules.LocalizedConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.slf4j.Logger;
@@ -82,34 +80,24 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, ConclusionProducer mainProducer,
 			ConclusionProducer trackingProducer) {
-		// TODO: we need hybrid contexts!
-		// since we process context and conclusions coming from the tracing
-		// state, we need to localize them when producing to the main state
-		ConclusionProducer localizedMainProducer = new LocalizedConclusionProducer(
-				mainProducer, saturationState);
 		return new CombinedConclusionVisitor<Context>(
-				// checking the conclusion against the main saturation state
+		// checking the conclusion against the main saturation state
 				new LocalizedConclusionVisitor(
-						new CombinedConclusionVisitor<Context>(
-						// the source context of the conclusion is not saturated
-						// TODO: make sure that such conclusions are never
-						// processed at all
-								new ConclusionSourceContextNotSaturatedCheckingVisitor(),
-								// and the conclusion already occurs there
-								new ConclusionOccurrenceCheckingVisitor()),
+						// conclusion already occurs there
+						new ConclusionOccurrenceCheckingVisitor(),
 						saturationState),
 				// if all fine,
 				new CombinedConclusionVisitor<Context>(
 				// insert the conclusion
 						new ConclusionInsertionVisitor(),
-						// apply the rules
-						new HybridRuleApplicationConclusionVisitor(ruleVisitor,
-								ruleVisitor,
-								// the conclusions of redundant rules are
-								// inserted
-								// to both main and tracing saturation states
-								new CombinedConclusionProducer(
-										localizedMainProducer, trackingProducer),
+						// apply local rules
+						new HybridLocalRuleApplicationConclusionVisitor(
+								saturationState, ruleVisitor, ruleVisitor,
+								// the conclusions of non-redundant rules are
+								// inserted to both main and tracing saturation
+								// states
+								new CombinedConclusionProducer(mainProducer,
+										trackingProducer),
 								// whereas the conclusion of redundant rules are
 								// needed only for tracking
 								trackingProducer)));

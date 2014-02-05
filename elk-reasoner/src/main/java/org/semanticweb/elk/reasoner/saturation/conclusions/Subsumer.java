@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
@@ -31,10 +31,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecomposi
 
 /**
  * A {@link Conclusion} representing a subsumer {@link IndexedClassExpression}
- * of the root of the {@link Context} for which it is produced. Intuitively, if
- * a subclass axiom {@code SubClassOf(:A :B)} is derived by inference rules,
- * then a {@link Subsumer} corresponding to {@code :B} can be produced for the
- * context with root {@code :A}
+ * of the root {@link IndexedClassExpression} for which it is produced.
+ * Intuitively, if a subclass axiom {@code SubClassOf(:A :B)} is derived by
+ * inference rules, then a {@link Subsumer} corresponding to {@code :B} can be
+ * produced for the context with root {@code :A}
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
@@ -67,25 +67,26 @@ public abstract class Subsumer extends AbstractConclusion {
 		return "Subsumer(" + expression_.toString() + ")";
 	}
 
-	void applyCompositionRules(RuleVisitor ruleAppVisitor, Context context,
-			ConclusionProducer producer) {
+	void applyCompositionRules(RuleVisitor ruleAppVisitor,
+			ContextPremises premises, ConclusionProducer producer) {
 		LinkedSubsumerRule compositionRule = expression_
 				.getCompositionRuleHead();
 		while (compositionRule != null) {
-			compositionRule.accept(ruleAppVisitor, expression_, context,
+			compositionRule.accept(ruleAppVisitor, expression_, premises,
 					producer);
 			compositionRule = compositionRule.next();
 		}
 	}
 
-	void applyDecompositionRules(RuleVisitor ruleAppVisitor, Context context,
-			ConclusionProducer producer) {
+	void applyDecompositionRules(RuleVisitor ruleAppVisitor,
+			ContextPremises premises, ConclusionProducer producer) {
 		expression_.accept(new SubsumerDecompositionVisitor(ruleAppVisitor,
-				context, producer));
+				premises, producer));
 	}
 
 	@Override
-	public Context getSourceContext(Context contextWhereStored) {
-		return contextWhereStored;
+	public IndexedClassExpression getSourceRoot(
+			IndexedClassExpression rootWhereStored) {
+		return rootWhereStored;
 	}
 }
