@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -42,11 +43,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * using the respective parameters.
  * 
  * When applying local rules, to the visited {@link Conclusion}, local premises
- * (premises for the same source {@link Context}) are taken from the local
- * {@link Context} and other premises from the corresponding {@link Context} in
- * the main saturation state. This is done to ensure that every rule is applied
- * at most once and no inference is lost when processing only local
- * {@link Conclusion}s.
+ * (premises with the same source) are taken from the local {@link Context} and
+ * other premises from the corresponding {@link Context} in the main saturation
+ * state. This is done to ensure that every rule is applied at most once and no
+ * inference is lost when processing only local {@link Conclusion}s.
  * 
  * @see HybridRuleApplicationConclusionVisitor
  * 
@@ -57,28 +57,28 @@ public class HybridLocalRuleApplicationConclusionVisitor extends
 		AbstractConclusionVisitor<Context, Boolean> {
 
 	/**
-	 * 
+	 * the main {@link SaturationState} to take the non-local premises from
 	 */
 	private final SaturationState mainState_;
 
 	/**
-	 * {@link RuleVisitor} for non-redundant rule applications
+	 * a {@link RuleVisitor} for non-redundant rule applications
 	 */
 	private final RuleVisitor nonRedundantRuleVisitor_;
 
 	/**
-	 * {@link RuleVisitor} for redundant rule applications
+	 * a {@link RuleVisitor} for redundant rule applications
 	 */
 	private final RuleVisitor redundantRuleVisitor_;
 
 	/**
-	 * {@link ConclusionProducer} to produce the {@link Conclusion}s of the
+	 * a {@link ConclusionProducer} to produce the {@link Conclusion}s of the
 	 * non-redundant rules
 	 */
 	private final ConclusionProducer nonRedundantProducer_;
 
 	/**
-	 * {@link ConclusionProducer} to produce the {@link Conclusion}s of the
+	 * a {@link ConclusionProducer} to produce the {@link Conclusion}s of the
 	 * redundant rules
 	 */
 	private final ConclusionProducer redundantProducer_;
@@ -97,7 +97,8 @@ public class HybridLocalRuleApplicationConclusionVisitor extends
 
 	@Override
 	Boolean defaultVisit(Conclusion conclusion, Context input) {
-		if (conclusion.isLocalFor(input.getRoot())) {
+		IndexedClassExpression root = input.getRoot();
+		if (conclusion.getSourceRoot(root) == root) {
 			// applying rules for hybrid premises
 			ContextPremises hybridPremises = new HybridContextPremises(input,
 					mainState_.getContext(input.getRoot()));

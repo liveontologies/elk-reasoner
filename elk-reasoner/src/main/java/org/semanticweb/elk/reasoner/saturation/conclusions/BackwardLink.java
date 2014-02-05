@@ -100,12 +100,6 @@ public class BackwardLink extends AbstractConclusion {
 	}
 
 	@Override
-	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		// no redundant rules for BackwardLink
-	}
-
-	@Override
 	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
 		if (isLocalFor(premises.getRoot()))
@@ -139,4 +133,9 @@ public class BackwardLink extends AbstractConclusion {
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
+
+	private boolean isLocalFor(IndexedClassExpression rootWhereStored) {
+		return (getSourceRoot(rootWhereStored) == rootWhereStored);
+	}
+
 }

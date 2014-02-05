@@ -32,13 +32,11 @@ import org.slf4j.LoggerFactory;
  * A {@link ConclusionVisitor} that localizes the input {@link Context} within
  * the given {@link SaturationState} and passes it to the given internal
  * {@link ConclusionVisitor}. Localization means that the {@link Context} is
- * converted to the corresponding {@link Context}s of the given
+ * converted to the corresponding {@link Context} within the given
  * {@link SaturationState} (i.e., with the same root). If the localized context
- * does not exist, the visitor returns {@code false}
- * 
+ * does not exist, the visitor returns {@code false}.
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
 public class LocalizedConclusionVisitor extends
 		AbstractConclusionVisitor<Context, Boolean> {
@@ -51,6 +49,10 @@ public class LocalizedConclusionVisitor extends
 	 * the {@link ConclusionVisitor} to be localized
 	 */
 	ConclusionVisitor<Context, Boolean> visitor_;
+
+	/**
+	 * the {@link SaturationState} used to localize {@link Context}s
+	 */
 	SaturationState state_;
 
 	public LocalizedConclusionVisitor(

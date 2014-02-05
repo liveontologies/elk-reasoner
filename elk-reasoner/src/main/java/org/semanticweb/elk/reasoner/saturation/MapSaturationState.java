@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation;
+
 /*
  * #%L
  * ELK Reasoner
@@ -36,10 +37,6 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  */
 public class MapSaturationState extends AbstractSaturationState {
-
-	// logger for events
-	//private static final Logger LOGGER_ = LoggerFactory
-	//		.getLogger(MapSaturationState.class);
 
 	private final ConcurrentHashMap<IndexedClassExpression, Context> contextAssignment_;
 

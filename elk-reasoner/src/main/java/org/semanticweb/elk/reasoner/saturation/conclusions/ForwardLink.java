@@ -88,12 +88,6 @@ public class ForwardLink extends AbstractConclusion {
 	}
 
 	@Override
-	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		// no redundant rules
-	}
-
-	@Override
 	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
 		// compose only with reflexive backward links

@@ -38,20 +38,22 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 public abstract class AbstractConclusion implements Conclusion {
 
 	@Override
-	public IndexedClassExpression getSourceRoot(IndexedClassExpression rootWhereStored) {
-		// by default the context where the conclusion is stored
+	public IndexedClassExpression getSourceRoot(
+			IndexedClassExpression rootWhereStored) {
+		// by default where the conclusion is stored
 		return rootWhereStored;
 	}
 
 	@Override
-	public boolean isLocalFor(IndexedClassExpression rootWhereStored) {
-		return (getSourceRoot(rootWhereStored) == rootWhereStored);
+	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
+			ContextPremises premises, ConclusionProducer producer) {
+		// no redundant rules by default
 	}
 
 	@Override
 	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
-		// by default all non-rules are local
+		// by default all non-redundant rules are local
 		applyNonRedundantRules(ruleAppVisitor, premises, producer);
 	}
 

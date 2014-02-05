@@ -86,12 +86,6 @@ public class DisjointSubsumer extends AbstractConclusion {
 	}
 
 	@Override
-	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		// no redundant rules
-	}
-
-	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}

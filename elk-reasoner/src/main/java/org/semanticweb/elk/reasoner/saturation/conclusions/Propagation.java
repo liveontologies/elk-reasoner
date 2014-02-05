@@ -90,14 +90,8 @@ public class Propagation extends AbstractConclusion {
 	}
 
 	@Override
-	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
+	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
-		// no redundant rules
-	}
-
-	@Override
-	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor, ContextPremises premises,
-			ConclusionProducer producer) {
 		// propagate only over reflexive backward links
 		ruleAppVisitor.visit(ReflexivePropagationRule.getInstance(), this,
 				premises, producer);

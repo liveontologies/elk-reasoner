@@ -67,8 +67,8 @@ import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
 public class ContextImpl implements Context {
 
 	// logger for events
-	//private static final Logger LOGGER_ = LoggerFactory
-	//		.getLogger(ContextImpl.class);
+	// private static final Logger LOGGER_ = LoggerFactory
+	// .getLogger(ContextImpl.class);
 
 	private static final ConclusionVisitor<ContextImpl, Boolean> CONCLUSION_INSERTER_ = new ConclusionInserter();
 	private static final ConclusionVisitor<ContextImpl, Boolean> CONCLUSION_DELETER_ = new ConclusionDeleter();
@@ -288,7 +288,7 @@ public class ContextImpl implements Context {
 		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
 			IndexedClassExpression source = conclusion.getSource();
 			IndexedPropertyChain relation = conclusion.getRelation();
-			if (conclusion.isLocalFor(input.root_)) {
+			if (conclusion.getSourceRoot(input.root_) == input.root_) {
 				// reflexive
 				if (input.reflexiveBackwardLinks_ == null) {
 					input.reflexiveBackwardLinks_ = new ArrayHashSet<IndexedPropertyChain>(
@@ -379,7 +379,7 @@ public class ContextImpl implements Context {
 		@Override
 		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
 			boolean changed = false;
-			if (conclusion.isLocalFor(input.root_)) {
+			if (conclusion.getSourceRoot(input.root_) == input.root_) {
 				// link is reflexive
 				if (input.reflexiveBackwardLinks_ != null) {
 					changed = input.reflexiveBackwardLinks_.remove(conclusion
@@ -484,15 +484,13 @@ public class ContextImpl implements Context {
 	private static class ConclusionOccurrenceChecker implements
 			ConclusionVisitor<ContextImpl, Boolean> {
 
-		/* adding, removing, checking conclusions */
-
 		static boolean visit(Subsumer conclusion, ContextImpl input) {
 			return input.subsumers_.contains(conclusion.getExpression());
 		}
 
 		@Override
 		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
-			if (conclusion.isLocalFor(input.root_)) {
+			if (conclusion.getSourceRoot(input.root_) == input.root_) {
 				// reflexive
 				if (input.reflexiveBackwardLinks_ != null)
 					return input.reflexiveBackwardLinks_.contains(conclusion

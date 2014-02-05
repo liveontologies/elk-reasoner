@@ -120,7 +120,7 @@ public class RuleApplicationFactory {
 		// the visitor used for inserting conclusion
 		ConclusionVisitor<Context, Boolean> insertionVisitor = new ConclusionInsertionVisitor();
 		if (trackModifiedContexts_)
-			// after insertion, mark the source context as modified
+			// after insertion, mark the source context as unsaturated
 			insertionVisitor = new CombinedConclusionVisitor<Context>(
 					insertionVisitor,
 					new ConclusionSourceContextUnsaturationVisitor(
@@ -128,7 +128,7 @@ public class RuleApplicationFactory {
 		return new CombinedConclusionVisitor<Context>(
 		// add conclusion to the context
 				insertionVisitor,
-				// if new, apply the rules
+				// if new, apply the non-redundant rules
 				new NonRedundantRuleApplicationConclusionVisitor(ruleVisitor,
 						writer));
 	}

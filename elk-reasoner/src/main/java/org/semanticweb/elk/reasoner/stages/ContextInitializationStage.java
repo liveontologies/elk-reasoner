@@ -98,7 +98,6 @@ class ContextInitializationStage extends AbstractReasonerStage {
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		// reasoner.saturationState.resetFirstContext();
 		reasoner.saturationState.getWriter().resetContexts();
 		todo_ = null;
 		return true;

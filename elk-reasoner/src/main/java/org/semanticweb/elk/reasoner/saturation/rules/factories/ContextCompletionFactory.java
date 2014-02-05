@@ -63,6 +63,9 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContextCompletionFactory.class);
 
+	/**
+	 * The local {@link SaturationState} used by this factory
+	 */
 	private final SaturationState localState_;
 
 	public ContextCompletionFactory(SaturationState saturationState) {
@@ -88,7 +91,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 						saturationState),
 				// if all fine,
 				new CombinedConclusionVisitor<Context>(
-				// insert the conclusion
+				// insert the conclusion to the local context
 						new ConclusionInsertionVisitor(),
 						// apply local rules
 						new HybridLocalRuleApplicationConclusionVisitor(

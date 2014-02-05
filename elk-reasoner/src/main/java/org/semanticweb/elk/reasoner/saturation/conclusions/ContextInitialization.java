@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
+
 /*
  * #%L
  * ELK Reasoner
@@ -32,17 +33,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@code Conclusion} indicating that this {@link Context} should be
- * initialized.
+ * A {@code Conclusion} indicating that the {@link Context} where it is stored
+ * should be initialized.
  * 
  * @author "Yevgeny Kazakov"
  */
 public class ContextInitialization extends AbstractConclusion {
-	
+
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContextInitialization.class);
-	
+
 	// actually we just need only context initialization rules,
 	// but they can change after creating this object
 	private final OntologyIndex ontologyIndex_;
@@ -59,20 +60,13 @@ public class ContextInitialization extends AbstractConclusion {
 	@Override
 	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
-		LinkedContextInitRule rule = ontologyIndex_.getContextInitRuleHead();		
+		LinkedContextInitRule rule = ontologyIndex_.getContextInitRuleHead();
 		LOGGER_.trace("applying init rules:");
 		while (rule != null) {
 			LOGGER_.trace("init rule: {}", rule.getName());
 			rule.accept(ruleAppVisitor, this, premises, producer);
 			rule = rule.next();
 		}
-	}
-
-	@Override
-	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		// no redundant rules
-
 	}
 
 	@Override

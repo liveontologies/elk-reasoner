@@ -27,9 +27,22 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 import org.semanticweb.elk.util.collections.Multimap;
 
+/**
+ * {@link ContextPremises} that are build from two {@link ContextPremises}
+ * objects with the same root. Local premises are taken from the first object,
+ * whereas non-local premises from the second. A premise is local if its source
+ * 
+ * 
+ * @see ContextPremises#getRoot()
+ * @see Conclusion#getSourceRoot(IndexedClassExpression)
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public class HybridContextPremises implements ContextPremises {
 
 	private final ContextPremises localPremises_;

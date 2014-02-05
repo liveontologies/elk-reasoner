@@ -2,9 +2,9 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /*
@@ -30,10 +30,26 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  */
 
 /**
- * A general type of conclusions, produced by inference rules. This is the main
- * type of information that is exchanged between {@link Context}s. When a
- * {@link Conclusion} has been derived for a particular {@link Context}, it
- * should be processed within this context.
+ * A general type of conclusions, produced by inference rules and used as
+ * premises of inference rules. The rules can be applied to {@link Conclusion}s
+ * together with other conclusions stored in {@link ContextPremises}. There are
+ * different type of rules that can be applied to {@link Conclusion}.
+ * Non-redundant rules are the (optimized) rules that do not cause
+ * incompleteness (all atomic subsumers are guaranteed to be computed). These
+ * rules are non-monotonic in the sense that a rule can be applicable with
+ * {@link ContextPremises} but not applicable if some {@link Conclusion}s are
+ * added to {@link ContextPremises}. This can result in non-deterministic result
+ * if the rules are applied in different order. Redundant rules are in the sense
+ * those rules that were not applied to {@link ContextPremises} but could be
+ * applied if some {@link Conclusion}s were not inserted to
+ * {@link ContextPremises}. Next, one can apply only local rules, namely those
+ * rules that produce {@link Conclusion}s with the same source root as the
+ * {@link Conclusion} to which the rule was applied. These rules are again
+ * distinguished on redundant and non-redundant: redundant local rules is the
+ * intersection of redundant rules and local rules, and similarly redundant
+ * non-local rules.
+ * 
+ * @see Rule
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -43,31 +59,23 @@ public interface Conclusion {
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input);
 
 	/**
+	 * Every {@link Conclusion}, depending in which {@link ContextPremises} it
+	 * is to be stored, represents a subsumer of some root
+	 * {@link IndexedClassExpression}, which is computed by this method.
 	 * 
 	 * @param rootWhereStored
 	 * @return The {@link IndexedClassExpression} for which this conclusion is
-	 *         logically relevant for; it cannot be {@code null}
+	 *         logically derived; it cannot be {@code null}
 	 */
 	public IndexedClassExpression getSourceRoot(
 			IndexedClassExpression rootWhereStored);
 
 	/**
-	 * @param rootWhereStored
-	 *            the {@code Context} for which to check locality of this
-	 *            {@link BackwardLink}
-	 * @return {@code true} if the source context of this {@link BackwardLink}
-	 *         is the same the given {@link Context}
-	 * 
-	 * @see BackwardLink#getSourceRoot(IndexedClassExpression)
-	 * @see Context#getRoot()
-	 */
-	public boolean isLocalFor(IndexedClassExpression rootWhereStored);
-
-	/**
 	 * Apply all non-redundant inferences for this {@link Conclusion} with other
 	 * {@link ContextPremises}
 	 * 
-	 * @see #applyRedundantRules(RuleVisitor, ContextPremises, ConclusionProducer)
+	 * @see #applyRedundantRules(RuleVisitor, ContextPremises,
+	 *      ConclusionProducer)
 	 * 
 	 * @param ruleAppVisitor
 	 * @param premises
