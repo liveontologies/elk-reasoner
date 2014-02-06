@@ -82,11 +82,11 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	/**
 	 * The listener object implementing callback functions for this engine
 	 */
-	private final TransitiveReductionListener<J> listener;
+	private final TransitiveReductionListener<J> listener_;
 	/**
 	 * The object used to process the finished saturation jobs
 	 */
-	private final SaturationOutputProcessor saturationOutputProcessor = new SaturationOutputProcessor();
+	private final SaturationOutputProcessor saturationOutputProcessor_ = new SaturationOutputProcessor();
 	/**
 	 * The processed jobs can create new saturation jobs for super classes to be
 	 * submitted to this engine. In order to avoid stack overflow due to the
@@ -94,24 +94,24 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 * but use a queue to buffer such created jobs. This queue will be emptied
 	 * every time the {@link Engine#process()} method is called.
 	 */
-	private final Queue<SaturationJobSuperClass<R, J>> auxJobQueue;
+	private final Queue<SaturationJobSuperClass<R, J>> auxJobQueue_;
 
 	/**
 	 * The jobs which root {@link IndexedClassExpression}s are already saturated
 	 */
-	private final Queue<J> jobsWithSaturatedRoot;
+	private final Queue<J> jobsWithSaturatedRoot_;
 
 	/**
 	 * The saturation factory used for computing saturations for relevant
 	 * indexed class expressions
 	 */
-	private final ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>> saturationFactory;
+	private final ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>> saturationFactory_;
 
 	/**
 	 * The default equivalence classes for owl:Thing to be used when there are
 	 * no (direct) subsumers
 	 */
-	private final TransitiveReductionOutputEquivalent<IndexedClass> defaultTopOutput;
+	private final TransitiveReductionOutputEquivalent<IndexedClass> defaultTopOutput_;
 
 	/**
 	 * Creating a new transitive reduction engine for the input ontology index
@@ -127,15 +127,15 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 */
 	public TransitiveReductionFactory(SaturationState saturationState,
 			int maxWorkers, TransitiveReductionListener<J> listener) {
-		this.listener = listener;
-		this.auxJobQueue = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
-		this.jobsWithSaturatedRoot = new ConcurrentLinkedQueue<J>();
-		this.saturationFactory = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
+		this.listener_ = listener;
+		this.auxJobQueue_ = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();
+		this.jobsWithSaturatedRoot_ = new ConcurrentLinkedQueue<J>();
+		this.saturationFactory_ = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
 				saturationState, maxWorkers,
 				new ThisClassExpressionSaturationListener());
-		this.defaultTopOutput = new TransitiveReductionOutputEquivalent<IndexedClass>(
+		this.defaultTopOutput_ = new TransitiveReductionOutputEquivalent<IndexedClass>(
 				saturationState.getOntologyIndex().getIndexedOwlThing());
-		defaultTopOutput.equivalent.add(PredefinedElkClass.OWL_THING);
+		defaultTopOutput_.equivalent.add(PredefinedElkClass.OWL_THING);
 	}
 
 	@Override
@@ -145,18 +145,18 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 
 	@Override
 	public void finish() {
-		saturationFactory.finish();
+		saturationFactory_.finish();
 	}
 
 	/**
 	 * Print statistics about the transitive reduction stage
 	 */
 	public void printStatistics() {
-		saturationFactory.printStatistics();
+		saturationFactory_.printStatistics();
 	}
 
 	public SaturationStatistics getRuleAndConclusionStatistics() {
-		return saturationFactory.getRuleAndConclusionStatistics();
+		return saturationFactory_.getRuleAndConclusionStatistics();
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		public void notifyFinished(
 				SaturationJobForTransitiveReduction<R, ?, J> output)
 				throws InterruptedException {
-			output.accept(saturationOutputProcessor);
+			output.accept(saturationOutputProcessor_);
 		}
 	}
 
@@ -241,7 +241,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				TransitiveReductionOutput<R> output = new TransitiveReductionOutputUnsatisfiable<R>(
 						root);
 				initiatorJob.setOutput(output);
-				listener.notifyFinished(initiatorJob);
+				listener_.notifyFinished(initiatorJob);
 				return;
 			}
 			/*
@@ -293,7 +293,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				 */
 				if (candidateSaturation == null
 						|| !candidateSaturation.isSaturated()) {
-					auxJobQueue.add(new SaturationJobSuperClass<R, J>(
+					auxJobQueue_.add(new SaturationJobSuperClass<R, J>(
 							candidate, state));
 					return;
 				}
@@ -307,15 +307,19 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 
 			/* When all candidates are processed, the output is computed */
 			TransitiveReductionOutputEquivalentDirect<R> output = state.output;
+			/*
+			 * if there are no direct subsumers found, then use the default
+			 * direct subsumer for owl:Thing unless it the output for owl:Thing
+			 * itself
+			 */
 			if (output.directSubsumers.isEmpty()
-					&& output.getRoot() != defaultTopOutput.getRoot()) {
-				// if there are no direct subsumers found, then use the default
-				// direct subsumer for owl:Thing unless it is owl:Thing itself
-				output.directSubsumers.add(defaultTopOutput);
+					&& !output.getEquivalent().contains(
+							PredefinedElkClass.OWL_THING)) {
+				output.directSubsumers.add(defaultTopOutput_);
 			}
 
 			state.initiatorJob.setOutput(output);
-			listener.notifyFinished(state.initiatorJob);
+			listener_.notifyFinished(state.initiatorJob);
 
 			if (LOGGER_.isTraceEnabled()) {
 				R root = output.getRoot();
@@ -436,7 +440,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		/**
 		 * The saturation engine used for transitive reduction computation
 		 */
-		private final ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>.Engine saturationEngine = saturationFactory
+		private final ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>.Engine saturationEngine = saturationFactory_
 				.getEngine();
 
 		// don't allow creating of engines directly; only through the factory
@@ -451,7 +455,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			}
 			Context context = root.getContext();
 			if (context != null && context.isSaturated()) {
-				jobsWithSaturatedRoot.add(job);
+				jobsWithSaturatedRoot_.add(job);
 			} else {
 				saturationEngine.submit(new SaturationJobRoot<R, J>(job));
 			}
@@ -462,14 +466,14 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					return;
-				J processedJob = jobsWithSaturatedRoot.poll();
+				J processedJob = jobsWithSaturatedRoot_.poll();
 				if (processedJob != null) {
-					saturationOutputProcessor
+					saturationOutputProcessor_
 							.processRootSaturation(processedJob);
 					continue;
 				}
 				saturationEngine.process();
-				SaturationJobForTransitiveReduction<R, ?, J> nextJob = auxJobQueue
+				SaturationJobForTransitiveReduction<R, ?, J> nextJob = auxJobQueue_
 						.poll();
 				if (nextJob == null)
 					break;
