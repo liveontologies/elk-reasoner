@@ -23,12 +23,10 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionFactory;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
@@ -77,10 +75,6 @@ public class ClassTaxonomyComputationFactory implements
 	 * transitive reduction
 	 */
 	private final TransitiveReductionOutputProcessor outputProcessor_;
-	/**
-	 * The reference to cache the value of the top node for frequent use
-	 */
-	private final AtomicReference<UpdateableTaxonomyNode<ElkClass>> topNodeRef_;
 
 	/**
 	 * Create a shared engine for the input ontology index and a partially
@@ -103,7 +97,6 @@ public class ClassTaxonomyComputationFactory implements
 				saturationState, maxWorkers,
 				new ThisTransitiveReductionListener());
 		this.outputProcessor_ = new TransitiveReductionOutputProcessor();
-		this.topNodeRef_ = new AtomicReference<UpdateableTaxonomyNode<ElkClass>>();
 	}
 
 	/**
@@ -155,12 +148,6 @@ public class ClassTaxonomyComputationFactory implements
 			
 			UpdateableTaxonomyNode<ElkClass> node = taxonomy_
 					.getCreateNode(output.getEquivalent());
-
-			if (node.getMembers().contains(PredefinedElkClass.OWL_THING)) {
-				topNodeRef_.compareAndSet(null, node);
-				node.trySetModified(false);
-				return;
-			}
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
 					.getDirectSubsumers()) {

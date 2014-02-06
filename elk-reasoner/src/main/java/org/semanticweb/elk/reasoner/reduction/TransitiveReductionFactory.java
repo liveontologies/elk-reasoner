@@ -118,7 +118,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 * The default equivalence classes for owl:Thing to be used when there are
 	 * no (direct) subsumers
 	 */
-	private final TransitiveReductionOutputEquivalent<IndexedClass> defaultTopOutput;
+	private final TransitiveReductionOutputEquivalent<IndexedClass> defaultTopOutput_;
 
 	/**
 	 * Creating a new transitive reduction engine for the input ontology index
@@ -141,9 +141,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		this.saturationFactory_ = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
 				saturationState, maxWorkers,
 				new ThisClassExpressionSaturationListener());
-		this.defaultTopOutput = new TransitiveReductionOutputEquivalent<IndexedClass>(
+		this.defaultTopOutput_ = new TransitiveReductionOutputEquivalent<IndexedClass>(
 				saturationState.getOntologyIndex().getIndexedOwlThing());
-		defaultTopOutput.equivalent.add(PredefinedElkClass.OWL_THING);
+		defaultTopOutput_.equivalent.add(PredefinedElkClass.OWL_THING);
 	}
 
 	@Override
@@ -315,11 +315,15 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 
 			/* When all candidates are processed, the output is computed */
 			TransitiveReductionOutputEquivalentDirect<R> output = state.output;
+			/*
+			 * if there are no direct subsumers found, then use the default
+			 * direct subsumer for owl:Thing unless it the output for owl:Thing
+			 * itself
+			 */
 			if (output.directSubsumers.isEmpty()
-					&& output.getRoot() != defaultTopOutput.getRoot()) {
-				// if there are no direct subsumers found, then use the default
-				// direct subsumer for owl:Thing unless it is owl:Thing itself
-				output.directSubsumers.add(defaultTopOutput);
+					&& !output.getEquivalent().contains(
+							PredefinedElkClass.OWL_THING)) {
+				output.directSubsumers.add(defaultTopOutput_);
 			}
 
 			state.initiatorJob.setOutput(output);
