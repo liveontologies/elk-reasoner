@@ -108,6 +108,12 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	private final ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>> saturationFactory;
 
 	/**
+	 * The default equivalence classes for owl:Thing to be used when there are
+	 * no (direct) subsumers
+	 */
+	private final TransitiveReductionOutputEquivalent<IndexedClass> defaultTopOutput;
+
+	/**
 	 * Creating a new transitive reduction engine for the input ontology index
 	 * and a listener for executing callback functions.
 	 * 
@@ -127,6 +133,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		this.saturationFactory = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
 				saturationState, maxWorkers,
 				new ThisClassExpressionSaturationListener());
+		this.defaultTopOutput = new TransitiveReductionOutputEquivalent<IndexedClass>(
+				saturationState.getOntologyIndex().getIndexedOwlThing());
+		defaultTopOutput.equivalent.add(PredefinedElkClass.OWL_THING);
 	}
 
 	@Override
@@ -271,10 +280,10 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 
 			while (subsumerIterator.hasNext()) {
 				IndexedClassExpression next = subsumerIterator.next();
-				
+
 				if (!(next instanceof IndexedClass))
 					continue;
-				
+
 				IndexedClass candidate = (IndexedClass) next;
 				Context candidateSaturation = candidate.getContext();
 				/*
@@ -295,26 +304,19 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				updateTransitiveReductionOutput(state.output, candidate,
 						candidateSaturation);
 			}
-			
-			if (state.output.directSubsumers.isEmpty()) {
-				//if there're no direct subsumers, then owl:Thing must be one
-				TransitiveReductionOutputEquivalent<IndexedClass> topOutput = new TransitiveReductionOutputEquivalent<IndexedClass>(
-				/*
-				 * Indexed owl:Thing must go in here but we don't propagate it
-				 * inside transitive reduction. Since this state isn't going to
-				 * be updated, we can just pass null (it's the list of
-				 * equivalent classes that's important)
-				 */
-				null);
-				topOutput.equivalent.add(PredefinedElkClass.OWL_THING);
-				state.output.directSubsumers.add(topOutput);
-			}
-			
+
 			/* When all candidates are processed, the output is computed */
 			TransitiveReductionOutputEquivalentDirect<R> output = state.output;
-			state.initiatorJob.setOutput(state.output);
+			if (output.directSubsumers.isEmpty()
+					&& output.getRoot() != defaultTopOutput.getRoot()) {
+				// if there are no direct subsumers found, then use the default
+				// direct subsumer for owl:Thing unless it is owl:Thing itself
+				output.directSubsumers.add(defaultTopOutput);
+			}
+
+			state.initiatorJob.setOutput(output);
 			listener.notifyFinished(state.initiatorJob);
-			
+
 			if (LOGGER_.isTraceEnabled()) {
 				R root = output.getRoot();
 				LOGGER_.trace(root + ": transitive reduction finished");
@@ -334,9 +336,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 
 		/**
 		 * Updates the output of the transitive reduction using a new candidate
-		 * indexed super class and its saturation. Special checks are needed if the
-		 * candidate is owl:Thing since it may not be derived if owl:Thing doesn't
-		 * occur negatively in the ontology.
+		 * indexed super class and its saturation. Special checks are needed if
+		 * the candidate is owl:Thing since it may not be derived if owl:Thing
+		 * doesn't occur negatively in the ontology.
 		 * 
 		 * @param output
 		 *            the partially computed transitive reduction output
@@ -366,7 +368,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				output.equivalent.add(candidate.getElkClass());
 				return;
 			}
-			
+
 			/*
 			 * To check if the candidate should be added to the list of direct
 			 * super-classes, we iterate over the direct super classes computed
@@ -375,27 +377,29 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			boolean isCandidateTop = isTop(candidate);
 			Iterator<TransitiveReductionOutputEquivalent<IndexedClass>> iteratorDirectSuperClasses = output.directSubsumers
 					.iterator();
-			
-			while (iteratorDirectSuperClasses.hasNext()) {				
+
+			while (iteratorDirectSuperClasses.hasNext()) {
 				TransitiveReductionOutputEquivalent<IndexedClass> directSuperClassEquivalent = iteratorDirectSuperClasses
 						.next();
 				IndexedClass directSuperClass = directSuperClassEquivalent
 						.getRoot();
 				boolean isDirectSuperClassTop = isTop(directSuperClass);
-				
+
 				/*
 				 * If the (already computed) saturation for the direct
 				 * super-class contains the candidate, it cannot be direct.
 				 */
-				if (isCandidateTop || directSuperClass.getContext().getSubsumers()
-						.contains(candidate)) {
+				if (isCandidateTop
+						|| directSuperClass.getContext().getSubsumers()
+								.contains(candidate)) {
 					/*
 					 * If, in addition, the saturation for the candidate
 					 * contains the direct super class, they are equivalent, so
 					 * the candidate is added to the equivalence class of the
 					 * direct super class.
 					 */
-					if (candidateSupers.contains(directSuperClass) || isDirectSuperClassTop)
+					if (candidateSupers.contains(directSuperClass)
+							|| isDirectSuperClassTop)
 						directSuperClassEquivalent.equivalent.add(candidate
 								.getElkClass());
 					return;
@@ -407,7 +411,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				 * direct super-class. In this case the direct super-class is
 				 * not direct anymore and should be removed from the list.
 				 */
-				if (candidateSupers.contains(directSuperClass) || isDirectSuperClassTop) {
+				if (candidateSupers.contains(directSuperClass)
+						|| isDirectSuperClassTop) {
 					iteratorDirectSuperClasses.remove();
 				}
 			}
@@ -425,7 +430,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	private boolean isTop(IndexedClass clazz) {
 		return clazz.getElkClass().getIri() == PredefinedElkIri.OWL_THING.get();
 	}
-	
+
 	public class Engine implements InputProcessor<J> {
 
 		/**
