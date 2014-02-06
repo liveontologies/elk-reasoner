@@ -36,13 +36,17 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * TODO docs
+ * A {@link SaturationState} in which {@link Context}s are assigned to
+ * {@link IndexedClassExpression}s by references.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
  */
-class SaturationStateImpl extends AbstractSaturationState {
+class ReferenceSaturationState extends AbstractSaturationState {
 
 	// the number of contexts created by this SaturationState
 	AtomicInteger contextCount = new AtomicInteger(0);
@@ -51,7 +55,7 @@ class SaturationStateImpl extends AbstractSaturationState {
 	 * 
 	 * @param index
 	 */
-	public SaturationStateImpl(OntologyIndex index) {
+	public ReferenceSaturationState(OntologyIndex index) {
 		super(index);
 	}
 

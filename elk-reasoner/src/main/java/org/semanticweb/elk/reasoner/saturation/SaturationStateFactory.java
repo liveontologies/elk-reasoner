@@ -44,7 +44,8 @@ public class SaturationStateFactory {
 	 */
 	public static SaturationState createSaturationState(
 			OntologyIndex ontologyIndex) {
-		return new SaturationStateImpl(ontologyIndex);
-//		return new MapSaturationState(ontologyIndex);
+		return new ReferenceSaturationState(ontologyIndex);
+//		return new MapSaturationState(ontologyIndex, ontologyIndex
+//				.getIndexedClassExpressions().size());
 	}
 }
