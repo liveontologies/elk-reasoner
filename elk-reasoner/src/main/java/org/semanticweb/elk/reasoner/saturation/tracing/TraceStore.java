@@ -43,6 +43,7 @@ public interface TraceStore {
 	public interface Reader {
 
 		/**
+		 * TODO let the calling code stop the visiting process, for example, by returning false from the visitor.
 		 * 
 		 * @param context
 		 * @param conclusion

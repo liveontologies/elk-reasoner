@@ -46,6 +46,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.CompositionRuleApplicationV
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
 import org.semanticweb.elk.util.collections.Condition;
+import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.MultimapOperations;
 import org.semanticweb.elk.util.collections.Operations;
@@ -166,12 +167,26 @@ public class LocalTracingSaturationState extends LocalSaturationState {
 		 */
 		private final ConclusionStore tracedConclusions_;
 		
+		private HashListMultimap<Conclusion, TracedConclusion> blockedInferences_;
+		
 		TracedContext(Context local, Context main) {
 			localContext_ = local;
 			mainContext_ = main;
 			beingTraced_ = new AtomicBoolean(false);
 			toTraceQueue_ = new ConcurrentLinkedQueue<Conclusion>();
 			tracedConclusions_ = new ConclusionStore();
+		}
+		
+		Multimap<Conclusion, TracedConclusion> getBlockedInferences() {
+			if (blockedInferences_ == null) {
+				blockedInferences_ = new HashListMultimap<Conclusion, TracedConclusion>();
+			}
+			
+			return blockedInferences_;
+		}
+		
+		void cleanBlockedInferences() {
+			blockedInferences_ = null;
 		}
 		
 		boolean addConclusionToTrace(Conclusion conclusion) {

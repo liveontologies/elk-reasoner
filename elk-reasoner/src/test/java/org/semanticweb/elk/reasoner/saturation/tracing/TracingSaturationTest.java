@@ -108,8 +108,10 @@ public class TracingSaturationTest {
 		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri("http://example.org/R"));
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
+		ElkClassExpression rSomeB = factory.getObjectSomeValuesFrom(r, b);
 		
 		reasoner.explainSubsumption(a, rSomeC);
+		TracingTestUtils.checkNumberOfInferences(a, rSomeB, reasoner, 1);
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 		reasoner.explainSubsumption(b, c);
 		// now check that we didn't get a duplicate inference in A due to tracing B
