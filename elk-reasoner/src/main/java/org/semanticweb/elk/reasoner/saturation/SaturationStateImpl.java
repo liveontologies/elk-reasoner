@@ -29,6 +29,7 @@ import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -43,9 +44,8 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 class SaturationStateImpl extends AbstractSaturationState {
 
-	// logger for this class
-	//private static final Logger LOGGER_ = LoggerFactory
-	//		.getLogger(SaturationStateImpl.class);
+	// the number of contexts created by this SaturationState
+	AtomicInteger contextCount = new AtomicInteger(0);
 
 	/**
 	 * 
@@ -63,7 +63,7 @@ class SaturationStateImpl extends AbstractSaturationState {
 			public Iterator<Context> iterator() {
 				return new Iterator<Context>() {
 
-					Iterator<IndexedClassExpression> ices = ontologyIndex
+					Iterator<? extends IndexedObjectWithContext> ices = ontologyIndex
 							.getIndexedClassExpressions().iterator();
 
 					Context next;
@@ -112,8 +112,7 @@ class SaturationStateImpl extends AbstractSaturationState {
 
 			@Override
 			public int size() {
-				// TODO Auto-generated method stub
-				return 0;
+				return contextCount.get();
 			}
 
 		};
@@ -121,18 +120,26 @@ class SaturationStateImpl extends AbstractSaturationState {
 
 	@Override
 	public Context getContext(IndexedClassExpression ice) {
-		return ice.getContext();
+		return ((IndexedObjectWithContext) ice).getContext();
 	}
 
 	@Override
 	void resetContexts() {
+		if (contextCount.get() == 0)
+			// everything is already done
+			return;
 		for (Context context : getContexts()) {
-			context.getRoot().resetContext();
+			((IndexedObjectWithContext) context.getRoot()).resetContext();
 		}
 	}
 
 	@Override
 	Context setIfAbsent(Context context) {
-		return context.getRoot().setContextIfAbsent(context);
+		Context result = ((IndexedObjectWithContext) context.getRoot())
+				.setContextIfAbsent(context);
+		if (result == null)
+			contextCount.incrementAndGet();
+		return result;
 	}
+
 }

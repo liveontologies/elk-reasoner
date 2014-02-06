@@ -274,7 +274,9 @@ public class ContextImpl implements Context {
 
 	@Override
 	public String toString() {
-		return root_.toString() + (this != root_.getContext() ? "[local]" : "");
+		return root_.toString()
+				+ (this != ((IndexedObjectWithContext) root_).getContext() ? "[local]"
+						: "");
 	}
 
 	private static class ConclusionInserter implements

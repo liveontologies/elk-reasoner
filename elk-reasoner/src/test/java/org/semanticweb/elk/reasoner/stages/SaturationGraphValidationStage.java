@@ -37,6 +37,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
@@ -87,6 +88,41 @@ import org.slf4j.LoggerFactory;
  */
 public class SaturationGraphValidationStage extends BasePostProcessingStage {
 
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(SaturationGraphValidationStage.class);
+	private final ContextValidator contextValidator_ = new ContextValidator();
+
+	private final ClassExpressionValidator iceValidator_ = new ClassExpressionValidator();
+
+	private final OntologyIndex index_;
+
+	private final ContextRuleValidator ruleValidator_ = new ContextRuleValidator();
+
+	private final SaturationState saturationState_;
+
+	public SaturationGraphValidationStage(final AbstractReasonerState reasoner) {
+		index_ = reasoner.ontologyIndex;
+		saturationState_ = reasoner.saturationState;
+	}
+
+	@Override
+	public String getName() {
+		return "Saturation graph validation";
+	}
+
+	@Override
+	public void execute() {
+		// starting from indexed class expressions
+		for (IndexedClassExpression ice : index_.getIndexedClassExpressions()) {
+			iceValidator_.add(ice);
+		}
+		for (;;) {
+			if (iceValidator_.validate() || contextValidator_.validate())
+				continue;
+			break;
+		}
+	}
+
 	/**
 	 * 
 	 */
@@ -136,7 +172,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			}
 
 			// validating context
-			Context context = ice.getContext();
+			Context context = saturationState_.getContext(ice);
 			if (context != null) {
 				contextValidator_.add(context);
 			}
@@ -409,7 +445,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			// validating the root
 			IndexedClassExpression root = context.getRoot();
 			iceValidator_.checkNew(root);
-			if (root.getContext() != context)
+			if (saturationState_.getContext(root) != context)
 				LOGGER_.error("Invalid root for " + context);
 
 			// validating subsumers recursively
@@ -434,38 +470,6 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				rule = rule.next();
 			}
 		}
-	}
-
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(SaturationGraphValidationStage.class);
-	private final ContextValidator contextValidator_ = new ContextValidator();
-
-	private final ClassExpressionValidator iceValidator_ = new ClassExpressionValidator();
-
-	private final OntologyIndex index_;
-
-	private final ContextRuleValidator ruleValidator_ = new ContextRuleValidator();
-
-	public SaturationGraphValidationStage(final AbstractReasonerState reasoner) {
-		index_ = reasoner.ontologyIndex;
-	}
-
-	@Override
-	public void execute() {
-		// starting from indexed class expressions
-		for (IndexedClassExpression ice : index_.getIndexedClassExpressions()) {
-			iceValidator_.add(ice);
-		}
-		for (;;) {
-			if (iceValidator_.validate() || contextValidator_.validate())
-				continue;
-			break;
-		}
-	}
-
-	@Override
-	public String getName() {
-		return "Saturation graph validation";
 	}
 
 }

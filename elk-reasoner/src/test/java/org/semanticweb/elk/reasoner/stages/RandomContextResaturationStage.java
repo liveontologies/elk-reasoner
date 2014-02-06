@@ -37,7 +37,7 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.ContextCleaningFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -102,12 +102,13 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		markAllContextsAsSaturated();
 	}
 
-	private void initContexts(Collection<IndexedClassExpression> contexts) {
-		for (IndexedClassExpression ice : contexts) {
-			if (ice.getContext() != null) {
-				reasoner.saturationState.getExtendedWriter().initContext(
-						ice.getContext());
-			}
+	private void initContexts(Collection<IndexedClassExpression> roots) {
+		for (IndexedClassExpression ice : roots) {
+			Context context = reasoner.saturationState.getContext(ice);
+			if (context == null)
+				continue;
+			// else
+			reasoner.saturationState.getExtendedWriter().initContext(context);
 		}
 	}
 
@@ -127,14 +128,13 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 
 		for (IndexedClassExpression ice : ices) {
 			if (indexes.contains(i)) {
-				if (ice.getContext() != null) {
+				Context context = reasoner.saturationState.getContext(ice);
+				if (context != null) {
 					reasoner.saturationState.getWriter().markAsNotSaturated(
-							ice.getContext());
+							context);
 				}
-
 				contexts.add(ice);
 			}
-
 			i++;
 		}
 

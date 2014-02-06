@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.IndexedObjectWithContext;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
@@ -43,8 +43,8 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * @author Pavel Klinov
  */
-abstract public class IndexedClassExpression extends IndexedObject implements
-		Comparable<IndexedClassExpression> {
+abstract public class IndexedClassExpression extends IndexedObjectWithContext
+		implements Comparable<IndexedClassExpression> {
 
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexedClassExpression.class);
@@ -73,12 +73,6 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 
 	/** Hash code for this object. */
 	private final int hashCode_ = HashGenerator.generateNextHashCode();
-
-	/**
-	 * /** the reference to a {@link Context} assigned to this
-	 * {@link IndexedClassExpression}
-	 */
-	private volatile Context context_ = null;
 
 	/**
 	 * This method should always return true apart from intermediate steps
@@ -139,40 +133,6 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 		updateOccurrenceNumbers(index, increment, positiveIncrement,
 				negativeIncrement);
 		checkOccurrenceNumbers();
-	}
-
-	/**
-	 * @return The corresponding context, null if none was assigned.
-	 */
-	public Context getContext() {
-		return context_;
-	}
-
-	/**
-	 * Assign the given {@link Context} to this {@link IndexedClassExpression}
-	 * if none was yet assigned.
-	 * 
-	 * @param context
-	 *            the {@link Context} which will be assigned to this
-	 *            {@link IndexedClassExpression}
-	 * 
-	 * @return the previously assigned {@link Context} or {@code null} if none
-	 *         was assigned (in which case the new {@link Context} will be
-	 *         assigned)
-	 */
-	public synchronized Context setContextIfAbsent(Context context) {
-		if (context_ != null)
-			return context_;
-		// else
-		context_ = context;
-		return null;
-	}
-
-	/**
-	 * Resets the corresponding context to null.
-	 */
-	public synchronized void resetContext() {
-		context_ = null;
 	}
 
 	/**

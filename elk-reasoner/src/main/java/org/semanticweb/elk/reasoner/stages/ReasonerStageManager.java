@@ -70,7 +70,7 @@ public class ReasonerStageManager {
 		this.propertyHierarchyCompositionComputationStage = new PropertyHierarchyCompositionComputationStage(
 				reasoner, propertyReflexivityComputationStage);
 
-		this.contextInitializationStage = new ContextInitializationStage(
+		this.contextInitializationStage = new ContextAssignmentResetStage(
 				reasoner, axiomLoadingStage,
 				propertyHierarchyCompositionComputationStage);
 

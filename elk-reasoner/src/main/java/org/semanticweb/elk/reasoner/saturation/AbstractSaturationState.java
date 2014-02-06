@@ -50,8 +50,8 @@ public abstract class AbstractSaturationState implements SaturationState {
 	final OntologyIndex ontologyIndex;
 
 	/**
-	 * The queue containing all activated contexts. Every activated context
-	 * occurs exactly once.
+	 * The queue containing all activated contexts (whose todo queue is not
+	 * empty). Every activated context occurs exactly once.
 	 */
 	private final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
 

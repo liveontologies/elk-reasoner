@@ -22,14 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import java.util.Iterator;
-
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-// TODO: add progress monitor, make concurrent if possible
 
 /**
  * A {@link ReasonerStage} which purpose is to ensure that no context is
@@ -38,75 +33,53 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-class ContextInitializationStage extends AbstractReasonerStage {
+class ContextAssignmentResetStage extends AbstractReasonerStage {
 
-	// logger for this class
+	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ContextInitializationStage.class);
+			.getLogger(ContextAssignmentResetStage.class);
 
 	/**
-	 * The counter for deleted contexts
+	 * The number of contexts before the stage
 	 */
-	private int deletedContexts_;
-	/**
-	 * The number of contexts
-	 */
-	private int maxContexts_;
+	private int contextCountBefore_ = 0;
 
-	/**
-	 * The state of the iterator of the input to be processed
-	 */
-	private Iterator<Context> todo_ = null;
-
-	public ContextInitializationStage(AbstractReasonerState reasoner,
+	public ContextAssignmentResetStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
 	}
 
 	@Override
 	public String getName() {
-		return "Context Initialization";
+		return "Context Reset";
 	}
 
 	@Override
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		todo_ = reasoner.saturationState.getContexts().iterator();
-		// upper limit
-		maxContexts_ = reasoner.ontologyIndex.getIndexedClassExpressions()
-				.size();
-		deletedContexts_ = 0;
+		contextCountBefore_ = reasoner.saturationState.getContexts().size();
 		return true;
 	}
 
 	@Override
 	public void executeStage() throws ElkInterruptedException {
-		for (;;) {
-			if (!todo_.hasNext())
-				break;
-			Context context = todo_.next();
-			context.getRoot().resetContext();
-			deletedContexts_++;
-			progressMonitor.report(deletedContexts_, maxContexts_);
-			if (spuriousInterrupt())
-				continue;
-		}
+		reasoner.saturationState.getWriter().resetContexts();
 	}
 
 	@Override
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.saturationState.getWriter().resetContexts();
-		todo_ = null;
 		return true;
 	}
 
 	@Override
 	public void printInfo() {
-		if (deletedContexts_ > 0 && LOGGER_.isDebugEnabled())
-			LOGGER_.debug("Contexts deleted:" + deletedContexts_);
+		int contexResetCount = reasoner.saturationState.getContexts().size()
+				- contextCountBefore_;
+		if (contexResetCount > 0)
+			LOGGER_.debug("Contexts deleted: {}" + contexResetCount);
 	}
 
 }
