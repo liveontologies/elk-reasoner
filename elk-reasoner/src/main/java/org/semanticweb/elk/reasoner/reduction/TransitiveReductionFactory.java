@@ -115,6 +115,12 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	private final SaturationState saturationState_;
 
 	/**
+	 * The default equivalence classes for owl:Thing to be used when there are
+	 * no (direct) subsumers
+	 */
+	private final TransitiveReductionOutputEquivalent<IndexedClass> defaultTopOutput;
+
+	/**
 	 * Creating a new transitive reduction engine for the input ontology index
 	 * and a listener for executing callback functions.
 	 * 
@@ -135,6 +141,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		this.saturationFactory_ = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
 				saturationState, maxWorkers,
 				new ThisClassExpressionSaturationListener());
+		this.defaultTopOutput = new TransitiveReductionOutputEquivalent<IndexedClass>(
+				saturationState.getOntologyIndex().getIndexedOwlThing());
+		defaultTopOutput.equivalent.add(PredefinedElkClass.OWL_THING);
 	}
 
 	@Override
@@ -304,25 +313,16 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 						candidateSaturation);
 			}
 
-			if (state.output.directSubsumers.isEmpty()) {
-				// if there're no direct subsumers, then owl:Thing must be one
-				TransitiveReductionOutputEquivalent<IndexedClass> topOutput = new TransitiveReductionOutputEquivalent<IndexedClass>(
-				/*
-				 * Indexed owl:Thing must go in here but we don't propagate it
-				 * inside transitive reduction. Since this state isn't going to
-				 * be updated, we can just pass null (it's the list of
-				 * equivalent classes that's important)
-				 * 
-				 * FIXME, get rid of this ugly null
-				 */
-				null);
-				topOutput.equivalent.add(PredefinedElkClass.OWL_THING);
-				state.output.directSubsumers.add(topOutput);
-			}
-
 			/* When all candidates are processed, the output is computed */
 			TransitiveReductionOutputEquivalentDirect<R> output = state.output;
-			state.initiatorJob.setOutput(state.output);
+			if (output.directSubsumers.isEmpty()
+					&& output.getRoot() != defaultTopOutput.getRoot()) {
+				// if there are no direct subsumers found, then use the default
+				// direct subsumer for owl:Thing unless it is owl:Thing itself
+				output.directSubsumers.add(defaultTopOutput);
+			}
+
+			state.initiatorJob.setOutput(output);
 			listener_.notifyFinished(state.initiatorJob);
 
 			if (LOGGER_.isTraceEnabled()) {
