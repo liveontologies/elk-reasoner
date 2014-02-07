@@ -6,7 +6,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.collections.Condition;
 
 /**
@@ -21,11 +20,10 @@ public class PremiseUtils {
 	 * or null if no such premise exists.
 	 * 
 	 * @param inference
-	 * @param context
 	 * @param condition
 	 * @return
 	 */
-	public static Conclusion find(TracedConclusion inference, final Context context, final Condition<Conclusion> premiseCondition) {
+	public static Conclusion find(TracedConclusion inference, final Condition<Conclusion> premiseCondition) {
 		final AtomicReference<Conclusion> found = new AtomicReference<Conclusion>();
 		
 		inference.acceptTraced(new PremiseVisitor<Void, Void>() {

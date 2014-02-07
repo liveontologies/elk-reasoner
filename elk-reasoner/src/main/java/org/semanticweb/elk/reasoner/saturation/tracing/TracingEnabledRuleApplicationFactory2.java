@@ -201,20 +201,18 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 
 		@Override
 		public void produce(Context context, Conclusion conclusion) {
+			// no need to check for duplicates since rules for all conclusions
+			// are applied only once.			
 			final TracedConclusion inference = (TracedConclusion) conclusion;
 			//the inference is applied in this context
-			final Context inferenceContext = inference.getInferenceContext(context);
-			final TracedContext thisContext = tracingState_.getContext(inferenceContext.getRoot());
+			//final Context inferenceContext = inference.getInferenceContext(context);
+			final TracedContext thisContext = tracingState_.getContext(context.getRoot());//inferenceContext.getRoot());
 			
 			if (thisContext == null) {
 				super.produce(context, conclusion);
 				return;
 			}
-			
-			// no need to check for duplicates since rules for all conclusions
-			// are applied only once.
-			// all premises of the inference are stored in this context so their
-			// inferences must be stored there, too
+			// get the premise which blocks this inference, if any
 			Conclusion cyclicPremise = isCyclic(inference, thisContext);
 			
 			if (cyclicPremise == null) {
@@ -223,7 +221,7 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 				unblockInferences(inference, thisContext);
 			}
 			else {
-				//block
+				//block the inference
 				LOGGER_.trace("Inference {} is cyclic through {}", inference, cyclicPremise);
 				
 				thisContext.getBlockedInferences().add(cyclicPremise, inference);
@@ -240,11 +238,11 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 					final TracedConclusion blockedInference = inferenceIter.next();
 					//deciding if the new inference should unblock the previously blocked one.
 					//i.e. if the new inference derives its conclusion NOT via the conclusion of the blocked inference.
-					if (isAlternative(premiseInference, blockedInference, cxt)) {
+					if (isAlternative(premiseInference, blockedInference)) {
 						inferenceIter.remove();
 						// now let's see if some other premise so far is derived
 						// only via the blocked inference's conclusion
-						Conclusion otherBlockingPremise = PremiseUtils.find(blockedInference, cxt, new Condition<Conclusion>() {
+						Conclusion otherBlockingPremise = PremiseUtils.find(blockedInference, new Condition<Conclusion>() {
 
 							@Override
 							public boolean holds(Conclusion premise) {
@@ -252,7 +250,7 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 									return false;
 								}
 								
-								return derivedOnlyViaGivenConclusion(premise, blockedInference, cxt);
+								return derivedOnlyViaGivenConclusion(premise, blockedInference, blockedInference.getInferenceContext(cxt), cxt);
 							}
 							
 						});
@@ -433,14 +431,16 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 		
 	}
 	
-	Conclusion isCyclic(final TracedConclusion inference, final TracedContext context) {
+	Conclusion isCyclic(final TracedConclusion inference, final TracedContext storeContext) {
 		// the inference is cyclic if at least one of the premises has been
 		// derived only through this inference's conclusion
-		Conclusion cyclicPremise = PremiseUtils.find(inference, context, new Condition<Conclusion>(){
+		final Context inferenceContext = inference.getInferenceContext(storeContext);
+		
+		Conclusion cyclicPremise = PremiseUtils.find(inference, new Condition<Conclusion>(){
 
 			@Override
 			public boolean holds(Conclusion premise) {
-				return derivedOnlyViaGivenConclusion(premise, inference, context);
+				return derivedOnlyViaGivenConclusion(premise, inference, inferenceContext, storeContext);
 			}
 			
 		});
@@ -453,23 +453,24 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 	 * 
 	 * @param premise
 	 * @param conclusion
-	 * @param context The context where the inference, which produced the conclusion, has been made
+	 * @param premiseContext
+	 * @param conclusionContext 
 	 * @return
 	 */
-	boolean derivedOnlyViaGivenConclusion(final Conclusion premise, final Conclusion conclusion, final Context context) {
+	boolean derivedOnlyViaGivenConclusion(final Conclusion premise, final Conclusion conclusion, final Context premiseContext, final Context conclusionContext) {
 		final MutableBoolean foundAlternative = new MutableBoolean(false);
 		final MutableBoolean anyInference = new MutableBoolean(false);
 
-		inferenceReader_.accept(context.getRoot(), premise, new BaseTracedConclusionVisitor<Void, Void>(){
+		inferenceReader_.accept(premiseContext.getRoot(), premise, new BaseTracedConclusionVisitor<Void, Void>(){
 
 			@Override
 			protected Void defaultTracedVisit(TracedConclusion premiseInference, Void ignored) {
 				anyInference.set(true);
 				// if the premise is produced in a context different
-				// from where the conclusion is produced, then it's
+				// from where the conclusion is stored, then it must be
 				// produced by an alternative inference.
-				if (premiseInference.getInferenceContext(context) != context
-					|| isAlternative(premiseInference, conclusion,	context)) {
+				if (premiseInference.getInferenceContext(conclusionContext).getRoot() != conclusionContext.getRoot()
+					|| isAlternative(premiseInference, conclusion)) {
 					foundAlternative.set(true);
 				}
 				
@@ -484,28 +485,20 @@ public class TracingEnabledRuleApplicationFactory2 extends RuleApplicationFactor
 	/**
 	 * Returns true if all premises of the inference are not equivalent to the
 	 * given conclusion (i.e. if the inference derives its conclusion NOT via
-	 * the given conclusion).
+	 * the given conclusion). It is assumed that the premises are stored in the
+	 * same context as the conclusion.
 	 */
-	boolean isAlternative(final TracedConclusion inference,
-			final Conclusion conclusion,
-			final Context context) {
-		final MutableBoolean allPremisesDifferentFromCurrent = new MutableBoolean(true);
-		
-		inference.acceptTraced(new PremiseVisitor<Void, Context>() {
+	boolean isAlternative(final TracedConclusion inference, final Conclusion conclusion) {
+		Conclusion equivalentPremise = PremiseUtils.find(inference, new Condition<Conclusion>(){
 
 			@Override
-			protected Void defaultVisit(Conclusion premise, Context context) {
-				
-				if (premise.accept(conclusionEqualityChecker_, conclusion)) {
-					allPremisesDifferentFromCurrent.set(false);
-				}
-				
-				return null;
+			public boolean holds(Conclusion premise) {
+				return premise.accept(conclusionEqualityChecker_, conclusion);
 			}
 			
-		}, context);
+		});
 		
-		return allPremisesDifferentFromCurrent.get();
+		return equivalentPremise == null;
 	}
 	
 }

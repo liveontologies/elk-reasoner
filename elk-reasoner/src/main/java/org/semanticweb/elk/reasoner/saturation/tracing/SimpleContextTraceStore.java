@@ -268,7 +268,6 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		return conclusion.acceptTraced(inferenceWriter_, null);
 	}
 
-	//TODO why do we need this method?
 	@Override
 	public void visitConclusions(ConclusionVisitor<?, ?> visitor) {
 		// subsumers

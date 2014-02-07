@@ -60,7 +60,7 @@ public class RuleApplicationFactory {
 	 * if set to true (should be by default), subsumers produced by composition rules
 	 * will not be decomposed.
 	 */
-	private final boolean APPLY_OPTIMIZED_RULES = true;
+	private final boolean APPLY_OPTIMIZED_RULES = false;
 	
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory	.getLogger(RuleApplicationFactory.class);
