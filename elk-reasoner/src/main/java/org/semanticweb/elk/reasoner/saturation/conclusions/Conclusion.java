@@ -70,6 +70,18 @@ public interface Conclusion {
 	public IndexedClassExpression getSourceRoot(
 			IndexedClassExpression rootWhereStored);
 
+	/**
+	 * TODO: this is a temporary solution to deal with {@link Propagation}s; a
+	 * more robust solution should be found later.
+	 * 
+	 * Returns the root {@link IndexedClassExpression} by which this
+	 * {@link Conclusion} is determined, i.e., after computing the saturation
+	 * for this root, {@link Conclusion}s that determine by this root will not
+	 * be produced. Could be {@code null}
+	 * 
+	 * @param rootWhereStored
+	 * @return
+	 */
 	public IndexedClassExpression getDeterminingRoot(
 			IndexedClassExpression rootWhereStored);
 
