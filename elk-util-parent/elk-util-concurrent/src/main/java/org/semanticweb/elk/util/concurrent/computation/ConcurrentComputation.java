@@ -193,6 +193,12 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	 * 
 	 */
 	private class Worker implements Runnable {
+
+		/**
+		 * Exceptions produced by worker
+		 */
+		private RuntimeException workerException_ = null;
+
 		@Override
 		public final void run() {
 			I nextInput;
@@ -203,8 +209,9 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 			try {
 				boolean doneProcess = false;
 				for (;;) {
-					if (interrupted)
+					if (interrupted) {
 						break;
+					}
 					try {
 						// make sure that all previously submitted inputs are
 						// processed
@@ -234,7 +241,12 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 						}
 					}
 				}
+			} catch (Throwable e) {
+				workerException_ = new RuntimeException(
+						"Exception in worker thread: ", e);
 			} finally {
+				if (workerException_ != null)
+					throw workerException_;
 				inputProcessor.finish();
 			}
 		}

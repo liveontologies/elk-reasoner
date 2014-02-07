@@ -70,6 +70,9 @@ public interface Conclusion {
 	public IndexedClassExpression getSourceRoot(
 			IndexedClassExpression rootWhereStored);
 
+	public IndexedClassExpression getDeterminingRoot(
+			IndexedClassExpression rootWhereStored);
+
 	/**
 	 * Apply all non-redundant inferences for this {@link Conclusion} with other
 	 * {@link ContextPremises}

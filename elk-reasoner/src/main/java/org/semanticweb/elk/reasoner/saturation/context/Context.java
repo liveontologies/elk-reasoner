@@ -102,7 +102,7 @@ public interface Context extends ConclusionSet, ContextPremises {
 	public boolean isSaturated();
 
 	/**
-	 * Marks this {@code Context} as saturated. This means that all all
+	 * Marks this {@code Context} as saturated. This means that all
 	 * {@link Conclusion}s for this {@link Context} are already computed.
 	 * 
 	 * @return the previous value of the saturation state for this

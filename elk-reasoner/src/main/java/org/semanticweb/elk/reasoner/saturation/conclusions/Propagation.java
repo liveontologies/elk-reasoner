@@ -75,6 +75,12 @@ public class Propagation extends AbstractConclusion {
 	}
 
 	@Override
+	public IndexedClassExpression getDeterminingRoot(
+			IndexedClassExpression rootWhereStored) {
+		return null;
+	}
+
+	@Override
 	public String toString() {
 		return "Propagation " + relation_ + "->" + carry_;
 	}

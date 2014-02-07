@@ -70,6 +70,7 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 			ConclusionProducer producer) {
 		final Multimap<IndexedPropertyChain, IndexedClassExpression> backLinks = premises
 				.getBackwardLinksByObjectProperty();
+		// no need to propagate over reflexive properties
 		for (IndexedPropertyChain propRelation : backLinks.keySet()) {
 
 			Collection<IndexedClassExpression> targets = backLinks

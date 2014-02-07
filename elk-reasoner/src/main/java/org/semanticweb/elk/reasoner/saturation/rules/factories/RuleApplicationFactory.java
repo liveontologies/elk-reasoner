@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextNotSaturatedCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationConclusionVisitor;
@@ -125,6 +126,11 @@ public class RuleApplicationFactory {
 					insertionVisitor,
 					new ConclusionSourceContextUnsaturationVisitor(
 							saturationState, writer));
+		else
+			// check that we never produce conclusions with saturated contexts
+			insertionVisitor = new CombinedConclusionVisitor<Context>(
+					new ConclusionSourceContextNotSaturatedCheckingVisitor(
+							saturationState), insertionVisitor);
 		return new CombinedConclusionVisitor<Context>(
 		// add conclusion to the context
 				insertionVisitor,

@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
+
 /*
  * #%L
  * ELK Reasoner
@@ -57,7 +58,9 @@ public class PropagationFromBackwardLinkRule extends AbstractBackwardLinkRule {
 		// if this is the first/last backward link for this relation,
 		// generate new propagations for this relation
 		if (premises.getBackwardLinksByObjectProperty().get(premiseRelation)
-				.size() == 1) {
+				.size()
+				+ (premises.getLocalReflexiveObjectProperties().contains(
+						premiseRelation) ? 1 : 0) == 1) {
 			IndexedObjectSomeValuesFrom.generatePropagations(premiseRelation,
 					premises, producer);
 		}

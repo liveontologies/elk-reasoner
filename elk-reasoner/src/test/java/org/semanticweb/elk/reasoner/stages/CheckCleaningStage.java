@@ -65,14 +65,22 @@ public class CheckCleaningStage extends BasePostProcessingStage {
 				.getNotSaturatedContexts()) {
 			Context context = reasoner_.saturationState.getContext(ice);
 			if (context == null) {
-				LOGGER_.error("Context removed for " + ice);
+				LOGGER_.error("{}: context removed", ice);
 				continue;
 			}
 			cleanedContexts.add(context);
-			if (context.getSubsumers().size() > 0) {
-				LOGGER_.error("Context not cleaned: " + ice.toString() + "\n"
-						+ context.getSubsumers().size() + " subsumers: "
-						+ context.getSubsumers());
+			if (!context.getSubsumers().isEmpty()) {
+				LOGGER_.error(
+						"{}: context not cleaned: there are {} subsumers: {}",
+						context, context.getSubsumers().size(),
+						context.getSubsumers());
+			}
+			if (!context.getLocalReflexiveObjectProperties().isEmpty()) {
+				LOGGER_.error(
+						"{}: context not cleaned: there are {} backward reflexive properties: {}"
+								+ context, context
+								.getLocalReflexiveObjectProperties().size(),
+						context.getLocalReflexiveObjectProperties());
 			}
 		}
 		// checking backward links
@@ -86,9 +94,9 @@ public class CheckCleaningStage extends BasePostProcessingStage {
 			for (IndexedPropertyChain ipc : backwardLinks.keySet()) {
 				for (IndexedClassExpression target : backwardLinks.get(ipc))
 					if (cleanedContexts.contains(target))
-						LOGGER_.error("Backward link in " + context
-								+ " via property " + ipc
-								+ " to cleaned context " + target);
+						LOGGER_.error(
+								"{}: backward link via {} to cleaned target {}",
+								context, ipc, target);
 			}
 		}
 	}

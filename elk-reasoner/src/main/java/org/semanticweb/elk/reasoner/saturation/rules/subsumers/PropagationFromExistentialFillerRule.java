@@ -38,6 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
+import org.semanticweb.elk.util.collections.LazySetUnion;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
@@ -102,8 +103,10 @@ public class PropagationFromExistentialFillerRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		final Set<IndexedPropertyChain> candidatePropagationProperties = premises
-				.getBackwardLinksByObjectProperty().keySet();
+		
+		final Set<IndexedPropertyChain> candidatePropagationProperties = new LazySetUnion<IndexedPropertyChain>(
+				premises.getLocalReflexiveObjectProperties(), premises
+						.getBackwardLinksByObjectProperty().keySet());
 
 		// TODO: deal with reflexive roles using another
 		// rule and uncomment this
