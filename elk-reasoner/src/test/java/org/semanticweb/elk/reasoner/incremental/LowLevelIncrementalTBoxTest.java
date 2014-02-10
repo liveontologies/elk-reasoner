@@ -81,7 +81,7 @@ public class LowLevelIncrementalTBoxTest {
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -106,7 +106,7 @@ public class LowLevelIncrementalTBoxTest {
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
 		reasoner.registerAxiomLoader(changeLoader);
-		
+
 		changeLoader.remove(objectFactory.getSubClassOfAxiom(b, d));
 
 		taxonomy = reasoner.getTaxonomy();
@@ -122,7 +122,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
 
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -165,7 +165,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor(), 1);
 
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -186,7 +186,7 @@ public class LowLevelIncrementalTBoxTest {
 		reasoner.setAllowIncrementalMode(true);
 
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);		
+		reasoner.registerAxiomLoader(changeLoader);
 
 		// this should not change anything
 		changeLoader.remove(axAandBsubC).add(axAandBsubC);
@@ -252,7 +252,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor(), 1);
 
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -265,8 +265,6 @@ public class LowLevelIncrementalTBoxTest {
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 
 		assertEquals(2, taxonomy.getNode(a).getMembers().size());
-
-		
 
 		reasoner.setAllowIncrementalMode(true);
 
@@ -318,7 +316,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
 
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -329,16 +327,15 @@ public class LowLevelIncrementalTBoxTest {
 
 		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
 				.contains(taxonomy.getNode(b)));
-		
 
 		reasoner.setAllowIncrementalMode(true);
 
 		TestChangesLoader changeLoader = new TestChangesLoader();
 		reasoner.registerAxiomLoader(changeLoader);
-		
+
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
-		
+
 		changeLoader.add(objectFactory.getDisjointClassesAxiom(Arrays.asList(c,
 				d, c)));
 		taxonomy = reasoner.getTaxonomy();
@@ -363,12 +360,12 @@ public class LowLevelIncrementalTBoxTest {
 
 			List<ElkAxiom> ontology = loadAxioms(stream);
 			List<ElkAxiom> deletions = loadAxioms(new StringReader(toDelete));
-			TestChangesLoader initialLoader = new TestChangesLoader();			
+			TestChangesLoader initialLoader = new TestChangesLoader();
 
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 					initialLoader, new LoggingStageExecutor());
 
-			reasoner.setAllowIncrementalMode(false);			
+			reasoner.setAllowIncrementalMode(false);
 
 			for (ElkAxiom axiom : ontology) {
 				initialLoader.add(axiom);
@@ -404,11 +401,12 @@ public class LowLevelIncrementalTBoxTest {
 	public void testDeleteFromKangaroo() throws ElkException, IOException {
 		InputStream stream = null;
 		String toDelete = "Prefix(test:=<http://www.test.com/schema#>) Ontology(\n"
-				//+ "SubClassOf(<test:KangarooInfant> ObjectIntersectionOf(ObjectSomeValuesFrom(<test:lives-in> <test:Pouch>) <test:Kangaroo>)) \n"
+				// +
+				// "SubClassOf(<test:KangarooInfant> ObjectIntersectionOf(ObjectSomeValuesFrom(<test:lives-in> <test:Pouch>) <test:Kangaroo>)) \n"
 				+ "DisjointClasses(<test:Irrational> <test:Rational>) \n "
-				+ "SubClassOf(<test:Kangaroo> <test:Beast>) \n"
-				+ ")";
-		ElkClass maternityKangaroo = objectFactory.getClass(new ElkFullIri("test:MaternityKangaroo"));
+				+ "SubClassOf(<test:Kangaroo> <test:Beast>) \n" + ")";
+		ElkClass maternityKangaroo = objectFactory.getClass(new ElkFullIri(
+				"test:MaternityKangaroo"));
 
 		try {
 			stream = getClass().getClassLoader().getResourceAsStream(
@@ -417,22 +415,23 @@ public class LowLevelIncrementalTBoxTest {
 			List<ElkAxiom> ontology = loadAxioms(stream);
 			List<ElkAxiom> deletions = loadAxioms(new StringReader(toDelete));
 			TestChangesLoader initialLoader = new TestChangesLoader();
-			
+
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(
 					initialLoader, new LoggingStageExecutor());
 			reasoner.setAllowIncrementalMode(false);
-			
+
 			for (ElkAxiom axiom : ontology) {
 				initialLoader.add(axiom);
 			}
 
 			Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 
-			assertSame(taxonomy.getBottomNode(), taxonomy.getNode(maternityKangaroo));
+			assertSame(taxonomy.getBottomNode(),
+					taxonomy.getNode(maternityKangaroo));
 
 			System.out.println("\n\n\n\n========DELETIONS======");
 
-			reasoner.setAllowIncrementalMode(true);			
+			reasoner.setAllowIncrementalMode(true);
 			TestChangesLoader changeLoader = new TestChangesLoader();
 			reasoner.registerAxiomLoader(changeLoader);
 
@@ -442,34 +441,35 @@ public class LowLevelIncrementalTBoxTest {
 
 			taxonomy = reasoner.getTaxonomy();
 
-			assertNotSame(taxonomy.getBottomNode(), taxonomy.getNode(maternityKangaroo));
-			
+			assertNotSame(taxonomy.getBottomNode(),
+					taxonomy.getNode(maternityKangaroo));
+
 			System.out.println("\n\n\n\n========ADDING BACK======");
 
 			reasoner.setAllowIncrementalMode(true);
 			reasoner.registerAxiomLoader(changeLoader);
-			
+
 			for (ElkAxiom del : deletions) {
 				changeLoader.add(del);
 			}
 
 			taxonomy = reasoner.getTaxonomy();
 
-			assertSame(taxonomy.getBottomNode(), taxonomy.getNode(maternityKangaroo));
-
+			assertSame(taxonomy.getBottomNode(),
+					taxonomy.getNode(maternityKangaroo));
 
 		} finally {
 			IOUtils.closeQuietly(stream);
 		}
-	}	
-	
+	}
+
 	@Test
 	public void testDuplicateSubclassAxioms() throws ElkException {
-		TestChangesLoader loader = new TestChangesLoader();		
+		TestChangesLoader loader = new TestChangesLoader();
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -484,11 +484,11 @@ public class LowLevelIncrementalTBoxTest {
 				.contains(taxonomy.getNode(b)));
 
 		// now delete it one time
-		
+
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
 		reasoner.registerAxiomLoader(changeLoader);
-		
+
 		changeLoader.add(objectFactory.getSubClassOfAxiom(a, b));
 
 		// System.out.println("===========================================");
@@ -501,7 +501,6 @@ public class LowLevelIncrementalTBoxTest {
 
 		// now delete it the second time
 
-		
 		// reasoner.setAllowIncrementalMode(true);
 		// reasoner.registerOntologyChangesLoader(loader);
 
@@ -519,12 +518,12 @@ public class LowLevelIncrementalTBoxTest {
 
 	@Test
 	public void testPropositionalAdditions() throws ElkException {
-		TestChangesLoader loader = new TestChangesLoader();		
+		TestChangesLoader loader = new TestChangesLoader();
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
 
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -536,12 +535,11 @@ public class LowLevelIncrementalTBoxTest {
 
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
 
-		
 		reasoner.setAllowIncrementalMode(true);
 
 		TestChangesLoader changeLoader = new TestChangesLoader();
 		reasoner.registerAxiomLoader(changeLoader);
-		
+
 		changeLoader.add(objectFactory.getSubClassOfAxiom(a, b)).add(
 				objectFactory.getSubClassOfAxiom(b, d));
 
@@ -597,7 +595,6 @@ public class LowLevelIncrementalTBoxTest {
 
 		reasoner.getTaxonomy();
 
-		
 		reasoner.setAllowIncrementalMode(true);
 
 		changeLoader.remove(axiom1);
@@ -620,7 +617,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
 
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -643,19 +640,19 @@ public class LowLevelIncrementalTBoxTest {
 
 		// now delete one disjointness, A should remain unsatisfiable
 		reasoner.setAllowIncrementalMode(true);
-		
+
 		TestChangesLoader changeLoader = new TestChangesLoader();
 		reasoner.registerAxiomLoader(changeLoader);
 
 		changeLoader.remove(disjCB);
 
-		 System.out.println("\n\n\n\n\n===========================================");
+		System.out
+				.println("\n\n\n\n\n===========================================");
 
 		taxonomy = reasoner.getTaxonomy();
 
 		assertTrue(taxonomy.getNode(a) == taxonomy.getBottomNode());
 
-		
 		// delete another disjointness, A should become satisfiable again
 		reasoner.registerAxiomLoader(changeLoader);
 		changeLoader.remove(disjBC);
@@ -675,7 +672,7 @@ public class LowLevelIncrementalTBoxTest {
 			Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 					new LoggingStageExecutor());
 
-			reasoner.setAllowIncrementalMode(false);			
+			reasoner.setAllowIncrementalMode(false);
 
 			ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 			ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -700,7 +697,7 @@ public class LowLevelIncrementalTBoxTest {
 			reasoner.setAllowIncrementalMode(true);
 			TestChangesLoader changeLoader = new TestChangesLoader();
 			reasoner.registerAxiomLoader(changeLoader);
-			
+
 			changeLoader.remove(disjABCD);
 			taxonomy = reasoner.getTaxonomy();
 
@@ -719,12 +716,12 @@ public class LowLevelIncrementalTBoxTest {
 
 	@Test
 	public void testAddClassRemoveClass() throws ElkException {
-		TestChangesLoader loader = new TestChangesLoader();		
+		TestChangesLoader loader = new TestChangesLoader();
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
 
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -746,7 +743,7 @@ public class LowLevelIncrementalTBoxTest {
 		// A should be deleted, E should appear, D should be a subclass of C now
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
-		reasoner.registerAxiomLoader(changeLoader);		
+		reasoner.registerAxiomLoader(changeLoader);
 
 		changeLoader
 				.remove(objectFactory.getSubClassOfAxiom(d, a))
@@ -767,12 +764,12 @@ public class LowLevelIncrementalTBoxTest {
 	@Test
 	public void testPropagations() throws ElkException {
 
-		TestChangesLoader loader = new TestChangesLoader();		
+		TestChangesLoader loader = new TestChangesLoader();
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor(), 1);
 
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -795,8 +792,6 @@ public class LowLevelIncrementalTBoxTest {
 		assertEquals(1, taxonomy.getNode(d).getDirectSubNodes().size());
 		assertTrue(taxonomy.getNode(d).getDirectSubNodes()
 				.contains(taxonomy.getNode(objectFactory.getOwlNothing())));
-
-		
 
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
@@ -822,12 +817,12 @@ public class LowLevelIncrementalTBoxTest {
 	@Test
 	public void testEquivalences() throws ElkException {
 
-		TestChangesLoader loader = new TestChangesLoader();		
+		TestChangesLoader loader = new TestChangesLoader();
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor(), 1);
 
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass x = objectFactory.getClass(new ElkFullIri(":X"));
 		ElkClass y = objectFactory.getClass(new ElkFullIri(":Y"));
@@ -841,8 +836,6 @@ public class LowLevelIncrementalTBoxTest {
 
 		// node for X = [X]
 		assertEquals(1, taxonomy.getNode(x).getMembers().size());
-
-		
 
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
@@ -865,7 +858,7 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor(), 1);
 
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass x = objectFactory.getClass(new ElkFullIri(":X"));
 		ElkClass y = objectFactory.getClass(new ElkFullIri(":Y"));
@@ -889,8 +882,6 @@ public class LowLevelIncrementalTBoxTest {
 		// Y = A
 		assertEquals(2, taxonomy.getNode(y).getMembers().size());
 
-		
-
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
 		reasoner.registerAxiomLoader(changeLoader);
@@ -911,12 +902,12 @@ public class LowLevelIncrementalTBoxTest {
 	@Test
 	public void testDeleteBackwardLinkAndModifySourceContext()
 			throws ElkException {
-		TestChangesLoader loader = new TestChangesLoader();		
+		TestChangesLoader loader = new TestChangesLoader();
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new LoggingStageExecutor());
-		
-		reasoner.setAllowIncrementalMode(false);		
+
+		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass a = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass b = objectFactory.getClass(new ElkFullIri(":B"));
@@ -945,34 +936,45 @@ public class LowLevelIncrementalTBoxTest {
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
 		reasoner.registerAxiomLoader(changeLoader);
-		
+
 		changeLoader.remove(toDelete).add(toAdd1).add(toAdd2);
 
 		System.out.println("\n\n\n\n\n");
-		
+
 		taxonomy = reasoner.getTaxonomy();
 
 		assertTrue(taxonomy.getNode(a).getDirectSuperNodes()
 				.contains(taxonomy.getNode(e)));
 	}
-	
-	
+
+	/**
+	 * Tests that redundant existential decomposition rules are dealt with
+	 * properly
+	 * 
+	 * @throws ElkException
+	 * @throws IOException
+	 */
 	@Test
-	public void testDeterministicLinks() throws ElkException, IOException {
+	public void testRedundantExistentialDecomposition() throws ElkException,
+			IOException {
 		String ontology = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
-				+ "SubClassOf(:A :B) "
-				+ "SubClassOf(:B ObjectSomeValuesFrom(:R :B1)) "
-				+ "SubClassOf(:B1 :C1) "				
-				+ "SubClassOf(ObjectSomeValuesFrom(:R :C1) :F) "
-				+ "SubClassOf(:A :C) "
-				+ "SubClassOf(:C :E) "
-				+ "TransitiveObjectProperty(:R) "
-				+ "SubClassOf(:D ObjectSomeValuesFrom(:R :A)) "
+				+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B)) "
+				// use filler for which the context should not be created by
+				// classification
+				+ "SubClassOf(:B ObjectIntersectionOf(:B :C)) "
+				// decomposition optimization should prevent creating a context
+				// for B & C
+				+ "SubClassOf(ObjectSomeValuesFrom(:R ObjectIntersectionOf(:B :C)) :D) "
 				+ ")";
-		
-		ElkClass A = objectFactory.getClass(new ElkFullIri("http://www.test.com/schema#A"));
-		//ElkClass C = objectFactory.getClass(new ElkFullIri("http://www.test.com/schema#C"));
-		ElkClass F = objectFactory.getClass(new ElkFullIri("http://www.test.com/schema#F"));
+
+		ElkClass A = objectFactory.getClass(new ElkFullIri(
+				"http://www.test.com/schema#A"));
+		ElkClass B = objectFactory.getClass(new ElkFullIri(
+				"http://www.test.com/schema#B"));
+		ElkClass C = objectFactory.getClass(new ElkFullIri(
+				"http://www.test.com/schema#C"));
+		ElkClass D = objectFactory.getClass(new ElkFullIri(
+				"http://www.test.com/schema#D"));
 
 		List<ElkAxiom> axioms = loadAxioms(new StringReader(ontology));
 		TestChangesLoader initialLoader = new TestChangesLoader();
@@ -980,69 +982,146 @@ public class LowLevelIncrementalTBoxTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader,
 				new LoggingStageExecutor());
 
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		for (ElkAxiom axiom : axioms) {
 			initialLoader.add(axiom);
 		}
 
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
-		
+
+		assertTrue(taxonomy.getNode(B).getDirectSuperNodes()
+				.contains(taxonomy.getNode(C)));
+		assertTrue(taxonomy.getNode(A).getDirectSuperNodes()
+				.contains(taxonomy.getNode(D)));
+
+		reasoner.setAllowIncrementalMode(true);
+		TestChangesLoader changeLoader = new TestChangesLoader();
+
+		// adding a redundant axiom
+		String toChange = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
+				// without the previous axioms the context for B & C would have
+				// been created
+				+ "SubClassOf(:A ObjectSomeValuesFrom(:R ObjectIntersectionOf(:B :C))) "
+				+ ")";
+		List<ElkAxiom> changes = loadAxioms(new StringReader(toChange));
+
+		for (ElkAxiom axiom : changes) {
+			changeLoader.add(axiom);
+		}
+		reasoner.registerAxiomLoader(changeLoader);
+
+		// nothing should change
+		taxonomy = reasoner.getTaxonomy();
+		assertTrue(taxonomy.getNode(B).getDirectSuperNodes()
+				.contains(taxonomy.getNode(C)));
+		assertTrue(taxonomy.getNode(A).getDirectSuperNodes()
+				.contains(taxonomy.getNode(D)));
+
+		// removing the redundant axiom
+		for (ElkAxiom axiom : changes) {
+			changeLoader.remove(axiom);
+		}
+		reasoner.registerAxiomLoader(changeLoader);
+
+		// nothing should change either
+		taxonomy = reasoner.getTaxonomy();
+		assertTrue(taxonomy.getNode(B).getDirectSuperNodes()
+				.contains(taxonomy.getNode(C)));
+		assertTrue(taxonomy.getNode(A).getDirectSuperNodes()
+				.contains(taxonomy.getNode(D)));
+	}
+
+	@Test
+	public void testDeterministicLinks() throws ElkException, IOException {
+		String ontology = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
+				+ "SubClassOf(:A :B) "
+				+ "SubClassOf(:B ObjectSomeValuesFrom(:R :B1)) "
+				+ "SubClassOf(:B1 :C1) "
+				+ "SubClassOf(ObjectSomeValuesFrom(:R :C1) :F) "
+				+ "SubClassOf(:A :C) " + "SubClassOf(:C :E) "
+				+ "TransitiveObjectProperty(:R) "
+				+ "SubClassOf(:D ObjectSomeValuesFrom(:R :A)) " + ")";
+
+		ElkClass A = objectFactory.getClass(new ElkFullIri(
+				"http://www.test.com/schema#A"));
+		// ElkClass C = objectFactory.getClass(new
+		// ElkFullIri("http://www.test.com/schema#C"));
+		ElkClass F = objectFactory.getClass(new ElkFullIri(
+				"http://www.test.com/schema#F"));
+
+		List<ElkAxiom> axioms = loadAxioms(new StringReader(ontology));
+		TestChangesLoader initialLoader = new TestChangesLoader();
+
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader,
+				new LoggingStageExecutor());
+
+		reasoner.setAllowIncrementalMode(false);
+
+		for (ElkAxiom axiom : axioms) {
+			initialLoader.add(axiom);
+		}
+
+		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomy();
+
 		assertTrue(taxonomy.getNode(A).getAllSuperNodes()
 				.contains(taxonomy.getNode(F)));
-		// at this point there is a backward link from B1 to A, and a (negative) subsumer R some C1 for A
-		System.out.println("\n\n\n\n===========================================");
-		// The subsumer R some C1 already exists, so it won't be processed (decomposed) for A again
+		// at this point there is a backward link from B1 to A, and a (negative)
+		// subsumer R some C1 for A
+		System.out
+				.println("\n\n\n\n===========================================");
+		// The subsumer R some C1 already exists, so it won't be processed
+		// (decomposed) for A again
 		// as a result, there won't be a backward link from C1 to A
 		String toAdd = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
-				+ "SubClassOf(:C1 :B1) "				
-				+ "SubClassOf(:C ObjectSomeValuesFrom(:R :C1)) "
-				+ ")";
+				+ "SubClassOf(:C1 :B1) "
+				+ "SubClassOf(:C ObjectSomeValuesFrom(:R :C1)) " + ")";
 		List<ElkAxiom> additions = loadAxioms(new StringReader(toAdd));
 
 		reasoner.setAllowIncrementalMode(true);
-		
+
 		TestChangesLoader changeLoader = new TestChangesLoader();
 		reasoner.registerAxiomLoader(changeLoader);
-		
+
 		for (ElkAxiom axiom : additions) {
 			changeLoader.add(axiom);
 		}
 
 		taxonomy = reasoner.getTaxonomy();
-		
-		System.out.println("\n\n\n\n===========================================");
-		// this leads to cleaning of A so the backward link A <-R<- B1 will be deleted
+
+		System.out
+				.println("\n\n\n\n===========================================");
+		// this leads to cleaning of A so the backward link A <-R<- B1 will be
+		// deleted
 		String toDelete = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
-				+ "SubClassOf(:C :E) "
-				+ ")";
+				+ "SubClassOf(:C :E) " + ")";
 		List<ElkAxiom> deletions = loadAxioms(new StringReader(toDelete));
 
 		reasoner.registerAxiomLoader(changeLoader);
-		
+
 		for (ElkAxiom axiom : deletions) {
 			changeLoader.remove(axiom);
 		}
-		
+
 		taxonomy = reasoner.getTaxonomy();
-		
-		System.out.println("\n\n\n\n===========================================");
-		
+
+		System.out
+				.println("\n\n\n\n===========================================");
+
 		toDelete = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
-				+ "SubClassOf(:D ObjectSomeValuesFrom(:R :A)) "
-					+ ")";
-		
+				+ "SubClassOf(:D ObjectSomeValuesFrom(:R :A)) " + ")";
+
 		deletions = loadAxioms(new StringReader(toDelete));
 
 		reasoner.registerAxiomLoader(changeLoader);
-		
+
 		for (ElkAxiom axiom : deletions) {
 			changeLoader.remove(axiom);
 		}
-		
+
 		taxonomy = reasoner.getTaxonomy();
-	}	
-	
+	}
+
 	private List<ElkAxiom> loadAxioms(InputStream stream) throws IOException,
 			Owl2ParseException {
 		return loadAxioms(new InputStreamReader(stream));

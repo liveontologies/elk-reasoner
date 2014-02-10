@@ -92,4 +92,9 @@ public class HybridContextPremises implements ContextPremises {
 		return localPremises_.isInconsistForDisjointnessAxiom(axiom);
 	}
 
+	@Override
+	public String toString() {
+		return getRoot() + "[hybrid]";
+	}
+
 }
