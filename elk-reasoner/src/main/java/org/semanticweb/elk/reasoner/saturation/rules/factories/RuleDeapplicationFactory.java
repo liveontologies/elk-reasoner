@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
+import org.semanticweb.elk.reasoner.saturation.ContextExistenceCheckingWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
@@ -112,11 +113,21 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
 		protected DeapplicationEngine(ContextModificationListener listener,
 				SaturationStatistics localStatistics) {
-			this(SaturationUtils.getStatAwareWriter(saturationState
-					.getWriter(SaturationUtils
-							.addStatsToContextModificationListener(listener,
-									localStatistics.getContextStatistics())),
-					localStatistics), localStatistics);
+			this(
+					// producing conclusions only in existing contexts
+					new ContextExistenceCheckingWriter(
+							// use writer with statistics
+							SaturationUtils.getStatAwareWriter(
+									saturationState
+											.getWriter(
+											// check which contexts are modified
+											SaturationUtils
+													.addStatsToContextModificationListener(
+															listener,
+															localStatistics
+																	.getContextStatistics())),
+									localStatistics), saturationState),
+					localStatistics);
 		}
 
 		protected DeapplicationEngine(ContextModificationListener listener) {

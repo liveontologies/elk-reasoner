@@ -961,10 +961,10 @@ public class LowLevelIncrementalTBoxTest {
 				+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B)) "
 				// use filler for which the context should not be created by
 				// classification
-				+ "SubClassOf(:B ObjectIntersectionOf(:B :C)) "
+				+ "SubClassOf(:B ObjectIntersectionOf(:C :C)) "
 				// decomposition optimization should prevent creating a context
 				// for B & C
-				+ "SubClassOf(ObjectSomeValuesFrom(:R ObjectIntersectionOf(:B :C)) :D) "
+				+ "SubClassOf(ObjectSomeValuesFrom(:R ObjectIntersectionOf(:C :C)) :D) "
 				+ ")";
 
 		ElkClass A = objectFactory.getClass(new ElkFullIri(
@@ -1002,7 +1002,7 @@ public class LowLevelIncrementalTBoxTest {
 		String toChange = "Prefix(:=<http://www.test.com/schema#>) Ontology(\n"
 				// without the previous axioms the context for B & C would have
 				// been created
-				+ "SubClassOf(:A ObjectSomeValuesFrom(:R ObjectIntersectionOf(:B :C))) "
+				+ "SubClassOf(:A ObjectSomeValuesFrom(:R ObjectIntersectionOf(:C :C))) "
 				+ ")";
 		List<ElkAxiom> changes = loadAxioms(new StringReader(toChange));
 
