@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 public class TimedConclusionVisitor<I> implements ConclusionVisitor<I, Long> {
@@ -44,9 +45,9 @@ public class TimedConclusionVisitor<I> implements ConclusionVisitor<I, Long> {
 	}
 
 	@Override
-	public Long visit(BackwardLink conclusion, I input) {
+	public Long visit(BackwardLink subConclusion, I input) {
 		timer_.timeBackwardLinks -= CachedTimeThread.getCurrentTimeMillis();
-		processor_.visit(conclusion, input);
+		processor_.visit(subConclusion, input);
 		return timer_.timeBackwardLinks += CachedTimeThread
 				.getCurrentTimeMillis();
 	}
@@ -101,9 +102,17 @@ public class TimedConclusionVisitor<I> implements ConclusionVisitor<I, Long> {
 	}
 
 	@Override
-	public Long visit(Propagation conclusion, I input) {
+	public Long visit(Propagation subConclusion, I input) {
 		timer_.timePropagations -= CachedTimeThread.getCurrentTimeMillis();
-		processor_.visit(conclusion, input);
+		processor_.visit(subConclusion, input);
+		return timer_.timePropagations += CachedTimeThread
+				.getCurrentTimeMillis();
+	}
+
+	@Override
+	public Long visit(SubContextInitialization subConclusion, I input) {
+		timer_.timePropagations -= CachedTimeThread.getCurrentTimeMillis();
+		processor_.visit(subConclusion, input);
 		return timer_.timePropagations += CachedTimeThread
 				.getCurrentTimeMillis();
 	}

@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
+package org.semanticweb.elk.reasoner.saturation.rules.subcontextinit;
 
 /*
  * #%L
@@ -22,22 +22,21 @@ package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 
 /**
- * A visitor pattern for {@link LinkedBackwardLinkRule}s
+ * A {@link Rule} applied when processing initializing {@link SubContext}s
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface LinkedBackwardLinkRuleVisitor {
+public interface SubContextInitRule extends Rule<SubContextInitialization> {
 
-	void visit(ContradictionOverBackwardLinkRule rule, BackwardLink premise,
-			ContextPremises premises, ConclusionProducer producer);
-
-	void visit(BackwardLinkChainFromBackwardLinkRule rule,
-			BackwardLink premise, ContextPremises premises,
+	public void accept(SubContextInitRuleVisitor visitor,
+			SubContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer);
 
 }

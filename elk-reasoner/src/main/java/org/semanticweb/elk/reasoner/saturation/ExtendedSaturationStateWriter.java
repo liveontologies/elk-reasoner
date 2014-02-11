@@ -28,6 +28,8 @@ package org.semanticweb.elk.reasoner.saturation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
+// TODO: this class is no longer necessary: contexts can be creating and initialized
+// by SaturationStateWriter itself
 /**
  * The extended writer for situations when new contexts may need to be
  * created/initialized or removed. With every
@@ -49,5 +51,4 @@ public interface ExtendedSaturationStateWriter extends SaturationStateWriter {
 
 	public void initContext(Context context);
 
-	public void removeContext(Context context);
 }

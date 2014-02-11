@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.context;
  * #L%
  */
 
+import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -30,24 +31,26 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
-import org.semanticweb.elk.util.collections.Multimap;
-import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
- * A representation of {@link Conclusion}s that can be used as premises for rule
- * applications. If an inference is be applicable to {@link Conclusion}s, then
- * all of them should be stored in the same {@link ContextPremises}.
+ * A representation for a set of {@link Conclusion}s that can be used as
+ * premises of inference rules associated with a given root
+ * {@link IndexedClassExpression} that can be obtained using {@link #getRoot()}.
+ * Whenever a {@link Conclusion} can participate in an inference with this root,
+ * it should be saved in the {@link ContextPremises} with the corresponding
+ * root.
  * 
+ * @see Rule
  * @author "Yevgeny Kazakov"
- * 
  */
 public interface ContextPremises {
 
 	/**
-	 * @return the {@link IndexedClassExpression} for which this
-	 *         {@link ContextPremises} is assigned. This may never been
-	 *         {@code null}.
+	 * @return the {@link IndexedClassExpression} for which the
+	 *         {@link Conclusion}s stored in this {@link ContextPremises} are
+	 *         assigned. This may never been {@code null}.
 	 */
 	public IndexedClassExpression getRoot();
 
@@ -57,6 +60,17 @@ public interface ContextPremises {
 	 *         {@link IndexedClassExpression}
 	 */
 	public Set<IndexedClassExpression> getSubsumers();
+
+	/**
+	 * @return the {@link Map} storing {@link SubContextPremises} for the
+	 *         corresponding {@link IndexedPropertyChain}s. The
+	 *         {@link SubContextPremises} store {@link Conclusion}s that can be
+	 *         used as premises of rules that are associated with the
+	 *         corresponding sub-root {@link IndexedPropertyChain} in addition
+	 *         to the root {@link IndexedClassExpression}
+	 * @see SubContextPremises
+	 */
+	public Map<IndexedPropertyChain, ? extends SubContextPremises> getSubContextPremisesByObjectProperty();
 
 	/**
 	 * @return the {@link ContextPremises}s different from this
@@ -78,7 +92,8 @@ public interface ContextPremises {
 	 * 
 	 * @see #getLocalReflexiveObjectProperties()
 	 */
-	public Multimap<IndexedPropertyChain, IndexedClassExpression> getBackwardLinksByObjectProperty();
+	// public Multimap<IndexedPropertyChain, IndexedClassExpression>
+	// getBackwardLinksByObjectProperty();
 
 	/**
 	 * @return the {@link IndexedPropertyChain}s representing all derived

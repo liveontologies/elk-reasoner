@@ -38,18 +38,17 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.SubContext;
+import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.collections.HashSetMultimap;
-import org.semanticweb.elk.util.collections.Multimap;
-import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
@@ -64,21 +63,11 @@ import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ContextImpl implements Context {
-
-	// logger for events
-	// private static final Logger LOGGER_ = LoggerFactory
-	// .getLogger(ContextImpl.class);
+public class ContextImpl implements ExtendedContext {
 
 	private static final ConclusionVisitor<ContextImpl, Boolean> CONCLUSION_INSERTER_ = new ConclusionInserter();
 	private static final ConclusionVisitor<ContextImpl, Boolean> CONCLUSION_DELETER_ = new ConclusionDeleter();
 	private static final ConclusionVisitor<ContextImpl, Boolean> CONCLUSION_OCCURRENCE_CHECKER_ = new ConclusionOccurrenceChecker();
-
-	/**
-	 * references to the next and previous contexts so that the contexts can be
-	 * chained
-	 */
-	// volatile ContextImpl next, previous;
 
 	/**
 	 * the rules that should be applied to each derived {@link BackwardLink} in
@@ -96,11 +85,16 @@ public class ContextImpl implements Context {
 	private Set<IndexedPropertyChain> reflexiveBackwardLinks_ = null;
 
 	/**
-	 * the indexed representation of all derived non-reflexive
-	 * {@link BackwardLink}s computed for this {@link Context}; can be
-	 * {@code null}
+	 * the {@link SubContext}s of this {@link Context} indexed by their root
+	 * {@link IndexedPropertyChain}s
 	 */
-	private Multimap<IndexedPropertyChain, IndexedClassExpression> backwardLinksByObjectProperty_ = null;
+	private Map<IndexedPropertyChain, SubContext> subContextsByObjectProperty_ = null;
+
+	/**
+	 * the {@link IndexedPropertyChain} for which {@link SubContext}s are
+	 * (being) initialized
+	 */
+	private Set<IndexedPropertyChain> initializedSubRoots_ = null;
 
 	/**
 	 * the derived {@link IndexedClassExpression} subsumers by
@@ -111,13 +105,13 @@ public class ContextImpl implements Context {
 	/**
 	 * {@code true} if {@code owl:Nothing} is stored in {@link #subsumers_}
 	 */
-	protected volatile boolean isInconsistent = false;
+	private volatile boolean isInconsistent_ = false;
 
 	/**
 	 * {@code true} if all derived {@link Subsumer} of {@link #root_} have been
 	 * computed.
 	 */
-	protected volatile boolean isSaturated = false;
+	private volatile boolean isSaturated_ = false;
 
 	/**
 	 * the root {@link IndexedClassExpression} for which the {@link #subsumers_}
@@ -155,24 +149,8 @@ public class ContextImpl implements Context {
 		this.subsumers_ = new ArrayHashSet<IndexedClassExpression>(13);
 	}
 
-	// @Override
-	// public void removeLinks() {
-	// // No sync here?
-	// if (previous != null) {
-	// previous.next = next;
-	// }
-	//
-	// if (next != null) {
-	// next.previous = previous;
-	// }
-	// }
-
 	@Override
 	public boolean addConclusion(Conclusion conclusion) {
-		// if (conclusion.getSourceContext(this).isSaturated())
-		// LOGGER_.error(
-		// "{}: adding conclusion belonging to a saturated context {}",
-		// conclusion);
 		return conclusion.accept(CONCLUSION_INSERTER_, this);
 	}
 
@@ -189,6 +167,43 @@ public class ContextImpl implements Context {
 	@Override
 	public boolean addToDo(Conclusion conclusion) {
 		return toDo_.push(conclusion);
+	}
+
+	@Override
+	public Map<IndexedPropertyChain, ? extends SubContextPremises> getSubContextPremisesByObjectProperty() {
+		if (subContextsByObjectProperty_ == null)
+			return Collections.emptyMap();
+		// else
+		return subContextsByObjectProperty_;
+	}
+
+	@Override
+	public SubContext getCreateSubContext(IndexedPropertyChain subRoot) {
+		if (subContextsByObjectProperty_ == null)
+			subContextsByObjectProperty_ = new ArrayHashMap<IndexedPropertyChain, SubContext>(
+					3);
+		SubContext result = subContextsByObjectProperty_.get(subRoot);
+		if (result == null) {
+			result = new SubContextImpl();
+			subContextsByObjectProperty_.put(subRoot, result);
+		}
+		return result;
+	}
+
+	@Override
+	public synchronized boolean setInitSubRoot(IndexedPropertyChain subRoot) {
+		if (initializedSubRoots_ == null)
+			initializedSubRoots_ = new ArrayHashSet<IndexedPropertyChain>(3);
+		return initializedSubRoots_.add(subRoot);
+	}
+
+	public boolean removeSubContext(IndexedPropertyChain subRoot) {
+		if (subContextsByObjectProperty_ == null)
+			return false;
+		boolean changed = subContextsByObjectProperty_.remove(subRoot) != null;
+		if (changed && subContextsByObjectProperty_.isEmpty())
+			subContextsByObjectProperty_ = null;
+		return changed;
 	}
 
 	@Override
@@ -213,13 +228,6 @@ public class ContextImpl implements Context {
 	}
 
 	@Override
-	public Multimap<IndexedPropertyChain, IndexedClassExpression> getBackwardLinksByObjectProperty() {
-		return backwardLinksByObjectProperty_ == null ? Operations
-				.<IndexedPropertyChain, IndexedClassExpression> emptyMultimap()
-				: backwardLinksByObjectProperty_;
-	}
-
-	@Override
 	public Set<IndexedPropertyChain> getLocalReflexiveObjectProperties() {
 		return reflexiveBackwardLinks_ == null ? Collections
 				.<IndexedPropertyChain> emptySet() : reflexiveBackwardLinks_;
@@ -233,13 +241,6 @@ public class ContextImpl implements Context {
 	@Override
 	public Set<IndexedClassExpression> getSubsumers() {
 		return subsumers_;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return (subsumers_ == null || subsumers_.isEmpty())
-				&& (backwardLinksByObjectProperty_ == null || backwardLinksByObjectProperty_
-						.isEmpty()) && getBackwardLinkRuleHead() == null;
 	}
 
 	@Override
@@ -257,13 +258,13 @@ public class ContextImpl implements Context {
 
 	@Override
 	public boolean isSaturated() {
-		return isSaturated;
+		return isSaturated_;
 	}
 
 	@Override
 	public boolean setSaturated(boolean saturated) {
-		boolean result = isSaturated;
-		isSaturated = saturated;
+		boolean result = isSaturated_;
+		isSaturated_ = saturated;
 		return result;
 	}
 
@@ -287,10 +288,11 @@ public class ContextImpl implements Context {
 		}
 
 		@Override
-		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
-			IndexedClassExpression source = conclusion.getSource();
-			IndexedPropertyChain relation = conclusion.getRelation();
-			if (conclusion.getSourceRoot(input.root_) == input.root_) {
+		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
+			IndexedPropertyChain relation = subConclusion.getRelation();
+			// make sure that relevant context always exists
+			SubContext subContext = input.getCreateSubContext(relation);
+			if (subConclusion.getSourceRoot(input.root_) == input.root_) {
 				// reflexive
 				if (input.reflexiveBackwardLinks_ == null) {
 					input.reflexiveBackwardLinks_ = new ArrayHashSet<IndexedPropertyChain>(
@@ -299,9 +301,7 @@ public class ContextImpl implements Context {
 				return input.reflexiveBackwardLinks_.add(relation);
 			}
 			// else non-reflexive
-			if (input.backwardLinksByObjectProperty_ == null)
-				input.backwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedClassExpression>();
-			return input.backwardLinksByObjectProperty_.add(relation, source);
+			return subContext.addSubConclusion(subConclusion);
 		}
 
 		@Override
@@ -321,10 +321,10 @@ public class ContextImpl implements Context {
 
 		@Override
 		public Boolean visit(Contradiction conclusion, ContextImpl input) {
-			boolean before = input.isInconsistent;
-			input.isInconsistent = true;
+			boolean before = input.isInconsistent_;
+			input.isInconsistent_ = true;
 			ContradictionOverBackwardLinkRule.addTo(input);
-			return before != input.isInconsistent;
+			return before != input.isInconsistent_;
 		}
 
 		@Override
@@ -369,8 +369,16 @@ public class ContextImpl implements Context {
 		}
 
 		@Override
-		public Boolean visit(Propagation conclusion, ContextImpl input) {
-			return SubsumerBackwardLinkRule.addRuleFor(conclusion, input);
+		public Boolean visit(Propagation subConclusion, ContextImpl input) {
+			return input.getCreateSubContext(subConclusion.getRelation())
+					.addSubConclusion(subConclusion);
+		}
+
+		@Override
+		public Boolean visit(SubContextInitialization subConclusion,
+				ContextImpl input) {
+			return input.getCreateSubContext(subConclusion.getSubRoot())
+					.addSubConclusion(subConclusion);
 		}
 
 	}
@@ -379,25 +387,24 @@ public class ContextImpl implements Context {
 			ConclusionVisitor<ContextImpl, Boolean> {
 
 		@Override
-		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
+		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
 			boolean changed = false;
-			if (conclusion.getSourceRoot(input.root_) == input.root_) {
+			IndexedPropertyChain relation = subConclusion.getRelation();
+			SubContext subContext = input.getCreateSubContext(relation);
+			if (subConclusion.getSourceRoot(input.root_) == input.root_) {
 				// link is reflexive
 				if (input.reflexiveBackwardLinks_ != null) {
-					changed = input.reflexiveBackwardLinks_.remove(conclusion
-							.getRelation());
+					changed = input.reflexiveBackwardLinks_.remove(relation);
 					if (input.reflexiveBackwardLinks_.isEmpty()) {
 						input.reflexiveBackwardLinks_ = null;
 					}
 				}
-			} else
-			// link is not reflexive
-			if (input.backwardLinksByObjectProperty_ != null) {
-				changed = input.backwardLinksByObjectProperty_.remove(
-						conclusion.getRelation(), conclusion.getSource());
-				if (input.backwardLinksByObjectProperty_.isEmpty()) {
-					input.backwardLinksByObjectProperty_ = null;
-				}
+			} else {
+				// link is not reflexive
+				if (subContext == null)
+					return false;
+				// else
+				changed = subContext.removeSubConclusion(subConclusion);
 			}
 			return changed;
 		}
@@ -423,10 +430,10 @@ public class ContextImpl implements Context {
 
 		@Override
 		public Boolean visit(Contradiction conclusion, ContextImpl input) {
-			boolean before = input.isInconsistent;
-			input.isInconsistent = false;
+			boolean before = input.isInconsistent_;
+			input.isInconsistent_ = false;
 			ContradictionOverBackwardLinkRule.removeFrom(input);
-			return before != input.isInconsistent;
+			return before != input.isInconsistent_;
 		}
 
 		@Override
@@ -477,8 +484,24 @@ public class ContextImpl implements Context {
 		}
 
 		@Override
-		public Boolean visit(Propagation conclusion, ContextImpl input) {
-			return SubsumerBackwardLinkRule.removeRuleFor(conclusion, input);
+		public Boolean visit(Propagation subConclusion, ContextImpl input) {
+			SubContext subContext = input.getCreateSubContext(subConclusion
+					.getRelation());
+			if (subContext == null)
+				return false;
+			// else
+			return subContext.removeSubConclusion(subConclusion);
+		}
+
+		@Override
+		public Boolean visit(SubContextInitialization subConclusion,
+				ContextImpl input) {
+			SubContext subContext = input.getCreateSubContext(subConclusion
+					.getSubRoot());
+			if (subContext == null)
+				return false;
+			// else
+			return subContext.removeSubConclusion(subConclusion);
 		}
 
 	}
@@ -491,19 +514,18 @@ public class ContextImpl implements Context {
 		}
 
 		@Override
-		public Boolean visit(BackwardLink conclusion, ContextImpl input) {
-			if (conclusion.getSourceRoot(input.root_) == input.root_) {
+		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
+			if (subConclusion.getSourceRoot(input.root_) == input.root_) {
 				// reflexive
-				if (input.reflexiveBackwardLinks_ != null)
-					return input.reflexiveBackwardLinks_.contains(conclusion
-							.getRelation());
-			} else
-			// non-reflexive
-			if (input.backwardLinksByObjectProperty_ != null) {
-				return input.backwardLinksByObjectProperty_.contains(
-						conclusion.getRelation(), conclusion.getSource());
+				return input.reflexiveBackwardLinks_ != null
+						&& input.reflexiveBackwardLinks_.contains(subConclusion
+								.getRelation());
 			}
-			return false;
+			// else non-reflexive
+			SubContext subContext = input.getCreateSubContext(subConclusion
+					.getRelation());
+			return subContext != null
+					&& subContext.containsSubConclusion(subConclusion);
 		}
 
 		@Override
@@ -518,7 +540,7 @@ public class ContextImpl implements Context {
 
 		@Override
 		public Boolean visit(Contradiction conclusion, ContextImpl input) {
-			return input.isInconsistent;
+			return input.isInconsistent_;
 		}
 
 		@Override
@@ -547,8 +569,24 @@ public class ContextImpl implements Context {
 		}
 
 		@Override
-		public Boolean visit(Propagation conclusion, ContextImpl input) {
-			return SubsumerBackwardLinkRule.containsRuleFor(conclusion, input);
+		public Boolean visit(Propagation subConclusion, ContextImpl input) {
+			SubContext subContext = input.getCreateSubContext(subConclusion
+					.getRelation());
+			if (subContext == null)
+				return false;
+			// else
+			return subContext.containsSubConclusion(subConclusion);
+		}
+
+		@Override
+		public Boolean visit(SubContextInitialization subConclusion,
+				ContextImpl input) {
+			SubContext subContext = input.getCreateSubContext(subConclusion
+					.getSubRoot());
+			if (subContext == null)
+				return false;
+			// else
+			return subContext.containsSubConclusion(subConclusion);
 		}
 
 	}

@@ -28,6 +28,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
@@ -43,7 +44,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class Propagation extends AbstractConclusion {
+public class Propagation extends AbstractConclusion implements Conclusion,
+		SubConclusion {
 
 	// logger for this class
 	static final Logger LOGGER_ = LoggerFactory.getLogger(Propagation.class);
@@ -56,28 +58,6 @@ public class Propagation extends AbstractConclusion {
 			final IndexedClassExpression carry) {
 		relation_ = relation;
 		carry_ = carry;
-	}
-
-	/**
-	 * @return the {@link IndexedPropertyChain} that is the relation over which
-	 *         this {@link Propagation} is applied
-	 */
-	public IndexedPropertyChain getRelation() {
-		return this.relation_;
-	}
-
-	/**
-	 * @return the {@link IndexedClassExpression} that is propagated by this
-	 *         {@link Propagation}
-	 */
-	public IndexedClassExpression getCarry() {
-		return this.carry_;
-	}
-
-	@Override
-	public IndexedClassExpression getDeterminingRoot(
-			IndexedClassExpression rootWhereStored) {
-		return null;
 	}
 
 	@Override
@@ -105,7 +85,33 @@ public class Propagation extends AbstractConclusion {
 
 	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+		return accept((SubConclusionVisitor<I, O>) visitor, input);
+	}
+
+	@Override
+	public <I, O> O accept(SubConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
+	}
+
+	@Override
+	public IndexedPropertyChain getSubRoot() {
+		return relation_;
+	}
+
+	/**
+	 * @return the {@link IndexedPropertyChain} that is the relation over which
+	 *         this {@link Propagation} is applied
+	 */
+	public IndexedPropertyChain getRelation() {
+		return this.relation_;
+	}
+
+	/**
+	 * @return the {@link IndexedClassExpression} that is propagated by this
+	 *         {@link Propagation}
+	 */
+	public IndexedClassExpression getCarry() {
+		return this.carry_;
 	}
 
 }

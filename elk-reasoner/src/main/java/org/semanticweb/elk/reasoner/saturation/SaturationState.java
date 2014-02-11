@@ -48,7 +48,7 @@ public interface SaturationState {
 	 * @return the {@link Collection} of {@link Context} stored in this
 	 *         {@link SaturationState}
 	 */
-	public Collection<Context> getContexts();
+	public Collection<? extends Context> getContexts();
 
 	public Context getContext(IndexedClassExpression ice);
 

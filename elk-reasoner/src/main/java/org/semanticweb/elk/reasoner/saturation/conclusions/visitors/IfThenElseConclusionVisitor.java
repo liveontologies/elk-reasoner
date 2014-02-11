@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
 
 /**
  * A {@link ConclusionVisitor} that implements an if-then-else statement over
@@ -78,9 +79,9 @@ public class IfThenElseConclusionVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(BackwardLink conclusion, I input) {
-		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
-				input) : doFalse_.visit(conclusion, input);
+	public O visit(BackwardLink subConclusion, I input) {
+		return check_.visit(subConclusion, input) ? doTrue_.visit(
+				subConclusion, input) : doFalse_.visit(subConclusion, input);
 	}
 
 	@Override
@@ -120,9 +121,15 @@ public class IfThenElseConclusionVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(Propagation conclusion, I input) {
-		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
-				input) : doFalse_.visit(conclusion, input);
+	public O visit(Propagation subConclusion, I input) {
+		return check_.visit(subConclusion, input) ? doTrue_.visit(
+				subConclusion, input) : doFalse_.visit(subConclusion, input);
+	}
+
+	@Override
+	public O visit(SubContextInitialization subConclusion, I input) {
+		return check_.visit(subConclusion, input) ? doTrue_.visit(
+				subConclusion, input) : doFalse_.visit(subConclusion, input);
 	}
 
 }

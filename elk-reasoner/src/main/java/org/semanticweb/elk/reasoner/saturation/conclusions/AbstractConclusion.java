@@ -45,12 +45,6 @@ public abstract class AbstractConclusion implements Conclusion {
 	}
 
 	@Override
-	public IndexedClassExpression getDeterminingRoot(
-			IndexedClassExpression rootWhereStored) {
-		return getSourceRoot(rootWhereStored);
-	}
-
-	@Override
 	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
 		// no redundant rules by default

@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,7 +22,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubConclusion;
 
 /**
  * A skeleton for implementation of {@link ConclusionVisitor}s using a common
@@ -42,14 +42,14 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
  * @param <O>
  *            the type of output parameter with which this visitor works
  */
-public abstract class AbstractConclusionVisitor<I, O> implements
-		ConclusionVisitor<I, O> {
+public abstract class AbstractConclusionVisitor<I, O> extends
+		AbstractSubConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 
 	abstract O defaultVisit(Conclusion conclusion, I input);
 
 	@Override
-	public O visit(BackwardLink conclusion, I input) {
-		return defaultVisit(conclusion, input);
+	O defaultVisit(SubConclusion subConclusion, I input) {
+		return defaultVisit((Conclusion) subConclusion, input);
 	}
 
 	@Override
@@ -79,11 +79,6 @@ public abstract class AbstractConclusionVisitor<I, O> implements
 
 	@Override
 	public O visit(ForwardLink conclusion, I input) {
-		return defaultVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(Propagation conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 

@@ -123,7 +123,7 @@ class ReferenceSaturationState extends AbstractSaturationState {
 	}
 
 	@Override
-	public Context getContext(IndexedClassExpression ice) {
+	public ExtendedContext getContext(IndexedClassExpression ice) {
 		return ((IndexedObjectWithContext) ice).getContext();
 	}
 
@@ -138,8 +138,8 @@ class ReferenceSaturationState extends AbstractSaturationState {
 	}
 
 	@Override
-	Context setIfAbsent(Context context) {
-		Context result = ((IndexedObjectWithContext) context.getRoot())
+	ExtendedContext setIfAbsent(ExtendedContext context) {
+		ExtendedContext result = ((IndexedObjectWithContext) context.getRoot())
 				.setContextIfAbsent(context);
 		if (result == null)
 			contextCount.incrementAndGet();

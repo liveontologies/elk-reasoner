@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
 
 public class PreprocessedConclusionVisitor<I, O> implements
 		ConclusionVisitor<I, O> {
@@ -44,9 +45,9 @@ public class PreprocessedConclusionVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(BackwardLink conclusion, I input) {
-		preprocessor_.visit(conclusion, input);
-		return visitor_.visit(conclusion, input);
+	public O visit(BackwardLink subConclusion, I input) {
+		preprocessor_.visit(subConclusion, input);
+		return visitor_.visit(subConclusion, input);
 	}
 
 	@Override
@@ -86,9 +87,15 @@ public class PreprocessedConclusionVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(Propagation conclusion, I input) {
-		preprocessor_.visit(conclusion, input);
-		return visitor_.visit(conclusion, input);
+	public O visit(Propagation subConclusion, I input) {
+		preprocessor_.visit(subConclusion, input);
+		return visitor_.visit(subConclusion, input);
+	}
+
+	@Override
+	public O visit(SubContextInitialization subConclusion, I input) {
+		preprocessor_.visit(subConclusion, input);
+		return visitor_.visit(subConclusion, input);
 	}
 
 }

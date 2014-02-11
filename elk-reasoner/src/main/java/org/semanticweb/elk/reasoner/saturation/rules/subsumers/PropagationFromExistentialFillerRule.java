@@ -103,10 +103,10 @@ public class PropagationFromExistentialFillerRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		
+
 		final Set<IndexedPropertyChain> candidatePropagationProperties = new LazySetUnion<IndexedPropertyChain>(
 				premises.getLocalReflexiveObjectProperties(), premises
-						.getBackwardLinksByObjectProperty().keySet());
+						.getSubContextPremisesByObjectProperty().keySet());
 
 		// TODO: deal with reflexive roles using another
 		// rule and uncomment this

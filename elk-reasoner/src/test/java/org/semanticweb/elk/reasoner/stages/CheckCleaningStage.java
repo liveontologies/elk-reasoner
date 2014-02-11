@@ -25,14 +25,15 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
+import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.collections.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,16 +84,17 @@ public class CheckCleaningStage extends BasePostProcessingStage {
 						context.getLocalReflexiveObjectProperties());
 			}
 		}
-		// checking backward links
+		// checking sub contexts
 		for (IndexedClassExpression ice : reasoner_
 				.getIndexedClassExpressions()) {
 			Context context = reasoner_.saturationState.getContext(ice);
 			if (context == null)
 				continue;
-			Multimap<IndexedPropertyChain, IndexedClassExpression> backwardLinks = context
-					.getBackwardLinksByObjectProperty();
-			for (IndexedPropertyChain ipc : backwardLinks.keySet()) {
-				for (IndexedClassExpression target : backwardLinks.get(ipc))
+			Map<IndexedPropertyChain, ? extends SubContextPremises> subContextMap = context
+					.getSubContextPremisesByObjectProperty();
+			for (IndexedPropertyChain ipc : subContextMap.keySet()) {
+				for (IndexedClassExpression target : subContextMap.get(ipc)
+						.getLinkedRoots())
 					if (cleanedContexts.contains(target))
 						LOGGER_.error(
 								"{}: backward link via {} to cleaned target {}",

@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
 
 /**
  * A {@link ConclusionVisitor} that combines two given {@link ConclusionVisitor}
@@ -70,9 +71,9 @@ public class CombinedConclusionVisitor<I> implements
 	}
 
 	@Override
-	public Boolean visit(BackwardLink conclusion, I input) {
-		return first_.visit(conclusion, input)
-				&& second_.visit(conclusion, input);
+	public Boolean visit(BackwardLink subConclusion, I input) {
+		return first_.visit(subConclusion, input)
+				&& second_.visit(subConclusion, input);
 	}
 
 	@Override
@@ -112,9 +113,15 @@ public class CombinedConclusionVisitor<I> implements
 	}
 
 	@Override
-	public Boolean visit(Propagation conclusion, I input) {
-		return first_.visit(conclusion, input)
-				&& second_.visit(conclusion, input);
+	public Boolean visit(Propagation subConclusion, I input) {
+		return first_.visit(subConclusion, input)
+				&& second_.visit(subConclusion, input);
+	}
+
+	@Override
+	public Boolean visit(SubContextInitialization subConclusion, I input) {
+		return first_.visit(subConclusion, input)
+				&& second_.visit(subConclusion, input);
 	}
 
 }

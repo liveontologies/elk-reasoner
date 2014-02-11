@@ -33,6 +33,8 @@ import org.semanticweb.elk.reasoner.saturation.MapSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
@@ -43,6 +45,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CombinedConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,9 +71,18 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	 */
 	private final SaturationState localState_;
 
+	/**
+	 * The {@link Conclusion} used to initialize contexts using
+	 * {@link ContextInitRule}s
+	 */
+	private final Conclusion contextInitConclusion_;
+
 	public ContextCompletionFactory(SaturationState saturationState) {
 		super(saturationState);
-		localState_ = new MapSaturationState(saturationState.getOntologyIndex());
+		this.localState_ = new MapSaturationState(
+				saturationState.getOntologyIndex());
+		this.contextInitConclusion_ = new ContextInitialization(
+				saturationState.getOntologyIndex());
 	}
 
 	@Override
@@ -165,8 +177,8 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 
 		@Override
 		public void submit(IndexedClassExpression job) {
-			LOGGER_.trace("{}: to complete",
-					trackingWriter_.getCreateContext(job));
+			LOGGER_.trace("{}: to complete", job);
+			trackingWriter_.produce(job, contextInitConclusion_);
 		}
 
 		@Override

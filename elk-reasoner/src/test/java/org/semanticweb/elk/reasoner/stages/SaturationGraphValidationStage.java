@@ -44,15 +44,16 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ForwardLinkFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.PropagationFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
@@ -62,6 +63,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBac
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
@@ -343,13 +345,6 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
-		public void visit(PropagationFromBackwardLinkRule rule,
-				BackwardLink premise, ContextPremises premises,
-				ConclusionProducer producer) {
-			// nothing is stored in the rule
-		}
-
-		@Override
 		public void visit(PropagationFromExistentialFillerRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
@@ -383,13 +378,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		@Override
 		public void visit(SubsumerBackwardLinkRule rule, BackwardLink premise,
 				ContextPremises premises, ConclusionProducer producer) {
-			for (IndexedPropertyChain prop : rule
-					.getPropagationsByObjectProperty().keySet()) {
-				for (IndexedClassExpression ice : rule
-						.getPropagationsByObjectProperty().get(prop)) {
-					iceValidator_.checkNew(ice);
-				}
-			}
+			// nothing is stored in the rule
 		}
 
 		@Override
@@ -400,6 +389,13 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				iceValidator_.checkNew(ice);
 			}
 
+		}
+
+		@Override
+		public void visit(PropagationInitializationRule rule,
+				SubContextInitialization premise, ContextPremises premises,
+				ConclusionProducer producer) {
+			// nothing is stored in the rule
 		}
 
 	}
@@ -453,12 +449,16 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				iceValidator_.checkNew(subsumer);
 			}
 
-			// validating backward links
-			for (IndexedPropertyChain prop : context
-					.getBackwardLinksByObjectProperty().keySet()) {
-				for (IndexedClassExpression source : context
-						.getBackwardLinksByObjectProperty().get(prop)) {
-					iceValidator_.checkNew(source);
+			// validating sub-contexts
+			for (SubContextPremises subContext : context
+					.getSubContextPremisesByObjectProperty().values()) {
+				for (IndexedClassExpression linkedRoot : subContext
+						.getLinkedRoots()) {
+					iceValidator_.checkNew(linkedRoot);
+				}
+				for (IndexedClassExpression propagation : subContext
+						.getLinkedRoots()) {
+					iceValidator_.checkNew(propagation);
 				}
 			}
 

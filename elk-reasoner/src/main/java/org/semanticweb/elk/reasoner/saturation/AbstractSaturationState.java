@@ -28,8 +28,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule;
 import org.slf4j.Logger;
@@ -59,7 +62,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 	 * The {@link Conclusion} used to initialize contexts using
 	 * {@link ContextInitRule}s
 	 */
-	private final Conclusion ContextInitConclusion_;
+	private final Conclusion contextInitConclusion_;
 
 	/**
 	 * The queue of all contexts for which computation of the closure under
@@ -69,7 +72,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 
 	public AbstractSaturationState(OntologyIndex index) {
 		this.ontologyIndex = index;
-		this.ContextInitConclusion_ = new ContextInitialization(index);
+		this.contextInitConclusion_ = new ContextInitialization(index);
 	}
 
 	@Override
@@ -107,22 +110,25 @@ public abstract class AbstractSaturationState implements SaturationState {
 		return getDefaultWriter();
 	}
 
+	@Override
+	abstract public ExtendedContext getContext(IndexedClassExpression ice);
+
 	abstract void resetContexts();
 
 	/**
-	 * Adds the given {@link Context} to this {@link SaturationState} if no
-	 * {@link Context} was assigned for its root
+	 * Adds the given {@link ExtendedContext} to this {@link SaturationState} if
+	 * no {@link ExtendedContext} was assigned for its root
 	 * 
 	 * @param context
-	 *            the {@link Context} to be added to this
+	 *            the {@link ExtendedContext} to be added to this
 	 *            {@link SaturationState}
-	 * @return the {@link Context} in this {@link SaturationState} assigned to
-	 *         the same root, or {@link null} if no such {@link Context} existed
-	 *         before this method is called
+	 * @return the {@link ExtendedContext} in this {@link SaturationState}
+	 *         assigned to the same root, or {@link null} if no such
+	 *         {@link Context} existed before this method is called
 	 * 
-	 * @see Context#getRoot()
+	 * @see ExtendedContext#getRoot()
 	 */
-	abstract Context setIfAbsent(Context context);
+	abstract ExtendedContext setIfAbsent(ExtendedContext context);
 
 	private ExtendedSaturationStateWriter getDefaultWriter() {
 		return new ExtendedWriter();
@@ -147,7 +153,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 			return result;
 		}
 
-		public void produce(Context context, Conclusion conclusion) {
+		void produce(Context context, Conclusion conclusion) {
 			LOGGER_.trace("{}: produced conclusion {}", context, conclusion);
 			if (context.addToDo(conclusion)) {
 				LOGGER_.trace("{}: activated", context);
@@ -227,30 +233,29 @@ public abstract class AbstractSaturationState implements SaturationState {
 			this.trackNewContextsAsUnsaturated_ = true;
 		}
 
+		void produce(ExtendedContext context, Conclusion conclusion) {
+			if (conclusion instanceof SubConclusion) {
+				SubConclusion subConclusion = (SubConclusion) conclusion;
+				IndexedPropertyChain subRoot = subConclusion.getSubRoot();
+				if (context.setInitSubRoot(subRoot))
+					initSubContext(context, subRoot);
+			}
+			super.produce(context, conclusion);
+		}
+
 		@Override
 		public void produce(IndexedClassExpression root, Conclusion conclusion) {
 			produce(getCreateContext(root), conclusion);
 		}
 
 		@Override
-		public void initContext(Context context) {
-			LOGGER_.trace("{}: initializing", context);
-			produce(context, ContextInitConclusion_);
-		}
-
-		@Override
-		public void removeContext(Context context) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public Context getCreateContext(IndexedClassExpression root) {
-			Context context = getContext(root);
-			if (context != null)
-				return context;
+		public ExtendedContext getCreateContext(IndexedClassExpression root) {
+			ExtendedContext previous = getContext(root);
+			if (previous != null)
+				return previous;
 			// else try to assign a new context
 			ContextImpl newContext = new ContextImpl(root);
-			Context previous = setIfAbsent(newContext);
+			previous = setIfAbsent(newContext);
 			if (previous != null)
 				// the context is already assigned meanwhile
 				return previous;
@@ -264,6 +269,17 @@ public abstract class AbstractSaturationState implements SaturationState {
 				markAsNotSaturatedInternal(newContext);
 			}
 			return newContext;
+		}
+
+		@Override
+		public void initContext(Context context) {
+			LOGGER_.trace("{}: initializing", context);
+			super.produce(context, contextInitConclusion_);
+		}
+
+		public void initSubContext(Context context, IndexedPropertyChain subRoot) {
+			LOGGER_.trace("{}: sub-context {} initializing", context, subRoot);
+			produce(context, new SubContextInitialization(subRoot));
 		}
 
 	}

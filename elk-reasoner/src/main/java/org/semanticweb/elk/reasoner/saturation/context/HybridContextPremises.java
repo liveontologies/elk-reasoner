@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.context;
  * #L%
  */
 
+import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -29,7 +30,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
-import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * {@link ContextPremises} that are build from two {@link ContextPremises}
@@ -68,12 +68,6 @@ public class HybridContextPremises implements ContextPremises {
 	}
 
 	@Override
-	public Multimap<IndexedPropertyChain, IndexedClassExpression> getBackwardLinksByObjectProperty() {
-		// non-local
-		return nonLocalPremises_.getBackwardLinksByObjectProperty();
-	}
-
-	@Override
 	public Set<IndexedPropertyChain> getLocalReflexiveObjectProperties() {
 		// local
 		return localPremises_.getLocalReflexiveObjectProperties();
@@ -90,6 +84,12 @@ public class HybridContextPremises implements ContextPremises {
 			IndexedDisjointnessAxiom axiom) {
 		// local
 		return localPremises_.isInconsistForDisjointnessAxiom(axiom);
+	}
+
+	@Override
+	public Map<IndexedPropertyChain, ? extends SubContextPremises> getSubContextPremisesByObjectProperty() {
+		// non-local
+		return nonLocalPremises_.getSubContextPremisesByObjectProperty();
 	}
 
 	@Override

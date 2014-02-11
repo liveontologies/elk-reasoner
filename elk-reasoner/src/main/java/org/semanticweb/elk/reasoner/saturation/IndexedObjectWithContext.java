@@ -37,28 +37,28 @@ public abstract class IndexedObjectWithContext extends IndexedObject {
 	/**
 	 * the reference to a {@link Context} assigned to this {@link IndexedObject}
 	 */
-	private volatile Context context_ = null;
+	private volatile ExtendedContext context_ = null;
 
 	/**
 	 * @return The corresponding context, null if none was assigned.
 	 */
-	Context getContext() {
+	ExtendedContext getContext() {
 		return context_;
 	}
 
 	/**
-	 * Assign the given {@link Context} to this {@link IndexedObject} if none
-	 * was yet assigned.
+	 * Assign the given {@link ExtendedContext} to this {@link IndexedObject} if
+	 * none was yet assigned.
 	 * 
 	 * @param context
-	 *            the {@link Context} which will be assigned to this
+	 *            the {@link ExtendedContext} which will be assigned to this
 	 *            {@link IndexedObject}
 	 * 
-	 * @return the previously assigned {@link Context} or {@code null} if none
-	 *         was assigned (in which case the new {@link Context} will be
-	 *         assigned)
+	 * @return the previously assigned {@link ExtendedContext} or {@code null}
+	 *         if none was assigned (in which case the new
+	 *         {@link ExtendedContext} will be assigned)
 	 */
-	synchronized Context setContextIfAbsent(Context context) {
+	synchronized ExtendedContext setContextIfAbsent(ExtendedContext context) {
 		if (context_ != null)
 			return context_;
 		// else

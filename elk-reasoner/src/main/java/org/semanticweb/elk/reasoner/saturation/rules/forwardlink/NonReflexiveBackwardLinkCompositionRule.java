@@ -23,12 +23,14 @@ package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
  */
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -83,19 +85,20 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = this.forwardLink_
 				.getRelation().getSaturated()
 				.getCompositionsByLeftSubProperty();
-		final Multimap<IndexedPropertyChain, IndexedClassExpression> backLinks = premises
-				.getBackwardLinksByObjectProperty();
+		final Map<IndexedPropertyChain, ? extends SubContextPremises> subContextMap = premises
+				.getSubContextPremisesByObjectProperty();
 
 		for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-				comps.keySet(), backLinks.keySet())) {
+				comps.keySet(), subContextMap.keySet())) {
 
 			Collection<IndexedPropertyChain> compositions = comps
 					.get(backwardRelation);
-			Collection<IndexedClassExpression> sources = backLinks
+			SubContextPremises subPremises = subContextMap
 					.get(backwardRelation);
 
 			for (IndexedPropertyChain composition : compositions)
-				for (IndexedClassExpression source : sources) {
+				for (IndexedClassExpression source : subPremises
+						.getLinkedRoots()) {
 					producer.produce(this.forwardLink_.getTarget(),
 							new BackwardLink(source, composition));
 				}

@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.contradiction.Contradiction
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.DisjointSubsumerRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ForwardLinkRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.PropagationRuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.SubContextInitRuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerRuleVisitor;
 
 /**
@@ -49,6 +50,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerRuleVisit
  */
 public interface RuleVisitor extends SubsumerRuleVisitor,
 		BackwardLinkRuleVisitor, ContextInitRuleVisitor,
-		ContradictionRuleVisitor, DisjointSubsumerRuleVisitor,
-		ForwardLinkRuleVisitor, PropagationRuleVisitor {
+		SubContextInitRuleVisitor, ContradictionRuleVisitor,
+		DisjointSubsumerRuleVisitor, ForwardLinkRuleVisitor,
+		PropagationRuleVisitor {
 }

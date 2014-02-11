@@ -25,12 +25,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ForwardLinkFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkedBackwardLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.PropagationFromBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from a
@@ -44,7 +45,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.PropagationFr
  * @author "Yevgeny Kazakov"
  * 
  */
-public class BackwardLink extends AbstractConclusion {
+public class BackwardLink extends AbstractConclusion implements Conclusion,
+		SubConclusion {
 
 	/**
 	 * the source {@link IndexedClassExpression} of this {@link BackwardLink};
@@ -64,50 +66,14 @@ public class BackwardLink extends AbstractConclusion {
 		this.source_ = source;
 	}
 
-	/**
-	 * @return the {@link IndexedPropertyChain} that is the relation of this
-	 *         {@link BackwardLink}
-	 */
-	public IndexedPropertyChain getRelation() {
-		return relation_;
-	}
-
-	/**
-	 * @return the source of this {@link BackwardLink}, that is, the
-	 *         {@link IndexedClassExpression} from which the existential
-	 *         restriction corresponding to this {@link BackwardLink} follows
-	 */
-	public IndexedClassExpression getSource() {
-		return source_;
-	}
-
 	@Override
 	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
 
-		ruleAppVisitor.visit(PropagationFromBackwardLinkRule.getInstance(),
-				this, premises, producer);
 		ruleAppVisitor.visit(ForwardLinkFromBackwardLinkRule.getInstance(),
 				this, premises, producer);
-
-		// apply all backward link rules of the context
-		LinkedBackwardLinkRule backLinkRule = premises
-				.getBackwardLinkRuleHead();
-		while (backLinkRule != null) {
-			backLinkRule.accept(ruleAppVisitor, this, premises, producer);
-			backLinkRule = backLinkRule.next();
-		}
-	}
-
-	@Override
-	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		if (isLocalFor(premises.getRoot()))
-			// generate propagations only if this link is local
-			ruleAppVisitor.visit(PropagationFromBackwardLinkRule.getInstance(),
-					this, premises, producer);
-		ruleAppVisitor.visit(ForwardLinkFromBackwardLinkRule.getInstance(),
-				this, premises, producer);
+		ruleAppVisitor.visit(SubsumerBackwardLinkRule.getInstance(), this,
+				premises, producer);
 
 		// apply all backward link rules of the context
 		LinkedBackwardLinkRule backLinkRule = premises
@@ -125,17 +91,40 @@ public class BackwardLink extends AbstractConclusion {
 	}
 
 	@Override
+	public IndexedPropertyChain getSubRoot() {
+		return relation_;
+	}
+
+	@Override
 	public String toString() {
 		return (relation_ + "<-" + source_);
 	}
 
 	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+		return accept((SubConclusionVisitor<I, O>) visitor, input);
+	}
+
+	@Override
+	public <I, O> O accept(SubConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 
-	private boolean isLocalFor(IndexedClassExpression rootWhereStored) {
-		return (getSourceRoot(rootWhereStored) == rootWhereStored);
+	/**
+	 * @return the {@link IndexedPropertyChain} that is the relation of this
+	 *         {@link BackwardLink}
+	 */
+	public IndexedPropertyChain getRelation() {
+		return relation_;
+	}
+
+	/**
+	 * @return the source of this {@link BackwardLink}, that is, the
+	 *         {@link IndexedClassExpression} from which the existential
+	 *         restriction corresponding to this {@link BackwardLink} follows
+	 */
+	public IndexedClassExpression getSource() {
+		return source_;
 	}
 
 }

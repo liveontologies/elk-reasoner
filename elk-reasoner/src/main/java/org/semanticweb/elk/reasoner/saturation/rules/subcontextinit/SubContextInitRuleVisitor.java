@@ -1,4 +1,8 @@
-package org.semanticweb.elk.reasoner.saturation;
+package org.semanticweb.elk.reasoner.saturation.rules.subcontextinit;
+
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
 /*
  * #%L
@@ -22,25 +26,16 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+/**
+ * A visitor pattern for {@link SubContextInitRule}s
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+public interface SubContextInitRuleVisitor {
 
-public class ExtendedSaturationStateWriterWrap<W extends ExtendedSaturationStateWriter>
-		extends SaturationStateWriterWrap<W> implements
-		ExtendedSaturationStateWriter {
-
-	public ExtendedSaturationStateWriterWrap(W mainWriter) {
-		super(mainWriter);
-	}
-
-	@Override
-	public Context getCreateContext(IndexedClassExpression root) {
-		return mainWriter.getCreateContext(root);
-	}
-
-	@Override
-	public void initContext(Context context) {
-		mainWriter.initContext(context);
-	}
+	public void visit(PropagationInitializationRule rule,
+			SubContextInitialization premise, ContextPremises premises,
+			ConclusionProducer producer);
 
 }

@@ -25,17 +25,16 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 
 /**
- * A visitor pattern for {@link Conclusions} together with additional input and
+ * A visitor pattern for {@link Conclusion}s together with additional input and
  * output parameters
  * 
  * @author Pavel Klinov
@@ -48,9 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
  * @param <O>
  *            the type of output parameter with which this visitor works
  */
-public interface ConclusionVisitor<I, O> {
-
-	public O visit(BackwardLink conclusion, I input);
+public interface ConclusionVisitor<I, O> extends SubConclusionVisitor<I, O> {
 
 	public O visit(ComposedSubsumer conclusion, I input);
 
@@ -63,7 +60,5 @@ public interface ConclusionVisitor<I, O> {
 	public O visit(DisjointSubsumer conclusion, I input);
 
 	public O visit(ForwardLink conclusion, I input);
-
-	public O visit(Propagation conclusion, I input);
 
 }

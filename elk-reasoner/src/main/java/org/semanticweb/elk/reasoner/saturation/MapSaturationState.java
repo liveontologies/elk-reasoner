@@ -31,34 +31,34 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * A {@link SaturationState} backed by a map from {@link IndexedClassExpression}
- * s to {@link Context}s
+ * s to {@link ExtendedContext}s
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
 public class MapSaturationState extends AbstractSaturationState {
 
-	private final ConcurrentHashMap<IndexedClassExpression, Context> contextAssignment_;
+	private final ConcurrentHashMap<IndexedClassExpression, ExtendedContext> contextAssignment_;
 
 	public MapSaturationState(OntologyIndex index, int expectedSize) {
 		super(index);
-		this.contextAssignment_ = new ConcurrentHashMap<IndexedClassExpression, Context>(
+		this.contextAssignment_ = new ConcurrentHashMap<IndexedClassExpression, ExtendedContext>(
 				expectedSize);
 	}
 
 	public MapSaturationState(OntologyIndex index) {
 		super(index);
-		this.contextAssignment_ = new ConcurrentHashMap<IndexedClassExpression, Context>(
+		this.contextAssignment_ = new ConcurrentHashMap<IndexedClassExpression, ExtendedContext>(
 				index.getIndexedClassExpressions().size());
 	}
 
 	@Override
-	public Collection<Context> getContexts() {
+	public Collection<? extends Context> getContexts() {
 		return contextAssignment_.values();
 	}
 
 	@Override
-	public Context getContext(IndexedClassExpression ice) {
+	public ExtendedContext getContext(IndexedClassExpression ice) {
 		return contextAssignment_.get(ice);
 	}
 
@@ -68,7 +68,7 @@ public class MapSaturationState extends AbstractSaturationState {
 	}
 
 	@Override
-	Context setIfAbsent(Context context) {
+	ExtendedContext setIfAbsent(ExtendedContext context) {
 		return contextAssignment_.putIfAbsent(context.getRoot(), context);
 	}
 

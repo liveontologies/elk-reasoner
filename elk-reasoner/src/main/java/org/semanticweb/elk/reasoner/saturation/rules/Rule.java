@@ -28,8 +28,10 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
  */
 
 /**
- * A rule that can be applied to a given premise within a {@link Context} that
- * produces {@link Conclusion}s using the given {@link SaturationStateWriter}.
+ * A rule that can be applied to a given {@link Conclusion} together with other
+ * {@link Conclusion}s stored in within {@link ContextPremises}. The rule
+ * produces other {@link Conclusion}s using the given
+ * {@link SaturationStateWriter}.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -58,9 +60,10 @@ public interface Rule<P> {
 	 *            of the inferences are produced
 	 * 
 	 */
-	public void apply(P premise, ContextPremises premises, ConclusionProducer producer);
-
-	public void accept(RuleVisitor visitor, P premise, ContextPremises premises,
+	public void apply(P premise, ContextPremises premises,
 			ConclusionProducer producer);
+
+	public void accept(RuleVisitor visitor, P premise,
+			ContextPremises premises, ConclusionProducer producer);
 
 }

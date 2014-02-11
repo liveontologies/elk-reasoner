@@ -1,4 +1,7 @@
-package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
+package org.semanticweb.elk.reasoner.saturation.context;
+
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 
 /*
  * #%L
@@ -22,22 +25,16 @@ package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-
 /**
- * A visitor pattern for {@link LinkedBackwardLinkRule}s
+ * The object representing an elementary unit of computations for
+ * {@link Conclusion}s that can be used as premises of inferences associated
+ * with the same {@link IndexedPropertyChain} sub-root in addition to the same
+ * {@link IndexedClassExpression} root. Each {@link SubContext} is accessible
+ * from the respective {@link Context} for the corresponding
+ * {@link IndexedPropertyChain} sub-root.
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface LinkedBackwardLinkRuleVisitor {
-
-	void visit(ContradictionOverBackwardLinkRule rule, BackwardLink premise,
-			ContextPremises premises, ConclusionProducer producer);
-
-	void visit(BackwardLinkChainFromBackwardLinkRule rule,
-			BackwardLink premise, ContextPremises premises,
-			ConclusionProducer producer);
+public interface SubContext extends SubContextPremises, SubConclusionSet {
 
 }

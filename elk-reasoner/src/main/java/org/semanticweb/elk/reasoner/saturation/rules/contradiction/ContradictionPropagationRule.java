@@ -22,15 +22,15 @@ package org.semanticweb.elk.reasoner.saturation.rules.contradiction;
  * #L%
  */
 
-import java.util.Collection;
+import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.util.collections.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,15 +68,12 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 	@Override
 	public void apply(Contradiction premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		final Multimap<IndexedPropertyChain, IndexedClassExpression> backLinks = premises
-				.getBackwardLinksByObjectProperty();
-		// no need to propagate over reflexive properties
-		for (IndexedPropertyChain propRelation : backLinks.keySet()) {
-
-			Collection<IndexedClassExpression> targets = backLinks
-					.get(propRelation);
-
-			for (IndexedClassExpression target : targets) {
+		final Map<IndexedPropertyChain, ? extends SubContextPremises> subPremises = premises
+				.getSubContextPremisesByObjectProperty();
+		// no need to propagate over reflexive links
+		for (IndexedPropertyChain propRelation : subPremises.keySet()) {
+			for (IndexedClassExpression target : subPremises.get(propRelation)
+					.getLinkedRoots()) {
 				producer.produce(target, premise);
 			}
 		}

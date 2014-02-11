@@ -2,6 +2,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
@@ -59,30 +60,24 @@ public interface Conclusion {
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input);
 
 	/**
-	 * Every {@link Conclusion}, depending in which {@link ContextPremises} it
-	 * is to be stored, represents a subsumer of some root
-	 * {@link IndexedClassExpression}, which is computed by this method.
+	 * Returns the root of {@link Context} from which this {@link Conclusion}
+	 * was derived (possibly in several steps). This depends on (and can be
+	 * different from) the {@link Context} in which this {@link Conclusion} is
+	 * stored (to apply further rules); thus the root of the {@link Context}
+	 * where the {@link Conclusion} is stored should be given as a parameter of
+	 * this method. If an inference produces some {@link Conclusion}s to be
+	 * stored in a {@link Context}, this {@link Conclusion} should have the same
+	 * source root as one of the premises of this inference. Furthermore, the
+	 * {@link Conclusion} cannot be produced after the source {@link Context} is
+	 * saturated {@link Context#isSaturated()}, unless it is a
+	 * {@link SubConclusion}, which depends on a {@link SubContext} that could
+	 * be created later on.
 	 * 
 	 * @param rootWhereStored
 	 * @return The {@link IndexedClassExpression} for which this conclusion is
 	 *         logically derived; it cannot be {@code null}
 	 */
 	public IndexedClassExpression getSourceRoot(
-			IndexedClassExpression rootWhereStored);
-
-	/**
-	 * TODO: this is a temporary solution to deal with {@link Propagation}s; a
-	 * more robust solution should be found later.
-	 * 
-	 * Returns the root {@link IndexedClassExpression} by which this
-	 * {@link Conclusion} is determined, i.e., after computing the saturation
-	 * for this root, {@link Conclusion}s that determine by this root will not
-	 * be produced. Could be {@code null}
-	 * 
-	 * @param rootWhereStored
-	 * @return
-	 */
-	public IndexedClassExpression getDeterminingRoot(
 			IndexedClassExpression rootWhereStored);
 
 	/**

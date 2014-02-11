@@ -23,23 +23,38 @@ package org.semanticweb.elk.reasoner.saturation.context;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubConclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
- * An object representing an elementary unit of computation for saturation of an
- * {@link IndexedClassExpression}, stored as a <em>root</em> of the
- * {@link Context}. This interface specifies method that can be used to access
- * the result of the computation in addition to the methods used by a
- * {@link RuleApplicationFactory} to perform the computation concurrently.
+ * An object representing an elementary unit of computation for
+ * {@link Conclusion}s that can be used as premises of inferences associated
+ * with the {@link IndexedClassExpression}, stored as a <em>root</em> of this
+ * {@link Context} ({@link Context#getRoot()}). The computation is organized in
+ * a saturation process where all {@link Conclusion}s to which inferences should
+ * be applied are added to the "todo" queue using
+ * {@link #addConclusion(Conclusion)} and when the rules are applied, they are
+ * repeatedly taken from this queue using {@link #takeToDo()}. The object
+ * provides some methods in addition to {@link ConclusionSet} to store, test and
+ * remove information for {@link Conclusion}s in this {@link Context}, and some
+ * bookkeeping methods for the saturation process.
  * 
  * @author "Yevgeny Kazakov"
  * @see RuleApplicationFactory
  * 
  */
 public interface Context extends ConclusionSet, ContextPremises {
+
+	/**
+	 * @param subRoot
+	 * @return the {@link SubContext} associated with the given
+	 *         {@link IndexedPropertyChain}; creates new if necessary
+	 */
+	public SubContext getCreateSubContext(IndexedPropertyChain subRoot);
 
 	/**
 	 * @return the {@link Chain} view of all backward link rules assigned to
@@ -81,45 +96,24 @@ public interface Context extends ConclusionSet, ContextPremises {
 	public Conclusion takeToDo();
 
 	/**
-	 * Call the given {@link ConclusionProcessor} exactly once for every
-	 * unprocessed {@link Conclusion} that was added using the method
-	 * {@link #addToDo(Conclusion)} and removes such {@link Conclusion}s. This
-	 * method is thread safe and can be used concurrently with the method
-	 * {@link #addToDo(Conclusion)}.
-	 * 
-	 * @param processor
-	 *            the {@link ConclusionProcessor} to be called on unprocessed
-	 *            {@link Conclusion}s of this {@link Context}
-	 */
-	// public void processPendingConclusions(ConclusionProcessor processor);
-
-	/**
 	 * @return {@code true} if all {@link Conclusion}s for this {@link Context},
 	 *         as determined by the function
-	 *         {@link Conclusion#getSourceRoot(IndexedClassExpression)}, are
+	 *         {@link Conclusion#getSourceRoot(IndexedClassExpression)}, except
+	 *         those with not-{@code null} {@link Conclusion#getSubRoot()} are
 	 *         already computed.
 	 */
 	public boolean isSaturated();
 
 	/**
 	 * Marks this {@code Context} as saturated. This means that all
-	 * {@link Conclusion}s for this {@link Context} are already computed.
+	 * {@link Conclusion}s for this {@link Context} except for
+	 * {@link SubConclusion}s for its {@link SubContext}s, are already computed.
 	 * 
 	 * @return the previous value of the saturation state for this
 	 *         {@link Context}
+	 * 
+	 * @see Conclusion#getSourceRoot(IndexedClassExpression)
 	 */
 	public boolean setSaturated(boolean saturated);
-
-	/**
-	 * 
-	 * @return {@code true} if the context is empty
-	 */
-	public boolean isEmpty();
-
-	/**
-	 * removes links to the next and previous contexts, effectively removing
-	 * this {@link Context} from the chain of contexts
-	 */
-	// public void removeLinks(); // TODO: find a way to hide this
 
 }

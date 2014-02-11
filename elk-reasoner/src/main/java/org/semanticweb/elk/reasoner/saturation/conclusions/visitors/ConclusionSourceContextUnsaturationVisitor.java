@@ -55,10 +55,9 @@ public class ConclusionSourceContextUnsaturationVisitor extends
 
 	@Override
 	Boolean defaultVisit(Conclusion conclusion, Context context) {
-		IndexedClassExpression root = conclusion.getDeterminingRoot(context
+		IndexedClassExpression root = conclusion.getSourceRoot(context
 				.getRoot());
-		if (root != null)
-			writer_.markAsNotSaturated(state_.getContext(root));
+		writer_.markAsNotSaturated(state_.getContext(root));
 		return true;
 	}
 

@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
 
 public class CountingConclusionVisitor<I> implements
 		ConclusionVisitor<I, Integer> {
@@ -41,13 +42,13 @@ public class CountingConclusionVisitor<I> implements
 	}
 
 	@Override
-	public Integer visit(BackwardLink conclusion, I input) {
+	public Integer visit(BackwardLink subConclusion, I input) {
 		return counter_.countBackwardLinks++;
 	}
 
 	@Override
 	public Integer visit(ComposedSubsumer conclusion, I input) {
-		return counter_.countNegativeSubsumers++;
+		return counter_.countDecomposedSubsumers++;
 	}
 
 	@Override
@@ -62,7 +63,7 @@ public class CountingConclusionVisitor<I> implements
 
 	@Override
 	public Integer visit(DecomposedSubsumer conclusion, I input) {
-		return counter_.countPositiveSubsumers++;
+		return counter_.countComposedSubsumers++;
 	}
 
 	@Override
@@ -76,8 +77,13 @@ public class CountingConclusionVisitor<I> implements
 	}
 
 	@Override
-	public Integer visit(Propagation conclusion, I input) {
+	public Integer visit(Propagation subConclusion, I input) {
 		return counter_.countPropagations++;
+	}
+
+	@Override
+	public Integer visit(SubContextInitialization subConclusion, I input) {
+		return counter_.countSubContextInitializations++;
 	}
 
 }

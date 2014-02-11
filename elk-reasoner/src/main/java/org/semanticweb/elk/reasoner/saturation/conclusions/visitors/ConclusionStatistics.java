@@ -102,9 +102,9 @@ public class ConclusionStatistics {
 	private static String ERR_MSG_MORE_USED = ": more used that processed!";
 
 	public void check(Logger logger) {
-		if (usedConclusionCounts_.countPositiveSubsumers > processedConclusionCounts_.countPositiveSubsumers)
+		if (usedConclusionCounts_.countComposedSubsumers > processedConclusionCounts_.countComposedSubsumers)
 			logger.error("Positive Subsumers" + ERR_MSG_MORE_USED);
-		if (usedConclusionCounts_.countNegativeSubsumers > processedConclusionCounts_.countNegativeSubsumers)
+		if (usedConclusionCounts_.countDecomposedSubsumers > processedConclusionCounts_.countDecomposedSubsumers)
 			logger.error("Negative Subsumers" + ERR_MSG_MORE_USED);
 		if (usedConclusionCounts_.countBackwardLinks > processedConclusionCounts_.countBackwardLinks)
 			logger.error("Backward Links" + ERR_MSG_MORE_USED);
@@ -127,18 +127,18 @@ public class ConclusionStatistics {
 			return;
 		}
 		
-		if (processedConclusionCounts_.countPositiveSubsumers > 0
+		if (processedConclusionCounts_.countComposedSubsumers > 0
 				|| conclusionProcessingTimer_.timePositiveSubsumers > 0)
 			logger.debug("Positive Subsumers produced/used: "
-					+ processedConclusionCounts_.countPositiveSubsumers + "/"
-					+ usedConclusionCounts_.countPositiveSubsumers + " ("
+					+ processedConclusionCounts_.countComposedSubsumers + "/"
+					+ usedConclusionCounts_.countComposedSubsumers + " ("
 					+ conclusionProcessingTimer_.timePositiveSubsumers
 					/ numOfMeasurements_ + " ms)");
-		if (processedConclusionCounts_.countNegativeSubsumers > 0
+		if (processedConclusionCounts_.countDecomposedSubsumers > 0
 				|| conclusionProcessingTimer_.timeNegativeSubsumers > 0)
 			logger.debug("Negative Subsumers produced/used: "
-					+ processedConclusionCounts_.countNegativeSubsumers + "/"
-					+ usedConclusionCounts_.countNegativeSubsumers + " ("
+					+ processedConclusionCounts_.countDecomposedSubsumers + "/"
+					+ usedConclusionCounts_.countDecomposedSubsumers + " ("
 					+ conclusionProcessingTimer_.timeNegativeSubsumers
 					/ numOfMeasurements_ + " ms)");
 		if (processedConclusionCounts_.countBackwardLinks > 0
