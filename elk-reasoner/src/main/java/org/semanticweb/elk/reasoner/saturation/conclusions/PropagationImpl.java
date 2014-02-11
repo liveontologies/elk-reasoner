@@ -83,9 +83,12 @@ public class PropagationImpl extends AbstractConclusion implements Propagation {
 		Multimap<IndexedPropertyChain, Context> backLinks = context.getBackwardLinksByObjectProperty();
 		ConclusionFactory factory = writer.getConclusionFactory();
 
-		if (backLinks.get(relation_).contains(context)) {
-			writer.produce(context, factory.createPropagatedSubsumer(this,
-					relation_, context, context));
+		for (Context target : backLinks.get(relation_)) {
+			if (target.getRoot() == context.getRoot()) {
+				writer.produce(context, factory.createPropagatedSubsumer(this,
+						relation_, context, context));
+				break;
+			}
 		}
 	}
 	
