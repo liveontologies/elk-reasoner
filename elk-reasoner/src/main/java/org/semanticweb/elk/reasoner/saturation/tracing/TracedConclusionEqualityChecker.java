@@ -137,7 +137,7 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 
 			@Override
 			public Boolean visit(DecomposedExistential first, DecomposedExistential second) {
-				return first.getExistential() == second.getExistential() 
+				return first.getExistential().getExpression() == second.getExistential().getExpression() 
 						&& first.getSource().getRoot() == second.getSource().getRoot();
 			}
 			
