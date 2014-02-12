@@ -67,7 +67,7 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 
 			@Override
 			public Boolean visit(DecomposedConjunction first, DecomposedConjunction second) {
-				return first.getConjunction() == second.getConjunction() 
+				return first.getConjunction().getExpression() == second.getConjunction().getExpression() 
 						&& first.getExpression() == second.getExpression();
 			}
 			
