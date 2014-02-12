@@ -39,16 +39,14 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * @see ConclusionProducer#produce(IndexedClassExpression, Conclusion)
  * 
  * @author "Yevgeny Kazakov"
- * 
- * @param <W>
- *            the type of the internal {@link SaturationStateWriter}
  */
-public class CountingSaturationStateWriter<W extends SaturationStateWriter>
-		extends SaturationStateWriterWrap<W> {
+public class CountingSaturationStateWriter extends
+		SaturationStateWriterWrap<SaturationStateWriter> {
 
 	private final ConclusionVisitor<Void, Integer> countingVisitor_;
 
-	public CountingSaturationStateWriter(W writer, ConclusionCounter counter) {
+	public CountingSaturationStateWriter(SaturationStateWriter writer,
+			ConclusionCounter counter) {
 		super(writer);
 		this.countingVisitor_ = new CountingConclusionVisitor<Void>(counter);
 	}

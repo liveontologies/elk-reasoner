@@ -42,8 +42,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
@@ -66,6 +68,24 @@ public class IncrementalAdditionInitializationStage extends
 		return IncrementalStages.ADDITIONS_INIT;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
+	 */
 	@Override
 	public boolean preExecute() {
 		if (!super.preExecute())
@@ -87,11 +107,15 @@ public class IncrementalAdditionInitializationStage extends
 		// first, create and init contexts for new classes
 		final IndexObjectConverter converter = reasoner.objectCache_
 				.getIndexObjectConverter();
-		final ExtendedSaturationStateWriter writer =
+		final SaturationStateWriter writer =
 
 		SaturationUtils.getStatsAwareWriter(reasoner.saturationState
 				.getExtendedWriter(contextCreationListener,
 						contextModificationListener, true), stageStatistics_);
+
+		// used to initialize new contexts
+		Conclusion contextInitConclusion = new ContextInitialization(
+				reasoner.saturationState.getOntologyIndex());
 
 		for (ElkEntity newEntity : Operations.concat(
 				reasoner.ontologyIndex.getAddedClasses(),
@@ -135,10 +159,8 @@ public class IncrementalAdditionInitializationStage extends
 						}
 					});
 
-			Context context = reasoner.saturationState.getContext(ice);
-			if (context == null) {
-				writer.getCreateContext(ice);
-			}
+			if (reasoner.saturationState.getContext(ice) == null)
+				writer.produce(ice, contextInitConclusion);
 		}
 
 		changedInitRules = diffIndex.getAddedContextInitRules();

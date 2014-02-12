@@ -35,8 +35,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.AbstractIndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
@@ -94,7 +96,7 @@ public class IncrementalDeletionInitializationStage extends
 			return false;
 		this.initialization_ = null;
 		// initializing contexts which will be removed
-		final ExtendedSaturationStateWriter satStateWriter = SaturationUtils
+		final SaturationStateWriter satStateWriter = SaturationUtils
 				.getStatsAwareWriter(
 						reasoner.saturationState.getExtendedWriter(),
 						stageStatistics_);
@@ -102,7 +104,7 @@ public class IncrementalDeletionInitializationStage extends
 				.getWriter();
 		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState
 				.getWriter();
-		final IndexedClassExpressionVisitor<Object> rootVisitor = new AbstractIndexedClassEntityVisitor<Object>() {
+		final IndexedClassExpressionVisitor<Object> entityRemovalVisitor = new AbstractIndexedClassEntityVisitor<Object>() {
 
 			@Override
 			public Object visit(IndexedClass element) {
@@ -120,15 +122,13 @@ public class IncrementalDeletionInitializationStage extends
 		for (IndexedClassExpression ice : reasoner.ontologyIndex
 				.getRemovedClassExpressions()) {
 
-			Context context = reasoner.saturationState.getContext(ice);
-			if (context != null) {
-				satStateWriter.initContext(context);
-				// otherwise it may not be cleaned
-				// we could use writer.markContextAsNotSaturated
-				// but then the context will end up in the queue
-				// for not saturated contexts, which isn't needed here
-				context.setSaturated(false);
-				ice.accept(rootVisitor);
+			Conclusion init = new ContextInitialization(
+					reasoner.saturationState.getOntologyIndex());
+
+			if (reasoner.saturationState.getContext(ice) != null) {
+				satStateWriter.produce(ice, init);
+				// mark removed classes
+				ice.accept(entityRemovalVisitor);
 			}
 		}
 

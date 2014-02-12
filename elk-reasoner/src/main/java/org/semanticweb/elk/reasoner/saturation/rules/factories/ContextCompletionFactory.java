@@ -28,13 +28,11 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.MapSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
@@ -45,7 +43,6 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CombinedConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +60,7 @@ import org.slf4j.LoggerFactory;
 public class ContextCompletionFactory extends RuleApplicationFactory {
 
 	// logger for this class
+	@SuppressWarnings("hiding")
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContextCompletionFactory.class);
 
@@ -71,17 +69,9 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	 */
 	private final SaturationState localState_;
 
-	/**
-	 * The {@link Conclusion} used to initialize contexts using
-	 * {@link ContextInitRule}s
-	 */
-	private final Conclusion contextInitConclusion_;
-
 	public ContextCompletionFactory(SaturationState saturationState) {
 		super(saturationState);
 		this.localState_ = new MapSaturationState(
-				saturationState.getOntologyIndex());
-		this.contextInitConclusion_ = new ContextInitialization(
 				saturationState.getOntologyIndex());
 	}
 
@@ -127,10 +117,10 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	private class ContextCompletionEngine extends
 			AbstractRuleEngineWithStatistics {
 
-		private final ExtendedSaturationStateWriter trackingWriter_;
+		private final SaturationStateWriter trackingWriter_;
 
-		ContextCompletionEngine(ExtendedSaturationStateWriter mainWriter,
-				ExtendedSaturationStateWriter trackingWriter,
+		ContextCompletionEngine(SaturationStateWriter mainWriter,
+				SaturationStateWriter trackingWriter,
 				SaturationStatistics localStatistics) {
 			super(getConclusionProcessor(
 					SaturationUtils.getStatsAwareRuleVisitor(localStatistics
@@ -178,7 +168,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		@Override
 		public void submit(IndexedClassExpression job) {
 			LOGGER_.trace("{}: to complete", job);
-			trackingWriter_.produce(job, contextInitConclusion_);
+			trackingWriter_.produce(job, contextInitConclusion);
 		}
 
 		@Override

@@ -25,12 +25,12 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextNotSaturatedCheckingVisitor;
@@ -39,6 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVi
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +64,12 @@ public class RuleApplicationFactory {
 	final SaturationState saturationState;
 
 	/**
+	 * The {@link Conclusion} used to initialize contexts using
+	 * {@link ContextInitRule}s
+	 */
+	final Conclusion contextInitConclusion;
+
+	/**
 	 * The {@link SaturationStatistics} aggregated for all workers
 	 */
 	final SaturationStatistics aggregatedStats;
@@ -81,8 +88,10 @@ public class RuleApplicationFactory {
 
 	public RuleApplicationFactory(final SaturationState saturationState,
 			final boolean trackModifiedContexts) {
-		this.aggregatedStats = new SaturationStatistics();
 		this.saturationState = saturationState;
+		this.contextInitConclusion = new ContextInitialization(
+				saturationState.getOntologyIndex());
+		this.aggregatedStats = new SaturationStatistics();
 		this.trackModifiedContexts_ = trackModifiedContexts;
 	}
 
@@ -146,9 +155,9 @@ public class RuleApplicationFactory {
 	 */
 	public class DefaultEngine extends AbstractRuleEngineWithStatistics {
 
-		private final ExtendedSaturationStateWriter writer_;
+		private final SaturationStateWriter writer_;
 
-		DefaultEngine(ExtendedSaturationStateWriter saturationStateWriter,
+		DefaultEngine(SaturationStateWriter saturationStateWriter,
 				SaturationStatistics localStatistics) {
 			super(getConclusionProcessor(
 					SaturationUtils.getStatsAwareRuleVisitor(localStatistics
@@ -182,7 +191,8 @@ public class RuleApplicationFactory {
 
 		@Override
 		public void submit(IndexedClassExpression job) {
-			writer_.getCreateContext(job);
+			if (saturationState.getContext(job) == null)
+				writer_.produce(job, contextInitConclusion);
 		}
 
 		@Override

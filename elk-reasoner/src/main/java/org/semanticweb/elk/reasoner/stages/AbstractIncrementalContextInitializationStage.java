@@ -29,14 +29,11 @@ import java.util.Iterator;
 
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CountingConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +65,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	 */
 	protected Iterator<IndexedClassExpression> todo = null;
 
-	private ExtendedSaturationStateWriter writer_;
+	private SaturationStateWriter writer_;
 
 	public AbstractIncrementalContextInitializationStage(
 			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
@@ -96,9 +93,11 @@ abstract class AbstractIncrementalContextInitializationStage extends
 				break;
 			IndexedClassExpression ice = todo.next();
 
-			Context context = reasoner.saturationState.getContext(ice);
-			if (context != null) {
-				writer_.initContext(context);
+			Conclusion init = new ContextInitialization(
+					reasoner.saturationState.getOntologyIndex());
+
+			if (reasoner.saturationState.getContext(ice) != null) {
+				writer_.produce(ice, init);
 			}
 
 			initContexts++;

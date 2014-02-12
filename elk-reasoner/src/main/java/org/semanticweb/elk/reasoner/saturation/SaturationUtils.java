@@ -92,15 +92,14 @@ public class SaturationUtils {
 
 	public static SaturationStateWriter getStatAwareWriter(
 			SaturationStateWriter writer, SaturationStatistics localStatistics) {
-		return COLLECT_CONCLUSION_COUNTS ? new CountingSaturationStateWriter<SaturationStateWriter>(
+		return COLLECT_CONCLUSION_COUNTS ? new CountingSaturationStateWriter(
 				writer, localStatistics.getConclusionStatistics()
 						.getProducedConclusionCounts()) : writer;
 	}
 
-	public static ExtendedSaturationStateWriter getStatsAwareWriter(
-			ExtendedSaturationStateWriter writer,
-			SaturationStatistics localStatistics) {
-		return COLLECT_CONCLUSION_COUNTS ? new CountingExtendedSaturationStateWriter<ExtendedSaturationStateWriter>(
+	public static SaturationStateWriter getStatsAwareWriter(
+			SaturationStateWriter writer, SaturationStatistics localStatistics) {
+		return COLLECT_CONCLUSION_COUNTS ? new CountingSaturationStateWriter(
 				writer, localStatistics.getConclusionStatistics()
 						.getProducedConclusionCounts()) : writer;
 	}
@@ -110,7 +109,7 @@ public class SaturationUtils {
 			SaturationStatistics localStatistics) {
 		if (COLLECT_CONCLUSION_COUNTS) {
 			return new PreprocessedConclusionVisitor<Context, Boolean>(
-					new CountingConclusionVisitor(localStatistics
+					new CountingConclusionVisitor<Context>(localStatistics
 							.getConclusionStatistics()
 							.getUsedConclusionCounts()), ruleProcessor);
 		}
@@ -125,15 +124,15 @@ public class SaturationUtils {
 
 		if (COLLECT_CONCLUSION_COUNTS) {
 			conclusionVisitor = new PreprocessedConclusionVisitor<Context, Boolean>(
-					new CountingConclusionVisitor(
+					new CountingConclusionVisitor<Context>(
 							stats.getProcessedConclusionCounts()),
 					conclusionVisitor);
 		}
 		if (COLLECT_CONCLUSION_TIMES) {
 			stats.startMeasurements();
 
-			return new TimedConclusionVisitor(stats.getConclusionTimers(),
-					conclusionVisitor);
+			return new TimedConclusionVisitor<Context>(
+					stats.getConclusionTimers(), conclusionVisitor);
 		}
 		return conclusionVisitor;
 	}

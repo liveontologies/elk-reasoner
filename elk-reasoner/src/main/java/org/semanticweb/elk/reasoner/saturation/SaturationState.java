@@ -66,7 +66,7 @@ public interface SaturationState {
 	 * rules to the newly created contexts
 	 * 
 	 */
-	public ExtendedSaturationStateWriter getExtendedWriter(
+	public SaturationStateWriter getExtendedWriter(
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener,
 			boolean trackNewContextsAsUnsaturated);
@@ -85,6 +85,6 @@ public interface SaturationState {
 	 */
 	public SaturationStateWriter getWriter();
 
-	public ExtendedSaturationStateWriter getExtendedWriter();
+	public SaturationStateWriter getExtendedWriter();
 
 }

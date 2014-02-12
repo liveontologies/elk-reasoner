@@ -86,7 +86,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 	}
 
 	@Override
-	public ExtendedSaturationStateWriter getExtendedWriter(
+	public SaturationStateWriter getExtendedWriter(
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener,
 			boolean trackNewContextsAsUnsaturated) {
@@ -106,7 +106,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 	}
 
 	@Override
-	public ExtendedSaturationStateWriter getExtendedWriter() {
+	public SaturationStateWriter getExtendedWriter() {
 		return getDefaultWriter();
 	}
 
@@ -130,7 +130,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 	 */
 	abstract ExtendedContext setIfAbsent(ExtendedContext context);
 
-	private ExtendedSaturationStateWriter getDefaultWriter() {
+	private SaturationStateWriter getDefaultWriter() {
 		return new ExtendedWriter();
 	}
 
@@ -204,7 +204,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 	 *         pavel.klinov@uni-ulm.de
 	 */
 	protected class ExtendedWriter extends BasicWriter implements
-			ExtendedSaturationStateWriter {
+			SaturationStateWriter {
 
 		/**
 		 * If set to true, the writer will put all newly created contexts to
@@ -248,7 +248,6 @@ public abstract class AbstractSaturationState implements SaturationState {
 			produce(getCreateContext(root), conclusion);
 		}
 
-		@Override
 		public ExtendedContext getCreateContext(IndexedClassExpression root) {
 			ExtendedContext previous = getContext(root);
 			if (previous != null)
@@ -271,7 +270,6 @@ public abstract class AbstractSaturationState implements SaturationState {
 			return newContext;
 		}
 
-		@Override
 		public void initContext(Context context) {
 			LOGGER_.trace("{}: initializing", context);
 			super.produce(context, contextInitConclusion_);
