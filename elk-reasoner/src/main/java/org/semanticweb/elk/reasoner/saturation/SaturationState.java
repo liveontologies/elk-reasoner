@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import java.util.Collection;
+import java.util.Queue;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -54,7 +55,7 @@ public interface SaturationState {
 
 	public OntologyIndex getOntologyIndex();
 
-	public Collection<IndexedClassExpression> getNotSaturatedContexts();
+	public Queue<? extends Context> getNotSaturatedContexts();
 
 	/**
 	 * Creates a new {@link ExtendedSaturationStateWriter} for modifying this
@@ -68,8 +69,7 @@ public interface SaturationState {
 	 */
 	public SaturationStateWriter getExtendedWriter(
 			ContextCreationListener contextCreationListener,
-			ContextModificationListener contextModificationListener,
-			boolean trackNewContextsAsUnsaturated);
+			ContextModificationListener contextModificationListener);
 
 	public SaturationStateWriter getWriter(
 			ContextModificationListener contextModificationListener);

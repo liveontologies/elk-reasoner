@@ -22,7 +22,6 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -65,10 +64,11 @@ public abstract class AbstractSaturationState implements SaturationState {
 	private final Conclusion contextInitConclusion_;
 
 	/**
-	 * The queue of all contexts for which computation of the closure under
-	 * inference rules has not yet been finished.
+	 * The queue containing all {@link Context}s of this {@link SaturationState}
+	 * that are not saturated, i.e., for which {@link Context#isSaturated()}
+	 * returns {@code false}.
 	 */
-	private final Queue<IndexedClassExpression> notSaturatedContexts_ = new ConcurrentLinkedQueue<IndexedClassExpression>();
+	private final Queue<Context> notSaturatedContexts_ = new ConcurrentLinkedQueue<Context>();
 
 	public AbstractSaturationState(OntologyIndex index) {
 		this.ontologyIndex = index;
@@ -81,17 +81,16 @@ public abstract class AbstractSaturationState implements SaturationState {
 	}
 
 	@Override
-	public Collection<IndexedClassExpression> getNotSaturatedContexts() {
+	public Queue<? extends Context> getNotSaturatedContexts() {
 		return notSaturatedContexts_;
 	}
 
 	@Override
 	public SaturationStateWriter getExtendedWriter(
 			ContextCreationListener contextCreationListener,
-			ContextModificationListener contextModificationListener,
-			boolean trackNewContextsAsUnsaturated) {
+			ContextModificationListener contextModificationListener) {
 		return new ExtendedWriter(contextCreationListener,
-				contextModificationListener, trackNewContextsAsUnsaturated);
+				contextModificationListener);
 	}
 
 	@Override
@@ -170,7 +169,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 
 		protected void markAsNotSaturatedInternal(Context context) {
 			LOGGER_.trace("{}: marked as non-saturated", context);
-			notSaturatedContexts_.add(context.getRoot());
+			notSaturatedContexts_.add(context);
 			contextModificationListener_.notifyContextModification(context);
 		}
 
@@ -178,9 +177,9 @@ public abstract class AbstractSaturationState implements SaturationState {
 		public boolean markAsNotSaturated(Context context) {
 			if (context.setSaturated(false)) {
 				markAsNotSaturatedInternal(context);
-
 				return true;
 			}
+			// else
 			return false;
 		}
 
@@ -206,31 +205,19 @@ public abstract class AbstractSaturationState implements SaturationState {
 	protected class ExtendedWriter extends BasicWriter implements
 			SaturationStateWriter {
 
-		/**
-		 * If set to true, the writer will put all newly created contexts to
-		 * {@link notSaturatedContexts_} This is important if saturation of a
-		 * new context has been interrupted for some reason, e.g. inconsistency.
-		 * Then we'll need to store all such contexts to be able to complete
-		 * their saturation later.
-		 */
-		private final boolean trackNewContextsAsUnsaturated_;
-
 		private final ContextCreationListener contextCreationListener_;
 
 		protected ExtendedWriter(
 				ContextCreationListener contextCreationListener,
-				ContextModificationListener contextModificationListener,
-				boolean trackNewContextsAsUnsaturated) {
+				ContextModificationListener contextModificationListener) {
 			super(contextModificationListener);
 
 			this.contextCreationListener_ = contextCreationListener;
-			this.trackNewContextsAsUnsaturated_ = trackNewContextsAsUnsaturated;
 		}
 
 		protected ExtendedWriter() {
 			super(ContextModificationListener.DUMMY);
 			this.contextCreationListener_ = ContextCreationListener.DUMMY;
-			this.trackNewContextsAsUnsaturated_ = true;
 		}
 
 		void produce(ExtendedContext context, Conclusion conclusion) {
@@ -264,9 +251,9 @@ public abstract class AbstractSaturationState implements SaturationState {
 			contextCreationListener_.notifyContextCreation(newContext);
 			LOGGER_.trace("{}: context created", newContext);
 
-			if (trackNewContextsAsUnsaturated_) {
-				markAsNotSaturatedInternal(newContext);
-			}
+			// if (trackNewContextsAsUnsaturated_) {
+			markAsNotSaturatedInternal(newContext);
+			// }
 			return newContext;
 		}
 

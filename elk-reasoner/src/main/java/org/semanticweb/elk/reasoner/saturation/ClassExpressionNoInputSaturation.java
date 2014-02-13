@@ -122,7 +122,7 @@ class ClassExpressionNoInputSaturationFactory
 		@Override
 		public void process() throws InterruptedException {
 			InputProcessor<IndexedClassExpression> engine = ruleAppFactory_
-					.getDefaultEngine(ContextCreationListener.DUMMY,
+					.getEngine(ContextCreationListener.DUMMY,
 							contextModificationListener_);
 
 			try {

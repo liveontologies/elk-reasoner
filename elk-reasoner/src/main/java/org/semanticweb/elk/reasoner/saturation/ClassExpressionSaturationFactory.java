@@ -76,6 +76,11 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 */
 	private final RuleApplicationFactory ruleApplicationFactory_;
 	/**
+	 * The cached {@link SaturationState} used by the
+	 * {@link RuleApplicationFactory}
+	 */
+	private final SaturationState saturationState_;
+	/**
 	 * The buffer for jobs that need to be processed, i.e., those for which the
 	 * method {@link Engine#submit(SaturationJob)} was executed but processing
 	 * of jobs has not been started yet.
@@ -103,12 +108,6 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * executed.
 	 */
 	private final AtomicInteger countJobsFinished_ = new AtomicInteger(0);
-
-	/**
-	 * The buffer for not saturated contexts, i.e., those for which method
-	 * {@link Context#isSaturated()} not necessarily returns {@code true}
-	 */
-	private final Queue<Context> nonSaturatedContexts_;
 	/**
 	 * The number of contexts created
 	 */
@@ -186,8 +185,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		this.jobsToDo_ = new ConcurrentLinkedQueue<J>();
 		this.jobsInProgress_ = new ConcurrentLinkedQueue<J>();
 		this.ruleApplicationFactory_ = ruleAppFactory;
+		this.saturationState_ = ruleAppFactory.getSaturationState();
 		this.aggregatedStats_ = new ThisStatistics();
-		this.nonSaturatedContexts_ = new ConcurrentLinkedQueue<Context>();
 	}
 
 	/**
@@ -268,7 +267,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			if (countContextsFinished_.compareAndSet(shapshotContextsFinished,
 					shapshotContextsFinished + 1)) {
 
-				Context nextContext = nonSaturatedContexts_.poll();
+				Context nextContext = saturationState_
+						.getNotSaturatedContexts().poll();
 
 				nextContext.setSaturated(true);
 			}
@@ -293,8 +293,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				 */
 				J nextJob = jobsInProgress_.poll();
 				IndexedClassExpression root = nextJob.getInput();
-				Context rootSaturation = ruleApplicationFactory_
-						.getSaturationState().getContext(root);
+				Context rootSaturation = saturationState_.getContext(root);
 
 				rootSaturation.setSaturated(true);
 				nextJob.setOutput(rootSaturation);
@@ -377,10 +376,9 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	public class Engine implements InputProcessor<J> {
 
 		private final InputProcessor<IndexedClassExpression> ruleApplicationEngine_ = ruleApplicationFactory_
-				.getDefaultEngine(new ContextCreationListener() {
+				.getEngine(new ContextCreationListener() {
 					@Override
 					public void notifyContextCreation(Context newContext) {
-						nonSaturatedContexts_.add(newContext);
 						countContextsCreated_.incrementAndGet();
 					}
 				}, ContextModificationListener.DUMMY);
@@ -469,8 +467,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				 * if the context is already assigned and saturated, this job is
 				 * already complete
 				 */
-				Context rootContext = ruleApplicationFactory_
-						.getSaturationState().getContext(root);// root.getContext();
+				Context rootContext = saturationState_.getContext(root);
 
 				if (rootContext != null && rootContext.isSaturated()) {
 					nextJob.setOutput(rootContext);

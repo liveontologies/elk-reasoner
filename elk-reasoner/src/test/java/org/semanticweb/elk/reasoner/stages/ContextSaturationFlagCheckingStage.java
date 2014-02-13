@@ -51,13 +51,13 @@ public class ContextSaturationFlagCheckingStage extends BasePostProcessingStage 
 			.getLogger(ContextSaturationFlagCheckingStage.class);
 
 	private final Collection<IndexedClassExpression> classes_;
-	private final Set<IndexedClassExpression> nonSaturated_;
+	private final Set<Context> nonSaturated_;
 	private final SaturationState saturationState_;
 
 	public ContextSaturationFlagCheckingStage(AbstractReasonerState reasoner) {
 		classes_ = reasoner.ontologyIndex.getIndexedClassExpressions();
-		nonSaturated_ = new ArrayHashSet<IndexedClassExpression>(
-				reasoner.saturationState.getNotSaturatedContexts().size());
+		nonSaturated_ = new ArrayHashSet<Context>(reasoner.saturationState
+				.getNotSaturatedContexts().size());
 		nonSaturated_
 				.addAll(reasoner.saturationState.getNotSaturatedContexts());
 		saturationState_ = reasoner.saturationState;
@@ -78,16 +78,15 @@ public class ContextSaturationFlagCheckingStage extends BasePostProcessingStage 
 				continue;
 			}
 
-			if (context.isSaturated() && nonSaturated_.contains(ice)) {
-				LOGGER_.error("Context "
-						+ context
-						+ " IS saturated but contained in the not saturated queue");
+			if (context.isSaturated() && nonSaturated_.contains(context)) {
+				LOGGER_.error("{}: context IS saturated but contained in the not saturated queue"
+						+ context);
 			}
 
-			if (!context.isSaturated() && !nonSaturated_.contains(ice)) {
-				LOGGER_.error("Context "
-						+ context
-						+ " is NOT saturated and NOT contained in the not saturated queue");
+			if (!context.isSaturated() && !nonSaturated_.contains(context)) {
+				LOGGER_.error(
+						"{}: context  is NOT saturated and NOT contained in the not saturated queue",
+						context);
 			}
 		}
 	}

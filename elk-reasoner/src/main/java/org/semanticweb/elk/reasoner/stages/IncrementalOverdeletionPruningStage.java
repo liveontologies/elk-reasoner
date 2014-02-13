@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -29,6 +30,7 @@ import java.util.Collection;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
+import org.semanticweb.elk.reasoner.saturation.context.ContextRootCollection;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.ContextCompletionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 
@@ -71,8 +73,8 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 
 		RuleApplicationFactory ruleAppFactory = new ContextCompletionFactory(
 				reasoner.saturationState);
-		Collection<IndexedClassExpression> inputs = reasoner.saturationState
-				.getNotSaturatedContexts();
+		Collection<IndexedClassExpression> inputs = new ContextRootCollection(
+				reasoner.saturationState.getNotSaturatedContexts());
 
 		completion_ = new ClassExpressionSaturation<IndexedClassExpression>(
 				inputs, reasoner.getProcessExecutor(), workerNo,

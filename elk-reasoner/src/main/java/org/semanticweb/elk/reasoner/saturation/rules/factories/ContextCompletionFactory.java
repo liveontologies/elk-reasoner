@@ -76,7 +76,7 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 	}
 
 	@Override
-	public InputProcessor<IndexedClassExpression> getDefaultEngine(
+	public InputProcessor<IndexedClassExpression> getEngine(
 			ContextCreationListener listener,
 			ContextModificationListener modListener) {
 		return new ContextCompletionEngine(listener, modListener);
@@ -136,23 +136,23 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 					// mainWriter with statistics
 					SaturationUtils
 							.getStatsAwareWriter(
-									saturationState.getExtendedWriter(
-											SaturationUtils
-													.addStatsToContextCreationListener(
-															listener,
-															localStatistics
-																	.getContextStatistics()),
-											SaturationUtils
-													.addStatsToContextModificationListener(
-															modificationListener,
-															localStatistics
-																	.getContextStatistics()),
-											trackModifiedContexts_),
+									saturationState
+											.getExtendedWriter(
+													SaturationUtils
+															.addStatsToContextCreationListener(
+																	listener,
+																	localStatistics
+																			.getContextStatistics()),
+													SaturationUtils
+															.addStatsToContextModificationListener(
+																	modificationListener,
+																	localStatistics
+																			.getContextStatistics())),
 									localStatistics),
 					// trackingWriter
 					localState_.getExtendedWriter(
 							ContextCreationListener.DUMMY,
-							ContextModificationListener.DUMMY, false),
+							ContextModificationListener.DUMMY),
 					// localStatistics
 					localStatistics);
 

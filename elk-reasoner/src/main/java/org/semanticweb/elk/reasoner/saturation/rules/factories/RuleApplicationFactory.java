@@ -29,8 +29,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextNotSaturatedCheckingVisitor;
@@ -39,10 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVi
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The factory for engines for concurrently computing the saturation of class
@@ -55,27 +50,8 @@ import org.slf4j.LoggerFactory;
  * @author Pavel Klinov
  * 
  */
-public class RuleApplicationFactory {
+public class RuleApplicationFactory extends AbstractRuleApplicationFactory {
 
-	// logger for this class
-	protected static final Logger LOGGER_ = LoggerFactory
-			.getLogger(RuleApplicationFactory.class);
-
-	/**
-	 * The main {@link SaturationState} this factory works with
-	 */
-	final SaturationState saturationState;
-
-	/**
-	 * The {@link Conclusion} used to initialize contexts using
-	 * {@link ContextInitRule}s
-	 */
-	final Conclusion contextInitConclusion;
-
-	/**
-	 * The {@link SaturationStatistics} aggregated for all workers
-	 */
-	final SaturationStatistics aggregatedStats;
 	/**
 	 * If {@code true}, the factory will keep track of contexts which get
 	 * modified during saturation. This is needed, for example, for cleaning
@@ -89,47 +65,29 @@ public class RuleApplicationFactory {
 		this(saturationState, false);
 	}
 
-	public RuleApplicationFactory(final SaturationState saturationState,
+	public RuleApplicationFactory(SaturationState saturationState,
 			final boolean trackModifiedContexts) {
-		this.saturationState = saturationState;
-		this.contextInitConclusion = new ContextInitialization(
-				saturationState.getOntologyIndex());
-		this.aggregatedStats = new SaturationStatistics();
+		super(saturationState);
 		this.trackModifiedContexts_ = trackModifiedContexts;
 	}
 
-	/*
-	 * This method is supposed to be overridden in subclasses
-	 */
-	public InputProcessor<IndexedClassExpression> getDefaultEngine(
+	public InputProcessor<IndexedClassExpression> getEngine(
 			ContextCreationListener listener,
 			ContextModificationListener modListener) {
-		return new DefaultEngine(listener, modListener);
+		SaturationStatistics localStatistics = new SaturationStatistics();
+		listener = SaturationUtils.addStatsToContextCreationListener(listener,
+				localStatistics.getContextStatistics());
+		modListener = SaturationUtils.addStatsToContextModificationListener(
+				modListener, localStatistics.getContextStatistics());
+		SaturationStateWriter writer = saturationState.getExtendedWriter(
+				listener, modListener);
+		writer = SaturationUtils.getStatsAwareWriter(writer, localStatistics);
+		return super.getEngine(writer, localStatistics);
 	}
 
-	public void finish() {
-		// aggregatedStats_.check(LOGGER_);
-	}
-
-	public SaturationStatistics getSaturationStatistics() {
-		return aggregatedStats;
-	}
-
-	public SaturationState getSaturationState() {
-		return saturationState;
-	}
-
-	/**
-	 * @param ruleVisitor
-	 *            A {@link RuleVisitor} used for rule application
-	 * @param writer
-	 *            A {@link SaturationStateWriter} to be used for rule
-	 *            applications
-	 * @return {@link ConclusionVisitor} that perform processing of
-	 *         {@link Conclusion}s in {@link Context}s
-	 */
+	@Override
 	@SuppressWarnings("unchecked")
-	private ConclusionVisitor<Context, Boolean> getConclusionProcessor(
+	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer) {
 		// the visitor used for inserting conclusion
 		ConclusionVisitor<Context, Boolean> insertionVisitor = new ConclusionInsertionVisitor();
@@ -150,60 +108,6 @@ public class RuleApplicationFactory {
 				// if new, apply the non-redundant rules
 				new NonRedundantRuleApplicationConclusionVisitor(ruleVisitor,
 						writer));
-	}
-
-	/**
-	 * Default rule application engine which can create new contexts via
-	 * {@link ExtendedSaturationStateWriter} (either directly when a new
-	 * {@link IndexedClassExpression} is submitted or during decomposition)
-	 */
-	public class DefaultEngine extends AbstractRuleEngineWithStatistics {
-
-		private final SaturationStateWriter writer_;
-
-		DefaultEngine(SaturationStateWriter saturationStateWriter,
-				SaturationStatistics localStatistics) {
-			super(getConclusionProcessor(
-					SaturationUtils.getStatsAwareRuleVisitor(localStatistics
-							.getRuleStatistics()), saturationStateWriter),
-					aggregatedStats, localStatistics);
-			writer_ = saturationStateWriter;
-		}
-
-		private DefaultEngine(final ContextCreationListener listener,
-				final ContextModificationListener modificationListener,
-				final SaturationStatistics localStatistics) {
-
-			this(SaturationUtils.getStatsAwareWriter(saturationState
-					.getExtendedWriter(SaturationUtils
-							.addStatsToContextCreationListener(listener,
-									localStatistics.getContextStatistics()),
-							SaturationUtils
-									.addStatsToContextModificationListener(
-											modificationListener,
-											localStatistics
-													.getContextStatistics()),
-							trackModifiedContexts_), localStatistics),
-					localStatistics);
-
-		}
-
-		protected DefaultEngine(final ContextCreationListener listener,
-				final ContextModificationListener modListener) {
-			this(listener, modListener, new SaturationStatistics());
-		}
-
-		@Override
-		public void submit(IndexedClassExpression job) {
-			if (saturationState.getContext(job) == null)
-				writer_.produce(job, contextInitConclusion);
-		}
-
-		@Override
-		Context getNextActiveContext() {
-			return writer_.pollForActiveContext();
-		}
-
 	}
 
 }

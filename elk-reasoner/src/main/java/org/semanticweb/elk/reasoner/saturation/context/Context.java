@@ -99,8 +99,7 @@ public interface Context extends ConclusionSet, ContextPremises {
 	 * @return {@code true} if all {@link Conclusion}s for this {@link Context},
 	 *         as determined by the function
 	 *         {@link Conclusion#getSourceRoot(IndexedClassExpression)}, except
-	 *         those with not-{@code null} {@link Conclusion#getSubRoot()} are
-	 *         already computed.
+	 *         for {@link SubConclusion}s are already computed.
 	 */
 	public boolean isSaturated();
 

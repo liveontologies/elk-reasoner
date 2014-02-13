@@ -61,7 +61,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	}
 
 	@Override
-	public DeapplicationEngine getDefaultEngine(
+	public DeapplicationEngine getEngine(
 			ContextCreationListener listener,
 			ContextModificationListener modListener) {
 		return new DeapplicationEngine(modListener);

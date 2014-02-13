@@ -49,7 +49,7 @@ public class ContextCleaningFactory extends RuleDeapplicationFactory {
 	}
 
 	@Override
-	public DeapplicationEngine getDefaultEngine(
+	public DeapplicationEngine getEngine(
 			ContextCreationListener listener,
 			ContextModificationListener modificationListener) {
 		return new CleaningEngine();

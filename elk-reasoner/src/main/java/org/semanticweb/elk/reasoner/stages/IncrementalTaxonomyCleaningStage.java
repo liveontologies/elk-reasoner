@@ -33,6 +33,7 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.context.ContextRootCollection;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyCleaning;
 import org.semanticweb.elk.util.collections.Operations;
 import org.slf4j.Logger;
@@ -69,11 +70,12 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			return false;
 		}
 
-		final Collection<IndexedClassEntity> modified = new ContextRootCollection(
-				reasoner.saturationState.getNotSaturatedContexts());
-		final Collection<IndexedClassEntity> removedClasses = new ContextRootCollection(
+		final Collection<IndexedClassEntity> modified = new IndexedClassEntityCollection(
+				new ContextRootCollection(
+						reasoner.saturationState.getNotSaturatedContexts()));
+		final Collection<IndexedClassEntity> removedClasses = new IndexedClassEntityCollection(
 				reasoner.classTaxonomyState.removedClasses);
-		final Collection<IndexedClassEntity> removedIndividuals = new ContextRootCollection(
+		final Collection<IndexedClassEntity> removedIndividuals = new IndexedClassEntityCollection(
 				reasoner.instanceTaxonomyState.getRemovedIndividuals());
 		Collection<IndexedClassEntity> inputs = Operations.getCollection(
 				Operations.concat(Operations.concat(removedClasses, modified),
@@ -132,12 +134,13 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	/*
 	 * Used to pass a collection of context's roots without extra copying
 	 */
-	private static class ContextRootCollection extends
+	private static class IndexedClassEntityCollection extends
 			AbstractCollection<IndexedClassEntity> {
 
 		private final Collection<? extends IndexedClassExpression> ices_;
 
-		ContextRootCollection(Collection<? extends IndexedClassExpression> ices) {
+		IndexedClassEntityCollection(
+				Collection<? extends IndexedClassExpression> ices) {
 			ices_ = ices;
 		}
 
