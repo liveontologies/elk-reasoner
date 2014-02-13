@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextExistenceCheckingWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -42,6 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSo
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
  * Creates an engine which applies rules backwards, e.g., removes conclusions
@@ -55,15 +55,25 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  */
 public class RuleDeapplicationFactory extends RuleApplicationFactory {
 
-	public RuleDeapplicationFactory(final SaturationState saturationState,
-			boolean trackModifiedContexts) {
-		super(saturationState, trackModifiedContexts);
+	public RuleDeapplicationFactory(SaturationState saturationState) {
+		super(saturationState);
 	}
 
-	@Override
-	public DeapplicationEngine getEngine(ContextCreationListener listener,
+	// TODO: this engine should not process any input
+	public InputProcessor<IndexedClassExpression> getEngine(
 			ContextModificationListener modListener) {
-		return new DeapplicationEngine(modListener);
+		SaturationStatistics localStatistics = new SaturationStatistics();
+		// add context statistics to the listener
+		modListener = SaturationUtils.addStatsToContextModificationListener(
+				modListener, localStatistics.getContextStatistics());
+		SaturationStateWriter writer = getWriter(modListener);
+		return super.getEngine(writer, localStatistics);
+	}
+
+	SaturationStateWriter getWriter(ContextModificationListener modListener) {
+		SaturationStateWriter writer = saturationState.getWriter(modListener);
+		// only write to exiting contexts
+		return new ContextExistenceCheckingWriter(writer, saturationState);
 	}
 
 	/**
@@ -76,8 +86,9 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	 *         {@link Conclusion} if it occurs in the {@link Context}, and
 	 *         deletes this {@link Conclusion} from the {@link Context}
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
-	private ConclusionVisitor<Context, Boolean> getDeletionConclusionProcessor(
+	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer) {
 		return new ComposedConclusionVisitor<Context>(
 		// check if conclusion occurs in the context
@@ -89,57 +100,6 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 				new ConclusionDeletionVisitor(),
 				// and mark the source context as non-saturated
 				new ConclusionSourceContextUnsaturationVisitor(writer));
-	}
-
-	/**
-	 * 
-	 */
-	public class DeapplicationEngine extends AbstractRuleEngineWithStatistics {
-
-		private final SaturationStateWriter writer_;
-
-		DeapplicationEngine(SaturationStateWriter saturationStateWriter,
-				SaturationStatistics localStatistics) {
-			super(getDeletionConclusionProcessor(
-					SaturationUtils.getStatsAwareRuleVisitor(localStatistics
-							.getRuleStatistics()), saturationStateWriter),
-					aggregatedStats, localStatistics);
-			writer_ = saturationStateWriter;
-		}
-
-		protected DeapplicationEngine(ContextModificationListener listener,
-				SaturationStatistics localStatistics) {
-			this(
-					// producing conclusions only in existing contexts
-					new ContextExistenceCheckingWriter(
-							// use writer with statistics
-							SaturationUtils.getStatAwareWriter(
-									saturationState
-											.getWriter(
-											// check which contexts are modified
-											SaturationUtils
-													.addStatsToContextModificationListener(
-															listener,
-															localStatistics
-																	.getContextStatistics())),
-									localStatistics), saturationState),
-					localStatistics);
-		}
-
-		protected DeapplicationEngine(ContextModificationListener listener) {
-			this(listener, new SaturationStatistics());
-		}
-
-		@Override
-		public void submit(IndexedClassExpression job) {
-			// new jobs cannot be submitted
-		}
-
-		@Override
-		Context getNextActiveContext() {
-			return writer_.pollForActiveContext();
-		}
-
 	}
 
 }

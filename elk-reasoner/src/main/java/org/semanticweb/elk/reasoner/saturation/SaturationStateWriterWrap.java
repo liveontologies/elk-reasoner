@@ -62,11 +62,6 @@ public class SaturationStateWriterWrap<W extends SaturationStateWriter>
 	}
 
 	@Override
-	public void clearNotSaturatedContexts() {
-		mainWriter.clearNotSaturatedContexts();
-	}
-
-	@Override
 	public void resetContexts() {
 		mainWriter.resetContexts();
 	}

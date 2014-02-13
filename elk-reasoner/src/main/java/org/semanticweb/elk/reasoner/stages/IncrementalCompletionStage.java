@@ -94,7 +94,6 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 		 * the non saturated contexts are not cleaned at all during incremental
 		 * consistency checking. Something needs to be done about it.
 		 */
-		reasoner.saturationState.getWriter().clearNotSaturatedContexts();
 		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
 		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
 		completion_ = null;

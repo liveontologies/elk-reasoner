@@ -22,21 +22,15 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
-import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextNotSaturatedCheckingVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
  * The factory for engines for concurrently computing the saturation of class
@@ -49,36 +43,22 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * @author Pavel Klinov
  * 
  */
-public class RuleApplicationFactory extends AbstractRuleApplicationFactory {
+public class RuleOverApplicationFactory extends RuleApplicationFactory {
 
-	public RuleApplicationFactory(SaturationState saturationState) {
+	public RuleOverApplicationFactory(SaturationState saturationState) {
 		super(saturationState);
-	}
-
-	public InputProcessor<IndexedClassExpression> getEngine(
-			ContextCreationListener listener,
-			ContextModificationListener modListener) {
-		SaturationStatistics localStatistics = new SaturationStatistics();
-		listener = SaturationUtils.addStatsToContextCreationListener(listener,
-				localStatistics.getContextStatistics());
-		modListener = SaturationUtils.addStatsToContextModificationListener(
-				modListener, localStatistics.getContextStatistics());
-		SaturationStateWriter writer = saturationState.getExtendedWriter(
-				listener, modListener);
-		writer = SaturationUtils.getStatsAwareWriter(writer, localStatistics);
-		return super.getEngine(writer, localStatistics);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer) {
+		// the visitor used for inserting conclusion
 		return new ComposedConclusionVisitor<Context>(
 		// insert conclusions
 				new ConclusionInsertionVisitor(),
-				// if new, check that conclusion is not for a saturated context
-				new ConclusionSourceContextNotSaturatedCheckingVisitor(
-						saturationState),
+				// if new, mark the source context as unsaturated
+				new ConclusionSourceContextUnsaturationVisitor(writer),
 				// apply the non-redundant rules
 				new NonRedundantRuleApplicationConclusionVisitor(ruleVisitor,
 						writer));

@@ -22,12 +22,12 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleDeapplicationFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Reverts inferences
@@ -60,7 +60,7 @@ public class IncrementalDeletionStage extends AbstractReasonerStage {
 		desaturation_ = new ClassExpressionNoInputSaturation(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), new RuleDeapplicationFactory(
-						reasoner.saturationState, true),
+						reasoner.saturationState),
 				ContextModificationListener.DUMMY);
 		return true;
 	}

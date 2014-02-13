@@ -25,11 +25,10 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationCheckingWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 
 /**
  * Creates an engine which works as the de-application engine except that it
@@ -45,31 +44,13 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 public class ContextCleaningFactory extends RuleDeapplicationFactory {
 
 	public ContextCleaningFactory(final SaturationState saturationState) {
-		super(saturationState, false);
+		super(saturationState);
 	}
 
 	@Override
-	public DeapplicationEngine getEngine(
-			ContextCreationListener listener,
-			ContextModificationListener modificationListener) {
-		return new CleaningEngine();
+	SaturationStateWriter getWriter(ContextModificationListener modListener) {
+		// do not produce conclusions if their source is saturated
+		return new SaturationCheckingWriter(saturationState);
 	}
 
-	/**
-	 * A {@link RuleDeapplicationFactory} that its own saturation state writer
-	 * that does not produce conclusions if their source is marked as saturated.
-	 */
-	public class CleaningEngine extends
-			RuleDeapplicationFactory.DeapplicationEngine {
-
-		CleaningEngine(SaturationStatistics localStatistics) {
-			super(new SaturationCheckingWriter(saturationState),
-					localStatistics);
-		}
-
-		protected CleaningEngine() {
-			this(new SaturationStatistics());
-		}
-
-	}
 }

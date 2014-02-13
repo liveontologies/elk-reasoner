@@ -123,9 +123,9 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			return false;
 		}
 		// at this point we're done with unsaturated contexts
-		reasoner.saturationState.getWriter().clearNotSaturatedContexts();
 		reasoner.classTaxonomyState.getWriter().clearModifiedClasses();
 		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
+		reasoner.instanceTaxonomyState.getWriter().clearModifiedIndividuals();
 		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
 		this.cleaning_ = null;
 

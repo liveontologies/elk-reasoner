@@ -199,12 +199,6 @@ public abstract class AbstractSaturationState implements SaturationState {
 		}
 
 		@Override
-		public void clearNotSaturatedContexts() {
-			LOGGER_.trace("Clear non-saturated contexts");
-			notSaturatedContexts_.clear();
-		}
-
-		@Override
 		public void resetContexts() {
 			AbstractSaturationState.this.resetContexts();
 		}
@@ -212,10 +206,10 @@ public abstract class AbstractSaturationState implements SaturationState {
 	}
 
 	/**
-	 * 
 	 * @author Pavel Klinov
 	 * 
 	 *         pavel.klinov@uni-ulm.de
+	 * @author "Yevgeny Kazakov"
 	 */
 	protected class ExtendedWriter extends BasicWriter implements
 			SaturationStateWriter {
@@ -261,14 +255,13 @@ public abstract class AbstractSaturationState implements SaturationState {
 				// the context is already assigned meanwhile
 				return previous;
 
-			// else the context is new; it should be initialized
+			// else the context is new and not saturated
+			markAsNotSaturatedInternal(newContext);
+			// it should be initialized
 			initContext(newContext);
 			contextCreationListener_.notifyContextCreation(newContext);
 			LOGGER_.trace("{}: context created", newContext);
 
-			// if (trackNewContextsAsUnsaturated_) {
-			markAsNotSaturatedInternal(newContext);
-			// }
 			return newContext;
 		}
 
