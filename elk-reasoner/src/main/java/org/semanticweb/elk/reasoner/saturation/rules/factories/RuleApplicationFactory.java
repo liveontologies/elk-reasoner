@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CombinedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextNotSaturatedCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextUnsaturationVisitor;
@@ -61,6 +61,9 @@ public class RuleApplicationFactory {
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RuleApplicationFactory.class);
 
+	/**
+	 * The main {@link SaturationState} this factory works with
+	 */
 	final SaturationState saturationState;
 
 	/**
@@ -125,22 +128,23 @@ public class RuleApplicationFactory {
 	 * @return {@link ConclusionVisitor} that perform processing of
 	 *         {@link Conclusion}s in {@link Context}s
 	 */
-	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
+	@SuppressWarnings("unchecked")
+	private ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer) {
 		// the visitor used for inserting conclusion
 		ConclusionVisitor<Context, Boolean> insertionVisitor = new ConclusionInsertionVisitor();
 		if (trackModifiedContexts_)
 			// after insertion, mark the source context as unsaturated
-			insertionVisitor = new CombinedConclusionVisitor<Context>(
+			insertionVisitor = new ComposedConclusionVisitor<Context>(
 					insertionVisitor,
 					new ConclusionSourceContextUnsaturationVisitor(
 							saturationState, writer));
 		else
 			// check that we never produce conclusions with saturated contexts
-			insertionVisitor = new CombinedConclusionVisitor<Context>(
+			insertionVisitor = new ComposedConclusionVisitor<Context>(
 					new ConclusionSourceContextNotSaturatedCheckingVisitor(
 							saturationState), insertionVisitor);
-		return new CombinedConclusionVisitor<Context>(
+		return new ComposedConclusionVisitor<Context>(
 		// add conclusion to the context
 				insertionVisitor,
 				// if new, apply the non-redundant rules

@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CombinedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -82,30 +82,29 @@ public class ContextCompletionFactory extends RuleApplicationFactory {
 		return new ContextCompletionEngine(listener, modListener);
 	}
 
+	@SuppressWarnings("unchecked")
 	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, ConclusionProducer mainProducer,
 			ConclusionProducer trackingProducer) {
-		return new CombinedConclusionVisitor<Context>(
+		return new ComposedConclusionVisitor<Context>(
 		// checking the conclusion against the main saturation state
 				new LocalizedConclusionVisitor(
 						// conclusion already occurs there
 						new ConclusionOccurrenceCheckingVisitor(),
 						saturationState),
-				// if all fine,
-				new CombinedConclusionVisitor<Context>(
-				// insert the conclusion to the local context
-						new ConclusionInsertionVisitor(),
-						// apply local rules
-						new HybridLocalRuleApplicationConclusionVisitor(
-								saturationState, ruleVisitor, ruleVisitor,
-								// the conclusions of non-redundant rules are
-								// inserted to both main and tracing saturation
-								// states
-								new CombinedConclusionProducer(mainProducer,
-										trackingProducer),
-								// whereas the conclusion of redundant rules are
-								// needed only for tracking
-								trackingProducer)));
+				// if all fine, insert the conclusion to the local context
+				new ConclusionInsertionVisitor(),
+				// and apply local rules
+				new HybridLocalRuleApplicationConclusionVisitor(
+						saturationState, ruleVisitor, ruleVisitor,
+						// the conclusions of non-redundant rules are
+						// inserted to both main and tracing saturation
+						// states
+						new CombinedConclusionProducer(mainProducer,
+								trackingProducer),
+						// whereas the conclusion of redundant rules are
+						// needed only for tracking
+						trackingProducer));
 	}
 
 	/**

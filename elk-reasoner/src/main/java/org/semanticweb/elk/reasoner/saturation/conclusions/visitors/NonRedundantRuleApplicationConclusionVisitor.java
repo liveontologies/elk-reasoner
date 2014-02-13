@@ -31,14 +31,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * A {@link ConclusionVisitor} that applies non-redundant rules for the visited
  * {@link Conclusion}s using the provided {@link RuleVisitor} to track rule
  * applications and {@link ConclusionProducer} to output the {@link Conclusion}s
- * of the applied rules. The methods always return {@link true}. This is used to
- * conveniently compose them using a {@link CombinedConclusionVisitor}
+ * of the applied rules. The methods always return {@link true}.
  * 
  * @see AllRuleApplicationConclusionVisitor
  * @see HybridRuleApplicationConclusionVisitor
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
 public class NonRedundantRuleApplicationConclusionVisitor extends
 		AbstractConclusionVisitor<Context, Boolean> {

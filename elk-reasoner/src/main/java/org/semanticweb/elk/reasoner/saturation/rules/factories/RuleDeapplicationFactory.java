@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AllRuleApplicationConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CombinedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionDeletionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextUnsaturationVisitor;
@@ -77,22 +77,20 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	 *         {@link Conclusion} if it occurs in the {@link Context}, and
 	 *         deletes this {@link Conclusion} from the {@link Context}
 	 */
+	@SuppressWarnings("unchecked")
 	private ConclusionVisitor<Context, Boolean> getDeletionConclusionProcessor(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer) {
-		return new CombinedConclusionVisitor<Context>(
-				new CombinedConclusionVisitor<Context>(
-				// check if conclusion occurs in the context
-						new ConclusionOccurrenceCheckingVisitor(),
-						// if so, apply the rules, including those that are
-						// redundant
-						new AllRuleApplicationConclusionVisitor(ruleVisitor,
-								writer)),
-				new CombinedConclusionVisitor<Context>(
+		return new ComposedConclusionVisitor<Context>(
+		// check if conclusion occurs in the context
+				new ConclusionOccurrenceCheckingVisitor(),
+				// if so, apply the rules, including those that are
+				// redundant
+				new AllRuleApplicationConclusionVisitor(ruleVisitor, writer),
 				// after processing, delete the conclusion
-						new ConclusionDeletionVisitor(),
-						// and mark the source context as non-saturated
-						new ConclusionSourceContextUnsaturationVisitor(
-								saturationState, writer)));
+				new ConclusionDeletionVisitor(),
+				// and mark the source context as non-saturated
+				new ConclusionSourceContextUnsaturationVisitor(saturationState,
+						writer));
 	}
 
 	/**
