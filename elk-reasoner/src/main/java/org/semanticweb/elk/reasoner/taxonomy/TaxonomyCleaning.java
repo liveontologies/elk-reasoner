@@ -83,8 +83,10 @@ class TaxonomyCleaningFactory
 		implements
 		InputProcessorFactory<IndexedClassEntity, InputProcessor<IndexedClassEntity>> {
 
-	/*private static final Logger LOGGER_ = Logger
-			.getLogger(TaxonomyCleaningFactory.class);*/
+	/*
+	 * private static final Logger LOGGER_ = Logger
+	 * .getLogger(TaxonomyCleaningFactory.class);
+	 */
 
 	private final ClassTaxonomyState classTaxonomyState_;
 	private final InstanceTaxonomyState instanceTaxonomyState_;
@@ -192,23 +194,22 @@ class TaxonomyCleaningFactory
 					if (typeNode == null) {
 						// could be deleted meanwhile in another thread
 						return;
-					} else {
-						List<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> directInstances = null;
+					}
+					// else
+					List<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>> directInstances = null;
 
-						synchronized (typeNode) {
-							directInstances = new LinkedList<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>>(
-									typeNode.getDirectInstanceNodes());
-						}
+					synchronized (typeNode) {
+						directInstances = new LinkedList<UpdateableInstanceNode<ElkClass, ElkNamedIndividual>>(
+								typeNode.getDirectInstanceNodes());
+					}
 
-						for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : directInstances) {
-							if (instanceNode.trySetModified(true)) {
-								instanceStateWriter_
-										.markModifiedIndividuals(instanceNode
-												.getMembers());
-								instanceTaxonomy
-										.removeInstanceNode(instanceNode
-												.getCanonicalMember());
-							}
+					for (UpdateableInstanceNode<ElkClass, ElkNamedIndividual> instanceNode : directInstances) {
+						if (instanceNode.trySetModified(true)) {
+							instanceStateWriter_
+									.markIndividualsForModifiedNode(instanceNode
+											.getMembers());
+							instanceTaxonomy.removeInstanceNode(instanceNode
+									.getCanonicalMember());
 						}
 					}
 				}
@@ -236,12 +237,12 @@ class TaxonomyCleaningFactory
 							.getInstanceNode(individual);
 
 					if (node != null && node.trySetModified(true)) {
-						instanceStateWriter_.markModifiedIndividuals(node
+						instanceStateWriter_.markIndividualsForModifiedNode(node
 								.getMembers());
 						taxonomy.removeInstanceNode(individual);
 					} else if (node == null) {
 						instanceStateWriter_
-								.markModifiedIndividuals(Collections
+								.markIndividualsForModifiedNode(Collections
 										.singleton(individual));
 					}
 				} else {

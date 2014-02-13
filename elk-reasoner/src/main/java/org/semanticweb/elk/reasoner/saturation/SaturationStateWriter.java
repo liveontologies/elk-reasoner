@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
@@ -40,7 +41,21 @@ public interface SaturationStateWriter extends ConclusionProducer {
 
 	public Context pollForActiveContext();
 
-	public boolean markAsNotSaturated(Context context);
+	/**
+	 * Marks the {@link Context} with the given root
+	 * {@link IndexedClassExpression} as not saturated. That is, after calling
+	 * of this method, {@code Context#isSaturated()} returns {@code true} for
+	 * the {@link Context} returned by
+	 * {@code SaturationState#getContext(IndexedClassExpression)} for the given
+	 * root.
+	 * 
+	 * @param root
+	 * @return {@code true} if the {@link Context} was marked as saturated or
+	 *         {@code false} if the {@link Context} for the given
+	 *         {@link IndexedClassExpression} does not exist or already marked
+	 *         as saturated.
+	 */
+	public boolean markAsNotSaturated(IndexedClassExpression root);
 
 	public void clearNotSaturatedContexts();
 

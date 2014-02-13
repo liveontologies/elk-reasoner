@@ -29,7 +29,9 @@ import java.util.Queue;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
@@ -250,9 +252,22 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	}
 
 	protected void markAllContextsAsSaturated() {
-		for (Context context : reasoner.saturationState
-				.getNotSaturatedContexts()) {
-			context.setSaturated(true);
+		ClassTaxonomyState.Writer classTaxonomyWriter = reasoner.classTaxonomyState
+				.getWriter();
+		InstanceTaxonomyState.Writer instanceTaxonomyWriter = reasoner.instanceTaxonomyState
+				.getWriter();
+		for (;;) {
+			Context context = reasoner.saturationState
+					.setNextContextSaturated();
+			if (context == null)
+				return;
+			// else
+			IndexedClassExpression root = context.getRoot();
+			if (root instanceof IndexedClass)
+				classTaxonomyWriter.markModifiedClass((IndexedClass) root);
+			else if (root instanceof IndexedIndividual)
+				instanceTaxonomyWriter
+						.markModifiedIndividual((IndexedIndividual) root);
 		}
 	}
 

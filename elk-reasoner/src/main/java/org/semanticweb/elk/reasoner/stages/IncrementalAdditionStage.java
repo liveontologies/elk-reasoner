@@ -62,7 +62,7 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 				reasoner.getProgressMonitor(), new RuleApplicationFactory(
 						reasoner.saturationState, true),
 				ContextModificationListener.DUMMY);
-		
+
 		return true;
 	}
 

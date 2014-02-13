@@ -33,7 +33,6 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.context.ContextRootCollection;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyCleaning;
 import org.semanticweb.elk.util.collections.Operations;
 import org.slf4j.Logger;
@@ -70,27 +69,32 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			return false;
 		}
 
-		final Collection<IndexedClassEntity> modified = new IndexedClassEntityCollection(
-				new ContextRootCollection(
-						reasoner.saturationState.getNotSaturatedContexts()));
+		final Collection<IndexedClassEntity> modifiedClasses = new IndexedClassEntityCollection(
+				reasoner.classTaxonomyState.getModifiedClasses());
 		final Collection<IndexedClassEntity> removedClasses = new IndexedClassEntityCollection(
-				reasoner.classTaxonomyState.removedClasses);
+				reasoner.classTaxonomyState.getRemovedClasses());
+		final Collection<IndexedClassEntity> modifiedIndividuals = new IndexedClassEntityCollection(
+				reasoner.instanceTaxonomyState.getModifiedIndividuals());
 		final Collection<IndexedClassEntity> removedIndividuals = new IndexedClassEntityCollection(
 				reasoner.instanceTaxonomyState.getRemovedIndividuals());
 		Collection<IndexedClassEntity> inputs = Operations.getCollection(
-				Operations.concat(Operations.concat(removedClasses, modified),
-						removedIndividuals),
-				removedClasses.size() + modified.size()
-						+ removedIndividuals.size());
+				Operations.concat(Operations.concat(removedClasses,
+						modifiedClasses), Operations.concat(removedIndividuals,
+						modifiedIndividuals)), removedClasses.size()
+						+ modifiedClasses.size() + removedIndividuals.size()
+						+ modifiedIndividuals.size());
 
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Taxonomy nodes to be cleaned for modified contexts: "
-					+ modified);
-			LOGGER_.trace("Class taxonomy nodes to be cleaned for removed classes: "
-					+ removedClasses);
-			LOGGER_.trace("Instance taxonomy nodes to be cleaned for removed individuals: "
-					+ removedIndividuals);
-		}
+		LOGGER_.trace("Taxonomy nodes to be cleaned for modified contexts: {}",
+				modifiedClasses);
+		LOGGER_.trace(
+				"Class taxonomy nodes to be cleaned for removed classes: {}",
+				removedClasses);
+		LOGGER_.trace(
+				"Instance taxonomy nodes to be cleaned for modified individuals: {}",
+				removedIndividuals);
+		LOGGER_.trace(
+				"Instance taxonomy nodes to be cleaned for removed individuals: {}",
+				removedIndividuals);
 
 		cleaning_ = new TaxonomyCleaning(inputs, reasoner.classTaxonomyState,
 				reasoner.instanceTaxonomyState, reasoner.getProcessExecutor(),
@@ -120,6 +124,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		}
 		// at this point we're done with unsaturated contexts
 		reasoner.saturationState.getWriter().clearNotSaturatedContexts();
+		reasoner.classTaxonomyState.getWriter().clearModifiedClasses();
 		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
 		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
 		this.cleaning_ = null;

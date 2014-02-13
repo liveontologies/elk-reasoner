@@ -262,13 +262,6 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	@Override
-	public boolean setSaturated(boolean saturated) {
-		boolean result = isSaturated_;
-		isSaturated_ = saturated;
-		return result;
-	}
-
-	@Override
 	public Conclusion takeToDo() {
 		return toDo_.pop();
 	}
@@ -278,6 +271,13 @@ public class ContextImpl implements ExtendedContext {
 		return root_.toString()
 				+ (this != ((IndexedObjectWithContext) root_).getContext() ? "[local]"
 						: "");
+	}
+
+	@Override
+	public boolean setSaturated(boolean saturated) {
+		boolean result = isSaturated_;
+		isSaturated_ = saturated;
+		return result;
 	}
 
 	private static class ConclusionInserter implements

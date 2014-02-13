@@ -61,8 +61,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	}
 
 	@Override
-	public DeapplicationEngine getEngine(
-			ContextCreationListener listener,
+	public DeapplicationEngine getEngine(ContextCreationListener listener,
 			ContextModificationListener modListener) {
 		return new DeapplicationEngine(modListener);
 	}
@@ -89,8 +88,7 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 				// after processing, delete the conclusion
 				new ConclusionDeletionVisitor(),
 				// and mark the source context as non-saturated
-				new ConclusionSourceContextUnsaturationVisitor(saturationState,
-						writer));
+				new ConclusionSourceContextUnsaturationVisitor(writer));
 	}
 
 	/**

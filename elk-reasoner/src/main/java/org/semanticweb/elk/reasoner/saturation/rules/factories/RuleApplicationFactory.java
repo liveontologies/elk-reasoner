@@ -95,8 +95,7 @@ public class RuleApplicationFactory extends AbstractRuleApplicationFactory {
 			// after insertion, mark the source context as unsaturated
 			insertionVisitor = new ComposedConclusionVisitor<Context>(
 					insertionVisitor,
-					new ConclusionSourceContextUnsaturationVisitor(
-							saturationState, writer));
+					new ConclusionSourceContextUnsaturationVisitor(writer));
 		else
 			// check that we never produce conclusions with saturated contexts
 			insertionVisitor = new ComposedConclusionVisitor<Context>(

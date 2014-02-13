@@ -73,7 +73,7 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 		 * taxonomy they must include new individuals
 		 */
 		final Set<ElkNamedIndividual> modifiedIndividuals = reasoner.instanceTaxonomyState
-				.getModifiedIndividuals();
+				.getIndividualsWithModifiedNodes();
 		// let's convert to indexed objects and filter out removed individuals
 		Operations.Transformation<ElkNamedIndividual, IndexedIndividual> transformation = new Operations.Transformation<ElkNamedIndividual, IndexedIndividual>() {
 			@Override
@@ -107,7 +107,7 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 			return false;
 		}
 
-		reasoner.instanceTaxonomyState.getWriter().clearModifiedIndividuals();
+		reasoner.instanceTaxonomyState.getWriter().clearModifiedNodeObjects();
 		reasoner.ontologyIndex.initIndividualSignatureChanges();
 		// reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
 		this.computation_ = null;

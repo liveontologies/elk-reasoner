@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -34,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
 
 /**
@@ -47,27 +49,37 @@ public class InstanceTaxonomyState {
 
 	private UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy_ = null;
 
-	private final Set<ElkNamedIndividual> modifiedIndividuals = Collections
+	private final Set<ElkNamedIndividual> individualsForModifiedNodes_ = Collections
 			.newSetFromMap(new ConcurrentHashMap<ElkNamedIndividual, Boolean>());
-	
-	private final List<IndexedIndividual> removedIndividuals = new LinkedList<IndexedIndividual>();
+
+	/**
+	 * Individuals for which {@link Context} was modified
+	 */
+	private final List<IndexedIndividual> modifiedIndividuals_ = new LinkedList<IndexedIndividual>();
+
+	private final List<IndexedIndividual> removedIndividuals_ = new LinkedList<IndexedIndividual>();
 
 	public UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
 		return taxonomy_;
 	}
-	
-	Set<ElkNamedIndividual> getModifiedIndividuals() {
-		return modifiedIndividuals;
+
+	Set<ElkNamedIndividual> getIndividualsWithModifiedNodes() {
+		return individualsForModifiedNodes_;
 	}
-	
+
+	Collection<IndexedIndividual> getModifiedIndividuals() {
+		return modifiedIndividuals_;
+	}
+
 	Collection<IndexedIndividual> getRemovedIndividuals() {
-		return removedIndividuals;
+		return removedIndividuals_;
 	}
-	
-	void initTaxonomy(UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy) {
+
+	void initTaxonomy(
+			UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy) {
 		taxonomy_ = instanceTaxonomy;
-	}	
-	
+	}
+
 	public Writer getWriter() {
 		return new Writer();
 	}
@@ -80,33 +92,42 @@ public class InstanceTaxonomyState {
 	 *         pavel.klinov@uni-ulm.de
 	 */
 	public class Writer {
-		
+
 		public void clearTaxonomy() {
 			taxonomy_ = null;
 		}
 
-		public void markModifiedIndividuals(Collection<ElkNamedIndividual> individuals) {
-			modifiedIndividuals.addAll(individuals);
+		public void markIndividualsForModifiedNode(
+				Collection<ElkNamedIndividual> individuals) {
+			individualsForModifiedNodes_.addAll(individuals);
 		}
-		
+
+		public void markModifiedIndividual(IndexedIndividual individual) {
+			modifiedIndividuals_.add(individual);
+		}
+
 		public void markRemovedIndividual(IndexedIndividual individual) {
-			removedIndividuals.add(individual);
+			removedIndividuals_.add(individual);
 		}
-		
+
+		public void clearModifiedNodeObjects() {
+			individualsForModifiedNodes_.clear();
+		}
+
 		public void clearModifiedIndividuals() {
-			modifiedIndividuals.clear();
+			modifiedIndividuals_.clear();
 		}
-		
+
 		public void clearRemovedIndividuals() {
-			removedIndividuals.clear();
+			removedIndividuals_.clear();
 		}
-		
+
 		public void clear() {
 			clearTaxonomy();
+			clearModifiedNodeObjects();
 			clearModifiedIndividuals();
 			clearRemovedIndividuals();
-		}		
+		}
 	}
 
-	
 }

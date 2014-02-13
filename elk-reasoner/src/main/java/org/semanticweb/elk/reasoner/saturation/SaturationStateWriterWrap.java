@@ -57,8 +57,8 @@ public class SaturationStateWriterWrap<W extends SaturationStateWriter>
 	}
 
 	@Override
-	public boolean markAsNotSaturated(Context context) {
-		return mainWriter.markAsNotSaturated(context);
+	public boolean markAsNotSaturated(IndexedClassExpression root) {
+		return mainWriter.markAsNotSaturated(root);
 	}
 
 	@Override

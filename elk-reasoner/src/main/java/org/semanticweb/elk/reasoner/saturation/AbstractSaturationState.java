@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
+import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -66,9 +67,9 @@ public abstract class AbstractSaturationState implements SaturationState {
 	/**
 	 * The queue containing all {@link Context}s of this {@link SaturationState}
 	 * that are not saturated, i.e., for which {@link Context#isSaturated()}
-	 * returns {@code false}.
+	 * returns {@code false}. Each non-saturated context occurs exactly once.
 	 */
-	private final Queue<Context> notSaturatedContexts_ = new ConcurrentLinkedQueue<Context>();
+	private final Queue<ExtendedContext> notSaturatedContexts_ = new ConcurrentLinkedQueue<ExtendedContext>();
 
 	public AbstractSaturationState(OntologyIndex index) {
 		this.ontologyIndex = index;
@@ -81,8 +82,18 @@ public abstract class AbstractSaturationState implements SaturationState {
 	}
 
 	@Override
-	public Queue<? extends Context> getNotSaturatedContexts() {
+	public Collection<? extends Context> getNotSaturatedContexts() {
 		return notSaturatedContexts_;
+	}
+
+	@Override
+	public Context setNextContextSaturated() {
+		ExtendedContext next = notSaturatedContexts_.poll();
+		if (next == null)
+			return null;
+		// else
+		next.setSaturated(true);
+		return next;
 	}
 
 	@Override
@@ -167,14 +178,18 @@ public abstract class AbstractSaturationState implements SaturationState {
 			produce(getContext(root), conclusion);
 		}
 
-		protected void markAsNotSaturatedInternal(Context context) {
+		protected void markAsNotSaturatedInternal(ExtendedContext context) {
 			LOGGER_.trace("{}: marked as non-saturated", context);
 			notSaturatedContexts_.add(context);
 			contextModificationListener_.notifyContextModification(context);
 		}
 
 		@Override
-		public boolean markAsNotSaturated(Context context) {
+		public boolean markAsNotSaturated(IndexedClassExpression root) {
+			ExtendedContext context = getContext(root);
+			if (context == null)
+				return false;
+			// else
 			if (context.setSaturated(false)) {
 				markAsNotSaturatedInternal(context);
 				return true;

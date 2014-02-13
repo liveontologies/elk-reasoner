@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,17 +22,33 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 
 /**
- * A {@link Context} with additional methods for managing {@link SubContext}s
+ * A {@link Context} with additional methods for managing them in
+ * {@link SaturationState}s
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
 public interface ExtendedContext extends Context {
+
+	/**
+	 * Marks this {@code Context} as saturated. This means that all
+	 * {@link Conclusion}s for this {@link Context} except for
+	 * {@link SubConclusion}s for its {@link SubContext}s, are already computed.
+	 * 
+	 * @return the previous value of the saturation state for this
+	 *         {@link Context}
+	 * 
+	 * @see Conclusion#getSourceRoot(IndexedClassExpression)
+	 */
+	boolean setSaturated(boolean saturated);
 
 	/**
 	 * Mark the given sub-root {@link IndexedPropertyChain} as initialized. This

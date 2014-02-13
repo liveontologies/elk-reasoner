@@ -80,10 +80,11 @@ public class IncrementalClassTaxonomyComputationStage extends
 		};
 
 		Collection<IndexedClass> modified = Operations.getCollection(Operations
-				.map(reasoner.classTaxonomyState.classesForModifiedNodes,
+				.map(reasoner.classTaxonomyState.getClassesWithModifiedNodes(),
 						transformation),
 		// an upper bound
-				reasoner.classTaxonomyState.classesForModifiedNodes.size());
+				reasoner.classTaxonomyState.getClassesWithModifiedNodes()
+						.size());
 
 		this.computation_ = new ClassTaxonomyComputation(Operations.split(
 				modified, 64), reasoner.getProcessExecutor(), workerNo,

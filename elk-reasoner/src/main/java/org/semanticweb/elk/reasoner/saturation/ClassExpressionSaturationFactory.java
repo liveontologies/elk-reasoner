@@ -266,11 +266,14 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			}
 			if (countContextsFinished_.compareAndSet(shapshotContextsFinished,
 					shapshotContextsFinished + 1)) {
-
-				Context nextContext = saturationState_
-						.getNotSaturatedContexts().poll();
-
-				nextContext.setSaturated(true);
+				/*
+				 * It is safe to assume that the next (created) context becomes
+				 * saturated since we create contexts only when workers are
+				 * working and we took the snapshot of processed contexts before
+				 * some time when all workers stop (and thus all created
+				 * contexts become saturated).
+				 */
+				saturationState_.setNextContextSaturated();
 			}
 		}
 		for (;;) {
@@ -295,7 +298,6 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				IndexedClassExpression root = nextJob.getInput();
 				Context rootSaturation = saturationState_.getContext(root);
 
-				rootSaturation.setSaturated(true);
 				nextJob.setOutput(rootSaturation);
 
 				LOGGER_.trace("{}: saturation finished", root);

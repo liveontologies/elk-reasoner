@@ -34,8 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 /**
  * A {@link ConclusionVisitor} that marks the source {@link Context} of the
  * {@link Conclusion} as not saturated if the {@link Conclusion} can potentially
- * be re-derived. The visit method returns {@link true} only if the source
- * {@link Context} has changed in this way.
+ * be re-derived. The visit method returns always {@link true}.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -43,13 +42,10 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public class ConclusionSourceContextUnsaturationVisitor extends
 		AbstractConclusionVisitor<Context, Boolean> {
 
-	private final SaturationState state_;
-
 	private final SaturationStateWriter writer_;
 
-	public ConclusionSourceContextUnsaturationVisitor(SaturationState state,
+	public ConclusionSourceContextUnsaturationVisitor(
 			SaturationStateWriter writer) {
-		this.state_ = state;
 		this.writer_ = writer;
 	}
 
@@ -57,7 +53,7 @@ public class ConclusionSourceContextUnsaturationVisitor extends
 	Boolean defaultVisit(Conclusion conclusion, Context context) {
 		IndexedClassExpression root = conclusion.getSourceRoot(context
 				.getRoot());
-		writer_.markAsNotSaturated(state_.getContext(root));
+		writer_.markAsNotSaturated(root);
 		return true;
 	}
 

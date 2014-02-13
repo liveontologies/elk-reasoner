@@ -91,15 +91,14 @@ public class CleaningRedundancyStageExecutor extends SimpleStageExecutor {
 			int cleanedCount = reasonerStage.reasoner.saturationState
 					.getNotSaturatedContexts().size();
 
-			for (IndexedClassExpression ice : reasonerStage.reasoner.saturationState
+			for (Context context : reasonerStage.reasoner.saturationState
 					.getNotSaturatedContexts()) {
-				Context context = reasonerStage.reasoner.saturationState
-						.getContext(ice);
-				if (context == null || !subsumerMap_.containsKey(ice)) {
+				IndexedClassExpression root = context.getRoot();
+				if (!subsumerMap_.containsKey(root)) {
 					continue;
 				}
 
-				if (sameSubsumers(subsumerMap_.get(ice), context)) {
+				if (sameSubsumers(subsumerMap_.get(root), context)) {
 					sameCount++;
 				}
 			}
