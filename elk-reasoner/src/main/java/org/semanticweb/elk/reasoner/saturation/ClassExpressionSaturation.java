@@ -26,13 +26,13 @@ import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ReasonerComputation} that computes saturation for the input
@@ -55,8 +55,9 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 	 */
 	public ClassExpressionSaturation(Collection<I> inputs,
 			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, SaturationState saturationState) {
-		this(inputs, executor, maxWorkers, progressMonitor, saturationState,
+			ProgressMonitor progressMonitor,
+			RuleApplicationFactory ruleAppFactory) {
+		this(inputs, executor, maxWorkers, progressMonitor, ruleAppFactory,
 				new DummyClassExpressionSaturationListener<SaturationJob<I>>());
 	}
 
@@ -65,28 +66,13 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 	 */
 	public ClassExpressionSaturation(Collection<I> inputs,
 			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, SaturationState saturationState,
+			ProgressMonitor progressMonitor,
+			RuleApplicationFactory ruleAppFactory,
 			ClassExpressionSaturationListener<SaturationJob<I>> listener) {
 		super(new TodoJobs<I>(inputs),
 				new ClassExpressionSaturationFactory<SaturationJob<I>>(
-						saturationState, maxWorkers, listener), executor,
+						ruleAppFactory, maxWorkers, listener), executor,
 				maxWorkers, progressMonitor);
-	}
-
-	/*
-	 * Takes inputs but uses the given rule application factory
-	 */
-	public ClassExpressionSaturation(Collection<I> inputs,
-			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor,
-			RuleApplicationFactory ruleAppFactory) {
-		super(
-				new TodoJobs<I>(inputs),
-				new ClassExpressionSaturationFactory<SaturationJob<I>>(
-						ruleAppFactory,
-						maxWorkers,
-						new DummyClassExpressionSaturationListener<SaturationJob<I>>()),
-				executor, maxWorkers, progressMonitor);
 	}
 
 	/**

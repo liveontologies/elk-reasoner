@@ -22,20 +22,27 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextUnsaturationVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextNotSaturatedCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
- * The factory for engines for concurrently computing the saturation of class
- * expressions. This is the class that implements the application of inference
- * rules.
+ * A {@link RuleApplicationFactory} that adds the produced {@link Conclusion}s
+ * to the respective {@link Context} (creating new if necessary) and applies
+ * non-redundant rules, which in turn produce new {@link Conclusion}s for which
+ * this process repeats if they have not been processed already. This
+ * {@link RuleApplicationFactory} should not produce {@link Conclusion}s for
+ * which the source {@link Context} is already saturated.
  * 
  * @author Frantisek Simancik
  * @author Yevgeny Kazakov
@@ -43,22 +50,30 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * @author Pavel Klinov
  * 
  */
-public class RuleOverApplicationFactory extends RuleApplicationFactory {
+public class RuleApplicationAdditionFactory extends
+		AbstractRuleApplicationFactory {
 
-	public RuleOverApplicationFactory(SaturationState saturationState) {
+	public RuleApplicationAdditionFactory(SaturationState saturationState) {
 		super(saturationState);
 	}
 
 	@Override
+	public InputProcessor<IndexedClassExpression> getEngine(
+			RuleVisitor ruleVisitor, SaturationStateWriter writer,
+			SaturationStatistics localStatistics) {
+		return super.getEngine(getConclusionProcessor(ruleVisitor, writer),
+				writer, localStatistics);
+	}
+
 	@SuppressWarnings("unchecked")
 	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer) {
-		// the visitor used for inserting conclusion
 		return new ComposedConclusionVisitor<Context>(
 		// insert conclusions
 				new ConclusionInsertionVisitor(),
-				// if new, mark the source context as unsaturated
-				new ConclusionSourceContextUnsaturationVisitor(writer),
+				// if new, check that conclusion is not for a saturated context
+				new ConclusionSourceContextNotSaturatedCheckingVisitor(
+						getSaturationState()),
 				// apply the non-redundant rules
 				new NonRedundantRuleApplicationConclusionVisitor(ruleVisitor,
 						writer));

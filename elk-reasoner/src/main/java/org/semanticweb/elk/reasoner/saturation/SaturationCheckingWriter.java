@@ -39,8 +39,9 @@ public class SaturationCheckingWriter extends
 
 	private final SaturationState state_;
 
-	public SaturationCheckingWriter(SaturationState state) {
-		super(state.getWriter());
+	public SaturationCheckingWriter(SaturationStateWriter writer,
+			SaturationState state) {
+		super(writer);
 		this.state_ = state;
 	}
 

@@ -27,7 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SubConclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
@@ -44,7 +44,7 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  * bookkeeping methods for the saturation process.
  * 
  * @author "Yevgeny Kazakov"
- * @see RuleApplicationFactory
+ * @see RuleApplicationAdditionFactory
  * 
  */
 public interface Context extends ConclusionSet, ContextPremises {

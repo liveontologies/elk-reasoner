@@ -38,6 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.slf4j.Logger;
@@ -139,8 +140,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		this.jobsWithSaturatedRoot_ = new ConcurrentLinkedQueue<J>();
 		this.saturationState_ = saturationState;
 		this.saturationFactory_ = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
-				saturationState, maxWorkers,
-				new ThisClassExpressionSaturationListener());
+				new RuleApplicationAdditionFactory(saturationState),
+				maxWorkers, new ThisClassExpressionSaturationListener());
 		this.defaultTopOutput_ = new TransitiveReductionOutputEquivalent<IndexedClass>(
 				saturationState.getOntologyIndex().getIndexedOwlThing());
 		defaultTopOutput_.equivalent.add(PredefinedElkClass.OWL_THING);

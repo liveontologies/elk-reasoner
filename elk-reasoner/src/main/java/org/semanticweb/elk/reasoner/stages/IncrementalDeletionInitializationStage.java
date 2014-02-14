@@ -35,6 +35,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.AbstractIndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
@@ -97,8 +99,10 @@ public class IncrementalDeletionInitializationStage extends
 		this.initialization_ = null;
 		// initializing contexts which will be removed
 		final SaturationStateWriter satStateWriter = SaturationUtils
-				.getStatsAwareWriter(
-						reasoner.saturationState.getExtendedWriter(),
+				.getStatsAwareWriter(reasoner.saturationState
+						.getContextCreatingWriter(
+								ContextCreationListener.DUMMY,
+								ContextModificationListener.DUMMY),
 						stageStatistics_);
 		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState
 				.getWriter();
@@ -136,5 +140,4 @@ public class IncrementalDeletionInitializationStage extends
 
 		return true;
 	}
-
 }

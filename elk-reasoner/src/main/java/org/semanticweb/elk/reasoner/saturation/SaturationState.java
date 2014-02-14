@@ -29,31 +29,48 @@ import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRuleVisitor;
 
 /**
- * Represents the state of saturation which can be changed by applying reasoning
- * rules and processing their conclusions.
+ * Represents the state of saturation containing information about
+ * {@link Context}s and their assignment to roots {@link IndexedClassExpression}
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author "Yevgeny Kazakov"
  */
 public interface SaturationState {
 
 	/**
-	 * @return the {@link Collection} of {@link Context} stored in this
-	 *         {@link SaturationState}
+	 * @return the unmodifiable {@link Collection} of {@link Context} stored in
+	 *         this {@link SaturationState}
 	 */
 	public Collection<? extends Context> getContexts();
 
+	/**
+	 * @param ice
+	 *            the root {@link IndexedClassExpression} for which to find the
+	 *            {@link Context}
+	 * @return the {@link Context} in this {@link SaturationState} with the
+	 *         given root {@link IndexedClassExpression}, or {@code null} if
+	 *         there exists no such {@link Context}. There can be at most one
+	 *         {@link Context} for any given root.
+	 * @see Context#getRoot()
+	 */
 	public Context getContext(IndexedClassExpression ice);
 
+	/**
+	 * @return the {@link OntologyIndex} associated with this
+	 *         {@link SaturationState}
+	 */
 	public OntologyIndex getOntologyIndex();
 
+	/**
+	 * @return the unmodifiable {@link Collection} of {@link Context}s in this
+	 *         {@link SaturationState} that are not saturated, i.e., for which
+	 *         {@link Context#isSaturated()} returns {@code false}
+	 */
 	public Collection<? extends Context> getNotSaturatedContexts();
 
 	/**
@@ -68,33 +85,42 @@ public interface SaturationState {
 	public Context setNextContextSaturated();
 
 	/**
-	 * Creates a new {@link ExtendedSaturationStateWriter} for modifying this
-	 * {@link SaturationState} associated with the given
-	 * {@link ContextCreationListener}. If {@link ContextCreationListener} is
-	 * not thread safe, the calls of the methods should be synchronized
+	 * @param contextModificationListener
+	 * @return a new {@link SaturationStateWriter} that can only modify
+	 *         {@link Context}s in this {@link SaturationState}, but cannot
+	 *         create new ones. When a {@link Context} is modified by the
+	 *         {@link SaturationStateWriter}, it becomes not saturated according
+	 *         to {@link Context#isSaturated()} if it was not already so.
+	 *         Whenever a {@link Context} becomes not saturated using this
+	 *         {@link SaturationStateWriter}, the provided
+	 *         {@link ContextModificationListener} is called.
 	 * 
-	 * The passed {@link ContextInitRuleVisitor} is used to apply initialization
-	 * rules to the newly created contexts
-	 * 
+	 * @see #getContextCreatingWriter(ContextCreationListener,
+	 *      ContextModificationListener)
+	 * @see Context#isSaturated()
 	 */
-	public SaturationStateWriter getExtendedWriter(
-			ContextCreationListener contextCreationListener,
-			ContextModificationListener contextModificationListener);
-
-	public SaturationStateWriter getWriter(
+	public SaturationStateWriter getContextModifyingWriter(
 			ContextModificationListener contextModificationListener);
 
 	/**
-	 * @param visitor
-	 *            a {@link ConclusionVisitor} which will be invoked for each
-	 *            produced {@link Conclusion}
+	 * @param contextCreationListener
+	 * @param contextModificationListener
+	 * @return a new {@link SaturationStateWriter} that can modify as well as
+	 *         create new {@link Context}s in this {@link SaturationState}. When
+	 *         a {@link Context} is modified by the
+	 *         {@link SaturationStateWriter}, it becomes not saturated according
+	 *         to {@link Context#isSaturated()} if it was not already so.
+	 *         Whenever a {@link Context} is created using this
+	 *         {@link SaturationStateWriter} the provided
+	 *         {@link ContextCreationListener} is called. Whenever a
+	 *         {@link Context} becomes not saturated using this
+	 *         {@link SaturationStateWriter}, the provided
+	 *         {@link ContextModificationListener} is called.
 	 * 
-	 * @return an {@link SaturationStateWriter} for modifying this
-	 *         {@link SaturationState}. The methods of this
-	 *         {@link SaturationStateWriter} are thread safe
+	 * @see #getContextModifyingWriter(ContextModificationListener)
 	 */
-	public SaturationStateWriter getWriter();
-
-	public SaturationStateWriter getExtendedWriter();
+	public SaturationStateWriter getContextCreatingWriter(
+			ContextCreationListener contextCreationListener,
+			ContextModificationListener contextModificationListener);
 
 }

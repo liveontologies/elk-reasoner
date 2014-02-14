@@ -110,7 +110,7 @@ public class IncrementalAdditionInitializationStage extends
 		final SaturationStateWriter writer =
 
 		SaturationUtils.getStatsAwareWriter(reasoner.saturationState
-				.getExtendedWriter(contextCreationListener,
+				.getContextCreatingWriter(contextCreationListener,
 						contextModificationListener), stageStatistics_);
 
 		// used to initialize new contexts

@@ -126,7 +126,7 @@ class ContextInitializationFactory
 				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());
 		final SaturationStateWriter saturationStateWriter = SaturationUtils
 				.getStatAwareWriter(saturationState_
-						.getWriter(ContextModificationListener.DUMMY),
+						.getContextModifyingWriter(ContextModificationListener.DUMMY),
 						localStatistics);
 
 		localStatistics.getConclusionStatistics().startMeasurements();

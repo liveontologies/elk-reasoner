@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -165,18 +166,13 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * process an individual job because it is possible to detect that the job
 	 * is processed only when the whole batch of jobs is processed.
 	 * 
-	 * @param saturationState
-	 *            the current state of saturation
+	 * @param ruleAppFactory
+	 *            specifies how the rules are applied to new {@link Conclusion}s
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 * @param listener
 	 *            the listener object implementing callback functions
 	 */
-	public ClassExpressionSaturationFactory(SaturationState saturationState,
-			int maxWorkers, ClassExpressionSaturationListener<J> listener) {
-		this(new RuleApplicationFactory(saturationState), maxWorkers, listener);
-	}
-
 	public ClassExpressionSaturationFactory(
 			RuleApplicationFactory ruleAppFactory, int maxWorkers,
 			ClassExpressionSaturationListener<J> listener) {

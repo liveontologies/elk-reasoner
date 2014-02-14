@@ -31,13 +31,13 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.context.ContextRootCollection;
-import org.semanticweb.elk.reasoner.saturation.rules.factories.ContextCompletionFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionPruningFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 
 /**
  * Prunes the set of deleted conclusions by re-deriving those having alternative
  * derivations (name taken from the original paper on the DRed algorithm). Uses
- * a {@link ContextCompletionFactory} which "fills gaps" in the set of
+ * a {@link RuleApplicationAdditionPruningFactory} which "fills gaps" in the set of
  * conclusions for each context by deriving the missing conclusions.
  * 
  * @author Pavel Klinov
@@ -71,7 +71,7 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 			return false;
 		}
 
-		RuleApplicationFactory ruleAppFactory = new ContextCompletionFactory(
+		RuleApplicationFactory ruleAppFactory = new RuleApplicationAdditionPruningFactory(
 				reasoner.saturationState);
 		Collection<IndexedClassExpression> inputs = new ContextRootCollection(
 				reasoner.saturationState.getNotSaturatedContexts());

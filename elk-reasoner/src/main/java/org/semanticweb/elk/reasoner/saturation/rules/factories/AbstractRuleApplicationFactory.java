@@ -23,6 +23,8 @@
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -38,16 +40,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The factory for engines for concurrently processing {@link Conclusion}s
- * within {@link Context}s and applying rules to them.
+ * A skeleton for implementing {@link RuleApplicationFactory}
  * 
- * @author Frantisek Simancik
- * @author Yevgeny Kazakov
- * @author Markus Kroetzsch
- * @author Pavel Klinov
- * 
+ * @author "Yevgeny Kazakov"
  */
-public abstract class AbstractRuleApplicationFactory {
+public abstract class AbstractRuleApplicationFactory implements
+		RuleApplicationFactory {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory
@@ -56,7 +54,7 @@ public abstract class AbstractRuleApplicationFactory {
 	/**
 	 * The main {@link SaturationState} this factory works with
 	 */
-	final SaturationState saturationState;
+	private final SaturationState saturationState_;
 
 	/**
 	 * The {@link Conclusion} used to initialize contexts using
@@ -70,13 +68,14 @@ public abstract class AbstractRuleApplicationFactory {
 	final SaturationStatistics aggregatedStats;
 
 	public AbstractRuleApplicationFactory(final SaturationState saturationState) {
-		this.saturationState = saturationState;
+		this.saturationState_ = saturationState;
 		this.contextInitConclusion = new ContextInitialization(
 				saturationState.getOntologyIndex());
 		this.aggregatedStats = new SaturationStatistics();
 	}
 
 	/**
+	 * @param conclusionProcessor
 	 * @param saturationStateWriter
 	 * @param localStatistics
 	 * @return an {@link InputProcessor} that processes {@link Conclusion}s in
@@ -86,57 +85,70 @@ public abstract class AbstractRuleApplicationFactory {
 	 *         {@link SaturationStatistics} accordingly
 	 */
 	InputProcessor<IndexedClassExpression> getEngine(
+			ConclusionVisitor<Context, Boolean> conclusionProcessor,
 			SaturationStateWriter saturationStateWriter,
 			SaturationStatistics localStatistics) {
-		return new Engine(saturationStateWriter, localStatistics);
+		return new Engine(conclusionProcessor, saturationStateWriter,
+				localStatistics);
 	}
 
-	public void finish() {
+	abstract InputProcessor<IndexedClassExpression> getEngine(
+			RuleVisitor ruleVisitor, SaturationStateWriter writer,
+			SaturationStatistics localStatistics);
+
+	@Override
+	public final InputProcessor<IndexedClassExpression> getEngine(
+			ContextCreationListener creationListener,
+			ContextModificationListener modificationListener) {
+		SaturationStatistics localStatistics = new SaturationStatistics();
+		creationListener = SaturationUtils.addStatsToContextCreationListener(
+				creationListener, localStatistics.getContextStatistics());
+		modificationListener = SaturationUtils
+				.addStatsToContextModificationListener(modificationListener,
+						localStatistics.getContextStatistics());
+		SaturationStateWriter writer = saturationState_
+				.getContextCreatingWriter(creationListener,
+						modificationListener);
+		writer = SaturationUtils.getStatsAwareWriter(writer, localStatistics);
+		RuleVisitor ruleVisitor = SaturationUtils
+				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());
+		return getEngine(ruleVisitor, writer, localStatistics);
+	}
+
+	@Override
+	public void dispose() {
 		// aggregatedStats_.check(LOGGER_);
 	}
 
+	@Override
 	public SaturationStatistics getSaturationStatistics() {
 		return aggregatedStats;
 	}
 
+	@Override
 	public SaturationState getSaturationState() {
-		return saturationState;
+		return saturationState_;
 	}
-
-	/**
-	 * @param ruleVisitor
-	 *            A {@link RuleVisitor} used for rule application
-	 * @param writer
-	 *            A {@link SaturationStateWriter} to be used for rule
-	 *            applications
-	 * @return {@link ConclusionVisitor} that perform processing of
-	 *         {@link Conclusion}s in {@link Context}s
-	 */
-	abstract ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter writer);
 
 	/**
 	 * Default rule application engine which can create new contexts via
 	 * {@link ExtendedSaturationStateWriter} (either directly when a new
 	 * {@link IndexedClassExpression} is submitted or during decomposition)
 	 */
-	public class Engine extends AbstractRuleEngineWithStatistics {
+	private class Engine extends AbstractRuleEngineWithStatistics {
 
 		private final SaturationStateWriter writer_;
 
-		Engine(SaturationStateWriter saturationStateWriter,
+		Engine(ConclusionVisitor<Context, Boolean> conclusionProcessor,
+				SaturationStateWriter saturationStateWriter,
 				SaturationStatistics localStatistics) {
-			super(getConclusionProcessor(
-					SaturationUtils.getStatsAwareRuleVisitor(localStatistics
-							.getRuleStatistics()), saturationStateWriter),
-					aggregatedStats, localStatistics);
+			super(conclusionProcessor, aggregatedStats, localStatistics);
 			writer_ = saturationStateWriter;
 		}
 
 		@Override
 		public void submit(IndexedClassExpression job) {
-			if (saturationState.getContext(job) == null)
-				writer_.produce(job, contextInitConclusion);
+			writer_.produce(job, contextInitConclusion);
 		}
 
 		@Override

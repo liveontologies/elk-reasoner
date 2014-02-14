@@ -117,27 +117,17 @@ public abstract class AbstractSaturationState implements SaturationState {
 	}
 
 	@Override
-	public SaturationStateWriter getExtendedWriter(
+	public SaturationStateWriter getContextCreatingWriter(
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener) {
-		return new ExtendedWriter(contextCreationListener,
+		return new ContextCreatingWriter(contextCreationListener,
 				contextModificationListener);
 	}
 
 	@Override
-	public SaturationStateWriter getWriter(
+	public SaturationStateWriter getContextModifyingWriter(
 			ContextModificationListener contextModificationListener) {
-		return new BasicWriter(contextModificationListener);
-	}
-
-	@Override
-	public SaturationStateWriter getWriter() {
-		return getDefaultWriter();
-	}
-
-	@Override
-	public SaturationStateWriter getExtendedWriter() {
-		return getDefaultWriter();
+		return new ContextModifyingWriter(contextModificationListener);
 	}
 
 	@Override
@@ -160,21 +150,17 @@ public abstract class AbstractSaturationState implements SaturationState {
 	 */
 	abstract ExtendedContext setIfAbsent(ExtendedContext context);
 
-	private SaturationStateWriter getDefaultWriter() {
-		return new ExtendedWriter();
-	}
-
 	/**
 	 * 
 	 * 
 	 */
-	class BasicWriter implements SaturationStateWriter {
+	class ContextModifyingWriter implements SaturationStateWriter {
 
 		private final ContextModificationListener contextModificationListener_;
 
 		private int localNotSaturatedContextCount_ = 0;
 
-		private BasicWriter(
+		private ContextModifyingWriter(
 				ContextModificationListener contextSaturationListener) {
 			this.contextModificationListener_ = contextSaturationListener;
 		}
@@ -241,12 +227,12 @@ public abstract class AbstractSaturationState implements SaturationState {
 	 *         pavel.klinov@uni-ulm.de
 	 * @author "Yevgeny Kazakov"
 	 */
-	protected class ExtendedWriter extends BasicWriter implements
+	protected class ContextCreatingWriter extends ContextModifyingWriter implements
 			SaturationStateWriter {
 
 		private final ContextCreationListener contextCreationListener_;
 
-		protected ExtendedWriter(
+		protected ContextCreatingWriter(
 				ContextCreationListener contextCreationListener,
 				ContextModificationListener contextModificationListener) {
 			super(contextModificationListener);
@@ -254,7 +240,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 			this.contextCreationListener_ = contextCreationListener;
 		}
 
-		protected ExtendedWriter() {
+		protected ContextCreatingWriter() {
 			super(ContextModificationListener.DUMMY);
 			this.contextCreationListener_ = ContextCreationListener.DUMMY;
 		}

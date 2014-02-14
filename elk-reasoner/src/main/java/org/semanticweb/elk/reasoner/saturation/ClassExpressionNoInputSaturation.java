@@ -27,6 +27,7 @@ import java.util.Collections;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
 // TODO: create a ReasonerComputation which requires no input
 /**
  * A {@link ReasonerComputation} that continues saturation based on what's
- * currently initialized in the {@link RuleApplicationFactory}
+ * currently initialized in the {@link RuleApplicationAdditionFactory}
  * 
  * @author Pavel Klinov
  * 
@@ -134,7 +135,7 @@ class ClassExpressionNoInputSaturationFactory
 
 		@Override
 		public void finish() {
-			ruleAppFactory_.finish();
+			ruleAppFactory_.dispose();
 			// System.err.println(ruleAppFactory_.getStatistics().getRuleStatistics().getTotalRuleAppCount());
 		}
 

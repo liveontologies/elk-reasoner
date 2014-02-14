@@ -27,11 +27,9 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextExistenceCheckingWriter;
-import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AllRuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
@@ -44,8 +42,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
- * Creates an engine which applies rules backwards, e.g., removes conclusions
- * from the context instead of adding them
+ * A {@link RuleApplicationFactory} that deletes the produced {@link Conclusion}
+ * s from the respective {@link Context} and applies all (redundant and
+ * non-redundant) rules, which in turn produce {@link Conclusion} s for which
+ * this process repeats if they have not been processed already. This
+ * {@link RuleApplicationFactory} should never create new {@link Context}s.
  * 
  * @author Pavel Klinov
  * 
@@ -53,27 +54,25 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class RuleDeapplicationFactory extends RuleApplicationFactory {
+public class RuleApplicationDeletionFactory extends
+		AbstractRuleApplicationFactory implements RuleApplicationFactory {
 
-	public RuleDeapplicationFactory(SaturationState saturationState) {
+	public RuleApplicationDeletionFactory(SaturationState saturationState) {
 		super(saturationState);
 	}
 
-	// TODO: this engine should not process any input
+	@Override
 	public InputProcessor<IndexedClassExpression> getEngine(
-			ContextModificationListener modListener) {
-		SaturationStatistics localStatistics = new SaturationStatistics();
-		// add context statistics to the listener
-		modListener = SaturationUtils.addStatsToContextModificationListener(
-				modListener, localStatistics.getContextStatistics());
-		SaturationStateWriter writer = getWriter(modListener);
-		return super.getEngine(writer, localStatistics);
+			RuleVisitor ruleVisitor, SaturationStateWriter writer,
+			SaturationStatistics localStatistics) {
+		writer = wrapWriter(writer);
+		return super.getEngine(getConclusionProcessor(ruleVisitor, writer),
+				writer, localStatistics);
 	}
 
-	SaturationStateWriter getWriter(ContextModificationListener modListener) {
-		SaturationStateWriter writer = saturationState.getWriter(modListener);
+	SaturationStateWriter wrapWriter(SaturationStateWriter writer) {
 		// only write to exiting contexts
-		return new ContextExistenceCheckingWriter(writer, saturationState);
+		return new ContextExistenceCheckingWriter(writer, getSaturationState());
 	}
 
 	/**
@@ -86,9 +85,8 @@ public class RuleDeapplicationFactory extends RuleApplicationFactory {
 	 *         {@link Conclusion} if it occurs in the {@link Context}, and
 	 *         deletes this {@link Conclusion} from the {@link Context}
 	 */
-	@Override
 	@SuppressWarnings("unchecked")
-	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
+	static ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer) {
 		return new ComposedConclusionVisitor<Context>(
 		// check if conclusion occurs in the context

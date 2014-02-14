@@ -25,32 +25,35 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationCheckingWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * Creates an engine which works as the de-application engine except that it
- * doesn't modify saturated contexts. The engine is used to "clean" contexts
- * after de-application but if the context is saturated, then cleaning is
- * unnecessary because it's not going to get any extra super-classes after
- * re-application.
+ * A {@link RuleApplicationFactory} that works similarly to
+ * {@link RuleApplicationDeletionFactory} except that it modifies only
+ * {@link Context}s that are not saturated.
  * 
+ * @see Context#isSaturated()
+ * 
+ * @author "Yevgeny Kazakov"
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ContextCleaningFactory extends RuleDeapplicationFactory {
+public class RuleApplicationDeletionNotSaturatedFactory extends
+		RuleApplicationDeletionFactory {
 
-	public ContextCleaningFactory(final SaturationState saturationState) {
+	public RuleApplicationDeletionNotSaturatedFactory(
+			final SaturationState saturationState) {
 		super(saturationState);
 	}
 
 	@Override
-	SaturationStateWriter getWriter(ContextModificationListener modListener) {
-		// do not produce conclusions if their source is saturated
-		return new SaturationCheckingWriter(saturationState);
+	SaturationStateWriter wrapWriter(SaturationStateWriter writer) {
+		// only write to non-saturated contexts
+		return new SaturationCheckingWriter(writer, getSaturationState());
 	}
 
 }
