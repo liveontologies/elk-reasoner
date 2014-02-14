@@ -24,14 +24,14 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.reasoner.ReasonerComputation;
+import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
- * A {@link ReasonerComputation} that computes reflexive
+ * A {@link ReasonerComputationWithInputs} that computes reflexive
  * {@link IndexedPropertyChain}s
  * 
  * @author Yevgeny Kazakov
@@ -39,7 +39,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class ReflexivePropertyComputation
 		extends
-		ReasonerComputation<IndexedObjectProperty, ReflexivePropertyComputationFactory> {
+		ReasonerComputationWithInputs<IndexedObjectProperty, ReflexivePropertyComputationFactory> {
 
 	public ReflexivePropertyComputation(OntologyIndex ontIndex,
 			ComputationExecutor executor, int maxWorkers,

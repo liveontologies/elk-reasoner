@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.reasoner.ReasonerComputation;
+import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
@@ -35,15 +35,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ReasonerComputation} that computes saturation for the input
- * collection of {@link IndexedClassExpression}s
+ * A {@link ReasonerComputationWithInputs} that computes saturation for the
+ * input collection of {@link IndexedClassExpression}s
  * 
  * @author Yevgeny Kazakov
  * 
  */
 public class ClassExpressionSaturation<I extends IndexedClassExpression>
 		extends
-		ReasonerComputation<SaturationJob<I>, ClassExpressionSaturationFactory<SaturationJob<I>>> {
+		ReasonerComputationWithInputs<SaturationJob<I>, ClassExpressionSaturationFactory<SaturationJob<I>>> {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -79,11 +79,11 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 	 * Print statistics about the saturation computation
 	 */
 	public void printStatistics() {
-		inputProcessorFactory.printStatistics();
+		processorFactory.printStatistics();
 	}
 
 	public SaturationStatistics getRuleAndConclusionStatistics() {
-		return inputProcessorFactory.getRuleAndConclusionStatistics();
+		return processorFactory.getRuleAndConclusionStatistics();
 	}
 
 	/**

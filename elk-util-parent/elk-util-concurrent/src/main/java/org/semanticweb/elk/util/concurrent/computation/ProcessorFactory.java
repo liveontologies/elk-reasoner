@@ -23,18 +23,30 @@
 package org.semanticweb.elk.util.concurrent.computation;
 
 /**
- * A {@link ProcessorFactory} that produce {@link InputProcessor}s of a given
- * type.
+ * An factory for creation of {@link InputProcessor}s of a given type. This
+ * factory is intended to be used in {@link ConcurrentComputationWithInputs} to process
+ * the input concurrently by independent workers. In this case, an
+ * {@link InputProcessor} will be created for each worker. Each
+ * {@link InputProcessor} created by this {@link InputProcessorFactory} should
+ * be used from at most one thread since it may contain some non-thread-safe
+ * worker-local objects.
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <I>
- *            the type of the input processed by the {@link InputProcessor}s
  * @param <P>
- *            the type of the {@link InputProcessor} produced by this
- *            {@link InputProcessorFactory}
+ *            the type of the {@link Processor}s produced by this
+ *            {@link ProcessorFactory}
  */
-public interface InputProcessorFactory<I, P extends InputProcessor<I>> extends
-		ProcessorFactory<P> {
+public interface ProcessorFactory<P extends Processor> {
+
+	/**
+	 * @return a new {@link Processor} of the given type
+	 */
+	public P getEngine();
+
+	/**
+	 * a hook function to be called when all jobs are processed
+	 */
+	public void finish();
 
 }

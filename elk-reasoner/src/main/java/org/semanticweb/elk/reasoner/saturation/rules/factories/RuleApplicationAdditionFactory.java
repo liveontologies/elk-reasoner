@@ -71,10 +71,11 @@ public class RuleApplicationAdditionFactory extends
 		return new ComposedConclusionVisitor<Context>(
 		// insert conclusions
 				new ConclusionInsertionVisitor(),
-				// if new, check that conclusion is not for a saturated context
+				// if new, check that the source of the conclusion is not
+				// saturated (this is only needed for debugging)
 				new ConclusionSourceContextNotSaturatedCheckingVisitor(
 						getSaturationState()),
-				// apply the non-redundant rules
+				// afterwards, apply all non-redundant rules
 				new NonRedundantRuleApplicationConclusionVisitor(ruleVisitor,
 						writer));
 	}

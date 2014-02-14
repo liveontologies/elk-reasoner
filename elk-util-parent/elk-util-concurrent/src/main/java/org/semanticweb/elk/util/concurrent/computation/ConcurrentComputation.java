@@ -22,34 +22,26 @@
  */
 package org.semanticweb.elk.util.concurrent.computation;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-
 /**
- * An class for concurrent processing of a number of tasks. The input for the
- * tasks are submitted, buffered, and processed by concurrent workers using the
- * the {@link InputProcessor} objects created by the supplied
- * {@link InputProcessorFactory}. The implementation is loosely based on a
- * producer-consumer framework with one producer and many consumers. The
- * processing of the input should start by calling the {@link #start()} method,
- * following by {@link #submit(Object)} method for submitting input to be
- * processed. The workers will always wait for new input, unless interrupted or
- * {@link #finish()} method is called. If {@link #finish()} is called then no
- * further input can be submitted and the workers will terminate when all input
- * has been processed or they are interrupted earlier, whichever is earlier.
+ * An class for concurrent processing using the supplied
+ * {@link ProcessorFactory}. Processing is performed concurrently by several
+ * workers, each using a {@link Processor} created by the
+ * {@link ProcessorFactory}. Processing starts by calling {@link #start()},
+ * which creates a specified number of working threads and starts concurrent
+ * processing. All workers can be interrupted by calling {@link #interrupt()}.
+ * When {@link #finish()} is called, the current thread blocks until everything
+ * is processed by the workers or all workers have been interrupted.
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <I>
- *            the type of the input to be processed.
  * @param <F>
  *            the type of the factory for the input processors
  */
-public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
+public class ConcurrentComputation<F extends ProcessorFactory<?>> {
 	/**
 	 * the factory for the input processor engines
 	 */
-	protected final F inputProcessorFactory;
+	protected final F processorFactory;
 	/**
 	 * maximum number of concurrent workers
 	 */
@@ -58,10 +50,6 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	 * the executor used internally to run the jobs
 	 */
 	protected final ComputationExecutor executor;
-	/**
-	 * the internal buffer for queuing input
-	 */
-	protected final BlockingQueue<I> buffer;
 	/**
 	 * {@code true} if the finish of computation was requested using the
 	 * function {@link #finish()}
@@ -92,11 +80,10 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	 */
 	public ConcurrentComputation(F inputProcessorFactory,
 			ComputationExecutor executor, int maxWorkers, int bufferCapacity) {
-		this.inputProcessorFactory = inputProcessorFactory;
-		this.buffer = new ArrayBlockingQueue<I>(bufferCapacity);
+		this.processorFactory = inputProcessorFactory;
 		this.finishRequested = false;
 		this.interrupted = false;
-		this.worker = new Worker();
+		this.worker = getWorker();
 		this.executor = executor;
 		this.maxWorkers = maxWorkers;
 	}
@@ -128,41 +115,19 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	}
 
 	/**
-	 * Submitting a new input for processing. Submitted input jobs are first
-	 * buffered, and then concurrently processed by workers. If the buffer is
-	 * full, the method blocks until new space is available.
-	 * 
-	 * @param input
-	 *            the input to be processed
-	 * @return {@code true} if the input has been successfully submitted for
-	 *         computation; the input cannot be submitted, e.g., if
-	 *         {@link #finish()} has been called
-	 * @throws InterruptedException
-	 *             thrown if interrupted during waiting for space to be
-	 *             available
-	 */
-	public synchronized boolean submit(I input) throws InterruptedException {
-		if (finishRequested)
-			return false;
-		buffer.put(input);
-		return true;
-	}
-
-	/**
 	 * Request all currently running workers to stop; no input can be submitted
 	 * after calling this method. When this method returns, no worker should be
 	 * running.
 	 * 
-	 * @return the submitted inputs that were not processed by the workers
 	 * @throws InterruptedException
 	 */
-	public synchronized Iterable<I> interrupt() throws InterruptedException {
+	public synchronized Object interrupt() throws InterruptedException {
 		if (!interrupted) {
 			interrupted = true;
 			executor.interrupt();
 		}
 		executor.waitDone();
-		return buffer;
+		return null;
 	}
 
 	/**
@@ -183,7 +148,11 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 			executor.interrupt();
 		}
 		executor.waitDone();
-		inputProcessorFactory.finish();
+		processorFactory.finish();
+	}
+
+	Runnable getWorker() {
+		return new Worker();
 	}
 
 	/**
@@ -201,38 +170,20 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 
 		@Override
 		public final void run() {
-			I nextInput;
 			// we use one engine per worker run
-			InputProcessor<I> inputProcessor = inputProcessorFactory
-					.getEngine();
+			Processor inputProcessor = processorFactory.getEngine();
 
 			try {
-				boolean doneProcess = false;
 				for (;;) {
 					if (interrupted) {
 						break;
 					}
 					try {
-						// make sure that all previously submitted inputs are
-						// processed
-						if (!doneProcess) {
-							inputProcessor.process(); // can be interrupted
-							doneProcess = true;
-						}
-						if (finishRequested) {
-							nextInput = buffer.poll();
-							if (nextInput == null) {
-								// make sure nothing is left unprocessed
-								inputProcessor.process(); // can be interrupted
-								if (!interrupted && Thread.interrupted())
-									continue;
-								break;
-							}
-						} else {
-							nextInput = buffer.take();
-						}
-						inputProcessor.submit(nextInput); // should never fail
 						inputProcessor.process(); // can be interrupted
+						if (!interrupted && Thread.interrupted())
+							// spurious interrupt
+							continue;
+						break;
 					} catch (InterruptedException e) {
 						if (interrupted) {
 							// restore the interrupt status and exit

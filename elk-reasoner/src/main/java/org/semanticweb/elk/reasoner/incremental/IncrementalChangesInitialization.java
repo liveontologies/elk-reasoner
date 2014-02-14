@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.reasoner.ReasonerComputation;
+import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class IncrementalChangesInitialization extends
-		ReasonerComputation<ArrayList<Context>, ContextInitializationFactory> {
+		ReasonerComputationWithInputs<ArrayList<Context>, ContextInitializationFactory> {
 
 	public IncrementalChangesInitialization(
 			Collection<ArrayList<Context>> inputs,

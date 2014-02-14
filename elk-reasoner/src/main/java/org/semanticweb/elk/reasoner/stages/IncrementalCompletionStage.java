@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationNoInput;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 
@@ -47,7 +47,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	// private static final Logger LOGGER_ =
 	// LoggerFactory.getLogger(IncrementalCompletionStage.class);
 
-	private ClassExpressionNoInputSaturation completion_ = null;
+	private ClassExpressionSaturationNoInput completion_ = null;
 
 	public IncrementalCompletionStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -63,10 +63,9 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		completion_ = new ClassExpressionNoInputSaturation(
+		completion_ = new ClassExpressionSaturationNoInput(
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), new RuleApplicationAdditionFactory(
-						reasoner.saturationState),
+				new RuleApplicationAdditionFactory(reasoner.saturationState),
 				ContextModificationListener.DUMMY);
 		return true;
 	}
@@ -86,7 +85,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 			return false;
 		reasoner.ruleAndConclusionStats.add(completion_
 				.getRuleAndConclusionStatistics());
-		completion_ = null;		
+		completion_ = null;
 		return true;
 	}
 

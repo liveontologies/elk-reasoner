@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
+
 /*
  * #%L
  * ELK Reasoner
@@ -29,6 +30,14 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * An engine to concurrently processing pending {@link Conclusion}s within the
+ * corresponding {@link Context}s using a supplied {@link ConclusionVisitor}.
+ * The {@link Conclusion}s are retrieved by {@link Context#takeToDo()}.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public abstract class AbstractRuleEngine implements
 		InputProcessor<IndexedClassExpression> {
 
@@ -78,7 +87,7 @@ public abstract class AbstractRuleEngine implements
 	 * {@link #getNextConclusion(Context)}
 	 * 
 	 * @return the next active {@link Context} to be processed by this
-	 *         {@link RuleEngine}
+	 *         {@link BasicRuleEngine}
 	 */
 	abstract Context getNextActiveContext();
 

@@ -46,7 +46,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * s from the respective {@link Context} and applies all (redundant and
  * non-redundant) rules, which in turn produce {@link Conclusion} s for which
  * this process repeats if they have not been processed already. This
- * {@link RuleApplicationFactory} should never create new {@link Context}s.
+ * {@link RuleApplicationFactory} never creates new {@link Context}s.
  * 
  * @author Pavel Klinov
  * 
@@ -91,12 +91,13 @@ public class RuleApplicationDeletionFactory extends
 		return new ComposedConclusionVisitor<Context>(
 		// check if conclusion occurs in the context
 				new ConclusionOccurrenceCheckingVisitor(),
-				// if so, apply the rules, including those that are
+				// if so, apply all rules, including those that are
 				// redundant
 				new AllRuleApplicationConclusionVisitor(ruleVisitor, writer),
 				// after processing, delete the conclusion
 				new ConclusionDeletionVisitor(),
-				// and mark the source context as non-saturated
+				// and mark the source context of the conclusion as
+				// non-saturated
 				new ConclusionSourceContextUnsaturationVisitor(writer));
 	}
 

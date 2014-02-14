@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.reasoner.ReasonerComputation;
+import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
@@ -45,7 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ReasonerComputation} for checking consistency of the ontology. This
+ * A {@link ReasonerComputationWithInputs} for checking consistency of the ontology. This
  * is done by checking consistency of {@code owl:Thing} and of all individuals
  * occurring in the ontology.
  * 
@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ConsistencyChecking
 		extends
-		ReasonerComputation<SaturationJob<IndexedClassEntity>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>> {
+		ReasonerComputationWithInputs<SaturationJob<IndexedClassEntity>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>> {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -127,7 +127,7 @@ public class ConsistencyChecking
 	}
 
 	public SaturationStatistics getRuleAndConclusionStatistics() {
-		return inputProcessorFactory.getRuleAndConclusionStatistics();
+		return processorFactory.getRuleAndConclusionStatistics();
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class ConsistencyChecking
 	 * Print statistics about consistency checking
 	 */
 	public void printStatistics() {
-		inputProcessorFactory.printStatistics();
+		processorFactory.printStatistics();
 	}
 
 	/**

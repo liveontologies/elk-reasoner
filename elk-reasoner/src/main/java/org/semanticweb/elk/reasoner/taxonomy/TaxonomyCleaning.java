@@ -36,7 +36,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.reasoner.ReasonerComputation;
+import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
@@ -60,7 +60,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  *         pavel.klinov@uni-ulm.de
  */
 public class TaxonomyCleaning extends
-		ReasonerComputation<IndexedClassEntity, TaxonomyCleaningFactory> {
+		ReasonerComputationWithInputs<IndexedClassEntity, TaxonomyCleaningFactory> {
 
 	public TaxonomyCleaning(Collection<IndexedClassEntity> inputs,
 			ClassTaxonomyState classTaxonomyState,

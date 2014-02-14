@@ -26,10 +26,10 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
-import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputationWithInputs;
 
 public class TestClassExpressionSaturation<J extends SaturationJob<? extends IndexedClassExpression>>
-		extends ConcurrentComputation<J, ClassExpressionSaturationFactory<J>> {
+		extends ConcurrentComputationWithInputs<J, ClassExpressionSaturationFactory<J>> {
 
 	public TestClassExpressionSaturation(ComputationExecutor executor,
 			int maxWorkers, SaturationState saturationState) {

@@ -24,20 +24,20 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.reasoner.ReasonerComputation;
+import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
- * A {@link ReasonerComputation} that computes relevant sub-properties and composition maps
+ * A {@link ReasonerComputationWithInputs} that computes relevant sub-properties and composition maps
  * 
  * @author Yevgeny Kazakov
  * 
  */
 public class PropertyHierarchyCompositionComputation
 		extends
-		ReasonerComputation<IndexedPropertyChain, PropertyHierarchyCompositionComputationFactory> {
+		ReasonerComputationWithInputs<IndexedPropertyChain, PropertyHierarchyCompositionComputationFactory> {
 
 	public PropertyHierarchyCompositionComputation(OntologyIndex ontIndex,
 			ComputationExecutor executor, int maxWorkers,

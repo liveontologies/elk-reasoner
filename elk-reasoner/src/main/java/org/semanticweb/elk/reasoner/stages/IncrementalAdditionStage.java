@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.stages;
  */
 
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationNoInput;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionUnSaturationFactory;
 
@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAd
  */
 public class IncrementalAdditionStage extends AbstractReasonerStage {
 
-	private ClassExpressionNoInputSaturation saturation_ = null;
+	private ClassExpressionSaturationNoInput saturation_ = null;
 
 	public IncrementalAdditionStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -57,9 +57,9 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 			return false;
 		}
 
-		saturation_ = new ClassExpressionNoInputSaturation(
+		saturation_ = new ClassExpressionSaturationNoInput(
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), new RuleApplicationAdditionUnSaturationFactory(
+				new RuleApplicationAdditionUnSaturationFactory(
 						reasoner.saturationState),
 				ContextModificationListener.DUMMY);
 

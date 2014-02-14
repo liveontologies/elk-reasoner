@@ -30,11 +30,9 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,21 +55,13 @@ public abstract class AbstractRuleApplicationFactory implements
 	private final SaturationState saturationState_;
 
 	/**
-	 * The {@link Conclusion} used to initialize contexts using
-	 * {@link ContextInitRule}s
-	 */
-	final Conclusion contextInitConclusion;
-
-	/**
 	 * The {@link SaturationStatistics} aggregated for all workers
 	 */
-	final SaturationStatistics aggregatedStats;
+	private final SaturationStatistics aggregatedStats_;
 
 	public AbstractRuleApplicationFactory(final SaturationState saturationState) {
 		this.saturationState_ = saturationState;
-		this.contextInitConclusion = new ContextInitialization(
-				saturationState.getOntologyIndex());
-		this.aggregatedStats = new SaturationStatistics();
+		this.aggregatedStats_ = new SaturationStatistics();
 	}
 
 	/**
@@ -88,7 +78,8 @@ public abstract class AbstractRuleApplicationFactory implements
 			ConclusionVisitor<Context, Boolean> conclusionProcessor,
 			SaturationStateWriter saturationStateWriter,
 			SaturationStatistics localStatistics) {
-		return new Engine(conclusionProcessor, saturationStateWriter,
+		return new BasicRuleEngine(saturationState_.getOntologyIndex(),
+				conclusionProcessor, saturationStateWriter, aggregatedStats_,
 				localStatistics);
 	}
 
@@ -122,46 +113,12 @@ public abstract class AbstractRuleApplicationFactory implements
 
 	@Override
 	public SaturationStatistics getSaturationStatistics() {
-		return aggregatedStats;
+		return aggregatedStats_;
 	}
 
 	@Override
 	public SaturationState getSaturationState() {
 		return saturationState_;
-	}
-
-	/**
-	 * Default rule application engine which can create new contexts via
-	 * {@link ExtendedSaturationStateWriter} (either directly when a new
-	 * {@link IndexedClassExpression} is submitted or during decomposition)
-	 */
-	private class Engine extends AbstractRuleEngineWithStatistics {
-
-		private final SaturationStateWriter writer_;
-
-		Engine(ConclusionVisitor<Context, Boolean> conclusionProcessor,
-				SaturationStateWriter saturationStateWriter,
-				SaturationStatistics localStatistics) {
-			super(conclusionProcessor, aggregatedStats, localStatistics);
-			writer_ = saturationStateWriter;
-		}
-
-		@Override
-		public void submit(IndexedClassExpression job) {
-			writer_.produce(job, contextInitConclusion);
-		}
-
-		@Override
-		Context getNextActiveContext() {
-			return writer_.pollForActiveContext();
-		}
-
-		@Override
-		public void finish() {
-			super.finish();
-			writer_.dispose();
-		}
-
 	}
 
 }

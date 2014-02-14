@@ -59,7 +59,7 @@ public class RuleApplicationAdditionUnSaturationFactory extends
 				new ConclusionInsertionVisitor(),
 				// if new, mark the source context as unsaturated
 				new ConclusionSourceContextUnsaturationVisitor(writer),
-				// apply the non-redundant rules
+				// afterwards, apply all non-redundant rules
 				new NonRedundantRuleApplicationConclusionVisitor(ruleVisitor,
 						writer));
 	}

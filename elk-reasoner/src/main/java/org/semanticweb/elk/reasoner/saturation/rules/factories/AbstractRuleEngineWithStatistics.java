@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
+
 /*
  * #%L
  * ELK Reasoner
@@ -27,6 +28,15 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
+/**
+ * An {@link AbstractRuleEngine} which additionally accumulates the statistics
+ * about the processed {@link Context}s and adds it to the provided
+ * {@link SaturationStatistics} when finished (i.e., when {@link #finish()} is
+ * called).
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public abstract class AbstractRuleEngineWithStatistics extends
 		AbstractRuleEngine {
 

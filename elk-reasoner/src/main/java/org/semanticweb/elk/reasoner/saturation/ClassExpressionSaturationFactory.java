@@ -36,13 +36,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The factory for engines that concurrently submit, process, and post-process
- * saturation jobs. Each saturation job requires to compute implied
- * super-classes of a given indexed class expression. The jobs are submitted
- * using the {@link Engine#submit(SaturationJob)}, and all currently submitted
- * jobs are processed using the {@link Engine#process()}. To every
- * {@link ClassExpressionSaturationFactory} it is possible to attach a
- * {@link ClassExpressionSaturationListener}, which can implement hook methods
+ * The factory for engines that use a {@link RuleApplicationFactory} to process
+ * the corresponding {@link SaturationState} (
+ * {@link RuleApplicationFactory#getSaturationState()}). The input for
+ * processing is submitted in the form of a {@link SaturationJob} that are
+ * forwarded to the corresponding engine of the {@link RuleApplicationFactory}
+ * (see
+ * {@link RuleApplicationFactory#getEngine(ContextCreationListener, ContextModificationListener)}
+ * ). The jobs are submitted using the {@link Engine#submit(SaturationJob)}, and
+ * all currently submitted jobs are processed using the {@link Engine#process()}
+ * . To every {@link ClassExpressionSaturationFactory} it is possible to attach
+ * a {@link ClassExpressionSaturationListener}, which can implement hook methods
  * that perform certain actions during the processing, e.g., notifying when the
  * jobs are finished.
  * 

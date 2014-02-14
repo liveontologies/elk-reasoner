@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
@@ -35,12 +36,11 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * {@link SaturationState} in parallel. Each engine has an exclusive read-write
  * access to the {@link Context} of the {@link SaturationState} in which the
  * current {@link Conclusion} is processed, so it can modify this
- * {@link Context} and apply the rules using conclusions saved in the
+ * {@link Context} and apply the rules using {@link Conclusion}s saved in the
  * {@link Context}, which can possibly produce {@link Conclusion}s for other
  * {@link Context}s.
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
 public interface RuleApplicationFactory {
 
@@ -51,12 +51,15 @@ public interface RuleApplicationFactory {
 	public SaturationState getSaturationState();
 
 	/**
-	 * Create a new {@link InputProcessor} that can perform computations for
-	 * input {@link IndexedClassExpression}s within a working thread, typically,
-	 * computing the closure under the rules for the {@link Context}s
-	 * initialized with the given {@link IndexedClassExpression}s. Since the
-	 * {@link SaturationState} is shared by all workers, the computation is
-	 * finished only when all concurrent workers finish the processing.
+	 * Create a new {@link InputProcessor} that concurrently processes
+	 * {@link Conclusion}s within {@link Context}s of the
+	 * {@link SaturationState} by applying inference rules. The input
+	 * {@link Conclusion}s can be created using {@link IndexedClassExpression}s
+	 * submitted using this {@link InputProcessor}, or they may be taken from
+	 * the {@link Context}s of the {@link SaturationState} using
+	 * {@link Context#takeToDo()}. Since the {@link SaturationState} is shared
+	 * by all workers, the computation is finished (i.e., all submitted jobs are
+	 * processed) only when all concurrent workers finish the processing.
 	 * 
 	 * @param creationListener
 	 *            the {@link ContextCreationListener} that registers all

@@ -35,14 +35,14 @@ import java.util.Set;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationNoInput;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationDeletionNotSaturatedFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationDeletionNotSaturatedFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
@@ -82,10 +82,9 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 
 		LOGGER_.trace("Starting random contexts cleaning");
 
-		ClassExpressionNoInputSaturation cleaning = new ClassExpressionNoInputSaturation(
+		ClassExpressionSaturationNoInput cleaning = new ClassExpressionSaturationNoInput(
 				reasoner.getProcessExecutor(), reasoner.getNumberOfWorkers(),
-				reasoner.getProgressMonitor(), cleaningFactory,
-				ContextModificationListener.DUMMY);
+				cleaningFactory, ContextModificationListener.DUMMY);
 
 		cleaning.process();
 
@@ -94,10 +93,9 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		RuleApplicationAdditionFactory resatFactory = new RuleApplicationAdditionFactory(
 				reasoner.saturationState);
 
-		ClassExpressionNoInputSaturation saturation = new ClassExpressionNoInputSaturation(
+		ClassExpressionSaturationNoInput saturation = new ClassExpressionSaturationNoInput(
 				reasoner.getProcessExecutor(), reasoner.getNumberOfWorkers(),
-				reasoner.getProgressMonitor(), resatFactory,
-				ContextModificationListener.DUMMY);
+				resatFactory, ContextModificationListener.DUMMY);
 
 		LOGGER_.trace("Starting random contexts resaturation");
 

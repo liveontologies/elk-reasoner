@@ -21,15 +21,15 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.ReasonerComputation;
+import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.PropertyHierarchyCompositionComputationFactory;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
-import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
+import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputationWithInputs;
 
 /**
- * A {@link ReasonerComputation} that computes relevant sub-properties anc
+ * A {@link ReasonerComputationWithInputs} that computes relevant sub-properties anc
  * composition maps
  * 
  * @author Yevgeny Kazakov
@@ -37,7 +37,7 @@ import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
  */
 public class TestPropertySaturation
 		extends
-		ConcurrentComputation<IndexedPropertyChain, PropertyHierarchyCompositionComputationFactory> {
+		ConcurrentComputationWithInputs<IndexedPropertyChain, PropertyHierarchyCompositionComputationFactory> {
 
 	public TestPropertySaturation(ComputationExecutor executor, int maxWorkers,
 			OntologyIndex ontologyIndex) {
