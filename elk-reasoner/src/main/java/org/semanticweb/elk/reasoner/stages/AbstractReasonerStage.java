@@ -252,22 +252,11 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	}
 
 	protected void markAllContextsAsSaturated() {
-		ClassTaxonomyState.Writer classTaxonomyWriter = reasoner.classTaxonomyState
-				.getWriter();
-		InstanceTaxonomyState.Writer instanceTaxonomyWriter = reasoner.instanceTaxonomyState
-				.getWriter();
 		for (;;) {
 			Context context = reasoner.saturationState
 					.setNextContextSaturated();
 			if (context == null)
 				return;
-			// else
-			IndexedClassExpression root = context.getRoot();
-			if (root instanceof IndexedClass)
-				classTaxonomyWriter.markModifiedClass((IndexedClass) root);
-			else if (root instanceof IndexedIndividual)
-				instanceTaxonomyWriter
-						.markModifiedIndividual((IndexedIndividual) root);
 		}
 	}
 

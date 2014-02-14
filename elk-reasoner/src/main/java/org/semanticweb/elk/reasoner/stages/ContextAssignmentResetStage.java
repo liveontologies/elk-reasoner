@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +65,9 @@ class ContextAssignmentResetStage extends AbstractReasonerStage {
 
 	@Override
 	public void executeStage() throws ElkInterruptedException {
-		reasoner.saturationState.getWriter().resetContexts();
+		SaturationStateWriter writer = reasoner.saturationState.getWriter();
+		writer.resetContexts();
+		writer.dispose();
 	}
 
 	@Override

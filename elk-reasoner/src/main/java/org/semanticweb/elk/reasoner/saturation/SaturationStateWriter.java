@@ -58,4 +58,6 @@ public interface SaturationStateWriter extends ConclusionProducer {
 	public boolean markAsNotSaturated(IndexedClassExpression root);
 
 	public void resetContexts();
+	
+	public void dispose();
 }

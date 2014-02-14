@@ -86,18 +86,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 			return false;
 		reasoner.ruleAndConclusionStats.add(completion_
 				.getRuleAndConclusionStatistics());
-		markAllContextsAsSaturated();
-		/*
-		 * TODO: at some point we need to clear non-saturated contexts when
-		 * everything is fine currently this is cleaned during the taxonomy
-		 * cleaning stage, but this stage might not be executed at all; also,
-		 * the non saturated contexts are not cleaned at all during incremental
-		 * consistency checking. Something needs to be done about it.
-		 */
-		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
-		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
-		completion_ = null;
-
+		completion_ = null;		
 		return true;
 	}
 

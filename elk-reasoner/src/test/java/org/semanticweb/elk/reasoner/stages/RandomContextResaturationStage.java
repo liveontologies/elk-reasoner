@@ -37,9 +37,9 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.ContextCleaningFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -130,11 +130,13 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		int i = 0;
 
 		for (IndexedClassExpression ice : ices) {
+			SaturationStateWriter writer = reasoner.saturationState.getWriter();
 			if (indexes.contains(i)) {
-				reasoner.saturationState.getWriter().markAsNotSaturated(ice);
+				writer.markAsNotSaturated(ice);
 				contexts.add(ice);
 			}
 			i++;
+			writer.dispose();
 		}
 
 		LOGGER_.trace("Random contexts picked: {}", contexts);

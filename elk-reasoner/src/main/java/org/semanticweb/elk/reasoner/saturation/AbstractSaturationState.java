@@ -22,9 +22,13 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
+import java.util.AbstractCollection;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -71,6 +75,9 @@ public abstract class AbstractSaturationState implements SaturationState {
 	 */
 	private final Queue<ExtendedContext> notSaturatedContexts_ = new ConcurrentLinkedQueue<ExtendedContext>();
 
+	private final AtomicInteger notSaturatedContextsCount_ = new AtomicInteger(
+			0);
+
 	public AbstractSaturationState(OntologyIndex index) {
 		this.ontologyIndex = index;
 		this.contextInitConclusion_ = new ContextInitialization(index);
@@ -83,7 +90,18 @@ public abstract class AbstractSaturationState implements SaturationState {
 
 	@Override
 	public Collection<? extends Context> getNotSaturatedContexts() {
-		return notSaturatedContexts_;
+		return Collections
+				.unmodifiableCollection(new AbstractCollection<ExtendedContext>() {
+					@Override
+					public Iterator<ExtendedContext> iterator() {
+						return notSaturatedContexts_.iterator();
+					}
+
+					@Override
+					public int size() {
+						return notSaturatedContextsCount_.get();
+					}
+				});
 	}
 
 	@Override
@@ -92,7 +110,9 @@ public abstract class AbstractSaturationState implements SaturationState {
 		if (next == null)
 			return null;
 		// else
+		notSaturatedContextsCount_.decrementAndGet();
 		next.setSaturated(true);
+		LOGGER_.trace("{}: marked as saturated", next);
 		return next;
 	}
 
@@ -152,6 +172,8 @@ public abstract class AbstractSaturationState implements SaturationState {
 
 		private final ContextModificationListener contextModificationListener_;
 
+		private int localNotSaturatedContextCount_ = 0;
+
 		private BasicWriter(
 				ContextModificationListener contextSaturationListener) {
 			this.contextModificationListener_ = contextSaturationListener;
@@ -181,6 +203,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 		protected void markAsNotSaturatedInternal(ExtendedContext context) {
 			LOGGER_.trace("{}: marked as non-saturated", context);
 			notSaturatedContexts_.add(context);
+			localNotSaturatedContextCount_++;
 			contextModificationListener_.notifyContextModification(context);
 		}
 
@@ -201,6 +224,13 @@ public abstract class AbstractSaturationState implements SaturationState {
 		@Override
 		public void resetContexts() {
 			AbstractSaturationState.this.resetContexts();
+		}
+
+		@Override
+		public void dispose() {
+			notSaturatedContextsCount_
+					.addAndGet(localNotSaturatedContextCount_);
+			localNotSaturatedContextCount_ = 0;
 		}
 
 	}

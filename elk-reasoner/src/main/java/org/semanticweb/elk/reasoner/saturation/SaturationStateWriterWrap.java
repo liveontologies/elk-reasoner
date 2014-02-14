@@ -66,4 +66,9 @@ public class SaturationStateWriterWrap<W extends SaturationStateWriter>
 		mainWriter.resetContexts();
 	}
 
+	@Override
+	public void dispose() {
+		mainWriter.dispose();
+	}
+
 }

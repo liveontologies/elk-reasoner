@@ -78,7 +78,7 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 		Operations.Transformation<ElkNamedIndividual, IndexedIndividual> transformation = new Operations.Transformation<ElkNamedIndividual, IndexedIndividual>() {
 			@Override
 			public IndexedIndividual transform(ElkNamedIndividual element) {
-				IndexedIndividual indexedindividual = (IndexedIndividual) element
+				IndexedIndividual indexedindividual = element
 						.accept(reasoner.objectCache_.getIndexObjectConverter());
 
 				return indexedindividual.occurs() ? indexedindividual : null;

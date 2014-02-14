@@ -51,8 +51,6 @@ public class ClassTaxonomyState {
 	private final Set<ElkClass> classesForModifiedNodes_ = Collections
 			.newSetFromMap(new ConcurrentHashMap<ElkClass, Boolean>());
 
-	private final List<IndexedClass> modifiedClasses_ = new LinkedList<IndexedClass>();
-
 	private final List<IndexedClass> removedClasses_ = new LinkedList<IndexedClass>();
 
 	public UpdateableTaxonomy<ElkClass> getTaxonomy() {
@@ -61,10 +59,6 @@ public class ClassTaxonomyState {
 
 	Set<ElkClass> getClassesWithModifiedNodes() {
 		return classesForModifiedNodes_;
-	}
-
-	Collection<IndexedClass> getModifiedClasses() {
-		return modifiedClasses_;
 	}
 
 	Collection<IndexedClass> getRemovedClasses() {
@@ -104,20 +98,12 @@ public class ClassTaxonomyState {
 			}
 		}
 
-		public void markModifiedClass(final IndexedClass clazz) {
-			modifiedClasses_.add(clazz);
-		}
-
 		public void markRemovedClass(final IndexedClass clazz) {
 			removedClasses_.add(clazz);
 		}
 
 		public void clearModifiedNodeObjects() {
 			classesForModifiedNodes_.clear();
-		}
-
-		public void clearModifiedClasses() {
-			modifiedClasses_.clear();
 		}
 
 		public void clearRemovedClasses() {
@@ -127,7 +113,6 @@ public class ClassTaxonomyState {
 		public void clear() {
 			clearTaxonomy();
 			clearModifiedNodeObjects();
-			clearModifiedClasses();
 			clearRemovedClasses();
 		}
 	}
