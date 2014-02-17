@@ -70,19 +70,19 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 			}
 		}
 
-		/*@Override
-		public Iterable<Context> getContexts() {
+		@Override
+		public Iterable<IndexedClassExpression> getContextRoots() {
 			return storage_.keySet();
 		}
-
+		
 		@Override
-		public void visitConclusions(Context context, ConclusionVisitor<?, ?> visitor) {
-			ContextTracer tracer = storage_.get(context);
+		public void visitInferences(IndexedClassExpression root, TracedConclusionVisitor<?, ?> visitor) {
+			ContextTraceStore tracer = storage_.get(root);
 			
 			if (tracer != null) {
-				tracer.visitConclusions(visitor);
+				tracer.visitInferences(visitor);
 			}
-		}*/
+		}
 		
 	}
 	

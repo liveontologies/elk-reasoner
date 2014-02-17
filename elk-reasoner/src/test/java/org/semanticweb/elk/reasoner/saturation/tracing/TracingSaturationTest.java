@@ -97,7 +97,7 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkNumberOfInferences(a, bAndC, reasoner, 1);
 		TracingTestUtils.checkNumberOfInferences(a, b, reasoner, 1);
 		TracingTestUtils.checkNumberOfInferences(a, c, reasoner, 1);
-		TracingTestUtils.checkInferenceAcyclicity(a, bAndC, reasoner);
+		TracingTestUtils.checkInferenceAcyclicity(reasoner);
 	}
 	
 	
@@ -119,7 +119,7 @@ public class TracingSaturationTest {
 		reasoner.explainSubsumption(b, c);
 		// now check that we didn't get a duplicate inference in A due to tracing B
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
-		TracingTestUtils.checkInferenceAcyclicity(a, rSomeC, reasoner);
+		TracingTestUtils.checkInferenceAcyclicity(reasoner);
 	}
 	
 	@Test
@@ -135,7 +135,7 @@ public class TracingSaturationTest {
 			
 		reasoner.explainSubsumption(a, rSomeC);
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
-		TracingTestUtils.checkInferenceAcyclicity(a, rSomeC, reasoner);
+		TracingTestUtils.checkInferenceAcyclicity(reasoner);
 		//B must be traced recursively
 		TracingTestUtils.checkNumberOfInferences(b, b, reasoner, 1);
 	}
@@ -188,7 +188,7 @@ public class TracingSaturationTest {
 		reasoner.explainSubsumption(a, rSomeC);
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 		TracingTestUtils.checkNumberOfInferences(b, b, reasoner, 1);
-		TracingTestUtils.checkInferenceAcyclicity(a, rSomeC, reasoner);
+		TracingTestUtils.checkInferenceAcyclicity(reasoner);
 	}	
 	
 	/*
@@ -204,6 +204,7 @@ public class TracingSaturationTest {
 		
 		reasoner.explainSubsumption(a, a1);
 		TracingTestUtils.checkNumberOfInferences(b2, b2, reasoner, 0);
+		TracingTestUtils.checkInferenceAcyclicity(reasoner);
 	}
 	
 	private Reasoner load(String resource) throws Exception {

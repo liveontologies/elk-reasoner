@@ -41,7 +41,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor
 import org.semanticweb.elk.reasoner.saturation.conclusions.CombinedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionEqualityChecker;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
@@ -68,27 +67,37 @@ import org.slf4j.LoggerFactory;
  * belong to the context submitted for tracing.
  * 
  * Implements a special trick to avoid trivial one-step inference cycles (e.g. A
- * and B => (A, B) => A and B). TODO explain
+ * and B => (A, B) => A and B). Every time an inference is being inserted, it is
+ * checked if it is cyclic (i.e. there exists a premise which is derived only
+ * via this inference). If it is, it is dropped and not inserted. The same
+ * inference may become acyclic later if that premise is derived by another
+ * inference. For this reason we apply rules to the same conclusion multiple
+ * times. This can lead to non-termination so
+ * {@link TracedConclusionEqualityChecker} is used to ensure that one inference
+ * is not inserted into its context more than once.
+ * 
+ * This factory is less efficient than
+ * {@link CycleBlockingRuleApplicationFactory} which blocks cyclic inferences
+ * instead of dropping them.
+ * 
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory {
+public class CycleDroppingRuleApplicationFactory extends RuleApplicationFactory {
 	
 	private final static boolean CYCLE_AVOIDANCE = true;
 	// logger for this class
-	protected static final Logger LOGGER_ = LoggerFactory	.getLogger(TracingEnabledRuleApplicationFactory.class);
+	protected static final Logger LOGGER_ = LoggerFactory	.getLogger(CycleDroppingRuleApplicationFactory.class);
 	
 	private final LocalTracingSaturationState tracingState_;
 	
 	private final TraceStore.Writer inferenceWriter_;
 	
 	private final TraceStore.Reader inferenceReader_;
-	
-	private final ConclusionEqualityChecker conclusionEqualityChecker_ = new ConclusionEqualityChecker();
 
-	public TracingEnabledRuleApplicationFactory(ExtendedSaturationState mainSaturationState,
+	public CycleDroppingRuleApplicationFactory(ExtendedSaturationState mainSaturationState,
 			LocalTracingSaturationState traceState, TraceStore traceStore) {
 		super(mainSaturationState);
 		tracingState_ = traceState;
@@ -197,7 +206,7 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 		Context getContext(Conclusion conclusion, Context context) {
 			IndexedClassExpression root = context.getRoot();
 			
-			if (context == conclusion.getSourceContext(context)) {
+			if (context.getRoot() == conclusion.getSourceContext(context).getRoot()) {
 				// this will be the traced context which will return all local
 				// conclusions except of the backward links which belong to
 				// other contexts. Those will be retrieved from the main
@@ -330,7 +339,7 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 					return false;
 				}
 
-				if (CYCLE_AVOIDANCE && isCyclic((TracedConclusion) conclusion, cxt)) {
+				if (CYCLE_AVOIDANCE && IsInferenceCyclic.check((TracedConclusion) conclusion, cxt, inferenceReader_) != null) {
 					return false;
 				}
 			}
@@ -340,93 +349,6 @@ public class TracingEnabledRuleApplicationFactory extends RuleApplicationFactory
 			return true;
 		}
 
-	}
-	
-	// TODO: this is spaghetti code, too many nested visitors, need to
-	// create higher level constructs to iterate over premises and
-	// inferences rather than using visitors
-	boolean isCyclic(final TracedConclusion inference, final Context context) {
-		// check if all premises have been produced by at least one
-		// inference in which all premises are different from the expression being produced now
-		Context inferenceContext = inference.getInferenceContext(context).getRoot().getContext();
-		
-		final MutableBoolean allPremisesHaveAlternativeInference = new MutableBoolean(true);
-		
-		//going through all premises
-		inference.acceptTraced(new PremiseVisitor<Void, Context>(){
-
-			@Override
-			protected Void defaultVisit(Conclusion premise, final Context contextWherePremiseStored) {
-				// go through all inferences which produced this premise and
-				// compare their premises with the conclusion being produced
-				final MutableBoolean hasAnyInference = new MutableBoolean(false);
-				final MutableBoolean hasAlternativeInference = new MutableBoolean(false);
-
-				inferenceReader_.accept(contextWherePremiseStored.getRoot(), premise, new BaseTracedConclusionVisitor<Void, Void>(){
-
-					@Override
-					public Void visit(InitializationSubsumer premiseInference, Void ignored) {
-						//initialization inference is obviously not cyclic
-						hasAlternativeInference.set(true);
-						
-						return null;
-					}
-
-					@Override
-					protected Void defaultTracedVisit(final TracedConclusion premiseInference, Void ignored) {
-						
-						hasAnyInference.set(true);
-						
-						boolean isAlternative = allPremisesDifferentFrom(premiseInference,
-								inference,
-								premiseInference.getInferenceContext(contextWherePremiseStored),
-								context);
-
-						hasAlternativeInference.or(isAlternative);
-						
-						return null;
-					}
-					
-				});
-				//if the premise doesn't have any inference yet, it can't be a part of a cycle
-				if (hasAnyInference.get()) {
-					allPremisesHaveAlternativeInference.and(hasAlternativeInference.get());
-				}
-				
-				return null;
-			}
-			
-		}, inferenceContext);
-		
-		return !allPremisesHaveAlternativeInference.get();
-	}
-	
-	/**
-	 * Returns true if all premises of the inference are not equivalent to
-	 * the given conclusion.
-	 */
-	private boolean allPremisesDifferentFrom(final TracedConclusion inference,
-			final Conclusion conclusion,
-			final Context whereInferenceMade,
-			final Context whereConclusionStored) {
-		final MutableBoolean allPremisesDifferentFromCurrent = new MutableBoolean(true);
-		
-		inference.acceptTraced(new PremiseVisitor<Void, Context>() {
-
-			@Override
-			protected Void defaultVisit(Conclusion premise, Context wherePremiseStored) {
-				
-				if (wherePremiseStored.getRoot() == whereConclusionStored.getRoot() &&
-						premise.accept(conclusionEqualityChecker_, conclusion)) {
-					allPremisesDifferentFromCurrent.set(false);
-				}
-				
-				return null;
-			}
-			
-		}, whereInferenceMade);
-		
-		return allPremisesDifferentFromCurrent.get();
 	}
 	
 	/**

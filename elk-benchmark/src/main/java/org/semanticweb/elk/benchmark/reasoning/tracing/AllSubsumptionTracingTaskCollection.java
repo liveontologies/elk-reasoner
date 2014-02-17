@@ -99,7 +99,9 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection2 {
 				}
 			});
 			
+			//visitor.visit(createSpecificTask("http://www.co-ode.org/ontologies/galen#BNFChapter5_5Section", "http://www.co-ode.org/ontologies/galen#BNFChapter5Section"));
 			//visitor.visit(createSpecificTask("http://www.co-ode.org/ontologies/galen#CerebellarSyndrome", "http://www.co-ode.org/ontologies/galen#Anonymous-757"));
+			//visitor.visit(createSpecificTask("http://www.co-ode.org/ontologies/galen#BigeminalPulseRhythm", "http://www.co-ode.org/ontologies/galen#CardiacDysrhythmia"));
 			
 			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0039693", "http://purl.obolibrary.org/obo/GO_0044034")); //55 axioms, now 15
 			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0006176", "http://purl.obolibrary.org/obo/GO_0046031")); //197 axioms, now 19
@@ -108,10 +110,16 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection2 {
 			
 			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0048684", "http://purl.obolibrary.org/obo/GO_0048672"));
 			
+			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0043404", "http://purl.obolibrary.org/obo/GO_0001653"));
+			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0001653", "http://purl.obolibrary.org/obo/BFO_0000003"));
+			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0033232", "http://purl.obolibrary.org/obo/GO_1901243"));
+			
 			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0048685", "http://purl.obolibrary.org/obo/GO_0048671"));
 			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0048685", "http://purl.obolibrary.org/obo/GO_0048683"));
 			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0048684", "http://purl.obolibrary.org/obo/GO_0048683"));
 			//visitor.visit(createSpecificTask("http://purl.obolibrary.org/obo/GO_0048685", "http://purl.obolibrary.org/obo/GO_0048681"));
+			
+			
 		} 
 		catch (TaskException e) {
 			throw e;
@@ -176,7 +184,7 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection2 {
 		public static final String SUBCLASSOF_AXIOM_COUNT = "Distinct SubClassOf axioms used";
 		public static final String RULES_APPLIED = "Number of rules applied during tracing";
 		public static final String CONTEXTS_TRACED = "Number of contexts traced";
-		public static final int MIN_SUBCLASS_AXIOM_NO = 10;
+		public static final int MIN_SUBCLASS_AXIOM_NO = 0;
 		public static final int MAX_SUBCLASS_AXIOM_NO = Integer.MAX_VALUE;
 
 		final Reasoner reasoner;
@@ -230,7 +238,7 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection2 {
 				if ((subClassAxiomNo >= MIN_SUBCLASS_AXIOM_NO) && (subClassAxiomNo <= MAX_SUBCLASS_AXIOM_NO)) {
 					metrics.incrementRunCount();
 					metrics.updateLongMetric(SUBCLASSOF_AXIOM_COUNT, subClassAxiomNo);
-					//metrics.updateLongMetric(RULES_APPLIED, stats.getConclusionStatistics().getProducedConclusionCounts().getTotalCount());
+					metrics.updateLongMetric(RULES_APPLIED, stats.getConclusionStatistics().getProducedConclusionCounts().getTotalCount());
 					metrics.updateLongMetric("inserted conclusions", stats.getConclusionStatistics().getUsedConclusionCounts().getTotalCount());
 					metrics.updateLongMetric(CONTEXTS_TRACED, stats.getContextStatistics().countModifiedContexts);
 					metrics.updateLongMetric(USED_INFERENCES_COUNT, counter.getInferenceCount());
@@ -244,6 +252,7 @@ public class AllSubsumptionTracingTaskCollection implements TaskCollection2 {
 				}
 				
 				TracingTestUtils.checkTracingMinimality(subsumee, subsumer, reasoner);
+				TracingTestUtils.checkInferenceAcyclicity(reasoner);
 				
 			} catch (Exception e) {
 				throw new TaskException(e);

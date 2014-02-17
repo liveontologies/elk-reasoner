@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Basically a wrapper around a {@link ClassExpressionSaturationFactory} with a
- * {@link TracingEnabledRuleApplicationFactory} as the rule application factory but
+ * {@link CycleDroppingRuleApplicationFactory} as the rule application factory but
  * transparently handles the situation when the context is being tracing when
  * another tracing job for it comes over. It puts it in a pending queue and
  * sends notifications once the context has been traced.
@@ -51,7 +51,7 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 			LocalTracingSaturationState tracingState,
 			TraceStore traceStore,
 			int maxWorkers) {
-		RuleApplicationFactory ruleTracingFactory = new TracingEnabledRuleApplicationFactory2(saturationState, tracingState, traceStore);
+		RuleApplicationFactory ruleTracingFactory = new CycleBlockingRuleApplicationFactory(saturationState, tracingState, traceStore);
 		
 		tracingState_ = tracingState;
 		tracingFactory_ = new ClassExpressionSaturationFactory<ContextTracingJob>(

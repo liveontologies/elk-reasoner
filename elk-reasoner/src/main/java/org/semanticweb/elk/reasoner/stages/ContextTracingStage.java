@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracingEnabledRuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.tracing.CycleDroppingRuleApplicationFactory;
 
 /**
  
@@ -66,7 +66,7 @@ public class ContextTracingStage extends AbstractReasonerStage {
 		}
 		
 		LocalTracingSaturationState tracingState = reasoner.traceState.getSaturationState();
-		RuleApplicationFactory ruleAppFactory = new TracingEnabledRuleApplicationFactory(reasoner.saturationState, tracingState, reasoner.traceState.getTraceStore());
+		RuleApplicationFactory ruleAppFactory = new CycleDroppingRuleApplicationFactory(reasoner.saturationState, tracingState, reasoner.traceState.getTraceStore());
 		
 		tracing_ = new ClassExpressionSaturation<IndexedClassExpression>(
 				reasoner.traceState.getTracingQueue().keySet(), reasoner.getProcessExecutor(), workerNo,

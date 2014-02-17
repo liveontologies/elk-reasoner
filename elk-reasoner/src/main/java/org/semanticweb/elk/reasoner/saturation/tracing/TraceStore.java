@@ -50,6 +50,10 @@ public interface TraceStore {
 		 * @param visitor
 		 */
 		public void accept(IndexedClassExpression root, Conclusion conclusion, TracedConclusionVisitor<?,?> visitor);
+		
+		public Iterable<IndexedClassExpression> getContextRoots();
+		
+		public void visitInferences(IndexedClassExpression root, TracedConclusionVisitor<?, ?> visitor);
 	}
 
 	/**

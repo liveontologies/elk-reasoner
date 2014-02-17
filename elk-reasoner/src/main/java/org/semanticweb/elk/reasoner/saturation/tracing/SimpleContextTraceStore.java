@@ -38,7 +38,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -269,35 +268,44 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 	}
 
 	@Override
-	public void visitConclusions(ConclusionVisitor<?, ?> visitor) {
+	public void visitInferences(TracedConclusionVisitor<?, ?> visitor) {
 		// subsumers
 		for (IndexedClassExpression ice : subsumerInferenceMap_.keySet()) {
-			TracingUtils.getSubsumerWrapper(ice).accept(visitor, null);
+			for (TracedConclusion inference : subsumerInferenceMap_.get(ice)) {
+				inference.acceptTraced(visitor, null);
+			}
 		}
 		// backward links
 		for (IndexedPropertyChain linkRelation : backwardLinkInferenceMap_
 				.keySet()) {
-			for (Context source : backwardLinkInferenceMap_.get(linkRelation)
-					.keySet()) {
-				TracingUtils.getBackwardLinkWrapper(linkRelation, source)
-						.accept(visitor, null);
+			Multimap<Context, TracedConclusion> contextMap = backwardLinkInferenceMap_.get(linkRelation); 
+			
+			for (Context source : contextMap.keySet()) {
+				for (TracedConclusion inference : contextMap.get(source)) {
+					inference.acceptTraced(visitor, null);
+				}
 			}
 		}
 		// forward links
-		for (IndexedPropertyChain linkRelation : forwardLinkInferenceMap_
-				.keySet()) {
-			for (Context target : forwardLinkInferenceMap_.get(linkRelation)
-					.keySet()) {
-				TracingUtils.getBackwardLinkWrapper(linkRelation, target)
-						.accept(visitor, null);
+		for (IndexedPropertyChain linkRelation : forwardLinkInferenceMap_.keySet()) {
+			
+			Multimap<Context, TracedConclusion> contextMap = forwardLinkInferenceMap_.get(linkRelation);
+			
+			for (Context target : contextMap.keySet()) {
+				for (TracedConclusion inference : contextMap.get(target)) {
+					inference.acceptTraced(visitor, null);
+				}
 			}
 		}
 		// propagations
 		for (IndexedPropertyChain propRelation : propagationMap_.keySet()) {
-			for (IndexedObjectSomeValuesFrom carry : propagationMap_.get(
-					propRelation).keySet()) {
-				TracingUtils.getPropagationWrapper(propRelation, carry).accept(
-						visitor, null);
+			
+			Multimap<IndexedObjectSomeValuesFrom, TracedConclusion> carryMap = propagationMap_.get(propRelation);
+			
+			for (IndexedObjectSomeValuesFrom carry : carryMap.keySet()) {
+				for (TracedConclusion inference : carryMap.get(carry)) {
+					inference.acceptTraced(visitor, null);
+				}
 			}
 		}
 	}

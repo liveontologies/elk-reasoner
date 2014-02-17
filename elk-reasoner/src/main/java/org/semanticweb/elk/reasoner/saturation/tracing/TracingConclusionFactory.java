@@ -64,24 +64,24 @@ public class TracingConclusionFactory implements ConclusionFactory {
 	public BackwardLink createComposedBackwardLink(Context context, ForwardLink forwardLink,
 			IndexedPropertyChain backwardLinkChain, IndexedPropertyChain chain,
 			Context backwardLinkSource) {
-		return new ComposedBackwardLink(chain, context, forwardLink, backwardLinkChain, backwardLinkSource);
+		return new ComposedBackwardLink(chain, getMainContext(context), forwardLink, backwardLinkChain, getMainContext(backwardLinkSource));
 	}
 
 	@Override
 	public BackwardLink createComposedBackwardLink(Context context, BackwardLink backwardLink,
 			IndexedPropertyChain forwardRelation, Context forwardTarget, IndexedPropertyChain chain) {
-		return new ComposedBackwardLink(chain, context, backwardLink, forwardRelation, forwardTarget);
+		return new ComposedBackwardLink(chain, getMainContext(context), backwardLink, forwardRelation, getMainContext(forwardTarget));
 	}
 
 	@Override
 	public ForwardLink createForwardLink(BackwardLink backwardLink, Context target) {
-		return new ReversedBackwardLink(backwardLink, target);
+		return new ReversedBackwardLink(backwardLink, getMainContext(target));
 	}
 
 	@Override
 	public BackwardLink createBackwardLink(
 			IndexedObjectSomeValuesFrom subsumer, Context source) {
-		return new DecomposedExistential(subsumer, source);
+		return new DecomposedExistential(subsumer, getMainContext(source));
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public class TracingConclusionFactory implements ConclusionFactory {
 	
 	@Override
 	public ComposedSubsumer createPropagatedSubsumer(Propagation propagation, IndexedPropertyChain linkSource, Context linkTarget, Context context) {
-		return new PropagatedSubsumer(context, propagation, linkSource, linkTarget);
+		return new PropagatedSubsumer(getMainContext(context), propagation, linkSource, getMainContext(linkTarget));
 	}
 
 	@Override
@@ -119,5 +119,9 @@ public class TracingConclusionFactory implements ConclusionFactory {
 	public ComposedSubsumer createReflexiveSubsumer(
 			IndexedObjectSomeValuesFrom existential) {
 		return new ReflexiveSubsumer(existential);
+	}
+	
+	private Context getMainContext(Context cxt) {
+		return cxt.getRoot().getContext();
 	}
 }

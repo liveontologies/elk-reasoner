@@ -15,14 +15,12 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class FirstNInferencesReader implements TraceStore.Reader {
+public class FirstNInferencesReader extends DelegatingTraceReader {
 
-	private final TraceStore.Reader reader_;
-	
 	private final int numberOfInferencesToVisit_;
 	
 	public FirstNInferencesReader(TraceStore.Reader r, int n) {
-		reader_ = r;
+		super(r);
 		numberOfInferencesToVisit_ = n;
 	}
 	
@@ -30,7 +28,7 @@ public class FirstNInferencesReader implements TraceStore.Reader {
 	public void accept(IndexedClassExpression root, Conclusion conclusion, final TracedConclusionVisitor<?, ?> visitor) {
 		final MutableInteger counter = new MutableInteger(0);
 		
-		reader_.accept(root, conclusion, new BaseTracedConclusionVisitor<Void, Void>() {
+		reader.accept(root, conclusion, new BaseTracedConclusionVisitor<Void, Void>() {
 
 			@Override
 			protected Void defaultTracedVisit(TracedConclusion inference,	Void ignored) {

@@ -19,17 +19,15 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class AvoidTrivialPropagationReader implements TraceStore.Reader {
+public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 
-	private final TraceStore.Reader reader_;
-	
 	public AvoidTrivialPropagationReader(TraceStore.Reader r) {
-		reader_ = r;
+		super(r);
 	}
 
 	@Override
 	public void accept(final IndexedClassExpression root, final Conclusion conclusion, final TracedConclusionVisitor<?, ?> visitor) {
-		reader_.accept(root, conclusion, new BaseTracedConclusionVisitor<Void, Void>() {
+		reader.accept(root, conclusion, new BaseTracedConclusionVisitor<Void, Void>() {
 
 			@Override
 			protected Void defaultTracedVisit(TracedConclusion inference, Void ignored) {
@@ -65,7 +63,7 @@ public class AvoidTrivialPropagationReader implements TraceStore.Reader {
 		
 		final MutableBoolean linkProducedByDecomposition = new MutableBoolean(false);
 		
-		reader_.accept(inferenceContext.getRoot(), link, new BaseTracedConclusionVisitor<Boolean, Void>(){
+		reader.accept(inferenceContext.getRoot(), link, new BaseTracedConclusionVisitor<Boolean, Void>(){
 
 			@Override
 			public Boolean visit(DecomposedExistential conclusion, 	Void ignored) {

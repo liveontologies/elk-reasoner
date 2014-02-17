@@ -15,10 +15,14 @@ public class UsedInferencesCounter extends BaseTracedConclusionVisitor<Void, Con
 
 	private int infCounter_ = 0;
 	
+	//private Set<TracedConclusion> inferences = new HashSet<TracedConclusion>();
+	
 	@Override
 	protected Void defaultTracedVisit(TracedConclusion conclusion,
 			Context parameter) {
 		infCounter_++;
+		//inferences.add(conclusion);
+		//System.out.println(parameter + ": " + conclusion + ": " + InferencePrinter.print(conclusion));
 		
 		return super.defaultTracedVisit(conclusion, parameter);
 	}
@@ -29,6 +33,7 @@ public class UsedInferencesCounter extends BaseTracedConclusionVisitor<Void, Con
 	
 	public int getInferenceCount() {
 		return infCounter_;
+		//return inferences.size();
 	}
 
 	

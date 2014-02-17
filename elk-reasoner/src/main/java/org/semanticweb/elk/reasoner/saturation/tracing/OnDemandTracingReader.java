@@ -20,13 +20,11 @@ import org.slf4j.LoggerFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class OnDemandTracingReader implements TraceStore.Reader {
+public class OnDemandTracingReader extends DelegatingTraceReader {
 	
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(OnDemandTracingReader.class);
 
 	private final TracingWriter tracingContextWriter_;
-	
-	private final TraceStore.Reader inferenceReader_;
 	
 	private final ContextTracingFactory tracingFactory_;
 	
@@ -34,7 +32,7 @@ public class OnDemandTracingReader implements TraceStore.Reader {
 			LocalTracingSaturationState tracingState,
 			TraceStore.Reader inferenceReader,
 			ContextTracingFactory tracingFactory) {
-		inferenceReader_ = inferenceReader;
+		super(inferenceReader);
 		tracingContextWriter_  = tracingState.getTracingWriter();
 		tracingFactory_ = tracingFactory;
 	}
@@ -62,6 +60,6 @@ public class OnDemandTracingReader implements TraceStore.Reader {
 			}
 		}
 
-		inferenceReader_.accept(root, conclusion, visitor);
+		reader.accept(root, conclusion, visitor);
 	}
 }

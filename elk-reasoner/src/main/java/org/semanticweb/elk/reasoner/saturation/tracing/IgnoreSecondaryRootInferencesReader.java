@@ -15,17 +15,15 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class IgnoreSecondaryRootInferencesReader implements TraceStore.Reader {
+public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 
-	private final TraceStore.Reader reader_;
-	
 	public IgnoreSecondaryRootInferencesReader(TraceStore.Reader r) {
-		reader_ = r;
+		super(r);
 	}
 
 	@Override
 	public void accept(final IndexedClassExpression root, final Conclusion conclusion, final TracedConclusionVisitor<?, ?> visitor) {
-		reader_.accept(root, conclusion, new BaseTracedConclusionVisitor<Boolean, Context>() {
+		reader.accept(root, conclusion, new BaseTracedConclusionVisitor<Boolean, Context>() {
 
 			@Override
 			protected Boolean defaultTracedVisit(TracedConclusion conclusion, Context context) {
