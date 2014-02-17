@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
 /**
- * Functions that can write the saturation state are grouped here.
+ * An object that can modify a {@link SaturationState}.
  * 
  * @author Pavel Klinov
  * 
@@ -38,6 +38,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * @author "Yevgeny Kazakov"
  */
 public interface SaturationStateWriter extends ConclusionProducer {
+
+	/**
+	 * @return the {@link SaturationState} modified by this
+	 *         {@link SaturationStateWriter}
+	 */
+	public SaturationState getSaturationState();
 
 	public Context pollForActiveContext();
 
@@ -58,6 +64,6 @@ public interface SaturationStateWriter extends ConclusionProducer {
 	public boolean markAsNotSaturated(IndexedClassExpression root);
 
 	public void resetContexts();
-	
+
 	public void dispose();
 }

@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInitializingInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -55,8 +56,8 @@ public class RuleApplicationAdditionUnSaturationFactory extends
 			RuleVisitor ruleVisitor, SaturationStateWriter writer) {
 		// the visitor used for inserting conclusion
 		return new ComposedConclusionVisitor<Context>(
-		// insert conclusions
-				new ConclusionInsertionVisitor(),
+		// insert conclusions initializing contexts if necessary
+				new ConclusionInitializingInsertionVisitor(writer),
 				// if new, mark the source context as unsaturated
 				new ConclusionSourceContextUnsaturationVisitor(writer),
 				// afterwards, apply all non-redundant rules

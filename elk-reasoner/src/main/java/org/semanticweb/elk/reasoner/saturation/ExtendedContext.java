@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SubConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -49,18 +48,5 @@ public interface ExtendedContext extends Context {
 	 * @see Conclusion#getSourceRoot(IndexedClassExpression)
 	 */
 	boolean setSaturated(boolean saturated);
-
-	/**
-	 * Mark the given sub-root {@link IndexedPropertyChain} as initialized. This
-	 * does not automatically create the {@link SubContext} for this sub-root.
-	 * 
-	 * @param subRoot
-	 *            the {@link IndexedPropertyChain} which should be marked as
-	 *            initialized
-	 * @return {@code true} if this {@link ExtendedContext} was changed as a
-	 *         result of this operation, i.e., the given
-	 *         {@link IndexedPropertyChain} was not marked as initialized.
-	 */
-	public boolean setInitSubRoot(IndexedPropertyChain subRoot);
 
 }

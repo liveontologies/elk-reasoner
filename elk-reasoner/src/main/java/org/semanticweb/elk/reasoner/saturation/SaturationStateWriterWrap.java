@@ -71,4 +71,9 @@ public class SaturationStateWriterWrap<W extends SaturationStateWriter>
 		mainWriter.dispose();
 	}
 
+	@Override
+	public SaturationState getSaturationState() {
+		return mainWriter.getSaturationState();
+	}
+
 }

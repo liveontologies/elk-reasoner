@@ -91,12 +91,6 @@ public class ContextImpl implements ExtendedContext {
 	private Map<IndexedPropertyChain, SubContext> subContextsByObjectProperty_ = null;
 
 	/**
-	 * the {@link IndexedPropertyChain} for which {@link SubContext}s are
-	 * (being) initialized
-	 */
-	private Set<IndexedPropertyChain> initializedSubRoots_ = null;
-
-	/**
 	 * the derived {@link IndexedClassExpression} subsumers by
 	 * {@link IndexedDisjointnessAxiom}s in which they occur as members
 	 */
@@ -177,8 +171,7 @@ public class ContextImpl implements ExtendedContext {
 		return subContextsByObjectProperty_;
 	}
 
-	@Override
-	public SubContext getCreateSubContext(IndexedPropertyChain subRoot) {
+	SubContext getCreateSubContext(IndexedPropertyChain subRoot) {
 		if (subContextsByObjectProperty_ == null)
 			subContextsByObjectProperty_ = new ArrayHashMap<IndexedPropertyChain, SubContext>(
 					3);
@@ -188,13 +181,6 @@ public class ContextImpl implements ExtendedContext {
 			subContextsByObjectProperty_.put(subRoot, result);
 		}
 		return result;
-	}
-
-	@Override
-	public synchronized boolean setInitSubRoot(IndexedPropertyChain subRoot) {
-		if (initializedSubRoots_ == null)
-			initializedSubRoots_ = new ArrayHashSet<IndexedPropertyChain>(3);
-		return initializedSubRoots_.add(subRoot);
 	}
 
 	public boolean removeSubContext(IndexedPropertyChain subRoot) {

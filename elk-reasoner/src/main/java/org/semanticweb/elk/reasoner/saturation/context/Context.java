@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.saturation.context;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SubConclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
@@ -48,13 +47,6 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  * 
  */
 public interface Context extends ConclusionSet, ContextPremises {
-
-	/**
-	 * @param subRoot
-	 * @return the {@link SubContext} associated with the given
-	 *         {@link IndexedPropertyChain}; creates new if necessary
-	 */
-	public SubContext getCreateSubContext(IndexedPropertyChain subRoot);
 
 	/**
 	 * @return the {@link Chain} view of all backward link rules assigned to

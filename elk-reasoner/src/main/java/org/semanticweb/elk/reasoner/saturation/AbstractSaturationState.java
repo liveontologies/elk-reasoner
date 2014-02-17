@@ -32,13 +32,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SubConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,12 +58,6 @@ public abstract class AbstractSaturationState implements SaturationState {
 	private final Queue<Context> activeContexts_ = new ConcurrentLinkedQueue<Context>();
 
 	/**
-	 * The {@link Conclusion} used to initialize contexts using
-	 * {@link ContextInitRule}s
-	 */
-	private final Conclusion contextInitConclusion_;
-
-	/**
 	 * The queue containing all {@link Context}s of this {@link SaturationState}
 	 * that are not saturated, i.e., for which {@link Context#isSaturated()}
 	 * returns {@code false}. Each non-saturated context occurs exactly once.
@@ -80,7 +69,6 @@ public abstract class AbstractSaturationState implements SaturationState {
 
 	public AbstractSaturationState(OntologyIndex index) {
 		this.ontologyIndex = index;
-		this.contextInitConclusion_ = new ContextInitialization(index);
 	}
 
 	@Override
@@ -219,6 +207,11 @@ public abstract class AbstractSaturationState implements SaturationState {
 			localNotSaturatedContextCount_ = 0;
 		}
 
+		@Override
+		public SaturationState getSaturationState() {
+			return AbstractSaturationState.this;
+		}
+
 	}
 
 	/**
@@ -227,8 +220,8 @@ public abstract class AbstractSaturationState implements SaturationState {
 	 *         pavel.klinov@uni-ulm.de
 	 * @author "Yevgeny Kazakov"
 	 */
-	protected class ContextCreatingWriter extends ContextModifyingWriter implements
-			SaturationStateWriter {
+	protected class ContextCreatingWriter extends ContextModifyingWriter
+			implements SaturationStateWriter {
 
 		private final ContextCreationListener contextCreationListener_;
 
@@ -243,16 +236,6 @@ public abstract class AbstractSaturationState implements SaturationState {
 		protected ContextCreatingWriter() {
 			super(ContextModificationListener.DUMMY);
 			this.contextCreationListener_ = ContextCreationListener.DUMMY;
-		}
-
-		void produce(ExtendedContext context, Conclusion conclusion) {
-			if (conclusion instanceof SubConclusion) {
-				SubConclusion subConclusion = (SubConclusion) conclusion;
-				IndexedPropertyChain subRoot = subConclusion.getSubRoot();
-				if (context.setInitSubRoot(subRoot))
-					initSubContext(context, subRoot);
-			}
-			super.produce(context, conclusion);
 		}
 
 		@Override
@@ -270,25 +253,11 @@ public abstract class AbstractSaturationState implements SaturationState {
 			if (previous != null)
 				// the context is already assigned meanwhile
 				return previous;
-
 			// else the context is new and not saturated
 			markAsNotSaturatedInternal(newContext);
-			// it should be initialized
-			initContext(newContext);
 			contextCreationListener_.notifyContextCreation(newContext);
 			LOGGER_.trace("{}: context created", newContext);
-
 			return newContext;
-		}
-
-		public void initContext(Context context) {
-			LOGGER_.trace("{}: initializing", context);
-			super.produce(context, contextInitConclusion_);
-		}
-
-		public void initSubContext(Context context, IndexedPropertyChain subRoot) {
-			LOGGER_.trace("{}: sub-context {} initializing", context, subRoot);
-			produce(context, new SubContextInitialization(subRoot));
 		}
 
 	}
