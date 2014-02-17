@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SubConclusion;
@@ -34,31 +35,32 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusio
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
-public class SubContextImpl implements SubContext {
+public class SubContextImpl extends ArrayHashSet<IndexedClassExpression>
+		implements SubContext {
 
 	private static final SubConclusionVisitor<SubContextImpl, Boolean> SUB_CONCLUSION_INSERTER_ = new SubConclusionInserter();
 	private static final SubConclusionVisitor<SubContextImpl, Boolean> SUB_CONCLUSION_DELETOR_ = new SubConclusionDeletor();
 	private static final SubConclusionVisitor<SubContextImpl, Boolean> SUB_CONCLUSION_OCCURRENCE_CHECKER_ = new SubConclusionOccurrenceChecker();
 
-	Set<IndexedClassExpression> linkedRoots_;
-
-	Set<IndexedClassExpression> propagatedSubsumers_;
+	Set<IndexedObjectSomeValuesFrom> propagatedSubsumers_;
 
 	/**
 	 * {@code true} if this {@link SubContext} was initialized
 	 */
 	boolean isInitialized_ = false;
 
-	@Override
-	public Set<IndexedClassExpression> getLinkedRoots() {
-		if (linkedRoots_ == null)
-			return Collections.emptySet();
-		// else
-		return linkedRoots_;
+	public SubContextImpl() {
+		// represents the set of roots linked by the stored backward links
+		super(3);
 	}
 
 	@Override
-	public Set<IndexedClassExpression> getPropagatedSubsumers() {
+	public Set<IndexedClassExpression> getLinkedRoots() {
+		return this;
+	}
+
+	@Override
+	public Set<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers() {
 		if (propagatedSubsumers_ == null)
 			return Collections.emptySet();
 		// else
@@ -85,15 +87,13 @@ public class SubContextImpl implements SubContext {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, SubContextImpl input) {
-			if (input.linkedRoots_ == null)
-				input.linkedRoots_ = new ArrayHashSet<IndexedClassExpression>(3);
-			return input.linkedRoots_.add(subConclusion.getSource());
+			return input.add(subConclusion.getSource());
 		}
 
 		@Override
 		public Boolean visit(Propagation subConclusion, SubContextImpl input) {
 			if (input.propagatedSubsumers_ == null)
-				input.propagatedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
+				input.propagatedSubsumers_ = new ArrayHashSet<IndexedObjectSomeValuesFrom>(
 						3);
 			return input.propagatedSubsumers_.add(subConclusion.getCarry());
 		}
@@ -115,10 +115,7 @@ public class SubContextImpl implements SubContext {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, SubContextImpl input) {
-			if (input.linkedRoots_ == null)
-				return false;
-			// else
-			return input.linkedRoots_.remove(subConclusion.getSource());
+			return input.remove(subConclusion.getSource());
 		}
 
 		@Override
@@ -146,10 +143,7 @@ public class SubContextImpl implements SubContext {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, SubContextImpl input) {
-			if (input.linkedRoots_ == null)
-				return false;
-			// else
-			return input.linkedRoots_.contains(subConclusion.getSource());
+			return input.contains(subConclusion.getSource());
 		}
 
 		@Override
