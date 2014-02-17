@@ -26,11 +26,12 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
 /**
- * An object that can modify a {@link SaturationState}.
+ * An object that can modify the respective {@link SaturationState}.
  * 
  * @author Pavel Klinov
  * 
@@ -45,6 +46,17 @@ public interface SaturationStateWriter extends ConclusionProducer {
 	 */
 	public SaturationState getSaturationState();
 
+	/**
+	 * Removes and returns the next active {@link Context} of the
+	 * {@link SaturationState}, i.e., the one which has at least one unprocessed
+	 * {@link Conclusion}
+	 * 
+	 * @return the next {@link Context} of the {@link SaturationState} with
+	 *         unprocessed {@link Conclusion} if there exists one, or
+	 *         {@code null} if not
+	 * 
+	 * @see Context#takeToDo()
+	 */
 	public Context pollForActiveContext();
 
 	/**
@@ -63,7 +75,15 @@ public interface SaturationStateWriter extends ConclusionProducer {
 	 */
 	public boolean markAsNotSaturated(IndexedClassExpression root);
 
+	/**
+	 * Removes all assignments of {@link Context}s to
+	 * {@link IndexedClassExpression}s of this {@link SaturationState}. After
+	 * that, {@link SaturationState#getContexts()} should be empty.
+	 */
 	public void resetContexts();
 
+	/**
+	 * Free the resources used by this {@link SaturationStateWriter}
+	 */
 	public void dispose();
 }
