@@ -260,51 +260,55 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	private void processFinishedCounters(ThisStatistics localStatistics)
 			throws InterruptedException {
 		for (;;) {
-			int shapshotContextsFinished = countContextsFinished_.get();
-			if (shapshotContextsFinished == countContextsProcessed_.get()) {
-				break;
-			}
-			if (countContextsFinished_.compareAndSet(shapshotContextsFinished,
-					shapshotContextsFinished + 1)) {
-				/*
-				 * It is safe to assume that the next (created) context becomes
-				 * saturated since we create contexts only when workers are
-				 * working and we took the snapshot of processed contexts before
-				 * some time when all workers stop (and thus all created
-				 * contexts become saturated).
-				 */
-				saturationState_.setNextContextSaturated();
-			}
-		}
-		for (;;) {
 			int shapshotJobsFinished = countJobsFinished_.get();
-			if (shapshotJobsFinished == countJobsProcessed_.get()) {
-				break;
-			}
-			/*
-			 * at this place we know that the number of output jobs is smaller
-			 * than the number of processed jobs; we try to increment this
-			 * counter if it has not been changed.
-			 */
-			if (countJobsFinished_.compareAndSet(shapshotJobsFinished,
-					shapshotJobsFinished + 1)) {
+			int shapshotContextsFinished = countContextsFinished_.get();
+			if (shapshotContextsFinished < countContextsProcessed_.get()) {
+				if (countContextsFinished_.compareAndSet(
+						shapshotContextsFinished, shapshotContextsFinished + 1)) {
+					/*
+					 * It is safe to assume that the next (created) context
+					 * becomes saturated since we create contexts only when
+					 * workers are working and we took the snapshot of processed
+					 * contexts before some time when all workers stop (and thus
+					 * all created contexts become saturated).
+					 */
+					saturationState_.setNextContextSaturated();
+				}
+				continue;
+			}			
+			if (shapshotJobsFinished < countJobsProcessed_.get()) {
 				/*
-				 * It is safe to assume that the next job in the buffer is
-				 * processed since we increment the counter for the jobs only
-				 * after the job is submitted, and the number of active workers
-				 * remains positive until the job is processed.
+				 * at this place we know that the number of output jobs is smaller
+				 * than the number of processed jobs; we try to increment this
+				 * counter if it has not been changed.
 				 */
-				J nextJob = jobsInProgress_.poll();
-				IndexedClassExpression root = nextJob.getInput();
-				Context rootSaturation = saturationState_.getContext(root);
+				if (countJobsFinished_.compareAndSet(shapshotJobsFinished,
+						shapshotJobsFinished + 1)) {
+					/*
+					 * It is safe to assume that the next job in the buffer is
+					 * processed since we increment the counter for the jobs
+					 * only after the job is submitted, and the number of active
+					 * workers remains positive until the job is processed.
+					 */
+					J nextJob = jobsInProgress_.poll();
+					IndexedClassExpression root = nextJob.getInput();
+					Context rootSaturation = saturationState_.getContext(root);
+					/*
+					 * rootSaturation should be already marked as saturated
+					 * because we took shapshotContextsFinished after
+					 * shapshotJobsFinished
+					 */
+					nextJob.setOutput(rootSaturation);
 
-				nextJob.setOutput(rootSaturation);
+					LOGGER_.trace("{}: saturation finished", root);
 
-				LOGGER_.trace("{}: saturation finished", root);
-
-				localStatistics.jobsProcessedNo++;
-				listener_.notifyFinished(nextJob);
+					localStatistics.jobsProcessedNo++;
+					listener_.notifyFinished(nextJob);
+				}
+				continue;
 			}
+			break;
+
 		}
 	}
 
@@ -322,12 +326,12 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			return;
 		}
 		/*
-		 * otherwise, cache the current snapshot for created contexts and jobs;
+		 * otherwise, cache the current snapshot for created jobs and contexts;
 		 * it is important for correctness to measure the number of started
-		 * workers only after that
+		 * workers only after that; the order of measurements matter
 		 */
-		int snapshotCountContextCreated = countContextsCreated_.get();
 		int snapshotCountJobsSubmitted = countJobsSubmitted_.get();
+		int snapshotCountContextCreated = countContextsCreated_.get();
 		if (countStartedWorkers_.get() > snapshotFinishedWorkers)
 			// this means that some started worker did not finish yet
 			return;

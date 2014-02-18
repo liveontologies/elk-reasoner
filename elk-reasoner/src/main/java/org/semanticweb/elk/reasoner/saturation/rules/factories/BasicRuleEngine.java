@@ -74,10 +74,4 @@ class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
 		return writer_.pollForActiveContext();
 	}
 
-	@Override
-	public void finish() {
-		super.finish();
-		writer_.dispose();
-	}
-
 }

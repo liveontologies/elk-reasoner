@@ -64,11 +64,6 @@ public class SaturationStateWriterWrap implements SaturationStateWriter {
 	}
 
 	@Override
-	public void dispose() {
-		mainWriter.dispose();
-	}
-
-	@Override
 	public SaturationState getSaturationState() {
 		return mainWriter.getSaturationState();
 	}

@@ -69,7 +69,6 @@ class ContextAssignmentResetStage extends AbstractReasonerStage {
 		SaturationStateWriter writer = reasoner.saturationState
 				.getContextModifyingWriter(ContextModificationListener.DUMMY);
 		writer.resetContexts();
-		writer.dispose();
 	}
 
 	@Override
