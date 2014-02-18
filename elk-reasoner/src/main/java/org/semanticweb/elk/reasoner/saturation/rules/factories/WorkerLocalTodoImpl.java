@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,6 +27,8 @@ import java.util.Deque;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of a {@link WorkerLocalTodo} backed by an
@@ -35,6 +38,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
  * 
  */
 public class WorkerLocalTodoImpl implements WorkerLocalTodo {
+
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(WorkerLocalTodoImpl.class);
 
 	private final Deque<Conclusion> localConclusions_;
 
@@ -51,6 +58,7 @@ public class WorkerLocalTodoImpl implements WorkerLocalTodo {
 
 	@Override
 	public void add(Conclusion concusion) {
+		LOGGER_.trace("{}: produced local conclusion", concusion);
 		localConclusions_.add(concusion);
 	}
 
@@ -61,6 +69,7 @@ public class WorkerLocalTodoImpl implements WorkerLocalTodo {
 
 	@Override
 	public void setActiveRoot(IndexedClassExpression currentActiveRoot) {
+		LOGGER_.trace("{}: new active root", currentActiveRoot);
 		this.activeRoot_ = currentActiveRoot;
 	}
 
