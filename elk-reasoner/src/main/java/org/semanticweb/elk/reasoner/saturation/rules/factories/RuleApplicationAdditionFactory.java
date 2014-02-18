@@ -61,8 +61,10 @@ public class RuleApplicationAdditionFactory extends
 	public InputProcessor<IndexedClassExpression> getEngine(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer,
 			SaturationStatistics localStatistics) {
+		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
+		writer = getActiveWriter(writer, localTodo, localStatistics);
 		return super.getEngine(getConclusionProcessor(ruleVisitor, writer),
-				writer, localStatistics);
+				writer, localTodo, localStatistics);
 	}
 
 	@SuppressWarnings("unchecked")

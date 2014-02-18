@@ -160,7 +160,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 		}
 
 		void produce(Context context, Conclusion conclusion) {
-			LOGGER_.trace("{}: produced conclusion {}", context, conclusion);
+//			LOGGER_.trace("{}: produced conclusion {}", context, conclusion);
 			if (context.addToDo(conclusion)) {
 				LOGGER_.trace("{}: activated", context);
 				// context was activated

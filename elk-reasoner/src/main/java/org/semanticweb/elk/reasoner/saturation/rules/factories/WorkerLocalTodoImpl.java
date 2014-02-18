@@ -1,5 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation;
-
+package org.semanticweb.elk.reasoner.saturation.rules.factories;
 /*
  * #%L
  * ELK Reasoner
@@ -22,36 +21,47 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * A {@link SaturationStateWriter} that does not produce conclusions if their
- * source context is already saturated.
- * 
- * @author Pavel Klinov
+ * An implementation of a {@link WorkerLocalTodo} backed by an
+ * {@link ArrayDeque}
  * 
  * @author "Yevgeny Kazakov"
+ * 
  */
-public class SaturationCheckingWriter extends SaturationStateWriterWrap {
+public class WorkerLocalTodoImpl implements WorkerLocalTodo {
 
-	private final SaturationState state_;
+	private final Deque<Conclusion> localConclusions_;
 
-	public SaturationCheckingWriter(SaturationStateWriter writer,
-			SaturationState state) {
-		super(writer);
-		this.state_ = state;
+	private IndexedClassExpression activeRoot_;
+
+	public WorkerLocalTodoImpl() {
+		this.localConclusions_ = new ArrayDeque<Conclusion>(1024);
 	}
 
 	@Override
-	public void produce(IndexedClassExpression root, Conclusion conclusion) {
-		Context sourceContext = state_.getContext(conclusion
-				.getSourceRoot(root));
+	public Conclusion poll() {
+		return localConclusions_.pollLast();
+	}
 
-		if (sourceContext == null || !sourceContext.isSaturated()) {
-			super.produce(root, conclusion);
-		}
+	@Override
+	public void add(Conclusion concusion) {
+		localConclusions_.add(concusion);
+	}
+
+	@Override
+	public IndexedClassExpression getActiveRoot() {
+		return activeRoot_;
+	}
+
+	@Override
+	public void setActiveRoot(IndexedClassExpression currentActiveRoot) {
+		this.activeRoot_ = currentActiveRoot;
 	}
 
 }

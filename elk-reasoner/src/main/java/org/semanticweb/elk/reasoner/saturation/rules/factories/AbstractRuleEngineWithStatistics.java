@@ -60,9 +60,9 @@ public abstract class AbstractRuleEngineWithStatistics extends
 
 	public AbstractRuleEngineWithStatistics(
 			ConclusionVisitor<Context, ?> conclusionProcessor,
-			SaturationStatistics aggregatedStats,
+			WorkerLocalTodo localTodo, SaturationStatistics aggregatedStats,
 			SaturationStatistics localStatistics) {
-		super(conclusionProcessor);
+		super(conclusionProcessor, localTodo);
 		this.aggregatedStats_ = aggregatedStats;
 		this.localStatistics = localStatistics;
 		this.localContextStatistics = localStatistics.getContextStatistics();

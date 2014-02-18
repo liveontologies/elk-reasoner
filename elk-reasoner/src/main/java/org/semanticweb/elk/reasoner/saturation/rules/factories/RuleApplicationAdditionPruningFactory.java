@@ -92,10 +92,12 @@ public class RuleApplicationAdditionPruningFactory extends
 		SaturationStateWriter localWriter = localState_
 				.getContextCreatingWriter(ContextCreationListener.DUMMY,
 						ContextModificationListener.DUMMY);
-		// use local writer in the engine instead of the main one
+		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
+		// the engine processes todo in the local saturation state
+		localWriter = getActiveWriter(localWriter, localTodo, localStatistics);
 		return super.getEngine(
 				getConclusionProcessor(ruleVisitor, writer, localWriter),
-				localWriter, localStatistics);
+				localWriter, localTodo, localStatistics);
 	}
 
 	@SuppressWarnings("unchecked")

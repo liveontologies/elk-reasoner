@@ -34,15 +34,12 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <W>
- *            the type of the wrapped {@link SaturationStateWriter}
  */
-public class SaturationStateWriterWrap<W extends SaturationStateWriter>
-		implements SaturationStateWriter {
+public class SaturationStateWriterWrap implements SaturationStateWriter {
 
-	protected final W mainWriter;
+	protected final SaturationStateWriter mainWriter;
 
-	public SaturationStateWriterWrap(W mainWriter) {
+	public SaturationStateWriterWrap(SaturationStateWriter mainWriter) {
 		this.mainWriter = mainWriter;
 	}
 

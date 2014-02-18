@@ -45,10 +45,24 @@ public abstract class AbstractRuleEngine implements
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractRuleEngine.class);
 
+	/**
+	 * Specifies what to do with {@link Conclusion}s within the processed
+	 * {@link Context}
+	 */
 	private final ConclusionVisitor<Context, ?> conclusionProcessor_;
 
-	public AbstractRuleEngine(ConclusionVisitor<Context, ?> conclusionProcessor) {
+	/**
+	 * Accumulates the produced {@link Conclusion}s that should be processed
+	 * within the same {@link Context} in which they were produced; this should
+	 * always be emptied before continuing to the next {@link Context}
+	 */
+	private final WorkerLocalTodo workerLocalTodo_;
+
+	public AbstractRuleEngine(
+			ConclusionVisitor<Context, ?> conclusionProcessor,
+			WorkerLocalTodo localizedProducer) {
 		this.conclusionProcessor_ = conclusionProcessor;
+		this.workerLocalTodo_ = localizedProducer;
 	}
 
 	@Override
@@ -71,11 +85,17 @@ public abstract class AbstractRuleEngine implements
 	 *            the active {@link Context} with unprocessed
 	 *            {@link Conclusions}
 	 */
-	protected void process(Context context) {
+	void process(Context context) {
+		// this method should not be interrupted
+		// at this point workerLocalTodo_ must be empty
+		workerLocalTodo_.setActiveRoot(context.getRoot());
 		for (;;) {
-			Conclusion conclusion = context.takeToDo();
-			if (conclusion == null)
-				return;
+			Conclusion conclusion = workerLocalTodo_.poll();
+			if (conclusion == null) {
+				conclusion = context.takeToDo();
+				if (conclusion == null)
+					return;
+			}
 			LOGGER_.trace("{}: processing conclusion {}", context, conclusion);
 			conclusion.accept(conclusionProcessor_, context);
 		}

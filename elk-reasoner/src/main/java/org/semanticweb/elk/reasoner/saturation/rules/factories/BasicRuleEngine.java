@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
+
 /*
  * #%L
  * ELK Reasoner
@@ -54,11 +55,12 @@ class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
 
 	BasicRuleEngine(OntologyIndex index,
 			ConclusionVisitor<Context, Boolean> conclusionProcessor,
-			SaturationStateWriter saturationStateWriter,
+			WorkerLocalTodo localTodo, SaturationStateWriter writer,
 			SaturationStatistics aggregatedStatistics,
 			SaturationStatistics localStatistics) {
-		super(conclusionProcessor, aggregatedStatistics, localStatistics);
-		this.writer_ = saturationStateWriter;
+		super(conclusionProcessor, localTodo, aggregatedStatistics,
+				localStatistics);
+		this.writer_ = writer;
 		this.contextInitConclusion_ = new ContextInitialization(index);
 	}
 
