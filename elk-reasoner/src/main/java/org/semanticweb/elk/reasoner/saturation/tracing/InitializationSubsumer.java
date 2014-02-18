@@ -34,14 +34,14 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class InitializationSubsumer extends DecomposedSubsumerImpl implements DecomposedSubsumer, TracedConclusion {
+public class InitializationSubsumer extends DecomposedSubsumerImpl implements DecomposedSubsumer, Inference {
 
 	InitializationSubsumer(IndexedClassExpression expression) {
 		super(expression);
 	}
 
 	@Override
-	public <R, C> R acceptTraced(TracedConclusionVisitor<R, C> visitor, C parameter) {
+	public <R, C> R acceptTraced(InferenceVisitor<R, C> visitor, C parameter) {
 		return visitor.visit(this, parameter);
 	}
 

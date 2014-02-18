@@ -23,11 +23,11 @@ public class TraceUnwindingState {
 
 	private final Queue<Pair<Conclusion, Context>> toUnwind_;
 
-	private final Set<TracedConclusion> processedInferences_;
+	private final Set<Inference> processedInferences_;
 
 	TraceUnwindingState() {
 		toUnwind_ = new LinkedList<Pair<Conclusion, Context>>();
-		processedInferences_ = new ArrayHashSet<TracedConclusion>();
+		processedInferences_ = new ArrayHashSet<Inference>();
 	}
 
 	void addToUnwindingQueue(Conclusion conclusion, Context contextWhereStored) {
@@ -38,7 +38,7 @@ public class TraceUnwindingState {
 		return toUnwind_.poll();
 	}
 
-	boolean addToProcessed(TracedConclusion inference) {
+	boolean addToProcessed(Inference inference) {
 		return processedInferences_.add(inference);
 	}
 }

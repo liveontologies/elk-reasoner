@@ -33,9 +33,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
  */
 public interface ContextTraceStore {
 
-	public void accept(Conclusion conclusion, TracedConclusionVisitor<?,?> visitor);
+	public void accept(Conclusion conclusion, InferenceVisitor<?,?> visitor);
 	
-	public void visitInferences(TracedConclusionVisitor<?, ?> visitor);
+	public void visitInferences(InferenceVisitor<?, ?> visitor);
 	
-	public boolean addInference(TracedConclusion conclusion);
+	public boolean addInference(Inference conclusion);
 }

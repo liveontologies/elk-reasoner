@@ -26,7 +26,7 @@ public class IsInferenceCyclic {
 	 * @param targetContext The context which this inference is being produced to (i.e. the target)
 	 * @return
 	 */
-	static Conclusion check(final TracedConclusion inference, final Context targetContext, final TraceStore.Reader inferenceReader) {
+	static Conclusion check(final Inference inference, final Context targetContext, final TraceStore.Reader inferenceReader) {
 		// the inference is cyclic if at least one of the premises has been
 		// derived only through this inference's conclusion
 		final Context inferenceContext = inference.getInferenceContext(targetContext);
@@ -56,10 +56,10 @@ public class IsInferenceCyclic {
 		final MutableBoolean foundAlternative = new MutableBoolean(false);
 		final MutableBoolean anyInference = new MutableBoolean(false);
 
-		inferenceReader.accept(premiseContext.getRoot(), premise, new BaseTracedConclusionVisitor<Void, Void>(){
+		inferenceReader.accept(premiseContext.getRoot(), premise, new BaseInferenceVisitor<Void, Void>(){
 
 			@Override
-			protected Void defaultTracedVisit(TracedConclusion premiseInference, Void ignored) {
+			protected Void defaultTracedVisit(Inference premiseInference, Void ignored) {
 				anyInference.set(true);
 				
 				if (isAlternative(premiseInference, conclusion, conclusionContext)) {
@@ -80,7 +80,7 @@ public class IsInferenceCyclic {
 	 * the given conclusion). It is assumed that the premises are stored in the
 	 * same context as the conclusion.
 	 */
-	static boolean isAlternative(final TracedConclusion inference, final Conclusion conclusion, final Context conclusionContext) {
+	static boolean isAlternative(final Inference inference, final Conclusion conclusion, final Context conclusionContext) {
 		// if the premise is produced in a context different
 		// from where the conclusion is stored, then it must be
 		// produced by an alternative inference.

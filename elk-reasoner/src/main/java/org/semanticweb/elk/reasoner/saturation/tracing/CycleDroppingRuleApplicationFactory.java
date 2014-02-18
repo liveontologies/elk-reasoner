@@ -73,7 +73,7 @@ import org.slf4j.LoggerFactory;
  * inference may become acyclic later if that premise is derived by another
  * inference. For this reason we apply rules to the same conclusion multiple
  * times. This can lead to non-termination so
- * {@link TracedConclusionEqualityChecker} is used to ensure that one inference
+ * {@link InferenceEqualityChecker} is used to ensure that one inference
  * is not inserted into its context more than once.
  * 
  * This factory is less efficient than
@@ -326,7 +326,7 @@ public class CycleDroppingRuleApplicationFactory extends RuleApplicationFactory 
 		
 		public TracedConclusionInserter(ConclusionInsertionVisitor inserter, SaturationStatistics localStats) {
 			contextInserter_ = inserter;
-			inferenceInserter_ = SaturationUtils.getUsedConclusionCountingProcessor(new TracingConclusionInsertionVisitor(inferenceWriter_), localStats);
+			inferenceInserter_ = SaturationUtils.getUsedConclusionCountingProcessor(new InferenceInsertionVisitor(inferenceWriter_), localStats);
 		}
 
 		@Override
@@ -335,11 +335,11 @@ public class CycleDroppingRuleApplicationFactory extends RuleApplicationFactory 
 			//insert into context
 			if (!conclusion.accept(contextInserter_, cxt)) {
 				//this is not the first insertion so need to check for duplicates and cycles
-				if(!isNew((TracedConclusion) conclusion, cxt)) {
+				if(!isNew((Inference) conclusion, cxt)) {
 					return false;
 				}
 
-				if (CYCLE_AVOIDANCE && IsInferenceCyclic.check((TracedConclusion) conclusion, cxt, inferenceReader_) != null) {
+				if (CYCLE_AVOIDANCE && IsInferenceCyclic.check((Inference) conclusion, cxt, inferenceReader_) != null) {
 					return false;
 				}
 			}
@@ -354,15 +354,15 @@ public class CycleDroppingRuleApplicationFactory extends RuleApplicationFactory 
 	/**
 	 * Returns true if the conclusion has not yet been derived via the same inference 
 	 */
-	private boolean isNew(final TracedConclusion conclusion, final Context context) {
+	private boolean isNew(final Inference conclusion, final Context context) {
 		final MutableBoolean inferenceFound = new MutableBoolean(false);
 		
-		inferenceReader_.accept(context.getRoot(), conclusion, new BaseTracedConclusionVisitor<Void, Void>(){
+		inferenceReader_.accept(context.getRoot(), conclusion, new BaseInferenceVisitor<Void, Void>(){
 
 			@Override
-			protected Void defaultTracedVisit(TracedConclusion inference, Void ignored) {
+			protected Void defaultTracedVisit(Inference inference, Void ignored) {
 				
-				if (TracedConclusionEqualityChecker.equal(inference, conclusion, context)) {
+				if (InferenceEqualityChecker.equal(inference, conclusion, context)) {
 					
 					inferenceFound.set(true);
 				}

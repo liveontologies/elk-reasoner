@@ -38,7 +38,7 @@ public class RecursiveTraceExplorer {
 	 */
 	private final UntracedConclusionListener listener_;
 	
-	private final static TracedConclusionVisitor<?, Context> DUMMY_INFERENCE_VISITOR = new BaseTracedConclusionVisitor<Void, Context>();
+	private final static InferenceVisitor<?, Context> DUMMY_INFERENCE_VISITOR = new BaseInferenceVisitor<Void, Context>();
 
 	public RecursiveTraceExplorer(TraceStore.Reader reader, LocalTracingSaturationState state) {
 		this(reader, state, UntracedConclusionListener.DUMMY);
@@ -66,9 +66,9 @@ public class RecursiveTraceExplorer {
 	public void accept(Context context,
 			final Conclusion conclusion,
 			final ConclusionVisitor<Boolean, Context> premiseVisitor,
-			final TracedConclusionVisitor<?, Context> inferenceVisitor) {
+			final InferenceVisitor<?, Context> inferenceVisitor) {
 		final Queue<InferenceWrapper> toDo = new LinkedList<InferenceWrapper>();
-		final Set<TracedConclusion> seenInferences = new HashSet<TracedConclusion>();
+		final Set<Inference> seenInferences = new HashSet<Inference>();
 
 		addToQueue(context, conclusion, toDo, seenInferences, premiseVisitor, inferenceVisitor);
 		// this visitor visits all premises and putting them into the todo queue
@@ -96,9 +96,9 @@ public class RecursiveTraceExplorer {
 	private void addToQueue(final Context context, 
 			final Conclusion conclusion,
 			final Queue<InferenceWrapper> toDo,
-			final Set<TracedConclusion> seenInferences,
+			final Set<Inference> seenInferences,
 			final ConclusionVisitor<Boolean, Context> visitor,
-			final TracedConclusionVisitor<?, Context> inferenceVisitor) {
+			final InferenceVisitor<?, Context> inferenceVisitor) {
 		
 		Context tracedContext = tracingState_.getContext(conclusion.getSourceContext(context).getRoot());
 		
@@ -114,10 +114,10 @@ public class RecursiveTraceExplorer {
 		// here, the inference must have premises, i.e. it's not an
 		// initialization inference)
 		traceReader_.accept(context.getRoot(), conclusion,
-				new BaseTracedConclusionVisitor<Void, Void>() {
+				new BaseInferenceVisitor<Void, Void>() {
 
 					@Override
-					protected Void defaultTracedVisit(TracedConclusion inference, Void v) {
+					protected Void defaultTracedVisit(Inference inference, Void v) {
 						if (!seenInferences.contains(inference)) {
 							Context inferenceContext = inference.getInferenceContext(context);
 							
@@ -144,10 +144,10 @@ public class RecursiveTraceExplorer {
 	 */
 	private static class InferenceWrapper {
 
-		final TracedConclusion inference;
+		final Inference inference;
 		final Context context;
 
-		InferenceWrapper(TracedConclusion inf, Context cxt) {
+		InferenceWrapper(Inference inf, Context cxt) {
 			inference = inf;
 			context = cxt;
 		}

@@ -200,7 +200,7 @@ public class CycleBlockingRuleApplicationFactory extends RuleApplicationFactory 
 		public void produce(Context context, Conclusion conclusion) {
 			// no need to check for duplicates since rules for all conclusions
 			// are applied only once.			
-			final TracedConclusion inference = (TracedConclusion) conclusion;
+			final Inference inference = (Inference) conclusion;
 			final TracedContext thisContext = tracingState_.getContext(context.getRoot());
 			
 			if (thisContext == null || !CYCLE_AVOIDANCE) {
@@ -366,7 +366,7 @@ public class CycleBlockingRuleApplicationFactory extends RuleApplicationFactory 
 		
 		public TracedConclusionInserter(ConclusionInsertionVisitor inserter, CycleAvoidingWriter producer, SaturationStatistics localStats) {
 			contextInserter_ = inserter;
-			inferenceInserter_ = SaturationUtils.getUsedConclusionCountingProcessor(new TracingConclusionInsertionVisitor(inferenceWriter_), localStats);
+			inferenceInserter_ = SaturationUtils.getUsedConclusionCountingProcessor(new InferenceInsertionVisitor(inferenceWriter_), localStats);
 			localProducer_ = producer;
 		}
 
@@ -376,20 +376,20 @@ public class CycleBlockingRuleApplicationFactory extends RuleApplicationFactory 
 			conclusion.accept(inferenceInserter_, cxt);
 			//see if some inferences can now be unblocked
 			if (CYCLE_AVOIDANCE) {
-				unblockInferences((TracedConclusion) conclusion, (TracedContext) cxt);
+				unblockInferences((Inference) conclusion, (TracedContext) cxt);
 			}
 			//insert into context
 			return conclusion.accept(contextInserter_, cxt);
 		}
 		
-		private void unblockInferences(final TracedConclusion premiseInference, final TracedContext cxt) {
-			Collection<TracedConclusion> blocked = cxt.getBlockedInferences().get(new ConclusionEntry(premiseInference));
+		private void unblockInferences(final Inference premiseInference, final TracedContext cxt) {
+			Collection<Inference> blocked = cxt.getBlockedInferences().get(new ConclusionEntry(premiseInference));
 			
 			if (blocked != null) {
-				Iterator<TracedConclusion> inferenceIter = blocked.iterator();
+				Iterator<Inference> inferenceIter = blocked.iterator();
 				
 				for (; inferenceIter.hasNext(); ) {
-					final TracedConclusion blockedInference = inferenceIter.next();
+					final Inference blockedInference = inferenceIter.next();
 					
 					LOGGER_.trace("Checking if {} should be unblocked in {} since we derived {}", blockedInference, cxt, premiseInference);
 					

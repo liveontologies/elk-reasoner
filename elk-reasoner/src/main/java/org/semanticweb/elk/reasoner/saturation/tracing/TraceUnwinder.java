@@ -20,5 +20,5 @@ public interface TraceUnwinder {
 
 	public void accept(IndexedClassExpression root, Conclusion conclusion,
 			ConclusionVisitor<?, Context> conclusionVisitor,
-			TracedConclusionVisitor<?, Context> inferenceVisitor);
+			InferenceVisitor<?, Context> inferenceVisitor);
 }

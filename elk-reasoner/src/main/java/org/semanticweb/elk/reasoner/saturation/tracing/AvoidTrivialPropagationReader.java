@@ -26,11 +26,11 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 	}
 
 	@Override
-	public void accept(final IndexedClassExpression root, final Conclusion conclusion, final TracedConclusionVisitor<?, ?> visitor) {
-		reader.accept(root, conclusion, new BaseTracedConclusionVisitor<Void, Void>() {
+	public void accept(final IndexedClassExpression root, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
+		reader.accept(root, conclusion, new BaseInferenceVisitor<Void, Void>() {
 
 			@Override
-			protected Void defaultTracedVisit(TracedConclusion inference, Void ignored) {
+			protected Void defaultTracedVisit(Inference inference, Void ignored) {
 				inference.acceptTraced(visitor, null);
 				
 				return null;
@@ -63,7 +63,7 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 		
 		final MutableBoolean linkProducedByDecomposition = new MutableBoolean(false);
 		
-		reader.accept(inferenceContext.getRoot(), link, new BaseTracedConclusionVisitor<Boolean, Void>(){
+		reader.accept(inferenceContext.getRoot(), link, new BaseInferenceVisitor<Boolean, Void>(){
 
 			@Override
 			public Boolean visit(DecomposedExistential conclusion, 	Void ignored) {

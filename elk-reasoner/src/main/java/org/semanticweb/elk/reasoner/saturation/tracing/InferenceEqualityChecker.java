@@ -13,19 +13,19 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<Boolean, TracedConclusion> {
+public class InferenceEqualityChecker implements InferenceVisitor<Boolean, Inference> {
 
-	public static boolean equal(TracedConclusion first, TracedConclusion second, Context context) {
+	public static boolean equal(Inference first, Inference second, Context context) {
 		if (first.getInferenceContext(context).getRoot() != second.getInferenceContext(context).getRoot()) {
 			return false;
 		}
 		
-		return first.acceptTraced(new TracedConclusionEqualityChecker(), second);
+		return first.acceptTraced(new InferenceEqualityChecker(), second);
 	}
 	
 	@Override
-	public Boolean visit(InitializationSubsumer conclusion, TracedConclusion other) {
-		return other.acceptTraced(new BaseBooleanTracedConclusionVisitor<InitializationSubsumer>() {
+	public Boolean visit(InitializationSubsumer conclusion, Inference other) {
+		return other.acceptTraced(new BaseBooleanInferenceVisitor<InitializationSubsumer>() {
 
 			@Override
 			public Boolean visit(InitializationSubsumer first, InitializationSubsumer second) {
@@ -36,8 +36,8 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 	}
 
 	@Override
-	public Boolean visit(SubClassOfSubsumer conclusion, TracedConclusion other) {
-		return other.acceptTraced(new BaseBooleanTracedConclusionVisitor<SubClassOfSubsumer>() {
+	public Boolean visit(SubClassOfSubsumer conclusion, Inference other) {
+		return other.acceptTraced(new BaseBooleanInferenceVisitor<SubClassOfSubsumer>() {
 
 			@Override
 			public Boolean visit(SubClassOfSubsumer first, SubClassOfSubsumer second) {
@@ -50,8 +50,8 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 	}
 
 	@Override
-	public Boolean visit(ComposedConjunction conclusion, TracedConclusion other) {
-		return other.acceptTraced(new BaseBooleanTracedConclusionVisitor<ComposedConjunction>() {
+	public Boolean visit(ComposedConjunction conclusion, Inference other) {
+		return other.acceptTraced(new BaseBooleanInferenceVisitor<ComposedConjunction>() {
 
 			@Override
 			public Boolean visit(ComposedConjunction first, ComposedConjunction second) {
@@ -62,8 +62,8 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 	}
 
 	@Override
-	public Boolean visit(DecomposedConjunction conclusion, 	TracedConclusion other) {
-		return other.acceptTraced(new BaseBooleanTracedConclusionVisitor<DecomposedConjunction>() {
+	public Boolean visit(DecomposedConjunction conclusion, 	Inference other) {
+		return other.acceptTraced(new BaseBooleanInferenceVisitor<DecomposedConjunction>() {
 
 			@Override
 			public Boolean visit(DecomposedConjunction first, DecomposedConjunction second) {
@@ -75,8 +75,8 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 	}
 
 	@Override
-	public Boolean visit(PropagatedSubsumer conclusion, TracedConclusion other) {
-		return other.acceptTraced(new BaseBooleanTracedConclusionVisitor<PropagatedSubsumer>() {
+	public Boolean visit(PropagatedSubsumer conclusion, Inference other) {
+		return other.acceptTraced(new BaseBooleanInferenceVisitor<PropagatedSubsumer>() {
 
 			@Override
 			public Boolean visit(PropagatedSubsumer first, PropagatedSubsumer second) {
@@ -90,8 +90,8 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 	}
 
 	@Override
-	public Boolean visit(ReflexiveSubsumer conclusion, 	TracedConclusion other) {
-		return other.acceptTraced(new BaseBooleanTracedConclusionVisitor<ReflexiveSubsumer>() {
+	public Boolean visit(ReflexiveSubsumer conclusion, 	Inference other) {
+		return other.acceptTraced(new BaseBooleanInferenceVisitor<ReflexiveSubsumer>() {
 
 			@Override
 			public Boolean visit(ReflexiveSubsumer first, ReflexiveSubsumer second) {
@@ -103,8 +103,8 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 	}
 
 	@Override
-	public Boolean visit(ComposedBackwardLink conclusion, TracedConclusion other) {
-		return other.acceptTraced(new BaseBooleanTracedConclusionVisitor<ComposedBackwardLink>() {
+	public Boolean visit(ComposedBackwardLink conclusion, Inference other) {
+		return other.acceptTraced(new BaseBooleanInferenceVisitor<ComposedBackwardLink>() {
 
 			@Override
 			public Boolean visit(ComposedBackwardLink first, ComposedBackwardLink second) {
@@ -118,8 +118,8 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 	}
 
 	@Override
-	public Boolean visit(ReversedBackwardLink conclusion, TracedConclusion other) {
-		return other.acceptTraced(new BaseBooleanTracedConclusionVisitor<ReversedBackwardLink>() {
+	public Boolean visit(ReversedBackwardLink conclusion, Inference other) {
+		return other.acceptTraced(new BaseBooleanInferenceVisitor<ReversedBackwardLink>() {
 
 			@Override
 			public Boolean visit(ReversedBackwardLink first, ReversedBackwardLink second) {
@@ -132,8 +132,8 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 	}
 
 	@Override
-	public Boolean visit(DecomposedExistential conclusion, 	TracedConclusion other) {
-		return other.acceptTraced(new BaseBooleanTracedConclusionVisitor<DecomposedExistential>() {
+	public Boolean visit(DecomposedExistential conclusion, 	Inference other) {
+		return other.acceptTraced(new BaseBooleanInferenceVisitor<DecomposedExistential>() {
 
 			@Override
 			public Boolean visit(DecomposedExistential first, DecomposedExistential second) {
@@ -145,8 +145,8 @@ public class TracedConclusionEqualityChecker implements TracedConclusionVisitor<
 	}
 
 	@Override
-	public Boolean visit(TracedPropagation conclusion, 	TracedConclusion other) {
-		return other.acceptTraced(new BaseBooleanTracedConclusionVisitor<TracedPropagation>() {
+	public Boolean visit(TracedPropagation conclusion, 	Inference other) {
+		return other.acceptTraced(new BaseBooleanInferenceVisitor<TracedPropagation>() {
 
 			@Override
 			public Boolean visit(TracedPropagation first, TracedPropagation second) {

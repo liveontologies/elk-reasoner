@@ -32,9 +32,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class InferencePrinter implements TracedConclusionVisitor<String, Void> {
+public class InferencePrinter implements InferenceVisitor<String, Void> {
 
-	public static String print(TracedConclusion conclusion) {
+	public static String print(Inference conclusion) {
 		return conclusion.acceptTraced(new InferencePrinter(), null);
 	}
 	

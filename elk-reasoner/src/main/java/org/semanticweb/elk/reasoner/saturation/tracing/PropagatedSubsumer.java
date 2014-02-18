@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class PropagatedSubsumer extends ComposedSubsumerImpl implements TracedConclusion {
+public class PropagatedSubsumer extends ComposedSubsumerImpl implements Inference {
 
 	private final IndexedPropertyChain linkRelation_;
 	
@@ -68,7 +68,7 @@ public class PropagatedSubsumer extends ComposedSubsumerImpl implements TracedCo
 	}	
 	
 	@Override
-	public <R, C> R acceptTraced(TracedConclusionVisitor<R, C> visitor, C parameter) {
+	public <R, C> R acceptTraced(InferenceVisitor<R, C> visitor, C parameter) {
 		return visitor.visit(this, parameter);
 	}
 

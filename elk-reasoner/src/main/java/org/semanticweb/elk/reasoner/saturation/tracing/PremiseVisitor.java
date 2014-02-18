@@ -10,7 +10,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor
  *
  * pavel.klinov@uni-ulm.de
  */
-public class PremiseVisitor<R, C> extends BaseConclusionVisitor<R, C> implements TracedConclusionVisitor<R, C> {
+public class PremiseVisitor<R, C> extends BaseConclusionVisitor<R, C> implements InferenceVisitor<R, C> {
 	
 	@Override
 	public R visit(InitializationSubsumer conclusion, C parameter) {

@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ComposedConjunction extends ComposedSubsumerImpl implements TracedConclusion {
+public class ComposedConjunction extends ComposedSubsumerImpl implements Inference {
 	//TODO store this as ICE
 	private final IndexedClassExpression first_;
 	
@@ -60,7 +60,7 @@ public class ComposedConjunction extends ComposedSubsumerImpl implements TracedC
 	}
 	
 	@Override
-	public <R, C> R acceptTraced(TracedConclusionVisitor<R, C> visitor, C parameter) {
+	public <R, C> R acceptTraced(InferenceVisitor<R, C> visitor, C parameter) {
 		return visitor.visit(this, parameter);
 	}
 

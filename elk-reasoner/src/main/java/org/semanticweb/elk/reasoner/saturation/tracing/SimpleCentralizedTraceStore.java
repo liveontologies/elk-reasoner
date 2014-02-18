@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 public class SimpleCentralizedTraceStore implements TraceStore {
 	
 	private final static Logger LOGGER_ = LoggerFactory.getLogger(SimpleCentralizedTraceStore.class);	
-	//TODO: use context roots as keys instead
+
 	private final ConcurrentHashMap<IndexedClassExpression, ContextTraceStore> storage_ = new ConcurrentHashMap<IndexedClassExpression, ContextTraceStore>();
 	
 	@Override
@@ -62,7 +62,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private class Reader implements TraceStore.Reader {
 
 		@Override
-		public void accept(IndexedClassExpression root, Conclusion conclusion, TracedConclusionVisitor<?,?> visitor) {
+		public void accept(IndexedClassExpression root, Conclusion conclusion, InferenceVisitor<?,?> visitor) {
 			ContextTraceStore tracer = storage_.get(root);
 			
 			if (tracer != null) {
@@ -76,7 +76,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 		}
 		
 		@Override
-		public void visitInferences(IndexedClassExpression root, TracedConclusionVisitor<?, ?> visitor) {
+		public void visitInferences(IndexedClassExpression root, InferenceVisitor<?, ?> visitor) {
 			ContextTraceStore tracer = storage_.get(root);
 			
 			if (tracer != null) {
@@ -89,7 +89,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private class Writer implements TraceStore.Writer {
 
 		@Override
-		public boolean addInference(IndexedClassExpression root, TracedConclusion conclusion) {
+		public boolean addInference(IndexedClassExpression root, Inference conclusion) {
 			ContextTraceStore tracer = storage_.get(root);
 			
 			if (LOGGER_.isTraceEnabled()) {

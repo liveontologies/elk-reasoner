@@ -32,7 +32,7 @@ public class GlobalTracingSaturationState implements ExtendedSaturationState {
 
 	private final ExtendedSaturationState mainSaturationState_;
 	
-	private final ConclusionFactory conclusionFactory_ = new TracingConclusionFactory();
+	private final ConclusionFactory conclusionFactory_ = new InferenceFactory();
 	
 	private final TraceStore.Writer traceWriter_;
 	
@@ -127,7 +127,7 @@ public class GlobalTracingSaturationState implements ExtendedSaturationState {
 
 		@Override
 		public ConclusionVisitor<Boolean, Context> getConclusionInserter() {
-			return new CombinedConclusionVisitor<Context>(new TracingConclusionInsertionVisitor(traceWriter_), super.getConclusionInserter());
+			return new CombinedConclusionVisitor<Context>(new InferenceInsertionVisitor(traceWriter_), super.getConclusionInserter());
 		}
 		
 	}
@@ -153,7 +153,7 @@ public class GlobalTracingSaturationState implements ExtendedSaturationState {
 
 		@Override
 		public ConclusionVisitor<Boolean, Context> getConclusionInserter() {
-			return new CombinedConclusionVisitor<Context>(new TracingConclusionInsertionVisitor(traceWriter_), super.getConclusionInserter());
+			return new CombinedConclusionVisitor<Context>(new InferenceInsertionVisitor(traceWriter_), super.getConclusionInserter());
 		}
 		
 	}

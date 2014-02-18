@@ -88,10 +88,10 @@ public class TracingTestUtils {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor.transform(reasoner, sub);
 		Conclusion conclusion = TracingUtils.getSubsumerWrapper(ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger inferenceCount = new AtomicInteger(0);
-		TracedConclusionVisitor<Boolean, Context> counter = new BaseTracedConclusionVisitor<Boolean, Context>() {
+		InferenceVisitor<Boolean, Context> counter = new BaseInferenceVisitor<Boolean, Context>() {
 
 			@Override
-			protected Boolean defaultTracedVisit(TracedConclusion conclusion, Context context) {
+			protected Boolean defaultTracedVisit(Inference conclusion, Context context) {
 				
 				LOGGER_.trace("{}: traced inference {}", subsumee, conclusion);
 				
@@ -117,10 +117,10 @@ public class TracingTestUtils {
 		for (IndexedClassExpression root : traceReader.getContextRoots()) {
 			final Context cxt = tracingState.getContext(root);
 			
-			traceReader.visitInferences(root, new BaseTracedConclusionVisitor<Void, Void>() {
+			traceReader.visitInferences(root, new BaseInferenceVisitor<Void, Void>() {
 
 				@Override
-				protected Void defaultTracedVisit(TracedConclusion inference, Void ignored) {
+				protected Void defaultTracedVisit(Inference inference, Void ignored) {
 					counter.increment();
 					
 					if (isInferenceCyclic(inference, cxt, traceReader)) {
@@ -144,7 +144,7 @@ public class TracingTestUtils {
 			TracedContext context = (TracedContext) cxt;
 			
 			for (Conclusion premise : context.getBlockedInferences().keySet()) {
-				for (TracedConclusion blocked : context.getBlockedInferences().get(premise)) {
+				for (Inference blocked : context.getBlockedInferences().get(premise)) {
 				
 					Context target = tracingState.getContext(blocked.acceptTraced(new GetInferenceTarget(), context));
 					
@@ -165,9 +165,9 @@ public class TracingTestUtils {
 	
 	
 	//the most straightforward (and slow) implementation
-	public static boolean isInferenceCyclic(final TracedConclusion inference, final Context inferenceTarget, final TraceStore.Reader traceReader) {
+	public static boolean isInferenceCyclic(final Inference inference, final Context inferenceTarget, final TraceStore.Reader traceReader) {
 		//first, create a map of premises to their inferences
-		final Multimap<Conclusion, TracedConclusion> premiseInferenceMap = new HashListMultimap<Conclusion, TracedConclusion>();
+		final Multimap<Conclusion, Inference> premiseInferenceMap = new HashListMultimap<Conclusion, Inference>();
 		final Context inferenceContext = inference.getInferenceContext(inferenceTarget);
 		
 		inference.acceptTraced(new PremiseVisitor<Void, Void>() {
@@ -175,10 +175,10 @@ public class TracingTestUtils {
 			@Override
 			protected Void defaultVisit(final Conclusion premise, Void ignored) {
 				
-				traceReader.accept(inferenceContext.getRoot(), premise, new BaseTracedConclusionVisitor<Void, Void>() {
+				traceReader.accept(inferenceContext.getRoot(), premise, new BaseInferenceVisitor<Void, Void>() {
 
 					@Override
-					protected Void defaultTracedVisit(TracedConclusion premiseInference, Void ignored) {
+					protected Void defaultTracedVisit(Inference premiseInference, Void ignored) {
 						
 						premiseInferenceMap.add(premise, premiseInference);
 						
@@ -196,7 +196,7 @@ public class TracingTestUtils {
 		for (Conclusion premise : premiseInferenceMap.keySet()) {
 			final MutableBoolean isPremiseCyclic = new MutableBoolean(true);
 			
-			for (TracedConclusion premiseInference : premiseInferenceMap.get(premise)) {
+			for (Inference premiseInference : premiseInferenceMap.get(premise)) {
 				final MutableBoolean isPremiseInferenceCyclic = new MutableBoolean(false);
 				//does it use the given conclusion as a premise?
 				if (premiseInference.getInferenceContext(inferenceContext).getRoot() == inferenceTarget.getRoot()) {

@@ -1,24 +1,24 @@
 package org.semanticweb.elk.benchmark.reasoning.tracing;
 
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.BaseTracedConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracedConclusion;
+import org.semanticweb.elk.reasoner.saturation.tracing.BaseInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.Inference;
 
 /**
- * Counts the number of visited inferences (instances of {@link TracedConclusion}).
+ * Counts the number of visited inferences (instances of {@link Inference}).
  * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class UsedInferencesCounter extends BaseTracedConclusionVisitor<Void, Context> {
+public class UsedInferencesCounter extends BaseInferenceVisitor<Void, Context> {
 
 	private int infCounter_ = 0;
 	
 	//private Set<TracedConclusion> inferences = new HashSet<TracedConclusion>();
 	
 	@Override
-	protected Void defaultTracedVisit(TracedConclusion conclusion,
+	protected Void defaultTracedVisit(Inference conclusion,
 			Context parameter) {
 		infCounter_++;
 		//inferences.add(conclusion);

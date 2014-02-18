@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DecomposedExistential extends BackwardLinkImpl implements TracedConclusion, BackwardLink {
+public class DecomposedExistential extends BackwardLinkImpl implements Inference, BackwardLink {
 
 	private final Context inferenceContext_;
 	
@@ -52,7 +52,7 @@ public class DecomposedExistential extends BackwardLinkImpl implements TracedCon
 	}
 	
 	@Override
-	public <R, C> R acceptTraced(TracedConclusionVisitor<R, C> visitor, C parameter) {
+	public <R, C> R acceptTraced(InferenceVisitor<R, C> visitor, C parameter) {
 		return visitor.visit(this, parameter);
 	}
 

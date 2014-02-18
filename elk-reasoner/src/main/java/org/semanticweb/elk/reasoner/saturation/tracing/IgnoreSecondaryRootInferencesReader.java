@@ -22,11 +22,11 @@ public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 	}
 
 	@Override
-	public void accept(final IndexedClassExpression root, final Conclusion conclusion, final TracedConclusionVisitor<?, ?> visitor) {
-		reader.accept(root, conclusion, new BaseTracedConclusionVisitor<Boolean, Context>() {
+	public void accept(final IndexedClassExpression root, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
+		reader.accept(root, conclusion, new BaseInferenceVisitor<Boolean, Context>() {
 
 			@Override
-			protected Boolean defaultTracedVisit(TracedConclusion conclusion, Context context) {
+			protected Boolean defaultTracedVisit(Inference conclusion, Context context) {
 				conclusion.acceptTraced(visitor, null);
 				
 				return true;

@@ -31,7 +31,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface TracedConclusionVisitor<R, C> {
+public interface InferenceVisitor<R, C> {
 
 	public R visit(InitializationSubsumer conclusion, C parameter);
 	
@@ -53,5 +53,5 @@ public interface TracedConclusionVisitor<R, C> {
 	
 	public R visit(TracedPropagation conclusion, C parameter);
 	
-	public static final TracedConclusionVisitor<?, ?> DUMMY = new BaseTracedConclusionVisitor<Void, Void>() {};
+	public static final InferenceVisitor<?, ?> DUMMY = new BaseInferenceVisitor<Void, Void>() {};
 }

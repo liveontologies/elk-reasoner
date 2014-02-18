@@ -110,7 +110,7 @@ public class LocalTracingSaturationState extends LocalSaturationState {
 
 	/**
 	 * The same as {@link LocalSaturationState.LocalWriter} but uses
-	 * {@link TracingConclusionFactory}.
+	 * {@link InferenceFactory}.
 	 * 
 	 * @author Pavel Klinov
 	 * 
@@ -120,7 +120,7 @@ public class LocalTracingSaturationState extends LocalSaturationState {
 
 		public TracingWriter(ConclusionVisitor<?, Context> visitor,
 				CompositionRuleApplicationVisitor ruleAppVisitor) {
-			super(visitor, ruleAppVisitor, new TracingConclusionFactory());
+			super(visitor, ruleAppVisitor, new InferenceFactory());
 		}
 
 		@Override
@@ -167,7 +167,7 @@ public class LocalTracingSaturationState extends LocalSaturationState {
 		 */
 		private final ConclusionStore tracedConclusions_;
 		
-		private HashListMultimap<Conclusion, TracedConclusion> blockedInferences_;
+		private HashListMultimap<Conclusion, Inference> blockedInferences_;
 		
 		TracedContext(Context local, Context main) {
 			localContext_ = local;
@@ -177,9 +177,9 @@ public class LocalTracingSaturationState extends LocalSaturationState {
 			tracedConclusions_ = new ConclusionStore();
 		}
 		
-		Multimap<Conclusion, TracedConclusion> getBlockedInferences() {
+		Multimap<Conclusion, Inference> getBlockedInferences() {
 			if (blockedInferences_ == null) {
-				blockedInferences_ = new HashListMultimap<Conclusion, TracedConclusion>();
+				blockedInferences_ = new HashListMultimap<Conclusion, Inference>();
 			}
 			
 			return blockedInferences_;

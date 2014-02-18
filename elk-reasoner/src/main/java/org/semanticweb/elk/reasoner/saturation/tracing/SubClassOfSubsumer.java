@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class SubClassOfSubsumer extends DecomposedSubsumerImpl implements DecomposedSubsumer, TracedConclusion {
+public class SubClassOfSubsumer extends DecomposedSubsumerImpl implements DecomposedSubsumer, Inference {
 	
 	private final Conclusion premise_;
 
@@ -49,7 +49,7 @@ public class SubClassOfSubsumer extends DecomposedSubsumerImpl implements Decomp
 	}
 
 	@Override
-	public <R, C> R acceptTraced(TracedConclusionVisitor<R, C> visitor, C parameter) {
+	public <R, C> R acceptTraced(InferenceVisitor<R, C> visitor, C parameter) {
 		return visitor.visit(this, parameter);
 	}
 

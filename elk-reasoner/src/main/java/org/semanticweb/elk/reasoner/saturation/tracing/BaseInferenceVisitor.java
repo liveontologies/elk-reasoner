@@ -31,9 +31,9 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class BaseTracedConclusionVisitor<R, C> implements TracedConclusionVisitor<R, C> {
+public class BaseInferenceVisitor<R, C> implements InferenceVisitor<R, C> {
 
-	protected R defaultTracedVisit(TracedConclusion conclusion, C parameter) {
+	protected R defaultTracedVisit(Inference conclusion, C parameter) {
 		return null;
 	}
 

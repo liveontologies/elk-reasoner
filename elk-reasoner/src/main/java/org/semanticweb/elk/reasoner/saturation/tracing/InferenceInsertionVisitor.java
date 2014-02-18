@@ -32,23 +32,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A conclusion visitor which processes {@link TracedConclusion}s and saves
+ * A conclusion visitor which processes {@link Inference}s and saves
  * their inferences using a {@link TraceStore.Writer}.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boolean, Context> {
+public class InferenceInsertionVisitor extends BaseConclusionVisitor<Boolean, Context> {
 
-	protected static final Logger LOGGER_ = LoggerFactory.getLogger(TracingConclusionInsertionVisitor.class);
+	protected static final Logger LOGGER_ = LoggerFactory.getLogger(InferenceInsertionVisitor.class);
 	
 	private final TraceStore.Writer traceWriter_;
 
-	private final TracedConclusionVisitor<Boolean, Context> tracedVisitor_ = new BaseTracedConclusionVisitor<Boolean, Context>() {
+	private final InferenceVisitor<Boolean, Context> tracedVisitor_ = new BaseInferenceVisitor<Boolean, Context>() {
 
 		@Override
-		protected Boolean defaultTracedVisit(TracedConclusion conclusion, Context context) {
+		protected Boolean defaultTracedVisit(Inference conclusion, Context context) {
 			traceWriter_.addInference(context.getRoot(), conclusion);
 			
 			return true;
@@ -58,18 +58,18 @@ public class TracingConclusionInsertionVisitor extends BaseConclusionVisitor<Boo
 	/**
 	 * 
 	 */
-	public TracingConclusionInsertionVisitor(TraceStore.Writer traceWriter) {
+	public InferenceInsertionVisitor(TraceStore.Writer traceWriter) {
 		traceWriter_ = traceWriter;
 	}
 
-	protected TracedConclusionVisitor<Boolean, Context> getTracedConclusionVisitor() {
+	protected InferenceVisitor<Boolean, Context> getTracedConclusionVisitor() {
 		return tracedVisitor_;
 	}
 	
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
-		if (conclusion instanceof TracedConclusion) {
-			return ((TracedConclusion) conclusion).acceptTraced(getTracedConclusionVisitor(), cxt);	
+		if (conclusion instanceof Inference) {
+			return ((Inference) conclusion).acceptTraced(getTracedConclusionVisitor(), cxt);	
 		}
 		else {
 			LOGGER_.warn("Tracing is ON but {} is not traced", conclusion);

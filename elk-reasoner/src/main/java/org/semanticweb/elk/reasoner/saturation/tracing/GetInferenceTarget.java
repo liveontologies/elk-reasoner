@@ -15,10 +15,10 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class GetInferenceTarget extends BaseTracedConclusionVisitor<IndexedClassExpression, Context> {
+public class GetInferenceTarget extends BaseInferenceVisitor<IndexedClassExpression, Context> {
 
 	@Override
-	protected IndexedClassExpression defaultTracedVisit(TracedConclusion conclusion, Context premiseContext) {
+	protected IndexedClassExpression defaultTracedVisit(Inference conclusion, Context premiseContext) {
 		// by default produce to the context where the inference has been
 		// made (where its premises are stored)
 		return premiseContext.getRoot();

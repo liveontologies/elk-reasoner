@@ -27,7 +27,7 @@ public class RecursiveTraceUnwinder {
 
 	private final TraceStore.Reader traceReader_;
 	
-	private final static TracedConclusionVisitor<?, Context> DUMMY_INFERENCE_VISITOR = new BaseTracedConclusionVisitor<Void, Context>();
+	private final static InferenceVisitor<?, Context> DUMMY_INFERENCE_VISITOR = new BaseInferenceVisitor<Void, Context>();
 
 	public RecursiveTraceUnwinder(TraceStore.Reader reader) {
 		traceReader_ = reader;
@@ -49,7 +49,7 @@ public class RecursiveTraceUnwinder {
 	public void accept(Context context,
 			final Conclusion conclusion,
 			final ConclusionVisitor<Boolean, Context> conclusionVisitor,
-			final TracedConclusionVisitor<?, Context> inferenceVisitor) {
+			final InferenceVisitor<?, Context> inferenceVisitor) {
 		final TraceUnwindingState unwindingState = new TraceUnwindingState();
 		
 		unwindingState.addToUnwindingQueue(conclusion, context);
@@ -69,7 +69,7 @@ public class RecursiveTraceUnwinder {
 			final Context contextWhereStored,
 			final TraceUnwindingState unwindingState,
 			final ConclusionVisitor<Boolean, Context> conclusionVisitor,
-			final TracedConclusionVisitor<?, Context> inferenceVisitor) {
+			final InferenceVisitor<?, Context> inferenceVisitor) {
 		
 		final PremiseVisitor<?, Context> premiseVisitor = new PremiseVisitor<Void, Context>() {
 
@@ -81,10 +81,10 @@ public class RecursiveTraceUnwinder {
 		};
 		
 		traceReader_.accept(contextWhereStored.getRoot(), conclusion,
-				new BaseTracedConclusionVisitor<Void, Void>() {
+				new BaseInferenceVisitor<Void, Void>() {
 
 					@Override
-					protected Void defaultTracedVisit(TracedConclusion inference, Void v) {
+					protected Void defaultTracedVisit(Inference inference, Void v) {
 						if (unwindingState.addToProcessed(inference)) {
 							Context inferenceContext = inference.getInferenceContext(contextWhereStored);
 							//visit the premises so they can be put into the queue

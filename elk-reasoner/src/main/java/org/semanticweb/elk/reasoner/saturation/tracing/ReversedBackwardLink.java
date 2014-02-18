@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReversedBackwardLink extends ForwardLinkImpl implements TracedConclusion {
+public class ReversedBackwardLink extends ForwardLinkImpl implements Inference {
 
 	private final BackwardLink sourceLink_;
 	
@@ -46,7 +46,7 @@ public class ReversedBackwardLink extends ForwardLinkImpl implements TracedConcl
 	}
 
 	@Override
-	public <R, C> R acceptTraced(TracedConclusionVisitor<R, C> visitor, C parameter) {
+	public <R, C> R acceptTraced(InferenceVisitor<R, C> visitor, C parameter) {
 		return visitor.visit(this, parameter);
 	}
 	

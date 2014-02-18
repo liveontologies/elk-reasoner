@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReflexiveSubsumer extends ComposedSubsumerImpl implements TracedConclusion {
+public class ReflexiveSubsumer extends ComposedSubsumerImpl implements Inference {
 
 	/**
 	 * @param superClassExpression
@@ -48,7 +48,7 @@ public class ReflexiveSubsumer extends ComposedSubsumerImpl implements TracedCon
 	}
 	
 	@Override
-	public <R, C> R acceptTraced(TracedConclusionVisitor<R, C> visitor, C parameter) {
+	public <R, C> R acceptTraced(InferenceVisitor<R, C> visitor, C parameter) {
 		return visitor.visit(this, parameter);
 	}
 

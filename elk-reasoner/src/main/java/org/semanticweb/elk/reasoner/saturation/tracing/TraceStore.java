@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 
 /**
  * The main object responsible for storing and retrieving inferences for {@link Conclusion}s.
- * Inferences are represented using {@link TracedConclusion}.
+ * Inferences are represented using {@link Inference}.
  * 
  * @author Pavel Klinov
  * 
@@ -49,11 +49,11 @@ public interface TraceStore {
 		 * @param conclusion
 		 * @param visitor
 		 */
-		public void accept(IndexedClassExpression root, Conclusion conclusion, TracedConclusionVisitor<?,?> visitor);
+		public void accept(IndexedClassExpression root, Conclusion conclusion, InferenceVisitor<?,?> visitor);
 		
 		public Iterable<IndexedClassExpression> getContextRoots();
 		
-		public void visitInferences(IndexedClassExpression root, TracedConclusionVisitor<?, ?> visitor);
+		public void visitInferences(IndexedClassExpression root, InferenceVisitor<?, ?> visitor);
 	}
 
 	/**
@@ -68,7 +68,7 @@ public interface TraceStore {
 		 * @param inference
 		 * @return
 		 */
-		public boolean addInference(IndexedClassExpression root, TracedConclusion conclusion);
+		public boolean addInference(IndexedClassExpression root, Inference conclusion);
 	}
 
 	/**

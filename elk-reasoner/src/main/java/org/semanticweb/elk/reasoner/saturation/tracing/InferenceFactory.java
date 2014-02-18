@@ -45,7 +45,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TracingConclusionFactory implements ConclusionFactory {
+public class InferenceFactory implements ConclusionFactory {
 
 	@Override
 	public DecomposedSubsumer createSubsumer(IndexedClassExpression ice) {

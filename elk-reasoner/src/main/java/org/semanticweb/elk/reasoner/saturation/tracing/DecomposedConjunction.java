@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DecomposedConjunction extends DecomposedSubsumerImpl implements TracedConclusion {
+public class DecomposedConjunction extends DecomposedSubsumerImpl implements Inference {
 
 	private final IndexedObjectIntersectionOf conjunction_;
 	
@@ -50,7 +50,7 @@ public class DecomposedConjunction extends DecomposedSubsumerImpl implements Tra
 	}
 	
 	@Override
-	public <R, C> R acceptTraced(TracedConclusionVisitor<R, C> visitor, C parameter) {
+	public <R, C> R acceptTraced(InferenceVisitor<R, C> visitor, C parameter) {
 		return visitor.visit(this, parameter);
 	}
 	

@@ -23,7 +23,7 @@ public class PremiseUtils {
 	 * @param condition
 	 * @return
 	 */
-	public static Conclusion find(TracedConclusion inference, final Condition<Conclusion> premiseCondition) {
+	public static Conclusion find(Inference inference, final Condition<Conclusion> premiseCondition) {
 		final AtomicReference<Conclusion> found = new AtomicReference<Conclusion>();
 		
 		inference.acceptTraced(new PremiseVisitor<Void, Void>() {

@@ -36,7 +36,7 @@ public class AcyclicRecursiveTraceUnwinder implements TraceUnwinder {
 	
 	private final TraceStore.Reader traceReader_;
 
-	private final static TracedConclusionVisitor<?, Context> DUMMY_INFERENCE_VISITOR = new BaseTracedConclusionVisitor<Void, Context>();
+	private final static InferenceVisitor<?, Context> DUMMY_INFERENCE_VISITOR = new BaseInferenceVisitor<Void, Context>();
 
 	public AcyclicRecursiveTraceUnwinder(TraceStore.Reader reader) {
 		traceReader_ = reader;
@@ -51,7 +51,7 @@ public class AcyclicRecursiveTraceUnwinder implements TraceUnwinder {
 	public void accept(IndexedClassExpression root, 
 			final Conclusion conclusion,
 			final ConclusionVisitor<?, Context> conclusionVisitor,
-			final TracedConclusionVisitor<?, Context> inferenceVisitor) {
+			final InferenceVisitor<?, Context> inferenceVisitor) {
 		
 		ConclusionByContextStore conclusionsToBeAvoided = new ConclusionByContextStore();
 		
@@ -63,7 +63,7 @@ public class AcyclicRecursiveTraceUnwinder implements TraceUnwinder {
 			final Conclusion conclusion,
 			final ConclusionByContextStore conclusionsToBeAvoided,
 			final ConclusionVisitor<?, Context> conclusionVisitor,
-			final TracedConclusionVisitor<?, Context> inferenceVisitor) {
+			final InferenceVisitor<?, Context> inferenceVisitor) {
 		
 		if (conclusionsToBeAvoided.add(context, conclusion)) {
 			
@@ -72,10 +72,10 @@ public class AcyclicRecursiveTraceUnwinder implements TraceUnwinder {
 			final MutableBoolean traced = new MutableBoolean(false);
 
 			traceReader_.accept(context.getRoot(), conclusion,
-					new BaseTracedConclusionVisitor<Void, Void>() {
+					new BaseInferenceVisitor<Void, Void>() {
 
 						@Override
-						protected Void defaultTracedVisit(TracedConclusion inference, Void ignored) {
+						protected Void defaultTracedVisit(Inference inference, Void ignored) {
 							Context inferenceContext = inference.getInferenceContext(context);
 							
 							if (traceInference(inferenceContext, inference, conclusionsToBeAvoided, conclusionVisitor, inferenceVisitor)) {
@@ -103,10 +103,10 @@ public class AcyclicRecursiveTraceUnwinder implements TraceUnwinder {
 
 	private boolean traceInference(
 			final Context inferenceContext,
-			final TracedConclusion inference,
+			final Inference inference,
 			final ConclusionByContextStore conclusionsToBeAvoided,
 			final ConclusionVisitor<?, Context> conclusionVisitor,
-			final TracedConclusionVisitor<?, Context> inferenceVisitor) {
+			final InferenceVisitor<?, Context> inferenceVisitor) {
 		
 		final MutableBoolean traced = new MutableBoolean(true);
 		
