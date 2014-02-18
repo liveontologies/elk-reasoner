@@ -47,8 +47,7 @@ public class TracedPropagation extends Propagation implements Inference {
 	}
 	
 	public Subsumer getPremise() {
-		//FIXME
-		return new DecomposedSubsumer(((IndexedObjectSomeValuesFrom)getCarry()).getFiller());
+		return new DecomposedSubsumer(getCarry().getFiller());
 	}
 
 	@Override

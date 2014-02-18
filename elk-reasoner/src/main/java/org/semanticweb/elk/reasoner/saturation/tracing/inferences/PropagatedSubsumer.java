@@ -61,6 +61,7 @@ public class PropagatedSubsumer extends ComposedSubsumer implements Inference {
 	}
 	
 	public Propagation getPropagation() {
+		//FIXME cast
 		return new Propagation(linkRelation_, (IndexedObjectSomeValuesFrom) getExpression());
 	}
 
