@@ -62,7 +62,7 @@ public class ConclusionInitializingInsertionVisitor extends
 	}
 
 	@Override
-	Boolean defaultVisit(Conclusion conclusion, Context context) {
+	protected Boolean defaultVisit(Conclusion conclusion, Context context) {
 		if (!context.containsConclusion(contextInitConclusion_))
 			producer_.produce(context.getRoot(), contextInitConclusion_);
 		if (conclusion instanceof SubConclusion) {

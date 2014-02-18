@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
  * Represents a decomposition of {@link IndexedObjectIntersectionOf}.
@@ -50,7 +51,7 @@ public class DecomposedConjunction extends DecomposedSubsumer implements Inferen
 	}
 	
 	@Override
-	public <R, C> R acceptTraced(InferenceVisitor<R, C> visitor, C parameter) {
+	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 	

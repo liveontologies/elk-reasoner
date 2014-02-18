@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
  * Represents an inference which creates a {@link Propagation} from a
@@ -51,7 +52,7 @@ public class TracedPropagation extends Propagation implements Inference {
 	}
 
 	@Override
-	public <R, C> R acceptTraced(InferenceVisitor<R, C> visitor, C parameter) {
+	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

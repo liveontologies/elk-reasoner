@@ -59,7 +59,7 @@ public class ConclusionSourceContextNotSaturatedCheckingVisitor extends
 	}
 
 	@Override
-	Boolean defaultVisit(Conclusion conclusion, Context context) {
+	protected Boolean defaultVisit(Conclusion conclusion, Context context) {
 		IndexedClassExpression sourceRoot = conclusion.getSourceRoot(context
 				.getRoot());
 		Context sourceContext = state_.getContext(sourceRoot);

@@ -30,9 +30,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
- * Represents an existential composition inference. 
+ * Represents an existential composition inference from a {@link BackwardLink} and a {@link Propagation}. 
  * 
  * @author Pavel Klinov
  *
@@ -70,7 +71,7 @@ public class PropagatedSubsumer extends ComposedSubsumer implements Inference {
 	}	
 	
 	@Override
-	public <R, C> R acceptTraced(InferenceVisitor<R, C> visitor, C parameter) {
+	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

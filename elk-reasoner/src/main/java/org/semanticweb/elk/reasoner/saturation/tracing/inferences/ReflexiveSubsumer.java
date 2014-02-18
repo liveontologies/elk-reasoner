@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
  * Represents an inference of the form A => R some A where R is a reflexive {@link IndexedPropertyChain}.
@@ -51,7 +52,7 @@ public class ReflexiveSubsumer extends ComposedSubsumer implements Inference {
 	}
 	
 	@Override
-	public <R, C> R acceptTraced(InferenceVisitor<R, C> visitor, C parameter) {
+	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

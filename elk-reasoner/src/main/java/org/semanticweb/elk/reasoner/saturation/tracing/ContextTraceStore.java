@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+package org.semanticweb.elk.reasoner.saturation.tracing;
 /*
  * #%L
  * ELK Reasoner
@@ -24,31 +24,23 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
- * Represents an inference as an extended conclusion. All premises can be
- * accessed via a suitable visitor.
+ * Stores and retrieves {@link Inference} for {@link Conclusion}s stored in a single {@link Context}.
  * 
  * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public interface Inference extends Conclusion {
+public interface ContextTraceStore {
 
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter);
+	public void accept(Conclusion conclusion, InferenceVisitor<?,?> visitor);
 	
-	/**
-	 * Returns the root of the {@link Context} where this inference has been
-	 * made. This is the same context where all premises are stored. This cannot
-	 * be {@code null}.
-	 * 
-	 * @param defaultContext
-	 * @return
-	 */
-	public IndexedClassExpression getInferenceContextRoot(IndexedClassExpression rootWhereStored);
-
+	public void visitInferences(InferenceVisitor<?, ?> visitor);
+	
+	public boolean addInference(Inference inference);
 }

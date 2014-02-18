@@ -48,7 +48,7 @@ public class ConclusionInsertionVisitor extends
 	// TODO: make this by combining the visitor in order to avoid overheads when
 	// logging is switched off
 	@Override
-	Boolean defaultVisit(Conclusion conclusion, Context context) {
+	protected Boolean defaultVisit(Conclusion conclusion, Context context) {
 		boolean result = context.addConclusion(conclusion);
 		LOGGER_.trace("{}: inserting {}: {}", context, conclusion,
 				result ? "success" : "failure");

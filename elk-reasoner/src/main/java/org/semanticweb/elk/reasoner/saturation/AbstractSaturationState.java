@@ -245,21 +245,31 @@ public abstract class AbstractSaturationState implements SaturationState {
 
 		public ExtendedContext getCreateContext(IndexedClassExpression root) {
 			ExtendedContext previous = getContext(root);
-			if (previous != null)
+			
+			if (previous != null) {
 				return previous;
+			}
 			// else try to assign a new context
-			ContextImpl newContext = new ContextImpl(root);
+			ExtendedContext newContext = newContext(root);
+			
 			previous = setIfAbsent(newContext);
-			if (previous != null)
+			
+			if (previous != null) {
 				// the context is already assigned meanwhile
 				return previous;
+			}
 			// else the context is new and not saturated
 			markAsNotSaturatedInternal(newContext);
 			contextCreationListener_.notifyContextCreation(newContext);
 			LOGGER_.trace("{}: context created", newContext);
+			
 			return newContext;
 		}
 
+		protected ExtendedContext newContext(IndexedClassExpression root) {
+			return new ContextImpl(root);
+		}
+		
 	}
 
 }

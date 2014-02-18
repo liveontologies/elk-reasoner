@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+package org.semanticweb.elk.reasoner.saturation.tracing;
 /*
  * #%L
  * ELK Reasoner
@@ -26,29 +26,62 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
- * Represents an inference as an extended conclusion. All premises can be
- * accessed via a suitable visitor.
+ * The main object responsible for storing and retrieving inferences for {@link Conclusion}s.
+ * Inferences are represented using {@link Inference}.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface Inference extends Conclusion {
+public interface TraceStore {
 
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter);
-	
 	/**
-	 * Returns the root of the {@link Context} where this inference has been
-	 * made. This is the same context where all premises are stored. This cannot
-	 * be {@code null}.
 	 * 
-	 * @param defaultContext
+	 */
+	public interface Reader {
+
+		/**
+		 * TODO 
+		 * 
+		 * @param context
+		 * @param conclusion
+		 * @param visitor
+		 */
+		public void accept(IndexedClassExpression root, Conclusion conclusion, InferenceVisitor<?,?> visitor);
+		
+		public Iterable<IndexedClassExpression> getContextRoots();
+		
+		public void visitInferences(IndexedClassExpression root, InferenceVisitor<?, ?> visitor);
+	}
+
+	/**
+	 * 
+	 */
+	public interface Writer {
+		
+		/**
+		 * 
+		 * @param context
+		 * @param conclusion
+		 * @param inference
+		 * @return
+		 */
+		public boolean addInference(IndexedClassExpression root, Inference conclusion);
+	}
+
+	/**
+	 * 
 	 * @return
 	 */
-	public IndexedClassExpression getInferenceContextRoot(IndexedClassExpression rootWhereStored);
+	public Reader getReader();
 
+	/**
+	 * 
+	 * @return
+	 */
+	public Writer getWriter();
 }

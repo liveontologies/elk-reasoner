@@ -37,7 +37,7 @@ public class DummyConclusionVisitor<I> extends
 		AbstractConclusionVisitor<I, Void> {
 
 	@Override
-	Void defaultVisit(Conclusion conclusion, I input) {
+	protected Void defaultVisit(Conclusion conclusion, I input) {
 		return null;
 	}
 

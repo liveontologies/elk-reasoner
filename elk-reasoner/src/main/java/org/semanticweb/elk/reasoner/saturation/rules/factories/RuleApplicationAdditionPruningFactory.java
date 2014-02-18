@@ -66,7 +66,6 @@ public class RuleApplicationAdditionPruningFactory extends
 		AbstractRuleApplicationFactory {
 
 	// logger for this class
-	@SuppressWarnings("hiding")
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RuleApplicationAdditionPruningFactory.class);
 

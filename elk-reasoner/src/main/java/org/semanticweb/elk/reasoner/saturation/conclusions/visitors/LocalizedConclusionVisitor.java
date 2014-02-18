@@ -62,7 +62,7 @@ public class LocalizedConclusionVisitor extends
 	}
 
 	@Override
-	Boolean defaultVisit(Conclusion conclusion, Context input) {
+	protected Boolean defaultVisit(Conclusion conclusion, Context input) {
 		Context localContext = state_.getContext(input.getRoot());
 		if (localContext == null) {
 			LOGGER_.trace("{}: local context does not exist", input);
