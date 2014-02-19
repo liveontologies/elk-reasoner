@@ -16,7 +16,7 @@ import org.semanticweb.elk.util.collections.Pair;
  * Recursively visits all conclusions which were used to produce a given
  * conclusion.
  * 
- * Works similarly to {@link RecursiveTraceExplorer} but is simpler. It does not
+ * Works similarly to {@link TestTraceUnwinder} but is simpler. It does not
  * know anything about which contexts are traced or how inferences are read. It
  * uses the given {@link TraceStore.Reader} as an oracle providing access to
  * inferences.
