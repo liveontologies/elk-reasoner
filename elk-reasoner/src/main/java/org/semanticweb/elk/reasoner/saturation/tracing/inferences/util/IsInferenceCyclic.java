@@ -29,7 +29,7 @@ public class IsInferenceCyclic {
 	 * @param targetContextRoot The root of the context to which this inference should be produced to (i.e. the target)
 	 * @return
 	 */
-	static Conclusion check(final Inference inference, final IndexedClassExpression targetContextRoot, final TraceStore.Reader inferenceReader) {
+	public static Conclusion check(final Inference inference, final IndexedClassExpression targetContextRoot, final TraceStore.Reader inferenceReader) {
 		// the inference is cyclic if at least one of the premises has been
 		// derived only through this inference's conclusion
 		final IndexedClassExpression inferenceContext = inference.getInferenceContextRoot(targetContextRoot);
@@ -87,7 +87,7 @@ public class IsInferenceCyclic {
 	 * the given conclusion). It is assumed that the premises are stored in the
 	 * same context as the conclusion.
 	 */
-	static boolean isAlternative(final Inference inference, final Conclusion conclusion, final IndexedClassExpression conclusionContext) {
+	public static boolean isAlternative(final Inference inference, final Conclusion conclusion, final IndexedClassExpression conclusionContext) {
 		// if the premise is produced in a context different
 		// from where the conclusion is stored, then it must be
 		// produced by an alternative inference.

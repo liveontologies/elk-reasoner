@@ -86,7 +86,7 @@ public class RuleApplicationAdditionPruningFactory extends
 	}
 
 	@Override
-	InputProcessor<IndexedClassExpression> getEngine(RuleVisitor ruleVisitor,
+	protected InputProcessor<IndexedClassExpression> getEngine(RuleVisitor ruleVisitor,
 			SaturationStateWriter writer, SaturationStatistics localStatistics) {
 		SaturationStateWriter localWriter = localState_
 				.getContextCreatingWriter(ContextCreationListener.DUMMY,

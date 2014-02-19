@@ -12,8 +12,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
- * A wrapper around the underlying {@link Conclusion} which implements equals
- * and hashCode. Useful for storing and looking up conclusions in collections.
+ * A wrapper around the underlying {@link Conclusion} which implements
+ * {@code equals} and {@code hashCode}. Useful for storing and looking up
+ * conclusions in collections.
  * 
  * @author Pavel Klinov
  * 
@@ -26,7 +27,7 @@ public class ConclusionEntry implements Conclusion {
 	
 	private final Conclusion conclusion_;
 	
-	ConclusionEntry(Conclusion c) {
+	public ConclusionEntry(Conclusion c) {
 		conclusion_ = c;
 	}
 	

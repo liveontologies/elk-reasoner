@@ -74,7 +74,7 @@ public abstract class AbstractRuleApplicationFactory implements
 	 *         {@link SaturationStateWriter} and updates the supplied local
 	 *         {@link SaturationStatistics} accordingly
 	 */
-	InputProcessor<IndexedClassExpression> getEngine(
+	protected InputProcessor<IndexedClassExpression> getEngine(
 			ConclusionVisitor<Context, Boolean> conclusionProcessor,
 			SaturationStateWriter saturationStateWriter,
 			SaturationStatistics localStatistics) {
@@ -83,7 +83,7 @@ public abstract class AbstractRuleApplicationFactory implements
 				localStatistics);
 	}
 
-	abstract InputProcessor<IndexedClassExpression> getEngine(
+	protected abstract InputProcessor<IndexedClassExpression> getEngine(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer,
 			SaturationStatistics localStatistics);
 
