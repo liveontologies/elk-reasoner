@@ -31,14 +31,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link LinkableBackwardLinkRule} applied when processing a
@@ -53,8 +52,8 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 		AbstractLinkableBackwardLinkRule {
 
 	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(BackwardLinkChainFromBackwardLinkRule.class);
+	/*private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(BackwardLinkChainFromBackwardLinkRule.class);*/
 
 	private static final String NAME_ = "BackwardLink ForwardLink Composition";
 
@@ -141,8 +140,6 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 		if (comps == null)
 			return;
 
-		IndexedClassExpression source = link.getSource();
-
 		for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
 				comps.keySet(), forwardLinksByObjectProperty_.keySet())) {
 
@@ -152,9 +149,10 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 					.get(forwardRelation);
 
 			for (IndexedPropertyChain composition : compositions)
-				for (IndexedClassExpression forwardTarget : forwardTargets)
-					producer.produce(forwardTarget, new BackwardLink(source,
-							composition));
+				for (IndexedClassExpression forwardTarget : forwardTargets) {
+					//producer.produce(forwardTarget, new BackwardLink(link.getSource(), composition));
+					producer.produce(forwardTarget, new ComposedBackwardLink(composition, premises.getRoot(), link, forwardRelation, forwardTarget));
+				}
 		}
 
 	}

@@ -49,7 +49,8 @@ public class ComposedBackwardLink extends BackwardLink implements Inference {
 	private final IndexedClassExpression forwardLinkTarget_;
 	
 	public ComposedBackwardLink(IndexedPropertyChain chain,
-			IndexedClassExpression inferenceContext, ForwardLink forwardLink,
+			IndexedClassExpression inferenceContext,
+			ForwardLink forwardLink,
 			IndexedPropertyChain backwardLinkChain,
 			IndexedClassExpression linkSource) {
 		super(linkSource, chain);
@@ -60,7 +61,8 @@ public class ComposedBackwardLink extends BackwardLink implements Inference {
 	}
 
 	public ComposedBackwardLink(IndexedPropertyChain chain,
-			IndexedClassExpression inferenceContext, BackwardLink backwardLink,
+			IndexedClassExpression inferenceContext,
+			BackwardLink backwardLink,
 			IndexedPropertyChain forwardLinkChain,
 			IndexedClassExpression forwardLinkTarget) {
 		super(backwardLink.getSource(), chain);

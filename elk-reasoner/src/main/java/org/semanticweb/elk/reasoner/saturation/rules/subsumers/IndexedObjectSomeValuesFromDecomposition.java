@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistential;
 
 /**
  * A {@link SubsumerDecompositionRule} that processes
@@ -60,8 +61,8 @@ public class IndexedObjectSomeValuesFromDecomposition extends
 	@Override
 	public void apply(IndexedObjectSomeValuesFrom premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		producer.produce(premise.getFiller(),
-				new BackwardLink(premises.getRoot(), premise.getRelation()));
+		//producer.produce(premise.getFiller(), new BackwardLink(premises.getRoot(), premise.getRelation()));
+		producer.produce(premise.getFiller(), new DecomposedExistential(premise, premises.getRoot()));
 	}
 
 	@Override

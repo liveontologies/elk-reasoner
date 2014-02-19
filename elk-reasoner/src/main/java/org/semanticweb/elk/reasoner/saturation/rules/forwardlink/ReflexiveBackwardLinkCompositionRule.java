@@ -25,11 +25,13 @@ package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
 import java.util.Collection;
 import java.util.Set;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -93,9 +95,12 @@ public class ReflexiveBackwardLinkCompositionRule extends
 			Collection<IndexedPropertyChain> compositions = comps
 					.get(backwardRelation);
 
-			for (IndexedPropertyChain composition : compositions)
-				producer.produce(this.forwardLink_.getTarget(),
-						new BackwardLink(premises.getRoot(), composition));
+			for (IndexedPropertyChain composition : compositions) {
+				//producer.produce(this.forwardLink_.getTarget(), new BackwardLink(premises.getRoot(), composition));
+				IndexedClassExpression root = premises.getRoot();
+				
+				producer.produce(forwardLink_.getTarget(), new ComposedBackwardLink(composition, root, forwardLink_, backwardRelation, root));
+			}
 		}
 	}
 

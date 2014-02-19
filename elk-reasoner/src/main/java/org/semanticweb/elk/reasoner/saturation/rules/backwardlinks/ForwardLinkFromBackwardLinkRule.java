@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedBackwardLink;
 
 /**
  * A {@link BackwardLinkRule} applied when processing {@link BackwardLink}
@@ -62,8 +63,8 @@ public class ForwardLinkFromBackwardLinkRule extends AbstractBackwardLinkRule {
 		 */
 		if (!premiseRelation.getSaturated().getCompositionsByLeftSubProperty()
 				.isEmpty()) {
-			producer.produce(premise.getSource(), new ForwardLink(
-					premiseRelation, premises.getRoot()));
+			//producer.produce(premise.getSource(), new ForwardLink(premiseRelation, premises.getRoot()));
+			producer.produce(premise.getSource(), new ReversedBackwardLink(premise, premises.getRoot()));
 		}
 
 	}

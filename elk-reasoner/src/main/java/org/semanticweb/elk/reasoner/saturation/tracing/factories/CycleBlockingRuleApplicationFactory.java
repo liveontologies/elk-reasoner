@@ -209,7 +209,7 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 			//write the inference and count it as used conclusion (if needed)
 			conclusion.accept(inferenceInserter_, cxt);
 			//see if some inferences can now be unblocked
-			if (CYCLE_AVOIDANCE) {
+			if (CYCLE_AVOIDANCE && conclusion instanceof Inference) {
 				unblockInferences((Inference) conclusion, (TracedContext) cxt);
 			}
 			//insert into context

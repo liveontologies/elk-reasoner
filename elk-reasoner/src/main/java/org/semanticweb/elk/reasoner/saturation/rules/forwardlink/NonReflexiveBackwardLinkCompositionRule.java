@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -99,8 +100,8 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 			for (IndexedPropertyChain composition : compositions)
 				for (IndexedClassExpression source : subPremises
 						.getLinkedRoots()) {
-					producer.produce(this.forwardLink_.getTarget(),
-							new BackwardLink(source, composition));
+					//producer.produce(this.forwardLink_.getTarget(), new BackwardLink(source, composition));
+					producer.produce(forwardLink_.getTarget(), new ComposedBackwardLink(composition, premises.getRoot(), forwardLink_, backwardRelation, source));
 				}
 		}
 	}
