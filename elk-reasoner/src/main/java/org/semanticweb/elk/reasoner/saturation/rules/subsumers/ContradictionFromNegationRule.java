@@ -53,7 +53,7 @@ public class ContradictionFromNegationRule extends
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContradictionFromNegationRule.class);
 
-	private static final String NAME_ = "ObjectComplementOf Clash";
+	public static final String NAME = "ObjectComplementOf Clash";
 
 	private IndexedObjectComplementOf negation_;
 
@@ -81,7 +81,7 @@ public class ContradictionFromNegationRule extends
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	// TODO: hide this method

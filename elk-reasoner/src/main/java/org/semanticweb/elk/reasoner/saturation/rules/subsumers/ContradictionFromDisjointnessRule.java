@@ -49,7 +49,7 @@ public class ContradictionFromDisjointnessRule extends
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContradictionFromDisjointnessRule.class);
 
-	public static final String NAME_ = "DisjointClasses Contradiction Introduction";
+	public static final String NAME = "DisjointClasses Contradiction Introduction";
 
 	/**
 	 * The number of {@link IndexedDisjointnessAxiom}s in which the
@@ -82,7 +82,7 @@ public class ContradictionFromDisjointnessRule extends
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

@@ -47,6 +47,8 @@ import org.semanticweb.elk.util.collections.Multimap;
 public class ReflexiveBackwardLinkCompositionRule extends
 		AbstractForwardLinkRule {
 
+	public static final String NAME = "ForwardLink Reflexive BackwardLink Composition";
+
 	/**
 	 * 
 	 */
@@ -58,8 +60,6 @@ public class ReflexiveBackwardLinkCompositionRule extends
 	private ReflexiveBackwardLinkCompositionRule(ForwardLink forwardLink) {
 		this.forwardLink_ = forwardLink;
 	}
-
-	private static final String NAME_ = "ForwardLink Reflexive BackwardLink Composition";
 
 	/**
 	 * @param link
@@ -74,7 +74,7 @@ public class ReflexiveBackwardLinkCompositionRule extends
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

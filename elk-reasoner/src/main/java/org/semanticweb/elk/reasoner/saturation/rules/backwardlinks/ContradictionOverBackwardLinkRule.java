@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
+
 /*
  * #%L
  * ELK Reasoner
@@ -44,7 +45,7 @@ public class ContradictionOverBackwardLinkRule extends
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContradictionOverBackwardLinkRule.class);
 
-	private static final String NAME_ = "Backward Link Contradiction Propagation";
+	public static final String NAME = "Backward Link Contradiction Propagation";
 
 	private ContradictionOverBackwardLinkRule(LinkableBackwardLinkRule tail) {
 		super(tail);
@@ -72,7 +73,7 @@ public class ContradictionOverBackwardLinkRule extends
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override
@@ -83,7 +84,8 @@ public class ContradictionOverBackwardLinkRule extends
 
 	@Override
 	public void accept(LinkedBackwardLinkRuleVisitor visitor,
-			BackwardLink premise, ContextPremises premises, ConclusionProducer producer) {
+			BackwardLink premise, ContextPremises premises,
+			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}
 

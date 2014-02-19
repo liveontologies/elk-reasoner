@@ -36,11 +36,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  */
 public class ContradicitonCompositionRule extends AbstractDisjointSubsumerRule {
 
-	private static final String NAME_ = "Contradiction by Disjointness Axiom";
+	public static final String NAME = "Contradiction by Disjointness Axiom";
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

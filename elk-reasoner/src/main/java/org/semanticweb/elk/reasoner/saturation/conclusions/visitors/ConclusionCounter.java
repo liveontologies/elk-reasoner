@@ -143,7 +143,7 @@ public class ConclusionCounter {
 		return countSubContextInitializations;
 	}
 
-	public long getTotalCount() {
+	public int getTotalCount() {
 		return countDecomposedSubsumers + countComposedSubsumers
 				+ countBackwardLinks + countForwardLinks + countContradictions
 				+ countPropagations + countDisjointSubsumers

@@ -48,6 +48,8 @@ import org.slf4j.LoggerFactory;
 public class ForwardLink extends AbstractConclusion {
 
 	static final Logger LOGGER_ = LoggerFactory.getLogger(ForwardLink.class);
+	
+	public static final String NAME = "Forward Link";
 
 	/**
 	 * the {@link IndexedPropertyChain} in the existential restriction

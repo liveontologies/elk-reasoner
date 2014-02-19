@@ -1,6 +1,17 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
+import org.semanticweb.elk.util.logging.statistics.StatisticsPrinter;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * #%L
@@ -25,7 +36,11 @@ import org.slf4j.Logger;
  */
 
 public class ConclusionStatistics {
-	
+
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ConclusionStatistics.class);
+
 	/**
 	 * Number of conclusions put to the todo queue
 	 */
@@ -38,7 +53,7 @@ public class ConclusionStatistics {
 	 * Number of unique conclusions saved to contexts
 	 */
 	private final ConclusionCounter usedConclusionCounts_;
-	
+
 	private final ConclusionTimer conclusionProcessingTimer_;
 	/**
 	 * The number of times measurements were taken in different threads. Used to
@@ -46,7 +61,8 @@ public class ConclusionStatistics {
 	 */
 	private int numOfMeasurements_ = 0;
 
-	public ConclusionStatistics(ConclusionCounter producedConclusionCounter, ConclusionCounter processedConclusionCounts,
+	public ConclusionStatistics(ConclusionCounter producedConclusionCounter,
+			ConclusionCounter processedConclusionCounts,
 			ConclusionCounter usedConclusionCounts,
 			ConclusionTimer conclusionTimers) {
 		this.producedConclusionCounts_ = producedConclusionCounter;
@@ -63,7 +79,7 @@ public class ConclusionStatistics {
 	public ConclusionCounter getProducedConclusionCounts() {
 		return producedConclusionCounts_;
 	}
-	
+
 	public ConclusionCounter getProcessedConclusionCounts() {
 		return processedConclusionCounts_;
 	}
@@ -99,95 +115,106 @@ public class ConclusionStatistics {
 		}
 	}
 
-	private static String ERR_MSG_MORE_USED = ": more used that processed!";
-
 	public void check(Logger logger) {
-		if (usedConclusionCounts_.countComposedSubsumers > processedConclusionCounts_.countComposedSubsumers)
-			logger.error("Positive Subsumers" + ERR_MSG_MORE_USED);
-		if (usedConclusionCounts_.countDecomposedSubsumers > processedConclusionCounts_.countDecomposedSubsumers)
-			logger.error("Negative Subsumers" + ERR_MSG_MORE_USED);
-		if (usedConclusionCounts_.countBackwardLinks > processedConclusionCounts_.countBackwardLinks)
-			logger.error("Backward Links" + ERR_MSG_MORE_USED);
-		if (usedConclusionCounts_.countForwardLinks > processedConclusionCounts_.countForwardLinks)
-			logger.error("Forward Links" + ERR_MSG_MORE_USED);
-		if (usedConclusionCounts_.countPropagations > processedConclusionCounts_.countPropagations)
-			logger.error("Propagations" + ERR_MSG_MORE_USED);
-		if (usedConclusionCounts_.countContradictions > processedConclusionCounts_.countContradictions)
-			logger.error("Contradictions" + ERR_MSG_MORE_USED);
-		if (usedConclusionCounts_.countDisjointSubsumers > processedConclusionCounts_.countDisjointSubsumers)
-			logger.error("Disjointness Axioms" + ERR_MSG_MORE_USED);
+		// TODO
+	}
+
+	static void print(StatisticsPrinter printer, String name,
+			int processedCount, int usedCount, long time) {
+		if (processedCount == 0)
+			return;
+
+		if (usedCount > processedCount)
+			LOGGER_.error("{}: conclusions used: {} more than processed: {}!",
+					name, usedCount, processedCount);
+
+		printer.print(name, processedCount, usedCount, time);
+
 	}
 
 	public void print(Logger logger) {
 		if (!logger.isDebugEnabled()) {
 			return;
 		}
-		
+
 		if (!measurementsTaken()) {
 			return;
 		}
-		
-		if (processedConclusionCounts_.countComposedSubsumers > 0
-				|| conclusionProcessingTimer_.timePositiveSubsumers > 0)
-			logger.debug("Positive Subsumers produced/used: "
-					+ processedConclusionCounts_.countComposedSubsumers + "/"
-					+ usedConclusionCounts_.countComposedSubsumers + " ("
-					+ conclusionProcessingTimer_.timePositiveSubsumers
-					/ numOfMeasurements_ + " ms)");
-		if (processedConclusionCounts_.countDecomposedSubsumers > 0
-				|| conclusionProcessingTimer_.timeNegativeSubsumers > 0)
-			logger.debug("Negative Subsumers produced/used: "
-					+ processedConclusionCounts_.countDecomposedSubsumers + "/"
-					+ usedConclusionCounts_.countDecomposedSubsumers + " ("
-					+ conclusionProcessingTimer_.timeNegativeSubsumers
-					/ numOfMeasurements_ + " ms)");
-		if (processedConclusionCounts_.countBackwardLinks > 0
-				|| conclusionProcessingTimer_.timeBackwardLinks > 0)
-			logger.debug("Backward Links produced/used: "
-					+ processedConclusionCounts_.countBackwardLinks + "/"
-					+ usedConclusionCounts_.countBackwardLinks + " ("
-					+ conclusionProcessingTimer_.timeBackwardLinks / numOfMeasurements_
-					+ " ms)");
-		if (processedConclusionCounts_.countForwardLinks > 0
-				|| conclusionProcessingTimer_.timeForwardLinks > 0)
-			logger.debug("Forward Links produced/used: "
-					+ processedConclusionCounts_.countForwardLinks + "/"
-					+ usedConclusionCounts_.countForwardLinks + " ("
-					+ conclusionProcessingTimer_.timeForwardLinks / numOfMeasurements_
-					+ " ms)");
-		if (processedConclusionCounts_.countPropagations > 0
-				|| conclusionProcessingTimer_.timePropagations > 0)
-			logger.debug("Propagations produced/used: "
-					+ processedConclusionCounts_.countPropagations + "/"
-					+ usedConclusionCounts_.countPropagations + " ("
-					+ conclusionProcessingTimer_.timePropagations / numOfMeasurements_
-					+ " ms)");
-		if (processedConclusionCounts_.countContradictions > 0
-				|| conclusionProcessingTimer_.timeContradictions > 0)
-			logger.debug("Contradictions produced/used: "
-					+ processedConclusionCounts_.countContradictions + "/"
-					+ usedConclusionCounts_.countContradictions + " ("
-					+ conclusionProcessingTimer_.timeContradictions
-					/ numOfMeasurements_ + " ms)");
-		if (processedConclusionCounts_.countDisjointSubsumers > 0
-				|| conclusionProcessingTimer_.timeDisjointSubsumers > 0)
-			logger.debug("Disjointness Axioms produced/used: "
-					+ processedConclusionCounts_.countDisjointSubsumers + "/"
-					+ usedConclusionCounts_.countDisjointSubsumers + " ("
-					+ conclusionProcessingTimer_.timeDisjointSubsumers
-					/ numOfMeasurements_ + " ms)");
-		long totalTime = conclusionProcessingTimer_.getTotalTime();
-		if (totalTime > 0)
-			logger.debug("Total conclusion processing time: " + totalTime
-					/ numOfMeasurements_ + " ms");
+
+		if (processedConclusionCounts_.getTotalCount() == 0) {
+			return;
+		}
+
+		StatisticsPrinter printer = new StatisticsPrinter(logger,
+				"%{CONCLUSIONS:}s %,{all}d | %,{used}d [%,{time}d ms]",
+				"TOTAL CONCLUSIONS",
+				processedConclusionCounts_.getTotalCount(),
+				usedConclusionCounts_.getTotalCount(),
+				conclusionProcessingTimer_.getTotalTime());
+
+		printer.printHeader();
+
+		print(printer, BackwardLink.NAME,
+				processedConclusionCounts_.countBackwardLinks,
+				usedConclusionCounts_.countBackwardLinks,
+				conclusionProcessingTimer_.timeBackwardLinks);
+
+		print(printer, ContextInitialization.NAME,
+				processedConclusionCounts_.countContextInitializations,
+				usedConclusionCounts_.countContextInitializations,
+				conclusionProcessingTimer_.timeContextInitializations);
+
+		print(printer, Contradiction.NAME,
+				processedConclusionCounts_.countContradictions,
+				usedConclusionCounts_.countContradictions,
+				conclusionProcessingTimer_.timeContradictions);
+
+		print(printer, DisjointSubsumer.NAME,
+				processedConclusionCounts_.countDisjointSubsumers,
+				usedConclusionCounts_.countDisjointSubsumers,
+				conclusionProcessingTimer_.timeDisjointSubsumers);
+
+		print(printer, ForwardLink.NAME,
+				processedConclusionCounts_.countForwardLinks,
+				usedConclusionCounts_.countForwardLinks,
+				conclusionProcessingTimer_.timeForwardLinks);
+
+		print(printer, DecomposedSubsumer.NAME,
+				processedConclusionCounts_.countDecomposedSubsumers,
+				usedConclusionCounts_.countDecomposedSubsumers,
+				conclusionProcessingTimer_.timeDecomposedSubsumers);
+
+		print(printer, ComposedSubsumer.NAME,
+				processedConclusionCounts_.countComposedSubsumers,
+				usedConclusionCounts_.countComposedSubsumers,
+				conclusionProcessingTimer_.timeComposedSubsumers);
+
+		print(printer, Propagation.NAME,
+				processedConclusionCounts_.countPropagations,
+				usedConclusionCounts_.countPropagations,
+				conclusionProcessingTimer_.timePropagations);
+
+		print(printer, SubContextInitialization.NAME,
+				processedConclusionCounts_.countSubContextInitializations,
+				usedConclusionCounts_.countSubContextInitializations,
+				conclusionProcessingTimer_.timeSubContextInitializations);
+
+		printer.printSeparator();
+
+		print(printer, "TOTAL CONCLUSIONS:",
+				processedConclusionCounts_.getTotalCount(),
+				usedConclusionCounts_.getTotalCount(),
+				conclusionProcessingTimer_.getTotalTime());
+
+		printer.printSeparator();
 	}
-	
+
 	public void startMeasurements() {
 		if (numOfMeasurements_ < 1) {
 			numOfMeasurements_ = 1;
 		}
 	}
-	
+
 	private boolean measurementsTaken() {
 		return numOfMeasurements_ > 0;
 	}

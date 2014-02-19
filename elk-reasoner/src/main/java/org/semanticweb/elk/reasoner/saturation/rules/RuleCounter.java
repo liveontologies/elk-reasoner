@@ -208,7 +208,7 @@ public class RuleCounter {
 		countPropagationInitializationRule += counter.countPropagationInitializationRule;
 	}
 
-	public long getTotalRuleAppCount() {
+	public int getTotalRuleAppCount() {
 		return countOwlThingContextInitRule
 				+ countRootContextInitializationRule
 				+ countDisjointSubsumerFromMemberRule

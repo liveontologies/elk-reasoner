@@ -42,7 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 public class IndexedObjectComplementOfDecomposition extends
 		AbstractSubsumerDecompositionRule<IndexedObjectComplementOf> {
 
-	public static final String NAME_ = "IndexedObjectComplementOf Decomposition";
+	public static final String NAME = "IndexedObjectComplementOf Decomposition";
 
 	private static IndexedObjectComplementOfDecomposition INSTANCE_ = new IndexedObjectComplementOfDecomposition();
 
@@ -52,7 +52,7 @@ public class IndexedObjectComplementOfDecomposition extends
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subcontextinit;
+
 /*
  * #%L
  * ELK Reasoner
@@ -37,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  */
 public class PropagationInitializationRule extends AbstractSubContextInitRule {
 
-	private static final String NAME_ = "Propagations For SubContext";
+	public static final String NAME = "Propagations For SubContext";
 
 	private static final PropagationInitializationRule INSTANCE_ = new PropagationInitializationRule();
 
@@ -47,7 +48,7 @@ public class PropagationInitializationRule extends AbstractSubContextInitRule {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

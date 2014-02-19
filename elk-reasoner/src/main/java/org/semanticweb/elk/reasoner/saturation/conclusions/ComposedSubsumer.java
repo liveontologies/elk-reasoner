@@ -37,6 +37,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  */
 public class ComposedSubsumer extends Subsumer {
 
+	public static final String NAME = "Composed Subsumer";
+
 	public ComposedSubsumer(IndexedClassExpression subsumer) {
 		super(subsumer);
 	}

@@ -48,6 +48,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackw
 public class BackwardLink extends AbstractConclusion implements Conclusion,
 		SubConclusion {
 
+	public static final String NAME = "Backward Link";
+
 	/**
 	 * the source {@link IndexedClassExpression} of this {@link BackwardLink};
 	 * the root of the source implies this link.

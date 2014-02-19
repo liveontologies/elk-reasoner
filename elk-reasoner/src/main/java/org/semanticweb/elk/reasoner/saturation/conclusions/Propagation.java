@@ -50,6 +50,8 @@ public class Propagation extends AbstractConclusion implements Conclusion,
 	// logger for this class
 	static final Logger LOGGER_ = LoggerFactory.getLogger(Propagation.class);
 
+	public static final String NAME = "Propagation";
+
 	private final IndexedPropertyChain relation_;
 
 	private final IndexedObjectSomeValuesFrom carry_;

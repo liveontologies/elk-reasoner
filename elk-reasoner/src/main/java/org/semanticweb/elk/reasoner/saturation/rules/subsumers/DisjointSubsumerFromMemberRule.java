@@ -56,7 +56,7 @@ public class DisjointSubsumerFromMemberRule extends
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(DisjointSubsumerFromMemberRule.class);
 
-	private static final String NAME_ = "DisjointClasses Introduction";
+	public static final String NAME = "DisjointClasses Introduction";
 
 	/**
 	 * Set of relevant {@link IndexedDisjointnessAxiom}s in which the member,
@@ -93,7 +93,7 @@ public class DisjointSubsumerFromMemberRule extends
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

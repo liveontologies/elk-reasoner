@@ -47,6 +47,8 @@ public class SubContextInitialization extends AbstractConclusion implements
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SubContextInitialization.class);
 
+	public static final String NAME = "Sub-Context Initialization";
+
 	/**
 	 * the sub-root of the {@link SubContext} that should be initialized
 	 */

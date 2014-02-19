@@ -50,7 +50,7 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 
 	private static final ContradictionPropagationRule INSTANCE_ = new ContradictionPropagationRule();
 
-	private static final String NAME_ = "Contradiction Propagation over Backward Links";
+	public static final String NAME = "Contradiction Propagation over Backward Links";
 
 	private ContradictionPropagationRule() {
 		// do not allow creation of instances outside of this class
@@ -62,7 +62,7 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

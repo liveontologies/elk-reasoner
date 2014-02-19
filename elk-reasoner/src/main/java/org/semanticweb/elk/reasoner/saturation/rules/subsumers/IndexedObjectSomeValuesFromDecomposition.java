@@ -44,7 +44,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 public class IndexedObjectSomeValuesFromDecomposition extends
 		AbstractSubsumerDecompositionRule<IndexedObjectSomeValuesFrom> {
 
-	public static final String NAME_ = "IndexedObjectSomeValuesFrom Decomposition";
+	public static final String NAME = "IndexedObjectSomeValuesFrom Decomposition";
 
 	private static SubsumerDecompositionRule<IndexedObjectSomeValuesFrom> INSTANCE_ = new IndexedObjectSomeValuesFromDecomposition();
 
@@ -54,7 +54,7 @@ public class IndexedObjectSomeValuesFromDecomposition extends
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

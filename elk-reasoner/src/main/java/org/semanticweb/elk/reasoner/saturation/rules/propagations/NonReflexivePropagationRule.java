@@ -22,7 +22,6 @@ package org.semanticweb.elk.reasoner.saturation.rules.propagations;
  * #L%
  */
 
-import java.util.Collection;
 import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -35,7 +34,6 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * A {@link NonReflexivePropagationRule} producing {@link Subsumer}s in the
@@ -50,7 +48,7 @@ import org.semanticweb.elk.util.collections.Multimap;
  */
 public class NonReflexivePropagationRule extends AbstractPropagationRule {
 
-	private static final String NAME_ = "Non-Reflexive Propagation";
+	public static final String NAME = "Non-Reflexive Propagation";
 
 	private static final NonReflexivePropagationRule INSTANCE_ = new NonReflexivePropagationRule();
 
@@ -60,7 +58,7 @@ public class NonReflexivePropagationRule extends AbstractPropagationRule {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

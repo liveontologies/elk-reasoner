@@ -33,88 +33,93 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
-public class TimedConclusionVisitor<I> implements ConclusionVisitor<I, Long> {
+public class TimedConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 
-	private final ConclusionVisitor<I, ?> processor_;
+	private final ConclusionVisitor<I, O> processor_;
 	private final ConclusionTimer timer_;
 
 	public TimedConclusionVisitor(ConclusionTimer timer,
-			ConclusionVisitor<I, ?> processor) {
+			ConclusionVisitor<I, O> processor) {
 		this.timer_ = timer;
 		this.processor_ = processor;
 	}
 
 	@Override
-	public Long visit(BackwardLink subConclusion, I input) {
+	public O visit(BackwardLink subConclusion, I input) {
 		timer_.timeBackwardLinks -= CachedTimeThread.getCurrentTimeMillis();
-		processor_.visit(subConclusion, input);
-		return timer_.timeBackwardLinks += CachedTimeThread
-				.getCurrentTimeMillis();
+		O result = processor_.visit(subConclusion, input);
+		timer_.timeBackwardLinks += CachedTimeThread.getCurrentTimeMillis();
+		return result;
 	}
 
 	@Override
-	public Long visit(ComposedSubsumer conclusion, I input) {
-		timer_.timeNegativeSubsumers -= CachedTimeThread.getCurrentTimeMillis();
-		processor_.visit(conclusion, input);
-		return timer_.timeNegativeSubsumers += CachedTimeThread
-				.getCurrentTimeMillis();
+	public O visit(ComposedSubsumer conclusion, I input) {
+		timer_.timeComposedSubsumers -= CachedTimeThread.getCurrentTimeMillis();
+		O result = processor_.visit(conclusion, input);
+		timer_.timeComposedSubsumers += CachedTimeThread.getCurrentTimeMillis();
+		return result;
 	}
 
 	@Override
-	public Long visit(ContextInitialization conclusion, I input) {
+	public O visit(ContextInitialization conclusion, I input) {
 		timer_.timeContextInitializations -= CachedTimeThread
 				.getCurrentTimeMillis();
-		processor_.visit(conclusion, input);
-		return timer_.timeContextInitializations += CachedTimeThread
+		O result = processor_.visit(conclusion, input);
+		timer_.timeContextInitializations += CachedTimeThread
 				.getCurrentTimeMillis();
+		return result;
 	}
 
 	@Override
-	public Long visit(Contradiction conclusion, I input) {
+	public O visit(Contradiction conclusion, I input) {
 		timer_.timeContradictions -= CachedTimeThread.getCurrentTimeMillis();
-		processor_.visit(conclusion, input);
-		return timer_.timeContradictions += CachedTimeThread
-				.getCurrentTimeMillis();
+		O result = processor_.visit(conclusion, input);
+		timer_.timeContradictions += CachedTimeThread.getCurrentTimeMillis();
+		return result;
 	}
 
 	@Override
-	public Long visit(DecomposedSubsumer conclusion, I input) {
-		timer_.timePositiveSubsumers -= CachedTimeThread.getCurrentTimeMillis();
-		processor_.visit(conclusion, input);
-		return timer_.timePositiveSubsumers += CachedTimeThread
+	public O visit(DecomposedSubsumer conclusion, I input) {
+		timer_.timeDecomposedSubsumers -= CachedTimeThread
 				.getCurrentTimeMillis();
+		O result = processor_.visit(conclusion, input);
+		timer_.timeDecomposedSubsumers += CachedTimeThread
+				.getCurrentTimeMillis();
+		return result;
 	}
 
 	@Override
-	public Long visit(DisjointSubsumer conclusion, I input) {
+	public O visit(DisjointSubsumer conclusion, I input) {
 		timer_.timeDisjointSubsumers -= CachedTimeThread.getCurrentTimeMillis();
-		processor_.visit(conclusion, input);
-		return timer_.timeDisjointSubsumers += CachedTimeThread
-				.getCurrentTimeMillis();
+		O result = processor_.visit(conclusion, input);
+		timer_.timeDisjointSubsumers += CachedTimeThread.getCurrentTimeMillis();
+		return result;
 	}
 
 	@Override
-	public Long visit(ForwardLink conclusion, I input) {
+	public O visit(ForwardLink conclusion, I input) {
 		timer_.timeForwardLinks -= CachedTimeThread.getCurrentTimeMillis();
-		processor_.visit(conclusion, input);
-		return timer_.timeForwardLinks += CachedTimeThread
-				.getCurrentTimeMillis();
+		O result = processor_.visit(conclusion, input);
+		timer_.timeForwardLinks += CachedTimeThread.getCurrentTimeMillis();
+		return result;
 	}
 
 	@Override
-	public Long visit(Propagation subConclusion, I input) {
+	public O visit(Propagation subConclusion, I input) {
 		timer_.timePropagations -= CachedTimeThread.getCurrentTimeMillis();
-		processor_.visit(subConclusion, input);
-		return timer_.timePropagations += CachedTimeThread
-				.getCurrentTimeMillis();
+		O result = processor_.visit(subConclusion, input);
+		timer_.timePropagations += CachedTimeThread.getCurrentTimeMillis();
+		return result;
 	}
 
 	@Override
-	public Long visit(SubContextInitialization subConclusion, I input) {
-		timer_.timePropagations -= CachedTimeThread.getCurrentTimeMillis();
-		processor_.visit(subConclusion, input);
-		return timer_.timePropagations += CachedTimeThread
+	public O visit(SubContextInitialization subConclusion, I input) {
+		timer_.timeSubContextInitializations -= CachedTimeThread
 				.getCurrentTimeMillis();
+		O result = processor_.visit(subConclusion, input);
+		timer_.timeSubContextInitializations += CachedTimeThread
+				.getCurrentTimeMillis();
+		return result;
 	}
 
 }

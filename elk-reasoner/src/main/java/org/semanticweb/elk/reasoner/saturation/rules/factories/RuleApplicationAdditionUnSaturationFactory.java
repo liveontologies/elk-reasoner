@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInitializingInsertionVisitor;
@@ -52,7 +53,8 @@ public class RuleApplicationAdditionUnSaturationFactory extends
 	@Override
 	@SuppressWarnings("unchecked")
 	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter writer) {
+			RuleVisitor ruleVisitor, SaturationStateWriter writer,
+			SaturationStatistics localStatistics) {
 		// the visitor used for inserting conclusion
 		return new ComposedConclusionVisitor<Context>(
 		// insert conclusions initializing contexts if necessary

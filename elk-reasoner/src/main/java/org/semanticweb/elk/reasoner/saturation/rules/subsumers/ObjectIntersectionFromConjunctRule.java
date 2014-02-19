@@ -57,7 +57,7 @@ public class ObjectIntersectionFromConjunctRule extends
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ObjectIntersectionFromConjunctRule.class);
 
-	private static final String NAME_ = "ObjectIntersectionOf Introduction";
+	public static final String NAME = "ObjectIntersectionOf Introduction";
 
 	private final Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
 
@@ -75,7 +75,7 @@ public class ObjectIntersectionFromConjunctRule extends
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	/**

@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  */
 public class SubsumerBackwardLinkRule extends AbstractBackwardLinkRule {
 
-	private static final String NAME_ = "Propagation Over BackwardLink";
+	public static final String NAME = "Propagation Over BackwardLink";
 
 	private static final SubsumerBackwardLinkRule INSTANCE_ = new SubsumerBackwardLinkRule();
 
@@ -51,7 +51,7 @@ public class SubsumerBackwardLinkRule extends AbstractBackwardLinkRule {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

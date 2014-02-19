@@ -60,7 +60,7 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 		this.forwardLink_ = forwardLink;
 	}
 
-	private static final String NAME_ = "ForwardLink Non-Reflexive BackwardLink Composition";
+	public static final String NAME = "ForwardLink Non-Reflexive BackwardLink Composition";
 
 	/**
 	 * @param link
@@ -75,7 +75,7 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

@@ -48,7 +48,7 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(OwlThingContextInitRule.class);
 
-	private static final String NAME_ = "owl:Thing Introduction";
+	public static final String NAME = "owl:Thing Introduction";
 
 	private IndexedClassExpression owlThing_;
 
@@ -70,7 +70,7 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 	 */
 	public static void addRuleFor(IndexedClass owlThing,
 			ModifiableOntologyIndex index) {
-		LOGGER_.trace("Adding {} to {}", owlThing, NAME_);
+		LOGGER_.trace("Adding {} to {}", owlThing, NAME);
 		index.addContextInitRule(new OwlThingContextInitRule(owlThing));
 	}
 
@@ -88,7 +88,7 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

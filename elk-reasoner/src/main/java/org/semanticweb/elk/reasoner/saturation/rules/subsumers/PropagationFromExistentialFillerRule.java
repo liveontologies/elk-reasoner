@@ -62,7 +62,7 @@ public class PropagationFromExistentialFillerRule extends
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(PropagationFromExistentialFillerRule.class);
 
-	private static final String NAME_ = "ObjectSomeValuesFrom Propagation Introduction";
+	public static final String NAME = "ObjectSomeValuesFrom Propagation Introduction";
 
 	private final Collection<IndexedObjectSomeValuesFrom> negExistentials_;
 
@@ -97,7 +97,7 @@ public class PropagationFromExistentialFillerRule extends
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

@@ -32,10 +32,28 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
 
+/**
+ * A {@link ConclusionVisitor} that runs a special preprocessor
+ * {@link ConclusionVisitor} before every call of the provided
+ * {@link ConclusionVisitor}. The returned result is taken from the letter.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <I>
+ *            the type of input parameter with which this visitor works
+ * @param <O>
+ *            the type of output parameter with which this visitor works
+ */
 public class PreprocessedConclusionVisitor<I, O> implements
 		ConclusionVisitor<I, O> {
 
+	/**
+	 * a {@link ConclusionVisitor} that is called first
+	 */
 	final private ConclusionVisitor<I, ?> preprocessor_;
+	/**
+	 * a {@link ConclusionVisitor} that is called next and returns the output
+	 */
 	final private ConclusionVisitor<I, O> visitor_;
 
 	public PreprocessedConclusionVisitor(ConclusionVisitor<I, ?> preprocessor,

@@ -42,7 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 public class IndexedObjectIntersectionOfDecomposition extends
 		AbstractSubsumerDecompositionRule<IndexedObjectIntersectionOf> {
 
-	public static final String NAME_ = "ObjectIntersectionOf Decomposition";
+	public static final String NAME = "ObjectIntersectionOf Decomposition";
 
 	private static IndexedObjectIntersectionOfDecomposition INSTANCE_ = new IndexedObjectIntersectionOfDecomposition();
 
@@ -52,7 +52,7 @@ public class IndexedObjectIntersectionOfDecomposition extends
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override
