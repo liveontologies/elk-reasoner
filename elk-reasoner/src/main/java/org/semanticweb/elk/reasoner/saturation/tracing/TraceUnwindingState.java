@@ -12,8 +12,8 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
- * The state of the trace unwinding procedure for some {@link Conclusion} in
- * some {@link Context} identified by its root.
+ * The state of the recursive trace unwinding procedure for some
+ * {@link Conclusion} in some {@link Context} identified by its root.
  * 
  * This state is not thread-safe.
  * 

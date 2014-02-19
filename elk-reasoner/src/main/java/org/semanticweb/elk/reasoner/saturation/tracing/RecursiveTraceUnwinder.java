@@ -39,7 +39,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 	
 	public void accept(IndexedClassExpression context,
 			final Conclusion conclusion,
-			final ConclusionVisitor<IndexedClassExpression, Boolean> premiseVisitor) {
+			final ConclusionVisitor<IndexedClassExpression, ?> premiseVisitor) {
 		accept(context, conclusion, premiseVisitor, DUMMY_INFERENCE_VISITOR);
 	}
 	

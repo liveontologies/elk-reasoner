@@ -54,7 +54,7 @@ public class TraceState {
 		return traceStore_;
 	}
 	
-	public SaturationState getSaturationState() {
+	public LocalTracingSaturationState getSaturationState() {
 		return tracingSaturationState_;
 	}
 	
