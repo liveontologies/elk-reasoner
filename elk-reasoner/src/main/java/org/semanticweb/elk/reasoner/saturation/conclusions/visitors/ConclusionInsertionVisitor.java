@@ -22,7 +22,9 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,12 @@ public class ConclusionInsertionVisitor extends
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ConclusionInsertionVisitor.class);
 
+	private final SaturationStateWriter writer_;
+
+	public ConclusionInsertionVisitor(SaturationStateWriter writer) {
+		this.writer_ = writer;
+	}
+
 	// TODO: make this by combining the visitor in order to avoid overheads when
 	// logging is switched off
 	@Override
@@ -53,5 +61,15 @@ public class ConclusionInsertionVisitor extends
 		LOGGER_.trace("{}: inserting {}: {}", context, conclusion,
 				result ? "success" : "failure");
 		return result;
+	}
+
+	@Override
+	public Boolean visit(ContextInitialization conclusion, Context input) {
+		if (!defaultVisit(conclusion, input))
+			return false;
+		// else
+		writer_.markAsNotSaturated(input.getRoot());
+		return true;
+
 	}
 }

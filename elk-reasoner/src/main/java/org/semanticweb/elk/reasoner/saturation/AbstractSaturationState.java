@@ -248,8 +248,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 			if (previous != null)
 				// the context is already assigned meanwhile
 				return previous;
-			// else the context is new and not saturated
-			markAsNotSaturatedInternal(newContext);
+			// markAsNotSaturatedInternal(newContext);
 			contextCreationListener_.notifyContextCreation(newContext);
 			LOGGER_.trace("{}: context created", newContext);
 			return newContext;

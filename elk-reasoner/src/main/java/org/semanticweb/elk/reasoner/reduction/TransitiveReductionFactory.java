@@ -301,6 +301,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				 * of the state until the job will be finished.
 				 */
 				if (candidateSaturation == null
+						|| !candidateSaturation.isInitialized()
 						|| !candidateSaturation.isSaturated()) {
 					auxJobQueue_.add(new SaturationJobSuperClass<R, J>(
 							candidate, state));
@@ -326,6 +327,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 							PredefinedElkClass.OWL_THING)) {
 				output.directSubsumers.add(defaultTopOutput_);
 			}
+			// if (output.equivalent.isEmpty()) {
+			// LOGGER_.error("{}: empty equivalent class!", output.getRoot());
+			// }
 
 			state.initiatorJob.setOutput(output);
 			listener_.notifyFinished(state.initiatorJob);
@@ -463,7 +467,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			LOGGER_.trace("{}: transitive reduction started", root);
 
 			Context context = saturationState_.getContext(root);
-			if (context != null && context.isSaturated()) {
+			if (context != null && context.isInitialized()
+					&& context.isSaturated()) {
 				jobsWithSaturatedRoot_.add(job);
 			} else {
 				saturationEngine.submit(new SaturationJobRoot<R, J>(job));

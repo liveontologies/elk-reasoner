@@ -56,6 +56,7 @@ public class ConclusionInitializingInsertionVisitor extends
 	private final ContextInitialization contextInitConclusion_;
 
 	public ConclusionInitializingInsertionVisitor(SaturationStateWriter writer) {
+		super(writer);
 		this.producer_ = writer;
 		this.contextInitConclusion_ = new ContextInitialization(writer
 				.getSaturationState().getOntologyIndex());

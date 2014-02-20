@@ -102,10 +102,10 @@ public class ContextImpl implements ExtendedContext {
 	private volatile boolean isInconsistent_ = false;
 
 	/**
-	 * {@code true} if all derived {@link Subsumer} of {@link #root_} have been
-	 * computed.
+	 * {@code true} if it is not initialized or otherwise all derived
+	 * {@link Subsumer} of {@link #root_} have been computed.
 	 */
-	private volatile boolean isSaturated_ = false;
+	private volatile boolean isSaturated_ = true;
 
 	/**
 	 * the root {@link IndexedClassExpression} for which the {@link #subsumers_}
@@ -245,6 +245,11 @@ public class ContextImpl implements ExtendedContext {
 	@Override
 	public boolean isSaturated() {
 		return isSaturated_;
+	}
+
+	@Override
+	public boolean isInitialized() {
+		return isInitialized_;
 	}
 
 	@Override

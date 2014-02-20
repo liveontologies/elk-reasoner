@@ -63,7 +63,7 @@ public class RuleApplicationAdditionFactory extends
 			RuleVisitor ruleVisitor, SaturationStateWriter writer,
 			SaturationStatistics localStatistics) {
 		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
-		writer = getActiveWriter(writer, localTodo, localStatistics);
+		writer = addLocalTodoAndStatistics(writer, localTodo, localStatistics);
 		ConclusionVisitor<Context, Boolean> conclusionProcessor = getConclusionProcessor(
 				ruleVisitor, writer, localStatistics);
 		conclusionProcessor = SaturationUtils

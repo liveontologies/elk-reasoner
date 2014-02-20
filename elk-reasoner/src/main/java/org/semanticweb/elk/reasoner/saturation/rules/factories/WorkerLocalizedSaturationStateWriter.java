@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
+
 /*
  * #%L
  * ELK Reasoner

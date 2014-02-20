@@ -70,60 +70,61 @@ public class RuleApplicationAdditionPruningFactory extends
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RuleApplicationAdditionPruningFactory.class);
 
-	/**
-	 * The local {@link SaturationState} used by this factory to iterate over
-	 * {@link Conclusion}s stored within {@link Context}s of the main
-	 * {@link SaturationState}. Iteration is done by applying all (redundant and
-	 * non-redundant) rules. We create (local) copies of {@link Context}s in the
-	 * main {@link SaturationState} to keep track of {@link Context}s to which
-	 * the rules are already applied.
-	 */
-	private final SaturationState localState_;
+	private final SaturationState mainSaturationState_;
 
-	public RuleApplicationAdditionPruningFactory(SaturationState saturationState) {
-		super(saturationState);
-		this.localState_ = new MapSaturationState(
-				saturationState.getOntologyIndex());
+	public RuleApplicationAdditionPruningFactory(
+			SaturationState mainSaturationState) {
+		/**
+		 * We use a "local" {@link SaturationState} to iterate over
+		 * {@link Conclusion}s stored within {@link Context}s of the main
+		 * {@link SaturationState}. Iteration is done by applying all (redundant
+		 * and non-redundant) rules. We create (local) copies of {@link Context}
+		 * s in the main {@link SaturationState} to keep track of
+		 * {@link Context}s to which the rules are already applied.
+		 */
+		super(new MapSaturationState(mainSaturationState.getOntologyIndex()));
+		this.mainSaturationState_ = mainSaturationState;
 	}
 
 	@Override
 	InputProcessor<IndexedClassExpression> getEngine(RuleVisitor ruleVisitor,
-			SaturationStateWriter writer, SaturationStatistics localStatistics) {
-		SaturationStateWriter localWriter = localState_
+			SaturationStateWriter localWriter,
+			SaturationStatistics localStatistics) {
+		SaturationStateWriter mainWriter = mainSaturationState_
 				.getContextCreatingWriter(ContextCreationListener.DUMMY,
 						ContextModificationListener.DUMMY);
 		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
-		// the engine processes todo in the local saturation state
-		localWriter = getActiveWriter(localWriter, localTodo, localStatistics);
+		localWriter = addLocalTodoAndStatistics(localWriter, localTodo,
+				localStatistics);
 		return super.getEngine(
-				getConclusionProcessor(ruleVisitor, writer, localWriter),
+				getConclusionProcessor(ruleVisitor, mainWriter, localWriter),
 				localWriter, localTodo, localStatistics);
 	}
 
 	@SuppressWarnings("unchecked")
 	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, ConclusionProducer mainProducer,
-			ConclusionProducer trackingProducer) {
+			SaturationStateWriter localWriter) {
 		return new ComposedConclusionVisitor<Context>(
 		// checking the conclusion against the main saturation state
 				new LocalizedConclusionVisitor(
 						// conclusion already occurs there
 						new ConclusionOccurrenceCheckingVisitor(),
-						getSaturationState()),
+						mainSaturationState_),
 				// if all fine, insert the conclusion to the local context
 				// copies
-				new ConclusionInsertionVisitor(),
+				new ConclusionInsertionVisitor(localWriter),
 				// and apply rules locally
 				new HybridLocalRuleApplicationConclusionVisitor(
-						getSaturationState(), ruleVisitor, ruleVisitor,
+						mainSaturationState_, ruleVisitor, ruleVisitor,
 						// the conclusions of non-redundant rules are
 						// produced within both main and tracing saturation
 						// states
 						new CombinedConclusionProducer(mainProducer,
-								trackingProducer),
+								localWriter),
 						// whereas the conclusion of redundant rules are
 						// needed only for tracking
-						trackingProducer));
+						localWriter));
 	}
 
 }

@@ -52,7 +52,7 @@ public abstract class AbstractRuleApplicationFactory implements
 	/**
 	 * The main {@link SaturationState} this factory works with
 	 */
-	private final SaturationState mainSaturationState_;
+	private final SaturationState saturationState_;
 
 	/**
 	 * The {@link SaturationStatistics} aggregated for all workers
@@ -60,7 +60,7 @@ public abstract class AbstractRuleApplicationFactory implements
 	private final SaturationStatistics aggregatedStats_;
 
 	public AbstractRuleApplicationFactory(final SaturationState saturationState) {
-		this.mainSaturationState_ = saturationState;
+		this.saturationState_ = saturationState;
 		this.aggregatedStats_ = new SaturationStatistics();
 	}
 
@@ -78,7 +78,7 @@ public abstract class AbstractRuleApplicationFactory implements
 			ConclusionVisitor<Context, Boolean> conclusionProcessor,
 			SaturationStateWriter saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
-		return new BasicRuleEngine(mainSaturationState_.getOntologyIndex(),
+		return new BasicRuleEngine(saturationState_.getOntologyIndex(),
 				conclusionProcessor, localTodo, saturationStateWriter,
 				aggregatedStats_, localStatistics);
 	}
@@ -100,8 +100,9 @@ public abstract class AbstractRuleApplicationFactory implements
 	 * @param localTodo
 	 * @return
 	 */
-	static SaturationStateWriter getActiveWriter(SaturationStateWriter writer,
-			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
+	static SaturationStateWriter addLocalTodoAndStatistics(
+			SaturationStateWriter writer, WorkerLocalTodo localTodo,
+			SaturationStatistics localStatistics) {
 		// optimizing the writer to deal more efficiently with conclusions to be
 		// processed within the same context
 		WorkerLocalizedSaturationStateWriter localizedWriter = new WorkerLocalizedSaturationStateWriter(
@@ -118,12 +119,10 @@ public abstract class AbstractRuleApplicationFactory implements
 	 * @return a new writer for the main {@link SaturationState} to be used by
 	 *         engine
 	 */
-	@SuppressWarnings("static-method")
-	SaturationStateWriter getMainWriter(SaturationState mainSaturationState,
-			ContextCreationListener creationListener,
+	SaturationStateWriter getWriter(ContextCreationListener creationListener,
 			ContextModificationListener modificationListener) {
 		// by default the writer can create new contexts
-		return mainSaturationState.getContextCreatingWriter(creationListener,
+		return saturationState_.getContextCreatingWriter(creationListener,
 				modificationListener);
 	}
 
@@ -141,8 +140,8 @@ public abstract class AbstractRuleApplicationFactory implements
 		modificationListener = SaturationUtils
 				.addStatsToContextModificationListener(modificationListener,
 						localStatistics.getContextStatistics());
-		SaturationStateWriter writer = getMainWriter(mainSaturationState_,
-				creationListener, modificationListener);
+		SaturationStateWriter writer = getWriter(creationListener,
+				modificationListener);
 		RuleVisitor ruleVisitor = SaturationUtils
 				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());
 		return getEngine(ruleVisitor, writer, localStatistics);
@@ -160,7 +159,7 @@ public abstract class AbstractRuleApplicationFactory implements
 
 	@Override
 	public SaturationState getSaturationState() {
-		return mainSaturationState_;
+		return saturationState_;
 	}
 
 }

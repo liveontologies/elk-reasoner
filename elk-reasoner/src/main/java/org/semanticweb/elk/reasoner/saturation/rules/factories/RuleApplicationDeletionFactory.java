@@ -69,7 +69,7 @@ public class RuleApplicationDeletionFactory extends
 			SaturationStatistics localStatistics) {
 		writer = wrapWriter(writer);
 		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
-		writer = getActiveWriter(writer, localTodo, localStatistics);
+		writer = addLocalTodoAndStatistics(writer, localTodo, localStatistics);
 		return super.getEngine(getConclusionProcessor(ruleVisitor, writer),
 				writer, localTodo, localStatistics);
 	}
@@ -80,11 +80,10 @@ public class RuleApplicationDeletionFactory extends
 	}
 
 	@Override
-	SaturationStateWriter getMainWriter(SaturationState mainSaturationState,
-			ContextCreationListener creationListener,
+	SaturationStateWriter getWriter(ContextCreationListener creationListener,
 			ContextModificationListener modificationListener) {
 		// by default the writer can create new contexts
-		return mainSaturationState.getContextCreatingWriter(creationListener,
+		return getSaturationState().getContextCreatingWriter(creationListener,
 				modificationListener);
 	}
 

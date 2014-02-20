@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
+
 /*
  * #%L
  * ELK Reasoner
@@ -50,13 +51,15 @@ interface WorkerLocalTodo {
 
 	/**
 	 * @return the root {@link IndexedClassExpression} of the {@link Context}
-	 *         that is currently processed
+	 *         that is currently processed or {@code null} if no {@link Context}
+	 *         is processed
 	 * @see Context#getRoot()
 	 */
 	IndexedClassExpression getActiveRoot();
 
 	/**
 	 * set the new value of the root for the currently processed {@link Context}
+	 * (or {@link null} if no context is processed)
 	 * 
 	 * @param currentActiveRoot
 	 *            the new value of the root for the currently processed

@@ -76,6 +76,7 @@ public abstract class AbstractRuleEngine implements
 			}
 			process(nextContext);
 		}
+		workerLocalTodo_.setActiveRoot(null);
 	}
 
 	/**

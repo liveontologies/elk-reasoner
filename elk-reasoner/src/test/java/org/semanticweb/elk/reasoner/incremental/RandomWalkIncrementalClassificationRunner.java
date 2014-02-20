@@ -197,7 +197,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			long seed) throws ElkException {
 
 		LOGGER_.trace("====== FAILURE! ====");
-		LOGGER_.trace("= Expexted Reasoner Computation =");
+		LOGGER_.trace("= Expected Reasoner Computation =");
 
 		Reasoner standardReasoner = io_.createReasoner(Operations.concat(
 				changingAxioms.getOnElements(), staticAxioms));

@@ -94,5 +94,7 @@ public interface Context extends ConclusionSet, ContextPremises {
 	 *         for {@link SubConclusion}s are already computed.
 	 */
 	public boolean isSaturated();
+	
+	public boolean isInitialized();
 
 }

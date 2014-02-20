@@ -100,7 +100,9 @@ public interface SaturationState {
 	 *         to {@link Context#isSaturated()} if it was not already so.
 	 *         Whenever a {@link Context} becomes not saturated using this
 	 *         {@link SaturationStateWriter}, the provided
-	 *         {@link ContextModificationListener} is called.
+	 *         {@link ContextModificationListener} is called. The returned
+	 *         {@link SaturationStateWriter} is not thread safe and should not
+	 *         be used from more than one thread.
 	 * 
 	 * @see #getContextCreatingWriter(ContextCreationListener,
 	 *      ContextModificationListener)
@@ -122,7 +124,9 @@ public interface SaturationState {
 	 *         {@link ContextCreationListener} is called. Whenever a
 	 *         {@link Context} becomes not saturated using this
 	 *         {@link SaturationStateWriter}, the provided
-	 *         {@link ContextModificationListener} is called.
+	 *         {@link ContextModificationListener} is called. The returned
+	 *         {@link SaturationStateWriter} is not thread safe and should not
+	 *         be used from more than one thread.
 	 * 
 	 * @see #getContextModifyingWriter(ContextModificationListener)
 	 */
