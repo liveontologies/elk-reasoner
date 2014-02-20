@@ -79,6 +79,11 @@ public class Operations {
 		public void clear() {
 		}
 
+		@Override
+		public Collection<Object> remove(Object key) {
+			return Collections.emptySet();
+		}
+
 	};
 
 	@SuppressWarnings("unchecked")
