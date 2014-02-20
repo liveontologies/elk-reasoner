@@ -65,11 +65,7 @@ public class ConclusionInsertionVisitor extends
 
 	@Override
 	public Boolean visit(ContextInitialization conclusion, Context input) {
-		if (!defaultVisit(conclusion, input))
-			return false;
-		// else
 		writer_.markAsNotSaturated(input.getRoot());
-		return true;
-
+		return defaultVisit(conclusion, input);
 	}
 }

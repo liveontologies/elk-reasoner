@@ -129,7 +129,7 @@ public class ContextImpl implements ExtendedContext {
 	 * {@code true} if this {@link Context} is initialized, i.e., contains
 	 * {@link ContextInitialization}
 	 */
-	private boolean isInitialized_ = false;
+	private volatile boolean isInitialized_ = false;
 
 	/**
 	 * Construct a new {@link Context} for the given root
