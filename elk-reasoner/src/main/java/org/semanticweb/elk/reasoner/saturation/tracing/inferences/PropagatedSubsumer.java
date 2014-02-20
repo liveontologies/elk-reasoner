@@ -54,11 +54,11 @@ public class PropagatedSubsumer extends ComposedSubsumer implements Inference {
 		inferenceContextRoot_ = inferenceRoot;
 	}
 	
-	public PropagatedSubsumer(IndexedClassExpression context, Propagation propagation, IndexedPropertyChain linkRelation, IndexedClassExpression linkSource) {
+	public PropagatedSubsumer(IndexedClassExpression contextRoot, Propagation propagation, IndexedPropertyChain linkRelation, IndexedClassExpression linkSource) {
 		super(propagation.getCarry());
 		linkSourceRoot_ = linkSource;
 		linkRelation_ = linkRelation;
-		inferenceContextRoot_ = context;
+		inferenceContextRoot_ = contextRoot;
 	}
 	
 	public Propagation getPropagation() {

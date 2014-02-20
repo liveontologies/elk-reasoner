@@ -38,15 +38,15 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  */
 public class SubClassOfSubsumer extends DecomposedSubsumer implements Inference {
 	
-	private final Conclusion premise_;
+	private final IndexedClassExpression premise_;
 
-	SubClassOfSubsumer(Conclusion premise, IndexedClassExpression expression) {
+	public SubClassOfSubsumer(IndexedClassExpression premise, IndexedClassExpression expression) {
 		super(expression);
 		premise_ = premise;
 	}
 	
 	public Conclusion getPremise() {
-		return premise_;
+		return new DecomposedSubsumer(premise_);
 	}
 
 	@Override

@@ -81,7 +81,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplicationFactory {
 	
-	private final static boolean CYCLE_AVOIDANCE = true;
+	private final static boolean CYCLE_AVOIDANCE = false;
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory	.getLogger(CycleBlockingRuleApplicationFactory.class);
 	
@@ -124,7 +124,7 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 				new InferenceInserter(new ConclusionInsertionVisitor(), tracingProducer, getSaturationStatistics()),
 				// apply only local rules and produce conclusion only to the locally copies
 				new HybridLocalRuleApplicationConclusionVisitor(
-						getSaturationState(), ruleVisitor, ruleVisitor,
+						super.getSaturationState(), ruleVisitor, ruleVisitor,
 						tracingProducer, tracingProducer));
 	}
 

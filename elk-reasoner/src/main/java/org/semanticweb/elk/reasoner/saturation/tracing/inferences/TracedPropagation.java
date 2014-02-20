@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
@@ -35,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
 
 /**
  * Represents an inference which creates a {@link Propagation} from a
- * {@link BackwardLink} and a {@link Subsumer}.
+ * {@link Subsumer}.
  * 
  * @author Pavel Klinov
  * 
@@ -43,7 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  */
 public class TracedPropagation extends Propagation implements Inference {
 
-	TracedPropagation(IndexedPropertyChain relation, IndexedObjectSomeValuesFrom carry) {
+	public TracedPropagation(IndexedPropertyChain relation, IndexedObjectSomeValuesFrom carry) {
 		super(relation, carry);
 	}
 	

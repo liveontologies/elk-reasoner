@@ -28,19 +28,17 @@ import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ChainableSubsumerRule} producing {@link Subsumer} for an
@@ -54,8 +52,8 @@ public class ObjectIntersectionFromConjunctRule extends
 		AbstractChainableSubsumerRule {
 
 	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ObjectIntersectionFromConjunctRule.class);
+	/*private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ObjectIntersectionFromConjunctRule.class);*/
 
 	private static final String NAME_ = "ObjectIntersectionOf Introduction";
 
@@ -130,9 +128,10 @@ public class ObjectIntersectionFromConjunctRule extends
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-				conjunctionsByConjunct_.keySet(), premises.getSubsumers()))
-			producer.produce(premises.getRoot(), new ComposedSubsumer(
-					conjunctionsByConjunct_.get(common)));
+				conjunctionsByConjunct_.keySet(), premises.getSubsumers())) {
+			//producer.produce(premises.getRoot(), new ComposedSubsumer(conjunctionsByConjunct_.get(common)));
+			producer.produce(premises.getRoot(), new ComposedConjunction(premise, common, conjunctionsByConjunct_.get(common)));
+		}
 
 	}
 

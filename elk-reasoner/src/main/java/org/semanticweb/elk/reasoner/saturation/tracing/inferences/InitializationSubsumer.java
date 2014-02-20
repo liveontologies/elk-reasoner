@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  */
 public class InitializationSubsumer extends DecomposedSubsumer implements Inference {
 
-	InitializationSubsumer(IndexedClassExpression expression) {
+	public InitializationSubsumer(IndexedClassExpression expression) {
 		super(expression);
 	}
 

@@ -22,20 +22,18 @@ package org.semanticweb.elk.reasoner.saturation.rules.propagations;
  * #L%
  */
 
-import java.util.Collection;
 import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
 
 /**
  * A {@link NonReflexivePropagationRule} producing {@link Subsumer}s in the
@@ -69,9 +67,10 @@ public class NonReflexivePropagationRule extends AbstractPropagationRule {
 		final Map<IndexedPropertyChain, ? extends SubContextPremises> subContextMap = premises
 				.getSubContextPremisesByObjectProperty();
 		SubContextPremises targets = subContextMap.get(premise.getRelation());
-		IndexedClassExpression carry = premise.getCarry();
+		//IndexedClassExpression carry = premise.getCarry();
 		for (IndexedClassExpression target : targets.getLinkedRoots()) {
-			producer.produce(target, new ComposedSubsumer(carry));
+			//producer.produce(target, new ComposedSubsumer(carry));
+			producer.produce(target, new PropagatedSubsumer(premises.getRoot(), premise, premise.getRelation(), target));
 		}
 	}
 

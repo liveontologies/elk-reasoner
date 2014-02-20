@@ -41,7 +41,7 @@ public class DecomposedConjunction extends DecomposedSubsumer implements Inferen
 
 	private final IndexedObjectIntersectionOf conjunction_;
 	
-	DecomposedConjunction(IndexedObjectIntersectionOf conjunction, IndexedClassExpression expression) {
+	public DecomposedConjunction(IndexedObjectIntersectionOf conjunction, IndexedClassExpression expression) {
 		super(expression);
 		conjunction_ = conjunction;
 	}

@@ -45,9 +45,9 @@ public class ComposedConjunction extends ComposedSubsumer implements Inference {
 	
 	/**
 	 */
-	public ComposedConjunction(IndexedClassExpression subsumer, IndexedClassExpression conjunct, IndexedObjectIntersectionOf conjunction) {
+	public ComposedConjunction(IndexedClassExpression premise, IndexedClassExpression conjunct, IndexedObjectIntersectionOf conjunction) {
 		super(conjunction);
-		first_ = subsumer;
+		first_ = premise;
 		second_ = conjunct;
 	}
 
