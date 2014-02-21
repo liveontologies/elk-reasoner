@@ -28,7 +28,8 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * A queue to keep {@link Conclusion}s that should be processed in the
- * {@link Context} currently processed by the worker.
+ * {@link Context} currently processed by the worker. It is not thread-safe, so
+ * all methods should be accessed from the same thread.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -50,20 +51,39 @@ interface WorkerLocalTodo {
 	void add(Conclusion concusion);
 
 	/**
-	 * @return the root {@link IndexedClassExpression} of the {@link Context}
-	 *         that is currently processed or {@code null} if no {@link Context}
-	 *         is processed
+	 * @return {@code true} if this {@link WorkerLocalTodo} is assigned for
+	 *         processing some {@link Context} or {@code false} otherwise. The
+	 *         root of this {@link Context} can be obtained by
+	 *         {@link #getActiveRoot()}
+	 */
+	boolean isActivated();
+
+	/**
+	 * @return the root {@link IndexedClassExpression} of the currently assigned
+	 *         {@link Context} or {@code null} if this {@link WorkerLocalTodo}
+	 *         is not activated.
+	 * @see #isActivated()
 	 * @see Context#getRoot()
 	 */
 	IndexedClassExpression getActiveRoot();
 
 	/**
-	 * set the new value of the root for the currently processed {@link Context}
-	 * (or {@link null} if no context is processed)
+	 * Set the new value of the root for the currently processed {@link Context}
+	 * . This will activate this {@link WorkerLocalTodo} (
+	 * {@link #getActiveRoot()} will return this value).
 	 * 
 	 * @param currentActiveRoot
 	 *            the new value of the root for the currently processed
 	 *            {@link Context}
 	 */
 	void setActiveRoot(IndexedClassExpression currentActiveRoot);
+
+	/**
+	 * Deactivates this {@link WorkerLocalTodo}. After that,
+	 * {@link #isActivated()} returns {@code false}
+	 * 
+	 * @return {@code true} if this {@link WorkerLocalTodo} was deactivated and
+	 *         {@code false} otherwise
+	 */
+	boolean deactivate();
 }

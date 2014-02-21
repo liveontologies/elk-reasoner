@@ -67,16 +67,19 @@ public abstract class AbstractRuleEngine implements
 
 	@Override
 	public void process() throws InterruptedException {
-		for (;;) {
-			if (Thread.currentThread().isInterrupted())
-				break;
-			Context nextContext = getNextActiveContext();
-			if (nextContext == null) {
-				break;
+		try {
+			for (;;) {
+				if (Thread.currentThread().isInterrupted())
+					break;
+				Context nextContext = getNextActiveContext();
+				if (nextContext == null) {
+					break;
+				}
+				process(nextContext);
 			}
-			process(nextContext);
+		} finally {
+			workerLocalTodo_.deactivate();
 		}
-		workerLocalTodo_.setActiveRoot(null);
 	}
 
 	/**
@@ -87,7 +90,6 @@ public abstract class AbstractRuleEngine implements
 	 *            {@link Conclusions}
 	 */
 	void process(Context context) {
-		// this method should not be interrupted
 		// at this point workerLocalTodo_ must be empty
 		workerLocalTodo_.setActiveRoot(context.getRoot());
 		for (;;) {

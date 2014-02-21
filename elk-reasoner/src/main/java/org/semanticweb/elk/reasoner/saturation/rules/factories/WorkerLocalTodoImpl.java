@@ -27,6 +27,7 @@ import java.util.Deque;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,34 +44,77 @@ public class WorkerLocalTodoImpl implements WorkerLocalTodo {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(WorkerLocalTodoImpl.class);
 
+	/**
+	 * The thread in which this {@link WorkerLocalTodo} should be used.
+	 */
+	private final Thread thisThread_;
+
 	private final Deque<Conclusion> localConclusions_;
 
-	private IndexedClassExpression activeRoot_;
+	/**
+	 * {@code true} if this {@link WorkerLocalTodo} is assigned to some
+	 * {@link Context}
+	 */
+	private boolean isActivated_ = false;
+
+	/**
+	 * the root of the {@link Context} to which this {@link WorkerLocalTodo} is
+	 * assigned or {@link null} if it is not activated.
+	 */
+	private IndexedClassExpression activeRoot_ = null;
 
 	public WorkerLocalTodoImpl() {
+		this.thisThread_ = Thread.currentThread();
 		this.localConclusions_ = new ArrayDeque<Conclusion>(1024);
 	}
 
 	@Override
 	public Conclusion poll() {
+		checkThread();
 		return localConclusions_.pollLast();
 	}
 
 	@Override
 	public void add(Conclusion concusion) {
+		checkThread();
 		LOGGER_.trace("{}: produced local conclusion", concusion);
 		localConclusions_.add(concusion);
 	}
 
 	@Override
+	public boolean isActivated() {
+		checkThread();
+		return isActivated_;
+	}
+
+	@Override
 	public IndexedClassExpression getActiveRoot() {
-		return activeRoot_;
+		checkThread();
+		if (isActivated_)
+			return activeRoot_;
+		// else
+		return null;
 	}
 
 	@Override
 	public void setActiveRoot(IndexedClassExpression currentActiveRoot) {
+		checkThread();
 		LOGGER_.trace("{}: new active root", currentActiveRoot);
 		this.activeRoot_ = currentActiveRoot;
 	}
 
+	@Override
+	public boolean deactivate() {
+		checkThread();
+		if (!isActivated_)
+			return false;
+		// else
+		LOGGER_.trace("local todo deactivated");
+		return true;
+	}
+
+	void checkThread() {
+		if (Thread.currentThread() != thisThread_)
+			LOGGER_.error("Worker Local Todo used from a different thread than created!");
+	}
 }
