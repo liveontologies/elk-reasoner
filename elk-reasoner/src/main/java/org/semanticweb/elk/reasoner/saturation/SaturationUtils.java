@@ -116,14 +116,14 @@ public class SaturationUtils {
 		return ruleProcessor;
 	}
 
-	public static ConclusionVisitor<Context, ?> getProcessedConclusionCountingProcessor(
-			ConclusionVisitor<Context, Boolean> conclusionVisitor,
+	public static <O> ConclusionVisitor<Context, O> getProcessedConclusionCountingProcessor(
+			ConclusionVisitor<Context, O> conclusionVisitor,
 			SaturationStatistics localStatistics) {
 
 		ConclusionStatistics stats = localStatistics.getConclusionStatistics();
 
 		if (COLLECT_CONCLUSION_COUNTS) {
-			conclusionVisitor = new PreprocessedConclusionVisitor<Context, Boolean>(
+			conclusionVisitor = new PreprocessedConclusionVisitor<Context, O>(
 					new CountingConclusionVisitor<Context>(
 							stats.getProcessedConclusionCounts()),
 					conclusionVisitor);
@@ -131,7 +131,7 @@ public class SaturationUtils {
 		if (COLLECT_CONCLUSION_TIMES) {
 			stats.startMeasurements();
 
-			return new TimedConclusionVisitor<Context>(
+			return new TimedConclusionVisitor<Context, O>(
 					stats.getConclusionTimers(), conclusionVisitor);
 		}
 		return conclusionVisitor;

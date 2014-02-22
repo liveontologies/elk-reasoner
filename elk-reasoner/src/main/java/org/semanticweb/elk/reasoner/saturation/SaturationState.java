@@ -74,6 +74,13 @@ public interface SaturationState {
 	public Collection<? extends Context> getNotSaturatedContexts();
 
 	/**
+	 * @return the number of {@link Context}s in this {@link SaturationState}
+	 *         that are not saturated, i.e., for which
+	 *         {@link Context#isSaturated()} returns {@code false}
+	 */
+	int getNonSaturatedContextCount();
+
+	/**
 	 * Sets one of the {@link Context}s as saturated and returns it. The
 	 * {@link Context}s are set in the order in which they become non-saturated
 	 * or created.
@@ -93,7 +100,9 @@ public interface SaturationState {
 	 *         to {@link Context#isSaturated()} if it was not already so.
 	 *         Whenever a {@link Context} becomes not saturated using this
 	 *         {@link SaturationStateWriter}, the provided
-	 *         {@link ContextModificationListener} is called.
+	 *         {@link ContextModificationListener} is called. The returned
+	 *         {@link SaturationStateWriter} is not thread safe and should not
+	 *         be used from more than one thread.
 	 * 
 	 * @see #getContextCreatingWriter(ContextCreationListener,
 	 *      ContextModificationListener)
@@ -115,7 +124,9 @@ public interface SaturationState {
 	 *         {@link ContextCreationListener} is called. Whenever a
 	 *         {@link Context} becomes not saturated using this
 	 *         {@link SaturationStateWriter}, the provided
-	 *         {@link ContextModificationListener} is called.
+	 *         {@link ContextModificationListener} is called. The returned
+	 *         {@link SaturationStateWriter} is not thread safe and should not
+	 *         be used from more than one thread.
 	 * 
 	 * @see #getContextModifyingWriter(ContextModificationListener)
 	 */

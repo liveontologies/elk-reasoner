@@ -40,7 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedBackwa
  */
 public class ForwardLinkFromBackwardLinkRule extends AbstractBackwardLinkRule {
 
-	private static final String NAME_ = "ForwardLink from BackwardLink";
+	public static final String NAME = "ForwardLink from BackwardLink";
 
 	private static final ForwardLinkFromBackwardLinkRule INSTANCE_ = new ForwardLinkFromBackwardLinkRule();
 
@@ -50,7 +50,7 @@ public class ForwardLinkFromBackwardLinkRule extends AbstractBackwardLinkRule {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

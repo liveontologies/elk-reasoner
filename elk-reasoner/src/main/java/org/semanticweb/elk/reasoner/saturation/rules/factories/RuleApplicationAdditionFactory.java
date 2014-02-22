@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInitializingInsertionVisitor;
@@ -61,13 +62,21 @@ public class RuleApplicationAdditionFactory extends
 	public InputProcessor<IndexedClassExpression> getEngine(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer,
 			SaturationStatistics localStatistics) {
-		return super.getEngine(getConclusionProcessor(ruleVisitor, writer),
-				writer, localStatistics);
+		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
+		writer = addLocalTodoAndStatistics(writer, localTodo, localStatistics);
+		ConclusionVisitor<Context, Boolean> conclusionProcessor = getConclusionProcessor(
+				ruleVisitor, writer, localStatistics);
+		conclusionProcessor = SaturationUtils
+				.getProcessedConclusionCountingProcessor(conclusionProcessor,
+						localStatistics);
+		return super.getEngine(conclusionProcessor, writer, localTodo,
+				localStatistics);
 	}
 
 	@SuppressWarnings("unchecked")
 	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter writer) {
+			RuleVisitor ruleVisitor, SaturationStateWriter writer,
+			SaturationStatistics localStatistics) {
 		return new ComposedConclusionVisitor<Context>(
 		// insert conclusions initializing contexts if necessary
 				new ConclusionInitializingInsertionVisitor(writer),
@@ -76,7 +85,8 @@ public class RuleApplicationAdditionFactory extends
 				new ConclusionSourceContextNotSaturatedCheckingVisitor(
 						getSaturationState()),
 				// afterwards, apply all non-redundant rules
-				new NonRedundantRuleApplicationConclusionVisitor(ruleVisitor,
-						writer));
+				SaturationUtils.getUsedConclusionCountingProcessor(
+						new NonRedundantRuleApplicationConclusionVisitor(
+								ruleVisitor, writer), localStatistics));
 	}
 }

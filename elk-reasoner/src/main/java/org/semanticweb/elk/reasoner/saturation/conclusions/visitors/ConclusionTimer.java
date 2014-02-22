@@ -22,29 +22,76 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
+
+/**
+ * An object which can be used to measure the time spent on processing
+ * {@link Conclusion}s using {@link ConclusionVisitor}.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public class ConclusionTimer {
 
+	/**
+	 * timer for {@link BackwardLink}s
+	 */
 	long timeBackwardLinks;
 
+	/**
+	 * timer for {@link ContextInitialization}s
+	 */
 	long timeContextInitializations;
 
+	/**
+	 * timer for {@link Contradiction}s
+	 */
 	long timeContradictions;
 
+	/**
+	 * timer for {@link DisjointSubsumer}s
+	 */
 	long timeDisjointSubsumers;
 
+	/**
+	 * timer for {@link ForwardLink}s
+	 */
 	long timeForwardLinks;
 
-	long timeNegativeSubsumers;
+	/**
+	 * timer for {@link DecomposedSubsumer}s
+	 */
+	long timeDecomposedSubsumers;
 
-	long timePositiveSubsumers;
+	/**
+	 * timer for {@link ComposedSubsumer}s
+	 */
+	long timeComposedSubsumers;
 
+	/**
+	 * timer for {@link Propagation}s
+	 */
 	long timePropagations;
+
+	/**
+	 * timer for {@link SubContextInitialization}s
+	 */
+	long timeSubContextInitializations;
 
 	public long getTimeBackwardLinks() {
 		return timeBackwardLinks;
 	}
 
-	public long getTimeBottoms() {
+	public long getTimeContradictions() {
 		return timeContradictions;
 	}
 
@@ -60,23 +107,27 @@ public class ConclusionTimer {
 		return timeForwardLinks;
 	}
 
-	public long getTimeNegativeSubsumers() {
-		return timeNegativeSubsumers;
+	public long getTimeComposedSubsumers() {
+		return timeComposedSubsumers;
 	}
 
-	public long getTimePositiveSubsumers() {
-		return timePositiveSubsumers;
+	public long getTimeDecomposedSubsumers() {
+		return timeDecomposedSubsumers;
 	}
 
 	public long getTimePropagations() {
 		return timePropagations;
 	}
 
+	public long getSubContextInitializations() {
+		return timeSubContextInitializations;
+	}
+
 	public long getTotalTime() {
-		return timeNegativeSubsumers + timePositiveSubsumers
+		return timeComposedSubsumers + timeDecomposedSubsumers
 				+ timeBackwardLinks + timeForwardLinks + timePropagations
 				+ timeContradictions + timeDisjointSubsumers
-				+ timeContextInitializations;
+				+ timeContextInitializations + timeSubContextInitializations;
 	}
 
 	/**
@@ -89,28 +140,30 @@ public class ConclusionTimer {
 	 *            the object which counters should be added
 	 */
 	public synchronized void add(ConclusionTimer timer) {
-		this.timeNegativeSubsumers += timer.timeNegativeSubsumers;
-		this.timePositiveSubsumers += timer.timePositiveSubsumers;
+		this.timeComposedSubsumers += timer.timeComposedSubsumers;
+		this.timeDecomposedSubsumers += timer.timeDecomposedSubsumers;
 		this.timeBackwardLinks += timer.timeBackwardLinks;
 		this.timeForwardLinks += timer.timeForwardLinks;
 		this.timeContradictions += timer.timeContradictions;
 		this.timePropagations += timer.timePropagations;
 		this.timeDisjointSubsumers += timer.timeDisjointSubsumers;
 		this.timeContextInitializations += timer.timeContextInitializations;
+		this.timeSubContextInitializations += timer.timeSubContextInitializations;
 	}
 
 	/**
 	 * Reset all times to zero.
 	 */
 	public void reset() {
-		timeNegativeSubsumers = 0;
-		timePositiveSubsumers = 0;
+		timeComposedSubsumers = 0;
+		timeDecomposedSubsumers = 0;
 		timeBackwardLinks = 0;
 		timeForwardLinks = 0;
 		timeContradictions = 0;
 		timePropagations = 0;
 		timeDisjointSubsumers = 0;
 		timeContextInitializations = 0;
+		timeSubContextInitializations = 0;
 	}
 
 }

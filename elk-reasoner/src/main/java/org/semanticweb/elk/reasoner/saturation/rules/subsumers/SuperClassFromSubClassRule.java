@@ -58,7 +58,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SuperClassFromSubClassRule.class);
 
-	private static final String NAME_ = "SubClassOf Expansion";
+	public static final String NAME = "SubClassOf Expansion";
 
 	/**
 	 * Correctness of axioms deletions requires that toldSuperClassExpressions
@@ -99,7 +99,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override
@@ -119,7 +119,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 		boolean changed = false;
 
 		for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-			LOGGER_.trace("Adding {} to {}", ice, NAME_);
+			LOGGER_.trace("Adding {} to {}", ice, NAME);
 
 			changed |= rule.addToldSuperClassExpression(ice);
 		}
@@ -136,7 +136,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 
 		if (rule != null) {
 			for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-				LOGGER_.trace("Removing {} from {}", ice, NAME_);
+				LOGGER_.trace("Removing {} from {}", ice, NAME);
 
 				changed |= rule.removeToldSuperClassExpression(ice);
 			}
@@ -144,7 +144,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 			if (rule.isEmpty()) {
 				ruleChain.remove(SuperClassFromSubClassRule.MATCHER_);
 
-				LOGGER_.trace("{}: removed ", NAME_);
+				LOGGER_.trace("{}: removed ", NAME);
 
 				return true;
 			}

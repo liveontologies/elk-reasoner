@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -50,6 +49,8 @@ public class Propagation extends AbstractConclusion implements Conclusion,
 
 	// logger for this class
 	static final Logger LOGGER_ = LoggerFactory.getLogger(Propagation.class);
+
+	public static final String NAME = "Propagation";
 
 	private final IndexedPropertyChain relation_;
 
@@ -108,8 +109,8 @@ public class Propagation extends AbstractConclusion implements Conclusion,
 	}
 
 	/**
-	 * @return the {@link IndexedClassExpression} that is propagated by this
-	 *         {@link Propagation}
+	 * @return the {@link IndexedObjectSomeValuesFrom} that is propagated by
+	 *         this {@link Propagation}
 	 */
 	public IndexedObjectSomeValuesFrom getCarry() {
 		return this.carry_;

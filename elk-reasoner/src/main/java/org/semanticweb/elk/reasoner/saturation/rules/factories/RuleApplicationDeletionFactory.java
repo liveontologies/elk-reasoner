@@ -26,7 +26,9 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextExistenceCheckingWriter;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -66,13 +68,23 @@ public class RuleApplicationDeletionFactory extends
 			RuleVisitor ruleVisitor, SaturationStateWriter writer,
 			SaturationStatistics localStatistics) {
 		writer = wrapWriter(writer);
+		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
+		writer = addLocalTodoAndStatistics(writer, localTodo, localStatistics);
 		return super.getEngine(getConclusionProcessor(ruleVisitor, writer),
-				writer, localStatistics);
+				writer, localTodo, localStatistics);
 	}
 
 	SaturationStateWriter wrapWriter(SaturationStateWriter writer) {
 		// only write to exiting contexts
 		return new ContextExistenceCheckingWriter(writer, getSaturationState());
+	}
+
+	@Override
+	SaturationStateWriter getWriter(ContextCreationListener creationListener,
+			ContextModificationListener modificationListener) {
+		// by default the writer can create new contexts
+		return getSaturationState().getContextCreatingWriter(creationListener,
+				modificationListener);
 	}
 
 	/**

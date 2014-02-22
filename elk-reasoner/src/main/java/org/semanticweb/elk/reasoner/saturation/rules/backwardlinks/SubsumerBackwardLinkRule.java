@@ -22,7 +22,6 @@ package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
@@ -42,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubs
  */
 public class SubsumerBackwardLinkRule extends AbstractBackwardLinkRule {
 
-	private static final String NAME_ = "Propagation Over BackwardLink";
+	public static final String NAME = "Propagation Over BackwardLink";
 
 	private static final SubsumerBackwardLinkRule INSTANCE_ = new SubsumerBackwardLinkRule();
 
@@ -52,18 +51,17 @@ public class SubsumerBackwardLinkRule extends AbstractBackwardLinkRule {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override
 	public void apply(BackwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		for (IndexedClassExpression carry : premises
+		for (IndexedObjectSomeValuesFrom carry : premises
 				.getSubContextPremisesByObjectProperty()
 				.get(premise.getRelation()).getPropagatedSubsumers()) {
 			//producer.produce(premise.getSource(), new ComposedSubsumer(carry));
-			//FIXME cast
-			producer.produce(premise.getSource(), new PropagatedSubsumer(premises.getRoot(), premise, (IndexedObjectSomeValuesFrom)carry));
+			producer.produce(premise.getSource(), new PropagatedSubsumer(premises.getRoot(), premise, carry));
 		}
 	}
 

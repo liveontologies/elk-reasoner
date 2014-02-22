@@ -1,6 +1,32 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ForwardLinkFromBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
+import org.semanticweb.elk.util.logging.statistics.StatisticsPrinter;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * #%L
@@ -32,6 +58,10 @@ import org.slf4j.Logger;
  * 
  */
 public class RuleStatistics {
+
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(RuleStatistics.class);
 
 	// TODO: limit access
 	public final RuleCounter ruleCounter = new RuleCounter();
@@ -70,116 +100,133 @@ public class RuleStatistics {
 		}
 	}
 
-	// TODO: can use rule names for printing
+	static void print(StatisticsPrinter printer, String name, int count,
+			int time) {
+		if (count == 0)
+			return;
+
+		printer.print(name, count, time);
+
+	}
+
 	public void print(Logger logger) {
 		if (!logger.isDebugEnabled() || !measurementsTaken())
 			return;
 
-		if (ruleCounter.countBackwardLinkChainFromBackwardLinkRule > 0)
-			logger.debug("Forward link from backward link rules: "
-					+ ruleCounter.countBackwardLinkChainFromBackwardLinkRule
-					+ " ("
-					+ ruleTimer.timeBackwardLinkChainFromBackwardLinkRule
-					/ numOfMeasurements_ + " ms)");
+		if (ruleCounter.getTotalRuleAppCount() == 0)
+			return;
 
-		if (ruleCounter.countContradictionFromDisjointnessRule > 0)
-			logger.debug("Disjointness axiom contradiction rules: "
-					+ ruleCounter.countContradictionFromDisjointnessRule + " ("
-					+ ruleTimer.timeContradictionFromDisjointnessRule
-					/ numOfMeasurements_ + " ms)");
+		StatisticsPrinter printer = new StatisticsPrinter(logger,
+				"%{RULES:}s %,{count}d [%,{time}d ms]", "TOTAL RULES",
+				ruleCounter.getTotalRuleAppCount(),
+				ruleTimer.getTotalRuleAppTime());
 
-		if (ruleCounter.countDisjointSubsumerFromMemberRule > 0)
-			logger.debug("Disjointness axiom composition rules: "
-					+ ruleCounter.countDisjointSubsumerFromMemberRule + " ("
-					+ ruleTimer.timeDisjointSubsumerFromMemberRule
-					/ numOfMeasurements_ + " ms)");
+		// TODO: sort in a better order
 
-		if (ruleCounter.countOwlThingContextInitRule > 0)
-			logger.debug("owl:Thing context init rules: "
-					+ ruleCounter.countOwlThingContextInitRule + " ("
-					+ ruleTimer.timeOwlThingContextInitRule
-					/ numOfMeasurements_ + " ms)");
+		printer.printHeader();
 
-		if (ruleCounter.countRootContextInitializationRule > 0)
-			logger.debug("Context root init rules: "
-					+ ruleCounter.countRootContextInitializationRule + " ("
-					+ ruleTimer.timeRootContextInitializationRule
-					/ numOfMeasurements_ + " ms)");
+		print(printer, BackwardLinkChainFromBackwardLinkRule.NAME,
+				ruleCounter.countBackwardLinkChainFromBackwardLinkRule,
+				ruleTimer.timeBackwardLinkChainFromBackwardLinkRule);
 
-		if (ruleCounter.countSuperClassFromSubClassRule > 0)
-			logger.debug("Subclass expansions: "
-					+ ruleCounter.countSuperClassFromSubClassRule + " ("
-					+ ruleTimer.timeSuperClassFromSubClassRule
-					/ numOfMeasurements_ + " ms)");
+		print(printer, NonReflexiveBackwardLinkCompositionRule.NAME,
+				ruleCounter.countNonReflexiveBackwardLinkCompositionRule,
+				ruleTimer.timeNonReflexiveBackwardLinkCompositionRule);
 
-		if (ruleCounter.countContradictionOverBackwardLinkRule > 0)
-			logger.debug("Propagations of inconsistency: "
-					+ ruleCounter.countContradictionOverBackwardLinkRule + " ("
-					+ ruleTimer.timeContradictionOverBackwardLinkRule
-					/ numOfMeasurements_ + " ms)");
+		print(printer, ContradicitonCompositionRule.NAME,
+				ruleCounter.countContradicitonCompositionRule,
+				ruleTimer.timeContradicitonCompositionRule);
 
-		if (ruleCounter.countSubsumerBackwardLinkRule > 0)
-			logger.debug("Propagations via backward links: "
-					+ ruleCounter.countSubsumerBackwardLinkRule + " ("
-					+ ruleTimer.timeSubsumerBackwardLinkRule
-					/ numOfMeasurements_ + " ms)");
+		print(printer, ContradictionFromDisjointnessRule.NAME,
+				ruleCounter.countContradictionFromDisjointnessRule,
+				ruleTimer.timeContradictionFromDisjointnessRule);
 
-		if (ruleCounter.countPropagationFromExistentialFillerRule
-				+ ruleCounter.countIndexedObjectSomeValuesFromDecomposition > 0)
-			logger.debug("ObjectSomeValuesFrom composition/decomposition rules: "
-					+ ruleCounter.countPropagationFromExistentialFillerRule
-					+ "/"
-					+ ruleCounter.countIndexedObjectSomeValuesFromDecomposition
-					+ " ("
-					+ ruleTimer.timePropagationFromExistentialFillerRule
-					/ numOfMeasurements_
-					+ "/"
-					+ ruleTimer.timeIndexedObjectSomeValuesFromDecomposition
-					/ numOfMeasurements_ + " ms)");
+		print(printer, ContradictionFromNegationRule.NAME,
+				ruleCounter.countContradictionFromNegationRule,
+				ruleTimer.timeContradictionFromNegationRule);
 
-		if (ruleCounter.countObjectIntersectionFromConjunctRule
-				+ ruleCounter.countIndexedObjectIntersectionOfDecomposition > 0)
-			logger.debug("ObjectIntersectionOf composition/decomposition rules: "
-					+ ruleCounter.countObjectIntersectionFromConjunctRule
-					+ "/"
-					+ ruleCounter.countIndexedObjectIntersectionOfDecomposition
-					+ " ("
-					+ ruleTimer.timeObjectIntersectionFromConjunctRule
-					/ numOfMeasurements_
-					+ "/"
-					+ ruleTimer.timeIndexedObjectIntersectionOfDecomposition
-					/ numOfMeasurements_ + " ms)");
+		print(printer, ContradictionFromOwlNothingRule.NAME,
+				ruleCounter.countContradictionFromOwlNothingRule,
+				ruleTimer.timeContradictionFromOwlNothingRule);
 
-		if (ruleCounter.countContradictionFromNegationRule
-				+ ruleCounter.countIndexedObjectComplementOfDecomposition > 0)
-			logger.debug("ObjectComplementOf composition/decomposition rules: "
-					+ ruleCounter.countContradictionFromNegationRule + "/"
-					+ ruleCounter.countIndexedObjectComplementOfDecomposition
-					+ " (" + ruleTimer.timeContradictionFromNegationRule
-					/ numOfMeasurements_ + "/"
-					+ ruleTimer.timeIndexedObjectComplementOfDecomposition
-					/ numOfMeasurements_ + " ms)");
+		print(printer, ContradictionOverBackwardLinkRule.NAME,
+				ruleCounter.countContradictionOverBackwardLinkRule,
+				ruleTimer.timeContradictionOverBackwardLinkRule);
 
-		if (ruleCounter.countObjectUnionFromDisjunctRule > 0)
-			logger.debug("ObjectUnionOf composition rules: "
-					+ ruleCounter.countObjectUnionFromDisjunctRule + " ("
-					+ ruleTimer.timeObjectUnionFromDisjunctRule
-					/ numOfMeasurements_ + " ms)");
+		print(printer, ContradictionPropagationRule.NAME,
+				ruleCounter.countContradictionPropagationRule,
+				ruleTimer.timeContradictionPropagationRule);
 
-		logger.debug("Total rule time: "
-				+ (ruleTimer.timeContradictionOverBackwardLinkRule
-						+ ruleTimer.timeDisjointSubsumerFromMemberRule
-						+ ruleTimer.timeContradictionFromDisjointnessRule
-						+ ruleTimer.timeBackwardLinkChainFromBackwardLinkRule
-						+ ruleTimer.timeObjectIntersectionFromConjunctRule
-						+ ruleTimer.timePropagationFromExistentialFillerRule
-						+ ruleTimer.timeContradictionFromNegationRule
-						+ ruleTimer.timeObjectUnionFromDisjunctRule
-						+ ruleTimer.timeOwlThingContextInitRule
-						+ ruleTimer.timeRootContextInitializationRule
-						+ ruleTimer.timeSubsumerBackwardLinkRule
-						+ ruleTimer.timeSuperClassFromSubClassRule
-						/ numOfMeasurements_ + " ms"));
+		print(printer, DisjointSubsumerFromMemberRule.NAME,
+				ruleCounter.countDisjointSubsumerFromMemberRule,
+				ruleTimer.timeDisjointSubsumerFromMemberRule);
+
+		print(printer, ForwardLinkFromBackwardLinkRule.NAME,
+				ruleCounter.countForwardLinkFromBackwardLinkRule,
+				ruleTimer.timeForwardLinkFromBackwardLinkRule);
+
+		print(printer, IndexedObjectComplementOfDecomposition.NAME,
+				ruleCounter.countIndexedObjectComplementOfDecomposition,
+				ruleTimer.timeIndexedObjectComplementOfDecomposition);
+
+		print(printer, IndexedObjectIntersectionOfDecomposition.NAME,
+				ruleCounter.countIndexedObjectIntersectionOfDecomposition,
+				ruleTimer.timeIndexedObjectIntersectionOfDecomposition);
+
+		print(printer, IndexedObjectSomeValuesFromDecomposition.NAME,
+				ruleCounter.countIndexedObjectSomeValuesFromDecomposition,
+				ruleTimer.timeIndexedObjectSomeValuesFromDecomposition);
+
+		print(printer, NonReflexivePropagationRule.NAME,
+				ruleCounter.countNonReflexivePropagationRule,
+				ruleTimer.timeNonReflexivePropagationRule);
+
+		print(printer, ObjectIntersectionFromConjunctRule.NAME,
+				ruleCounter.countObjectIntersectionFromConjunctRule,
+				ruleTimer.timeObjectIntersectionFromConjunctRule);
+
+		print(printer, ObjectUnionFromDisjunctRule.NAME,
+				ruleCounter.countObjectUnionFromDisjunctRule,
+				ruleTimer.timeObjectUnionFromDisjunctRule);
+
+		print(printer, OwlThingContextInitRule.NAME,
+				ruleCounter.countOwlThingContextInitRule,
+				ruleTimer.timeOwlThingContextInitRule);
+
+		print(printer, PropagationFromExistentialFillerRule.NAME,
+				ruleCounter.countPropagationFromExistentialFillerRule,
+				ruleTimer.timePropagationFromExistentialFillerRule);
+
+		print(printer, ReflexivePropagationRule.NAME,
+				ruleCounter.countReflexivePropagationRule,
+				ruleTimer.timeReflexivePropagationRule);
+
+		print(printer, RootContextInitializationRule.NAME,
+				ruleCounter.countRootContextInitializationRule,
+				ruleTimer.timeRootContextInitializationRule);
+
+		print(printer, SubsumerBackwardLinkRule.NAME,
+				ruleCounter.countSubsumerBackwardLinkRule,
+				ruleTimer.timeSubsumerBackwardLinkRule);
+
+		print(printer, SuperClassFromSubClassRule.NAME,
+				ruleCounter.countSuperClassFromSubClassRule,
+				ruleTimer.timeSuperClassFromSubClassRule);
+
+		print(printer, ReflexiveBackwardLinkCompositionRule.NAME,
+				ruleCounter.countReflexiveBackwardLinkCompositionRule,
+				ruleTimer.timeReflexiveBackwardLinkCompositionRule);
+
+		print(printer, PropagationInitializationRule.NAME,
+				ruleCounter.countPropagationInitializationRule,
+				ruleTimer.timePropagationInitializationRule);
+
+		printer.printSeparator();
+
+		print(printer, "TOTAL RULES:", ruleCounter.getTotalRuleAppCount(),
+				ruleTimer.getTotalRuleAppTime());
+
+		printer.printSeparator();
 	}
 
 	public long getTotalRuleAppCount() {

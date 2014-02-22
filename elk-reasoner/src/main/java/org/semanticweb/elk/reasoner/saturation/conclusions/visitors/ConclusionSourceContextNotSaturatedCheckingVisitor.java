@@ -63,7 +63,7 @@ public class ConclusionSourceContextNotSaturatedCheckingVisitor extends
 		IndexedClassExpression sourceRoot = conclusion.getSourceRoot(context
 				.getRoot());
 		Context sourceContext = state_.getContext(sourceRoot);
-		if (sourceContext.isSaturated()) {
+		if (sourceContext.isInitialized() && sourceContext.isSaturated()) {
 			LOGGER_.error(
 					"{}: adding conclusion {} to saturated context {}",
 					context,

@@ -44,6 +44,8 @@ public class ContextInitialization extends AbstractConclusion {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContextInitialization.class);
 
+	public static final String NAME = "Context Initialization";
+
 	// actually we just need only context initialization rules,
 	// but they can change after creating this object
 	private final OntologyIndex ontologyIndex_;

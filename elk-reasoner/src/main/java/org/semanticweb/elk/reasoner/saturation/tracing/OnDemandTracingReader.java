@@ -4,6 +4,8 @@
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracingWriter;
@@ -35,7 +37,7 @@ public class OnDemandTracingReader extends DelegatingTraceReader {
 			TraceStore.Reader inferenceReader,
 			ContextTracingFactory tracingFactory) {
 		super(inferenceReader);
-		tracingContextWriter_  = tracingState.getTracingWriter();
+		tracingContextWriter_  = tracingState.getContextCreatingWriter(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY);
 		tracingFactory_ = tracingFactory;
 	}
 	
@@ -44,7 +46,7 @@ public class OnDemandTracingReader extends DelegatingTraceReader {
 		IndexedClassExpression conclusionContextRoot = conclusion.getSourceRoot(root);
 		TracedContext tracedContext = tracingContextWriter_.getCreateContext(conclusionContextRoot);	
 		
-		while (!tracedContext.isSaturated()) {
+		while (!tracedContext.isInitialized() || !tracedContext.isSaturated()) {
 			LOGGER_.trace("Need to trace {} to read inferences for {}", tracedContext, conclusion);
 			
 			InputProcessor<ContextTracingJob> tracingEngine = tracingFactory_.getEngine();

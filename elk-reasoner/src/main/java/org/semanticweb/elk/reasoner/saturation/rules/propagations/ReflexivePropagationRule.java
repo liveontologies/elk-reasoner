@@ -46,7 +46,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubs
  */
 public class ReflexivePropagationRule extends AbstractPropagationRule {
 
-	private static final String NAME_ = "Reflexive Propagation";
+	public static final String NAME = "Reflexive Propagation";
 
 	private static final ReflexivePropagationRule INSTANCE_ = new ReflexivePropagationRule();
 
@@ -56,7 +56,7 @@ public class ReflexivePropagationRule extends AbstractPropagationRule {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

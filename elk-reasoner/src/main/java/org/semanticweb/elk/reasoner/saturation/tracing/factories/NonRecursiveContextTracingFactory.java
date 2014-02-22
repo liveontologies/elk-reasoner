@@ -8,6 +8,8 @@ import java.util.Collection;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
+import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
@@ -104,14 +106,14 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 
 		private final ClassExpressionSaturationFactory<ContextTracingJob>.Engine tracingEngine_ = tracingFactory_.getEngine();
 		
-		private final TracingWriter tracingContextWriter_ = tracingState_.getTracingWriter();
+		private final TracingWriter tracingContextWriter_ = tracingState_.getContextCreatingWriter(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY);
 
 		@Override
 		public void submit(ContextTracingJob job) {
 			IndexedClassExpression root = job.getInput();
 			TracedContext context = tracingContextWriter_.getCreateContext(root);
 
-			if (!context.isSaturated()) {
+			if (!context.isInitialized() || !context.isSaturated()) {
 				addPendingJob(job);
 				// if the context is being traced now (by the same factory), do
 				// nothing as all notifications will be sent when tracing

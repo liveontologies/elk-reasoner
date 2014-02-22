@@ -30,7 +30,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.AbstractSaturationState;
+import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextImpl;
+import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.MapSaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -63,14 +65,18 @@ public class LocalTracingSaturationState extends MapSaturationState {
 
 			@Override
 			public boolean holds(Context cxt) {
-				return cxt.isSaturated();
+				return cxt.isInitialized() && cxt.isSaturated();
 			}
 		});
 	}
 
-	public TracingWriter getTracingWriter() {
-		return new TracingWriter();
+	@Override
+	public TracingWriter getContextCreatingWriter(
+			ContextCreationListener contextCreationListener,
+			ContextModificationListener contextModificationListener) {
+		return new TracingWriter(contextCreationListener, contextModificationListener);
 	}
+
 
 	/**
 	 * TODO
@@ -80,6 +86,11 @@ public class LocalTracingSaturationState extends MapSaturationState {
 	 *         pavel.klinov@uni-ulm.de
 	 */
 	public class TracingWriter extends AbstractSaturationState.ContextCreatingWriter {
+
+		public TracingWriter(ContextCreationListener contextCreationListener,
+				ContextModificationListener contextModificationListener) {
+			super(contextCreationListener, contextModificationListener);
+		}
 
 		@Override
 		protected TracedContext newContext(IndexedClassExpression root) {

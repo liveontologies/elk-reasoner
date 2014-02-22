@@ -55,7 +55,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 	/*private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(BackwardLinkChainFromBackwardLinkRule.class);*/
 
-	private static final String NAME_ = "BackwardLink ForwardLink Composition";
+	public static final String NAME = "BackwardLink ForwardLink Composition";
 
 	/**
 	 * the record that stores all {@link ForwardLink}s produced in the
@@ -126,7 +126,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

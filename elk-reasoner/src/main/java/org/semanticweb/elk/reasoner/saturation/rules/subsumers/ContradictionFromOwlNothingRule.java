@@ -50,7 +50,7 @@ public class ContradictionFromOwlNothingRule extends
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContradictionFromOwlNothingRule.class);
 
-	public static final String NAME_ = "Owl:Nothing Contradiction Introduction";
+	public static final String NAME = "Owl:Nothing Contradiction Introduction";
 
 	private ContradictionFromOwlNothingRule(ChainableSubsumerRule tail) {
 		super(tail);
@@ -80,7 +80,7 @@ public class ContradictionFromOwlNothingRule extends
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

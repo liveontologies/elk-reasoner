@@ -93,6 +93,11 @@ public abstract class AbstractSaturationState implements SaturationState {
 	}
 
 	@Override
+	public int getNonSaturatedContextCount() {
+		return notSaturatedContextsCount_.get();
+	}
+
+	@Override
 	public Context setNextContextSaturated() {
 		ExtendedContext next = notSaturatedContexts_.poll();
 		if (next == null)
@@ -146,8 +151,6 @@ public abstract class AbstractSaturationState implements SaturationState {
 
 		private final ContextModificationListener contextModificationListener_;
 
-		private int localNotSaturatedContextCount_ = 0;
-
 		private ContextModifyingWriter(
 				ContextModificationListener contextSaturationListener) {
 			this.contextModificationListener_ = contextSaturationListener;
@@ -155,8 +158,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 
 		@Override
 		public Context pollForActiveContext() {
-			Context result = activeContexts_.poll();
-			return result;
+			return activeContexts_.poll();
 		}
 
 		void produce(Context context, Conclusion conclusion) {
@@ -174,10 +176,10 @@ public abstract class AbstractSaturationState implements SaturationState {
 			produce(getContext(root), conclusion);
 		}
 
-		protected void markAsNotSaturatedInternal(ExtendedContext context) {
+		void markAsNotSaturatedInternal(ExtendedContext context) {
 			LOGGER_.trace("{}: marked as non-saturated", context);
 			notSaturatedContexts_.add(context);
-			localNotSaturatedContextCount_++;
+			notSaturatedContextsCount_.incrementAndGet();
 			contextModificationListener_.notifyContextModification(context);
 		}
 
@@ -198,13 +200,6 @@ public abstract class AbstractSaturationState implements SaturationState {
 		@Override
 		public void resetContexts() {
 			AbstractSaturationState.this.resetContexts();
-		}
-
-		@Override
-		public void dispose() {
-			notSaturatedContextsCount_
-					.addAndGet(localNotSaturatedContextCount_);
-			localNotSaturatedContextCount_ = 0;
 		}
 
 		@Override
@@ -258,8 +253,8 @@ public abstract class AbstractSaturationState implements SaturationState {
 				// the context is already assigned meanwhile
 				return previous;
 			}
-			// else the context is new and not saturated
-			markAsNotSaturatedInternal(newContext);
+
+			// markAsNotSaturatedInternal(newContext);
 			contextCreationListener_.notifyContextCreation(newContext);
 			LOGGER_.trace("{}: context created", newContext);
 			

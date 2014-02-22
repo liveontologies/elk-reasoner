@@ -139,7 +139,6 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 				contexts.add(ice);
 			}
 			i++;
-			writer.dispose();
 		}
 
 		LOGGER_.trace("Random contexts picked: {}", contexts);

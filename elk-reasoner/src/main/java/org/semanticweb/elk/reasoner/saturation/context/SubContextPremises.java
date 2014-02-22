@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.context;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
@@ -54,6 +55,8 @@ public interface SubContextPremises {
 	 *         relations {@link Propagation#getRelation()} to be sub-root of
 	 *         this {@link SubContextPremises}
 	 */
-	Set<IndexedClassExpression> getPropagatedSubsumers();
+	Set<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers();
+	
+	boolean isInitialized();
 
 }

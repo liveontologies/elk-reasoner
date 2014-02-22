@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.Processor;
 import org.semanticweb.elk.util.concurrent.computation.ProcessorFactory;
@@ -30,8 +32,8 @@ import org.slf4j.LoggerFactory;
 /**
  * A factory of engines that use a provided {@link RuleApplicationFactory} to
  * concurrently compute the closure of the current {@link SaturationState} under
- * the rules (based on which {@link Concusion}s are currently unprocessed). This
- * factory cannot supply any further input jobs.
+ * the rules (based on which {@link Conclusion}s are currently unprocessed).
+ * This factory cannot supply any further input jobs.
  * 
  * @author "Yevgeny Kazakov"
  * 

@@ -52,7 +52,7 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ObjectUnionFromDisjunctRule.class);
 
-	private static final String NAME_ = "ObjectUnionOf Introduction";
+	public static final String NAME = "ObjectUnionOf Introduction";
 
 	/**
 	 * All disjunctions containing the disjunct for which this rule is
@@ -85,7 +85,7 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

@@ -49,7 +49,7 @@ public class RootContextInitializationRule extends
 	/*private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RootContextInitializationRule.class);*/
 
-	private static final String NAME_ = "Root Introduction";
+	public static final String NAME = "Root Introduction";
 
 	private RootContextInitializationRule(ChainableContextInitRule tail) {
 		super(tail);
@@ -83,7 +83,7 @@ public class RootContextInitializationRule extends
 
 	@Override
 	public String getName() {
-		return NAME_;
+		return NAME;
 	}
 
 	@Override

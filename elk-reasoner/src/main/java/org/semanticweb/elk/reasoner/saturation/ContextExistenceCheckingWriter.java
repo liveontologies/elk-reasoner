@@ -32,8 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ContextExistenceCheckingWriter extends
-		SaturationStateWriterWrap<SaturationStateWriter> {
+public class ContextExistenceCheckingWriter extends SaturationStateWriterWrap {
 
 	private final SaturationState state_;
 

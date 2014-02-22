@@ -40,8 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class CountingSaturationStateWriter extends
-		SaturationStateWriterWrap<SaturationStateWriter> {
+public class CountingSaturationStateWriter extends SaturationStateWriterWrap {
 
 	private final ConclusionVisitor<Void, Integer> countingVisitor_;
 

@@ -41,6 +41,8 @@ public class Contradiction extends AbstractConclusion {
 
 	static final Logger LOGGER_ = LoggerFactory.getLogger(Contradiction.class);
 
+	public static final String NAME = "Contradiction";
+
 	/**
 	 * we use just one instance of this class
 	 */

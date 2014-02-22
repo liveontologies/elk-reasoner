@@ -82,8 +82,4 @@ public interface SaturationStateWriter extends ConclusionProducer {
 	 */
 	public void resetContexts();
 
-	/**
-	 * Free the resources used by this {@link SaturationStateWriter}
-	 */
-	public void dispose();
 }

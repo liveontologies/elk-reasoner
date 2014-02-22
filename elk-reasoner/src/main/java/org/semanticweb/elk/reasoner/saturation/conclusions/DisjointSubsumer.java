@@ -49,6 +49,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.Contradici
  */
 public class DisjointSubsumer extends AbstractConclusion {
 
+	public static final String NAME = "Disjoint Subsumer";
+	
 	private static ContradicitonCompositionRule THIS_COMPOSITION_RULE_ = new ContradicitonCompositionRule();
 
 	private final IndexedClassExpression member_;
