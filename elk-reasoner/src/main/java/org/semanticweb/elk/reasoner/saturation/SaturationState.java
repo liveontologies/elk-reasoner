@@ -115,12 +115,24 @@ public interface SaturationState {
 	 *         {@link SaturationStateWriter} is not thread safe and should not
 	 *         be used from more than one thread.
 	 * 
+	 * @see #getContextModifyingWriter()
 	 * @see #getContextCreatingWriter(ContextCreationListener,
 	 *      ContextModificationListener)
 	 * @see Context#isSaturated()
 	 */
 	public SaturationStateWriter getContextModifyingWriter(
 			ContextModificationListener contextModificationListener);
+
+	/**
+	 * @return a new {@link SaturationStateWriter} for this
+	 *         {@link SaturationState} that can modify but cannot create new
+	 *         {@link Context}s. The returned {@link SaturationStateWriter} is
+	 *         not thread safe and should not be used from more than one thread.
+	 * 
+	 * @see #getContextModifyingWriter(ContextModificationListener)
+	 * @see #getContextCreatingWriter()
+	 */
+	public SaturationStateWriter getContextModifyingWriter();
 
 	/**
 	 * @param contextCreationListener
@@ -139,10 +151,23 @@ public interface SaturationState {
 	 *         {@link SaturationStateWriter} is not thread safe and should not
 	 *         be used from more than one thread.
 	 * 
+	 * @see #getContextCreatingWriter()
 	 * @see #getContextModifyingWriter(ContextModificationListener)
 	 */
 	public SaturationStateWriter getContextCreatingWriter(
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener);
+
+	/**
+	 * @return a new {@link SaturationStateWriter} for this
+	 *         {@link SaturationState} that can modify and create new
+	 *         {@link Context}s. The returned {@link SaturationStateWriter} is
+	 *         not thread safe and should not be used from more than one thread.
+	 * 
+	 * @see #getContextCreatingWriter(ContextCreationListener,
+	 *      ContextModificationListener)
+	 * @see #getContextModifyingWriter()
+	 */
+	public SaturationStateWriter getContextCreatingWriter();
 
 }

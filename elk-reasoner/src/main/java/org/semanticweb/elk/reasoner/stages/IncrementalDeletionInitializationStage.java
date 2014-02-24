@@ -99,10 +99,8 @@ public class IncrementalDeletionInitializationStage extends
 		this.initialization_ = null;
 		// initializing contexts which will be removed
 		final SaturationStateWriter satStateWriter = SaturationUtils
-				.getStatsAwareWriter(reasoner.saturationState
-						.getContextCreatingWriter(
-								ContextCreationListener.DUMMY,
-								ContextModificationListener.DUMMY),
+				.getStatsAwareWriter(
+						reasoner.saturationState.getContextCreatingWriter(),
 						stageStatistics_);
 		final ClassTaxonomyState.Writer taxStateWriter = reasoner.classTaxonomyState
 				.getWriter();

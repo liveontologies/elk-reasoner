@@ -109,8 +109,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 				reasoner.saturationState.getOntologyIndex());
 
 		SaturationStateWriter writer = reasoner.saturationState
-				.getContextCreatingWriter(ContextCreationListener.DUMMY,
-						ContextModificationListener.DUMMY);
+				.getContextCreatingWriter();
 		for (IndexedClassExpression root : roots) {
 			if (reasoner.saturationState.getContext(root) != null)
 				writer.produce(root, init);
@@ -133,7 +132,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 
 		for (IndexedClassExpression ice : ices) {
 			SaturationStateWriter writer = reasoner.saturationState
-					.getContextModifyingWriter(ContextModificationListener.DUMMY);
+					.getContextModifyingWriter();
 			if (indexes.contains(i)) {
 				writer.markAsNotSaturated(ice);
 				contexts.add(ice);

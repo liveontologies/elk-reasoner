@@ -62,7 +62,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class IncrementalChangesInitialization extends
+public class IncrementalChangesInitialization
+		extends
 		ReasonerComputationWithInputs<ArrayList<Context>, ContextInitializationFactory> {
 
 	public IncrementalChangesInitialization(
@@ -125,8 +126,8 @@ class ContextInitializationFactory
 		final RuleVisitor ruleAppVisitor = SaturationUtils
 				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());
 		final SaturationStateWriter saturationStateWriter = SaturationUtils
-				.getStatAwareWriter(saturationState_
-						.getContextModifyingWriter(ContextModificationListener.DUMMY),
+				.getStatAwareWriter(
+						saturationState_.getContextModifyingWriter(),
 						localStatistics);
 
 		localStatistics.getConclusionStatistics().startMeasurements();
@@ -138,7 +139,8 @@ class ContextInitializationFactory
 			@Override
 			public void process(Context context) {
 				// apply all changed context initialization rules
-				// TODO: do the initialization using the context initialization conclusion
+				// TODO: do the initialization using the context initialization
+				// conclusion
 				LinkedContextInitRule nextGlobalRule = changedGlobalRuleHead_;
 				while (nextGlobalRule != null) {
 					if (LOGGER_.isTraceEnabled())

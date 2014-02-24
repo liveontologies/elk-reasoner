@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -35,7 +34,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVi
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
  * A {@link RuleApplicationFactory} that adds the produced {@link Conclusion}s
@@ -59,20 +57,6 @@ public class RuleApplicationAdditionFactory extends
 	}
 
 	@Override
-	public InputProcessor<IndexedClassExpression> getEngine(
-			RuleVisitor ruleVisitor, SaturationStateWriter writer,
-			SaturationStatistics localStatistics) {
-		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
-		writer = addLocalTodoAndStatistics(writer, localTodo, localStatistics);
-		ConclusionVisitor<Context, Boolean> conclusionProcessor = getConclusionProcessor(
-				ruleVisitor, writer, localStatistics);
-		conclusionProcessor = SaturationUtils
-				.getProcessedConclusionCountingProcessor(conclusionProcessor,
-						localStatistics);
-		return super.getEngine(conclusionProcessor, writer, localTodo,
-				localStatistics);
-	}
-
 	@SuppressWarnings("unchecked")
 	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer,
@@ -84,7 +68,8 @@ public class RuleApplicationAdditionFactory extends
 				// saturated (this is only needed for debugging)
 				new ConclusionSourceContextNotSaturatedCheckingVisitor(
 						getSaturationState()),
-				// afterwards, apply all non-redundant rules
+				// afterwards, apply all non-redundant rules, collecting
+				// statistics if necessary
 				SaturationUtils.getUsedConclusionCountingProcessor(
 						new NonRedundantRuleApplicationConclusionVisitor(
 								ruleVisitor, writer), localStatistics));
