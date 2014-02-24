@@ -84,9 +84,8 @@ abstract class AbstractIncrementalContextInitializationStage extends
 		if (!super.preExecute())
 			return false;
 		this.writer_ = SaturationUtils.getStatsAwareWriter(
-				reasoner.saturationState.getContextCreatingWriter(
-						ContextCreationListener.DUMMY,
-						ContextModificationListener.DUMMY), stageStatistics_);
+				reasoner.saturationState.getContextCreatingWriter(),
+				stageStatistics_);
 		return true;
 	}
 

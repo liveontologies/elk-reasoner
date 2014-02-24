@@ -78,55 +78,57 @@ public abstract class AbstractRuleApplicationFactory implements
 			ConclusionVisitor<Context, Boolean> conclusionProcessor,
 			SaturationStateWriter saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
+		conclusionProcessor = SaturationUtils
+				.getProcessedConclusionCountingProcessor(conclusionProcessor,
+						localStatistics);
 		return new BasicRuleEngine(saturationState_.getOntologyIndex(),
 				conclusionProcessor, localTodo, saturationStateWriter,
 				aggregatedStats_, localStatistics);
 	}
 
 	/**
-	 * Produces the {@link SaturationStateWriter} that produces
-	 * {@link Conclusion}s that are processed within this
-	 * {@link RuleApplicationFactory}. The given {@link WorkerLocalTodo} is used
-	 * to optimize producing & processing of {@link Conclusion}s for the
-	 * currently processed {@link Context}, and the provided local
-	 * {@link SaturationStatistics} is used to accumulate the statistics about
-	 * this {@link SaturationStateWriter}. The returned
-	 * {@link SaturationStateWriter} should be the same as passed to
-	 * {@link #getEngine(ContextCreationListener, ContextModificationListener)},
-	 * but it can be used in other places, e.g., to define the
-	 * {@link ConclusionVisitor}.
+	 * Creates a new primary {@link SaturationStateWriter} for the
+	 * {@link SaturationState} to be used by an engine of this
+	 * {@link RuleApplicationFactory}. This {@link SaturationStateWriter} can be
+	 * further extended and optimized.
 	 * 
-	 * @param writer
-	 * @param localTodo
-	 * @return
-	 */
-	static SaturationStateWriter addLocalTodoAndStatistics(
-			SaturationStateWriter writer, WorkerLocalTodo localTodo,
-			SaturationStatistics localStatistics) {
-		// optimizing the writer to deal more efficiently with conclusions to be
-		// processed within the same context
-		WorkerLocalizedSaturationStateWriter localizedWriter = new WorkerLocalizedSaturationStateWriter(
-				writer, localTodo);
-		// count all conclusions produced
-		return SaturationUtils.getStatsAwareWriter(localizedWriter,
-				localStatistics);
-
-	}
-
-	/**
 	 * @param creationListener
 	 * @param modificationListener
 	 * @return a new writer for the main {@link SaturationState} to be used by
-	 *         engine
+	 *         engine.
 	 */
-	SaturationStateWriter getWriter(ContextCreationListener creationListener,
+	SaturationStateWriter getBaseWriter(
+			ContextCreationListener creationListener,
 			ContextModificationListener modificationListener) {
 		// by default the writer can create new contexts
 		return saturationState_.getContextCreatingWriter(creationListener,
 				modificationListener);
 	}
 
-	protected abstract InputProcessor<IndexedClassExpression> getEngine(
+	/**
+	 * Produces the final {@link SaturationStateWriter} to be used by an engine
+	 * of this {@link RuleApplicationFactory} using the given candidate.
+	 * 
+	 * @param writer
+	 *            the {@link SaturationStateWriter} intended to be used by this
+	 *            {@link RuleApplicationFactory}
+	 * @return the actual {@link SaturationStateWriter} that will be used
+	 */
+	@SuppressWarnings("static-method")
+	SaturationStateWriter getFinalWriter(SaturationStateWriter writer) {
+		return writer;
+	}
+
+	/**
+	 * An instance of {@link ConclusionVisitor} that processes
+	 * {@link Conclusion}s within {@link Context} by an individual worker.
+	 * 
+	 * @param ruleVisitor
+	 * @param writer
+	 * @param localStatistics
+	 * @return
+	 */
+	protected abstract ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer,
 			SaturationStatistics localStatistics);
 
@@ -140,11 +142,19 @@ public abstract class AbstractRuleApplicationFactory implements
 		modificationListener = SaturationUtils
 				.addStatsToContextModificationListener(modificationListener,
 						localStatistics.getContextStatistics());
-		SaturationStateWriter writer = getWriter(creationListener,
+		SaturationStateWriter writer = getBaseWriter(creationListener,
 				modificationListener);
+		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
+		WorkerLocalizedSaturationStateWriter optimizedWriter = new WorkerLocalizedSaturationStateWriter(
+				writer, localTodo);
+		writer = SaturationUtils.getStatsAwareWriter(optimizedWriter,
+				localStatistics);
+		writer = getFinalWriter(writer);
 		RuleVisitor ruleVisitor = SaturationUtils
 				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());
-		return getEngine(ruleVisitor, writer, localStatistics);
+		return getEngine(
+				getConclusionProcessor(ruleVisitor, writer, localStatistics),
+				writer, localTodo, localStatistics);
 	}
 
 	@Override
@@ -158,7 +168,7 @@ public abstract class AbstractRuleApplicationFactory implements
 	}
 
 	@Override
-	public SaturationState getSaturationState() {
+	public final SaturationState getSaturationState() {
 		return saturationState_;
 	}
 

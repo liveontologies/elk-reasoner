@@ -33,7 +33,9 @@ import org.slf4j.LoggerFactory;
  * A factory of engines that use a provided {@link RuleApplicationFactory} to
  * concurrently compute the closure of the current {@link SaturationState} under
  * the rules (based on which {@link Conclusion}s are currently unprocessed).
- * This factory cannot supply any further input jobs.
+ * This factory cannot supply any further input jobs. Unlike
+ * {@link ClassExpressionSaturationFactory}, it does not mark any contexts as
+ * saturated.
  * 
  * @author "Yevgeny Kazakov"
  * 

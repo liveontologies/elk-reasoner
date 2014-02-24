@@ -64,8 +64,16 @@ public abstract class AbstractSaturationState implements SaturationState {
 	 */
 	private final Queue<ExtendedContext> notSaturatedContexts_ = new ConcurrentLinkedQueue<ExtendedContext>();
 
-	private final AtomicInteger notSaturatedContextsCount_ = new AtomicInteger(
+	/**
+	 * increments every time a {@link Context} is marked as non-saturated
+	 */
+	private final AtomicInteger countextMarkNonSaturatedCount_ = new AtomicInteger(
 			0);
+
+	/**
+	 * increments every time a {@link Context} is marked as saturated
+	 */
+	private final AtomicInteger contextSetSaturatedCount_ = new AtomicInteger(0);
 
 	public AbstractSaturationState(OntologyIndex index) {
 		this.ontologyIndex = index;
@@ -87,14 +95,20 @@ public abstract class AbstractSaturationState implements SaturationState {
 
 					@Override
 					public int size() {
-						return notSaturatedContextsCount_.get();
+						return countextMarkNonSaturatedCount_.get()
+								- contextSetSaturatedCount_.get();
 					}
 				});
 	}
 
 	@Override
-	public int getNonSaturatedContextCount() {
-		return notSaturatedContextsCount_.get();
+	public int getContextMarkNonSaturatedCount() {
+		return countextMarkNonSaturatedCount_.get();
+	}
+
+	@Override
+	public int getContextSetSaturatedCount() {
+		return contextSetSaturatedCount_.get();
 	}
 
 	@Override
@@ -103,10 +117,22 @@ public abstract class AbstractSaturationState implements SaturationState {
 		if (next == null)
 			return null;
 		// else
-		notSaturatedContextsCount_.decrementAndGet();
-		next.setSaturated(true);
+		if (next.setSaturated(true))
+			LOGGER_.error("{}: was marked as saturated already");
 		LOGGER_.trace("{}: marked as saturated", next);
+		contextSetSaturatedCount_.incrementAndGet();
 		return next;
+	}
+
+	@Override
+	public SaturationStateWriter getContextModifyingWriter(
+			ContextModificationListener contextModificationListener) {
+		return new ContextModifyingWriter(contextModificationListener);
+	}
+
+	@Override
+	public SaturationStateWriter getContextModifyingWriter() {
+		return getContextModifyingWriter(ContextModificationListener.DUMMY);
 	}
 
 	@Override
@@ -118,9 +144,9 @@ public abstract class AbstractSaturationState implements SaturationState {
 	}
 
 	@Override
-	public SaturationStateWriter getContextModifyingWriter(
-			ContextModificationListener contextModificationListener) {
-		return new ContextModifyingWriter(contextModificationListener);
+	public SaturationStateWriter getContextCreatingWriter() {
+		return getContextCreatingWriter(ContextCreationListener.DUMMY,
+				ContextModificationListener.DUMMY);
 	}
 
 	@Override
@@ -179,7 +205,7 @@ public abstract class AbstractSaturationState implements SaturationState {
 		void markAsNotSaturatedInternal(ExtendedContext context) {
 			LOGGER_.trace("{}: marked as non-saturated", context);
 			notSaturatedContexts_.add(context);
-			notSaturatedContextsCount_.incrementAndGet();
+			countextMarkNonSaturatedCount_.incrementAndGet();
 			contextModificationListener_.notifyContextModification(context);
 		}
 

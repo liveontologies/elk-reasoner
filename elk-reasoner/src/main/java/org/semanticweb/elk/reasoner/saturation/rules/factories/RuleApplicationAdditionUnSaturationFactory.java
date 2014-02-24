@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInitializingInsertionVisitor;
@@ -52,7 +53,7 @@ public class RuleApplicationAdditionUnSaturationFactory extends
 
 	@Override
 	@SuppressWarnings("unchecked")
-	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
+	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, SaturationStateWriter writer,
 			SaturationStatistics localStatistics) {
 		// the visitor used for inserting conclusion
@@ -61,8 +62,10 @@ public class RuleApplicationAdditionUnSaturationFactory extends
 				new ConclusionInitializingInsertionVisitor(writer),
 				// if new, mark the source context as unsaturated
 				new ConclusionSourceContextUnsaturationVisitor(writer),
-				// afterwards, apply all non-redundant rules
-				new NonRedundantRuleApplicationConclusionVisitor(ruleVisitor,
-						writer));
+				// afterwards, apply all non-redundant rules, collecting
+				// statistics if necessary
+				SaturationUtils.getUsedConclusionCountingProcessor(
+						new NonRedundantRuleApplicationConclusionVisitor(
+								ruleVisitor, writer), localStatistics));
 	}
 }

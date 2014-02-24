@@ -33,7 +33,9 @@ import org.slf4j.LoggerFactory;
  * A {@link ConclusionVisitor} that adds the visited {@link Conclusion} into the
  * given {@link Context}. The visit method returns {@link true} if the
  * {@link Context} was modified as the result of this operation, i.e., the
- * {@link Conclusion} was not contained in the {@link Context}.
+ * {@link Conclusion} was not contained in the {@link Context}. Additionally,
+ * when inserting {@link ContextInitialization} the {@link Context} is marked as
+ * non-saturated using the provided {@link SaturationStateWriter}.
  * 
  * @see ConclusionDeletionVisitor
  * @see ConclusionOccurrenceCheckingVisitor
@@ -65,6 +67,12 @@ public class ConclusionInsertionVisitor extends
 
 	@Override
 	public Boolean visit(ContextInitialization conclusion, Context input) {
+		// Mark context as non-saturated if conclusion was not already
+		// initialized. It is important to mark before we insert, otherwise
+		// the concept can be found initialized and saturated when it is not.
+		if (input.containsConclusion(conclusion))
+			return false;
+		// else
 		writer_.markAsNotSaturated(input.getRoot());
 		return defaultVisit(conclusion, input);
 	}

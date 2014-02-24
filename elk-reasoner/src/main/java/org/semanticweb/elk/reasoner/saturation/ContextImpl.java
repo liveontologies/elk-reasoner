@@ -265,10 +265,11 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	@Override
-	public boolean setSaturated(boolean saturated) {
-		boolean result = isSaturated_;
+	public synchronized boolean setSaturated(boolean saturated) {
+		// synchronized to ensure consistency when updated from two workers
+		boolean previous = isSaturated_;
 		isSaturated_ = saturated;
-		return result;
+		return previous;
 	}
 
 	private static class ConclusionInserter implements

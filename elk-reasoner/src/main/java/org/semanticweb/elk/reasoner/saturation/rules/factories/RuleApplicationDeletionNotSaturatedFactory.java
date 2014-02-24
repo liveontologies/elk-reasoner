@@ -51,7 +51,7 @@ public class RuleApplicationDeletionNotSaturatedFactory extends
 	}
 
 	@Override
-	SaturationStateWriter wrapWriter(SaturationStateWriter writer) {
+	SaturationStateWriter getFinalWriter(SaturationStateWriter writer) {
 		// only write to non-saturated contexts
 		return new SaturationCheckingWriter(writer, getSaturationState());
 	}

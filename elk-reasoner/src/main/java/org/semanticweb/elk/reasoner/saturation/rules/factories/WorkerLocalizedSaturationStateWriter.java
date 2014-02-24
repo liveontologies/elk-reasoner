@@ -49,7 +49,7 @@ class WorkerLocalizedSaturationStateWriter extends SaturationStateWriterWrap {
 
 	@Override
 	public void produce(IndexedClassExpression root, Conclusion conclusion) {
-		if (root == localTodo_.getActiveRoot()) {
+		if (localTodo_.isActivated() && root == localTodo_.getActiveRoot()) {
 			localTodo_.add(conclusion);
 		} else {
 			mainWriter.produce(root, conclusion);

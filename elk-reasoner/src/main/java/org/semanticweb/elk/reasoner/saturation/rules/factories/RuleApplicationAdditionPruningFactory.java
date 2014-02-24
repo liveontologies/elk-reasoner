@@ -25,13 +25,11 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
-import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.MapSaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
@@ -41,9 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.HybridLocalR
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalizedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CombinedConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,33 +73,19 @@ public class RuleApplicationAdditionPruningFactory extends
 		 * We use a "local" {@link SaturationState} to iterate over
 		 * {@link Conclusion}s stored within {@link Context}s of the main
 		 * {@link SaturationState}. Iteration is done by applying all (redundant
-		 * and non-redundant) rules. We create (local) copies of {@link Context}
-		 * s in the main {@link SaturationState} to keep track of
-		 * {@link Context}s to which the rules are already applied.
+		 * and non-redundant) rules. We create (local) copies of the
+		 * {@link Context} s in the main {@link SaturationState} to keep track
+		 * of {@link Context}s to which the rules are already applied.
 		 */
 		super(new MapSaturationState(mainSaturationState.getOntologyIndex()));
 		this.mainSaturationState_ = mainSaturationState;
 	}
 
 	@Override
-	protected InputProcessor<IndexedClassExpression> getEngine(RuleVisitor ruleVisitor,
-			SaturationStateWriter localWriter,
-			SaturationStatistics localStatistics) {
-		SaturationStateWriter mainWriter = mainSaturationState_
-				.getContextCreatingWriter(ContextCreationListener.DUMMY,
-						ContextModificationListener.DUMMY);
-		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
-		localWriter = addLocalTodoAndStatistics(localWriter, localTodo,
-				localStatistics);
-		return super.getEngine(
-				getConclusionProcessor(ruleVisitor, mainWriter, localWriter),
-				localWriter, localTodo, localStatistics);
-	}
-
 	@SuppressWarnings("unchecked")
-	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, ConclusionProducer mainProducer,
-			SaturationStateWriter localWriter) {
+	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
+			RuleVisitor ruleVisitor, SaturationStateWriter localWriter,
+			SaturationStatistics localStatistics) {
 		return new ComposedConclusionVisitor<Context>(
 		// checking the conclusion against the main saturation state
 				new LocalizedConclusionVisitor(
@@ -113,17 +95,22 @@ public class RuleApplicationAdditionPruningFactory extends
 				// if all fine, insert the conclusion to the local context
 				// copies
 				new ConclusionInsertionVisitor(localWriter),
-				// and apply rules locally
-				new HybridLocalRuleApplicationConclusionVisitor(
-						mainSaturationState_, ruleVisitor, ruleVisitor,
-						// the conclusions of non-redundant rules are
-						// produced within both main and tracing saturation
-						// states
-						new CombinedConclusionProducer(mainProducer,
-								localWriter),
-						// whereas the conclusion of redundant rules are
-						// needed only for tracking
-						localWriter));
+				// and apply rules locally, collecting statistics if necessary
+				SaturationUtils.getUsedConclusionCountingProcessor(
+						new HybridLocalRuleApplicationConclusionVisitor(
+								mainSaturationState_, ruleVisitor, ruleVisitor,
+								// the conclusions of non-redundant rules are
+								// produced within both main and tracing
+								// saturation states
+								new CombinedConclusionProducer(
+										mainSaturationState_
+												.getContextCreatingWriter(),
+										localWriter),
+								// whereas the conclusion of redundant rules are
+								// needed only for tracking
+								localWriter), localStatistics)
+
+		);
 	}
 
 }

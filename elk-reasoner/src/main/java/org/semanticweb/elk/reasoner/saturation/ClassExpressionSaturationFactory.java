@@ -115,41 +115,36 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 */
 	private final AtomicInteger countJobsFinishedUpper_ = new AtomicInteger(0);
 	/**
-	 * The lower bound on the number of contexts created
+	 * The lower bound on the number of contexts that are saturated (but not
+	 * necessarily marked as saturated yet).
 	 */
-	private final AtomicInteger countContextsModifiedLower_ = new AtomicInteger(
+	private final AtomicInteger countContextsSaturatedLower_ = new AtomicInteger(
 			0);
 	/**
-	 * The lower number of processed contexts, i.e., for which saturation is
-	 * computed (but not necessarily marked as saturated yet).
+	 * The upper bound on the overall number of contexts, which are marked as
+	 * saturated by the {@link SaturationState} (not necessarily within this
+	 * factory), i.e., the upper bound on the number of calls of
+	 * {@link SaturationState#setNextContextSaturated()}
 	 */
-	private final AtomicInteger countContextsProcessedLower_ = new AtomicInteger(
-			0);
-	/**
-	 * The lower bound of the number of created initialized contexts, which are
-	 * marked as saturated, i.e., for which {@link Context#isSaturated()}
-	 * returns {@code true}
-	 */
-	private final AtomicInteger countContextsFinishedLower_ = new AtomicInteger(
-			0);
-	/**
-	 * The upper bound of the number of created contexts, which are marked as
-	 * saturated, i.e., for which {@link Context#isSaturated()} returns
-	 * {@code true}
-	 */
-	private final AtomicInteger countContextsFinishedUpper_ = new AtomicInteger(
+	private final AtomicInteger countContextsSetSaturatedUpper_ = new AtomicInteger(
 			0);
 	/**
 	 * The threshold used to submit new jobs. The job is successfully submitted
-	 * if the difference between {@link #countContextsModifiedLower_} and
-	 * {@link #countContextsProcessedLower_} is less than {@link #threshold_};
-	 * otherwise the computation is suspended, and will resume only when all
-	 * possible rules are applied.
+	 * if the number of currently non-saturated contexts in the
+	 * {@link SaturationState} does not exceed {@link #threshold_}; otherwise
+	 * processing of new jobs is suspended, and resumes only when all possible
+	 * rules are applied. The threshold has influence on the size of the batches
+	 * of the input jobs that are processed simultaneously, which, in turn, has
+	 * an effect on throughput and latency of the saturation: in general, the
+	 * larger the threshold is, the faster it takes (in theory) to perform the
+	 * overall processing of jobs, but it might take longer to process an
+	 * individual job because it is possible to detect that the job is processed
+	 * only when the whole batch of jobs is processed.
 	 */
 	private final int threshold_;
 	/**
-	 * {@code true} if some worker could be blocked from submitting the jobs
-	 * because threshold is exceeded.
+	 * {@code true} if some worker could be blocked because {{@link #threshold_}
+	 * is exceeded.
 	 */
 	private volatile boolean workersWaiting_ = false;
 	/**
@@ -164,7 +159,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * the number of the started workers at the moment the last worker was
 	 * interrupted
 	 */
-	private final AtomicInteger lastInterruptStartedWorkersSnapshot_ = new AtomicInteger(
+	private final AtomicInteger lastInterruptCountStartedWorkers_ = new AtomicInteger(
 			0);
 	/**
 	 * The statistics about this factory aggregated from statistics for all
@@ -173,15 +168,14 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	private final ThisStatistics aggregatedStats_;
 
 	/**
-	 * Creates a new saturation engine using the given saturation state,
-	 * listener for callback functions, and threshold for the number of
-	 * unprocessed contexts. The threshold has influence on the size of the
-	 * batches of the input jobs that are processed simultaneously, which, in
-	 * turn, has an effect on throughput and latency of the saturation: in
-	 * general, the larger the threshold is, the faster it takes (in theory) to
-	 * perform the overall processing of jobs, but it might take longer to
-	 * process an individual job because it is possible to detect that the job
-	 * is processed only when the whole batch of jobs is processed.
+	 * Creates a new {@link ClassExpressionSaturationFactory} using the given
+	 * {@link RuleApplicationFactory}for applying the rules, the maximal number
+	 * of workers that can apply the rules concurrently, and
+	 * {@link ClassExpressionSaturationListener} for reporting finished
+	 * saturation jobs.
+	 * 
+	 * saturation state, listener for callback functions, and threshold for the
+	 * number of unprocessed contexts.
 	 * 
 	 * @param ruleAppFactory
 	 *            specifies how the rules are applied to new {@link Conclusion}s
@@ -200,11 +194,14 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		this.ruleApplicationFactory_ = ruleAppFactory;
 		this.saturationState_ = ruleAppFactory.getSaturationState();
 		this.aggregatedStats_ = new ThisStatistics();
+		this.countContextsSetSaturatedUpper_.set(saturationState_
+				.getContextSetSaturatedCount());
 	}
 
 	/**
-	 * Creates a new saturation factory using the given rule application
-	 * factory.
+	 * Creates a new {@link ClassExpressionSaturationFactory} using the given
+	 * {@link RuleApplicationFactory}for applying the rules and the maximal
+	 * number of workers that can apply the rules concurrently.
 	 * 
 	 * @param ruleAppFactory
 	 * @param maxWorkers
@@ -237,10 +234,11 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		checkStatistics();
 		if (LOGGER_.isDebugEnabled()) {
 			if (aggregatedStats_.jobsSubmittedNo > 0)
-				LOGGER_.debug("Saturation Jobs Submitted=Done+Processed: "
-						+ aggregatedStats_.jobsSubmittedNo + "="
-						+ aggregatedStats_.jobsAlreadyDoneNo + "+"
-						+ aggregatedStats_.jobsProcessedNo);
+				LOGGER_.debug(
+						"Saturation Jobs Submitted=Done+Processed: {}={}+{}",
+						aggregatedStats_.jobsSubmittedNo,
+						aggregatedStats_.jobsAlreadyDoneNo,
+						aggregatedStats_.jobsProcessedNo);
 			LOGGER_.debug("Locks: " + aggregatedStats_.locks);
 		}
 	}
@@ -267,58 +265,82 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	/**
 	 * Updates the counter for processed contexts and jobs
 	 */
+	/**
+	 * @param snapshotFinishedWorkers
+	 */
 	private void updateProcessedCounters(int snapshotFinishedWorkers) {
-		if (lastInterruptStartedWorkersSnapshot_.get() >= countStartedWorkers_
-				.get()) {
+		if (lastInterruptCountStartedWorkers_.get() >= snapshotFinishedWorkers) {
 			/*
-			 * after the last started worker was interrupted, no worker has
-			 * started yet; in this case we cannot be sure whether submitted
-			 * jobs are processed
+			 * This means that this worker might not be the one that has started
+			 * after the last worker was interrupted. Since interrupting a
+			 * worker interrupts the computation, we cannot be sure that all
+			 * submitted jobs are processed unless some worker started after
+			 * interrupt and was not interrupted. If such worker exists, then
+			 * there should also be a worker for which the counter for finished
+			 * workers becomes greater than the number of started workers during
+			 * the last interrupt. Thus, this condition becomes false for some
+			 * worker. Conversely, if the counter for finished workers becomes
+			 * greater, then the counter for started workers is also grater and
+			 * so, there must be a worker started after the interrupt. If this
+			 * condition does not hold, then this worker is one of them.
 			 */
 			return;
 		}
 		/*
-		 * otherwise, cache the current snapshot for created jobs and contexts;
-		 * it is important for correctness to measure the number of started
-		 * workers only after that
+		 * take a snapshot for the jobs submitted
 		 */
 		int snapshotCountJobsSubmitted = countJobsSubmittedUpper_.get();
-		int snapshotCountContextCreated = countContextsModifiedLower_.get();
+
 		if (countStartedWorkers_.get() > snapshotFinishedWorkers)
-			// this means that some started worker did not finish yet
+			/*
+			 * this means that some started worker did not finish yet we cannot
+			 * say which jobs or contexts are processed
+			 */
+			return;
+
+		/*
+		 * Otherwise, the taken snapshot represents at least the number of jobs
+		 * processed (all of them were submitted by the time no worker was
+		 * processing the jobs). Now, similarly, take the snapshot for the
+		 * counter of non-saturated contexts.
+		 */
+		int snapshotCountContextNonSaturated = saturationState_
+				.getContextMarkNonSaturatedCount();
+
+		if (countStartedWorkers_.get() > snapshotFinishedWorkers)
+			/*
+			 * some worker have started, our previous counter may have spoiled.
+			 */
 			return;
 		/*
-		 * if we arrive here, then at the period of time from the beginning of
-		 * this function until the test we have: (1) there is no worker that
-		 * started processing but did not finished, and (2) after the last
-		 * interrupted worker there was a started (and thus finished) worker
-		 * that was not interrupted. This means that the taken snapshots
-		 * represent at least the number of processed contexts and jobs in the
-		 * respective queues (starting from the beginning) because at the time
-		 * when the snapshots were taken, these numbers represented exactly the
-		 * number of elements on the queue, since these queues could only be
-		 * updated by workers. Now, we make sure that the counter for processed
-		 * contexts and jobs have at least the values of the corresponding
-		 * snapshots. We first update the counter for context to make sure that
-		 * for every processed job the context was already identified to be
-		 * processed.
+		 * If we arrive here, the taken snapshot represents at least the number
+		 * of concepts that become saturated. Furthermore, since we took it
+		 * after we counted processed jobs, we know that all contexts for the
+		 * processed jobs were created, and thus, have been counted. Now, we
+		 * make sure that the counter for processed contexts and jobs have at
+		 * least the values of the corresponding snapshots. We first update the
+		 * counter for context to make sure that for every processed job the
+		 * context was already identified to be processed.
 		 */
-		if (updateIfSmaller(countContextsProcessedLower_,
-				snapshotCountContextCreated) && workersWaiting_) {
+		if (updateIfSmaller(countContextsSaturatedLower_,
+				snapshotCountContextNonSaturated) && workersWaiting_) {
 			/*
-			 * waking up all workers waiting for new processed contexts
+			 * waking up all workers waiting for new saturated contexts
 			 */
-			synchronized (countContextsProcessedLower_) {
+			synchronized (countContextsSaturatedLower_) {
 				workersWaiting_ = false;
-				countContextsProcessedLower_.notifyAll();
+				countContextsSaturatedLower_.notifyAll();
 			}
 		}
+		/*
+		 * It is important to update it last
+		 */
 		updateIfSmaller(countJobsProcessedLower_, snapshotCountJobsSubmitted);
 	}
 
 	/**
-	 * Check if the counter for processed jobs can be increased and post-process
-	 * the finished jobs
+	 * Check if the counter for saturated contexts and processed jobs can be
+	 * increased and post-process the finished jobs
 	 * 
 	 * @throws InterruptedException
 	 */
@@ -331,36 +353,56 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		 * context is already considered to be processed
 		 */
 		int snapshotJobsProcessed = countJobsProcessedLower_.get();
-		int snapshotContextProcessed = countContextsProcessedLower_.get();
+		int snapshotContextsSaturated = countContextsSaturatedLower_.get();
+		/*
+		 * update the finished context counter at least to the taken snapshot
+		 * value and mark the corresponding number of contexts as saturated
+		 */
+		int shapshotContextsFinished = countContextsSetSaturatedUpper_.get();
 		for (;;) {
-			/*
-			 * update the finished context counter at least to the taken
-			 * snapshot value and mark the corresponding number of contexts as
-			 * saturated
-			 */
-			int shapshotContextsFinished = countContextsFinishedUpper_.get();
-			if (shapshotContextsFinished >= snapshotContextProcessed)
-				break;
-			if (countContextsFinishedUpper_.compareAndSet(
-					shapshotContextsFinished, shapshotContextsFinished + 1)) {
-				saturationState_.setNextContextSaturated();
-				countContextsFinishedLower_.incrementAndGet();
+			if (shapshotContextsFinished >= snapshotContextsSaturated) {
+				/*
+				 * take the snapshots again so that when we are done we have the
+				 * latest snapshots; this is needed when other worker that also
+				 * updates these counters (possibly to larger values found) will
+				 * not be able to process finished jobs (see the condition
+				 * later) because we still set contexts as saturated here. In
+				 * this case we will need to take over.
+				 */
+				snapshotJobsProcessed = countJobsProcessedLower_.get();
+				snapshotContextsSaturated = countContextsSaturatedLower_.get();
+				if (shapshotContextsFinished >= snapshotContextsSaturated)
+					/*
+					 * terminate only if we really marked the corresponding
+					 * number of contexts as saturated
+					 */
+					break;
 			}
-			/* take the snapshots again */
-			snapshotJobsProcessed = countJobsProcessedLower_.get();
-			snapshotContextProcessed = countContextsProcessedLower_.get();
+			if (countContextsSetSaturatedUpper_.compareAndSet(
+					shapshotContextsFinished, ++shapshotContextsFinished)) {
+				saturationState_.setNextContextSaturated();
+			} else {
+				/*
+				 * the counter has changed by a different worker; refresh the
+				 * counter and start over
+				 */
+				shapshotContextsFinished = countContextsSetSaturatedUpper_
+						.get();
+			}
 		}
 
-		int countContextFinishedUpperSnapshot = countContextsFinishedUpper_
-				.get(); // the order of evaluation matters here
-		if (countContextFinishedUpperSnapshot > countContextsFinishedLower_
-				.get())
-			// some other worker is still marking concepts as saturated, we
-			// cannot process finished jobs yet
+		int snapshotContextSetSaturated = saturationState_
+				.getContextSetSaturatedCount();
+		if (countContextsSetSaturatedUpper_.get() > snapshotContextSetSaturated)
+			/*
+			 * some other may still mark concepts as saturated, we cannot
+			 * process finished jobs yet since we do not know which contexts it
+			 * marks (all of them are shared between workers)
+			 */
 			return;
 
+		int snapshotJobsFinished = countJobsFinishedUpper_.get();
 		for (;;) {
-			int snapshotJobsFinished = countJobsFinishedUpper_.get();
 			if (snapshotJobsFinished >= snapshotJobsProcessed)
 				break;
 			/*
@@ -369,19 +411,18 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			 * processed
 			 */
 			if (countJobsFinishedUpper_.compareAndSet(snapshotJobsFinished,
-					snapshotJobsFinished + 1)) {
+					++snapshotJobsFinished)) {
 				J nextJob = jobsInProgress_.poll();
 				IndexedClassExpression root = nextJob.getInput();
 				Context rootSaturation = saturationState_.getContext(root);
 				/*
-				 * rootSaturation should be already marked as saturated because
-				 * we took shapshotContextsFinished after shapshotJobsFinished.
-				 * But we test anyway for debugging purpose.
+				 * rootSaturation should be already marked as saturated but we
+				 * test anyway for debugging purpose.
 				 */
 				if (rootSaturation.isInitialized()
-						& !rootSaturation.isSaturated()) {
+						&& !rootSaturation.isSaturated()) {
 					LOGGER_.error(
-							"{}: context for a finished job is not saturated!",
+							"{}: context for a finished job not saturated!",
 							rootSaturation);
 				}
 				nextJob.setOutput(rootSaturation);
@@ -390,6 +431,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 
 				localStatistics.jobsProcessedNo++;
 				listener_.notifyFinished(nextJob);// can be interrupted
+			} else {
+				snapshotJobsFinished = countJobsFinishedUpper_.get();
 			}
 
 		}
@@ -420,15 +463,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 
 		private final InputProcessor<IndexedClassExpression> ruleApplicationEngine_ = ruleApplicationFactory_
 				.getEngine(ContextCreationListener.DUMMY,
-						new ContextModificationListener() {
-							@Override
-							public void notifyContextModification(
-									Context context) {
-								countContextsModifiedLower_.incrementAndGet();
-								
-								LOGGER_.trace("{}: marked as modified");
-							}
-						});
+						ContextModificationListener.DUMMY);
 
 		private final ThisStatistics stats_ = new ThisStatistics();
 
@@ -446,47 +481,60 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		public void process() throws InterruptedException {
 			/*
 			 * This works as follows. We apply inference rules to the contexts
-			 * created so far in batches: when the number of unprocessed
+			 * created so far in batches: when the number of unsaturated
 			 * contexts is below a certain threshold, we add a new saturation
 			 * job and process the contexts. How do we know when contexts are
-			 * completely processed, i.e., there will be nothing more derived in
-			 * a context? This is very difficult to know. We apply the following
-			 * strategy: we know that all created contexts are processed when
-			 * (1) no worker is creating or processing contexts and (2) after
-			 * every worker that was interrupted while processing contexts there
-			 * was a worker that has started processing contexts. To check
-			 * condition (1), we use two counters: first counter is incremented
-			 * before a worker starts processing contexts, the second counter is
-			 * incremented after a worker finishes processing contexts.
-			 * Therefore, at the moment when the values of both counters
-			 * coincide, we know that condition (1) is fulfilled. Now, to check
-			 * condition (2) we use a variable, where store the snapshot of the
-			 * number of started workers at the moment when the last worker was
-			 * interrupted, and when condition (1) is fulfilled, we check if the
-			 * value of this snapshot is smaller then the number of started =
-			 * the number of finished workers. This way we know that after last
-			 * interrupted worker there was a worker that was finished and not
-			 * interrupted. To avoid deadlock, it is essential that whenever
-			 * conditions (1) and (2) are satisfied, we can update the number of
-			 * processed contexts, i.e., the computation was not interrupted in
-			 * between processing of contexts and updating this counter.
+			 * completely processed, i.e., there could be nothing more derived
+			 * in the context? This is very difficult to know. We apply the
+			 * following strategy: we know that all created contexts are
+			 * processed when (1) no worker is creating or processing contexts
+			 * and (2) after every worker that was interrupted while processing
+			 * contexts there was a worker that has started processing contexts.
+			 * To check condition (1), we use two counters: first counter is
+			 * incremented before a worker starts processing contexts, the
+			 * second counter is incremented after a worker finishes processing
+			 * contexts. Therefore, at the moment when the values of both
+			 * counters coincide, we know that condition (1) is fulfilled. To
+			 * check condition (2) we use a variable, where store the snapshot
+			 * of the number of started workers at the moment when the last
+			 * worker was interrupted, and when condition (1) is fulfilled, we
+			 * check if the value of this snapshot is smaller then the number of
+			 * started = the number of finished workers. This way we know that
+			 * after the last interrupted worker there was a worker that was
+			 * finished and not interrupted. To avoid deadlock, it is essential
+			 * that whenever conditions (1) and (2) are satisfied, we can update
+			 * the number of processed contexts, i.e., the computation was not
+			 * interrupted in between processing of contexts and updating these
+			 * counters.
 			 */
+			boolean interrupted = false;
 			countStartedWorkers_.incrementAndGet();
-			// process leftovers possibly from the previous interrupt
-			ruleApplicationEngine_.process();
-			if (Thread.currentThread().isInterrupted())
-				updateIfSmaller(lastInterruptStartedWorkersSnapshot_,
-						countStartedWorkers_.get());
-			updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
-			processFinishedCounters(stats_); // can throw InterruptedException
+			/*
+			 * process leftovers possibly from the previous interrupt
+			 */
+			try {
+				ruleApplicationEngine_.process();
+				if (Thread.currentThread().isInterrupted())
+					interrupted = true;
+			} catch (InterruptedException e) {
+				interrupted = true;
+				throw e;
+			} finally {
+				if (interrupted)
+					updateIfSmaller(lastInterruptCountStartedWorkers_,
+							countStartedWorkers_.get());
+				updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
+			}
+			// can throw InterruptedException
+			processFinishedCounters(stats_);
+
 			for (;;) {
 				if (Thread.currentThread().isInterrupted())
 					return;
-				int snapshotCountContextsProcessed = countContextsProcessedLower_
-						.get();
-				if (countContextsModifiedLower_.get()
-						- snapshotCountContextsProcessed > threshold_) {
-					synchronized (countContextsProcessedLower_) {
+				int snapshotCountSaturated = countContextsSaturatedLower_.get();
+				if (saturationState_.getContextMarkNonSaturatedCount()
+						- snapshotCountSaturated > threshold_) {
+					synchronized (countContextsSaturatedLower_) {
 						workersWaiting_ = true;
 						stats_.locks++;
 						/*
@@ -494,16 +542,16 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 						 * checking processed contexts counters because it is
 						 * tested in the other order when waking up the workers
 						 */
-						if (countContextsProcessedLower_.get() > snapshotCountContextsProcessed) {
+						if (countContextsSaturatedLower_.get() > snapshotCountSaturated) {
 							/*
 							 * new contexts were processed meanwhile; all
 							 * workers should be notified
 							 */
 							workersWaiting_ = false;
-							countContextsProcessedLower_.notifyAll();
+							countContextsSaturatedLower_.notifyAll();
 							continue;
 						}
-						countContextsProcessedLower_.wait();
+						countContextsSaturatedLower_.wait();
 						continue;
 					}
 				}
@@ -521,8 +569,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 						&& rootContext.isSaturated()) {
 					nextJob.setOutput(rootContext);
 					stats_.jobsAlreadyDoneNo++;
-					listener_.notifyFinished(nextJob); // can throw
-														// InterruptedException
+					// can throw InterruptedException
+					listener_.notifyFinished(nextJob);
 					continue;
 				}
 
@@ -531,19 +579,26 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				 * submit the job to the rule engine and start processing it
 				 */
 				countStartedWorkers_.incrementAndGet();
-				countJobsSubmittedUpper_.incrementAndGet();
-				jobsInProgress_.add(nextJob);
-				ruleApplicationEngine_.submit(root);
-				ruleApplicationEngine_.process();
-
-				if (Thread.currentThread().isInterrupted()) {
-					updateIfSmaller(lastInterruptStartedWorkersSnapshot_,
-							countStartedWorkers_.get());
+				interrupted = false;
+				try {
+					countJobsSubmittedUpper_.incrementAndGet();
+					jobsInProgress_.add(nextJob);
+					ruleApplicationEngine_.submit(root);
+					ruleApplicationEngine_.process();
+					if (Thread.currentThread().isInterrupted())
+						interrupted = true;
+				} catch (InterruptedException e) {
+					interrupted = true;
+					throw e;
+				} finally {
+					if (interrupted)
+						updateIfSmaller(lastInterruptCountStartedWorkers_,
+								countStartedWorkers_.get());
+					updateProcessedCounters(countFinishedWorkers_
+							.incrementAndGet());
 				}
-
-				updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
-				processFinishedCounters(stats_); // can throw
-													// InterruptedException
+				// can throw InterruptedException
+				processFinishedCounters(stats_);
 			}
 		}
 

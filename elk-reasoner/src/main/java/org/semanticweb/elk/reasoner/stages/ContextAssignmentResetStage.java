@@ -67,7 +67,7 @@ class ContextAssignmentResetStage extends AbstractReasonerStage {
 	@Override
 	public void executeStage() throws ElkInterruptedException {
 		SaturationStateWriter writer = reasoner.saturationState
-				.getContextModifyingWriter(ContextModificationListener.DUMMY);
+				.getContextModifyingWriter();
 		writer.resetContexts();
 	}
 

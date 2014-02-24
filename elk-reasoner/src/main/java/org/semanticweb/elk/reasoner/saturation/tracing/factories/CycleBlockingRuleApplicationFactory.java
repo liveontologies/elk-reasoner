@@ -38,7 +38,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionEntry;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInitializingInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -48,8 +47,6 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleApplicationFactory;
-import org.semanticweb.elk.reasoner.saturation.rules.factories.WorkerLocalTodo;
-import org.semanticweb.elk.reasoner.saturation.rules.factories.WorkerLocalTodoImpl;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
@@ -57,7 +54,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.IsInferenceCyclic;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.GetInferenceTarget;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceInsertionVisitor;
-import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,19 +100,13 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 	}
 	
 	@Override
-	protected InputProcessor<IndexedClassExpression> getEngine(RuleVisitor ruleVisitor,
-			SaturationStateWriter localWriter, SaturationStatistics localStatistics) {
-		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
-		// use the cycle blocking writer in the engine
-		return super.getEngine(
-				getConclusionProcessor(ruleVisitor, new CycleBlockingWriter(localWriter)),
-				localWriter, localTodo, localStatistics);
-	}
-
 	@SuppressWarnings("unchecked")
-	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
+	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor,
-			SaturationStateWriter localWriter/*this producer is responsible for blocking cyclic inferences*/) {
+			SaturationStateWriter localWriter/*this producer is responsible for blocking cyclic inferences*/,
+			SaturationStatistics statistics) {
+		
+		SaturationStateWriter cycleBlocker = new CycleBlockingWriter(localWriter);
 		
 		return new ComposedConclusionVisitor<Context>(
 				// checking the conclusion against the main saturation state
@@ -125,19 +115,13 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 						new ConclusionOccurrenceCheckingVisitor(),
 						mainSaturationState_),
 				// if all fine, insert the conclusion to the local context copy and write the inference 
-				new InferenceInserter(new ConclusionInsertionVisitor/*ConclusionInitializingInsertionVisitor*/(localWriter), localWriter, getSaturationStatistics()),
+				new InferenceInserter(new ConclusionInsertionVisitor/*ConclusionInitializingInsertionVisitor*/(cycleBlocker), cycleBlocker, getSaturationStatistics()),
 				// apply only local rules and produce conclusion only to the locally copies
 				new HybridLocalRuleApplicationConclusionVisitor(
 						mainSaturationState_, ruleVisitor, ruleVisitor,
-						localWriter, localWriter));
+						cycleBlocker, cycleBlocker));
 	}
 
-	@Override
-	public LocalTracingSaturationState getSaturationState() {
-		return (LocalTracingSaturationState) super.getSaturationState();
-	}
-
-	
 	@Override
 	public void dispose() {
 		super.dispose();
@@ -159,7 +143,8 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 
 		@Override
 		public void produce(IndexedClassExpression root, Conclusion conclusion) {
-			final LocalTracingSaturationState tracingState = CycleBlockingRuleApplicationFactory.this.getSaturationState();
+			//FIXME parameterize to get rid of the cast
+			final LocalTracingSaturationState tracingState = (LocalTracingSaturationState)CycleBlockingRuleApplicationFactory.this.getSaturationState();
 			// no need to check for duplicates since rules for all conclusions
 			// are applied only once.			
 			final TracedContext thisContext = tracingState.getContext(root);

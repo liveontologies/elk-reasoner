@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,6 +27,7 @@ package org.semanticweb.elk.reasoner.incremental;
 
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.semanticweb.elk.util.logging.statistics.AbstractStatistics;
 import org.slf4j.Logger;
 
 /**
@@ -33,7 +35,7 @@ import org.slf4j.Logger;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class IncrementalProcessingStatistics {
+public class IncrementalProcessingStatistics extends AbstractStatistics {
 
 	/**
 	 * Time it takes to process a context during the change initialization stage
@@ -41,82 +43,69 @@ public class IncrementalProcessingStatistics {
 	 * changed rules)
 	 */
 	long changeInitContextProcessingTime;
-	
+
 	long changeInitContextCollectionProcessingTime;
-	
+
 	long countContexts;
-	
+
 	long countContextSubsumers;
-	
-	private int numOfMeasurements_ = 0;
-	
-	
+
 	public long getContextCount() {
 		return countContexts;
 	}
-	
+
 	public long getSubsumersPerContextCount() {
 		if (!measurementsTaken()) {
 			return 0;
 		}
-		else {
-			return countContextSubsumers / numOfMeasurements_;
-		}
+		// else
+		return countContextSubsumers / getNumberOfMeasurements();
 	}
-	
+
 	public long getChangeInitContextProcessingTime() {
 		if (!measurementsTaken()) {
 			return 0;
 		}
-		else {
-			return changeInitContextProcessingTime / numOfMeasurements_;
-		}
+		// else
+		return changeInitContextProcessingTime / getNumberOfMeasurements();
 	}
-	
+
 	public long getChangeInitContextCollectionProcessingTime() {
 		if (!measurementsTaken()) {
 			return 0;
 		}
-		else {
-			
-			return changeInitContextCollectionProcessingTime / numOfMeasurements_;
-		}
+		// else
+		return changeInitContextCollectionProcessingTime
+				/ getNumberOfMeasurements();
+
 	}
-	
+
+	@Override
 	public void reset() {
+		super.reset();
 		changeInitContextProcessingTime = 0;
 		changeInitContextCollectionProcessingTime = 0;
 		countContexts = 0;
 		countContextSubsumers = 0;
-		numOfMeasurements_ = 0;
 	}
-	
+
 	public synchronized void add(IncrementalProcessingStatistics stats) {
-		if (stats.measurementsTaken()) {
-			numOfMeasurements_ += stats.numOfMeasurements_;
-			changeInitContextProcessingTime += stats.changeInitContextProcessingTime;
-			changeInitContextCollectionProcessingTime += stats.changeInitContextCollectionProcessingTime;
-			countContexts += stats.countContexts;
-			countContextSubsumers += stats.countContextSubsumers;
-		}
+		super.add(stats);
+		changeInitContextProcessingTime += stats.changeInitContextProcessingTime;
+		changeInitContextCollectionProcessingTime += stats.changeInitContextCollectionProcessingTime;
+		countContexts += stats.countContexts;
+		countContextSubsumers += stats.countContextSubsumers;
 	}
-	
-	public void startMeasurements() {
-		if (numOfMeasurements_ < 1) {
-			numOfMeasurements_ = 1;
-		}
-	}
-	
-	private boolean measurementsTaken() {
-		return numOfMeasurements_ > 0;
-	}
-	
+
 	public void print(Logger logger, LogLevel level) {
 		if (!LoggerWrap.isEnabledFor(logger, level) || !measurementsTaken())
 			return;
 
 		if (changeInitContextProcessingTime > 0) {
-			LoggerWrap.log(logger, level, "Total context processing time during change initialization: " + changeInitContextProcessingTime / numOfMeasurements_);
+			LoggerWrap.log(logger, level,
+					"Total context processing time during change initialization: "
+							+ changeInitContextProcessingTime
+							/ getNumberOfMeasurements());
 		}
 	}
 }

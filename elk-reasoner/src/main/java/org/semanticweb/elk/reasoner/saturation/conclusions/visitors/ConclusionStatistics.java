@@ -9,6 +9,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
+import org.semanticweb.elk.util.logging.statistics.AbstractStatistics;
 import org.semanticweb.elk.util.logging.statistics.StatisticsPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * #L%
  */
 
-public class ConclusionStatistics {
+public class ConclusionStatistics extends AbstractStatistics {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -55,11 +56,6 @@ public class ConclusionStatistics {
 	private final ConclusionCounter usedConclusionCounts_;
 
 	private final ConclusionTimer conclusionProcessingTimer_;
-	/**
-	 * The number of times measurements were taken in different threads. Used to
-	 * average the wall time results.
-	 */
-	private int numOfMeasurements_ = 0;
 
 	public ConclusionStatistics(ConclusionCounter producedConclusionCounter,
 			ConclusionCounter processedConclusionCounts,
@@ -95,32 +91,29 @@ public class ConclusionStatistics {
 	/**
 	 * Reset all timers to zero.
 	 */
+	@Override
 	public void reset() {
+		super.reset();
 		producedConclusionCounts_.reset();
 		processedConclusionCounts_.reset();
 		usedConclusionCounts_.reset();
 		conclusionProcessingTimer_.reset();
-		numOfMeasurements_ = 0;
 	}
 
 	public synchronized void add(ConclusionStatistics stats) {
-		if (stats.measurementsTaken()) {
-			this.numOfMeasurements_ += stats.numOfMeasurements_;
-			this.producedConclusionCounts_.add(stats.producedConclusionCounts_);
-			this.processedConclusionCounts_
-					.add(stats.processedConclusionCounts_);
-			this.usedConclusionCounts_.add(stats.usedConclusionCounts_);
-			this.conclusionProcessingTimer_
-					.add(stats.conclusionProcessingTimer_);
-		}
+		super.add(stats);
+		this.producedConclusionCounts_.add(stats.producedConclusionCounts_);
+		this.processedConclusionCounts_.add(stats.processedConclusionCounts_);
+		this.usedConclusionCounts_.add(stats.usedConclusionCounts_);
+		this.conclusionProcessingTimer_.add(stats.conclusionProcessingTimer_);
 	}
 
 	public void check(Logger logger) {
 		// TODO
 	}
 
-	static void print(StatisticsPrinter printer, String name,
-			int processedCount, int usedCount, long time) {
+	void print(StatisticsPrinter printer, String name, int processedCount,
+			int usedCount, long time) {
 		if (processedCount == 0)
 			return;
 
@@ -128,7 +121,8 @@ public class ConclusionStatistics {
 			LOGGER_.error("{}: conclusions used: {} more than processed: {}!",
 					name, usedCount, processedCount);
 
-		printer.print(name, processedCount, usedCount, time);
+		printer.print(name, processedCount, usedCount, time
+				/ getNumberOfMeasurements());
 
 	}
 
@@ -207,16 +201,6 @@ public class ConclusionStatistics {
 				conclusionProcessingTimer_.getTotalTime());
 
 		printer.printSeparator();
-	}
-
-	public void startMeasurements() {
-		if (numOfMeasurements_ < 1) {
-			numOfMeasurements_ = 1;
-		}
-	}
-
-	private boolean measurementsTaken() {
-		return numOfMeasurements_ > 0;
 	}
 
 }
