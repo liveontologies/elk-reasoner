@@ -234,10 +234,11 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 		checkStatistics();
 		if (LOGGER_.isDebugEnabled()) {
 			if (aggregatedStats_.jobsSubmittedNo > 0)
-				LOGGER_.debug("Saturation Jobs Submitted=Done+Processed: "
-						+ aggregatedStats_.jobsSubmittedNo + "="
-						+ aggregatedStats_.jobsAlreadyDoneNo + "+"
-						+ aggregatedStats_.jobsProcessedNo);
+				LOGGER_.debug(
+						"Saturation Jobs Submitted=Done+Processed: {}={}+{}",
+						aggregatedStats_.jobsSubmittedNo,
+						aggregatedStats_.jobsAlreadyDoneNo,
+						aggregatedStats_.jobsProcessedNo);
 			LOGGER_.debug("Locks: " + aggregatedStats_.locks);
 		}
 	}

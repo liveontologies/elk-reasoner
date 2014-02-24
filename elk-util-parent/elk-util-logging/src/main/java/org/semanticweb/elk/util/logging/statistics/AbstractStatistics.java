@@ -1,4 +1,5 @@
 package org.semanticweb.elk.util.logging.statistics;
+
 /*
  * #%L
  * ELK Utilities for Logging
@@ -21,11 +22,18 @@ package org.semanticweb.elk.util.logging.statistics;
  * #L%
  */
 
+/**
+ * A skeleton class for implementing counters and timers for statistical
+ * information.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public abstract class AbstractStatistics {
 
 	/**
 	 * The number of times measurements were taken in different threads. Used to
-	 * average the wall time results.
+	 * average the time results.
 	 */
 	private int numOfMeasurements_ = 0;
 
@@ -35,8 +43,16 @@ public abstract class AbstractStatistics {
 		}
 	}
 
-	private boolean measurementsTaken() {
+	public boolean measurementsTaken() {
 		return numOfMeasurements_ > 0;
+	}
+
+	/**
+	 * @return the number of (parallel) measurements aggregated in this
+	 *         {@link AbstractStatistics}
+	 */
+	public int getNumberOfMeasurements() {
+		return numOfMeasurements_;
 	}
 
 	/**
@@ -47,8 +63,7 @@ public abstract class AbstractStatistics {
 	}
 
 	public synchronized void add(AbstractStatistics stats) {
-		if (stats.measurementsTaken()) {
-			numOfMeasurements_ += stats.numOfMeasurements_;
-		}
+		numOfMeasurements_ += stats.numOfMeasurements_;
 	}
+
 }

@@ -24,6 +24,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectio
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
+import org.semanticweb.elk.util.logging.statistics.AbstractStatistics;
 import org.semanticweb.elk.util.logging.statistics.StatisticsPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class RuleStatistics {
+public class RuleStatistics extends AbstractStatistics {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -68,44 +69,26 @@ public class RuleStatistics {
 	public final RuleApplicationTimer ruleTimer = new RuleApplicationTimer();
 
 	/**
-	 * The number of times measurements were taken in different threads. Used to
-	 * average the wall time results.
-	 */
-	private int numOfMeasurements_ = 0;
-
-	public void startMeasurements() {
-		if (numOfMeasurements_ < 1) {
-			numOfMeasurements_ = 1;
-		}
-	}
-
-	private boolean measurementsTaken() {
-		return numOfMeasurements_ > 0;
-	}
-
-	/**
 	 * Reset all timers to zero.
 	 */
+	@Override
 	public void reset() {
+		super.reset();
 		ruleCounter.reset();
 		ruleTimer.reset();
-		numOfMeasurements_ = 0;
 	}
 
 	public synchronized void add(RuleStatistics stats) {
-		if (stats.measurementsTaken()) {
-			numOfMeasurements_ += stats.numOfMeasurements_;
-			ruleCounter.add(stats.ruleCounter);
-			ruleTimer.add(stats.ruleTimer);
-		}
+		super.add(stats);
+		ruleCounter.add(stats.ruleCounter);
+		ruleTimer.add(stats.ruleTimer);
 	}
 
-	static void print(StatisticsPrinter printer, String name, int count,
-			int time) {
+	void print(StatisticsPrinter printer, String name, int count, int time) {
 		if (count == 0)
 			return;
 
-		printer.print(name, count, time);
+		printer.print(name, count, time / getNumberOfMeasurements());
 
 	}
 
@@ -234,7 +217,7 @@ public class RuleStatistics {
 	}
 
 	public double getTotalRuleTime() {
-		return numOfMeasurements_ == 0 ? 0 : 1d
-				* ruleTimer.getTotalRuleAppTime() / numOfMeasurements_;
+		return getNumberOfMeasurements() == 0 ? 0 : 1d
+				* ruleTimer.getTotalRuleAppTime() / getNumberOfMeasurements();
 	}
 }
