@@ -45,7 +45,7 @@ public class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
 	 * a {@link SaturationStateWriter} to produce new {@link Conclusion}s and
 	 * query for active {@link Context}s
 	 */
-	private final SaturationStateWriter writer_;
+	private final SaturationStateWriter<?> writer_;
 
 	/**
 	 * The {@link Conclusion} used to initialize contexts using
@@ -55,7 +55,7 @@ public class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
 
 	protected BasicRuleEngine(OntologyIndex index,
 			ConclusionVisitor<Context, Boolean> conclusionProcessor,
-			WorkerLocalTodo localTodo, SaturationStateWriter writer,
+			WorkerLocalTodo localTodo, SaturationStateWriter<?> writer,
 			SaturationStatistics aggregatedStatistics,
 			SaturationStatistics localStatistics) {
 		super(conclusionProcessor, localTodo, aggregatedStatistics,
@@ -74,7 +74,7 @@ public class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
 		return writer_.pollForActiveContext();
 	}
 
-	protected final SaturationStateWriter getWriter() {
+	protected final SaturationStateWriter<?> getWriter() {
 		return writer_;
 	}
 }

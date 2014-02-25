@@ -38,13 +38,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  *         pavel.klinov@uni-ulm.de
  * @author "Yevgeny Kazakov"
  */
-public interface SaturationStateWriter extends ConclusionProducer {
+public interface SaturationStateWriter<C extends Context> extends ConclusionProducer {
 
 	/**
 	 * @return the {@link SaturationState} modified by this
 	 *         {@link SaturationStateWriter}
 	 */
-	public SaturationState getSaturationState();
+	public SaturationState<C> getSaturationState();
 
 	/**
 	 * Removes and returns the next active {@link Context} of the

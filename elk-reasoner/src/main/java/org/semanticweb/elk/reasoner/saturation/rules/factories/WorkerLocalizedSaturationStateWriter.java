@@ -42,7 +42,7 @@ class WorkerLocalizedSaturationStateWriter extends SaturationStateWriterWrap {
 	private final WorkerLocalTodo localTodo_;
 
 	public WorkerLocalizedSaturationStateWriter(
-			SaturationStateWriter mainWriter, WorkerLocalTodo localTodo) {
+			SaturationStateWriter<?> mainWriter, WorkerLocalTodo localTodo) {
 		super(mainWriter);
 		this.localTodo_ = localTodo;
 	}

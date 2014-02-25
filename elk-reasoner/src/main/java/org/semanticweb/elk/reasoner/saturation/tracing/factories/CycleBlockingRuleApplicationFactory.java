@@ -85,14 +85,14 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 	protected static final Logger LOGGER_ = LoggerFactory	.getLogger(CycleBlockingRuleApplicationFactory.class);
 	
 	//private final LocalTracingSaturationState tracingState_;
-	private final SaturationState mainSaturationState_;
+	private final SaturationState<?> mainSaturationState_;
 	
 	private final TraceStore.Writer inferenceWriter_;
 	
 	private final TraceStore.Reader inferenceReader_;
 
-	public CycleBlockingRuleApplicationFactory(SaturationState mainSaturationState,
-			LocalTracingSaturationState traceState, TraceStore traceStore) {
+	public CycleBlockingRuleApplicationFactory(SaturationState<?> mainSaturationState,
+			SaturationState<TracedContext> traceState, TraceStore traceStore) {
 		super(traceState);
 		mainSaturationState_ = mainSaturationState;
 		inferenceWriter_ = traceStore.getWriter();
@@ -103,10 +103,10 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor,
-			SaturationStateWriter localWriter/*this producer is responsible for blocking cyclic inferences*/,
+			SaturationStateWriter<?> localWriter/*this producer is responsible for blocking cyclic inferences*/,
 			SaturationStatistics statistics) {
 		
-		SaturationStateWriter cycleBlocker = new CycleBlockingWriter(localWriter);
+		SaturationStateWriter<?> cycleBlocker = new CycleBlockingWriter(localWriter);
 		
 		return new ComposedConclusionVisitor<Context>(
 				// checking the conclusion against the main saturation state
@@ -137,7 +137,7 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 	 */
 	private class CycleBlockingWriter extends SaturationStateWriterWrap {
 
-		public CycleBlockingWriter(SaturationStateWriter writer) {
+		public CycleBlockingWriter(SaturationStateWriter<?> writer) {
 			super(writer);
 		}
 

@@ -89,7 +89,7 @@ public abstract class AbstractReasonerState {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractReasonerState.class);
 
-	final SaturationState saturationState;
+	final SaturationState<?> saturationState;
 
 	/**
 	 * Accumulated statistics regarding produced conclusions and rule
@@ -617,8 +617,8 @@ public abstract class AbstractReasonerState {
 		createTraceState(saturationState);
 	}
 	
-	private void createTraceState(SaturationState state) {
-		traceState = new TraceState(new SimpleCentralizedTraceStore(), state, getNumberOfWorkers());
+	private void createTraceState(SaturationState<?> mainState) {
+		traceState = new TraceState(new SimpleCentralizedTraceStore(), mainState, getNumberOfWorkers());
 	}
 	
 	TraceState getTraceState() {

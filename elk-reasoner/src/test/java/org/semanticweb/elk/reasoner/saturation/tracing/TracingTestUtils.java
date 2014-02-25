@@ -82,7 +82,7 @@ public class TracingTestUtils {
 		
 		new TestTraceUnwinder(traceState.getTraceStore().getReader(), traceState.getSaturationState(), UNTRACED_LISTENER).accept(subsumee, subsumer, collector);
 
-		for (Context traced : traceState.getSaturationState().getTracedContexts()) {
+		for (Context traced : traceState.getTracedContexts()) {
 			IndexedClassExpression root = traced.getRoot();
 			
 			assertTrue(root + " has been traced for no good reason", collector.getTracedRoots().contains(traced.getRoot()));
@@ -116,7 +116,7 @@ public class TracingTestUtils {
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		final TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 		final TraceStore.Reader traceReader = traceState.getTraceStore().getReader();
-		final SaturationState tracingState = traceState.getSaturationState();
+		final SaturationState<TracedContext> tracingState = traceState.getSaturationState();
 		final MutableInteger counter = new MutableInteger(0);
 		
 		for (final IndexedClassExpression root : traceReader.getContextRoots()) {

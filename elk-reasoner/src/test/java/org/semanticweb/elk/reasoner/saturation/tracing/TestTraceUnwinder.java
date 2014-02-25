@@ -10,9 +10,11 @@ import java.util.Set;
 
 import org.semanticweb.elk.MutableInteger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.BaseInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
@@ -36,7 +38,7 @@ public class TestTraceUnwinder implements TraceUnwinder {
 
 	private final TraceStore.Reader traceReader_;
 	
-	private final LocalTracingSaturationState tracingState_;
+	private final SaturationState<TracedContext> tracingState_;
 
 	private final UntracedConclusionListener listener_;
 	
@@ -46,7 +48,7 @@ public class TestTraceUnwinder implements TraceUnwinder {
 		this(reader, state, UntracedConclusionListener.DUMMY);
 	}
 	
-	TestTraceUnwinder(TraceStore.Reader reader, LocalTracingSaturationState state, UntracedConclusionListener listener) {
+	TestTraceUnwinder(TraceStore.Reader reader, SaturationState<TracedContext> state, UntracedConclusionListener listener) {
 		traceReader_ = reader;
 		listener_ = listener;
 		tracingState_ = state;

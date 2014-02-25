@@ -52,14 +52,14 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 public class RuleApplicationAdditionFactory extends
 		AbstractRuleApplicationFactory {
 
-	public RuleApplicationAdditionFactory(SaturationState saturationState) {
+	public RuleApplicationAdditionFactory(SaturationState<?> saturationState) {
 		super(saturationState);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter writer,
+			RuleVisitor ruleVisitor, SaturationStateWriter<?> writer,
 			SaturationStatistics localStatistics) {
 		return new ComposedConclusionVisitor<Context>(
 		// insert conclusions initializing contexts if necessary

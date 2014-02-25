@@ -8,14 +8,13 @@ import java.util.Collection;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
+import org.semanticweb.elk.reasoner.saturation.ContextCreatingSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
-import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
-import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracingWriter;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -43,7 +42,7 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 	 */
 	private final ClassExpressionSaturationFactory<ContextTracingJob> tracingFactory_;
 	
-	private final LocalTracingSaturationState tracingState_;
+	private final SaturationState<TracedContext> tracingState_;
 	/**
 	 * Pending tracing jobs indexed by the context roots (there could be more
 	 * than one job for the same context)
@@ -51,8 +50,8 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 	private final Multimap<IndexedClassExpression, ContextTracingJob> pendingJobsByRoot_; 
 	
 	public NonRecursiveContextTracingFactory(
-			SaturationState saturationState,
-			LocalTracingSaturationState tracingState,
+			SaturationState<?> saturationState,
+			SaturationState<TracedContext> tracingState,
 			TraceStore traceStore,
 			int maxWorkers) {
 		RuleApplicationFactory ruleTracingFactory = new CycleBlockingRuleApplicationFactory(saturationState, tracingState, traceStore);
@@ -106,7 +105,7 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 
 		private final ClassExpressionSaturationFactory<ContextTracingJob>.Engine tracingEngine_ = tracingFactory_.getEngine();
 		
-		private final TracingWriter tracingContextWriter_ = tracingState_.getContextCreatingWriter(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY);
+		private final ContextCreatingSaturationStateWriter<TracedContext> tracingContextWriter_ = tracingState_.getContextCreatingWriter(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY);
 
 		@Override
 		public void submit(ContextTracingJob job) {

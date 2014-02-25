@@ -29,13 +29,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.AbstractSaturationState;
-import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
+import org.semanticweb.elk.reasoner.saturation.ContextFactory;
 import org.semanticweb.elk.reasoner.saturation.ContextImpl;
-import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.MapSaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -49,10 +48,18 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class LocalTracingSaturationState extends MapSaturationState {
+public class LocalTracingSaturationState extends MapSaturationState<TracedContext> {
 
 	public LocalTracingSaturationState(OntologyIndex index) {
-		super(index);
+		// use a context factory which creates traced contexts
+		super(index, new ContextFactory<TracedContext>() {
+
+			@Override
+			public TracedContext createContext(IndexedClassExpression root) {
+				return new TracedContext(root);
+			}
+			
+		});
 	}
 
 	@Override
@@ -60,7 +67,7 @@ public class LocalTracingSaturationState extends MapSaturationState {
 		return (TracedContext) super.getContext(ice);
 	}
 	
-	public Iterable<? extends Context> getTracedContexts() {
+	public Iterable<TracedContext> getTracedContexts() {
 		return Operations.filter(getContexts(), new Condition<Context>() {
 
 			@Override
@@ -70,40 +77,6 @@ public class LocalTracingSaturationState extends MapSaturationState {
 		});
 	}
 
-	@Override
-	public TracingWriter getContextCreatingWriter(
-			ContextCreationListener contextCreationListener,
-			ContextModificationListener contextModificationListener) {
-		return new TracingWriter(contextCreationListener, contextModificationListener);
-	}
-
-
-	/**
-	 * TODO
-	 * 
-	 * @author Pavel Klinov
-	 * 
-	 *         pavel.klinov@uni-ulm.de
-	 */
-	public class TracingWriter extends AbstractSaturationState.ContextCreatingWriter {
-
-		public TracingWriter(ContextCreationListener contextCreationListener,
-				ContextModificationListener contextModificationListener) {
-			super(contextCreationListener, contextModificationListener);
-		}
-
-		@Override
-		protected TracedContext newContext(IndexedClassExpression root) {
-			return new TracedContext(root);
-		}
-
-		@Override
-		public TracedContext getCreateContext(IndexedClassExpression root) {
-			return (TracedContext) super.getCreateContext(root);
-		}
-		
-	}
-	
 	/**
 	 * TODO 
 	 * 

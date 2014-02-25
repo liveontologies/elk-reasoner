@@ -48,7 +48,7 @@ public interface RuleApplicationFactory {
 	 * @return the {@link SaturationState} with which this
 	 *         {@link RuleApplicationFactory} is working.
 	 */
-	public SaturationState getSaturationState();
+	public SaturationState<?> getSaturationState();
 
 	/**
 	 * Create a new {@link InputProcessor} that concurrently processes

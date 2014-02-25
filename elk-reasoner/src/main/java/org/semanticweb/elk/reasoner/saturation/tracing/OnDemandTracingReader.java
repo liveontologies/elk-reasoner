@@ -4,11 +4,12 @@
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.ContextCreatingSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
-import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracingWriter;
 import org.semanticweb.elk.reasoner.saturation.tracing.factories.ContextTracingFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.factories.ContextTracingJob;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
@@ -28,12 +29,12 @@ public class OnDemandTracingReader extends DelegatingTraceReader {
 	
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(OnDemandTracingReader.class);
 
-	private final TracingWriter tracingContextWriter_;
+	private final ContextCreatingSaturationStateWriter<TracedContext> tracingContextWriter_;
 	
 	private final ContextTracingFactory tracingFactory_;
 	
 	public OnDemandTracingReader(
-			LocalTracingSaturationState tracingState,
+			SaturationState<TracedContext> tracingState,
 			TraceStore.Reader inferenceReader,
 			ContextTracingFactory tracingFactory) {
 		super(inferenceReader);

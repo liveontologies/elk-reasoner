@@ -58,12 +58,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 public class RuleApplicationDeletionFactory extends
 		AbstractRuleApplicationFactory implements RuleApplicationFactory {
 
-	public RuleApplicationDeletionFactory(SaturationState saturationState) {
+	public RuleApplicationDeletionFactory(SaturationState<?> saturationState) {
 		super(saturationState);
 	}
 
 	@Override
-	SaturationStateWriter getBaseWriter(
+	SaturationStateWriter<?> getBaseWriter(
 			ContextCreationListener creationListener,
 			ContextModificationListener modificationListener) {
 		// writer cannot create new contexts
@@ -72,7 +72,7 @@ public class RuleApplicationDeletionFactory extends
 	}
 
 	@Override
-	SaturationStateWriter getFinalWriter(SaturationStateWriter writer) {
+	SaturationStateWriter<?> getFinalWriter(SaturationStateWriter<?> writer) {
 		// only write to exiting contexts
 		return new ContextExistenceCheckingWriter(writer, getSaturationState());
 	}
@@ -80,7 +80,7 @@ public class RuleApplicationDeletionFactory extends
 	@Override
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter writer,
+			RuleVisitor ruleVisitor, SaturationStateWriter<?> writer,
 			SaturationStatistics localStatistics) {
 		return new ComposedConclusionVisitor<Context>(
 		// check if conclusion occurs in the context

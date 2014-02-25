@@ -52,14 +52,14 @@ public abstract class AbstractRuleApplicationFactory implements
 	/**
 	 * The main {@link SaturationState} this factory works with
 	 */
-	private final SaturationState saturationState_;
+	private final SaturationState<?> saturationState_;
 
 	/**
 	 * The {@link SaturationStatistics} aggregated for all workers
 	 */
 	private final SaturationStatistics aggregatedStats_;
 
-	public AbstractRuleApplicationFactory(final SaturationState saturationState) {
+	public AbstractRuleApplicationFactory(final SaturationState<?> saturationState) {
 		this.saturationState_ = saturationState;
 		this.aggregatedStats_ = new SaturationStatistics();
 	}
@@ -76,7 +76,7 @@ public abstract class AbstractRuleApplicationFactory implements
 	 */
 	protected InputProcessor<IndexedClassExpression> getEngine(
 			ConclusionVisitor<Context, Boolean> conclusionProcessor,
-			SaturationStateWriter saturationStateWriter,
+			SaturationStateWriter<?> saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
 		conclusionProcessor = SaturationUtils
 				.getProcessedConclusionCountingProcessor(conclusionProcessor,
@@ -97,7 +97,7 @@ public abstract class AbstractRuleApplicationFactory implements
 	 * @return a new writer for the main {@link SaturationState} to be used by
 	 *         engine.
 	 */
-	SaturationStateWriter getBaseWriter(
+	SaturationStateWriter<?> getBaseWriter(
 			ContextCreationListener creationListener,
 			ContextModificationListener modificationListener) {
 		// by default the writer can create new contexts
@@ -115,7 +115,7 @@ public abstract class AbstractRuleApplicationFactory implements
 	 * @return the actual {@link SaturationStateWriter} that will be used
 	 */
 	@SuppressWarnings("static-method")
-	SaturationStateWriter getFinalWriter(SaturationStateWriter writer) {
+	SaturationStateWriter<?> getFinalWriter(SaturationStateWriter<?> writer) {
 		return writer;
 	}
 
@@ -129,7 +129,7 @@ public abstract class AbstractRuleApplicationFactory implements
 	 * @return
 	 */
 	protected abstract ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter writer,
+			RuleVisitor ruleVisitor, SaturationStateWriter<?> writer,
 			SaturationStatistics localStatistics);
 
 	@Override
@@ -142,7 +142,7 @@ public abstract class AbstractRuleApplicationFactory implements
 		modificationListener = SaturationUtils
 				.addStatsToContextModificationListener(modificationListener,
 						localStatistics.getContextStatistics());
-		SaturationStateWriter writer = getBaseWriter(creationListener,
+		SaturationStateWriter<?> writer = getBaseWriter(creationListener,
 				modificationListener);
 		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
 		WorkerLocalizedSaturationStateWriter optimizedWriter = new WorkerLocalizedSaturationStateWriter(
@@ -168,7 +168,7 @@ public abstract class AbstractRuleApplicationFactory implements
 	}
 
 	@Override
-	public final SaturationState getSaturationState() {
+	public final SaturationState<?> getSaturationState() {
 		return saturationState_;
 	}
 

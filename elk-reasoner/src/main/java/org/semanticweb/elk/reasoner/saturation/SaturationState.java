@@ -40,13 +40,13 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  *         pavel.klinov@uni-ulm.de
  * @author "Yevgeny Kazakov"
  */
-public interface SaturationState {
+public interface SaturationState<C extends Context> {
 
 	/**
 	 * @return the unmodifiable {@link Collection} of {@link Context} stored in
 	 *         this {@link SaturationState}
 	 */
-	public Collection<? extends Context> getContexts();
+	public Collection<C> getContexts();
 
 	/**
 	 * @param ice
@@ -58,7 +58,7 @@ public interface SaturationState {
 	 *         {@link Context} for any given root.
 	 * @see Context#getRoot()
 	 */
-	public Context getContext(IndexedClassExpression ice);
+	public C getContext(IndexedClassExpression ice);
 
 	/**
 	 * @return the {@link OntologyIndex} associated with this
@@ -71,7 +71,7 @@ public interface SaturationState {
 	 *         {@link SaturationState} that are not saturated, i.e., for which
 	 *         {@link Context#isSaturated()} returns {@code false}
 	 */
-	public Collection<? extends Context> getNotSaturatedContexts();
+	public Collection<C> getNotSaturatedContexts();
 
 	/**
 	 * @return the total number of times a {@link Context} was marked as
@@ -120,7 +120,7 @@ public interface SaturationState {
 	 *      ContextModificationListener)
 	 * @see Context#isSaturated()
 	 */
-	public SaturationStateWriter getContextModifyingWriter(
+	public SaturationStateWriter<C> getContextModifyingWriter(
 			ContextModificationListener contextModificationListener);
 
 	/**
@@ -132,7 +132,7 @@ public interface SaturationState {
 	 * @see #getContextModifyingWriter(ContextModificationListener)
 	 * @see #getContextCreatingWriter()
 	 */
-	public SaturationStateWriter getContextModifyingWriter();
+	public SaturationStateWriter<C> getContextModifyingWriter();
 
 	/**
 	 * @param contextCreationListener
@@ -154,7 +154,7 @@ public interface SaturationState {
 	 * @see #getContextCreatingWriter()
 	 * @see #getContextModifyingWriter(ContextModificationListener)
 	 */
-	public SaturationStateWriter getContextCreatingWriter(
+	public ContextCreatingSaturationStateWriter<C> getContextCreatingWriter(
 			ContextCreationListener contextCreationListener,
 			ContextModificationListener contextModificationListener);
 
@@ -168,6 +168,6 @@ public interface SaturationState {
 	 *      ContextModificationListener)
 	 * @see #getContextModifyingWriter()
 	 */
-	public SaturationStateWriter getContextCreatingWriter();
+	public ContextCreatingSaturationStateWriter<C> getContextCreatingWriter();
 
 }
