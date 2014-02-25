@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule
  * 
  * @author "Yevgeny Kazakov"
  */
-class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
+public class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
 
 	/**
 	 * a {@link SaturationStateWriter} to produce new {@link Conclusion}s and
@@ -53,7 +53,7 @@ class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
 	 */
 	private final Conclusion contextInitConclusion_;
 
-	BasicRuleEngine(OntologyIndex index,
+	protected BasicRuleEngine(OntologyIndex index,
 			ConclusionVisitor<Context, Boolean> conclusionProcessor,
 			WorkerLocalTodo localTodo, SaturationStateWriter writer,
 			SaturationStatistics aggregatedStatistics,
@@ -74,4 +74,7 @@ class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
 		return writer_.pollForActiveContext();
 	}
 
+	protected final SaturationStateWriter getWriter() {
+		return writer_;
+	}
 }

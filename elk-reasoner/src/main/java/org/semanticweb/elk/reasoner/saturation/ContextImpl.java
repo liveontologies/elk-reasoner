@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
@@ -270,6 +271,21 @@ public class ContextImpl implements ExtendedContext {
 		boolean previous = isSaturated_;
 		isSaturated_ = saturated;
 		return previous;
+	}
+	
+	@Override
+	public Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(IndexedPropertyChain subRoot) {
+		if (subContextsByObjectProperty_ == null) {
+			return Collections.emptyList();
+		}
+		
+		SubContext subContext = subContextsByObjectProperty_.get(subRoot);
+		
+		if (subContext == null) {
+			return Collections.emptyList();
+		}
+		
+		return subContext.getPropagatedSubsumers();
 	}
 
 	private static class ConclusionInserter implements

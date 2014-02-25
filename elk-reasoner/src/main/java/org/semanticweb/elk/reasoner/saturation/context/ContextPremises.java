@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
@@ -128,4 +129,5 @@ public interface ContextPremises {
 	public boolean isInconsistForDisjointnessAxiom(
 			IndexedDisjointnessAxiom axiom);
 
+	public Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(IndexedPropertyChain subRoot);
 }

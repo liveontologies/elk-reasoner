@@ -57,9 +57,10 @@ public class SubsumerBackwardLinkRule extends AbstractBackwardLinkRule {
 	@Override
 	public void apply(BackwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		for (IndexedObjectSomeValuesFrom carry : premises
+		/*for (IndexedObjectSomeValuesFrom carry : premises
 				.getSubContextPremisesByObjectProperty()
-				.get(premise.getRelation()).getPropagatedSubsumers()) {
+				.get(premise.getRelation()).getPropagatedSubsumers()) {*/
+		for (IndexedObjectSomeValuesFrom carry : premises.getPropagatedSubsumers(premise.getRelation())) {
 			//producer.produce(premise.getSource(), new ComposedSubsumer(carry));
 			producer.produce(premise.getSource(), new PropagatedSubsumer(premises.getRoot(), premise, carry));
 		}
