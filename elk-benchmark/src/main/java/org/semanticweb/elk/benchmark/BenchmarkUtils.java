@@ -140,8 +140,9 @@ public class BenchmarkUtils {
 		}
 	}
 	
+	//TODO need a better name
 	public static void runTaskCollection2(String taskClass, int warmups, int runs, String[] params) throws Exception {
-		TaskCollection collection = TaskFactory.createTaskCollection(taskClass, params);
+		VisitorTaskCollection collection = TaskFactory.createTaskCollection2(taskClass, params);
 		RunAllOnceThenRepeatRunner runner = new RunAllOnceThenRepeatRunner(warmups, runs);
 
 		try {
@@ -163,10 +164,14 @@ public class BenchmarkUtils {
 	}
 	
 	public static ReasonerConfiguration getReasonerConfiguration(String[] args) {
+		return getReasonerConfiguration(args, 1);
+	}
+	
+	public static ReasonerConfiguration getReasonerConfiguration(String[] args, int firstArgIndex) {
 		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
 		
-		if (args.length > 1) {
-			config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS, args[1]);
+		if (args.length > firstArgIndex) {
+			config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS, args[firstArgIndex]);
 		}
 		
 		return config;

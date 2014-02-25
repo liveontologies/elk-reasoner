@@ -95,6 +95,9 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 	}
 
 	@Override
+	public void postRun() throws TaskException {}
+	
+	@Override
 	public void prepare() throws TaskException {
 		try {
 			File ontologyFile = BenchmarkUtils.getFile(ontologyFile_);

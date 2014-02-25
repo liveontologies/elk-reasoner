@@ -1,9 +1,13 @@
+/**
+ * 
+ */
+package org.semanticweb.elk.benchmark;
+
 /*
  * #%L
- * ELK Bencharking Package
- * 
- * $Id$
- * $HeadURL$
+ * ELK Benchmarking Package
+ * $Id:$
+ * $HeadURL:$
  * %%
  * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
@@ -20,25 +24,17 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
-package org.semanticweb.elk.benchmark;
 
 /**
- * A unit of work to be executed for benchmarking purposes (e.g. classification
- * of an ontology)
+ * A collection of tasks which uses a {@link TaskVisitor} to provide access to
+ * its tasks.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface Task {
-
-	public String getName();
-	public void prepare() throws TaskException;
-	public void run() throws TaskException;
-	public void dispose();
+public interface VisitorTaskCollection {
+	public void visitTasks(TaskVisitor visitor) throws TaskException;
 	public Metrics getMetrics();
-	public void postRun() throws TaskException;	
+	public void dispose();
 }

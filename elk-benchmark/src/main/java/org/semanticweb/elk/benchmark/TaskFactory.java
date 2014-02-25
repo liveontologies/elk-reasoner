@@ -43,6 +43,10 @@ public class TaskFactory {
 		return (TaskCollection) create(className, params);
 	}
 	
+	public static VisitorTaskCollection createTaskCollection2(String className, String[] params) {
+		return (VisitorTaskCollection) create(className, params);
+	}
+	
 	private static Object create(String className, String[] params) {
 		try {
 			Class<?> clazz = Class.forName(className);

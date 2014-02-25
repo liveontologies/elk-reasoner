@@ -24,6 +24,7 @@ package org.semanticweb.elk.benchmark;
  * #L%
  */
 
+import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -112,23 +113,39 @@ public class Metrics {
 		for (Map.Entry<String, MetricBean> entry : metricMap_.entrySet()) {
 			MetricBean value = entry.getValue();
 
-			if (value.total > 0.0) {
-				buffer.append("Average " + entry.getKey()).append(" : ")
-						.append(value.printAverage()).append(delim);
+			if (value.count > 0 && value.total > 0d) {
+				buffer.append("Average " + entry.getKey()).append(" : ").append(value.printAverage()).append(delim);
 			}
 		}
 		
 		LoggerWrap.log(logger, level, buffer.toString());
 	}
 	
-	//TODO Remove this debug method
-	/*public void printAverage(String name) {
-		MetricBean mb = metricMap_.get(name);
+	public void add(Metrics metrics) {
+		runCount_ += metrics.runCount_;
+		
+		if (metrics.runCount_ > 0) {
+			for (Map.Entry<String, MetricBean> entry : metricMap_.entrySet()) {
+				MetricBean other = metrics.getMetric(entry.getKey());
 
-		if (mb.total > 0.0) {
-			System.err.println(mb.printAverage());
+				if (other != null) {
+					entry.getValue().add(other);
+				}
+			}
+
+			for (Map.Entry<String, MetricBean> entry : metrics.getMetricsMap()
+					.entrySet()) {
+				MetricBean our = metricMap_.get(entry.getKey());
+
+				if (our == null) {
+					MetricBean bean = new MetricBean();
+
+					bean.add(entry.getValue());
+					metricMap_.put(entry.getKey(), bean);
+				}
+			}
 		}
-	}*/
+	}
 	
 	/**
 	 * 
@@ -137,6 +154,8 @@ public class Metrics {
 	 * pavel.klinov@uni-ulm.de
 	 */
 	private static class MetricBean {
+		
+		static DecimalFormat FORMAT = new DecimalFormat("#.##");
 		
 		double total = 0;
 		double min = Double.MAX_VALUE;
@@ -149,13 +168,19 @@ public class Metrics {
 		}
 		
 		public String format(double value) {
-			return String.format("%.0f", value);
+			return FORMAT.format(value);
 		}
 		
 		public String printAverage() {
 			return format(total/count) + " [" + format(min) + "--" + format(max) + "] (" + count + ")";
 		}
 		
+		public void add(MetricBean bean) {
+			count += bean.count;
+			total += bean.total;
+			min = Math.min(min, bean.min);
+			max = Math.max(max, bean.max);
+		}
 	}
 }
 

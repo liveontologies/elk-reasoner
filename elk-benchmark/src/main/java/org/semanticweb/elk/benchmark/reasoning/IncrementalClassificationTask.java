@@ -89,6 +89,9 @@ public class IncrementalClassificationTask implements Task {
 	}
 
 	@Override
+	public void postRun() throws TaskException {}
+	
+	@Override
 	public void prepare() throws TaskException {
 		File ontologyFile = BenchmarkUtils.getFile(ontologyFileName);
 
