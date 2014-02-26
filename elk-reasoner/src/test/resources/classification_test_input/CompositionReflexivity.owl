@@ -1,0 +1,8 @@
+Prefix( : = <http://example.org/> )
+Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
+Ontology(<www.example.org#composition_reflexivity>
+ReflexiveObjectProperty(:R)
+SubObjectPropertyOf(ObjectPropertyChain(:H :R) :T)
+SubClassOf(:A ObjectSomeValuesFrom(:H :C))
+EquivalentClasses(:B ObjectSomeValuesFrom(:T :C))
+)

@@ -1,0 +1,10 @@
+Prefix( : = <http://example.org/> )
+Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
+Ontology(<www.example.org#transitive_property#taxonomy>
+SubClassOf(:A :X)
+SubClassOf(:B :X)
+SubClassOf(:C :X)
+SubClassOf(:D :X)
+Declaration(Class(:E))
+
+)

@@ -79,7 +79,7 @@ class ReducingCompositionClosure extends CompositionClosure {
 	public void applyTo(Collection<IndexedPropertyChain> currentCompositions) {
 		for (IndexedPropertyChain relevant : relevantCompositions) {
 			Set<IndexedPropertyChain> subProperties = SubPropertyExplorer
-					.getSetRelevantSubProperties(relevant);
+					.getRelevantSubProperties(relevant);
 			// add this composition unless it already implied by a current
 			// composition
 			boolean addThis = true;

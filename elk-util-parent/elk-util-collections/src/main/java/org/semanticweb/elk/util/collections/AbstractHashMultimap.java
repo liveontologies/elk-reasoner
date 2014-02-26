@@ -53,8 +53,8 @@ public abstract class AbstractHashMultimap<Key, Value> extends
 		Collection<Value> record = super.get(key);
 		if (record == null)
 			return false;
-		else
-			return record.contains(value);
+		// else
+		return record.contains(value);
 	}
 
 	@Override
@@ -75,7 +75,12 @@ public abstract class AbstractHashMultimap<Key, Value> extends
 		return result;
 	}
 
-	public Collection<Value> getOld(Object key) {
+	/**
+	 * @param key
+	 * @return the collection of values associated with the given key, or
+	 *         {@code null} if no value us associated
+	 */
+	public Collection<Value> getValues(Object key) {
 		return super.get(key);
 	}
 

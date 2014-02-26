@@ -57,7 +57,7 @@ public class SaturatedPropertyChain {
 	 * composition of R1 and R2 derives directly R skipping the auxiliary binary
 	 * chain representing [R1 R2].
 	 */
-	public static final boolean REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES = true;
+	public static final boolean REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES = false;
 
 	/**
 	 * If set to true, then compositions between each pair of R1 and R2 are
@@ -70,7 +70,7 @@ public class SaturatedPropertyChain {
 	 * the composition of R1 and R2 derives only S1 and not S2. Note that this
 	 * only makes sense if REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES is also on.
 	 */
-	public static final boolean ELIMINATE_IMPLIED_COMPOSITIONS = true;
+	public static final boolean ELIMINATE_IMPLIED_COMPOSITIONS = false;
 
 	/**
 	 * the {@code IndexedPropertyChain} for which this saturation is computed
@@ -86,6 +86,24 @@ public class SaturatedPropertyChain {
 	 * the {@code IndexedPropertyChain}s which are subsumed by {@link #root}
 	 */
 	Set<IndexedPropertyChain> derivedSubProperties;
+
+	/**
+	 * {@code true} if {@link #derivedSubProperties} is not {@code null} and
+	 * fully computed
+	 */
+	volatile boolean derivedSubPropertiesComputed = false;
+
+	/**
+	 * a multimap T -> {S} such that both S and ObjectPropertyChain(S, T) imply
+	 * {@link #root}
+	 */
+	Multimap<IndexedObjectProperty, IndexedPropertyChain> leftSubComposableSubPropertiesByRightProperties;
+
+	/**
+	 * {@code true} if {@link #leftSubComposableSubPropertiesByRightProperties}
+	 * is not {@code null} and was fully computed
+	 */
+	volatile boolean leftSubComposableSubPropertiesByRightPropertiesComputed = false;
 
 	/**
 	 * A {@link Multimap} from R to S such that ObjectPropertyChain(R, root)
@@ -109,6 +127,9 @@ public class SaturatedPropertyChain {
 	public void clear() {
 		isDerivedReflexive_ = false;
 		derivedSubProperties = null;
+		derivedSubPropertiesComputed = false;
+		leftSubComposableSubPropertiesByRightProperties = null;
+		leftSubComposableSubPropertiesByRightPropertiesComputed = false;
 		compositionsByLeftSubProperty = null;
 		compositionsByRightSubProperty = null;
 	}
@@ -116,26 +137,17 @@ public class SaturatedPropertyChain {
 	/**
 	 * @return {@code true} if there is no derived information in this
 	 *         {@link SaturatedPropertyChain}, that is, its state is the same as
-	 *         after applying {{@link #clear()}
+	 *         after applying {@link #clear()}
 	 */
 	public boolean isClear() {
 		return isDerivedReflexive_ == false && derivedSubProperties == null
+				&& leftSubComposableSubPropertiesByRightProperties == null
 				&& compositionsByLeftSubProperty == null
 				&& compositionsByRightSubProperty == null;
 	}
 
-	@Override
-	public SaturatedPropertyChain clone() {
-		SaturatedPropertyChain result = new SaturatedPropertyChain(root);
-		result.isDerivedReflexive_ = this.isDerivedReflexive_;
-		result.derivedSubProperties = this.derivedSubProperties;
-		result.compositionsByLeftSubProperty = this.compositionsByLeftSubProperty;
-		result.compositionsByRightSubProperty = this.compositionsByRightSubProperty;
-		return result;
-	}
-
 	/**
-	 * @return All sub-properties R of root including root itself. 
+	 * @return All sub-properties R of root including root itself.
 	 */
 	public Set<IndexedPropertyChain> getSubProperties() {
 		return derivedSubProperties == null ? Collections
