@@ -36,12 +36,12 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitializat
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ForwardLinkFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
@@ -110,6 +110,17 @@ public class RuleApplicationTimerVisitor implements RuleVisitor {
 		timer_.timeBackwardLinkChainFromBackwardLinkRule += CachedTimeThread
 				.getCurrentTimeMillis();
 
+	}
+
+	@Override
+	public void visit(BackwardLinkFromForwardLinkRule rule,
+			ForwardLink premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		timer_.timeBackwardLinkFromForwardLinkRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(rule, premise, premises, producer);
+		timer_.timeBackwardLinkFromForwardLinkRule += CachedTimeThread
+				.getCurrentTimeMillis();
 	}
 
 	@Override
@@ -188,18 +199,6 @@ public class RuleApplicationTimerVisitor implements RuleVisitor {
 		visitor_.visit(rule, premise, premises, producer);
 		timer_.timeDisjointSubsumerFromMemberRule += CachedTimeThread
 				.getCurrentTimeMillis();
-	}
-
-	@Override
-	public void visit(ForwardLinkFromBackwardLinkRule rule,
-			BackwardLink premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		timer_.timeForwardLinkFromBackwardLinkRule -= CachedTimeThread
-				.getCurrentTimeMillis();
-		visitor_.visit(rule, premise, premises, producer);
-		timer_.timeForwardLinkFromBackwardLinkRule += CachedTimeThread
-				.getCurrentTimeMillis();
-
 	}
 
 	@Override

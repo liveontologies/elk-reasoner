@@ -39,7 +39,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A factory of engines for computing
+ * A factory of engines for computing sub-properties and compositions induced by
+ * property inclusions, property chains, and reflexive properties
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -85,7 +86,8 @@ public class PropertyHierarchyCompositionComputationFactory
 
 		@Override
 		public Void visit(IndexedObjectProperty element) {
-			SubPropertyExplorer.getRelevantSubProperties(element);
+			// ensure that sub-properties are computed
+			SubPropertyExplorer.getSubPropertyChains(element);
 			return null;
 		}
 
@@ -111,38 +113,37 @@ public class PropertyHierarchyCompositionComputationFactory
 
 			IndexedObjectProperty left = element.getLeftProperty();
 			IndexedPropertyChain right = element.getRightProperty();
-			Set<IndexedPropertyChain> leftSubProperties = SubPropertyExplorer
-					.getRelevantSubProperties(left);
+			Set<IndexedObjectProperty> leftSubProperties = SubPropertyExplorer
+					.getSubProperties(left);
 			if (leftSubProperties.isEmpty())
 				return null;
 			Set<IndexedPropertyChain> rightSubProperties = SubPropertyExplorer
-					.getRelevantSubProperties(right);
+					.getSubPropertyChains(right);
 			if (rightSubProperties.isEmpty())
 				return null;
-			CompositionClosure closure = SaturatedPropertyChain.ELIMINATE_IMPLIED_COMPOSITIONS ? new ReducingCompositionClosure(
-					element) : new CompositionClosure(element);
 
-			for (IndexedPropertyChain rightSubProperty : rightSubProperties) {
+			for (IndexedPropertyChain rightSubPropertyChain : rightSubProperties) {
 
 				SaturatedPropertyChain rightSaturation = SaturatedPropertyChain
-						.getCreate(rightSubProperty);
+						.getCreate(rightSubPropertyChain);
 				synchronized (rightSaturation) {
 					if (rightSaturation.compositionsByLeftSubProperty == null)
-						rightSaturation.compositionsByLeftSubProperty = new CompositionMultimap();
+						rightSaturation.compositionsByLeftSubProperty = new CompositionMultimap<IndexedObjectProperty>();
 				}
 
-				AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByLeft = rightSaturation.compositionsByLeftSubProperty;
+				AbstractHashMultimap<IndexedObjectProperty, IndexedBinaryPropertyChain> compositionsByLeft = rightSaturation.compositionsByLeftSubProperty;
 
 				// computing left properties for which composition with the
 				// current right sub-property is redundant
-				Collection<IndexedPropertyChain> redundantLeftProperties = Collections
+				Collection<IndexedObjectProperty> redundantLeftProperties = Collections
 						.emptySet();
 
-				if (rightSubProperty instanceof IndexedBinaryPropertyChain) {
-					IndexedPropertyChain rightRightSubProperty = ((IndexedBinaryPropertyChain) rightSubProperty)
+				if (rightSubPropertyChain instanceof IndexedBinaryPropertyChain) {
+					IndexedBinaryPropertyChain composition = (IndexedBinaryPropertyChain) rightSubPropertyChain;
+					IndexedPropertyChain rightRightSubProperty = composition
 							.getRightProperty();
 					if (rightSubProperties.contains(rightRightSubProperty)) {
-						IndexedObjectProperty rightLeftSubProperty = ((IndexedBinaryPropertyChain) rightSubProperty)
+						IndexedObjectProperty rightLeftSubProperty = composition
 								.getLeftProperty();
 						redundantLeftProperties = SubPropertyExplorer
 								.getLeftSubComposableSubPropertiesByRightProperties(
@@ -150,22 +151,25 @@ public class PropertyHierarchyCompositionComputationFactory
 					}
 				}
 
-				for (IndexedPropertyChain leftSubProperty : leftSubProperties) {
+				for (IndexedObjectProperty leftSubProperty : leftSubProperties) {
 					boolean newRecord = false;
 
 					if (redundantLeftProperties.contains(leftSubProperty)) {
 						LOGGER_.trace(
 								"{} o {} => {}: composition is redundant",
-								leftSubProperty, rightSubProperty, element);
+								leftSubProperty, rightSubPropertyChain, element);
 						continue;
 					}
 
-					Collection<IndexedPropertyChain> compositionsSoFar;
+					LOGGER_.trace("{} o {} => {}: new composition",
+							leftSubProperty, rightSubPropertyChain, element);
+
+					Collection<IndexedBinaryPropertyChain> compositionsSoFar;
 					synchronized (compositionsByLeft) {
 						compositionsSoFar = compositionsByLeft
 								.getValues(leftSubProperty);
 						if (compositionsSoFar == null) {
-							compositionsSoFar = new ArrayHashSet<IndexedPropertyChain>(
+							compositionsSoFar = new ArrayHashSet<IndexedBinaryPropertyChain>(
 									2);
 							compositionsByLeft.put(leftSubProperty,
 									compositionsSoFar);
@@ -178,20 +182,17 @@ public class PropertyHierarchyCompositionComputationFactory
 								.getCreate(leftSubProperty);
 						synchronized (leftSaturation) {
 							if (leftSaturation.compositionsByRightSubProperty == null)
-								leftSaturation.compositionsByRightSubProperty = new CompositionMultimap();
+								leftSaturation.compositionsByRightSubProperty = new CompositionMultimap<IndexedPropertyChain>();
 						}
-						Map<IndexedPropertyChain, Collection<IndexedPropertyChain>> compositionsByRight = leftSaturation.compositionsByRightSubProperty;
+						Map<IndexedPropertyChain, Collection<IndexedBinaryPropertyChain>> compositionsByRight = leftSaturation.compositionsByRightSubProperty;
 						synchronized (compositionsByRight) {
-							compositionsByRight.put(rightSubProperty,
+							compositionsByRight.put(rightSubPropertyChain,
 									compositionsSoFar);
 						}
 					}
+
 					synchronized (compositionsSoFar) {
-						closure.applyTo(compositionsSoFar);
-						// the logger should be within synchronized
-						LOGGER_.trace("{} o {} => {}: updated compositions",
-								leftSubProperty, rightSubProperty,
-								compositionsSoFar);
+						compositionsSoFar.add(element);
 					}
 				}
 			}
@@ -200,12 +201,12 @@ public class PropertyHierarchyCompositionComputationFactory
 
 	};
 
-	private static class CompositionMultimap extends
-			AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> {
+	private static class CompositionMultimap<P extends IndexedPropertyChain>
+			extends AbstractHashMultimap<P, IndexedBinaryPropertyChain> {
 
 		@Override
-		protected Collection<IndexedPropertyChain> newRecord() {
-			return new ArrayHashSet<IndexedPropertyChain>(2);
+		protected Collection<IndexedBinaryPropertyChain> newRecord() {
+			return new ArrayHashSet<IndexedBinaryPropertyChain>(2);
 		}
 	}
 

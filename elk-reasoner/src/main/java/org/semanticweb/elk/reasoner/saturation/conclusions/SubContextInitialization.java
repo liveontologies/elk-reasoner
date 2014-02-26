@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -52,9 +52,9 @@ public class SubContextInitialization extends AbstractConclusion implements
 	/**
 	 * the sub-root of the {@link SubContext} that should be initialized
 	 */
-	private final IndexedPropertyChain subRoot_;
+	private final IndexedObjectProperty subRoot_;
 
-	public SubContextInitialization(IndexedPropertyChain subRoot) {
+	public SubContextInitialization(IndexedObjectProperty subRoot) {
 		this.subRoot_ = subRoot;
 	}
 
@@ -78,7 +78,7 @@ public class SubContextInitialization extends AbstractConclusion implements
 	}
 
 	@Override
-	public IndexedPropertyChain getSubRoot() {
+	public IndexedObjectProperty getSubRoot() {
 		return subRoot_;
 	}
 

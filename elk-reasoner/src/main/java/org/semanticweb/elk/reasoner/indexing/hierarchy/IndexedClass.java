@@ -40,9 +40,6 @@ import org.slf4j.LoggerFactory;
  */
 public class IndexedClass extends IndexedClassEntity {
 
-	protected static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedClass.class);
-
 	/**
 	 * The indexed ElkClass
 	 */

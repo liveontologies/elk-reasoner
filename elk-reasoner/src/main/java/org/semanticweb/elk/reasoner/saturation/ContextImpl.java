@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
@@ -82,13 +83,13 @@ public class ContextImpl implements ExtendedContext {
 	 * 
 	 * @see BackwardLink#getSource()
 	 */
-	private Set<IndexedPropertyChain> reflexiveBackwardLinks_ = null;
+	private Set<IndexedObjectProperty> reflexiveBackwardLinks_ = null;
 
 	/**
 	 * the {@link SubContext}s of this {@link Context} indexed by their root
-	 * {@link IndexedPropertyChain}s
+	 * {@link IndexedObjectProperty}s
 	 */
-	private Map<IndexedPropertyChain, SubContext> subContextsByObjectProperty_ = null;
+	private Map<IndexedObjectProperty, SubContext> subContextsByObjectProperty_ = null;
 
 	/**
 	 * the derived {@link IndexedClassExpression} subsumers by
@@ -164,16 +165,16 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	@Override
-	public Map<IndexedPropertyChain, ? extends SubContextPremises> getSubContextPremisesByObjectProperty() {
+	public Map<IndexedObjectProperty, ? extends SubContextPremises> getSubContextPremisesByObjectProperty() {
 		if (subContextsByObjectProperty_ == null)
 			return Collections.emptyMap();
 		// else
 		return subContextsByObjectProperty_;
 	}
 
-	SubContext getCreateSubContext(IndexedPropertyChain subRoot) {
+	SubContext getCreateSubContext(IndexedObjectProperty subRoot) {
 		if (subContextsByObjectProperty_ == null)
-			subContextsByObjectProperty_ = new ArrayHashMap<IndexedPropertyChain, SubContext>(
+			subContextsByObjectProperty_ = new ArrayHashMap<IndexedObjectProperty, SubContext>(
 					3);
 		SubContext result = subContextsByObjectProperty_.get(subRoot);
 		if (result == null) {
@@ -214,9 +215,9 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	@Override
-	public Set<IndexedPropertyChain> getLocalReflexiveObjectProperties() {
+	public Set<IndexedObjectProperty> getLocalReflexiveObjectProperties() {
 		return reflexiveBackwardLinks_ == null ? Collections
-				.<IndexedPropertyChain> emptySet() : reflexiveBackwardLinks_;
+				.<IndexedObjectProperty> emptySet() : reflexiveBackwardLinks_;
 	}
 
 	@Override
@@ -281,13 +282,13 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
-			IndexedPropertyChain relation = subConclusion.getRelation();
+			IndexedObjectProperty relation = subConclusion.getRelation();
 			// make sure that relevant context always exists
 			SubContext subContext = input.getCreateSubContext(relation);
 			if (subConclusion.getSourceRoot(input.root_) == input.root_) {
 				// reflexive
 				if (input.reflexiveBackwardLinks_ == null) {
-					input.reflexiveBackwardLinks_ = new ArrayHashSet<IndexedPropertyChain>(
+					input.reflexiveBackwardLinks_ = new ArrayHashSet<IndexedObjectProperty>(
 							3);
 				}
 				return input.reflexiveBackwardLinks_.add(relation);
@@ -381,7 +382,7 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
 			boolean changed = false;
-			IndexedPropertyChain relation = subConclusion.getRelation();
+			IndexedObjectProperty relation = subConclusion.getRelation();
 			SubContext subContext = input.getCreateSubContext(relation);
 			if (subConclusion.getSourceRoot(input.root_) == input.root_) {
 				// link is reflexive

@@ -51,23 +51,25 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 			.getLogger(SubPropertyExplorer.class);
 
 	/**
-	 * collects all encountered sub-properties to make sure the procedure does
-	 * not loop
+	 * the set that will be closed under sub-properties
 	 */
-	final private Set<IndexedPropertyChain> allSubProperties_ = new ArrayHashSet<IndexedPropertyChain>();
+	final private Set<IndexedPropertyChain> subPropertyChains_;
+	/**
+	 * the subset of {@link #subProperties_} consisting of
+	 * {@link IndexedObjectProperty}s
+	 */
+	final private Set<IndexedObjectProperty> subProperties_;
 	/**
 	 * the sub-properties for which the told sub-properties may not be yet
 	 * expanded
 	 */
 	final private Queue<IndexedPropertyChain> toDoSubProperties_ = new LinkedList<IndexedPropertyChain>();
-	/**
-	 * the set that will be extended with relevant sub-propeties
-	 */
-	final private Set<IndexedPropertyChain> relevantSubProperties_;
 
 	SubPropertyExplorer(IndexedPropertyChain element,
-			Set<IndexedPropertyChain> relevantSubProperties) {
-		this.relevantSubProperties_ = relevantSubProperties;
+			Set<IndexedPropertyChain> subPropertyChains,
+			Set<IndexedObjectProperty> subProperties) {
+		this.subPropertyChains_ = subPropertyChains;
+		this.subProperties_ = subProperties;
 		toDo(element);
 	}
 
@@ -92,10 +94,10 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	}
 
 	private void toDo(IndexedPropertyChain element) {
-		if (allSubProperties_.add(element)) {
+		if (subPropertyChains_.add(element)) {
 			toDoSubProperties_.add(element);
-			if (SaturatedPropertyChain.isRelevant(element)) {
-				relevantSubProperties_.add(element);
+			if (element instanceof IndexedObjectProperty) {
+				subProperties_.add((IndexedObjectProperty) element);
 			}
 		}
 	}
@@ -109,42 +111,62 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		}
 	}
 
-	private static void addRelevantSubProperties(IndexedPropertyChain property,
-			Set<IndexedPropertyChain> relevantSubProperties) {
-		new SubPropertyExplorer(property, relevantSubProperties).process();
-
-		LOGGER_.trace("{} relevant subproperties: {}", property,
-				relevantSubProperties);
+	private static void expandUnderSubProperties(IndexedPropertyChain property,
+			Set<IndexedPropertyChain> currentSubPropertyChains,
+			Set<IndexedObjectProperty> currentSubProperties) {
+		new SubPropertyExplorer(property, currentSubPropertyChains,
+				currentSubProperties).process();
+		LOGGER_.trace("{} sub-property chains: {}, sub-properties", property,
+				currentSubPropertyChains, currentSubProperties);
 	}
 
-	/**
-	 * @param element
-	 * @return the relevant sub-properties of the given
-	 *         {@link IndexedPropertyChain}
-	 * @see SaturatedPropertyChain#isRelevant(IndexedPropertyChain)
-	 */
-	static Set<IndexedPropertyChain> getRelevantSubProperties(
+	private static SaturatedPropertyChain computeSubProperties(
 			IndexedPropertyChain element) {
 		SaturatedPropertyChain saturation = SaturatedPropertyChain
 				.getCreate(element);
 		if (saturation.derivedSubPropertiesComputed)
-			return saturation.derivedSubProperties;
+			return saturation;
 		// else
-		if (saturation.derivedSubProperties == null) {
+		if (saturation.derivedSubProperyChains == null) {
 			synchronized (saturation) {
-				if (saturation.derivedSubProperties == null)
-					saturation.derivedSubProperties = new ArrayHashSet<IndexedPropertyChain>(
+				if (saturation.derivedSubProperyChains == null)
+					saturation.derivedSubProperyChains = new ArrayHashSet<IndexedPropertyChain>(
 							8);
 			}
 		}
-		synchronized (saturation.derivedSubProperties) {
+		synchronized (saturation.derivedSubProperyChains) {
 			if (saturation.derivedSubPropertiesComputed)
-				return saturation.derivedSubProperties;
+				return saturation;
 			// else
-			addRelevantSubProperties(element, saturation.derivedSubProperties);
+			if (saturation.derivedSubProperties == null)
+				saturation.derivedSubProperties = new ArrayHashSet<IndexedObjectProperty>(
+						8);
+			expandUnderSubProperties(element,
+					saturation.derivedSubProperyChains,
+					saturation.derivedSubProperties);
 			saturation.derivedSubPropertiesComputed = true;
 		}
-		return saturation.derivedSubProperties;
+		return saturation;
+	}
+
+	/**
+	 * @param element
+	 * @return the sub-{@link IndexedPropertyChain}s of the given
+	 *         {@link IndexedPropertyChain}
+	 */
+	static Set<IndexedPropertyChain> getSubPropertyChains(
+			IndexedPropertyChain element) {
+		return computeSubProperties(element).getSubPropertyChains();
+	}
+
+	/**
+	 * @param element
+	 * @return the sub-{@link IndexedObjectProperty} of the given
+	 *         {@link IndexedPropertyChain}
+	 */
+	static Set<IndexedObjectProperty> getSubProperties(
+			IndexedPropertyChain element) {
+		return computeSubProperties(element).getSubProperties();
 	}
 
 	/**
@@ -152,7 +174,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	 * @return a multimap T -> {S} such that both S and ObjectPropertyChain(S,
 	 *         T) are sub-properties of the given {@link IndexedObjectProperty}
 	 */
-	static Multimap<IndexedObjectProperty, IndexedPropertyChain> getLeftSubComposableSubPropertiesByRightProperties(
+	static Multimap<IndexedObjectProperty, IndexedObjectProperty> getLeftSubComposableSubPropertiesByRightProperties(
 			IndexedObjectProperty element) {
 		SaturatedPropertyChain saturation = SaturatedPropertyChain
 				.getCreate(element);
@@ -162,34 +184,32 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		if (saturation.leftSubComposableSubPropertiesByRightProperties == null) {
 			synchronized (saturation) {
 				if (saturation.leftSubComposableSubPropertiesByRightProperties == null)
-					saturation.leftSubComposableSubPropertiesByRightProperties = new HashSetMultimap<IndexedObjectProperty, IndexedPropertyChain>();
+					saturation.leftSubComposableSubPropertiesByRightProperties = new HashSetMultimap<IndexedObjectProperty, IndexedObjectProperty>();
 			}
 		}
 		synchronized (saturation.leftSubComposableSubPropertiesByRightProperties) {
 			if (saturation.leftSubComposableSubPropertiesByRightPropertiesComputed)
 				return saturation.leftSubComposableSubPropertiesByRightProperties;
 			// else compute it
-			Set<IndexedPropertyChain> subProperties = getRelevantSubProperties(element);
-			for (IndexedPropertyChain subProperty : subProperties) {
-				if (subProperty instanceof IndexedBinaryPropertyChain) {
-					IndexedBinaryPropertyChain composition = (IndexedBinaryPropertyChain) subProperty;
-					Set<IndexedPropertyChain> leftSubProperties = getRelevantSubProperties(composition
+			Set<IndexedObjectProperty> subProperties = getSubProperties(element);
+			for (IndexedPropertyChain subPropertyChain : getSubPropertyChains(element)) {
+				if (subPropertyChain instanceof IndexedBinaryPropertyChain) {
+					IndexedBinaryPropertyChain composition = (IndexedBinaryPropertyChain) subPropertyChain;
+					Set<IndexedObjectProperty> leftSubProperties = getSubProperties(composition
 							.getLeftProperty());
-					Set<IndexedPropertyChain> commonSubProperties = new LazySetIntersection<IndexedPropertyChain>(
+					Set<IndexedObjectProperty> commonSubProperties = new LazySetIntersection<IndexedObjectProperty>(
 							subProperties, leftSubProperties);
 					if (commonSubProperties.isEmpty())
 						continue;
-					for (IndexedPropertyChain rightSubProperty : getRelevantSubProperties(composition
+					for (IndexedObjectProperty rightSubProperty : getSubProperties(composition
 							.getRightProperty()))
-						if (rightSubProperty instanceof IndexedObjectProperty)
-							for (IndexedPropertyChain commonLeft : commonSubProperties)
-								saturation.leftSubComposableSubPropertiesByRightProperties
-										.add((IndexedObjectProperty) rightSubProperty,
-												commonLeft);
+						for (IndexedObjectProperty commonLeft : commonSubProperties)
+							saturation.leftSubComposableSubPropertiesByRightProperties
+									.add(rightSubProperty, commonLeft);
 				}
 			}
 			saturation.leftSubComposableSubPropertiesByRightPropertiesComputed = true;
-			return saturation.leftSubComposableSubPropertiesByRightProperties;
 		}
+		return saturation.leftSubComposableSubPropertiesByRightProperties;
 	}
 }

@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -52,12 +52,12 @@ public class Propagation extends AbstractConclusion implements Conclusion,
 
 	public static final String NAME = "Propagation";
 
-	private final IndexedPropertyChain relation_;
+	private final IndexedObjectProperty relation_;
 
 	private final IndexedObjectSomeValuesFrom carry_;
 
-	public Propagation(final IndexedPropertyChain relation,
-			final IndexedObjectSomeValuesFrom carry) {
+	public Propagation(IndexedObjectProperty relation,
+			IndexedObjectSomeValuesFrom carry) {
 		relation_ = relation;
 		carry_ = carry;
 	}
@@ -96,15 +96,15 @@ public class Propagation extends AbstractConclusion implements Conclusion,
 	}
 
 	@Override
-	public IndexedPropertyChain getSubRoot() {
+	public IndexedObjectProperty getSubRoot() {
 		return relation_;
 	}
 
 	/**
-	 * @return the {@link IndexedPropertyChain} that is the relation over which
+	 * @return the {@link IndexedObjectProperty} that is the relation over which
 	 *         this {@link Propagation} is applied
 	 */
-	public IndexedPropertyChain getRelation() {
+	public IndexedObjectProperty getRelation() {
 		return this.relation_;
 	}
 

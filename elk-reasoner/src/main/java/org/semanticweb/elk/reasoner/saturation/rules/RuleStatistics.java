@@ -2,12 +2,12 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ForwardLinkFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
@@ -112,6 +112,10 @@ public class RuleStatistics extends AbstractStatistics {
 				ruleCounter.countBackwardLinkChainFromBackwardLinkRule,
 				ruleTimer.timeBackwardLinkChainFromBackwardLinkRule);
 
+		print(printer, BackwardLinkFromForwardLinkRule.NAME,
+				ruleCounter.countBackwardLinkFromForwardLinkRule,
+				ruleTimer.timeBackwardLinkFromForwardLinkRule);
+
 		print(printer, NonReflexiveBackwardLinkCompositionRule.NAME,
 				ruleCounter.countNonReflexiveBackwardLinkCompositionRule,
 				ruleTimer.timeNonReflexiveBackwardLinkCompositionRule);
@@ -143,10 +147,6 @@ public class RuleStatistics extends AbstractStatistics {
 		print(printer, DisjointSubsumerFromMemberRule.NAME,
 				ruleCounter.countDisjointSubsumerFromMemberRule,
 				ruleTimer.timeDisjointSubsumerFromMemberRule);
-
-		print(printer, ForwardLinkFromBackwardLinkRule.NAME,
-				ruleCounter.countForwardLinkFromBackwardLinkRule,
-				ruleTimer.timeForwardLinkFromBackwardLinkRule);
 
 		print(printer, IndexedObjectComplementOfDecomposition.NAME,
 				ruleCounter.countIndexedObjectComplementOfDecomposition,

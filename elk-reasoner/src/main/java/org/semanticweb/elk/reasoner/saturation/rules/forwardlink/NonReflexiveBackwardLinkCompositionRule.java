@@ -25,8 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
 import java.util.Collection;
 import java.util.Map;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -82,25 +83,25 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 	public void apply(ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		/* compose the link with all non-reflexive backward links */
-		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = this.forwardLink_
+		final Multimap<IndexedObjectProperty, IndexedBinaryPropertyChain> comps = this.forwardLink_
 				.getRelation().getSaturated()
 				.getCompositionsByLeftSubProperty();
-		final Map<IndexedPropertyChain, ? extends SubContextPremises> subContextMap = premises
+		final Map<IndexedObjectProperty, ? extends SubContextPremises> subContextMap = premises
 				.getSubContextPremisesByObjectProperty();
 
-		for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
+		for (IndexedObjectProperty backwardRelation : new LazySetIntersection<IndexedObjectProperty>(
 				comps.keySet(), subContextMap.keySet())) {
 
-			Collection<IndexedPropertyChain> compositions = comps
+			Collection<IndexedBinaryPropertyChain> compositions = comps
 					.get(backwardRelation);
 			SubContextPremises subPremises = subContextMap
 					.get(backwardRelation);
 
-			for (IndexedPropertyChain composition : compositions)
+			for (IndexedBinaryPropertyChain composition : compositions)
 				for (IndexedClassExpression source : subPremises
 						.getLinkedRoots()) {
-					producer.produce(this.forwardLink_.getTarget(),
-							new BackwardLink(source, composition));
+					ForwardLink.produceLink(producer, source, composition,
+							forwardLink_.getTarget());
 				}
 		}
 	}

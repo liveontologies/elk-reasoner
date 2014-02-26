@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,20 +25,23 @@ package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionRule;
 
 /**
- * A visitor pattern for {@link ContradictionRule}s
+ * A visitor pattern for {@link ForwardLinkRule}s
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
 public interface ForwardLinkRuleVisitor {
 
+	void visit(BackwardLinkFromForwardLinkRule rule, ForwardLink premise,
+			ContextPremises premises, ConclusionProducer producer);
+
 	void visit(ReflexiveBackwardLinkCompositionRule rule, ForwardLink premise,
 			ContextPremises premises, ConclusionProducer producer);
 
 	void visit(NonReflexiveBackwardLinkCompositionRule rule,
-			ForwardLink premise, ContextPremises premises, ConclusionProducer producer);
+			ForwardLink premise, ContextPremises premises,
+			ConclusionProducer producer);
 
 }

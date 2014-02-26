@@ -23,13 +23,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
 
 /**
  * A {@link Conclusion} that can be used in inferences that are assigned with a
- * {@link IndexedPropertyChain} sub-root ( {@link SubConclusion#getSubRoot()} in
- * addition to the {@link IndexedClassExpression} root
+ * {@link IndexedObjectProperty} sub-root ( {@link SubConclusion#getSubRoot()}
+ * in addition to the {@link IndexedClassExpression} root
  * {@link Conclusion#getSourceRoot(IndexedClassExpression)} .
  * 
  * @author "Yevgeny Kazakov"
@@ -38,11 +38,11 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusio
 public interface SubConclusion extends Conclusion {
 
 	/**
-	 * @return the {@link IndexedPropertyChain} associated with the inferences
+	 * @return the {@link IndexedObjectProperty} associated with the inferences
 	 *         with which this {@link SubConclusion} can be used. All premises
 	 *         of such inferences must return the same {#getSubRoot()}
 	 */
-	public IndexedPropertyChain getSubRoot();
+	public IndexedObjectProperty getSubRoot();
 
 	public <I, O> O accept(SubConclusionVisitor<I, O> visitor, I input);
 

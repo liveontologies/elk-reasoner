@@ -34,9 +34,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  */
 public interface BackwardLinkRuleVisitor extends LinkedBackwardLinkRuleVisitor {
 
-	void visit(ForwardLinkFromBackwardLinkRule rule, BackwardLink premise,
-			ContextPremises premises, ConclusionProducer producer);
-
 	void visit(SubsumerBackwardLinkRule rule, BackwardLink premise,
 			ContextPremises premises, ConclusionProducer producer);
 

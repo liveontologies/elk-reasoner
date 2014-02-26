@@ -26,8 +26,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkObjectIntersectionOf} in an
@@ -38,9 +36,6 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class IndexedObjectIntersectionOf extends IndexedClassExpression {
-
-	protected static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedObjectIntersectionOf.class);
 
 	/**
 	 * The conjunction has only two conjuncts. To ensure uniqueness of a

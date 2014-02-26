@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 
@@ -68,7 +68,7 @@ public class HybridContextPremises implements ContextPremises {
 	}
 
 	@Override
-	public Set<IndexedPropertyChain> getLocalReflexiveObjectProperties() {
+	public Set<IndexedObjectProperty> getLocalReflexiveObjectProperties() {
 		// local
 		return localPremises_.getLocalReflexiveObjectProperties();
 	}
@@ -87,7 +87,7 @@ public class HybridContextPremises implements ContextPremises {
 	}
 
 	@Override
-	public Map<IndexedPropertyChain, ? extends SubContextPremises> getSubContextPremisesByObjectProperty() {
+	public Map<IndexedObjectProperty, ? extends SubContextPremises> getSubContextPremisesByObjectProperty() {
 		// non-local
 		return nonLocalPremises_.getSubContextPremisesByObjectProperty();
 	}

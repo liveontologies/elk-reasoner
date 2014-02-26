@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
@@ -104,7 +105,7 @@ public class PropagationFromExistentialFillerRule extends
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 
-		final Set<IndexedPropertyChain> candidatePropagationProperties = new LazySetUnion<IndexedPropertyChain>(
+		final Set<IndexedObjectProperty> candidatePropagationProperties = new LazySetUnion<IndexedObjectProperty>(
 				premises.getLocalReflexiveObjectProperties(), premises
 						.getSubContextPremisesByObjectProperty().keySet());
 
@@ -116,11 +117,11 @@ public class PropagationFromExistentialFillerRule extends
 		// }
 
 		for (IndexedObjectSomeValuesFrom e : negExistentials_) {
-			IndexedPropertyChain relation = e.getRelation();
+			IndexedObjectProperty relation = e.getRelation();
 			/*
 			 * creating propagations for relevant sub-properties of the relation
 			 */
-			for (IndexedPropertyChain property : new LazySetIntersection<IndexedPropertyChain>(
+			for (IndexedObjectProperty property : new LazySetIntersection<IndexedObjectProperty>(
 					candidatePropagationProperties, relation.getSaturated()
 							.getSubProperties())) {
 				producer.produce(premises.getRoot(), new Propagation(property,
@@ -198,11 +199,11 @@ public class PropagationFromExistentialFillerRule extends
 	 * @param premises
 	 * @param producer
 	 */
-	void applyForProperty(IndexedPropertyChain property,
+	void applyForProperty(IndexedObjectProperty property,
 			ContextPremises premises, ConclusionProducer producer) {
 
 		for (IndexedObjectSomeValuesFrom e : negExistentials_) {
-			if (e.getRelation().getSaturated().getSubProperties()
+			if (e.getRelation().getSaturated().getSubPropertyChains()
 					.contains(property)) {
 				producer.produce(premises.getRoot(), new Propagation(property,
 						e));
@@ -212,7 +213,7 @@ public class PropagationFromExistentialFillerRule extends
 	}
 
 	public static void applyForProperty(Chain<ChainableSubsumerRule> ruleChain,
-			IndexedPropertyChain property, ContextPremises premises,
+			IndexedObjectProperty property, ContextPremises premises,
 			ConclusionProducer producer) {
 		PropagationFromExistentialFillerRule rule = ruleChain.find(MATCHER_);
 

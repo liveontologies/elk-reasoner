@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.propagations;
 import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
@@ -64,7 +64,7 @@ public class NonReflexivePropagationRule extends AbstractPropagationRule {
 	@Override
 	public void apply(Propagation premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		final Map<IndexedPropertyChain, ? extends SubContextPremises> subContextMap = premises
+		final Map<IndexedObjectProperty, ? extends SubContextPremises> subContextMap = premises
 				.getSubContextPremisesByObjectProperty();
 		SubContextPremises targets = subContextMap.get(premise.getRelation());
 		IndexedClassExpression carry = premise.getCarry();

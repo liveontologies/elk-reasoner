@@ -75,7 +75,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 	public void clear() {
 		LOGGER_.trace("Clear cache");
-		
+
 		indexedClassExpressionLookup.clear();
 		indexedPropertyChainLookup.clear();
 		indexedAxiomLookup.clear();
@@ -108,9 +108,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			if (ice.getCompositionRuleHead() != null)
 				throw new ElkUnexpectedIndexingException(
 						"Deleting object with registered rules: " + ice);
-//			Context context = ice.getContext();
-//			if (context != null)
-//				context.removeLinks();
 			if (!ice.accept(deletor))
 				throw new ElkUnexpectedIndexingException(
 						"Cannot remove indexed object from the cache " + ice);
@@ -218,8 +215,8 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			if (indexedClassExpressionLookup.add(element)) {
 				indexedClassCount++;
 				return true;
-			} else
-				return false;
+			}
+			return false;
 		}
 
 		@Override
@@ -228,8 +225,8 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			if (indexedClassExpressionLookup.add(element)) {
 				indexedIndividualCount++;
 				return true;
-			} else
-				return false;
+			}
+			return false;
 		}
 
 		@Override
@@ -267,8 +264,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			LOGGER_.trace("Adding {}", element);
 			if (indexedPropertyChainLookup.add(element)) {
 				indexedObjectPropertyCount++;
-				if (SaturatedPropertyChain.isRelevant(element))
-					SaturatedPropertyChain.getCreate(element);
+				SaturatedPropertyChain.getCreate(element);
 				return true;
 			}
 			return false;
@@ -277,10 +273,9 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		@Override
 		public Boolean visit(IndexedBinaryPropertyChain element) {
 			LOGGER_.trace("Adding {}", element);
-			
+
 			if (indexedPropertyChainLookup.add(element)) {
-				if (SaturatedPropertyChain.isRelevant(element))
-					SaturatedPropertyChain.getCreate(element);
+				SaturatedPropertyChain.getCreate(element);
 				return true;
 			}
 			return false;
@@ -309,8 +304,8 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			if (indexedClassExpressionLookup.removeEntry(element) != null) {
 				indexedClassCount--;
 				return true;
-			} else
-				return false;
+			}
+			return false;
 		}
 
 		@Override
@@ -320,8 +315,8 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			if (indexedClassExpressionLookup.removeEntry(element) != null) {
 				indexedIndividualCount--;
 				return true;
-			} else
-				return false;
+			}
+			return false;
 		}
 
 		@Override
@@ -361,8 +356,8 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			if (indexedPropertyChainLookup.removeEntry(element) != null) {
 				indexedObjectPropertyCount--;
 				return true;
-			} else
-				return false;
+			}
+			return false;
 		}
 
 		@Override

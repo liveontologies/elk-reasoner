@@ -36,12 +36,12 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitializat
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ForwardLinkFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
@@ -107,10 +107,10 @@ public class RuleCounterVisitor implements RuleVisitor {
 	}
 
 	@Override
-	public void visit(NonReflexiveBackwardLinkCompositionRule rule,
+	public void visit(BackwardLinkFromForwardLinkRule rule,
 			ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		counter_.countNonReflexiveBackwardLinkCompositionRule++;
+		counter_.countBackwardLinkFromForwardLinkRule++;
 		visitor_.visit(rule, premise, premises, producer);
 	}
 
@@ -170,14 +170,6 @@ public class RuleCounterVisitor implements RuleVisitor {
 	}
 
 	@Override
-	public void visit(ForwardLinkFromBackwardLinkRule rule,
-			BackwardLink premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		counter_.countForwardLinkFromBackwardLinkRule++;
-		visitor_.visit(rule, premise, premises, producer);
-	}
-
-	@Override
 	public void visit(IndexedObjectComplementOfDecomposition rule,
 			IndexedObjectComplementOf premise, ContextPremises premises,
 			ConclusionProducer producer) {
@@ -199,6 +191,14 @@ public class RuleCounterVisitor implements RuleVisitor {
 			IndexedObjectSomeValuesFrom premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		counter_.countIndexedObjectSomeValuesFromDecomposition++;
+		visitor_.visit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public void visit(NonReflexiveBackwardLinkCompositionRule rule,
+			ForwardLink premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		counter_.countNonReflexiveBackwardLinkCompositionRule++;
 		visitor_.visit(rule, premise, premises, producer);
 	}
 
@@ -242,6 +242,22 @@ public class RuleCounterVisitor implements RuleVisitor {
 	}
 
 	@Override
+	public void visit(PropagationInitializationRule rule,
+			SubContextInitialization premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		counter_.countPropagationInitializationRule++;
+		visitor_.visit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public void visit(ReflexiveBackwardLinkCompositionRule rule,
+			ForwardLink premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		counter_.countReflexiveBackwardLinkCompositionRule++;
+		visitor_.visit(rule, premise, premises, producer);
+	}
+
+	@Override
 	public void visit(ReflexivePropagationRule rule, Propagation premise,
 			ContextPremises premises, ConclusionProducer producer) {
 		counter_.countReflexivePropagationRule++;
@@ -269,22 +285,6 @@ public class RuleCounterVisitor implements RuleVisitor {
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		counter_.countSuperClassFromSubClassRule++;
-		visitor_.visit(rule, premise, premises, producer);
-	}
-
-	@Override
-	public void visit(ReflexiveBackwardLinkCompositionRule rule,
-			ForwardLink premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		counter_.countReflexiveBackwardLinkCompositionRule++;
-		visitor_.visit(rule, premise, premises, producer);
-	}
-
-	@Override
-	public void visit(PropagationInitializationRule rule,
-			SubContextInitialization premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		counter_.countPropagationInitializationRule++;
 		visitor_.visit(rule, premise, premises, producer);
 	}
 

@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contradiction;
 import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
@@ -68,7 +69,7 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 	@Override
 	public void apply(Contradiction premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		final Map<IndexedPropertyChain, ? extends SubContextPremises> subPremises = premises
+		final Map<IndexedObjectProperty, ? extends SubContextPremises> subPremises = premises
 				.getSubContextPremisesByObjectProperty();
 		// no need to propagate over reflexive links
 		for (IndexedPropertyChain propRelation : subPremises.keySet()) {

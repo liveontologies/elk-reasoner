@@ -24,12 +24,12 @@ package org.semanticweb.elk.reasoner.saturation.rules;
 
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ForwardLinkFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
@@ -61,6 +61,11 @@ public class RuleApplicationTimer {
 	 * timer for {@link BackwardLinkChainFromBackwardLinkRule}
 	 */
 	int timeBackwardLinkChainFromBackwardLinkRule;
+
+	/**
+	 * timer for {@link BackwardLinkFromForwardLinkRule}
+	 */
+	int timeBackwardLinkFromForwardLinkRule;
 
 	/**
 	 * time for {@link ContradicitonCompositionRule}
@@ -96,11 +101,6 @@ public class RuleApplicationTimer {
 	 * timer for {@link DisjointSubsumerFromMemberRule}
 	 */
 	int timeDisjointSubsumerFromMemberRule;
-
-	/**
-	 * time for {@link ForwardLinkFromBackwardLinkRule}
-	 */
-	int timeForwardLinkFromBackwardLinkRule;
 
 	/**
 	 * timer for {@link IndexedObjectComplementOfDecomposition}
@@ -201,12 +201,12 @@ public class RuleApplicationTimer {
 		timeContradicitonCompositionRule += timer.timeContradicitonCompositionRule;
 		timeIndexedObjectIntersectionOfDecomposition += timer.timeIndexedObjectIntersectionOfDecomposition;
 		timeIndexedObjectSomeValuesFromDecomposition += timer.timeIndexedObjectSomeValuesFromDecomposition;
-		timeForwardLinkFromBackwardLinkRule += timer.timeForwardLinkFromBackwardLinkRule;
 		timeIndexedObjectComplementOfDecomposition += timer.timeIndexedObjectComplementOfDecomposition;
 		timeContradictionFromOwlNothingRule += timer.timeContradictionFromOwlNothingRule;
 		timeNonReflexivePropagationRule += timer.timeNonReflexivePropagationRule;
 		timeReflexivePropagationRule += timer.timeReflexivePropagationRule;
 		timePropagationInitializationRule += timer.timePropagationInitializationRule;
+		timeBackwardLinkFromForwardLinkRule += timer.timeBackwardLinkFromForwardLinkRule;
 	}
 
 	public int getTotalRuleAppTime() {
@@ -227,12 +227,12 @@ public class RuleApplicationTimer {
 				+ timeReflexiveBackwardLinkCompositionRule
 				+ timeIndexedObjectIntersectionOfDecomposition
 				+ timeIndexedObjectSomeValuesFromDecomposition
-				+ timeForwardLinkFromBackwardLinkRule
 				+ timeIndexedObjectComplementOfDecomposition
 				+ timeContradictionFromOwlNothingRule
 				+ timeNonReflexivePropagationRule
 				+ timeReflexivePropagationRule
-				+ timePropagationInitializationRule;
+				+ timePropagationInitializationRule
+				+ timeBackwardLinkFromForwardLinkRule;
 	}
 
 	/**
@@ -257,12 +257,12 @@ public class RuleApplicationTimer {
 		timeReflexiveBackwardLinkCompositionRule = 0;
 		timeIndexedObjectIntersectionOfDecomposition = 0;
 		timeIndexedObjectSomeValuesFromDecomposition = 0;
-		timeForwardLinkFromBackwardLinkRule = 0;
 		timeIndexedObjectComplementOfDecomposition = 0;
 		timeContradictionFromOwlNothingRule = 0;
 		timeNonReflexivePropagationRule = 0;
 		timeReflexivePropagationRule = 0;
 		timePropagationInitializationRule = 0;
+		timeBackwardLinkFromForwardLinkRule = 0;
 	}
 
 }

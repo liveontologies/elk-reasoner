@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
+package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
 
 /*
  * #%L
@@ -22,6 +22,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
@@ -29,21 +31,18 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 
 /**
- * A {@link BackwardLinkRule} applied when processing {@link BackwardLink}
- * producing the corresponding {@link ForwardLink} if the relation of this
- * {@link BackwardLink} can be composed with other {@link IndexedPropertyChain}s
- * 
- * @see {@link BackwardLink#getRelation()}
+ * A {@link ForwardLinkRule} applied when processing {@link ForwardLink}
+ * producing the corresponding {@link BackwardLink}
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ForwardLinkFromBackwardLinkRule extends AbstractBackwardLinkRule {
+public class BackwardLinkFromForwardLinkRule extends AbstractForwardLinkRule {
 
-	public static final String NAME = "ForwardLink from BackwardLink";
+	public static final String NAME = "BackwardLink from ForwardLink";
 
-	private static final ForwardLinkFromBackwardLinkRule INSTANCE_ = new ForwardLinkFromBackwardLinkRule();
+	private static final BackwardLinkFromForwardLinkRule INSTANCE_ = new BackwardLinkFromForwardLinkRule();
 
-	public static ForwardLinkFromBackwardLinkRule getInstance() {
+	public static BackwardLinkFromForwardLinkRule getInstance() {
 		return INSTANCE_;
 	}
 
@@ -53,23 +52,25 @@ public class ForwardLinkFromBackwardLinkRule extends AbstractBackwardLinkRule {
 	}
 
 	@Override
-	public void apply(BackwardLink premise, ContextPremises premises,
+	public void apply(ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		IndexedPropertyChain premiseRelation = premise.getRelation();
-		/*
-		 * convert backward link to a forward link if it can potentially be
-		 * composed
-		 */
-		if (!premiseRelation.getSaturated().getCompositionsByLeftSubProperty()
-				.isEmpty()) {
-			producer.produce(premise.getSource(), new ForwardLink(
-					premiseRelation, premises.getRoot()));
+		IndexedPropertyChain relation = premise.getRelation();
+		IndexedClassExpression source = premises.getRoot();
+		IndexedClassExpression target = premise.getTarget();
+		if (relation instanceof IndexedObjectProperty)
+			producer.produce(target, new BackwardLink(source,
+					(IndexedObjectProperty) relation));
+		else {
+			for (IndexedObjectProperty toldSuper : relation
+					.getToldSuperProperties()) {
+				producer.produce(target, new BackwardLink(source, toldSuper));
+			}
 		}
 
 	}
 
 	@Override
-	public void accept(BackwardLinkRuleVisitor visitor, BackwardLink premise,
+	public void accept(ForwardLinkRuleVisitor visitor, ForwardLink premise,
 			ContextPremises premises, ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 	}

@@ -22,9 +22,11 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -60,8 +62,8 @@ public class IndexedObjectSomeValuesFromDecomposition extends
 	@Override
 	public void apply(IndexedObjectSomeValuesFrom premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		producer.produce(premise.getFiller(),
-				new BackwardLink(premises.getRoot(), premise.getRelation()));
+		ForwardLink.produceLink(producer, premises.getRoot(),
+				premise.getRelation(), premise.getFiller());
 	}
 
 	@Override

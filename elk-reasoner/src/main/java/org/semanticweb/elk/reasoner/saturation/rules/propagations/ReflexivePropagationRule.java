@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.propagations;
 
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
@@ -61,7 +61,7 @@ public class ReflexivePropagationRule extends AbstractPropagationRule {
 	@Override
 	public void apply(Propagation premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		final Set<IndexedPropertyChain> reflexive = premises
+		final Set<IndexedObjectProperty> reflexive = premises
 				.getLocalReflexiveObjectProperties();
 		if (reflexive.contains(premise.getRelation()))
 			producer.produce(premises.getRoot(),

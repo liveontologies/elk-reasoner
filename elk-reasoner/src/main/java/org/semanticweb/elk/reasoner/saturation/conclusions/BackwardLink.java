@@ -23,13 +23,13 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ForwardLinkFromBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkedBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 
@@ -57,13 +57,13 @@ public class BackwardLink extends AbstractConclusion implements Conclusion,
 	private final IndexedClassExpression source_;
 
 	/**
-	 * the {@link IndexedPropertyChain} in the existential restriction
+	 * the {@link IndexedObjectProperty} in the existential restriction
 	 * corresponding to this link
 	 */
-	private final IndexedPropertyChain relation_;
+	private final IndexedObjectProperty relation_;
 
 	public BackwardLink(IndexedClassExpression source,
-			IndexedPropertyChain relation) {
+			IndexedObjectProperty relation) {
 		this.relation_ = relation;
 		this.source_ = source;
 	}
@@ -72,8 +72,6 @@ public class BackwardLink extends AbstractConclusion implements Conclusion,
 	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
 
-		ruleAppVisitor.visit(ForwardLinkFromBackwardLinkRule.getInstance(),
-				this, premises, producer);
 		ruleAppVisitor.visit(SubsumerBackwardLinkRule.getInstance(), this,
 				premises, producer);
 
@@ -93,7 +91,7 @@ public class BackwardLink extends AbstractConclusion implements Conclusion,
 	}
 
 	@Override
-	public IndexedPropertyChain getSubRoot() {
+	public IndexedObjectProperty getSubRoot() {
 		return relation_;
 	}
 
@@ -116,7 +114,7 @@ public class BackwardLink extends AbstractConclusion implements Conclusion,
 	 * @return the {@link IndexedPropertyChain} that is the relation of this
 	 *         {@link BackwardLink}
 	 */
-	public IndexedPropertyChain getRelation() {
+	public IndexedObjectProperty getRelation() {
 		return relation_;
 	}
 

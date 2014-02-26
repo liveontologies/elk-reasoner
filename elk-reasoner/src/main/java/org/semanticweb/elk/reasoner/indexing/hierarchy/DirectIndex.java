@@ -40,17 +40,12 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 
  * 
  */
 public class DirectIndex implements ModifiableOntologyIndex {
-
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(DirectIndex.class);
 
 	final IndexedClass indexedOwlThing, indexedOwlNothing;
 
@@ -228,12 +223,6 @@ public class DirectIndex implements ModifiableOntologyIndex {
 		if (!oldObject.accept(objectCache.deletor))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove indexed object from the cache " + oldObject);
-//		if (oldObject instanceof IndexedClassExpression) {
-//			IndexedClassExpression ice = (IndexedClassExpression) oldObject;
-//			Context context = ice.getContext();
-//			if (context != null)
-//				context.removeLinks();
-//		}
 	}
 
 	@Override

@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
@@ -66,37 +67,14 @@ public interface ContextPremises {
 	 *         corresponding {@link IndexedPropertyChain}s. The
 	 *         {@link SubContextPremises} store {@link Conclusion}s that can be
 	 *         used as premises of rules that are associated with the
-	 *         corresponding sub-root {@link IndexedPropertyChain} in addition
+	 *         corresponding sub-root {@link IndexedObjectProperty} in addition
 	 *         to the root {@link IndexedClassExpression}
 	 * @see SubContextPremises
 	 */
-	public Map<IndexedPropertyChain, ? extends SubContextPremises> getSubContextPremisesByObjectProperty();
+	public Map<IndexedObjectProperty, ? extends SubContextPremises> getSubContextPremisesByObjectProperty();
 
 	/**
-	 * @return the {@link ContextPremises}s different from this
-	 *         {@link ContextPremises} from which there exists an (implied)
-	 *         "existential relation" with this {@link ContextPremises} indexed
-	 *         by the {@link IndexedPropertyChain} of this relation. For
-	 *         example, if the input ontology contains an axiom
-	 *         {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B)} then an
-	 *         existential link between {@code :A} and {@code :B} with property
-	 *         {@code :r} will be created. For technical reasons, this link is
-	 *         stored in the {@link ContextPremises} for {@code :B}, as a
-	 *         "backward link" {@code <:r, :A>} indexed by {@code :r} in the
-	 *         {@link Multimap} returned by this method. This link is saved only
-	 *         if {@code :A} is different from {@code :B}. If they are the same,
-	 *         then the property {@code :r} is saved as a local reflexive
-	 *         property for the root {@code :B = :A}. The returned
-	 *         {@link Multimap} is not thread safe and concurrent access should
-	 *         be properly synchronized. This is never {@code null}.
-	 * 
-	 * @see #getLocalReflexiveObjectProperties()
-	 */
-	// public Multimap<IndexedPropertyChain, IndexedClassExpression>
-	// getBackwardLinksByObjectProperty();
-
-	/**
-	 * @return the {@link IndexedPropertyChain}s representing all derived
+	 * @return the {@link IndexedObjectProperty}s representing all derived
 	 *         "local reflexive" existential restrictions, i.e., conclusions of
 	 *         the form {@code SubClassOf(:A ObjectSomeValuesFrom(:r :A)}. In
 	 *         this case {@code :r} is saved as a reflexive property in the
@@ -104,7 +82,7 @@ public interface ContextPremises {
 	 *         and concurrent access should be properly synchronized. It is
 	 *         never {@code null}.
 	 */
-	public Set<IndexedPropertyChain> getLocalReflexiveObjectProperties();
+	public Set<IndexedObjectProperty> getLocalReflexiveObjectProperties();
 
 	/**
 	 * @return the first backward link rule assigned to this

@@ -26,12 +26,9 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkObjectSomeValuesFrom} in an
@@ -42,9 +39,6 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
-
-	protected static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedObjectSomeValuesFrom.class);
 
 	protected final IndexedObjectProperty property;
 
@@ -102,13 +96,13 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	/**
 	 * Generates {@link Propagation}s for the {@link ContextPremises} that apply
-	 * for the given {@link IndexedPropertyChain}
+	 * for the given {@link IndexedObjectProperty}
 	 * 
 	 * @param property
 	 * @param premises
 	 * @param producer
 	 */
-	public static void generatePropagations(IndexedPropertyChain property,
+	public static void generatePropagations(IndexedObjectProperty property,
 			ContextPremises premises, ConclusionProducer producer) {
 		for (IndexedClassExpression ice : premises.getSubsumers()) {
 			PropagationFromExistentialFillerRule

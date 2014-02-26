@@ -22,12 +22,15 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.slf4j.Logger;
@@ -48,7 +51,7 @@ import org.slf4j.LoggerFactory;
 public class ForwardLink extends AbstractConclusion {
 
 	static final Logger LOGGER_ = LoggerFactory.getLogger(ForwardLink.class);
-	
+
 	public static final String NAME = "Forward Link";
 
 	/**
@@ -78,23 +81,24 @@ public class ForwardLink extends AbstractConclusion {
 	}
 
 	@Override
-	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
+	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
-		// compose with all backward links
-		ruleAppVisitor.visit(
-				NonReflexiveBackwardLinkCompositionRule.getRuleFor(this), this,
-				premises, producer);
+		// generate backward links
+		ruleAppVisitor.visit(BackwardLinkFromForwardLinkRule.getInstance(),
+				this, premises, producer);
+		// compose only with reflexive backward links
 		ruleAppVisitor.visit(
 				ReflexiveBackwardLinkCompositionRule.getRuleFor(this), this,
 				premises, producer);
 	}
 
 	@Override
-	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor,
+	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
-		// compose only with reflexive backward links
+		applyNonRedundantLocalRules(ruleAppVisitor, premises, producer);
+		// in addition, compose with non-reflexive backward links
 		ruleAppVisitor.visit(
-				ReflexiveBackwardLinkCompositionRule.getRuleFor(this), this,
+				NonReflexiveBackwardLinkCompositionRule.getRuleFor(this), this,
 				premises, producer);
 	}
 
@@ -106,5 +110,53 @@ public class ForwardLink extends AbstractConclusion {
 	@Override
 	public String toString() {
 		return relation_ + "->" + target_;
+	}
+
+	// TODO: find a better place for the following methods
+
+	/**
+	 * Producing {@link ForwardLink} or {@link BackwardLink} with the given
+	 * parameters using the given {@link ConclusionProducer} depending on
+	 * whether the link can participate in role composition rules.
+	 * 
+	 * @param producer
+	 * @param source
+	 * @param relation
+	 * @param target
+	 */
+	public static void produceLink(ConclusionProducer producer,
+			IndexedClassExpression source, IndexedObjectProperty relation,
+			IndexedClassExpression target) {
+
+		if (relation.getSaturated().getCompositionsByLeftSubProperty()
+				.isEmpty()) {
+			producer.produce(target, new BackwardLink(source, relation));
+		} else {
+			producer.produce(source, new ForwardLink(relation, target));
+		}
+	}
+
+	/**
+	 * @see #produceLink(ConclusionProducer, IndexedClassExpression,
+	 *      IndexedObjectProperty, IndexedClassExpression)
+	 * 
+	 * @param producer
+	 * @param source
+	 * @param relation
+	 * @param target
+	 */
+	public static void produceLink(ConclusionProducer producer,
+			IndexedClassExpression source, IndexedBinaryPropertyChain relation,
+			IndexedClassExpression target) {
+
+		if (relation.getSaturated().getCompositionsByLeftSubProperty()
+				.isEmpty()) {
+			for (IndexedObjectProperty toldSuper : relation
+					.getToldSuperProperties()) {
+				producer.produce(target, new BackwardLink(source, toldSuper));
+			}
+		} else {
+			producer.produce(source, new ForwardLink(relation, target));
+		}
 	}
 }

@@ -25,7 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
 import java.util.Collection;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -46,6 +47,7 @@ import org.semanticweb.elk.util.collections.Multimap;
  */
 public class ReflexiveBackwardLinkCompositionRule extends
 		AbstractForwardLinkRule {
+	// local rule
 
 	public static final String NAME = "ForwardLink Reflexive BackwardLink Composition";
 
@@ -81,21 +83,21 @@ public class ReflexiveBackwardLinkCompositionRule extends
 	public void apply(ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		/* compose the link with all reflexive backward links */
-		final Multimap<IndexedPropertyChain, IndexedPropertyChain> comps = this.forwardLink_
+		final Multimap<IndexedObjectProperty, IndexedBinaryPropertyChain> comps = this.forwardLink_
 				.getRelation().getSaturated()
 				.getCompositionsByLeftSubProperty();
-		final Set<IndexedPropertyChain> reflexiveBackwardRelations = premises
+		final Set<IndexedObjectProperty> reflexiveBackwardRelations = premises
 				.getLocalReflexiveObjectProperties();
 
-		for (IndexedPropertyChain backwardRelation : new LazySetIntersection<IndexedPropertyChain>(
+		for (IndexedObjectProperty backwardRelation : new LazySetIntersection<IndexedObjectProperty>(
 				comps.keySet(), reflexiveBackwardRelations)) {
 
-			Collection<IndexedPropertyChain> compositions = comps
+			Collection<IndexedBinaryPropertyChain> compositions = comps
 					.get(backwardRelation);
 
-			for (IndexedPropertyChain composition : compositions)
-				producer.produce(this.forwardLink_.getTarget(),
-						new BackwardLink(premises.getRoot(), composition));
+			for (IndexedBinaryPropertyChain composition : compositions)
+				ForwardLink.produceLink(producer, premises.getRoot(),
+						composition, forwardLink_.getTarget());
 		}
 	}
 

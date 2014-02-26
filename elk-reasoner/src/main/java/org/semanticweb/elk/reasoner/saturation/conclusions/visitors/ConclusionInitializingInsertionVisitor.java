@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
@@ -67,7 +68,7 @@ public class ConclusionInitializingInsertionVisitor extends
 		if (!context.containsConclusion(contextInitConclusion_))
 			producer_.produce(context.getRoot(), contextInitConclusion_);
 		if (conclusion instanceof SubConclusion) {
-			IndexedPropertyChain subRoot = ((SubConclusion) conclusion)
+			IndexedObjectProperty subRoot = ((SubConclusion) conclusion)
 					.getSubRoot();
 			SubConclusion subContextInit = new SubContextInitialization(subRoot);
 			if (!context.containsConclusion(subContextInit))

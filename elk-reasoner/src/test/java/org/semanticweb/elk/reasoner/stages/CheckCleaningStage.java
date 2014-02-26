@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
@@ -85,7 +86,7 @@ public class CheckCleaningStage extends BasePostProcessingStage {
 			Context context = reasoner_.saturationState.getContext(ice);
 			if (context == null)
 				continue;
-			Map<IndexedPropertyChain, ? extends SubContextPremises> subContextMap = context
+			Map<IndexedObjectProperty, ? extends SubContextPremises> subContextMap = context
 					.getSubContextPremisesByObjectProperty();
 			for (IndexedPropertyChain ipc : subContextMap.keySet()) {
 				for (IndexedClassExpression target : subContextMap.get(ipc)

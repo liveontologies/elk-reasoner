@@ -113,8 +113,9 @@ public class IndexedPropertyChainSaturationTest {
 			for (IndexedPropertyChain chain : chains) {
 				VerifySymmetricPropertySaturation.testLeftCompositions(chain,
 						hook);
-				VerifySymmetricPropertySaturation.testRightCompositions(chain,
-						hook);
+				if (chain instanceof IndexedObjectProperty)
+					VerifySymmetricPropertySaturation.testRightCompositions(
+							(IndexedObjectProperty) chain, hook);
 			}
 		}
 	}
@@ -193,14 +194,10 @@ public class IndexedPropertyChainSaturationTest {
 
 		computation.process();
 
-		// depending on the flag, we get different compositions
-		IndexedPropertyChain composition = SaturatedPropertyChain.REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES ? H
-				: RR;
-
 		assertTrue(R.getSaturated().getCompositionsByLeftSubProperty().get(R)
-				.contains(composition));
+				.contains(RR));
 		assertTrue(R.getSaturated().getCompositionsByRightSubProperty().get(R)
-				.contains(composition));
+				.contains(RR));
 	}
 
 	/**
