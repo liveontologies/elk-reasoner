@@ -61,16 +61,16 @@ import org.slf4j.LoggerFactory;
  *         pavel.klinov@uni-ulm.de
  */
 public class RuleApplicationAdditionPruningFactory extends
-		AbstractRuleApplicationFactory {
+		AbstractRuleApplicationFactory<ExtendedContext> {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RuleApplicationAdditionPruningFactory.class);
 
-	private final SaturationState<?> mainSaturationState_;
+	private final SaturationState<? extends Context> mainSaturationState_;
 
 	public RuleApplicationAdditionPruningFactory(
-			SaturationState<?> mainSaturationState) {
+			SaturationState<? extends Context> mainSaturationState) {
 		/**
 		 * We use a "local" {@link SaturationState} to iterate over
 		 * {@link Conclusion}s stored within {@link Context}s of the main
@@ -86,7 +86,7 @@ public class RuleApplicationAdditionPruningFactory extends
 	@Override
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter<?> localWriter,
+			RuleVisitor ruleVisitor, SaturationStateWriter<? extends ExtendedContext> localWriter,
 			SaturationStatistics localStatistics) {
 		return new ComposedConclusionVisitor<Context>(
 		// checking the conclusion against the main saturation state

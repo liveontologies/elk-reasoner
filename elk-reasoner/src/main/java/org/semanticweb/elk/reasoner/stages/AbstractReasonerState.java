@@ -55,6 +55,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.OnDemandTracingReader;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.SimpleCentralizedTraceStore;
@@ -89,7 +90,7 @@ public abstract class AbstractReasonerState {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractReasonerState.class);
 
-	final SaturationState<?> saturationState;
+	final SaturationState<? extends Context> saturationState;
 
 	/**
 	 * Accumulated statistics regarding produced conclusions and rule

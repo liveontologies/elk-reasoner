@@ -47,7 +47,6 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleApplicationFactory;
-import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
@@ -78,13 +77,12 @@ import org.slf4j.LoggerFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplicationFactory {
+public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplicationFactory<TracedContext> {
 	
 	private final static boolean CYCLE_AVOIDANCE = true;
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory	.getLogger(CycleBlockingRuleApplicationFactory.class);
 	
-	//private final LocalTracingSaturationState tracingState_;
 	private final SaturationState<?> mainSaturationState_;
 	
 	private final TraceStore.Writer inferenceWriter_;
@@ -103,7 +101,7 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor,
-			SaturationStateWriter<?> localWriter/*this producer is responsible for blocking cyclic inferences*/,
+			SaturationStateWriter<? extends TracedContext> localWriter/*this producer is responsible for blocking cyclic inferences*/,
 			SaturationStatistics statistics) {
 		
 		SaturationStateWriter<?> cycleBlocker = new CycleBlockingWriter(localWriter);
@@ -125,28 +123,26 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 	@Override
 	public void dispose() {
 		super.dispose();
-		/*for (Context cxt : tracingState_.getContexts()) {
-			TracedContext context = (TracedContext) cxt;
-
+		//cleaning blocked inferences
+		for (TracedContext context : getSaturationState().getContexts()) {
 			context.cleanBlockedInferences();
-		}*/
+		}
 	}
 
 	/**
-	 * Checks for cycles
+	 * Blocks cyclic inferences when producing conclusions.
 	 */
-	private class CycleBlockingWriter extends SaturationStateWriterWrap {
+	private class CycleBlockingWriter extends SaturationStateWriterWrap<TracedContext> {
 
-		public CycleBlockingWriter(SaturationStateWriter<?> writer) {
+		public CycleBlockingWriter(SaturationStateWriter<? extends TracedContext> writer) {
 			super(writer);
 		}
 
 		@Override
 		public void produce(IndexedClassExpression root, Conclusion conclusion) {
-			//FIXME parameterize to get rid of the cast
-			final LocalTracingSaturationState tracingState = (LocalTracingSaturationState)CycleBlockingRuleApplicationFactory.this.getSaturationState();
-			// no need to check for duplicates since rules for all conclusions
-			// are applied only once.			
+			final SaturationState<? extends TracedContext> tracingState = CycleBlockingRuleApplicationFactory.this.getSaturationState();
+			// no need to check for duplicates of inferences since rules for all
+			// conclusions are applied only once.
 			final TracedContext thisContext = tracingState.getContext(root);
 			
 			if (thisContext == null || !(conclusion instanceof Inference) || !CYCLE_AVOIDANCE) {

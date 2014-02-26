@@ -107,7 +107,7 @@ public class IncrementalAdditionInitializationStage extends
 		// first, create and init contexts for new classes
 		final IndexObjectConverter converter = reasoner.objectCache_
 				.getIndexObjectConverter();
-		final SaturationStateWriter writer =
+		final SaturationStateWriter<?> writer =
 
 		SaturationUtils.getStatsAwareWriter(reasoner.saturationState
 				.getContextCreatingWriter(contextCreationListener,

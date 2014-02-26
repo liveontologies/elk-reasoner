@@ -46,14 +46,14 @@ public class RuleApplicationDeletionNotSaturatedFactory extends
 		RuleApplicationDeletionFactory {
 
 	public RuleApplicationDeletionNotSaturatedFactory(
-			final SaturationState<?> saturationState) {
+			final SaturationState<? extends Context> saturationState) {
 		super(saturationState);
 	}
 
 	@Override
-	SaturationStateWriter<?> getFinalWriter(SaturationStateWriter<?> writer) {
+	SaturationStateWriter<Context> getFinalWriter(SaturationStateWriter<? extends Context> writer) {
 		// only write to non-saturated contexts
-		return new SaturationCheckingWriter(writer, getSaturationState());
+		return new SaturationCheckingWriter<Context>(writer, getSaturationState());
 	}
 
 }

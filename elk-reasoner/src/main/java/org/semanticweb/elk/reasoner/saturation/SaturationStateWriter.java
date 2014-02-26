@@ -44,7 +44,7 @@ public interface SaturationStateWriter<C extends Context> extends ConclusionProd
 	 * @return the {@link SaturationState} modified by this
 	 *         {@link SaturationStateWriter}
 	 */
-	public SaturationState<C> getSaturationState();
+	public SaturationState<? extends C> getSaturationState();
 
 	/**
 	 * Removes and returns the next active {@link Context} of the

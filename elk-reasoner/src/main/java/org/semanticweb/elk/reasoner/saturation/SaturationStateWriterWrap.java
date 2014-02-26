@@ -35,11 +35,11 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class SaturationStateWriterWrap implements SaturationStateWriter {
+public class SaturationStateWriterWrap<C extends Context> implements SaturationStateWriter<C> {
 
-	protected final SaturationStateWriter mainWriter;
+	protected final SaturationStateWriter<? extends C> mainWriter;
 
-	public SaturationStateWriterWrap(SaturationStateWriter mainWriter) {
+	public SaturationStateWriterWrap(SaturationStateWriter<? extends C> mainWriter) {
 		this.mainWriter = mainWriter;
 	}
 
@@ -64,7 +64,7 @@ public class SaturationStateWriterWrap implements SaturationStateWriter {
 	}
 
 	@Override
-	public SaturationState getSaturationState() {
+	public SaturationState<? extends C> getSaturationState() {
 		return mainWriter.getSaturationState();
 	}
 
