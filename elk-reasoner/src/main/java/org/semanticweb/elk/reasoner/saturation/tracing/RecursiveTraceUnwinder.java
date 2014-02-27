@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractInferenceVisitor;
@@ -101,15 +101,13 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 			}
 
 			unwind(next.getFirst(), next.getSecond(), unwindingState,
-					conclusionVisitor, inferenceVisitor);
+					inferenceVisitor);
 		}
 	}
 
-	private void unwind(
-			Conclusion conclusion,
+	private void unwind(Conclusion conclusion,
 			final IndexedClassExpression rootWhereStored,
 			final TraceUnwindingState unwindingState,
-			final ConclusionVisitor<IndexedClassExpression, ?> conclusionVisitor,
 			final InferenceVisitor<IndexedClassExpression, ?> inferenceVisitor) {
 
 		final PremiseVisitor<IndexedClassExpression, ?> premiseVisitor = new PremiseVisitor<IndexedClassExpression, Void>() {

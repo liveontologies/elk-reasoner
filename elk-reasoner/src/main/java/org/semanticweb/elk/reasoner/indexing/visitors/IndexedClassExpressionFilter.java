@@ -39,4 +39,5 @@ public interface IndexedClassExpressionFilter extends
 		IndexedObjectUnionOfVisitor<IndexedObjectUnionOf>,
 		IndexedDataHasValueVisitor<IndexedDataHasValue> {
 
+	// nothing else
 }

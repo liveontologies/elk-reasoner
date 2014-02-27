@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
@@ -42,8 +42,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalizedCon
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.CombinedConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link RuleApplicationFactory} that applies non-redundant rules to
@@ -63,10 +61,6 @@ import org.slf4j.LoggerFactory;
 public class RuleApplicationAdditionPruningFactory extends
 		AbstractRuleApplicationFactory<ExtendedContext> {
 
-	// logger for this class
-	protected static final Logger LOGGER_ = LoggerFactory
-			.getLogger(RuleApplicationAdditionPruningFactory.class);
-
 	private final SaturationState<? extends Context> mainSaturationState_;
 
 	public RuleApplicationAdditionPruningFactory(
@@ -79,14 +73,17 @@ public class RuleApplicationAdditionPruningFactory extends
 		 * {@link Context} s in the main {@link SaturationState} to keep track
 		 * of {@link Context}s to which the rules are already applied.
 		 */
-		super(new MapSaturationState<ExtendedContext>(mainSaturationState.getOntologyIndex(), new MainContextFactory()));
+		super(new MapSaturationState<ExtendedContext>(
+				mainSaturationState.getOntologyIndex(),
+				new MainContextFactory()));
 		this.mainSaturationState_ = mainSaturationState;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter<? extends ExtendedContext> localWriter,
+			RuleVisitor ruleVisitor,
+			SaturationStateWriter<? extends ExtendedContext> localWriter,
 			SaturationStatistics localStatistics) {
 		return new ComposedConclusionVisitor<Context>(
 		// checking the conclusion against the main saturation state

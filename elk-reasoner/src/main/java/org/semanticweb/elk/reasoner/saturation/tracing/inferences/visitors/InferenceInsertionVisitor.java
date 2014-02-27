@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
@@ -34,24 +34,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A conclusion visitor which saves inferences using a {@link TraceStore.Writer}.
+ * A conclusion visitor which saves inferences using a {@link TraceStore.Writer}
+ * .
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class InferenceInsertionVisitor extends AbstractConclusionVisitor<Context, Boolean> {
+public class InferenceInsertionVisitor extends
+		AbstractConclusionVisitor<Context, Boolean> {
 
-	protected static final Logger LOGGER_ = LoggerFactory.getLogger(InferenceInsertionVisitor.class);
-	
+	protected static final Logger LOGGER_ = LoggerFactory
+			.getLogger(InferenceInsertionVisitor.class);
+
 	private final TraceStore.Writer traceWriter_;
 
 	private final InferenceVisitor<Context, Boolean> tracedVisitor_ = new AbstractInferenceVisitor<Context, Boolean>() {
 
 		@Override
-		protected Boolean defaultTracedVisit(Inference conclusion, Context context) {
+		protected Boolean defaultTracedVisit(Inference conclusion,
+				Context context) {
 			traceWriter_.addInference(context.getRoot(), conclusion);
-			
+
 			return true;
 		}
 	};
@@ -66,17 +70,18 @@ public class InferenceInsertionVisitor extends AbstractConclusionVisitor<Context
 	protected InferenceVisitor<Context, Boolean> getTracedConclusionVisitor() {
 		return tracedVisitor_;
 	}
-	
+
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
 		if (conclusion instanceof Inference) {
-			return ((Inference) conclusion).acceptTraced(getTracedConclusionVisitor(), cxt);	
+			return ((Inference) conclusion).acceptTraced(
+					getTracedConclusionVisitor(), cxt);
 		}
-		else {
-			LOGGER_.warn("Tracing is ON but {} does not contain tracing information", conclusion);
-			
-			return true;
-		}
+		LOGGER_.warn(
+				"Tracing is ON but {} does not contain tracing information",
+				conclusion);
+
+		return true;
 	}
 
 }

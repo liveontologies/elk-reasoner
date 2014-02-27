@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.HybridContextPremises;
@@ -59,7 +59,7 @@ public class HybridLocalRuleApplicationConclusionVisitor extends
 	/**
 	 * the main {@link SaturationState} to take the non-local premises from
 	 */
-	private final SaturationState mainState_;
+	private final SaturationState<?> mainState_;
 
 	/**
 	 * a {@link RuleVisitor} for non-redundant rule applications
@@ -84,7 +84,7 @@ public class HybridLocalRuleApplicationConclusionVisitor extends
 	private final ConclusionProducer redundantProducer_;
 
 	public HybridLocalRuleApplicationConclusionVisitor(
-			SaturationState mainState, RuleVisitor nonRedundantRuleVisitor,
+			SaturationState<?> mainState, RuleVisitor nonRedundantRuleVisitor,
 			RuleVisitor redundantRuleVisitor,
 			ConclusionProducer nonRedundantProducer,
 			ConclusionProducer redundantProducer) {

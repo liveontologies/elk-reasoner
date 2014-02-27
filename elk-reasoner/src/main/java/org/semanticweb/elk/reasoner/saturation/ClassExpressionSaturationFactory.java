@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -79,7 +79,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * The rule application engine used internally for execution of the
 	 * saturation rules.
 	 */
-	private final RuleApplicationFactory ruleApplicationFactory_;
+	private final RuleApplicationFactory<?> ruleApplicationFactory_;
 	/**
 	 * The cached {@link SaturationState} used by the
 	 * {@link RuleApplicationFactory}
@@ -185,7 +185,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 *            the listener object implementing callback functions
 	 */
 	public ClassExpressionSaturationFactory(
-			RuleApplicationFactory ruleAppFactory, int maxWorkers,
+			RuleApplicationFactory<?> ruleAppFactory, int maxWorkers,
 			ClassExpressionSaturationListener<J> listener) {
 		this.threshold_ = 64 + 32 * maxWorkers;
 		this.listener_ = listener;
@@ -208,7 +208,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 *            the maximum number of workers that can use this factory
 	 */
 	public ClassExpressionSaturationFactory(
-			RuleApplicationFactory ruleAppFactory, int maxWorkers) {
+			RuleApplicationFactory<?> ruleAppFactory, int maxWorkers) {
 		/* we use a dummy listener */
 		this(ruleAppFactory, maxWorkers,
 				new ClassExpressionSaturationListener<J>() {

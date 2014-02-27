@@ -59,6 +59,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class IndexedPropertyChainSaturationTest {
 
+	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
 	public void testPropertyCompositionSymmetry() {
@@ -125,6 +126,7 @@ public class IndexedPropertyChainSaturationTest {
 	 * compositionsByLeftSubProperty and compositionsByRightSubProperty work
 	 * correctly and don't fall into an infinite cycle
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void testCyclicCompositions() {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
@@ -316,9 +318,9 @@ public class IndexedPropertyChainSaturationTest {
 			}
 
 			@Override
-			public Boolean visit(IndexedBinaryPropertyChain chain) {
-				return chain.getSaturated() != null
-						&& chain.getSaturated().isDerivedReflexive();
+			public Boolean visit(IndexedBinaryPropertyChain binaryChain) {
+				return binaryChain.getSaturated() != null
+						&& binaryChain.getSaturated().isDerivedReflexive();
 			}
 		});
 	}

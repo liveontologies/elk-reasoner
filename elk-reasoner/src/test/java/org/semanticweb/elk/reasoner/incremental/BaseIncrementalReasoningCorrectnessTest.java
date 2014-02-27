@@ -92,6 +92,10 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 
 	}
 
+	/**
+	 * @param input
+	 *            dummy parameter
+	 */
 	@SuppressWarnings("static-method")
 	protected boolean ignore(TestInput input) {
 		return false;
@@ -171,7 +175,7 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 	protected abstract void dumpChangeToLog(T change, LogLevel level);
 
 	protected abstract void loadAxioms(InputStream stream,
-			List<T> staticAxioms, OnOffVector<T> changingAxioms)
+			List<T> staticAxiomsInput, OnOffVector<T> changingAxiomsInput)
 			throws IOException, Owl2ParseException;
 
 	protected abstract Reasoner getReasoner(Iterable<T> axioms);

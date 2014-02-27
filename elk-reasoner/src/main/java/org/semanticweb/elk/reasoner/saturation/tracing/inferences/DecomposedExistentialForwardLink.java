@@ -27,9 +27,10 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
@@ -39,7 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  * @author "Yevgeny Kazakov"
  * 
  */
-public class DecomposedExistentialForwardLink extends ForwardLink implements
+public class DecomposedExistentialForwardLink extends ForwardLinkImpl implements
 		Inference {
 
 	private final IndexedObjectSomeValuesFrom existential_;
@@ -57,8 +58,9 @@ public class DecomposedExistentialForwardLink extends ForwardLink implements
 		return visitor.visit(this, parameter);
 	}
 
-	public Subsumer getExistential() {
-		return new DecomposedSubsumer(existential_);
+	public Subsumer<IndexedObjectSomeValuesFrom> getExistential() {
+		return new DecomposedSubsumerImpl<IndexedObjectSomeValuesFrom>(
+				existential_);
 	}
 
 	@Override

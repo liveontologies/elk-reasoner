@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.conclusions;
+package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 /*
  * #%L
@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
@@ -35,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public abstract class AbstractConclusion implements Conclusion {
+abstract class AbstractConclusion implements Conclusion {
 
 	@Override
 	public IndexedClassExpression getSourceRoot(

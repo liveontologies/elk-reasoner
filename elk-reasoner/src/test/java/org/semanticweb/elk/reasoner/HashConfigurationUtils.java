@@ -41,24 +41,27 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  * Loads a hash-based configuration
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class HashConfigurationUtils {
 
-	static <AO extends ClassTaxonomyTestOutput> Configuration loadConfiguration(String location, Class<?> clazz) throws URISyntaxException, IOException {
-		return ConfigurationUtils.loadFileBasedTestConfiguration(	location,
-																	HashClassificationCorrectnessTest.class,
-																	"owl",
-																	"expected.hash",
-																	new TestManifestCreator<URLTestIO, HashTestOutput, AO>() {
-			@Override
-			public TestManifest<URLTestIO, HashTestOutput, AO> create(URL input, URL output) throws IOException {
-				//input is an OWL ontology, expected output is a hash code
-				int hash = IOUtils.readInteger(output, 10);
-					
-				return new HashTaxonomyTestManifest<AO>(input, new HashTestOutput(hash));
-			}
-		});
+	static <AO extends ClassTaxonomyTestOutput> Configuration loadConfiguration(
+			String location) throws URISyntaxException, IOException {
+		return ConfigurationUtils.loadFileBasedTestConfiguration(location,
+				HashClassificationCorrectnessTest.class, "owl",
+				"expected.hash",
+				new TestManifestCreator<URLTestIO, HashTestOutput, AO>() {
+					@Override
+					public TestManifest<URLTestIO, HashTestOutput, AO> create(
+							URL input, URL output) throws IOException {
+						// input is an OWL ontology, expected output is a hash
+						// code
+						int hash = IOUtils.readInteger(output, 10);
+
+						return new HashTaxonomyTestManifest<AO>(input,
+								new HashTestOutput(hash));
+					}
+				});
 	}
 }

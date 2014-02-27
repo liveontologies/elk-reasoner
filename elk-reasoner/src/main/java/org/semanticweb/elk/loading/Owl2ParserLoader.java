@@ -268,7 +268,7 @@ public class Owl2ParserLoader extends AbstractAxiomLoader implements
 	 * A hook to free resources used by the parser
 	 */
 	protected void disposeParserResources() {
-
+		// does nothing so far
 	}
 
 }

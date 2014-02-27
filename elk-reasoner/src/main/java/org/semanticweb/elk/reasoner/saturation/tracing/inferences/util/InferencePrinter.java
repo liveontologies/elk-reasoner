@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.util;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
@@ -56,12 +56,12 @@ public class InferencePrinter implements InferenceVisitor<Void, String> {
 	}
 
 	@Override
-	public String visit(InitializationSubsumer conclusion, Void parameter) {
+	public String visit(InitializationSubsumer<?> conclusion, Void parameter) {
 		return "Root Initialization";
 	}
 
 	@Override
-	public String visit(SubClassOfSubsumer conclusion, Void parameter) {
+	public String visit(SubClassOfSubsumer<?> conclusion, Void parameter) {
 		return "SubClassOf( " + conclusion.getPremise() + " "
 				+ conclusion.getExpression() + " )";
 	}
@@ -86,7 +86,7 @@ public class InferencePrinter implements InferenceVisitor<Void, String> {
 	}
 
 	@Override
-	public String visit(ReflexiveSubsumer conclusion, Void parameter) {
+	public String visit(ReflexiveSubsumer<?> conclusion, Void parameter) {
 		return "Reflexive inference: owl:Thing => " + conclusion.getRelation()
 				+ " some owl:Thing";
 	}

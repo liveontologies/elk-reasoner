@@ -27,8 +27,9 @@ import java.util.Collection;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -41,9 +42,10 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * A {@link LinkableBackwardLinkRule} applied when processing a
- * {@link BackwardLink} producing {@link BackwardLink}s resulted by composing
- * the processed {@link BackwardLink} with the {@link ForwardLink}s contained in
- * the {@link ContextPremises} using property chain axioms
+ * {@link BackwardLink} producing {@link BackwardLink}s resulted by
+ * composing the processed {@link BackwardLink} with the
+ * {@link ForwardLink}s contained in the {@link ContextPremises} using
+ * property chain axioms
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -152,9 +154,10 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 
 			for (IndexedBinaryPropertyChain composition : compositions)
 				for (IndexedClassExpression forwardTarget : forwardTargets)
-					ForwardLink.produceComposedLink(producer, link.getSource(),
-							link.getRelation(), premises.getRoot(),
-							forwardRelation, forwardTarget, composition);
+					ForwardLinkImpl.produceComposedLink(producer,
+							link.getSource(), link.getRelation(),
+							premises.getRoot(), forwardRelation, forwardTarget,
+							composition);
 		}
 
 	}

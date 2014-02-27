@@ -31,17 +31,19 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
@@ -72,17 +74,17 @@ public class ContextImpl implements ExtendedContext {
 	private static final ConclusionVisitor<ContextImpl, Boolean> CONCLUSION_OCCURRENCE_CHECKER_ = new ConclusionOccurrenceChecker();
 
 	/**
-	 * the rules that should be applied to each derived {@link BackwardLink} in
-	 * this {@link Context}; can be {@code null}
+	 * the rules that should be applied to each derived {@link BackwardLinkImpl}
+	 * in this {@link Context}; can be {@code null}
 	 */
 	private LinkableBackwardLinkRule backwardLinkRules_ = null;
 
 	/**
-	 * the indexed representation of all derived reflexive {@link BackwardLink}
-	 * s, i.e., the {@link BackwardLink}s whose source is this {@link Context};
-	 * can be {@code null}
+	 * the indexed representation of all derived reflexive
+	 * {@link BackwardLinkImpl} s, i.e., the {@link BackwardLinkImpl}s whose
+	 * source is this {@link Context}; can be {@code null}
 	 * 
-	 * @see BackwardLink#getSource()
+	 * @see BackwardLinkImpl#getSource()
 	 */
 	private Set<IndexedObjectProperty> reflexiveBackwardLinks_ = null;
 
@@ -105,7 +107,7 @@ public class ContextImpl implements ExtendedContext {
 
 	/**
 	 * {@code true} if it is not initialized or otherwise all derived
-	 * {@link Subsumer} of {@link #root_} have been computed.
+	 * {@link Subsumer}s of {@link #root_} have been computed.
 	 */
 	private volatile boolean isSaturated_ = true;
 
@@ -129,7 +131,7 @@ public class ContextImpl implements ExtendedContext {
 
 	/**
 	 * {@code true} if this {@link Context} is initialized, i.e., contains
-	 * {@link ContextInitialization}
+	 * {@link ContextInitializationImpl}
 	 */
 	private volatile boolean isInitialized_ = false;
 
@@ -273,26 +275,27 @@ public class ContextImpl implements ExtendedContext {
 		isSaturated_ = saturated;
 		return previous;
 	}
-	
+
 	@Override
-	public Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(IndexedPropertyChain subRoot) {
+	public Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(
+			IndexedPropertyChain subRoot) {
 		if (subContextsByObjectProperty_ == null) {
 			return Collections.emptyList();
 		}
-		
+
 		SubContext subContext = subContextsByObjectProperty_.get(subRoot);
-		
+
 		if (subContext == null) {
 			return Collections.emptyList();
 		}
-		
+
 		return subContext.getPropagatedSubsumers();
 	}
 
 	private static class ConclusionInserter implements
 			ConclusionVisitor<ContextImpl, Boolean> {
 
-		static Boolean visit(Subsumer conclusion, ContextImpl input) {
+		static Boolean visit(Subsumer<?> conclusion, ContextImpl input) {
 			return input.subsumers_.add(conclusion.getExpression());
 		}
 
@@ -314,8 +317,8 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
-			return visit((Subsumer) conclusion, input);
+		public Boolean visit(ComposedSubsumer<?> conclusion, ContextImpl input) {
+			return visit((Subsumer<?>) conclusion, input);
 		}
 
 		@Override
@@ -337,8 +340,8 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
-			return visit((Subsumer) conclusion, input);
+		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
+			return visit((Subsumer<?>) conclusion, input);
 		}
 
 		@Override
@@ -418,13 +421,13 @@ public class ContextImpl implements ExtendedContext {
 			return changed;
 		}
 
-		static boolean visit(Subsumer conclusion, ContextImpl input) {
+		static boolean visit(Subsumer<?> conclusion, ContextImpl input) {
 			return input.subsumers_.remove(conclusion.getExpression());
 		}
 
 		@Override
-		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
-			return visit((Subsumer) conclusion, input);
+		public Boolean visit(ComposedSubsumer<?> conclusion, ContextImpl input) {
+			return visit((Subsumer<?>) conclusion, input);
 		}
 
 		@Override
@@ -446,8 +449,8 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
-			return visit((Subsumer) conclusion, input);
+		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
+			return visit((Subsumer<?>) conclusion, input);
 		}
 
 		@Override
@@ -518,7 +521,7 @@ public class ContextImpl implements ExtendedContext {
 	private static class ConclusionOccurrenceChecker implements
 			ConclusionVisitor<ContextImpl, Boolean> {
 
-		static boolean visit(Subsumer conclusion, ContextImpl input) {
+		static boolean visit(Subsumer<?> conclusion, ContextImpl input) {
 			return input.subsumers_.contains(conclusion.getExpression());
 		}
 
@@ -538,8 +541,8 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(ComposedSubsumer conclusion, ContextImpl input) {
-			return visit((Subsumer) conclusion, input);
+		public Boolean visit(ComposedSubsumer<?> conclusion, ContextImpl input) {
+			return visit((Subsumer<?>) conclusion, input);
 		}
 
 		@Override
@@ -553,8 +556,8 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
-		public Boolean visit(DecomposedSubsumer conclusion, ContextImpl input) {
-			return visit((Subsumer) conclusion, input);
+		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
+			return visit((Subsumer<?>) conclusion, input);
 		}
 
 		@Override

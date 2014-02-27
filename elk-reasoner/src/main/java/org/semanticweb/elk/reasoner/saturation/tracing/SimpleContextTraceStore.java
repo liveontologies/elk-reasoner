@@ -30,12 +30,12 @@ import java.util.Map;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
@@ -109,7 +109,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		}
 
 		@Override
-		public Void visit(ComposedSubsumer negSCE,
+		public Void visit(ComposedSubsumer<?> negSCE,
 				InferenceVisitor<?, ?> visitor) {
 			visitAll(getSubsumerInferences(negSCE.getExpression()), visitor);
 
@@ -117,7 +117,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		}
 
 		@Override
-		public Void visit(DecomposedSubsumer posSCE,
+		public Void visit(DecomposedSubsumer<?> posSCE,
 				InferenceVisitor<?, ?> visitor) {
 			visitAll(getSubsumerInferences(posSCE.getExpression()), visitor);
 
@@ -163,12 +163,12 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 	private final InferenceVisitor<?, Boolean> inferenceWriter_ = new InferenceVisitor<Void, Boolean>() {
 
 		@Override
-		public Boolean visit(InitializationSubsumer conclusion, Void param) {
+		public Boolean visit(InitializationSubsumer<?> conclusion, Void param) {
 			return addSubsumerInference(conclusion.getExpression(), conclusion);
 		}
 
 		@Override
-		public Boolean visit(SubClassOfSubsumer conclusion, Void param) {
+		public Boolean visit(SubClassOfSubsumer<?> conclusion, Void param) {
 			return addSubsumerInference(conclusion.getExpression(), conclusion);
 		}
 
@@ -188,7 +188,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		}
 
 		@Override
-		public Boolean visit(ReflexiveSubsumer conclusion, Void param) {
+		public Boolean visit(ReflexiveSubsumer<?> conclusion, Void param) {
 			return addSubsumerInference(conclusion.getExpression(), conclusion);
 		}
 

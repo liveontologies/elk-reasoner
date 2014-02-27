@@ -28,4 +28,6 @@ public interface IndexedAxiomFilter extends
 		IndexedSubClassOfAxiomVisitor<IndexedSubClassOfAxiom>,
 		IndexedDisjointnessAxiomVisitor<IndexedDisjointnessAxiom> {
 
+	// nothing else
+	
 }

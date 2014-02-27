@@ -36,23 +36,26 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 @RunWith(PolySuite.class)
-public abstract class HashRealizationCorrectnessTest extends BaseRealizationCorrectnessTest<HashTestOutput> {
+public abstract class HashRealizationCorrectnessTest extends
+		BaseRealizationCorrectnessTest<HashTestOutput> {
 
-	public HashRealizationCorrectnessTest(ReasoningTestManifest<HashTestOutput, InstanceTaxonomyTestOutput> testManifest) { 
+	public HashRealizationCorrectnessTest(
+			ReasoningTestManifest<HashTestOutput, InstanceTaxonomyTestOutput> testManifest) {
 		super(testManifest);
 	}
-	
+
 	/*
-	 * ---------------------------------------------
-	 * Configuration: loading all test input data
-	 * ---------------------------------------------
-	 */	
+	 * --------------------------------------------- Configuration: loading all
+	 * test input data ---------------------------------------------
+	 */
 	@Config
-	public static Configuration getConfig() throws URISyntaxException, IOException {
-		return HashConfigurationUtils.<InstanceTaxonomyTestOutput>loadConfiguration(INPUT_DATA_LOCATION, HashRealizationCorrectnessTest.class);
-	}	
+	public static Configuration getConfig() throws URISyntaxException,
+			IOException {
+		return HashConfigurationUtils
+				.<InstanceTaxonomyTestOutput> loadConfiguration(INPUT_DATA_LOCATION);
+	}
 }

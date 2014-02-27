@@ -48,9 +48,9 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagat
  */
 public interface InferenceVisitor<I, O> {
 
-	public O visit(InitializationSubsumer conclusion, I parameter);
+	public O visit(InitializationSubsumer<?> conclusion, I parameter);
 
-	public O visit(SubClassOfSubsumer conclusion, I parameter);
+	public O visit(SubClassOfSubsumer<?> conclusion, I parameter);
 
 	public O visit(ComposedConjunction conclusion, I input);
 
@@ -58,7 +58,7 @@ public interface InferenceVisitor<I, O> {
 
 	public O visit(PropagatedSubsumer conclusion, I input);
 
-	public O visit(ReflexiveSubsumer conclusion, I input);
+	public O visit(ReflexiveSubsumer<?> conclusion, I input);
 
 	public O visit(ComposedBackwardLink conclusion, I input);
 

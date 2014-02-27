@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.conclusions;
+package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 /*
  * #%L
@@ -27,53 +27,40 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
 
 /**
- * A {@code Conclusion} representing that some {@link IndexedClassExpression}
- * member of an {@link IndexedDisjointnessAxiom} was derived as a subsumer in
- * the {@link Context}.
- * 
- * @see IndexedDisjointnessAxiom#getDisjointMembers()
- * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ * An implementation of {@link DisjointSubsumer}
  * 
  * @author "Yevgeny Kazakov"
+ * 
  */
-public class DisjointSubsumer extends AbstractConclusion {
+public class DisjointSubsumerImpl extends AbstractConclusion implements
+		DisjointSubsumer {
 
-	public static final String NAME = "Disjoint Subsumer";
-	
 	private static ContradicitonCompositionRule THIS_COMPOSITION_RULE_ = new ContradicitonCompositionRule();
 
 	private final IndexedClassExpression member_;
 
 	private final IndexedDisjointnessAxiom axiom_;
 
-	public DisjointSubsumer(IndexedDisjointnessAxiom axiom,
+	public DisjointSubsumerImpl(IndexedDisjointnessAxiom axiom,
 			IndexedClassExpression member) {
 		this.axiom_ = axiom;
 		this.member_ = member;
 	}
 
-	/**
-	 * @return the member of an {@link IndexedDisjointnessAxiom} that was
-	 *         derived as a subsumer
-	 */
+	@Override
 	public IndexedClassExpression getMember() {
 		return member_;
 	}
 
-	/**
-	 * @return the {@link IndexedDisjointnessAxiom} to which the member belongs
-	 */
+	@Override
 	public IndexedDisjointnessAxiom getAxiom() {
 		return axiom_;
 	}

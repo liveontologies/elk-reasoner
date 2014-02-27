@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,49 +27,49 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
- * Represents a {@link IndexedObjectIntersectionOf} composition inference.
+ * A {@link ComposedSubsumer} for {@link IndexedObjectIntersectionOf}
+ * obtained from its conjunts.
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class ComposedConjunction extends ComposedSubsumer implements Inference {
+public class ComposedConjunction extends
+		ComposedSubsumerImpl<IndexedObjectIntersectionOf> implements Inference {
 
-	private final IndexedClassExpression first_;
-	
-	private final IndexedClassExpression second_;
-	
 	/**
 	 */
-	public ComposedConjunction(IndexedClassExpression premise, IndexedClassExpression conjunct, IndexedObjectIntersectionOf conjunction) {
+	public ComposedConjunction(IndexedObjectIntersectionOf conjunction) {
 		super(conjunction);
-		first_ = premise;
-		second_ = conjunct;
 	}
 
-	public Subsumer getFirstConjunct() {
-		return new ComposedSubsumer(first_);
+	public Subsumer<IndexedClassExpression> getFirstConjunct() {
+		return new ComposedSubsumerImpl<IndexedClassExpression>(getExpression()
+				.getFirstConjunct());
 	}
-	
-	public Subsumer getSecondConjunct() {
-		return new ComposedSubsumer(second_);
+
+	public Subsumer<IndexedClassExpression> getSecondConjunct() {
+		return new ComposedSubsumerImpl<IndexedClassExpression>(getExpression()
+				.getSecondConjunct());
 	}
-	
+
 	@Override
 	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 
 	@Override
-	public IndexedClassExpression getInferenceContextRoot(IndexedClassExpression rootWhereStored) {
+	public IndexedClassExpression getInferenceContextRoot(
+			IndexedClassExpression rootWhereStored) {
 		return rootWhereStored;
 	}
-	
+
 	@Override
 	public String toString() {
 		return super.toString() + " (conjunction+)";

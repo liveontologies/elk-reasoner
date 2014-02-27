@@ -22,16 +22,15 @@ package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link LinkableBackwardLinkRule} applied when processing
@@ -40,10 +39,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ContradictionOverBackwardLinkRule extends
 		AbstractLinkableBackwardLinkRule {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ContradictionOverBackwardLinkRule.class);
 
 	public static final String NAME = "Backward Link Contradiction Propagation";
 
@@ -79,7 +74,7 @@ public class ContradictionOverBackwardLinkRule extends
 	@Override
 	public void apply(BackwardLink premise, ContextPremises contex,
 			ConclusionProducer producer) {
-		producer.produce(premise.getSource(), Contradiction.getInstance());
+		producer.produce(premise.getSource(), ContradictionImpl.getInstance());
 	}
 
 	@Override

@@ -1137,6 +1137,7 @@ public class LowLevelIncrementalTBoxTest {
 
 			@Override
 			public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
+				// does nothing
 			}
 
 			@Override

@@ -34,8 +34,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.util.Comparators;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
@@ -43,6 +41,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNodeUtils;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.hashing.HashGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for storing information about a class in the context of classification.
@@ -111,9 +111,10 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	 *            node to add
 	 */
 	@Override
-	public synchronized void addDirectSuperNode(UpdateableTaxonomyNode<ElkClass> superNode) {
+	public synchronized void addDirectSuperNode(
+			UpdateableTaxonomyNode<ElkClass> superNode) {
 		LOGGER_.trace("{}: new direct super-node {}", this, superNode);
-		
+
 		directSuperNodes_.add(superNode);
 	}
 
@@ -124,7 +125,8 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	 *            node to add
 	 */
 	@Override
-	public synchronized void addDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
+	public synchronized void addDirectSubNode(
+			UpdateableTaxonomyNode<ElkClass> subNode) {
 		LOGGER_.trace("{}: new direct sub-node {}", this, subNode);
 
 		if (directSubNodes_.isEmpty()) {
@@ -190,10 +192,11 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	@Override
 	public Set<TaxonomyNode<ElkClass>> getDirectSubNodes() {
 		if (!directSubNodes_.isEmpty()) {
-			return Collections.<TaxonomyNode<ElkClass>>unmodifiableSet(directSubNodes_);
-		} else {
-			return Collections.singleton(this.taxonomy_.getBottomNode());
+			return Collections
+					.<TaxonomyNode<ElkClass>> unmodifiableSet(directSubNodes_);
 		}
+		// else
+		return Collections.singleton(this.taxonomy_.getBottomNode());
 	}
 
 	@Override
@@ -240,8 +243,7 @@ class NonBottomClassNode implements UpdateableTaxonomyNode<ElkClass> {
 	}
 
 	@Override
-	public boolean removeDirectSubNode(
-			UpdateableTaxonomyNode<ElkClass> subNode) {
+	public boolean removeDirectSubNode(UpdateableTaxonomyNode<ElkClass> subNode) {
 		boolean changed = directSubNodes_.remove(subNode);
 
 		if (changed)

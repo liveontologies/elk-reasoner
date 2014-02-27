@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
@@ -95,7 +95,7 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	/**
-	 * Generates {@link Propagation}s for the {@link ContextPremises} that apply
+	 * Generates {@link PropagationImpl}s for the {@link ContextPremises} that apply
 	 * for the given {@link IndexedObjectProperty}
 	 * 
 	 * @param property

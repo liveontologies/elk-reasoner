@@ -35,4 +35,6 @@ import org.semanticweb.elk.util.collections.chains.Chainable;
 public interface ChainableContextInitRule extends LinkedContextInitRule,
 		Chainable<ChainableContextInitRule> {
 
+	// nothing else
+	
 }

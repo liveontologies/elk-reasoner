@@ -22,16 +22,16 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 
 /**
  * A {@link ConclusionVisitor} that implements an if-then-else statement over
@@ -85,7 +85,7 @@ public class IfThenElseConclusionVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(ComposedSubsumer conclusion, I input) {
+	public O visit(ComposedSubsumer<?> conclusion, I input) {
 		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
 				input) : doFalse_.visit(conclusion, input);
 	}
@@ -103,7 +103,7 @@ public class IfThenElseConclusionVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(DecomposedSubsumer conclusion, I input) {
+	public O visit(DecomposedSubsumer<?> conclusion, I input) {
 		return check_.visit(conclusion, input) ? doTrue_.visit(conclusion,
 				input) : doFalse_.visit(conclusion, input);
 	}

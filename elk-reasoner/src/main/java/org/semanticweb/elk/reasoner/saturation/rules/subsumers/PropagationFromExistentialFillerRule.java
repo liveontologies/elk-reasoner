@@ -32,9 +32,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
@@ -144,7 +144,8 @@ public class PropagationFromExistentialFillerRule extends
 			if (relation.getSaturated().isDerivedReflexive()) {
 				// producer.produce(premises.getRoot(), new
 				// ComposedSubsumer(e));
-				producer.produce(premises.getRoot(), new ReflexiveSubsumer(e));
+				producer.produce(premises.getRoot(),
+						new ReflexiveSubsumer<IndexedObjectSomeValuesFrom>(e));
 			}
 		}
 	}

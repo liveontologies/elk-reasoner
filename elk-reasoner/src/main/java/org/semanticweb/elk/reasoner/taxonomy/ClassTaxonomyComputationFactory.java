@@ -90,7 +90,7 @@ public class ClassTaxonomyComputationFactory implements
 	 *            the (partially pre-computed) class taxonomy object to store
 	 *            results in
 	 */
-	public ClassTaxonomyComputationFactory(SaturationState saturationState,
+	public ClassTaxonomyComputationFactory(SaturationState<?> saturationState,
 			int maxWorkers, UpdateableTaxonomy<ElkClass> partialTaxonomy) {
 		this.taxonomy_ = partialTaxonomy;
 		this.transitiveReductionShared_ = new TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>(
@@ -107,7 +107,7 @@ public class ClassTaxonomyComputationFactory implements
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 */
-	public ClassTaxonomyComputationFactory(SaturationState saturationState,
+	public ClassTaxonomyComputationFactory(SaturationState<?> saturationState,
 			int maxWorkers) {
 		this(saturationState, maxWorkers, new ConcurrentClassTaxonomy());
 	}
@@ -144,14 +144,15 @@ public class ClassTaxonomyComputationFactory implements
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
 
-			//LOGGER_.trace("+++ creating node for equivalent classes: " + output.getEquivalent());
-			
+			// LOGGER_.trace("+++ creating node for equivalent classes: " +
+			// output.getEquivalent());
+
 			UpdateableTaxonomyNode<ElkClass> node = taxonomy_
 					.getCreateNode(output.getEquivalent());
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
 					.getDirectSubsumers()) {
-							
+
 				UpdateableTaxonomyNode<ElkClass> superNode = taxonomy_
 						.getCreateNode(directSuperEquivalent.getEquivalent());
 				assignDirectSuperClassNode(node, superNode);

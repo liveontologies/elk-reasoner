@@ -43,8 +43,8 @@ import org.semanticweb.elk.testing.TestOutput;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- * @param <EO> 
- * @param <AO> 
+ * @param <EO>
+ * @param <AO>
  */
 @RunWith(PolySuite.class)
 public abstract class BaseReasoningCorrectnessTest<EO extends TestOutput, AO extends TestOutput> {
@@ -71,6 +71,10 @@ public abstract class BaseReasoningCorrectnessTest<EO extends TestOutput, AO ext
 		IOUtils.closeQuietly(inputStream);
 	}
 
+	/**
+	 * @param input
+	 *            dummy parameter
+	 */
 	@SuppressWarnings("static-method")
 	protected boolean ignore(TestInput input) {
 		return false;

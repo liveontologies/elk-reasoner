@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -28,4 +29,5 @@ public interface IndexedPropertyChainFilter extends
 		IndexedObjectPropertyVisitor<IndexedObjectProperty>,
 		IndexedBinaryPropertyChainVisitor<IndexedBinaryPropertyChain> {
 
+	// nothing else
 }

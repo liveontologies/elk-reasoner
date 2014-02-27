@@ -59,7 +59,8 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TaxonomyCleaning extends
+public class TaxonomyCleaning
+		extends
 		ReasonerComputationWithInputs<IndexedClassEntity, TaxonomyCleaningFactory> {
 
 	public TaxonomyCleaning(Collection<IndexedClassEntity> inputs,
@@ -237,8 +238,9 @@ class TaxonomyCleaningFactory
 							.getInstanceNode(individual);
 
 					if (node != null && node.trySetModified(true)) {
-						instanceStateWriter_.markIndividualsForModifiedNode(node
-								.getMembers());
+						instanceStateWriter_
+								.markIndividualsForModifiedNode(node
+										.getMembers());
 						taxonomy.removeInstanceNode(individual);
 					} else if (node == null) {
 						instanceStateWriter_
@@ -286,6 +288,7 @@ class TaxonomyCleaningFactory
 
 			@Override
 			public void finish() {
+				// nothing to do
 			}
 
 		};
@@ -293,5 +296,6 @@ class TaxonomyCleaningFactory
 
 	@Override
 	public void finish() {
+		// nothing to do
 	}
 }

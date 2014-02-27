@@ -23,8 +23,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  */
 
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +34,8 @@ import org.slf4j.LoggerFactory;
  * given {@link Context}. The visit method returns {@link true} if the
  * {@link Context} was modified as the result of this operation, i.e., the
  * {@link Conclusion} was not contained in the {@link Context}. Additionally,
- * when inserting {@link ContextInitialization} the {@link Context} is marked as
- * non-saturated using the provided {@link SaturationStateWriter}.
+ * when inserting {@link ContextInitialization} the {@link Context} is
+ * marked as non-saturated using the provided {@link SaturationStateWriter}.
  * 
  * @see ConclusionDeletionVisitor
  * @see ConclusionOccurrenceCheckingVisitor
@@ -49,9 +49,9 @@ public class ConclusionInsertionVisitor extends
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ConclusionInsertionVisitor.class);
 
-	private final SaturationStateWriter writer_;
+	private final SaturationStateWriter<?> writer_;
 
-	public ConclusionInsertionVisitor(SaturationStateWriter writer) {
+	public ConclusionInsertionVisitor(SaturationStateWriter<?> writer) {
 		this.writer_ = writer;
 	}
 

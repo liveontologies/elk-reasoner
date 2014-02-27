@@ -261,6 +261,7 @@ public class MockTaxonomyLoader {
 
 		@Override
 		public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
+			// ignored
 		}
 
 		@Override

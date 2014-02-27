@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions;
+package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 /*
  * #%L
@@ -23,8 +23,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  */
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
@@ -33,24 +33,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@code Conclusion} indicating that the {@link Context} where it is stored
- * should be initialized.
+ * An implementation of {@link ContextInitialization}.
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ContextInitialization extends AbstractConclusion {
+public class ContextInitializationImpl extends AbstractConclusion implements
+		ContextInitialization {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ContextInitialization.class);
-
-	public static final String NAME = "Context Initialization";
+			.getLogger(ContextInitializationImpl.class);
 
 	// actually we just need only context initialization rules,
 	// but they can change after creating this object
 	private final OntologyIndex ontologyIndex_;
 
-	public ContextInitialization(OntologyIndex ontologyIndex) {
+	public ContextInitializationImpl(OntologyIndex ontologyIndex) {
 		this.ontologyIndex_ = ontologyIndex;
 	}
 

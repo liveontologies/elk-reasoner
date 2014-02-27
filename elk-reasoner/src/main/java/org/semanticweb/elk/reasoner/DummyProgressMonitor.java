@@ -35,14 +35,17 @@ public class DummyProgressMonitor implements ProgressMonitor {
 
 	@Override
 	public void start(String message) {
+		// does nothing
 	}
 
 	@Override
 	public void report(int state, int maxState) {
+		// does nothing
 	}
 
 	@Override
 	public void finish() {
+		// does nothing
 	}
 
 }

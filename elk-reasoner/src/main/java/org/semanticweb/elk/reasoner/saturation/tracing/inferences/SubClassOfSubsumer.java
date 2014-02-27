@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,28 +26,29 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
- * Represents a subsumption inference. 
+ * Represents a subsumption inference.
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class SubClassOfSubsumer extends DecomposedSubsumer implements Inference {
-	
+public class SubClassOfSubsumer<S extends IndexedClassExpression> extends
+		DecomposedSubsumerImpl<S> implements Inference {
+
 	private final IndexedClassExpression premise_;
 
-	public SubClassOfSubsumer(IndexedClassExpression premise, IndexedClassExpression expression) {
+	public SubClassOfSubsumer(IndexedClassExpression premise, S expression) {
 		super(expression);
 		premise_ = premise;
 	}
-	
-	public Conclusion getPremise() {
-		return new DecomposedSubsumer(premise_);
+
+	public Subsumer<?> getPremise() {
+		return new DecomposedSubsumerImpl<IndexedClassExpression>(premise_);
 	}
 
 	@Override
@@ -55,7 +57,8 @@ public class SubClassOfSubsumer extends DecomposedSubsumer implements Inference 
 	}
 
 	@Override
-	public IndexedClassExpression getInferenceContextRoot(IndexedClassExpression rootWhereStored) {
+	public IndexedClassExpression getInferenceContextRoot(
+			IndexedClassExpression rootWhereStored) {
 		return rootWhereStored;
 	}
 

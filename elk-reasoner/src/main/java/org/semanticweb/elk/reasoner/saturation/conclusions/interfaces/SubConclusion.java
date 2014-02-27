@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions;
+package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
 /*
  * #%L

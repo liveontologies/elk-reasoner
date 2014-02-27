@@ -48,7 +48,7 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  * Low-level saturation tests using a high number of workers.
  * 
  * @author Yevgeny Kazakov
- *
+ * 
  */
 public class ConcurrentSaturatorTest extends TestCase {
 
@@ -73,8 +73,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ModifiableOntologyIndex index = new DirectIndex();
 		ComputationExecutor executor = new ComputationExecutor(16, "test");
 
-		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(new MainAxiomIndexerVisitor(index,
-				true));
+		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(
+				new MainAxiomIndexerVisitor(index, true));
 		inserter.visit(objectFactory.getEquivalentClassesAxiom(b, c));
 		inserter.visit(objectFactory.getSubClassOfAxiom(a,
 				objectFactory.getObjectSomeValuesFrom(r, b)));
@@ -91,9 +91,10 @@ public class ConcurrentSaturatorTest extends TestCase {
 		IndexedPropertyChain R = r.accept(converter);
 
 		final TestPropertySaturation propertySaturation = new TestPropertySaturation(
-				executor, 16, index);
+				executor, 16);
 
-		SaturationState saturationState = SaturationStateFactory.createSaturationState(index);
+		SaturationState<?> saturationState = SaturationStateFactory
+				.createSaturationState(index);
 		final TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
 				executor, 16, saturationState);
 
@@ -106,7 +107,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 				.submit(new SaturationJob<IndexedClassExpression>(A));
 		classExpressionSaturation.finish();
 
-		assertTrue("A contains D", saturationState.getContext(A).getSubsumers().contains(D));
+		assertTrue("A contains D", saturationState.getContext(A).getSubsumers()
+				.contains(D));
 
 	}
 
@@ -120,8 +122,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 
 		final ModifiableOntologyIndex index = new DirectIndex();
 		ComputationExecutor executor = new ComputationExecutor(16, "test");
-		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(new MainAxiomIndexerVisitor(index,
-				true));
+		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(
+				new MainAxiomIndexerVisitor(index, true));
 
 		inserter.visit(objectFactory.getSubClassOfAxiom(a, b));
 		inserter.visit(objectFactory.getSubClassOfAxiom(a, c));
@@ -139,7 +141,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 		IndexedClassExpression I = objectFactory.getObjectIntersectionOf(b, c)
 				.accept(converter);
 
-		SaturationState saturationState = SaturationStateFactory.createSaturationState(index);
+		SaturationState<?> saturationState = SaturationStateFactory
+				.createSaturationState(index);
 		final TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>> classExpressionSaturation = new TestClassExpressionSaturation<SaturationJob<IndexedClassExpression>>(
 				executor, 16, saturationState);
 
@@ -155,5 +158,5 @@ public class ConcurrentSaturatorTest extends TestCase {
 		assertTrue("A contains I", context.getSubsumers().contains(I));
 		assertTrue("A contains D", context.getSubsumers().contains(D));
 	}
-	
+
 }

@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public abstract class AbstractRuleApplicationFactory<C extends Context> implements
-		RuleApplicationFactory<C> {
+public abstract class AbstractRuleApplicationFactory<C extends Context>
+		implements RuleApplicationFactory<C> {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory
@@ -59,7 +59,8 @@ public abstract class AbstractRuleApplicationFactory<C extends Context> implemen
 	 */
 	private final SaturationStatistics aggregatedStats_;
 
-	public AbstractRuleApplicationFactory(final SaturationState<? extends C> saturationState) {
+	public AbstractRuleApplicationFactory(
+			final SaturationState<? extends C> saturationState) {
 		this.saturationState_ = saturationState;
 		this.aggregatedStats_ = new SaturationStatistics();
 	}
@@ -114,8 +115,8 @@ public abstract class AbstractRuleApplicationFactory<C extends Context> implemen
 	 *            {@link RuleApplicationFactory}
 	 * @return the actual {@link SaturationStateWriter} that will be used
 	 */
-	@SuppressWarnings("static-method")
-	SaturationStateWriter<? extends C> getFinalWriter(SaturationStateWriter<? extends C> writer) {
+	SaturationStateWriter<? extends C> getFinalWriter(
+			SaturationStateWriter<? extends C> writer) {
 		return writer;
 	}
 
@@ -142,12 +143,12 @@ public abstract class AbstractRuleApplicationFactory<C extends Context> implemen
 		modificationListener = SaturationUtils
 				.addStatsToContextModificationListener(modificationListener,
 						localStatistics.getContextStatistics());
-		SaturationStateWriter<? extends C> writer = getBaseWriter(creationListener,
-				modificationListener);
+		SaturationStateWriter<? extends C> writer = getBaseWriter(
+				creationListener, modificationListener);
 		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
 		WorkerLocalizedSaturationStateWriter<C> optimizedWriter = new WorkerLocalizedSaturationStateWriter<C>(
 				writer, localTodo);
-		writer = SaturationUtils.<C>getStatsAwareWriter(optimizedWriter,
+		writer = SaturationUtils.<C> getStatsAwareWriter(optimizedWriter,
 				localStatistics);
 		writer = getFinalWriter(writer);
 		RuleVisitor ruleVisitor = SaturationUtils

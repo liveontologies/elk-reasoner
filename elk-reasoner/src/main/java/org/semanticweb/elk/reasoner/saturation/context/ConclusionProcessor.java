@@ -21,7 +21,7 @@ package org.semanticweb.elk.reasoner.saturation.context;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 
 /**
  * An abstract interfaces for implementing processors of {@link Conclusion}s in

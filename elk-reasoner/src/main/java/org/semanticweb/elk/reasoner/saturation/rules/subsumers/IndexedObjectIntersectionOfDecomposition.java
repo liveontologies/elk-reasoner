@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedConjunction;
@@ -58,11 +58,15 @@ public class IndexedObjectIntersectionOfDecomposition extends
 	@Override
 	public void apply(IndexedObjectIntersectionOf premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		//producer.produce(premises.getRoot(), new DecomposedSubsumer(premise.getFirstConjunct()));
-		//producer.produce(premises.getRoot(), new DecomposedSubsumer(premise.getSecondConjunct()));
-		
-		producer.produce(premises.getRoot(), new DecomposedConjunction(premise, premise.getFirstConjunct()));
-		producer.produce(premises.getRoot(), new DecomposedConjunction(premise, premise.getSecondConjunct()));
+		// producer.produce(premises.getRoot(), new
+		// DecomposedSubsumer(premise.getFirstConjunct()));
+		// producer.produce(premises.getRoot(), new
+		// DecomposedSubsumer(premise.getSecondConjunct()));
+
+		producer.produce(premises.getRoot(), new DecomposedConjunction(premise,
+				premise.getFirstConjunct()));
+		producer.produce(premises.getRoot(), new DecomposedConjunction(premise,
+				premise.getSecondConjunct()));
 	}
 
 	@Override

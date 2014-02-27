@@ -28,7 +28,7 @@ import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -52,8 +52,10 @@ public class ObjectIntersectionFromConjunctRule extends
 		AbstractChainableSubsumerRule {
 
 	// logger for events
-	/*private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ObjectIntersectionFromConjunctRule.class);*/
+	/*
+	 * private static final Logger LOGGER_ = LoggerFactory
+	 * .getLogger(ObjectIntersectionFromConjunctRule.class);
+	 */
 
 	public static final String NAME = "ObjectIntersectionOf Introduction";
 
@@ -129,8 +131,10 @@ public class ObjectIntersectionFromConjunctRule extends
 			ConclusionProducer producer) {
 		for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 				conjunctionsByConjunct_.keySet(), premises.getSubsumers())) {
-			//producer.produce(premises.getRoot(), new ComposedSubsumer(conjunctionsByConjunct_.get(common)));
-			producer.produce(premises.getRoot(), new ComposedConjunction(premise, common, conjunctionsByConjunct_.get(common)));
+			// producer.produce(premises.getRoot(), new
+			// ComposedSubsumer(conjunctionsByConjunct_.get(common)));
+			producer.produce(premises.getRoot(), new ComposedConjunction(
+					conjunctionsByConjunct_.get(common)));
 		}
 
 	}

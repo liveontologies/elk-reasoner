@@ -36,5 +36,6 @@ public abstract class BasePostProcessingStage implements PostProcessingStage {
 
 	@Override
 	public void printInfo() {
+		// does nothing by default
 	}
 }

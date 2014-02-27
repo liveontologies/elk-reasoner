@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,7 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
@@ -35,9 +36,10 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class InitializationSubsumer extends DecomposedSubsumer implements Inference {
+public class InitializationSubsumer<S extends IndexedClassExpression> extends
+		DecomposedSubsumerImpl<S> implements Inference {
 
-	public InitializationSubsumer(IndexedClassExpression expression) {
+	public InitializationSubsumer(S expression) {
 		super(expression);
 	}
 
@@ -47,7 +49,8 @@ public class InitializationSubsumer extends DecomposedSubsumer implements Infere
 	}
 
 	@Override
-	public IndexedClassExpression getInferenceContextRoot(IndexedClassExpression rootWhereStored) {
+	public IndexedClassExpression getInferenceContextRoot(
+			IndexedClassExpression rootWhereStored) {
 		return rootWhereStored;
 	}
 

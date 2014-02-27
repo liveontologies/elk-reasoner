@@ -20,13 +20,14 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.conclusions;
+package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -42,45 +43,41 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link Conclusion} representing derived existential restrictions from this
- * source {@link IndexedClassExpression} to a target
- * {@link IndexedClassExpression}. Intuitively, if a subclass axiom
- * {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))} is derived by inference
- * rules, then a {@link ForwardLink} with the relation {@code :r} and the target
- * {@code :B} can be produced for {@code :A}.
+ * An implementation of {@link ForwardLink}
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ForwardLink extends AbstractConclusion {
+public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 
-	static final Logger LOGGER_ = LoggerFactory.getLogger(ForwardLink.class);
-
-	public static final String NAME = "Forward Link";
+	static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ForwardLinkImpl.class);
 
 	/**
 	 * the {@link IndexedPropertyChain} in the existential restriction
-	 * corresponding to this {@link ForwardLink}
+	 * corresponding to this {@link ForwardLinkImpl}
 	 */
 	final IndexedPropertyChain relation_;
 
 	/**
 	 * the {@link IndexedClassExpression}, which root is the filler of the
-	 * existential restriction corresponding to this {@link ForwardLink}
+	 * existential restriction corresponding to this {@link ForwardLinkImpl}
 	 */
 	final IndexedClassExpression target_;
 
-	public ForwardLink(IndexedPropertyChain relation,
+	public ForwardLinkImpl(IndexedPropertyChain relation,
 			IndexedClassExpression target) {
 		this.relation_ = relation;
 		this.target_ = target;
 	}
 
+	@Override
 	public IndexedPropertyChain getRelation() {
 		return relation_;
 	}
 
+	@Override
 	public IndexedClassExpression getTarget() {
 		return target_;
 	}
@@ -155,4 +152,5 @@ public class ForwardLink extends AbstractConclusion {
 					composition));
 		}
 	}
+
 }

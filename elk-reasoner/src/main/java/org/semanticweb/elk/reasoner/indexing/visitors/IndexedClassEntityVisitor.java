@@ -35,4 +35,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
  */
 public interface IndexedClassEntityVisitor<O> extends IndexedClassVisitor<O>,
 		IndexedIndividualVisitor<O> {
+
+	// nothing else
 }

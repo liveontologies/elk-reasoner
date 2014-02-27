@@ -44,8 +44,8 @@ import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
@@ -114,7 +114,7 @@ public class IncrementalAdditionInitializationStage extends
 						contextModificationListener), stageStatistics_);
 
 		// used to initialize new contexts
-		Conclusion contextInitConclusion = new ContextInitialization(
+		Conclusion contextInitConclusion = new ContextInitializationImpl(
 				reasoner.saturationState.getOntologyIndex());
 
 		for (ElkEntity newEntity : Operations.concat(

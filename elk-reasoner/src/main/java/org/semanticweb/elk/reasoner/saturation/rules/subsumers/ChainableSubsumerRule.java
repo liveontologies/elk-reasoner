@@ -35,4 +35,6 @@ import org.semanticweb.elk.util.collections.chains.Chainable;
 public interface ChainableSubsumerRule extends LinkedSubsumerRule,
 		Chainable<ChainableSubsumerRule> {
 
+	// nothing else
+	
 }

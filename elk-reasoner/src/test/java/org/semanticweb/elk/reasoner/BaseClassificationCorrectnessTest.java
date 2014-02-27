@@ -131,6 +131,6 @@ public abstract class BaseClassificationCorrectnessTest<EO extends TestOutput>
 			return this.taxonomy;
 		}
 
-	};
+	}
 
 }

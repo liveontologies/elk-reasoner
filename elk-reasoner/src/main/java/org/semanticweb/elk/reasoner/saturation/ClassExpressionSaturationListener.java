@@ -37,4 +37,6 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNot
  */
 public interface ClassExpressionSaturationListener<J extends SaturationJob<? extends IndexedClassExpression>>
 		extends InputProcessorListenerNotifyFinishedJob<J> {
+	
+	// nothing else
 }

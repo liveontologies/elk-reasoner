@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;

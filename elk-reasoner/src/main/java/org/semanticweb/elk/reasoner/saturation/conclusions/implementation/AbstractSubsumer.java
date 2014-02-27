@@ -20,9 +20,10 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.conclusions;
+package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
@@ -30,35 +31,31 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRul
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecompositionVisitor;
 
 /**
- * A {@link Conclusion} representing a subsumer {@link IndexedClassExpression}
- * of the root {@link IndexedClassExpression} for which it is produced.
- * Intuitively, if a subclass axiom {@code SubClassOf(:A :B)} is derived by
- * inference rules, then a {@link Subsumer} corresponding to {@code :B} can be
- * produced for the context with root {@code :A}
+ * An implementation of {@link Subsumer}
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
+ * @param <S>
+ *            the type of the subsumer {@link IndexedClassExpression}
  */
-public abstract class Subsumer extends AbstractConclusion {
+abstract class AbstractSubsumer<S extends IndexedClassExpression>
+		extends AbstractConclusion implements Subsumer<S> {
 
 	/**
 	 * the implied {@code IndexedClassExpression} represented by this
 	 * {@link Subsumer}
 	 */
-	private final IndexedClassExpression expression_;
+	private final S expression_;
 
-	public Subsumer(IndexedClassExpression expression) {
+	public AbstractSubsumer(S expression) {
 		if (expression == null)
 			throw new NullPointerException("Subsumer cannot be null!");
 		this.expression_ = expression;
 	}
 
-	/**
-	 * @return the {@code IndexedClassExpression} represented by this
-	 *         {@link Subsumer}
-	 */
-	public IndexedClassExpression getExpression() {
+	@Override
+	public S getExpression() {
 		return expression_;
 	}
 

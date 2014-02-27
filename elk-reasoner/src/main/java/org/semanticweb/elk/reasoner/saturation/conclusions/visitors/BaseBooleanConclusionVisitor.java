@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,14 +25,15 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class AbstractBooleanConclusionVisitor<C> extends AbstractConclusionVisitor<C,Boolean> {
+public class BaseBooleanConclusionVisitor<C> extends
+		AbstractConclusionVisitor<C, Boolean> {
 
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, C cxt) {

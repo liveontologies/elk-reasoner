@@ -25,13 +25,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 
 /**
  * A visitor pattern for {@link Conclusion}s together with additional input and
@@ -49,13 +49,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
  */
 public interface ConclusionVisitor<I, O> extends SubConclusionVisitor<I, O> {
 
-	public O visit(ComposedSubsumer conclusion, I input);
+	public O visit(ComposedSubsumer<?> conclusion, I input);
 
 	public O visit(ContextInitialization conclusion, I input);
 
 	public O visit(Contradiction conclusion, I input);
 
-	public O visit(DecomposedSubsumer conclusion, I input);
+	public O visit(DecomposedSubsumer<?> conclusion, I input);
 
 	public O visit(DisjointSubsumer conclusion, I input);
 

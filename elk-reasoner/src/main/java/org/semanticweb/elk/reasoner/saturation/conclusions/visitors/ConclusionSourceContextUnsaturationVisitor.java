@@ -24,10 +24,10 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -41,10 +41,10 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public class ConclusionSourceContextUnsaturationVisitor extends
 		AbstractConclusionVisitor<Context, Boolean> {
 
-	private final SaturationStateWriter writer_;
+	private final SaturationStateWriter<?> writer_;
 
 	public ConclusionSourceContextUnsaturationVisitor(
-			SaturationStateWriter writer) {
+			SaturationStateWriter<?> writer) {
 		this.writer_ = writer;
 	}
 
@@ -56,7 +56,7 @@ public class ConclusionSourceContextUnsaturationVisitor extends
 		return true;
 	}
 
-	Boolean defaultVisit(Subsumer conclusion, Context context) {
+	Boolean defaultVisit(Subsumer<?> conclusion, Context context) {
 		// if the subsumer does not occur in the ontology anymore, it cannot be
 		// re-derived, and thus, the context should not be modified
 		// TODO: extend this check to other types of conclusions
@@ -66,12 +66,12 @@ public class ConclusionSourceContextUnsaturationVisitor extends
 	}
 
 	@Override
-	public Boolean visit(ComposedSubsumer conclusion, Context context) {
+	public Boolean visit(ComposedSubsumer<?> conclusion, Context context) {
 		return defaultVisit(conclusion, context);
 	}
 
 	@Override
-	public Boolean visit(DecomposedSubsumer conclusion, Context context) {
+	public Boolean visit(DecomposedSubsumer<?> conclusion, Context context) {
 		return defaultVisit(conclusion, context);
 	}
 }

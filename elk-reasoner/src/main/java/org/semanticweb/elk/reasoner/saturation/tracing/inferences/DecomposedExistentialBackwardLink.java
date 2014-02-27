@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,9 +27,10 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
@@ -39,35 +41,39 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class DecomposedExistentialBackwardLink extends BackwardLink implements Inference {
+public class DecomposedExistentialBackwardLink extends BackwardLinkImpl
+		implements Inference {
 
 	private final IndexedClassExpression inferenceContext_;
-	
+
 	private final IndexedObjectSomeValuesFrom existential_;
-	
+
 	/**
 	 * 
 	 */
-	public DecomposedExistentialBackwardLink(IndexedClassExpression source, IndexedObjectSomeValuesFrom subsumer) {
+	public DecomposedExistentialBackwardLink(IndexedClassExpression source,
+			IndexedObjectSomeValuesFrom subsumer) {
 		super(source, subsumer.getRelation());
 		existential_ = subsumer;
 		inferenceContext_ = source;
 	}
-	
+
 	@Override
 	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 
-	public Subsumer getExistential() {
-		return new DecomposedSubsumer(existential_);
+	public Subsumer<IndexedObjectSomeValuesFrom> getExistential() {
+		return new DecomposedSubsumerImpl<IndexedObjectSomeValuesFrom>(
+				existential_);
 	}
 
 	@Override
-	public IndexedClassExpression getInferenceContextRoot(IndexedClassExpression rootWhereStored) {
+	public IndexedClassExpression getInferenceContextRoot(
+			IndexedClassExpression rootWhereStored) {
 		return inferenceContext_;
 	}
-	
+
 	@Override
 	public String toString() {
 		return super.toString() + " (decomposition)";

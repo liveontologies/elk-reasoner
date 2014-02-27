@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.factories;
+
 /*
  * #%L
  * ELK Reasoner
@@ -31,8 +32,8 @@ import org.semanticweb.elk.reasoner.saturation.SaturationJob;
  * A job for non-recursive context tracing.
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class ContextTracingJob extends SaturationJob<IndexedClassExpression> {
 
@@ -40,7 +41,7 @@ public class ContextTracingJob extends SaturationJob<IndexedClassExpression> {
 		super(input);
 	}
 
-	public ContextTracingListener getCallback() {
-		return ContextTracingListener.DUMMY; 
+	public static ContextTracingListener getCallback() {
+		return ContextTracingListener.DUMMY;
 	}
 }

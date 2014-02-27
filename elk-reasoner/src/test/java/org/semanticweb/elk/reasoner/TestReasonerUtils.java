@@ -25,8 +25,6 @@ package org.semanticweb.elk.reasoner;
  * #L%
  */
 
-import java.util.concurrent.Executors;
-
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
@@ -41,7 +39,7 @@ public class TestReasonerUtils {
 	public static Reasoner createTestReasoner(AxiomLoader axiomLoader,
 			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
 		return new ReasonerFactory().createReasoner(axiomLoader, stageExecutor,
-				Executors.newSingleThreadExecutor(), config);
+				config);
 	}
 
 	public static Reasoner createTestReasoner(AxiomLoader axiomLoader,

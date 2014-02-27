@@ -26,8 +26,8 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule;
@@ -61,7 +61,7 @@ public class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
 		super(conclusionProcessor, localTodo, aggregatedStatistics,
 				localStatistics);
 		this.writer_ = writer;
-		this.contextInitConclusion_ = new ContextInitialization(index);
+		this.contextInitConclusion_ = new ContextInitializationImpl(index);
 	}
 
 	@Override
