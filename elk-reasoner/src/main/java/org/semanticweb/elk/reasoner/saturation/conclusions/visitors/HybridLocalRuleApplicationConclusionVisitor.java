@@ -96,7 +96,7 @@ public class HybridLocalRuleApplicationConclusionVisitor extends
 	}
 
 	@Override
-	Boolean defaultVisit(Conclusion conclusion, Context input) {
+	protected Boolean defaultVisit(Conclusion conclusion, Context input) {
 		IndexedClassExpression root = input.getRoot();
 		if (conclusion.getSourceRoot(root) == root) {
 			// applying rules for hybrid premises

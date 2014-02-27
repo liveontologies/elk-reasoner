@@ -71,7 +71,7 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 			return false;
 		}
 
-		RuleApplicationFactory ruleAppFactory = new RuleApplicationAdditionPruningFactory(
+		RuleApplicationFactory<?> ruleAppFactory = new RuleApplicationAdditionPruningFactory(
 				reasoner.saturationState);
 		Collection<IndexedClassExpression> inputs = new ContextRootCollection(
 				reasoner.saturationState.getNotSaturatedContexts());

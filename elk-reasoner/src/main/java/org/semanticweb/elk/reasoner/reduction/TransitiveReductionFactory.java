@@ -113,7 +113,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	/**
 	 * The {@link SaturationState} keeping the information about saturation
 	 */
-	private final SaturationState saturationState_;
+	private final SaturationState<?> saturationState_;
 
 	/**
 	 * The default equivalence classes for owl:Thing to be used when there are
@@ -133,7 +133,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 *            the listener object implementing callback functions for this
 	 *            engine
 	 */
-	public TransitiveReductionFactory(SaturationState saturationState,
+	public TransitiveReductionFactory(SaturationState<?> saturationState,
 			int maxWorkers, TransitiveReductionListener<J> listener) {
 		this.listener_ = listener;
 		this.auxJobQueue_ = new ConcurrentLinkedQueue<SaturationJobSuperClass<R, J>>();

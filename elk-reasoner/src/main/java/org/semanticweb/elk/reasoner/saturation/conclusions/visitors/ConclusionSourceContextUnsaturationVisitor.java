@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
@@ -50,7 +49,7 @@ public class ConclusionSourceContextUnsaturationVisitor extends
 	}
 
 	@Override
-	Boolean defaultVisit(Conclusion conclusion, Context context) {
+	protected Boolean defaultVisit(Conclusion conclusion, Context context) {
 		IndexedClassExpression root = conclusion.getSourceRoot(context
 				.getRoot());
 		writer_.markAsNotSaturated(root);

@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * @author "Yevgeny Kazakov"
  * 
  */
-interface WorkerLocalTodo {
+public interface WorkerLocalTodo {
 
 	/**
 	 * @return the next {@link Conclusion} in the queue or {@link null} if there

@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -33,6 +34,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialForwardLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,49 +119,40 @@ public class ForwardLink extends AbstractConclusion {
 
 	// TODO: find a better place for the following methods
 
-	/**
-	 * Producing {@link ForwardLink} or {@link BackwardLink} with the given
-	 * parameters using the given {@link ConclusionProducer} depending on
-	 * whether the link can participate in role composition rules.
-	 * 
-	 * @param producer
-	 * @param source
-	 * @param relation
-	 * @param target
-	 */
-	public static void produceLink(ConclusionProducer producer,
-			IndexedClassExpression source, IndexedObjectProperty relation,
-			IndexedClassExpression target) {
-
+	public static void produceDecomposedExistentialLink(
+			ConclusionProducer producer, IndexedClassExpression source,
+			IndexedObjectSomeValuesFrom existential) {
+		IndexedObjectProperty relation = existential.getRelation();
 		if (relation.getSaturated().getCompositionsByLeftSubProperty()
 				.isEmpty()) {
-			producer.produce(target, new BackwardLink(source, relation));
+			producer.produce(existential.getFiller(),
+					new DecomposedExistentialBackwardLink(source, existential));
 		} else {
-			producer.produce(source, new ForwardLink(relation, target));
+			producer.produce(source, new DecomposedExistentialForwardLink(
+					existential));
 		}
 	}
 
-	/**
-	 * @see #produceLink(ConclusionProducer, IndexedClassExpression,
-	 *      IndexedObjectProperty, IndexedClassExpression)
-	 * 
-	 * @param producer
-	 * @param source
-	 * @param relation
-	 * @param target
-	 */
-	public static void produceLink(ConclusionProducer producer,
-			IndexedClassExpression source, IndexedBinaryPropertyChain relation,
-			IndexedClassExpression target) {
+	public static void produceComposedLink(ConclusionProducer producer,
+			IndexedClassExpression source,
+			IndexedObjectProperty backwardRelation,
+			IndexedClassExpression inferenceRoot,
+			IndexedPropertyChain forwardRelation,
+			IndexedClassExpression target,
+			IndexedBinaryPropertyChain composition) {
 
-		if (relation.getSaturated().getCompositionsByLeftSubProperty()
+		if (composition.getSaturated().getCompositionsByLeftSubProperty()
 				.isEmpty()) {
-			for (IndexedObjectProperty toldSuper : relation
+			for (IndexedObjectProperty toldSuper : composition
 					.getToldSuperProperties()) {
-				producer.produce(target, new BackwardLink(source, toldSuper));
+				producer.produce(target, new ComposedBackwardLink(source,
+						backwardRelation, inferenceRoot, forwardRelation,
+						target, toldSuper));
 			}
 		} else {
-			producer.produce(source, new ForwardLink(relation, target));
+			producer.produce(source, new ComposedForwardLink(source,
+					backwardRelation, inferenceRoot, forwardRelation, target,
+					composition));
 		}
 	}
 }

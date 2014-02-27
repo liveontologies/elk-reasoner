@@ -55,7 +55,7 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		RuleApplicationFactory cleaningFactory = new RuleApplicationDeletionNotSaturatedFactory(
+		RuleApplicationFactory<?> cleaningFactory = new RuleApplicationDeletionNotSaturatedFactory(
 				reasoner.saturationState);
 		this.cleaning_ = new ClassExpressionSaturationNoInput(
 				reasoner.getProcessExecutor(), workerNo, cleaningFactory,

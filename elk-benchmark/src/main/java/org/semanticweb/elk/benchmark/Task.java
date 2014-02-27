@@ -40,4 +40,5 @@ public interface Task {
 	public void run() throws TaskException;
 	public void dispose();
 	public Metrics getMetrics();
+	public void postRun() throws TaskException;	
 }

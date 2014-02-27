@@ -32,6 +32,7 @@ import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
@@ -52,6 +53,14 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalChangeCheck
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.OnDemandTracingReader;
+import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
+import org.semanticweb.elk.reasoner.saturation.tracing.SimpleCentralizedTraceStore;
+import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
+import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
@@ -81,7 +90,7 @@ public abstract class AbstractReasonerState {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractReasonerState.class);
 
-	final SaturationState saturationState;
+	final SaturationState<? extends Context> saturationState;
 
 	/**
 	 * Accumulated statistics regarding produced conclusions and rule
@@ -163,6 +172,11 @@ public abstract class AbstractReasonerState {
 			propertyHierarchyUpToDate_ = false;
 		}
 	};
+	
+	/**
+	 * Keeps relevant information about tracing
+	 */
+	TraceState traceState;
 
 	protected AbstractReasonerState() {
 		this.objectCache_ = new IndexedObjectCache();
@@ -566,6 +580,54 @@ public abstract class AbstractReasonerState {
 	public synchronized void initInstanceTaxonomy() {
 		instanceTaxonomyState.initTaxonomy(new ConcurrentInstanceTaxonomy(
 				classTaxonomyState.getTaxonomy()));
+	}
+	
+	/*---------------------------------------------------
+	 * TRACING METHODS
+	 * TODO; clients should not have to work with contexts and conclusions. we
+	 * need to represent the trace graphs in a way that is completely detached
+	 * from the index or saturation data structures (like the taxonomies).
+	 * 
+	 * TODO#2: check if FULL_TRACING is on 
+	 *---------------------------------------------------*/
+	
+	public TraceStore.Reader explainSubsumption(ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
+		if (traceState == null) {
+			resetTraceState();
+		}
+		
+		IndexedClassExpression subsumee = sub.accept(objectCache_.getIndexObjectConverter());
+		IndexedClassExpression subsumer = sup.accept(objectCache_.getIndexObjectConverter());
+		
+		TraceStore.Reader onDemandTracer = new OnDemandTracingReader(traceState.getSaturationState(),
+				traceState.getTraceStore().getReader(),
+				traceState.getContextTracingFactory());
+		//TraceStore.Reader inferenceReader = new FirstNInferencesReader(onDemandTracer, 1);
+		TraceStore.Reader inferenceReader = onDemandTracer;
+		RecursiveTraceUnwinder unwinder = new RecursiveTraceUnwinder(inferenceReader);
+		unwinder.accept(subsumee, new DecomposedSubsumer(subsumer), new DummyConclusionVisitor<IndexedClassExpression>());
+		
+		return traceState.getTraceStore().getReader();
+	}
+	
+	IndexedClassExpression transform(ElkClassExpression ce) {
+		return ce.accept(objectCache_.getIndexObjectConverter());
+	}
+	
+	public void resetTraceState() {
+		createTraceState(saturationState);
+	}
+	
+	private void createTraceState(SaturationState<?> mainState) {
+		traceState = new TraceState(new SimpleCentralizedTraceStore(), mainState, getNumberOfWorkers());
+	}
+	
+	TraceState getTraceState() {
+		if (traceState == null) {
+			resetTraceState();
+		}
+		
+		return traceState;
 	}
 
 	// ////////////////////////////////////////////////////////////////

@@ -46,7 +46,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * @author "Yevgeny Kazakov"
  * 
  */
-class ReferenceSaturationState extends AbstractSaturationState {
+class ReferenceSaturationState extends AbstractSaturationState<ExtendedContext> {
 
 	// the number of contexts created by this SaturationState
 	AtomicInteger contextCount = new AtomicInteger(0);
@@ -56,21 +56,21 @@ class ReferenceSaturationState extends AbstractSaturationState {
 	 * @param index
 	 */
 	public ReferenceSaturationState(OntologyIndex index) {
-		super(index);
+		super(index, new MainContextFactory());
 	}
 
 	@Override
-	public Collection<Context> getContexts() {
-		return new AbstractCollection<Context>() {
+	public Collection<ExtendedContext> getContexts() {
+		return new AbstractCollection<ExtendedContext>() {
 
 			@Override
-			public Iterator<Context> iterator() {
-				return new Iterator<Context>() {
+			public Iterator<ExtendedContext> iterator() {
+				return new Iterator<ExtendedContext>() {
 
 					Iterator<? extends IndexedObjectWithContext> ices = ontologyIndex
 							.getIndexedClassExpressions().iterator();
 
-					Context next;
+					ExtendedContext next;
 
 					{
 						seekNext();
@@ -92,10 +92,10 @@ class ReferenceSaturationState extends AbstractSaturationState {
 					}
 
 					@Override
-					public Context next() {
+					public ExtendedContext next() {
 						if (next == null)
 							throw new NoSuchElementException("No next context");
-						Context result = next;
+						ExtendedContext result = next;
 						seekNext();
 						return result;
 					}

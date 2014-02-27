@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
@@ -91,13 +92,14 @@ public class ReflexiveBackwardLinkCompositionRule extends
 
 		for (IndexedObjectProperty backwardRelation : new LazySetIntersection<IndexedObjectProperty>(
 				comps.keySet(), reflexiveBackwardRelations)) {
-
 			Collection<IndexedBinaryPropertyChain> compositions = comps
 					.get(backwardRelation);
-
-			for (IndexedBinaryPropertyChain composition : compositions)
-				ForwardLink.produceLink(producer, premises.getRoot(),
-						composition, forwardLink_.getTarget());
+			for (IndexedBinaryPropertyChain composition : compositions) {
+				IndexedClassExpression root = premises.getRoot();
+				ForwardLink.produceComposedLink(producer, root,
+						backwardRelation, root, forwardLink_.getRelation(),
+						forwardLink_.getTarget(), composition);
+			}
 		}
 	}
 

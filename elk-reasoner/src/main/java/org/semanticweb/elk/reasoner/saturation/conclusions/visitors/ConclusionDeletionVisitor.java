@@ -48,7 +48,7 @@ public class ConclusionDeletionVisitor extends
 	// TODO: make this by combining the visitor in order to avoid overheads when
 	// logging is switched off
 	@Override
-	Boolean defaultVisit(Conclusion conclusion, Context context) {
+	protected Boolean defaultVisit(Conclusion conclusion, Context context) {
 		boolean result = context.removeConclusion(conclusion);
 		LOGGER_.trace("{}: deleting {}: {}", context, conclusion,
 				result ? "success" : "failure");

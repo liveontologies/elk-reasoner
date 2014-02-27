@@ -42,13 +42,13 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface RuleApplicationFactory {
+public interface RuleApplicationFactory<C extends Context> {
 
 	/**
 	 * @return the {@link SaturationState} with which this
 	 *         {@link RuleApplicationFactory} is working.
 	 */
-	public SaturationState getSaturationState();
+	public SaturationState<? extends C> getSaturationState();
 
 	/**
 	 * Create a new {@link InputProcessor} that concurrently processes

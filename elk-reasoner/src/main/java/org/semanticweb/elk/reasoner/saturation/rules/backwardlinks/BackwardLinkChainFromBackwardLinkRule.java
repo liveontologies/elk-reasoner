@@ -38,8 +38,6 @@ import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link LinkableBackwardLinkRule} applied when processing a
@@ -54,8 +52,10 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 		AbstractLinkableBackwardLinkRule {
 
 	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(BackwardLinkChainFromBackwardLinkRule.class);
+	/*
+	 * private static final Logger LOGGER_ = LoggerFactory
+	 * .getLogger(BackwardLinkChainFromBackwardLinkRule.class);
+	 */
 
 	public static final String NAME = "BackwardLink ForwardLink Composition";
 
@@ -142,8 +142,6 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 		if (comps == null)
 			return;
 
-		IndexedClassExpression source = link.getSource();
-
 		for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
 				comps.keySet(), forwardLinksByObjectProperty_.keySet())) {
 
@@ -154,8 +152,9 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 
 			for (IndexedBinaryPropertyChain composition : compositions)
 				for (IndexedClassExpression forwardTarget : forwardTargets)
-					ForwardLink.produceLink(producer, source, composition,
-							forwardTarget);
+					ForwardLink.produceComposedLink(producer, link.getSource(),
+							link.getRelation(), premises.getRoot(),
+							forwardRelation, forwardTarget, composition);
 		}
 
 	}

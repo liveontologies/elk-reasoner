@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public abstract class AbstractRuleApplicationFactory implements
-		RuleApplicationFactory {
+public abstract class AbstractRuleApplicationFactory<C extends Context> implements
+		RuleApplicationFactory<C> {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory
@@ -52,14 +52,14 @@ public abstract class AbstractRuleApplicationFactory implements
 	/**
 	 * The main {@link SaturationState} this factory works with
 	 */
-	private final SaturationState saturationState_;
+	private final SaturationState<? extends C> saturationState_;
 
 	/**
 	 * The {@link SaturationStatistics} aggregated for all workers
 	 */
 	private final SaturationStatistics aggregatedStats_;
 
-	public AbstractRuleApplicationFactory(final SaturationState saturationState) {
+	public AbstractRuleApplicationFactory(final SaturationState<? extends C> saturationState) {
 		this.saturationState_ = saturationState;
 		this.aggregatedStats_ = new SaturationStatistics();
 	}
@@ -74,9 +74,9 @@ public abstract class AbstractRuleApplicationFactory implements
 	 *         {@link SaturationStateWriter} and updates the supplied local
 	 *         {@link SaturationStatistics} accordingly
 	 */
-	InputProcessor<IndexedClassExpression> getEngine(
+	protected InputProcessor<IndexedClassExpression> getEngine(
 			ConclusionVisitor<Context, Boolean> conclusionProcessor,
-			SaturationStateWriter saturationStateWriter,
+			SaturationStateWriter<? extends C> saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
 		conclusionProcessor = SaturationUtils
 				.getProcessedConclusionCountingProcessor(conclusionProcessor,
@@ -97,7 +97,7 @@ public abstract class AbstractRuleApplicationFactory implements
 	 * @return a new writer for the main {@link SaturationState} to be used by
 	 *         engine.
 	 */
-	SaturationStateWriter getBaseWriter(
+	SaturationStateWriter<? extends C> getBaseWriter(
 			ContextCreationListener creationListener,
 			ContextModificationListener modificationListener) {
 		// by default the writer can create new contexts
@@ -115,7 +115,7 @@ public abstract class AbstractRuleApplicationFactory implements
 	 * @return the actual {@link SaturationStateWriter} that will be used
 	 */
 	@SuppressWarnings("static-method")
-	SaturationStateWriter getFinalWriter(SaturationStateWriter writer) {
+	SaturationStateWriter<? extends C> getFinalWriter(SaturationStateWriter<? extends C> writer) {
 		return writer;
 	}
 
@@ -128,8 +128,8 @@ public abstract class AbstractRuleApplicationFactory implements
 	 * @param localStatistics
 	 * @return
 	 */
-	abstract ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter writer,
+	protected abstract ConclusionVisitor<Context, Boolean> getConclusionProcessor(
+			RuleVisitor ruleVisitor, SaturationStateWriter<? extends C> writer,
 			SaturationStatistics localStatistics);
 
 	@Override
@@ -142,12 +142,12 @@ public abstract class AbstractRuleApplicationFactory implements
 		modificationListener = SaturationUtils
 				.addStatsToContextModificationListener(modificationListener,
 						localStatistics.getContextStatistics());
-		SaturationStateWriter writer = getBaseWriter(creationListener,
+		SaturationStateWriter<? extends C> writer = getBaseWriter(creationListener,
 				modificationListener);
 		WorkerLocalTodo localTodo = new WorkerLocalTodoImpl();
-		WorkerLocalizedSaturationStateWriter optimizedWriter = new WorkerLocalizedSaturationStateWriter(
+		WorkerLocalizedSaturationStateWriter<C> optimizedWriter = new WorkerLocalizedSaturationStateWriter<C>(
 				writer, localTodo);
-		writer = SaturationUtils.getStatsAwareWriter(optimizedWriter,
+		writer = SaturationUtils.<C>getStatsAwareWriter(optimizedWriter,
 				localStatistics);
 		writer = getFinalWriter(writer);
 		RuleVisitor ruleVisitor = SaturationUtils
@@ -168,7 +168,7 @@ public abstract class AbstractRuleApplicationFactory implements
 	}
 
 	@Override
-	public final SaturationState getSaturationState() {
+	public final SaturationState<? extends C> getSaturationState() {
 		return saturationState_;
 	}
 

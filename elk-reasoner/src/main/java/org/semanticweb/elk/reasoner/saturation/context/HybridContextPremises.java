@@ -28,6 +28,8 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 
@@ -84,6 +86,13 @@ public class HybridContextPremises implements ContextPremises {
 			IndexedDisjointnessAxiom axiom) {
 		// local
 		return localPremises_.isInconsistForDisjointnessAxiom(axiom);
+	}
+
+	@Override
+	public Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(
+			IndexedPropertyChain subRoot) {
+		// local
+		return localPremises_.getPropagatedSubsumers(subRoot);
 	}
 
 	@Override

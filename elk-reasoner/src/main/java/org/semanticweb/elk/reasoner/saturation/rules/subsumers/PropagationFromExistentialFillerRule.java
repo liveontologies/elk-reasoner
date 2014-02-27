@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -32,20 +33,20 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.LazySetUnion;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ChainableSubsumerRule} producing {@link Propagation} of a
@@ -60,8 +61,10 @@ public class PropagationFromExistentialFillerRule extends
 		AbstractChainableSubsumerRule {
 
 	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(PropagationFromExistentialFillerRule.class);
+	/*
+	 * private static final Logger LOGGER_ = LoggerFactory
+	 * .getLogger(PropagationFromExistentialFillerRule.class);
+	 */
 
 	public static final String NAME = "ObjectSomeValuesFrom Propagation Introduction";
 
@@ -105,9 +108,11 @@ public class PropagationFromExistentialFillerRule extends
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 
+		final Map<IndexedObjectProperty, ? extends SubContextPremises> subContextMap = premises
+				.getSubContextPremisesByObjectProperty();
 		final Set<IndexedObjectProperty> candidatePropagationProperties = new LazySetUnion<IndexedObjectProperty>(
-				premises.getLocalReflexiveObjectProperties(), premises
-						.getSubContextPremisesByObjectProperty().keySet());
+				premises.getLocalReflexiveObjectProperties(),
+				subContextMap.keySet());
 
 		// TODO: deal with reflexive roles using another
 		// rule and uncomment this
@@ -124,14 +129,23 @@ public class PropagationFromExistentialFillerRule extends
 			for (IndexedObjectProperty property : new LazySetIntersection<IndexedObjectProperty>(
 					candidatePropagationProperties, relation.getSaturated()
 							.getSubProperties())) {
-				producer.produce(premises.getRoot(), new Propagation(property,
-						e));
+				// producer.produce(premises.getRoot(), new
+				// Propagation(property, e));
+				if (subContextMap.get(property).isInitialized()) {
+					// propagation introduction is a binary rule where the
+					// sub-context being initialized is a premise
+					producer.produce(premises.getRoot(), new TracedPropagation(
+							property, e));
+				}
 			}
 
 			// TODO: create a composition rule to deal with reflexivity
 			// propagating to the this context if relation is reflexive
-			if (relation.getSaturated().isDerivedReflexive())
-				producer.produce(premises.getRoot(), new ComposedSubsumer(e));
+			if (relation.getSaturated().isDerivedReflexive()) {
+				// producer.produce(premises.getRoot(), new
+				// ComposedSubsumer(e));
+				producer.produce(premises.getRoot(), new ReflexiveSubsumer(e));
+			}
 		}
 	}
 
@@ -205,8 +219,10 @@ public class PropagationFromExistentialFillerRule extends
 		for (IndexedObjectSomeValuesFrom e : negExistentials_) {
 			if (e.getRelation().getSaturated().getSubPropertyChains()
 					.contains(property)) {
-				producer.produce(premises.getRoot(), new Propagation(property,
-						e));
+				// producer.produce(premises.getRoot(), new
+				// Propagation(property, e));
+				producer.produce(premises.getRoot(), new TracedPropagation(
+						property, e));
 			}
 		}
 

@@ -84,7 +84,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * The cached {@link SaturationState} used by the
 	 * {@link RuleApplicationFactory}
 	 */
-	private final SaturationState saturationState_;
+	private final SaturationState<?> saturationState_;
 	/**
 	 * The buffer for jobs that need to be processed, i.e., those for which the
 	 * method {@link Engine#submit(SaturationJob)} was executed but processing

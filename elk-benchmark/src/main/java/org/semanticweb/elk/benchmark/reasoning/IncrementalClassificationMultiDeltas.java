@@ -201,6 +201,9 @@ public class IncrementalClassificationMultiDeltas extends
 		public String getName() {
 			return "Classify first ontology: " + ontologyFile_.getName();
 		}
+		
+		@Override
+		public void postRun() throws TaskException {}
 
 		@Override
 		public void prepare() throws TaskException {
@@ -271,6 +274,9 @@ public class IncrementalClassificationMultiDeltas extends
 			deltaDir_ = dir;
 		}
 
+		@Override
+		public void postRun() throws TaskException {}
+		
 		@Override
 		public String getName() {
 			return "Classify incrementally";

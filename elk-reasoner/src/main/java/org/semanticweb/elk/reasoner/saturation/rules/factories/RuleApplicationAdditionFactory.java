@@ -50,16 +50,16 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * 
  */
 public class RuleApplicationAdditionFactory extends
-		AbstractRuleApplicationFactory {
+		AbstractRuleApplicationFactory<Context> {
 
-	public RuleApplicationAdditionFactory(SaturationState saturationState) {
+	public RuleApplicationAdditionFactory(SaturationState<? extends Context> saturationState) {
 		super(saturationState);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter writer,
+	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
+			RuleVisitor ruleVisitor, SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
 		return new ComposedConclusionVisitor<Context>(
 		// insert conclusions initializing contexts if necessary

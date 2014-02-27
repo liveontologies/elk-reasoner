@@ -47,14 +47,14 @@ public class RuleApplicationAdditionUnSaturationFactory extends
 		RuleApplicationAdditionFactory {
 
 	public RuleApplicationAdditionUnSaturationFactory(
-			SaturationState saturationState) {
+			SaturationState<? extends Context> saturationState) {
 		super(saturationState);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter writer,
+	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
+			RuleVisitor ruleVisitor, SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
 		// the visitor used for inserting conclusion
 		return new ComposedConclusionVisitor<Context>(

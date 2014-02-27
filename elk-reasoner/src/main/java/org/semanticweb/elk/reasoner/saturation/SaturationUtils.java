@@ -56,10 +56,8 @@ public class SaturationUtils {
 
 	/*
 	 * --------------------------------------------------------------------------
-	 * ---------- METHOD WHICH ADD TIMERS AND COUNTERS TO VARIOUS VISITORS AND
-	 * LISTENERS
+	 * METHODS WHICH ADD TIMERS AND COUNTERS TO VARIOUS VISITORS AND LISTENERS
 	 * ----------------------------------------------------------------
-	 * --------------------
 	 */
 
 	public static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_
@@ -90,16 +88,16 @@ public class SaturationUtils {
 		return ruleAppVisitor;
 	}
 
-	public static SaturationStateWriter getStatAwareWriter(
-			SaturationStateWriter writer, SaturationStatistics localStatistics) {
-		return COLLECT_CONCLUSION_COUNTS ? new CountingSaturationStateWriter(
+	public static <C extends Context> SaturationStateWriter<C> getStatAwareWriter(
+			SaturationStateWriter<C> writer, SaturationStatistics localStatistics) {
+		return COLLECT_CONCLUSION_COUNTS ? new CountingSaturationStateWriter<C>(
 				writer, localStatistics.getConclusionStatistics()
 						.getProducedConclusionCounts()) : writer;
 	}
 
-	public static SaturationStateWriter getStatsAwareWriter(
-			SaturationStateWriter writer, SaturationStatistics localStatistics) {
-		return COLLECT_CONCLUSION_COUNTS ? new CountingSaturationStateWriter(
+	public static <C extends Context> SaturationStateWriter<C> getStatsAwareWriter(
+			SaturationStateWriter<C> writer, SaturationStatistics localStatistics) {
+		return COLLECT_CONCLUSION_COUNTS ? new CountingSaturationStateWriter<C>(
 				writer, localStatistics.getConclusionStatistics()
 						.getProducedConclusionCounts()) : writer;
 	}

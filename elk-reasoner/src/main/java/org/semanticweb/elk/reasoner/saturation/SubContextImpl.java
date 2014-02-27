@@ -81,6 +81,12 @@ public class SubContextImpl extends ArrayHashSet<IndexedClassExpression>
 	public boolean containsSubConclusion(SubConclusion conclusion) {
 		return conclusion.accept(SUB_CONCLUSION_OCCURRENCE_CHECKER_, this);
 	}
+	
+	@Override
+	public boolean isInitialized() {
+		return isInitialized_;
+	}
+
 
 	public static class SubConclusionInserter implements
 			SubConclusionVisitor<SubContextImpl, Boolean> {

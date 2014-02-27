@@ -27,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * A {@link SaturationState} backed by a map from {@link IndexedClassExpression}
@@ -36,29 +35,29 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class MapSaturationState extends AbstractSaturationState {
+public class MapSaturationState<EC extends ExtendedContext> extends AbstractSaturationState<EC> {
 
-	private final ConcurrentHashMap<IndexedClassExpression, ExtendedContext> contextAssignment_;
+	private final ConcurrentHashMap<IndexedClassExpression, EC> contextAssignment_;
 
-	public MapSaturationState(OntologyIndex index, int expectedSize) {
-		super(index);
-		this.contextAssignment_ = new ConcurrentHashMap<IndexedClassExpression, ExtendedContext>(
+	public MapSaturationState(OntologyIndex index, ContextFactory<EC> factory, int expectedSize) {
+		super(index, factory);
+		this.contextAssignment_ = new ConcurrentHashMap<IndexedClassExpression, EC>(
 				expectedSize);
 	}
 
-	public MapSaturationState(OntologyIndex index) {
-		super(index);
-		this.contextAssignment_ = new ConcurrentHashMap<IndexedClassExpression, ExtendedContext>(
+	public MapSaturationState(OntologyIndex index, ContextFactory<EC> factory) {
+		super(index, factory);
+		this.contextAssignment_ = new ConcurrentHashMap<IndexedClassExpression, EC>(
 				index.getIndexedClassExpressions().size());
 	}
 
 	@Override
-	public Collection<? extends Context> getContexts() {
+	public Collection<EC> getContexts() {
 		return contextAssignment_.values();
 	}
 
 	@Override
-	public ExtendedContext getContext(IndexedClassExpression ice) {
+	public EC getContext(IndexedClassExpression ice) {
 		return contextAssignment_.get(ice);
 	}
 
@@ -68,7 +67,7 @@ public class MapSaturationState extends AbstractSaturationState {
 	}
 
 	@Override
-	ExtendedContext setIfAbsent(ExtendedContext context) {
+	EC setIfAbsent(EC context) {
 		return contextAssignment_.putIfAbsent(context.getRoot(), context);
 	}
 

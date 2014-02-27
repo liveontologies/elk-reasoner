@@ -45,7 +45,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.SubConclusion;
 public abstract class AbstractConclusionVisitor<I, O> extends
 		AbstractSubConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 
-	abstract O defaultVisit(Conclusion conclusion, I input);
+	protected abstract O defaultVisit(Conclusion conclusion, I input);
 
 	@Override
 	O defaultVisit(SubConclusion subConclusion, I input) {

@@ -100,8 +100,10 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 			for (IndexedBinaryPropertyChain composition : compositions)
 				for (IndexedClassExpression source : subPremises
 						.getLinkedRoots()) {
-					ForwardLink.produceLink(producer, source, composition,
-							forwardLink_.getTarget());
+					ForwardLink.produceComposedLink(producer, source,
+							backwardRelation, premises.getRoot(),
+							forwardLink_.getRelation(),
+							forwardLink_.getTarget(), composition);
 				}
 		}
 	}

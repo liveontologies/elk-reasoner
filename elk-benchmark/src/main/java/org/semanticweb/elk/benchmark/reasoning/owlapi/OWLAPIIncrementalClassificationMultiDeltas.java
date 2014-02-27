@@ -169,6 +169,9 @@ public abstract class OWLAPIIncrementalClassificationMultiDeltas extends
 		}
 
 		@Override
+		public void postRun() throws TaskException {}
+		
+		@Override
 		public String getName() {
 			return "Classify first ontology: " + ontologyFile_.getName();
 		}
@@ -222,6 +225,9 @@ public abstract class OWLAPIIncrementalClassificationMultiDeltas extends
 			deltaDir_ = dir;
 		}
 
+		@Override
+		public void postRun() throws TaskException {}
+		
 		@Override
 		public String getName() {
 			return "Classify incrementally";

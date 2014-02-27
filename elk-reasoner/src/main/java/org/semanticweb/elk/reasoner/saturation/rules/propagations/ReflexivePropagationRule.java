@@ -24,13 +24,14 @@ package org.semanticweb.elk.reasoner.saturation.rules.propagations;
 
 import java.util.Set;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
 
 /**
  * A {@link PropagationRule} producing {@link Subsumer}s in the {@link Context}s
@@ -63,9 +64,14 @@ public class ReflexivePropagationRule extends AbstractPropagationRule {
 			ConclusionProducer producer) {
 		final Set<IndexedObjectProperty> reflexive = premises
 				.getLocalReflexiveObjectProperties();
-		if (reflexive.contains(premise.getRelation()))
-			producer.produce(premises.getRoot(),
-					new ComposedSubsumer(premise.getCarry()));
+		if (reflexive.contains(premise.getRelation())) {
+			// producer.produce(premises.getRoot(), new
+			// ComposedSubsumer(premise.getCarry()));
+			IndexedClassExpression thisRoot = premises.getRoot();
+
+			producer.produce(thisRoot, new PropagatedSubsumer(thisRoot,
+					premise, premise.getRelation(), thisRoot));
+		}
 	}
 
 	@Override

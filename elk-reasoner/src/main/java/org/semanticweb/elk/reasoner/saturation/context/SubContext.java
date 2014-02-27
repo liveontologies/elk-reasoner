@@ -1,7 +1,12 @@
 package org.semanticweb.elk.reasoner.saturation.context;
 
+import java.util.Set;
+
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 
 /*
  * #%L
@@ -36,5 +41,12 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
  * @author "Yevgeny Kazakov"
  */
 public interface SubContext extends SubContextPremises, SubConclusionSet {
+	
+	/**
+	 * @return the representation of all derived {@link Propagation}s with
+	 *         relations {@link Propagation#getRelation()} to be sub-root of
+	 *         this {@link SubContextPremises}
+	 */
+	Set<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers();
 
 }
