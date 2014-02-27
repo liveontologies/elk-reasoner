@@ -41,6 +41,7 @@ import org.semanticweb.elk.benchmark.reasoning.ClassificationTask;
 import org.semanticweb.elk.benchmark.reasoning.IncrementalClassificationMultiDeltas;
 import org.semanticweb.elk.benchmark.reasoning.IncrementalClassificationTask;
 import org.semanticweb.elk.benchmark.reasoning.RandomWalkIncrementalClassificationTask;
+import org.semanticweb.elk.benchmark.reasoning.RandomWalkIncrementalClassificationWithABoxTask;
 
 /**
  * 
@@ -129,6 +130,31 @@ public class BenchmarkTest {
 				Integer.valueOf(System.getProperty(Constants.WARM_UPS, "0")),
 				Integer.valueOf(System.getProperty(Constants.RUNS, "1")),
 				new String[] { System.getProperty("incremental.dir") });
+	}
+	
+	@Test
+	public void incrementalRandomWalkTBoxABox() throws Exception {
+		Assume.assumeTrue(testsToRun_.contains(testName.getMethodName()));
+
+		VisitorTaskCollection collection = new AllFilesTaskCollection(
+				new String[] { System.getProperty("incremental.dir") }) {
+
+			@Override
+			public Task instantiateSubTask(String[] args) throws TaskException {
+				return new RandomWalkIncrementalClassificationWithABoxTask(args);
+			}
+		};
+
+		RunAllOnceThenRepeatRunner runner = new RunAllOnceThenRepeatRunner(
+				Integer.valueOf(System.getProperty(Constants.WARM_UPS, "0")),
+				Integer.valueOf(System.getProperty(Constants.RUNS, "1")));
+
+		try {
+			runner.run(collection);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 	}
 
 }
