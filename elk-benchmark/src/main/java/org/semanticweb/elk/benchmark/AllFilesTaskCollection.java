@@ -34,7 +34,7 @@ import java.util.Collection;
  *
  * pavel.klinov@uni-ulm.de
  */
-public abstract class AllFilesTaskCollection implements TaskCollection {
+public abstract class AllFilesTaskCollection implements TaskCollection, VisitorTaskCollection {
 
 	private final String[] args_;
 	
@@ -80,5 +80,13 @@ public abstract class AllFilesTaskCollection implements TaskCollection {
 		return null;
 	}
 	
+	@Override
+	public void visitTasks(TaskVisitor visitor) throws TaskException {
+		for (Task task : getTasks()) {
+			visitor.visit(task);
+		}
+	}
+
 	public abstract Task instantiateSubTask(String[] args) throws TaskException;
+	
 }
