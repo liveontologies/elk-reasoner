@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.util.collections.Pair;
 
@@ -22,7 +22,7 @@ public class SideConditionCollector extends UsedInferencesCounter {
 	
 	@Override
 	public Void visit(SubClassOfSubsumer conclusion, IndexedClassExpression input) {
-		subclassAxioms_.add(new Pair<IndexedClassExpression, IndexedClassExpression>(((Subsumer)conclusion.getPremise()).getExpression(), conclusion.getExpression()));
+		subclassAxioms_.add(new Pair<IndexedClassExpression, IndexedClassExpression>(((Subsumer<?>)conclusion.getPremise()).getExpression(), conclusion.getExpression()));
 		//subclassAxioms_.add(conclusion);
 		
 		return super.visit(conclusion, input);

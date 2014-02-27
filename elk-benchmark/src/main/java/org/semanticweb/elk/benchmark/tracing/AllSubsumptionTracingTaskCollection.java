@@ -47,8 +47,8 @@ import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionTracingTests;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
@@ -229,7 +229,7 @@ public class AllSubsumptionTracingTaskCollection implements VisitorTaskCollectio
 				SideConditionCollector counter = new SideConditionCollector();
 				SaturationStatistics stats = traceState.getContextTracingFactory().getStatistics();
 				
-				traceUnwinder.accept(sub, new DecomposedSubsumer(sup), new AbstractConclusionVisitor<IndexedClassExpression, Boolean>() {
+				traceUnwinder.accept(sub, new DecomposedSubsumerImpl(sup), new AbstractConclusionVisitor<IndexedClassExpression, Boolean>() {
 
 					@Override
 					protected Boolean defaultVisit(Conclusion conclusion, IndexedClassExpression input) {
