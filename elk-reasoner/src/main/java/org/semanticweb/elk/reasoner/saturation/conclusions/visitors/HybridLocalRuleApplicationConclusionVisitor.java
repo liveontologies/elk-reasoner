@@ -39,10 +39,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * applications.
  * 
  * When applying local rules, to the visited {@link Conclusion}, local premises
- * (premises with the same source) are taken from the local {@link Context} and
- * other premises from the corresponding {@link Context} in the main saturation
- * state. This is done to ensure that every rule is applied at most once and no
- * inference is lost when processing only local {@link Conclusion}s.
+ * (premises with the same source as the {@link Conclusion}) are taken from the
+ * local {@link Context} and other premises from the corresponding
+ * {@link Context} in the main saturation state. This is done to ensure that
+ * every rule is applied at most once and no inference is lost when processing
+ * only local {@link Conclusion}s.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -81,20 +82,20 @@ public class HybridLocalRuleApplicationConclusionVisitor extends
 
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, Context input) {
-		IndexedClassExpression root = input.getRoot();
-		if (conclusion.getSourceRoot(root) == root) {
-			// applying rules for hybrid premises
-			ContextPremises hybridPremises = new HybridContextPremises(input,
-					mainState_.getContext(input.getRoot()));
-			conclusion.accept(nonRedundantLocalRuleApplicator_, hybridPremises);
-			conclusion.accept(redundantLocalRuleApplicator_, hybridPremises);
-		} else {
-			// applying rules with non-local premises
-			ContextPremises mainPremises = mainState_.getContext(input
-					.getRoot());
-			conclusion.accept(nonRedundantLocalRuleApplicator_, mainPremises);
-			conclusion.accept(redundantLocalRuleApplicator_, mainPremises);
-		}
+		ContextPremises premises = getPremises(conclusion, input);
+		conclusion.accept(nonRedundantLocalRuleApplicator_, premises);
+		conclusion.accept(redundantLocalRuleApplicator_, premises);
 		return true;
+	}
+
+	private ContextPremises getPremises(Conclusion conclusion, Context input) {
+		IndexedClassExpression root = input.getRoot();
+		ContextPremises mainPremises = mainState_.getContext(root);
+		if (conclusion.getSourceRoot(root) != root)
+			// there are currently no rules which can use other context premises
+			// with the same source, so we can just take all main premises
+			return mainPremises;
+		// else
+		return new HybridContextPremises(input, mainPremises);
 	}
 }
