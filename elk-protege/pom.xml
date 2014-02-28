@@ -13,8 +13,16 @@
 	<name>ELK Reasoner Protege Plug-in</name>
 	<description>ELK plug-in for Protege ontology editor</description>
 
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<log4j.lower.version>1.2</log4j.lower.version>
+		<log4j.upper.version>2</log4j.upper.version>
+		<protege.lower.version>4.2</protege.lower.version>
+		<protege.upper.version>6</protege.upper.version>		
+	</properties>
+
 	<dependencies>
-		<dependency>
+		<!--dependency>
 			<groupId>org.protege</groupId>
 			<artifactId>protege-editor-core-application</artifactId>
 			<version>${protege.version}</version>
@@ -22,6 +30,21 @@
 		<dependency>
 			<groupId>org.protege</groupId>
 			<artifactId>protege-editor-owl</artifactId>
+			<version>${protege.version}</version>
+		</dependency-->
+    <dependency>
+			<groupId>edu.stanford.protege</groupId>
+			<artifactId>org.protege.common</artifactId>
+			<version>${protege.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>edu.stanford.protege</groupId>
+			<artifactId>org.protege.editor.core.application</artifactId>
+			<version>${protege.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>edu.stanford.protege</groupId>
+			<artifactId>org.protege.editor.owl</artifactId>
 			<version>${protege.version}</version>
 		</dependency>
 		<dependency>
@@ -102,13 +125,14 @@
 						<Implementation-Title>ELK Reasoner</Implementation-Title>
 						<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
 						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
-						<Export-Package>org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui;org.slf4j.*</Export-Package>
-						<Private-Package>org.semanticweb.elk.*;-split-package:=merge-first</Private-Package>
+						<Export-Package>org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui</Export-Package>
+						<Private-Package>org.slf4j.*;org.semanticweb.elk.*;-split-package:=merge-first</Private-Package>
 						<Bundle-SymbolicName>org.semanticweb.elk;singleton:=true</Bundle-SymbolicName>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
 						<Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>
 						<Update-Url>http://elk.semanticweb.org/maven/latest/elk-distribution/resources/update.properties</Update-Url>
-						<Import-Package>*</Import-Package>
+						<Import-Package>org.apache.log4j.*;version="[${log4j.lower.version},${log4j.upper.version})",
+						org.protege.*;version="[${protege.lower.version},${protege.upper.version})",*</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>

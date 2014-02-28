@@ -196,10 +196,11 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<owlapi.version>3.4.5</owlapi.version>
-		<protege.version>4.1.0</protege.version>
+		<!--protege.version>5.0.0-beta-05-SNAPSHOT</protege.version-->
+		<protege.version>4.3.0</protege.version>
 		<java.required.version>1.6</java.required.version>
 		<!-- TODO: get current year automatically -->
-		<currentYear>2013</currentYear>
+		<currentYear>2014</currentYear>
 	</properties>
 
 	<build>
