@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 
 /**
  * Gets notifications if there're no inferences stored for a particular

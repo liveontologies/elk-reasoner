@@ -32,8 +32,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,6 +51,8 @@ import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for unit tests based on the random walk runners
@@ -89,7 +89,11 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 
 	}
 
-	protected boolean ignore(TestInput input) {
+	/**
+	 * @param input
+	 *            dummy parameter
+	 */
+	protected static boolean ignore(TestInput input) {
 		return false;
 	}
 
@@ -115,7 +119,7 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 		incrementalReasoner.setAllowIncrementalMode(true);
 
 		try {
-//			incrementalReasoner.loadAxioms();
+			// incrementalReasoner.loadAxioms();
 			// let the runner run..
 			getRandomWalkRunner(MAX_ROUNDS, ITERATIONS).run(
 					incrementalReasoner, changingAxioms, staticAxioms, seed);
@@ -123,6 +127,7 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 		} catch (Exception e) {
 			throw new ElkRuntimeException("Seed " + seed, e);
 		} finally {
+			stream.close();
 			incrementalReasoner.shutdown();
 		}
 	}

@@ -35,4 +35,6 @@ import org.semanticweb.elk.util.collections.chains.ModifiableLink;
 public interface LinkableBackwardLinkRule extends LinkedBackwardLinkRule,
 		ModifiableLink<LinkableBackwardLinkRule> {
 
+	// nothing else
+
 }

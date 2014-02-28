@@ -52,13 +52,13 @@ public class InstanceTaxonomyComputation
 			ComputationExecutor executor,
 			int maxWorkers,
 			ProgressMonitor progressMonitor,
-			SaturationState saturationState,
+			SaturationState<?> saturationState,
 			UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> partialTaxonomy) {
 		super(inputs, new InstanceTaxonomyComputationFactory(saturationState,
 				maxWorkers, partialTaxonomy), executor, maxWorkers,
 				progressMonitor);
 	}
-	
+
 	/**
 	 * @return the taxonomy computed by this computation; the method
 	 *         {@link #process()} should be called first to compute the taxonomy

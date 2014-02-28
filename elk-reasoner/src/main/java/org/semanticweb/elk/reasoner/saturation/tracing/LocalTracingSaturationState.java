@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextFactory;
 import org.semanticweb.elk.reasoner.saturation.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.MapSaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
@@ -48,7 +48,8 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class LocalTracingSaturationState extends MapSaturationState<TracedContext> {
+public class LocalTracingSaturationState extends
+		MapSaturationState<TracedContext> {
 
 	public LocalTracingSaturationState(OntologyIndex index) {
 		// use a context factory which creates traced contexts
@@ -58,15 +59,15 @@ public class LocalTracingSaturationState extends MapSaturationState<TracedContex
 			public TracedContext createContext(IndexedClassExpression root) {
 				return new TracedContext(root);
 			}
-			
+
 		});
 	}
 
 	@Override
 	public TracedContext getContext(IndexedClassExpression ice) {
-		return (TracedContext) super.getContext(ice);
+		return super.getContext(ice);
 	}
-	
+
 	public Iterable<TracedContext> getTracedContexts() {
 		return Operations.filter(getContexts(), new Condition<Context>() {
 
@@ -78,11 +79,11 @@ public class LocalTracingSaturationState extends MapSaturationState<TracedContex
 	}
 
 	/**
-	 * TODO 
+	 * TODO
 	 * 
 	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
+	 * 
+	 *         pavel.klinov@uni-ulm.de
 	 */
 	public static class TracedContext extends ContextImpl {
 		/**
@@ -93,26 +94,26 @@ public class LocalTracingSaturationState extends MapSaturationState<TracedContex
 		 * until that is done.
 		 */
 		private final AtomicBoolean beingTraced_;
-		
+
 		private HashListMultimap<Conclusion, Inference> blockedInferences_;
-		
+
 		public TracedContext(IndexedClassExpression root) {
 			super(root);
 			beingTraced_ = new AtomicBoolean(false);
 		}
-		
+
 		public Multimap<Conclusion, Inference> getBlockedInferences() {
 			if (blockedInferences_ == null) {
 				blockedInferences_ = new HashListMultimap<Conclusion, Inference>();
 			}
-			
+
 			return blockedInferences_;
 		}
-		
+
 		public void cleanBlockedInferences() {
 			blockedInferences_ = null;
 		}
-		
+
 		public boolean beingTracedCompareAndSet(boolean expect, boolean update) {
 			return beingTraced_.compareAndSet(expect, update);
 		}

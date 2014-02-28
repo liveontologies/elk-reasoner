@@ -73,16 +73,17 @@ public abstract class AbstractIndexObjectConverter implements
 		ElkSubObjectPropertyExpressionVisitor<IndexedPropertyChain>,
 		ElkIndividualVisitor<IndexedIndividual> {
 
-	protected IndexedClassExpression defaultVisit(ElkClassExpression expression) {
+	protected static IndexedClassExpression defaultVisit(
+			ElkClassExpression expression) {
 		throw new ElkIndexingUnsupportedException(expression);
 	}
 
-	protected IndexedPropertyChain defaultVisit(
+	protected static IndexedPropertyChain defaultVisit(
 			ElkSubObjectPropertyExpression expression) {
 		throw new ElkIndexingUnsupportedException(expression);
 	}
 
-	protected IndexedIndividual defaultVisit(ElkIndividual expression) {
+	protected static IndexedIndividual defaultVisit(ElkIndividual expression) {
 		throw new ElkIndexingUnsupportedException(expression);
 	}
 

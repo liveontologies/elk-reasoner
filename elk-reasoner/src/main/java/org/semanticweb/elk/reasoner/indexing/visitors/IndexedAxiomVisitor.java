@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,4 +25,5 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
 public interface IndexedAxiomVisitor<O> extends
 		IndexedSubClassOfAxiomVisitor<O>, IndexedDisjointnessAxiomVisitor<O> {
 
+	// nothing else
 }

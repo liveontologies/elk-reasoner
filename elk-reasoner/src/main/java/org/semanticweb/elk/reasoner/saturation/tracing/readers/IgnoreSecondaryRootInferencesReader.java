@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.readers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,7 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.readers;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedConjunction;
@@ -50,53 +51,63 @@ public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 	}
 
 	@Override
-	public void accept(final IndexedClassExpression root, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
-		reader.accept(root, conclusion, new AbstractInferenceVisitor<IndexedClassExpression, Boolean>() {
+	public void accept(final IndexedClassExpression root,
+			final Conclusion inferredConclusion,
+			final InferenceVisitor<?, ?> visitor) {
+		reader.accept(
+				root,
+				inferredConclusion,
+				new AbstractInferenceVisitor<IndexedClassExpression, Boolean>() {
 
-			@Override
-			protected Boolean defaultTracedVisit(Inference conclusion, IndexedClassExpression contextRoot) {
-				conclusion.acceptTraced(visitor, null);
-				
-				return true;
-			}
-			
-			@Override
-			public Boolean visit(SubClassOfSubsumer conclusion, IndexedClassExpression contextRoot) {
-				if (conclusion.getExpression() != contextRoot) {
-					defaultTracedVisit(conclusion, contextRoot);
-				}
-				
-				return true;
-			}
+					@Override
+					protected Boolean defaultTracedVisit(Inference conclusion,
+							IndexedClassExpression contextRoot) {
+						conclusion.acceptTraced(visitor, null);
 
-			@Override
-			public Boolean visit(ComposedConjunction conclusion, IndexedClassExpression contextRoot) {
-				if (conclusion.getExpression() != contextRoot) {
-					defaultTracedVisit(conclusion, contextRoot);
-				}
-				
-				return true;
-			}
+						return true;
+					}
 
-			@Override
-			public Boolean visit(DecomposedConjunction conclusion, IndexedClassExpression contextRoot) {
-				if (conclusion.getExpression() != contextRoot) {
-					defaultTracedVisit(conclusion, contextRoot);
-				}
-				
-				return true;
-			}
+					@Override
+					public Boolean visit(SubClassOfSubsumer<?> conclusion,
+							IndexedClassExpression contextRoot) {
+						if (conclusion.getExpression() != contextRoot) {
+							defaultTracedVisit(conclusion, contextRoot);
+						}
 
-			@Override
-			public Boolean visit(PropagatedSubsumer conclusion, IndexedClassExpression contextRoot) {
-				if (conclusion.getExpression() != contextRoot) {
-					defaultTracedVisit(conclusion, contextRoot);
-				}
-				
-				return true;
-			}
-			
-		});
+						return true;
+					}
+
+					@Override
+					public Boolean visit(ComposedConjunction conclusion,
+							IndexedClassExpression contextRoot) {
+						if (conclusion.getExpression() != contextRoot) {
+							defaultTracedVisit(conclusion, contextRoot);
+						}
+
+						return true;
+					}
+
+					@Override
+					public Boolean visit(DecomposedConjunction conclusion,
+							IndexedClassExpression contextRoot) {
+						if (conclusion.getExpression() != contextRoot) {
+							defaultTracedVisit(conclusion, contextRoot);
+						}
+
+						return true;
+					}
+
+					@Override
+					public Boolean visit(PropagatedSubsumer conclusion,
+							IndexedClassExpression contextRoot) {
+						if (conclusion.getExpression() != contextRoot) {
+							defaultTracedVisit(conclusion, contextRoot);
+						}
+
+						return true;
+					}
+
+				});
 	}
 
 }

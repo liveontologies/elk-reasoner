@@ -92,7 +92,7 @@ public class InstanceTaxonomyComputationFactory implements
 	 *            results in
 	 */
 	public InstanceTaxonomyComputationFactory(
-			SaturationState saturationState,
+			SaturationState<?> saturationState,
 			int maxWorkers,
 			UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> partialTaxonomy) {
 		this.taxonomy_ = partialTaxonomy;

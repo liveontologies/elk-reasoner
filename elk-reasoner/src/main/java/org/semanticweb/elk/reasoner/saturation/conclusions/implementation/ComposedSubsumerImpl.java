@@ -20,35 +20,30 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.conclusions;
+package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
- * A {@link Subsumer} created by decomposition rules.
+ * An implementation of {@link Subsumer}
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
+ * @param <S>
+ *            the type of the subsumer {@link IndexedClassExpression}
  */
-public class DecomposedSubsumer extends Subsumer {
+public class ComposedSubsumerImpl<S extends IndexedClassExpression> extends
+		AbstractSubsumer<S> implements ComposedSubsumer<S> {
 
-	public static final String NAME = "Decomposed Subsumer";
-	
-	public DecomposedSubsumer(IndexedClassExpression subsumer) {
+	public ComposedSubsumerImpl(S subsumer) {
 		super(subsumer);
-	}
-
-	@Override
-	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		applyCompositionRules(ruleAppVisitor, premises, producer);
-		applyDecompositionRules(ruleAppVisitor, premises, producer);
-
 	}
 
 	@Override
@@ -57,8 +52,21 @@ public class DecomposedSubsumer extends Subsumer {
 	}
 
 	@Override
-	public String toString() {
-		return "Decomposed" + super.toString();
+	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
+			ContextPremises premises, ConclusionProducer producer) {
+		applyCompositionRules(ruleAppVisitor, premises, producer);
+
 	}
 
+	@Override
+	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
+			ContextPremises premises, ConclusionProducer producer) {
+		// if subsumer was composed, it is not necessary to decompose it
+		applyDecompositionRules(ruleAppVisitor, premises, producer);
+	}
+
+	@Override
+	public String toString() {
+		return "Composed" + super.toString();
+	}
 }

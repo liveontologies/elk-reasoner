@@ -1,14 +1,14 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.util.logging.statistics.AbstractStatistics;
 import org.semanticweb.elk.util.logging.statistics.StatisticsPrinter;
 import org.slf4j.Logger;
@@ -108,6 +108,7 @@ public class ConclusionStatistics extends AbstractStatistics {
 		this.conclusionProcessingTimer_.add(stats.conclusionProcessingTimer_);
 	}
 
+	@SuppressWarnings("unused")
 	public void check(Logger logger) {
 		// TODO
 	}

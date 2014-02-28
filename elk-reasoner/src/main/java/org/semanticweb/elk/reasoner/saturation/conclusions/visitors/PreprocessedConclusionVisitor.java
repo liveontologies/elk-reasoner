@@ -22,15 +22,15 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 
 /**
  * A {@link ConclusionVisitor} that runs a special preprocessor
@@ -69,7 +69,7 @@ public class PreprocessedConclusionVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(ComposedSubsumer conclusion, I input) {
+	public O visit(ComposedSubsumer<?> conclusion, I input) {
 		preprocessor_.visit(conclusion, input);
 		return visitor_.visit(conclusion, input);
 	}
@@ -87,7 +87,7 @@ public class PreprocessedConclusionVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(DecomposedSubsumer conclusion, I input) {
+	public O visit(DecomposedSubsumer<?> conclusion, I input) {
 		preprocessor_.visit(conclusion, input);
 		return visitor_.visit(conclusion, input);
 	}

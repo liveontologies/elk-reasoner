@@ -39,6 +39,7 @@ public interface ContextCreationListener {
 		
 		@Override
 		public void notifyContextCreation(Context newContext) {
+			// does nothing
 		}
 	};
 }

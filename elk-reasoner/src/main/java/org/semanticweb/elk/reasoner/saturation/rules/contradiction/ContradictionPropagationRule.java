@@ -27,13 +27,11 @@ import java.util.Map;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ContradictionRule} applied when processing {@link Contradiction}
@@ -44,10 +42,6 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class ContradictionPropagationRule extends AbstractContradictionRule {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ContradictionPropagationRule.class);
 
 	private static final ContradictionPropagationRule INSTANCE_ = new ContradictionPropagationRule();
 

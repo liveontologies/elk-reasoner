@@ -92,6 +92,7 @@ public class Owl2ParserLoaderTest {
 		load(ontology);
 	}
 
+	@SuppressWarnings("static-method")
 	@After
 	public void cleanUp() {
 		Thread.interrupted();

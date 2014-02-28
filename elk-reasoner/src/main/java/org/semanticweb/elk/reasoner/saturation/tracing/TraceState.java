@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
+
 /*
  * #%L
  * ELK Reasoner
@@ -42,27 +43,29 @@ public class TraceState {
 	private final TraceStore traceStore_;
 
 	private final LocalTracingSaturationState tracingSaturationState_;
-	
+
 	private final ContextTracingFactory tracingFactory_;
-	
-	public TraceState(TraceStore store, SaturationState<?> mainState, int maxWorkers) {
+
+	public TraceState(SaturationState<?> mainState, int maxWorkers) {
 		traceStore_ = new SimpleCentralizedTraceStore();
-		tracingSaturationState_ = new LocalTracingSaturationState(mainState.getOntologyIndex());
-		tracingFactory_ = new NonRecursiveContextTracingFactory(mainState, tracingSaturationState_, traceStore_, maxWorkers);
+		tracingSaturationState_ = new LocalTracingSaturationState(
+				mainState.getOntologyIndex());
+		tracingFactory_ = new NonRecursiveContextTracingFactory(mainState,
+				tracingSaturationState_, traceStore_, maxWorkers);
 	}
 
 	public TraceStore getTraceStore() {
 		return traceStore_;
 	}
-	
+
 	public SaturationState<TracedContext> getSaturationState() {
 		return tracingSaturationState_;
 	}
-	
+
 	public Iterable<TracedContext> getTracedContexts() {
 		return tracingSaturationState_.getTracedContexts();
 	}
-	
+
 	public ContextTracingFactory getContextTracingFactory() {
 		return tracingFactory_;
 	}

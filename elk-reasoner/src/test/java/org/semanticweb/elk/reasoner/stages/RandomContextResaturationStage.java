@@ -36,11 +36,10 @@ import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationNoInput;
-import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationDeletionNotSaturatedFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
@@ -77,7 +76,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		// init them for deletions
 		initContexts(contexts);
 		// and now clean then up
-		RuleApplicationFactory cleaningFactory = new RuleApplicationDeletionNotSaturatedFactory(
+		RuleApplicationFactory<?> cleaningFactory = new RuleApplicationDeletionNotSaturatedFactory(
 				reasoner.saturationState);
 
 		LOGGER_.trace("Starting random contexts cleaning");
@@ -105,10 +104,10 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 	}
 
 	private void initContexts(Collection<IndexedClassExpression> roots) {
-		Conclusion init = new ContextInitialization(
+		Conclusion init = new ContextInitializationImpl(
 				reasoner.saturationState.getOntologyIndex());
 
-		SaturationStateWriter writer = reasoner.saturationState
+		SaturationStateWriter<?> writer = reasoner.saturationState
 				.getContextCreatingWriter();
 		for (IndexedClassExpression root : roots) {
 			if (reasoner.saturationState.getContext(root) != null)
@@ -131,7 +130,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		int i = 0;
 
 		for (IndexedClassExpression ice : ices) {
-			SaturationStateWriter writer = reasoner.saturationState
+			SaturationStateWriter<?> writer = reasoner.saturationState
 					.getContextModifyingWriter();
 			if (indexes.contains(i)) {
 				writer.markAsNotSaturated(ice);
@@ -157,6 +156,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
+		// nothing
 	}
 
 }

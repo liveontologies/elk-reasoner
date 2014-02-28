@@ -24,10 +24,12 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SubConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -56,10 +58,11 @@ public class ConclusionInitializingInsertionVisitor extends
 	 */
 	private final ContextInitialization contextInitConclusion_;
 
-	public ConclusionInitializingInsertionVisitor(SaturationStateWriter writer) {
+	public ConclusionInitializingInsertionVisitor(
+			SaturationStateWriter<?> writer) {
 		super(writer);
 		this.producer_ = writer;
-		this.contextInitConclusion_ = new ContextInitialization(writer
+		this.contextInitConclusion_ = new ContextInitializationImpl(writer
 				.getSaturationState().getOntologyIndex());
 	}
 
@@ -70,7 +73,8 @@ public class ConclusionInitializingInsertionVisitor extends
 		if (conclusion instanceof SubConclusion) {
 			IndexedObjectProperty subRoot = ((SubConclusion) conclusion)
 					.getSubRoot();
-			SubConclusion subContextInit = new SubContextInitialization(subRoot);
+			SubConclusion subContextInit = new SubContextInitializationImpl(
+					subRoot);
 			if (!context.containsConclusion(subContextInit))
 				producer_.produce(context.getRoot(), subContextInit);
 		}

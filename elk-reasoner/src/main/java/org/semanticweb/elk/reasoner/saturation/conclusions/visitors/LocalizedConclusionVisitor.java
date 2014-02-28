@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  */
 
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,10 +53,11 @@ public class LocalizedConclusionVisitor extends
 	/**
 	 * the {@link SaturationState} used to localize {@link Context}s
 	 */
-	SaturationState state_;
+	SaturationState<?> state_;
 
 	public LocalizedConclusionVisitor(
-			ConclusionVisitor<Context, Boolean> visitor, SaturationState state) {
+			ConclusionVisitor<Context, Boolean> visitor,
+			SaturationState<?> state) {
 		this.visitor_ = visitor;
 		this.state_ = state;
 	}

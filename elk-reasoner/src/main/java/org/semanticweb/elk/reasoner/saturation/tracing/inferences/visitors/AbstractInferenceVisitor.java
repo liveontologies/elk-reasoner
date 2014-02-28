@@ -82,7 +82,7 @@ public abstract class AbstractInferenceVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(InitializationSubsumer conclusion, I input) {
+	public O visit(InitializationSubsumer<?> conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 
@@ -92,7 +92,7 @@ public abstract class AbstractInferenceVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(ReflexiveSubsumer conclusion, I input) {
+	public O visit(ReflexiveSubsumer<?> conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 
@@ -102,7 +102,7 @@ public abstract class AbstractInferenceVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(SubClassOfSubsumer conclusion, I input) {
+	public O visit(SubClassOfSubsumer<?> conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 

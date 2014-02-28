@@ -22,16 +22,16 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 
 /**
  * A {@link ConclusionVisitor} that composes several given
@@ -79,7 +79,7 @@ public class ComposedConclusionVisitor<I> implements
 	}
 
 	@Override
-	public Boolean visit(ComposedSubsumer conclusion, I input) {
+	public Boolean visit(ComposedSubsumer<?> conclusion, I input) {
 		for (int i = 0; i < visitors_.length; i++) {
 			if (!visitors_[i].visit(conclusion, input))
 				return false;
@@ -106,7 +106,7 @@ public class ComposedConclusionVisitor<I> implements
 	}
 
 	@Override
-	public Boolean visit(DecomposedSubsumer conclusion, I input) {
+	public Boolean visit(DecomposedSubsumer<?> conclusion, I input) {
 		for (int i = 0; i < visitors_.length; i++) {
 			if (!visitors_[i].visit(conclusion, input))
 				return false;

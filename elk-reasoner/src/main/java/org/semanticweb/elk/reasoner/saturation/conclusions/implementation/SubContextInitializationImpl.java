@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions;
+package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 /*
  * #%L
@@ -23,9 +23,9 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -35,26 +35,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@code Conclusion} indicating that a {@link SubContext} of a
- * {@link Context} where it is stored should be initialized.
+ * An implementation of {@link SubContextInitialization}
  * 
  * @author "Yevgeny Kazakov"
  */
-public class SubContextInitialization extends AbstractConclusion implements
-		Conclusion, SubConclusion {
+public class SubContextInitializationImpl extends AbstractConclusion implements
+		SubContextInitialization {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(SubContextInitialization.class);
-
-	public static final String NAME = "Sub-Context Initialization";
+			.getLogger(SubContextInitializationImpl.class);
 
 	/**
 	 * the sub-root of the {@link SubContext} that should be initialized
 	 */
 	private final IndexedObjectProperty subRoot_;
 
-	public SubContextInitialization(IndexedObjectProperty subRoot) {
+	public SubContextInitializationImpl(IndexedObjectProperty subRoot) {
 		this.subRoot_ = subRoot;
 	}
 

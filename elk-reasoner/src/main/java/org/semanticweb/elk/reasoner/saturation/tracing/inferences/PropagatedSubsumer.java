@@ -28,9 +28,11 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
@@ -41,7 +43,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class PropagatedSubsumer extends ComposedSubsumer implements Inference {
+public class PropagatedSubsumer extends
+		ComposedSubsumerImpl<IndexedObjectSomeValuesFrom> implements Inference {
 
 	private final IndexedObjectProperty linkRelation_;
 
@@ -67,13 +70,11 @@ public class PropagatedSubsumer extends ComposedSubsumer implements Inference {
 	}
 
 	public Propagation getPropagation() {
-		// FIXME cast
-		return new Propagation(linkRelation_,
-				(IndexedObjectSomeValuesFrom) getExpression());
+		return new PropagationImpl(linkRelation_, getExpression());
 	}
 
 	public BackwardLink getBackwardLink() {
-		return new BackwardLink(linkSourceRoot_, linkRelation_);
+		return new BackwardLinkImpl(linkSourceRoot_, linkRelation_);
 	}
 
 	@Override

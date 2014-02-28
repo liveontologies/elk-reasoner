@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.readers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,9 +27,9 @@ package org.semanticweb.elk.reasoner.saturation.tracing.readers;
 
 import org.semanticweb.elk.MutableBoolean;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
@@ -52,60 +53,70 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 	}
 
 	@Override
-	public void accept(final IndexedClassExpression root, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
-		reader.accept(root, conclusion, new AbstractInferenceVisitor<Void, Void>() {
+	public void accept(final IndexedClassExpression root,
+			final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
+		reader.accept(root, conclusion,
+				new AbstractInferenceVisitor<Void, Void>() {
 
-			@Override
-			protected Void defaultTracedVisit(Inference inference, Void ignored) {
-				inference.acceptTraced(visitor, null);
-				
-				return null;
-			}
+					@Override
+					protected Void defaultTracedVisit(Inference inference,
+							Void ignored) {
+						inference.acceptTraced(visitor, null);
 
-			@Override
-			public Void visit(PropagatedSubsumer propagated, Void ignored) {
-				if (!isTrivialPropagation(propagated, root)) {
-					propagated.acceptTraced(visitor, null);
-				}
-				
-				return null;
-			}
-			
-		});
+						return null;
+					}
+
+					@Override
+					public Void visit(PropagatedSubsumer propagated,
+							Void ignored) {
+						if (!isTrivialPropagation(propagated, root)) {
+							propagated.acceptTraced(visitor, null);
+						}
+
+						return null;
+					}
+
+				});
 	}
 
-	boolean isTrivialPropagation(PropagatedSubsumer propagated, IndexedClassExpression contextRoot) {
+	boolean isTrivialPropagation(PropagatedSubsumer propagated,
+			IndexedClassExpression contextRoot) {
 		// a propagation is trivial if two conditions are met:
 		// 1) the root is propagated (not one of its subsumers)
 		// 2) the backward link has been derived by decomposing the existential
 		// (which is the same as the propagation carry)
 		BackwardLink link = propagated.getBackwardLink();
 		Propagation propagation = propagated.getPropagation();
-		IndexedClassExpression inferenceContextRoot = propagated.getInferenceContextRoot(contextRoot);
-		
+		IndexedClassExpression inferenceContextRoot = propagated
+				.getInferenceContextRoot(contextRoot);
+
 		if (inferenceContextRoot != propagation.getCarry().getFiller()) {
 			return false;
 		}
-		
-		final MutableBoolean linkProducedByDecomposition = new MutableBoolean(false);
-		
-		reader.accept(inferenceContextRoot, link, new AbstractInferenceVisitor<Void, Boolean>(){
 
-			@Override
-			protected Boolean defaultTracedVisit(Inference conclusion,
-					Void input) {
-				return false;
-			}
-			
-			@Override
-			public Boolean visit(DecomposedExistentialBackwardLink conclusion, 	Void ignored) {
-				linkProducedByDecomposition.set(true);
-				
-				return true;
-			}
-			
-		});
-		
+		final MutableBoolean linkProducedByDecomposition = new MutableBoolean(
+				false);
+
+		reader.accept(inferenceContextRoot, link,
+				new AbstractInferenceVisitor<Void, Boolean>() {
+
+					@Override
+					protected Boolean defaultTracedVisit(Inference conclusion,
+							Void input) {
+						return false;
+					}
+
+					@Override
+					public Boolean visit(
+							DecomposedExistentialBackwardLink conclusion,
+							Void ignored) {
+						linkProducedByDecomposition.set(true);
+
+						return true;
+					}
+
+				});
+
 		return linkProducedByDecomposition.get();
 	}
 

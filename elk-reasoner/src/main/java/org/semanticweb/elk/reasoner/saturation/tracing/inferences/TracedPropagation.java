@@ -28,28 +28,30 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
  * Represents an inference which creates a {@link Propagation} from a
- * {@link Subsumer}.
+ * {@link AbstractSubsumer}.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TracedPropagation extends Propagation implements Inference {
+public class TracedPropagation extends PropagationImpl implements Inference {
 
 	public TracedPropagation(IndexedObjectProperty relation,
 			IndexedObjectSomeValuesFrom carry) {
 		super(relation, carry);
 	}
 
-	public Subsumer getPremise() {
-		return new DecomposedSubsumer(getCarry().getFiller());
+	public Subsumer<?> getPremise() {
+		return new DecomposedSubsumerImpl<IndexedClassExpression>(getCarry()
+				.getFiller());
 	}
 
 	@Override

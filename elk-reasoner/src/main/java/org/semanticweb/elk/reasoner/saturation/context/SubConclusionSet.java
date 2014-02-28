@@ -21,7 +21,7 @@ package org.semanticweb.elk.reasoner.saturation.context;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.SubConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
 
 public interface SubConclusionSet {
 

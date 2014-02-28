@@ -22,11 +22,11 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.semanticweb.elk.util.logging.Statistics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ReasonerStageExecutor} which refuses to interrupt: it will restart
@@ -55,14 +55,14 @@ public class RestartingStageExecutor extends SimpleInterrupter implements
 			for (;;) {
 				try {
 					stage.preExecute();
-					stage.execute();					
+					stage.execute();
 					break;
 				} catch (ElkException e) {
 					if (e instanceof ElkInterruptedException) {
 						stage.clearInterrupt();
 						continue;
-					} else
-						throw e;
+					}
+					throw e;
 				} finally {
 					stage.postExecute();
 					finish(stage);

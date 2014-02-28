@@ -78,13 +78,6 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			final OnOffVector<T> changingAxioms, final List<T> staticAxioms,
 			final long seed) throws ElkException, InterruptedException,
 			IOException {
-		run(reasoner, changingAxioms, staticAxioms, seed, null);
-	}
-
-	public void run(final Reasoner reasoner,
-			final OnOffVector<T> changingAxioms, final List<T> staticAxioms,
-			final long seed, final RandomWalkTestHook hook)
-			throws ElkException, InterruptedException, IOException {
 
 		// for storing taxonomy hash history
 		Deque<String> resultHashHistory = new LinkedList<String>();
@@ -202,7 +195,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 		Reasoner standardReasoner = io_.createReasoner(Operations.concat(
 				changingAxioms.getOnElements(), staticAxioms));
 		standardReasoner.getTaxonomy();
-		
+
 		LOGGER_.trace("Current axioms");
 		printCurrentAxioms(
 				Operations.concat(changingAxioms.getOnElements(), staticAxioms),
@@ -217,6 +210,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 			printResult(testReasoner, writer);
 			writer.flush();
 		} catch (IOException ioe) {
+			// TODO
 		}
 
 		fail("Seed: " + seed + "\n" + writer.getBuffer().toString());
@@ -226,6 +220,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 	 * The next methods should be overridden in subclasses which perform other
 	 * reasoning tasks
 	 */
+	@SuppressWarnings("static-method")
 	protected void printResult(Reasoner reasoner, Logger logger, LogLevel level)
 			throws IOException, ElkException {
 		StringWriter writer = new StringWriter();
@@ -237,7 +232,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 		writer.close();
 	}
 
-	protected void printResult(Reasoner reasoner, Writer writer)
+	protected static void printResult(Reasoner reasoner, Writer writer)
 			throws IOException, ElkException {
 		Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
 
@@ -245,6 +240,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 		writer.flush();
 	}
 
+	@SuppressWarnings("static-method")
 	protected String getResultHash(Reasoner reasoner) throws ElkException {
 		return TaxonomyPrinter.getHashString(reasoner.getTaxonomyQuietly());
 	}

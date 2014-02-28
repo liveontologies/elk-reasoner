@@ -29,8 +29,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChai
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
@@ -39,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ComposedForwardLink extends ForwardLink implements Inference {
+public class ComposedForwardLink extends ForwardLinkImpl implements Inference {
 
 	private final IndexedClassExpression backwardLinkSource_;
 
@@ -68,11 +70,11 @@ public class ComposedForwardLink extends ForwardLink implements Inference {
 	}
 
 	public BackwardLink getBackwardLink() {
-		return new BackwardLink(backwardLinkSource_, backwardLinkRelation_);
+		return new BackwardLinkImpl(backwardLinkSource_, backwardLinkRelation_);
 	}
 
 	public ForwardLink getForwardLink() {
-		return new ForwardLink(forwardLinkChain_, getTarget());
+		return new ForwardLinkImpl(forwardLinkChain_, getTarget());
 	}
 
 	@Override

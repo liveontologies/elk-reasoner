@@ -1,7 +1,4 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
+package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 /*
  * #%L
  * ELK Reasoner
@@ -24,18 +21,16 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
- * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * A {@code Conclusion} indicating that the {@link Context} where it is stored
+ * should be initialized.
+ * 
+ * @author "Yevgeny Kazakov"
  */
-public class AbstractBooleanConclusionVisitor<C> extends AbstractConclusionVisitor<C,Boolean> {
+public interface ContextInitialization extends Conclusion {
 
-	@Override
-	protected Boolean defaultVisit(Conclusion conclusion, C cxt) {
-		return Boolean.FALSE;
-	}
+	public static final String NAME = "Context Initialization";
 
 }

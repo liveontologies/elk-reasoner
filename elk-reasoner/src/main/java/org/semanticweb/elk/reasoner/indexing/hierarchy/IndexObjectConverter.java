@@ -210,7 +210,10 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 	@Override
 	public IndexedClassExpression visit(ElkDataHasValue elkDataHasValue) {
 		if (LOGGER_.isWarnEnabled()) {
-			LoggerWrap.log(LOGGER_, LogLevel.WARN, "reasoner.indexing.dataHasValue", "ELK supports DataHasValue only partially. Reasoning might be incomplete!");
+			LoggerWrap
+					.log(LOGGER_, LogLevel.WARN,
+							"reasoner.indexing.dataHasValue",
+							"ELK supports DataHasValue only partially. Reasoning might be incomplete!");
 		}
 
 		return indexedClassFilter_.visit(new IndexedDataHasValue(
@@ -260,7 +263,7 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 
 	@Override
 	public IndexedIndividual visit(ElkNamedIndividual elkNamedIndividual) {
-		return (IndexedIndividual) indexedClassFilter_
-				.visit(new IndexedIndividual(elkNamedIndividual));
+		return indexedClassFilter_.visit(new IndexedIndividual(
+				elkNamedIndividual));
 	}
 }

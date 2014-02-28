@@ -20,11 +20,11 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.conclusions;
+package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -34,25 +34,17 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkedBackwar
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 
 /**
- * A {@link Conclusion} representing derived existential restrictions from a
- * source {@link IndexedClassExpression} to this target
- * {@link IndexedClassExpression}. Intuitively, if a subclass axiom
- * {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))} is derived by inference
- * rules, then a {@link BackwardLink} with the source {@code :A} and the
- * relation {@code :r} can be produced for the target {@code :B}.
+ * An implementation for {@link BackwardLink}
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
- * 
  */
-public class BackwardLink extends AbstractConclusion implements Conclusion,
-		SubConclusion {
-
-	public static final String NAME = "Backward Link";
+public class BackwardLinkImpl extends AbstractConclusion implements
+		BackwardLink {
 
 	/**
-	 * the source {@link IndexedClassExpression} of this {@link BackwardLink};
-	 * the root of the source implies this link.
+	 * the source {@link IndexedClassExpression} of this
+	 * {@link BackwardLinkImpl}; the root of the source implies this link.
 	 */
 	private final IndexedClassExpression source_;
 
@@ -62,7 +54,7 @@ public class BackwardLink extends AbstractConclusion implements Conclusion,
 	 */
 	private final IndexedObjectProperty relation_;
 
-	public BackwardLink(IndexedClassExpression source,
+	public BackwardLinkImpl(IndexedClassExpression source,
 			IndexedObjectProperty relation) {
 		this.relation_ = relation;
 		this.source_ = source;
@@ -110,19 +102,12 @@ public class BackwardLink extends AbstractConclusion implements Conclusion,
 		return visitor.visit(this, input);
 	}
 
-	/**
-	 * @return the {@link IndexedPropertyChain} that is the relation of this
-	 *         {@link BackwardLink}
-	 */
+	@Override
 	public IndexedObjectProperty getRelation() {
 		return relation_;
 	}
 
-	/**
-	 * @return the source of this {@link BackwardLink}, that is, the
-	 *         {@link IndexedClassExpression} from which the existential
-	 *         restriction corresponding to this {@link BackwardLink} follows
-	 */
+	@Override
 	public IndexedClassExpression getSource() {
 		return source_;
 	}

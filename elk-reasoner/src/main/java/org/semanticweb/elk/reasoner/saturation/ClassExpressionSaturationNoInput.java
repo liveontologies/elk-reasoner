@@ -40,7 +40,8 @@ public class ClassExpressionSaturationNoInput extends
 		ReasonerComputation<ClassExpressionSaturationNoInputFactory> {
 
 	public ClassExpressionSaturationNoInput(final ComputationExecutor executor,
-			final int maxWorkers, final RuleApplicationFactory ruleAppFactory,
+			final int maxWorkers,
+			final RuleApplicationFactory<?> ruleAppFactory,
 			final ContextModificationListener contextModificationListener) {
 
 		super(new ClassExpressionSaturationNoInputFactory(ruleAppFactory,

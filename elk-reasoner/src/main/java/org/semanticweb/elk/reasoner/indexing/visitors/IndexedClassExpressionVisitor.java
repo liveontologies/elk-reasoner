@@ -38,4 +38,6 @@ public interface IndexedClassExpressionVisitor<O> extends
 		IndexedObjectIntersectionOfVisitor<O>,
 		IndexedObjectSomeValuesFromVisitor<O>, IndexedObjectUnionOfVisitor<O>,
 		IndexedDataHasValueVisitor<O> {
+
+	// nothing else
 }

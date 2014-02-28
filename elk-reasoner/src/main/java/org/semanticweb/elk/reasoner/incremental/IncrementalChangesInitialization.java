@@ -34,7 +34,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -70,7 +69,7 @@ public class IncrementalChangesInitialization
 			Collection<ArrayList<Context>> inputs,
 			LinkedContextInitRule changedInitRules,
 			Map<IndexedClassExpression, ChainableSubsumerRule> changes,
-			SaturationState state, ComputationExecutor executor,
+			SaturationState<?> state, ComputationExecutor executor,
 			SaturationStatistics stageStats, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		super(inputs, new ContextInitializationFactory(state, changes,
@@ -92,7 +91,7 @@ class ContextInitializationFactory
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContextInitializationFactory.class);
 
-	private final SaturationState saturationState_;
+	private final SaturationState<?> saturationState_;
 	private final Map<IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges_;
 	private final IndexedClassExpression[] indexChangesKeys_;
 	private final LinkedContextInitRule changedGlobalRuleHead_;
@@ -100,7 +99,7 @@ class ContextInitializationFactory
 	private final SaturationStatistics stageStatistics_;
 
 	public ContextInitializationFactory(
-			SaturationState state,
+			SaturationState<?> state,
 			Map<IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges,
 			LinkedContextInitRule changedGlobalRuleHead,
 			SaturationStatistics stageStats) {
@@ -125,7 +124,7 @@ class ContextInitializationFactory
 
 		final RuleVisitor ruleAppVisitor = SaturationUtils
 				.getStatsAwareRuleVisitor(localStatistics.getRuleStatistics());
-		final SaturationStateWriter saturationStateWriter = SaturationUtils
+		final SaturationStateWriter<?> saturationStateWriter = SaturationUtils
 				.getStatAwareWriter(
 						saturationState_.getContextModifyingWriter(),
 						localStatistics);

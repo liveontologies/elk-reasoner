@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,40 +27,46 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
- * Represents a decomposition of {@link IndexedObjectIntersectionOf}.
+ * A {@link DecomposedSubsumer} obtained from a conjunct of an
+ * {@link IndexedObjectIntersectionOf}.
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class DecomposedConjunction extends DecomposedSubsumer implements Inference {
+public class DecomposedConjunction extends
+		DecomposedSubsumerImpl<IndexedClassExpression> implements Inference {
 
 	private final IndexedObjectIntersectionOf conjunction_;
-	
-	public DecomposedConjunction(IndexedObjectIntersectionOf conjunction, IndexedClassExpression expression) {
+
+	public DecomposedConjunction(IndexedObjectIntersectionOf conjunction,
+			IndexedClassExpression expression) {
 		super(expression);
 		conjunction_ = conjunction;
 	}
 
-	public Subsumer getConjunction() {
-		return new DecomposedSubsumer(conjunction_);
+	public Subsumer<IndexedObjectIntersectionOf> getConjunction() {
+		return new DecomposedSubsumerImpl<IndexedObjectIntersectionOf>(
+				conjunction_);
 	}
-	
+
 	@Override
 	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
-	
+
 	@Override
-	public IndexedClassExpression getInferenceContextRoot(IndexedClassExpression rootWhereStored) {
+	public IndexedClassExpression getInferenceContextRoot(
+			IndexedClassExpression rootWhereStored) {
 		return rootWhereStored;
 	}
-	
+
 	@Override
 	public String toString() {
 		return super.toString() + " (conjunction-)";

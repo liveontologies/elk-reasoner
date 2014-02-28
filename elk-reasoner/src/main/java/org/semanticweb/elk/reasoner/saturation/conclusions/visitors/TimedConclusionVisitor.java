@@ -22,15 +22,15 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 public class TimedConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
@@ -53,7 +53,7 @@ public class TimedConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 	}
 
 	@Override
-	public O visit(ComposedSubsumer conclusion, I input) {
+	public O visit(ComposedSubsumer<?> conclusion, I input) {
 		timer_.timeComposedSubsumers -= CachedTimeThread.getCurrentTimeMillis();
 		O result = processor_.visit(conclusion, input);
 		timer_.timeComposedSubsumers += CachedTimeThread.getCurrentTimeMillis();
@@ -79,7 +79,7 @@ public class TimedConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 	}
 
 	@Override
-	public O visit(DecomposedSubsumer conclusion, I input) {
+	public O visit(DecomposedSubsumer<?> conclusion, I input) {
 		timer_.timeDecomposedSubsumers -= CachedTimeThread
 				.getCurrentTimeMillis();
 		O result = processor_.visit(conclusion, input);

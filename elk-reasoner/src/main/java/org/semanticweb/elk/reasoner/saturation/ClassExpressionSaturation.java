@@ -56,7 +56,7 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 	public ClassExpressionSaturation(Collection<I> inputs,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor,
-			RuleApplicationFactory ruleAppFactory) {
+			RuleApplicationFactory<?> ruleAppFactory) {
 		this(inputs, executor, maxWorkers, progressMonitor, ruleAppFactory,
 				new DummyClassExpressionSaturationListener<SaturationJob<I>>());
 	}
@@ -67,7 +67,7 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 	public ClassExpressionSaturation(Collection<I> inputs,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor,
-			RuleApplicationFactory ruleAppFactory,
+			RuleApplicationFactory<?> ruleAppFactory,
 			ClassExpressionSaturationListener<SaturationJob<I>> listener) {
 		super(new TodoJobs<I>(inputs),
 				new ClassExpressionSaturationFactory<SaturationJob<I>>(

@@ -22,14 +22,14 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SubConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
 
 /**
  * A skeleton for implementation of {@link ConclusionVisitor}s using a common
@@ -53,7 +53,7 @@ public abstract class AbstractConclusionVisitor<I, O> extends
 	}
 
 	@Override
-	public O visit(ComposedSubsumer conclusion, I input) {
+	public O visit(ComposedSubsumer<?> conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 
@@ -68,7 +68,7 @@ public abstract class AbstractConclusionVisitor<I, O> extends
 	}
 
 	@Override
-	public O visit(DecomposedSubsumer conclusion, I input) {
+	public O visit(DecomposedSubsumer<?> conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.conclusions;
+package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 /*
  * #%L
@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -38,25 +39,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * An implementation of {@link Propagation}
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  * 
  * @author "Yevgeny Kazakov"
  */
-public class Propagation extends AbstractConclusion implements Conclusion,
-		SubConclusion {
+public class PropagationImpl extends AbstractConclusion implements Propagation {
 
 	// logger for this class
-	static final Logger LOGGER_ = LoggerFactory.getLogger(Propagation.class);
-
-	public static final String NAME = "Propagation";
+	static final Logger LOGGER_ = LoggerFactory
+			.getLogger(PropagationImpl.class);
 
 	private final IndexedObjectProperty relation_;
 
 	private final IndexedObjectSomeValuesFrom carry_;
 
-	public Propagation(IndexedObjectProperty relation,
+	public PropagationImpl(IndexedObjectProperty relation,
 			IndexedObjectSomeValuesFrom carry) {
 		relation_ = relation;
 		carry_ = carry;
@@ -100,18 +101,12 @@ public class Propagation extends AbstractConclusion implements Conclusion,
 		return relation_;
 	}
 
-	/**
-	 * @return the {@link IndexedObjectProperty} that is the relation over which
-	 *         this {@link Propagation} is applied
-	 */
+	@Override
 	public IndexedObjectProperty getRelation() {
 		return this.relation_;
 	}
 
-	/**
-	 * @return the {@link IndexedObjectSomeValuesFrom} that is propagated by
-	 *         this {@link Propagation}
-	 */
+	@Override
 	public IndexedObjectSomeValuesFrom getCarry() {
 		return this.carry_;
 	}

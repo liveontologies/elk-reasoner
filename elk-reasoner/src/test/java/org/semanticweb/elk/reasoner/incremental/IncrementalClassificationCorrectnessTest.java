@@ -62,21 +62,21 @@ public class IncrementalClassificationCorrectnessTest extends
 
 	@Override
 	protected void applyChanges(final Reasoner reasoner,
-			final Iterable<ElkAxiom> changes,
-			final IncrementalChangeType type) {
+			final Iterable<ElkAxiom> changes, final IncrementalChangeType type) {
 		reasoner.registerAxiomLoader(new TestChangesLoader(changes, type));
 	}
 
 	@Override
 	protected void dumpChangeToLog(ElkAxiom change, LogLevel level) {
-		LoggerWrap.log(LOGGER_, level, OwlFunctionalStylePrinter.toString(change) + ": deleted");
+		LoggerWrap.log(LOGGER_, level,
+				OwlFunctionalStylePrinter.toString(change) + ": deleted");
 	}
 
 	@Override
 	protected void loadAxioms(InputStream stream,
-			final List<ElkAxiom> staticAxioms,
-			final OnOffVector<ElkAxiom> changingAxioms) throws IOException,
-			Owl2ParseException {
+			final List<ElkAxiom> inputStaticAxioms,
+			final OnOffVector<ElkAxiom> inputChangingAxioms)
+			throws IOException, Owl2ParseException {
 
 		Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
 				.getParser(stream);
@@ -84,6 +84,7 @@ public class IncrementalClassificationCorrectnessTest extends
 
 			@Override
 			public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
+				// does nothing
 			}
 
 			@Override
@@ -102,7 +103,8 @@ public class IncrementalClassificationCorrectnessTest extends
 	@Override
 	protected Reasoner getReasoner(final Iterable<ElkAxiom> axioms) {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new TestChangesLoader(axioms, IncrementalChangeType.ADD), new PostProcessingStageExecutor());
+				new TestChangesLoader(axioms, IncrementalChangeType.ADD),
+				new PostProcessingStageExecutor());
 
 		return reasoner;
 	}

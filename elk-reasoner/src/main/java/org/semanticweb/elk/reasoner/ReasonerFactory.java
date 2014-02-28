@@ -25,15 +25,12 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The main factory to instantiate {@link Reasoner}
@@ -47,7 +44,8 @@ import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
  */
 public class ReasonerFactory {
 
-	final static Logger LOGGER_ = LoggerFactory.getLogger(ReasonerFactory.class);
+	final static Logger LOGGER_ = LoggerFactory
+			.getLogger(ReasonerFactory.class);
 	final static ReasonerStageExecutor DEFAULT_STAGE_EXECUTOR = new SimpleStageExecutor();
 
 	public Reasoner createReasoner(AxiomLoader axiomLoader) {
@@ -68,24 +66,10 @@ public class ReasonerFactory {
 				ReasonerConfiguration.getConfiguration());
 	}
 
-	/**
-	 * Creates {@link Reasoner} with the provided configuration
-	 * 
-	 * @param stageExecutor
-	 * @param config
-	 * @return ELK reasoner
-	 */
-	public Reasoner createReasoner(AxiomLoader axiomLoader,
-			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
-		return createReasoner(axiomLoader, stageExecutor,
-				Executors.newCachedThreadPool(), config);
-	}
-
 	@SuppressWarnings("static-method")
 	public Reasoner createReasoner(AxiomLoader axiomLoader,
-			ReasonerStageExecutor stageExecutor, ExecutorService executor,
-			ReasonerConfiguration config) {
-		Reasoner reasoner = new Reasoner(axiomLoader, stageExecutor, executor);
+			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
+		Reasoner reasoner = new Reasoner(axiomLoader, stageExecutor);
 
 		reasoner.setConfigurationOptions(config);
 

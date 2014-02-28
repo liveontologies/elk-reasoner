@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.context;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 
 /**
  * An object containing {@link Conclusion}s. Every {@link Conclusion} is stored

@@ -57,8 +57,8 @@ public class TaxonomyValidatorTest {
 	public void testAllGood() throws Exception {
 		Taxonomy<ElkClass> taxonomy = load("io/taxonomy.owl");
 		TaxonomyValidator<ElkClass> validator = new BasicTaxonomyValidator<ElkClass>()
-				.add(new TaxonomyNodeDisjointnessVisitor<ElkClass>(taxonomy)).add(
-						new TaxonomyLinkConsistencyVisitor<ElkClass>());
+				.add(new TaxonomyNodeDisjointnessVisitor<ElkClass>(taxonomy))
+				.add(new TaxonomyLinkConsistencyVisitor<ElkClass>());
 
 		validator.validate(taxonomy);
 		new TaxonomyAcyclicityAndReductionValidator<ElkClass>()
@@ -216,6 +216,7 @@ public class TaxonomyValidatorTest {
 				Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
 	}
 
+	@SuppressWarnings("resource")
 	private Taxonomy<ElkClass> load(String resource) throws IOException,
 			Owl2ParseException, ElkInconsistentOntologyException {
 		InputStream stream = null;

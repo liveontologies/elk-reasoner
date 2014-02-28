@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.taxonomy;
+
 /*
  * #%L
  * ELK Reasoner
@@ -56,7 +57,7 @@ public class DepthFirstSearch<T extends ElkObject> {
 		};
 
 		public abstract Direction reverse();
-	};
+	}
 
 	public void run(TaxonomyNode<T> start, Direction dir,
 			TaxonomyNodeVisitor<T> visitor) {
@@ -74,15 +75,15 @@ public class DepthFirstSearch<T extends ElkObject> {
 		if (!pathSet.add(node)) {
 			return;
 		}
-		
-		path.add(node);	
+
+		path.add(node);
 		// now go depth-first
 		for (TaxonomyNode<T> subNode : getSuccessors(node, dir)) {
 			run(subNode, dir, visitor, path, pathSet);
 		}
-		
-		path.removeLast(/*path.size() - 1*/);
-		pathSet.remove(node);		
+
+		path.removeLast(/* path.size() - 1 */);
+		pathSet.remove(node);
 	}
 
 	protected static <U extends ElkObject> Set<? extends TaxonomyNode<U>> getSuccessors(

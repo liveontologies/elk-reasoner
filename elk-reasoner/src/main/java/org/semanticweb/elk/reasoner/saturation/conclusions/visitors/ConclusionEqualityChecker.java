@@ -25,16 +25,16 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.SubContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 
 /**
  * Checks if they conclusions should be considered logically equal.
@@ -56,16 +56,16 @@ public class ConclusionEqualityChecker implements ConclusionVisitor<Conclusion, 
 	}
 	
 	@Override
-	public Boolean visit(ComposedSubsumer negSCE, Conclusion other) {
-		return other.accept(new AbstractBooleanConclusionVisitor<IndexedClassExpression>(){
+	public Boolean visit(ComposedSubsumer<?> negSCE, Conclusion other) {
+		return other.accept(new BaseBooleanConclusionVisitor<IndexedClassExpression>(){
 
 			@Override
-			public Boolean visit(ComposedSubsumer subsumer, IndexedClassExpression ice) {
+			public Boolean visit(ComposedSubsumer<?> subsumer, IndexedClassExpression ice) {
 				return subsumer.getExpression() == ice;
 			}
 
 			@Override
-			public Boolean visit(DecomposedSubsumer subsumer, IndexedClassExpression ice) {
+			public Boolean visit(DecomposedSubsumer<?> subsumer, IndexedClassExpression ice) {
 				return subsumer.getExpression() == ice;
 			}
 			
@@ -74,16 +74,16 @@ public class ConclusionEqualityChecker implements ConclusionVisitor<Conclusion, 
 	}
 
 	@Override
-	public Boolean visit(DecomposedSubsumer posSCE, Conclusion other) {
-		return other.accept(new AbstractBooleanConclusionVisitor<IndexedClassExpression>(){
+	public Boolean visit(DecomposedSubsumer<?> posSCE, Conclusion other) {
+		return other.accept(new BaseBooleanConclusionVisitor<IndexedClassExpression>(){
 
 			@Override
-			public Boolean visit(ComposedSubsumer subsumer, IndexedClassExpression ice) {
+			public Boolean visit(ComposedSubsumer<?> subsumer, IndexedClassExpression ice) {
 				return subsumer.getExpression() == ice;
 			}
 
 			@Override
-			public Boolean visit(DecomposedSubsumer subsumer, IndexedClassExpression ice) {
+			public Boolean visit(DecomposedSubsumer<?> subsumer, IndexedClassExpression ice) {
 				return subsumer.getExpression() == ice;
 			}
 			
@@ -92,7 +92,7 @@ public class ConclusionEqualityChecker implements ConclusionVisitor<Conclusion, 
 
 	@Override
 	public Boolean visit(final BackwardLink link, Conclusion other) {
-		return other.accept(new AbstractBooleanConclusionVisitor<Void>(){
+		return other.accept(new BaseBooleanConclusionVisitor<Void>(){
 
 			@Override
 			public Boolean visit(BackwardLink otherLink, Void ignored) {
@@ -104,7 +104,7 @@ public class ConclusionEqualityChecker implements ConclusionVisitor<Conclusion, 
 
 	@Override
 	public Boolean visit(final ForwardLink link, Conclusion other) {
-		return other.accept(new AbstractBooleanConclusionVisitor<Void>(){
+		return other.accept(new BaseBooleanConclusionVisitor<Void>(){
 
 			@Override
 			public Boolean visit(ForwardLink otherLink, Void ignored) {
@@ -122,7 +122,7 @@ public class ConclusionEqualityChecker implements ConclusionVisitor<Conclusion, 
 
 	@Override
 	public Boolean visit(final Propagation propagation, Conclusion other) {
-		return other.accept(new AbstractBooleanConclusionVisitor<Void>(){
+		return other.accept(new BaseBooleanConclusionVisitor<Void>(){
 
 			@Override
 			public Boolean visit(Propagation otherPropagation, Void ignored) {

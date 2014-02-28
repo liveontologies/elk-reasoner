@@ -23,11 +23,8 @@
 package org.semanticweb.elk.reasoner;
 
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.loading.AbstractAxiomLoader;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
@@ -57,6 +54,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The class for querying the results of the reasoning tasks for a given
@@ -71,7 +70,8 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 public class Reasoner extends AbstractReasonerState {
 
 	// logger for this class
-	private static final Logger LOGGER_ = LoggerFactory.getLogger(Reasoner.class);
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(Reasoner.class);
 
 	/**
 	 * The progress monitor that is used for reporting progress.
@@ -108,7 +108,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * {@link ReasonerFactory}.
 	 * */
 	protected Reasoner(AxiomLoader axiomLoader,
-			ReasonerStageExecutor stageExecutor, ExecutorService executor) {
+			ReasonerStageExecutor stageExecutor) {
 		super(axiomLoader);
 
 		this.stageExecutor = stageExecutor;

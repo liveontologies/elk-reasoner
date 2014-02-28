@@ -53,4 +53,6 @@ public interface RuleVisitor extends SubsumerRuleVisitor,
 		SubContextInitRuleVisitor, ContradictionRuleVisitor,
 		DisjointSubsumerRuleVisitor, ForwardLinkRuleVisitor,
 		PropagationRuleVisitor {
+
+	// nothing else
 }

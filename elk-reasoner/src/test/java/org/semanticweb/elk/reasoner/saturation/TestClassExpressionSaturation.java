@@ -32,7 +32,7 @@ public class TestClassExpressionSaturation<J extends SaturationJob<? extends Ind
 		extends ConcurrentComputationWithInputs<J, ClassExpressionSaturationFactory<J>> {
 
 	public TestClassExpressionSaturation(ComputationExecutor executor,
-			int maxWorkers, SaturationState saturationState) {
+			int maxWorkers, SaturationState<?> saturationState) {
 		super(new ClassExpressionSaturationFactory<J>(
 				new RuleApplicationAdditionFactory(saturationState),
 				maxWorkers), executor, maxWorkers);

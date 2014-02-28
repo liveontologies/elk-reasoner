@@ -41,5 +41,6 @@ public abstract class AbstractAxiomLoader implements AxiomLoader {
 
 	@Override
 	public void dispose() {
+		// does nothing
 	}
 }

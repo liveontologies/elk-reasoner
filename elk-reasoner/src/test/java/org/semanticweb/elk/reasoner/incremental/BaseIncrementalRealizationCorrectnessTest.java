@@ -91,7 +91,9 @@ public abstract class BaseIncrementalRealizationCorrectnessTest<T>
 				writer.write("\nINCREMENTAL TAXONOMY:\n");
 				TaxonomyPrinter.dumpInstanceTaxomomy(incremental, writer, false);
 				writer.flush();
-			} catch (IOException ioe) {	}
+			} catch (IOException ioe) {	
+				// TODO
+			}
 			
 			fail("Seed: " + seed + "\n" + writer.getBuffer().toString());
 		}

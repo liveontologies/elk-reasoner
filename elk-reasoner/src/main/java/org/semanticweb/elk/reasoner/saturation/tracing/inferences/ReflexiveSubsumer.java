@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -27,37 +28,39 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
- * Represents an inference of the form A => R some A where R is a reflexive {@link IndexedPropertyChain}.
+ * Represents an inference of the form A => R some A where R is a reflexive
+ * {@link IndexedPropertyChain}.
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class ReflexiveSubsumer extends ComposedSubsumer implements Inference {
+public class ReflexiveSubsumer<S extends IndexedObjectSomeValuesFrom> extends
+		ComposedSubsumerImpl<S> implements Inference {
 
 	/**
 	 * @param superClassExpression
 	 */
-	public ReflexiveSubsumer(IndexedObjectSomeValuesFrom existential) {
+	public ReflexiveSubsumer(S existential) {
 		super(existential);
 	}
 
 	public IndexedPropertyChain getRelation() {
-		//FIXME cast
-		return ((IndexedObjectSomeValuesFrom) getExpression()).getRelation();
+		return getExpression().getRelation();
 	}
-	
+
 	@Override
 	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 
 	@Override
-	public IndexedClassExpression getInferenceContextRoot(IndexedClassExpression rootWhereStored) {
+	public IndexedClassExpression getInferenceContextRoot(
+			IndexedClassExpression rootWhereStored) {
 		return rootWhereStored;
 	}
 

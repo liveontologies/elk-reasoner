@@ -34,8 +34,8 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriterWrap;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionEntry;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ConclusionEntry;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
@@ -53,8 +53,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.IsInferenceCyclic;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.GetInferenceTarget;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceInsertionVisitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This factory should be used for tracing already made inferences whose
@@ -80,8 +78,6 @@ import org.slf4j.LoggerFactory;
 public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplicationFactory<TracedContext> {
 	
 	private final static boolean CYCLE_AVOIDANCE = true;
-	// logger for this class
-	protected static final Logger LOGGER_ = LoggerFactory	.getLogger(CycleBlockingRuleApplicationFactory.class);
 	
 	private final SaturationState<?> mainSaturationState_;
 	
@@ -217,7 +213,7 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 					IndexedClassExpression targetRoot = blockedInference.acceptTraced(new GetInferenceTarget(), cxt);
 					//deciding if the new inference should unblock the previously blocked one.
 					//i.e. if the new inference derives its conclusion NOT via the conclusion of the blocked inference.
-					if (IsInferenceCyclic.isAlternative(premiseInference, (Conclusion) blockedInference, targetRoot)) {
+					if (IsInferenceCyclic.isAlternative(premiseInference, blockedInference, targetRoot)) {
 						inferenceIter.remove();
 						// unblock the inference
 						LOGGER_.trace("Inference {} is unblocked in {}", blockedInference, cxt);

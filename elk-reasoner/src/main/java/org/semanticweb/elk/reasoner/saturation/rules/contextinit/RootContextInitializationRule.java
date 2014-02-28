@@ -22,9 +22,10 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -44,10 +45,6 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class RootContextInitializationRule extends
 		AbstractChainableContextInitRule {
-
-	// logger for events
-	/*private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(RootContextInitializationRule.class);*/
 
 	public static final String NAME = "Root Introduction";
 
@@ -89,9 +86,13 @@ public class RootContextInitializationRule extends
 	@Override
 	public void apply(ContextInitialization premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		//producer.produce(premises.getRoot(), new DecomposedSubsumer(premises.getRoot()));
-		
-		producer.produce(premises.getRoot(), new InitializationSubsumer(premises.getRoot()));
+		// producer.produce(premises.getRoot(), new
+		// DecomposedSubsumer(premises.getRoot()));
+
+		producer.produce(
+				premises.getRoot(),
+				new InitializationSubsumer<IndexedClassExpression>(premises
+						.getRoot()));
 	}
 
 	@Override

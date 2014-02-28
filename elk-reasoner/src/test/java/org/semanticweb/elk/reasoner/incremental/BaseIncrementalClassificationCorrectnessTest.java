@@ -82,17 +82,19 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 		Taxonomy<ElkClass> incremental = incrementalReasoner
 				.getTaxonomyQuietly();
 
-		if ( TaxonomyHasher.hash(expected) != TaxonomyHasher.hash(incremental)){
+		if (TaxonomyHasher.hash(expected) != TaxonomyHasher.hash(incremental)) {
 			StringWriter writer = new StringWriter();
-			
+
 			try {
 				writer.write("EXPECTED TAXONOMY:\n");
 				TaxonomyPrinter.dumpClassTaxomomy(expected, writer, false);
 				writer.write("INCREMENTAL TAXONOMY:\n");
 				TaxonomyPrinter.dumpClassTaxomomy(incremental, writer, false);
 				writer.flush();
-			} catch (IOException ioe) {	}
-			
+			} catch (IOException ioe) {
+				// TODO
+			}
+
 			fail("Seed: " + seed + "\n" + writer.getBuffer().toString());
 		}
 

@@ -124,6 +124,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
+		// TODO
 	}
 
 	/*

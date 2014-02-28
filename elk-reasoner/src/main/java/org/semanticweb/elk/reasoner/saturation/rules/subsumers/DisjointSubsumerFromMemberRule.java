@@ -27,7 +27,8 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjointSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -35,8 +36,6 @@ import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ChainableSubsumerRule} producing {@link DisjointSubsumer} when
@@ -51,10 +50,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DisjointSubsumerFromMemberRule extends
 		AbstractChainableSubsumerRule {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(DisjointSubsumerFromMemberRule.class);
 
 	public static final String NAME = "DisjointClasses Introduction";
 
@@ -107,8 +102,8 @@ public class DisjointSubsumerFromMemberRule extends
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
-			producer.produce(premises.getRoot(), new DisjointSubsumer(disAxiom,
-					premise));
+			producer.produce(premises.getRoot(), new DisjointSubsumerImpl(
+					disAxiom, premise));
 	}
 
 	protected boolean isEmpty() {

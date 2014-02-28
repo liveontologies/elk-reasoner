@@ -67,11 +67,11 @@ public class IncrementalModeSwitchTest {
 
 	@Test
 	public void testAddedTransitivity() throws ElkException {
-		TestChangesLoader loader = new TestChangesLoader();		
+		TestChangesLoader loader = new TestChangesLoader();
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new PostProcessingStageExecutor());
 
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
@@ -97,7 +97,7 @@ public class IncrementalModeSwitchTest {
 		reasoner.setAllowIncrementalMode(true);
 		TestChangesLoader changeLoader = new TestChangesLoader();
 		reasoner.registerAxiomLoader(changeLoader);
-		
+
 		changeLoader.add(axTransR);
 
 		taxonomy = reasoner.getTaxonomyQuietly();
@@ -120,12 +120,12 @@ public class IncrementalModeSwitchTest {
 
 		List<ElkAxiom> ontology = loadAxioms(new StringReader(initial));
 		List<ElkAxiom> additions = loadAxioms(new StringReader(toAdd));
-		TestChangesLoader initialLoader = new TestChangesLoader();		
+		TestChangesLoader initialLoader = new TestChangesLoader();
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader,
 				new LoggingStageExecutor());
 
-		reasoner.setAllowIncrementalMode(false);		
+		reasoner.setAllowIncrementalMode(false);
 
 		for (ElkAxiom axiom : ontology) {
 			initialLoader.add(axiom);
@@ -135,9 +135,9 @@ public class IncrementalModeSwitchTest {
 		reasoner.getTaxonomy();
 
 		System.out.println("===========================================");
-		
+
 		reasoner.setAllowIncrementalMode(true);
-		
+
 		TestChangesLoader changeLoader = new TestChangesLoader();
 		reasoner.registerAxiomLoader(changeLoader);
 
@@ -158,6 +158,7 @@ public class IncrementalModeSwitchTest {
 
 			@Override
 			public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
+				// does nothing
 			}
 
 			@Override

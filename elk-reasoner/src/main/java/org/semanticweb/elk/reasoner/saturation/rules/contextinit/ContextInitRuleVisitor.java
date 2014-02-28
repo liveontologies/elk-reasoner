@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
+
 /*
  * #%L
  * ELK Reasoner
@@ -28,5 +29,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
  * 
  */
 public interface ContextInitRuleVisitor extends LinkedContextInitRuleVisitor {
+
+	// nothing else
 
 }

@@ -20,8 +20,9 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.saturation.conclusions;
+package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -31,28 +32,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * An implementation of {@link Contradiction}
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  * 
  * @author "Yevgeny Kazakov"
  */
-public class Contradiction extends AbstractConclusion {
+public class ContradictionImpl extends AbstractConclusion implements
+		Contradiction {
 
-	static final Logger LOGGER_ = LoggerFactory.getLogger(Contradiction.class);
-
-	public static final String NAME = "Contradiction";
+	static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ContradictionImpl.class);
 
 	/**
 	 * we use just one instance of this class
 	 */
-	private static Contradiction INSTANCE_ = new Contradiction();
+	private static ContradictionImpl INSTANCE_ = new ContradictionImpl();
 
-	public static Contradiction getInstance() {
+	public static ContradictionImpl getInstance() {
 		return INSTANCE_;
 	}
 
-	private Contradiction() {
+	private ContradictionImpl() {
 		// do not allow creation of instances outside of this class
 	}
 

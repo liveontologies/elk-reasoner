@@ -59,7 +59,7 @@ class TransitiveReductionState<R extends IndexedClassExpression, J extends Trans
 	 * @param initiatorJob
 	 * @param saturationState
 	 */
-	TransitiveReductionState(J initiatorJob, SaturationState saturationState) {
+	TransitiveReductionState(J initiatorJob, SaturationState<?> saturationState) {
 		this.initiatorJob = initiatorJob;
 		R root = initiatorJob.getInput();
 		this.output = new TransitiveReductionOutputEquivalentDirect<R>(root);

@@ -27,8 +27,8 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -36,8 +36,6 @@ import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ChainableSubsumerRule} producing {@link Subsumer} for an
@@ -47,10 +45,6 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ObjectUnionFromDisjunctRule.class);
 
 	public static final String NAME = "ObjectUnionOf Introduction";
 
@@ -104,8 +98,9 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		for (IndexedClassExpression disjunction : disjunctions_)
-			producer.produce(premises.getRoot(), new ComposedSubsumer(
-					disjunction));
+			producer.produce(premises.getRoot(),
+					new ComposedSubsumerImpl<IndexedClassExpression>(
+							disjunction));
 	}
 
 	@Override

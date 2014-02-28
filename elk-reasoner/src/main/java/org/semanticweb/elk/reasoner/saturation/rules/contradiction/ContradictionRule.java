@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.contradiction;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contradiction;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;

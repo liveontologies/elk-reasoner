@@ -36,4 +36,5 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 public interface IndexedPropertyChainVisitor<O> extends
 		IndexedObjectPropertyVisitor<O>, IndexedBinaryPropertyChainVisitor<O> {
 
+	// nothing else
 }

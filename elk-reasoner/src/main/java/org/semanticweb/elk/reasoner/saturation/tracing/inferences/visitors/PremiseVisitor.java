@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
@@ -53,12 +53,12 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 		implements InferenceVisitor<I, O> {
 
 	@Override
-	public O visit(InitializationSubsumer conclusion, I parameter) {
+	public O visit(InitializationSubsumer<?> conclusion, I parameter) {
 		return null;
 	}
 
 	@Override
-	public O visit(SubClassOfSubsumer conclusion, I cxt) {
+	public O visit(SubClassOfSubsumer<?> conclusion, I cxt) {
 		conclusion.getPremise().accept(this, cxt);
 		return null;
 	}
@@ -84,7 +84,7 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 	}
 
 	@Override
-	public O visit(ReflexiveSubsumer conclusion, I parameter) {
+	public O visit(ReflexiveSubsumer<?> conclusion, I parameter) {
 		return null;
 	}
 

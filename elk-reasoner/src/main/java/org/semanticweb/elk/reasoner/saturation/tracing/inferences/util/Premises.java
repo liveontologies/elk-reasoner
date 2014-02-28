@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.util;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.PremiseVisitor;
 import org.semanticweb.elk.util.collections.Operations.Condition;

@@ -49,7 +49,7 @@ public class ClassTaxonomyComputation
 	public ClassTaxonomyComputation(
 			Collection<? extends Collection<IndexedClass>> inputs,
 			ComputationExecutor executor, int maxWorkers,
-			ProgressMonitor progressMonitor, SaturationState saturationState,
+			ProgressMonitor progressMonitor, SaturationState<?> saturationState,
 			UpdateableTaxonomy<ElkClass> partialTaxonomy) {
 		super(inputs, new ClassTaxonomyComputationFactory(saturationState,
 				maxWorkers, partialTaxonomy), executor, maxWorkers,

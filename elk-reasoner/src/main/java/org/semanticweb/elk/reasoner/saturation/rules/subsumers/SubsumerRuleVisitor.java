@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
+
 /*
  * #%L
  * ELK Reasoner
@@ -29,5 +30,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  */
 public interface SubsumerRuleVisitor extends LinkedSubsumerRuleVisitor,
 		SubsumerDecompositionRuleVisitor {
+
+	// nothing else
 
 }

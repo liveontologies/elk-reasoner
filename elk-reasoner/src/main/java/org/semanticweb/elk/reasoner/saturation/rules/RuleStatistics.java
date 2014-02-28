@@ -27,7 +27,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSub
 import org.semanticweb.elk.util.logging.statistics.AbstractStatistics;
 import org.semanticweb.elk.util.logging.statistics.StatisticsPrinter;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /*
  * #%L
@@ -59,10 +58,6 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class RuleStatistics extends AbstractStatistics {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(RuleStatistics.class);
 
 	// TODO: limit access
 	public final RuleCounter ruleCounter = new RuleCounter();

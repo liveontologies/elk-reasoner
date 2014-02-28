@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,4 +24,6 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
 
 public interface IndexedObjectFilter extends IndexedClassExpressionFilter,
 		IndexedPropertyChainFilter, IndexedAxiomFilter {
+
+	// nothing else
 }

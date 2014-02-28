@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.ContextCreatingSaturationStateWri
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.factories.ContextTracingFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.factories.ContextTracingJob;

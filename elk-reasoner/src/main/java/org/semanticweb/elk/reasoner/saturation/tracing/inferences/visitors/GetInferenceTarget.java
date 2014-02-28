@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialBackwardLink;
@@ -74,9 +73,6 @@ public class GetInferenceTarget extends
 	@Override
 	public IndexedClassExpression visit(
 			DecomposedExistentialBackwardLink conclusion, Context premiseContext) {
-		// FIXME this is a dirty hack, parameterize Subsumer so we can get the
-		// properly typed existential here
-		return ((IndexedObjectSomeValuesFrom) conclusion.getExistential()
-				.getExpression()).getFiller();
+		return conclusion.getExistential().getExpression().getFiller();
 	}
 }

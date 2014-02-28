@@ -25,15 +25,14 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ChainableSubsumerRule} producing {@link Contradiction} when
@@ -44,10 +43,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ContradictionFromDisjointnessRule extends
 		AbstractChainableSubsumerRule {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ContradictionFromDisjointnessRule.class);
 
 	public static final String NAME = "DisjointClasses Contradiction Introduction";
 
@@ -88,7 +83,7 @@ public class ContradictionFromDisjointnessRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		producer.produce(premises.getRoot(), Contradiction.getInstance());
+		producer.produce(premises.getRoot(), ContradictionImpl.getInstance());
 	}
 
 	@Override

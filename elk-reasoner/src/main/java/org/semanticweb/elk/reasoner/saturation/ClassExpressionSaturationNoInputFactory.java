@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.Processor;
 import org.semanticweb.elk.util.concurrent.computation.ProcessorFactory;
@@ -46,12 +46,12 @@ class ClassExpressionSaturationNoInputFactory implements
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassExpressionSaturationNoInputFactory.class);
 
-	private final RuleApplicationFactory ruleAppFactory_;
+	private final RuleApplicationFactory<?> ruleAppFactory_;
 
 	private final ContextModificationListener contextModificationListener_;
 
 	public ClassExpressionSaturationNoInputFactory(
-			final RuleApplicationFactory ruleAppFactory,
+			final RuleApplicationFactory<?> ruleAppFactory,
 			final ContextModificationListener contextModificationListener) {
 		ruleAppFactory_ = ruleAppFactory;
 		contextModificationListener_ = contextModificationListener;

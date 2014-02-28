@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
+
 /*
  * #%L
  * ELK Reasoner
@@ -53,37 +54,36 @@ import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class TracingSaturationTest {
-	
-	
+
 	@Test
 	public void testBasicTracing() throws Exception {
 		Reasoner reasoner = load("tracing/DuplicateExistential.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
-			
+
 		reasoner.explainSubsumption(a, d);
 		TracingTestUtils.checkTracingCompleteness(a, d, reasoner);
 		TracingTestUtils.checkTracingMinimality(a, d, reasoner);
 	}
-	
-	/*@Test
-	public void testGalen() throws Exception {
-		Reasoner reasoner = load("tracing/EL-GALEN.owl");
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		IndexedClassExpression clazz = ReasonerStateAccessor.transform(reasoner, factory.getClass(new ElkFullIri("http://www.co-ode.org/ontologies/galen#IndexFingerNail")));
-		TraceState state = ReasonerStateAccessor.getTraceState(reasoner);
-		
-		InputProcessor<ContextTracingJob> engine = state.getContextTracingFactory().getEngine();
-		engine.submit(new ContextTracingJob(clazz));
-		engine.process();
-	}*/
-	
-	
+
+	/*
+	 * @Test public void testGalen() throws Exception { Reasoner reasoner =
+	 * load("tracing/EL-GALEN.owl"); ElkObjectFactory factory = new
+	 * ElkObjectFactoryImpl(); IndexedClassExpression clazz =
+	 * ReasonerStateAccessor.transform(reasoner, factory.getClass(new
+	 * ElkFullIri("http://www.co-ode.org/ontologies/galen#IndexFingerNail")));
+	 * TraceState state = ReasonerStateAccessor.getTraceState(reasoner);
+	 * 
+	 * InputProcessor<ContextTracingJob> engine =
+	 * state.getContextTracingFactory().getEngine(); engine.submit(new
+	 * ContextTracingJob(clazz)); engine.process(); }
+	 */
+
 	@Test
 	public void testDuplicateInferenceOfConjunction() throws Exception {
 		Reasoner reasoner = load("tracing/DuplicateConjunction.owl");
@@ -91,8 +91,8 @@ public class TracingSaturationTest {
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
-		ElkClassExpression bAndC = factory.getObjectIntersectionOf(b,  c);
-			
+		ElkClassExpression bAndC = factory.getObjectIntersectionOf(b, c);
+
 		reasoner.explainSubsumption(a, bAndC);
 		TracingTestUtils.checkNumberOfInferences(a, bAndC, reasoner, 1);
 		TracingTestUtils.checkNumberOfInferences(a, b, reasoner, 1);
@@ -100,8 +100,7 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkInferenceAcyclicity(reasoner);
 		TracingTestUtils.checkTracingCompleteness(a, bAndC, reasoner);
 	}
-	
-	
+
 	@Test
 	public void testDuplicateInferenceOfExistential() throws Exception {
 		Reasoner reasoner = load("tracing/DuplicateExistential.owl");
@@ -109,49 +108,52 @@ public class TracingSaturationTest {
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
-		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri("http://example.org/R"));
+		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri(
+				"http://example.org/R"));
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 		ElkClassExpression rSomeB = factory.getObjectSomeValuesFrom(r, b);
-		
+
 		reasoner.explainSubsumption(a, rSomeC);
 		TracingTestUtils.checkNumberOfInferences(a, rSomeB, reasoner, 1);
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 		reasoner.explainSubsumption(b, c);
-		// now check that we didn't get a duplicate inference in A due to tracing B
+		// now check that we didn't get a duplicate inference in A due to
+		// tracing B
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 		TracingTestUtils.checkInferenceAcyclicity(reasoner);
 		TracingTestUtils.checkTracingCompleteness(a, rSomeB, reasoner);
 		TracingTestUtils.checkTracingCompleteness(a, rSomeC, reasoner);
 	}
-	
+
 	@Test
 	public void testDuplicateInferenceViaComposition() throws Exception {
 		Reasoner reasoner = load("tracing/DuplicateComposition.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		
+
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
-		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri("http://example.org/R"));
+		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri(
+				"http://example.org/R"));
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
-			
+
 		reasoner.explainSubsumption(a, rSomeC);
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 		TracingTestUtils.checkTracingCompleteness(a, rSomeC, reasoner);
 		TracingTestUtils.checkInferenceAcyclicity(reasoner);
-		//B must be traced recursively
+		// B must be traced recursively
 		TracingTestUtils.checkNumberOfInferences(b, b, reasoner, 1);
 	}
-	
-	
+
 	@Test
 	public void testDuplicateInferenceOfReflexiveExistential() throws Exception {
 		Reasoner reasoner = load("tracing/DuplicateReflexiveExistential.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
-		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri("http://example.org/R"));
+		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri(
+				"http://example.org/R"));
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
 
@@ -159,7 +161,7 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 		TracingTestUtils.checkTracingCompleteness(a, rSomeC, reasoner);
 	}
-	
+
 	//
 	@Test
 	public void testRecursiveTracingExistential() throws Exception {
@@ -178,19 +180,19 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkNumberOfInferences(b, c, reasoner, 1);
 		TracingTestUtils.checkTracingCompleteness(a, rSomeC, reasoner);
 	}
-	
-	
+
 	@Test
 	public void testRecursiveTracingComposition() throws Exception {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		Reasoner reasoner = load("tracing/RecursiveComposition.owl");
-		
+
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
-		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri("http://example.org/R"));
+		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri(
+				"http://example.org/R"));
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
 		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
-		
+
 		reasoner.explainSubsumption(a, rSomeC);
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
 		TracingTestUtils.checkNumberOfInferences(b, b, reasoner, 1);
@@ -204,28 +206,29 @@ public class TracingSaturationTest {
 	public void testAvoidTracingDueToCyclicInferences() throws Exception {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		Reasoner reasoner = load("tracing/TrivialPropagation.owl");
-		
+
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass a1 = factory.getClass(new ElkFullIri("http://example.org/A1"));
 		ElkClass b2 = factory.getClass(new ElkFullIri("http://example.org/B2"));
-		
+
 		reasoner.explainSubsumption(a, a1);
 		TracingTestUtils.checkNumberOfInferences(b2, b2, reasoner, 0);
 		TracingTestUtils.checkInferenceAcyclicity(reasoner);
 	}
-	
+
 	private Reasoner load(String resource) throws Exception {
 		Reasoner reasoner = null;
 		InputStream stream = null;
-		
+
 		try {
 			stream = getClass().getClassLoader().getResourceAsStream(resource);
 
 			List<ElkAxiom> ontology = loadAxioms(stream);
-			TestChangesLoader initialLoader = new TestChangesLoader();			
+			TestChangesLoader initialLoader = new TestChangesLoader();
 			ReasonerStageExecutor executor = new LoggingStageExecutor();
-			
-			reasoner = TestReasonerUtils.createTestReasoner(initialLoader, executor);
+
+			reasoner = TestReasonerUtils.createTestReasoner(initialLoader,
+					executor);
 
 			for (ElkAxiom axiom : ontology) {
 				initialLoader.add(axiom);
@@ -235,7 +238,7 @@ public class TracingSaturationTest {
 		} finally {
 			IOUtils.closeQuietly(stream);
 		}
-		
+
 		return reasoner;
 	}
 
@@ -254,6 +257,7 @@ public class TracingSaturationTest {
 
 			@Override
 			public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
+				// ignored
 			}
 
 			@Override

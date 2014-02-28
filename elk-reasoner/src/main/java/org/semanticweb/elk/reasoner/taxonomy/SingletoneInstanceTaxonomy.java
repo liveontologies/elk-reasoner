@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.taxonomy;
+
 /*
  * #%L
  * ELK Reasoner
@@ -77,8 +78,8 @@ public class SingletoneInstanceTaxonomy<T extends ElkObject, I extends ElkObject
 	public TypeNode<T, I> getTypeNode(T elkObject) {
 		if (node.getMembers().contains(elkObject))
 			return node;
-		else
-			return null;
+		// else
+		return null;
 	}
 
 	@Override

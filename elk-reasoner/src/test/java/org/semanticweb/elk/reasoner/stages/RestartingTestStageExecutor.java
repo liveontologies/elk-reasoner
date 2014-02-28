@@ -53,8 +53,9 @@ public class RestartingTestStageExecutor extends SimpleInterrupter implements
 					if (e instanceof ElkInterruptedException) {
 						stage.clearInterrupt();
 						continue;
-					} else
-						throw e;
+					}
+					// else
+					throw e;
 				} finally {
 					stage.postExecute();
 					finish(stage);
@@ -64,6 +65,7 @@ public class RestartingTestStageExecutor extends SimpleInterrupter implements
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void finish(ReasonerStage stage) {
 		clearThreadToInterrupt();
 	}
