@@ -54,10 +54,10 @@ public class PreprocessedConclusionVisitor<I, O> implements
 	/**
 	 * a {@link ConclusionVisitor} that is called next and returns the output
 	 */
-	final private ConclusionVisitor<I, O> visitor_;
+	final private ConclusionVisitor<? super I, O> visitor_;
 
 	public PreprocessedConclusionVisitor(ConclusionVisitor<I, ?> preprocessor,
-			ConclusionVisitor<I, O> visitor) {
+			ConclusionVisitor<? super I, O> visitor) {
 		this.preprocessor_ = preprocessor;
 		this.visitor_ = visitor;
 	}

@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,6 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  */
 
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 
 /**
  * A {@code Conclusion} indicating that the {@link Context} where it is stored
@@ -32,5 +34,10 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public interface ContextInitialization extends Conclusion {
 
 	public static final String NAME = "Context Initialization";
+
+	/**
+	 * @return the rules that should be applied for context initializations
+	 */
+	public LinkedContextInitRule getContextInitRuleHead();
 
 }

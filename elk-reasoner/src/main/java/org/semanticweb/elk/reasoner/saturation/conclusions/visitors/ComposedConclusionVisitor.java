@@ -51,7 +51,7 @@ public class ComposedConclusionVisitor<I> implements
 	 * The original {@link ConclusionVisitor}s to be called in the specified
 	 * order
 	 */
-	final private ConclusionVisitor<I, Boolean>[] visitors_;
+	final private ConclusionVisitor<? super I, Boolean>[] visitors_;
 
 	/**
 	 * Creates a new {@link ConclusionVisitor} that combines several given
@@ -65,7 +65,8 @@ public class ComposedConclusionVisitor<I> implements
 	 * @param visitors
 	 *            the {@link ConclusionVisitor} to be composed
 	 */
-	public ComposedConclusionVisitor(ConclusionVisitor<I, Boolean>... visitors) {
+	public ComposedConclusionVisitor(
+			ConclusionVisitor<? super I, Boolean>... visitors) {
 		this.visitors_ = visitors;
 	}
 

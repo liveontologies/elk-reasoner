@@ -54,7 +54,7 @@ public class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
 	private final Conclusion contextInitConclusion_;
 
 	protected BasicRuleEngine(OntologyIndex index,
-			ConclusionVisitor<Context, Boolean> conclusionProcessor,
+			ConclusionVisitor<? super Context, Boolean> conclusionProcessor,
 			WorkerLocalTodo localTodo, SaturationStateWriter<?> writer,
 			SaturationStatistics aggregatedStatistics,
 			SaturationStatistics localStatistics) {

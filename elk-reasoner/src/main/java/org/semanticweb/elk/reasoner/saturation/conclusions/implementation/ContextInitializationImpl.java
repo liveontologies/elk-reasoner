@@ -74,4 +74,9 @@ public class ContextInitializationImpl extends AbstractConclusion implements
 		return "Init";
 	}
 
+	@Override
+	public LinkedContextInitRule getContextInitRuleHead() {
+		return ontologyIndex_.getContextInitRuleHead();
+	}
+
 }

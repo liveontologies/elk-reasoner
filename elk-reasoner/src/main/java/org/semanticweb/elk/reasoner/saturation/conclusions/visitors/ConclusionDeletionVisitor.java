@@ -23,15 +23,15 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ConclusionSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ConclusionVisitor} that removes the visited {@link Conclusion} from
- * the given {@link Context}. The visit method returns {@link true} if the
- * {@link Context} was modified as the result of this operation, i.e., the
- * {@link Conclusion} was contained in the {@link Context}.
+ * the given {@link ConclusionSet}. The visit method returns {@link true} if the
+ * {@link ConclusionSet} was modified as the result of this operation, i.e., the
+ * {@link Conclusion} was contained in the {@link ConclusionSet}.
  * 
  * @see ConclusionInsertionVisitor
  * @see ConclusionOccurrenceCheckingVisitor
@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class ConclusionDeletionVisitor extends
-		AbstractConclusionVisitor<Context, Boolean> {
+		AbstractConclusionVisitor<ConclusionSet, Boolean> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -48,9 +48,10 @@ public class ConclusionDeletionVisitor extends
 	// TODO: make this by combining the visitor in order to avoid overheads when
 	// logging is switched off
 	@Override
-	protected Boolean defaultVisit(Conclusion conclusion, Context context) {
-		boolean result = context.removeConclusion(conclusion);
-		LOGGER_.trace("{}: deleting {}: {}", context, conclusion,
+	protected Boolean defaultVisit(Conclusion conclusion,
+			ConclusionSet conclusions) {
+		boolean result = conclusions.removeConclusion(conclusion);
+		LOGGER_.trace("{}: deleting {}: {}", conclusions, conclusion,
 				result ? "success" : "failure");
 		return result;
 	}

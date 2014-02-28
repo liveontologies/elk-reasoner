@@ -76,7 +76,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context>
 	 *         {@link SaturationStatistics} accordingly
 	 */
 	protected InputProcessor<IndexedClassExpression> getEngine(
-			ConclusionVisitor<Context, Boolean> conclusionProcessor,
+			ConclusionVisitor<? super Context, Boolean> conclusionProcessor,
 			SaturationStateWriter<? extends C> saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
 		conclusionProcessor = SaturationUtils

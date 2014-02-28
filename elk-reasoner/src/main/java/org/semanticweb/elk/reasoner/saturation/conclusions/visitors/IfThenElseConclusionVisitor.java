@@ -46,11 +46,11 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContext
 public class IfThenElseConclusionVisitor<I, O> implements
 		ConclusionVisitor<I, O> {
 
-	final private ConclusionVisitor<I, Boolean> check_;
+	final private ConclusionVisitor<? super I, Boolean> check_;
 
-	final private ConclusionVisitor<I, O> doFalse_;
+	final private ConclusionVisitor<? super I, O> doFalse_;
 
-	final private ConclusionVisitor<I, O> doTrue_;
+	final private ConclusionVisitor<? super I, O> doTrue_;
 
 	/**
 	 * Creates a new {@link ConclusionVisitor} that implements an if-then-else
@@ -71,8 +71,10 @@ public class IfThenElseConclusionVisitor<I, O> implements
 	 *            The {@link ConclusionVisitor} that is called when the
 	 *            condition is evaluated {@code false}
 	 */
-	public IfThenElseConclusionVisitor(ConclusionVisitor<I, Boolean> check,
-			ConclusionVisitor<I, O> doTrue, ConclusionVisitor<I, O> doFalse) {
+	public IfThenElseConclusionVisitor(
+			ConclusionVisitor<? super I, Boolean> check,
+			ConclusionVisitor<? super I, O> doTrue,
+			ConclusionVisitor<? super I, O> doFalse) {
 		this.check_ = check;
 		this.doTrue_ = doTrue;
 		this.doFalse_ = doFalse;

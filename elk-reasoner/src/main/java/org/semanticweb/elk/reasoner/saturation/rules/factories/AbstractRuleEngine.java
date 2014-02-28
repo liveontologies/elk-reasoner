@@ -49,7 +49,7 @@ public abstract class AbstractRuleEngine implements
 	 * Specifies what to do with {@link Conclusion}s within the processed
 	 * {@link Context}
 	 */
-	private final ConclusionVisitor<Context, ?> conclusionProcessor_;
+	private final ConclusionVisitor<? super Context, ?> conclusionProcessor_;
 
 	/**
 	 * Accumulates the produced {@link Conclusion}s that should be processed
@@ -59,7 +59,7 @@ public abstract class AbstractRuleEngine implements
 	private final WorkerLocalTodo workerLocalTodo_;
 
 	public AbstractRuleEngine(
-			ConclusionVisitor<Context, ?> conclusionProcessor,
+			ConclusionVisitor<? super Context, ?> conclusionProcessor,
 			WorkerLocalTodo localizedProducer) {
 		this.conclusionProcessor_ = conclusionProcessor;
 		this.workerLocalTodo_ = localizedProducer;

@@ -89,21 +89,23 @@ public class SaturationUtils {
 	}
 
 	public static <C extends Context> SaturationStateWriter<C> getStatAwareWriter(
-			SaturationStateWriter<C> writer, SaturationStatistics localStatistics) {
+			SaturationStateWriter<C> writer,
+			SaturationStatistics localStatistics) {
 		return COLLECT_CONCLUSION_COUNTS ? new CountingSaturationStateWriter<C>(
 				writer, localStatistics.getConclusionStatistics()
 						.getProducedConclusionCounts()) : writer;
 	}
 
 	public static <C extends Context> SaturationStateWriter<C> getStatsAwareWriter(
-			SaturationStateWriter<C> writer, SaturationStatistics localStatistics) {
+			SaturationStateWriter<C> writer,
+			SaturationStatistics localStatistics) {
 		return COLLECT_CONCLUSION_COUNTS ? new CountingSaturationStateWriter<C>(
 				writer, localStatistics.getConclusionStatistics()
 						.getProducedConclusionCounts()) : writer;
 	}
 
-	public static ConclusionVisitor<Context, Boolean> getUsedConclusionCountingProcessor(
-			ConclusionVisitor<Context, Boolean> ruleProcessor,
+	public static ConclusionVisitor<? super Context, Boolean> getUsedConclusionCountingProcessor(
+			ConclusionVisitor<? super Context, Boolean> ruleProcessor,
 			SaturationStatistics localStatistics) {
 		if (COLLECT_CONCLUSION_COUNTS) {
 			return new PreprocessedConclusionVisitor<Context, Boolean>(
@@ -114,8 +116,8 @@ public class SaturationUtils {
 		return ruleProcessor;
 	}
 
-	public static <O> ConclusionVisitor<Context, O> getProcessedConclusionCountingProcessor(
-			ConclusionVisitor<Context, O> conclusionVisitor,
+	public static <O> ConclusionVisitor<? super Context, O> getProcessedConclusionCountingProcessor(
+			ConclusionVisitor<? super Context, O> conclusionVisitor,
 			SaturationStatistics localStatistics) {
 
 		ConclusionStatistics stats = localStatistics.getConclusionStatistics();

@@ -59,7 +59,7 @@ public abstract class AbstractRuleEngineWithStatistics extends
 	protected final ContextStatistics localContextStatistics;
 
 	public AbstractRuleEngineWithStatistics(
-			ConclusionVisitor<Context, ?> conclusionProcessor,
+			ConclusionVisitor<? super Context, ?> conclusionProcessor,
 			WorkerLocalTodo localTodo, SaturationStatistics aggregatedStats,
 			SaturationStatistics localStatistics) {
 		super(conclusionProcessor, localTodo);

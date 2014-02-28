@@ -48,7 +48,7 @@ public class LocalizedConclusionVisitor extends
 	/**
 	 * the {@link ConclusionVisitor} to be localized
 	 */
-	ConclusionVisitor<Context, Boolean> visitor_;
+	ConclusionVisitor<? super Context, Boolean> visitor_;
 
 	/**
 	 * the {@link SaturationState} used to localize {@link Context}s
@@ -56,7 +56,7 @@ public class LocalizedConclusionVisitor extends
 	SaturationState<?> state_;
 
 	public LocalizedConclusionVisitor(
-			ConclusionVisitor<Context, Boolean> visitor,
+			ConclusionVisitor<? super Context, Boolean> visitor,
 			SaturationState<?> state) {
 		this.visitor_ = visitor;
 		this.state_ = state;

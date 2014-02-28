@@ -23,15 +23,15 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ConclusionSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ConclusionVisitor} that checks if visited {@link Conclusion} is
- * contained the given {@link Context}. The visit method returns {@link true} if
- * the {@link Context} is occurs in the {@link Context} and {@link false}
- * otherwise.
+ * contained the given {@link ConclusionSet}. The visit method returns {@link
+ * true} if the {@link ConclusionSet} is occurs in the {@link ConclusionSet} and
+ * {@link false} otherwise.
  * 
  * @see ConclusionInsertionVisitor
  * @see ConclusionDeletionVisitor
@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public class ConclusionOccurrenceCheckingVisitor extends
-		AbstractConclusionVisitor<Context, Boolean> {
+		AbstractConclusionVisitor<ConclusionSet, Boolean> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -49,7 +49,7 @@ public class ConclusionOccurrenceCheckingVisitor extends
 	// TODO: make this by combining the visitor in order to avoid overheads when
 	// logging is switched off
 	@Override
-	protected Boolean defaultVisit(Conclusion conclusion, Context context) {
+	protected Boolean defaultVisit(Conclusion conclusion, ConclusionSet context) {
 		boolean result = context.containsConclusion(conclusion);
 		LOGGER_.trace("{}: check occurrence of {}: {}", context, conclusion,
 				result ? "success" : "failure");

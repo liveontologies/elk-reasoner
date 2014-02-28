@@ -75,42 +75,59 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplicationFactory<TracedContext> {
-	
+public class CycleBlockingRuleApplicationFactory extends
+		AbstractRuleApplicationFactory<TracedContext> {
+
 	private final static boolean CYCLE_AVOIDANCE = true;
-	
+
 	private final SaturationState<?> mainSaturationState_;
-	
+
 	private final TraceStore.Writer inferenceWriter_;
-	
+
 	private final TraceStore.Reader inferenceReader_;
 
-	public CycleBlockingRuleApplicationFactory(SaturationState<?> mainSaturationState,
+	public CycleBlockingRuleApplicationFactory(
+			SaturationState<?> mainSaturationState,
 			SaturationState<TracedContext> traceState, TraceStore traceStore) {
 		super(traceState);
 		mainSaturationState_ = mainSaturationState;
 		inferenceWriter_ = traceStore.getWriter();
 		inferenceReader_ = traceStore.getReader();
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor,
-			SaturationStateWriter<? extends TracedContext> localWriter/*this producer is responsible for blocking cyclic inferences*/,
+			SaturationStateWriter<? extends TracedContext> localWriter/*
+																	 * this
+																	 * producer
+																	 * is
+																	 * responsible
+																	 * for
+																	 * blocking
+																	 * cyclic
+																	 * inferences
+																	 */,
 			SaturationStatistics statistics) {
-		
-		SaturationStateWriter<?> cycleBlocker = new CycleBlockingWriter(localWriter);
-		
+
+		SaturationStateWriter<?> cycleBlocker = new CycleBlockingWriter(
+				localWriter);
+
 		return new ComposedConclusionVisitor<Context>(
 				// checking the conclusion against the main saturation state
 				new LocalizedConclusionVisitor(
 						// conclusion already occurs there
 						new ConclusionOccurrenceCheckingVisitor(),
 						mainSaturationState_),
-				// if all fine, insert the conclusion to the local context copy and write the inference 
-				new InferenceInserter(new ConclusionInsertionVisitor/*ConclusionInitializingInsertionVisitor*/(cycleBlocker), cycleBlocker, getSaturationStatistics()),
-				// apply only local rules and produce conclusion only to the locally copies
+				// if all fine, insert the conclusion to the local context copy
+				// and write the inference
+				new InferenceInserter(
+						new ConclusionInsertionVisitor/* ConclusionInitializingInsertionVisitor */(
+								cycleBlocker), cycleBlocker,
+						getSaturationStatistics()),
+				// apply only local rules and produce conclusion only to the
+				// locally copies
 				new HybridLocalRuleApplicationConclusionVisitor(
 						mainSaturationState_, ruleVisitor, ruleVisitor,
 						cycleBlocker, cycleBlocker));
@@ -119,7 +136,7 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 	@Override
 	public void dispose() {
 		super.dispose();
-		//cleaning blocked inferences
+		// cleaning blocked inferences
 		for (TracedContext context : getSaturationState().getContexts()) {
 			context.cleanBlockedInferences();
 		}
@@ -128,44 +145,51 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 	/**
 	 * Blocks cyclic inferences when producing conclusions.
 	 */
-	private class CycleBlockingWriter extends SaturationStateWriterWrap<TracedContext> {
+	private class CycleBlockingWriter extends
+			SaturationStateWriterWrap<TracedContext> {
 
-		public CycleBlockingWriter(SaturationStateWriter<? extends TracedContext> writer) {
+		public CycleBlockingWriter(
+				SaturationStateWriter<? extends TracedContext> writer) {
 			super(writer);
 		}
 
 		@Override
 		public void produce(IndexedClassExpression root, Conclusion conclusion) {
-			final SaturationState<? extends TracedContext> tracingState = CycleBlockingRuleApplicationFactory.this.getSaturationState();
+			final SaturationState<? extends TracedContext> tracingState = CycleBlockingRuleApplicationFactory.this
+					.getSaturationState();
 			// no need to check for duplicates of inferences since rules for all
 			// conclusions are applied only once.
 			final TracedContext thisContext = tracingState.getContext(root);
-			
-			if (thisContext == null || !(conclusion instanceof Inference) || !CYCLE_AVOIDANCE) {
+
+			if (thisContext == null || !(conclusion instanceof Inference)
+					|| !CYCLE_AVOIDANCE) {
 				super.produce(root, conclusion);
 				return;
 			}
 
 			final Inference inference = (Inference) conclusion;
 			// get the premise which blocks this inference, if any
-			Conclusion cyclicPremise = IsInferenceCyclic.check(inference, root, inferenceReader_);
-			
+			Conclusion cyclicPremise = IsInferenceCyclic.check(inference, root,
+					inferenceReader_);
+
 			if (cyclicPremise == null) {
-				//cool, the inference isn't cyclic, go ahead
+				// cool, the inference isn't cyclic, go ahead
 				super.produce(root, inference);
-			}
-			else {
-				final TracedContext inferenceContext = tracingState.getContext(inference.getInferenceContextRoot(root));
-				//block the inference in the context where the inference has been made
-				LOGGER_.trace("Inference {} is blocked in {} through {}", inference, inferenceContext, cyclicPremise);
-				
-				inferenceContext.getBlockedInferences().add(new ConclusionEntry(cyclicPremise), inference);
+			} else {
+				final TracedContext inferenceContext = tracingState
+						.getContext(inference.getInferenceContextRoot(root));
+				// block the inference in the context where the inference has
+				// been made
+				LOGGER_.trace("Inference {} is blocked in {} through {}",
+						inference, inferenceContext, cyclicPremise);
+
+				inferenceContext.getBlockedInferences().add(
+						new ConclusionEntry(cyclicPremise), inference);
 			}
 		}
-			
+
 	}
-	
-	
+
 	/**
 	 * First, writes the new inference for the conclusion, second, inserts that
 	 * conclusion into the context.
@@ -174,49 +198,65 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private class InferenceInserter extends AbstractConclusionVisitor<Context, Boolean> {
-		
+	private class InferenceInserter extends
+			AbstractConclusionVisitor<Context, Boolean> {
+
 		private final ConclusionProducer localProducer_;
 		private final ConclusionInsertionVisitor contextInserter_;
-		private final ConclusionVisitor<Context, Boolean> inferenceInserter_;
-		
-		public InferenceInserter(ConclusionInsertionVisitor inserter, ConclusionProducer producer, SaturationStatistics localStats) {
+		private final ConclusionVisitor<? super Context, Boolean> inferenceInserter_;
+
+		public InferenceInserter(ConclusionInsertionVisitor inserter,
+				ConclusionProducer producer, SaturationStatistics localStats) {
 			contextInserter_ = inserter;
-			inferenceInserter_ = SaturationUtils.getUsedConclusionCountingProcessor(new InferenceInsertionVisitor(inferenceWriter_), localStats);
+			inferenceInserter_ = SaturationUtils
+					.getUsedConclusionCountingProcessor(
+							new InferenceInsertionVisitor(inferenceWriter_),
+							localStats);
 			localProducer_ = producer;
 		}
 
 		@Override
-		protected Boolean defaultVisit(final Conclusion conclusion, final Context cxt) {
-			//write the inference and count it as used conclusion (if needed)
+		protected Boolean defaultVisit(final Conclusion conclusion,
+				final Context cxt) {
+			// write the inference and count it as used conclusion (if needed)
 			conclusion.accept(inferenceInserter_, cxt);
-			//see if some inferences can now be unblocked
+			// see if some inferences can now be unblocked
 			if (CYCLE_AVOIDANCE && conclusion instanceof Inference) {
 				unblockInferences((Inference) conclusion, (TracedContext) cxt);
 			}
-			//insert into context
+			// insert into context
 			return conclusion.accept(contextInserter_, cxt);
 		}
-		
-		private void unblockInferences(final Inference premiseInference, final TracedContext cxt) {
-			Collection<Inference> blocked = cxt.getBlockedInferences().get(new ConclusionEntry(premiseInference));
-			
+
+		private void unblockInferences(final Inference premiseInference,
+				final TracedContext cxt) {
+			Collection<Inference> blocked = cxt.getBlockedInferences().get(
+					new ConclusionEntry(premiseInference));
+
 			if (blocked != null) {
 				Iterator<Inference> inferenceIter = blocked.iterator();
-				
-				for (; inferenceIter.hasNext(); ) {
+
+				for (; inferenceIter.hasNext();) {
 					final Inference blockedInference = inferenceIter.next();
-					
-					LOGGER_.trace("Checking if {} should be unblocked in {} since we derived {}", blockedInference, cxt, premiseInference);
-					
-					//this is the context to which the blocked inference should be produced (if unblocked)
-					IndexedClassExpression targetRoot = blockedInference.acceptTraced(new GetInferenceTarget(), cxt);
-					//deciding if the new inference should unblock the previously blocked one.
-					//i.e. if the new inference derives its conclusion NOT via the conclusion of the blocked inference.
-					if (IsInferenceCyclic.isAlternative(premiseInference, blockedInference, targetRoot)) {
+
+					LOGGER_.trace(
+							"Checking if {} should be unblocked in {} since we derived {}",
+							blockedInference, cxt, premiseInference);
+
+					// this is the context to which the blocked inference should
+					// be produced (if unblocked)
+					IndexedClassExpression targetRoot = blockedInference
+							.acceptTraced(new GetInferenceTarget(), cxt);
+					// deciding if the new inference should unblock the
+					// previously blocked one.
+					// i.e. if the new inference derives its conclusion NOT via
+					// the conclusion of the blocked inference.
+					if (IsInferenceCyclic.isAlternative(premiseInference,
+							blockedInference, targetRoot)) {
 						inferenceIter.remove();
 						// unblock the inference
-						LOGGER_.trace("Inference {} is unblocked in {}", blockedInference, cxt);
+						LOGGER_.trace("Inference {} is unblocked in {}",
+								blockedInference, cxt);
 						// produce again to the same producer, the inference
 						// will again be checked for cyclicity and may be
 						// blocked by another premise or finally produced
@@ -226,5 +266,5 @@ public class CycleBlockingRuleApplicationFactory extends AbstractRuleApplication
 			}
 		}
 	}
-	
+
 }

@@ -35,11 +35,11 @@ import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 public class TimedConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 
-	private final ConclusionVisitor<I, O> processor_;
+	private final ConclusionVisitor<? super I, O> processor_;
 	private final ConclusionTimer timer_;
 
 	public TimedConclusionVisitor(ConclusionTimer timer,
-			ConclusionVisitor<I, O> processor) {
+			ConclusionVisitor<? super I, O> processor) {
 		this.timer_ = timer;
 		this.processor_ = processor;
 	}
