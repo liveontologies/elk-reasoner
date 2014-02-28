@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,28 +23,32 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
- * A {@link ConclusionVisitor} that applies both redundant and non-redundant
- * rules for the visited {@link Conclusion}s using the provided
- * {@link RuleVisitor} to track rule applications and {@link ConclusionProducer}
- * to output the {@link Conclusion}s of the applied rules. The methods always
- * return {@link true}.
+ * A {@link ConclusionVisitor} that applies all redundant rules for the visited
+ * {@link Conclusion}s using the provided {@link RuleVisitor} to track rule
+ * applications and {@link ConclusionProducer} to output the {@link Conclusion}s
+ * of the applied rules. A rule is redundant if its application is not necessary
+ * for completeness. Redundancy of a rule depends on other
+ * {@link ContextPremises}: a non-redundant rule might become redundant when
+ * other {@link ContextPremises} are added. The methods always return {@link
+ * true}.
  * 
  * @see NonRedundantRuleApplicationConclusionVisitor
- * @see HybridRuleApplicationConclusionVisitor
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
-public class AllRuleApplicationConclusionVisitor extends
-		HybridRuleApplicationConclusionVisitor {
+public class RedundantRuleApplicationConclusionVisitor extends
+		RedundantLocalRuleApplicationConclusionVisitor {
 
-	public AllRuleApplicationConclusionVisitor(RuleVisitor ruleVisitor,
-			ConclusionProducer producer) {
-		super(ruleVisitor, ruleVisitor, producer, producer);
+	public RedundantRuleApplicationConclusionVisitor(
+			RuleVisitor ruleAppVisitor, ConclusionProducer producer) {
+		super(ruleAppVisitor, producer);
 	}
+
+	// at the moment all redundant rules are local
 
 }

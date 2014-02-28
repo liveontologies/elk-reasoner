@@ -27,7 +27,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInitializingInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextNotSaturatedCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -52,26 +51,33 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 public class RuleApplicationAdditionFactory extends
 		AbstractRuleApplicationFactory<Context> {
 
-	public RuleApplicationAdditionFactory(SaturationState<? extends Context> saturationState) {
+	public RuleApplicationAdditionFactory(
+			SaturationState<? extends Context> saturationState) {
 		super(saturationState);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter<? extends Context> writer,
+	protected ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
+			RuleVisitor ruleVisitor,
+			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
-		return new ComposedConclusionVisitor<Context>(
-		// insert conclusions initializing contexts if necessary
-				new ConclusionInitializingInsertionVisitor(writer),
-				// if new, check that the source of the conclusion is not
-				// saturated (this is only needed for debugging)
-				new ConclusionSourceContextNotSaturatedCheckingVisitor(
-						getSaturationState()),
-				// afterwards, apply all non-redundant rules, collecting
-				// statistics if necessary
-				SaturationUtils.getUsedConclusionCountingProcessor(
+		return SaturationUtils
+				.compose(
+				// count processed conclusions, if necessary
+						SaturationUtils
+								.getProcessedConclusionCountingVisitor(localStatistics),
+						// insert conclusions initializing contexts if necessary
+						new ConclusionInitializingInsertionVisitor(writer),
+						// if new, check that the source of the conclusion is
+						// not saturated (this is only needed for debugging)
+						new ConclusionSourceContextNotSaturatedCheckingVisitor(
+								getSaturationState()),
+						// count conclusions used in the rules, if necessary
+						SaturationUtils
+								.getUsedConclusionCountingVisitor(localStatistics),
+						// and apply all non-redundant rules
 						new NonRedundantRuleApplicationConclusionVisitor(
-								ruleVisitor, writer), localStatistics));
+								ruleVisitor, writer));
 	}
 }

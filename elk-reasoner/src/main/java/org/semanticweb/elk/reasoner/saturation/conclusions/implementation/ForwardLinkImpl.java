@@ -29,12 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
-import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialBackwardLink;
@@ -80,28 +75,6 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	@Override
 	public IndexedClassExpression getTarget() {
 		return target_;
-	}
-
-	@Override
-	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		// generate backward links
-		ruleAppVisitor.visit(BackwardLinkFromForwardLinkRule.getInstance(),
-				this, premises, producer);
-		// compose only with reflexive backward links
-		ruleAppVisitor.visit(
-				ReflexiveBackwardLinkCompositionRule.getRuleFor(this), this,
-				premises, producer);
-	}
-
-	@Override
-	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		applyNonRedundantLocalRules(ruleAppVisitor, premises, producer);
-		// in addition, compose with non-reflexive backward links
-		ruleAppVisitor.visit(
-				NonReflexiveBackwardLinkCompositionRule.getRuleFor(this), this,
-				premises, producer);
 	}
 
 	@Override

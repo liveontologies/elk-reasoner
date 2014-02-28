@@ -129,7 +129,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context>
 	 * @param localStatistics
 	 * @return
 	 */
-	protected abstract ConclusionVisitor<Context, Boolean> getConclusionProcessor(
+	protected abstract ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor, SaturationStateWriter<? extends C> writer,
 			SaturationStatistics localStatistics);
 

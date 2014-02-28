@@ -26,13 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of {@link SubContextInitialization}
@@ -41,10 +35,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SubContextInitializationImpl extends AbstractConclusion implements
 		SubContextInitialization {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(SubContextInitializationImpl.class);
 
 	/**
 	 * the sub-root of the {@link SubContext} that should be initialized
@@ -63,15 +53,6 @@ public class SubContextInitializationImpl extends AbstractConclusion implements
 	@Override
 	public <I, O> O accept(SubConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
-	}
-
-	@Override
-	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		LOGGER_.trace("{}::{} applying sub-concept init rules:",
-				premises.getRoot(), subRoot_);
-		PropagationInitializationRule.getInstance().accept(ruleAppVisitor,
-				this, premises, producer);
 	}
 
 	@Override

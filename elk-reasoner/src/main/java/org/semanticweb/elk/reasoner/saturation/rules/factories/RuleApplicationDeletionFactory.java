@@ -33,12 +33,12 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AllRuleApplicationConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionDeletionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RedundantRuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
@@ -56,9 +56,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * @author "Yevgeny Kazakov"
  */
 public class RuleApplicationDeletionFactory extends
-		AbstractRuleApplicationFactory<Context> implements RuleApplicationFactory<Context> {
+		AbstractRuleApplicationFactory<Context> implements
+		RuleApplicationFactory<Context> {
 
-	public RuleApplicationDeletionFactory(SaturationState<? extends Context> saturationState) {
+	public RuleApplicationDeletionFactory(
+			SaturationState<? extends Context> saturationState) {
 		super(saturationState);
 	}
 
@@ -72,29 +74,39 @@ public class RuleApplicationDeletionFactory extends
 	}
 
 	@Override
-	SaturationStateWriter<Context> getFinalWriter(SaturationStateWriter<? extends Context> writer) {
+	SaturationStateWriter<Context> getFinalWriter(
+			SaturationStateWriter<? extends Context> writer) {
 		// only write to exiting contexts
-		return new ContextExistenceCheckingWriter<Context>(writer, getSaturationState());
+		return new ContextExistenceCheckingWriter<Context>(writer,
+				getSaturationState());
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter<? extends Context> writer,
+	protected ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
+			RuleVisitor ruleVisitor,
+			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
-		return new ComposedConclusionVisitor<Context>(
-		// check if conclusion occurs in the context
-				new ConclusionOccurrenceCheckingVisitor(),
-				// if so, apply all rules, including those that are
-				// redundant, collecting statistics if necessary
-				SaturationUtils.getUsedConclusionCountingProcessor(
-						new AllRuleApplicationConclusionVisitor(ruleVisitor,
-								writer), localStatistics),
-				// after processing, delete the conclusion
-				new ConclusionDeletionVisitor(),
-				// and mark the source context of the conclusion as
-				// non-saturated
-				new ConclusionSourceContextUnsaturationVisitor(writer));
+		return SaturationUtils
+				.compose(
+				// count processed conclusions, if necessary
+						SaturationUtils
+								.getProcessedConclusionCountingVisitor(localStatistics),
+						// check if conclusion occurs in the context and proceed
+						new ConclusionOccurrenceCheckingVisitor(),
+						// count conclusions used in the rules, if necessary
+						SaturationUtils
+								.getUsedConclusionCountingVisitor(localStatistics),
+						// apply non-redundant rules
+						new NonRedundantRuleApplicationConclusionVisitor(
+								ruleVisitor, writer),
+						// apply redundant rules
+						new RedundantRuleApplicationConclusionVisitor(
+								ruleVisitor, writer),
+						// after processing, delete the conclusion
+						new ConclusionDeletionVisitor(),
+						// and mark the source context of the conclusion as
+						// non-saturated
+						new ConclusionSourceContextUnsaturationVisitor(writer));
 	}
-
 }

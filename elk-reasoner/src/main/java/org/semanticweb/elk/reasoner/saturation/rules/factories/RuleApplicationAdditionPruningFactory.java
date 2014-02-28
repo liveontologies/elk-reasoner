@@ -33,7 +33,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -81,21 +80,29 @@ public class RuleApplicationAdditionPruningFactory extends
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
+	protected ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor,
 			SaturationStateWriter<? extends ExtendedContext> localWriter,
 			SaturationStatistics localStatistics) {
-		return new ComposedConclusionVisitor<Context>(
-		// checking the conclusion against the main saturation state
-				new LocalizedConclusionVisitor(
-						// conclusion already occurs there
-						new ConclusionOccurrenceCheckingVisitor(),
-						mainSaturationState_),
-				// if all fine, insert the conclusion to the local context
-				// copies
-				new ConclusionInsertionVisitor(localWriter),
-				// and apply rules locally, collecting statistics if necessary
-				SaturationUtils.getUsedConclusionCountingProcessor(
+		return SaturationUtils
+				.compose(
+				// count processed conclusions, if necessary
+						SaturationUtils
+								.getProcessedConclusionCountingVisitor(localStatistics),
+						// checking the conclusion against the main saturation
+						// state
+						new LocalizedConclusionVisitor(
+								// conclusion already occurs there
+								new ConclusionOccurrenceCheckingVisitor(),
+								mainSaturationState_),
+						// if all fine, insert the conclusion to the local
+						// context
+						// copies
+						new ConclusionInsertionVisitor(localWriter),
+						// count conclusions used in the rules, if necessary
+						SaturationUtils
+								.getUsedConclusionCountingVisitor(localStatistics),
+						// and apply rules locally
 						new HybridLocalRuleApplicationConclusionVisitor(
 								mainSaturationState_, ruleVisitor, ruleVisitor,
 								// the conclusions of non-redundant rules are
@@ -107,9 +114,8 @@ public class RuleApplicationAdditionPruningFactory extends
 										localWriter),
 								// whereas the conclusion of redundant rules are
 								// needed only for tracking
-								localWriter), localStatistics)
+								localWriter)
 
-		);
+				);
 	}
-
 }

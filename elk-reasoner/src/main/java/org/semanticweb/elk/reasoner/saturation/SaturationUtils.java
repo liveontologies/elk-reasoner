@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionCounter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.CountingConclusionVisitor;
@@ -102,6 +104,50 @@ public class SaturationUtils {
 		return COLLECT_CONCLUSION_COUNTS ? new CountingSaturationStateWriter<C>(
 				writer, localStatistics.getConclusionStatistics()
 						.getProducedConclusionCounts()) : writer;
+	}
+
+	/**
+	 * @param visitors
+	 * @return A {@link ConclusionVisitor} that applies the given
+	 *         {@link ConclusionVisitor}s consequently until one of them returns
+	 *         {@code false}. {@link ConclusionVisitor}s that are {@code null}
+	 *         are filtered out, i.e., they are ignored.
+	 */
+	public static <I> ConclusionVisitor<? super I, Boolean> compose(
+			ConclusionVisitor<? super I, Boolean>... visitors) {
+		// filter out null visitors
+		int size = 0;
+		for (int i = 0; i < visitors.length; i++) {
+			if (visitors[i] != null)
+				size++;
+		}
+		@SuppressWarnings("unchecked")
+		ConclusionVisitor<? super I, Boolean>[] filteredVisitors = new ConclusionVisitor[size];
+		int pos = 0;
+		for (int i = 0; i < visitors.length; i++) {
+			if (visitors[i] != null)
+				filteredVisitors[pos++] = visitors[i];
+		}
+		return new ComposedConclusionVisitor<I>(filteredVisitors);
+
+	}
+
+	public static ConclusionVisitor<? super Context, Boolean> getCountingConclusionVisitor(
+			ConclusionCounter counter) {
+		return COLLECT_CONCLUSION_COUNTS ? new CountingConclusionVisitor<Context>(
+				counter) : null;
+	}
+
+	public static ConclusionVisitor<? super Context, Boolean> getProcessedConclusionCountingVisitor(
+			SaturationStatistics statistics) {
+		return getCountingConclusionVisitor(statistics
+				.getConclusionStatistics().getProcessedConclusionCounts());
+	}
+
+	public static ConclusionVisitor<? super Context, Boolean> getUsedConclusionCountingVisitor(
+			SaturationStatistics statistics) {
+		return getCountingConclusionVisitor(statistics
+				.getConclusionStatistics().getUsedConclusionCounts());
 	}
 
 	public static ConclusionVisitor<? super Context, Boolean> getUsedConclusionCountingProcessor(

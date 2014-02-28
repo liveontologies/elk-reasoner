@@ -25,12 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of {@link ContextInitialization}.
@@ -39,10 +34,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ContextInitializationImpl extends AbstractConclusion implements
 		ContextInitialization {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(ContextInitializationImpl.class);
 
 	// actually we just need only context initialization rules,
 	// but they can change after creating this object
@@ -55,18 +46,6 @@ public class ContextInitializationImpl extends AbstractConclusion implements
 	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
-	}
-
-	@Override
-	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		LinkedContextInitRule rule = ontologyIndex_.getContextInitRuleHead();
-		LOGGER_.trace("applying init rules:");
-		while (rule != null) {
-			LOGGER_.trace("init rule: {}", rule.getName());
-			rule.accept(ruleAppVisitor, this, premises, producer);
-			rule = rule.next();
-		}
 	}
 
 	@Override

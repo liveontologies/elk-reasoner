@@ -27,9 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
  * @author Pavel Klinov
@@ -43,26 +40,6 @@ abstract class AbstractConclusion implements Conclusion {
 			IndexedClassExpression rootWhereStored) {
 		// by default where the conclusion is stored
 		return rootWhereStored;
-	}
-
-	@Override
-	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		// no redundant rules by default
-	}
-
-	@Override
-	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		// by default all non-redundant rules are local
-		applyNonRedundantRules(ruleAppVisitor, premises, producer);
-	}
-
-	@Override
-	public void applyRedundantLocalRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		// by default all redundant rules are local
-		applyRedundantRules(ruleAppVisitor, premises, producer);
 	}
 
 }

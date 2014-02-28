@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
@@ -32,8 +33,16 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLin
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 
+/**
+ * A {@link ConclusionVisitor} that increments the corresponding counters of the
+ * given {@link ConclusionCounter} when visiting {@link Conclusion}s
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <I>
+ */
 public class CountingConclusionVisitor<I> implements
-		ConclusionVisitor<I, Integer> {
+		ConclusionVisitor<I, Boolean> {
 
 	private final ConclusionCounter counter_;
 
@@ -42,48 +51,57 @@ public class CountingConclusionVisitor<I> implements
 	}
 
 	@Override
-	public Integer visit(BackwardLink subConclusion, I input) {
-		return counter_.countBackwardLinks++;
+	public Boolean visit(BackwardLink subConclusion, I input) {
+		counter_.countBackwardLinks++;
+		return true;
 	}
 
 	@Override
-	public Integer visit(ComposedSubsumer<?> conclusion, I input) {
-		return counter_.countDecomposedSubsumers++;
+	public Boolean visit(ComposedSubsumer<?> conclusion, I input) {
+		counter_.countDecomposedSubsumers++;
+		return true;
 	}
 
 	@Override
-	public Integer visit(ContextInitialization conclusion, I input) {
-		return counter_.countContextInitializations++;
+	public Boolean visit(ContextInitialization conclusion, I input) {
+		counter_.countContextInitializations++;
+		return true;
 	}
 
 	@Override
-	public Integer visit(Contradiction conclusion, I input) {
-		return counter_.countContradictions++;
+	public Boolean visit(Contradiction conclusion, I input) {
+		counter_.countContradictions++;
+		return true;
 	}
 
 	@Override
-	public Integer visit(DecomposedSubsumer<?> conclusion, I input) {
-		return counter_.countComposedSubsumers++;
+	public Boolean visit(DecomposedSubsumer<?> conclusion, I input) {
+		counter_.countComposedSubsumers++;
+		return true;
 	}
 
 	@Override
-	public Integer visit(DisjointSubsumer conclusion, I input) {
-		return counter_.countDisjointSubsumers++;
+	public Boolean visit(DisjointSubsumer conclusion, I input) {
+		counter_.countDisjointSubsumers++;
+		return true;
 	}
 
 	@Override
-	public Integer visit(ForwardLink conclusion, I input) {
-		return counter_.countForwardLinks++;
+	public Boolean visit(ForwardLink conclusion, I input) {
+		counter_.countForwardLinks++;
+		return true;
 	}
 
 	@Override
-	public Integer visit(Propagation subConclusion, I input) {
-		return counter_.countPropagations++;
+	public Boolean visit(Propagation subConclusion, I input) {
+		counter_.countPropagations++;
+		return true;
 	}
 
 	@Override
-	public Integer visit(SubContextInitialization subConclusion, I input) {
-		return counter_.countSubContextInitializations++;
+	public Boolean visit(SubContextInitialization subConclusion, I input) {
+		counter_.countSubContextInitializations++;
+		return true;
 	}
 
 }

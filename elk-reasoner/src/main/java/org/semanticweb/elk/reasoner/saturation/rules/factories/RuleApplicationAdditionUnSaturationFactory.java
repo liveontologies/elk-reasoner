@@ -27,7 +27,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInitializingInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextUnsaturationVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -53,19 +52,25 @@ public class RuleApplicationAdditionUnSaturationFactory extends
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
-			RuleVisitor ruleVisitor, SaturationStateWriter<? extends Context> writer,
+	protected ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
+			RuleVisitor ruleVisitor,
+			SaturationStateWriter<? extends Context> writer,
 			SaturationStatistics localStatistics) {
 		// the visitor used for inserting conclusion
-		return new ComposedConclusionVisitor<Context>(
-		// insert conclusions initializing contexts if necessary
-				new ConclusionInitializingInsertionVisitor(writer),
-				// if new, mark the source context as unsaturated
-				new ConclusionSourceContextUnsaturationVisitor(writer),
-				// afterwards, apply all non-redundant rules, collecting
-				// statistics if necessary
-				SaturationUtils.getUsedConclusionCountingProcessor(
+		return SaturationUtils
+				.compose(
+				// count processed conclusions, if necessary
+						SaturationUtils
+								.getProcessedConclusionCountingVisitor(localStatistics),
+						// insert conclusions initializing contexts if necessary
+						new ConclusionInitializingInsertionVisitor(writer),
+						// if new, mark the source context as unsaturated
+						new ConclusionSourceContextUnsaturationVisitor(writer),
+						// count conclusions used in the rules, if necessary
+						SaturationUtils
+								.getUsedConclusionCountingVisitor(localStatistics),
+						// apply all non-redundant rules
 						new NonRedundantRuleApplicationConclusionVisitor(
-								ruleVisitor, writer), localStatistics));
+								ruleVisitor, writer));
 	}
 }

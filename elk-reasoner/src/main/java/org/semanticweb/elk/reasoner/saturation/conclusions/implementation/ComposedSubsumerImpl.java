@@ -26,9 +26,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
  * An implementation of {@link Subsumer}
@@ -49,20 +46,6 @@ public class ComposedSubsumerImpl<S extends IndexedClassExpression> extends
 	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
-	}
-
-	@Override
-	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		applyCompositionRules(ruleAppVisitor, premises, producer);
-
-	}
-
-	@Override
-	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		// if subsumer was composed, it is not necessary to decompose it
-		applyDecompositionRules(ruleAppVisitor, premises, producer);
 	}
 
 	@Override

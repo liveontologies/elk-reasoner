@@ -27,11 +27,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkedBackwardLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 
 /**
  * An implementation for {@link BackwardLink}
@@ -58,22 +53,6 @@ public class BackwardLinkImpl extends AbstractConclusion implements
 			IndexedObjectProperty relation) {
 		this.relation_ = relation;
 		this.source_ = source;
-	}
-
-	@Override
-	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-
-		ruleAppVisitor.visit(SubsumerBackwardLinkRule.getInstance(), this,
-				premises, producer);
-
-		// apply all backward link rules of the context
-		LinkedBackwardLinkRule backLinkRule = premises
-				.getBackwardLinkRuleHead();
-		while (backLinkRule != null) {
-			backLinkRule.accept(ruleAppVisitor, this, premises, producer);
-			backLinkRule = backLinkRule.next();
-		}
 	}
 
 	@Override

@@ -24,10 +24,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,13 +53,6 @@ public class ContradictionImpl extends AbstractConclusion implements
 
 	private ContradictionImpl() {
 		// do not allow creation of instances outside of this class
-	}
-
-	@Override
-	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer) {
-		ruleAppVisitor.visit(ContradictionPropagationRule.getInstance(), this,
-				premises, producer);
 	}
 
 	@Override

@@ -4,9 +4,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /*
  * #%L
@@ -33,9 +32,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 /**
  * A general type of conclusions, produced by inference rules and used as
  * premises of inference rules. The rules can be applied to {@link Conclusion}s
- * together with other conclusions stored in {@link ContextPremises}. There are
- * different type of rules that can be applied to {@link Conclusion}.
- * Non-redundant rules are the (optimized) rules that do not cause
+ * together with other {@link Conclusion}s stored in {@link ContextPremises}.
+ * There are different type of rules that can be applied to a {@link Conclusion}
+ * . Non-redundant rules are the (optimized) rules that do not cause
  * incompleteness (all atomic subsumers are guaranteed to be computed). These
  * rules are non-monotonic in the sense that a rule can be applicable with
  * {@link ContextPremises} but not applicable if some {@link Conclusion}s are
@@ -79,65 +78,5 @@ public interface Conclusion {
 	 */
 	public IndexedClassExpression getSourceRoot(
 			IndexedClassExpression rootWhereStored);
-
-	/**
-	 * Apply all non-redundant inferences for this {@link Conclusion} with other
-	 * {@link ContextPremises}
-	 * 
-	 * @see #applyRedundantRules(RuleVisitor, ContextPremises,
-	 *      ConclusionProducer)
-	 * 
-	 * @param ruleAppVisitor
-	 * @param premises
-	 * @param producer
-	 */
-	public void applyNonRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer);
-
-	/**
-	 * Apply all redundant rules for this {@link Conclusion} and given
-	 * {@link ContextPremises}. A rule is redundant if its application is not
-	 * necessary for completeness. Redundancy of a rule depends on other
-	 * {@link ContextPremises}: a non-redundant rule might become redundant when
-	 * other {@link ContextPremises} are added.
-	 * 
-	 * @see #applyNonRedundantRules(RuleVisitor, ContextPremises,
-	 *      ConclusionProducer)
-	 * 
-	 * @param ruleAppVisitor
-	 * @param premises
-	 * @param producer
-	 */
-	public void applyRedundantRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer);
-
-	/**
-	 * Apply all non-redundant rules that produce {@link Conclusion}s that
-	 * logically belong to the same root as this {@link Conclusion}
-	 * 
-	 * @see #isLocalFor(IndexedClassExpression)
-	 * @see #applyRedundantLocalRules(RuleVisitor, ContextPremises,
-	 *      ConclusionProducer)
-	 * 
-	 * @param ruleAppVisitor
-	 * @param premises
-	 * @param producer
-	 */
-	public void applyNonRedundantLocalRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer);
-
-	/**
-	 * Apply all redundant rules that produce {@link Conclusion}s that logically
-	 * belong to the same root as this {@link Conclusion}
-	 * 
-	 * @see #applyNonRedundantLocalRules(RuleVisitor, ContextPremises,
-	 *      ConclusionProducer)
-	 * 
-	 * @param ruleAppVisitor
-	 * @param premises
-	 * @param producer
-	 */
-	public void applyRedundantLocalRules(RuleVisitor ruleAppVisitor,
-			ContextPremises premises, ConclusionProducer producer);
 
 }

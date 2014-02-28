@@ -36,11 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * {@link Conclusion}s with the same source as for the premise) for visited
  * {@link Conclusion}s using the provided {@link RuleVisitor}s and
  * {@link ConclusionProducer}s for respectively non-redundant and redundant rule
- * applications. Essentially, it just calls
- * {@link Conclusion#applyNonRedundantLocalRules(RuleVisitor, ContextPremises, ConclusionProducer)}
- * and
- * {@link Conclusion#applyRedundantLocalRules(RuleVisitor, ContextPremises, ConclusionProducer)}
- * using the respective parameters.
+ * applications.
  * 
  * When applying local rules, to the visited {@link Conclusion}, local premises
  * (premises with the same source) are taken from the local {@link Context} and
@@ -48,40 +44,28 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * state. This is done to ensure that every rule is applied at most once and no
  * inference is lost when processing only local {@link Conclusion}s.
  * 
- * @see HybridRuleApplicationConclusionVisitor
- * 
  * @author "Yevgeny Kazakov"
  * 
+ * @see NonRedundantLocalRuleApplicationConclusionVisitor
+ * @see RedundantLocalRuleApplicationConclusionVisitor
  */
 public class HybridLocalRuleApplicationConclusionVisitor extends
 		AbstractConclusionVisitor<Context, Boolean> {
 
 	/**
+	 * {@link ConclusionVisitor} applying non-redundant local rules
+	 */
+	private final ConclusionVisitor<? super ContextPremises, Boolean> nonRedundantLocalRuleApplicator_;
+
+	/**
+	 * {@link ConclusionVisitor} applying redundant local rules
+	 */
+	private final ConclusionVisitor<? super ContextPremises, Boolean> redundantLocalRuleApplicator_;
+
+	/**
 	 * the main {@link SaturationState} to take the non-local premises from
 	 */
 	private final SaturationState<?> mainState_;
-
-	/**
-	 * a {@link RuleVisitor} for non-redundant rule applications
-	 */
-	private final RuleVisitor nonRedundantRuleVisitor_;
-
-	/**
-	 * a {@link RuleVisitor} for redundant rule applications
-	 */
-	private final RuleVisitor redundantRuleVisitor_;
-
-	/**
-	 * a {@link ConclusionProducer} to produce the {@link Conclusion}s of the
-	 * non-redundant rules
-	 */
-	private final ConclusionProducer nonRedundantProducer_;
-
-	/**
-	 * a {@link ConclusionProducer} to produce the {@link Conclusion}s of the
-	 * redundant rules
-	 */
-	private final ConclusionProducer redundantProducer_;
 
 	public HybridLocalRuleApplicationConclusionVisitor(
 			SaturationState<?> mainState, RuleVisitor nonRedundantRuleVisitor,
@@ -89,10 +73,10 @@ public class HybridLocalRuleApplicationConclusionVisitor extends
 			ConclusionProducer nonRedundantProducer,
 			ConclusionProducer redundantProducer) {
 		this.mainState_ = mainState;
-		this.nonRedundantRuleVisitor_ = nonRedundantRuleVisitor;
-		this.redundantRuleVisitor_ = redundantRuleVisitor;
-		this.nonRedundantProducer_ = nonRedundantProducer;
-		this.redundantProducer_ = redundantProducer;
+		this.nonRedundantLocalRuleApplicator_ = new NonRedundantLocalRuleApplicationConclusionVisitor(
+				nonRedundantRuleVisitor, nonRedundantProducer);
+		this.redundantLocalRuleApplicator_ = new RedundantLocalRuleApplicationConclusionVisitor(
+				redundantRuleVisitor, redundantProducer);
 	}
 
 	@Override
@@ -102,18 +86,14 @@ public class HybridLocalRuleApplicationConclusionVisitor extends
 			// applying rules for hybrid premises
 			ContextPremises hybridPremises = new HybridContextPremises(input,
 					mainState_.getContext(input.getRoot()));
-			conclusion.applyNonRedundantLocalRules(nonRedundantRuleVisitor_,
-					hybridPremises, nonRedundantProducer_);
-			conclusion.applyRedundantLocalRules(redundantRuleVisitor_,
-					hybridPremises, redundantProducer_);
+			conclusion.accept(nonRedundantLocalRuleApplicator_, hybridPremises);
+			conclusion.accept(redundantLocalRuleApplicator_, hybridPremises);
 		} else {
 			// applying rules with non-local premises
 			ContextPremises mainPremises = mainState_.getContext(input
 					.getRoot());
-			conclusion.applyNonRedundantLocalRules(nonRedundantRuleVisitor_,
-					mainPremises, nonRedundantProducer_);
-			conclusion.applyRedundantLocalRules(redundantRuleVisitor_,
-					mainPremises, redundantProducer_);
+			conclusion.accept(nonRedundantLocalRuleApplicator_, mainPremises);
+			conclusion.accept(redundantLocalRuleApplicator_, mainPremises);
 		}
 		return true;
 	}
