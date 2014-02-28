@@ -79,9 +79,8 @@ public abstract class AbstractRuleApplicationFactory<C extends Context>
 			ConclusionVisitor<? super Context, Boolean> conclusionProcessor,
 			SaturationStateWriter<? extends C> saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
-		conclusionProcessor = SaturationUtils
-				.getProcessedConclusionCountingProcessor(conclusionProcessor,
-						localStatistics);
+		conclusionProcessor = SaturationUtils.getTimedConclusionVisitor(
+				conclusionProcessor, localStatistics);
 		return new BasicRuleEngine(saturationState_.getOntologyIndex(),
 				conclusionProcessor, localTodo, saturationStateWriter,
 				aggregatedStats_, localStatistics);
@@ -138,6 +137,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context>
 			ContextCreationListener creationListener,
 			ContextModificationListener modificationListener) {
 		SaturationStatistics localStatistics = new SaturationStatistics();
+		localStatistics.startMeasurements();
 		creationListener = SaturationUtils.addStatsToContextCreationListener(
 				creationListener, localStatistics.getContextStatistics());
 		modificationListener = SaturationUtils

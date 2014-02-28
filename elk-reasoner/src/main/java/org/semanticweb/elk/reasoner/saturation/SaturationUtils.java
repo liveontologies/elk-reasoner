@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
+import java.util.Arrays;
+
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionCounter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionStatistics;
@@ -111,31 +113,38 @@ public class SaturationUtils {
 	 * @return A {@link ConclusionVisitor} that applies the given
 	 *         {@link ConclusionVisitor}s consequently until one of them returns
 	 *         {@code false}. {@link ConclusionVisitor}s that are {@code null}
-	 *         are filtered out, i.e., they are ignored.
+	 *         are ignored.
 	 */
 	public static <I> ConclusionVisitor<? super I, Boolean> compose(
 			ConclusionVisitor<? super I, Boolean>... visitors) {
-		// filter out null visitors
-		int size = 0;
-		for (int i = 0; i < visitors.length; i++) {
-			if (visitors[i] != null)
-				size++;
-		}
-		@SuppressWarnings("unchecked")
-		ConclusionVisitor<? super I, Boolean>[] filteredVisitors = new ConclusionVisitor[size];
-		int pos = 0;
-		for (int i = 0; i < visitors.length; i++) {
-			if (visitors[i] != null)
-				filteredVisitors[pos++] = visitors[i];
-		}
-		return new ComposedConclusionVisitor<I>(filteredVisitors);
+		return new ComposedConclusionVisitor<I>(removeNulls(visitors));
 
+	}
+
+	/**
+	 * @param input
+	 * @return the array obtained from the input array by removing the
+	 *         {@code null} values. The order of the remaining elements is
+	 *         preserved.
+	 */
+	private static <T> T[] removeNulls(T[] input) {
+		int pos = 0;
+		for (int i = 0; i < input.length; i++) {
+			if (input[i] != null) {
+				if (i > pos)
+					input[pos] = input[i];
+				pos++;
+			}
+		}
+		return Arrays.copyOf(input, pos);
 	}
 
 	public static ConclusionVisitor<? super Context, Boolean> getCountingConclusionVisitor(
 			ConclusionCounter counter) {
-		return COLLECT_CONCLUSION_COUNTS ? new CountingConclusionVisitor<Context>(
-				counter) : null;
+		if (!COLLECT_CONCLUSION_COUNTS)
+			return null;
+		// else
+		return new CountingConclusionVisitor<Context>(counter);
 	}
 
 	public static ConclusionVisitor<? super Context, Boolean> getProcessedConclusionCountingVisitor(
@@ -146,6 +155,7 @@ public class SaturationUtils {
 
 	public static ConclusionVisitor<? super Context, Boolean> getUsedConclusionCountingVisitor(
 			SaturationStatistics statistics) {
+		statistics.getConclusionStatistics().startMeasurements();
 		return getCountingConclusionVisitor(statistics
 				.getConclusionStatistics().getUsedConclusionCounts());
 	}
@@ -162,21 +172,12 @@ public class SaturationUtils {
 		return ruleProcessor;
 	}
 
-	public static <O> ConclusionVisitor<? super Context, O> getProcessedConclusionCountingProcessor(
+	public static <O> ConclusionVisitor<? super Context, O> getTimedConclusionVisitor(
 			ConclusionVisitor<? super Context, O> conclusionVisitor,
 			SaturationStatistics localStatistics) {
 
 		ConclusionStatistics stats = localStatistics.getConclusionStatistics();
-
-		if (COLLECT_CONCLUSION_COUNTS) {
-			conclusionVisitor = new PreprocessedConclusionVisitor<Context, O>(
-					new CountingConclusionVisitor<Context>(
-							stats.getProcessedConclusionCounts()),
-					conclusionVisitor);
-		}
 		if (COLLECT_CONCLUSION_TIMES) {
-			stats.startMeasurements();
-
 			return new TimedConclusionVisitor<Context, O>(
 					stats.getConclusionTimers(), conclusionVisitor);
 		}

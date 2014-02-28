@@ -114,7 +114,7 @@ public class ConclusionStatistics extends AbstractStatistics {
 	}
 
 	void print(StatisticsPrinter printer, String name, int processedCount,
-			int usedCount, long time) {
+			int usedCount, int producedCount, long time) {
 		if (processedCount == 0)
 			return;
 
@@ -122,7 +122,7 @@ public class ConclusionStatistics extends AbstractStatistics {
 			LOGGER_.error("{}: conclusions used: {} more than processed: {}!",
 					name, usedCount, processedCount);
 
-		printer.print(name, processedCount, usedCount, time
+		printer.print(name, processedCount, usedCount, producedCount, time
 				/ getNumberOfMeasurements());
 
 	}
@@ -140,11 +140,13 @@ public class ConclusionStatistics extends AbstractStatistics {
 			return;
 		}
 
-		StatisticsPrinter printer = new StatisticsPrinter(logger,
-				"%{CONCLUSIONS:}s %,{all}d | %,{used}d [%,{time}d ms]",
+		StatisticsPrinter printer = new StatisticsPrinter(
+				logger,
+				"%{CONCLUSIONS:}s %,{processed}d | %,{used}d | %,{produced}d [%,{time}d ms]",
 				"TOTAL CONCLUSIONS",
 				processedConclusionCounts_.getTotalCount(),
 				usedConclusionCounts_.getTotalCount(),
+				producedConclusionCounts_.getTotalCount(),
 				conclusionProcessingTimer_.getTotalTime());
 
 		printer.printHeader();
@@ -152,46 +154,55 @@ public class ConclusionStatistics extends AbstractStatistics {
 		print(printer, BackwardLink.NAME,
 				processedConclusionCounts_.countBackwardLinks,
 				usedConclusionCounts_.countBackwardLinks,
+				producedConclusionCounts_.countBackwardLinks,
 				conclusionProcessingTimer_.timeBackwardLinks);
 
 		print(printer, ContextInitialization.NAME,
 				processedConclusionCounts_.countContextInitializations,
 				usedConclusionCounts_.countContextInitializations,
+				producedConclusionCounts_.countContextInitializations,
 				conclusionProcessingTimer_.timeContextInitializations);
 
 		print(printer, Contradiction.NAME,
 				processedConclusionCounts_.countContradictions,
 				usedConclusionCounts_.countContradictions,
+				producedConclusionCounts_.countContradictions,
 				conclusionProcessingTimer_.timeContradictions);
 
 		print(printer, DisjointSubsumer.NAME,
 				processedConclusionCounts_.countDisjointSubsumers,
 				usedConclusionCounts_.countDisjointSubsumers,
+				producedConclusionCounts_.countDisjointSubsumers,
 				conclusionProcessingTimer_.timeDisjointSubsumers);
 
 		print(printer, ForwardLink.NAME,
 				processedConclusionCounts_.countForwardLinks,
 				usedConclusionCounts_.countForwardLinks,
+				producedConclusionCounts_.countForwardLinks,
 				conclusionProcessingTimer_.timeForwardLinks);
 
 		print(printer, DecomposedSubsumer.NAME,
 				processedConclusionCounts_.countDecomposedSubsumers,
 				usedConclusionCounts_.countDecomposedSubsumers,
+				producedConclusionCounts_.countDecomposedSubsumers,
 				conclusionProcessingTimer_.timeDecomposedSubsumers);
 
 		print(printer, ComposedSubsumer.NAME,
 				processedConclusionCounts_.countComposedSubsumers,
 				usedConclusionCounts_.countComposedSubsumers,
+				producedConclusionCounts_.countComposedSubsumers,
 				conclusionProcessingTimer_.timeComposedSubsumers);
 
 		print(printer, Propagation.NAME,
 				processedConclusionCounts_.countPropagations,
 				usedConclusionCounts_.countPropagations,
+				producedConclusionCounts_.countPropagations,
 				conclusionProcessingTimer_.timePropagations);
 
 		print(printer, SubContextInitialization.NAME,
 				processedConclusionCounts_.countSubContextInitializations,
 				usedConclusionCounts_.countSubContextInitializations,
+				producedConclusionCounts_.countSubContextInitializations,
 				conclusionProcessingTimer_.timeSubContextInitializations);
 
 		printer.printSeparator();
@@ -199,6 +210,7 @@ public class ConclusionStatistics extends AbstractStatistics {
 		print(printer, "TOTAL CONCLUSIONS:",
 				processedConclusionCounts_.getTotalCount(),
 				usedConclusionCounts_.getTotalCount(),
+				producedConclusionCounts_.getTotalCount(),
 				conclusionProcessingTimer_.getTotalTime());
 
 		printer.printSeparator();

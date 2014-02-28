@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation;
+
 /*
  * #%L
  * ELK Reasoner
@@ -33,18 +34,25 @@ import org.slf4j.Logger;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class SaturationStatistics {
-	
+
 	private final ConclusionStatistics conclusionsStatistics_ = new ConclusionStatistics();
 
 	private final RuleStatistics ruleStatistics_ = new RuleStatistics();
-	
+
 	private final ContextStatistics contextStatistics_ = new ContextStatistics();
-	
+
 	private final IncrementalProcessingStatistics processingStatistics_ = new IncrementalProcessingStatistics();
+
+	public void startMeasurements() {
+		conclusionsStatistics_.startMeasurements();
+		ruleStatistics_.startMeasurements();
+		conclusionsStatistics_.startMeasurements();
+		processingStatistics_.startMeasurements();
+	}
 
 	public void reset() {
 		conclusionsStatistics_.reset();
@@ -75,19 +83,19 @@ public class SaturationStatistics {
 		contextStatistics_.print(logger, LogLevel.DEBUG);
 		processingStatistics_.print(logger, LogLevel.DEBUG);
 	}
-	
+
 	public RuleStatistics getRuleStatistics() {
 		return ruleStatistics_;
 	}
-	
+
 	public ConclusionStatistics getConclusionStatistics() {
 		return conclusionsStatistics_;
 	}
-	
+
 	public ContextStatistics getContextStatistics() {
 		return contextStatistics_;
 	}
-	
+
 	public IncrementalProcessingStatistics getIncrementalProcessingStatistics() {
 		return processingStatistics_;
 	}
