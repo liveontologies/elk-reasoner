@@ -75,15 +75,6 @@ public abstract class AbstractHashMultimap<Key, Value> extends
 		return result;
 	}
 
-	/**
-	 * @param key
-	 * @return the collection of values associated with the given key, or
-	 *         {@code null} if no value us associated
-	 */
-	public Collection<Value> getValues(Object key) {
-		return super.get(key);
-	}
-
 	@Override
 	public boolean remove(Object key, Object value) {
 		Collection<Value> record = super.get(key);
@@ -91,6 +82,5 @@ public abstract class AbstractHashMultimap<Key, Value> extends
 			return false;
 		return record.remove(value);
 	}
-	
-	
+
 }
