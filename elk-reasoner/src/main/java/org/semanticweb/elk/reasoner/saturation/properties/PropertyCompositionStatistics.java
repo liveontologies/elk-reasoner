@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,6 +23,8 @@ package org.semanticweb.elk.reasoner.saturation.properties;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Counter accumulating statistical information about property compositions.
@@ -30,6 +33,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChai
  * 
  */
 class PropertyCompositionStatistics {
+
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(PropertyCompositionStatistics.class);
 
 	/**
 	 * The number of {@link IndexedBinaryPropertyChain}s processed
@@ -53,12 +60,9 @@ class PropertyCompositionStatistics {
 	}
 
 	void print() {
-		PropertyHierarchyCompositionComputationFactory.LOGGER_.debug(
-				"role chains processed: {}", roleChainsProcessed);
-		PropertyHierarchyCompositionComputationFactory.LOGGER_.debug(
-				"compositions created: {}", compositionsCreated);
-		PropertyHierarchyCompositionComputationFactory.LOGGER_.debug(
-				"redundant compositions: {}", compositionsRedundant);
+		LOGGER_.debug("role chains processed: {}", roleChainsProcessed);
+		LOGGER_.debug("compositions created: {}", compositionsCreated);
+		LOGGER_.debug("redundant compositions: {}", compositionsRedundant);
 	}
 
 }

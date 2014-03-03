@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -32,6 +33,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link IndexedPropertyChainVisitor} that creates compositions producing
@@ -43,6 +46,10 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  */
 final class CompositionCreatingVisitor implements
 		IndexedPropertyChainVisitor<Void> {
+
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(CompositionCreatingVisitor.class);
 
 	private final PropertyCompositionStatistics localStatistics_ = new PropertyCompositionStatistics();
 
@@ -59,8 +66,7 @@ final class CompositionCreatingVisitor implements
 
 	@Override
 	public Void visit(IndexedBinaryPropertyChain element) {
-		PropertyHierarchyCompositionComputationFactory.LOGGER_.trace(
-				"{}: computing compositions", element);
+		LOGGER_.trace("{}: computing compositions", element);
 		localStatistics_.roleChainsProcessed++;
 
 		IndexedObjectProperty left = element.getLeftProperty();
@@ -107,17 +113,14 @@ final class CompositionCreatingVisitor implements
 				boolean newRecord = false;
 
 				if (redundantLeftProperties.contains(leftSubProperty)) {
-					PropertyHierarchyCompositionComputationFactory.LOGGER_
-							.trace("{} o {} => {}: composition is redundant",
-									leftSubProperty, rightSubPropertyChain,
-									element);
+					LOGGER_.trace("{} o {} => {}: composition is redundant",
+							leftSubProperty, rightSubPropertyChain, element);
 					localStatistics_.compositionsRedundant++;
 					continue;
 				}
 
-				PropertyHierarchyCompositionComputationFactory.LOGGER_.trace(
-						"{} o {} => {}: new composition", leftSubProperty,
-						rightSubPropertyChain, element);
+				LOGGER_.trace("{} o {} => {}: new composition",
+						leftSubProperty, rightSubPropertyChain, element);
 				localStatistics_.compositionsCreated++;
 
 				Collection<IndexedBinaryPropertyChain> compositionsSoFar;

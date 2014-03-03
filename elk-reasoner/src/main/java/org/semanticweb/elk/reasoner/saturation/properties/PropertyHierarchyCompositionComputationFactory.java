@@ -25,8 +25,6 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A factory of engines for computing sub-properties and compositions induced by
@@ -38,10 +36,6 @@ import org.slf4j.LoggerFactory;
 public class PropertyHierarchyCompositionComputationFactory
 		implements
 		InputProcessorFactory<IndexedPropertyChain, PropertyHierarchyCompositionComputationFactory.Engine> {
-
-	// logger for this class
-	static final Logger LOGGER_ = LoggerFactory
-			.getLogger(PropertyHierarchyCompositionComputationFactory.class);
 
 	// statistical information
 	private final PropertyCompositionStatistics statistics_ = new PropertyCompositionStatistics();
