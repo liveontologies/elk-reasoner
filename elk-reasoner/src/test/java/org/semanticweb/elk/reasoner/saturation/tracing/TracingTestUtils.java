@@ -37,7 +37,8 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionEqualityChecker;
@@ -76,12 +77,24 @@ public class TracingTestUtils {
 					+ " was not traced");
 		}
 	};
+	
+	static Conclusion getConclusionToTrace(Context context, IndexedClassExpression subsumer) {
+		if (context != null) {
+			if (context.containsConclusion(ContradictionImpl.getInstance())) {
+				return ContradictionImpl.getInstance();
+			}
+			
+			return new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer);
+		}
+		
+		throw new IllegalArgumentException("Context may not be null");
+	}
 
 	public static int checkTracingCompleteness(ElkClassExpression sub,
 			ElkClassExpression sup, Reasoner reasoner) {
 		IndexedClassExpression subsumee = ReasonerStateAccessor.transform(
 				reasoner, sub);
-		Conclusion subsumer = new ComposedSubsumerImpl<IndexedClassExpression>(
+		Conclusion subsumer = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
 				ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
@@ -89,7 +102,7 @@ public class TracingTestUtils {
 
 			@Override
 			protected Boolean defaultVisit(Conclusion conclusion,
-					IndexedClassExpression cxt) {
+					IndexedClassExpression root) {
 				conclusionCount.incrementAndGet();
 
 				return true;
@@ -109,7 +122,7 @@ public class TracingTestUtils {
 			ElkClassExpression sup, Reasoner reasoner) {
 		IndexedClassExpression subsumee = ReasonerStateAccessor.transform(
 				reasoner, sub);
-		Conclusion subsumer = new ComposedSubsumerImpl<IndexedClassExpression>(
+		Conclusion subsumer = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
 				ReasonerStateAccessor.transform(reasoner, sup));
 		TracedContextsCollector collector = new TracedContextsCollector();
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
@@ -130,7 +143,7 @@ public class TracingTestUtils {
 			ElkClassExpression sup, Reasoner reasoner, int expected) {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
-		Conclusion conclusion = new ComposedSubsumerImpl<IndexedClassExpression>(
+		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
 				ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger inferenceCount = new AtomicInteger(0);
 		InferenceVisitor<Context, Boolean> counter = new AbstractInferenceVisitor<Context, Boolean>() {

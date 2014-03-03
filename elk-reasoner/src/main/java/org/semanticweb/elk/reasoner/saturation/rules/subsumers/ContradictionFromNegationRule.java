@@ -26,10 +26,10 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkUnexpectedIndexingExce
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromNegation;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
@@ -54,7 +54,6 @@ public class ContradictionFromNegationRule extends
 
 	private ContradictionFromNegationRule(ChainableSubsumerRule tail) {
 		super(tail);
-
 	}
 
 	private ContradictionFromNegationRule(IndexedObjectComplementOf negation) {
@@ -87,9 +86,10 @@ public class ContradictionFromNegationRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		if (negation_ != null && premises.getSubsumers().contains(negation_))
-			producer.produce(premises.getRoot(),
-					ContradictionImpl.getInstance());
+		if (negation_ != null && premises.getSubsumers().contains(negation_)) {
+			//producer.produce(premises.getRoot(), ContradictionImpl.getInstance());
+			producer.produce(premises.getRoot(), new ContradictionFromNegation(negation_));
+		}
 	}
 
 	@Override

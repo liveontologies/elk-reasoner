@@ -28,11 +28,18 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromInconsistentDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromNegation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromOwlNothing;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialForwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjunctionComposition;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InitializationSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
@@ -40,7 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubs
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
 
 /**
- * TODO
+ * A skeleton implementation of {@link InferenceVisitor}.
  * 
  * @author Pavel Klinov
  * 
@@ -110,4 +117,42 @@ public abstract class AbstractInferenceVisitor<I, O> implements
 	public O visit(TracedPropagation conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
+
+	@Override
+	public O visit(ContradictionFromInconsistentDisjointnessAxiom conclusion,
+			I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(ContradictionFromDisjointSubsumers conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(ContradictionFromNegation conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(ContradictionFromOwlNothing conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(PropagatedContradiction conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(DisjointSubsumerFromSubsumer conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+	
+	@Override
+	public O visit(DisjunctionComposition conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+	
+	
 }

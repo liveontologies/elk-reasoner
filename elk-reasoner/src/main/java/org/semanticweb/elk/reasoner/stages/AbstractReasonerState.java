@@ -53,7 +53,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalChangeCheck
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.OnDemandTracingReader;
@@ -604,14 +606,30 @@ public abstract class AbstractReasonerState {
 		TraceStore.Reader onDemandTracer = new OnDemandTracingReader(
 				traceState.getSaturationState(), traceState.getTraceStore()
 						.getReader(), traceState.getContextTracingFactory());
-		// TraceStore.Reader inferenceReader = new
-		// FirstNInferencesReader(onDemandTracer, 1);
+		// TraceStore.Reader inferenceReader = new FirstNInferencesReader(onDemandTracer, 1);
 		TraceStore.Reader inferenceReader = onDemandTracer;
 		RecursiveTraceUnwinder unwinder = new RecursiveTraceUnwinder(
 				inferenceReader);
+		Context subsumeeContext = saturationState.getContext(subsumee);
+		
+		if (subsumeeContext != null) {
+			Conclusion conclusion = null;
+			
+			if (subsumeeContext.containsConclusion(ContradictionImpl.getInstance())) {
+				// the subsumee is unsatisfiable so we explain the unsatisfiability
+				conclusion = ContradictionImpl.getInstance();
+			}
+			else {
+				conclusion = new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer);
+			}
+		
 		unwinder.accept(subsumee,
-				new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer),
+				conclusion,
 				new DummyConclusionVisitor<IndexedClassExpression>());
+		}
+		else {
+			throw new IllegalArgumentException("Unknown class: " + sub);
+		}
 
 		return traceState.getTraceStore().getReader();
 	}

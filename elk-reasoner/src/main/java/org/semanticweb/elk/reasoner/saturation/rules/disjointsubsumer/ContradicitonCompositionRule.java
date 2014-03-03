@@ -22,11 +22,12 @@ package org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromDisjointSubsumers;
 
 /**
  * A {@link DisjointSubsumerRule} applied when processing a
@@ -47,7 +48,12 @@ public class ContradicitonCompositionRule extends AbstractDisjointSubsumerRule {
 	@Override
 	public void apply(DisjointSubsumer premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		producer.produce(premises.getRoot(), ContradictionImpl.getInstance());
+		//producer.produce(premises.getRoot(), ContradictionImpl.getInstance());
+		IndexedClassExpression[] disjointSubsumers = premises.getDisjointSubsumers(premise.getAxiom());
+		
+		if (disjointSubsumers[1] != null) {
+			producer.produce(premises.getRoot(), new ContradictionFromDisjointSubsumers(premise, disjointSubsumers));
+		}
 	}
 
 	@Override

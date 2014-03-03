@@ -49,7 +49,7 @@ public class InferenceInsertionVisitor extends
 
 	private final TraceStore.Writer traceWriter_;
 
-	private final InferenceVisitor<Context, Boolean> tracedVisitor_ = new AbstractInferenceVisitor<Context, Boolean>() {
+	private final InferenceVisitor<Context, Boolean> inferenceInserter_ = new AbstractInferenceVisitor<Context, Boolean>() {
 
 		@Override
 		protected Boolean defaultTracedVisit(Inference conclusion,
@@ -67,15 +67,11 @@ public class InferenceInsertionVisitor extends
 		traceWriter_ = traceWriter;
 	}
 
-	protected InferenceVisitor<Context, Boolean> getTracedConclusionVisitor() {
-		return tracedVisitor_;
-	}
-
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
 		if (conclusion instanceof Inference) {
 			return ((Inference) conclusion).acceptTraced(
-					getTracedConclusionVisitor(), cxt);
+					inferenceInserter_, cxt);
 		}
 		LOGGER_.warn(
 				"Tracing is ON but {} does not contain tracing information",

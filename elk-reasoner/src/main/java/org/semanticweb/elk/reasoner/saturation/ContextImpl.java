@@ -233,7 +233,7 @@ public class ContextImpl implements ExtendedContext {
 		return subsumers_;
 	}
 
-	@Override
+	/*@Override
 	public boolean isInconsistForDisjointnessAxiom(
 			IndexedDisjointnessAxiom axiom) {
 		if (disjointnessAxioms_ == null)
@@ -244,6 +244,16 @@ public class ContextImpl implements ExtendedContext {
 		// check if both members are not null; this is always when the second
 		// member is not null
 		return (members[1] != null);
+	}*/
+
+	@Override
+	public IndexedClassExpression[] getDisjointSubsumers(
+			IndexedDisjointnessAxiom axiom) {
+		if (disjointnessAxioms_ == null) {
+			return null;
+		}
+		
+		return disjointnessAxioms_.get(axiom);
 	}
 
 	@Override

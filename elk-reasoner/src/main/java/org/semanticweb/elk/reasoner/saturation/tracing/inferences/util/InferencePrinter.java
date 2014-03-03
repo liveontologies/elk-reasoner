@@ -30,11 +30,18 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLin
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromInconsistentDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromNegation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromOwlNothing;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialForwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjunctionComposition;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InitializationSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
@@ -125,5 +132,43 @@ public class InferencePrinter implements InferenceVisitor<Void, String> {
 	public String visit(TracedPropagation conclusion, Void parameter) {
 		return "Creating propagation from " + conclusion.getPremise();
 	}
+
+	@Override
+	public String visit(
+			ContradictionFromInconsistentDisjointnessAxiom conclusion,
+			Void input) {
+		return "Contradiction since " + conclusion.getPremise() + " is disjoint with itself";
+	}
+
+	@Override
+	public String visit(ContradictionFromDisjointSubsumers conclusion,
+			Void input) {
+		return "Contradiction due to " + conclusion.getAxiom() + ", derived through " + conclusion.getPremises()[0].getMember();
+	}
+
+	@Override
+	public String visit(ContradictionFromNegation conclusion, Void input) {
+		return "Contradiction due to derived " + conclusion.getPremise() + " and " + conclusion.getPositivePremise();
+	}
+
+	@Override
+	public String visit(ContradictionFromOwlNothing conclusion, Void input) {
+		return conclusion.toString();
+	}
+
+	@Override
+	public String visit(PropagatedContradiction conclusion, Void input) {
+		return "Contradiction propagated over " + conclusion.getLinkPremise();
+	}
+
+	@Override
+	public String visit(DisjointSubsumerFromSubsumer conclusion, Void input) {
+		return "Disjoint subsumer " + conclusion + " derived from " + conclusion.getPremise(); 
+	}
+
+	@Override
+	public String visit(DisjunctionComposition conclusion, Void input) {
+		return "Composed disjunction " + conclusion.getExpression() + " from " + conclusion.getPremise();
+	}	
 
 }

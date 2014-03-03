@@ -22,12 +22,12 @@ package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedContradiction;
 import org.semanticweb.elk.util.collections.chains.Matcher;
 import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
 import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
@@ -72,9 +72,10 @@ public class ContradictionOverBackwardLinkRule extends
 	}
 
 	@Override
-	public void apply(BackwardLink premise, ContextPremises contex,
+	public void apply(BackwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		producer.produce(premise.getSource(), ContradictionImpl.getInstance());
+		//producer.produce(premise.getSource(), ContradictionImpl.getInstance());
+		producer.produce(premise.getSource(), new PropagatedContradiction(premise, premises.getRoot()));
 	}
 
 	@Override

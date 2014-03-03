@@ -24,10 +24,10 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromNegation;
 
 /**
  * A {@link SubsumerDecompositionRule} producing {@link Contradiction} when
@@ -66,8 +66,9 @@ public class IndexedObjectComplementOfDecomposition extends
 	@Override
 	public void apply(IndexedObjectComplementOf premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		if (premises.getSubsumers().contains(premise.getNegated()))
-			producer.produce(premises.getRoot(),
-					ContradictionImpl.getInstance());
+		if (premises.getSubsumers().contains(premise.getNegated())) {
+			//producer.produce(premises.getRoot(), ContradictionImpl.getInstance());
+			producer.produce(premises.getRoot(), new ContradictionFromNegation(premise));
+		}
 	}
 }

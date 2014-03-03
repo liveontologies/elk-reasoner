@@ -27,10 +27,10 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -102,8 +102,9 @@ public class DisjointSubsumerFromMemberRule extends
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
-			producer.produce(premises.getRoot(), new DisjointSubsumerImpl(
-					disAxiom, premise));
+			/*producer.produce(premises.getRoot(), new DisjointSubsumerImpl(
+					disAxiom, premise));*/
+			producer.produce(premises.getRoot(), new DisjointSubsumerFromSubsumer(disAxiom, premise));
 	}
 
 	protected boolean isEmpty() {

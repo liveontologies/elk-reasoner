@@ -27,10 +27,10 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjunctionComposition;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.collections.chains.Matcher;
@@ -52,15 +52,15 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 	 * All disjunctions containing the disjunct for which this rule is
 	 * registered
 	 */
-	private final Set<IndexedClassExpression> disjunctions_;
+	private final Set<IndexedObjectUnionOf> disjunctions_;
 
 	private ObjectUnionFromDisjunctRule(ChainableSubsumerRule tail) {
 		super(tail);
-		disjunctions_ = new ArrayHashSet<IndexedClassExpression>();
+		disjunctions_ = new ArrayHashSet<IndexedObjectUnionOf>();
 
 	}
 
-	private ObjectUnionFromDisjunctRule(IndexedClassExpression disjunction) {
+	private ObjectUnionFromDisjunctRule(IndexedObjectUnionOf disjunction) {
 		this((ChainableSubsumerRule) null);
 		this.disjunctions_.add(disjunction);
 	}
@@ -90,17 +90,20 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 	}
 
 	// TODO: hide this method
-	public Set<IndexedClassExpression> getDisjunctions() {
+	public Set<IndexedObjectUnionOf> getDisjunctions() {
 		return disjunctions_;
 	}
 
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		for (IndexedClassExpression disjunction : disjunctions_)
-			producer.produce(premises.getRoot(),
+		for (IndexedObjectUnionOf disjunction : disjunctions_) {
+			/*producer.produce(premises.getRoot(),
 					new ComposedSubsumerImpl<IndexedClassExpression>(
-							disjunction));
+							disjunction));*/
+			producer.produce(premises.getRoot(),
+					new DisjunctionComposition(premise, disjunction));
+		}
 	}
 
 	@Override

@@ -53,8 +53,8 @@ public class IndexedClass extends IndexedClassEntity {
 	/**
 	 * Creates an object representing the given ElkClass.
 	 */
-	protected IndexedClass(ElkClass elkClass) {
-		this.elkClass = elkClass;
+	protected IndexedClass(ElkClass clazz) {
+		elkClass = clazz;
 	}
 
 	/**

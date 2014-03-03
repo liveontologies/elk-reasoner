@@ -1,15 +1,14 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
-
+package org.semanticweb.elk.reasoner.saturation.tracing;
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,21 +24,22 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import java.net.URL;
+
+import org.semanticweb.elk.reasoner.ReasoningTestManifest;
+import org.semanticweb.elk.testing.VoidTestOutput;
 
 /**
- * @author Pavel Klinov
+ * The manifest for testing tracing functionality.
  * 
- *         pavel.klinov@uni-ulm.de
+ * @author Pavel Klinov
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public abstract class AbstractConclusion implements Conclusion {
+public class TracingTestManifest extends ReasoningTestManifest<VoidTestOutput, VoidTestOutput> {
 
-	@Override
-	public IndexedClassExpression getSourceRoot(
-			IndexedClassExpression rootWhereStored) {
-		// by default where the conclusion is stored
-		return rootWhereStored;
+	public TracingTestManifest(URL input) {
+		super(input, null);
 	}
 
 }
