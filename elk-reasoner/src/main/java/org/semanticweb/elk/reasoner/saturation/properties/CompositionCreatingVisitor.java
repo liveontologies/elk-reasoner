@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -68,6 +69,9 @@ final class CompositionCreatingVisitor implements
 	public Void visit(IndexedBinaryPropertyChain element) {
 		LOGGER_.trace("{}: computing compositions", element);
 		localStatistics_.roleChainsProcessed++;
+		if (element.getToldSuperProperties().size() > 1)
+			LOGGER_.debug("{}: has sevaral super-properties: {}", element,
+					element.getToldSuperProperties());
 
 		IndexedObjectProperty left = element.getLeftProperty();
 		IndexedPropertyChain right = element.getRightProperty();
@@ -93,26 +97,57 @@ final class CompositionCreatingVisitor implements
 
 			// computing left properties for which composition with the
 			// current right sub-property is redundant
-			Collection<IndexedObjectProperty> redundantLeftProperties = Collections
+
+			Collection<IndexedObjectProperty> redundantSimple = Collections
+					.emptySet();
+
+			Collection<IndexedObjectProperty> redundantComplex = Collections
 					.emptySet();
 
 			if (rightSubPropertyChain instanceof IndexedBinaryPropertyChain) {
 				IndexedBinaryPropertyChain composition = (IndexedBinaryPropertyChain) rightSubPropertyChain;
 				IndexedPropertyChain rightRightSubProperty = composition
 						.getRightProperty();
+
+				// simple method
 				if (rightSubProperties.contains(rightRightSubProperty)) {
 					IndexedObjectProperty rightLeftSubProperty = composition
 							.getLeftProperty();
-					redundantLeftProperties = SubPropertyExplorer
+					redundantSimple = SubPropertyExplorer
 							.getLeftSubComposableSubPropertiesByRightProperties(
 									left).get(rightLeftSubProperty);
 				}
+
+				// complex method
+				for (IndexedObjectProperty superProperty : element
+						.getToldSuperProperties()) {
+					Set<IndexedObjectProperty> newRedundantProperties = new HashSet<IndexedObjectProperty>(
+							64);
+					for (IndexedBinaryPropertyChain leftSubComposition : SubPropertyExplorer
+							.getSubPropertyChainsByRightSubProperties(
+									superProperty).get(rightRightSubProperty)) {
+						for (IndexedBinaryPropertyChain leftLeftSubComposition : SubPropertyExplorer
+								.getSubPropertyChainsByRightSubProperties(
+										leftSubComposition.getLeftProperty())
+								.get(composition.getLeftProperty())) {
+							newRedundantProperties.addAll(SubPropertyExplorer
+									.getSubProperties(leftLeftSubComposition
+											.getLeftProperty()));
+						}
+					}
+					if (redundantComplex.isEmpty()) {
+						redundantComplex = newRedundantProperties;
+					} else {
+						redundantComplex.retainAll(newRedundantProperties);
+					}
+				}
+
 			}
 
 			for (IndexedObjectProperty leftSubProperty : leftSubProperties) {
 				boolean newRecord = false;
 
-				if (redundantLeftProperties.contains(leftSubProperty)) {
+				if (redundantComplex.contains(leftSubProperty)) {
 					LOGGER_.trace("{} o {} => {}: composition is redundant",
 							leftSubProperty, rightSubPropertyChain, element);
 					localStatistics_.compositionsRedundant++;

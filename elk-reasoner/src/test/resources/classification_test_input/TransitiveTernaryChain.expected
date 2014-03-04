@@ -1,0 +1,8 @@
+Prefix( : = <http://example.org/> )
+Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
+Ontology(<www.example.org#transitive_ternary_chain#taxonomy>
+SubClassOf(:A :X)
+Declaration(Class(:B))
+Declaration(Class(:C))
+Declaration(Class(:D))
+)

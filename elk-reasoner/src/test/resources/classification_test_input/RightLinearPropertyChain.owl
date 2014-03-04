@@ -1,0 +1,12 @@
+Prefix( : = <http://example.org/> )
+Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
+Ontology(<www.example.org#right_linear_property_chain>
+
+SubObjectPropertyOf(ObjectPropertyChain(:R :S) :S)
+
+SubClassOf(:A ObjectSomeValuesFrom(:R :B))
+SubClassOf(:B ObjectSomeValuesFrom(:R :C))
+SubClassOf(:C ObjectSomeValuesFrom(:R :D))
+SubClassOf(:D ObjectSomeValuesFrom(:S :E))
+EquivalentClasses(:X ObjectSomeValuesFrom(:S :E))
+)

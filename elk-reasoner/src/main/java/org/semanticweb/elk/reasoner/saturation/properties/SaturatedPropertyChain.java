@@ -85,6 +85,18 @@ public class SaturatedPropertyChain {
 	volatile boolean leftSubComposableSubPropertiesByRightPropertiesComputed = false;
 
 	/**
+	 * A multimap S -> {[ToH]} such that ToH is a sub-property of {{@link #root}
+	 * and S is a sub-property of H
+	 */
+	Multimap<IndexedPropertyChain, IndexedBinaryPropertyChain> subPropertyChainsByRightSubProperties;
+
+	/**
+	 * {@code true} if {{@link #subPropertyChainsByRightSubProperties} is not
+	 * {@code null} and was fully computed
+	 */
+	volatile boolean subPropertyChainsByRightSubPropertiesComputed = false;
+
+	/**
 	 * A {@link Multimap} from R to S such that ObjectPropertyChain(R, root)
 	 * implies S
 	 */
@@ -110,6 +122,8 @@ public class SaturatedPropertyChain {
 		derivedSubPropertiesComputed = false;
 		leftSubComposableSubPropertiesByRightProperties = null;
 		leftSubComposableSubPropertiesByRightPropertiesComputed = false;
+		subPropertyChainsByRightSubProperties = null;
+		subPropertyChainsByRightSubPropertiesComputed = false;		
 		compositionsByLeftSubProperty = null;
 		compositionsByRightSubProperty = null;
 	}
@@ -123,6 +137,7 @@ public class SaturatedPropertyChain {
 		return isDerivedReflexive_ == false && derivedSubProperties == null
 				&& derivedSubProperyChains == null
 				&& leftSubComposableSubPropertiesByRightProperties == null
+				&& subPropertyChainsByRightSubProperties == null
 				&& compositionsByLeftSubProperty == null
 				&& compositionsByRightSubProperty == null;
 	}

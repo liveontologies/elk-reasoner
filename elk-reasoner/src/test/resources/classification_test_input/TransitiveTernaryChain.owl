@@ -1,0 +1,10 @@
+Prefix( : = <http://example.org/> )
+Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
+Ontology(<www.example.org#transitive_ternary_chain>
+TransitiveObjectProperty(:T)
+SubObjectPropertyOf(ObjectPropertyChain(:T :T :T) :H)
+SubClassOf(:A ObjectSomeValuesFrom(:T :B))
+SubClassOf(:B ObjectSomeValuesFrom(:T :C))
+SubClassOf(:C ObjectSomeValuesFrom(:T :D))
+EquivalentClasses(:X ObjectSomeValuesFrom(:H :D))
+)

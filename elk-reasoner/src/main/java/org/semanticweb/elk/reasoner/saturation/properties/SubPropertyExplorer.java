@@ -128,10 +128,11 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 			return saturation;
 		// else
 		if (saturation.derivedSubProperyChains == null) {
+			Set<IndexedPropertyChain> newSubPropertyChains = new ArrayHashSet<IndexedPropertyChain>(
+					8);
 			synchronized (saturation) {
 				if (saturation.derivedSubProperyChains == null)
-					saturation.derivedSubProperyChains = new ArrayHashSet<IndexedPropertyChain>(
-							8);
+					saturation.derivedSubProperyChains = newSubPropertyChains;
 			}
 		}
 		synchronized (saturation.derivedSubProperyChains) {
@@ -182,9 +183,10 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 			return saturation.leftSubComposableSubPropertiesByRightProperties;
 		// else
 		if (saturation.leftSubComposableSubPropertiesByRightProperties == null) {
+			Multimap<IndexedObjectProperty, IndexedObjectProperty> newMultimap = new HashSetMultimap<IndexedObjectProperty, IndexedObjectProperty>();
 			synchronized (saturation) {
 				if (saturation.leftSubComposableSubPropertiesByRightProperties == null)
-					saturation.leftSubComposableSubPropertiesByRightProperties = new HashSetMultimap<IndexedObjectProperty, IndexedObjectProperty>();
+					saturation.leftSubComposableSubPropertiesByRightProperties = newMultimap;
 			}
 		}
 		synchronized (saturation.leftSubComposableSubPropertiesByRightProperties) {
@@ -211,5 +213,43 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 			saturation.leftSubComposableSubPropertiesByRightPropertiesComputed = true;
 		}
 		return saturation.leftSubComposableSubPropertiesByRightProperties;
+	}
+
+	/**
+	 * @param property
+	 *            R
+	 * @return A map S -> {[ToH]} such that ToH is a sub-property of R and S is
+	 *         a sub-property of H
+	 */
+	static Multimap<IndexedPropertyChain, IndexedBinaryPropertyChain> getSubPropertyChainsByRightSubProperties(
+			IndexedObjectProperty property) {
+		SaturatedPropertyChain saturation = SaturatedPropertyChain
+				.getCreate(property);
+		if (saturation.subPropertyChainsByRightSubPropertiesComputed)
+			return saturation.subPropertyChainsByRightSubProperties;
+		// else
+		if (saturation.subPropertyChainsByRightSubProperties == null) {
+			Multimap<IndexedPropertyChain, IndexedBinaryPropertyChain> newMultimap = new HashSetMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain>();
+			synchronized (saturation) {
+				if (saturation.subPropertyChainsByRightSubProperties == null)
+					saturation.subPropertyChainsByRightSubProperties = newMultimap;
+			}
+		}
+		synchronized (saturation.subPropertyChainsByRightSubProperties) {
+			if (saturation.subPropertyChainsByRightSubPropertiesComputed)
+				return saturation.subPropertyChainsByRightSubProperties;
+			// else compute it
+			for (IndexedPropertyChain subPropertyChain : getSubPropertyChains(property)) {
+				if (subPropertyChain instanceof IndexedBinaryPropertyChain) {
+					IndexedBinaryPropertyChain composition = (IndexedBinaryPropertyChain) subPropertyChain;
+					for (IndexedPropertyChain rightSubPropertyChain : getSubPropertyChains(composition
+							.getRightProperty())) {
+						saturation.subPropertyChainsByRightSubProperties.add(
+								rightSubPropertyChain, composition);
+					}
+				}
+			}
+		}
+		return saturation.subPropertyChainsByRightSubProperties;
 	}
 }
