@@ -90,6 +90,10 @@ public abstract class AbstractReasonerState {
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractReasonerState.class);
+	/**
+	 * If true, all inferences will be stored in the trace store.
+	 */
+	final boolean FULL_TRACING = false;
 
 	final SaturationState<? extends Context> saturationState;
 

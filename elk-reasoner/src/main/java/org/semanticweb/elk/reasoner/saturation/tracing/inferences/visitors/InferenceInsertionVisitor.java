@@ -73,7 +73,7 @@ public class InferenceInsertionVisitor extends
 			return ((Inference) conclusion).acceptTraced(
 					inferenceInserter_, cxt);
 		}
-		LOGGER_.warn(
+		LOGGER_.debug(
 				"Tracing is ON but {} does not contain tracing information",
 				conclusion);
 
