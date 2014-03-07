@@ -30,6 +30,7 @@
 		<module>elk-standalone</module>
 		<module>elk-distribution</module>
 		<module>elk-owlapi-standalone</module>
+		<module>alc-reasoner</module>
 	</modules>
 
 	<scm>
