@@ -65,7 +65,7 @@ public class IndexedClass extends IndexedClassExpression {
 			int positiveIncrement, int negativeIncrement) {
 
 		if (occurrenceNo == 0 && increment > 0) {
-			index.addClass(elkClass);
+			index.addClass(this);
 		}
 
 		occurrenceNo += increment;

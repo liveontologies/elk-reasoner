@@ -28,7 +28,14 @@ import java.util.Set;
 
 import org.semanticweb.elk.alc.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.alc.indexing.visitors.IndexedObjectVisitor;
+import org.semanticweb.elk.alc.saturation.ConclusionProducer;
+import org.semanticweb.elk.alc.saturation.Context;
+import org.semanticweb.elk.alc.saturation.Root;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -185,4 +192,50 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
 
+	public static void applyCompositionRules(IndexedClassExpression subsumer,
+			Context premises, ConclusionProducer producer) {
+		Root root = premises.getRoot();
+		if (subsumer.conjunctionsByConjunct_ != null) {
+			// conjunction introduction
+			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
+					premises.getSubsumers(),
+					subsumer.conjunctionsByConjunct_.keySet())) {
+				producer.produce(root, new ComposedSubsumerImpl(
+						subsumer.conjunctionsByConjunct_.get(common)));
+			}
+		}
+		if (subsumer.negativeExistentials_ != null) {
+			// generate propagations
+			Set<IndexedObjectProperty> backwardProperties = premises
+					.getBackwardLinks().keySet();
+			for (IndexedObjectSomeValuesFrom existential : subsumer.negativeExistentials_) {
+				IndexedObjectProperty relation = existential.getRelation();
+				if (backwardProperties.contains(relation))
+					producer.produce(root, new PropagationImpl(relation,
+							existential));
+			}
+		}
+		if (subsumer.toldSuperClasses_ != null) {
+			// expand under told super-classes
+			for (IndexedClassExpression toldSuper : subsumer.toldSuperClasses_) {
+				producer.produce(root, new DecomposedSubsumerImpl(toldSuper));
+			}
+
+		}
+	}
+
+	public static void generatePropagations(IndexedObjectProperty property,
+			Context premises, ConclusionProducer producer) {
+		Root root = premises.getRoot();
+		for (IndexedClassExpression subsumer : premises.getSubsumers()) {
+			if (subsumer.negativeExistentials_ == null)
+				continue;
+			for (IndexedObjectSomeValuesFrom existential : subsumer.negativeExistentials_) {
+				if (existential.getRelation() == property)
+					producer.produce(root, new PropagationImpl(property,
+							existential));
+			}
+		}
+
+	}
 }
