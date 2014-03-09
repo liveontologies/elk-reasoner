@@ -90,10 +90,18 @@ public abstract class AbstractReasonerState {
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractReasonerState.class);
+	
+	//TODO create reasoner configuration options instead of these flags?
 	/**
 	 * If true, all inferences will be stored in the trace store.
 	 */
 	final boolean FULL_TRACING = false;
+	/**
+	 * If true, all rules, redundant and non-redundant, will be applied during
+	 * the class expression saturation stage. Otherwise, only non-redundant
+	 * rules will be applied.
+	 */
+	final boolean REDUNDANT_RULES = false;
 
 	final SaturationState<? extends Context> saturationState;
 

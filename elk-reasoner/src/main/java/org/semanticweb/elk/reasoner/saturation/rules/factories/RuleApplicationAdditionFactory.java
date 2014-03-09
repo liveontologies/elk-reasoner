@@ -30,7 +30,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInitializingInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionSourceContextNotSaturatedCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationVisitorFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationVisitorFactory;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
@@ -51,11 +52,24 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 public class RuleApplicationAdditionFactory extends
 		AbstractRuleApplicationFactory<Context> {
 
+	private final RuleApplicationVisitorFactory ruleAppVisitorFactory_;
+	
 	public RuleApplicationAdditionFactory(
-			SaturationState<? extends Context> saturationState) {
+			SaturationState<?> saturationState) {
+		// this factory applies non-redundant rules by default
+		this(saturationState, new NonRedundantRuleApplicationVisitorFactory());
+	}
+	
+	public RuleApplicationAdditionFactory(
+			SaturationState<?> saturationState, RuleApplicationVisitorFactory factory) {
 		super(saturationState);
+		ruleAppVisitorFactory_ = factory;
 	}
 
+	protected final RuleApplicationVisitorFactory getRuleApplicationVisitorFactory() {
+		return ruleAppVisitorFactory_;
+	}
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
@@ -77,7 +91,6 @@ public class RuleApplicationAdditionFactory extends
 						SaturationUtils
 								.getUsedConclusionCountingVisitor(localStatistics),
 						// and apply all non-redundant rules
-						new NonRedundantRuleApplicationConclusionVisitor(
-								ruleVisitor, writer));
+						ruleAppVisitorFactory_.create(ruleVisitor, writer));
 	}
 }
