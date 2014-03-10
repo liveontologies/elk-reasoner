@@ -25,32 +25,15 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Test;
-import org.semanticweb.elk.io.IOUtils;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.iris.ElkPrefix;
-import org.semanticweb.elk.owl.parsing.Owl2ParseException;
-import org.semanticweb.elk.owl.parsing.Owl2Parser;
-import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
-import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
-import org.semanticweb.elk.reasoner.stages.LoggingStageExecutor;
-import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 
 /**
  * @author Pavel Klinov
@@ -61,7 +44,7 @@ public class TracingSaturationTest {
 
 	@Test
 	public void testBasicTracing() throws Exception {
-		Reasoner reasoner = load("tracing/DuplicateExistential.owl");
+		Reasoner reasoner = TestReasonerUtils.load("tracing/DuplicateExistential.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
@@ -86,7 +69,7 @@ public class TracingSaturationTest {
 
 	@Test
 	public void testDuplicateInferenceOfConjunction() throws Exception {
-		Reasoner reasoner = load("tracing/DuplicateConjunction.owl");
+		Reasoner reasoner = TestReasonerUtils.load("tracing/DuplicateConjunction.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
@@ -103,7 +86,7 @@ public class TracingSaturationTest {
 
 	@Test
 	public void testDuplicateInferenceOfExistential() throws Exception {
-		Reasoner reasoner = load("tracing/DuplicateExistential.owl");
+		Reasoner reasoner = TestReasonerUtils.load("tracing/DuplicateExistential.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
@@ -128,7 +111,7 @@ public class TracingSaturationTest {
 
 	@Test
 	public void testDuplicateInferenceViaComposition() throws Exception {
-		Reasoner reasoner = load("tracing/DuplicateComposition.owl");
+		Reasoner reasoner = TestReasonerUtils.load("tracing/DuplicateComposition.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
@@ -148,7 +131,7 @@ public class TracingSaturationTest {
 
 	@Test
 	public void testDuplicateInferenceOfReflexiveExistential() throws Exception {
-		Reasoner reasoner = load("tracing/DuplicateReflexiveExistential.owl");
+		Reasoner reasoner = TestReasonerUtils.load("tracing/DuplicateReflexiveExistential.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
@@ -166,7 +149,7 @@ public class TracingSaturationTest {
 	@Test
 	public void testRecursiveTracingExistential() throws Exception {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		Reasoner reasoner = load("tracing/RecursiveExistential.owl");
+		Reasoner reasoner = TestReasonerUtils.load("tracing/RecursiveExistential.owl");
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
@@ -184,7 +167,7 @@ public class TracingSaturationTest {
 	@Test
 	public void testRecursiveTracingComposition() throws Exception {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		Reasoner reasoner = load("tracing/RecursiveComposition.owl");
+		Reasoner reasoner = TestReasonerUtils.load("tracing/RecursiveComposition.owl");
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
@@ -205,7 +188,7 @@ public class TracingSaturationTest {
 	@Test
 	public void testAvoidTracingDueToCyclicInferences() throws Exception {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		Reasoner reasoner = load("tracing/TrivialPropagation.owl");
+		Reasoner reasoner = TestReasonerUtils.load("tracing/TrivialPropagation.owl");
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass a1 = factory.getClass(new ElkFullIri("http://example.org/A1"));
@@ -216,61 +199,5 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkInferenceAcyclicity(reasoner);
 	}
 
-	private Reasoner load(String resource) throws Exception {
-		Reasoner reasoner = null;
-		InputStream stream = null;
 
-		try {
-			stream = getClass().getClassLoader().getResourceAsStream(resource);
-
-			List<ElkAxiom> ontology = loadAxioms(stream);
-			TestChangesLoader initialLoader = new TestChangesLoader();
-			ReasonerStageExecutor executor = new LoggingStageExecutor();
-
-			reasoner = TestReasonerUtils.createTestReasoner(initialLoader,
-					executor);
-
-			for (ElkAxiom axiom : ontology) {
-				initialLoader.add(axiom);
-			}
-
-			reasoner.getTaxonomy();
-		} finally {
-			IOUtils.closeQuietly(stream);
-		}
-
-		return reasoner;
-	}
-
-	private List<ElkAxiom> loadAxioms(InputStream stream) throws IOException,
-			Owl2ParseException {
-		return loadAxioms(new InputStreamReader(stream));
-	}
-
-	private List<ElkAxiom> loadAxioms(Reader reader) throws IOException,
-			Owl2ParseException {
-		Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
-				.getParser(reader);
-		final List<ElkAxiom> axioms = new ArrayList<ElkAxiom>();
-
-		parser.accept(new Owl2ParserAxiomProcessor() {
-
-			@Override
-			public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
-				// ignored
-			}
-
-			@Override
-			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
-				axioms.add(elkAxiom);
-			}
-
-			@Override
-			public void finish() throws Owl2ParseException {
-				// everything is processed immediately
-			}
-		});
-
-		return axioms;
-	}
 }
