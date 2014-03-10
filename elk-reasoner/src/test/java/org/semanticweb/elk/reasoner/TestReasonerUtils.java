@@ -74,7 +74,7 @@ public class TestReasonerUtils {
 		return createTestReasoner(axiomLoader, stageExecutor, config);
 	}
 	
-	public static Reasoner load(String resource) throws Exception {
+	public static Reasoner loadAndClassify(String resource) throws Exception {
 		Reasoner reasoner = null;
 		InputStream stream = null;
 

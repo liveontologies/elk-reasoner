@@ -44,7 +44,7 @@ public class TracingSaturationTest {
 
 	@Test
 	public void testBasicTracing() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.load("tracing/DuplicateExistential.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/DuplicateExistential.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
@@ -69,7 +69,7 @@ public class TracingSaturationTest {
 
 	@Test
 	public void testDuplicateInferenceOfConjunction() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.load("tracing/DuplicateConjunction.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/DuplicateConjunction.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
@@ -86,7 +86,7 @@ public class TracingSaturationTest {
 
 	@Test
 	public void testDuplicateInferenceOfExistential() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.load("tracing/DuplicateExistential.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/DuplicateExistential.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
@@ -111,7 +111,7 @@ public class TracingSaturationTest {
 
 	@Test
 	public void testDuplicateInferenceViaComposition() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.load("tracing/DuplicateComposition.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/DuplicateComposition.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
@@ -131,7 +131,7 @@ public class TracingSaturationTest {
 
 	@Test
 	public void testDuplicateInferenceOfReflexiveExistential() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.load("tracing/DuplicateReflexiveExistential.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/DuplicateReflexiveExistential.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
@@ -149,7 +149,7 @@ public class TracingSaturationTest {
 	@Test
 	public void testRecursiveTracingExistential() throws Exception {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		Reasoner reasoner = TestReasonerUtils.load("tracing/RecursiveExistential.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/RecursiveExistential.owl");
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
@@ -167,7 +167,7 @@ public class TracingSaturationTest {
 	@Test
 	public void testRecursiveTracingComposition() throws Exception {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		Reasoner reasoner = TestReasonerUtils.load("tracing/RecursiveComposition.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/RecursiveComposition.owl");
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass b = factory.getClass(new ElkFullIri("http://example.org/B"));
@@ -188,7 +188,7 @@ public class TracingSaturationTest {
 	@Test
 	public void testAvoidTracingDueToCyclicInferences() throws Exception {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		Reasoner reasoner = TestReasonerUtils.load("tracing/TrivialPropagation.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/TrivialPropagation.owl");
 
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass a1 = factory.getClass(new ElkFullIri("http://example.org/A1"));
