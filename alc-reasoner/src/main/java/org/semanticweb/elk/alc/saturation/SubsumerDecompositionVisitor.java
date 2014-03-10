@@ -1,4 +1,5 @@
 package org.semanticweb.elk.alc.saturation;
+
 /*
  * #%L
  * ALC Reasoner
@@ -24,6 +25,7 @@ package org.semanticweb.elk.alc.saturation;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.alc.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
@@ -73,6 +75,12 @@ public class SubsumerDecompositionVisitor implements
 		// TODO: take into account propagations
 		producer_.produce(fillerRoot,
 				new BackwardLinkImpl(root_, element.getRelation()));
+		return null;
+	}
+
+	@Override
+	public Void visit(IndexedObjectUnionOf element) {
+		// TODO: apply non-deterministic rules
 		return null;
 	}
 

@@ -74,29 +74,27 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 	@Override
 	public IndexedClass visit(IndexedClass element) {
-		return resolveCache((IndexedClass) indexedObjectLookup.get(element),
-				element);
+		return resolveCache(element);
 	}
 
 	@Override
 	public IndexedObjectIntersectionOf visit(IndexedObjectIntersectionOf element) {
-		return resolveCache(
-				(IndexedObjectIntersectionOf) indexedObjectLookup.get(element),
-				element);
+		return resolveCache(element);
+	}
+
+	@Override
+	public IndexedObjectUnionOf visit(IndexedObjectUnionOf element) {
+		return resolveCache(element);
 	}
 
 	@Override
 	public IndexedObjectSomeValuesFrom visit(IndexedObjectSomeValuesFrom element) {
-		return resolveCache(
-				(IndexedObjectSomeValuesFrom) indexedObjectLookup.get(element),
-				element);
+		return resolveCache(element);
 	}
 
 	@Override
 	public IndexedObjectProperty visit(IndexedObjectProperty element) {
-		return resolveCache(
-				(IndexedObjectProperty) indexedObjectLookup.get(element),
-				element);
+		return resolveCache(element);
 	}
 
 	@Override
@@ -105,36 +103,46 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		return axiom;
 	}
 
-	private static <T> T resolveCache(T cached, T element) {
+	private <T extends IndexedObject> T resolveCache(T element) {
+		@SuppressWarnings("unchecked")
+		T cached = (T) indexedObjectLookup.get(element);
 		return cached == null ? element : cached;
 	}
 
 	final IndexedObjectVisitor<Boolean> inserter = new IndexedObjectVisitor<Boolean>() {
+
+		public Boolean commonVisit(IndexedObject element) {
+			LOGGER_.trace("Adding {}", element);
+			return indexedObjectLookup.add(element);
+		}
+
 		@Override
 		public Boolean visit(IndexedClass element) {
-			LOGGER_.trace("Adding {}", element);
-			if (indexedObjectLookup.add(element)) {
+			if (commonVisit(element)) {
 				indexedClassCount++;
 				return true;
 			}
+			// else
 			return false;
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectIntersectionOf element) {
-			LOGGER_.trace("Adding {}", element);
-			return indexedObjectLookup.add(element);
+			return commonVisit(element);
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectUnionOf element) {
+			return commonVisit(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectSomeValuesFrom element) {
-			LOGGER_.trace("Adding {}", element);
-			return indexedObjectLookup.add(element);
+			return commonVisit(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectProperty element) {
-			LOGGER_.trace("Adding {}", element);
 			if (indexedObjectLookup.add(element)) {
 				indexedObjectPropertyCount++;
 				return true;
@@ -152,34 +160,39 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 	final IndexedObjectVisitor<Boolean> deletor = new IndexedObjectVisitor<Boolean>() {
 
+		public Boolean commonVisit(IndexedObject element) {
+			LOGGER_.trace("Removing {}", element);
+			return (indexedObjectLookup.removeEntry(element) != null);
+		}
+
 		@Override
 		public Boolean visit(IndexedClass element) {
-			LOGGER_.trace("Removing {}", element);
-
-			if (indexedObjectLookup.removeEntry(element) != null) {
+			if (commonVisit(element)) {
 				indexedClassCount--;
 				return true;
 			}
+			// else
 			return false;
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectIntersectionOf element) {
-			LOGGER_.trace("Removing {}", element);
-			return indexedObjectLookup.removeEntry(element) != null;
+			return commonVisit(element);
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectUnionOf element) {
+			return commonVisit(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectSomeValuesFrom element) {
-			LOGGER_.trace("Removing {}", element);
-			return indexedObjectLookup.removeEntry(element) != null;
+			return commonVisit(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectProperty element) {
-			LOGGER_.trace("Removing {}", element);
-
-			if (indexedObjectLookup.removeEntry(element) != null) {
+			if (indexedObjectLookup.add(element)) {
 				indexedObjectPropertyCount--;
 				return true;
 			}

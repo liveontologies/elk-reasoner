@@ -28,6 +28,7 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.alc.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.util.collections.entryset.KeyEntry;
@@ -59,6 +60,12 @@ public class IndexedEntryConverter<T> implements
 			IndexedObjectIntersectionOf element) {
 		return new IndexedObjectIntersectionOfEntry<T, IndexedObjectIntersectionOf>(
 				element);
+	}
+
+	@Override
+	public KeyEntry<T, ? extends IndexedObjectUnionOf> visit(
+			IndexedObjectUnionOf element) {
+		return new IndexedObjectUnionOfEntry<T, IndexedObjectUnionOf>(element);
 	}
 
 	@Override

@@ -29,6 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 /**
@@ -134,6 +135,24 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 			else
 				result = indexedObjectFilter_
 						.visit(new IndexedObjectIntersectionOf(result, ice));
+		}
+
+		return result;
+	}
+
+	@Override
+	public IndexedClassExpression visit(ElkObjectUnionOf elkObjectUnionOf) {
+
+		// the input disjunction is binarized
+		IndexedClassExpression result = null;
+		for (ElkClassExpression c : elkObjectUnionOf.getClassExpressions()) {
+			IndexedClassExpression ice = c.accept(this);
+
+			if (result == null)
+				result = ice;
+			else
+				result = indexedObjectFilter_.visit(new IndexedObjectUnionOf(
+						result, ice));
 		}
 
 		return result;

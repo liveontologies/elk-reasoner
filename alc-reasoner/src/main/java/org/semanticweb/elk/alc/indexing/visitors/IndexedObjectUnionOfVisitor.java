@@ -1,12 +1,11 @@
-package org.semanticweb.elk.alc.indexing.visitors;
-
 /*
  * #%L
  * ELK Reasoner
- * $Id:$
- * $HeadURL:$
+ * 
+ * $Id$
+ * $HeadURL$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +20,20 @@ package org.semanticweb.elk.alc.indexing.visitors;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.alc.indexing.visitors;
 
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectUnionOf;
 
-public interface IndexedClassExpressionFilter extends
-		IndexedClassVisitor<IndexedClass>,
-		IndexedObjectIntersectionOfVisitor<IndexedObjectIntersectionOf>,
-		IndexedObjectUnionOfVisitor<IndexedObjectUnionOf>,
-		IndexedObjectSomeValuesFromVisitor<IndexedObjectSomeValuesFrom> {
+/**
+ * Visitor pattern interface for instances of {@link IndexedObjectUnionOf}.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
+ */
+public interface IndexedObjectUnionOfVisitor<O> {
 
-	// nothing else
+	O visit(IndexedObjectUnionOf element);
+
 }

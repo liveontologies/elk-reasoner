@@ -22,10 +22,7 @@
  */
 package org.semanticweb.elk.alc.indexing.visitors;
 
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 
 /**
  * Visitor pattern interface for instances of {@link IndexedClassExpression}.
@@ -36,12 +33,10 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
  * @param <O>
  *            the type of the output of this visitor
  */
-public interface IndexedClassExpressionVisitor<O> {
+public interface IndexedClassExpressionVisitor<O> extends
+		IndexedClassVisitor<O>, IndexedObjectIntersectionOfVisitor<O>,
+		IndexedObjectUnionOfVisitor<O>, IndexedObjectSomeValuesFromVisitor<O> {
 
-	O visit(IndexedClass element);
-
-	O visit(IndexedObjectIntersectionOf element);
-
-	O visit(IndexedObjectSomeValuesFrom element);
+	// nothing else
 
 }

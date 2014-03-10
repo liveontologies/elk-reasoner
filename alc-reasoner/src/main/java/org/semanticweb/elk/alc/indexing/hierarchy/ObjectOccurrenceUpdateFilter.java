@@ -1,4 +1,5 @@
 package org.semanticweb.elk.alc.indexing.hierarchy;
+
 /*
  * #%L
  * ALC Reasoner
@@ -92,6 +93,11 @@ class ObjectOccurrenceUpdateFilter implements IndexedObjectFilter {
 
 	@Override
 	public IndexedObjectIntersectionOf visit(IndexedObjectIntersectionOf element) {
+		return update(cache_.visit(element));
+	}
+
+	@Override
+	public IndexedObjectUnionOf visit(IndexedObjectUnionOf element) {
 		return update(cache_.visit(element));
 	}
 
