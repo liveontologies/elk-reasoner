@@ -28,10 +28,10 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.alc.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjunctionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 
 /**
  * An {@link IndexedClassExpressionVisitor} applying decomposition rules using a
@@ -75,10 +75,7 @@ public class SubsumerDecompositionVisitor implements
 
 	@Override
 	public Void visit(IndexedObjectSomeValuesFrom element) {
-		Root fillerRoot = new Root(element.getFiller());
-		// TODO: take into account propagations
-		producer_.produce(fillerRoot,
-				new BackwardLinkImpl(root_, element.getRelation()));
+		producer_.produce(root_, new ForwardLinkImpl(element));
 		return null;
 	}
 

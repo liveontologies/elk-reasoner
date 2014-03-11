@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 
@@ -50,6 +51,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
  *            the type of output parameter with which this visitor works
  */
 public interface ConclusionVisitor<I, O> {
+
+	public O visit(ForwardLink conclusion, I input);
 
 	public O visit(BackwardLink conclusion, I input);
 

@@ -37,6 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
@@ -85,6 +86,11 @@ public class Context {
 	 * the negated super-classes of the {@link Root}
 	 */
 	private Set<IndexedClassExpression> negativeSubsumers_;
+
+	/**
+	 * the entailed existential relations
+	 */
+	private Multimap<IndexedObjectProperty, IndexedClassExpression> forwardLinks_;
 
 	/**
 	 * the existential relations from other {@link Root}s
@@ -144,6 +150,13 @@ public class Context {
 			return Operations.emptyMultimap();
 		// else
 		return disjunctions_;
+	}
+
+	public Multimap<IndexedObjectProperty, IndexedClassExpression> getForwardLinks() {
+		if (forwardLinks_ == null)
+			return Operations.emptyMultimap();
+		// else
+		return forwardLinks_;
 	}
 
 	public Multimap<IndexedObjectProperty, Root> getBackwardLinks() {
@@ -304,6 +317,15 @@ public class Context {
 		}
 
 		@Override
+		public Boolean visit(ForwardLink conclusion, Context input) {
+			if (input.forwardLinks_ == null)
+				input.forwardLinks_ = new HashSetMultimap<IndexedObjectProperty, IndexedClassExpression>(
+						16);
+			return input.forwardLinks_.add(conclusion.getRelation(),
+					conclusion.getTarget());
+		}
+
+		@Override
 		public Boolean visit(BackwardLink conclusion, Context input) {
 			if (input.backwardLinks_ == null)
 				input.backwardLinks_ = new HashSetMultimap<IndexedObjectProperty, Root>(
@@ -388,6 +410,20 @@ public class Context {
 					conclusion.getPropagatedDisjunct())) {
 				if (input.disjunctions_.isEmpty())
 					input.disjunctions_ = null;
+				return true;
+			}
+			// else
+			return false;
+		}
+
+		@Override
+		public Boolean visit(ForwardLink conclusion, Context input) {
+			if (input.forwardLinks_ == null)
+				return false;
+			if (input.forwardLinks_.remove(conclusion.getRelation(),
+					conclusion.getTarget())) {
+				if (input.forwardLinks_.isEmpty())
+					input.forwardLinks_ = null;
 				return true;
 			}
 			// else

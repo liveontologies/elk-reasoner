@@ -24,6 +24,7 @@ package org.semanticweb.elk.alc.saturation;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
@@ -34,6 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSu
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -83,6 +85,16 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			producer_.produce(root, new DecomposedSubsumerImpl(
 					propagatedDisjunct));
 		}
+		return null;
+	}
+
+	@Override
+	public Void visit(ForwardLink conclusion, Context input) {
+		// TODO: take into account propagations
+		Root root = input.getRoot();
+		Root fillerRoot = new Root(conclusion.getTarget());
+		producer_.produce(fillerRoot,
+				new BackwardLinkImpl(root, conclusion.getRelation()));
 		return null;
 	}
 
