@@ -1,5 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
-
+package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 /*
  * #%L
  * ALC Reasoner
@@ -22,18 +21,16 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-/**
- * A {@link Conclusion} representing that some inconsistency for a concept has
- * been derived.
- * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
- * 
- * @author "Yevgeny Kazakov"
- */
-public interface Clash extends Conclusion {
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.alc.saturation.Root;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BacktrackedConclusion;
 
-	public static final String NAME = "Clash";
+public class BacktrackedBackwardLinkImpl extends BackwardLinkImpl implements
+		BacktrackedConclusion {
+
+	public BacktrackedBackwardLinkImpl(Root source,
+			IndexedObjectProperty relation) {
+		super(source, relation);
+	}
 
 }

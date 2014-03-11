@@ -1,4 +1,5 @@
 package org.semanticweb.elk.alc.saturation;
+
 /*
  * #%L
  * ALC Reasoner
@@ -21,6 +22,10 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
@@ -32,15 +37,67 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class Root extends ArrayHashSet<IndexedClassExpression> {
+public class Root {
 
-	public Root(IndexedClassExpression... elements) {
-		super(elements.length);
-		for (int i = 0; i < elements.length; i++) {
-			add(elements[i]);
+	private final IndexedClassExpression positiveSubsumer_;
+
+	private Set<IndexedClassExpression> negativeSubsumers_;
+
+	public Root(IndexedClassExpression positiveSubsumer,
+			IndexedClassExpression... negativeSubsumers) {
+		this.positiveSubsumer_ = positiveSubsumer;
+		if (negativeSubsumers.length > 0) {
+			this.negativeSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
+					negativeSubsumers.length);
+			for (int i = 0; i < negativeSubsumers.length; i++) {
+				negativeSubsumers_.add(negativeSubsumers[i]);
+			}
 		}
 	}
 
-	// TODO: cache hash code for frequent use
+	public Root(IndexedClassExpression positiveSubsumer,
+			Collection<IndexedClassExpression> negativeSubsumers) {
+		this.positiveSubsumer_ = positiveSubsumer;
+		if (negativeSubsumers.size() > 0) {
+			this.negativeSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
+					negativeSubsumers.size());
+			for (IndexedClassExpression negativeSubsumer : negativeSubsumers)
+				negativeSubsumers_.add(negativeSubsumer);
+		}
+	}
 
+	public IndexedClassExpression getPositiveSubsumer() {
+		return this.positiveSubsumer_;
+	}
+
+	public Set<IndexedClassExpression> getNegatitveSubsumers() {
+		if (negativeSubsumers_ == null)
+			return Collections.emptySet();
+		// else
+		return negativeSubsumers_;
+	}
+
+	@Override
+	public int hashCode() {
+		return (positiveSubsumer_.hashCode() + getNegatitveSubsumers()
+				.hashCode());
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof Root))
+			return false;
+		// else
+		Root otherRoot = (Root) o;
+		return positiveSubsumer_.equals(otherRoot.positiveSubsumer_)
+				&& getNegatitveSubsumers().equals(
+						otherRoot.getNegatitveSubsumers());
+	}
+
+	@Override
+	public String toString() {
+		return positiveSubsumer_.toString()
+				+ (negativeSubsumers_ == null ? "" : "~"
+						+ getNegatitveSubsumers().toString());
+	}
 }

@@ -26,6 +26,7 @@ import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.Queue;
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
@@ -54,6 +55,8 @@ public class SaturationState implements ConclusionProducer {
 	 * {@link Context}s that have unprocessed {@link PossibleConclusion}s
 	 */
 	private final Queue<Context> possibleContexts_;
+
+	private final Conclusion init_ = new ContextInitializationImpl();
 
 	public SaturationState() {
 		this.contextsByRoots_ = new ArrayHashMap<Root, Context>(1024);
@@ -93,6 +96,7 @@ public class SaturationState implements ConclusionProducer {
 		// else create new
 		result = new Context(root);
 		contextsByRoots_.put(root, result);
+		produce(root, init_);
 		return result;
 	}
 

@@ -24,25 +24,27 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 
-public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
+public class NegativePropagationImpl extends AbstractConclusion implements
+		NegativePropagation {
 
-	private final IndexedObjectSomeValuesFrom existential_;
+	private final IndexedObjectSomeValuesFrom negatedExistential_;
 
-	public ForwardLinkImpl(IndexedObjectSomeValuesFrom existential) {
-		this.existential_ = existential;
+	public NegativePropagationImpl(
+			IndexedObjectSomeValuesFrom negatedExistential) {
+		this.negatedExistential_ = negatedExistential;
 	}
 
 	@Override
 	public IndexedObjectProperty getRelation() {
-		return existential_.getRelation();
+		return negatedExistential_.getRelation();
 	}
 
 	@Override
-	public IndexedClassExpression getTarget() {
-		return existential_.getFiller();
+	public IndexedClassExpression getNegatedCarry() {
+		return negatedExistential_.getFiller();
 	}
 
 	@Override
@@ -52,7 +54,8 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 
 	@Override
 	public String toString() {
-		return (getRelation() + "->" + getTarget());
+		return NegativePropagation.NAME + getRelation() + "->~"
+				+ getNegatedCarry();
 	}
 
 }

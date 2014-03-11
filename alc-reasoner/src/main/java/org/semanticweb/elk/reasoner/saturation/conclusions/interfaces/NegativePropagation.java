@@ -1,8 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
-
 /*
  * #%L
- * ELK Reasoner
+ * ALC Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
@@ -26,30 +25,20 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 
-/**
- * A {@link SubConclusion} representing that a given
- * {@link IndexedClassExpression} should be produced as a subsumer of all
- * neighbors over the given {@link IndexedObjectProperty}.
- * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
- * 
- * @author "Yevgeny Kazakov"
- */
-public interface Propagation extends Conclusion {
+public interface NegativePropagation extends Conclusion {
 
-	public static final String NAME = "Propagation";
+	public static final String NAME = "Negative Propagation";
 
 	/**
 	 * @return the {@link IndexedObjectProperty} that is the relation over which
-	 *         this {@link Propagation} is applied
+	 *         this {@link NegativePropagation} is applied
 	 */
 	public IndexedObjectProperty getRelation();
 
 	/**
 	 * @return the {@link IndexedObjectSomeValuesFrom} that is propagated by
-	 *         this {@link Propagation}
+	 *         this {@link NegativePropagation}
 	 */
-	public IndexedObjectSomeValuesFrom getCarry();
+	public IndexedClassExpression getNegatedCarry();
+
 }

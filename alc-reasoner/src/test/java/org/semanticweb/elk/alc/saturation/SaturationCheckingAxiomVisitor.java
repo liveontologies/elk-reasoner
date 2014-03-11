@@ -1,4 +1,5 @@
 package org.semanticweb.elk.alc.saturation;
+
 /*
  * #%L
  * ALC Reasoner
@@ -45,8 +46,14 @@ public class SaturationCheckingAxiomVisitor implements
 	public Void visit(IndexedSubClassOfAxiom axiom) {
 		Root root = new Root(axiom.getSubClass());
 		Context context = saturationState_.getContext(root);
-		if (context != null
-				&& context.getSubsumers().contains(axiom.getSuperClass()))
+		if (context == null)
+			return failVisit(axiom);
+		// else
+		if (context.isInconsistent())
+			// everything is fine
+			return null;
+		// else
+		if (context.getSubsumers().contains(axiom.getSuperClass()))
 			return null;
 		// else
 		return failVisit(axiom);

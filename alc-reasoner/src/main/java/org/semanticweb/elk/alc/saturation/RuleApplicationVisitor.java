@@ -22,12 +22,18 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
+import java.util.Collection;
+
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegativePropagationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
@@ -37,8 +43,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Decomposed
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.util.collections.Multimap;
 
 public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> {
 
@@ -51,8 +59,10 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	@Override
 	public Void visit(ContextInitialization conclusion, Context input) {
 		Root root = input.getRoot();
-		for (IndexedClassExpression init : root)
-			producer_.produce(root, new DecomposedSubsumerImpl(init));
+		producer_.produce(root,
+				new DecomposedSubsumerImpl(root.getPositiveSubsumer()));
+		for (IndexedClassExpression init : root.getNegatitveSubsumers())
+			producer_.produce(root, new NegatedSubsumerImpl(init));
 		return null;
 	}
 
@@ -85,14 +95,22 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			producer_.produce(root, new DecomposedSubsumerImpl(
 					propagatedDisjunct));
 		}
+		if (negatedExpression instanceof IndexedObjectSomeValuesFrom) {
+			IndexedObjectSomeValuesFrom negatedExistential = (IndexedObjectSomeValuesFrom) negatedExpression;
+			if (negatedExistential.occursNegatively()) {
+				producer_.produce(root, new NegativePropagationImpl(
+						negatedExistential));
+			}
+		}
 		return null;
 	}
 
 	@Override
 	public Void visit(ForwardLink conclusion, Context input) {
-		// TODO: take into account propagations
 		Root root = input.getRoot();
-		Root fillerRoot = new Root(conclusion.getTarget());
+		IndexedObjectProperty relation = conclusion.getRelation();
+		Root fillerRoot = new Root(conclusion.getTarget(), input
+				.getNegativePropagations().get(relation));
 		producer_.produce(fillerRoot,
 				new BackwardLinkImpl(root, conclusion.getRelation()));
 		return null;
@@ -124,14 +142,37 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			// TODO: for propagations of universals should be decomposed
 			// subsumer!
 			producer_.produce(root,
-					new ComposedSubsumerImpl(conclusion.getCarry()));
+					new PossibleComposedSubsumerImpl(conclusion.getCarry()));
 		}
 		return null;
 	}
 
 	@Override
 	public Void visit(Clash conclusion, Context input) {
-		// no further rules need to be applied; backtrack should follow
+		if (!input.isDeterministic())
+			return null;
+		// propagated to backward links only if the clash is derived
+		// deterministically
+		Multimap<IndexedObjectProperty, Root> backwardLinks = input
+				.getBackwardLinks();
+		for (IndexedObjectProperty relation : backwardLinks.keySet())
+			for (Root target : backwardLinks.get(relation))
+				producer_.produce(target, conclusion);
+		return null;
+	}
+
+	@Override
+	public Void visit(NegativePropagation conclusion, Context input) {
+		Root root = input.getRoot();
+		IndexedObjectProperty relation = conclusion.getRelation();
+		Collection<IndexedClassExpression> negativeRootMembers = input
+				.getNegativePropagations().get(relation);
+		for (IndexedClassExpression positiveMember : input.getForwardLinks()
+				.get(relation)) {
+			Root targetRoot = new Root(positiveMember, negativeRootMembers);
+			producer_.produce(targetRoot,
+					new BackwardLinkImpl(root, conclusion.getRelation()));
+		}
 		return null;
 	}
 

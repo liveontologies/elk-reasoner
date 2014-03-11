@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
@@ -39,6 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Decomposed
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
@@ -98,9 +100,14 @@ public class Context {
 	private Multimap<IndexedObjectProperty, Root> backwardLinks_;
 
 	/**
-	 * propagations for the keys of {@link #backwardLinks_}
+	 * backward propagations for the keys of {@link #backwardLinks_}
 	 */
-	private Multimap<IndexedObjectProperty, IndexedClassExpression> propagations_;
+	private Multimap<IndexedObjectProperty, IndexedObjectSomeValuesFrom> propagations_;
+
+	/**
+	 * forward propagations of negations
+	 */
+	private Multimap<IndexedObjectProperty, IndexedClassExpression> negativePropagations_;
 
 	/**
 	 * disjunctions indexed by disjuncts
@@ -166,11 +173,18 @@ public class Context {
 		return backwardLinks_;
 	}
 
-	public Multimap<IndexedObjectProperty, IndexedClassExpression> getPropagations() {
+	public Multimap<IndexedObjectProperty, IndexedObjectSomeValuesFrom> getPropagations() {
 		if (propagations_ == null)
 			return Operations.emptyMultimap();
 		// else
 		return propagations_;
+	}
+
+	public Multimap<IndexedObjectProperty, IndexedClassExpression> getNegativePropagations() {
+		if (negativePropagations_ == null)
+			return Operations.emptyMultimap();
+		// else
+		return negativePropagations_;
 	}
 
 	/**
@@ -346,10 +360,19 @@ public class Context {
 		@Override
 		public Boolean visit(Propagation conclusion, Context input) {
 			if (input.propagations_ == null)
-				input.propagations_ = new HashSetMultimap<IndexedObjectProperty, IndexedClassExpression>(
+				input.propagations_ = new HashSetMultimap<IndexedObjectProperty, IndexedObjectSomeValuesFrom>(
 						16);
 			return input.propagations_.add(conclusion.getRelation(),
 					conclusion.getCarry());
+		}
+
+		@Override
+		public Boolean visit(NegativePropagation conclusion, Context input) {
+			if (input.negativePropagations_ == null)
+				input.negativePropagations_ = new HashSetMultimap<IndexedObjectProperty, IndexedClassExpression>(
+						16);
+			return input.negativePropagations_.add(conclusion.getRelation(),
+					conclusion.getNegatedCarry());
 		}
 
 		@Override
@@ -462,6 +485,20 @@ public class Context {
 					conclusion.getCarry())) {
 				if (input.propagations_.isEmpty())
 					input.propagations_ = null;
+				return true;
+			}
+			// else
+			return false;
+		}
+
+		@Override
+		public Boolean visit(NegativePropagation conclusion, Context input) {
+			if (input.negativePropagations_ == null)
+				return false;
+			if (input.negativePropagations_.remove(conclusion.getRelation(),
+					conclusion.getNegatedCarry())) {
+				if (input.negativePropagations_.isEmpty())
+					input.negativePropagations_ = null;
 				return true;
 			}
 			// else

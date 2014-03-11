@@ -34,6 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Decomposed
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 
 /**
@@ -67,6 +68,8 @@ public interface ConclusionVisitor<I, O> {
 	public O visit(DecomposedSubsumer conclusion, I input);
 
 	public O visit(Propagation conclusion, I input);
+
+	public O visit(NegativePropagation conclusion, I input);
 
 	public O visit(Clash conclusion, I input);
 

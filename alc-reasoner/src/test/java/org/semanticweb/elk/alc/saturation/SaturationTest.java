@@ -338,4 +338,66 @@ public class SaturationTest {
 						+ "SubClassOf(:E owl:Nothing)"//
 						+ ")");
 	}
+
+	@Test
+	public void testContradictionExistential() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<http://example.org/>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+						+ "SubClassOf(:B owl:Nothing)"//
+						+ ")",
+				// Expected saturation:
+				"Prefix(:=<http://example.org/>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A owl:Nothing)"//
+						+ "SubClassOf(:B owl:Nothing)"//
+						+ ")");
+	}
+
+	@Test
+	public void testPropagationDisjunction() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<http://example.org/>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R ObjectUnionOf(:B :C)))"//
+						+ "SubClassOf(:C owl:Nothing)"//
+						+ "SubClassOf(:B ObjectUnionOf(:C :D))"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:R :D) :E)"//
+						+ ")",
+				// Expected saturation:
+				"Prefix(:=<http://example.org/>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:C owl:Nothing)"//
+						+ "SubClassOf(:B :D)"//
+						+ "SubClassOf(:A :E)"//
+						+ ")");
+	}
+
+	@Test
+	public void testNonDeterministicPropagatedClash()
+			throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<http://example.org/>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R ObjectUnionOf(:B :C)))"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:R :C) :AC)"//
+						+ "SubClassOf(ObjectIntersectionOf(:A :AC) owl:Nothing)"//
+						+ "SubClassOf(:B ObjectUnionOf(:D :E))"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:R :D) :AD)"//
+						+ "SubClassOf(ObjectIntersectionOf(:A :AD) owl:Nothing)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:R :E) :F)"//
+						+ ")",
+				// Expected saturation:
+				"Prefix(:=<http://example.org/>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :F)"//
+						+ ")");
+	}
+
 }

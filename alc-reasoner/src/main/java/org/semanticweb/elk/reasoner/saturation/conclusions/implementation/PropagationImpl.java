@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  * #L%
  */
 
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
@@ -50,7 +49,7 @@ public class PropagationImpl extends AbstractConclusion implements Propagation {
 
 	private final IndexedObjectProperty relation_;
 
-	private final IndexedClassExpression carry_;
+	private final IndexedObjectSomeValuesFrom carry_;
 
 	public PropagationImpl(IndexedObjectProperty relation,
 			IndexedObjectSomeValuesFrom carry) {
@@ -59,8 +58,13 @@ public class PropagationImpl extends AbstractConclusion implements Propagation {
 	}
 
 	@Override
-	public String toString() {
-		return Propagation.NAME + relation_ + "->" + carry_;
+	public IndexedObjectProperty getRelation() {
+		return this.relation_;
+	}
+
+	@Override
+	public IndexedObjectSomeValuesFrom getCarry() {
+		return this.carry_;
 	}
 
 	@Override
@@ -69,13 +73,8 @@ public class PropagationImpl extends AbstractConclusion implements Propagation {
 	}
 
 	@Override
-	public IndexedObjectProperty getRelation() {
-		return this.relation_;
-	}
-
-	@Override
-	public IndexedClassExpression getCarry() {
-		return this.carry_;
+	public String toString() {
+		return Propagation.NAME + relation_ + "->" + carry_;
 	}
 
 }

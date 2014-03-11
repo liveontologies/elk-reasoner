@@ -23,8 +23,12 @@ package org.semanticweb.elk.alc.saturation;
  */
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BacktrackedConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.PossibleConclusionVisitor;
@@ -66,19 +70,23 @@ public class Saturation {
 					return;
 			}
 			for (;;) {
-				// todo: take from the local queue
+				// TODO: take from the local queue
 				Conclusion conclusion = context.takeToDo();
 				if (conclusion == null) {
 					conclusion = context.takeToGuess();
 					if (conclusion == null)
 						break;
 				}
+				if (conclusion instanceof BacktrackedConclusion) {
+					context.removeConclusion(conclusion);
+					continue;
+				}
 				if (!context.addConclusion(conclusion))
 					continue;
 				// else
 				conclusion.accept(ruleApplicationVisitor_, context);
-				if (!context.isDeterministic()
-						|| conclusion instanceof PossibleConclusion) {
+				if ((!context.isDeterministic() || conclusion instanceof PossibleConclusion)
+						&& !(conclusion instanceof BackwardLink)) {
 					context.pushToHistory(conclusion);
 				}
 				if (context.isInconsistent()) {
@@ -90,6 +98,15 @@ public class Saturation {
 						LOGGER_.trace("{}: backtracking {}", context.getRoot(),
 								toBacktrack);
 						context.removeConclusion(toBacktrack);
+						if (toBacktrack instanceof ForwardLink) {
+							ForwardLink link = (ForwardLink) toBacktrack;
+							Root root = context.getRoot();
+							Root fillerRoot = new Root(link.getTarget());
+							saturationState_.produce(
+									fillerRoot,
+									new BacktrackedBackwardLinkImpl(root, link
+											.getRelation()));
+						}
 						if (toBacktrack instanceof PossibleConclusion) {
 							// backtrack
 							((PossibleConclusion) toBacktrack).accept(

@@ -1,5 +1,4 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
-
 /*
  * #%L
  * ALC Reasoner
@@ -22,18 +21,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-/**
- * A {@link Conclusion} representing that some inconsistency for a concept has
- * been derived.
- * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
- * 
- * @author "Yevgeny Kazakov"
- */
-public interface Clash extends Conclusion {
+public interface BacktrackedConclusion {
 
-	public static final String NAME = "Clash";
+	// nothing so far
 
 }
