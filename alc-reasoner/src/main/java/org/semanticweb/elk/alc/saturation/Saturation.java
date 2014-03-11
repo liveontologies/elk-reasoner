@@ -25,10 +25,12 @@ package org.semanticweb.elk.alc.saturation;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BacktrackedConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.PossibleConclusionVisitor;
@@ -106,6 +108,13 @@ public class Saturation {
 									fillerRoot,
 									new BacktrackedBackwardLinkImpl(root, link
 											.getRelation()));
+						}
+						if (toBacktrack instanceof NegatedSubsumer) {
+							IndexedClassExpression negatedSubsumer = ((NegatedSubsumer) toBacktrack)
+									.getNegatedExpression();
+							saturationState_.produce(context.getRoot(),
+									new PossibleDecomposedSubsumerImpl(
+											negatedSubsumer));
 						}
 						if (toBacktrack instanceof PossibleConclusion) {
 							// backtrack
