@@ -1,4 +1,5 @@
 package org.semanticweb.elk.alc.saturation;
+
 /*
  * #%L
  * ALC Reasoner
@@ -21,14 +22,21 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.PossibleConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 
-public class BacktrackingVisitor implements
-		PossibleConclusionVisitor<Context, Void> {
+public class BacktrackingVisitor extends
+		AbstractConclusionVisitor<Context, Void> {
 
 	private final ConclusionProducer producer_;
 
@@ -36,9 +44,18 @@ public class BacktrackingVisitor implements
 		this.producer_ = conclusionProducer;
 	}
 
+	@Override
+	protected Void defaultVisit(Conclusion conclusion, Context input) {
+		// does nothing by default
+		return null;
+	}
+
 	public void visitSubsumer(Subsumer conclusion, Context input) {
-		producer_.produce(input.getRoot(),
-				new NegatedSubsumerImpl(conclusion.getExpression()));
+		IndexedClassExpression expression = conclusion.getExpression();
+		if (input.getDisjunctions().keySet().contains(expression)
+				|| input.getPropagatedSubsumers().contains(expression))
+			producer_.produce(input.getRoot(), new NegatedSubsumerImpl(
+					expression));
 	}
 
 	@Override
@@ -53,4 +70,25 @@ public class BacktrackingVisitor implements
 		return null;
 	}
 
+	@Override
+	public Void visit(NegatedSubsumer conclusion, Context input) {
+		IndexedClassExpression negatedExpression = conclusion
+				.getNegatedExpression();
+		if (input.getDisjunctions().keySet().contains(negatedExpression))
+			producer_.produce(input.getRoot(),
+					new PossibleDecomposedSubsumerImpl(negatedExpression));
+		if (input.getPropagatedSubsumers().contains(negatedExpression))
+			producer_.produce(input.getRoot(),
+					new PossibleComposedSubsumerImpl(negatedExpression));
+		return null;
+	}
+
+	@Override
+	public Void visit(ForwardLink conclusion, Context input) {
+		Root root = input.getRoot();
+		Root fillerRoot = new Root(conclusion.getTarget());
+		producer_.produce(fillerRoot, new BacktrackedBackwardLinkImpl(root,
+				conclusion.getRelation()));
+		return null;
+	}
 }

@@ -419,4 +419,26 @@ public class SaturationTest {
 						+ ")");
 	}
 
+	@Test
+	public void testSubsumedDisjunct() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<http://example.org/>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectUnionOf(:BB :B))"//
+						+ "SubClassOf(:A :AA)"//
+						+ "SubClassOf(:B :C)"//
+						+ "SubClassOf(:AA ObjectUnionOf(:C :C))"//
+						+ "SubClassOf(:AA ObjectUnionOf(:D :D))"//
+						+ "SubClassOf(ObjectIntersectionOf(:B :D) owl:Nothing)"//
+						+ ")",
+				// Expected saturation:
+				"Prefix(:=<http://example.org/>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :BB)"//
+						+ "SubClassOf(:A :C)"//
+						+ "SubClassOf(:A :D)"//
+						+ ")");
+	}
+
 }

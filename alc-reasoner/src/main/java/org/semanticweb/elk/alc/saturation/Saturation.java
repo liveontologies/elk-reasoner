@@ -23,17 +23,13 @@ package org.semanticweb.elk.alc.saturation;
  */
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BacktrackedConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.PossibleConclusionVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +45,7 @@ public class Saturation {
 
 	private final ConclusionVisitor<Context, Void> ruleApplicationVisitor_;
 
-	private final PossibleConclusionVisitor<Context, Void> backtrackingVisitor_;
+	private final ConclusionVisitor<Context, Void> backtrackingVisitor_;
 
 	public Saturation(SaturationState saturationState) {
 		this.saturationState_ = saturationState;
@@ -85,10 +81,11 @@ public class Saturation {
 				}
 				if (!context.addConclusion(conclusion))
 					continue;
-				// else
+				// else conclusion was added
 				conclusion.accept(ruleApplicationVisitor_, context);
 				if ((!context.isDeterministic() || conclusion instanceof PossibleConclusion)
-						&& !(conclusion instanceof BackwardLink)) {
+						&& !(conclusion instanceof BackwardLink)
+						&& !(conclusion instanceof PropagatedComposedSubsumer)) {
 					context.pushToHistory(conclusion);
 				}
 				if (context.isInconsistent()) {
@@ -97,31 +94,12 @@ public class Saturation {
 						Conclusion toBacktrack = context.popHistory();
 						if (toBacktrack == null)
 							break;
-						LOGGER_.trace("{}: backtracking {}", context.getRoot(),
+						LOGGER_.trace("{}: backtrack {}", context.getRoot(),
 								toBacktrack);
 						context.removeConclusion(toBacktrack);
-						if (toBacktrack instanceof ForwardLink) {
-							ForwardLink link = (ForwardLink) toBacktrack;
-							Root root = context.getRoot();
-							Root fillerRoot = new Root(link.getTarget());
-							saturationState_.produce(
-									fillerRoot,
-									new BacktrackedBackwardLinkImpl(root, link
-											.getRelation()));
-						}
-						if (toBacktrack instanceof NegatedSubsumer) {
-							IndexedClassExpression negatedSubsumer = ((NegatedSubsumer) toBacktrack)
-									.getNegatedExpression();
-							saturationState_.produce(context.getRoot(),
-									new PossibleDecomposedSubsumerImpl(
-											negatedSubsumer));
-						}
-						if (toBacktrack instanceof PossibleConclusion) {
-							// backtrack
-							((PossibleConclusion) toBacktrack).accept(
-									backtrackingVisitor_, context);
-							break;
-						}
+						toBacktrack.accept(backtrackingVisitor_, context);
+						if (toBacktrack instanceof PossibleConclusion)
+							return;
 					}
 				}
 
