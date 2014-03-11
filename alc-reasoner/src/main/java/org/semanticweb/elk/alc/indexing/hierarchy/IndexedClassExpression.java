@@ -32,6 +32,7 @@ import org.semanticweb.elk.alc.saturation.ConclusionProducer;
 import org.semanticweb.elk.alc.saturation.Context;
 import org.semanticweb.elk.alc.saturation.Root;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
@@ -195,6 +196,12 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	public static void applyCompositionRules(IndexedClassExpression subsumer,
 			Context premises, ConclusionProducer producer) {
 		Root root = premises.getRoot();
+		if (premises.getNegativeSubsumers().contains(subsumer)) {
+			// generate clash
+			producer.produce(root, ClashImpl.getInstance());
+			// nothing else should be derived
+			return;
+		}
 		if (subsumer.conjunctionsByConjunct_ != null) {
 			// conjunction introduction
 			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(

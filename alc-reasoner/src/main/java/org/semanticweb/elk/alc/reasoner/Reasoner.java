@@ -1,4 +1,5 @@
 package org.semanticweb.elk.alc.reasoner;
+
 /*
  * #%L
  * ALC Reasoner
@@ -31,6 +32,7 @@ import org.semanticweb.elk.alc.loading.ComposedAxiomLoader;
 import org.semanticweb.elk.alc.loading.ElkLoadingException;
 import org.semanticweb.elk.alc.saturation.Saturation;
 import org.semanticweb.elk.alc.saturation.SaturationState;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.util.logging.Statistics;
 import org.slf4j.Logger;
@@ -65,6 +67,11 @@ public class Reasoner {
 				ontologyIndex_, true);
 		this.axiomDeleterVisitor_ = new MainAxiomIndexerVisitor(ontologyIndex_,
 				false);
+		// adding declarations for predefined classes
+		axiomInserterVisitor_
+				.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
+		axiomInserterVisitor_
+				.indexClassDeclaration(PredefinedElkClass.OWL_THING);
 
 	}
 

@@ -53,6 +53,6 @@ abstract class AbstractSubsumer extends AbstractConclusion implements Subsumer {
 
 	@Override
 	public String toString() {
-		return "Subsumer(" + expression_.toString() + ")";
+		return Subsumer.NAME + "(" + expression_.toString() + ")";
 	}
 }

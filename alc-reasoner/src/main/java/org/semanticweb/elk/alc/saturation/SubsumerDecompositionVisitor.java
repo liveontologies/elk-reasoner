@@ -27,8 +27,11 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.alc.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjunctionImpl;
 
 /**
  * An {@link IndexedClassExpressionVisitor} applying decomposition rules using a
@@ -56,7 +59,8 @@ public class SubsumerDecompositionVisitor implements
 
 	@Override
 	public Void visit(IndexedClass element) {
-		// no rules are applicable
+		if (element.getElkClass() == PredefinedElkClass.OWL_NOTHING)
+			producer_.produce(root_, ClashImpl.getInstance());
 		return null;
 	}
 
@@ -80,7 +84,7 @@ public class SubsumerDecompositionVisitor implements
 
 	@Override
 	public Void visit(IndexedObjectUnionOf element) {
-		// TODO: apply non-deterministic rules
+		producer_.produce(root_, new DisjunctionImpl(element));
 		return null;
 	}
 

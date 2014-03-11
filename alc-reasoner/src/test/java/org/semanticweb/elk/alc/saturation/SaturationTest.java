@@ -1,4 +1,5 @@
 package org.semanticweb.elk.alc.saturation;
+
 /*
  * #%L
  * ALC Reasoner
@@ -268,6 +269,73 @@ public class SaturationTest {
 						+ "SubClassOf(:B :B)"//
 						+ "SubClassOf(:B :C)"//
 						+ "SubClassOf(:C :C)"//
+						+ ")");
+	}
+
+	@Test
+	public void testInconsistentConjunction() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<http://example.org/>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :B)"//
+						+ "SubClassOf(:A :C)"//
+						+ "SubClassOf(ObjectIntersectionOf(:B :C) owl:Nothing)"//
+						+ ")",
+				// Expected saturation:
+				"Prefix(:=<http://example.org/>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A owl:Nothing)"//
+						+ "SubClassOf(:B :B)"//
+						+ "SubClassOf(:C :C)"//
+						+ ")");
+	}
+
+	@Test
+	public void testDisjunction() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<http://example.org/>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectUnionOf(:B :C))"//
+						+ "SubClassOf(:B :D)"//
+						+ "SubClassOf(:C :D)"//
+						+ ")",
+				// Expected saturation:
+				"Prefix(:=<http://example.org/>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :A)"//
+						+ "SubClassOf(:A :D)"//
+						+ "SubClassOf(:B :B)"//
+						+ "SubClassOf(:B :D)"//
+						+ "SubClassOf(:C :C)"//
+						+ "SubClassOf(:C :D)"//
+						+ "SubClassOf(:D :D)"//
+						+ ")");
+	}
+
+	@Test
+	public void testDisjunctionBacktracking() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<http://example.org/>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectUnionOf(:B :C))"//
+						+ "SubClassOf(:B owl:Nothing)"//
+						+ "SubClassOf(:C ObjectUnionOf(:D :E))"//
+						+ "SubClassOf(:E owl:Nothing)"//
+						+ ")",
+				// Expected saturation:
+				"Prefix(:=<http://example.org/>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :A)"//
+						+ "SubClassOf(:A :C)"//
+						+ "SubClassOf(:A :D)"//
+						+ "SubClassOf(:B owl:Nothing)"//
+						+ "SubClassOf(:C :C)"//
+						+ "SubClassOf(:C :D)"//
+						+ "SubClassOf(:E owl:Nothing)"//
 						+ ")");
 	}
 }

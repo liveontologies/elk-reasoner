@@ -69,7 +69,7 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 
 	@Override
 	public String toStringStructural() {
-		return "ObjectIntersectionOf(" + this.firstDisjunct_ + ' '
+		return "ObjectUnionOf(" + this.firstDisjunct_ + ' '
 				+ this.secondDisjunct_ + ')';
 	}
 

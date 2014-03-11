@@ -1,4 +1,5 @@
 package org.semanticweb.elk.alc.saturation;
+
 /*
  * #%L
  * ALC Reasoner
@@ -24,9 +25,17 @@ package org.semanticweb.elk.alc.saturation;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.PossibleConclusionVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Saturation {
+
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(Saturation.class);
 
 	private final static Conclusion CONTEXT_INIT_ = new ContextInitializationImpl();
 
@@ -34,10 +43,13 @@ public class Saturation {
 
 	private final ConclusionVisitor<Context, Void> ruleApplicationVisitor_;
 
+	private final PossibleConclusionVisitor<Context, Void> backtrackingVisitor_;
+
 	public Saturation(SaturationState saturationState) {
 		this.saturationState_ = saturationState;
 		this.ruleApplicationVisitor_ = new RuleApplicationVisitor(
 				saturationState);
+		this.backtrackingVisitor_ = new BacktrackingVisitor(saturationState);
 	}
 
 	public void submit(IndexedClassExpression expression) {
@@ -48,16 +60,46 @@ public class Saturation {
 	public void process() {
 		for (;;) {
 			Context context = saturationState_.pollActiveContext();
-			if (context == null)
-				return;
+			if (context == null) {
+				context = saturationState_.pollPossibleContext();
+				if (context == null)
+					return;
+			}
 			for (;;) {
-				Conclusion unprocessed = context.takeToDo();
-				if (unprocessed == null)
-					break;
-				if (context.addConclusion(unprocessed))
-					unprocessed.accept(ruleApplicationVisitor_, context);
+				// todo: take from the local queue
+				Conclusion conclusion = context.takeToDo();
+				if (conclusion == null) {
+					conclusion = context.takeToGuess();
+					if (conclusion == null)
+						break;
+				}
+				if (!context.addConclusion(conclusion))
+					continue;
+				// else
+				conclusion.accept(ruleApplicationVisitor_, context);
+				if (!context.isDeterministic()
+						|| conclusion instanceof PossibleConclusion) {
+					context.pushToHistory(conclusion);
+				}
+				if (context.isInconsistent()) {
+					context.clearToDo();
+					for (;;) {
+						Conclusion toBacktrack = context.popHistory();
+						if (toBacktrack == null)
+							break;
+						LOGGER_.trace("{}: backtracking {}", context.getRoot(),
+								toBacktrack);
+						context.removeConclusion(toBacktrack);
+						if (toBacktrack instanceof PossibleConclusion) {
+							// backtrack
+							((PossibleConclusion) toBacktrack).accept(
+									backtrackingVisitor_, context);
+							break;
+						}
+					}
+				}
+
 			}
 		}
 	}
-
 }

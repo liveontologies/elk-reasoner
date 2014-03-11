@@ -25,19 +25,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
 
 /**
- * A visitor pattern for {@link Conclusion}s together with additional input and
- * output parameters
+ * A visitor pattern for {@link PossibleConclusion}s together with
+ * additional input and output parameters
  * 
  * @author Pavel Klinov
  * 
@@ -49,22 +43,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
  * @param <O>
  *            the type of output parameter with which this visitor works
  */
-public interface ConclusionVisitor<I, O> {
-
-	public O visit(BackwardLink conclusion, I input);
+public interface PossibleConclusionVisitor<I, O> {
 
 	public O visit(ComposedSubsumer conclusion, I input);
 
-	public O visit(NegatedSubsumer conclusion, I input);
-
-	public O visit(Disjunction conclusion, I input);
-
-	public O visit(ContextInitialization conclusion, I input);
-
 	public O visit(DecomposedSubsumer conclusion, I input);
-
-	public O visit(Propagation conclusion, I input);
-
-	public O visit(Clash conclusion, I input);
 
 }

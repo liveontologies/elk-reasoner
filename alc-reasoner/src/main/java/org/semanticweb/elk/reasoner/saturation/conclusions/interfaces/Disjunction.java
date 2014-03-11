@@ -1,8 +1,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
-
 /*
  * #%L
- * ELK Reasoner
+ * ALC Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
@@ -24,25 +23,12 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 
-/**
- * A {@link Conclusion} representing a subsumer {@link IndexedClassExpression}
- * of the root {@link IndexedClassExpression} for which it is produced.
- * Intuitively, if a subclass axiom {@code SubClassOf(:A :B)} is derived by
- * inference rules, then a {@link Subsumer} corresponding to {@code :B} can be
- * produced for the context with root {@code :A}
- * 
- * @author Frantisek Simancik
- * @author "Yevgeny Kazakov"
- * 
- */
-public interface Subsumer extends Conclusion {
+public interface Disjunction extends Conclusion {
 
-	public static final String NAME = "Subsumer";
+	public static final String NAME = "Disjunction";
 
-	/**
-	 * @return the {@code IndexedClassExpression} represented by this
-	 *         {@link Subsumer}
-	 */
-	public IndexedClassExpression getExpression();
+	public IndexedClassExpression getWatchedDisjunct();
+
+	public IndexedClassExpression getPropagatedDisjunct();
 
 }
