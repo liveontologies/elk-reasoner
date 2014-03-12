@@ -25,11 +25,13 @@ package org.semanticweb.elk.alc.reasoner;
 import org.semanticweb.elk.alc.indexing.hierarchy.ChangeIndexingProcessor;
 import org.semanticweb.elk.alc.indexing.hierarchy.ElkAxiomIndexingVisitor;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.alc.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.alc.loading.AxiomLoader;
 import org.semanticweb.elk.alc.loading.ComposedAxiomLoader;
 import org.semanticweb.elk.alc.loading.ElkLoadingException;
+import org.semanticweb.elk.alc.saturation.Context;
 import org.semanticweb.elk.alc.saturation.Saturation;
 import org.semanticweb.elk.alc.saturation.SaturationState;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
@@ -127,14 +129,31 @@ public class Reasoner {
 		forceLoading();
 		SaturationState saturationState = new SaturationState();
 		Saturation saturation = new Saturation(saturationState);
-		Statistics.logOperationStart("saturation", LOGGER_);
+		Statistics.logOperationStart("concept satisfiability testing", LOGGER_);
 		try {
 			for (IndexedClass initialClass : ontologyIndex_.getIndexedClasses()) {
 				saturation.submit(initialClass);
 				saturation.process();
 			}
 		} finally {
-			Statistics.logOperationFinish("saturation", LOGGER_);
+			Statistics.logOperationFinish("concept satisfiability testing",
+					LOGGER_);
+			Statistics.logMemoryUsage(LOGGER_);
+		}
+		Statistics.logOperationStart("classification", LOGGER_);
+		try {
+			for (IndexedClass initialClass : ontologyIndex_.getIndexedClasses()) {
+				Context context = saturationState.getContext(initialClass);
+				for (IndexedClassExpression possibleSubsumer : context
+						.getPossibleSubsumers()) {
+					if (possibleSubsumer instanceof IndexedClass) {
+						saturation.submit(initialClass, possibleSubsumer);
+					}
+				}
+				saturation.process();
+			}
+		} finally {
+			Statistics.logOperationFinish("classification", LOGGER_);
 			Statistics.logMemoryUsage(LOGGER_);
 		}
 		return saturationState;

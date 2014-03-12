@@ -59,6 +59,12 @@ public class Saturation {
 		saturationState_.produce(root, CONTEXT_INIT_);
 	}
 
+	public void submit(IndexedClassExpression expression,
+			IndexedClassExpression possibleSubsumer) {
+		Root root = new Root(expression, possibleSubsumer);
+		saturationState_.produce(root, CONTEXT_INIT_);
+	}
+
 	public void process() {
 		for (;;) {
 			Context context = saturationState_.pollActiveContext();
@@ -82,6 +88,8 @@ public class Saturation {
 				if (!context.addConclusion(conclusion))
 					continue;
 				// else conclusion was added
+				LOGGER_.trace("{}: processing {}", context.getRoot(),
+						conclusion);
 				conclusion.accept(ruleApplicationVisitor_, context);
 				if ((!context.isDeterministic() || conclusion instanceof PossibleConclusion)
 						&& !(conclusion instanceof BackwardLink)

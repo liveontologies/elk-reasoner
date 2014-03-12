@@ -200,6 +200,19 @@ public class Context {
 		return negativePropagations_;
 	}
 
+	public Set<IndexedClassExpression> getPossibleSubsumers() {
+		if (history_ == null)
+			return Collections.emptySet();
+		Set<IndexedClassExpression> result = new ArrayHashSet<IndexedClassExpression>(
+				32);
+		for (Conclusion nonDeterministic : history_) {
+			if (nonDeterministic instanceof Subsumer) {
+				result.add(((Subsumer) nonDeterministic).getExpression());
+			}
+		}
+		return result;
+	}
+
 	/**
 	 * Adds the given {@link Conclusion} to this {@link Context}
 	 * 

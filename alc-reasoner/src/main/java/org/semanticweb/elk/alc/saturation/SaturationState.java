@@ -23,13 +23,14 @@ package org.semanticweb.elk.alc.saturation;
  */
 
 import java.util.ArrayDeque;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
-import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ public class SaturationState implements ConclusionProducer {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SaturationState.class);
 
-	private final Map<Root, Context> contextsByRoots_;
+	private final Map<Root, Root> existingRoots_;
 
 	/**
 	 * {@link Context}s that have unprocessed {@link Conclusion}s, i.e., for
@@ -58,16 +59,21 @@ public class SaturationState implements ConclusionProducer {
 
 	private final Conclusion init_ = new ContextInitializationImpl();
 
+	private Context currentContext_ = null;
+
 	public SaturationState() {
-		this.contextsByRoots_ = new ArrayHashMap<Root, Context>(1024);
+		this.existingRoots_ = new HashMap<Root, Root>(1024);
 		this.activeContexts_ = new ArrayDeque<Context>(1024);
 		this.possibleContexts_ = new ArrayDeque<Context>(1024);
 	}
 
 	@Override
 	public void produce(Root root, Conclusion conclusion) {
-		LOGGER_.trace("{}: produced {}", root, conclusion);
-		Context context = getCreateContext(root);
+		produce(getCreateContext(root), conclusion);
+	}
+
+	void produce(Context context, Conclusion conclusion) {
+		LOGGER_.trace("{}: produced {}", context.getRoot(), conclusion);
 		if (conclusion instanceof PossibleConclusion) {
 			if (context.addToGuess((PossibleConclusion) conclusion))
 				possibleContexts_.add(context);
@@ -78,15 +84,30 @@ public class SaturationState implements ConclusionProducer {
 	}
 
 	public Context pollActiveContext() {
-		return activeContexts_.poll();
+		currentContext_ = activeContexts_.poll();
+		return currentContext_;
 	}
 
 	public Context pollPossibleContext() {
-		return possibleContexts_.poll();
+		currentContext_ = possibleContexts_.poll();
+		return currentContext_;
+	}
+
+	public Context getContext(IndexedClassExpression positiveMember,
+			IndexedClassExpression... negativeMembers) {
+		return getContext(new Root(positiveMember, negativeMembers));
 	}
 
 	Context getContext(Root root) {
-		return contextsByRoots_.get(root);
+		Context result = root.getContext();
+		if (result != null)
+			return result;
+		// else, try to find equal root
+		Root equalRoot = existingRoots_.get(root);
+		if (equalRoot == null)
+			return null;
+		// else
+		return equalRoot.getContext();
 	}
 
 	Context getCreateContext(Root root) {
@@ -95,7 +116,8 @@ public class SaturationState implements ConclusionProducer {
 			return result;
 		// else create new
 		result = new Context(root);
-		contextsByRoots_.put(root, result);
+		root.setContext(result);
+		existingRoots_.put(root, root);
 		produce(root, init_);
 		return result;
 	}

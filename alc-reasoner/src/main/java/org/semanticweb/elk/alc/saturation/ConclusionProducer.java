@@ -1,4 +1,5 @@
 package org.semanticweb.elk.alc.saturation;
+
 /*
  * #%L
  * ALC Reasoner
@@ -32,8 +33,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 public interface ConclusionProducer {
 
 	/**
-	 * Tells that the given {@link Conclusion} is derived for the
-	 * {@link ContextPremises} with the given {@link Root}.
+	 * Tells that the given {@link Conclusion} is derived as subsumer of
+	 * elements in the given {@link Root}.
 	 * 
 	 * @param root
 	 * @param conclusion

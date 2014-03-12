@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * A key for the {@link Context}. Two {@link Root}s are equal if they contain
@@ -42,6 +43,8 @@ public class Root {
 	private final IndexedClassExpression positiveSubsumer_;
 
 	private Set<IndexedClassExpression> negativeSubsumers_;
+
+	private Context context_;
 
 	public Root(IndexedClassExpression positiveSubsumer,
 			IndexedClassExpression... negativeSubsumers) {
@@ -79,8 +82,8 @@ public class Root {
 
 	@Override
 	public int hashCode() {
-		return (positiveSubsumer_.hashCode() + getNegatitveSubsumers()
-				.hashCode());
+		return HashGenerator.combinedHashCode(positiveSubsumer_,
+				getNegatitveSubsumers());
 	}
 
 	@Override
@@ -100,4 +103,13 @@ public class Root {
 				+ (negativeSubsumers_ == null ? "" : "~"
 						+ getNegatitveSubsumers().toString());
 	}
+
+	void setContext(Context context) {
+		this.context_ = context;
+	}
+
+	Context getContext() {
+		return this.context_;
+	}
+
 }

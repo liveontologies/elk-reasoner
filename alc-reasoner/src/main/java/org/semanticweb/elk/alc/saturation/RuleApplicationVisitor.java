@@ -130,10 +130,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		IndexedObjectProperty relation = conclusion.getRelation();
 		if (input.isDeterministic() && input.isInconsistent()) {
 			// propagate clash
-			Multimap<IndexedObjectProperty, Root> backwardLinks = input
-					.getBackwardLinks();
-			for (Root target : backwardLinks.get(relation))
-				producer_.produce(target, ClashImpl.getInstance());
+			producer_.produce(conclusion.getSource(), ClashImpl.getInstance());
 		}
 		if (input.getBackwardLinks().get(relation).size() == 1)
 			// first link; generating propagations
