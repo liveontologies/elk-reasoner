@@ -46,12 +46,12 @@ public class TraceState {
 
 	private final ContextTracingFactory tracingFactory_;
 
-	public TraceState(SaturationState<?> mainState, int maxWorkers) {
+	public TraceState(SaturationState<?> mainState) {
 		traceStore_ = new SimpleCentralizedTraceStore();
 		tracingSaturationState_ = new LocalTracingSaturationState(
 				mainState.getOntologyIndex());
 		tracingFactory_ = new NonRecursiveContextTracingFactory(mainState,
-				tracingSaturationState_, traceStore_, maxWorkers);
+				tracingSaturationState_, traceStore_);
 	}
 
 	public TraceStore getTraceStore() {

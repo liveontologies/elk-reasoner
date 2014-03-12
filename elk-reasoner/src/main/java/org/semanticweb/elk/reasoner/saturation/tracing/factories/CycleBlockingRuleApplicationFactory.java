@@ -39,10 +39,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.HybridLocalRuleApplicationConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalizedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
@@ -95,37 +93,27 @@ public class CycleBlockingRuleApplicationFactory extends
 		inferenceReader_ = traceStore.getReader();
 	}
 
+
 	@Override
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<Context, Boolean> getConclusionProcessor(
 			RuleVisitor ruleVisitor,
-			SaturationStateWriter<? extends TracedContext> localWriter/*
-																	 * this
-																	 * producer
-																	 * is
-																	 * responsible
-																	 * for
-																	 * blocking
-																	 * cyclic
-																	 * inferences
-																	 */,
-			SaturationStatistics statistics) {
+			// this writer will block cyclic inferences
+			SaturationStateWriter<? extends TracedContext> localWriter,
+			SaturationStatistics localStatistics) {
 
 		SaturationStateWriter<?> cycleBlocker = new CycleBlockingWriter(
 				localWriter);
 
 		return new ComposedConclusionVisitor<Context>(
-				// checking the conclusion against the main saturation state
-				new LocalizedConclusionVisitor(
-						// conclusion already occurs there
-						new ConclusionOccurrenceCheckingVisitor(),
-						mainSaturationState_),
+		// Checking the conclusion against the main saturation state and saves
+		// conclusions if the context doesn't yet exist. Returns true when the
+		// context exists but the conclusion is missing.
+				new MissingContextChecker(),
 				// if all fine, insert the conclusion to the local context copy
 				// and write the inference
-				new InferenceInserter(
-						new ConclusionInsertionVisitor/* ConclusionInitializingInsertionVisitor */(
-								cycleBlocker), cycleBlocker,
-						getSaturationStatistics()),
+				new InferenceInserter(new ConclusionInsertionVisitor(
+						cycleBlocker), cycleBlocker, getSaturationStatistics()),
 				// apply only local rules and produce conclusion only to the
 				// locally copies
 				new HybridLocalRuleApplicationConclusionVisitor(
@@ -265,6 +253,32 @@ public class CycleBlockingRuleApplicationFactory extends
 				}
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private class MissingContextChecker extends AbstractConclusionVisitor<Context, Boolean> {
+		
+		@Override
+		protected Boolean defaultVisit(Conclusion conclusion,
+				Context context) {
+			IndexedClassExpression root = context.getRoot();
+			Context mainContext = mainSaturationState_.getContext(root);
+			TracedContext localContext = getSaturationState().getContext(conclusion.getSourceRoot(root));
+			
+			if (mainContext == null/* || !mainContext.containsConclusion(conclusion)*/) {
+				localContext.addMissingConclusion(root, conclusion);
+				
+				return Boolean.FALSE;
+			}
+			
+			return Boolean.TRUE;
+		}
+
 	}
 
 }

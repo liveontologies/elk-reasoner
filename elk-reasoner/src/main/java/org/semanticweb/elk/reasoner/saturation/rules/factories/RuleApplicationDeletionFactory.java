@@ -65,7 +65,7 @@ public class RuleApplicationDeletionFactory extends
 	}
 
 	@Override
-	SaturationStateWriter<? extends Context> getBaseWriter(
+	protected SaturationStateWriter<? extends Context> getBaseWriter(
 			ContextCreationListener creationListener,
 			ContextModificationListener modificationListener) {
 		// writer cannot create new contexts
@@ -74,7 +74,7 @@ public class RuleApplicationDeletionFactory extends
 	}
 
 	@Override
-	SaturationStateWriter<Context> getFinalWriter(
+	protected SaturationStateWriter<Context> getFinalWriter(
 			SaturationStateWriter<? extends Context> writer) {
 		// only write to exiting contexts
 		return new ContextExistenceCheckingWriter<Context>(writer,

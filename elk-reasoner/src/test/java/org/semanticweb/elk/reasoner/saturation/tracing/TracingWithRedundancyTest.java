@@ -55,7 +55,10 @@ public class TracingWithRedundancyTest {
 		//now add  A => R some (R some C) to which the decomposition rules should not be applied
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass c = factory.getClass(new ElkFullIri("http://example.org/C"));
+		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
 		ElkObjectProperty r = factory.getObjectProperty(new ElkFullIri("http://example.org/R"));
+		ElkClassExpression rSomeC = factory.getObjectSomeValuesFrom(r, c);
+		ElkClassExpression rSomeD = factory.getObjectSomeValuesFrom(r, d);
 		ElkClassExpression rSomeRSomeC = factory.getObjectSomeValuesFrom(r, factory.getObjectSomeValuesFrom(r, c));
 		
 		reasoner.setAllowIncrementalMode(true);
@@ -66,9 +69,9 @@ public class TracingWithRedundancyTest {
 		
 		reasoner.getTaxonomyQuietly();
 		//now test that when we trace A, we also trace inferences in R some (R some C)
-		reasoner.explainSubsumption(a, rSomeRSomeC);
-		// will fail if no context for R some (R some C) has been created
-		TracingTestUtils.checkNumberOfInferences(rSomeRSomeC, rSomeRSomeC, reasoner, 1);
+		reasoner.explainSubsumption(a, rSomeD);
+		// will fail if no context for "R some C" has been created or if it hasn't been traced
+		TracingTestUtils.checkNumberOfInferences(rSomeC, d, reasoner, 1);
 	}
 	
 }

@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * @author "Yevgeny Kazakov"
  * 
  */
-class WorkerLocalizedSaturationStateWriter<C extends Context> extends SaturationStateWriterWrap<C> {
+public class WorkerLocalizedSaturationStateWriter<C extends Context> extends SaturationStateWriterWrap<C> {
 
 	private final WorkerLocalTodo localTodo_;
 

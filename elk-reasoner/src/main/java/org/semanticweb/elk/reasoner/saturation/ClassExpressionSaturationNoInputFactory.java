@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-class ClassExpressionSaturationNoInputFactory implements
+public class ClassExpressionSaturationNoInputFactory implements
 		ProcessorFactory<ClassExpressionSaturationNoInputFactory.Engine> {
 
 	private static final Logger LOGGER_ = LoggerFactory
@@ -56,15 +56,28 @@ class ClassExpressionSaturationNoInputFactory implements
 		ruleAppFactory_ = ruleAppFactory;
 		contextModificationListener_ = contextModificationListener;
 	}
+	
+	public ClassExpressionSaturationNoInputFactory(
+			final RuleApplicationFactory<?> ruleAppFactory) {
+		this(ruleAppFactory, ContextModificationListener.DUMMY);
+	}
 
 	@Override
 	public Engine getEngine() {
 		return new Engine();
 	}
+	
+	public Engine getEngine(ContextModificationListener listener) {
+		return new Engine(listener);
+	}
 
 	@Override
 	public void finish() {
 		ruleAppFactory_.dispose();
+	}
+	
+	protected RuleApplicationFactory<?> getRuleApplicationFactory() {
+		return ruleAppFactory_;
 	}
 
 	public SaturationStatistics getRuleAndConclusionStatistics() {
@@ -78,12 +91,17 @@ class ClassExpressionSaturationNoInputFactory implements
 		ruleAppFactory_.getSaturationStatistics().print(LOGGER_);
 	}
 
-	class Engine implements Processor {
+	public class Engine implements Processor {
 
-		private final Processor engine_ = ruleAppFactory_.getEngine(
-				ContextCreationListener.DUMMY, contextModificationListener_);
+		private final Processor engine_;
 
 		private Engine() {
+			this(contextModificationListener_);
+		}
+		
+		private Engine(ContextModificationListener listener) {
+			engine_ =  ruleAppFactory_.getEngine(
+					ContextCreationListener.DUMMY, listener);
 		}
 
 		@Override

@@ -100,13 +100,33 @@ public class LocalTracingSaturationState extends
 		 * derived through the inference I, then we store C -> I when we derive
 		 * I from C.
 		 */
-		private HashListMultimap<Conclusion, Inference> blockedInferences_;
+		private Multimap<Conclusion, Inference> blockedInferences_;
+		/**
+		 * The set of conclusions missing in the main saturation state at the
+		 * time of tracing (if the closure was computed w.r.t. a subset of all
+		 * rules, e.g. only non-redundant rules). Indexed by roots of contexts
+		 * where these conclusions should be stored.
+		 */
+		private final Multimap<IndexedClassExpression, Conclusion> missingConclusions_; 
 
 		public TracedContext(IndexedClassExpression root) {
 			super(root);
 			beingTraced_ = new AtomicBoolean(false);
+			missingConclusions_ = new HashListMultimap<IndexedClassExpression, Conclusion>();
 		}
 
+		public Multimap<IndexedClassExpression, Conclusion> getMissingConclusions() {
+			return missingConclusions_;
+		}
+		
+		public void addMissingConclusion(IndexedClassExpression root, Conclusion conclusion) {
+			missingConclusions_.add(root, conclusion);
+		}
+		
+		public void clearMissingConclusions() {
+			missingConclusions_.clear();
+		}
+		
 		public Multimap<Conclusion, Inference> getBlockedInferences() {
 			if (blockedInferences_ == null) {
 				blockedInferences_ = new HashListMultimap<Conclusion, Inference>();

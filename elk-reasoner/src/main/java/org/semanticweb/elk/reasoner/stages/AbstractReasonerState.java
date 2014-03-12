@@ -655,7 +655,7 @@ public abstract class AbstractReasonerState {
 	}
 
 	private void createTraceState(SaturationState<?> mainState) {
-		traceState = new TraceState(mainState, getNumberOfWorkers());
+		traceState = new TraceState(mainState);
 	}
 
 	TraceState getTraceState() {
