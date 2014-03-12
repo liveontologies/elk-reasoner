@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
+
 /*
  * #%L
  * ALC Reasoner
@@ -26,7 +27,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSub
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 
-public class NegatedSubsumerImpl implements NegatedSubsumer {
+public class NegatedSubsumerImpl extends AbstractConclusion implements
+		NegatedSubsumer {
 
 	/**
 	 * the implied {@code IndexedClassExpression} negation fo which is

@@ -22,8 +22,12 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
+import java.util.Collection;
+
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagatedClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
@@ -32,6 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 
@@ -85,10 +90,31 @@ public class BacktrackingVisitor extends
 
 	@Override
 	public Void visit(ForwardLink conclusion, Context input) {
-		Root root = input.getRoot();
 		Root fillerRoot = new Root(conclusion.getTarget());
-		producer_.produce(fillerRoot, new BacktrackedBackwardLinkImpl(root,
-				conclusion.getRelation()));
+		backtrackLink(input, conclusion.getRelation(), fillerRoot);
 		return null;
 	}
+
+	@Override
+	public Void visit(NegativePropagation conclusion, Context input) {
+		IndexedObjectProperty relation = conclusion.getRelation();
+		Collection<IndexedClassExpression> negativeRootMembers = input
+				.getNegativePropagations().get(relation);
+		for (IndexedClassExpression positiveMember : input.getForwardLinks()
+				.get(relation)) {
+			Root targetRoot = new Root(positiveMember, negativeRootMembers);
+			backtrackLink(input, conclusion.getRelation(), targetRoot);
+		}
+		return null;
+	}
+
+	private void backtrackLink(Context input, IndexedObjectProperty relation,
+			Root targetRoot) {
+		producer_.produce(targetRoot,
+				new BacktrackedBackwardLinkImpl(input.getRoot(), relation));
+		input.removeConclusion(new PropagatedClashImpl(relation,
+				targetRoot));
+
+	}
+
 }

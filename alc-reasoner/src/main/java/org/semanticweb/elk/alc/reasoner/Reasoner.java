@@ -131,9 +131,13 @@ public class Reasoner {
 		Saturation saturation = new Saturation(saturationState);
 		Statistics.logOperationStart("concept satisfiability testing", LOGGER_);
 		try {
+			int count = 0;
 			for (IndexedClass initialClass : ontologyIndex_.getIndexedClasses()) {
 				saturation.submit(initialClass);
 				saturation.process();
+				count++;
+				if ((count / 1000) * 1000 == count)
+					LOGGER_.info("{} concepts processed", count);
 			}
 		} finally {
 			Statistics.logOperationFinish("concept satisfiability testing",
@@ -142,15 +146,23 @@ public class Reasoner {
 		}
 		Statistics.logOperationStart("classification", LOGGER_);
 		try {
+			int count = 0;
+			int countSubsumers = 0;
 			for (IndexedClass initialClass : ontologyIndex_.getIndexedClasses()) {
 				Context context = saturationState.getContext(initialClass);
 				for (IndexedClassExpression possibleSubsumer : context
 						.getPossibleSubsumers()) {
 					if (possibleSubsumer instanceof IndexedClass) {
 						saturation.submit(initialClass, possibleSubsumer);
+						countSubsumers++;
 					}
 				}
 				saturation.process();
+				count++;
+				if ((count / 1000) * 1000 == count)
+					LOGGER_.info(
+							"{} concepts processed ({} possible subsumers in evarage)",
+							count, countSubsumers / count);
 			}
 		} finally {
 			Statistics.logOperationFinish("classification", LOGGER_);

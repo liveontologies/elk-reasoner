@@ -352,8 +352,55 @@ public class SaturationTest {
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
-						+ "SubClassOf(:A owl:Nothing)"//
 						+ "SubClassOf(:B owl:Nothing)"//
+						+ "SubClassOf(:A owl:Nothing)"//
+						+ ")");
+	}
+
+	@Test
+	public void testContradictionExistentialClashPropagation()
+			throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectUnionOf(:B :C))"//
+						+ "SubClassOf(:B ObjectSomeValuesFrom(:R ObjectIntersectionOf(:D :D)))"//
+						+ "SubClassOf(:C ObjectSomeValuesFrom(:S ObjectIntersectionOf(:D :D)))"//
+						+ "SubClassOf(:D owl:Nothing)"//
+						+ ")",
+				// Expected saturation:
+				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:B owl:Nothing)"//
+						+ "SubClassOf(:C owl:Nothing)"//
+						+ "SubClassOf(:A owl:Nothing)"//
+						+ ")");
+	}
+
+	@Test
+	public void testContradictionExistentialChainClashPropagation()
+			throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R ObjectIntersectionOf(:B :B)))"//
+						+ "SubClassOf(:B ObjectUnionOf(:C :D))"//
+						+ "SubClassOf(:C ObjectSomeValuesFrom(:R ObjectIntersectionOf(:E :E)))"//
+						+ "SubClassOf(:D ObjectSomeValuesFrom(:S ObjectIntersectionOf(:E :E)))"//
+						+ "SubClassOf(:E owl:Nothing)"//
+						+ ")",
+				// Expected saturation:
+				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:E owl:Nothing)"//
+						+ "SubClassOf(:C owl:Nothing)"//
+						+ "SubClassOf(:D owl:Nothing)"//
+						+ "SubClassOf(:B owl:Nothing)"//
+						+ "SubClassOf(:A owl:Nothing)"//
 						+ ")");
 	}
 

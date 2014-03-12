@@ -1,5 +1,4 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
-
 /*
  * #%L
  * ALC Reasoner
@@ -22,30 +21,32 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  * #L%
  */
 
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
+import org.semanticweb.elk.alc.saturation.Root;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 
-public class NegativePropagationImpl extends AbstractConclusion implements
-		NegativePropagation {
+public class PropagatedClashImpl extends AbstractConclusion implements
+		PropagatedClash {
 
-	private final IndexedObjectSomeValuesFrom negatedExistential_;
+	private final IndexedObjectProperty relation_;
 
-	public NegativePropagationImpl(
-			IndexedObjectSomeValuesFrom negatedExistential) {
-		this.negatedExistential_ = negatedExistential;
+	private final Root inconsistentRoot_;
+
+	public PropagatedClashImpl(IndexedObjectProperty relation,
+			Root inconsistentRoot) {
+		this.relation_ = relation;
+		this.inconsistentRoot_ = inconsistentRoot;
 	}
 
 	@Override
 	public IndexedObjectProperty getRelation() {
-		return negatedExistential_.getRelation();
+		return this.relation_;
 	}
 
 	@Override
-	public IndexedClassExpression getNegatedCarry() {
-		return negatedExistential_.getFiller();
+	public Root getInconsistentRoot() {
+		return this.inconsistentRoot_;
 	}
 
 	@Override
@@ -55,8 +56,7 @@ public class NegativePropagationImpl extends AbstractConclusion implements
 
 	@Override
 	public String toString() {
-		return NegativePropagation.NAME + "(" + getRelation() + " "
-				+ getNegatedCarry() + ")";
+		return PropagatedClash.NAME + "(" + relation_ + " "
+				+ inconsistentRoot_ + ")";
 	}
-
 }

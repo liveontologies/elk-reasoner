@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 /*
@@ -9,7 +6,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +37,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagated
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 
 /**
- * A visitor pattern for {@link Conclusion}s together with additional input and
- * output parameters
+ * A {@link ConclusionVisitor} that does nothing for the visited
+ * {@link Conclusion}. Used as a skeleton to construct visitors so not to forget
+ * to use new types of {@link Conclusion}s.
  * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
  * @author "Yevgeny Kazakov"
  * 
  * @param <I>
@@ -53,30 +48,78 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
  * @param <O>
  *            the type of output parameter with which this visitor works
  */
-public interface ConclusionVisitor<I, O> {
+class DummyConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 
-	public O visit(ForwardLink conclusion, I input);
+	/**
+	 * Dummy default visiting method
+	 * 
+	 * @param conclusion
+	 * @param input
+	 * @return
+	 */
+	protected O defaultVisit(Conclusion conclusion, I input) {
+		// does nothing
+		return null;
+	}
 
-	public O visit(BackwardLink conclusion, I input);
+	@Override
+	public O visit(ComposedSubsumer conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
 
-	public O visit(ComposedSubsumer conclusion, I input);
+	@Override
+	public O visit(DecomposedSubsumer conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
 
-	public O visit(PropagatedComposedSubsumer conclusion, I input);
+	@Override
+	public O visit(PropagatedComposedSubsumer conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
 
-	public O visit(PropagatedClash conclusion, I input);
+	@Override
+	public O visit(PropagatedClash conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
 
-	public O visit(NegatedSubsumer conclusion, I input);
+	@Override
+	public O visit(BackwardLink conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
 
-	public O visit(Disjunction conclusion, I input);
+	@Override
+	public O visit(ContextInitialization conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
 
-	public O visit(ContextInitialization conclusion, I input);
+	@Override
+	public O visit(ForwardLink conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
 
-	public O visit(DecomposedSubsumer conclusion, I input);
+	@Override
+	public O visit(NegatedSubsumer conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
 
-	public O visit(Propagation conclusion, I input);
+	@Override
+	public O visit(Disjunction conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
 
-	public O visit(NegativePropagation conclusion, I input);
+	@Override
+	public O visit(Propagation conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
 
-	public O visit(Clash conclusion, I input);
+	@Override
+	public O visit(NegativePropagation conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(Clash conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
 
 }

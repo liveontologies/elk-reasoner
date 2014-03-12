@@ -23,11 +23,13 @@ package org.semanticweb.elk.alc.saturation;
  */
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BacktrackedConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.slf4j.Logger;
@@ -81,6 +83,8 @@ public class Saturation {
 					if (conclusion == null)
 						break;
 				}
+				LOGGER_.trace("{}: processing {}", context.getRoot(),
+						conclusion);
 				if (conclusion instanceof BacktrackedConclusion) {
 					context.removeConclusion(conclusion);
 					continue;
@@ -88,27 +92,34 @@ public class Saturation {
 				if (!context.addConclusion(conclusion))
 					continue;
 				// else conclusion was added
-				LOGGER_.trace("{}: processing {}", context.getRoot(),
-						conclusion);
 				conclusion.accept(ruleApplicationVisitor_, context);
 				if ((!context.isDeterministic() || conclusion instanceof PossibleConclusion)
 						&& !(conclusion instanceof BackwardLink)
-						&& !(conclusion instanceof PropagatedComposedSubsumer)) {
+						&& !(conclusion instanceof PropagatedComposedSubsumer)
+						&& !(conclusion instanceof PropagatedClash)) {
+					LOGGER_.trace("{}: to history: {}", context.getRoot(),
+							conclusion);
 					context.pushToHistory(conclusion);
 				}
-				if (context.isInconsistent()) {
+				if (context.hasClash()) {
 					context.clearToDo();
 					for (;;) {
 						Conclusion toBacktrack = context.popHistory();
-						if (toBacktrack == null)
+						if (toBacktrack == null) {
+							LOGGER_.trace("{}: nothing to backtrack",
+									context.getRoot());
 							break;
+						}
 						LOGGER_.trace("{}: backtrack {}", context.getRoot(),
 								toBacktrack);
-						context.removeConclusion(toBacktrack);
 						toBacktrack.accept(backtrackingVisitor_, context);
+						context.removeConclusion(toBacktrack);
 						if (toBacktrack instanceof PossibleConclusion)
-							return;
+							break;
 					}
+					if (!context.getPropagatedClashes().isEmpty())
+						saturationState_.produce(context,
+								ClashImpl.getInstance());
 				}
 
 			}

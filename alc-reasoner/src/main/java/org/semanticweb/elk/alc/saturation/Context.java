@@ -42,6 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLin
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
@@ -78,7 +79,7 @@ public class Context {
 	 * {@code true} if some inconsistency has been derived in this
 	 * {@link Context}
 	 */
-	private boolean isInconsistent_ = false;
+	private boolean hasClash_ = false;
 
 	/**
 	 * the common super-classes of the {@link Root}
@@ -119,6 +120,12 @@ public class Context {
 	 * subsumers propagated from other contexts that need to be guessed
 	 */
 	private Set<IndexedObjectSomeValuesFrom> propagatedSubsumers_;
+
+	/**
+	 * roots for inconsistent {@link Context}s with backward links to this
+	 * {@link Context}
+	 */
+	private Multimap<IndexedObjectProperty, Root> propagatedClashes_;
 
 	/**
 	 * {@link Conclusion}s to which the rules are yet to be applied
@@ -170,6 +177,13 @@ public class Context {
 			return Collections.emptySet();
 		// else
 		return propagatedSubsumers_;
+	}
+
+	public Multimap<IndexedObjectProperty, Root> getPropagatedClashes() {
+		if (propagatedClashes_ == null)
+			return Operations.emptyMultimap();
+		// else
+		return propagatedClashes_;
 	}
 
 	public Multimap<IndexedObjectProperty, IndexedClassExpression> getForwardLinks() {
@@ -295,8 +309,12 @@ public class Context {
 		return result;
 	}
 
+	public boolean hasClash() {
+		return hasClash_;
+	}
+
 	public boolean isInconsistent() {
-		return isInconsistent_;
+		return hasClash() && isDeterministic();
 	}
 
 	void pushToHistory(Conclusion conclusion) {
@@ -316,7 +334,7 @@ public class Context {
 	}
 
 	boolean isDeterministic() {
-		return (history_ == null);
+		return (history_ == null || history_.isEmpty());
 	}
 
 	static class ConclusionInserter implements
@@ -345,6 +363,23 @@ public class Context {
 				input.propagatedSubsumers_ = new ArrayHashSet<IndexedObjectSomeValuesFrom>(
 						16);
 			return input.propagatedSubsumers_.add(conclusion.getExpression());
+		}
+
+		@Override
+		public Boolean visit(PropagatedClash conclusion, Context input) {
+			// check if forward relation to this forward root exists
+			IndexedObjectProperty property = conclusion.getRelation();
+			Root inconsistentRoot = conclusion.getInconsistentRoot();
+			if (!input.getForwardLinks().get(property)
+					.contains(inconsistentRoot.getPositiveSubsumer()))
+				return false;
+			if (!input.getNegativePropagations().get(property)
+					.containsAll(inconsistentRoot.getNegatitveSubsumers()))
+				return false;
+			if (input.propagatedClashes_ == null)
+				input.propagatedClashes_ = new HashSetMultimap<IndexedObjectProperty, Root>(
+						8);
+			return input.propagatedClashes_.add(property, inconsistentRoot);
 		}
 
 		@Override
@@ -412,10 +447,10 @@ public class Context {
 
 		@Override
 		public Boolean visit(Clash conclusion, Context input) {
-			if (input.isInconsistent_)
+			if (input.hasClash_)
 				return false;
 			// else
-			input.isInconsistent_ = true;
+			input.hasClash_ = true;
 			return true;
 		}
 
@@ -454,6 +489,21 @@ public class Context {
 			if (input.propagatedSubsumers_.remove(conclusion.getExpression())) {
 				if (input.propagatedSubsumers_.isEmpty())
 					input.propagatedSubsumers_ = null;
+				return true;
+			}
+			// else
+			return false;
+		}
+
+		@Override
+		public Boolean visit(PropagatedClash conclusion, Context input) {
+			if (input.propagatedClashes_ == null)
+				return false;
+			if (input.propagatedClashes_.remove(conclusion.getRelation(),
+					conclusion.getInconsistentRoot())) {
+				if (input.propagatedClashes_.isEmpty()) {
+					input.propagatedClashes_ = null;
+				}
 				return true;
 			}
 			// else
@@ -556,8 +606,8 @@ public class Context {
 
 		@Override
 		public Boolean visit(Clash conclusion, Context input) {
-			if (input.isInconsistent_) {
-				input.isInconsistent_ = false;
+			if (input.hasClash_) {
+				input.hasClash_ = false;
 				return true;
 			}
 			// else

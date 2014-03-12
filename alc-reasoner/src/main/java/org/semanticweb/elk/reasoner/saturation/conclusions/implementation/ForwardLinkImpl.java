@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
+
 /*
  * #%L
  * ALC Reasoner
@@ -52,7 +53,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 
 	@Override
 	public String toString() {
-		return (getRelation() + "->" + getTarget());
+		return ForwardLink.NAME + "(" + getRelation() + " " + getTarget() + ")";
 	}
 
 }

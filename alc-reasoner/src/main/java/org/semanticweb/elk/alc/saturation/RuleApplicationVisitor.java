@@ -35,6 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Negate
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegativePropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagatedClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagatedComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
@@ -45,6 +46,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunctio
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -79,6 +81,12 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(PropagatedComposedSubsumer conclusion, Context input) {
 		producer_.produce(input.getRoot(), new PossibleComposedSubsumerImpl(
 				conclusion.getExpression()));
+		return null;
+	}
+
+	@Override
+	public Void visit(PropagatedClash conclusion, Context input) {
+		producer_.produce(input.getRoot(), ClashImpl.getInstance());
 		return null;
 	}
 
@@ -128,7 +136,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	@Override
 	public Void visit(BackwardLink conclusion, Context input) {
 		IndexedObjectProperty relation = conclusion.getRelation();
-		if (input.isDeterministic() && input.isInconsistent()) {
+		if (input.isInconsistent()) {
 			// propagate clash
 			producer_.produce(conclusion.getSource(), ClashImpl.getInstance());
 		}
@@ -168,9 +176,11 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		// deterministically
 		Multimap<IndexedObjectProperty, Root> backwardLinks = input
 				.getBackwardLinks();
+		Root root = input.getRoot();
 		for (IndexedObjectProperty relation : backwardLinks.keySet())
 			for (Root target : backwardLinks.get(relation))
-				producer_.produce(target, conclusion);
+				producer_.produce(target, new PropagatedClashImpl(relation,
+						root));
 		return null;
 	}
 

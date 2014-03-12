@@ -74,7 +74,7 @@ public class PropagationImpl extends AbstractConclusion implements Propagation {
 
 	@Override
 	public String toString() {
-		return Propagation.NAME + relation_ + "->" + carry_;
+		return Propagation.NAME + "(" + relation_ + " " + carry_ + ")";
 	}
 
 }

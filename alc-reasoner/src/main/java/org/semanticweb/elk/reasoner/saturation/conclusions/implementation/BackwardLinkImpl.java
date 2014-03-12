@@ -54,8 +54,13 @@ public class BackwardLinkImpl extends AbstractConclusion implements
 	}
 
 	@Override
-	public String toString() {
-		return (relation_ + "<-" + source_);
+	public IndexedObjectProperty getRelation() {
+		return relation_;
+	}
+
+	@Override
+	public Root getSource() {
+		return source_;
 	}
 
 	@Override
@@ -64,13 +69,8 @@ public class BackwardLinkImpl extends AbstractConclusion implements
 	}
 
 	@Override
-	public IndexedObjectProperty getRelation() {
-		return relation_;
-	}
-
-	@Override
-	public Root getSource() {
-		return source_;
+	public String toString() {
+		return BackwardLink.NAME + "(" + relation_ + " " + source_ + ")";
 	}
 
 }

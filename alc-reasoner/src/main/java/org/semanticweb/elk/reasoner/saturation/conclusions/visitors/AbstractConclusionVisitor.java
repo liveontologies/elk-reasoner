@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextIni
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
@@ -46,9 +47,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
  * @param <O>
  *            the type of output parameter with which this visitor works
  */
-public abstract class AbstractConclusionVisitor<I, O> implements
-		ConclusionVisitor<I, O> {
+public abstract class AbstractConclusionVisitor<I, O> extends
+		DummyConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 
+	@Override
 	protected abstract O defaultVisit(Conclusion conclusion, I input);
 
 	@Override
@@ -63,6 +65,11 @@ public abstract class AbstractConclusionVisitor<I, O> implements
 
 	@Override
 	public O visit(PropagatedComposedSubsumer conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(PropagatedClash conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 
