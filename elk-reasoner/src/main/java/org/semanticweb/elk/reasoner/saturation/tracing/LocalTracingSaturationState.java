@@ -79,7 +79,7 @@ public class LocalTracingSaturationState extends
 	}
 
 	/**
-	 * TODO
+	 * Local contexts used for inference tracing.
 	 * 
 	 * @author Pavel Klinov
 	 * 
@@ -94,7 +94,12 @@ public class LocalTracingSaturationState extends
 		 * until that is done.
 		 */
 		private final AtomicBoolean beingTraced_;
-
+		/**
+		 * Stores the set of blocked inferences indexed by conclusions through
+		 * which they are blocked. That is, if a conclusion C has only been
+		 * derived through the inference I, then we store C -> I when we derive
+		 * I from C.
+		 */
 		private HashListMultimap<Conclusion, Inference> blockedInferences_;
 
 		public TracedContext(IndexedClassExpression root) {
