@@ -46,6 +46,8 @@ public class SaturationState implements ConclusionProducer {
 
 	private final Map<Root, Root> existingRoots_;
 
+	private int contextCount = 0;
+
 	/**
 	 * {@link Context}s that have unprocessed {@link Conclusion}s, i.e., for
 	 * which {@link Context#takeToDo()} returns not {@code null}
@@ -115,6 +117,9 @@ public class SaturationState implements ConclusionProducer {
 		if (result != null)
 			return result;
 		// else create new
+		contextCount++;
+		if ((contextCount / 1000) * 1000 == contextCount)
+			LOGGER_.info("{} contexts created", contextCount);
 		result = new Context(root);
 		root.setContext(result);
 		existingRoots_.put(root, root);
@@ -122,4 +127,11 @@ public class SaturationState implements ConclusionProducer {
 		return result;
 	}
 
+	void discard(Root root) {
+		Context context = getContext(root);
+		if (context.getBackwardLinks().isEmpty()) {
+			existingRoots_.remove(root);
+			contextCount--;
+		}
+	}
 }

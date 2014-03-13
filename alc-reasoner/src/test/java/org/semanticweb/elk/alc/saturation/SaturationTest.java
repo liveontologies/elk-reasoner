@@ -488,4 +488,28 @@ public class SaturationTest {
 						+ ")");
 	}
 
+	@Test
+	public void testBackForthPropagation() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectUnionOf(:B :C))"//
+						+ "SubClassOf(:C ObjectSomeValuesFrom(:R ObjectIntersectionOf(:D :D)))"//
+						+ "SubClassOf(:D ObjectUnionOf(:E :F))"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:R :F) :AF)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:R :E) :AE)"//
+						+ "SubClassOf(:C ObjectUnionOf(:CA :CB))"//
+						+ "SubClassOf(ObjectIntersectionOf(:CA :AF) owl:Nothing)"//
+						+ "SubClassOf(ObjectIntersectionOf(:CB :AF) owl:Nothing)"//
+						+ "SubClassOf(ObjectIntersectionOf(:CA :AE) owl:Nothing)"//
+						+ "SubClassOf(ObjectIntersectionOf(:CB :AE) owl:Nothing)"//
+						+ ")",
+				// Expected saturation:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :B)"//
+						+ ")");
+	}
+
 }

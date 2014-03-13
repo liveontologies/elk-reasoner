@@ -43,7 +43,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSub
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -117,11 +116,6 @@ public class Context {
 	private Multimap<IndexedClassExpression, IndexedClassExpression> disjunctions_;
 
 	/**
-	 * subsumers propagated from other contexts that need to be guessed
-	 */
-	private Set<IndexedObjectSomeValuesFrom> propagatedSubsumers_;
-
-	/**
 	 * roots for inconsistent {@link Context}s with backward links to this
 	 * {@link Context}
 	 */
@@ -170,13 +164,6 @@ public class Context {
 			return Operations.emptyMultimap();
 		// else
 		return disjunctions_;
-	}
-
-	public Set<IndexedObjectSomeValuesFrom> getPropagatedSubsumers() {
-		if (propagatedSubsumers_ == null)
-			return Collections.emptySet();
-		// else
-		return propagatedSubsumers_;
 	}
 
 	public Multimap<IndexedObjectProperty, Root> getPropagatedClashes() {
@@ -357,15 +344,6 @@ public class Context {
 		}
 
 		@Override
-		public Boolean visit(PropagatedComposedSubsumer conclusion,
-				Context input) {
-			if (input.propagatedSubsumers_ == null)
-				input.propagatedSubsumers_ = new ArrayHashSet<IndexedObjectSomeValuesFrom>(
-						16);
-			return input.propagatedSubsumers_.add(conclusion.getExpression());
-		}
-
-		@Override
 		public Boolean visit(PropagatedClash conclusion, Context input) {
 			// check if forward relation to this forward root exists
 			IndexedObjectProperty property = conclusion.getRelation();
@@ -479,20 +457,6 @@ public class Context {
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, Context input) {
 			return visit((Subsumer) conclusion, input);
-		}
-
-		@Override
-		public Boolean visit(PropagatedComposedSubsumer conclusion,
-				Context input) {
-			if (input.propagatedSubsumers_ == null)
-				return false;
-			if (input.propagatedSubsumers_.remove(conclusion.getExpression())) {
-				if (input.propagatedSubsumers_.isEmpty())
-					input.propagatedSubsumers_ = null;
-				return true;
-			}
-			// else
-			return false;
 		}
 
 		@Override

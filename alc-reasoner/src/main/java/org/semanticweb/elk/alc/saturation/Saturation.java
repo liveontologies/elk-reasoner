@@ -30,7 +30,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLi
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +66,12 @@ public class Saturation {
 		saturationState_.produce(root, CONTEXT_INIT_);
 	}
 
+	public void discard(IndexedClassExpression expression,
+			IndexedClassExpression possibleSubsumer) {
+		Root root = new Root(expression, possibleSubsumer);
+		saturationState_.discard(root);
+	}
+
 	public void process() {
 		for (;;) {
 			Context context = saturationState_.pollActiveContext();
@@ -95,7 +100,6 @@ public class Saturation {
 				conclusion.accept(ruleApplicationVisitor_, context);
 				if ((!context.isDeterministic() || conclusion instanceof PossibleConclusion)
 						&& !(conclusion instanceof BackwardLink)
-						&& !(conclusion instanceof PropagatedComposedSubsumer)
 						&& !(conclusion instanceof PropagatedClash)) {
 					LOGGER_.trace("{}: to history: {}", context.getRoot(),
 							conclusion);

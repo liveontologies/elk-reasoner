@@ -154,10 +154,11 @@ public class Reasoner {
 						.getPossibleSubsumers()) {
 					if (possibleSubsumer instanceof IndexedClass) {
 						saturation.submit(initialClass, possibleSubsumer);
+						saturation.process();
+						saturation.discard(initialClass, possibleSubsumer);
 						countSubsumers++;
 					}
 				}
-				saturation.process();
 				count++;
 				if ((count / 1000) * 1000 == count)
 					LOGGER_.info(

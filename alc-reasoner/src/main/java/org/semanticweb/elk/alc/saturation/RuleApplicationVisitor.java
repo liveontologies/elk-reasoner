@@ -36,7 +36,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Negati
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagatedClashImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagatedComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
@@ -47,7 +46,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLin
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -74,13 +72,6 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(ComposedSubsumer conclusion, Context input) {
 		IndexedClassExpression.applyCompositionRules(
 				conclusion.getExpression(), input, producer_);
-		return null;
-	}
-
-	@Override
-	public Void visit(PropagatedComposedSubsumer conclusion, Context input) {
-		producer_.produce(input.getRoot(), new PossibleComposedSubsumerImpl(
-				conclusion.getExpression()));
 		return null;
 	}
 
@@ -162,8 +153,8 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		for (Root root : input.getBackwardLinks().get(conclusion.getRelation())) {
 			// TODO: for propagations of universals should be decomposed
 			// subsumer!
-			producer_.produce(root, new PropagatedComposedSubsumerImpl(
-					conclusion.getCarry()));
+			producer_.produce(root,
+					new PossibleComposedSubsumerImpl(conclusion.getCarry()));
 		}
 		return null;
 	}

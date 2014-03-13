@@ -27,16 +27,16 @@ import java.util.Collection;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagatedClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagatedClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 
@@ -57,8 +57,7 @@ public class BacktrackingVisitor extends
 
 	public void visitSubsumer(Subsumer conclusion, Context input) {
 		IndexedClassExpression expression = conclusion.getExpression();
-		if (input.getDisjunctions().keySet().contains(expression)
-				|| input.getPropagatedSubsumers().contains(expression))
+		if (conclusion instanceof PossibleConclusion)
 			producer_.produce(input.getRoot(), new NegatedSubsumerImpl(
 					expression));
 	}
@@ -82,9 +81,6 @@ public class BacktrackingVisitor extends
 		if (input.getDisjunctions().keySet().contains(negatedExpression))
 			producer_.produce(input.getRoot(),
 					new PossibleDecomposedSubsumerImpl(negatedExpression));
-		if (input.getPropagatedSubsumers().contains(negatedExpression))
-			producer_.produce(input.getRoot(),
-					new PossibleComposedSubsumerImpl(negatedExpression));
 		return null;
 	}
 
@@ -112,8 +108,7 @@ public class BacktrackingVisitor extends
 			Root targetRoot) {
 		producer_.produce(targetRoot,
 				new BacktrackedBackwardLinkImpl(input.getRoot(), relation));
-		input.removeConclusion(new PropagatedClashImpl(relation,
-				targetRoot));
+		input.removeConclusion(new PropagatedClashImpl(relation, targetRoot));
 
 	}
 
