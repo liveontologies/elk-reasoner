@@ -70,12 +70,14 @@ public class Saturation {
 		saturationState_.produce(root, CONTEXT_INIT_);
 	}
 
-	public boolean checkSubsumerOptimized(Context context,
+	boolean checkSubsumerOptimized(Context context,
 			IndexedClassExpression possibleSubsumer) {
 		LOGGER_.trace("{}: checking possible subsumer {}", context.getRoot(),
 				possibleSubsumer);
 		// make sure everything is processed
 		process();
+		if (context.isInconsistent())
+			return true;
 		Conclusion conjecture = new NegatedSubsumerImpl(possibleSubsumer);
 		// backtrack everything
 		for (;;) {
@@ -96,7 +98,7 @@ public class Saturation {
 		return (context.getSubsumers().contains(possibleSubsumer));
 	}
 
-	public boolean checkSubsumer(Context context,
+	boolean checkSubsumerSimple(Context context,
 			IndexedClassExpression possibleSubsumer) {
 		LOGGER_.trace("{}: checking possible subsumer {}", context.getRoot(),
 				possibleSubsumer);
@@ -107,6 +109,11 @@ public class Saturation {
 		saturationState_.produce(conjectureRoot, CONTEXT_INIT_);
 		process();
 		return (saturationState_.getContext(conjectureRoot).isInconsistent());
+	}
+
+	public boolean checkSubsumer(Context context,
+			IndexedClassExpression possibleSubsumer) {
+		return checkSubsumerSimple(context, possibleSubsumer);
 	}
 
 	public void process() {
@@ -148,7 +155,7 @@ public class Saturation {
 				if (!context.addConclusion(conclusion))
 					continue;
 				if ((!context.isDeterministic() || conclusion instanceof PossibleConclusion)
-						&& !context.hasClash()
+						&& !context.isInconsistent()
 						&& !(conclusion instanceof BackwardLink)) {
 					context.pushToHistory(conclusion);
 				}

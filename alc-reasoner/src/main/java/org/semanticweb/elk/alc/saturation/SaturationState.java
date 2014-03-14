@@ -75,13 +75,17 @@ public class SaturationState implements ConclusionProducer {
 	}
 
 	void produce(Context context, Conclusion conclusion) {
-		LOGGER_.trace("{}: produced {}", context.getRoot(), conclusion);
+		LOGGER_.trace("{}: produced {}", context, conclusion);
 		if (conclusion instanceof PossibleConclusion) {
-			if (context.addToGuess((PossibleConclusion) conclusion))
+			if (context.addToGuess((PossibleConclusion) conclusion)) {
+				LOGGER_.trace("{}: activated possible", context);
 				possibleContexts_.add(context);
+			}
 		} else {
-			if (context.addToDo(conclusion))
+			if (context.addToDo(conclusion)) {
+				LOGGER_.trace("{}: activated deterministic", context);
 				activeContexts_.add(context);
+			}
 		}
 	}
 

@@ -281,7 +281,8 @@ public class Context {
 	}
 
 	void clearToDo() {
-		toDo_ = null;
+		if (toDo_ != null)
+			toDo_.clear();
 	}
 
 	boolean addToGuess(PossibleConclusion possibleConclusion) {
