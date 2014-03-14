@@ -76,7 +76,7 @@ public class Saturation {
 		saturationState_.discard(root);
 	}
 
-	public boolean checkSubsumer(Context context,
+	public boolean checkSubsumerOptimized(Context context,
 			IndexedClassExpression possibleSubsumer) {
 		LOGGER_.trace("{}: checking possible subsumer {}", context.getRoot(),
 				possibleSubsumer);
@@ -100,6 +100,19 @@ public class Saturation {
 		}
 		process();
 		return (context.getSubsumers().contains(possibleSubsumer));
+	}
+
+	public boolean checkSubsumer(Context context,
+			IndexedClassExpression possibleSubsumer) {
+		LOGGER_.trace("{}: checking possible subsumer {}", context.getRoot(),
+				possibleSubsumer);
+		// make sure everything is processed
+		process();
+		Root conjectureRoot = Root.addNegativeMember(context.getRoot(),
+				possibleSubsumer);
+		saturationState_.produce(conjectureRoot, CONTEXT_INIT_);
+		process();
+		return (saturationState_.getContext(conjectureRoot).isInconsistent());
 	}
 
 	public void process() {
