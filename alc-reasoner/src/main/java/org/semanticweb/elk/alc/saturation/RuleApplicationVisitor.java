@@ -46,7 +46,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunctio
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -73,12 +72,6 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(ComposedSubsumer conclusion, Context input) {
 		IndexedClassExpression.applyCompositionRules(
 				conclusion.getExpression(), input, producer_);
-		return null;
-	}
-
-	@Override
-	public Void visit(PropagatedClash conclusion, Context input) {
-		producer_.produce(input.getRoot(), ClashImpl.getInstance());
 		return null;
 	}
 
@@ -194,8 +187,10 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 					newNegativeRootMembers);
 			Root oldTargetRoot = Root.removeNegativeMember(newTargetRoot,
 					negatedCarry);
-			producer_.produce(oldTargetRoot, toBacktrack);
-			producer_.produce(newTargetRoot, toAdd);
+			if (oldTargetRoot != newTargetRoot) {
+				producer_.produce(oldTargetRoot, toBacktrack);
+				producer_.produce(newTargetRoot, toAdd);
+			}
 		}
 		return null;
 	}

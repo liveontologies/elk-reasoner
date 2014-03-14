@@ -25,12 +25,12 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.saturation.Root;
 
-public interface PropagatedClash extends Conclusion {
+public interface PropagatedConclusion extends Conclusion {
 
-	public static final String NAME = "Inconsistent Forward Root";
+	public static final String NAME = "Propagated Conclusion";
 
 	IndexedObjectProperty getRelation();
 
-	Root getInconsistentRoot();
+	Root getSourceRoot();
 
 }

@@ -42,7 +42,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLin
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -127,12 +126,6 @@ public class Context {
 	private Multimap<IndexedClassExpression, IndexedClassExpression> disjunctions_;
 
 	/**
-	 * roots for inconsistent {@link Context}s with backward links to this
-	 * {@link Context}
-	 */
-	private Multimap<IndexedObjectProperty, Root> propagatedClashes_;
-
-	/**
 	 * {@link Conclusion}s to which the rules are yet to be applied
 	 */
 	private Deque<Conclusion> toDo_;
@@ -175,13 +168,6 @@ public class Context {
 			return Operations.emptyMultimap();
 		// else
 		return disjunctions_;
-	}
-
-	public Multimap<IndexedObjectProperty, Root> getPropagatedClashes() {
-		if (propagatedClashes_ == null)
-			return Operations.emptyMultimap();
-		// else
-		return propagatedClashes_;
 	}
 
 	public Multimap<IndexedObjectProperty, IndexedClassExpression> getForwardLinks() {
@@ -384,23 +370,6 @@ public class Context {
 		}
 
 		@Override
-		public Boolean visit(PropagatedClash conclusion, Context input) {
-			// check if forward relation to this forward root exists
-			IndexedObjectProperty property = conclusion.getRelation();
-			Root inconsistentRoot = conclusion.getInconsistentRoot();
-			if (!input.getForwardLinks().get(property)
-					.contains(inconsistentRoot.getPositiveMember()))
-				return false;
-			if (!input.getNegativePropagations().get(property)
-					.containsAll(inconsistentRoot.getNegatitveMembers()))
-				return false;
-			if (input.propagatedClashes_ == null)
-				input.propagatedClashes_ = new HashSetMultimap<IndexedObjectProperty, Root>(
-						8);
-			return input.propagatedClashes_.add(property, inconsistentRoot);
-		}
-
-		@Override
 		public Boolean visit(NegatedSubsumer conclusion, Context input) {
 			if (input.negativeSubsumers_ == null)
 				input.negativeSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
@@ -501,21 +470,6 @@ public class Context {
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, Context input) {
 			return visit((Subsumer) conclusion, input);
-		}
-
-		@Override
-		public Boolean visit(PropagatedClash conclusion, Context input) {
-			if (input.propagatedClashes_ == null)
-				return false;
-			if (input.propagatedClashes_.remove(conclusion.getRelation(),
-					conclusion.getInconsistentRoot())) {
-				if (input.propagatedClashes_.isEmpty()) {
-					input.propagatedClashes_ = null;
-				}
-				return true;
-			}
-			// else
-			return false;
 		}
 
 		@Override

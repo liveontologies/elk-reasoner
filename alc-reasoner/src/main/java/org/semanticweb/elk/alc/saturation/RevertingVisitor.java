@@ -30,7 +30,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Backtr
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagatedClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
@@ -100,38 +99,33 @@ public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
 	@Override
 	public Void visit(ForwardLink conclusion, Context input) {
 		IndexedObjectProperty relation = conclusion.getRelation();
+		Root root = input.getRoot();
 		Root fillerRoot = new Root(conclusion.getTarget(), input
 				.getNegativePropagations().get(relation));
-		backtrackLink(input, conclusion.getRelation(), fillerRoot);
+		producer_.produce(fillerRoot, new BacktrackedBackwardLinkImpl(root,
+				relation));
 		return null;
 	}
 
 	@Override
 	public Void visit(NegativePropagation conclusion, Context input) {
 		IndexedObjectProperty relation = conclusion.getRelation();
+		Root root = input.getRoot();
 		IndexedClassExpression negatedCarry = conclusion.getNegatedCarry();
 		Collection<IndexedClassExpression> oldNegativeRootMembers = input
 				.getNegativePropagations().get(relation);
-		Conclusion newConclusion = new BackwardLinkImpl(input.getRoot(),
-				relation);
+		Conclusion toAdd = new BackwardLinkImpl(root, relation);
+		Conclusion toBacktrack = new BacktrackedBackwardLinkImpl(root, relation);
 		for (IndexedClassExpression positiveMember : input.getForwardLinks()
 				.get(relation)) {
 			Root oldTargetRoot = new Root(positiveMember,
 					oldNegativeRootMembers);
 			Root newTargetRoot = Root.removeNegativeMember(oldTargetRoot,
 					negatedCarry);
-			backtrackLink(input, conclusion.getRelation(), oldTargetRoot);
-			producer_.produce(newTargetRoot, newConclusion);
+			producer_.produce(oldTargetRoot, toBacktrack);
+			producer_.produce(newTargetRoot, toAdd);
 		}
 		return null;
-	}
-
-	private void backtrackLink(Context input, IndexedObjectProperty relation,
-			Root targetRoot) {
-		producer_.produce(targetRoot,
-				new BacktrackedBackwardLinkImpl(input.getRoot(), relation));
-		input.removeConclusion(new PropagatedClashImpl(relation, targetRoot));
-
 	}
 
 }

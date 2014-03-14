@@ -23,14 +23,14 @@ package org.semanticweb.elk.alc.saturation;
  */
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BacktrackedConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,12 +68,6 @@ public class Saturation {
 			IndexedClassExpression possibleSubsumer) {
 		Root root = new Root(expression, possibleSubsumer);
 		saturationState_.produce(root, CONTEXT_INIT_);
-	}
-
-	public void discard(IndexedClassExpression expression,
-			IndexedClassExpression possibleSubsumer) {
-		Root root = new Root(expression, possibleSubsumer);
-		saturationState_.discard(root);
 	}
 
 	public boolean checkSubsumerOptimized(Context context,
@@ -137,12 +131,25 @@ public class Saturation {
 					context.removeConclusion(conclusion);
 					continue;
 				}
-				// else conclusion was added
+				if (conclusion instanceof PropagatedConclusion) {
+					// check if the conclusion is still relevant
+					PropagatedConclusion propagatedConclusion = ((PropagatedConclusion) conclusion);
+					IndexedObjectProperty relation = propagatedConclusion
+							.getRelation();
+					Root sourceRoot = propagatedConclusion.getSourceRoot();
+					if (!context.getForwardLinks().get(relation)
+							.contains(sourceRoot.getPositiveMember())
+							|| !context.getNegativePropagations().get(relation)
+									.equals(sourceRoot.getNegatitveMembers())) {
+						LOGGER_.trace("{}: obsolete {}", context, conclusion);
+						continue;
+					}
+				}
 				if (!context.addConclusion(conclusion))
 					continue;
 				if ((!context.isDeterministic() || conclusion instanceof PossibleConclusion)
-						&& !(conclusion instanceof BackwardLink)
-						&& !(conclusion instanceof PropagatedClash)) {
+						&& !context.hasClash()
+						&& !(conclusion instanceof BackwardLink)) {
 					context.pushToHistory(conclusion);
 				}
 				conclusion.accept(ruleApplicationVisitor_, context);
@@ -160,9 +167,6 @@ public class Saturation {
 						if (toBacktrack instanceof PossibleConclusion)
 							break;
 					}
-					if (!context.getPropagatedClashes().isEmpty())
-						saturationState_.produce(context,
-								ClashImpl.getInstance());
 				}
 
 			}
