@@ -40,86 +40,86 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  */
 public class Root {
 
-	private final IndexedClassExpression positiveSubsumer_;
+	private final IndexedClassExpression positiveMember_;
 
-	private Set<IndexedClassExpression> negativeSubsumers_;
+	private Set<IndexedClassExpression> negativeMembers_;
 
 	private Context context_;
 
-	public Root(IndexedClassExpression positiveSubsumer,
-			IndexedClassExpression... negativeSubsumers) {
-		this.positiveSubsumer_ = positiveSubsumer;
-		if (negativeSubsumers.length > 0) {
-			this.negativeSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
-					negativeSubsumers.length);
-			for (int i = 0; i < negativeSubsumers.length; i++) {
-				negativeSubsumers_.add(negativeSubsumers[i]);
+	public Root(IndexedClassExpression positiveMember,
+			IndexedClassExpression... negativeMembers) {
+		this.positiveMember_ = positiveMember;
+		if (negativeMembers.length > 0) {
+			this.negativeMembers_ = new ArrayHashSet<IndexedClassExpression>(
+					negativeMembers.length);
+			for (int i = 0; i < negativeMembers.length; i++) {
+				negativeMembers_.add(negativeMembers[i]);
 			}
 		}
 	}
 
-	public Root(IndexedClassExpression positiveSubsumer,
-			Collection<IndexedClassExpression> negativeSubsumers) {
-		this.positiveSubsumer_ = positiveSubsumer;
-		if (negativeSubsumers.size() > 0) {
-			this.negativeSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
-					negativeSubsumers.size());
-			for (IndexedClassExpression negativeSubsumer : negativeSubsumers)
-				negativeSubsumers_.add(negativeSubsumer);
+	public Root(IndexedClassExpression positiveMember,
+			Collection<IndexedClassExpression> negativeMembers) {
+		this.positiveMember_ = positiveMember;
+		if (negativeMembers.size() > 0) {
+			this.negativeMembers_ = new ArrayHashSet<IndexedClassExpression>(
+					negativeMembers.size());
+			for (IndexedClassExpression negativeMember : negativeMembers)
+				negativeMembers_.add(negativeMember);
 		}
 	}
 
 	/**
 	 * @param root
-	 * @param negativeSubsumer
-	 * @return the {@link Root} obtained by adding the given negative subsumer
-	 *         to the given {@link Root}
+	 * @param negativeMember
+	 * @return the {@link Root} obtained by adding the given negative member to
+	 *         the given {@link Root}
 	 */
-	public static Root addNegativeSubsumer(Root root,
-			IndexedClassExpression negativeSubsumer) {
-		Set<IndexedClassExpression> negativeSubsumers = root
-				.getNegatitveSubsumers();
-		if (negativeSubsumers.contains(negativeSubsumer))
+	public static Root addNegativeMember(Root root,
+			IndexedClassExpression negativeMember) {
+		Set<IndexedClassExpression> negativeMembers = root
+				.getNegatitveMembers();
+		if (negativeMembers.contains(negativeMember))
 			return root;
 		// else
-		Root newRoot = new Root(root.getPositiveSubsumer(), negativeSubsumers);
-		newRoot.addNegativeSubsumer(negativeSubsumer);
+		Root newRoot = new Root(root.getPositiveMember(), negativeMembers);
+		newRoot.addNegativeMember(negativeMember);
 		return newRoot;
 	}
 
 	/**
 	 * @param root
-	 * @param negativeSubsumer
-	 * @return the {@link Root} obtained by removing the given negative subsumer
+	 * @param negativeMember
+	 * @return the {@link Root} obtained by removing the given negative member
 	 *         from the given {@link Root}
 	 */
-	public static Root removeNegativeSubsumer(Root root,
-			IndexedClassExpression negativeSubsumer) {
-		Set<IndexedClassExpression> negativeSubsumers = root
-				.getNegatitveSubsumers();
-		if (!negativeSubsumers.contains(negativeSubsumer))
+	public static Root removeNegativeMember(Root root,
+			IndexedClassExpression negativeMember) {
+		Set<IndexedClassExpression> negativeMembers = root
+				.getNegatitveMembers();
+		if (!negativeMembers.contains(negativeMember))
 			return root;
 		// else
-		Root newRoot = new Root(root.getPositiveSubsumer(), negativeSubsumers);
-		newRoot.removeNegativeSubsumer(negativeSubsumer);
+		Root newRoot = new Root(root.getPositiveMember(), negativeMembers);
+		newRoot.removeNegativeMember(negativeMember);
 		return newRoot;
 	}
 
-	public IndexedClassExpression getPositiveSubsumer() {
-		return this.positiveSubsumer_;
+	public IndexedClassExpression getPositiveMember() {
+		return this.positiveMember_;
 	}
 
-	public Set<IndexedClassExpression> getNegatitveSubsumers() {
-		if (negativeSubsumers_ == null)
+	public Set<IndexedClassExpression> getNegatitveMembers() {
+		if (negativeMembers_ == null)
 			return Collections.emptySet();
 		// else
-		return negativeSubsumers_;
+		return negativeMembers_;
 	}
 
 	@Override
 	public int hashCode() {
-		return HashGenerator.combinedHashCode(positiveSubsumer_,
-				getNegatitveSubsumers());
+		return HashGenerator.combinedHashCode(positiveMember_,
+				getNegatitveMembers());
 	}
 
 	@Override
@@ -128,31 +128,31 @@ public class Root {
 			return false;
 		// else
 		Root otherRoot = (Root) o;
-		return positiveSubsumer_.equals(otherRoot.positiveSubsumer_)
-				&& getNegatitveSubsumers().equals(
-						otherRoot.getNegatitveSubsumers());
+		return positiveMember_.equals(otherRoot.positiveMember_)
+				&& getNegatitveMembers()
+						.equals(otherRoot.getNegatitveMembers());
 	}
 
 	@Override
 	public String toString() {
-		return positiveSubsumer_.toString()
-				+ (negativeSubsumers_ == null ? "" : "~"
-						+ getNegatitveSubsumers().toString());
+		return positiveMember_.toString()
+				+ (negativeMembers_ == null ? "" : "~"
+						+ getNegatitveMembers().toString());
 	}
 
-	boolean addNegativeSubsumer(IndexedClassExpression negativeSubsumer) {
-		if (negativeSubsumers_ == null)
-			negativeSubsumers_ = new ArrayHashSet<IndexedClassExpression>(4);
-		return negativeSubsumers_.add(negativeSubsumer);
+	boolean addNegativeMember(IndexedClassExpression negativeMember) {
+		if (negativeMembers_ == null)
+			negativeMembers_ = new ArrayHashSet<IndexedClassExpression>(4);
+		return negativeMembers_.add(negativeMember);
 	}
 
-	boolean removeNegativeSubsumer(IndexedClassExpression negativeSubsumer) {
-		if (negativeSubsumers_ == null)
+	boolean removeNegativeMember(IndexedClassExpression negativeMember) {
+		if (negativeMembers_ == null)
 			return false;
 		// else
-		if (negativeSubsumers_.remove(negativeSubsumer)) {
-			if (negativeSubsumers_.isEmpty())
-				negativeSubsumers_ = null;
+		if (negativeMembers_.remove(negativeMember)) {
+			if (negativeMembers_.isEmpty())
+				negativeMembers_ = null;
 			return true;
 		}
 		// else

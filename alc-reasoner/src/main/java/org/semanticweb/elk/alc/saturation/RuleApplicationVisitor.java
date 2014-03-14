@@ -63,9 +63,9 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(ContextInitialization conclusion, Context input) {
 		Root root = input.getRoot();
 		producer_.produce(root,
-				new DecomposedSubsumerImpl(root.getPositiveSubsumer()));
-		for (IndexedClassExpression init : root.getNegatitveSubsumers())
-			producer_.produce(root, new NegatedSubsumerImpl(init));
+				new DecomposedSubsumerImpl(root.getPositiveMember()));
+		for (IndexedClassExpression negativeMember : root.getNegatitveMembers())
+			producer_.produce(root, new NegatedSubsumerImpl(negativeMember));
 		return null;
 	}
 
@@ -192,7 +192,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 				.get(relation)) {
 			Root newTargetRoot = new Root(positiveMember,
 					newNegativeRootMembers);
-			Root oldTargetRoot = Root.removeNegativeSubsumer(newTargetRoot,
+			Root oldTargetRoot = Root.removeNegativeMember(newTargetRoot,
 					negatedCarry);
 			producer_.produce(oldTargetRoot, toBacktrack);
 			producer_.produce(newTargetRoot, toAdd);

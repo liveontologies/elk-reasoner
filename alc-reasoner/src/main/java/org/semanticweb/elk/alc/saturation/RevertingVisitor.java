@@ -118,7 +118,7 @@ public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
 				.get(relation)) {
 			Root oldTargetRoot = new Root(positiveMember,
 					oldNegativeRootMembers);
-			Root newTargetRoot = Root.removeNegativeSubsumer(oldTargetRoot,
+			Root newTargetRoot = Root.removeNegativeMember(oldTargetRoot,
 					negatedCarry);
 			backtrackLink(input, conclusion.getRelation(), oldTargetRoot);
 			producer_.produce(newTargetRoot, newConclusion);

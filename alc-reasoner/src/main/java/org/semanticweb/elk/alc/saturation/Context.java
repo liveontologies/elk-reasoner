@@ -389,10 +389,10 @@ public class Context {
 			IndexedObjectProperty property = conclusion.getRelation();
 			Root inconsistentRoot = conclusion.getInconsistentRoot();
 			if (!input.getForwardLinks().get(property)
-					.contains(inconsistentRoot.getPositiveSubsumer()))
+					.contains(inconsistentRoot.getPositiveMember()))
 				return false;
 			if (!input.getNegativePropagations().get(property)
-					.containsAll(inconsistentRoot.getNegatitveSubsumers()))
+					.containsAll(inconsistentRoot.getNegatitveMembers()))
 				return false;
 			if (input.propagatedClashes_ == null)
 				input.propagatedClashes_ = new HashSetMultimap<IndexedObjectProperty, Root>(
