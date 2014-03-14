@@ -63,6 +63,12 @@ public class Reasoner {
 	 */
 	private AxiomLoader axiomLoader_;
 
+	private SaturationState saturationState_ = null;
+
+	private boolean satisfiabilityCheckingFinished_ = false;
+
+	private boolean classificationFinished_ = false;
+
 	public Reasoner() {
 		ontologyIndex_ = new OntologyIndex();
 		this.axiomInserterVisitor_ = new MainAxiomIndexerVisitor(
@@ -125,10 +131,26 @@ public class Reasoner {
 
 	}
 
-	public SaturationState saturate() throws ElkLoadingException {
+	public boolean subsumes(IndexedClassExpression first,
+			IndexedClassExpression second) throws ElkLoadingException {
+		checkSatisfiability();
+		Context context = saturationState_.getContext(first);
+		if (context == null) {
+			// does not occur
+			return first == second;
+		}
+		if (context.isInconsistent())
+			return true;
+		Saturation saturation = new Saturation(saturationState_);
+		return (saturation.checkSubsumer(context, second));
+	}
+
+	public void checkSatisfiability() throws ElkLoadingException {
+		if (satisfiabilityCheckingFinished_)
+			return;
 		forceLoading();
-		SaturationState saturationState = new SaturationState();
-		Saturation saturation = new Saturation(saturationState);
+		saturationState_ = new SaturationState();
+		Saturation saturation = new Saturation(saturationState_);
 		Statistics.logOperationStart("concept satisfiability testing", LOGGER_);
 		try {
 			int count = 0;
@@ -144,31 +166,46 @@ public class Reasoner {
 					LOGGER_);
 			Statistics.logMemoryUsage(LOGGER_);
 		}
+		satisfiabilityCheckingFinished_ = true;
+	}
+
+	public void classify() throws ElkLoadingException {
+		if (classificationFinished_)
+			return;
+		checkSatisfiability();
+		Saturation saturation = new Saturation(saturationState_);
 		Statistics.logOperationStart("classification", LOGGER_);
+		int count = 0;
+		int countSubsumers = 0;
+		int countSubsumerTests = 0;
 		try {
-			int count = 0;
-			int countSubsumers = 0;
 			for (IndexedClass initialClass : ontologyIndex_.getIndexedClasses()) {
-				Context context = saturationState.getContext(initialClass);
+				Context context = saturationState_.getContext(initialClass);
+				for (@SuppressWarnings("unused")
+				IndexedClassExpression subsumer : context.getSubsumers()) {
+					countSubsumers++;
+				}
 				for (IndexedClassExpression possibleSubsumer : context
 						.getPossibleSubsumers()) {
 					if (possibleSubsumer instanceof IndexedClass) {
-						saturation.submit(initialClass, possibleSubsumer);
-						saturation.process();
-						saturation.discard(initialClass, possibleSubsumer);
-						countSubsumers++;
+						if (!saturation
+								.checkSubsumer(context, possibleSubsumer))
+							countSubsumers--;
+						countSubsumerTests++;
 					}
 				}
 				count++;
 				if ((count / 1000) * 1000 == count)
 					LOGGER_.info(
-							"{} concepts processed ({} possible subsumers in evarage)",
-							count, countSubsumers / count);
+							"{} concepts processed ({}/{} possible subsumers/subsumer tests in evarage)",
+							count, countSubsumers / count, countSubsumerTests
+									/ count);
 			}
 		} finally {
+			LOGGER_.debug("Total subsumer: {}", countSubsumers);
 			Statistics.logOperationFinish("classification", LOGGER_);
 			Statistics.logMemoryUsage(LOGGER_);
 		}
-		return saturationState;
+		classificationFinished_ = true;
 	}
 }

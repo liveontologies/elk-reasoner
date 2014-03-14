@@ -34,26 +34,20 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SaturationTest {
 
 	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(SaturationTest.class);
 
 	private final Owl2ParserFactory parserFactory_ = new Owl2FunctionalStyleParserFactory();
 
 	void testSaturation(String ontology, String expectedSaturation)
 			throws ElkLoadingException {
-		LOGGER_.info("Saturating test ontology");
 		Reasoner reasoner = new Reasoner(new Owl2StreamLoader(parserFactory_,
 				ontology));
-		SaturationState saturationState = reasoner.saturate();
-		LOGGER_.info("Checking saturation");
 		SaturationCheckingAxiomVisitor checker = new SaturationCheckingAxiomVisitor(
-				saturationState);
+				reasoner);
+		reasoner.forceLoading();
 		OntologyIndex index = reasoner.getOntologyIndex();
 		TestAxiomIndexerVisitor testIndexer = new TestAxiomIndexerVisitor(
 				index, checker);
@@ -223,7 +217,24 @@ public class SaturationTest {
 	}
 
 	@Test
-	public void testCyclicExistentials() throws ElkLoadingException {
+	public void testCyclicExistentialsSimple() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :A))"//
+						+ "SubClassOf(:A :B)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:R :B) :C)"//
+						+ ")",
+				// Expected saturation:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :B)"//
+						+ "SubClassOf(:A :C)"//
+						+ ")");
+	}
+
+	@Test
+	public void testCyclicExistentialsComplex() throws ElkLoadingException {
 		testSaturation(// Ontology:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
@@ -482,9 +493,30 @@ public class SaturationTest {
 				// Expected saturation:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
-						+ "SubClassOf(:A :BB)"//
 						+ "SubClassOf(:A :C)"//
 						+ "SubClassOf(:A :D)"//
+						+ "SubClassOf(:A :BB)"//
+						+ ")");
+	}
+
+	@Test
+	public void testDisjunctionPropagation() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R ObjectIntersectionOf(:B :B)))"//
+						+ "SubClassOf(:B ObjectUnionOf(:C :D))"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:R :C) :AC)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:R :D) :AD)"//
+						+ "SubClassOf(:AC :ACD)"//
+						+ "SubClassOf(:AD :ACD)"//
+						+ ")",
+				// Expected saturation:
+				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :ACD)"//
 						+ ")");
 	}
 
@@ -499,15 +531,16 @@ public class SaturationTest {
 						+ "SubClassOf(:D ObjectUnionOf(:E :F))"//
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :F) :AF)"//
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :E) :AE)"//
+						+ "SubClassOf(:AF :AEF)"//
+						+ "SubClassOf(:AE :AEF)"//
+						+ "SubClassOf(ObjectIntersectionOf(:C :AEF) owl:Nothing)"//
 						+ "SubClassOf(:C ObjectUnionOf(:CA :CB))"//
-						+ "SubClassOf(ObjectIntersectionOf(:CA :AF) owl:Nothing)"//
-						+ "SubClassOf(ObjectIntersectionOf(:CB :AF) owl:Nothing)"//
-						+ "SubClassOf(ObjectIntersectionOf(:CA :AE) owl:Nothing)"//
-						+ "SubClassOf(ObjectIntersectionOf(:CB :AE) owl:Nothing)"//
 						+ ")",
 				// Expected saturation:
 				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
+						+ "SubClassOf(:C owl:Nothing)"//
 						+ "SubClassOf(:A :B)"//
 						+ ")");
 	}

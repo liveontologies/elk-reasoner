@@ -27,14 +27,16 @@ import static org.junit.Assert.fail;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedAxiom;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.alc.indexing.visitors.IndexedAxiomVisitor;
+import org.semanticweb.elk.alc.loading.ElkLoadingException;
+import org.semanticweb.elk.alc.reasoner.Reasoner;
 
 public class SaturationCheckingAxiomVisitor implements
 		IndexedAxiomVisitor<Void> {
 
-	private final SaturationState saturationState_;
+	private final Reasoner reasoner_;
 
-	public SaturationCheckingAxiomVisitor(SaturationState state) {
-		this.saturationState_ = state;
+	public SaturationCheckingAxiomVisitor(Reasoner reasoner) {
+		this.reasoner_ = reasoner;
 	}
 
 	static Void failVisit(IndexedAxiom axiom) {
@@ -44,17 +46,12 @@ public class SaturationCheckingAxiomVisitor implements
 
 	@Override
 	public Void visit(IndexedSubClassOfAxiom axiom) {
-		Root root = new Root(axiom.getSubClass());
-		Context context = saturationState_.getContext(root);
-		if (context == null)
+		try {
+			if (reasoner_.subsumes(axiom.getSubClass(), axiom.getSuperClass()))
+				return null;
+		} catch (ElkLoadingException e) {
 			return failVisit(axiom);
-		// else
-		if (context.isInconsistent())
-			// everything is fine
-			return null;
-		// else
-		if (context.getSubsumers().contains(axiom.getSuperClass()))
-			return null;
+		}
 		// else
 		return failVisit(axiom);
 	}

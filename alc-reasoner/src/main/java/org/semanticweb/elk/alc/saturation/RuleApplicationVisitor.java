@@ -27,9 +27,9 @@ import java.util.Collection;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegativePropagationImpl;
@@ -39,6 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Propag
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
@@ -48,6 +49,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePr
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Multimap;
 
 public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> {
@@ -129,7 +131,8 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		IndexedObjectProperty relation = conclusion.getRelation();
 		if (input.isInconsistent()) {
 			// propagate clash
-			producer_.produce(conclusion.getSource(), ClashImpl.getInstance());
+			producer_.produce(conclusion.getSource(), new PropagatedClashImpl(
+					relation, input.getRoot()));
 		}
 		if (input.getBackwardLinks().get(relation).size() == 1)
 			// first link; generating propagations
@@ -141,8 +144,8 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 				.getPropagations().get(relation)) {
 			// TODO: for propagations of universals should be decomposed
 			// subsumer!
-			producer_.produce(root,
-					new ComposedSubsumerImpl(propagatedSubsumer));
+			producer_.produce(root, new PossibleComposedSubsumerImpl(
+					propagatedSubsumer));
 		}
 		return null;
 	}
@@ -179,13 +182,24 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(NegativePropagation conclusion, Context input) {
 		Root root = input.getRoot();
 		IndexedObjectProperty relation = conclusion.getRelation();
-		Collection<IndexedClassExpression> negativeRootMembers = input
+		Collection<IndexedClassExpression> newNegativeRootMembers = input
 				.getNegativePropagations().get(relation);
+		Conclusion newLink = new BackwardLinkImpl(root,
+				conclusion.getRelation());
+		Conclusion oldLink = new BacktrackedBackwardLinkImpl(root,
+				conclusion.getRelation());
+		Collection<IndexedClassExpression> oldNegativeRootMembers = new ArrayHashSet<IndexedClassExpression>(
+				newNegativeRootMembers.size());
+		oldNegativeRootMembers.addAll(newNegativeRootMembers);
+		oldNegativeRootMembers.remove(conclusion.getNegatedCarry());
 		for (IndexedClassExpression positiveMember : input.getForwardLinks()
 				.get(relation)) {
-			Root targetRoot = new Root(positiveMember, negativeRootMembers);
-			producer_.produce(targetRoot,
-					new BackwardLinkImpl(root, conclusion.getRelation()));
+			Root newTargetRoot = new Root(positiveMember,
+					newNegativeRootMembers);
+			producer_.produce(newTargetRoot, newLink);
+			Root oldTargetRoot = new Root(positiveMember,
+					oldNegativeRootMembers);
+			producer_.produce(oldTargetRoot, oldLink);
 		}
 		return null;
 	}

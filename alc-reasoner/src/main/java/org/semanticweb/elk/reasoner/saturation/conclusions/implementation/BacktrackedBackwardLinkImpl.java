@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
+
 /*
  * #%L
  * ALC Reasoner
@@ -31,6 +32,11 @@ public class BacktrackedBackwardLinkImpl extends BackwardLinkImpl implements
 	public BacktrackedBackwardLinkImpl(Root source,
 			IndexedObjectProperty relation) {
 		super(source, relation);
+	}
+
+	@Override
+	public String toString() {
+		return "Backtracked" + super.toString();
 	}
 
 }

@@ -50,6 +50,8 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The elementary component of the saturation.
@@ -58,6 +60,10 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  */
 public class Context {
+
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(Context.class);
 
 	private final static ConclusionVisitor<Context, Boolean> CONCLUSION_INSERTER_ = new ConclusionInserter();
 
@@ -89,6 +95,11 @@ public class Context {
 	 * the negated super-classes of the {@link Root}
 	 */
 	private Set<IndexedClassExpression> negativeSubsumers_;
+
+	/**
+	 * deterministically derived composed subsumers that should be guessed
+	 */
+	private Set<IndexedClassExpression> maskedPossibleComposedSubsumers_;
 
 	/**
 	 * the entailed existential relations
@@ -201,6 +212,13 @@ public class Context {
 		return negativePropagations_;
 	}
 
+	public Set<IndexedClassExpression> getMaskedPossibleComposedSubsumers() {
+		if (maskedPossibleComposedSubsumers_ == null)
+			return Collections.emptySet();
+		// else
+		return maskedPossibleComposedSubsumers_;
+	}
+
 	public Set<IndexedClassExpression> getPossibleSubsumers() {
 		if (history_ == null)
 			return Collections.emptySet();
@@ -222,7 +240,10 @@ public class Context {
 	 *         this operation
 	 */
 	boolean addConclusion(Conclusion conclusion) {
-		return conclusion.accept(CONCLUSION_INSERTER_, this);
+		boolean result = conclusion.accept(CONCLUSION_INSERTER_, this);
+		LOGGER_.trace("{}: adding {}: {}", this, conclusion, result ? "success"
+				: "failure");
+		return result;
 	}
 
 	/**
@@ -233,7 +254,10 @@ public class Context {
 	 *         this operation
 	 */
 	boolean removeConclusion(Conclusion conclusion) {
-		return conclusion.accept(CONCLUSION_DELETER_, this);
+		boolean result = conclusion.accept(CONCLUSION_DELETER_, this);
+		LOGGER_.trace("{}: removing {}: {}", this, conclusion,
+				result ? "success" : "failure");
+		return result;
 	}
 
 	/**
@@ -307,6 +331,7 @@ public class Context {
 	void pushToHistory(Conclusion conclusion) {
 		if (history_ == null)
 			history_ = new ArrayDeque<Conclusion>(16);
+		LOGGER_.trace("{}: to history: {}", this, conclusion);
 		history_.addLast(conclusion);
 	}
 
@@ -317,7 +342,14 @@ public class Context {
 		Conclusion result = this.history_.pollLast();
 		if (result == null)
 			history_ = null;
+		else
+			LOGGER_.trace("{}: taken from history: {}", this, result);
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return getRoot().toString();
 	}
 
 	boolean isDeterministic() {
@@ -340,7 +372,15 @@ public class Context {
 
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, Context input) {
-			return visit((Subsumer) conclusion, input);
+			boolean inserted = visit((Subsumer) conclusion, input);
+			if (!inserted && (conclusion instanceof PossibleConclusion)) {
+				if (input.maskedPossibleComposedSubsumers_ == null)
+					input.maskedPossibleComposedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
+							8);
+				input.maskedPossibleComposedSubsumers_.add(conclusion
+						.getExpression());
+			}
+			return inserted;
 		}
 
 		@Override
@@ -443,6 +483,10 @@ public class Context {
 			if (input.subsumers_.remove(conclusion.getExpression())) {
 				if (input.subsumers_.isEmpty())
 					input.subsumers_ = null;
+				if (input.maskedPossibleComposedSubsumers_ != null) {
+					input.maskedPossibleComposedSubsumers_.remove(conclusion
+							.getExpression());
+				}
 				return true;
 			}
 			// else

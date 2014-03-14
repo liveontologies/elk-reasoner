@@ -25,6 +25,7 @@ package org.semanticweb.elk.alc.saturation;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BacktrackedConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
@@ -48,11 +49,14 @@ public class Saturation {
 
 	private final ConclusionVisitor<Context, Void> backtrackingVisitor_;
 
+	private final ConclusionVisitor<Context, Void> revertingVisitor_;
+
 	public Saturation(SaturationState saturationState) {
 		this.saturationState_ = saturationState;
 		this.ruleApplicationVisitor_ = new RuleApplicationVisitor(
 				saturationState);
 		this.backtrackingVisitor_ = new BacktrackingVisitor(saturationState);
+		this.revertingVisitor_ = new RevertingVisitor(saturationState);
 	}
 
 	public void submit(IndexedClassExpression expression) {
@@ -70,6 +74,32 @@ public class Saturation {
 			IndexedClassExpression possibleSubsumer) {
 		Root root = new Root(expression, possibleSubsumer);
 		saturationState_.discard(root);
+	}
+
+	public boolean checkSubsumer(Context context,
+			IndexedClassExpression possibleSubsumer) {
+		LOGGER_.trace("{}: checking possible subsumer {}", context.getRoot(),
+				possibleSubsumer);
+		// make sure everything is processed
+		process();
+		Conclusion conjecture = new NegatedSubsumerImpl(possibleSubsumer);
+		// backtrack everything
+		for (;;) {
+			Conclusion toBacktrack = context.popHistory();
+			if (toBacktrack == null) {
+				LOGGER_.trace("{}: nothing to backtrack", context.getRoot());
+				break;
+			}
+			toBacktrack.accept(revertingVisitor_, context);
+			context.removeConclusion(toBacktrack);
+		}
+		if (context.addConclusion(conjecture)) {
+			context.pushToHistory(conjecture);
+			// start applying the rules
+			conjecture.accept(ruleApplicationVisitor_, context);
+		}
+		process();
+		return (context.getSubsumers().contains(possibleSubsumer));
 	}
 
 	public void process() {
@@ -94,17 +124,15 @@ public class Saturation {
 					context.removeConclusion(conclusion);
 					continue;
 				}
+				// else conclusion was added
 				if (!context.addConclusion(conclusion))
 					continue;
-				// else conclusion was added
-				conclusion.accept(ruleApplicationVisitor_, context);
 				if ((!context.isDeterministic() || conclusion instanceof PossibleConclusion)
 						&& !(conclusion instanceof BackwardLink)
 						&& !(conclusion instanceof PropagatedClash)) {
-					LOGGER_.trace("{}: to history: {}", context.getRoot(),
-							conclusion);
 					context.pushToHistory(conclusion);
 				}
+				conclusion.accept(ruleApplicationVisitor_, context);
 				if (context.hasClash()) {
 					context.clearToDo();
 					for (;;) {
@@ -114,8 +142,6 @@ public class Saturation {
 									context.getRoot());
 							break;
 						}
-						LOGGER_.trace("{}: backtrack {}", context.getRoot(),
-								toBacktrack);
 						toBacktrack.accept(backtrackingVisitor_, context);
 						context.removeConclusion(toBacktrack);
 						if (toBacktrack instanceof PossibleConclusion)

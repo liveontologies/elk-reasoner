@@ -22,94 +22,37 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
-import java.util.Collection;
-
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagatedClashImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 
-public class BacktrackingVisitor extends
-		AbstractConclusionVisitor<Context, Void> {
+public class BacktrackingVisitor extends RevertingVisitor {
 
 	private final ConclusionProducer producer_;
 
 	public BacktrackingVisitor(ConclusionProducer conclusionProducer) {
+		super(conclusionProducer);
 		this.producer_ = conclusionProducer;
 	}
 
 	@Override
-	protected Void defaultVisit(Conclusion conclusion, Context input) {
-		// does nothing by default
-		return null;
-	}
-
 	public void visitSubsumer(Subsumer conclusion, Context input) {
 		IndexedClassExpression expression = conclusion.getExpression();
-		if (conclusion instanceof PossibleConclusion)
+		if (conclusion instanceof PossibleConclusion) {
 			producer_.produce(input.getRoot(), new NegatedSubsumerImpl(
 					expression));
-	}
-
-	@Override
-	public Void visit(ComposedSubsumer conclusion, Context input) {
-		visitSubsumer(conclusion, input);
-		return null;
-	}
-
-	@Override
-	public Void visit(DecomposedSubsumer conclusion, Context input) {
-		visitSubsumer(conclusion, input);
-		return null;
-	}
-
-	@Override
-	public Void visit(NegatedSubsumer conclusion, Context input) {
-		IndexedClassExpression negatedExpression = conclusion
-				.getNegatedExpression();
-		if (input.getDisjunctions().keySet().contains(negatedExpression))
-			producer_.produce(input.getRoot(),
-					new PossibleDecomposedSubsumerImpl(negatedExpression));
-		return null;
-	}
-
-	@Override
-	public Void visit(ForwardLink conclusion, Context input) {
-		Root fillerRoot = new Root(conclusion.getTarget());
-		backtrackLink(input, conclusion.getRelation(), fillerRoot);
-		return null;
-	}
-
-	@Override
-	public Void visit(NegativePropagation conclusion, Context input) {
-		IndexedObjectProperty relation = conclusion.getRelation();
-		Collection<IndexedClassExpression> negativeRootMembers = input
-				.getNegativePropagations().get(relation);
-		for (IndexedClassExpression positiveMember : input.getForwardLinks()
-				.get(relation)) {
-			Root targetRoot = new Root(positiveMember, negativeRootMembers);
-			backtrackLink(input, conclusion.getRelation(), targetRoot);
+			return;
 		}
-		return null;
-	}
-
-	private void backtrackLink(Context input, IndexedObjectProperty relation,
-			Root targetRoot) {
-		producer_.produce(targetRoot,
-				new BacktrackedBackwardLinkImpl(input.getRoot(), relation));
-		input.removeConclusion(new PropagatedClashImpl(relation, targetRoot));
-
+		if (input.getMaskedPossibleComposedSubsumers().contains(expression)) {
+			producer_.produce(input.getRoot(),
+					new PossibleComposedSubsumerImpl(expression));
+		}
+		if (input.getDisjunctions().keySet().contains(expression))
+			producer_.produce(input.getRoot(),
+					new PossibleDecomposedSubsumerImpl(expression));
 	}
 
 }
