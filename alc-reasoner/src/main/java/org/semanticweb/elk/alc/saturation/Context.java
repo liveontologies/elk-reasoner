@@ -42,6 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLin
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -126,6 +127,12 @@ public class Context {
 	private Multimap<IndexedClassExpression, IndexedClassExpression> disjunctions_;
 
 	/**
+	 * properties for which there exists forward relations to inconsistent
+	 * {@link Root}s
+	 */
+	private Set<IndexedObjectProperty> propagetedClashProperties_;
+
+	/**
 	 * {@link Conclusion}s to which the rules are yet to be applied
 	 */
 	private Deque<Conclusion> toDo_;
@@ -203,6 +210,13 @@ public class Context {
 			return Collections.emptySet();
 		// else
 		return maskedPossibleComposedSubsumers_;
+	}
+
+	public Set<IndexedObjectProperty> getPropagatedClashProperties() {
+		if (propagetedClashProperties_ == null)
+			return Collections.emptySet();
+		// else
+		return propagetedClashProperties_;
 	}
 
 	public Set<IndexedClassExpression> getPossibleSubsumers() {
@@ -305,6 +319,13 @@ public class Context {
 			toGuess_ = null;
 		}
 		return result;
+	}
+
+	public void removePropagatedConclusions(IndexedObjectProperty property) {
+		if (propagetedClashProperties_ == null)
+			return;
+		// else
+		propagetedClashProperties_.remove(property);
 	}
 
 	public boolean hasClash() {
@@ -442,6 +463,15 @@ public class Context {
 			return true;
 		}
 
+		@Override
+		public Boolean visit(PropagatedClash conclusion, Context input) {
+			if (input.propagetedClashProperties_ == null)
+				input.propagetedClashProperties_ = new ArrayHashSet<IndexedObjectProperty>(
+						4);
+			return input.propagetedClashProperties_.add(conclusion
+					.getRelation());
+		}
+
 	}
 
 	static class ConclusionDeleter implements
@@ -571,6 +601,20 @@ public class Context {
 		public Boolean visit(Clash conclusion, Context input) {
 			if (input.hasClash_) {
 				input.hasClash_ = false;
+				return true;
+			}
+			// else
+			return false;
+		}
+
+		@Override
+		public Boolean visit(PropagatedClash conclusion, Context input) {
+			if (input.propagetedClashProperties_ == null)
+				return false;
+			if (input.propagetedClashProperties_.remove(conclusion
+					.getRelation())) {
+				if (input.propagetedClashProperties_.isEmpty())
+					input.propagetedClashProperties_ = null;
 				return true;
 			}
 			// else

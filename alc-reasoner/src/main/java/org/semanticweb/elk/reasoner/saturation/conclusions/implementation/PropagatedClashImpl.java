@@ -24,12 +24,11 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.saturation.Root;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 
-public class PropagatedClashImpl extends AbstractConclusion implements Clash,
-		PropagatedConclusion {
+public class PropagatedClashImpl extends AbstractConclusion implements
+		PropagatedClash {
 
 	private final IndexedObjectProperty relation_;
 
@@ -58,7 +57,7 @@ public class PropagatedClashImpl extends AbstractConclusion implements Clash,
 
 	@Override
 	public String toString() {
-		return "Propagated" + Clash.NAME + "(" + relation_ + " "
-				+ inconsistentRoot_ + ")";
+		return PropagatedClash.NAME + "(" + relation_ + " " + inconsistentRoot_
+				+ ")";
 	}
 }

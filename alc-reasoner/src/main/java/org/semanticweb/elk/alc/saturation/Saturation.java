@@ -24,6 +24,7 @@ package org.semanticweb.elk.alc.saturation;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BacktrackedConclusion;
@@ -156,7 +157,8 @@ public class Saturation {
 					continue;
 				if ((!context.isDeterministic() || conclusion instanceof PossibleConclusion)
 						&& !context.isInconsistent()
-						&& !(conclusion instanceof BackwardLink)) {
+						&& !(conclusion instanceof BackwardLink)
+						&& !(conclusion instanceof PropagatedConclusion)) {
 					context.pushToHistory(conclusion);
 				}
 				conclusion.accept(ruleApplicationVisitor_, context);
@@ -173,6 +175,10 @@ public class Saturation {
 						context.removeConclusion(toBacktrack);
 						if (toBacktrack instanceof PossibleConclusion)
 							break;
+					}
+					if (!context.getPropagatedClashProperties().isEmpty()) {
+						saturationState_.produce(context.getRoot(),
+								ClashImpl.getInstance());
 					}
 				}
 
