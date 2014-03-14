@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -36,6 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
@@ -93,7 +95,7 @@ public class LocalTracingSaturationState extends
 		 * processing (including "reading" e.g. unwinding the traces) must wait
 		 * until that is done.
 		 */
-		private final AtomicBoolean beingTraced_;
+		private final AtomicBoolean beingTraced_ = new AtomicBoolean(false);
 		/**
 		 * Stores the set of blocked inferences indexed by conclusions through
 		 * which they are blocked. That is, if a conclusion C has only been
@@ -107,12 +109,21 @@ public class LocalTracingSaturationState extends
 		 * rules, e.g. only non-redundant rules). Indexed by roots of contexts
 		 * where these conclusions should be stored.
 		 */
-		private final Multimap<IndexedClassExpression, Conclusion> missingConclusions_; 
+		private final Multimap<IndexedClassExpression, Conclusion> missingConclusions_ = new HashListMultimap<IndexedClassExpression, Conclusion>();
+		/**
+		 * The set of roots of contexts in the main saturation state whose
+		 * saturation was triggered by tracing this context. We remember such
+		 * contexts because we can't simply mark *specific* contexts in the main
+		 * state as saturated during tracing. We can only mark *all* unsaturated
+		 * contexts as saturated which is only possible when all concurrent
+		 * tracing jobs finish.
+		 * 
+		 * TODO I'd happily get rid of this if I could
+		 */
+		private final Set<IndexedClassExpression> saturatedMainContexts_ = new ArrayHashSet<IndexedClassExpression>(4);
 
 		public TracedContext(IndexedClassExpression root) {
 			super(root);
-			beingTraced_ = new AtomicBoolean(false);
-			missingConclusions_ = new HashListMultimap<IndexedClassExpression, Conclusion>();
 		}
 
 		public Multimap<IndexedClassExpression, Conclusion> getMissingConclusions() {
@@ -127,6 +138,22 @@ public class LocalTracingSaturationState extends
 			missingConclusions_.clear();
 		}
 		
+		public void addSaturatedMainContext(IndexedClassExpression root) {
+			saturatedMainContexts_.add(root);
+		}
+		
+		public void addSaturatedMainContexts(Set<IndexedClassExpression> roots) {
+			saturatedMainContexts_.addAll(roots);
+		}
+		
+		public boolean isMainContextSaturated(IndexedClassExpression root) {
+			return saturatedMainContexts_.contains(root);
+		}
+		
+		public void clearSaturatedMainContexts() {
+			saturatedMainContexts_.clear();
+		}
+		
 		public Multimap<Conclusion, Inference> getBlockedInferences() {
 			if (blockedInferences_ == null) {
 				blockedInferences_ = new HashListMultimap<Conclusion, Inference>();
@@ -135,7 +162,7 @@ public class LocalTracingSaturationState extends
 			return blockedInferences_;
 		}
 
-		public void cleanBlockedInferences() {
+		public void clearBlockedInferences() {
 			blockedInferences_ = null;
 		}
 

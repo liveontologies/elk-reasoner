@@ -30,7 +30,8 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
  * Interface for engine factories which trace all inferences in the given
- * context.
+ * context. Depending on the implementation, they may or may not recursively
+ * trace other contexts.
  * 
  * @author Pavel Klinov
  * 

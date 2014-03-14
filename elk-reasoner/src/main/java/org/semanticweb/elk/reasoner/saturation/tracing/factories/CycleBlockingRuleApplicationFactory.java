@@ -126,7 +126,7 @@ public class CycleBlockingRuleApplicationFactory extends
 		super.dispose();
 		// cleaning blocked inferences
 		for (TracedContext context : getSaturationState().getContexts()) {
-			context.cleanBlockedInferences();
+			context.clearBlockedInferences();
 		}
 	}
 
@@ -270,13 +270,43 @@ public class CycleBlockingRuleApplicationFactory extends
 			Context mainContext = mainSaturationState_.getContext(root);
 			TracedContext localContext = getSaturationState().getContext(conclusion.getSourceRoot(root));
 			
-			if (mainContext == null/* || !mainContext.containsConclusion(conclusion)*/) {
+			if (needsTracing(mainContext, localContext, conclusion)) {
+				// If the main context isn't saturated, then it can't be used
+				// for tracing yet since it can be saturating concurrently due
+				// to a parallel tracing job.
 				localContext.addMissingConclusion(root, conclusion);
 				
 				return Boolean.FALSE;
 			}
 			
 			return Boolean.TRUE;
+		}
+		
+		/**
+		 * Decides if saturation of the main context is required for tracing of
+		 * the local context. The answer is yes if either the main context
+		 * doesn't exist or hasn't been saturated yet or has been saturated but
+		 * doesn't contain the given conclusion (e.g. a backward link). Note
+		 * that the context could already be saturated but not yet marked as
+		 * saturated. Then, if its saturation was triggered by tracing this
+		 * local context, it will be stored in the local context.
+		 */
+		private boolean needsTracing(Context mainContext,
+				TracedContext tracedContext, Conclusion conclusion) {
+			if (mainContext == null) {
+				return true;
+			}
+
+			IndexedClassExpression root = mainContext.getRoot();
+			
+			if (root == tracedContext.getRoot()) {
+				return false;
+			}
+
+			return !mainContext.isSaturated()
+					&& !tracedContext.isMainContextSaturated(root)
+					|| !mainContext.containsConclusion(conclusion)
+					&& !tracedContext.getMissingConclusions().contains(root, conclusion);
 		}
 
 	}

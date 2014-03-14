@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
@@ -39,11 +40,12 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.MultimapQueue;
@@ -132,16 +134,6 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 		return pendingJobsByRoot_.takeEntry();
 	}
 	
-	private void finishTracing(IndexedClassExpression root, Collection<ContextTracingJob> pendingJobs) {
-		TracedContext context = tracingState_.getContext(root);
-		
-		LOGGER_.trace("{} finished tracing", root);
-		
-		context.setSaturated(true);
-		context.beingTracedCompareAndSet(true, false);
-		notifyCallers(pendingJobs);
-	}
-	
 	@Override
 	public SaturationStatistics getStatistics() {
 		return tracingFactory_.getRuleAndConclusionStatistics();
@@ -159,7 +151,22 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 				.getEngine();
 
 		private final ClassExpressionSaturationNoInputFactory.Engine saturationEngine_ = saturationFactory_
-				.getEngine();
+				.getEngine(new ContextModificationListener() {
+					/*
+					 * All contexts modified during the saturation completion
+					 * procedure should be treated as saturated when the
+					 * procedure finishes. We collect them using this visitor.
+					 * 
+					 * TODO It'd be better if we could simply mark these
+					 * contexts as saturated when the saturation engine
+					 * finishes. I.e. if the factory could mark as saturated
+					 * those contexts which got activated during processing.
+					 */
+					@Override
+					public void notifyContextModification(Context context) {
+						markAsModified(context.getRoot());
+					}
+				});
 
 		private final ContextCreatingSaturationStateWriter<TracedContext> tracingContextWriter_ = tracingState_
 				.getContextCreatingWriter(ContextCreationListener.DUMMY,
@@ -167,6 +174,15 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 		
 		private final SaturationStateWriter<?> mainStateWriter_ = mainSaturationState_.getContextCreatingWriter();
 		
+		private Set<IndexedClassExpression> saturatedContexts_;
+		
+		private void markAsModified(IndexedClassExpression root) {
+			if (saturatedContexts_ == null) {
+				saturatedContexts_ = new ArrayHashSet<IndexedClassExpression>();
+			}
+			
+			saturatedContexts_.add(root);
+		}
 
 		@Override
 		public void submit(ContextTracingJob job) {
@@ -217,22 +233,54 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 						break;
 					}
 					
-					LOGGER_.trace("{} will resume tracing after some missing contexts are saturated: {}", rootToTrace, missingConlusions.keySet());
-					// otherwise, need to complete the main closure by applying
-					// the redundant rules starting with the missing conclusions
-					initRuleApplication(missingConlusions, mainStateWriter_);
+					LOGGER_.trace(
+							"{} will resume tracing after some missing contexts are saturated: {}",
+							rootToTrace, missingConlusions.keySet());
+					// Otherwise, need to complete the main closure by
+					// saturating contexts which did not exist before. Since we
+					// don't know yet if these contexts will be used for
+					// tracing, we first saturate them under non-redundant
+					// rules. 
+					initSaturationCompletion(missingConlusions);
 					saturationEngine_.process();
-					// now, resume tracing
-					initRuleApplication(missingConlusions, tracingContextWriter_);
+					// now, resume tracing by applying redundant rules.
+					resumeTracing(context);
 					context.clearMissingConclusions();
 				}
 			}
 		}
+		
+		private final void resumeTracing(TracedContext context) {
+			context.addSaturatedMainContexts(saturatedContexts_);
+			saturatedContexts_.clear();
+			
+			for (IndexedClassExpression root : context.getMissingConclusions().keySet()) {
+				for (Conclusion conclusion : context.getMissingConclusions().get(root)) {
+					tracingContextWriter_.produce(root, conclusion);
+				}
+			}
+		}
+		
+		private void finishTracing(IndexedClassExpression root, Collection<ContextTracingJob> pendingJobs) {
+			TracedContext context = tracingState_.getContext(root);
+			
+			LOGGER_.trace("{} finished tracing", root);
+			
+			context.setSaturated(true);
+			context.beingTracedCompareAndSet(true, false);
+			// cleaning up the auxiliary data structures
+			context.clearBlockedInferences();
+			context.clearMissingConclusions();
+			context.clearSaturatedMainContexts();
+			notifyCallers(pendingJobs);
+		}
 
-		private void initRuleApplication(Multimap<IndexedClassExpression, Conclusion> missingConlusions, ConclusionProducer producer) {
+		private void initSaturationCompletion(Multimap<IndexedClassExpression, Conclusion> missingConlusions) {
 			for (IndexedClassExpression root : missingConlusions.keySet()) {
+				markAsModified(root);
+				
 				for (Conclusion conclusion : missingConlusions.get(root)) {
-					producer.produce(root, conclusion);
+					mainStateWriter_.produce(root, conclusion);
 				}
 			}
 		}
@@ -242,7 +290,6 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 			tracingEngine_.finish();
 			saturationEngine_.finish();
 		}
-
 	}
 
 }
