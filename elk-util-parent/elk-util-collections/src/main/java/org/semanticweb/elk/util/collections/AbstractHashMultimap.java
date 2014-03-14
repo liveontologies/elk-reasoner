@@ -89,8 +89,13 @@ public abstract class AbstractHashMultimap<Key, Value> extends
 		Collection<Value> record = super.get(key);
 		if (record == null)
 			return false;
-		return record.remove(value);
+		if (record.remove(value)) {
+			if (record.isEmpty())
+				super.remove(key);
+			return true;
+		}
+		// else
+		return false;
 	}
-	
-	
+
 }
