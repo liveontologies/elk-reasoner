@@ -69,6 +69,42 @@ public class Root {
 		}
 	}
 
+	/**
+	 * @param root
+	 * @param negativeSubsumer
+	 * @return the {@link Root} obtained by adding the given negative subsumer
+	 *         to the given {@link Root}
+	 */
+	public static Root addNegativeSubsumer(Root root,
+			IndexedClassExpression negativeSubsumer) {
+		Set<IndexedClassExpression> negativeSubsumers = root
+				.getNegatitveSubsumers();
+		if (negativeSubsumers.contains(negativeSubsumer))
+			return root;
+		// else
+		Root newRoot = new Root(root.getPositiveSubsumer(), negativeSubsumers);
+		newRoot.addNegativeSubsumer(negativeSubsumer);
+		return newRoot;
+	}
+
+	/**
+	 * @param root
+	 * @param negativeSubsumer
+	 * @return the {@link Root} obtained by removing the given negative subsumer
+	 *         from the given {@link Root}
+	 */
+	public static Root removeNegativeSubsumer(Root root,
+			IndexedClassExpression negativeSubsumer) {
+		Set<IndexedClassExpression> negativeSubsumers = root
+				.getNegatitveSubsumers();
+		if (!negativeSubsumers.contains(negativeSubsumer))
+			return root;
+		// else
+		Root newRoot = new Root(root.getPositiveSubsumer(), negativeSubsumers);
+		newRoot.removeNegativeSubsumer(negativeSubsumer);
+		return newRoot;
+	}
+
 	public IndexedClassExpression getPositiveSubsumer() {
 		return this.positiveSubsumer_;
 	}
@@ -102,6 +138,25 @@ public class Root {
 		return positiveSubsumer_.toString()
 				+ (negativeSubsumers_ == null ? "" : "~"
 						+ getNegatitveSubsumers().toString());
+	}
+
+	boolean addNegativeSubsumer(IndexedClassExpression negativeSubsumer) {
+		if (negativeSubsumers_ == null)
+			negativeSubsumers_ = new ArrayHashSet<IndexedClassExpression>(4);
+		return negativeSubsumers_.add(negativeSubsumer);
+	}
+
+	boolean removeNegativeSubsumer(IndexedClassExpression negativeSubsumer) {
+		if (negativeSubsumers_ == null)
+			return false;
+		// else
+		if (negativeSubsumers_.remove(negativeSubsumer)) {
+			if (negativeSubsumers_.isEmpty())
+				negativeSubsumers_ = null;
+			return true;
+		}
+		// else
+		return false;
 	}
 
 	void setContext(Context context) {

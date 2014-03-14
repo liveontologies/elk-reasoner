@@ -40,7 +40,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePr
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
 
@@ -100,7 +99,9 @@ public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
 
 	@Override
 	public Void visit(ForwardLink conclusion, Context input) {
-		Root fillerRoot = new Root(conclusion.getTarget());
+		IndexedObjectProperty relation = conclusion.getRelation();
+		Root fillerRoot = new Root(conclusion.getTarget(), input
+				.getNegativePropagations().get(relation));
 		backtrackLink(input, conclusion.getRelation(), fillerRoot);
 		return null;
 	}
@@ -108,21 +109,18 @@ public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
 	@Override
 	public Void visit(NegativePropagation conclusion, Context input) {
 		IndexedObjectProperty relation = conclusion.getRelation();
+		IndexedClassExpression negatedCarry = conclusion.getNegatedCarry();
 		Collection<IndexedClassExpression> oldNegativeRootMembers = input
 				.getNegativePropagations().get(relation);
-		Collection<IndexedClassExpression> newNegativeRootMembers = new ArrayHashSet<IndexedClassExpression>(
-				oldNegativeRootMembers.size());
-		newNegativeRootMembers.addAll(oldNegativeRootMembers);
-		newNegativeRootMembers.remove(conclusion.getNegatedCarry());
 		Conclusion newConclusion = new BackwardLinkImpl(input.getRoot(),
 				relation);
 		for (IndexedClassExpression positiveMember : input.getForwardLinks()
 				.get(relation)) {
 			Root oldTargetRoot = new Root(positiveMember,
 					oldNegativeRootMembers);
+			Root newTargetRoot = Root.removeNegativeSubsumer(oldTargetRoot,
+					negatedCarry);
 			backtrackLink(input, conclusion.getRelation(), oldTargetRoot);
-			Root newTargetRoot = new Root(positiveMember,
-					newNegativeRootMembers);
 			producer_.produce(newTargetRoot, newConclusion);
 		}
 		return null;

@@ -49,7 +49,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePr
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Multimap;
 
 public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> {
@@ -166,15 +165,16 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(Clash conclusion, Context input) {
 		if (!input.isDeterministic())
 			return null;
-		// propagated to backward links only if the clash is derived
+		// propagate to backward links only if the clash is derived
 		// deterministically
 		Multimap<IndexedObjectProperty, Root> backwardLinks = input
 				.getBackwardLinks();
 		Root root = input.getRoot();
-		for (IndexedObjectProperty relation : backwardLinks.keySet())
+		for (IndexedObjectProperty relation : backwardLinks.keySet()) {
+			Conclusion propagatedClash = new PropagatedClashImpl(relation, root);
 			for (Root target : backwardLinks.get(relation))
-				producer_.produce(target, new PropagatedClashImpl(relation,
-						root));
+				producer_.produce(target, propagatedClash);
+		}
 		return null;
 	}
 
@@ -182,24 +182,20 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(NegativePropagation conclusion, Context input) {
 		Root root = input.getRoot();
 		IndexedObjectProperty relation = conclusion.getRelation();
+		IndexedClassExpression negatedCarry = conclusion.getNegatedCarry();
 		Collection<IndexedClassExpression> newNegativeRootMembers = input
 				.getNegativePropagations().get(relation);
-		Conclusion newLink = new BackwardLinkImpl(root,
+		Conclusion toBacktrack = new BacktrackedBackwardLinkImpl(root,
 				conclusion.getRelation());
-		Conclusion oldLink = new BacktrackedBackwardLinkImpl(root,
-				conclusion.getRelation());
-		Collection<IndexedClassExpression> oldNegativeRootMembers = new ArrayHashSet<IndexedClassExpression>(
-				newNegativeRootMembers.size());
-		oldNegativeRootMembers.addAll(newNegativeRootMembers);
-		oldNegativeRootMembers.remove(conclusion.getNegatedCarry());
+		Conclusion toAdd = new BackwardLinkImpl(root, conclusion.getRelation());
 		for (IndexedClassExpression positiveMember : input.getForwardLinks()
 				.get(relation)) {
 			Root newTargetRoot = new Root(positiveMember,
 					newNegativeRootMembers);
-			producer_.produce(newTargetRoot, newLink);
-			Root oldTargetRoot = new Root(positiveMember,
-					oldNegativeRootMembers);
-			producer_.produce(oldTargetRoot, oldLink);
+			Root oldTargetRoot = Root.removeNegativeSubsumer(newTargetRoot,
+					negatedCarry);
+			producer_.produce(oldTargetRoot, toBacktrack);
+			producer_.produce(newTargetRoot, toAdd);
 		}
 		return null;
 	}

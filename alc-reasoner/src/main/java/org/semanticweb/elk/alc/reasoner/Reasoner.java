@@ -139,8 +139,9 @@ public class Reasoner {
 			// does not occur
 			return first == second;
 		}
-		if (context.isInconsistent())
+		if (context.isInconsistent()) {
 			return true;
+		}
 		Saturation saturation = new Saturation(saturationState_);
 		return (saturation.checkSubsumer(context, second));
 	}
@@ -195,6 +196,11 @@ public class Reasoner {
 							countNegativeSubsumerTests++;
 						}
 						countSubsumerTests++;
+						if (saturation.checkSubsumer(context, possibleSubsumer) != saturation
+								.checkSubsumer(context, possibleSubsumer)) {
+							LOGGER_.error("{}: testst do not agree on {}",
+									context, possibleSubsumer);
+						}
 					}
 				}
 				count++;
