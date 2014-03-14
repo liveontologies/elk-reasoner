@@ -1,15 +1,14 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
-
+package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,21 +24,24 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 
 /**
+ * Creates instances of {@link RedundantRuleApplicationConclusionVisitor}
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public abstract class AbstractConclusion implements Conclusion {
+public class RedundantRuleApplicationVisitorFactory implements
+		RuleApplicationVisitorFactory {
 
 	@Override
-	public IndexedClassExpression getSourceRoot(
-			IndexedClassExpression rootWhereStored) {
-		// by default where the conclusion is stored
-		return rootWhereStored;
+	public AbstractRuleApplicationConclusionVisitor create(
+			RuleVisitor ruleVisitor, ConclusionProducer producer) {
+		return new RedundantRuleApplicationConclusionVisitor(ruleVisitor,
+				producer);
 	}
 
 }

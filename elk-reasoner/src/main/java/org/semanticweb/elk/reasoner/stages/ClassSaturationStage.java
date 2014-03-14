@@ -24,7 +24,13 @@ package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationVisitorFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RedundantRuleApplicationVisitorFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationVisitorFactory;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.tracing.factories.RuleApplicationFactoryWithTracing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,11 +65,31 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
+
+		RuleApplicationFactory<Context> ruleFactory = null;
+		RuleApplicationVisitorFactory ruleAppVisitorFactory = null;
+		
+		if (reasoner.REDUNDANT_RULES) {
+			ruleAppVisitorFactory = new RedundantRuleApplicationVisitorFactory();
+		}
+		else {
+			ruleAppVisitorFactory = new NonRedundantRuleApplicationVisitorFactory();
+		}
+
+		if (reasoner.FULL_TRACING) {
+			reasoner.resetTraceState();
+			ruleFactory = new RuleApplicationFactoryWithTracing(
+					reasoner.saturationState, reasoner.traceState
+							.getTraceStore().getWriter(), ruleAppVisitorFactory);
+		} else {
+			ruleFactory = new RuleApplicationAdditionFactory(
+					reasoner.saturationState, ruleAppVisitorFactory);
+		}
+
 		this.computation_ = new ClassExpressionSaturation<IndexedClass>(
 				reasoner.ontologyIndex.getIndexedClasses(),
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(),
-				new RuleApplicationAdditionFactory(reasoner.saturationState));
+				reasoner.getProgressMonitor(), ruleFactory);
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		return true;

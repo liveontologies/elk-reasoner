@@ -104,8 +104,9 @@ public interface ContextPremises {
 	 *         contains at least two different {@link DisjointSubsumer}s for
 	 *         this {@link IndexedDisjointnessAxiom}
 	 */
-	public boolean isInconsistForDisjointnessAxiom(
-			IndexedDisjointnessAxiom axiom);
+	/*public boolean isInconsistForDisjointnessAxiom(
+			IndexedDisjointnessAxiom axiom);*/
+	public IndexedClassExpression[] getDisjointSubsumers(IndexedDisjointnessAxiom axiom);
 
 	public Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(IndexedPropertyChain subRoot);
 }

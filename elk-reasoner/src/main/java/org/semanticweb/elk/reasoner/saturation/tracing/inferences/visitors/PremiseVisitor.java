@@ -26,15 +26,23 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromInconsistentDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromNegation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromOwlNothing;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialForwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjunctionComposition;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InitializationSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
@@ -127,9 +135,57 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 	}
 
 	@Override
+	public O visit(ContradictionFromInconsistentDisjointnessAxiom conclusion,
+			I input) {
+		conclusion.getPremise().accept(this, input);
+		return null;
+	}
+
+	@Override
+	public O visit(ContradictionFromDisjointSubsumers conclusion, I input) {
+		for (DisjointSubsumer subsumer : conclusion.getPremises()) {
+			subsumer.accept(this, input);
+		}
+
+		return null;
+	}
+
+	@Override
+	public O visit(ContradictionFromNegation conclusion, I input) {
+		conclusion.getPremise().accept(this, input); 
+		conclusion.getPositivePremise().accept(this, input);
+		return null;
+	}
+
+	@Override
+	public O visit(ContradictionFromOwlNothing conclusion, I input) {
+		conclusion.getPremise().accept(this, input);
+		return null;
+	}
+
+	@Override
+	public O visit(PropagatedContradiction conclusion, I input) {
+		conclusion.getLinkPremise().accept(this, input);
+		conclusion.getContradictionPremise().accept(this, input);
+		return null;
+	}
+
+	@Override
+	public O visit(DisjointSubsumerFromSubsumer conclusion, I input) {
+		conclusion.getPremise().accept(this, input);
+		return null;
+	}
+	
+	@Override
+	public O visit(DisjunctionComposition conclusion, I input) {
+		conclusion.getPremise().accept(this, input);
+		return null;
+	}
+
+	@Override
 	protected O defaultVisit(Conclusion conclusion, I input) {
 		// no-op
 		return null;
-	}
+	}	
 
 }

@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecompositionVisitor;
 
-abstract class AbstractRuleApplicationConclusionVisitor extends
+public abstract class AbstractRuleApplicationConclusionVisitor extends
 		AbstractConclusionVisitor<ContextPremises, Boolean> {
 
 	/**

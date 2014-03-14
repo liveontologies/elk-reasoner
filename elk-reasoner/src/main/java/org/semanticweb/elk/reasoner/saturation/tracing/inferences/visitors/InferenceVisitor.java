@@ -6,11 +6,18 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromInconsistentDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromNegation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromOwlNothing;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialForwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjunctionComposition;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InitializationSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
@@ -71,6 +78,20 @@ public interface InferenceVisitor<I, O> {
 	public O visit(DecomposedExistentialForwardLink conclusion, I input);
 
 	public O visit(TracedPropagation conclusion, I input);
+	
+	public O visit(ContradictionFromInconsistentDisjointnessAxiom conclusion, I input);
+	
+	public O visit(ContradictionFromDisjointSubsumers conclusion, I input);
+	
+	public O visit(ContradictionFromNegation conclusion, I input);
+	
+	public O visit(ContradictionFromOwlNothing conclusion, I input);
+	
+	public O visit(PropagatedContradiction conclusion, I input);
+	
+	public O visit(DisjointSubsumerFromSubsumer conclusion, I input);
+	
+	public O visit(DisjunctionComposition conclusion, I input);
 
 	public static final InferenceVisitor<?, ?> DUMMY = new AbstractInferenceVisitor<Void, Void>() {
 

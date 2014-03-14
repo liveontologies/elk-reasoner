@@ -70,7 +70,7 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkTracingCompleteness(a, d, reasoner);
 		TracingTestUtils.checkTracingMinimality(a, d, reasoner);
 	}
-
+	
 	/*
 	 * @Test public void testGalen() throws Exception { Reasoner reasoner =
 	 * load("tracing/EL-GALEN.owl"); ElkObjectFactory factory = new

@@ -154,10 +154,10 @@ public class NonRedundantLocalRuleApplicationConclusionVisitor extends
 
 	@Override
 	public Boolean visit(DisjointSubsumer conclusion, ContextPremises premises) {
-		if (premises.isInconsistForDisjointnessAxiom(conclusion.getAxiom())) {
-			ruleAppVisitor.visit(CONTRADICTION_COMPOSITION_RULE_, conclusion,
+		//if (premises.isInconsistForDisjointnessAxiom(conclusion.getAxiom())) {
+		ruleAppVisitor.visit(CONTRADICTION_COMPOSITION_RULE_, conclusion,
 					premises, producer);
-		}
+		//}
 		return true;
 	}
 

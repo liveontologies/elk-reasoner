@@ -25,27 +25,40 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromInconsistentDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromNegation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromOwlNothing;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialForwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjunctionComposition;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InitializationSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
@@ -72,6 +85,10 @@ import org.semanticweb.elk.util.collections.Multimap;
  */
 public class SimpleContextTraceStore implements ContextTraceStore {
 
+	private final List<Inference> contradictionInferences_;
+	
+	private final Map<IndexedClassExpression, Multimap<IndexedDisjointnessAxiom, Inference>> disjointSubsumerInferenceMap_;
+	
 	private final Multimap<IndexedClassExpression, Inference> subsumerInferenceMap_;
 
 	private final Map<IndexedPropertyChain, Multimap<IndexedClassExpression, Inference>> backwardLinkInferenceMap_;
@@ -80,7 +97,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 
 	private final Map<IndexedPropertyChain, Multimap<IndexedObjectSomeValuesFrom, Inference>> propagationMap_;
 
-	private final ConclusionVisitor<InferenceVisitor<?, ?>, Void> inferenceReader_ = new AbstractConclusionVisitor<InferenceVisitor<?, ?>, Void>() {
+	private final ConclusionVisitor<InferenceVisitor<?, ?>, Void> inferenceReader_ = new ConclusionVisitor<InferenceVisitor<?, ?>, Void>() {
 
 		private void visitAll(Iterable<Inference> conclusions,
 				InferenceVisitor<?, ?> visitor) {
@@ -135,7 +152,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		@Override
 		public Void visit(ForwardLink link, InferenceVisitor<?, ?> visitor) {
 			visitAll(
-					getLinkInferences(forwardLinkInferenceMap_,
+					getInferences(forwardLinkInferenceMap_,
 							link.getRelation(), link.getTarget()), visitor);
 
 			return null;
@@ -145,7 +162,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		public Void visit(Propagation propagation,
 				InferenceVisitor<?, ?> visitor) {
 			visitAll(
-					getLinkInferences(propagationMap_,
+					getInferences(propagationMap_,
 							propagation.getRelation(), propagation.getCarry()),
 					visitor);
 
@@ -153,8 +170,28 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		}
 
 		@Override
-		public Void defaultVisit(Conclusion conclusion,
+		public Void visit(SubContextInitialization subConclusion,
 				InferenceVisitor<?, ?> input) {
+			// no-op
+			return null;
+		}
+
+		@Override
+		public Void visit(ContextInitialization conclusion,
+				InferenceVisitor<?, ?> input) {
+			// no-op
+			return null;
+		}
+
+		@Override
+		public Void visit(Contradiction conclusion, InferenceVisitor<?, ?> input) {
+			visitAll(contradictionInferences_, input);
+			return null;
+		}
+
+		@Override
+		public Void visit(DisjointSubsumer conclusion, InferenceVisitor<?, ?> input) {
+			visitAll(getInferences(disjointSubsumerInferenceMap_, conclusion.getMember(), conclusion.getAxiom()), input);
 			return null;
 		}
 
@@ -200,7 +237,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 
 		@Override
 		public Boolean visit(ComposedForwardLink conclusion, Void input) {
-			return addTracedValue(forwardLinkInferenceMap_,
+			return addInference(forwardLinkInferenceMap_,
 					conclusion.getRelation(), conclusion.getTarget(),
 					conclusion);
 		}
@@ -221,15 +258,53 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		@Override
 		public Boolean visit(DecomposedExistentialForwardLink conclusion,
 				Void input) {
-			return addTracedValue(forwardLinkInferenceMap_,
+			return addInference(forwardLinkInferenceMap_,
 					conclusion.getRelation(), conclusion.getTarget(),
 					conclusion);
 		}
 
 		@Override
 		public Boolean visit(TracedPropagation conclusion, Void param) {
-			return addTracedValue(propagationMap_, conclusion.getRelation(),
+			return addInference(propagationMap_, conclusion.getRelation(),
 					conclusion.getCarry(), conclusion);
+		}
+
+		@Override
+		public Boolean visit(
+				ContradictionFromInconsistentDisjointnessAxiom conclusion,
+				Void input) {
+			return addContradictionInference(conclusion);
+		}
+
+		@Override
+		public Boolean visit(ContradictionFromDisjointSubsumers conclusion,
+				Void input) {
+			return addContradictionInference(conclusion);
+		}
+
+		@Override
+		public Boolean visit(ContradictionFromNegation conclusion, Void input) {
+			return addContradictionInference(conclusion);
+		}
+
+		@Override
+		public Boolean visit(ContradictionFromOwlNothing conclusion, Void input) {
+			return addContradictionInference(conclusion);
+		}
+
+		@Override
+		public Boolean visit(PropagatedContradiction conclusion, Void input) {
+			return addContradictionInference(conclusion);
+		}
+
+		@Override
+		public Boolean visit(DisjointSubsumerFromSubsumer conclusion, Void input) {
+			return addInference(disjointSubsumerInferenceMap_, conclusion.getMember(), conclusion.getAxiom(), conclusion);
+		}
+
+		@Override
+		public Boolean visit(DisjunctionComposition conclusion, Void input) {
+			return addSubsumerInference(conclusion.getExpression(), conclusion);
 		}
 
 	};
@@ -238,6 +313,8 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 	 * 
 	 */
 	public SimpleContextTraceStore() {
+		contradictionInferences_ = new ArrayList<Inference>(2);
+		disjointSubsumerInferenceMap_ = new ArrayHashMap<IndexedClassExpression, Multimap<IndexedDisjointnessAxiom, Inference>>();
 		subsumerInferenceMap_ = new HashListMultimap<IndexedClassExpression, Inference>();
 		backwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedClassExpression, Inference>>();
 		forwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedClassExpression, Inference>>();
@@ -281,7 +358,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 	 * @return {@code true} if the trace multimap has changed as a result of
 	 *         this operation
 	 */
-	protected static <K, V, T> Boolean addTracedValue(
+	protected static <K, V, T> Boolean addInference(
 			Map<K, Multimap<V, T>> traceMultiMap, K key, V value, T trace) {
 		Multimap<V, T> traces = traceMultiMap.get(key);
 
@@ -297,6 +374,10 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		return traces.add(value, trace);
 	}
 
+	protected Boolean addContradictionInference(Inference inf) {
+		return contradictionInferences_.add(inf);
+	}
+	
 	protected Boolean addSubsumerInference(IndexedClassExpression ice,
 			Inference inf) {
 		return subsumerInferenceMap_.add(ice, inf);
@@ -312,7 +393,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		return subsumerInferenceMap_.get(conclusion);
 	}
 
-	public static <K, V, T> Iterable<T> getLinkInferences(
+	public static <K, V, T> Iterable<T> getInferences(
 			Map<K, Multimap<V, T>> traceMultiMap, K key, V value) {
 		Multimap<V, T> traces = traceMultiMap.get(key);
 
