@@ -109,12 +109,14 @@ public class Saturation {
 				possibleSubsumer);
 		saturationState_.produce(conjectureRoot, CONTEXT_INIT_);
 		process();
+		// saturationState_.checkSaturation();
 		return (saturationState_.getContext(conjectureRoot).isInconsistent());
 	}
 
 	public boolean checkSubsumer(Context context,
 			IndexedClassExpression possibleSubsumer) {
 		return checkSubsumerSimple(context, possibleSubsumer);
+		// return checkSubsumerOptimized(context, possibleSubsumer);
 	}
 
 	public void process() {
@@ -122,8 +124,9 @@ public class Saturation {
 			Context context = saturationState_.pollActiveContext();
 			if (context == null) {
 				context = saturationState_.pollPossibleContext();
-				if (context == null)
+				if (context == null) {
 					return;
+				}
 			}
 			for (;;) {
 				// TODO: take from the local queue
@@ -136,7 +139,10 @@ public class Saturation {
 				LOGGER_.trace("{}: processing {}", context.getRoot(),
 						conclusion);
 				if (conclusion instanceof BacktrackedConclusion) {
-					context.removeConclusion(conclusion);
+					if (!context.removeConclusion(conclusion))
+						LOGGER_.error(
+								"{}: backtracked conclusion not found: {}!",
+								context, conclusion);
 					continue;
 				}
 				if (conclusion instanceof PropagatedConclusion) {
@@ -163,7 +169,7 @@ public class Saturation {
 				}
 				conclusion.accept(ruleApplicationVisitor_, context);
 				if (context.hasClash()) {
-					context.clearToDo();
+					context.clearToDoFromLocalConclusions();
 					for (;;) {
 						Conclusion toBacktrack = context.popHistory();
 						if (toBacktrack == null) {
@@ -176,7 +182,7 @@ public class Saturation {
 						if (toBacktrack instanceof PossibleConclusion)
 							break;
 					}
-					if (!context.getPropagatedClashProperties().isEmpty()) {
+					if (!context.getInconsistentSuccessors().isEmpty()) {
 						saturationState_.produce(context.getRoot(),
 								ClashImpl.getInstance());
 					}

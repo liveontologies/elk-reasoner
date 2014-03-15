@@ -43,6 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSub
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -127,10 +128,9 @@ public class Context {
 	private Multimap<IndexedClassExpression, IndexedClassExpression> disjunctions_;
 
 	/**
-	 * properties for which there exists forward relations to inconsistent
-	 * {@link Root}s
+	 * inconsistent {@link Root}s that are reachable by forward links
 	 */
-	private Set<IndexedObjectProperty> propagetedClashProperties_;
+	private Multimap<IndexedObjectProperty, Root> inconsistentSuccessors_;
 
 	/**
 	 * {@link Conclusion}s to which the rules are yet to be applied
@@ -212,11 +212,11 @@ public class Context {
 		return maskedPossibleComposedSubsumers_;
 	}
 
-	public Set<IndexedObjectProperty> getPropagatedClashProperties() {
-		if (propagetedClashProperties_ == null)
-			return Collections.emptySet();
+	public Multimap<IndexedObjectProperty, Root> getInconsistentSuccessors() {
+		if (inconsistentSuccessors_ == null)
+			return Operations.emptyMultimap();
 		// else
-		return propagetedClashProperties_;
+		return inconsistentSuccessors_;
 	}
 
 	public Set<IndexedClassExpression> getPossibleSubsumers() {
@@ -294,9 +294,21 @@ public class Context {
 		return result;
 	}
 
-	void clearToDo() {
-		if (toDo_ != null)
-			toDo_.clear();
+	// TODO: it is safer to use local todo and clear it instead!
+	void clearToDoFromLocalConclusions() {
+		if (toDo_ == null)
+			return;
+		Deque<Conclusion> newToDo = new ArrayDeque<Conclusion>();
+		for (;;) {
+			Conclusion next = toDo_.poll();
+			if (next == null)
+				break;
+			if (next instanceof BackwardLink
+					|| next instanceof PropagatedConclusion)
+				// TODO: do not keep reflexive backward links?
+				newToDo.add(next);
+		}
+		toDo_ = newToDo;
 	}
 
 	boolean addToGuess(PossibleConclusion possibleConclusion) {
@@ -322,10 +334,18 @@ public class Context {
 	}
 
 	public void removePropagatedConclusions(IndexedObjectProperty property) {
-		if (propagetedClashProperties_ == null)
+		if (inconsistentSuccessors_ == null)
 			return;
 		// else
-		propagetedClashProperties_.remove(property);
+		inconsistentSuccessors_.remove(property);
+	}
+
+	public void removePropagatedConclusions(IndexedObjectProperty property,
+			Root root) {
+		if (inconsistentSuccessors_ == null)
+			return;
+		// else
+		inconsistentSuccessors_.remove(property, root);
 	}
 
 	public boolean hasClash() {
@@ -465,11 +485,11 @@ public class Context {
 
 		@Override
 		public Boolean visit(PropagatedClash conclusion, Context input) {
-			if (input.propagetedClashProperties_ == null)
-				input.propagetedClashProperties_ = new ArrayHashSet<IndexedObjectProperty>(
+			if (input.inconsistentSuccessors_ == null)
+				input.inconsistentSuccessors_ = new HashSetMultimap<IndexedObjectProperty, Root>(
 						4);
-			return input.propagetedClashProperties_.add(conclusion
-					.getRelation());
+			return input.inconsistentSuccessors_.add(conclusion.getRelation(),
+					conclusion.getSourceRoot());
 		}
 
 	}
@@ -609,12 +629,12 @@ public class Context {
 
 		@Override
 		public Boolean visit(PropagatedClash conclusion, Context input) {
-			if (input.propagetedClashProperties_ == null)
+			if (input.inconsistentSuccessors_ == null)
 				return false;
-			if (input.propagetedClashProperties_.remove(conclusion
-					.getRelation())) {
-				if (input.propagetedClashProperties_.isEmpty())
-					input.propagetedClashProperties_ = null;
+			if (input.inconsistentSuccessors_.remove(conclusion.getRelation(),
+					conclusion.getSourceRoot())) {
+				if (input.inconsistentSuccessors_.isEmpty())
+					input.inconsistentSuccessors_ = null;
 				return true;
 			}
 			// else

@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
@@ -136,6 +137,30 @@ public class SaturationState implements ConclusionProducer {
 		if (context.getBackwardLinks().isEmpty()) {
 			existingRoots_.remove(root);
 			contextCount--;
+		}
+	}
+
+	void checkSaturation() {
+		for (Root root : existingRoots_.values()) {
+			Context context = root.getContext();
+			if (context.isInconsistent()) {
+				for (IndexedObjectProperty backwardRelation : context
+						.getBackwardLinks().keySet()) {
+					for (Root backwardRoot : context.getBackwardLinks().get(
+							backwardRelation)) {
+						Context backwardContext = backwardRoot.getContext();
+						if (backwardContext.isInconsistent())
+							continue;
+						// else
+						LOGGER_.error(
+								"{}({}): inconsistent, but its parent {}({}) is not (inconsistent successors: {})",
+								root, root.hashCode(), backwardRoot,
+								backwardRoot.hashCode(), backwardContext
+										.getInconsistentSuccessors().keySet());
+					}
+				}
+
+			}
 		}
 	}
 }

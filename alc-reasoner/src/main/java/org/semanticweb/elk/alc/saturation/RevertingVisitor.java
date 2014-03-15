@@ -99,12 +99,12 @@ public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
 	@Override
 	public Void visit(ForwardLink conclusion, Context input) {
 		IndexedObjectProperty relation = conclusion.getRelation();
-		input.removePropagatedConclusions(relation);
 		Root root = input.getRoot();
 		Root fillerRoot = new Root(conclusion.getTarget(), input
 				.getNegativePropagations().get(relation));
 		producer_.produce(fillerRoot, new BacktrackedBackwardLinkImpl(root,
 				relation));
+		input.removePropagatedConclusions(relation, fillerRoot);
 		return null;
 	}
 
