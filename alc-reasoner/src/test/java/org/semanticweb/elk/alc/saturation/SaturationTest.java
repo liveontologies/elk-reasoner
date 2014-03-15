@@ -614,4 +614,30 @@ public class SaturationTest {
 						+ ")");
 	}
 
+	@Test
+	public void testPropagationDecompositionRedundancy()
+			throws ElkLoadingException {
+		/*
+		 * this example illustrate a problem with decomposition optimization for
+		 * possible propagated subsumers: it may be that the link through which
+		 * the subsumer was propagated does not exist anymore, but subsumer can
+		 * block decomposition rules since it was composed
+		 */
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectUnionOf(ObjectUnionOf(:B ObjectSomeValuesFrom(:R ObjectUnionOf(:D :D))) :C))"
+						+ "SubClassOf(:D owl:Nothing)"//
+						+ "SubClassOf(:B ObjectUnionOf(:BB :BB))"
+						+ "EquivalentClasses(:BB ObjectSomeValuesFrom(:R :F))"//
+						+ ")",
+				// Expected saturation:
+				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :C)"//
+						+ ")");
+	}
+
 }
