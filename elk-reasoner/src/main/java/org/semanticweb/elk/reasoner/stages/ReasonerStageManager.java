@@ -42,16 +42,14 @@ public class ReasonerStageManager {
 			incrementalCompletionStage,
 			incrementalDeletionInitializationStage,
 			incrementalDeletionStage,
-			// initializeContextsAfterDeletionsStage,
-			// incrementalContextCleaningStage,
 			incrementalContextGapFillingStage,
-			// initializeContextsAfterCleaningStage,
 			incrementalAdditionInitializationStage, incrementalAdditionStage,
 			incrementalConsistencyCheckingStage,
 			incrementalTaxonomyCleaningStage,
 			incrementalClassTaxonomyComputationStage,
 			instanceTaxonomyComputationStage,
-			incrementalInstanceTaxonomyComputationStage;
+			incrementalInstanceTaxonomyComputationStage,
+			inferenceTracingStage;
 
 	ReasonerStageManager(AbstractReasonerState reasoner) {
 
@@ -98,25 +96,8 @@ public class ReasonerStageManager {
 		this.incrementalDeletionStage = new IncrementalDeletionStage(reasoner,
 				incrementalDeletionInitializationStage);
 
-		/*
-		 * this.initializeContextsAfterDeletionsStage = new
-		 * InitializeContextsAfterDeletionsStage( reasoner,
-		 * incrementalDeletionStage);
-		 */
-
-		/*
-		 * this.incrementalContextCleaningStage = new
-		 * IncrementalContextCleaningStage( reasoner,
-		 * initializeContextsAfterDeletionsStage);
-		 */
 		this.incrementalContextGapFillingStage = new IncrementalOverdeletionPruningStage(
 				reasoner, incrementalDeletionStage);
-
-		/*
-		 * this.initializeContextsAfterCleaningStage = new
-		 * InitializeContextsAfterCleaningStage( reasoner,
-		 * incrementalContextGapFillingStage);
-		 */
 
 		this.incrementalAdditionInitializationStage = new IncrementalAdditionInitializationStage(
 				reasoner, incrementalContextGapFillingStage/* initializeContextsAfterCleaningStage */);
@@ -135,6 +116,9 @@ public class ReasonerStageManager {
 
 		this.incrementalInstanceTaxonomyComputationStage = new IncrementalInstanceTaxonomyComputationStage(
 				reasoner, incrementalClassTaxonomyComputationStage);
-
+		
+		/* Tracing stages */
+		
+		this.inferenceTracingStage = new InferenceTracingStage(reasoner, classTaxonomyComputationStage);
 	}
 }

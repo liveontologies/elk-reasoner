@@ -48,20 +48,20 @@ public class TraceUnwindingState {
 
 	private final Set<Inference> processedInferences_;
 
-	TraceUnwindingState() {
+	public TraceUnwindingState() {
 		toUnwind_ = new LinkedList<Pair<Conclusion, IndexedClassExpression>>();
 		processedInferences_ = new ArrayHashSet<Inference>();
 	}
 
-	void addToUnwindingQueue(Conclusion conclusion, IndexedClassExpression rootWhereStored) {
+	public void addToUnwindingQueue(Conclusion conclusion, IndexedClassExpression rootWhereStored) {
 		toUnwind_.add(new Pair<Conclusion, IndexedClassExpression>(conclusion, rootWhereStored));
 	}
 
-	Pair<Conclusion, IndexedClassExpression> pollFromUnwindingQueue() {
+	public Pair<Conclusion, IndexedClassExpression> pollFromUnwindingQueue() {
 		return toUnwind_.poll();
 	}
 
-	boolean addToProcessed(Inference inference) {
+	public boolean addToProcessed(Inference inference) {
 		return processedInferences_.add(inference);
 	}
 }

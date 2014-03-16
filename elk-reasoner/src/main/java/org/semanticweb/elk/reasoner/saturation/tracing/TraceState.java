@@ -25,10 +25,12 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
-import org.semanticweb.elk.reasoner.saturation.tracing.factories.ContextTracingFactory;
-import org.semanticweb.elk.reasoner.saturation.tracing.factories.NonRecursiveContextTracingFactory;
+import org.semanticweb.elk.util.collections.HashListMultimap;
+import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * A collections of objects for tracing contexts and keeping the relevant
@@ -44,14 +46,12 @@ public class TraceState {
 
 	private final LocalTracingSaturationState tracingSaturationState_;
 
-	private final ContextTracingFactory tracingFactory_;
+	private final Multimap<IndexedClassExpression, Conclusion> toTraceMap_ = new HashListMultimap<IndexedClassExpression, Conclusion>();
 
 	public TraceState(SaturationState<?> mainState) {
 		traceStore_ = new SimpleCentralizedTraceStore();
 		tracingSaturationState_ = new LocalTracingSaturationState(
 				mainState.getOntologyIndex());
-		tracingFactory_ = new NonRecursiveContextTracingFactory(mainState,
-				tracingSaturationState_, traceStore_);
 	}
 
 	public TraceStore getTraceStore() {
@@ -65,8 +65,16 @@ public class TraceState {
 	public Iterable<TracedContext> getTracedContexts() {
 		return tracingSaturationState_.getTracedContexts();
 	}
-
-	public ContextTracingFactory getContextTracingFactory() {
-		return tracingFactory_;
+	
+	public Multimap<IndexedClassExpression, Conclusion> getTracingMap() {
+		return toTraceMap_;
+	}
+	
+	public void addConclusionToTrace(IndexedClassExpression root, Conclusion target) {
+		toTraceMap_.add(root, target);
+	}
+	
+	public void clearTracingMap() {
+		toTraceMap_.clear();
 	}
 }

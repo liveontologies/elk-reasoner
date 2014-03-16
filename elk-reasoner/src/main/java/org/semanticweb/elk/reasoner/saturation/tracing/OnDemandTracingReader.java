@@ -52,12 +52,12 @@ public class OnDemandTracingReader extends DelegatingTraceReader {
 
 	private final ContextCreatingSaturationStateWriter<TracedContext> tracingContextWriter_;
 	
-	private final ContextTracingFactory tracingFactory_;
+	private final ContextTracingFactory<ContextTracingJob> tracingFactory_;
 	
 	public OnDemandTracingReader(
 			SaturationState<TracedContext> tracingState,
 			TraceStore.Reader inferenceReader,
-			ContextTracingFactory tracingFactory) {
+			ContextTracingFactory<ContextTracingJob> tracingFactory) {
 		super(inferenceReader);
 		tracingContextWriter_  = tracingState.getContextCreatingWriter(ContextCreationListener.DUMMY, ContextModificationListener.DUMMY);
 		tracingFactory_ = tracingFactory;
@@ -67,6 +67,8 @@ public class OnDemandTracingReader extends DelegatingTraceReader {
 	public void accept(final IndexedClassExpression root, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
 		IndexedClassExpression conclusionContextRoot = conclusion.getSourceRoot(root);
 		TracedContext tracedContext = tracingContextWriter_.getCreateContext(conclusionContextRoot);	
+		
+		LOGGER_.trace("Reading inferences for {}", tracedContext);
 		
 		while (!tracedContext.isInitialized() || !tracedContext.isSaturated()) {
 			LOGGER_.trace("Need to trace {} to read inferences for {}", tracedContext, conclusion);
@@ -83,6 +85,10 @@ public class OnDemandTracingReader extends DelegatingTraceReader {
 			}
 			finally {
 				tracingEngine.finish();
+			}
+			
+			if (Thread.currentThread().isInterrupted()) {
+				break;
 			}
 		}
 

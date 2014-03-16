@@ -62,6 +62,9 @@ import org.semanticweb.elk.reasoner.saturation.tracing.OnDemandTracingReader;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
+import org.semanticweb.elk.reasoner.saturation.tracing.factories.ContextTracingFactory;
+import org.semanticweb.elk.reasoner.saturation.tracing.factories.ContextTracingJob;
+import org.semanticweb.elk.reasoner.saturation.tracing.factories.NonRecursiveContextTracingFactory;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
@@ -615,13 +618,38 @@ public abstract class AbstractReasonerState {
 		IndexedClassExpression subsumer = sup.accept(objectCache_
 				.getIndexObjectConverter());
 
+		//simpleTrace(subsumee, subsumer);
+		stageBasedTrace(subsumee, subsumer);
+
+		return traceState.getTraceStore().getReader();
+	}
+	
+	void stageBasedTrace(IndexedClassExpression subsumee, IndexedClassExpression subsumer) throws ElkException {
+		traceState.addConclusionToTrace(subsumee, convertTraceTarget(subsumee, subsumer));
+		stageManager.inferenceTracingStage.invalidate();
+		getStageExecutor().complete(stageManager.inferenceTracingStage);
+		stageManager.inferenceTracingStage.setCompleted();
+		traceState.clearTracingMap();
+	}
+	
+	void simpleTrace(IndexedClassExpression subsumee, IndexedClassExpression subsumer) {
+		ContextTracingFactory<ContextTracingJob> factory = new NonRecursiveContextTracingFactory(
+				saturationState, traceState.getSaturationState(),
+				traceState.getTraceStore());
 		TraceStore.Reader onDemandTracer = new OnDemandTracingReader(
 				traceState.getSaturationState(), traceState.getTraceStore()
-						.getReader(), traceState.getContextTracingFactory());
+						.getReader(), factory);
 		// TraceStore.Reader inferenceReader = new FirstNInferencesReader(onDemandTracer, 1);
 		TraceStore.Reader inferenceReader = onDemandTracer;
 		RecursiveTraceUnwinder unwinder = new RecursiveTraceUnwinder(
 				inferenceReader);
+		
+		unwinder.accept(subsumee,
+				convertTraceTarget(subsumee, subsumer),
+				new DummyConclusionVisitor<IndexedClassExpression>());
+	}
+
+	private Conclusion convertTraceTarget(IndexedClassExpression subsumee, IndexedClassExpression subsumer) {
 		Context subsumeeContext = saturationState.getContext(subsumee);
 		
 		if (subsumeeContext != null) {
@@ -634,18 +662,13 @@ public abstract class AbstractReasonerState {
 			else {
 				conclusion = new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer);
 			}
+			
+			return conclusion;
+		}
 		
-		unwinder.accept(subsumee,
-				conclusion,
-				new DummyConclusionVisitor<IndexedClassExpression>());
-		}
-		else {
-			throw new IllegalArgumentException("Unknown class: " + sub);
-		}
-
-		return traceState.getTraceStore().getReader();
+		throw new IllegalArgumentException("Unknown class: " + subsumee);
 	}
-
+	
 	IndexedClassExpression transform(ElkClassExpression ce) {
 		return ce.accept(objectCache_.getIndexObjectConverter());
 	}

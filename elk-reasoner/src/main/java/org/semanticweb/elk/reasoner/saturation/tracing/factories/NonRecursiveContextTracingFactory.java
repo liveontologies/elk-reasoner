@@ -67,7 +67,7 @@ import org.slf4j.LoggerFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class NonRecursiveContextTracingFactory implements ContextTracingFactory {
+public class NonRecursiveContextTracingFactory implements ContextTracingFactory<ContextTracingJob> {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(NonRecursiveContextTracingFactory.class);
@@ -138,6 +138,10 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 	public SaturationStatistics getStatistics() {
 		return tracingFactory_.getRuleAndConclusionStatistics();
 	}
+	
+	SaturationState<TracedContext> getTracingSaturationState() {
+		return tracingState_;
+	}
 
 	/**
 	 * 
@@ -187,8 +191,7 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 		@Override
 		public void submit(ContextTracingJob job) {
 			IndexedClassExpression root = job.getInput();
-			TracedContext context = tracingContextWriter_
-					.getCreateContext(root);
+			TracedContext context = tracingContextWriter_.getCreateContext(root);
 
 			if (!context.isInitialized() || !context.isSaturated()) {
 				addPendingJob(job);
@@ -208,23 +211,41 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 		@Override
 		public void process() throws InterruptedException {
 			for (;;) {
+				//process the leftover from the previous run
+				tracingEngine_.process();
+				saturationEngine_.process();
+				
+				if (Thread.currentThread().isInterrupted()) {
+					LOGGER_.trace("Tracing has been interrupted");
+					break;
+				}
+				
+				LOGGER_.trace("Tracing processing started");
+				
 				Map.Entry<IndexedClassExpression, Collection<ContextTracingJob>> nextTracingJob = takeTracingJob();
 				
 				if (nextTracingJob == null) {
 					break;
 				}
-				
 				// the main trace'n'saturate loop
 				IndexedClassExpression rootToTrace = nextTracingJob.getKey();
-				
+
 				tracingContextWriter_.produce(rootToTrace, new ContextInitializationImpl(mainSaturationState_.getOntologyIndex()));
 				
 				for (;;) {
 					LOGGER_.trace("{}: started (re)tracing", rootToTrace);
 					
-					tracingEngine_.process();
-					//now check if some gaps should be filled before we finish tracing
 					TracedContext context = tracingState_.getContext(rootToTrace);
+					
+					tracingEngine_.process();
+					
+					if (Thread.currentThread().isInterrupted()) {
+						// break here to not finish tracing if it has been
+						// interrupted
+						LOGGER_.trace("{}: tracing has been interrupted", rootToTrace);
+						break;
+					}
+					//now check if some gaps should be filled before we finish tracing
 					Multimap<IndexedClassExpression, Conclusion> missingConlusions = context.getMissingConclusions();
 					
 					if (missingConlusions.isEmpty()) {
@@ -233,9 +254,7 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 						break;
 					}
 					
-					LOGGER_.trace(
-							"{} will resume tracing after some missing contexts are saturated: {}",
-							rootToTrace, missingConlusions.keySet());
+					LOGGER_.trace("{} will resume tracing after some missing contexts are saturated: {}", rootToTrace, missingConlusions.keySet());
 					// Otherwise, need to complete the main closure by
 					// saturating contexts which did not exist before. Since we
 					// don't know yet if these contexts will be used for
@@ -245,6 +264,14 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 					saturationEngine_.process();
 					// now, resume tracing by applying redundant rules.
 					resumeTracing(context);
+
+					if (Thread.currentThread().isInterrupted()) {
+						// break here to not clear missing conclusion if
+						// saturation completion has been interrupted
+						LOGGER_.trace("{}: tracing has been interrupted", rootToTrace);
+						break;
+					}
+					
 					context.clearMissingConclusions();
 				}
 			}
@@ -259,15 +286,17 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory 
 					tracingContextWriter_.produce(root, conclusion);
 				}
 			}
+			
+			context.setSaturated(false);
 		}
 		
 		private void finishTracing(IndexedClassExpression root, Collection<ContextTracingJob> pendingJobs) {
 			TracedContext context = tracingState_.getContext(root);
 			
-			LOGGER_.trace("{} finished tracing", root);
-			
 			context.setSaturated(true);
 			context.beingTracedCompareAndSet(true, false);
+			
+			LOGGER_.trace("{} finished tracing", root);
 			// cleaning up the auxiliary data structures
 			context.clearBlockedInferences();
 			context.clearMissingConclusions();

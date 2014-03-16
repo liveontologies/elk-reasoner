@@ -37,7 +37,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface ContextTracingFactory extends InputProcessorFactory<ContextTracingJob, InputProcessor<ContextTracingJob>> {
+public interface ContextTracingFactory<J extends ContextTracingJob> extends InputProcessorFactory<J, InputProcessor<J>> {
 
 	public SaturationStatistics getStatistics();
 }
