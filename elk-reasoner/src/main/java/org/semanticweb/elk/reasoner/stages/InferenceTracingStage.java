@@ -58,4 +58,14 @@ public class InferenceTracingStage extends AbstractReasonerStage {
 		}
 	}
 
+	@Override
+	public boolean postExecute() {
+		// merge the stats
+		reasoner.ruleAndConclusionStats.add(tracing_.getStatistics());
+		
+		return super.postExecute();
+	}
+	
+	
+
 }

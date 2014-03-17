@@ -47,7 +47,7 @@ public class TimingStageExecutor extends AbstractStageExecutor {
 		metrics = m;
 	}
 	
-	protected boolean measure(ReasonerStage stage) {
+	protected boolean measure(@SuppressWarnings("unused") ReasonerStage stage) {
 		return true;
 	}
 	

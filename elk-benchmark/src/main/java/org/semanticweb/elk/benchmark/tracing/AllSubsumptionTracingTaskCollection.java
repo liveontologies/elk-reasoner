@@ -30,9 +30,9 @@ import java.io.File;
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
-import org.semanticweb.elk.benchmark.VisitorTaskCollection;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.benchmark.TaskVisitor;
+import org.semanticweb.elk.benchmark.VisitorTaskCollection;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
@@ -46,10 +46,8 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionTracingTests;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
@@ -57,6 +55,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestUtils;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
+import org.semanticweb.elk.reasoner.stages.RuleAndConclusionCountMeasuringExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
@@ -146,7 +145,9 @@ public class AllSubsumptionTracingTaskCollection implements VisitorTaskCollectio
 					new Owl2FunctionalStyleParserFactory(), ontFile);
 			
 			reasoner_ = new ReasonerFactory().createReasoner(loader,
-					new SimpleStageExecutor(), reasonerConfig_);
+					/*new SimpleStageExecutor(),*/
+					new RuleAndConclusionCountMeasuringExecutor(new SimpleStageExecutor(), metrics_),
+					reasonerConfig_);
 			
 			Taxonomy<ElkClass> taxonomy = reasoner_.getTaxonomy();
 			
@@ -227,25 +228,18 @@ public class AllSubsumptionTracingTaskCollection implements VisitorTaskCollectio
 				//TraceStore.Reader inferenceReader = new FirstNInferencesReader(traceState.getTraceStore().getReader(), 1);
 				RecursiveTraceUnwinder traceUnwinder = new RecursiveTraceUnwinder(inferenceReader);
 				SideConditionCollector counter = new SideConditionCollector();
-				SaturationStatistics stats = traceState.getContextTracingFactory().getStatistics();
+				//SaturationStatistics stats = traceState.getContextTracingFactory().getStatistics();
 				
-				traceUnwinder.accept(sub, new DecomposedSubsumerImpl(sup), new AbstractConclusionVisitor<IndexedClassExpression, Boolean>() {
-
-					@Override
-					protected Boolean defaultVisit(Conclusion conclusion, IndexedClassExpression input) {
-						return null;
-					}
-					
-				}, counter);
+				traceUnwinder.accept(sub, new DecomposedSubsumerImpl<IndexedClassExpression>(sup), new DummyConclusionVisitor<IndexedClassExpression>(), counter);
 				
 				int subClassAxiomNo = counter.getSubClassOfAxioms().size();
 				
 				if ((subClassAxiomNo >= MIN_SUBCLASS_AXIOM_NO) && (subClassAxiomNo <= MAX_SUBCLASS_AXIOM_NO)) {
 					metrics.incrementRunCount();
 					metrics.updateLongMetric(SUBCLASSOF_AXIOM_COUNT, subClassAxiomNo);
-					metrics.updateLongMetric(RULES_APPLIED, stats.getConclusionStatistics().getProducedConclusionCounts().getTotalCount());
-					metrics.updateLongMetric("inserted conclusions", stats.getConclusionStatistics().getUsedConclusionCounts().getTotalCount());
-					metrics.updateLongMetric(CONTEXTS_TRACED, stats.getContextStatistics().countModifiedContexts);
+					//metrics.updateLongMetric(RULES_APPLIED, stats.getConclusionStatistics().getProducedConclusionCounts().getTotalCount());
+					//metrics.updateLongMetric("inserted conclusions", stats.getConclusionStatistics().getUsedConclusionCounts().getTotalCount());
+					//metrics.updateLongMetric(CONTEXTS_TRACED, stats.getContextStatistics().countModifiedContexts);
 					metrics.updateLongMetric(USED_INFERENCES_COUNT, counter.getInferenceCount());
 				}
 				else {

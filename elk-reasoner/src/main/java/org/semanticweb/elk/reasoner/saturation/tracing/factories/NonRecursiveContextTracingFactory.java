@@ -91,6 +91,8 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory<
 	
 	private final SaturationState<?> mainSaturationState_;
 	
+	private final SaturationStatistics aggregateStatistics_;
+	
 	public NonRecursiveContextTracingFactory(
 			SaturationState<?> saturationState,
 			SaturationState<TracedContext> tracingState, TraceStore traceStore) {
@@ -107,6 +109,7 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory<
 		
 		saturationFactory_ = new ClassExpressionSaturationNoInputFactory(ruleAppFactory);
 		pendingJobsByRoot_ = new MultimapQueueImpl<IndexedClassExpression, ContextTracingJob>(new HashListMultimap<IndexedClassExpression, ContextTracingJob>());
+		aggregateStatistics_ = new SaturationStatistics();
 	}
 
 	@Override
@@ -116,6 +119,10 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory<
 
 	@Override
 	public void finish() {
+		// aggregating statistics over both factories
+		aggregateStatistics_.add(tracingFactory_.getRuleAndConclusionStatistics());
+		aggregateStatistics_.add(saturationFactory_.getRuleAndConclusionStatistics());
+		
 		tracingFactory_.finish();
 		saturationFactory_.finish();
 	}
@@ -136,7 +143,7 @@ public class NonRecursiveContextTracingFactory implements ContextTracingFactory<
 	
 	@Override
 	public SaturationStatistics getStatistics() {
-		return tracingFactory_.getRuleAndConclusionStatistics();
+		return aggregateStatistics_;
 	}
 	
 	SaturationState<TracedContext> getTracingSaturationState() {

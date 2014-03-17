@@ -21,7 +21,7 @@ public class SideConditionCollector extends UsedInferencesCounter {
 	//private Set<SubClassOfSubsumer> subclassAxioms_ = new HashSet<SubClassOfSubsumer>();
 	
 	@Override
-	public Void visit(SubClassOfSubsumer conclusion, IndexedClassExpression input) {
+	public Void visit(SubClassOfSubsumer<?> conclusion, IndexedClassExpression input) {
 		subclassAxioms_.add(new Pair<IndexedClassExpression, IndexedClassExpression>(((Subsumer<?>)conclusion.getPremise()).getExpression(), conclusion.getExpression()));
 		//subclassAxioms_.add(conclusion);
 		
