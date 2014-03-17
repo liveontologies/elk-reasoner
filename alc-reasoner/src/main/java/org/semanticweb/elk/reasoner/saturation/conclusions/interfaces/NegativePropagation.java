@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+
 /*
  * #%L
  * ALC Reasoner
@@ -25,7 +26,7 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 
-public interface NegativePropagation extends Conclusion {
+public interface NegativePropagation extends LocalConclusion {
 
 	public static final String NAME = "Negative Propagation";
 

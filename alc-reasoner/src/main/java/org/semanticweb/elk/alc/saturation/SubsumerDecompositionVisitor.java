@@ -45,43 +45,37 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Forwar
 public class SubsumerDecompositionVisitor implements
 		IndexedClassExpressionVisitor<Void> {
 
-	/**
-	 * the {@link Root} of the {@link Context} in which the rules are applied
-	 */
-	private final Root root_;
-
 	private final ConclusionProducer producer_;
 
-	SubsumerDecompositionVisitor(Root root, ConclusionProducer producer) {
-		this.root_ = root;
+	SubsumerDecompositionVisitor(ConclusionProducer producer) {
 		this.producer_ = producer;
 	}
 
 	@Override
 	public Void visit(IndexedClass element) {
 		if (element.getElkClass() == PredefinedElkClass.OWL_NOTHING)
-			producer_.produce(root_, ClashImpl.getInstance());
+			producer_.produce(ClashImpl.getInstance());
 		return null;
 	}
 
 	@Override
 	public Void visit(IndexedObjectIntersectionOf element) {
-		producer_.produce(root_,
-				new DecomposedSubsumerImpl(element.getFirstConjunct()));
-		producer_.produce(root_,
-				new DecomposedSubsumerImpl(element.getSecondConjunct()));
+		producer_
+				.produce(new DecomposedSubsumerImpl(element.getFirstConjunct()));
+		producer_.produce(new DecomposedSubsumerImpl(element
+				.getSecondConjunct()));
 		return null;
 	}
 
 	@Override
 	public Void visit(IndexedObjectSomeValuesFrom element) {
-		producer_.produce(root_, new ForwardLinkImpl(element));
+		producer_.produce(new ForwardLinkImpl(element));
 		return null;
 	}
 
 	@Override
 	public Void visit(IndexedObjectUnionOf element) {
-		producer_.produce(root_, new DisjunctionImpl(element));
+		producer_.produce(new DisjunctionImpl(element));
 		return null;
 	}
 

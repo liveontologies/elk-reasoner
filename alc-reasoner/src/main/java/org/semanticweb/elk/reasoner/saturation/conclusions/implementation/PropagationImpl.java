@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class PropagationImpl extends AbstractConclusion implements Propagation {
+public class PropagationImpl extends AbstractLocalConclusion implements
+		Propagation {
 
 	// logger for this class
 	static final Logger LOGGER_ = LoggerFactory
@@ -68,7 +69,7 @@ public class PropagationImpl extends AbstractConclusion implements Propagation {
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(LocalConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

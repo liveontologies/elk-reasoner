@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.saturation.Root;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalDeterministicConclusionVisitor;
 
 /**
  * An implementation for {@link BackwardLink}
@@ -33,8 +33,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVi
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  */
-public class BackwardLinkImpl extends AbstractConclusion implements
-		BackwardLink {
+public class BackwardLinkImpl extends AbstractExternalDeterministicConclusion
+		implements BackwardLink {
 
 	/**
 	 * the source {@link Root} of this {@link BackwardLinkImpl}; the root of the
@@ -64,7 +64,8 @@ public class BackwardLinkImpl extends AbstractConclusion implements
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(
+			ExternalDeterministicConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

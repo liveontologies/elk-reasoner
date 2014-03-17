@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ClashImpl extends AbstractConclusion implements Clash {
+public class ClashImpl extends AbstractLocalConclusion implements Clash {
 
 	static final Logger LOGGER_ = LoggerFactory.getLogger(ClashImpl.class);
 
@@ -54,7 +54,7 @@ public class ClashImpl extends AbstractConclusion implements Clash {
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(LocalConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

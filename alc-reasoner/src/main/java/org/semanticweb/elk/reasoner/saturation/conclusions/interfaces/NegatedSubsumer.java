@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+
 /*
  * #%L
  * ALC Reasoner
@@ -26,12 +27,13 @@ import org.semanticweb.elk.alc.saturation.Root;
 
 /**
  * 
- * A {@link Conclusion} representing a negated {@link IndexedClassExpression}
- * that subsumes all elements of the {@link Root} for which it is produced.
+ * A {@link LocalConclusion} representing a negated
+ * {@link IndexedClassExpression} that subsumes all elements of the {@link Root}
+ * for which it is produced.
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface NegatedSubsumer extends Conclusion {
+public interface NegatedSubsumer extends LocalConclusion {
 
 	public static final String NAME = "Negated Subsumer";
 

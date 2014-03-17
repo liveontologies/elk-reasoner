@@ -25,12 +25,12 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 import org.semanticweb.elk.alc.saturation.Context;
 
 /**
- * A {@code Conclusion} indicating that the {@link Context} where it is stored
- * should be initialized.
+ * An {@code ExternalDeterministicConclusion} indicating that the
+ * {@link Context} where it is stored should be initialized.
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface ContextInitialization extends Conclusion {
+public interface ContextInitialization extends ExternalDeterministicConclusion {
 
 	public static final String NAME = "Context Initialization";
 

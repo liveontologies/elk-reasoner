@@ -23,25 +23,24 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  */
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.PossibleConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalConclusionVisitor;
 
 public class PossibleSubsumerImpl extends AbstractSubsumer implements
-		DecomposedSubsumer, PossibleConclusion {
+		PossibleSubsumer {
 
 	public PossibleSubsumerImpl(IndexedClassExpression subsumer) {
 		super(subsumer);
 	}
 
 	@Override
-	public <I, O> O accept(PossibleConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(ExternalConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

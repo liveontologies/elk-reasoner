@@ -25,9 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 
-public class NegatedSubsumerImpl extends AbstractConclusion implements
+public class NegatedSubsumerImpl extends AbstractLocalConclusion implements
 		NegatedSubsumer {
 
 	/**
@@ -54,7 +54,7 @@ public class NegatedSubsumerImpl extends AbstractConclusion implements
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(LocalConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

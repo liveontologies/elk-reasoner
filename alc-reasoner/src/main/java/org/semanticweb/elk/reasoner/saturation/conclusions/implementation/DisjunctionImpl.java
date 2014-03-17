@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
+
 /*
  * #%L
  * ALC Reasoner
@@ -24,9 +25,10 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 
-public class DisjunctionImpl extends AbstractConclusion implements Disjunction {
+public class DisjunctionImpl extends AbstractLocalConclusion implements
+		Disjunction {
 
 	private final IndexedObjectUnionOf disjunction_;
 
@@ -45,7 +47,7 @@ public class DisjunctionImpl extends AbstractConclusion implements Disjunction {
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(LocalConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

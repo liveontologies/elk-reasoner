@@ -22,11 +22,8 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSubsumer;
 
 public class BacktrackingVisitor extends RevertingVisitor {
 
@@ -38,16 +35,9 @@ public class BacktrackingVisitor extends RevertingVisitor {
 	}
 
 	@Override
-	public void visitSubsumer(Subsumer conclusion, Context input) {
-		IndexedClassExpression expression = conclusion.getExpression();
-		if (conclusion instanceof PossibleConclusion) {
-			producer_.produce(input.getRoot(), new NegatedSubsumerImpl(
-					expression));
-		} else if (input.getDisjunctions().keySet().contains(expression)
-				|| input.getMaskedPossibleSubsumers().contains(expression)) {
-			producer_.produce(input.getRoot(), new PossibleSubsumerImpl(
-					expression));
-			return;
-		}
+	public Void visit(PossibleSubsumer conclusion, Context input) {
+		producer_.produce(new NegatedSubsumerImpl(conclusion.getExpression()));
+		return null;
 	}
+
 }

@@ -26,6 +26,7 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 
 /**
  * An implementation of {@link Subsumer}
@@ -46,7 +47,13 @@ public class ComposedSubsumerImpl extends AbstractSubsumer implements
 	}
 
 	@Override
+	public <I, O> O accept(LocalConclusionVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
+	}
+
+	@Override
 	public String toString() {
 		return "Composed" + super.toString();
 	}
+
 }

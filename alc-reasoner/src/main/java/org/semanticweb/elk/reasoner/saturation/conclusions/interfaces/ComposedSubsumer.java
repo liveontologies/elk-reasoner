@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  */
-public interface ComposedSubsumer extends Subsumer {
+public interface ComposedSubsumer extends Subsumer, LocalConclusion {
 
 	public static final String NAME = "Composed Subsumer";
 

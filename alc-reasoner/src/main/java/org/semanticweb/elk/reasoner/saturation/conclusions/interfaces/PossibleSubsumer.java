@@ -2,7 +2,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
 /*
  * #%L
- * ALC Reasoner
+ * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
@@ -22,14 +22,14 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
+/**
+ * A {@link Subsumer} created by decomposition rules.
+ * 
+ * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
+ */
+public interface PossibleSubsumer extends Subsumer, ExternalConclusion {
 
-public interface Disjunction extends LocalConclusion {
-
-	public static final String NAME = "Disjunction";
-
-	public IndexedClassExpression getWatchedDisjunct();
-
-	public IndexedClassExpression getPropagatedDisjunct();
+	public static final String NAME = "Decomposed Subsumer";
 
 }

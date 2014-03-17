@@ -1,5 +1,4 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
-
 /*
  * #%L
  * ALC Reasoner
@@ -22,14 +21,10 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalConclusionVisitor;
 
-public interface Disjunction extends LocalConclusion {
+public interface ExternalConclusion extends Conclusion {
 
-	public static final String NAME = "Disjunction";
-
-	public IndexedClassExpression getWatchedDisjunct();
-
-	public IndexedClassExpression getPropagatedDisjunct();
+	public <I, O> O accept(ExternalConclusionVisitor<I, O> visitor, I input);
 
 }

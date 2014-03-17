@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+
 /*
  * #%L
  * ALC Reasoner

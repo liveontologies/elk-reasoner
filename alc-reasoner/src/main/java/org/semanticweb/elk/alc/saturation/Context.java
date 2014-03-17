@@ -38,12 +38,13 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -133,14 +134,14 @@ public class Context {
 	private Multimap<IndexedObjectProperty, Root> inconsistentSuccessors_;
 
 	/**
-	 * {@link Conclusion}s to which the rules are yet to be applied
+	 * {@link ExternalConclusion}s to which the rules are yet to be applied
 	 */
-	private Deque<Conclusion> toDo_;
+	private Deque<ExternalDeterministicConclusion> toDo_;
 
 	/**
 	 * subsumers which need to be guessed within this context
 	 */
-	private Queue<PossibleConclusion> toGuess_;
+	private Queue<PossibleSubsumer> toGuess_;
 
 	/**
 	 * the {@link Conclusion}s that have been processed after the first
@@ -266,12 +267,13 @@ public class Context {
 	 * 
 	 * @param conclusion
 	 * @return {@code true} if this {@link Context} did not have any unprocessed
-	 *         {@link Conclusion}s and {@code false} otherwise
+	 *         {@link ExternalDeterministicConclusion}s and {@code false}
+	 *         otherwise
 	 */
-	boolean addToDo(Conclusion conclusion) {
+	boolean addToDo(ExternalDeterministicConclusion conclusion) {
 		boolean result = false;
 		if (toDo_ == null) {
-			toDo_ = new ArrayDeque<Conclusion>();
+			toDo_ = new ArrayDeque<ExternalDeterministicConclusion>();
 			result = true;
 		}
 		toDo_.add(conclusion);
@@ -279,54 +281,37 @@ public class Context {
 	}
 
 	/**
-	 * @return the next unprocessed {@link Conclusion} within this
-	 *         {@link Context} or {@code null} if there is no such unprocessed
-	 *         {@link Conclusion}.
+	 * @return the next unprocessed {@link ExternalDeterministicConclusion}
+	 *         within this {@link Context} or {@code null} if there is no such
+	 *         unprocessed {@link ExternalDeterministicConclusion}.
 	 */
-	Conclusion takeToDo() {
+	ExternalDeterministicConclusion takeToDo() {
 		if (toDo_ == null)
 			return null;
 		// else
-		Conclusion result = toDo_.poll();
+		ExternalDeterministicConclusion result = toDo_.poll();
 		if (result == null) {
 			toDo_ = null;
 		}
 		return result;
 	}
 
-	// TODO: it is safer to use local todo and clear it instead!
-	void clearToDoFromLocalConclusions() {
-		if (toDo_ == null)
-			return;
-		Deque<Conclusion> newToDo = new ArrayDeque<Conclusion>();
-		for (;;) {
-			Conclusion next = toDo_.poll();
-			if (next == null)
-				break;
-			if (next instanceof BackwardLink
-					|| next instanceof PropagatedConclusion)
-				// TODO: do not keep reflexive backward links?
-				newToDo.add(next);
-		}
-		toDo_ = newToDo;
-	}
-
-	boolean addToGuess(PossibleConclusion possibleConclusion) {
+	boolean addToGuess(PossibleSubsumer possibleConclusion) {
 		boolean result = false;
 		if (toGuess_ == null) {
-			toGuess_ = new ArrayDeque<PossibleConclusion>();
+			toGuess_ = new ArrayDeque<PossibleSubsumer>();
 			result = true;
 		}
 		toGuess_.add(possibleConclusion);
 		return result;
 	}
 
-	PossibleConclusion takeToGuess() {
+	PossibleSubsumer takeToGuess() {
 		if (toGuess_ == null) {
 			return null;
 		}
 		// else
-		PossibleConclusion result = toGuess_.poll();
+		PossibleSubsumer result = toGuess_.poll();
 		if (result == null) {
 			toGuess_ = null;
 		}
@@ -390,14 +375,7 @@ public class Context {
 		public static boolean visit(Subsumer conclusion, Context input) {
 			if (input.subsumers_ == null)
 				input.subsumers_ = new ArrayHashSet<IndexedClassExpression>(64);
-			boolean inserted = input.subsumers_.add(conclusion.getExpression());
-			if (!inserted && (conclusion instanceof PossibleConclusion)) {
-				if (input.maskedPossibleSubsumers_ == null)
-					input.maskedPossibleSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
-							8);
-				input.maskedPossibleSubsumers_.add(conclusion.getExpression());
-			}
-			return inserted;
+			return input.subsumers_.add(conclusion.getExpression());
 		}
 
 		@Override
@@ -408,6 +386,18 @@ public class Context {
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, Context input) {
 			return visit((Subsumer) conclusion, input);
+		}
+
+		@Override
+		public Boolean visit(PossibleSubsumer conclusion, Context input) {
+			boolean inserted = visit((Subsumer) conclusion, input);
+			if (!inserted) {
+				if (input.maskedPossibleSubsumers_ == null)
+					input.maskedPossibleSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
+							8);
+				input.maskedPossibleSubsumers_.add(conclusion.getExpression());
+			}
+			return inserted;
 		}
 
 		@Override
@@ -519,6 +509,11 @@ public class Context {
 
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, Context input) {
+			return visit((Subsumer) conclusion, input);
+		}
+
+		@Override
+		public Boolean visit(PossibleSubsumer conclusion, Context input) {
 			return visit((Subsumer) conclusion, input);
 		}
 

@@ -25,18 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 
 /**
  * A visitor pattern for {@link Conclusion}s together with additional input and
@@ -52,28 +41,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
  * @param <O>
  *            the type of output parameter with which this visitor works
  */
-public interface ConclusionVisitor<I, O> {
+public interface ConclusionVisitor<I, O> extends LocalConclusionVisitor<I, O>,
+		ExternalConclusionVisitor<I, O> {
 
-	public O visit(ForwardLink conclusion, I input);
-
-	public O visit(BackwardLink conclusion, I input);
-
-	public O visit(ComposedSubsumer conclusion, I input);
-
-	public O visit(NegatedSubsumer conclusion, I input);
-
-	public O visit(Disjunction conclusion, I input);
-
-	public O visit(ContextInitialization conclusion, I input);
-
-	public O visit(DecomposedSubsumer conclusion, I input);
-
-	public O visit(Propagation conclusion, I input);
-
-	public O visit(NegativePropagation conclusion, I input);
-
-	public O visit(Clash conclusion, I input);
-
-	public O visit(PropagatedClash conclusion, I input);
-
+	// nothing else
 }

@@ -24,10 +24,11 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 
 /**
- * A {@link Conclusion} representing derived existential restrictions from this
- * source {@link IndexedClassExpression} to a target
+ * A {@link LocalConclusion} representing derived existential restrictions from
+ * this source {@link IndexedClassExpression} to a target
  * {@link IndexedClassExpression}. Intuitively, if a subclass axiom
  * {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))} is derived by inference
  * rules, then a {@link ForwardLinkImpl} with the relation {@code :r} and the
@@ -37,7 +38,7 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ForwardLink extends Conclusion {
+public interface ForwardLink extends LocalConclusion {
 
 	public static final String NAME = "Forward Link";
 

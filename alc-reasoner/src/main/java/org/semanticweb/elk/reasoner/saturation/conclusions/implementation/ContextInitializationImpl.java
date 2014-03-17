@@ -23,18 +23,20 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalDeterministicConclusionVisitor;
 
 /**
  * An implementation of {@link ContextInitialization}.
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ContextInitializationImpl extends AbstractConclusion implements
+public class ContextInitializationImpl extends
+		AbstractExternalDeterministicConclusion implements
 		ContextInitialization {
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(
+			ExternalDeterministicConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

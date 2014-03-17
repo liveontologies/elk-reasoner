@@ -30,7 +30,6 @@ import org.semanticweb.elk.alc.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.alc.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.alc.saturation.ConclusionProducer;
 import org.semanticweb.elk.alc.saturation.Context;
-import org.semanticweb.elk.alc.saturation.Root;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
@@ -195,10 +194,9 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 
 	public static void applyCompositionRules(IndexedClassExpression subsumer,
 			Context premises, ConclusionProducer producer) {
-		Root root = premises.getRoot();
 		if (premises.getNegativeSubsumers().contains(subsumer)) {
 			// generate clash
-			producer.produce(root, ClashImpl.getInstance());
+			producer.produce(ClashImpl.getInstance());
 			// nothing else should be derived
 			return;
 		}
@@ -207,7 +205,7 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
 					premises.getSubsumers(),
 					subsumer.conjunctionsByConjunct_.keySet())) {
-				producer.produce(root, new ComposedSubsumerImpl(
+				producer.produce(new ComposedSubsumerImpl(
 						subsumer.conjunctionsByConjunct_.get(common)));
 			}
 		}
@@ -215,14 +213,13 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 			// generate propagations
 			for (IndexedObjectSomeValuesFrom existential : subsumer.negativeExistentials_) {
 				IndexedObjectProperty relation = existential.getRelation();
-				producer.produce(root, new PropagationImpl(relation,
-						existential));
+				producer.produce(new PropagationImpl(relation, existential));
 			}
 		}
 		if (subsumer.toldSuperClasses_ != null) {
 			// expand under told super-classes
 			for (IndexedClassExpression toldSuper : subsumer.toldSuperClasses_) {
-				producer.produce(root, new DecomposedSubsumerImpl(toldSuper));
+				producer.produce(new DecomposedSubsumerImpl(toldSuper));
 			}
 
 		}

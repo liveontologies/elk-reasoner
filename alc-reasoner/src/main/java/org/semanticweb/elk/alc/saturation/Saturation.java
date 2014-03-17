@@ -22,6 +22,9 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
+import java.util.ArrayDeque;
+import java.util.Queue;
+
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
@@ -30,7 +33,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Negate
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BacktrackedConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.slf4j.Logger;
@@ -42,9 +47,13 @@ public class Saturation {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(Saturation.class);
 
-	private final static Conclusion CONTEXT_INIT_ = new ContextInitializationImpl();
+	private final static ExternalDeterministicConclusion CONTEXT_INIT_ = new ContextInitializationImpl();
 
 	private final SaturationState saturationState_;
+
+	private final Queue<LocalConclusion> localConclusions_;
+
+	private final ConclusionProducer conclusionProducer_;
 
 	private final ConclusionVisitor<Context, Void> ruleApplicationVisitor_;
 
@@ -54,10 +63,28 @@ public class Saturation {
 
 	public Saturation(SaturationState saturationState) {
 		this.saturationState_ = saturationState;
+		this.localConclusions_ = new ArrayDeque<LocalConclusion>(1024);
+		this.conclusionProducer_ = new ConclusionProducer() {
+			@Override
+			public void produce(Root root, PossibleSubsumer conclusion) {
+				saturationState_.produce(root, conclusion);
+			}
+
+			@Override
+			public void produce(Root root,
+					ExternalDeterministicConclusion conclusion) {
+				saturationState_.produce(root, conclusion);
+			}
+
+			@Override
+			public void produce(LocalConclusion conclusion) {
+				localConclusions_.add(conclusion);
+			}
+		};
 		this.ruleApplicationVisitor_ = new RuleApplicationVisitor(
-				saturationState);
-		this.backtrackingVisitor_ = new BacktrackingVisitor(saturationState);
-		this.revertingVisitor_ = new RevertingVisitor(saturationState);
+				conclusionProducer_);
+		this.backtrackingVisitor_ = new BacktrackingVisitor(conclusionProducer_);
+		this.revertingVisitor_ = new RevertingVisitor(conclusionProducer_);
 	}
 
 	public void submit(IndexedClassExpression expression) {
@@ -115,8 +142,8 @@ public class Saturation {
 
 	public boolean checkSubsumer(Context context,
 			IndexedClassExpression possibleSubsumer) {
-		return checkSubsumerSimple(context, possibleSubsumer);
-		// return checkSubsumerOptimized(context, possibleSubsumer);
+		// return checkSubsumerSimple(context, possibleSubsumer);
+		return checkSubsumerOptimized(context, possibleSubsumer);
 	}
 
 	public void process() {
@@ -129,12 +156,14 @@ public class Saturation {
 				}
 			}
 			for (;;) {
-				// TODO: take from the local queue
-				Conclusion conclusion = context.takeToDo();
+				Conclusion conclusion = localConclusions_.poll();
 				if (conclusion == null) {
-					conclusion = context.takeToGuess();
-					if (conclusion == null)
-						break;
+					conclusion = context.takeToDo();
+					if (conclusion == null) {
+						conclusion = context.takeToGuess();
+						if (conclusion == null)
+							break;
+					}
 				}
 				LOGGER_.trace("{}: processing {}", context.getRoot(),
 						conclusion);
@@ -161,7 +190,7 @@ public class Saturation {
 				}
 				if (!context.addConclusion(conclusion))
 					continue;
-				if ((!context.isDeterministic() || conclusion instanceof PossibleConclusion)
+				if ((!context.isDeterministic() || conclusion instanceof PossibleSubsumer)
 						&& !context.isInconsistent()
 						&& !(conclusion instanceof BackwardLink)
 						&& !(conclusion instanceof PropagatedConclusion)) {
@@ -169,7 +198,7 @@ public class Saturation {
 				}
 				conclusion.accept(ruleApplicationVisitor_, context);
 				if (context.hasClash()) {
-					context.clearToDoFromLocalConclusions();
+					localConclusions_.clear();
 					for (;;) {
 						Conclusion toBacktrack = context.popHistory();
 						if (toBacktrack == null) {
@@ -179,16 +208,16 @@ public class Saturation {
 						}
 						toBacktrack.accept(backtrackingVisitor_, context);
 						context.removeConclusion(toBacktrack);
-						if (toBacktrack instanceof PossibleConclusion)
+						if (toBacktrack instanceof PossibleSubsumer)
 							break;
 					}
 					if (!context.getInconsistentSuccessors().isEmpty()) {
-						saturationState_.produce(context.getRoot(),
-								ClashImpl.getInstance());
+						conclusionProducer_.produce(ClashImpl.getInstance());
 					}
 				}
 
 			}
 		}
 	}
+
 }

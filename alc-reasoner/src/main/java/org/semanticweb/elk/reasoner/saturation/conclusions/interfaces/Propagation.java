@@ -27,7 +27,7 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 
 /**
- * A {@link SubConclusion} representing that a given
+ * A {@link SubLocalConclusion} representing that a given
  * {@link IndexedClassExpression} should be produced as a subsumer of all
  * neighbors over the given {@link IndexedObjectProperty}.
  * 
@@ -37,7 +37,7 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface Propagation extends Conclusion {
+public interface Propagation extends LocalConclusion {
 
 	public static final String NAME = "Propagation";
 

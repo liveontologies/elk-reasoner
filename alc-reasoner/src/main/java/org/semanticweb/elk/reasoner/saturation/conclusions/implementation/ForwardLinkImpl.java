@@ -26,9 +26,10 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 
-public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
+public class ForwardLinkImpl extends AbstractLocalConclusion implements
+		ForwardLink {
 
 	private final IndexedObjectSomeValuesFrom existential_;
 
@@ -47,7 +48,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(LocalConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

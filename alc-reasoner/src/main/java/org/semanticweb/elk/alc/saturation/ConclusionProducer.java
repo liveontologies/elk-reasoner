@@ -30,15 +30,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ConclusionProducer {
+public interface ConclusionProducer extends LocalConclusionProducer,
+		ExternalConclusionProducer {
 
-	/**
-	 * Tells that the given {@link Conclusion} is derived as subsumer of
-	 * elements in the given {@link Root}.
-	 * 
-	 * @param root
-	 * @param conclusion
-	 */
-	public void produce(Root root, Conclusion conclusion);
-
+	// and nothing else
 }

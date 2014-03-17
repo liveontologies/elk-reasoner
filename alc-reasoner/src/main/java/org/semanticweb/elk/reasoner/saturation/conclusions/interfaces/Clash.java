@@ -23,8 +23,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  */
 
 /**
- * A {@link Conclusion} representing that some inconsistency for a concept has
- * been derived.
+ * A {@link LocalConclusion} representing that some inconsistency for a concept
+ * has been derived.
  * 
  * @author Pavel Klinov
  * 
@@ -32,7 +32,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface Clash extends Conclusion {
+public interface Clash extends LocalConclusion {
 
 	public static final String NAME = "Clash";
 

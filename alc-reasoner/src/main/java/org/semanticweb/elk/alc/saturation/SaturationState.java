@@ -31,7 +31,8 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSubsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class SaturationState implements ConclusionProducer {
+public class SaturationState implements ExternalConclusionProducer {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -60,9 +61,7 @@ public class SaturationState implements ConclusionProducer {
 	 */
 	private final Queue<Context> possibleContexts_;
 
-	private final Conclusion init_ = new ContextInitializationImpl();
-
-	private Context currentContext_ = null;
+	private final ExternalDeterministicConclusion init_ = new ContextInitializationImpl();
 
 	public SaturationState() {
 		this.existingRoots_ = new HashMap<Root, Root>(1024);
@@ -71,33 +70,38 @@ public class SaturationState implements ConclusionProducer {
 	}
 
 	@Override
-	public void produce(Root root, Conclusion conclusion) {
+	public void produce(Root root, ExternalDeterministicConclusion conclusion) {
 		produce(getCreateContext(root), conclusion);
 	}
 
-	void produce(Context context, Conclusion conclusion) {
+	@Override
+	public void produce(Root root, PossibleSubsumer conclusion) {
+		produce(getCreateContext(root), conclusion);
+	}
+
+	private void produce(Context context,
+			ExternalDeterministicConclusion conclusion) {
 		LOGGER_.trace("{}: produced {}", context, conclusion);
-		if (conclusion instanceof PossibleConclusion) {
-			if (context.addToGuess((PossibleConclusion) conclusion)) {
-				LOGGER_.trace("{}: activated possible", context);
-				possibleContexts_.add(context);
-			}
-		} else {
-			if (context.addToDo(conclusion)) {
-				LOGGER_.trace("{}: activated deterministic", context);
-				activeContexts_.add(context);
-			}
+		if (context.addToDo(conclusion)) {
+			LOGGER_.trace("{}: activated deterministic", context);
+			activeContexts_.add(context);
+		}
+	}
+
+	private void produce(Context context, PossibleSubsumer conclusion) {
+		LOGGER_.trace("{}: produced {}", context, conclusion);
+		if (context.addToGuess(conclusion)) {
+			LOGGER_.trace("{}: activated possible", context);
+			possibleContexts_.add(context);
 		}
 	}
 
 	public Context pollActiveContext() {
-		currentContext_ = activeContexts_.poll();
-		return currentContext_;
+		return activeContexts_.poll();
 	}
 
 	public Context pollPossibleContext() {
-		currentContext_ = possibleContexts_.poll();
-		return currentContext_;
+		return possibleContexts_.poll();
 	}
 
 	public Context getContext(IndexedClassExpression positiveMember,
@@ -163,4 +167,5 @@ public class SaturationState implements ConclusionProducer {
 			}
 		}
 	}
+
 }

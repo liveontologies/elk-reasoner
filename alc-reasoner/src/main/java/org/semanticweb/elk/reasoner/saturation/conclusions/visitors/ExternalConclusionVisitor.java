@@ -25,17 +25,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSubsumer;
 
 /**
- * A visitor pattern for {@link PossibleConclusion}s together with
- * additional input and output parameters
+ * A visitor pattern for {@link ExternalConclusion}s together with additional
+ * input and output parameters
  * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
  * @author "Yevgeny Kazakov"
  * 
  * @param <I>
@@ -43,10 +39,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleCo
  * @param <O>
  *            the type of output parameter with which this visitor works
  */
-public interface PossibleConclusionVisitor<I, O> {
+public interface ExternalConclusionVisitor<I, O> extends
+		ExternalDeterministicConclusionVisitor<I, O> {
 
-	public O visit(ComposedSubsumer conclusion, I input);
-
-	public O visit(DecomposedSubsumer conclusion, I input);
+	public O visit(PossibleSubsumer conclusion, I input);
 
 }

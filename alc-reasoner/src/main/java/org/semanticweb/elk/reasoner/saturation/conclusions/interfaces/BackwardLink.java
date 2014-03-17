@@ -28,9 +28,9 @@ import org.semanticweb.elk.alc.saturation.Root;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 
 /**
- * A {@link Conclusion} representing derived existential restrictions from a
- * source {@link Root} to this target {@link IndexedClassExpression}.
- * Intuitively, if a subclass axiom
+ * An {@link ExternalDeterministicConclusion} representing derived existential
+ * restrictions from a source {@link Root} to this target
+ * {@link IndexedClassExpression}. Intuitively, if a subclass axiom
  * {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))} is derived by inference
  * rules, then a {@link BackwardLinkImpl} with the source {@code :A} and the
  * relation {@code :r} can be produced for the target {@code :B}.
@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Backwa
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface BackwardLink extends Conclusion {
+public interface BackwardLink extends ExternalDeterministicConclusion {
 
 	public static final String NAME = "Backward Link";
 

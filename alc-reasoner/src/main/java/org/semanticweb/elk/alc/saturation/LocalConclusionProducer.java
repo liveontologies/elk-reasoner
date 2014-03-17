@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+package org.semanticweb.elk.alc.saturation;
 
 /*
  * #%L
@@ -22,14 +22,16 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
 
-public interface Disjunction extends LocalConclusion {
+/**
+ * An object using which {@link LocalConclusion}s of inferences can be produced
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+public interface LocalConclusionProducer {
 
-	public static final String NAME = "Disjunction";
-
-	public IndexedClassExpression getWatchedDisjunct();
-
-	public IndexedClassExpression getPropagatedDisjunct();
+	public void produce(LocalConclusion conclusion);
 
 }

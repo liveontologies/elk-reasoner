@@ -25,10 +25,10 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.saturation.Root;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalDeterministicConclusionVisitor;
 
-public class PropagatedClashImpl extends AbstractConclusion implements
-		PropagatedClash {
+public class PropagatedClashImpl extends
+		AbstractExternalDeterministicConclusion implements PropagatedClash {
 
 	private final IndexedObjectProperty relation_;
 
@@ -51,7 +51,8 @@ public class PropagatedClashImpl extends AbstractConclusion implements
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(
+			ExternalDeterministicConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
 

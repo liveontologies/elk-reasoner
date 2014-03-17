@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 /*
  * #%L
  * ALC Reasoner
@@ -21,11 +21,16 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.PossibleConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 
-public interface PossibleConclusion extends Conclusion {
+public interface ExternalDeterministicConclusionVisitor<I, O> {
 
-	public <I, O> O accept(PossibleConclusionVisitor<I, O> visitor,
-			I input);
+	public O visit(ContextInitialization conclusion, I input);
+
+	public O visit(BackwardLink conclusion, I input);
+
+	public O visit(PropagatedClash conclusion, I input);
 
 }

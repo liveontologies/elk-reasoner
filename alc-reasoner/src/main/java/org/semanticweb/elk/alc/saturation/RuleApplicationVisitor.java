@@ -27,6 +27,7 @@ import java.util.Collection;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.alc.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
@@ -38,13 +39,14 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Propag
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -54,17 +56,20 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 
 	private final ConclusionProducer producer_;
 
+	private final IndexedClassExpressionVisitor<Void> subsumerDecompositionVisitor_;
+
 	RuleApplicationVisitor(ConclusionProducer conclusionProducer) {
 		this.producer_ = conclusionProducer;
+		this.subsumerDecompositionVisitor_ = new SubsumerDecompositionVisitor(
+				conclusionProducer);
 	}
 
 	@Override
 	public Void visit(ContextInitialization conclusion, Context input) {
 		Root root = input.getRoot();
-		producer_.produce(root,
-				new DecomposedSubsumerImpl(root.getPositiveMember()));
+		producer_.produce(new DecomposedSubsumerImpl(root.getPositiveMember()));
 		for (IndexedClassExpression negativeMember : root.getNegatitveMembers())
-			producer_.produce(root, new NegatedSubsumerImpl(negativeMember));
+			producer_.produce(new NegatedSubsumerImpl(negativeMember));
 		return null;
 	}
 
@@ -80,8 +85,16 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		IndexedClassExpression subsumer = conclusion.getExpression();
 		IndexedClassExpression
 				.applyCompositionRules(subsumer, input, producer_);
-		subsumer.accept(new SubsumerDecompositionVisitor(input.getRoot(),
-				producer_));
+		subsumer.accept(subsumerDecompositionVisitor_);
+		return null;
+	}
+
+	@Override
+	public Void visit(PossibleSubsumer conclusion, Context input) {
+		IndexedClassExpression subsumer = conclusion.getExpression();
+		IndexedClassExpression
+				.applyCompositionRules(subsumer, input, producer_);
+		subsumer.accept(subsumerDecompositionVisitor_);
 		return null;
 	}
 
@@ -89,18 +102,16 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(NegatedSubsumer conclusion, Context input) {
 		IndexedClassExpression negatedExpression = conclusion
 				.getNegatedExpression();
-		Root root = input.getRoot();
 		if (input.getSubsumers().contains(negatedExpression))
-			producer_.produce(root, ClashImpl.getInstance());
+			producer_.produce(ClashImpl.getInstance());
 		for (IndexedClassExpression propagatedDisjunct : input
 				.getDisjunctions().get(negatedExpression)) {
-			producer_.produce(root, new DecomposedSubsumerImpl(
-					propagatedDisjunct));
+			producer_.produce(new DecomposedSubsumerImpl(propagatedDisjunct));
 		}
 		if (negatedExpression instanceof IndexedObjectSomeValuesFrom) {
 			IndexedObjectSomeValuesFrom negatedExistential = (IndexedObjectSomeValuesFrom) negatedExpression;
 			if (negatedExistential.occursNegatively()) {
-				producer_.produce(root, new NegativePropagationImpl(
+				producer_.produce(new NegativePropagationImpl(
 						negatedExistential));
 			}
 		}
@@ -158,7 +169,8 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 				.getBackwardLinks();
 		Root root = input.getRoot();
 		for (IndexedObjectProperty relation : backwardLinks.keySet()) {
-			Conclusion propagatedClash = new PropagatedClashImpl(relation, root);
+			ExternalDeterministicConclusion propagatedClash = new PropagatedClashImpl(
+					relation, root);
 			for (Root target : backwardLinks.get(relation))
 				producer_.produce(target, propagatedClash);
 		}
@@ -172,9 +184,10 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		IndexedClassExpression negatedCarry = conclusion.getNegatedCarry();
 		Collection<IndexedClassExpression> newNegativeRootMembers = input
 				.getNegativePropagations().get(relation);
-		Conclusion toBacktrack = new BacktrackedBackwardLinkImpl(root,
+		ExternalDeterministicConclusion toBacktrack = new BacktrackedBackwardLinkImpl(
+				root, conclusion.getRelation());
+		ExternalDeterministicConclusion toAdd = new BackwardLinkImpl(root,
 				conclusion.getRelation());
-		Conclusion toAdd = new BackwardLinkImpl(root, conclusion.getRelation());
 		for (IndexedClassExpression positiveMember : input.getForwardLinks()
 				.get(relation)) {
 			Root newTargetRoot = new Root(positiveMember,
@@ -195,10 +208,8 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 				.getWatchedDisjunct();
 		Root root = input.getRoot();
 		if (input.getNegativeSubsumers().contains(watchedDisjunct)) {
-			producer_.produce(
-					root,
-					new DecomposedSubsumerImpl(conclusion
-							.getPropagatedDisjunct()));
+			producer_.produce(new DecomposedSubsumerImpl(conclusion
+					.getPropagatedDisjunct()));
 		} else {
 			producer_.produce(root, new PossibleSubsumerImpl(watchedDisjunct));
 		}
@@ -207,7 +218,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 
 	@Override
 	public Void visit(PropagatedClash conclusion, Context input) {
-		producer_.produce(input.getRoot(), ClashImpl.getInstance());
+		producer_.produce(ClashImpl.getInstance());
 		return null;
 	}
 
