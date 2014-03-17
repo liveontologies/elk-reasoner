@@ -28,8 +28,7 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
@@ -62,15 +61,14 @@ public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
 	 */
 	void visitSubsumer(Subsumer conclusion, Context input) {
 		IndexedClassExpression expression = conclusion.getExpression();
-		if (input.getDisjunctions().keySet().contains(expression))
-			producer_.produce(input.getRoot(),
-					new PossibleDecomposedSubsumerImpl(expression));
-		if (conclusion instanceof PossibleConclusion)
+		if (conclusion instanceof PossibleConclusion) {
 			producer_.produce(input.getRoot(), conclusion);
-		else if (input.getMaskedPossibleComposedSubsumers()
-				.contains(expression)) {
-			producer_.produce(input.getRoot(),
-					new PossibleComposedSubsumerImpl(expression));
+			return;
+		} else if (input.getDisjunctions().keySet().contains(expression)
+				|| input.getMaskedPossibleSubsumers().contains(expression)) {
+			producer_.produce(input.getRoot(), new PossibleSubsumerImpl(
+					expression));
+			return;
 		}
 	}
 
@@ -90,9 +88,8 @@ public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
 	public Void visit(NegatedSubsumer conclusion, Context input) {
 		IndexedClassExpression negatedExpression = conclusion
 				.getNegatedExpression();
-		if (input.getDisjunctions().keySet().contains(negatedExpression))
-			producer_.produce(input.getRoot(),
-					new PossibleDecomposedSubsumerImpl(negatedExpression));
+		producer_.produce(input.getRoot(), new PossibleSubsumerImpl(
+				negatedExpression));
 		return null;
 	}
 

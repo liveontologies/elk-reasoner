@@ -100,7 +100,7 @@ public class Context {
 	/**
 	 * deterministically derived composed subsumers that should be guessed
 	 */
-	private Set<IndexedClassExpression> maskedPossibleComposedSubsumers_;
+	private Set<IndexedClassExpression> maskedPossibleSubsumers_;
 
 	/**
 	 * the entailed existential relations
@@ -205,11 +205,11 @@ public class Context {
 		return negativePropagations_;
 	}
 
-	public Set<IndexedClassExpression> getMaskedPossibleComposedSubsumers() {
-		if (maskedPossibleComposedSubsumers_ == null)
+	public Set<IndexedClassExpression> getMaskedPossibleSubsumers() {
+		if (maskedPossibleSubsumers_ == null)
 			return Collections.emptySet();
 		// else
-		return maskedPossibleComposedSubsumers_;
+		return maskedPossibleSubsumers_;
 	}
 
 	public Multimap<IndexedObjectProperty, Root> getInconsistentSuccessors() {
@@ -390,7 +390,14 @@ public class Context {
 		public static boolean visit(Subsumer conclusion, Context input) {
 			if (input.subsumers_ == null)
 				input.subsumers_ = new ArrayHashSet<IndexedClassExpression>(64);
-			return input.subsumers_.add(conclusion.getExpression());
+			boolean inserted = input.subsumers_.add(conclusion.getExpression());
+			if (!inserted && (conclusion instanceof PossibleConclusion)) {
+				if (input.maskedPossibleSubsumers_ == null)
+					input.maskedPossibleSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
+							8);
+				input.maskedPossibleSubsumers_.add(conclusion.getExpression());
+			}
+			return inserted;
 		}
 
 		@Override
@@ -400,15 +407,7 @@ public class Context {
 
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, Context input) {
-			boolean inserted = visit((Subsumer) conclusion, input);
-			if (!inserted && (conclusion instanceof PossibleConclusion)) {
-				if (input.maskedPossibleComposedSubsumers_ == null)
-					input.maskedPossibleComposedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
-							8);
-				input.maskedPossibleComposedSubsumers_.add(conclusion
-						.getExpression());
-			}
-			return inserted;
+			return visit((Subsumer) conclusion, input);
 		}
 
 		@Override
@@ -503,8 +502,8 @@ public class Context {
 			if (input.subsumers_.remove(conclusion.getExpression())) {
 				if (input.subsumers_.isEmpty())
 					input.subsumers_ = null;
-				if (input.maskedPossibleComposedSubsumers_ != null) {
-					input.maskedPossibleComposedSubsumers_.remove(conclusion
+				if (input.maskedPossibleSubsumers_ != null) {
+					input.maskedPossibleSubsumers_.remove(conclusion
 							.getExpression());
 				}
 				return true;

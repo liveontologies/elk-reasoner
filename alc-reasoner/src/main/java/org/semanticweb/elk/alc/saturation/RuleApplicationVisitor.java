@@ -33,8 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashI
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegativePropagationImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagatedClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
@@ -127,18 +126,12 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			producer_.produce(conclusion.getSource(), new PropagatedClashImpl(
 					relation, input.getRoot()));
 		}
-		if (input.getBackwardLinks().get(relation).size() == 1)
-			// first link; generating propagations
-			IndexedClassExpression.generatePropagations(relation, input,
-					producer_);
 		// apply propagations
 		Root root = conclusion.getSource();
 		for (IndexedClassExpression propagatedSubsumer : input
 				.getPropagations().get(relation)) {
-			// TODO: for propagations of universals should be decomposed
-			// subsumer!
-			producer_.produce(root, new PossibleComposedSubsumerImpl(
-					propagatedSubsumer));
+			producer_.produce(root,
+					new PossibleSubsumerImpl(propagatedSubsumer));
 		}
 		return null;
 	}
@@ -150,7 +143,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			// TODO: for propagations of universals should be decomposed
 			// subsumer!
 			producer_.produce(root,
-					new PossibleComposedSubsumerImpl(conclusion.getCarry()));
+					new PossibleSubsumerImpl(conclusion.getCarry()));
 		}
 		return null;
 	}
@@ -207,8 +200,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 					new DecomposedSubsumerImpl(conclusion
 							.getPropagatedDisjunct()));
 		} else {
-			producer_.produce(root, new PossibleDecomposedSubsumerImpl(
-					watchedDisjunct));
+			producer_.produce(root, new PossibleSubsumerImpl(watchedDisjunct));
 		}
 		return null;
 	}

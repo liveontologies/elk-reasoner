@@ -213,13 +213,10 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 		}
 		if (subsumer.negativeExistentials_ != null) {
 			// generate propagations
-			Set<IndexedObjectProperty> backwardProperties = premises
-					.getBackwardLinks().keySet();
 			for (IndexedObjectSomeValuesFrom existential : subsumer.negativeExistentials_) {
 				IndexedObjectProperty relation = existential.getRelation();
-				if (backwardProperties.contains(relation))
-					producer.produce(root, new PropagationImpl(relation,
-							existential));
+				producer.produce(root, new PropagationImpl(relation,
+						existential));
 			}
 		}
 		if (subsumer.toldSuperClasses_ != null) {
@@ -229,20 +226,5 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 			}
 
 		}
-	}
-
-	public static void generatePropagations(IndexedObjectProperty property,
-			Context premises, ConclusionProducer producer) {
-		Root root = premises.getRoot();
-		for (IndexedClassExpression subsumer : premises.getSubsumers()) {
-			if (subsumer.negativeExistentials_ == null)
-				continue;
-			for (IndexedObjectSomeValuesFrom existential : subsumer.negativeExistentials_) {
-				if (existential.getRelation() == property)
-					producer.produce(root, new PropagationImpl(property,
-							existential));
-			}
-		}
-
 	}
 }

@@ -196,11 +196,11 @@ public class Reasoner {
 							countNegativeSubsumerTests++;
 						}
 						countSubsumerTests++;
-						if (saturation.checkSubsumer(context, possibleSubsumer) != saturation
-								.checkSubsumer(context, possibleSubsumer)) {
-							LOGGER_.error("{}: testst do not agree on {}",
-									context, possibleSubsumer);
-						}
+//						if (saturation.checkSubsumer(context, possibleSubsumer) != saturation
+//								.checkSubsumer(context, possibleSubsumer)) {
+//							LOGGER_.error("{}: testst do not agree on {}",
+//									context, possibleSubsumer);
+//						}
 					}
 				}
 				count++;
