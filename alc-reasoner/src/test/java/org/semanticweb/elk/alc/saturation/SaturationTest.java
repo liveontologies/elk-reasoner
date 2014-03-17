@@ -630,7 +630,7 @@ public class SaturationTest {
 						+ "SubClassOf(:A ObjectUnionOf(ObjectUnionOf(:B ObjectSomeValuesFrom(:R ObjectUnionOf(:D :D))) :C))"
 						+ "SubClassOf(:D owl:Nothing)"//
 						+ "SubClassOf(:B ObjectUnionOf(:BB :BB))"
-						+ "EquivalentClasses(:BB ObjectSomeValuesFrom(:R :F))"//
+						+ "EquivalentClasses(:BB ObjectSomeValuesFrom(:R :D))"//
 						+ ")",
 				// Expected saturation:
 				"Prefix(:=<>)"//
