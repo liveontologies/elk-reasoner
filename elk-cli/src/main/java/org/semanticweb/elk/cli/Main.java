@@ -187,13 +187,16 @@ public class Main {
 							!inconsistent);
 				}
 			}
+			
+			boolean addHash = options.has(printHash);
 
 			if (options.has(classify)) {
 				Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
+			
 				if (options.hasArgument(outputFile))
 					writeClassTaxonomyToFile(options.valueOf(outputFile),
-							taxonomy);
-				if (options.has(printHash))
+							taxonomy, addHash);
+				if (addHash)
 					printTaxonomyHash(taxonomy);
 			}
 
@@ -202,8 +205,8 @@ public class Main {
 				taxonomy = reasoner.getInstanceTaxonomyQuietly();
 				if (options.hasArgument(outputFile))
 					writeInstanceTaxonomyToFile(options.valueOf(outputFile),
-							taxonomy);
-				if (options.has(printHash))
+							taxonomy, addHash);
+				if (addHash)
 					printTaxonomyHash(taxonomy);
 			}
 
@@ -224,24 +227,24 @@ public class Main {
 		writer.close();
 	}
 
-	static void writeClassTaxonomyToFile(File file, Taxonomy<ElkClass> taxonomy)
+	static void writeClassTaxonomyToFile(File file, Taxonomy<ElkClass> taxonomy, boolean printHash)
 			throws IOException, ElkInconsistentOntologyException, ElkException {
 		LOGGER_.info("Writing taxonomy to {}", file);
 
 		Statistics.logOperationStart("Writing taxonomy", LOGGER_);
-		TaxonomyPrinter.dumpClassTaxomomyToFile(taxonomy, file.getPath(), true);
+		TaxonomyPrinter.dumpClassTaxomomyToFile(taxonomy, file.getPath(), printHash);
 		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
 	}
 
 	static void writeInstanceTaxonomyToFile(File file,
-			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy)
+			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy, boolean printHash)
 			throws IOException, ElkInconsistentOntologyException, ElkException {
 		LOGGER_.info("Writing taxonomy with instances to {}", file);
 
 		Statistics
 				.logOperationStart("Writing taxonomy with instances", LOGGER_);
 		TaxonomyPrinter.dumpInstanceTaxomomyToFile(taxonomy, file.getPath(),
-				true);
+				printHash);
 		Statistics.logOperationFinish("Writing taxonomy with instances",
 				LOGGER_);
 	}
