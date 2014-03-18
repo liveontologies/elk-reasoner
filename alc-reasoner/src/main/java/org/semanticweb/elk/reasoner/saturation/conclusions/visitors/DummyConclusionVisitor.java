@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSu
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
@@ -80,7 +81,7 @@ class DummyConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 	}
 
 	@Override
-	public O visit(PossibleDecomposedSubsumer conclusion, I input) {		
+	public O visit(PossibleDecomposedSubsumer conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 
@@ -131,6 +132,11 @@ class DummyConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 
 	@Override
 	public O visit(PossiblePropagatedExistential conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(PropagatedComposedSubsumer conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 

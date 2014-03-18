@@ -87,14 +87,13 @@ public class RevertingVisitor extends
 				.getNegativePropagations().get(relation));
 		producer_.produce(fillerRoot, new BacktrackedBackwardLinkImpl(root,
 				relation));
-		input.removePropagatedConclusions(relation, fillerRoot);
+		input.removePropagatedConclusions(fillerRoot);
 		return true;
 	}
 
 	@Override
 	public Boolean visit(NegativePropagation conclusion, Context input) {
 		IndexedObjectProperty relation = conclusion.getRelation();
-		input.removePropagatedConclusions(relation);
 		Root root = input.getRoot();
 		IndexedClassExpression negatedCarry = conclusion.getNegatedCarry();
 		Collection<IndexedClassExpression> oldNegativeRootMembers = input
@@ -109,6 +108,7 @@ public class RevertingVisitor extends
 					oldNegativeRootMembers);
 			Root newTargetRoot = Root.removeNegativeMember(oldTargetRoot,
 					negatedCarry);
+			input.removePropagatedConclusions(oldTargetRoot);
 			producer_.produce(oldTargetRoot, toBacktrack);
 			producer_.produce(newTargetRoot, toAdd);
 		}

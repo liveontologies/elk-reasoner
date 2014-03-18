@@ -116,6 +116,10 @@ public class Root {
 		return negativeMembers_;
 	}
 
+	public int size() {
+		return getNegatitveMembers().size() + 1;
+	}
+
 	@Override
 	public int hashCode() {
 		return HashGenerator.combinedHashCode(positiveMember_,

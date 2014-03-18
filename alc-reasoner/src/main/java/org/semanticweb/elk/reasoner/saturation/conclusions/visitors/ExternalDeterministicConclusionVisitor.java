@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
+
 /*
  * #%L
  * ALC Reasoner
@@ -23,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 
 public interface ExternalDeterministicConclusionVisitor<I, O> {
@@ -32,5 +34,7 @@ public interface ExternalDeterministicConclusionVisitor<I, O> {
 	public O visit(BackwardLink conclusion, I input);
 
 	public O visit(PropagatedClash conclusion, I input);
+
+	public O visit(PropagatedComposedSubsumer conclusion, I input);
 
 }

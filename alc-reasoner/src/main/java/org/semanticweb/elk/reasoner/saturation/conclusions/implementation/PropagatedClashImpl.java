@@ -27,27 +27,11 @@ import org.semanticweb.elk.alc.saturation.Root;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalDeterministicConclusionVisitor;
 
-public class PropagatedClashImpl extends
-		AbstractExternalDeterministicConclusion implements PropagatedClash {
+public class PropagatedClashImpl extends AbstractPropagatedConclusion implements
+		PropagatedClash {
 
-	private final IndexedObjectProperty relation_;
-
-	private final Root inconsistentRoot_;
-
-	public PropagatedClashImpl(IndexedObjectProperty relation,
-			Root inconsistentRoot) {
-		this.relation_ = relation;
-		this.inconsistentRoot_ = inconsistentRoot;
-	}
-
-	@Override
-	public IndexedObjectProperty getRelation() {
-		return this.relation_;
-	}
-
-	@Override
-	public Root getSourceRoot() {
-		return this.inconsistentRoot_;
+	public PropagatedClashImpl(IndexedObjectProperty relation, Root sourceRoot) {
+		super(relation, sourceRoot);
 	}
 
 	@Override
@@ -58,7 +42,7 @@ public class PropagatedClashImpl extends
 
 	@Override
 	public String toString() {
-		return PropagatedClash.NAME + "(" + relation_ + " " + inconsistentRoot_
-				+ ")";
+		return PropagatedClash.NAME + "(" + getRelation() + ": "
+				+ getSourceRoot() + ")";
 	}
 }

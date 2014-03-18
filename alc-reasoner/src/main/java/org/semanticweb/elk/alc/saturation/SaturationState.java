@@ -50,6 +50,8 @@ public class SaturationState implements ExternalConclusionProducer {
 
 	private int contextCount = 0;
 
+	private int contextSizes = 0;
+
 	/**
 	 * {@link Context}s that have unprocessed {@link Conclusion}s, i.e., for
 	 * which {@link Context#takeToDo()} returns not {@code null}
@@ -127,8 +129,10 @@ public class SaturationState implements ExternalConclusionProducer {
 			return result;
 		// else create new
 		contextCount++;
+		contextSizes += root.size();
 		if ((contextCount / 1000) * 1000 == contextCount)
-			LOGGER_.info("{} contexts created", contextCount);
+			LOGGER_.info("{} contexts created (evarage root size: {})",
+					contextCount, contextSizes / contextCount);
 		result = new Context(root);
 		root.setContext(result);
 		existingRoots_.put(root, root);
@@ -159,8 +163,8 @@ public class SaturationState implements ExternalConclusionProducer {
 						LOGGER_.error(
 								"{}({}): inconsistent, but its parent {}({}) is not (inconsistent successors: {})",
 								root, root.hashCode(), backwardRoot,
-								backwardRoot.hashCode(), backwardContext
-										.getInconsistentSuccessors().keySet());
+								backwardRoot.hashCode(),
+								backwardContext.getInconsistentSuccessors());
 					}
 				}
 

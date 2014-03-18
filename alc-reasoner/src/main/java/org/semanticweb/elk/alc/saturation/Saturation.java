@@ -28,6 +28,7 @@ import java.util.Queue;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
@@ -161,7 +162,7 @@ public class Saturation {
 	public boolean checkSubsumer(Context context,
 			IndexedClassExpression possibleSubsumer) {
 		return checkSubsumerSimple(context, possibleSubsumer);
-		// return checkSubsumerOptimized(context, possibleSubsumer);
+//		 return checkSubsumerOptimized(context, possibleSubsumer);
 	}
 
 	public void process() {
@@ -237,8 +238,16 @@ public class Saturation {
 							context);
 					context.removeConclusion(toBacktrack);
 				} while (proceedNext);
+				// restore conclusions that are still valid
 				if (!context.getInconsistentSuccessors().isEmpty()) {
 					conclusionProducer_.produce(ClashImpl.getInstance());
+				}
+				for (Root root : context.getPropagatedComposedSubsumers()
+						.keySet()) {
+					for (IndexedClassExpression subsumer : context
+							.getPropagatedComposedSubsumers().get(root))
+						conclusionProducer_.produce(new ComposedSubsumerImpl(
+								subsumer));
 				}
 			}
 

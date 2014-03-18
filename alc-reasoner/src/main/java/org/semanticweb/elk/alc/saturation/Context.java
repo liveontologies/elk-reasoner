@@ -49,6 +49,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleCo
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossiblePropagatedExistential;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -147,7 +148,13 @@ public class Context {
 	/**
 	 * inconsistent {@link Root}s that are reachable by forward links
 	 */
-	private Multimap<IndexedObjectProperty, Root> inconsistentSuccessors_;
+	private Set<Root> inconsistentSuccessors_;
+
+	/**
+	 * propagated {@link IndexedClassExpression}s indexed by {@link Root}s for
+	 * which they were generated
+	 */
+	private Multimap<Root, IndexedClassExpression> propagatedComposedSubsumers_;
 
 	/**
 	 * {@link ExternalConclusion}s to which the rules are yet to be applied
@@ -250,11 +257,18 @@ public class Context {
 		return possibleExistentials_;
 	}
 
-	public Multimap<IndexedObjectProperty, Root> getInconsistentSuccessors() {
+	public Set<Root> getInconsistentSuccessors() {
 		if (inconsistentSuccessors_ == null)
-			return Operations.emptyMultimap();
+			return Collections.emptySet();
 		// else
 		return inconsistentSuccessors_;
+	}
+
+	public Multimap<Root, IndexedClassExpression> getPropagatedComposedSubsumers() {
+		if (propagatedComposedSubsumers_ == null)
+			return Operations.emptyMultimap();
+		// else
+		return propagatedComposedSubsumers_;
 	}
 
 	public Set<IndexedClassExpression> getPossibleSubsumers() {
@@ -355,19 +369,11 @@ public class Context {
 		return result;
 	}
 
-	public void removePropagatedConclusions(IndexedObjectProperty property) {
+	public void removePropagatedConclusions(Root root) {
 		if (inconsistentSuccessors_ == null)
 			return;
 		// else
-		inconsistentSuccessors_.remove(property);
-	}
-
-	public void removePropagatedConclusions(IndexedObjectProperty property,
-			Root root) {
-		if (inconsistentSuccessors_ == null)
-			return;
-		// else
-		inconsistentSuccessors_.remove(property, root);
+		inconsistentSuccessors_.remove(root);
 	}
 
 	public boolean hasClash() {
@@ -540,10 +546,19 @@ public class Context {
 		@Override
 		public Boolean visit(PropagatedClash conclusion, Context input) {
 			if (input.inconsistentSuccessors_ == null)
-				input.inconsistentSuccessors_ = new HashSetMultimap<IndexedObjectProperty, Root>(
-						4);
-			return input.inconsistentSuccessors_.add(conclusion.getRelation(),
-					conclusion.getSourceRoot());
+				input.inconsistentSuccessors_ = new ArrayHashSet<Root>(4);
+			return input.inconsistentSuccessors_
+					.add(conclusion.getSourceRoot());
+		}
+
+		@Override
+		public Boolean visit(PropagatedComposedSubsumer conclusion,
+				Context input) {
+			if (input.propagatedComposedSubsumers_ == null)
+				input.propagatedComposedSubsumers_ = new HashSetMultimap<Root, IndexedClassExpression>(
+						16);
+			return input.propagatedComposedSubsumers_.add(
+					conclusion.getSourceRoot(), conclusion.getExpression());
 		}
 
 	}
@@ -733,10 +748,25 @@ public class Context {
 		public Boolean visit(PropagatedClash conclusion, Context input) {
 			if (input.inconsistentSuccessors_ == null)
 				return false;
-			if (input.inconsistentSuccessors_.remove(conclusion.getRelation(),
-					conclusion.getSourceRoot())) {
+			if (input.inconsistentSuccessors_
+					.remove(conclusion.getSourceRoot())) {
 				if (input.inconsistentSuccessors_.isEmpty())
 					input.inconsistentSuccessors_ = null;
+				return true;
+			}
+			// else
+			return false;
+		}
+
+		@Override
+		public Boolean visit(PropagatedComposedSubsumer conclusion,
+				Context input) {
+			if (input.propagatedComposedSubsumers_ == null)
+				return false;
+			if (input.propagatedComposedSubsumers_.remove(
+					conclusion.getSourceRoot(), conclusion.getExpression())) {
+				if (input.propagatedComposedSubsumers_.isEmpty())
+					input.propagatedComposedSubsumers_ = null;
 				return true;
 			}
 			// else
