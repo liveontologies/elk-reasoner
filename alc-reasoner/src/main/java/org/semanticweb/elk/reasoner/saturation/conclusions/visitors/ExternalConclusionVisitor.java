@@ -26,7 +26,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSubsumer;
 
 /**
  * A visitor pattern for {@link ExternalConclusion}s together with additional
@@ -40,8 +39,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSu
  *            the type of output parameter with which this visitor works
  */
 public interface ExternalConclusionVisitor<I, O> extends
-		ExternalDeterministicConclusionVisitor<I, O> {
+		ExternalDeterministicConclusionVisitor<I, O>,
+		ExternalPossibleConclusionVisitor<I, O> {
 
-	public O visit(PossibleSubsumer conclusion, I input);
+	// nothing else
 
 }

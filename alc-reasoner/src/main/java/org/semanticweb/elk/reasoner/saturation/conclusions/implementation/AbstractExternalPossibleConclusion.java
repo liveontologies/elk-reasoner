@@ -22,31 +22,16 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  * #L%
  */
 
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalPossibleConclusionVisitor;
 
-public class PossibleSubsumerImpl extends AbstractSubsumer implements
-		PossibleSubsumer {
-
-	public PossibleSubsumerImpl(IndexedClassExpression subsumer) {
-		super(subsumer);
-	}
-
-	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
-	}
+public abstract class AbstractExternalPossibleConclusion extends
+		AbstractExternalConclusion implements ExternalPossibleConclusion {
 
 	@Override
 	public <I, O> O accept(ExternalConclusionVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
-	}
-
-	@Override
-	public String toString() {
-		return "Possible" + super.toString();
+		return accept((ExternalPossibleConclusionVisitor<I, O>) visitor, input);
 	}
 
 }

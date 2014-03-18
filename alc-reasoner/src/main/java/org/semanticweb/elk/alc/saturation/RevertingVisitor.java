@@ -28,7 +28,8 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
@@ -36,7 +37,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDe
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 
@@ -64,8 +66,8 @@ public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
 		IndexedClassExpression expression = conclusion.getExpression();
 		if (input.getDisjunctions().keySet().contains(expression)
 				|| input.getMaskedPossibleSubsumers().contains(expression)) {
-			producer_.produce(input.getRoot(), new PossibleSubsumerImpl(
-					expression));
+			producer_.produce(input.getRoot(),
+					new PossibleComposedSubsumerImpl(expression));
 			return;
 		}
 	}
@@ -83,7 +85,13 @@ public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
 	}
 
 	@Override
-	public Void visit(PossibleSubsumer conclusion, Context input) {
+	public Void visit(PossibleComposedSubsumer conclusion, Context input) {
+		producer_.produce(input.getRoot(), conclusion);
+		return null;
+	}
+
+	@Override
+	public Void visit(PossibleDecomposedSubsumer conclusion, Context input) {
 		producer_.produce(input.getRoot(), conclusion);
 		return null;
 	}
@@ -92,7 +100,13 @@ public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
 	public Void visit(NegatedSubsumer conclusion, Context input) {
 		IndexedClassExpression negatedExpression = conclusion
 				.getNegatedExpression();
-		producer_.produce(input.getRoot(), new PossibleSubsumerImpl(
+		if (!input.getDisjunctions().get(negatedExpression).isEmpty()) {
+			producer_.produce(input.getRoot(),
+					new PossibleDecomposedSubsumerImpl(negatedExpression));
+			return null;
+		}
+		// else
+		producer_.produce(input.getRoot(), new PossibleComposedSubsumerImpl(
 				negatedExpression));
 		return null;
 	}

@@ -627,7 +627,7 @@ public class SaturationTest {
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
-						+ "SubClassOf(:A ObjectUnionOf(ObjectUnionOf(:B ObjectSomeValuesFrom(:R ObjectUnionOf(:D :D))) :C))"
+						+ "SubClassOf(:A ObjectUnionOf(:B ObjectSomeValuesFrom(:R ObjectUnionOf(:D :D)) :C))"
 						+ "SubClassOf(:D owl:Nothing)"//
 						+ "SubClassOf(:B ObjectUnionOf(:BB :BB))"
 						+ "EquivalentClasses(:BB ObjectSomeValuesFrom(:R :D))"//

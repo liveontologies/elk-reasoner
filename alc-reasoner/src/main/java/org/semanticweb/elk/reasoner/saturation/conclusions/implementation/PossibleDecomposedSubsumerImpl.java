@@ -1,4 +1,4 @@
-package org.semanticweb.elk.alc.saturation;
+package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 /*
  * #%L
@@ -22,29 +22,26 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalPossibleConclusionVisitor;
 
-public class BacktrackingVisitor extends RevertingVisitor {
+public class PossibleDecomposedSubsumerImpl extends
+		AbstractExternalPossibleSubsumer implements PossibleDecomposedSubsumer {
 
-	private final ConclusionProducer producer_;
-
-	public BacktrackingVisitor(ConclusionProducer conclusionProducer) {
-		super(conclusionProducer);
-		this.producer_ = conclusionProducer;
+	public PossibleDecomposedSubsumerImpl(IndexedClassExpression subsumer) {
+		super(subsumer);
 	}
 
 	@Override
-	public Void visit(PossibleComposedSubsumer conclusion, Context input) {
-		producer_.produce(new NegatedSubsumerImpl(conclusion.getExpression()));
-		return null;
+	String getNameQualifier() {
+		return "Decomposed";
 	}
 
 	@Override
-	public Void visit(PossibleDecomposedSubsumer conclusion, Context input) {
-		producer_.produce(new NegatedSubsumerImpl(conclusion.getExpression()));
-		return null;
+	public <I, O> O accept(ExternalPossibleConclusionVisitor<I, O> visitor,
+			I input) {
+		return visitor.visit(this, input);
 	}
 
 }

@@ -40,10 +40,12 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Decomposed
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
@@ -89,9 +91,14 @@ public class Context {
 	private boolean hasClash_ = false;
 
 	/**
-	 * the common super-classes of the {@link Root}
+	 * the common (possible) super-classes of the {@link Root} members
 	 */
 	private Set<IndexedClassExpression> subsumers_;
+
+	/**
+	 * subsumers to which decomposition rules are applied
+	 */
+	private Set<IndexedClassExpression> decomposedSubsumers_;
 
 	/**
 	 * the negated super-classes of the {@link Root}
@@ -101,7 +108,7 @@ public class Context {
 	/**
 	 * deterministically derived composed subsumers that should be guessed
 	 */
-	private Set<IndexedClassExpression> maskedPossibleSubsumers_;
+	private Set<IndexedClassExpression> maskedPossibleComposedSubsumers_;
 
 	/**
 	 * the entailed existential relations
@@ -141,7 +148,7 @@ public class Context {
 	/**
 	 * subsumers which need to be guessed within this context
 	 */
-	private Queue<PossibleSubsumer> toGuess_;
+	private Queue<ExternalPossibleConclusion> toGuess_;
 
 	/**
 	 * the {@link Conclusion}s that have been processed after the first
@@ -162,6 +169,13 @@ public class Context {
 			return Collections.emptySet();
 		// else
 		return subsumers_;
+	}
+
+	public Set<IndexedClassExpression> getDecomposedSubsumers() {
+		if (decomposedSubsumers_ == null)
+			return Collections.emptySet();
+		// else
+		return decomposedSubsumers_;
 	}
 
 	public Set<IndexedClassExpression> getNegativeSubsumers() {
@@ -207,10 +221,10 @@ public class Context {
 	}
 
 	public Set<IndexedClassExpression> getMaskedPossibleSubsumers() {
-		if (maskedPossibleSubsumers_ == null)
+		if (maskedPossibleComposedSubsumers_ == null)
 			return Collections.emptySet();
 		// else
-		return maskedPossibleSubsumers_;
+		return maskedPossibleComposedSubsumers_;
 	}
 
 	public Multimap<IndexedObjectProperty, Root> getInconsistentSuccessors() {
@@ -296,22 +310,22 @@ public class Context {
 		return result;
 	}
 
-	boolean addToGuess(PossibleSubsumer possibleConclusion) {
+	boolean addToGuess(ExternalPossibleConclusion possibleConclusion) {
 		boolean result = false;
 		if (toGuess_ == null) {
-			toGuess_ = new ArrayDeque<PossibleSubsumer>();
+			toGuess_ = new ArrayDeque<ExternalPossibleConclusion>();
 			result = true;
 		}
 		toGuess_.add(possibleConclusion);
 		return result;
 	}
 
-	PossibleSubsumer takeToGuess() {
+	ExternalPossibleConclusion takeToGuess() {
 		if (toGuess_ == null) {
 			return null;
 		}
 		// else
-		PossibleSubsumer result = toGuess_.poll();
+		ExternalPossibleConclusion result = toGuess_.poll();
 		if (result == null) {
 			toGuess_ = null;
 		}
@@ -372,32 +386,49 @@ public class Context {
 	static class ConclusionInserter implements
 			ConclusionVisitor<Context, Boolean> {
 
-		public static boolean visit(Subsumer conclusion, Context input) {
+		private static boolean visitComposedSubsumer(Subsumer conclusion,
+				Context input) {
 			if (input.subsumers_ == null)
 				input.subsumers_ = new ArrayHashSet<IndexedClassExpression>(64);
 			return input.subsumers_.add(conclusion.getExpression());
 		}
 
+		private static boolean visitDecomposedSubsumer(Subsumer conclusion,
+				Context input) {
+			if (input.decomposedSubsumers_ == null)
+				input.decomposedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
+						32);
+			return input.decomposedSubsumers_.add(conclusion.getExpression());
+		}
+
 		@Override
 		public Boolean visit(DecomposedSubsumer conclusion, Context input) {
-			return visit((Subsumer) conclusion, input);
+			return visitDecomposedSubsumer(conclusion, input);
 		}
 
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, Context input) {
-			return visit((Subsumer) conclusion, input);
+			return visitComposedSubsumer(conclusion, input);
 		}
 
 		@Override
-		public Boolean visit(PossibleSubsumer conclusion, Context input) {
-			boolean inserted = visit((Subsumer) conclusion, input);
+		public Boolean visit(PossibleComposedSubsumer conclusion, Context input) {
+			boolean inserted = visitComposedSubsumer(conclusion, input);
 			if (!inserted) {
-				if (input.maskedPossibleSubsumers_ == null)
-					input.maskedPossibleSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
+				if (input.maskedPossibleComposedSubsumers_ == null)
+					input.maskedPossibleComposedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
 							8);
-				input.maskedPossibleSubsumers_.add(conclusion.getExpression());
+				input.maskedPossibleComposedSubsumers_.add(conclusion
+						.getExpression());
 			}
 			return inserted;
+		}
+
+		@Override
+		public Boolean visit(PossibleDecomposedSubsumer conclusion,
+				Context input) {
+			// TODO: updated masked decomposed subsumers?
+			return visitDecomposedSubsumer(conclusion, input);
 		}
 
 		@Override
@@ -486,16 +517,36 @@ public class Context {
 	static class ConclusionDeleter implements
 			ConclusionVisitor<Context, Boolean> {
 
-		public static boolean visit(Subsumer conclusion, Context input) {
+		private void removeMaskedSubsumer(IndexedClassExpression expression,
+				Context input) {
+			if (input.maskedPossibleComposedSubsumers_ != null) {
+				input.maskedPossibleComposedSubsumers_.remove(expression);
+			}
+		}
+
+		private boolean visitComposedSubsumer(Subsumer conclusion, Context input) {
 			if (input.subsumers_ == null)
 				return false;
-			if (input.subsumers_.remove(conclusion.getExpression())) {
+			IndexedClassExpression expression = conclusion.getExpression();
+			if (input.subsumers_.remove(expression)) {
 				if (input.subsumers_.isEmpty())
 					input.subsumers_ = null;
-				if (input.maskedPossibleSubsumers_ != null) {
-					input.maskedPossibleSubsumers_.remove(conclusion
-							.getExpression());
-				}
+				removeMaskedSubsumer(expression, input);
+				return true;
+			}
+			// else
+			return false;
+		}
+
+		private boolean visitDecomposedSubsumer(Subsumer conclusion,
+				Context input) {
+			if (input.decomposedSubsumers_ == null)
+				return false;
+			IndexedClassExpression expression = conclusion.getExpression();
+			if (input.decomposedSubsumers_.remove(expression)) {
+				if (input.decomposedSubsumers_.isEmpty())
+					input.decomposedSubsumers_ = null;
+				removeMaskedSubsumer(expression, input);
 				return true;
 			}
 			// else
@@ -504,17 +555,23 @@ public class Context {
 
 		@Override
 		public Boolean visit(DecomposedSubsumer conclusion, Context input) {
-			return visit((Subsumer) conclusion, input);
+			return visitDecomposedSubsumer(conclusion, input);
 		}
 
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, Context input) {
-			return visit((Subsumer) conclusion, input);
+			return visitComposedSubsumer(conclusion, input);
 		}
 
 		@Override
-		public Boolean visit(PossibleSubsumer conclusion, Context input) {
-			return visit((Subsumer) conclusion, input);
+		public Boolean visit(PossibleDecomposedSubsumer conclusion,
+				Context input) {
+			return visitDecomposedSubsumer(conclusion, input);
+		}
+
+		@Override
+		public Boolean visit(PossibleComposedSubsumer conclusion, Context input) {
+			return visitComposedSubsumer(conclusion, input);
 		}
 
 		@Override

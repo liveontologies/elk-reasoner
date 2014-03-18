@@ -1,8 +1,8 @@
-package org.semanticweb.elk.alc.saturation;
+package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
 /*
  * #%L
- * ALC Reasoner
+ * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
@@ -22,21 +22,15 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
-
 /**
- * An object using which {@link ExternalConclusion}s of inferences can be
- * produced
+ * A {@link Subsumer} created by composition rules.
  * 
+ * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
- * 
  */
-public interface ExternalConclusionProducer {
+public interface PossibleComposedSubsumer extends Subsumer,
+		ExternalPossibleConclusion {
 
-	public void produce(Root root, ExternalDeterministicConclusion conclusion);
-
-	public void produce(Root root, ExternalPossibleConclusion conclusion);
+	public static final String NAME = "Possible Conmposed Subsumer";
 
 }

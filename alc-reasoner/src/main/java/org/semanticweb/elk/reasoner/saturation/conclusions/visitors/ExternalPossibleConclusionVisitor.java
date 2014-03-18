@@ -1,8 +1,8 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 /*
  * #%L
- * ELK Reasoner
+ * ALC Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
@@ -22,14 +22,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-/**
- * A {@link Subsumer} created by decomposition rules.
- * 
- * @author Frantisek Simancik
- * @author "Yevgeny Kazakov"
- */
-public interface PossibleSubsumer extends Subsumer, ExternalConclusion {
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
 
-	public static final String NAME = "Decomposed Subsumer";
+public interface ExternalPossibleConclusionVisitor<I, O> {
+
+	public O visit(PossibleComposedSubsumer conclusion, I input);
+
+	public O visit(PossibleDecomposedSubsumer conclusion, I input);
 
 }

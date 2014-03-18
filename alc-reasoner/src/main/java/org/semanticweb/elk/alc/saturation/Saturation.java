@@ -31,11 +31,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashI
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BacktrackedConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.slf4j.Logger;
@@ -66,7 +65,7 @@ public class Saturation {
 		this.localConclusions_ = new ArrayDeque<LocalConclusion>(1024);
 		this.conclusionProducer_ = new ConclusionProducer() {
 			@Override
-			public void produce(Root root, PossibleSubsumer conclusion) {
+			public void produce(Root root, ExternalPossibleConclusion conclusion) {
 				saturationState_.produce(root, conclusion);
 			}
 
@@ -190,10 +189,9 @@ public class Saturation {
 				}
 				if (!context.addConclusion(conclusion))
 					continue;
-				if ((!context.isDeterministic() || conclusion instanceof PossibleSubsumer)
+				if ((!context.isDeterministic() || conclusion instanceof ExternalPossibleConclusion)
 						&& !context.isInconsistent()
-						&& !(conclusion instanceof BackwardLink)
-						&& !(conclusion instanceof PropagatedConclusion)) {
+						&& !(conclusion instanceof ExternalDeterministicConclusion)) {
 					context.pushToHistory(conclusion);
 				}
 				conclusion.accept(ruleApplicationVisitor_, context);
@@ -208,7 +206,7 @@ public class Saturation {
 						}
 						toBacktrack.accept(backtrackingVisitor_, context);
 						context.removeConclusion(toBacktrack);
-						if (toBacktrack instanceof PossibleSubsumer)
+						if (toBacktrack instanceof ExternalPossibleConclusion)
 							break;
 					}
 					if (!context.getInconsistentSuccessors().isEmpty()) {

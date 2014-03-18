@@ -1,4 +1,4 @@
-package org.semanticweb.elk.alc.saturation;
+package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
 /*
  * #%L
@@ -22,21 +22,11 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalPossibleConclusionVisitor;
 
-/**
- * An object using which {@link ExternalConclusion}s of inferences can be
- * produced
- * 
- * @author "Yevgeny Kazakov"
- * 
- */
-public interface ExternalConclusionProducer {
+public interface ExternalPossibleConclusion extends ExternalConclusion {
 
-	public void produce(Root root, ExternalDeterministicConclusion conclusion);
-
-	public void produce(Root root, ExternalPossibleConclusion conclusion);
+	public <I, O> O accept(ExternalPossibleConclusionVisitor<I, O> visitor,
+			I input);
 
 }

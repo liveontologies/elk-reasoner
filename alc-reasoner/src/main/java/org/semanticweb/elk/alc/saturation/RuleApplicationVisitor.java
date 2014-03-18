@@ -31,10 +31,12 @@ import org.semanticweb.elk.alc.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegativePropagationImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagatedClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
@@ -46,9 +48,11 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDe
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -73,28 +77,38 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		return null;
 	}
 
-	@Override
-	public Void visit(ComposedSubsumer conclusion, Context input) {
+	private void visitComposedSubsumer(Subsumer conclusion, Context input) {
 		IndexedClassExpression.applyCompositionRules(
 				conclusion.getExpression(), input, producer_);
+	}
+
+	private void visitDecomposedSubsumer(Subsumer conclusion) {
+		IndexedClassExpression expression = conclusion.getExpression();
+		expression.accept(subsumerDecompositionVisitor_);
+		producer_.produce(new ComposedSubsumerImpl(expression));
+	}
+
+	@Override
+	public Void visit(ComposedSubsumer conclusion, Context input) {
+		visitComposedSubsumer(conclusion, input);
 		return null;
 	}
 
 	@Override
 	public Void visit(DecomposedSubsumer conclusion, Context input) {
-		IndexedClassExpression subsumer = conclusion.getExpression();
-		IndexedClassExpression
-				.applyCompositionRules(subsumer, input, producer_);
-		subsumer.accept(subsumerDecompositionVisitor_);
+		visitDecomposedSubsumer(conclusion);
 		return null;
 	}
 
 	@Override
-	public Void visit(PossibleSubsumer conclusion, Context input) {
-		IndexedClassExpression subsumer = conclusion.getExpression();
-		IndexedClassExpression
-				.applyCompositionRules(subsumer, input, producer_);
-		subsumer.accept(subsumerDecompositionVisitor_);
+	public Void visit(PossibleComposedSubsumer conclusion, Context input) {
+		visitComposedSubsumer(conclusion, input);
+		return null;
+	}
+
+	@Override
+	public Void visit(PossibleDecomposedSubsumer conclusion, Context input) {
+		visitDecomposedSubsumer(conclusion);
 		return null;
 	}
 
@@ -141,8 +155,8 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		Root root = conclusion.getSource();
 		for (IndexedClassExpression propagatedSubsumer : input
 				.getPropagations().get(relation)) {
-			producer_.produce(root,
-					new PossibleSubsumerImpl(propagatedSubsumer));
+			producer_.produce(root, new PossibleComposedSubsumerImpl(
+					propagatedSubsumer));
 		}
 		return null;
 	}
@@ -154,7 +168,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			// TODO: for propagations of universals should be decomposed
 			// subsumer!
 			producer_.produce(root,
-					new PossibleSubsumerImpl(conclusion.getCarry()));
+					new PossibleComposedSubsumerImpl(conclusion.getCarry()));
 		}
 		return null;
 	}
@@ -211,7 +225,8 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			producer_.produce(new DecomposedSubsumerImpl(conclusion
 					.getPropagatedDisjunct()));
 		} else {
-			producer_.produce(root, new PossibleSubsumerImpl(watchedDisjunct));
+			producer_.produce(root, new PossibleDecomposedSubsumerImpl(
+					watchedDisjunct));
 		}
 		return null;
 	}

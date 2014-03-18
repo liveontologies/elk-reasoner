@@ -32,7 +32,7 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +75,7 @@ public class SaturationState implements ExternalConclusionProducer {
 	}
 
 	@Override
-	public void produce(Root root, PossibleSubsumer conclusion) {
+	public void produce(Root root, ExternalPossibleConclusion conclusion) {
 		produce(getCreateContext(root), conclusion);
 	}
 
@@ -88,7 +88,7 @@ public class SaturationState implements ExternalConclusionProducer {
 		}
 	}
 
-	private void produce(Context context, PossibleSubsumer conclusion) {
+	private void produce(Context context, ExternalPossibleConclusion conclusion) {
 		LOGGER_.trace("{}: produced {}", context, conclusion);
 		if (context.addToGuess(conclusion)) {
 			LOGGER_.trace("{}: activated possible", context);
