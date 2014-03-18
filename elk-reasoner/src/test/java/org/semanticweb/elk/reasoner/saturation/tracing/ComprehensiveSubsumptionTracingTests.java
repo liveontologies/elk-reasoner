@@ -35,15 +35,13 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
 /**
- * Visits all atomic subsumptions in a class taxonomy using a {@link TracingTestVisitor}. Used for tracng tests and benchmarking.
+ * Visits all atomic subsumptions in a class taxonomy using a {@link TracingTestVisitor}. Used for tracing tests and benchmarking.
  * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
 public class ComprehensiveSubsumptionTracingTests implements TracingTests {
-
-	//private static final Logger LOGGER_ = LoggerFactory.getLogger(ComprehensiveSubsumptionTracingTests.class);	
 	
 	private final Taxonomy<ElkClass> classTaxonomy_;
 	
@@ -105,38 +103,4 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 		visitTracingTasksForDirectSubClasses(node, node, visitor);
 	}
 
-	/*@Override
-	public void accept(TracingTestVisitor visitor) throws Exception {
-		Set<ElkClass> canonicalElkClasses = new HashSet<ElkClass>();
-		
-		for (TaxonomyNode<ElkClass> classNode : classTaxonomy_.getNodes()) {
-			canonicalElkClasses.add(classNode.getCanonicalMember());
-		}
-
-		for (ElkClass elkClass : canonicalElkClasses) {
-			TaxonomyNode<ElkClass> classNode = classTaxonomy_.getNode(elkClass);
-
-			for (TaxonomyNode<ElkClass> childNode : classNode.getDirectSubNodes()) {
-				if (childNode != classTaxonomy_.getBottomNode() && classNode != classTaxonomy_.getTopNode()) {
-					visitor.visit(childNode.getCanonicalMember(), classNode.getCanonicalMember());
-				}
-			}
-
-			for (ElkClass sub : classNode.getMembers()) {
-				if (sub.getIri().equals(PredefinedElkIri.OWL_NOTHING.get())) {
-					continue;
-				}
-				
-				for (ElkClass sup : classNode.getMembers()) {
-					if (sup.getIri().equals(PredefinedElkIri.OWL_THING.get())) {
-						continue;
-					}
-					
-					if (sub != sup) {
-						visitor.visit(sub, sup);
-					}
-				}
-			}
-		}
-	}*/	
 }
