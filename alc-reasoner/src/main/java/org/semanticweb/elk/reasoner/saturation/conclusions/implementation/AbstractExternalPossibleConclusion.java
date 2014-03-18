@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.BacktrackableConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalPossibleConclusionVisitor;
 
@@ -32,6 +33,11 @@ public abstract class AbstractExternalPossibleConclusion extends
 	@Override
 	public <I, O> O accept(ExternalConclusionVisitor<I, O> visitor, I input) {
 		return accept((ExternalPossibleConclusionVisitor<I, O>) visitor, input);
+	}
+
+	@Override
+	public <I, O> O accept(BacktrackableConclusionVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 
 }

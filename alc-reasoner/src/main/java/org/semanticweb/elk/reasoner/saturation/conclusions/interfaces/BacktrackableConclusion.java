@@ -1,5 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
-
+package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 /*
  * #%L
  * ALC Reasoner
@@ -22,21 +21,16 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  * #L%
  */
 
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.alc.saturation.Root;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.RetractedConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.BacktrackableConclusionVisitor;
 
-public class BacktrackedBackwardLinkImpl extends BackwardLinkImpl implements
-		RetractedConclusion {
+/**
+ * {@link Conclusion}s that should be saved for backtracking
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+public interface BacktrackableConclusion extends Conclusion {
 
-	public BacktrackedBackwardLinkImpl(Root source,
-			IndexedObjectProperty relation) {
-		super(source, relation);
-	}
-
-	@Override
-	public String toString() {
-		return "Backtracked" + super.toString();
-	}
+	public <I, O> O accept(BacktrackableConclusionVisitor<I, O> visitor, I input);
 
 }

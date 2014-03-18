@@ -30,12 +30,14 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BacktrackedConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BacktrackableConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.RetractedConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.BacktrackableConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +61,8 @@ public class Saturation {
 	private final ConclusionVisitor<Context, Void> backtrackingVisitor_;
 
 	private final ConclusionVisitor<Context, Void> revertingVisitor_;
+
+	private final BacktrackableConclusionVisitor<Context, Void> historyInsertingVisitor_;
 
 	public Saturation(SaturationState saturationState) {
 		this.saturationState_ = saturationState;
@@ -84,6 +88,7 @@ public class Saturation {
 				conclusionProducer_);
 		this.backtrackingVisitor_ = new BacktrackingVisitor(conclusionProducer_);
 		this.revertingVisitor_ = new RevertingVisitor(conclusionProducer_);
+		this.historyInsertingVisitor_ = new HistoryInsertingVisitor();
 	}
 
 	public void submit(IndexedClassExpression expression) {
@@ -105,7 +110,8 @@ public class Saturation {
 		process();
 		if (context.isInconsistent())
 			return true;
-		Conclusion conjecture = new NegatedSubsumerImpl(possibleSubsumer);
+		BacktrackableConclusion conjecture = new NegatedSubsumerImpl(
+				possibleSubsumer);
 		// backtrack everything
 		for (;;) {
 			Conclusion toBacktrack = context.popHistory();
@@ -166,7 +172,7 @@ public class Saturation {
 				}
 				LOGGER_.trace("{}: processing {}", context.getRoot(),
 						conclusion);
-				if (conclusion instanceof BacktrackedConclusion) {
+				if (conclusion instanceof RetractedConclusion) {
 					if (!context.removeConclusion(conclusion))
 						LOGGER_.error(
 								"{}: backtracked conclusion not found: {}!",
@@ -189,12 +195,13 @@ public class Saturation {
 				}
 				if (!context.addConclusion(conclusion))
 					continue;
-				if ((!context.isDeterministic() || conclusion instanceof ExternalPossibleConclusion)
-						&& !context.isInconsistent()
-						&& !(conclusion instanceof ExternalDeterministicConclusion)) {
-					context.pushToHistory(conclusion);
-				}
+
+				if (conclusion instanceof BacktrackableConclusion)
+					((BacktrackableConclusion) conclusion).accept(
+							historyInsertingVisitor_, context);
+
 				conclusion.accept(ruleApplicationVisitor_, context);
+
 				if (context.hasClash()) {
 					localConclusions_.clear();
 					for (;;) {

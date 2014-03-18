@@ -1,5 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
-
+package org.semanticweb.elk.alc.saturation;
 /*
  * #%L
  * ALC Reasoner
@@ -22,22 +21,25 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.BacktrackableConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 
-public abstract class AbstractLocalConclusion extends AbstractConclusion
-		implements LocalConclusion {
+public class HistoryInsertingVisitor implements
+		BacktrackableConclusionVisitor<Context, Void> {
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
-		return accept((LocalConclusionVisitor<I, O>) visitor, input);
+	public Void visit(LocalConclusion conclusion, Context input) {
+		if (!input.isDeterministic() && !input.isInconsistent())
+			input.pushToHistory(conclusion);
+		return null;
 	}
 
 	@Override
-	public <I, O> O accept(BacktrackableConclusionVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public Void visit(ExternalPossibleConclusion conclusion, Context input) {
+		if (!input.isInconsistent())
+			input.pushToHistory(conclusion);
+		return null;
 	}
 
 }

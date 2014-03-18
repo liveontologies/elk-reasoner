@@ -31,6 +31,7 @@ import java.util.Set;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BacktrackableConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
@@ -151,10 +152,10 @@ public class Context {
 	private Queue<ExternalPossibleConclusion> toGuess_;
 
 	/**
-	 * the {@link Conclusion}s that have been processed after the first
-	 * non-deterministic choice point
+	 * the {@link BacktrackableConclusion}s that have been processed after the
+	 * first non-deterministic choice point
 	 */
-	private Deque<Conclusion> history_ = null;
+	private Deque<BacktrackableConclusion> history_ = null;
 
 	Context(Root root) {
 		this.root_ = root;
@@ -355,18 +356,18 @@ public class Context {
 		return hasClash() && isDeterministic();
 	}
 
-	void pushToHistory(Conclusion conclusion) {
+	void pushToHistory(BacktrackableConclusion conclusion) {
 		if (history_ == null)
-			history_ = new ArrayDeque<Conclusion>(16);
+			history_ = new ArrayDeque<BacktrackableConclusion>(16);
 		LOGGER_.trace("{}: to history: {}", this, conclusion);
 		history_.addLast(conclusion);
 	}
 
-	Conclusion popHistory() {
+	BacktrackableConclusion popHistory() {
 		if (history_ == null)
 			return null;
 		// else
-		Conclusion result = this.history_.pollLast();
+		BacktrackableConclusion result = this.history_.pollLast();
 		if (result == null)
 			history_ = null;
 		else

@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+
 /*
  * #%L
  * ALC Reasoner
@@ -23,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 
-public interface LocalConclusion extends Conclusion {
+public interface LocalConclusion extends BacktrackableConclusion {
 
 	public <I, O> O accept(LocalConclusionVisitor<I, O> visitor, I input);
 

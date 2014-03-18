@@ -32,7 +32,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
  * @author "Yevgeny Kazakov"
  * 
  */
-abstract class AbstractSubsumer extends AbstractConclusion implements Subsumer {
+abstract class AbstractSubsumer extends AbstractLocalConclusion implements
+		Subsumer {
 
 	/**
 	 * the implied {@code IndexedClassExpression} represented by this
