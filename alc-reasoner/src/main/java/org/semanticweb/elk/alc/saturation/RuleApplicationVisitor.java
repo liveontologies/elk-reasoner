@@ -37,6 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Negate
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegativePropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossiblePropagatedExistentialImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagatedClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
@@ -50,9 +51,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSub
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossiblePropagatedExistential;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -77,38 +78,31 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		return null;
 	}
 
-	private void visitComposedSubsumer(Subsumer conclusion, Context input) {
-		IndexedClassExpression.applyCompositionRules(
-				conclusion.getExpression(), input, producer_);
-	}
-
-	private void visitDecomposedSubsumer(Subsumer conclusion) {
-		IndexedClassExpression expression = conclusion.getExpression();
-		expression.accept(subsumerDecompositionVisitor_);
-		producer_.produce(new ComposedSubsumerImpl(expression));
-	}
-
 	@Override
 	public Void visit(ComposedSubsumer conclusion, Context input) {
-		visitComposedSubsumer(conclusion, input);
+		IndexedClassExpression.applyCompositionRules(
+				conclusion.getExpression(), input, producer_);
 		return null;
 	}
 
 	@Override
 	public Void visit(DecomposedSubsumer conclusion, Context input) {
-		visitDecomposedSubsumer(conclusion);
+		IndexedClassExpression expression = conclusion.getExpression();
+		expression.accept(subsumerDecompositionVisitor_);
+		producer_.produce(new ComposedSubsumerImpl(expression));
 		return null;
 	}
 
 	@Override
 	public Void visit(PossibleComposedSubsumer conclusion, Context input) {
-		visitComposedSubsumer(conclusion, input);
+		producer_.produce(new ComposedSubsumerImpl(conclusion.getExpression()));
 		return null;
 	}
 
 	@Override
 	public Void visit(PossibleDecomposedSubsumer conclusion, Context input) {
-		visitDecomposedSubsumer(conclusion);
+		producer_
+				.produce(new DecomposedSubsumerImpl(conclusion.getExpression()));
 		return null;
 	}
 
@@ -122,12 +116,9 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 				.getDisjunctions().get(negatedExpression)) {
 			producer_.produce(new DecomposedSubsumerImpl(propagatedDisjunct));
 		}
-		if (negatedExpression instanceof IndexedObjectSomeValuesFrom) {
+		if (input.getPossibleExistentials().contains(negatedExpression)) {
 			IndexedObjectSomeValuesFrom negatedExistential = (IndexedObjectSomeValuesFrom) negatedExpression;
-			if (negatedExistential.occursNegatively()) {
-				producer_.produce(new NegativePropagationImpl(
-						negatedExistential));
-			}
+			producer_.produce(new NegativePropagationImpl(negatedExistential));
 		}
 		return null;
 	}
@@ -153,9 +144,9 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		}
 		// apply propagations
 		Root root = conclusion.getSource();
-		for (IndexedClassExpression propagatedSubsumer : input
+		for (IndexedObjectSomeValuesFrom propagatedSubsumer : input
 				.getPropagations().get(relation)) {
-			producer_.produce(root, new PossibleComposedSubsumerImpl(
+			producer_.produce(root, new PossiblePropagatedExistentialImpl(
 					propagatedSubsumer));
 		}
 		return null;
@@ -167,8 +158,8 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		for (Root root : input.getBackwardLinks().get(conclusion.getRelation())) {
 			// TODO: for propagations of universals should be decomposed
 			// subsumer!
-			producer_.produce(root,
-					new PossibleComposedSubsumerImpl(conclusion.getCarry()));
+			producer_.produce(root, new PossiblePropagatedExistentialImpl(
+					conclusion.getCarry()));
 		}
 		return null;
 	}
@@ -220,12 +211,11 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(Disjunction conclusion, Context input) {
 		IndexedClassExpression watchedDisjunct = conclusion
 				.getWatchedDisjunct();
-		Root root = input.getRoot();
 		if (input.getNegativeSubsumers().contains(watchedDisjunct)) {
 			producer_.produce(new DecomposedSubsumerImpl(conclusion
 					.getPropagatedDisjunct()));
 		} else {
-			producer_.produce(root, new PossibleDecomposedSubsumerImpl(
+			producer_.produce(new PossibleDecomposedSubsumerImpl(
 					watchedDisjunct));
 		}
 		return null;
@@ -234,6 +224,13 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	@Override
 	public Void visit(PropagatedClash conclusion, Context input) {
 		producer_.produce(ClashImpl.getInstance());
+		return null;
+	}
+
+	@Override
+	public Void visit(PossiblePropagatedExistential conclusion, Context input) {
+		producer_.produce(new PossibleComposedSubsumerImpl(conclusion
+				.getExpression()));
 		return null;
 	}
 

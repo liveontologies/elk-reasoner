@@ -24,8 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalPossibleConclusionVisitor;
 
-public interface ExternalPossibleConclusion extends ExternalConclusion,
-		BacktrackableConclusion {
+public interface ExternalPossibleConclusion extends ExternalConclusion {
 
 	public <I, O> O accept(ExternalPossibleConclusionVisitor<I, O> visitor,
 			I input);

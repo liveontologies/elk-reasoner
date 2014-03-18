@@ -25,13 +25,13 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalDeterministicConclusionVisitor;
 
-public class NegatedSubsumerImpl extends AbstractLocalConclusion implements
-		NegatedSubsumer {
+public class NegatedSubsumerImpl extends AbstractLocalDeterministicConclusion
+		implements NegatedSubsumer {
 
 	/**
-	 * the implied {@code IndexedClassExpression} negation fo which is
+	 * the implied {@code IndexedClassExpression} negation for which is
 	 * represented by this {@link Subsumer}
 	 */
 	private final IndexedClassExpression negatedExpression_;
@@ -54,7 +54,8 @@ public class NegatedSubsumerImpl extends AbstractLocalConclusion implements
 	}
 
 	@Override
-	public <I, O> O accept(LocalConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(LocalDeterministicConclusionVisitor<I, O> visitor,
+			I input) {
 		return visitor.visit(this, input);
 	}
 

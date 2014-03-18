@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Forwar
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface ForwardLink extends LocalConclusion {
+public interface ForwardLink extends LocalDeterministicConclusion {
 
 	public static final String NAME = "Forward Link";
 

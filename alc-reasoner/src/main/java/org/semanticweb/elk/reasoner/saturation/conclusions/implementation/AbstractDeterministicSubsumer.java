@@ -23,31 +23,29 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalDeterministicConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalDeterministicConclusionVisitor;
 
 /**
- * An implementation of {@link DecomposedSubsumer}.
+ * An implementation of {@link Subsumer}
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
+ * 
  */
-public class DecomposedSubsumerImpl extends AbstractDeterministicSubsumer
-		implements DecomposedSubsumer {
+abstract class AbstractDeterministicSubsumer extends AbstractSubsumer implements
+		LocalDeterministicConclusion {
 
-	public DecomposedSubsumerImpl(IndexedClassExpression subsumer) {
-		super(subsumer);
+	public AbstractDeterministicSubsumer(IndexedClassExpression expression) {
+		super(expression);
 	}
 
 	@Override
-	public <I, O> O accept(LocalDeterministicConclusionVisitor<I, O> visitor,
-			I input) {
-		return visitor.visit(this, input);
-	}
-
-	@Override
-	public String toString() {
-		return "Decomposed" + super.toString();
+	public <I, O> O accept(LocalConclusionVisitor<I, O> visitor, I input) {
+		return accept((LocalDeterministicConclusionVisitor<I, O>) visitor,
+				input);
 	}
 
 }

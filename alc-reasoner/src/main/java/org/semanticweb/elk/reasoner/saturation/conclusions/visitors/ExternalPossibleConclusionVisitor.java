@@ -22,13 +22,10 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossiblePropagatedExistential;
 
 public interface ExternalPossibleConclusionVisitor<I, O> {
 
-	public O visit(PossibleComposedSubsumer conclusion, I input);
-
-	public O visit(PossibleDecomposedSubsumer conclusion, I input);
+	public O visit(PossiblePropagatedExistential conclusion, I input);
 
 }

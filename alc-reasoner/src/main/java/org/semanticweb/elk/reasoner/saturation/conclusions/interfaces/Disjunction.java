@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 
-public interface Disjunction extends LocalConclusion {
+public interface Disjunction extends LocalDeterministicConclusion {
 
 	public static final String NAME = "Disjunction";
 

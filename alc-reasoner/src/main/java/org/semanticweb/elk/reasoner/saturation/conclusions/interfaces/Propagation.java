@@ -37,7 +37,7 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface Propagation extends LocalConclusion {
+public interface Propagation extends LocalDeterministicConclusion {
 
 	public static final String NAME = "Propagation";
 

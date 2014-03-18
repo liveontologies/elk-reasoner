@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.BacktrackableConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 
@@ -33,11 +32,6 @@ public abstract class AbstractLocalConclusion extends AbstractConclusion
 	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
 		return accept((LocalConclusionVisitor<I, O>) visitor, input);
-	}
-
-	@Override
-	public <I, O> O accept(BacktrackableConclusionVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
 	}
 
 }

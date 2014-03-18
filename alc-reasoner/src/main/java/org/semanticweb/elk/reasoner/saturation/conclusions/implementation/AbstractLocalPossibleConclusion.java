@@ -22,25 +22,16 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  * #L%
  */
 
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalPossibleConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalPossibleConclusionVisitor;
 
-public class PossibleComposedSubsumerImpl extends AbstractPossibleSubsumer
-		implements PossibleComposedSubsumer {
-
-	public PossibleComposedSubsumerImpl(IndexedClassExpression subsumer) {
-		super(subsumer);
-	}
+public abstract class AbstractLocalPossibleConclusion extends
+		AbstractLocalConclusion implements LocalPossibleConclusion {
 
 	@Override
-	public <I, O> O accept(LocalPossibleConclusionVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
-	}
-
-	@Override
-	public String toString() {
-		return "PossibleComposed" + super.toString();
+	public <I, O> O accept(LocalConclusionVisitor<I, O> visitor, I input) {
+		return accept((LocalPossibleConclusionVisitor<I, O>) visitor, input);
 	}
 
 }

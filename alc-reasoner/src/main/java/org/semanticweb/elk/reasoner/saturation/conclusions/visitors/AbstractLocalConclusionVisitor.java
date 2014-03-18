@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 
 /*
  * #%L
@@ -22,15 +22,24 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-/**
- * A {@link Subsumer} created by decomposition rules.
- * 
- * @author Frantisek Simancik
- * @author "Yevgeny Kazakov"
- */
-public interface DecomposedSubsumer extends Subsumer,
-		LocalDeterministicConclusion {
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 
-	public static final String NAME = "Decomposed Subsumer";
+/**
+ * A skeleton for implementation of {@link LocalConclusionVisitor}s using a
+ * common (default) method
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <I>
+ *            the type of input parameter with which this visitor works
+ * @param <O>
+ *            the type of output parameter with which this visitor works
+ */
+public abstract class AbstractLocalConclusionVisitor<I, O> extends
+		DummyLocalConclusionVisitor<I, O> implements
+		LocalConclusionVisitor<I, O> {
+
+	@Override
+	protected abstract O defaultVisit(Conclusion conclusion, I input);
 
 }

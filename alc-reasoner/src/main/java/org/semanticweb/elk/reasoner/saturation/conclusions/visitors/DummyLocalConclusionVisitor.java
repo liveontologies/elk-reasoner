@@ -22,26 +22,23 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossiblePropagatedExistential;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 
 /**
- * A {@link ConclusionVisitor} that does nothing for the visited
+ * A {@link LocalConclusionVisitor} that does nothing for the visited
  * {@link Conclusion}. Used as a skeleton to construct visitors so not to forget
- * to use new types of {@link Conclusion}s.
+ * to use new types of {@link LocalConclusion}s.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -50,7 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
  * @param <O>
  *            the type of output parameter with which this visitor works
  */
-class DummyConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
+class DummyLocalConclusionVisitor<I, O> implements LocalConclusionVisitor<I, O> {
 
 	/**
 	 * Dummy default visiting method
@@ -80,17 +77,7 @@ class DummyConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 	}
 
 	@Override
-	public O visit(PossibleDecomposedSubsumer conclusion, I input) {		
-		return defaultVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(BackwardLink conclusion, I input) {
-		return defaultVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(ContextInitialization conclusion, I input) {
+	public O visit(PossibleDecomposedSubsumer conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 
@@ -121,16 +108,6 @@ class DummyConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 
 	@Override
 	public O visit(Clash conclusion, I input) {
-		return defaultVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(PropagatedClash conclusion, I input) {
-		return defaultVisit(conclusion, input);
-	}
-
-	@Override
-	public O visit(PossiblePropagatedExistential conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 

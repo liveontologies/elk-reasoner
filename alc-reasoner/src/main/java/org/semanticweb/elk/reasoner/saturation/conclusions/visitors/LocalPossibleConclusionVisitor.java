@@ -1,4 +1,5 @@
-package org.semanticweb.elk.alc.saturation;
+package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
+
 /*
  * #%L
  * ALC Reasoner
@@ -21,25 +22,25 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.BacktrackableConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
 
-public class HistoryInsertingVisitor implements
-		BacktrackableConclusionVisitor<Context, Void> {
+/**
+ * A visitor pattern for {@link LocalConclusion}s together with additional input
+ * and output parameters
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <I>
+ *            the type of input parameter with which this visitor works
+ * @param <O>
+ *            the type of output parameter with which this visitor works
+ */
+public interface LocalPossibleConclusionVisitor<I, O> {
 
-	@Override
-	public Void visit(LocalConclusion conclusion, Context input) {
-		if (!input.isDeterministic() && !input.isInconsistent())
-			input.pushToHistory(conclusion);
-		return null;
-	}
+	public O visit(PossibleComposedSubsumer conclusion, I input);
 
-	@Override
-	public Void visit(ExternalPossibleConclusion conclusion, Context input) {
-		if (!input.isInconsistent())
-			input.pushToHistory(conclusion);
-		return null;
-	}
+	public O visit(PossibleDecomposedSubsumer conclusion, I input);
 
 }

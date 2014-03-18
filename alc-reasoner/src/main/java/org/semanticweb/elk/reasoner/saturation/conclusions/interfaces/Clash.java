@@ -32,7 +32,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface Clash extends LocalConclusion {
+public interface Clash extends LocalDeterministicConclusion {
 
 	public static final String NAME = "Clash";
 

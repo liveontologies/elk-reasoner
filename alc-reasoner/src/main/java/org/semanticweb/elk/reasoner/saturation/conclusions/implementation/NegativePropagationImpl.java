@@ -26,10 +26,10 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalDeterministicConclusionVisitor;
 
-public class NegativePropagationImpl extends AbstractLocalConclusion implements
-		NegativePropagation {
+public class NegativePropagationImpl extends
+		AbstractLocalDeterministicConclusion implements NegativePropagation {
 
 	private final IndexedObjectSomeValuesFrom negatedExistential_;
 
@@ -49,7 +49,8 @@ public class NegativePropagationImpl extends AbstractLocalConclusion implements
 	}
 
 	@Override
-	public <I, O> O accept(LocalConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(LocalDeterministicConclusionVisitor<I, O> visitor,
+			I input) {
 		return visitor.visit(this, input);
 	}
 

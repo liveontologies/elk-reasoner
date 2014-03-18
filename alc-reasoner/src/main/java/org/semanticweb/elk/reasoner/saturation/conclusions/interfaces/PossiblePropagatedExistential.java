@@ -1,8 +1,10 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+
 /*
  * #%L
- * ALC Reasoner
+ * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
@@ -22,10 +24,11 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
+public interface PossiblePropagatedExistential extends
+		ExternalPossibleConclusion {
 
-public interface LocalConclusion extends Conclusion {
+	public static final String NAME = "Possible Propagated Existential";
 
-	public <I, O> O accept(LocalConclusionVisitor<I, O> visitor, I input);
+	public IndexedObjectSomeValuesFrom getExpression();
 
 }

@@ -30,15 +30,16 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BacktrackableConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalDeterministicConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalPossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.RetractedConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.BacktrackableConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,43 +53,54 @@ public class Saturation {
 
 	private final SaturationState saturationState_;
 
-	private final Queue<LocalConclusion> localConclusions_;
+	private final Queue<LocalDeterministicConclusion> localDeterministicConclusions_;
+
+	private final Queue<LocalPossibleConclusion> localPossibleConclusions_;
 
 	private final ConclusionProducer conclusionProducer_;
 
 	private final ConclusionVisitor<Context, Void> ruleApplicationVisitor_;
 
-	private final ConclusionVisitor<Context, Void> backtrackingVisitor_;
+	private final LocalConclusionVisitor<Context, Boolean> backtrackingVisitor_;
 
-	private final ConclusionVisitor<Context, Void> revertingVisitor_;
-
-	private final BacktrackableConclusionVisitor<Context, Void> historyInsertingVisitor_;
+	private final LocalConclusionVisitor<Context, Boolean> revertingVisitor_;
 
 	public Saturation(SaturationState saturationState) {
 		this.saturationState_ = saturationState;
-		this.localConclusions_ = new ArrayDeque<LocalConclusion>(1024);
+		this.localDeterministicConclusions_ = new ArrayDeque<LocalDeterministicConclusion>(
+				1024);
+		this.localPossibleConclusions_ = new ArrayDeque<LocalPossibleConclusion>(
+				1024);
 		this.conclusionProducer_ = new ConclusionProducer() {
 			@Override
 			public void produce(Root root, ExternalPossibleConclusion conclusion) {
+				LOGGER_.trace("{}: produced {}", root, conclusion);
 				saturationState_.produce(root, conclusion);
 			}
 
 			@Override
 			public void produce(Root root,
 					ExternalDeterministicConclusion conclusion) {
+				LOGGER_.trace("{}: produced {}", root, conclusion);
 				saturationState_.produce(root, conclusion);
 			}
 
 			@Override
-			public void produce(LocalConclusion conclusion) {
-				localConclusions_.add(conclusion);
+			public void produce(LocalDeterministicConclusion conclusion) {
+				LOGGER_.trace("produced {}", conclusion);
+				localDeterministicConclusions_.add(conclusion);
+			}
+
+			@Override
+			public void produce(LocalPossibleConclusion conclusion) {
+				LOGGER_.trace("produced {}", conclusion);
+				localPossibleConclusions_.add(conclusion);
 			}
 		};
 		this.ruleApplicationVisitor_ = new RuleApplicationVisitor(
 				conclusionProducer_);
 		this.backtrackingVisitor_ = new BacktrackingVisitor(conclusionProducer_);
 		this.revertingVisitor_ = new RevertingVisitor(conclusionProducer_);
-		this.historyInsertingVisitor_ = new HistoryInsertingVisitor();
 	}
 
 	public void submit(IndexedClassExpression expression) {
@@ -110,11 +122,11 @@ public class Saturation {
 		process();
 		if (context.isInconsistent())
 			return true;
-		BacktrackableConclusion conjecture = new NegatedSubsumerImpl(
+		LocalDeterministicConclusion conjecture = new NegatedSubsumerImpl(
 				possibleSubsumer);
 		// backtrack everything
 		for (;;) {
-			Conclusion toBacktrack = context.popHistory();
+			LocalConclusion toBacktrack = context.popHistory();
 			if (toBacktrack == null) {
 				LOGGER_.trace("{}: nothing to backtrack", context.getRoot());
 				break;
@@ -126,6 +138,7 @@ public class Saturation {
 			context.pushToHistory(conjecture);
 			// start applying the rules
 			conjecture.accept(ruleApplicationVisitor_, context);
+			processContext(context);
 		}
 		process();
 		return (context.getSubsumers().contains(possibleSubsumer));
@@ -147,8 +160,8 @@ public class Saturation {
 
 	public boolean checkSubsumer(Context context,
 			IndexedClassExpression possibleSubsumer) {
-		// return checkSubsumerSimple(context, possibleSubsumer);
-		return checkSubsumerOptimized(context, possibleSubsumer);
+		return checkSubsumerSimple(context, possibleSubsumer);
+		// return checkSubsumerOptimized(context, possibleSubsumer);
 	}
 
 	public void process() {
@@ -160,69 +173,75 @@ public class Saturation {
 					return;
 				}
 			}
-			for (;;) {
-				Conclusion conclusion = localConclusions_.poll();
+			processContext(context);
+		}
+	}
+
+	public void processContext(Context context) {
+		for (;;) {
+			Conclusion conclusion = localDeterministicConclusions_.poll();
+			if (conclusion == null) {
+				conclusion = context.takeToDo();
 				if (conclusion == null) {
-					conclusion = context.takeToDo();
+					conclusion = localPossibleConclusions_.poll();
 					if (conclusion == null) {
 						conclusion = context.takeToGuess();
 						if (conclusion == null)
 							break;
 					}
 				}
-				LOGGER_.trace("{}: processing {}", context.getRoot(),
-						conclusion);
-				if (conclusion instanceof RetractedConclusion) {
-					if (!context.removeConclusion(conclusion))
-						LOGGER_.error(
-								"{}: backtracked conclusion not found: {}!",
-								context, conclusion);
-					continue;
-				}
-				if (conclusion instanceof PropagatedConclusion) {
-					// check if the conclusion is still relevant
-					PropagatedConclusion propagatedConclusion = ((PropagatedConclusion) conclusion);
-					IndexedObjectProperty relation = propagatedConclusion
-							.getRelation();
-					Root sourceRoot = propagatedConclusion.getSourceRoot();
-					if (!context.getForwardLinks().get(relation)
-							.contains(sourceRoot.getPositiveMember())
-							|| !context.getNegativePropagations().get(relation)
-									.equals(sourceRoot.getNegatitveMembers())) {
-						LOGGER_.trace("{}: obsolete {}", context, conclusion);
-						continue;
-					}
-				}
-				if (!context.addConclusion(conclusion))
-					continue;
-
-				if (conclusion instanceof BacktrackableConclusion)
-					((BacktrackableConclusion) conclusion).accept(
-							historyInsertingVisitor_, context);
-
-				conclusion.accept(ruleApplicationVisitor_, context);
-
-				if (context.hasClash()) {
-					localConclusions_.clear();
-					for (;;) {
-						Conclusion toBacktrack = context.popHistory();
-						if (toBacktrack == null) {
-							LOGGER_.trace("{}: nothing to backtrack",
-									context.getRoot());
-							break;
-						}
-						toBacktrack.accept(backtrackingVisitor_, context);
-						context.removeConclusion(toBacktrack);
-						if (toBacktrack instanceof ExternalPossibleConclusion)
-							break;
-					}
-					if (!context.getInconsistentSuccessors().isEmpty()) {
-						conclusionProducer_.produce(ClashImpl.getInstance());
-					}
-				}
-
 			}
+			LOGGER_.trace("{}: processing {}", context.getRoot(), conclusion);
+			if (conclusion instanceof RetractedConclusion) {
+				if (!context.removeConclusion(conclusion))
+					LOGGER_.error("{}: backtracked conclusion not found: {}!",
+							context, conclusion);
+				continue;
+			}
+			if (conclusion instanceof PropagatedConclusion) {
+				// check if the conclusion is still relevant
+				PropagatedConclusion propagatedConclusion = ((PropagatedConclusion) conclusion);
+				IndexedObjectProperty relation = propagatedConclusion
+						.getRelation();
+				Root sourceRoot = propagatedConclusion.getSourceRoot();
+				if (!context.getForwardLinks().get(relation)
+						.contains(sourceRoot.getPositiveMember())
+						|| !context.getNegativePropagations().get(relation)
+								.equals(sourceRoot.getNegatitveMembers())) {
+					LOGGER_.trace("{}: obsolete {}", context, conclusion);
+					continue;
+				}
+			}
+			if (!context.addConclusion(conclusion))
+				continue;
+
+			if (conclusion instanceof LocalConclusion
+					&& !context.isInconsistent()
+					&& (!context.isDeterministic() || conclusion instanceof LocalPossibleConclusion)) {
+				context.pushToHistory((LocalConclusion) conclusion);
+			}
+
+			conclusion.accept(ruleApplicationVisitor_, context);
+
+			if (context.hasClash()) {
+				localDeterministicConclusions_.clear();
+				boolean proceedNext;
+				do {
+					LocalConclusion toBacktrack = context.popHistory();
+					if (toBacktrack == null) {
+						LOGGER_.trace("{}: nothing to backtrack",
+								context.getRoot());
+						break;
+					}
+					proceedNext = toBacktrack.accept(backtrackingVisitor_,
+							context);
+					context.removeConclusion(toBacktrack);
+				} while (proceedNext);
+				if (!context.getInconsistentSuccessors().isEmpty()) {
+					conclusionProducer_.produce(ClashImpl.getInstance());
+				}
+			}
+
 		}
 	}
-
 }

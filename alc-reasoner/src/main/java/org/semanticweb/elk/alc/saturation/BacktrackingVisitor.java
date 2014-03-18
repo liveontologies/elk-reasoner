@@ -36,15 +36,15 @@ public class BacktrackingVisitor extends RevertingVisitor {
 	}
 
 	@Override
-	public Void visit(PossibleComposedSubsumer conclusion, Context input) {
+	public Boolean visit(PossibleComposedSubsumer conclusion, Context input) {
 		producer_.produce(new NegatedSubsumerImpl(conclusion.getExpression()));
-		return null;
+		return false;
 	}
 
 	@Override
-	public Void visit(PossibleDecomposedSubsumer conclusion, Context input) {
+	public Boolean visit(PossibleDecomposedSubsumer conclusion, Context input) {
 		producer_.produce(new NegatedSubsumerImpl(conclusion.getExpression()));
-		return null;
+		return false;
 	}
 
 }

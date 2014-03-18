@@ -33,7 +33,7 @@ import org.semanticweb.elk.alc.saturation.Root;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface NegatedSubsumer extends LocalConclusion {
+public interface NegatedSubsumer extends LocalDeterministicConclusion {
 
 	public static final String NAME = "Negated Subsumer";
 

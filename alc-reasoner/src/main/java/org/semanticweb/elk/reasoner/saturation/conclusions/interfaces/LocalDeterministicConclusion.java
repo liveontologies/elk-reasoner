@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+
 /*
  * #%L
  * ALC Reasoner
@@ -21,16 +22,11 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.BacktrackableConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalDeterministicConclusionVisitor;
 
-/**
- * {@link Conclusion}s that should be saved for backtracking
- * 
- * @author "Yevgeny Kazakov"
- * 
- */
-public interface BacktrackableConclusion extends Conclusion {
+public interface LocalDeterministicConclusion extends LocalConclusion {
 
-	public <I, O> O accept(BacktrackableConclusionVisitor<I, O> visitor, I input);
+	public <I, O> O accept(LocalDeterministicConclusionVisitor<I, O> visitor,
+			I input);
 
 }

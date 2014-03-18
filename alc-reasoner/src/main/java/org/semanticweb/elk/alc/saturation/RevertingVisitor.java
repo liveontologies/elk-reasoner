@@ -30,19 +30,17 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Backtr
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractLocalConclusionVisitor;
 
-public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
+public class RevertingVisitor extends
+		AbstractLocalConclusionVisitor<Context, Boolean> {
 
 	private final ConclusionProducer producer_;
 
@@ -51,68 +49,38 @@ public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
 	}
 
 	@Override
-	protected Void defaultVisit(Conclusion conclusion, Context input) {
+	protected Boolean defaultVisit(Conclusion conclusion, Context input) {
 		// does nothing by default
-		return null;
-	}
-
-	/**
-	 * Called first when visiting any {@link Subsumer}
-	 * 
-	 * @param conclusion
-	 * @param input
-	 */
-	void visitLocalSubsumer(Subsumer conclusion, Context input) {
-		IndexedClassExpression expression = conclusion.getExpression();
-		if (input.getDisjunctions().keySet().contains(expression)
-				|| input.getMaskedPossibleSubsumers().contains(expression)) {
-			producer_.produce(input.getRoot(),
-					new PossibleComposedSubsumerImpl(expression));
-			return;
-		}
+		return true;
 	}
 
 	@Override
-	public Void visit(ComposedSubsumer conclusion, Context input) {
-		visitLocalSubsumer(conclusion, input);
-		return null;
+	public Boolean visit(PossibleComposedSubsumer conclusion, Context input) {
+		producer_.produce(conclusion);
+		return true;
 	}
 
 	@Override
-	public Void visit(DecomposedSubsumer conclusion, Context input) {
-		visitLocalSubsumer(conclusion, input);
-		return null;
+	public Boolean visit(PossibleDecomposedSubsumer conclusion, Context input) {
+		producer_.produce(conclusion);
+		return true;
 	}
 
 	@Override
-	public Void visit(PossibleComposedSubsumer conclusion, Context input) {
-		producer_.produce(input.getRoot(), conclusion);
-		return null;
-	}
-
-	@Override
-	public Void visit(PossibleDecomposedSubsumer conclusion, Context input) {
-		producer_.produce(input.getRoot(), conclusion);
-		return null;
-	}
-
-	@Override
-	public Void visit(NegatedSubsumer conclusion, Context input) {
+	public Boolean visit(NegatedSubsumer conclusion, Context input) {
 		IndexedClassExpression negatedExpression = conclusion
 				.getNegatedExpression();
-		if (!input.getDisjunctions().get(negatedExpression).isEmpty()) {
-			producer_.produce(input.getRoot(),
-					new PossibleDecomposedSubsumerImpl(negatedExpression));
-			return null;
-		}
-		// else
-		producer_.produce(input.getRoot(), new PossibleComposedSubsumerImpl(
-				negatedExpression));
-		return null;
+		if (!input.getDisjunctions().get(negatedExpression).isEmpty())
+			producer_.produce(new PossibleDecomposedSubsumerImpl(
+					negatedExpression));
+		else if (input.getPossibleExistentials().contains(negatedExpression))
+			producer_.produce(new PossibleComposedSubsumerImpl(
+					negatedExpression));
+		return true;
 	}
 
 	@Override
-	public Void visit(ForwardLink conclusion, Context input) {
+	public Boolean visit(ForwardLink conclusion, Context input) {
 		IndexedObjectProperty relation = conclusion.getRelation();
 		Root root = input.getRoot();
 		Root fillerRoot = new Root(conclusion.getTarget(), input
@@ -120,11 +88,11 @@ public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
 		producer_.produce(fillerRoot, new BacktrackedBackwardLinkImpl(root,
 				relation));
 		input.removePropagatedConclusions(relation, fillerRoot);
-		return null;
+		return true;
 	}
 
 	@Override
-	public Void visit(NegativePropagation conclusion, Context input) {
+	public Boolean visit(NegativePropagation conclusion, Context input) {
 		IndexedObjectProperty relation = conclusion.getRelation();
 		input.removePropagatedConclusions(relation);
 		Root root = input.getRoot();
@@ -144,7 +112,7 @@ public class RevertingVisitor extends AbstractConclusionVisitor<Context, Void> {
 			producer_.produce(oldTargetRoot, toBacktrack);
 			producer_.produce(newTargetRoot, toAdd);
 		}
-		return null;
+		return true;
 	}
 
 }

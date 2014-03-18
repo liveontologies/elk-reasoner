@@ -25,8 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalDeterministicConclusionVisitor;
 
 /**
  * An implementation of {@link Subsumer}
@@ -34,20 +33,16 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclus
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  */
-public class ComposedSubsumerImpl extends AbstractSubsumer implements
-		ComposedSubsumer {
+public class ComposedSubsumerImpl extends AbstractDeterministicSubsumer
+		implements ComposedSubsumer {
 
 	public ComposedSubsumerImpl(IndexedClassExpression subsumer) {
 		super(subsumer);
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
-	}
-
-	@Override
-	public <I, O> O accept(LocalConclusionVisitor<I, O> visitor, I input) {
+	public <I, O> O accept(LocalDeterministicConclusionVisitor<I, O> visitor,
+			I input) {
 		return visitor.visit(this, input);
 	}
 

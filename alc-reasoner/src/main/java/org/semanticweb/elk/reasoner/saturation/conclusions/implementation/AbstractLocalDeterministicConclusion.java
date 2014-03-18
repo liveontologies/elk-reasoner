@@ -22,29 +22,17 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  * #L%
  */
 
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalDeterministicConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalDeterministicConclusionVisitor;
 
-public abstract class AbstractExternalPossibleSubsumer extends
-		AbstractExternalPossibleConclusion implements Subsumer {
-
-	private final IndexedClassExpression expression_;
-
-	public AbstractExternalPossibleSubsumer(IndexedClassExpression subsumer) {
-		this.expression_ = subsumer;
-	}
+public abstract class AbstractLocalDeterministicConclusion extends
+		AbstractLocalConclusion implements LocalDeterministicConclusion {
 
 	@Override
-	public IndexedClassExpression getExpression() {
-		return this.expression_;
-	}
-
-	abstract String getNameQualifier();
-
-	@Override
-	public String toString() {
-		return "Possible" + getNameQualifier() + Subsumer.NAME + "("
-				+ expression_.toString() + ")";
+	public <I, O> O accept(LocalConclusionVisitor<I, O> visitor, I input) {
+		return accept((LocalDeterministicConclusionVisitor<I, O>) visitor,
+				input);
 	}
 
 }

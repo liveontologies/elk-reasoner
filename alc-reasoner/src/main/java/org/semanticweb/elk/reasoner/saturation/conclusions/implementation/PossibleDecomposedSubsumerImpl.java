@@ -24,24 +24,23 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalPossibleConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalPossibleConclusionVisitor;
 
-public class PossibleDecomposedSubsumerImpl extends
-		AbstractExternalPossibleSubsumer implements PossibleDecomposedSubsumer {
+public class PossibleDecomposedSubsumerImpl extends AbstractPossibleSubsumer
+		implements PossibleDecomposedSubsumer {
 
 	public PossibleDecomposedSubsumerImpl(IndexedClassExpression subsumer) {
 		super(subsumer);
 	}
 
 	@Override
-	String getNameQualifier() {
-		return "Decomposed";
+	public <I, O> O accept(LocalPossibleConclusionVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 
 	@Override
-	public <I, O> O accept(ExternalPossibleConclusionVisitor<I, O> visitor,
-			I input) {
-		return visitor.visit(this, input);
+	public String toString() {
+		return "PossibleDecomposed" + super.toString();
 	}
 
 }

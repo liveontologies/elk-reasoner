@@ -22,14 +22,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-/**
- * A {@link Subsumer} created by decomposition rules.
- * 
- * @author Frantisek Simancik
- * @author "Yevgeny Kazakov"
- */
 public interface PossibleDecomposedSubsumer extends Subsumer,
-		ExternalPossibleConclusion {
+		LocalPossibleConclusion {
 
 	public static final String NAME = "Possible Decomposed Subsumer";
 
