@@ -624,11 +624,24 @@ public abstract class AbstractReasonerState {
 		return traceState.getTraceStore().getReader();
 	}
 	
-	void stageBasedTrace(IndexedClassExpression subsumee, IndexedClassExpression subsumer) throws ElkException {
+	public void submitForTracing(ElkClassExpression sub, ElkClassExpression sup) {
+		IndexedClassExpression subsumee = sub.accept(objectCache_
+				.getIndexObjectConverter());
+		IndexedClassExpression subsumer = sup.accept(objectCache_
+				.getIndexObjectConverter());
 		traceState.addConclusionToTrace(subsumee, convertTraceTarget(subsumee, subsumer));
+	}
+	
+	public TraceStore.Reader trace() throws ElkException {
 		stageManager.inferenceTracingStage.invalidate();
 		getStageExecutor().complete(stageManager.inferenceTracingStage);
-		stageManager.inferenceTracingStage.setCompleted();
+		
+		return traceState.getTraceStore().getReader();
+	}
+	
+	void stageBasedTrace(IndexedClassExpression subsumee, IndexedClassExpression subsumer) throws ElkException {
+		traceState.addConclusionToTrace(subsumee, convertTraceTarget(subsumee, subsumer));
+		trace();
 		traceState.clearTracingMap();
 	}
 	

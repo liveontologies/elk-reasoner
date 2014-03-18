@@ -163,6 +163,8 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 
 		@Override
 		public void submit(RecursiveContextTracingJob job) {
+			LOGGER_.info("Recursive tracing job subsmitted: {} -> {}", job.getInput(), job.getTarget());
+			
 			jobsToDo_.add(job);
 		}
 		
