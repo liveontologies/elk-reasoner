@@ -37,8 +37,8 @@ import org.semanticweb.elk.util.logging.CachedTimeThread;
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class AbstractRuleEngineWithStatistics extends
-		AbstractRuleEngine {
+public abstract class AbstractRuleEngineWithStatistics<I extends RuleApplicationInput> extends
+		AbstractRuleEngine<I> {
 
 	/**
 	 * The global {@link SaturationStatistics} in which the aggregated

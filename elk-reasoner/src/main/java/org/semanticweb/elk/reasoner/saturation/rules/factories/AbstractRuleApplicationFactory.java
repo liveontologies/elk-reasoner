@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public abstract class AbstractRuleApplicationFactory<C extends Context>
-		implements RuleApplicationFactory<C> {
+public abstract class AbstractRuleApplicationFactory<C extends Context, I extends RuleApplicationInput>
+		implements RuleApplicationFactory<C, I> {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory
@@ -75,13 +75,13 @@ public abstract class AbstractRuleApplicationFactory<C extends Context>
 	 *         {@link SaturationStateWriter} and updates the supplied local
 	 *         {@link SaturationStatistics} accordingly
 	 */
-	protected InputProcessor<IndexedClassExpression> getEngine(
+	protected InputProcessor<I> getEngine(
 			ConclusionVisitor<? super Context, Boolean> conclusionProcessor,
 			SaturationStateWriter<? extends C> saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
 		conclusionProcessor = SaturationUtils.getTimedConclusionVisitor(
 				conclusionProcessor, localStatistics);
-		return new BasicRuleEngine(saturationState_.getOntologyIndex(),
+		return new BasicRuleEngine<I>(saturationState_.getOntologyIndex(),
 				conclusionProcessor, localTodo, saturationStateWriter,
 				aggregatedStats_, localStatistics);
 	}
@@ -133,7 +133,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context>
 			SaturationStatistics localStatistics);
 
 	@Override
-	public final InputProcessor<IndexedClassExpression> getEngine(
+	public final InputProcessor<I> getEngine(
 			ContextCreationListener creationListener,
 			ContextModificationListener modificationListener) {
 		SaturationStatistics localStatistics = new SaturationStatistics();

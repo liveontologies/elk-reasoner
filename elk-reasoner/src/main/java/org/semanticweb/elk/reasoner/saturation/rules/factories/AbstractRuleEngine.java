@@ -22,7 +22,6 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -38,8 +37,8 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class AbstractRuleEngine implements
-		InputProcessor<IndexedClassExpression> {
+public abstract class AbstractRuleEngine<I extends RuleApplicationInput> implements
+		InputProcessor<I> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -112,6 +111,6 @@ public abstract class AbstractRuleEngine implements
 	 * @return the next active {@link Context} to be processed by this
 	 *         {@link BasicRuleEngine}
 	 */
-	abstract Context getNextActiveContext();
+	abstract protected Context getNextActiveContext();
 
 }

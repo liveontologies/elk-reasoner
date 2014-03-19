@@ -43,7 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * @author Pavel Klinov
  */
 public class RuleApplicationAdditionUnSaturationFactory extends
-		RuleApplicationAdditionFactory {
+		RuleApplicationAdditionFactory<RuleApplicationInput> {
 
 	public RuleApplicationAdditionUnSaturationFactory(
 			SaturationState<? extends Context> saturationState) {

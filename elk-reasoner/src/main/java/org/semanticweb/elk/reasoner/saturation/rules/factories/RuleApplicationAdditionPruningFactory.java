@@ -58,7 +58,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  *         pavel.klinov@uni-ulm.de
  */
 public class RuleApplicationAdditionPruningFactory extends
-		AbstractRuleApplicationFactory<ExtendedContext> {
+		AbstractRuleApplicationFactory<ExtendedContext, RuleApplicationInput> {
 
 	private final SaturationState<? extends Context> mainSaturationState_;
 

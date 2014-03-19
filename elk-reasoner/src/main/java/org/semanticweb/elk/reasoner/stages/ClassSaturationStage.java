@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicat
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.reasoner.saturation.tracing.factories.RuleApplicationFactoryWithTracing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +67,7 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 		if (!super.preExecute())
 			return false;
 
-		RuleApplicationFactory<Context> ruleFactory = null;
+		RuleApplicationFactory<Context, RuleApplicationInput> ruleFactory = null;
 		RuleApplicationVisitorFactory ruleAppVisitorFactory = null;
 		
 		if (reasoner.REDUNDANT_RULES) {
@@ -82,7 +83,7 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 					reasoner.saturationState, reasoner.traceState
 							.getTraceStore().getWriter(), ruleAppVisitorFactory);
 		} else {
-			ruleFactory = new RuleApplicationAdditionFactory(
+			ruleFactory = new RuleApplicationAdditionFactory<RuleApplicationInput>(
 					reasoner.saturationState, ruleAppVisitorFactory);
 		}
 

@@ -49,8 +49,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * @author Pavel Klinov
  * 
  */
-public class RuleApplicationAdditionFactory extends
-		AbstractRuleApplicationFactory<Context> {
+public class RuleApplicationAdditionFactory<I extends RuleApplicationInput> extends
+		AbstractRuleApplicationFactory<Context, I> {
 
 	private final RuleApplicationVisitorFactory ruleAppVisitorFactory_;
 	

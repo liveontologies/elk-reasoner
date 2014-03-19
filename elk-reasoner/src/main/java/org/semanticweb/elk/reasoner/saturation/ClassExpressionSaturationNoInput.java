@@ -41,7 +41,7 @@ public class ClassExpressionSaturationNoInput extends
 
 	public ClassExpressionSaturationNoInput(final ComputationExecutor executor,
 			final int maxWorkers,
-			final RuleApplicationFactory<?> ruleAppFactory,
+			final RuleApplicationFactory<?, ?> ruleAppFactory,
 			final ContextModificationListener contextModificationListener) {
 
 		super(new ClassExpressionSaturationNoInputFactory(ruleAppFactory,

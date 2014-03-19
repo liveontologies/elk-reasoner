@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationNoInput;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 
 /**
  * Completes saturation of all contexts which are not saturated at this point.
@@ -65,7 +66,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 			return false;
 		completion_ = new ClassExpressionSaturationNoInput(
 				reasoner.getProcessExecutor(), workerNo,
-				new RuleApplicationAdditionFactory(reasoner.saturationState),
+				new RuleApplicationAdditionFactory<RuleApplicationInput>(reasoner.saturationState),
 				ContextModificationListener.DUMMY);
 		return true;
 	}

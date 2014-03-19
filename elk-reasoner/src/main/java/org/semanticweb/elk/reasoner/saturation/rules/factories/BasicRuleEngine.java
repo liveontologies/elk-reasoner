@@ -23,7 +23,6 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  */
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
@@ -39,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule
  * 
  * @author "Yevgeny Kazakov"
  */
-public class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
+public class BasicRuleEngine<I extends RuleApplicationInput> extends AbstractRuleEngineWithStatistics<I> {
 
 	/**
 	 * a {@link SaturationStateWriter} to produce new {@link Conclusion}s and
@@ -65,12 +64,12 @@ public class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
 	}
 
 	@Override
-	public void submit(IndexedClassExpression job) {
-		writer_.produce(job, contextInitConclusion_);
+	public void submit(RuleApplicationInput job) {
+		writer_.produce(job.getRoot(), contextInitConclusion_);
 	}
 
 	@Override
-	Context getNextActiveContext() {
+	protected Context getNextActiveContext() {
 		return writer_.pollForActiveContext();
 	}
 

@@ -109,7 +109,7 @@ public class LocalTracingSaturationState extends
 		 * rules, e.g. only non-redundant rules). Indexed by roots of contexts
 		 * where these conclusions should be stored.
 		 */
-		private final Multimap<IndexedClassExpression, Conclusion> missingConclusions_ = new HashListMultimap<IndexedClassExpression, Conclusion>();
+		private Multimap<IndexedClassExpression, Conclusion> missingConclusions_ = new HashListMultimap<IndexedClassExpression, Conclusion>();
 		/**
 		 * The set of roots of contexts in the main saturation state whose
 		 * saturation was triggered by tracing this context. We remember such
@@ -127,15 +127,28 @@ public class LocalTracingSaturationState extends
 		}
 
 		public Multimap<IndexedClassExpression, Conclusion> getMissingConclusions() {
+			if (!beingTraced_.get()) {
+				throw new RuntimeException("The context isn't being traced now: " + getRoot() + ", finished? " + (isInitialized() && isSaturated()));
+			}
+			
 			return missingConclusions_;
 		}
 		
 		public void addMissingConclusion(IndexedClassExpression root, Conclusion conclusion) {
+			if (!beingTraced_.get()) {
+				throw new RuntimeException("The context isn't being traced now: " + getRoot() + ", finished? " + (isInitialized() && isSaturated()));
+			}
+			
 			missingConclusions_.add(root, conclusion);
 		}
 		
 		public void clearMissingConclusions() {
+			if (!beingTraced_.get()) {
+				throw new RuntimeException("The context isn't being traced now: " + getRoot() + ", finished? " + (isInitialized() && isSaturated()));
+			}
+			
 			missingConclusions_.clear();
+			//missingConclusions_ = null;
 		}
 		
 		public void addSaturatedMainContext(IndexedClassExpression root) {

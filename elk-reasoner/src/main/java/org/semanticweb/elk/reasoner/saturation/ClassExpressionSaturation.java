@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,7 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 	public ClassExpressionSaturation(Collection<I> inputs,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor,
-			RuleApplicationFactory<?> ruleAppFactory) {
+			RuleApplicationFactory<?, RuleApplicationInput> ruleAppFactory) {
 		this(inputs, executor, maxWorkers, progressMonitor, ruleAppFactory,
 				new DummyClassExpressionSaturationListener<SaturationJob<I>>());
 	}
@@ -67,7 +68,7 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 	public ClassExpressionSaturation(Collection<I> inputs,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor,
-			RuleApplicationFactory<?> ruleAppFactory,
+			RuleApplicationFactory<?, RuleApplicationInput> ruleAppFactory,
 			ClassExpressionSaturationListener<SaturationJob<I>> listener) {
 		super(new TodoJobs<I>(inputs),
 				new ClassExpressionSaturationFactory<SaturationJob<I>>(

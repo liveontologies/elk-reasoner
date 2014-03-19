@@ -208,7 +208,7 @@ public class PropagationFromExistentialFillerRule extends
 
 	/**
 	 * Produces propagations of {@link IndexedObjectSomeValuesFrom} over the
-	 * given {@link IndexedPropertyChain} in the given {@link Context}
+	 * given {@link IndexedObjectProperty} in the given {@link Context}
 	 * 
 	 * @param property
 	 * @param premises

@@ -43,6 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationDeletionNotSaturatedFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +77,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		// init them for deletions
 		initContexts(contexts);
 		// and now clean then up
-		RuleApplicationFactory<?> cleaningFactory = new RuleApplicationDeletionNotSaturatedFactory(
+		RuleApplicationFactory<?, RuleApplicationInput> cleaningFactory = new RuleApplicationDeletionNotSaturatedFactory(
 				reasoner.saturationState);
 
 		LOGGER_.trace("Starting random contexts cleaning");
@@ -89,7 +90,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 
 		initContexts(contexts);
 		// re-saturate
-		RuleApplicationAdditionFactory resatFactory = new RuleApplicationAdditionFactory(
+		RuleApplicationAdditionFactory<RuleApplicationInput> resatFactory = new RuleApplicationAdditionFactory<RuleApplicationInput>(
 				reasoner.saturationState);
 
 		ClassExpressionSaturationNoInput saturation = new ClassExpressionSaturationNoInput(

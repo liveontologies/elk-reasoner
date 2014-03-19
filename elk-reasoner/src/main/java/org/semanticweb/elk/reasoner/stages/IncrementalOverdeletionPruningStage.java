@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 import org.semanticweb.elk.reasoner.saturation.context.ContextRootCollection;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionPruningFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 
 /**
  * Prunes the set of deleted conclusions by re-deriving those having alternative
@@ -71,7 +72,7 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 			return false;
 		}
 
-		RuleApplicationFactory<?> ruleAppFactory = new RuleApplicationAdditionPruningFactory(
+		RuleApplicationFactory<?, RuleApplicationInput> ruleAppFactory = new RuleApplicationAdditionPruningFactory(
 				reasoner.saturationState);
 		Collection<IndexedClassExpression> inputs = new ContextRootCollection(
 				reasoner.saturationState.getNotSaturatedContexts());

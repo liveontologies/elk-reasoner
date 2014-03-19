@@ -45,6 +45,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
@@ -74,7 +75,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  *         pavel.klinov@uni-ulm.de
  */
 public class CycleBlockingRuleApplicationFactory extends
-		AbstractRuleApplicationFactory<TracedContext> {
+		AbstractRuleApplicationFactory<TracedContext, RuleApplicationInput> {
 
 	private final static boolean CYCLE_AVOIDANCE = true;
 

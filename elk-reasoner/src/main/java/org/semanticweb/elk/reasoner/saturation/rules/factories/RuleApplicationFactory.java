@@ -22,7 +22,6 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -42,7 +41,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface RuleApplicationFactory<C extends Context> {
+public interface RuleApplicationFactory<C extends Context, I extends RuleApplicationInput> {
 
 	/**
 	 * @return the {@link SaturationState} with which this
@@ -54,7 +53,7 @@ public interface RuleApplicationFactory<C extends Context> {
 	 * Create a new {@link InputProcessor} that concurrently processes
 	 * {@link Conclusion}s within {@link Context}s of the
 	 * {@link SaturationState} by applying inference rules. The input
-	 * {@link Conclusion}s can be created using {@link IndexedClassExpression}s
+	 * {@link Conclusion}s can be created using {@link RuleApplicationInput}s
 	 * submitted using this {@link InputProcessor}, or they may be taken from
 	 * the {@link Context}s of the {@link SaturationState} using
 	 * {@link Context#takeToDo()}. Since the {@link SaturationState} is shared
@@ -68,10 +67,10 @@ public interface RuleApplicationFactory<C extends Context> {
 	 *            the {@link ContextModificationListener} that registers all
 	 *            {@link Context}s that become not saturated by operations of
 	 *            this {@link InputProcessor}
-	 * @return the new {@link InputProcessor} for {@link IndexedClassExpression}
+	 * @return the new {@link InputProcessor} for {@link RuleApplicationInput}
 	 *         that can perform computation in parallel.
 	 */
-	public InputProcessor<IndexedClassExpression> getEngine(
+	public InputProcessor<I> getEngine(
 			ContextCreationListener creationListener,
 			ContextModificationListener modificationListener);
 

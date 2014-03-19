@@ -56,8 +56,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
  * @author "Yevgeny Kazakov"
  */
 public class RuleApplicationDeletionFactory extends
-		AbstractRuleApplicationFactory<Context> implements
-		RuleApplicationFactory<Context> {
+		AbstractRuleApplicationFactory<Context, RuleApplicationInput>  {
 
 	public RuleApplicationDeletionFactory(
 			SaturationState<? extends Context> saturationState) {

@@ -46,19 +46,19 @@ public class ClassExpressionSaturationNoInputFactory implements
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassExpressionSaturationNoInputFactory.class);
 
-	private final RuleApplicationFactory<?> ruleAppFactory_;
+	private final RuleApplicationFactory<?, ?> ruleAppFactory_;
 
 	private final ContextModificationListener contextModificationListener_;
 
 	public ClassExpressionSaturationNoInputFactory(
-			final RuleApplicationFactory<?> ruleAppFactory,
+			final RuleApplicationFactory<?, ?> ruleAppFactory,
 			final ContextModificationListener contextModificationListener) {
 		ruleAppFactory_ = ruleAppFactory;
 		contextModificationListener_ = contextModificationListener;
 	}
 	
 	public ClassExpressionSaturationNoInputFactory(
-			final RuleApplicationFactory<?> ruleAppFactory) {
+			final RuleApplicationFactory<?, ?> ruleAppFactory) {
 		this(ruleAppFactory, ContextModificationListener.DUMMY);
 	}
 
@@ -76,7 +76,7 @@ public class ClassExpressionSaturationNoInputFactory implements
 		ruleAppFactory_.dispose();
 	}
 	
-	protected RuleApplicationFactory<?> getRuleApplicationFactory() {
+	protected RuleApplicationFactory<?, ?> getRuleApplicationFactory() {
 		return ruleAppFactory_;
 	}
 

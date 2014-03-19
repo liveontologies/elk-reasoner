@@ -44,4 +44,11 @@ public class ContextTracingJob extends SaturationJob<IndexedClassExpression> {
 	public ContextTracingListener getCallback() {
 		return ContextTracingListener.DUMMY;
 	}
+
+	@Override
+	public String toString() {
+		return getInput().toString();
+	}
+	
+	
 }

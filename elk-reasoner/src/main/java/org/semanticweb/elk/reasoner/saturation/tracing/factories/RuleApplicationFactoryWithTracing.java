@@ -35,6 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicat
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceInsertionVisitor;
@@ -48,7 +49,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  *         pavel.klinov@uni-ulm.de
  */
 public class RuleApplicationFactoryWithTracing extends
-		RuleApplicationAdditionFactory {
+		RuleApplicationAdditionFactory<RuleApplicationInput> {
 
 	private final TraceStore.Writer inferenceWriter_;
 
