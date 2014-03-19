@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
+
 /*
  * #%L
  * ALC Reasoner
@@ -21,18 +22,22 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  * #L%
  */
 
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.alc.saturation.Root;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossiblePropagatedExistential;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalPossibleConclusionVisitor;
 
 public class PossiblePropagatedExistentialImpl extends
-		AbstractExternalPossibleConclusion implements
-		PossiblePropagatedExistential {
+		AbstractPropagatedPossibleConclusion implements
+		PossiblePropagatedExistential, PropagatedConclusion {
 
 	private final IndexedObjectSomeValuesFrom existential_;
 
-	public PossiblePropagatedExistentialImpl(
-			IndexedObjectSomeValuesFrom existential) {
+	public PossiblePropagatedExistentialImpl(IndexedObjectProperty relation,
+			Root sourceRoot, IndexedObjectSomeValuesFrom existential) {
+		super(relation, sourceRoot);
 		this.existential_ = existential;
 	}
 
@@ -45,6 +50,12 @@ public class PossiblePropagatedExistentialImpl extends
 	public <I, O> O accept(ExternalPossibleConclusionVisitor<I, O> visitor,
 			I input) {
 		return visitor.visit(this, input);
+	}
+
+	@Override
+	public String toString() {
+		return PossiblePropagatedExistential.NAME + "(" + getRelation() + ": "
+				+ getSourceRoot() + ": " + getExpression() + ")";
 	}
 
 }

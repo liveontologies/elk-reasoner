@@ -24,7 +24,7 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
  * #L%
  */
 
-public interface PossiblePropagatedExistential extends
+public interface PossiblePropagatedExistential extends PropagatedConclusion,
 		ExternalPossibleConclusion {
 
 	public static final String NAME = "Possible Propagated Existential";

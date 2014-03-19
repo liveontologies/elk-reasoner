@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
+
 /*
  * #%L
  * ALC Reasoner
@@ -28,7 +29,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagated
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalDeterministicConclusionVisitor;
 
 public class PropagatedComposedSubsumerImpl extends
-		AbstractPropagatedConclusion implements PropagatedComposedSubsumer {
+		AbstractPropagatedDeterministicConclusion implements
+		PropagatedComposedSubsumer {
 
 	private final IndexedClassExpression expression_;
 

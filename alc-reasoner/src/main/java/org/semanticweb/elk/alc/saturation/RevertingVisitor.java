@@ -33,12 +33,22 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Possib
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractLocalConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 
+/**
+ * A {@link LocalConclusionVisitor} that reverts the visited
+ * {@link LocalConclusion} (and possibly other related {@link Conclusions})
+ * using the given {@link ConclusionProducer}. Always returns {@code true}.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public class RevertingVisitor extends
 		AbstractLocalConclusionVisitor<Context, Boolean> {
 

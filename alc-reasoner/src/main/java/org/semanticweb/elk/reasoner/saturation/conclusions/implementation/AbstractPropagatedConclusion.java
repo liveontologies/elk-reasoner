@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
+
 /*
  * #%L
  * ALC Reasoner
@@ -26,16 +27,16 @@ import org.semanticweb.elk.alc.saturation.Root;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedConclusion;
 
 public abstract class AbstractPropagatedConclusion extends
-		AbstractExternalDeterministicConclusion implements PropagatedConclusion {
+		AbstractExternalConclusion implements PropagatedConclusion {
 
 	private final IndexedObjectProperty relation_;
 
 	private final Root sourceRoot_;
 
 	public AbstractPropagatedConclusion(IndexedObjectProperty relation,
-			Root inconsistentRoot) {
+			Root sourceRoot) {
 		this.relation_ = relation;
-		this.sourceRoot_ = inconsistentRoot;
+		this.sourceRoot_ = sourceRoot;
 	}
 
 	@Override

@@ -50,9 +50,11 @@ public class SaturationState implements ExternalConclusionProducer {
 
 	private final Map<Root, Root> existingRoots_;
 
-	private int contextCount = 0;
-
-	private int contextSizes = 0;
+	// private int contextCount = 0;
+	//
+	// private int rootSizesSum = 0;
+	//
+	// private int maxRootSize = 0;
 
 	/**
 	 * {@link Context}s that have unprocessed {@link Conclusion}s, i.e., for
@@ -134,24 +136,20 @@ public class SaturationState implements ExternalConclusionProducer {
 		if (result != null)
 			return result;
 		// else create new
-		contextCount++;
-		contextSizes += root.size();
-		if ((contextCount / 1000) * 1000 == contextCount)
-			LOGGER_.info("{} contexts created (evarage root size: {})",
-					contextCount, contextSizes / contextCount);
+		// contextCount++;
+		// int rootSize = root.size();
+		// if (rootSize > maxRootSize)
+		// maxRootSize = rootSize;
+		// rootSizesSum += rootSize;
+		// if ((contextCount / 1000) * 1000 == contextCount)
+		// LOGGER_.info(
+		// "{} contexts created (evarage root size: {}, max root size: {})",
+		// contextCount, rootSizesSum / contextCount, maxRootSize);
 		result = new Context(root);
 		root.setContext(result);
 		existingRoots_.put(root, root);
 		produce(root, init_);
 		return result;
-	}
-
-	void discard(Root root) {
-		Context context = getContext(root);
-		if (context.getBackwardLinks().isEmpty()) {
-			existingRoots_.remove(root);
-			contextCount--;
-		}
 	}
 
 	void checkSaturation() {

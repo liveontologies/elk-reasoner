@@ -154,13 +154,13 @@ public class Reasoner {
 		Saturation saturation = new Saturation(saturationState_);
 		Statistics.logOperationStart("concept satisfiability testing", LOGGER_);
 		try {
-			int count = 0;
+			// int count = 0;
 			for (IndexedClass initialClass : ontologyIndex_.getIndexedClasses()) {
 				saturation.submit(initialClass);
 				saturation.process();
-				count++;
-				if ((count / 1000) * 1000 == count)
-					LOGGER_.info("{} concepts processed", count);
+				// count++;
+				// if ((count / 1000) * 1000 == count)
+				// LOGGER_.info("{} concepts processed", count);
 			}
 		} finally {
 			Statistics.logOperationFinish("concept satisfiability testing",
@@ -176,7 +176,7 @@ public class Reasoner {
 		checkSatisfiability();
 		Saturation saturation = new Saturation(saturationState_);
 		Statistics.logOperationStart("classification", LOGGER_);
-		int count = 0;
+		// int count = 0;
 		int countSubsumers = 0;
 		int countSubsumerTests = 0;
 		int countNegativeSubsumerTests = 0;
@@ -196,21 +196,22 @@ public class Reasoner {
 							countNegativeSubsumerTests++;
 						}
 						countSubsumerTests++;
-//						if (saturation.checkSubsumer(context, possibleSubsumer) != saturation
-//								.checkSubsumer(context, possibleSubsumer)) {
-//							LOGGER_.error("{}: testst do not agree on {}",
-//									context, possibleSubsumer);
-//						}
+						// if (saturation.checkSubsumer(context,
+						// possibleSubsumer) != saturation
+						// .checkSubsumer(context, possibleSubsumer)) {
+						// LOGGER_.error("{}: testst do not agree on {}",
+						// context, possibleSubsumer);
+						// }
 					}
 				}
-				count++;
-				if ((count / 1000) * 1000 == count)
-					LOGGER_.info(
-							"{} concepts processed (evarage: {} subsumers, {} subsumer tests, {} positive)",
-							count, countSubsumers / count, countSubsumerTests
-									/ count,
-							(countSubsumerTests - countNegativeSubsumerTests)
-									/ count);
+				// count++;
+				// if ((count / 1000) * 1000 == count)
+				// LOGGER_.info(
+				// "{} concepts processed (evarage: {} subsumers, {} subsumer tests, {} positive)",
+				// count, countSubsumers / count, countSubsumerTests
+				// / count,
+				// (countSubsumerTests - countNegativeSubsumerTests)
+				// / count);
 			}
 		} finally {
 			LOGGER_.debug(

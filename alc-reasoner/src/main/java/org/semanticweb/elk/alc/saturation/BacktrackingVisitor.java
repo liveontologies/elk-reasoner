@@ -23,9 +23,23 @@ package org.semanticweb.elk.alc.saturation;
  */
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalDeterministicConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalPossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 
+/**
+ * A {@link LocalConclusionVisitor} that reverts the visited
+ * {@link LocalDeterministicConclusion}s and produces the complements of the
+ * visited {@link LocalPossibleConclusion}s in the {@link Context} given as the
+ * second argument. Returns {@code true} only for
+ * {@link LocalPossibleConclusion}s. This is useful to know when backtracking
+ * should stop.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public class BacktrackingVisitor extends RevertingVisitor {
 
 	private final ConclusionProducer producer_;

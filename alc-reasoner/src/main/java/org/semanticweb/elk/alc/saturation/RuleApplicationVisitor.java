@@ -152,8 +152,8 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		}
 		// apply propagations
 		Root root = conclusion.getSource();
+		Root sourceRoot = input.getRoot();
 		if (input.isDeterministic()) {
-			Root sourceRoot = input.getRoot();
 			for (IndexedObjectSomeValuesFrom propagatedSubsumer : input
 					.getPropagations().get(relation)) {
 				producer_.produce(root, new PropagatedComposedSubsumerImpl(
@@ -163,7 +163,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			for (IndexedObjectSomeValuesFrom propagatedSubsumer : input
 					.getPropagations().get(relation)) {
 				producer_.produce(root, new PossiblePropagatedExistentialImpl(
-						propagatedSubsumer));
+						relation, sourceRoot, propagatedSubsumer));
 			}
 		}
 		return null;
@@ -172,11 +172,11 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	@Override
 	public Void visit(Propagation conclusion, Context input) {
 		// propagate over all backward links
-		// TODO: for propagations of universals should be decomposed
+		// TODO: for the future: propagations of universals should be decomposed
 		// subsumer!
 		IndexedObjectProperty relation = conclusion.getRelation();
+		Root sourceRoot = input.getRoot();
 		if (input.isDeterministic()) {
-			Root sourceRoot = input.getRoot();
 			for (Root root : input.getBackwardLinks().get(relation)) {
 				producer_.produce(root, new PropagatedComposedSubsumerImpl(
 						relation, sourceRoot, conclusion.getCarry()));
@@ -184,7 +184,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		} else {
 			for (Root root : input.getBackwardLinks().get(relation)) {
 				producer_.produce(root, new PossiblePropagatedExistentialImpl(
-						conclusion.getCarry()));
+						relation, sourceRoot, conclusion.getCarry()));
 			}
 		}
 		return null;
@@ -225,6 +225,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 					newNegativeRootMembers);
 			Root oldTargetRoot = Root.removeNegativeMember(newTargetRoot,
 					negatedCarry);
+			input.removePropagatedConclusions(oldTargetRoot);
 			if (oldTargetRoot != newTargetRoot) {
 				producer_.produce(oldTargetRoot, toBacktrack);
 				producer_.produce(newTargetRoot, toAdd);
@@ -237,13 +238,18 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(Disjunction conclusion, Context input) {
 		IndexedClassExpression watchedDisjunct = conclusion
 				.getWatchedDisjunct();
+		IndexedClassExpression propagatedDisjunct = conclusion
+				.getPropagatedDisjunct();
 		if (input.getNegativeSubsumers().contains(watchedDisjunct)) {
-			producer_.produce(new DecomposedSubsumerImpl(conclusion
-					.getPropagatedDisjunct()));
-		} else {
-			producer_.produce(new PossibleDecomposedSubsumerImpl(
-					watchedDisjunct));
+			producer_.produce(new DecomposedSubsumerImpl(propagatedDisjunct));
+			return null;
 		}
+		if (input.getNegativeSubsumers().contains(propagatedDisjunct)) {
+			producer_.produce(new DecomposedSubsumerImpl(watchedDisjunct));
+			return null;
+		}
+		// else
+		producer_.produce(new PossibleDecomposedSubsumerImpl(watchedDisjunct));
 		return null;
 	}
 

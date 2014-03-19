@@ -27,8 +27,8 @@ import org.semanticweb.elk.alc.saturation.Root;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalDeterministicConclusionVisitor;
 
-public class PropagatedClashImpl extends AbstractPropagatedConclusion implements
-		PropagatedClash {
+public class PropagatedClashImpl extends
+		AbstractPropagatedDeterministicConclusion implements PropagatedClash {
 
 	public PropagatedClashImpl(IndexedObjectProperty relation, Root sourceRoot) {
 		super(relation, sourceRoot);

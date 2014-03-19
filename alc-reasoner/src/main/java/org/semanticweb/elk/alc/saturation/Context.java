@@ -109,12 +109,13 @@ public class Context {
 	private Set<IndexedClassExpression> negativeSubsumers_;
 
 	/**
-	 * deterministically derived composed subsumers that should be guessed
+	 * non-deterministically derived composed subsumers that should be guessed
 	 */
-	// private Set<IndexedClassExpression> maskedPossibleComposedSubsumers_;
-
 	private Set<IndexedClassExpression> possibleComposedSubsumers_;
 
+	/**
+	 * non-deterministically derived decomposed subsumers that should be guessed
+	 */
 	private Set<IndexedClassExpression> possibleDecomposedSubsumers_;
 
 	/**
@@ -133,7 +134,8 @@ public class Context {
 	private Multimap<IndexedObjectProperty, IndexedObjectSomeValuesFrom> propagations_;
 
 	/**
-	 * forward propagations of negations
+	 * all values of negative propagations should be present negatively in the
+	 * roots of contexts reachable using the given links
 	 */
 	private Multimap<IndexedObjectProperty, IndexedClassExpression> negativePropagations_;
 
@@ -142,11 +144,15 @@ public class Context {
 	 */
 	private Multimap<IndexedClassExpression, IndexedClassExpression> disjunctions_;
 
-	// TODO: make a multiset
-	private Set<IndexedObjectSomeValuesFrom> possibleExistentials_;
+	/**
+	 * possible existentials that are propagated from successor {@link Root}s;
+	 * they should be guessed
+	 */
+	private Multimap<IndexedObjectSomeValuesFrom, Root> possibleExistentials_;
 
 	/**
-	 * inconsistent {@link Root}s that are reachable by forward links
+	 * inconsistent {@link Root}s that are reachable by forward links (together
+	 * with negative propagations)
 	 */
 	private Set<Root> inconsistentSuccessors_;
 
@@ -162,7 +168,8 @@ public class Context {
 	private Deque<ExternalDeterministicConclusion> toDo_;
 
 	/**
-	 * subsumers which need to be guessed within this context
+	 * conclusions which need to be non-deterministically guessed within this
+	 * context
 	 */
 	private Queue<PossibleConclusion> toGuess_;
 
@@ -170,7 +177,7 @@ public class Context {
 	 * the {@link LocalConclusion}s that have been processed after the first
 	 * non-deterministic choice point
 	 */
-	private Deque<LocalConclusion> history_ = null;
+	private Deque<LocalConclusion> localHistory_ = null;
 
 	Context(Root root) {
 		this.root_ = root;
@@ -254,7 +261,7 @@ public class Context {
 		if (possibleExistentials_ == null)
 			return Collections.emptySet();
 		// else
-		return possibleExistentials_;
+		return possibleExistentials_.keySet();
 	}
 
 	public Set<Root> getInconsistentSuccessors() {
@@ -272,11 +279,11 @@ public class Context {
 	}
 
 	public Set<IndexedClassExpression> getPossibleSubsumers() {
-		if (history_ == null)
+		if (localHistory_ == null)
 			return Collections.emptySet();
 		Set<IndexedClassExpression> result = new ArrayHashSet<IndexedClassExpression>(
 				32);
-		for (Conclusion nonDeterministic : history_) {
+		for (Conclusion nonDeterministic : localHistory_) {
 			if (nonDeterministic instanceof Subsumer) {
 				result.add(((Subsumer) nonDeterministic).getExpression());
 			}
@@ -370,10 +377,18 @@ public class Context {
 	}
 
 	public void removePropagatedConclusions(Root root) {
-		if (inconsistentSuccessors_ == null)
-			return;
-		// else
-		inconsistentSuccessors_.remove(root);
+		if (inconsistentSuccessors_ != null) {
+			inconsistentSuccessors_.remove(root);
+			if (inconsistentSuccessors_.isEmpty()) {
+				inconsistentSuccessors_ = null;
+			}
+		}
+		if (propagatedComposedSubsumers_ != null) {
+			propagatedComposedSubsumers_.remove(root);
+			if (propagatedComposedSubsumers_.isEmpty()) {
+				propagatedComposedSubsumers_ = null;
+			}
+		}
 	}
 
 	public boolean hasClash() {
@@ -385,21 +400,19 @@ public class Context {
 	}
 
 	void pushToHistory(LocalConclusion conclusion) {
-		if (history_ == null)
-			history_ = new ArrayDeque<LocalConclusion>(16);
+		if (localHistory_ == null)
+			localHistory_ = new ArrayDeque<LocalConclusion>(16);
 		LOGGER_.trace("{}: to history: {}", this, conclusion);
-		history_.addLast(conclusion);
+		localHistory_.addLast(conclusion);
 	}
 
 	LocalConclusion popHistory() {
-		if (history_ == null)
+		if (localHistory_ == null)
 			return null;
 		// else
-		LocalConclusion result = this.history_.pollLast();
+		LocalConclusion result = this.localHistory_.pollLast();
 		if (result == null)
-			history_ = null;
-		else
-			LOGGER_.trace("{}: taken from history: {}", this, result);
+			localHistory_ = null;
 		return result;
 	}
 
@@ -409,7 +422,7 @@ public class Context {
 	}
 
 	boolean isDeterministic() {
-		return (history_ == null || history_.isEmpty());
+		return (localHistory_ == null || localHistory_.isEmpty());
 	}
 
 	static class ConclusionInserter implements
@@ -472,6 +485,15 @@ public class Context {
 
 		@Override
 		public Boolean visit(Disjunction conclusion, Context input) {
+			IndexedClassExpression watchedDisjunct = conclusion
+					.getWatchedDisjunct();
+			IndexedClassExpression propagatedDisjunct = conclusion
+					.getPropagatedDisjunct();
+			if (input.getSubsumers().contains(watchedDisjunct)
+					|| input.getSubsumers().contains(propagatedDisjunct))
+				// disjunction is already subsumed
+				return false;
+			// else
 			if (input.disjunctions_ == null)
 				input.disjunctions_ = new HashSetMultimap<IndexedClassExpression, IndexedClassExpression>(
 						16);
@@ -483,10 +505,16 @@ public class Context {
 		public Boolean visit(PossiblePropagatedExistential conclusion,
 				Context input) {
 			if (input.possibleExistentials_ == null) {
-				input.possibleExistentials_ = new ArrayHashSet<IndexedObjectSomeValuesFrom>(
+				input.possibleExistentials_ = new HashSetMultimap<IndexedObjectSomeValuesFrom, Root>(
 						16);
 			}
-			return input.possibleExistentials_.add(conclusion.getExpression());
+			IndexedObjectSomeValuesFrom expression = conclusion.getExpression();
+			Root root = conclusion.getSourceRoot();
+			if (input.possibleExistentials_.add(expression, root)) {
+				return true;
+			}
+			// else
+			return false;
 		}
 
 		@Override
@@ -658,7 +686,9 @@ public class Context {
 				Context input) {
 			if (input.possibleExistentials_ == null)
 				return false;
-			if (input.possibleExistentials_.remove(conclusion.getExpression())) {
+			IndexedObjectSomeValuesFrom expression = conclusion.getExpression();
+			Root root = conclusion.getSourceRoot();
+			if (input.possibleExistentials_.remove(expression, root)) {
 				if (input.possibleExistentials_.isEmpty()) {
 					input.possibleExistentials_ = null;
 				}
