@@ -40,12 +40,12 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Decomposed
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossiblePropagatedExistential;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
@@ -164,7 +164,7 @@ public class Context {
 	/**
 	 * subsumers which need to be guessed within this context
 	 */
-	private Queue<ExternalPossibleConclusion> toGuess_;
+	private Queue<PossibleConclusion> toGuess_;
 
 	/**
 	 * the {@link LocalConclusion}s that have been processed after the first
@@ -347,22 +347,22 @@ public class Context {
 		return result;
 	}
 
-	boolean addToGuess(ExternalPossibleConclusion possibleConclusion) {
+	boolean addToGuess(PossibleConclusion possibleConclusion) {
 		boolean result = false;
 		if (toGuess_ == null) {
-			toGuess_ = new ArrayDeque<ExternalPossibleConclusion>();
+			toGuess_ = new ArrayDeque<PossibleConclusion>();
 			result = true;
 		}
 		toGuess_.add(possibleConclusion);
 		return result;
 	}
 
-	ExternalPossibleConclusion takeToGuess() {
+	PossibleConclusion takeToGuess() {
 		if (toGuess_ == null) {
 			return null;
 		}
 		// else
-		ExternalPossibleConclusion result = toGuess_.poll();
+		PossibleConclusion result = toGuess_.poll();
 		if (result == null) {
 			toGuess_ = null;
 		}

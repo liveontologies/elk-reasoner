@@ -24,7 +24,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalPossibleConclusionVisitor;
 
-public interface LocalPossibleConclusion extends LocalConclusion {
+public interface LocalPossibleConclusion extends LocalConclusion,
+		PossibleConclusion {
 
 	public <I, O> O accept(LocalPossibleConclusionVisitor<I, O> visitor, I input);
 

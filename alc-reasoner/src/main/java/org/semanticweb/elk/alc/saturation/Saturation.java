@@ -56,7 +56,7 @@ public class Saturation {
 
 	private final Queue<LocalDeterministicConclusion> localDeterministicConclusions_;
 
-	private final Queue<LocalPossibleConclusion> localPossibleConclusions_;
+	// private final Queue<LocalPossibleConclusion> localPossibleConclusions_;
 
 	private final ConclusionProducer conclusionProducer_;
 
@@ -66,11 +66,13 @@ public class Saturation {
 
 	private final LocalConclusionVisitor<Context, Boolean> revertingVisitor_;
 
+	private Context context_;
+
+	private int inconsistentNodeCount_ = 0;
+
 	public Saturation(SaturationState saturationState) {
 		this.saturationState_ = saturationState;
 		this.localDeterministicConclusions_ = new ArrayDeque<LocalDeterministicConclusion>(
-				1024);
-		this.localPossibleConclusions_ = new ArrayDeque<LocalPossibleConclusion>(
 				1024);
 		this.conclusionProducer_ = new ConclusionProducer() {
 			@Override
@@ -95,7 +97,7 @@ public class Saturation {
 			@Override
 			public void produce(LocalPossibleConclusion conclusion) {
 				LOGGER_.trace("produced {}", conclusion);
-				localPossibleConclusions_.add(conclusion);
+				saturationState_.produce(context_, conclusion);
 			}
 		};
 		this.ruleApplicationVisitor_ = new RuleApplicationVisitor(
@@ -138,10 +140,11 @@ public class Saturation {
 		if (context.addConclusion(conjecture)) {
 			context.pushToHistory(conjecture);
 			// start applying the rules
+			context_ = context;
 			conjecture.accept(ruleApplicationVisitor_, context);
-			processContext(context);
+			process(context);
+			process();
 		}
-		process();
 		return (context.getSubsumers().contains(possibleSubsumer));
 	}
 
@@ -162,95 +165,113 @@ public class Saturation {
 	public boolean checkSubsumer(Context context,
 			IndexedClassExpression possibleSubsumer) {
 		return checkSubsumerSimple(context, possibleSubsumer);
-//		 return checkSubsumerOptimized(context, possibleSubsumer);
+		// return checkSubsumerOptimized(context, possibleSubsumer);
 	}
 
 	public void process() {
 		for (;;) {
-			Context context = saturationState_.pollActiveContext();
-			if (context == null) {
-				context = saturationState_.pollPossibleContext();
-				if (context == null) {
-					return;
-				}
+			context_ = saturationState_.pollActiveContext();
+			if (context_ == null) {
+				context_ = saturationState_.pollPossibleContext();
+				if (context_ == null)
+					break;
+				process(context_);
+				continue;
 			}
-			processContext(context);
+			processDeterministic(context_);
+			process(context_);
 		}
 	}
 
-	public void processContext(Context context) {
+	public void processDeterministic(Context context) {
 		for (;;) {
 			Conclusion conclusion = localDeterministicConclusions_.poll();
 			if (conclusion == null) {
 				conclusion = context.takeToDo();
 				if (conclusion == null) {
-					conclusion = localPossibleConclusions_.poll();
-					if (conclusion == null) {
-						conclusion = context.takeToGuess();
-						if (conclusion == null)
-							break;
-					}
+					break;
 				}
 			}
-			LOGGER_.trace("{}: processing {}", context.getRoot(), conclusion);
-			if (conclusion instanceof RetractedConclusion) {
-				if (!context.removeConclusion(conclusion))
-					LOGGER_.error("{}: backtracked conclusion not found: {}!",
-							context, conclusion);
-				continue;
-			}
-			if (conclusion instanceof PropagatedConclusion) {
-				// check if the conclusion is still relevant
-				PropagatedConclusion propagatedConclusion = ((PropagatedConclusion) conclusion);
-				IndexedObjectProperty relation = propagatedConclusion
-						.getRelation();
-				Root sourceRoot = propagatedConclusion.getSourceRoot();
-				if (!context.getForwardLinks().get(relation)
-						.contains(sourceRoot.getPositiveMember())
-						|| !context.getNegativePropagations().get(relation)
-								.equals(sourceRoot.getNegatitveMembers())) {
-					LOGGER_.trace("{}: obsolete {}", context, conclusion);
-					continue;
-				}
-			}
-			if (!context.addConclusion(conclusion))
-				continue;
-
-			if (conclusion instanceof LocalConclusion
-					&& !context.isInconsistent()
-					&& (!context.isDeterministic() || conclusion instanceof LocalPossibleConclusion)) {
-				context.pushToHistory((LocalConclusion) conclusion);
-			}
-
-			conclusion.accept(ruleApplicationVisitor_, context);
-
-			if (context.hasClash()) {
-				localDeterministicConclusions_.clear();
-				boolean proceedNext;
-				do {
-					LocalConclusion toBacktrack = context.popHistory();
-					if (toBacktrack == null) {
-						LOGGER_.trace("{}: nothing to backtrack",
-								context.getRoot());
-						break;
-					}
-					proceedNext = toBacktrack.accept(backtrackingVisitor_,
-							context);
-					context.removeConclusion(toBacktrack);
-				} while (proceedNext);
-				// restore conclusions that are still valid
-				if (!context.getInconsistentSuccessors().isEmpty()) {
-					conclusionProducer_.produce(ClashImpl.getInstance());
-				}
-				for (Root root : context.getPropagatedComposedSubsumers()
-						.keySet()) {
-					for (IndexedClassExpression subsumer : context
-							.getPropagatedComposedSubsumers().get(root))
-						conclusionProducer_.produce(new ComposedSubsumerImpl(
-								subsumer));
-				}
-			}
-
+			process(context, conclusion);
 		}
+	}
+
+	public void process(Context context) {
+		for (;;) {
+			Conclusion conclusion = localDeterministicConclusions_.poll();
+			if (conclusion == null) {
+				conclusion = context.takeToDo();
+				if (conclusion == null) {
+					conclusion = context.takeToGuess();
+					if (conclusion == null)
+						break;
+				}
+			}
+			process(context, conclusion);
+		}
+	}
+
+	public void process(Context context, Conclusion conclusion) {
+		LOGGER_.trace("{}: processing {}", context.getRoot(), conclusion);
+		if (conclusion instanceof RetractedConclusion) {
+			if (!context.removeConclusion(conclusion))
+				LOGGER_.error("{}: backtracked conclusion not found: {}!",
+						context, conclusion);
+			return;
+		}
+		if (conclusion instanceof PropagatedConclusion) {
+			// check if the conclusion is still relevant
+			PropagatedConclusion propagatedConclusion = ((PropagatedConclusion) conclusion);
+			IndexedObjectProperty relation = propagatedConclusion.getRelation();
+			Root sourceRoot = propagatedConclusion.getSourceRoot();
+			if (!context.getForwardLinks().get(relation)
+					.contains(sourceRoot.getPositiveMember())
+					|| !context.getNegativePropagations().get(relation)
+							.equals(sourceRoot.getNegatitveMembers())) {
+				LOGGER_.trace("{}: obsolete {}", context, conclusion);
+				return;
+			}
+		}
+		if (!context.addConclusion(conclusion))
+			return;
+
+		if (conclusion == ClashImpl.getInstance() && context.isInconsistent()) {
+			inconsistentNodeCount_++;
+			if ((inconsistentNodeCount_ / 1000) * 1000 == inconsistentNodeCount_)
+				LOGGER_.info("{} inconsistent nodes", inconsistentNodeCount_);
+		}
+
+		if (conclusion instanceof LocalConclusion
+				&& !context.isInconsistent()
+				&& (!context.isDeterministic() || conclusion instanceof LocalPossibleConclusion)) {
+			context.pushToHistory((LocalConclusion) conclusion);
+		}
+
+		conclusion.accept(ruleApplicationVisitor_, context);
+
+		if (context.hasClash()) {
+			localDeterministicConclusions_.clear();
+			boolean proceedNext;
+			do {
+				LocalConclusion toBacktrack = context.popHistory();
+				if (toBacktrack == null) {
+					LOGGER_.trace("{}: nothing to backtrack", context.getRoot());
+					break;
+				}
+				proceedNext = toBacktrack.accept(backtrackingVisitor_, context);
+				context.removeConclusion(toBacktrack);
+			} while (proceedNext);
+			// restore conclusions that are still valid
+			if (!context.getInconsistentSuccessors().isEmpty()) {
+				conclusionProducer_.produce(ClashImpl.getInstance());
+			}
+			for (Root root : context.getPropagatedComposedSubsumers().keySet()) {
+				for (IndexedClassExpression subsumer : context
+						.getPropagatedComposedSubsumers().get(root))
+					conclusionProducer_.produce(new ComposedSubsumerImpl(
+							subsumer));
+			}
+		}
+
 	}
 }

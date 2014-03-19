@@ -1,5 +1,4 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
-
 /*
  * #%L
  * ALC Reasoner
@@ -22,12 +21,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ExternalPossibleConclusionVisitor;
+public interface PossibleConclusion extends Conclusion {
 
-public interface ExternalPossibleConclusion extends ExternalConclusion,
-		PossibleConclusion {
-
-	public <I, O> O accept(ExternalPossibleConclusionVisitor<I, O> visitor,
-			I input);
+	// nothing else so far
 
 }
