@@ -56,17 +56,22 @@ public class Saturation {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(Saturation.class);
 
-	private final static ExternalDeterministicConclusion CONTEXT_INIT_ = new ContextInitializationImpl();
+	private static final ExternalDeterministicConclusion CONTEXT_INIT_ = new ContextInitializationImpl();
 
 	/**
 	 * if {@code true} will use an optimized subsumption test
 	 */
-	private final static boolean OPTIMIZED_SUBSUMPTION_TEST_ = true;
+	private final static boolean OPTIMIZED_SUBSUMPTION_TEST_ = false;
 
 	/**
 	 * if {@code true}, the integrity of saturation will be periodically tested
 	 */
 	private final static boolean CHECK_SATURATION_ = false;
+
+	/**
+	 * if {@code true}, some statistics will be printed
+	 */
+	private static final boolean PRINT_STATS_ = false;
 
 	private final SaturationState saturationState_;
 
@@ -92,7 +97,8 @@ public class Saturation {
 	private final Multimap<IndexedObjectProperty, Root> producedBackwardLinks_;
 	private final Multimap<IndexedObjectProperty, Root> rectractedBackwardLinks_;
 
-	// private int inconsistentRootCount_ = 0;
+	// some statistics counters
+	private int inconsistentRootCount_ = 0;
 
 	public Saturation(SaturationState saturationState) {
 		this.saturationState_ = saturationState;
@@ -160,16 +166,14 @@ public class Saturation {
 			IndexedClassExpression possibleSubsumer) {
 		LOGGER_.trace("{}: checking possible subsumer {}", context.getRoot(),
 				possibleSubsumer);
-		// make sure everything is processed
-		process();
 		if (context.isInconsistent())
 			return true;
 		if (!possibleSubsumer.occursNegatively()
 				&& !(possibleSubsumer instanceof IndexedClass))
 			LOGGER_.error("{}: checking subsumption with {} not supported",
 					context, possibleSubsumer);
-		if (!context.getSubsumers().contains(possibleSubsumer))
-			return false;
+//		if (!context.getSubsumers().contains(possibleSubsumer))
+//			return false;
 		/*
 		 * use one of the two methods: simple tests just creates a context with
 		 * the root obtained by the root of the original context and adding the
@@ -208,8 +212,11 @@ public class Saturation {
 			toBacktrack.accept(revertingVisitor_, context);
 			context.removeConclusion(toBacktrack);
 		}
+		if (context.getSubsumers().contains(possibleSubsumer))
+			// it was derived deterministically
+			return true;
 		/*
-		 * we will add negation of the possible subsumer as the first
+		 * else we will add negation of the possible subsumer as the first
 		 * "nondeterministic" conclusion; if the possible subsumer will still be
 		 * derived, this conclusion must be backtracked, and so, the possible
 		 * subsumer will be derived deterministically
@@ -319,12 +326,15 @@ public class Saturation {
 		if (!context.addConclusion(conclusion))
 			return;
 
-		// if (conclusion == ClashImpl.getInstance() &&
-		// context.isInconsistent()) {
-		// inconsistentRootCount_++;
-		// if ((inconsistentRootCount_ / 1000) * 1000 == inconsistentRootCount_)
-		// LOGGER_.info("{} inconsistent roots", inconsistentRootCount_);
-		// }
+		if (PRINT_STATS_) {
+			if (conclusion == ClashImpl.getInstance()
+					&& context.isInconsistent()) {
+				inconsistentRootCount_++;
+				if ((inconsistentRootCount_ / 1000) * 1000 == inconsistentRootCount_)
+					LOGGER_.info("{} inconsistent roots",
+							inconsistentRootCount_);
+			}
+		}
 
 		if (conclusion instanceof LocalConclusion
 				&& !context.isInconsistent()

@@ -47,7 +47,12 @@ public class Reasoner {
 			.getLogger(Reasoner.class);
 
 	/**
-	 * the (differential) index for loading of axioms and changes
+	 * if {@code true}, some statistics will be printed
+	 */
+	private static final boolean PRINT_STATS_ = true;
+
+	/**
+	 * the index for loading of axioms and changes
 	 */
 	private final OntologyIndex ontologyIndex_;
 	/**
@@ -154,13 +159,15 @@ public class Reasoner {
 		Saturation saturation = new Saturation(saturationState_);
 		Statistics.logOperationStart("concept satisfiability testing", LOGGER_);
 		try {
-			// int count = 0;
+			int count = 0;
 			for (IndexedClass initialClass : ontologyIndex_.getIndexedClasses()) {
 				saturation.submit(initialClass);
 				saturation.process();
-				// count++;
-				// if ((count / 1000) * 1000 == count)
-				// LOGGER_.info("{} concepts processed", count);
+				if (PRINT_STATS_) {
+					count++;
+					if ((count / 1000) * 1000 == count)
+						LOGGER_.info("{} concepts processed", count);
+				}
 			}
 		} finally {
 			Statistics.logOperationFinish("concept satisfiability testing",
@@ -197,21 +204,18 @@ public class Reasoner {
 							countNegativeSubsumerTests++;
 						}
 						countSubsumerTests++;
-						// if (saturation.checkSubsumer(context,
-						// possibleSubsumer) != saturation
-						// .checkSubsumer(context, possibleSubsumer)) {
-						// LOGGER_.error("{}: testst do not agree on {}",
-						// context, possibleSubsumer);
-						// }
 					}
 				}
-				// if ((countClasses / 1000) * 1000 == countClasses)
-				// LOGGER_.info(
-				// "{} concepts processed (evarage: {} subsumers, {} subsumer tests, {} positive)",
-				// countClasses, countSubsumers / countClasses,
-				// countSubsumerTests / countClasses,
-				// (countSubsumerTests - countNegativeSubsumerTests)
-				// / countClasses);
+				if (PRINT_STATS_) {
+					if ((countClasses / 1000) * 1000 == countClasses)
+						LOGGER_.info(
+								"{} concepts processed (evarage: {} subsumers, {} subsumer tests, {} positive)",
+								countClasses,
+								countSubsumers / countClasses,
+								countSubsumerTests / countClasses,
+								(countSubsumerTests - countNegativeSubsumerTests)
+										/ countClasses);
+				}
 			}
 		} finally {
 			LOGGER_.debug(
