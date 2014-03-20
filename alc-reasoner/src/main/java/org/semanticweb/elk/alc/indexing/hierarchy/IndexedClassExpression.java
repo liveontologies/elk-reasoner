@@ -76,6 +76,12 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	Map<IndexedClassExpression, IndexedObjectIntersectionOf> conjunctionsByConjunct_;
 
 	/**
+	 * Negatively occurred {@link IndexedObjectUnionOf} in which this
+	 * {@link IndexedClassExpression} occurs as one of disjuncts.
+	 */
+	Set<IndexedObjectUnionOf> negativeDisjunctions_;
+
+	/**
 	 * Negatively occurred {@link IndexedObjectSomeValuesFrom} in which this
 	 * {@link IndexedClassExpression} is the filler.
 	 */
@@ -93,6 +99,13 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 			return Collections.emptyMap();
 		// else
 		return conjunctionsByConjunct_;
+	}
+
+	Set<IndexedObjectUnionOf> getNegativeDisjunctions() {
+		if (negativeDisjunctions_ == null)
+			return Collections.emptySet();
+		// else
+		return negativeDisjunctions_;
 	}
 
 	Set<IndexedObjectSomeValuesFrom> getNegativeExistentials() {
@@ -207,6 +220,12 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 					subsumer.conjunctionsByConjunct_.keySet())) {
 				producer.produce(new ComposedSubsumerImpl(
 						subsumer.conjunctionsByConjunct_.get(common)));
+			}
+		}
+		if (subsumer.negativeDisjunctions_ != null) {
+			// generate disjunctions
+			for (IndexedObjectUnionOf disjunction : subsumer.negativeDisjunctions_) {
+				producer.produce(new ComposedSubsumerImpl(disjunction));
 			}
 		}
 		if (subsumer.negativeExistentials_ != null) {

@@ -24,6 +24,7 @@ package org.semanticweb.elk.alc.indexing.hierarchy;
 
 import org.semanticweb.elk.alc.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
  * Represents all occurrences of an {@link ElkObjectUnionOf} in an ontology.
@@ -61,9 +62,38 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 	protected void updateOccurrenceNumbers(OntologyIndex index, int increment,
 			int positiveIncrement, int negativeIncrement) {
 
-		// no need to index anything
+		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
+			// first negative occurrence of this expression
+			addDisjunction(firstDisjunct_, this);
+			addDisjunction(secondDisjunct_, this);
+		}
+
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
+
+		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
+			// no negative occurrences of this expression left
+			removeDisjunction(firstDisjunct_, this);
+			removeDisjunction(secondDisjunct_, this);
+		}
+
+	}
+
+	private void addDisjunction(IndexedClassExpression disjunct,
+			IndexedObjectUnionOf disjunction) {
+		if (disjunct.negativeDisjunctions_ == null) {
+			disjunct.negativeDisjunctions_ = new ArrayHashSet<IndexedObjectUnionOf>(
+					4);
+		}
+		disjunct.negativeDisjunctions_.add(disjunction);
+	}
+
+	private void removeDisjunction(IndexedClassExpression disjunct,
+			IndexedObjectUnionOf disjunction) {
+		disjunct.negativeDisjunctions_.remove(disjunction);
+		if (disjunct.negativeDisjunctions_.isEmpty()) {
+			disjunct.negativeDisjunctions_ = null;
+		}
 
 	}
 

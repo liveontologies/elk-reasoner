@@ -176,12 +176,13 @@ public class Reasoner {
 		checkSatisfiability();
 		Saturation saturation = new Saturation(saturationState_);
 		Statistics.logOperationStart("classification", LOGGER_);
-		// int count = 0;
+		int countClasses = 0;
 		int countSubsumers = 0;
 		int countSubsumerTests = 0;
 		int countNegativeSubsumerTests = 0;
 		try {
 			for (IndexedClass initialClass : ontologyIndex_.getIndexedClasses()) {
+				countClasses++;
 				Context context = saturationState_.getContext(initialClass);
 				for (IndexedClassExpression subsumer : context.getSubsumers()) {
 					if (subsumer instanceof IndexedClass)
@@ -204,20 +205,19 @@ public class Reasoner {
 						// }
 					}
 				}
-				// count++;
-				// if ((count / 1000) * 1000 == count)
+				// if ((countClasses / 1000) * 1000 == countClasses)
 				// LOGGER_.info(
 				// "{} concepts processed (evarage: {} subsumers, {} subsumer tests, {} positive)",
-				// count, countSubsumers / count, countSubsumerTests
-				// / count,
+				// countClasses, countSubsumers / countClasses,
+				// countSubsumerTests / countClasses,
 				// (countSubsumerTests - countNegativeSubsumerTests)
-				// / count);
+				// / countClasses);
 			}
 		} finally {
 			LOGGER_.debug(
-					"Total subsumers: {}, subsumer tests: {}, positive: {}",
-					countSubsumers, countSubsumerTests, countSubsumerTests
-							- countNegativeSubsumerTests);
+					"Total classes: {}, subsumers: {}, subsumer tests: {}, positive: {}",
+					countClasses, countSubsumers, countSubsumerTests,
+					countSubsumerTests - countNegativeSubsumerTests);
 			Statistics.logOperationFinish("classification", LOGGER_);
 			Statistics.logMemoryUsage(LOGGER_);
 		}
