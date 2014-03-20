@@ -38,12 +38,14 @@ public class DisjunctionImpl extends AbstractLocalDeterministicConclusion
 
 	@Override
 	public IndexedClassExpression getWatchedDisjunct() {
-		return disjunction_.getSecondDisjunct();
+		return disjunction_.getFirstDisjunct();
+//		return disjunction_.getSecondDisjunct();
 	}
 
 	@Override
 	public IndexedClassExpression getPropagatedDisjunct() {
-		return disjunction_.getFirstDisjunct();
+//		return disjunction_.getFirstDisjunct();
+		return disjunction_.getSecondDisjunct();
 	}
 
 	@Override

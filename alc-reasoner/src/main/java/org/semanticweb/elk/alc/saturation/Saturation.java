@@ -219,10 +219,6 @@ public class Saturation {
 					possibleSubsumer);
 			return true;
 		}
-//		LOGGER_.info(
-//				"{}: local queue size: {}, todo queue size: {}, to guess queue size: {}",
-//				context, localDeterministicConclusions_.size(),
-//				context.getToDoSize(), context.getToGuessSize());
 		/*
 		 * else we will add negation of the possible subsumer as the first
 		 * "nondeterministic" conclusion; if the possible subsumer will still be
@@ -234,7 +230,7 @@ public class Saturation {
 			context.pushToHistory(conjecture);
 			// start applying the rules
 			conjecture.accept(ruleApplicationVisitor_, context);
-			process(context);
+			processDeterministic(context);
 			process();
 		}
 		if (context.getSubsumers().contains(possibleSubsumer)) {
@@ -266,7 +262,7 @@ public class Saturation {
 			saturationState_.checkSaturation();
 	}
 
-	private void processBackwardLinks(Context context) {
+	private void producedBufferedBackwardLinks(Context context) {
 		Root sourceRoot = context.getRoot();
 		for (IndexedObjectProperty relation : rectractedBackwardLinks_.keySet()) {
 			for (Root root : rectractedBackwardLinks_.get(relation)) {
@@ -296,7 +292,7 @@ public class Saturation {
 			}
 			process(context, conclusion);
 		}
-		processBackwardLinks(context);
+		producedBufferedBackwardLinks(context);
 	}
 
 	private void process(Context context) {
@@ -312,7 +308,7 @@ public class Saturation {
 			}
 			process(context, conclusion);
 		}
-		processBackwardLinks(context);
+		producedBufferedBackwardLinks(context);
 	}
 
 	private void process(Context context, Conclusion conclusion) {
