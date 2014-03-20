@@ -99,7 +99,14 @@ public class Context {
 	private Set<IndexedClassExpression> subsumers_;
 
 	/**
-	 * subsumers to which decomposition rules are applied
+	 * subsumers to which composition rules were applied after non-deterministic
+	 * choices
+	 */
+	private Set<IndexedClassExpression> composedSubsumers_;
+
+	/**
+	 * subsumers to which composition rules were applied after non-deterministic
+	 * choices
 	 */
 	private Set<IndexedClassExpression> decomposedSubsumers_;
 
@@ -140,9 +147,9 @@ public class Context {
 	private Multimap<IndexedObjectProperty, IndexedClassExpression> negativePropagations_;
 
 	/**
-	 * disjunctions indexed by disjuncts
+	 * disjunctions indexed by watch disjuncts
 	 */
-	private Multimap<IndexedClassExpression, IndexedClassExpression> disjunctions_;
+	private Multimap<IndexedClassExpression, IndexedClassExpression> disjunctionsPropagatedByWatched_;
 
 	/**
 	 * possible existentials that are propagated from successor {@link Root}s;
@@ -187,6 +194,10 @@ public class Context {
 		return root_;
 	}
 
+	/**
+	 * @return all subsumers (deterministic and non-deterministic) derived in
+	 *         this {@link Context}
+	 */
 	public Set<IndexedClassExpression> getSubsumers() {
 		if (subsumers_ == null)
 			return Collections.emptySet();
@@ -194,6 +205,22 @@ public class Context {
 		return subsumers_;
 	}
 
+	/**
+	 * @return the subsumers in this {@link Context} derived after a
+	 *         non-deterministic choice to which composition rules were applied
+	 */
+	public Set<IndexedClassExpression> getComposedSubsumers() {
+		if (composedSubsumers_ == null)
+			return Collections.emptySet();
+		// else
+		return composedSubsumers_;
+	}
+
+	/**
+	 * @return the subsumers in this {@link Context} derived after a
+	 *         non-deterministic choice to which decomposition rules were
+	 *         applied
+	 */
 	public Set<IndexedClassExpression> getDecomposedSubsumers() {
 		if (decomposedSubsumers_ == null)
 			return Collections.emptySet();
@@ -201,6 +228,11 @@ public class Context {
 		return decomposedSubsumers_;
 	}
 
+	/**
+	 * @return the set of {@link IndexedClassExpression} which negations where
+	 *         derived (possibly after a non-deterministic choice) in this
+	 *         {@link Context}
+	 */
 	public Set<IndexedClassExpression> getNegativeSubsumers() {
 		if (negativeSubsumers_ == null)
 			return Collections.emptySet();
@@ -208,11 +240,11 @@ public class Context {
 		return negativeSubsumers_;
 	}
 
-	public Multimap<IndexedClassExpression, IndexedClassExpression> getDisjunctions() {
-		if (disjunctions_ == null)
+	public Multimap<IndexedClassExpression, IndexedClassExpression> getPropagatedDisjunctionsByWatched() {
+		if (disjunctionsPropagatedByWatched_ == null)
 			return Operations.emptyMultimap();
 		// else
-		return disjunctions_;
+		return disjunctionsPropagatedByWatched_;
 	}
 
 	public Multimap<IndexedObjectProperty, IndexedClassExpression> getForwardLinks() {
@@ -289,6 +321,20 @@ public class Context {
 			}
 		}
 		return result;
+	}
+
+	public int getToDoSize() {
+		if (toDo_ == null)
+			return 0;
+		// else
+		return toDo_.size();
+	}
+
+	public int getToGuessSize() {
+		if (toGuess_ == null)
+			return 0;
+		// else
+		return toGuess_.size();
 	}
 
 	/**
@@ -428,29 +474,45 @@ public class Context {
 	static class ConclusionInserter implements
 			ConclusionVisitor<Context, Boolean> {
 
-		private static boolean visitComposedSubsumer(Subsumer conclusion,
+		private boolean visitSubsumer(IndexedClassExpression expression,
 				Context input) {
 			if (input.subsumers_ == null)
 				input.subsumers_ = new ArrayHashSet<IndexedClassExpression>(64);
-			return input.subsumers_.add(conclusion.getExpression());
-		}
-
-		private static boolean visitDecomposedSubsumer(Subsumer conclusion,
-				Context input) {
-			if (input.decomposedSubsumers_ == null)
-				input.decomposedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
-						32);
-			return input.decomposedSubsumers_.add(conclusion.getExpression());
+			return input.subsumers_.add(expression);
 		}
 
 		@Override
 		public Boolean visit(DecomposedSubsumer conclusion, Context input) {
-			return visitDecomposedSubsumer(conclusion, input);
+			IndexedClassExpression expression = conclusion.getExpression();
+			if (input.isDeterministic()) {
+				return visitSubsumer(expression, input);
+			}
+			// else non-deterministic
+			if (input.getSubsumers().contains(expression)
+					&& !input.getComposedSubsumers().contains(expression))
+				// a subsumer was derived deterministically => already
+				// decomposed
+				return false;
+			// else
+			if (input.decomposedSubsumers_ == null)
+				input.decomposedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
+						16);
+			return input.decomposedSubsumers_.add(conclusion.getExpression());
 		}
 
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, Context input) {
-			return visitComposedSubsumer(conclusion, input);
+			IndexedClassExpression expression = conclusion.getExpression();
+			if (visitSubsumer(expression, input)) {
+				if (input.isDeterministic())
+					return true;
+				// else non-deterministic
+				if (input.composedSubsumers_ == null)
+					input.composedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
+							16);
+				return input.composedSubsumers_.add(expression);
+			}
+			return false;
 		}
 
 		@Override
@@ -478,7 +540,7 @@ public class Context {
 		public Boolean visit(NegatedSubsumer conclusion, Context input) {
 			if (input.negativeSubsumers_ == null)
 				input.negativeSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
-						32);
+						16);
 			return input.negativeSubsumers_.add(conclusion
 					.getNegatedExpression());
 		}
@@ -494,11 +556,12 @@ public class Context {
 				// disjunction is already subsumed
 				return false;
 			// else
-			if (input.disjunctions_ == null)
-				input.disjunctions_ = new HashSetMultimap<IndexedClassExpression, IndexedClassExpression>(
-						16);
-			return input.disjunctions_.add(conclusion.getWatchedDisjunct(),
-					conclusion.getPropagatedDisjunct());
+			if (input.disjunctionsPropagatedByWatched_ == null) {
+				input.disjunctionsPropagatedByWatched_ = new HashSetMultimap<IndexedClassExpression, IndexedClassExpression>(
+						8);
+			}
+			return input.disjunctionsPropagatedByWatched_.add(watchedDisjunct,
+					propagatedDisjunct);
 		}
 
 		@Override
@@ -506,7 +569,7 @@ public class Context {
 				Context input) {
 			if (input.possibleExistentials_ == null) {
 				input.possibleExistentials_ = new HashSetMultimap<IndexedObjectSomeValuesFrom, Root>(
-						16);
+						8);
 			}
 			IndexedObjectSomeValuesFrom expression = conclusion.getExpression();
 			Root root = conclusion.getSourceRoot();
@@ -521,7 +584,7 @@ public class Context {
 		public Boolean visit(ForwardLink conclusion, Context input) {
 			if (input.forwardLinks_ == null)
 				input.forwardLinks_ = new HashSetMultimap<IndexedObjectProperty, IndexedClassExpression>(
-						16);
+						8);
 			return input.forwardLinks_.add(conclusion.getRelation(),
 					conclusion.getTarget());
 		}
@@ -530,7 +593,7 @@ public class Context {
 		public Boolean visit(BackwardLink conclusion, Context input) {
 			if (input.backwardLinks_ == null)
 				input.backwardLinks_ = new HashSetMultimap<IndexedObjectProperty, Root>(
-						16);
+						8);
 			return input.backwardLinks_.add(conclusion.getRelation(),
 					conclusion.getSource());
 		}
@@ -548,7 +611,7 @@ public class Context {
 		public Boolean visit(Propagation conclusion, Context input) {
 			if (input.propagations_ == null)
 				input.propagations_ = new HashSetMultimap<IndexedObjectProperty, IndexedObjectSomeValuesFrom>(
-						16);
+						8);
 			return input.propagations_.add(conclusion.getRelation(),
 					conclusion.getCarry());
 		}
@@ -557,7 +620,7 @@ public class Context {
 		public Boolean visit(NegativePropagation conclusion, Context input) {
 			if (input.negativePropagations_ == null)
 				input.negativePropagations_ = new HashSetMultimap<IndexedObjectProperty, IndexedClassExpression>(
-						16);
+						8);
 			return input.negativePropagations_.add(conclusion.getRelation(),
 					conclusion.getNegatedCarry());
 		}
@@ -584,7 +647,7 @@ public class Context {
 				Context input) {
 			if (input.propagatedComposedSubsumers_ == null)
 				input.propagatedComposedSubsumers_ = new HashSetMultimap<Root, IndexedClassExpression>(
-						16);
+						8);
 			return input.propagatedComposedSubsumers_.add(
 					conclusion.getSourceRoot(), conclusion.getExpression());
 		}
@@ -594,11 +657,27 @@ public class Context {
 	static class ConclusionDeleter implements
 			ConclusionVisitor<Context, Boolean> {
 
+		private boolean visitSubsumer(IndexedClassExpression expression,
+				Context input) {
+			if (input.subsumers_ == null)
+				return false;
+			if (input.subsumers_.remove(expression)) {
+				if (input.subsumers_.isEmpty())
+					input.subsumers_ = null;
+				return true;
+			}
+			// else
+			return false;
+		}
+
 		@Override
 		public Boolean visit(DecomposedSubsumer conclusion, Context input) {
+			IndexedClassExpression expression = conclusion.getExpression();
+			if (input.isDeterministic())
+				return visitSubsumer(expression, input);
+			// else it was derived non-deterministically
 			if (input.decomposedSubsumers_ == null)
 				return false;
-			IndexedClassExpression expression = conclusion.getExpression();
 			if (input.decomposedSubsumers_.remove(expression)) {
 				if (input.decomposedSubsumers_.isEmpty())
 					input.decomposedSubsumers_ = null;
@@ -610,16 +689,10 @@ public class Context {
 
 		@Override
 		public Boolean visit(ComposedSubsumer conclusion, Context input) {
-			if (input.subsumers_ == null)
-				return false;
 			IndexedClassExpression expression = conclusion.getExpression();
-			if (input.subsumers_.remove(expression)) {
-				if (input.subsumers_.isEmpty())
-					input.subsumers_ = null;
-				return true;
-			}
-			// else
-			return false;
+			if (input.composedSubsumers_ != null)
+				input.composedSubsumers_.remove(expression);
+			return visitSubsumer(expression, input);
 		}
 
 		@Override
@@ -669,12 +742,17 @@ public class Context {
 
 		@Override
 		public Boolean visit(Disjunction conclusion, Context input) {
-			if (input.disjunctions_ == null)
+			if (input.disjunctionsPropagatedByWatched_ == null)
 				return false;
-			if (input.disjunctions_.remove(conclusion.getWatchedDisjunct(),
-					conclusion.getPropagatedDisjunct())) {
-				if (input.disjunctions_.isEmpty())
-					input.disjunctions_ = null;
+			IndexedClassExpression watchedDisjunct = conclusion
+					.getWatchedDisjunct();
+			IndexedClassExpression propagatedDisjunct = conclusion
+					.getPropagatedDisjunct();
+			if (input.disjunctionsPropagatedByWatched_.remove(watchedDisjunct,
+					propagatedDisjunct)) {
+				if (input.disjunctionsPropagatedByWatched_.isEmpty()) {
+					input.disjunctionsPropagatedByWatched_ = null;
+				}
 				return true;
 			}
 			// else

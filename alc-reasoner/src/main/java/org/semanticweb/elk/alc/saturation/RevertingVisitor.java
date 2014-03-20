@@ -80,7 +80,7 @@ public class RevertingVisitor extends
 	public Boolean visit(NegatedSubsumer conclusion, Context input) {
 		IndexedClassExpression negatedExpression = conclusion
 				.getNegatedExpression();
-		if (!input.getDisjunctions().get(negatedExpression).isEmpty())
+		if (!input.getPropagatedDisjunctionsByWatched().get(negatedExpression).isEmpty())
 			producer_.produce(new PossibleDecomposedSubsumerImpl(
 					negatedExpression));
 		else if (input.getPossibleExistentials().contains(negatedExpression))

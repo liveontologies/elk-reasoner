@@ -219,6 +219,10 @@ public class Saturation {
 					possibleSubsumer);
 			return true;
 		}
+//		LOGGER_.info(
+//				"{}: local queue size: {}, todo queue size: {}, to guess queue size: {}",
+//				context, localDeterministicConclusions_.size(),
+//				context.getToDoSize(), context.getToGuessSize());
 		/*
 		 * else we will add negation of the possible subsumer as the first
 		 * "nondeterministic" conclusion; if the possible subsumer will still be
@@ -234,9 +238,9 @@ public class Saturation {
 			process();
 		}
 		if (context.getSubsumers().contains(possibleSubsumer)) {
-//			if (context.getPossibleSubsumers().contains(possibleSubsumer))
-//				LOGGER_.error("{}: subsumer {} is still not definite!",
-//						context, possibleSubsumer);
+			// if (context.getPossibleSubsumers().contains(possibleSubsumer))
+			// LOGGER_.error("{}: subsumer {} is still not definite!",
+			// context, possibleSubsumer);
 			return true;
 		}
 		return false;

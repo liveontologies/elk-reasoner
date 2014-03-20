@@ -91,7 +91,12 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(DecomposedSubsumer conclusion, Context input) {
 		IndexedClassExpression expression = conclusion.getExpression();
 		expression.accept(subsumerDecompositionVisitor_);
-		producer_.produce(new ComposedSubsumerImpl(expression));
+		if (input.isDeterministic()) {
+			IndexedClassExpression.applyCompositionRules(expression, input,
+					producer_);
+		} else {
+			producer_.produce(new ComposedSubsumerImpl(expression));
+		}
 		return null;
 	}
 
@@ -121,7 +126,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		if (input.getSubsumers().contains(negatedExpression))
 			producer_.produce(ClashImpl.getInstance());
 		for (IndexedClassExpression propagatedDisjunct : input
-				.getDisjunctions().get(negatedExpression)) {
+				.getPropagatedDisjunctionsByWatched().get(negatedExpression)) {
 			producer_.produce(new DecomposedSubsumerImpl(propagatedDisjunct));
 		}
 		if (input.getPossibleExistentials().contains(negatedExpression)) {
