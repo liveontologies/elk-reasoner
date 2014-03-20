@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  * #L%
  */
 
+import org.semanticweb.elk.alc.saturation.Root;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 
 /**
@@ -34,6 +35,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
  */
 abstract class AbstractConclusion implements Conclusion {
 
-	// nothing common so far
+	@Override
+	public Root getSourceRoot(Root forWhicProduced) {
+		return forWhicProduced;
+	}
 
 }

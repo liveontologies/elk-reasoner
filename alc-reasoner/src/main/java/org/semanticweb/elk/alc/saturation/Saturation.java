@@ -203,6 +203,8 @@ public class Saturation {
 		// set the active context to be used for newly produced local
 		// conclusions
 		activeContext_ = context;
+		// we are going to re-saturate this context
+		saturationState_.setNotSaturated(context);
 		// backtrack everything
 		for (;;) {
 			LocalConclusion toBacktrack = context.popHistory();
@@ -257,6 +259,12 @@ public class Saturation {
 				continue;
 			}
 			processDeterministic(activeContext_);
+		}
+		// setting all contexts as saturated
+		for (;;) {
+			Context context = saturationState_.takeAndSetSaturated();
+			if (context == null)
+				break;
 		}
 		if (CHECK_SATURATION_)
 			saturationState_.checkSaturation();

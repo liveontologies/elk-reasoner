@@ -1,5 +1,6 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 
+import org.semanticweb.elk.alc.saturation.Root;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 
 /*
@@ -34,5 +35,16 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVi
 public interface Conclusion {
 
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input);
+
+	/**
+	 * Returns the source {@link Root} as a consequence of which this
+	 * {@link Conclusion} given the {@link Root} for which this
+	 * {@link Conclusion} was produced (except for a few cases, it will be
+	 * always the same {@link Root}).
+	 * 
+	 * @param forWhicProduced
+	 * @return
+	 */
+	public Root getSourceRoot(Root forWhicProduced);
 
 }

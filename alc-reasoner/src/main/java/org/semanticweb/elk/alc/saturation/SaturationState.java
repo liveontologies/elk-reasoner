@@ -58,6 +58,12 @@ public class SaturationState implements ExternalConclusionProducer {
 	 */
 	private final Map<Root, Root> existingRoots_;
 
+	/**
+	 * Contains all {@link Context}s that are not saturated, i.e., for which
+	 * {@link Context#isSaturated()} returns {@code false}
+	 */
+	private final Queue<Context> nonSaturatedContexts_;
+
 	// statistics counters
 	private int contextCount = 0;
 
@@ -82,19 +88,26 @@ public class SaturationState implements ExternalConclusionProducer {
 		this.existingRoots_ = new HashMap<Root, Root>(1024);
 		this.activeContexts_ = new ArrayDeque<Context>(1024);
 		this.possibleContexts_ = new ArrayDeque<Context>(1024);
+		this.nonSaturatedContexts_ = new ArrayDeque<Context>(1024);
 	}
 
 	@Override
 	public void produce(Root root, ExternalDeterministicConclusion conclusion) {
+		if (isBlocked(root, conclusion))
+			return;
 		produce(getCreateContext(root), conclusion);
 	}
 
 	@Override
 	public void produce(Root root, ExternalPossibleConclusion conclusion) {
+		if (isBlocked(root, conclusion))
+			return;
 		produce(getCreateContext(root), conclusion);
 	}
 
 	public void produce(Root root, LocalPossibleConclusion conclusion) {
+		if (isBlocked(root, conclusion))
+			return;
 		produce(getCreateContext(root), conclusion);
 	}
 
@@ -115,6 +128,26 @@ public class SaturationState implements ExternalConclusionProducer {
 		}
 	}
 
+	/**
+	 * @param root
+	 * @param conclusion
+	 * @return {@code true} if the given {@link Conclusion} should not be
+	 *         produced for the given {@link Root}, i.e., when the
+	 *         {@link Context} for the {@link Root} exists and is already
+	 *         saturated.
+	 */
+	private boolean isBlocked(Root root, Conclusion conclusion) {
+		Root sourceRoot = conclusion.getSourceRoot(root);
+		Context context = getContext(sourceRoot);
+		if (context != null && context.isSaturated()) {
+			LOGGER_.trace("{}: not produced {}: context {} is saturated", root,
+					conclusion, context);
+			return true;
+		}
+		// else
+		return false;
+	}
+
 	public Context pollActiveContext() {
 		return activeContexts_.poll();
 	}
@@ -126,6 +159,35 @@ public class SaturationState implements ExternalConclusionProducer {
 	public Context getContext(IndexedClassExpression positiveMember,
 			IndexedClassExpression... negativeMembers) {
 		return getContext(new Root(positiveMember, negativeMembers));
+	}
+
+	/**
+	 * Sets the given {@link Context} as non-saturated. After calling this
+	 * method, {@link Context#isSaturated()} should return {@code false};
+	 * 
+	 * @param context
+	 * @return {@code true} if the given {@link Context} was saturated before.
+	 */
+	public boolean setNotSaturated(Context context) {
+		if (!context.isSaturated())
+			return false;
+		// else
+		context.setNotSaturated();
+		nonSaturatedContexts_.add(context);
+		return true;
+	}
+
+	/**
+	 * @return some {@link Context} that was non saturated and which becomes
+	 *         saturated after calling of this method, or {@code null} if all
+	 *         {@link Contexts} were marked as saturated.
+	 */
+	public Context takeAndSetSaturated() {
+		Context context = nonSaturatedContexts_.poll();
+		if (context == null)
+			return null;
+		context.setSaturated();
+		return context;
 	}
 
 	Context getContext(Root root) {
@@ -141,13 +203,14 @@ public class SaturationState implements ExternalConclusionProducer {
 	}
 
 	Context getCreateContext(Root root) {
-		Context result = getContext(root);
-		if (result != null)
-			return result;
+		Context context = getContext(root);
+		if (context != null)
+			return context;
 		// else create new
-		result = new Context(root);
-		root.setContext(result);
+		context = new Context(root);
+		root.setContext(context);
 		existingRoots_.put(root, root);
+		nonSaturatedContexts_.add(context);
 		produce(root, init_);
 		if (PRINT_STATS_) {
 			contextCount++;
@@ -160,7 +223,7 @@ public class SaturationState implements ExternalConclusionProducer {
 						"{} contexts created (evarage root size: {}, max root size: {})",
 						contextCount, rootSizesSum / contextCount, maxRootSize);
 		}
-		return result;
+		return context;
 	}
 
 	void checkSaturation() {

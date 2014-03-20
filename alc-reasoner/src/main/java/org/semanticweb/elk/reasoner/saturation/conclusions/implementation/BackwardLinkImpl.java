@@ -70,6 +70,11 @@ public class BackwardLinkImpl extends AbstractExternalDeterministicConclusion
 	}
 
 	@Override
+	public Root getSourceRoot(Root forWhicProduced) {
+		return source_;
+	}
+
+	@Override
 	public String toString() {
 		return BackwardLink.NAME + "(" + relation_ + " " + source_ + ")";
 	}

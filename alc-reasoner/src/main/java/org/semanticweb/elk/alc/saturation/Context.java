@@ -83,6 +83,13 @@ public class Context {
 	private final Root root_;
 
 	/**
+	 * {@code true} if all rules for this {@link Context} are applied, i.e., all
+	 * {@link Conclusion}s witnessing a model for this {@link Context} have been
+	 * computed
+	 */
+	private boolean isSaturated_ = false;
+
+	/**
 	 * {@code true} if this {@link Context} is initialized
 	 */
 	private boolean isInitialized_ = false;
@@ -192,6 +199,10 @@ public class Context {
 
 	public Root getRoot() {
 		return root_;
+	}
+
+	public boolean isSaturated() {
+		return isSaturated_;
 	}
 
 	/**
@@ -420,6 +431,24 @@ public class Context {
 			toGuess_ = null;
 		}
 		return result;
+	}
+
+	boolean setSaturated() {
+		if (isSaturated_)
+			return false;
+		// else
+		isSaturated_ = true;
+		LOGGER_.trace("{}: set saturated", this);
+		return true;
+	}
+
+	boolean setNotSaturated() {
+		if (!isSaturated_)
+			return false;
+		// else
+		isSaturated_ = false;
+		LOGGER_.trace("{}: set not saturated", this);
+		return true;
 	}
 
 	public void removePropagatedConclusions(Root root) {
