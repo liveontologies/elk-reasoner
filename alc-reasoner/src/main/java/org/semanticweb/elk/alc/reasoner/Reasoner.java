@@ -22,6 +22,8 @@ package org.semanticweb.elk.alc.reasoner;
  * #L%
  */
 
+import java.util.Set;
+
 import org.semanticweb.elk.alc.indexing.hierarchy.ChangeIndexingProcessor;
 import org.semanticweb.elk.alc.indexing.hierarchy.ElkAxiomIndexingVisitor;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClass;
@@ -195,8 +197,9 @@ public class Reasoner {
 					if (subsumer instanceof IndexedClass)
 						countSubsumers++;
 				}
-				for (IndexedClassExpression possibleSubsumer : context
-						.getPossibleSubsumers()) {
+				Set<IndexedClassExpression> possibleSubsumers = context
+						.getPossibleSubsumers();
+				for (IndexedClassExpression possibleSubsumer : possibleSubsumers) {
 					if (possibleSubsumer instanceof IndexedClass) {
 						if (!saturation
 								.checkSubsumer(context, possibleSubsumer)) {

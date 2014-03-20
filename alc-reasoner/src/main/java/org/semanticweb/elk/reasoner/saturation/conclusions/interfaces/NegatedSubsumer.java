@@ -39,7 +39,7 @@ public interface NegatedSubsumer extends LocalDeterministicConclusion {
 
 	/**
 	 * @return the {@code IndexedClassExpression} negation of which is
-	 *         represented by this {@link Subsumer}
+	 *         represented by this {@link NegatedSubsumer}
 	 */
 	public IndexedClassExpression getNegatedExpression();
 

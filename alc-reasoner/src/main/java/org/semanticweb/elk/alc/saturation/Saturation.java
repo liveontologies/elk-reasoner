@@ -61,7 +61,7 @@ public class Saturation {
 	/**
 	 * if {@code true} will use an optimized subsumption test
 	 */
-	private final static boolean OPTIMIZED_SUBSUMPTION_TEST_ = false;
+	private final static boolean OPTIMIZED_SUBSUMPTION_TEST_ = true;
 
 	/**
 	 * if {@code true}, the integrity of saturation will be periodically tested
@@ -172,8 +172,9 @@ public class Saturation {
 				&& !(possibleSubsumer instanceof IndexedClass))
 			LOGGER_.error("{}: checking subsumption with {} not supported",
 					context, possibleSubsumer);
-//		if (!context.getSubsumers().contains(possibleSubsumer))
-//			return false;
+		process();
+		if (!context.getSubsumers().contains(possibleSubsumer))
+			return false;
 		/*
 		 * use one of the two methods: simple tests just creates a context with
 		 * the root obtained by the root of the original context and adding the
@@ -212,17 +213,19 @@ public class Saturation {
 			toBacktrack.accept(revertingVisitor_, context);
 			context.removeConclusion(toBacktrack);
 		}
-		if (context.getSubsumers().contains(possibleSubsumer))
+		if (context.getSubsumers().contains(possibleSubsumer)) {
 			// it was derived deterministically
+			LOGGER_.trace("{}: subsumeer {} test skpped", context,
+					possibleSubsumer);
 			return true;
+		}
 		/*
 		 * else we will add negation of the possible subsumer as the first
 		 * "nondeterministic" conclusion; if the possible subsumer will still be
 		 * derived, this conclusion must be backtracked, and so, the possible
 		 * subsumer will be derived deterministically
 		 */
-		LocalDeterministicConclusion conjecture = new NegatedSubsumerImpl(
-				possibleSubsumer);
+		LocalConclusion conjecture = new NegatedSubsumerImpl(possibleSubsumer);
 		if (context.addConclusion(conjecture)) {
 			context.pushToHistory(conjecture);
 			// start applying the rules
@@ -230,7 +233,13 @@ public class Saturation {
 			process(context);
 			process();
 		}
-		return (context.getSubsumers().contains(possibleSubsumer));
+		if (context.getSubsumers().contains(possibleSubsumer)) {
+//			if (context.getPossibleSubsumers().contains(possibleSubsumer))
+//				LOGGER_.error("{}: subsumer {} is still not definite!",
+//						context, possibleSubsumer);
+			return true;
+		}
+		return false;
 	}
 
 	/**
