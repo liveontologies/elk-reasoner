@@ -341,6 +341,22 @@ public class SaturationTest {
 	}
 
 	@Test
+	public void testDisjunctionAssociativity() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "EquivalentClasses(:X ObjectUnionOf(:A ObjectUnionOf(:B :C)))"//
+						+ "EquivalentClasses(:Y ObjectUnionOf(ObjectUnionOf(:A :B) :C))"//
+						+ ")",
+				// Expected saturation:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:X :Y)"//
+						+ "SubClassOf(:Y :X)"//
+						+ ")");
+	}
+
+	@Test
 	public void testDisjunctionBacktracking() throws ElkLoadingException {
 		testSaturation(// Ontology:
 				"Prefix(:=<>)"//
