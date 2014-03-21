@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.semanticweb.elk.alc.indexing.hierarchy.ChangeIndexingProcessor;
 import org.semanticweb.elk.alc.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.alc.indexing.hierarchy.TestAxiomIndexerVisitor;
+import org.semanticweb.elk.alc.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.alc.loading.AxiomLoader;
 import org.semanticweb.elk.alc.loading.ElkLoadingException;
 import org.semanticweb.elk.alc.loading.Owl2StreamLoader;
@@ -41,20 +42,28 @@ public class SaturationTest {
 
 	private final Owl2ParserFactory parserFactory_ = new Owl2FunctionalStyleParserFactory();
 
-	void testSaturation(String ontology, String expectedSaturation)
-			throws ElkLoadingException {
+	void testSaturation(String ontology, String expectedSubsumptions,
+			String expectedNonSubsumptions) throws ElkLoadingException {
 		Reasoner reasoner = new Reasoner(new Owl2StreamLoader(parserFactory_,
 				ontology));
-		SaturationCheckingAxiomVisitor checker = new SaturationCheckingAxiomVisitor(
+		IndexedAxiomVisitor<Void> subsumptionChecker = new SubsumptionCheckingAxiomVisitor(
+				reasoner);
+		IndexedAxiomVisitor<Void> nonSubsumptionChecker = new NonSubsumptionCheckingAxiomVisitor(
 				reasoner);
 		reasoner.forceLoading();
 		OntologyIndex index = reasoner.getOntologyIndex();
-		TestAxiomIndexerVisitor testIndexer = new TestAxiomIndexerVisitor(
-				index, checker);
-		AxiomLoader expectedAxiomLoader = new Owl2StreamLoader(parserFactory_,
-				expectedSaturation);
-		ElkAxiomProcessor expectedAxiomInserter = new ChangeIndexingProcessor(
-				testIndexer);
+		TestAxiomIndexerVisitor subsumptionIndexer = new TestAxiomIndexerVisitor(
+				index, subsumptionChecker);
+		TestAxiomIndexerVisitor nonSubsumptionIndexer = new TestAxiomIndexerVisitor(
+				index, nonSubsumptionChecker);
+		AxiomLoader expectedSubsumptionsLoader = new Owl2StreamLoader(
+				parserFactory_, expectedSubsumptions);
+		AxiomLoader expectedNonSubsumptionsLoader = new Owl2StreamLoader(
+				parserFactory_, expectedNonSubsumptions);
+		ElkAxiomProcessor expectedSubsumptionsInserter = new ChangeIndexingProcessor(
+				subsumptionIndexer);
+		ElkAxiomProcessor expectedNonSubsumptionsInserter = new ChangeIndexingProcessor(
+				nonSubsumptionIndexer);
 		ElkAxiomProcessor dummyAxiomDeletor = new ElkAxiomProcessor() {
 			@Override
 			public void visit(ElkAxiom elkAxiom) {
@@ -62,9 +71,18 @@ public class SaturationTest {
 			}
 		};
 		try {
-			expectedAxiomLoader.load(expectedAxiomInserter, dummyAxiomDeletor);
+			expectedNonSubsumptionsLoader.load(expectedNonSubsumptionsInserter,
+					dummyAxiomDeletor);
 		} finally {
-			expectedAxiomLoader.dispose();
+			expectedNonSubsumptionsLoader.dispose();
+			// clear interrupt status
+			Thread.interrupted();
+		}
+		try {
+			expectedSubsumptionsLoader.load(expectedSubsumptionsInserter,
+					dummyAxiomDeletor);
+		} finally {
+			expectedSubsumptionsLoader.dispose();
 			// clear interrupt status
 			Thread.interrupted();
 		}
@@ -80,7 +98,7 @@ public class SaturationTest {
 						+ "SubClassOf(:B :D)"//
 						+ "SubClassOf(:C :D)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						// Told
@@ -94,6 +112,17 @@ public class SaturationTest {
 						+ "SubClassOf(:C :C)"//
 						+ "SubClassOf(:D :D)"//
 						+ "SubClassOf(:A :D)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:B :A)"//
+						+ "SubClassOf(:B :C)"//
+						+ "SubClassOf(:C :A)"//
+						+ "SubClassOf(:C :B)"//
+						+ "SubClassOf(:D :A)"//
+						+ "SubClassOf(:D :B)"//
+						+ "SubClassOf(:D :C)"//
 						+ ")"//
 		);
 	}
@@ -108,14 +137,31 @@ public class SaturationTest {
 						+ "SubClassOf(:A :D)"//
 						+ "SubClassOf(ObjectIntersectionOf(:B :C :D) :BCD)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :B)"//
 						+ "SubClassOf(:A :C)"//
 						+ "SubClassOf(:A :D)"//
 						+ "SubClassOf(:A :BCD)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:B :A)"//
+						+ "SubClassOf(:B :C)"//
+						+ "SubClassOf(:B :D)"//
+						+ "SubClassOf(:B :BCD)"//
+						+ "SubClassOf(:C :A)"//
+						+ "SubClassOf(:C :B)"//
+						+ "SubClassOf(:C :D)"//
+						+ "SubClassOf(:C :BCD)"//
+						+ "SubClassOf(:D :A)"//
+						+ "SubClassOf(:D :B)"//
+						+ "SubClassOf(:D :C)"//
+						+ "SubClassOf(:D :BCD)"//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -142,7 +188,7 @@ public class SaturationTest {
 						+ "SubClassOf(ObjectIntersectionOf(:D :B :C) :DBC)"//
 						+ "SubClassOf(ObjectIntersectionOf(:D :C :B) :DCB)"//
 						+ ")",//
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(<A> <B>)"//
@@ -163,7 +209,12 @@ public class SaturationTest {
 						+ "SubClassOf(<A> <CDB>)"//
 						+ "SubClassOf(<A> <DBC>)"//
 						+ "SubClassOf(<A> <DCB>)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -179,7 +230,7 @@ public class SaturationTest {
 						+ "EquivalentClasses(:B :A)"//
 						+ "EquivalentClasses(:C :D)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :A)"//
@@ -191,7 +242,12 @@ public class SaturationTest {
 						+ "SubClassOf(:D :D)"//
 						+ "SubClassOf(:D :C)"//
 						+ "SubClassOf(:E :E)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -203,7 +259,7 @@ public class SaturationTest {
 						+ "EquivalentClasses(:B :C)"//
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :C) :D)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :A)"//
@@ -213,7 +269,12 @@ public class SaturationTest {
 						+ "SubClassOf(:C :C)"//
 						+ "SubClassOf(:C :B)"//
 						+ "SubClassOf(:D :D)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -225,12 +286,17 @@ public class SaturationTest {
 						+ "SubClassOf(:A :B)"//
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :B) :C)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :B)"//
 						+ "SubClassOf(:A :C)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -245,7 +311,7 @@ public class SaturationTest {
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :C) :D)"//
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :D) :E)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :A)"//
@@ -260,7 +326,12 @@ public class SaturationTest {
 						+ "SubClassOf(:C :E)"//
 						+ "SubClassOf(:D :D)"//
 						+ "SubClassOf(:E :E)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -272,7 +343,7 @@ public class SaturationTest {
 						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :A))"//
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :A) :C)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :A)"//
@@ -280,7 +351,12 @@ public class SaturationTest {
 						+ "SubClassOf(:B :B)"//
 						+ "SubClassOf(:B :C)"//
 						+ "SubClassOf(:C :C)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -293,14 +369,19 @@ public class SaturationTest {
 						+ "SubClassOf(:A :C)"//
 						+ "SubClassOf(ObjectIntersectionOf(:B :C) owl:Nothing)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A owl:Nothing)"//
 						+ "SubClassOf(:B :B)"//
 						+ "SubClassOf(:C :C)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -312,7 +393,7 @@ public class SaturationTest {
 						+ "SubClassOf(:B :D)"//
 						+ "SubClassOf(:C :D)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :A)"//
@@ -322,7 +403,16 @@ public class SaturationTest {
 						+ "SubClassOf(:C :C)"//
 						+ "SubClassOf(:C :D)"//
 						+ "SubClassOf(:D :D)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :B)"//
+						+ "SubClassOf(:A :C)"//
+						+ "SubClassOf(:B :C)"//
+						+ "SubClassOf(:C :B)"//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -332,12 +422,20 @@ public class SaturationTest {
 						+ "Ontology("//
 						+ "SubClassOf(ObjectUnionOf(:B :C) :A)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:B :A)"//
 						+ "SubClassOf(:C :A)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :B)"//
+						+ "SubClassOf(:A :C)"//
+						+ "SubClassOf(:B :C)"//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -348,12 +446,23 @@ public class SaturationTest {
 						+ "EquivalentClasses(:X ObjectUnionOf(:A ObjectUnionOf(:B :C)))"//
 						+ "EquivalentClasses(:Y ObjectUnionOf(ObjectUnionOf(:A :B) :C))"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:X :Y)"//
 						+ "SubClassOf(:Y :X)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:X :A)"//
+						+ "SubClassOf(:X :B)"//
+						+ "SubClassOf(:X :C)"//
+						+ "SubClassOf(:Y :A)"//
+						+ "SubClassOf(:Y :B)"//
+						+ "SubClassOf(:Y :C)"//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -367,7 +476,7 @@ public class SaturationTest {
 						+ "SubClassOf(:C ObjectUnionOf(:D :E))"//
 						+ "SubClassOf(:E owl:Nothing)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
@@ -378,7 +487,13 @@ public class SaturationTest {
 						+ "SubClassOf(:C :C)"//
 						+ "SubClassOf(:C :D)"//
 						+ "SubClassOf(:E owl:Nothing)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:C :A)"//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -390,13 +505,18 @@ public class SaturationTest {
 						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
 						+ "SubClassOf(:B owl:Nothing)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:B owl:Nothing)"//
 						+ "SubClassOf(:A owl:Nothing)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -411,14 +531,19 @@ public class SaturationTest {
 						+ "SubClassOf(:C ObjectSomeValuesFrom(:S ObjectIntersectionOf(:D :D)))"//
 						+ "SubClassOf(:D owl:Nothing)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:B owl:Nothing)"//
 						+ "SubClassOf(:C owl:Nothing)"//
 						+ "SubClassOf(:A owl:Nothing)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -434,7 +559,7 @@ public class SaturationTest {
 						+ "SubClassOf(:D ObjectSomeValuesFrom(:S ObjectIntersectionOf(:E :E)))"//
 						+ "SubClassOf(:E owl:Nothing)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
@@ -443,7 +568,12 @@ public class SaturationTest {
 						+ "SubClassOf(:D owl:Nothing)"//
 						+ "SubClassOf(:B owl:Nothing)"//
 						+ "SubClassOf(:A owl:Nothing)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -457,14 +587,19 @@ public class SaturationTest {
 						+ "SubClassOf(:B ObjectUnionOf(:C :D))"//
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :D) :E)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:C owl:Nothing)"//
 						+ "SubClassOf(:B :D)"//
 						+ "SubClassOf(:A :E)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -482,11 +617,16 @@ public class SaturationTest {
 						+ "SubClassOf(ObjectIntersectionOf(:A :AD) owl:Nothing)"//
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :E) :F)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :F)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -500,12 +640,17 @@ public class SaturationTest {
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :D) :AD)"//
 						+ "SubClassOf(ObjectIntersectionOf(:C :AD) owl:Nothing)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :B)"//
 						+ "SubClassOf(:A :AD)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -521,13 +666,18 @@ public class SaturationTest {
 						+ "SubClassOf(:AA ObjectUnionOf(:D :D))"//
 						+ "SubClassOf(ObjectIntersectionOf(:B :D) owl:Nothing)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :C)"//
 						+ "SubClassOf(:A :D)"//
 						+ "SubClassOf(:A :BB)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -543,12 +693,17 @@ public class SaturationTest {
 						+ "SubClassOf(:AC :ACD)"//
 						+ "SubClassOf(:AD :ACD)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :ACD)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -567,13 +722,18 @@ public class SaturationTest {
 						+ "SubClassOf(ObjectIntersectionOf(:C :AEF) owl:Nothing)"//
 						+ "SubClassOf(:C ObjectUnionOf(:CA :CB))"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:C owl:Nothing)"//
 						+ "SubClassOf(:A :B)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -588,7 +748,7 @@ public class SaturationTest {
 						+ "SubClassOf(:C ObjectSomeValuesFrom(:R ObjectIntersectionOf(:D :D)))"//
 						+ "SubClassOf(:D owl:Nothing)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
@@ -596,7 +756,12 @@ public class SaturationTest {
 						+ "SubClassOf(:B owl:Nothing)"//
 						+ "SubClassOf(:C owl:Nothing)"//
 						+ "SubClassOf(:A owl:Nothing)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -612,7 +777,7 @@ public class SaturationTest {
 						+ "SubClassOf(:D owl:Nothing)"//
 						+ "SubClassOf(:E owl:Nothing)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
@@ -621,7 +786,12 @@ public class SaturationTest {
 						+ "SubClassOf(:C owl:Nothing)"//
 						+ "SubClassOf(:C owl:Nothing)"//
 						+ "SubClassOf(:A owl:Nothing)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -635,14 +805,19 @@ public class SaturationTest {
 						+ "SubClassOf(:C ObjectSomeValuesFrom(:R :A))"//
 						+ "SubClassOf(:B owl:Nothing)"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:B owl:Nothing)"//
 						+ "SubClassOf(:A owl:Nothing)"//
 						+ "SubClassOf(:C owl:Nothing)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 	@Test
@@ -663,12 +838,17 @@ public class SaturationTest {
 						+ "SubClassOf(:B ObjectUnionOf(:BB :BB))"
 						+ "EquivalentClasses(:BB ObjectSomeValuesFrom(:R :D))"//
 						+ ")",
-				// Expected saturation:
+				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :C)"//
-						+ ")");
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
 	}
 
 }

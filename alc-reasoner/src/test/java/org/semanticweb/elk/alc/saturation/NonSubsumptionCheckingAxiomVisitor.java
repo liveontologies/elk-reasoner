@@ -30,24 +30,24 @@ import org.semanticweb.elk.alc.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.alc.loading.ElkLoadingException;
 import org.semanticweb.elk.alc.reasoner.Reasoner;
 
-public class SaturationCheckingAxiomVisitor implements
+public class NonSubsumptionCheckingAxiomVisitor implements
 		IndexedAxiomVisitor<Void> {
 
 	private final Reasoner reasoner_;
 
-	public SaturationCheckingAxiomVisitor(Reasoner reasoner) {
+	public NonSubsumptionCheckingAxiomVisitor(Reasoner reasoner) {
 		this.reasoner_ = reasoner;
 	}
 
 	static Void failVisit(IndexedAxiom axiom) {
-		fail("Saturation should contain " + axiom);
+		fail("Subsamption should not hold: " + axiom);
 		return null;
 	}
 
 	@Override
 	public Void visit(IndexedSubClassOfAxiom axiom) {
 		try {
-			if (reasoner_.subsumes(axiom.getSubClass(), axiom.getSuperClass()))
+			if (!reasoner_.subsumes(axiom.getSubClass(), axiom.getSuperClass()))
 				return null;
 		} catch (ElkLoadingException e) {
 			return failVisit(axiom);
