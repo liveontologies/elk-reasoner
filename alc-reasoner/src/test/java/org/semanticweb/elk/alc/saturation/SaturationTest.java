@@ -511,6 +511,7 @@ public class SaturationTest {
 						+ "Ontology("//
 						+ "SubClassOf(:B owl:Nothing)"//
 						+ "SubClassOf(:A owl:Nothing)"//
+						+ "SubClassOf(:A :B)"//
 						+ ")",//
 				// Expected non-subsumptions:
 				"Prefix(:=<>)"//
@@ -598,6 +599,7 @@ public class SaturationTest {
 				// Expected non-subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
+						+ "SubClassOf(:A :B)"//
 						+ ")"//
 		);
 	}
@@ -625,6 +627,18 @@ public class SaturationTest {
 				// Expected non-subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
+						+ "SubClassOf(:B :C)"//
+						+ "SubClassOf(:B :D)"//
+						+ "SubClassOf(:B :E)"//
+						+ "SubClassOf(:C :B)"//
+						+ "SubClassOf(:C :D)"//
+						+ "SubClassOf(:C :E)"//
+						+ "SubClassOf(:D :B)"//
+						+ "SubClassOf(:D :C)"//
+						+ "SubClassOf(:D :E)"//
+						+ "SubClassOf(:E :B)"//
+						+ "SubClassOf(:E :C)"//
+						+ "SubClassOf(:E :d)"//
 						+ ")"//
 		);
 	}
@@ -643,12 +657,13 @@ public class SaturationTest {
 				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
-						+ "SubClassOf(:A :B)"//
 						+ "SubClassOf(:A :AD)"//
+						+ "SubClassOf(:A :B)"//
 						+ ")",//
 				// Expected non-subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
+						+ "SubClassOf(:A :C)"//
 						+ ")"//
 		);
 	}
@@ -676,6 +691,8 @@ public class SaturationTest {
 				// Expected non-subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
+						+ "SubClassOf(:A :B)"//
+						+ "SubClassOf(:B :D)"//
 						+ ")"//
 		);
 	}
@@ -702,6 +719,8 @@ public class SaturationTest {
 				// Expected non-subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
+						+ "SubClassOf(:A :AC)"//
+						+ "SubClassOf(:A :AD)"//
 						+ ")"//
 		);
 	}
@@ -732,6 +751,10 @@ public class SaturationTest {
 				// Expected non-subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
+						+ "SubClassOf(:A :AE)"//
+						+ "SubClassOf(:A :AF)"//
+						+ "SubClassOf(:A :CA)"//
+						+ "SubClassOf(:A :CB)"//
 						+ ")"//
 		);
 	}
@@ -784,12 +807,13 @@ public class SaturationTest {
 						+ "SubClassOf(:D owl:Nothing)"//
 						+ "SubClassOf(:E owl:Nothing)"//
 						+ "SubClassOf(:C owl:Nothing)"//
-						+ "SubClassOf(:C owl:Nothing)"//
 						+ "SubClassOf(:A owl:Nothing)"//
 						+ ")",//
 				// Expected non-subsumptions:
 				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
+						+ "SubClassOf(:B owl:Nothing)"//
 						+ ")"//
 		);
 	}
@@ -843,10 +867,13 @@ public class SaturationTest {
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :C)"//
+						+ "SubClassOf(:B :C)"//
+						+ "SubClassOf(:B owl:Nothing)"//
 						+ ")",//
 				// Expected non-subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
+						+ "SubClassOf(:A :B)"//
 						+ ")"//
 		);
 	}
