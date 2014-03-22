@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConjectureNonSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
@@ -108,6 +109,11 @@ class DummyLocalConclusionVisitor<I, O> implements LocalConclusionVisitor<I, O> 
 
 	@Override
 	public O visit(Clash conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(ConjectureNonSubsumer conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 

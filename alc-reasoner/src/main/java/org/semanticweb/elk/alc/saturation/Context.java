@@ -35,6 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLi
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConjectureNonSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
@@ -51,7 +52,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossiblePr
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
@@ -319,19 +319,6 @@ public class Context {
 			return Operations.emptyMultimap();
 		// else
 		return propagatedComposedSubsumers_;
-	}
-
-	public Set<IndexedClassExpression> getPossibleSubsumers() {
-		if (localHistory_ == null)
-			return Collections.emptySet();
-		Set<IndexedClassExpression> result = new ArrayHashSet<IndexedClassExpression>(
-				32);
-		for (Conclusion nonDeterministic : localHistory_) {
-			if (nonDeterministic instanceof Subsumer) {
-				result.add(((Subsumer) nonDeterministic).getExpression());
-			}
-		}
-		return result;
 	}
 
 	public int getToDoSize() {
@@ -681,6 +668,14 @@ public class Context {
 					conclusion.getSourceRoot(), conclusion.getExpression());
 		}
 
+		@Override
+		public Boolean visit(ConjectureNonSubsumer conclusion, Context input) {
+			if (input.negativeSubsumers_ == null)
+				input.negativeSubsumers_ = new ArrayHashSet<IndexedClassExpression>(
+						16);
+			return input.negativeSubsumers_.add(conclusion.getExpression());
+		}
+
 	}
 
 	static class ConclusionDeleter implements
@@ -904,6 +899,19 @@ public class Context {
 					conclusion.getSourceRoot(), conclusion.getExpression())) {
 				if (input.propagatedComposedSubsumers_.isEmpty())
 					input.propagatedComposedSubsumers_ = null;
+				return true;
+			}
+			// else
+			return false;
+		}
+
+		@Override
+		public Boolean visit(ConjectureNonSubsumer conclusion, Context input) {
+			if (input.negativeSubsumers_ == null)
+				return false;
+			if (input.negativeSubsumers_.remove(conclusion.getExpression())) {
+				if (input.negativeSubsumers_.isEmpty())
+					input.negativeSubsumers_ = null;
 				return true;
 			}
 			// else

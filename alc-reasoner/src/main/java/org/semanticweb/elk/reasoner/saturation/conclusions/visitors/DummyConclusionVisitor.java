@@ -26,9 +26,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLi
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConjectureNonSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
@@ -37,6 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleCo
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossiblePropagatedExistential;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 
 /**
@@ -137,6 +138,11 @@ class DummyConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 
 	@Override
 	public O visit(PropagatedComposedSubsumer conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(ConjectureNonSubsumer conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 

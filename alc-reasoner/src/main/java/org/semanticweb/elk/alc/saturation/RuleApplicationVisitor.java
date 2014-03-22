@@ -43,6 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Propag
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConjectureNonSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
@@ -119,12 +120,11 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		return null;
 	}
 
-	@Override
-	public Void visit(NegatedSubsumer conclusion, Context input) {
-		IndexedClassExpression negatedExpression = conclusion
-				.getNegatedExpression();
-		if (input.getSubsumers().contains(negatedExpression))
+	void visitNegation(IndexedClassExpression negatedExpression, Context input) {
+		if (input.getSubsumers().contains(negatedExpression)) {
 			producer_.produce(ClashImpl.getInstance());
+			return;
+		}
 		for (IndexedClassExpression propagatedDisjunct : input
 				.getPropagatedDisjunctionsByWatched().get(negatedExpression)) {
 			producer_.produce(new DecomposedSubsumerImpl(propagatedDisjunct));
@@ -133,6 +133,12 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			IndexedObjectSomeValuesFrom negatedExistential = (IndexedObjectSomeValuesFrom) negatedExpression;
 			producer_.produce(new NegativePropagationImpl(negatedExistential));
 		}
+
+	}
+
+	@Override
+	public Void visit(NegatedSubsumer conclusion, Context input) {
+		visitNegation(conclusion.getNegatedExpression(), input);
 		return null;
 	}
 
@@ -268,6 +274,12 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(PossiblePropagatedExistential conclusion, Context input) {
 		producer_.produce(new PossibleComposedSubsumerImpl(conclusion
 				.getExpression()));
+		return null;
+	}
+
+	@Override
+	public Void visit(ConjectureNonSubsumer conclusion, Context input) {
+		visitNegation(conclusion.getExpression(), input);
 		return null;
 	}
 

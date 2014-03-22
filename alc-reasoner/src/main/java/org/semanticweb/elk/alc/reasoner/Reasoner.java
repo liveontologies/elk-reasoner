@@ -22,6 +22,9 @@ package org.semanticweb.elk.alc.reasoner;
  * #L%
  */
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.ChangeIndexingProcessor;
@@ -190,25 +193,58 @@ public class Reasoner {
 		int countSubsumerTests = 0;
 		int countNegativeSubsumerTests = 0;
 		try {
+
 			for (IndexedClass initialClass : ontologyIndex_.getIndexedClasses()) {
 				countClasses++;
 				Context context = saturationState_.getContext(initialClass);
-				for (IndexedClassExpression subsumer : context.getSubsumers()) {
+				Set<IndexedClassExpression> allSubsumers = context
+						.getSubsumers();
+				for (IndexedClassExpression subsumer : allSubsumers) {
 					if (subsumer instanceof IndexedClass)
 						countSubsumers++;
 				}
-				Set<IndexedClassExpression> possibleSubsumers = context
-						.getPossibleSubsumers();
-				for (IndexedClassExpression possibleSubsumer : possibleSubsumers) {
-					if (possibleSubsumer instanceof IndexedClass) {
-						if (!saturation
-								.checkSubsumer(context, possibleSubsumer)) {
-							countSubsumers--;
-							countNegativeSubsumerTests++;
+				// contains possible subsumers remained to be tested
+				Queue<IndexedClass> subsumersToTest = null;
+				for (;;) {
+					Set<IndexedClassExpression> possibleSubsumers = context
+							.getComposedSubsumers();
+					if (subsumersToTest == null) {
+						// initializing subsumers by possible subsumers
+						subsumersToTest = new LinkedList<IndexedClass>();
+						for (IndexedClassExpression possibleSubsumer : possibleSubsumers) {
+							if (possibleSubsumer instanceof IndexedClass) {
+								subsumersToTest
+										.add((IndexedClass) possibleSubsumer);
+							}
 						}
-						countSubsumerTests++;
+					} else {
+						// filtering out subsumers that are no longer derived
+						// non-deterministically
+						allSubsumers = context.getSubsumers();
+						Iterator<IndexedClass> iterator = subsumersToTest
+								.iterator();
+						while (iterator.hasNext()) {
+							IndexedClass next = iterator.next();
+							if (possibleSubsumers.contains(next))
+								continue;
+							// else not derived non-deterministically
+							iterator.remove();
+							if (!allSubsumers.contains(next)) {
+								// not derived deterministically either
+								countSubsumers--;
+							}
+						}
 					}
+					IndexedClass possibleSubsumer = subsumersToTest.poll();
+					if (possibleSubsumer == null)
+						break;
+					if (!saturation.checkSubsumer(context, possibleSubsumer)) {
+						countSubsumers--;
+						countNegativeSubsumerTests++;
+					}
+					countSubsumerTests++;
 				}
+
 				if (PRINT_STATS_) {
 					if ((countClasses / 1000) * 1000 == countClasses)
 						LOGGER_.info(
@@ -225,6 +261,9 @@ public class Reasoner {
 					"Total classes: {}, subsumers: {}, subsumer tests: {}, positive: {}",
 					countClasses, countSubsumers, countSubsumerTests,
 					countSubsumerTests - countNegativeSubsumerTests);
+			LOGGER_.debug("Conclusions added: {}, removed: {}",
+					saturation.getAddedConclusionsCount(),
+					saturation.getRemovedConclusionsCount());
 			Statistics.logOperationFinish("classification", LOGGER_);
 			Statistics.logMemoryUsage(LOGGER_);
 		}

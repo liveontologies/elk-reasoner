@@ -99,6 +99,8 @@ public class Saturation {
 
 	// some statistics counters
 	private int inconsistentRootCount_ = 0;
+	private int addedConclusions_ = 0;
+	private int removedConclusions_ = 0;
 
 	public Saturation(SaturationState saturationState) {
 		this.saturationState_ = saturationState;
@@ -164,7 +166,7 @@ public class Saturation {
 
 	public boolean checkSubsumer(Context context,
 			IndexedClassExpression possibleSubsumer) {
-		LOGGER_.trace("{}: checking possible subsumer {}", context.getRoot(),
+		LOGGER_.trace("{}: checking possible subsumer {}", context,
 				possibleSubsumer);
 		if (context.isInconsistent())
 			return true;
@@ -189,7 +191,7 @@ public class Saturation {
 
 	private boolean checkSubsumerSimple(Context context,
 			IndexedClassExpression possibleSubsumer) {
-		LOGGER_.trace("{}: checking possible subsumer {}", context.getRoot(),
+		LOGGER_.trace("{}: checking possible subsumer {}", context,
 				possibleSubsumer);
 		Root conjectureRoot = Root.addNegativeMember(context.getRoot(),
 				possibleSubsumer);
@@ -209,15 +211,19 @@ public class Saturation {
 		for (;;) {
 			LocalConclusion toBacktrack = context.popHistory();
 			if (toBacktrack == null) {
-				LOGGER_.trace("{}: nothing to backtrack", context.getRoot());
+				LOGGER_.trace("{}: nothing to backtrack", context);
 				break;
 			}
 			toBacktrack.accept(revertingVisitor_, context);
-			context.removeConclusion(toBacktrack);
+			if (!context.removeConclusion(toBacktrack))
+				LOGGER_.error("{}: cannot backtrack {}", context, toBacktrack);
+			LOGGER_.trace("{}: backtracking {}", context, toBacktrack);
+			removedConclusions_++;
 		}
+		restoreValidConclusions(context);
 		if (context.getSubsumers().contains(possibleSubsumer)) {
 			// it was derived deterministically
-			LOGGER_.trace("{}: subsumeer {} test skpped", context,
+			LOGGER_.trace("{}: deterministic subsumer {}", context,
 					possibleSubsumer);
 			return true;
 		}
@@ -227,16 +233,24 @@ public class Saturation {
 		 * derived, this conclusion must be backtracked, and so, the possible
 		 * subsumer will be derived deterministically
 		 */
+//		 LocalConclusion conjecture = new ConjectureNonSubsumerImpl(
+//		 possibleSubsumer);
+		// FIXME: or some reason, the above results in more inferences, although
+		// definite conclusions should result in fewer non-deterministic steps
 		LocalConclusion conjecture = new NegatedSubsumerImpl(possibleSubsumer);
 		if (context.addConclusion(conjecture)) {
+			addedConclusions_++;
 			context.pushToHistory(conjecture);
 			// start applying the rules
 			conjecture.accept(ruleApplicationVisitor_, context);
 			processDeterministic(context);
 			process();
+		} else {
+			LOGGER_.error("{}: conjecture cannot be added {}", context,
+					conjecture);
 		}
 		if (context.getSubsumers().contains(possibleSubsumer)) {
-			// if (context.getPossibleSubsumers().contains(possibleSubsumer))
+			// if (context.getComposedSubsumers().contains(possibleSubsumer))
 			// LOGGER_.error("{}: subsumer {} is still not definite!",
 			// context, possibleSubsumer);
 			return true;
@@ -268,6 +282,14 @@ public class Saturation {
 		}
 		if (CHECK_SATURATION_)
 			saturationState_.checkSaturation();
+	}
+
+	public int getAddedConclusionsCount() {
+		return addedConclusions_;
+	}
+
+	public int getRemovedConclusionsCount() {
+		return removedConclusions_;
 	}
 
 	private void producedBufferedBackwardLinks(Context context) {
@@ -320,11 +342,12 @@ public class Saturation {
 	}
 
 	private void process(Context context, Conclusion conclusion) {
-		LOGGER_.trace("{}: processing {}", context.getRoot(), conclusion);
+		LOGGER_.trace("{}: processing {}", context, conclusion);
 		if (conclusion instanceof RetractedConclusion) {
 			if (!context.removeConclusion(conclusion))
-				LOGGER_.error("{}: backtracked conclusion not found: {}!",
+				LOGGER_.error("{}: retracted conclusion not found: {}!",
 						context, conclusion);
+			removedConclusions_++;
 			return;
 		}
 		if (conclusion instanceof PropagatedConclusion) {
@@ -336,12 +359,15 @@ public class Saturation {
 					.contains(sourceRoot.getPositiveMember())
 					|| !context.getNegativePropagations().get(relation)
 							.equals(sourceRoot.getNegatitveMembers())) {
-				LOGGER_.trace("{}: obsolete {}", context, conclusion);
+				LOGGER_.trace("{}: conclusion not relevant {}", context,
+						conclusion);
 				return;
 			}
 		}
 		if (!context.addConclusion(conclusion))
 			return;
+
+		addedConclusions_++;
 
 		if (PRINT_STATS_) {
 			if (conclusion == ClashImpl.getInstance()
@@ -374,19 +400,30 @@ public class Saturation {
 				if (!context.removeConclusion(toBacktrack))
 					LOGGER_.error("{}: cannot backtrack {}", context,
 							toBacktrack);
+				LOGGER_.trace("{}: backtracking {}", context, toBacktrack);
+				removedConclusions_++;
 			} while (proceedNext);
 
-			// restore conclusions that are still valid
-			if (!context.getInconsistentSuccessors().isEmpty()) {
-				conclusionProducer_.produce(ClashImpl.getInstance());
-			}
-			for (Root root : context.getPropagatedComposedSubsumers().keySet()) {
-				for (IndexedClassExpression subsumer : context
-						.getPropagatedComposedSubsumers().get(root))
-					conclusionProducer_.produce(new ComposedSubsumerImpl(
-							subsumer));
-			}
+			restoreValidConclusions(context);
 		}
 
 	}
+
+	/**
+	 * Restores (propagated) conclusions that are still valid. This is needed
+	 * after every backtracking step.
+	 * 
+	 * @param context
+	 */
+	void restoreValidConclusions(Context context) {
+		if (!context.getInconsistentSuccessors().isEmpty()) {
+			conclusionProducer_.produce(ClashImpl.getInstance());
+		}
+		for (Root root : context.getPropagatedComposedSubsumers().keySet()) {
+			for (IndexedClassExpression subsumer : context
+					.getPropagatedComposedSubsumers().get(root))
+				conclusionProducer_.produce(new ComposedSubsumerImpl(subsumer));
+		}
+	}
+
 }

@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConjectureNonSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
@@ -42,5 +43,7 @@ public interface LocalPossibleConclusionVisitor<I, O> {
 	public O visit(PossibleComposedSubsumer conclusion, I input);
 
 	public O visit(PossibleDecomposedSubsumer conclusion, I input);
+
+	public O visit(ConjectureNonSubsumer conclusion, I input);
 
 }

@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Backwa
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConjectureNonSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
@@ -76,16 +77,25 @@ public class RevertingVisitor extends
 		return true;
 	}
 
-	@Override
-	public Boolean visit(NegatedSubsumer conclusion, Context input) {
-		IndexedClassExpression negatedExpression = conclusion
-				.getNegatedExpression();
-		if (!input.getPropagatedDisjunctionsByWatched().get(negatedExpression).isEmpty())
+	void visitNegation(IndexedClassExpression negatedExpression, Context input) {
+		if (!input.getPropagatedDisjunctionsByWatched().get(negatedExpression)
+				.isEmpty())
 			producer_.produce(new PossibleDecomposedSubsumerImpl(
 					negatedExpression));
 		else if (input.getPossibleExistentials().contains(negatedExpression))
 			producer_.produce(new PossibleComposedSubsumerImpl(
 					negatedExpression));
+	}
+
+	@Override
+	public Boolean visit(NegatedSubsumer conclusion, Context input) {
+		visitNegation(conclusion.getNegatedExpression(), input);
+		return true;
+	}
+
+	@Override
+	public Boolean visit(ConjectureNonSubsumer conclusion, Context input) {
+		visitNegation(conclusion.getExpression(), input);
 		return true;
 	}
 
