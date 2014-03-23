@@ -845,6 +845,29 @@ public class SaturationTest {
 	}
 
 	@Test
+	public void testUnitResolution() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectUnionOf(:B :C))"//
+						+ "SubClassOf(:B owl:Nothing)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :C)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :B)"//
+						+ ")"//
+		);
+	}
+
+	@Test
 	public void testPropagationDecompositionRedundancy()
 			throws ElkLoadingException {
 		/*
@@ -874,6 +897,38 @@ public class SaturationTest {
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :B)"//
+						+ ")"//
+		);
+	}
+
+	@Test
+	public void testDeterministicFIFOStrategy() throws ElkLoadingException {
+		/*
+		 * if used with stack (LIFO) clash can be processed before elements that
+		 * were produced earlier, thus earlier elements can be deleted when the
+		 * queue is cleared without properly reverting inferences
+		 */
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectUnionOf(:B :C))"//
+						+ "SubClassOf(:A ObjectUnionOf(:E :E))"//
+						+ "SubClassOf(:A ObjectUnionOf(:B :C))"//
+						+ "SubClassOf(:C ObjectSomeValuesFrom(:R :D))"//
+						+ "SubClassOf(:D owl:Nothing)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :E)"//
+						+ "SubClassOf(:A :B)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :C)"//
 						+ ")"//
 		);
 	}
