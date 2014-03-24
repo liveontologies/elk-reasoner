@@ -933,4 +933,31 @@ public class SaturationTest {
 		);
 	}
 
+	@Test
+	public void testSplittingDisjunctionsNontEnough()
+			throws ElkLoadingException {
+		/*
+		 * if we non-deterministically split only disjunctions, the result might
+		 * be unsound
+		 */
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :A))"//
+						+ "SubClassOf(:A ObjectUnionOf(:B :C))"//
+						+ "SubClassOf(ObjectIntersectionOf(:B ObjectSomeValuesFrom(:R :B)) :D)"//
+						+ "SubClassOf(ObjectIntersectionOf(:C ObjectSomeValuesFrom(:R :C)) :D)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :D)"//
+						+ ")"//
+		);
+	}
+
 }
