@@ -255,9 +255,12 @@ public class SaturationTest {
 		testSaturation(// Ontology:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
+						+ "SubObjectPropertyOf(:R :S)"//
+						+ "SubObjectPropertyOf(:H :R)"//
 						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
 						+ "EquivalentClasses(:B :C)"//
-						+ "SubClassOf(ObjectSomeValuesFrom(:R :C) :D)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :C) :D)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:H :C) :F)"//
 						+ ")",
 				// Expected subsumptions:
 				"Prefix(:=<>)"//
@@ -273,6 +276,7 @@ public class SaturationTest {
 				// Expected non-subsumptions:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
+						+ "SubClassOf(:A :F)"//
 						+ ")"//
 		);
 	}
@@ -304,12 +308,13 @@ public class SaturationTest {
 		testSaturation(// Ontology:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
+						+ "SubObjectPropertyOf(:R :S)"//
 						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
 						+ "SubClassOf(:B :C)"//
 						+ "SubClassOf(:C ObjectSomeValuesFrom(:R :A))"//
 						+ "SubClassOf(:C ObjectSomeValuesFrom(:R :B))"//
-						+ "SubClassOf(ObjectSomeValuesFrom(:R :C) :D)"//
-						+ "SubClassOf(ObjectSomeValuesFrom(:R :D) :E)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :C) :D)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :D) :E)"//
 						+ ")",
 				// Expected subsumptions:
 				"Prefix(:=<>)"//

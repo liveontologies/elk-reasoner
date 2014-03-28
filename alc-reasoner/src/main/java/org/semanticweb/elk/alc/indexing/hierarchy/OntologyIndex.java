@@ -32,13 +32,24 @@ public class OntologyIndex {
 
 	private final Set<IndexedClass> classes_ = new ArrayHashSet<IndexedClass>(
 			1024);
-
+	
+	private final Set<IndexedObjectProperty> objectProperties_ = new ArrayHashSet<IndexedObjectProperty>(
+			32);
+	
 	void addClass(IndexedClass indexedClass) {
 		classes_.add(indexedClass);
 	}
 
 	void removeClass(ElkClass elkClass) {
 		classes_.remove(elkClass);
+	}
+	
+	void addObjectProperty(IndexedObjectProperty property) {
+		objectProperties_.add(property);
+	}
+
+	void removeObjectProperty(IndexedObjectProperty property) {
+		objectProperties_.remove(property);
 	}
 
 	public IndexedObjectCache getIndexedObjectCache() {
@@ -47,6 +58,10 @@ public class OntologyIndex {
 
 	public Set<IndexedClass> getIndexedClasses() {
 		return classes_;
+	}
+	
+	public Set<IndexedObjectProperty> getIndexedObjectProperties() {
+		return objectProperties_;
 	}
 
 	/**

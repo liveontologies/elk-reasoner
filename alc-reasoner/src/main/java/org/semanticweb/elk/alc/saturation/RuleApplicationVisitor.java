@@ -164,6 +164,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		// apply propagations
 		Root root = conclusion.getSource();
 		Root sourceRoot = input.getRoot();
+		
 		if (input.isDeterministic()) {
 			for (IndexedObjectSomeValuesFrom propagatedSubsumer : input
 					.getPropagations().get(relation)) {

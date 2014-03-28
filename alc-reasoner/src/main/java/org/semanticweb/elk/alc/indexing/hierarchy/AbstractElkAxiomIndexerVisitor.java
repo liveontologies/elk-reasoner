@@ -34,11 +34,18 @@ import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 
 /**
  * An abstract class for indexing axioms. Its purpose is to reduce many
@@ -59,6 +66,8 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 	 * use any factory implementation here.
 	 */
 	private final ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
+	
+	
 
 	@Override
 	protected Void defaultLogicalVisit(ElkAxiom axiom) {
@@ -119,6 +128,46 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 	public Void visit(ElkDeclarationAxiom axiom) {
 		return axiom.getEntity().accept(entityDeclarator);
 	}
+	
+	@Override
+	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
+		ElkObjectProperty subProperty = axiom.getSubObjectPropertyExpression().accept(subPropertyExtractor);
+		ElkObjectProperty superProperty = axiom.getSuperObjectPropertyExpression().accept(superPropertyExtractor);
+		
+		if (subProperty != null && superProperty != null) {
+			indexSubObjectPropertyOfAxiom(subProperty, superProperty);
+		}
+		else if (subProperty == null && superProperty != null) {
+			// could be a transitivity axioms expressed as a chain
+			ElkObjectPropertyChain subChain = axiom.getSubObjectPropertyExpression().accept(subChainExtractor);
+			
+			if (subChain != null && subChain.getObjectPropertyExpressions().size() == 2) {
+				ElkObjectPropertyExpression first = subChain.getObjectPropertyExpressions().get(0);
+				ElkObjectPropertyExpression second = subChain.getObjectPropertyExpressions().get(1);
+				// check if this looks like R o R -> R
+				if (first instanceof ElkObjectProperty && second instanceof ElkObjectProperty) {
+					if (first.equals(second) && first.equals(superProperty)) {
+						indexTransitiveProperty(superProperty);
+					}
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public Void visit(
+			ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom) {
+		
+		ElkObjectProperty property = elkTransitiveObjectPropertyAxiom.getProperty().accept(superPropertyExtractor); 
+		
+		if (property != null) {
+			indexTransitiveProperty(property);
+		}
+		
+		return null;
+	}
 
 	/**
 	 * Entity visitor for calling the appropriate type of declarations.
@@ -167,5 +216,57 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 		public Void visit(ElkAnnotationProperty elkAnnotationProperty) {
 			return null;
 		}
+	};
+	
+	private final ElkSubObjectPropertyExpressionVisitor<ElkObjectProperty> subPropertyExtractor = new ElkSubObjectPropertyExpressionVisitor<ElkObjectProperty>() {
+
+		@Override
+		public ElkObjectProperty visit(ElkObjectInverseOf elkObjectInverseOf) {
+			return null;
+		}
+
+		@Override
+		public ElkObjectProperty visit(ElkObjectProperty elkObjectProperty) {
+			return elkObjectProperty;
+		}
+
+		@Override
+		public ElkObjectProperty visit(
+				ElkObjectPropertyChain elkObjectPropertyChain) {
+			return null;
+		}
+	};
+	
+	private final ElkSubObjectPropertyExpressionVisitor<ElkObjectPropertyChain> subChainExtractor = new ElkSubObjectPropertyExpressionVisitor<ElkObjectPropertyChain>() {
+
+		@Override
+		public ElkObjectPropertyChain visit(ElkObjectInverseOf elkObjectInverseOf) {
+			return null;
+		}
+
+		@Override
+		public ElkObjectPropertyChain visit(ElkObjectProperty elkObjectProperty) {
+			return null;
+		}
+
+		@Override
+		public ElkObjectPropertyChain visit(
+				ElkObjectPropertyChain elkObjectPropertyChain) {
+			return elkObjectPropertyChain;
+		}
+	};
+	
+	private final ElkObjectPropertyExpressionVisitor<ElkObjectProperty> superPropertyExtractor = new ElkObjectPropertyExpressionVisitor<ElkObjectProperty>() {
+
+		@Override
+		public ElkObjectProperty visit(ElkObjectInverseOf elkObjectInverseOf) {
+			return null;
+		}
+
+		@Override
+		public ElkObjectProperty visit(ElkObjectProperty elkObjectProperty) {
+			return elkObjectProperty;
+		}
+		
 	};
 }

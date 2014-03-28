@@ -30,7 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
 /**
- * A collection of method for indexing ELK objects
+ * A collection of methods for indexing ELK objects
  * 
  * @author Pavel Klinov
  * 
@@ -45,5 +45,11 @@ public interface ElkAxiomIndexer {
 
 	public IndexedObjectProperty indexObjectPropertyDeclaration(
 			ElkObjectProperty eop);
+	
+	// do not support chains, only property hierarchies and transitivity
+	
+	public void indexSubObjectPropertyOfAxiom(ElkObjectProperty subProperty, ElkObjectProperty superProperty);
+	
+	public void indexTransitiveProperty(ElkObjectProperty property);
 
 }

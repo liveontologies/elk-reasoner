@@ -82,4 +82,16 @@ public class TestAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 		return ep.accept(converter_);
 	}
 
+	@Override
+	public void indexSubObjectPropertyOfAxiom(ElkObjectProperty subProperty,
+			ElkObjectProperty superProperty) {
+		// no-op
+	}
+
+	@Override
+	public void indexTransitiveProperty(ElkObjectProperty property) {
+		// no-op
+		
+	}
+
 }

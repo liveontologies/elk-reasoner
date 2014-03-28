@@ -38,6 +38,7 @@ import org.semanticweb.elk.alc.loading.AxiomLoader;
 import org.semanticweb.elk.alc.loading.ComposedAxiomLoader;
 import org.semanticweb.elk.alc.loading.ElkLoadingException;
 import org.semanticweb.elk.alc.saturation.Context;
+import org.semanticweb.elk.alc.saturation.PropertyHierarchyComputation;
 import org.semanticweb.elk.alc.saturation.Saturation;
 import org.semanticweb.elk.alc.saturation.SaturationState;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
@@ -165,11 +166,16 @@ public class Reasoner {
 			return (saturation.checkSubsumer(context, second));	
 		}
 	}
+	
+	private void computePropertyHierarchy() {
+		new PropertyHierarchyComputation().compute(ontologyIndex_);
+	}
 
 	public void checkSatisfiability() throws ElkLoadingException {
 		if (satisfiabilityCheckingFinished_)
 			return;
 		forceLoading();
+		computePropertyHierarchy();
 		saturationState_ = new SaturationState();
 		Saturation saturation = new Saturation(saturationState_);
 		Statistics.logOperationStart("concept satisfiability testing", LOGGER_);

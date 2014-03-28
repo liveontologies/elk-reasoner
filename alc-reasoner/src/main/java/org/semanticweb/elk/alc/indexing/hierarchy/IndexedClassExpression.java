@@ -229,10 +229,18 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 			}
 		}
 		if (subsumer.negativeExistentials_ != null) {
-			// generate propagations
+			// generate propagations for all sub-properties 
+			// TODO do it only for those properties for which backward links have been created, create others when we process each new link
 			for (IndexedObjectSomeValuesFrom existential : subsumer.negativeExistentials_) {
-				IndexedObjectProperty relation = existential.getRelation();
-				producer.produce(new PropagationImpl(relation, existential));
+				//IndexedObjectProperty relation = existential.getRelation();
+				//Set<IndexedObjectProperty> existingLinkProperties = premises.getBackwardLinks().keySet();
+				Set<IndexedObjectProperty> subProperties = existential.getRelation().getSaturatedProperty().getSubProperties();
+				
+				for (IndexedObjectProperty property : subProperties) {
+					producer.produce(new PropagationImpl(property, existential));
+				}
+				
+				//producer.produce(new PropagationImpl(relation, existential));
 			}
 		}
 		if (subsumer.toldSuperClasses_ != null) {

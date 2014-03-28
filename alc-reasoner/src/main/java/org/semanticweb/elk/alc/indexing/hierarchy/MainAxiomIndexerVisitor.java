@@ -114,4 +114,34 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 		return ep.accept(neutralIndexer);
 	}
 
+	@Override
+	public void indexSubObjectPropertyOfAxiom(ElkObjectProperty subElkProperty,
+			ElkObjectProperty superElkProperty) {
+		
+		IndexedObjectProperty subIndexedProperty = subElkProperty
+				.accept(negativeIndexer);
+
+		IndexedObjectProperty superIndexedProperty = superElkProperty
+				.accept(positiveIndexer);
+
+		if (multiplicity_ == 1) {
+			subIndexedProperty.addToldSuperObjectProperty(superIndexedProperty);
+		} else {
+			subIndexedProperty.removeToldSuperObjectProperty(superIndexedProperty);
+		}
+		
+	}
+
+	@Override
+	public void indexTransitiveProperty(ElkObjectProperty property) {
+		IndexedObjectProperty indexedProperty = property.accept(neutralIndexer);
+		
+		if (multiplicity_ == 1) {
+			indexedProperty.setTransitive();
+		}
+		else {
+			indexedProperty.setNotTransitive();
+		}
+	}
+
 }

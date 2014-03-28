@@ -66,7 +66,7 @@ class ObjectOccurrenceUpdateFilter implements IndexedObjectFilter {
 		if (!ipc.occurs() && increment > 0)
 			index_.add(ipc);
 
-		ipc.updateAndCheckOccurrenceNumbers(increment);
+		ipc.updateAndCheckOccurrenceNumbers(index_, increment);
 
 		if (!ipc.occurs() && increment < 0)
 			index_.remove(ipc);
