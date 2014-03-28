@@ -137,13 +137,13 @@ public class SaturationState implements ExternalConclusionProducer {
 	 *         saturated.
 	 */
 	private boolean isBlocked(Root root, Conclusion conclusion) {
-		Root sourceRoot = conclusion.getSourceRoot(root);
+		/*Root sourceRoot = conclusion.getSourceRoot(root);
 		Context context = getContext(sourceRoot);
 		if (context != null && context.isSaturated()) {
 			LOGGER_.trace("{}: not produced {}: context {} is saturated", root,
 					conclusion, context);
 			return true;
-		}
+		}*/
 		// else
 		return false;
 	}

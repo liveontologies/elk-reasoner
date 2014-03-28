@@ -492,6 +492,8 @@ public class SaturationTest {
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:C :A)"//
+						+ "SubClassOf(:A :B)"//
+						+ "SubClassOf(:C :E)"//
 						+ ")"//
 		);
 	}
@@ -615,6 +617,9 @@ public class SaturationTest {
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :C) :AC)"//
 						+ "SubClassOf(ObjectIntersectionOf(:A :AC) owl:Nothing)"//
 						+ "SubClassOf(:B ObjectUnionOf(:D :E))"//
+						
+						//+ "SubClassOf(ObjectSomeValuesFrom(:R :E) owl:Nothing)"//
+						
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :D) :AD)"//
 						+ "SubClassOf(ObjectIntersectionOf(:A :AD) owl:Nothing)"//
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :E) :F)"//
@@ -642,6 +647,29 @@ public class SaturationTest {
 						+ ")"//
 		);
 	}
+	
+	/*@Test
+	public void testDisjunctionClash() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:B ObjectUnionOf(:D :E))"//
+						+ "SubClassOf(:E owl:Nothing)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:B :D)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:B :C)"//
+						+ "SubClassOf(:B :E)"//
+						+ ")"//
+		);
+	}*/
 
 	@Test
 	public void testDisjunctionAndPropagation() throws ElkLoadingException {

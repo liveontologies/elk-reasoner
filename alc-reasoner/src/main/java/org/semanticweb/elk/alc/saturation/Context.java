@@ -192,6 +192,11 @@ public class Context {
 	 * non-deterministic choice point
 	 */
 	private Deque<LocalConclusion> localHistory_ = null;
+	
+	/**
+	 * Stores an object with additional information, e.g. all subsumers, when computed. 
+	 */
+	private SaturatedContext saturated_ = null;
 
 	Context(Root root) {
 		this.root_ = root;
@@ -485,6 +490,14 @@ public class Context {
 
 	boolean isDeterministic() {
 		return (localHistory_ == null || localHistory_.isEmpty());
+	}
+	
+	void setSaturated(SaturatedContext saturated) {
+		saturated_ = saturated;
+	}
+	
+	SaturatedContext getSaturatedContext() {
+		return saturated_;
 	}
 
 	static class ConclusionInserter implements

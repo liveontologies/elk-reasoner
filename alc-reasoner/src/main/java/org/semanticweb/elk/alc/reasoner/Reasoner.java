@@ -22,6 +22,7 @@ package org.semanticweb.elk.alc.reasoner;
  * #L%
  */
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -152,8 +153,17 @@ public class Reasoner {
 		if (context.isInconsistent()) {
 			return true;
 		}
+
 		Saturation saturation = new Saturation(saturationState_);
-		return (saturation.checkSubsumer(context, second));
+		//TODO this is temporary
+		if (second instanceof IndexedClass) {
+			Collection<? extends IndexedClassExpression> atomicSubsumers = saturation.getAtomicSubsumers(first);
+			
+			return atomicSubsumers.contains(second);
+		}
+		else {
+			return (saturation.checkSubsumer(context, second));	
+		}
 	}
 
 	public void checkSatisfiability() throws ElkLoadingException {
@@ -221,14 +231,14 @@ public class Reasoner {
 						// filtering out subsumers that are no longer derived
 						// non-deterministically
 						allSubsumers = context.getSubsumers();
-						Iterator<IndexedClass> iterator = subsumersToTest
+						Iterator<IndexedClass> subsumersToTestIterator = subsumersToTest
 								.iterator();
-						while (iterator.hasNext()) {
-							IndexedClass next = iterator.next();
+						while (subsumersToTestIterator.hasNext()) {
+							IndexedClass next = subsumersToTestIterator.next();
 							if (possibleSubsumers.contains(next))
 								continue;
 							// else not derived non-deterministically
-							iterator.remove();
+							subsumersToTestIterator.remove();
 							if (!allSubsumers.contains(next)) {
 								// not derived deterministically either
 								countSubsumers--;
@@ -248,7 +258,58 @@ public class Reasoner {
 				if (PRINT_STATS_) {
 					if ((countClasses / 1000) * 1000 == countClasses)
 						LOGGER_.info(
-								"{} concepts processed (evarage: {} subsumers, {} subsumer tests, {} positive)",
+								"{} concepts processed (average: {} subsumers, {} subsumer tests, {} positive)",
+								countClasses,
+								countSubsumers / countClasses,
+								countSubsumerTests / countClasses,
+								(countSubsumerTests - countNegativeSubsumerTests)
+										/ countClasses);
+				}
+			}
+		} finally {
+			LOGGER_.debug(
+					"Total classes: {}, subsumers: {}, subsumer tests: {}, positive: {}",
+					countClasses, countSubsumers, countSubsumerTests,
+					countSubsumerTests - countNegativeSubsumerTests);
+			LOGGER_.debug("Conclusions added: {}, removed: {}",
+					saturation.getAddedConclusionsCount(),
+					saturation.getRemovedConclusionsCount());
+			Statistics.logOperationFinish("classification", LOGGER_);
+			Statistics.logMemoryUsage(LOGGER_);
+		}
+		classificationFinished_ = true;
+	}
+	
+	public void classifyOptimized() throws ElkLoadingException {
+		if (classificationFinished_)
+			return;
+		checkSatisfiability();
+		Saturation saturation = new Saturation(saturationState_);
+		Statistics.logOperationStart("classification", LOGGER_);
+		int countClasses = 0;
+		int countSubsumers = 0;
+		int countSubsumerTests = 0;
+		int countNegativeSubsumerTests = 0;
+		try {
+
+			for (IndexedClass initialClass : ontologyIndex_.getIndexedClasses()) {
+				countClasses++;
+				
+				Collection<IndexedClass> atomicSubsumers = saturation.getAtomicSubsumers(initialClass);
+				
+				if (atomicSubsumers == null) {
+					//currently this means the class is unsatisfiable (TODO return owl:Nothing explicitly)
+					LOGGER_.debug("{}: is unsatisfiable", initialClass);
+					countSubsumers += 1;//owl:Nothing is the only subsumer
+				}
+				else {
+					countSubsumers += atomicSubsumers.size();
+				}
+				
+				if (PRINT_STATS_) {
+					if ((countClasses / 1000) * 1000 == countClasses)
+						LOGGER_.info(
+								"{} concepts processed (average: {} subsumers, {} subsumer tests, {} positive)",
 								countClasses,
 								countSubsumers / countClasses,
 								countSubsumerTests / countClasses,
