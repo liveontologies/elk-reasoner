@@ -107,9 +107,9 @@ public class Saturation {
 	private final Multimap<IndexedObjectProperty, Root> rectractedBackwardLinks_;
 
 	// some statistics counters
-	private int inconsistentRootCount_ = 0;
-	private int addedConclusions_ = 0;
-	private int removedConclusions_ = 0;
+	private static int inconsistentRootCount_ = 0;
+	private static int addedConclusions_ = 0;
+	private static int removedConclusions_ = 0;
 
 	public Saturation(SaturationState saturationState) {
 		this.saturationState_ = saturationState;
@@ -323,6 +323,11 @@ public class Saturation {
 							context, candidate);
 					subsumerCandidatesIterator.remove();
 				}
+			}
+			if (context.getPossibleComposedSubsumers().isEmpty()
+					&& context.getPossibleDecomposedSubsumers().isEmpty()) {
+				// no choices left anymore, we are at the last branch
+				break;
 			}
 		}
 		// finally adding all deterministically derived subsumers
