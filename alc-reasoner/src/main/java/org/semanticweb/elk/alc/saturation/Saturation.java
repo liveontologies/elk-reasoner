@@ -73,7 +73,14 @@ public class Saturation {
 	private final static boolean CHECK_SATURATION_ = false;
 
 	/**
-	 * if {@code true}, propagations won't be generated until the corresponding backward links have been created
+	 * if {@code true}, propagations won't be generated until the corresponding
+	 * backward links have been created.
+	 * 
+	 * WARNING:
+	 * This is generally unsafe when the ontology requires backtracking because
+	 * propagations can get deleted during backtracking and never come back
+	 * (unless they are explicitly restored similarly to propagated subsumers).
+	 * Seems like too much pain for too little gain at this point.
 	 */
 	public final static boolean DEFERRED_PROPAGATION_GENERATION = false;
 	
