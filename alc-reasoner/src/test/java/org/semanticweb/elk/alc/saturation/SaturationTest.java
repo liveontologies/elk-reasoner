@@ -280,6 +280,92 @@ public class SaturationTest {
 						+ ")"//
 		);
 	}
+	
+	@Test
+	public void testTransitivityNoHierarchies() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "TransitiveObjectProperty(:R)"//						
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :C))"//						
+						+ "EquivalentClasses(:C :D)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:R :D) :E)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :A)"//
+						+ "SubClassOf(:A :E)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :C)"//
+						+ "SubClassOf(:A :D)"//
+						+ "SubClassOf(:A :B)"//
+						+ ")"//
+		);
+	}
+	
+	@Test
+	public void testTransitivityWithHierarchy() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "TransitiveObjectProperty(:R)"//
+						+ "SubObjectPropertyOf(:R :S)"//	
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :C))"//						
+						+ "EquivalentClasses(:C :D)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :D) :E)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :A)"//
+						+ "SubClassOf(:A :E)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :C)"//
+						+ "SubClassOf(:A :D)"//
+						+ "SubClassOf(:A :B)"//
+						+ ")"//
+		);
+	}
+	
+	@Test
+	public void testTransitivityWithHierarchyNonDeterministic() throws ElkLoadingException {
+		/*
+		 * testing that transitive propagations get propagated via possible propagated existentials
+		 */
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "TransitiveObjectProperty(:R)"//
+						+ "SubObjectPropertyOf(:R :S)"//	
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :C))"//						
+						+ "SubClassOf(:C ObjectUnionOf(:D1 :D2))"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :D1) :E)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :D2) :E)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :A)"//
+						+ "SubClassOf(:A :E)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :C)"//
+						+ "SubClassOf(:A :B)"//
+						+ ")"//
+		);
+	}
 
 	@Test
 	public void testCyclicExistentialsSimple() throws ElkLoadingException {

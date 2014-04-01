@@ -206,7 +206,7 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
 
-	public static void applyCompositionRules(IndexedClassExpression subsumer,
+/*	public static void applyCompositionRules(IndexedClassExpression subsumer,
 			Context premises, ConclusionProducer producer) {
 		if (premises.getNegativeSubsumers().contains(subsumer)) {
 			// generate clash
@@ -255,7 +255,57 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 			}
 
 		}
-	}
+	}*/
+	
+	public void applyCompositionRules(Context premises, ConclusionProducer producer) {
+		if (premises.getNegativeSubsumers().contains(this)) {
+			// generate clash
+			producer.produce(ClashImpl.getInstance());
+			// nothing else should be derived
+			return;
+		}
+		if (conjunctionsByConjunct_ != null) {
+			// conjunction introduction
+			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
+					premises.getSubsumers(),
+					conjunctionsByConjunct_.keySet())) {
+				producer.produce(new ComposedSubsumerImpl(
+						conjunctionsByConjunct_.get(common)));
+			}
+		}
+		
+		if (negativeDisjunctions_ != null) {
+			// generate disjunctions
+			for (IndexedObjectUnionOf disjunction : negativeDisjunctions_) {
+				producer.produce(new ComposedSubsumerImpl(disjunction));
+			}
+		}
+		
+		if (negativeExistentials_ != null) {
+			for (IndexedObjectSomeValuesFrom existential : negativeExistentials_) {
+				if (Saturation.DEFERRED_PROPAGATION_GENERATION) {
+					// generate propagations for relevant roles 
+					Set<IndexedObjectProperty> subProperties = existential.getRelation().getSaturatedProperty().getSubProperties();
+
+					for (IndexedObjectProperty property : subProperties) {
+						if (!premises.getBackwardLinks().get(property).isEmpty()) {
+							producer.produce(new PropagationImpl(property, existential));
+						}
+					}
+				}
+				else {
+					producer.produce(new PropagationImpl(existential.getRelation(), existential));
+				}
+			}
+		}
+		if (toldSuperClasses_ != null) {
+			// expand under told super-classes
+			for (IndexedClassExpression toldSuper : toldSuperClasses_) {
+				producer.produce(new DecomposedSubsumerImpl(toldSuper));
+			}
+
+		}
+	}	
 
 	public static void generatePropagations(ConclusionProducer producer, Context premises, IndexedObjectProperty relation) {
 		LOGGER_.trace("{}: generating propagations for {}", premises.getRoot(), relation);

@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Possib
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossiblePropagatedExistentialImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagatedClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagatedComposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
@@ -84,8 +85,8 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 
 	@Override
 	public Void visit(ComposedSubsumer conclusion, Context input) {
-		IndexedClassExpression.applyCompositionRules(
-				conclusion.getExpression(), input, producer_);
+		//IndexedClassExpression.applyCompositionRules(conclusion.getExpression(), input, producer_);
+		conclusion.getExpression().applyCompositionRules(input, producer_);
 		return null;
 	}
 
@@ -94,8 +95,8 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		IndexedClassExpression expression = conclusion.getExpression();
 		expression.accept(subsumerDecompositionVisitor_);
 		if (input.isDeterministic()) {
-			IndexedClassExpression.applyCompositionRules(expression, input,
-					producer_);
+			//IndexedClassExpression.applyCompositionRules(expression, input, producer_);
+			conclusion.getExpression().applyCompositionRules(input, producer_);
 		} else {
 			producer_.produce(new ComposedSubsumerImpl(expression));
 		}
@@ -104,7 +105,22 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 
 	@Override
 	public Void visit(PropagatedComposedSubsumer conclusion, Context input) {
+		IndexedObjectProperty propagationRelation = conclusion.getRelation();
+		//FIXME generics to avoid the cast
+		IndexedObjectSomeValuesFrom carry = (IndexedObjectSomeValuesFrom)conclusion.getExpression();
+		
+		if (propagationRelation.isTransitive() && propagationRelation != carry.getRelation()) {
+			// if the existential was propagated via a transitive role, we
+			// produce a propagation in this context to propagate it further.
+			// It's unnecessary if the relation of the carry is the same as the
+			// propagation relation (and not a super-role) because
+			// in that case we'll generate the propagation when processing the
+			// carry as a subsumer (and only if it's not been done before). 
+			producer_.produce(new PropagationImpl(conclusion.getRelation(), carry));
+		}
+		
 		producer_.produce(new ComposedSubsumerImpl(conclusion.getExpression()));
+		
 		return null;
 	}
 
@@ -299,8 +315,14 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 
 	@Override
 	public Void visit(PossiblePropagatedExistential conclusion, Context input) {
-		producer_.produce(new PossibleComposedSubsumerImpl(conclusion
-				.getExpression()));
+		IndexedObjectProperty propagationRelation = conclusion.getRelation();
+		IndexedObjectSomeValuesFrom carry = (IndexedObjectSomeValuesFrom)conclusion.getExpression();
+		
+		if (propagationRelation.isTransitive() && propagationRelation != carry.getRelation()) {
+			producer_.produce(new PropagationImpl(conclusion.getRelation(), carry));
+		}
+		
+		producer_.produce(new PossibleComposedSubsumerImpl(conclusion.getExpression()));
 		return null;
 	}
 

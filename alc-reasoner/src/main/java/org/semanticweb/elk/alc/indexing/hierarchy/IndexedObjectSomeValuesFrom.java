@@ -23,7 +23,10 @@
 package org.semanticweb.elk.alc.indexing.hierarchy;
 
 import org.semanticweb.elk.alc.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.alc.saturation.ConclusionProducer;
+import org.semanticweb.elk.alc.saturation.Context;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
@@ -96,6 +99,19 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	public String toStringStructural() {
 		return "ObjectSomeValuesFrom(" + this.property_ + ' ' + this.filler_
 				+ ')';
+	}
+
+	@Override
+	public void applyCompositionRules(Context premises, ConclusionProducer producer) {
+		super.applyCompositionRules(premises, producer);
+		// the rule for transitivity
+		if (property_.isTransitive() && filler_.negativeExistentials_ != null) {
+			for (IndexedObjectSomeValuesFrom e : filler_.negativeExistentials_) {
+				if (e.getRelation().getSaturatedProperty().getSubProperties().contains(property_)) {
+					producer.produce(new PropagationImpl(property_, this));
+				}
+			}
+		}
 	}
 
 }
