@@ -296,8 +296,11 @@ public class Reasoner {
 		int countSubsumers = 0;
 		int countSubsumerTests = 0;
 		int countNegativeSubsumerTests = 0;
+		
 		try {
 
+			
+			
 			for (IndexedClass initialClass : ontologyIndex_.getIndexedClasses()) {
 				countClasses++;
 				
@@ -310,14 +313,10 @@ public class Reasoner {
 				}
 				else {
 					countSubsumers += atomicSubsumers.size();
-					
-					if (initialClass.toString().startsWith("<http://www.ihtsdo.org/sep/S17412>")) {
-						System.out.println(atomicSubsumers);
-					}
 				}
 				
 				if (PRINT_STATS_) {
-					if ((countClasses / 1000) * 1000 == countClasses)
+					if ((countClasses / 100) * 100 == countClasses) {
 						LOGGER_.info(
 								"{} concepts processed (average: {} subsumers, {} subsumer tests, {} positive)",
 								countClasses,
@@ -325,6 +324,10 @@ public class Reasoner {
 								countSubsumerTests / countClasses,
 								(countSubsumerTests - countNegativeSubsumerTests)
 										/ countClasses);
+						LOGGER_.debug("Conclusions added: {}, removed: {}",
+								saturation.getAddedConclusionsCount(),
+								saturation.getRemovedConclusionsCount());
+					}
 				}
 			}
 		} finally {

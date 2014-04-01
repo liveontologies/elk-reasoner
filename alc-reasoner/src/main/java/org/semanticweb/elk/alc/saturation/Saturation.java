@@ -73,6 +73,11 @@ public class Saturation {
 	private final static boolean CHECK_SATURATION_ = false;
 
 	/**
+	 * if {@code true}, propagations won't be generated until the corresponding backward links have been created
+	 */
+	public final static boolean DEFERRED_PROPAGATION_GENERATION = true;
+	
+	/**
 	 * if {@code true}, some statistics will be printed
 	 */
 	private static final boolean PRINT_STATS_ = false;

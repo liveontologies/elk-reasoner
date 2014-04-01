@@ -654,17 +654,6 @@ public class SaturationTest {
 		);
 	}
 
-	/*
-	 * @Test public void testDisjunctionClash() throws ElkLoadingException {
-	 * testSaturation(// Ontology: "Prefix(:=<>)"// +
-	 * "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"// + "Ontology("// +
-	 * "SubClassOf(:B ObjectUnionOf(:D :E))"// + "SubClassOf(:E owl:Nothing)"//
-	 * + ")", // Expected subsumptions: "Prefix(:=<>)"// + "Ontology("// +
-	 * "SubClassOf(:B :D)"// + ")",// // Expected non-subsumptions:
-	 * "Prefix(:=<>)"// + "Ontology("// + "SubClassOf(:B :C)"// +
-	 * "SubClassOf(:B :E)"// + ")"// ); }
-	 */
-
 	@Test
 	public void testDisjunctionAndPropagation() throws ElkLoadingException {
 		testSaturation(// Ontology:

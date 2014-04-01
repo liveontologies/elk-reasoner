@@ -30,6 +30,7 @@ import org.semanticweb.elk.alc.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.alc.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.alc.saturation.ConclusionProducer;
 import org.semanticweb.elk.alc.saturation.Context;
+import org.semanticweb.elk.alc.saturation.Saturation;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
@@ -235,16 +236,18 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 			for (IndexedObjectSomeValuesFrom existential : subsumer.negativeExistentials_) {
 				// TODO For some reason this way of generating propagations is slower (i.e. when they are generated only
 				// for existing backward links and also generated when the first backward link for the relation is added).
-				/*Set<IndexedObjectProperty> existingLinkProperties = premises.getBackwardLinks().keySet();
-				Set<IndexedObjectProperty> subProperties = existential.getRelation().getSaturatedProperty().getSubProperties();
-				
-				for (IndexedObjectProperty property : subProperties) {
-					if (!premises.getBackwardLinks().get(property).isEmpty()) {
-						producer.produce(new PropagationImpl(property, existential));
+				if (Saturation.DEFERRED_PROPAGATION_GENERATION) {
+					Set<IndexedObjectProperty> subProperties = existential.getRelation().getSaturatedProperty().getSubProperties();
+
+					for (IndexedObjectProperty property : subProperties) {
+						if (!premises.getBackwardLinks().get(property).isEmpty()) {
+							producer.produce(new PropagationImpl(property, existential));
+						}
 					}
-				}*/
-				
-				producer.produce(new PropagationImpl(existential.getRelation(), existential));
+				}
+				else {
+					producer.produce(new PropagationImpl(existential.getRelation(), existential));
+				}
 			}
 		}
 		if (subsumer.toldSuperClasses_ != null) {

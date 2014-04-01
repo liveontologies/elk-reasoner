@@ -58,6 +58,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagated
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 
 public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> {
@@ -161,27 +162,50 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			producer_.produce(conclusion.getSource(), new PropagatedClashImpl(
 					relation, input.getRoot()));
 		}
-		// create propagations if this is the first backward link for this relation
-		/*if (input.getBackwardLinks().get(relation).size() == 1) {
-			IndexedClassExpression.generatePropagations(producer_, input, relation);	
-		}*/		
-		// apply previously generated propagations
-		Root root = conclusion.getSource();
-		Root sourceRoot = input.getRoot();
 		
-		for (IndexedObjectProperty superProperty : relation.getSaturatedProperty().getSuperProperties()) {
-			if (input.isDeterministic()) {
-				for (IndexedObjectSomeValuesFrom propagatedSubsumer : input.getPropagations().get(superProperty)) {
-					producer_.produce(root, new PropagatedComposedSubsumerImpl(relation, sourceRoot, propagatedSubsumer));
-				}
-			} else {
-				for (IndexedObjectSomeValuesFrom propagatedSubsumer : input.getPropagations().get(superProperty)) {
-					producer_.produce(root,	new PossiblePropagatedExistentialImpl(relation,	sourceRoot, propagatedSubsumer));
-				}
+		Root root = conclusion.getSource();
+		
+		if (Saturation.DEFERRED_PROPAGATION_GENERATION) {
+			// generate propagations if this is the first backward link for this relation
+			if (input.getBackwardLinks().get(relation).size() == 1) {
+				IndexedClassExpression.generatePropagations(producer_, input, relation);	
+			}
+			// apply previously generated propagations	
+			applyAllPropagationsForRelation(relation, relation, input, root);
+		}
+		else {
+			// apply all stored propagations over the super-roles of this link
+			for (IndexedObjectProperty superProperty : new LazySetIntersection<IndexedObjectProperty>(relation.getSaturatedProperty().getSuperProperties(), input.getPropagations().keySet())) {
+				applyAllPropagationsForRelation(superProperty, relation, input, root);
 			}
 		}
 		
 		return null;
+	}
+	
+	void applyAllPropagationsForRelation(IndexedObjectProperty relation, IndexedObjectProperty linkRelation, Context input, Root target) {
+		// propagations are done over the link's relation otherwise they will be filtered as not relevant
+		if (input.isDeterministic()) {
+			for (IndexedObjectSomeValuesFrom propagatedSubsumer : input.getPropagations().get(relation)) {
+				producer_.produce(target, new PropagatedComposedSubsumerImpl(linkRelation, input.getRoot(), propagatedSubsumer));
+			}
+		} else {
+			for (IndexedObjectSomeValuesFrom propagatedSubsumer : input.getPropagations().get(relation)) {
+				producer_.produce(target,	new PossiblePropagatedExistentialImpl(linkRelation,	input.getRoot(), propagatedSubsumer));
+			}
+		}
+	}
+	
+	void applyPropagationForRelation(Propagation propagation, IndexedObjectProperty relation, Context input) {
+		if (input.isDeterministic()) {
+			for (Root root : input.getBackwardLinks().get(relation)) {
+				producer_.produce(root, new PropagatedComposedSubsumerImpl(relation, input.getRoot(), propagation.getCarry()));
+			}
+		} else {
+			for (Root root : input.getBackwardLinks().get(relation)) {
+				producer_.produce(root, new PossiblePropagatedExistentialImpl(relation, input.getRoot(), propagation.getCarry()));
+			}
+		}
 	}
 
 	@Override
@@ -190,19 +214,17 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		// TODO: for the future: propagations of universals should be decomposed
 		// subsumer!
 		IndexedObjectProperty relation = conclusion.getRelation();
-		Root sourceRoot = input.getRoot();
 		
-		for (IndexedObjectProperty subProperty : relation.getSaturatedProperty().getSubProperties()) {
-			if (input.isDeterministic()) {
-				for (Root root : input.getBackwardLinks().get(subProperty)) {
-					producer_.produce(root, new PropagatedComposedSubsumerImpl(subProperty, sourceRoot, conclusion.getCarry()));
-				}
-			} else {
-				for (Root root : input.getBackwardLinks().get(subProperty)) {
-					producer_.produce(root, new PossiblePropagatedExistentialImpl(subProperty, sourceRoot, conclusion.getCarry()));
-				}
-			}
+		if (Saturation.DEFERRED_PROPAGATION_GENERATION) {
+			applyPropagationForRelation(conclusion, conclusion.getRelation(), input);	
 		}
+		else {
+			// apply this propagation over the stored links for sub-roles of the propagations' relation
+			for (IndexedObjectProperty subProperty : new LazySetIntersection<IndexedObjectProperty>(relation.getSaturatedProperty().getSubProperties(), input.getBackwardLinks().keySet())) {
+				applyPropagationForRelation(conclusion, subProperty, input);
+			}	
+		}
+		
 		return null;
 	}
 
