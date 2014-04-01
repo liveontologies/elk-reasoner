@@ -23,8 +23,14 @@ public class SaturatedObjectProperty {
 	 */
 	private Set<IndexedObjectProperty> derivedSubProperties;
 	
+	private Set<IndexedObjectProperty> derivedSuperProperties;
+	
 	public Set<IndexedObjectProperty> getSubProperties() {
 		return derivedSubProperties != null ? derivedSubProperties : Collections.<IndexedObjectProperty>emptySet();
+	}
+	
+	public Set<IndexedObjectProperty> getSuperProperties() {
+		return derivedSuperProperties != null ? derivedSuperProperties : Collections.<IndexedObjectProperty>emptySet();
 	}
 
 	public boolean addSubProperty(IndexedObjectProperty subProperty) {
@@ -35,6 +41,12 @@ public class SaturatedObjectProperty {
 		return derivedSubProperties.add(subProperty);
 	}
 	
-
+	public boolean addSuperProperty(IndexedObjectProperty subProperty) {
+		if (derivedSuperProperties == null) {
+			derivedSuperProperties = new ArrayHashSet<IndexedObjectProperty>(2);
+		}
+		
+		return derivedSuperProperties.add(subProperty);
+	}
 	
 }

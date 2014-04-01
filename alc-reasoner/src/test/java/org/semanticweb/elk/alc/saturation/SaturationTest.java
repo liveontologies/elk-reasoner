@@ -1035,5 +1035,63 @@ public class SaturationTest {
 						+ ")"//
 		);
 	}
+	
+	@Test
+	public void testDisjunctionsComplex() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectUnionOf(:B :C))"//
+						+ "SubClassOf(:B ObjectUnionOf(:F :G))"//
+						+ "SubClassOf(:C ObjectUnionOf(:D :E))"//
+						+ "SubClassOf(:G :K)"//
+						+ "SubClassOf(:E :K)"//
+						+ "SubClassOf(:D <http://www.w3.org/2002/07/owl#Nothing>)"//
+						+ "SubClassOf(:F <http://www.w3.org/2002/07/owl#Nothing>)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :K)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :B)"//
+						+ "SubClassOf(:A :C)"//
+						+ "SubClassOf(:A :D)"//
+						+ "SubClassOf(:A :E)"//
+						+ "SubClassOf(:A :G)"//
+						+ ")"//
+		);
+	}
+	
+	@Test
+	public void testDisjunctionsComplex2() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectUnionOf(:B :C))"//
+						+ "SubClassOf(:B ObjectUnionOf(:D :E))"//
+						+ "SubClassOf(:B :C)"//
+						+ "SubClassOf(:C ObjectUnionOf(:E :F))"//
+						+ "SubClassOf(:E :F)"//
+						+ "SubClassOf(ObjectIntersectionOf(:D :C) <http://www.w3.org/2002/07/owl#Nothing>)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :C)"//
+						+ "SubClassOf(:A :F)"//						
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :B)"//
+						+ "SubClassOf(:A :D)"//
+						+ "SubClassOf(:A :E)"//
+						+ ")"//
+		);
+	}
 
 }

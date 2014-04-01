@@ -45,16 +45,11 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPo
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalDeterministicConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalPossibleConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.RetractedConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
-import org.semanticweb.elk.util.collections.LazySetUnion;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -252,7 +247,7 @@ public class Saturation {
 			context.pushToHistory(conjecture);
 			// start applying the rules
 			conjecture.accept(ruleApplicationVisitor_, context);
-			processDeterministic(context, BacktrackingListener.DUMMY);
+			processDeterministic(context);
 			process();
 		} else {
 			LOGGER_.error("{}: conjecture cannot be added {}", context,
@@ -302,7 +297,7 @@ public class Saturation {
 			}
 			restoreValidConclusions(context);
 			// re-saturate for the new choices
-			processDeterministic(context, BacktrackingListener.DUMMY);
+			processDeterministic(context);
 			process();
 			if (context.setSaturated()) {
 				// context was set not saturated before, this means
@@ -342,25 +337,22 @@ public class Saturation {
 		return subsumerCandidates;
 	}
 
-	public void process() {
-		process(BacktrackingListener.DUMMY);
-	}
-
+	
 	/**
 	 * Processes all previously submitted {@link IndexedClassExpression}s for
 	 * checking satisfiability
 	 */
-	public void process(BacktrackingListener listener) {
+	public void process() {
 		for (;;) {
 			activeContext_ = saturationState_.pollActiveContext();
 			if (activeContext_ == null) {
 				activeContext_ = saturationState_.pollPossibleContext();
 				if (activeContext_ == null)
 					break;
-				process(activeContext_, listener);
+				process(activeContext_);
 				continue;
 			}
-			processDeterministic(activeContext_, listener);
+			processDeterministic(activeContext_);
 		}
 		// setting all contexts as saturated
 		for (;;) {
@@ -399,8 +391,7 @@ public class Saturation {
 		producedBackwardLinks_.clear();
 	}
 
-	private void processDeterministic(Context context,
-			BacktrackingListener listener) {
+	private void processDeterministic(Context context) {
 		for (;;) {
 			Conclusion conclusion = localDeterministicConclusions_.poll();
 			if (conclusion == null) {
@@ -409,12 +400,12 @@ public class Saturation {
 					break;
 				}
 			}
-			process(context, conclusion, listener);
+			process(context, conclusion);
 		}
 		producedBufferedBackwardLinks(context);
 	}
 
-	private void process(Context context, BacktrackingListener listener) {
+	private void process(Context context) {
 		for (;;) {
 			Conclusion conclusion = localDeterministicConclusions_.poll();
 			if (conclusion == null) {
@@ -425,13 +416,12 @@ public class Saturation {
 						break;
 				}
 			}
-			process(context, conclusion, listener);
+			process(context, conclusion);
 		}
 		producedBufferedBackwardLinks(context);
 	}
 
-	private void process(Context context, Conclusion conclusion,
-			BacktrackingListener listener) {
+	private void process(Context context, Conclusion conclusion) {
 		LOGGER_.trace("{}: processing {}", context, conclusion);
 		if (conclusion instanceof RetractedConclusion) {
 			if (!context.removeConclusion(conclusion))
@@ -483,7 +473,6 @@ public class Saturation {
 			while (proceedNext) {
 				LocalConclusion toBacktrack = context.popHistory();
 				if (toBacktrack == null) {
-					listener.notifyEndOfBacktracking(context, null);
 					LOGGER_.trace("{}: nothing to backtrack", context.getRoot());
 					if (proceedNext && context.setNotSaturated())
 						// this means that the last removed conclusion in
@@ -499,15 +488,7 @@ public class Saturation {
 							toBacktrack);
 				LOGGER_.trace("{}: backtracking {}", context, toBacktrack);
 
-				listener.notifyBacktracking(context, toBacktrack);
-
 				removedConclusions_++;
-
-				if (!proceedNext) {
-					// will exit the loop on this iteration
-					listener.notifyEndOfBacktracking(context, toBacktrack);
-				}
-
 			}
 
 			restoreValidConclusions(context);
@@ -552,262 +533,6 @@ public class Saturation {
 				getSubsumersOptimized(rootContext)));
 		return rootContext.getSaturatedContext().getAtomicSubsumers();
 
-	}
-
-	/**
-	 * TODO
-	 * 
-	 * @param rootClass
-	 * @return
-	 */
-	public Collection<IndexedClass> getAtomicSubsumersOld(
-			IndexedClassExpression rootClass) {
-		Context rootContext = saturationState_.getContext(rootClass);
-
-		if (rootContext.getSaturatedContext() != null) {
-			// everything has been computed and is up-to-date
-			return rootContext.getSaturatedContext().getAtomicSubsumers();
-		}
-
-		if (rootContext.isInconsistent()) {
-			// TODO return {owl:Nothing}
-			LOGGER_.trace("{} is unsatisfiable", rootClass);
-			return null;
-		}
-
-		LOGGER_.trace("Started computing subsumers for {}", rootClass);
-
-		rootContext.setNotSaturated();
-		// the root class has a model, we're now at the first branch which
-		// finished without deriving a clash -- that's the starting point.
-		Set<IndexedClass> candidates = new HashSet<IndexedClass>();
-		AtomicSubsumerCandidatesCollector collector = new AtomicSubsumerCandidatesCollector(
-				rootContext.getRoot(), null, candidates);
-		// first, get definite atomic subsumers, i.e. derived before the first
-		// branching point. They need not be checked later.
-		Set<IndexedClass> subsumers = new HashSet<IndexedClass>(rootContext
-				.getSubsumers().size()
-				- rootContext.getComposedSubsumers().size());
-
-		for (IndexedClassExpression possibleSubsumer : rootContext
-				.getSubsumers()) {
-			if (possibleSubsumer instanceof IndexedClass
-					&& !rootContext.getComposedSubsumers().contains(
-							possibleSubsumer)) {
-				subsumers.add((IndexedClass) possibleSubsumer);
-			}
-		}
-
-		for (;;) {
-			// Start moving up the branch tree. Iterate backwards over the
-			// history and collect all atomic subsumers till the next branching
-			// point (possible conclusion).
-			activeContext_ = rootContext;
-			backtrackToLastBranchingPoint(rootContext, collector);
-
-			if (collector.getCurrentBranchingSubsumer() == null) {
-				// the local history must be empty
-				break;
-			}
-
-			LOGGER_.trace("Exploring a new branch starting at {}",
-					collector.getCurrentBranchingSubsumer());
-			// if processing backtracks above the current top branching point,
-			// the collector object will start collecting atomic subsumer
-			// candidates.
-			conclusionProducer_.produce(rootContext.getRoot(),
-					new ContextInitializationImpl());
-			process(collector);
-
-			if (!rootContext.hasClash()) {
-				LOGGER_.trace(
-						"Found an alternative model for {}, begin filtering subsumer candidates",
-						rootClass);
-				// Finished exploring an alternative branch, found another
-				// model, can now filter the set of candidates by removing those
-				// not derived deterministically.
-				Set<IndexedClassExpression> possibleSubsumers = rootContext
-						.isDeterministic() ? rootContext.getSubsumers()
-						: rootContext.getComposedSubsumers();
-				Iterator<IndexedClass> candidateIterator = candidates
-						.iterator();
-
-				while (candidateIterator.hasNext()) {
-					IndexedClass candidate = candidateIterator.next();
-
-					if (!possibleSubsumers.contains(candidate)) {
-						LOGGER_.trace(
-								"{} has not been derived deterministically in this branch, deleting",
-								candidate);
-						// this conclusion has not been derived in this branch
-						// so it's not a definite subsumer (there's a model
-						// which witnesses this non-subsumption).
-						candidateIterator.remove();
-					}
-				}
-			} else {
-				LOGGER_.trace(
-						"{} has a clash so all candidate subsumers are retained",
-						rootContext);
-				// nothing to do, we're interested in exploring models which
-				// witness non-subsumptions but this
-				// branch is inconsistent so doesn't have a model
-			}
-		}
-
-		rootContext.setSaturated(new SaturatedContext(
-				new LazySetUnion<IndexedClass>(candidates, subsumers)));
-		rootContext.setSaturated();
-
-		return rootContext.getSaturatedContext().getAtomicSubsumers();
-	}
-
-	private void backtrackToLastBranchingPoint(Context context,
-			AtomicSubsumerCandidatesCollector atomicSubsumerCollector) {
-
-		for (;;) {
-			LocalConclusion nextFromHistory = context.popHistory();
-
-			if (nextFromHistory == null) {
-				atomicSubsumerCollector.notifyEndOfBacktracking(context, null);
-				return;
-			}
-
-			LOGGER_.trace("Examining history, next: {}", nextFromHistory);
-
-			boolean branchingPoint = !nextFromHistory.accept(
-					backtrackingVisitor_, context);
-
-			context.removeConclusion(nextFromHistory);
-			/*
-			 * TODO can also skip the branching point if no atomic subsumers
-			 * were derived after it. Add tests for that.
-			 */
-			if (branchingPoint
-					&& !atomicSubsumerCollector.getCandidates().isEmpty()) {
-				// came across the next branching point
-				atomicSubsumerCollector.notifyEndOfBacktracking(context,
-						nextFromHistory);
-				return;
-			}
-			// see if it's an atomic subsumer
-			atomicSubsumerCollector
-					.notifyBacktracking(context, nextFromHistory);
-		}
-	}
-
-	/**
-	 * Responsible for examining conclusions during backtracking and collecting
-	 * some of them (atomic subsumers) as subsumer candidates.
-	 * 
-	 * @author Pavel Klinov
-	 * 
-	 *         pavel.klinov@uni-ulm.de
-	 */
-	private static class AtomicSubsumerCandidatesCollector implements
-			BacktrackingListener {
-
-		private final Root root_;
-
-		private final Collection<IndexedClass> candidates_;
-
-		private LocalPossibleConclusion currentBranchingPoint_;
-
-		private boolean collecting_;
-
-		AtomicSubsumerCandidatesCollector(Root root,
-				LocalPossibleConclusion branchingPoint,
-				Collection<IndexedClass> candidates) {
-			root_ = root;
-			candidates_ = candidates;
-			// set the initial branching point
-			if (branchingPoint != null) {
-				// TODO so far we assume that all branching points are subsumers
-				currentBranchingPoint_ = branchingPoint;
-				collecting_ = false;
-			} else {
-				// there is no current branching point, i.e. we backtrack to the
-				// nearest one start collecting candidates immediately
-				collecting_ = true;
-			}
-		}
-
-		boolean isPossibleSubsumer(LocalConclusion conclusion) {
-			return conclusion instanceof PossibleComposedSubsumer
-					|| conclusion instanceof PossibleDecomposedSubsumer;
-		}
-
-		@Override
-		public void notifyBacktracking(Context context,
-				LocalConclusion conclusionToBacktrack) {
-			if (root_ != context.getRoot()) {
-				return;
-			}
-
-			if (collecting_) {
-				// we've backtracked far enough to start collecting atomic
-				// subsumer candidates
-				if (conclusionToBacktrack instanceof Subsumer) {
-					IndexedClassExpression expression = ((Subsumer) conclusionToBacktrack)
-							.getExpression();
-
-					if (expression instanceof IndexedClass) {
-						candidates_.add((IndexedClass) expression);
-
-						LOGGER_.trace(
-								"New subsumer candidate found during backtracking: {}",
-								expression);
-					}
-				}
-			} else {
-				// check if we've backtracked far enough to start collecting
-				// atomic subsumer candidates
-				if (conclusionToBacktrack instanceof NegatedSubsumer) {
-					IndexedClassExpression expression = ((NegatedSubsumer) conclusionToBacktrack)
-							.getNegatedExpression();
-
-					if (expression == ((Subsumer) currentBranchingPoint_)
-							.getExpression()) {
-						LOGGER_.trace(
-								"Backtracked beyond {}, starting to collect candidates",
-								expression);
-
-						collecting_ = true;
-					}
-				}
-			}
-		}
-
-		@Override
-		public void notifyEndOfBacktracking(Context context,
-				LocalConclusion lastBacktracked) {
-			if (root_ != context.getRoot()) {
-				return;
-			}
-
-			collecting_ = false;
-
-			if (lastBacktracked == null) {
-				// exhausted the local history
-				currentBranchingPoint_ = null;
-				return;
-			}
-
-			// update the top branching point
-			if (isPossibleSubsumer(lastBacktracked)) {
-				LOGGER_.trace("Stopped backtracking at {}", lastBacktracked);
-
-				currentBranchingPoint_ = (LocalPossibleConclusion) lastBacktracked;
-			}
-		}
-
-		LocalPossibleConclusion getCurrentBranchingSubsumer() {
-			return currentBranchingPoint_;
-		}
-
-		Collection<IndexedClass> getCandidates() {
-			return candidates_;
-		}
 	}
 
 }

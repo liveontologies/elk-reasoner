@@ -222,25 +222,29 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 						subsumer.conjunctionsByConjunct_.get(common)));
 			}
 		}
+		
 		if (subsumer.negativeDisjunctions_ != null) {
 			// generate disjunctions
 			for (IndexedObjectUnionOf disjunction : subsumer.negativeDisjunctions_) {
 				producer.produce(new ComposedSubsumerImpl(disjunction));
 			}
 		}
+		
 		if (subsumer.negativeExistentials_ != null) {
-			// generate propagations for all sub-properties 
-			// TODO do it only for those properties for which backward links have been created, create others when we process each new link
+			// generate propagations  
 			for (IndexedObjectSomeValuesFrom existential : subsumer.negativeExistentials_) {
-				//IndexedObjectProperty relation = existential.getRelation();
-				//Set<IndexedObjectProperty> existingLinkProperties = premises.getBackwardLinks().keySet();
+				// TODO For some reason this way of generating propagations is slower (i.e. when they are generated only
+				// for existing backward links and also generated when the first backward link for the relation is added).
+				/*Set<IndexedObjectProperty> existingLinkProperties = premises.getBackwardLinks().keySet();
 				Set<IndexedObjectProperty> subProperties = existential.getRelation().getSaturatedProperty().getSubProperties();
 				
 				for (IndexedObjectProperty property : subProperties) {
-					producer.produce(new PropagationImpl(property, existential));
-				}
+					if (!premises.getBackwardLinks().get(property).isEmpty()) {
+						producer.produce(new PropagationImpl(property, existential));
+					}
+				}*/
 				
-				//producer.produce(new PropagationImpl(relation, existential));
+				producer.produce(new PropagationImpl(existential.getRelation(), existential));
 			}
 		}
 		if (subsumer.toldSuperClasses_ != null) {
@@ -249,6 +253,22 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 				producer.produce(new DecomposedSubsumerImpl(toldSuper));
 			}
 
+		}
+	}
+
+	public static void generatePropagations(ConclusionProducer producer, Context premises, IndexedObjectProperty relation) {
+		LOGGER_.trace("{}: generating propagations for {}", premises.getRoot(), relation);
+		
+		for (IndexedClassExpression subsumer : premises.getSubsumers()) {
+			if (subsumer.negativeExistentials_ == null) {
+				continue;
+			}
+			
+			for (IndexedObjectSomeValuesFrom e : subsumer.negativeExistentials_) {
+				if (e.getRelation().getSaturatedProperty().getSubProperties().contains(relation)) {
+					producer.produce(new PropagationImpl(relation, e));
+				}
+			}
 		}
 	}
 }

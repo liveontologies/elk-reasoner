@@ -310,6 +310,10 @@ public class Reasoner {
 				}
 				else {
 					countSubsumers += atomicSubsumers.size();
+					
+					if (initialClass.toString().startsWith("<http://www.ihtsdo.org/sep/S17412>")) {
+						System.out.println(atomicSubsumers);
+					}
 				}
 				
 				if (PRINT_STATS_) {

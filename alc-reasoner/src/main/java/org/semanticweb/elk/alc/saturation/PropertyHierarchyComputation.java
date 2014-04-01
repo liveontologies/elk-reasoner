@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class PropertyHierarchyComputation {
 
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(PropertyHierarchyComputation.class);
-	
+	//TODO make a local var?
 	private final Queue<IndexedObjectProperty> toDo_ = new LinkedList<IndexedObjectProperty>();
 	
 	/**
@@ -48,6 +48,7 @@ public class PropertyHierarchyComputation {
 			}
 			
 			superProperty.getSaturatedProperty().addSubProperty(property);
+			property.getSaturatedProperty().addSuperProperty(superProperty);
 			
 			for (IndexedObjectProperty toldSuper : superProperty.getToldSuperProperties()) {
 				toDo_.add(toldSuper);

@@ -161,23 +161,26 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			producer_.produce(conclusion.getSource(), new PropagatedClashImpl(
 					relation, input.getRoot()));
 		}
-		// apply propagations
+		// create propagations if this is the first backward link for this relation
+		/*if (input.getBackwardLinks().get(relation).size() == 1) {
+			IndexedClassExpression.generatePropagations(producer_, input, relation);	
+		}*/		
+		// apply previously generated propagations
 		Root root = conclusion.getSource();
 		Root sourceRoot = input.getRoot();
 		
-		if (input.isDeterministic()) {
-			for (IndexedObjectSomeValuesFrom propagatedSubsumer : input
-					.getPropagations().get(relation)) {
-				producer_.produce(root, new PropagatedComposedSubsumerImpl(
-						relation, sourceRoot, propagatedSubsumer));
-			}
-		} else {
-			for (IndexedObjectSomeValuesFrom propagatedSubsumer : input
-					.getPropagations().get(relation)) {
-				producer_.produce(root, new PossiblePropagatedExistentialImpl(
-						relation, sourceRoot, propagatedSubsumer));
+		for (IndexedObjectProperty superProperty : relation.getSaturatedProperty().getSuperProperties()) {
+			if (input.isDeterministic()) {
+				for (IndexedObjectSomeValuesFrom propagatedSubsumer : input.getPropagations().get(superProperty)) {
+					producer_.produce(root, new PropagatedComposedSubsumerImpl(relation, sourceRoot, propagatedSubsumer));
+				}
+			} else {
+				for (IndexedObjectSomeValuesFrom propagatedSubsumer : input.getPropagations().get(superProperty)) {
+					producer_.produce(root,	new PossiblePropagatedExistentialImpl(relation,	sourceRoot, propagatedSubsumer));
+				}
 			}
 		}
+		
 		return null;
 	}
 
@@ -188,15 +191,16 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		// subsumer!
 		IndexedObjectProperty relation = conclusion.getRelation();
 		Root sourceRoot = input.getRoot();
-		if (input.isDeterministic()) {
-			for (Root root : input.getBackwardLinks().get(relation)) {
-				producer_.produce(root, new PropagatedComposedSubsumerImpl(
-						relation, sourceRoot, conclusion.getCarry()));
-			}
-		} else {
-			for (Root root : input.getBackwardLinks().get(relation)) {
-				producer_.produce(root, new PossiblePropagatedExistentialImpl(
-						relation, sourceRoot, conclusion.getCarry()));
+		
+		for (IndexedObjectProperty subProperty : relation.getSaturatedProperty().getSubProperties()) {
+			if (input.isDeterministic()) {
+				for (Root root : input.getBackwardLinks().get(subProperty)) {
+					producer_.produce(root, new PropagatedComposedSubsumerImpl(subProperty, sourceRoot, conclusion.getCarry()));
+				}
+			} else {
+				for (Root root : input.getBackwardLinks().get(subProperty)) {
+					producer_.produce(root, new PossiblePropagatedExistentialImpl(subProperty, sourceRoot, conclusion.getCarry()));
+				}
 			}
 		}
 		return null;
