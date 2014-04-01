@@ -93,6 +93,13 @@ public class Context {
 	 * {@code true} if this {@link Context} is initialized
 	 */
 	private boolean isInitialized_ = false;
+	
+	/**
+	 * if {@code false}, this context is in the process of exploring alternative
+	 * branches and its local history will be maintained if it currently doesn't
+	 * contain non-deterministic conclusions.
+	 */
+	private boolean historyExplored_ = true;
 
 	/**
 	 * {@code true} if some inconsistency has been derived in this
@@ -498,6 +505,28 @@ public class Context {
 	
 	SaturatedContext getSaturatedContext() {
 		return saturated_;
+	}
+	
+	boolean setHistoryExplored() {
+		if (historyExplored_)
+			return false;
+		// else
+		historyExplored_ = true;
+		LOGGER_.trace("{}: marked as history explored", this);
+		return true;
+	}
+	
+	boolean setHistoryNotExplored() {
+		if (!historyExplored_)
+			return false;
+		// else
+		historyExplored_ = false;
+		LOGGER_.trace("{}: marked as history not explored", this);
+		return true;
+	}
+	
+	boolean isHistoryExplored() {
+		return historyExplored_;
 	}
 
 	static class ConclusionInserter implements

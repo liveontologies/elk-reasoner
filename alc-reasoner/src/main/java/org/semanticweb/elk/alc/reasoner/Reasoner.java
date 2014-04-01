@@ -316,7 +316,7 @@ public class Reasoner {
 				}
 				
 				if (PRINT_STATS_) {
-					if ((countClasses / 100) * 100 == countClasses) {
+					if ((countClasses / 1000) * 1000 == countClasses) {
 						LOGGER_.info(
 								"{} concepts processed (average: {} subsumers, {} subsumer tests, {} positive)",
 								countClasses,
@@ -324,9 +324,6 @@ public class Reasoner {
 								countSubsumerTests / countClasses,
 								(countSubsumerTests - countNegativeSubsumerTests)
 										/ countClasses);
-						LOGGER_.debug("Conclusions added: {}, removed: {}",
-								saturation.getAddedConclusionsCount(),
-								saturation.getRemovedConclusionsCount());
 					}
 				}
 			}

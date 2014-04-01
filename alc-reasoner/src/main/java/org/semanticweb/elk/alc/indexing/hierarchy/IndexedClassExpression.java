@@ -232,11 +232,9 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 		}
 		
 		if (subsumer.negativeExistentials_ != null) {
-			// generate propagations  
 			for (IndexedObjectSomeValuesFrom existential : subsumer.negativeExistentials_) {
-				// TODO For some reason this way of generating propagations is slower (i.e. when they are generated only
-				// for existing backward links and also generated when the first backward link for the relation is added).
 				if (Saturation.DEFERRED_PROPAGATION_GENERATION) {
+					// generate propagations for relevant roles 
 					Set<IndexedObjectProperty> subProperties = existential.getRelation().getSaturatedProperty().getSubProperties();
 
 					for (IndexedObjectProperty property : subProperties) {

@@ -75,7 +75,7 @@ public class Saturation {
 	/**
 	 * if {@code true}, propagations won't be generated until the corresponding backward links have been created
 	 */
-	public final static boolean DEFERRED_PROPAGATION_GENERATION = true;
+	public final static boolean DEFERRED_PROPAGATION_GENERATION = false;
 	
 	/**
 	 * if {@code true}, some statistics will be printed
@@ -277,7 +277,9 @@ public class Saturation {
 			if (possibleSubsumer instanceof IndexedClass)
 				subsumerCandidates.add((IndexedClass) possibleSubsumer);
 		}
+		
 		for (;;) {
+			context.setHistoryNotExplored();
 			// we are going to re-saturate this context
 			activeContext_ = context;
 			// visitor for exploring branches
@@ -287,7 +289,7 @@ public class Saturation {
 			while (proceedNext) {
 				LocalConclusion toBacktrack = context.popHistory();
 				if (toBacktrack == null) {
-					if (proceedNext && context.setNotSaturated())
+					if (proceedNext && /*context.setNotSaturated()*/context.setHistoryExplored())
 						// this means that the last removed conclusion in
 						// history was deterministic or history was empty
 						LOGGER_.trace("{}: history fully explored", context);
@@ -304,10 +306,11 @@ public class Saturation {
 			// re-saturate for the new choices
 			processDeterministic(context);
 			process();
-			if (context.setSaturated()) {
-				// context was set not saturated before, this means
+			if (/*context.setSaturated()*/context.setHistoryNotExplored()) {
+				// this means
 				// that all (relevant) non-deterministic choices have
 				// been explored, so we are done
+				context.setHistoryExplored();
 				break;
 			}
 			// filter out subsumer candidates
@@ -466,7 +469,7 @@ public class Saturation {
 
 		if (conclusion instanceof LocalConclusion
 				&& !context.isInconsistent()
-				&& (!context.isDeterministic() || context.isSaturated() || conclusion instanceof LocalPossibleConclusion)) {
+				&& (!context.isDeterministic() || /*context.isSaturated()*/!context.isHistoryExplored() || conclusion instanceof LocalPossibleConclusion)) {
 			context.pushToHistory((LocalConclusion) conclusion);
 		}
 
@@ -479,7 +482,7 @@ public class Saturation {
 				LocalConclusion toBacktrack = context.popHistory();
 				if (toBacktrack == null) {
 					LOGGER_.trace("{}: nothing to backtrack", context.getRoot());
-					if (proceedNext && context.setNotSaturated())
+					if (proceedNext && /*context.setNotSaturated()*/context.setHistoryExplored())
 						// this means that the last removed conclusion in
 						// history was deterministic or history was empty
 						LOGGER_.trace("{}: history fully explored", context);
