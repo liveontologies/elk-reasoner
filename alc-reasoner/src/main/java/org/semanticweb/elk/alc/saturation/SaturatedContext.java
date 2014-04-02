@@ -14,7 +14,7 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClass;
  *
  * pavel.klinov@uni-ulm.de
  */
-class SaturatedContext {
+public class SaturatedContext {
 
 	private final Set<IndexedClass> atomicSubsumers_;
 	
@@ -22,7 +22,7 @@ class SaturatedContext {
 		atomicSubsumers_ = atomicSubsumers;
 	}
 	
-	Set<IndexedClass> getAtomicSubsumers() {
+	public Set<IndexedClass> getAtomicSubsumers() {
 		return atomicSubsumers_;
 	}
 }

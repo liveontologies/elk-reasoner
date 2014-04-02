@@ -28,18 +28,17 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedAxiom;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.alc.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.alc.loading.ElkLoadingException;
-import org.semanticweb.elk.alc.reasoner.Reasoner;
+import org.semanticweb.elk.util.collections.Operations.Condition;
 
 public class SubsumptionCheckingAxiomVisitor implements
 		IndexedAxiomVisitor<Void> {
 
-	private final Reasoner reasoner_;
+	private final Condition<IndexedSubClassOfAxiom> condition_;
 
-	public SubsumptionCheckingAxiomVisitor(Reasoner reasoner) {
-		this.reasoner_ = reasoner;
+	public SubsumptionCheckingAxiomVisitor(Condition<IndexedSubClassOfAxiom> condition) {
+		condition_ = condition;
 	}
-
+	
 	static Void failVisit(IndexedAxiom axiom) {
 		fail("Subsumption should hold: " + axiom);
 		return null;
@@ -47,14 +46,11 @@ public class SubsumptionCheckingAxiomVisitor implements
 
 	@Override
 	public Void visit(IndexedSubClassOfAxiom axiom) {
-		try {
-			if (reasoner_.subsumes(axiom.getSubClass(), axiom.getSuperClass()))
-				return null;
-		} catch (ElkLoadingException e) {
+		if (!condition_.holds(axiom)) {
 			return failVisit(axiom);
 		}
-		// else
-		return failVisit(axiom);
+		
+		return null;
 	}
 
 	@Override

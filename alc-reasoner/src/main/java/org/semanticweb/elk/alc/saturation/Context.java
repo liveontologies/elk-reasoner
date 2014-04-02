@@ -518,11 +518,11 @@ public class Context {
 		return (localHistory_ == null || localHistory_.isEmpty());
 	}
 	
-	void setSaturated(SaturatedContext saturated) {
+	void setSaturatedContext(SaturatedContext saturated) {
 		saturated_ = saturated;
 	}
 	
-	SaturatedContext getSaturatedContext() {
+	public SaturatedContext getSaturatedContext() {
 		return saturated_;
 	}
 	

@@ -25,6 +25,7 @@ package org.semanticweb.elk.alc.reasoner;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -41,6 +42,8 @@ import org.semanticweb.elk.alc.saturation.Context;
 import org.semanticweb.elk.alc.saturation.PropertyHierarchyComputation;
 import org.semanticweb.elk.alc.saturation.Saturation;
 import org.semanticweb.elk.alc.saturation.SaturationState;
+import org.semanticweb.elk.alc.saturation.reduction.SubsumptionReduct;
+import org.semanticweb.elk.alc.saturation.reduction.SubsumptionTransitiveReduction;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.util.logging.Statistics;
@@ -155,7 +158,7 @@ public class Reasoner {
 			return true;
 		}
 
-		Saturation saturation = new Saturation(saturationState_);
+		Saturation saturation = new Saturation(saturationState_, ontologyIndex_.getIndexedOwlNothing());
 		//TODO this is temporary
 		if (second instanceof IndexedClass) {
 			Collection<? extends IndexedClassExpression> atomicSubsumers = saturation.getAtomicSubsumers(first);
@@ -177,7 +180,7 @@ public class Reasoner {
 		forceLoading();
 		computePropertyHierarchy();
 		saturationState_ = new SaturationState();
-		Saturation saturation = new Saturation(saturationState_);
+		Saturation saturation = new Saturation(saturationState_, ontologyIndex_.getIndexedOwlNothing());
 		Statistics.logOperationStart("concept satisfiability testing", LOGGER_);
 		try {
 			int count = 0;
@@ -202,7 +205,7 @@ public class Reasoner {
 		if (classificationFinished_)
 			return;
 		checkSatisfiability();
-		Saturation saturation = new Saturation(saturationState_);
+		Saturation saturation = new Saturation(saturationState_, ontologyIndex_.getIndexedOwlNothing());
 		Statistics.logOperationStart("classification", LOGGER_);
 		int countClasses = 0;
 		int countSubsumers = 0;
@@ -290,7 +293,7 @@ public class Reasoner {
 		if (classificationFinished_)
 			return;
 		checkSatisfiability();
-		Saturation saturation = new Saturation(saturationState_);
+		Saturation saturation = new Saturation(saturationState_, ontologyIndex_.getIndexedOwlNothing());
 		Statistics.logOperationStart("classification", LOGGER_);
 		int countClasses = 0;
 		int countSubsumers = 0;
@@ -298,8 +301,6 @@ public class Reasoner {
 		int countNegativeSubsumerTests = 0;
 		
 		try {
-
-			
 			
 			for (IndexedClass initialClass : ontologyIndex_.getIndexedClasses()) {
 				countClasses++;
@@ -307,7 +308,7 @@ public class Reasoner {
 				Collection<IndexedClass> atomicSubsumers = saturation.getAtomicSubsumers(initialClass);
 				
 				if (atomicSubsumers == null) {
-					//currently this means the class is unsatisfiable (TODO return owl:Nothing explicitly)
+					//currently this means the class is unsatisfiable 
 					LOGGER_.debug("{}: is unsatisfiable", initialClass);
 					countSubsumers += 1;//owl:Nothing is the only subsumer
 				}
@@ -339,5 +340,11 @@ public class Reasoner {
 			Statistics.logMemoryUsage(LOGGER_);
 		}
 		classificationFinished_ = true;
+	}
+	
+	public Map<IndexedClass, SubsumptionReduct> classifyAndReduce() throws ElkLoadingException {
+		classifyOptimized();
+		
+		return new SubsumptionTransitiveReduction().compute(ontologyIndex_.getIndexedClasses(), saturationState_);
 	}
 }

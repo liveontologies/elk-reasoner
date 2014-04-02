@@ -24,10 +24,13 @@ package org.semanticweb.elk.alc.indexing.hierarchy;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 public class OntologyIndex {
 
+	final IndexedClass owlNothing;
+	
 	private final IndexedObjectCache objectCache_ = new IndexedObjectCache();
 
 	private final Set<IndexedClass> classes_ = new ArrayHashSet<IndexedClass>(
@@ -35,6 +38,16 @@ public class OntologyIndex {
 	
 	private final Set<IndexedObjectProperty> objectProperties_ = new ArrayHashSet<IndexedObjectProperty>(
 			32);
+	
+	public OntologyIndex() {
+		// index predefined entities
+		MainAxiomIndexerVisitor tmpAxiomInserter = new MainAxiomIndexerVisitor(this, true);
+		owlNothing = tmpAxiomInserter.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
+	}
+	
+	public IndexedClass getIndexedOwlNothing() {
+		return owlNothing;
+	}
 	
 	void addClass(IndexedClass indexedClass) {
 		classes_.add(indexedClass);

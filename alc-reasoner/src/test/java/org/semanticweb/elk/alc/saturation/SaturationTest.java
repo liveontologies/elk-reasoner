@@ -24,6 +24,7 @@ package org.semanticweb.elk.alc.saturation;
 
 import org.junit.Test;
 import org.semanticweb.elk.alc.indexing.hierarchy.ChangeIndexingProcessor;
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.alc.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.alc.indexing.hierarchy.TestAxiomIndexerVisitor;
 import org.semanticweb.elk.alc.indexing.visitors.IndexedAxiomVisitor;
@@ -35,21 +36,52 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.util.collections.Operations.Condition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SaturationTest {
 
-	//private static final Logger LOGGER_ = LoggerFactory.getLogger(SaturationTest.class);
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(SaturationTest.class);
 
 	private final Owl2ParserFactory parserFactory_ = new Owl2FunctionalStyleParserFactory();
 
 	void testSaturation(String ontology, String expectedSubsumptions,
 			String expectedNonSubsumptions) throws ElkLoadingException {
-		Reasoner reasoner = new Reasoner(new Owl2StreamLoader(parserFactory_,
+		final Reasoner reasoner = new Reasoner(new Owl2StreamLoader(parserFactory_,
 				ontology));
+		Condition<IndexedSubClassOfAxiom> subsumptionCondition = new Condition<IndexedSubClassOfAxiom>() {
+
+			@Override
+			public boolean holds(IndexedSubClassOfAxiom axiom) {
+				try {
+					return reasoner.subsumes(axiom.getSubClass(), axiom.getSuperClass());
+				} catch (ElkLoadingException e) {
+					LOGGER_.error("Exception during subsumption check", e);
+					return false;
+				}
+			}
+			
+		};
+		Condition<IndexedSubClassOfAxiom> nonSubsumptionCondition = new Condition<IndexedSubClassOfAxiom>() {
+
+			@Override
+			public boolean holds(IndexedSubClassOfAxiom axiom) {
+				try {
+					return !reasoner.subsumes(axiom.getSubClass(), axiom.getSuperClass());
+				} catch (ElkLoadingException e) {
+					LOGGER_.error("Exception during subsumption check", e);
+					return false;
+				}
+			}
+			
+		};
+		
+		
 		IndexedAxiomVisitor<Void> subsumptionChecker = new SubsumptionCheckingAxiomVisitor(
-				reasoner);
-		IndexedAxiomVisitor<Void> nonSubsumptionChecker = new NonSubsumptionCheckingAxiomVisitor(
-				reasoner);
+				subsumptionCondition);
+		IndexedAxiomVisitor<Void> nonSubsumptionChecker = new SubsumptionCheckingAxiomVisitor(
+				nonSubsumptionCondition);
 		reasoner.forceLoading();
 		OntologyIndex index = reasoner.getOntologyIndex();
 		TestAxiomIndexerVisitor subsumptionIndexer = new TestAxiomIndexerVisitor(

@@ -24,6 +24,7 @@ package org.semanticweb.elk.alc.saturation;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Queue;
@@ -114,12 +115,18 @@ public class Saturation {
 	private final Multimap<IndexedObjectProperty, Root> producedBackwardLinks_;
 	private final Multimap<IndexedObjectProperty, Root> rectractedBackwardLinks_;
 
+	// FIXME this is a kluge, needed only for returning it as the sole subsumer
+	// of unsatisfiable classes.
+	// Use another way of indicating that a class is unsatisfiable.
+	private final IndexedClass owlNothing_;
+	
 	// some statistics counters
 	private static int inconsistentRootCount_ = 0;
 	private static int addedConclusions_ = 0;
 	private static int removedConclusions_ = 0;
 
-	public Saturation(SaturationState saturationState) {
+	public Saturation(SaturationState saturationState, IndexedClass owlNothing) {
+		this.owlNothing_ = owlNothing;
 		this.saturationState_ = saturationState;
 		this.localDeterministicConclusions_ = new ArrayDeque<LocalDeterministicConclusion>(
 				1024);
@@ -558,13 +565,15 @@ public class Saturation {
 		}
 
 		if (rootContext.isInconsistent()) {
-			// TODO return {owl:Nothing}
 			LOGGER_.trace("{} is unsatisfiable", rootClass);
+			
+			rootContext.setSaturatedContext(new SaturatedContext(Collections.singleton(owlNothing_)));
+			
 			return null;
 		}
 
 		LOGGER_.trace("Started computing subsumers for {}", rootClass);
-		rootContext.setSaturated(new SaturatedContext(
+		rootContext.setSaturatedContext(new SaturatedContext(
 				getSubsumersOptimized(rootContext)));
 		return rootContext.getSaturatedContext().getAtomicSubsumers();
 
