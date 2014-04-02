@@ -25,6 +25,7 @@ package org.semanticweb.elk.alc.saturation;
 import static org.junit.Assert.fail;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedAxiom;
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.alc.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.alc.loading.ElkLoadingException;
@@ -54,6 +55,12 @@ public class SubsumptionCheckingAxiomVisitor implements
 		}
 		// else
 		return failVisit(axiom);
+	}
+
+	@Override
+	public Void visit(IndexedDisjointnessAxiom axiom) {
+		//no-op
+		return null;
 	}
 
 }

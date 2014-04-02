@@ -25,6 +25,8 @@ package org.semanticweb.elk.alc.indexing.hierarchy;
  * #L%
  */
 
+import java.util.List;
+
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -40,6 +42,8 @@ public interface ElkAxiomIndexer {
 
 	public void indexSubClassOfAxiom(ElkClassExpression subClass,
 			ElkClassExpression superClass);
+	
+	public void indexDisjointClassesAxiom(List<? extends ElkClassExpression> disjointClasses);
 
 	public IndexedClass indexClassDeclaration(ElkClass ec);
 

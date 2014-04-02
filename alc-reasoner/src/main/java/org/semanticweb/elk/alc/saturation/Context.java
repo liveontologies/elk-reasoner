@@ -25,10 +25,12 @@ package org.semanticweb.elk.alc.saturation;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
@@ -38,6 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConjectureNonSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
@@ -53,6 +56,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagated
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -182,6 +186,12 @@ public class Context {
 	 * which they were generated
 	 */
 	private Multimap<Root, IndexedClassExpression> propagatedComposedSubsumers_;
+	
+	/**
+	 * the derived {@link IndexedClassExpression} subsumers by
+	 * {@link IndexedDisjointnessAxiom}s in which they occur as members
+	 */
+	private Map<IndexedDisjointnessAxiom, IndexedClassExpression[]> disjointnessAxioms_;
 
 	/**
 	 * {@link ExternalConclusion}s to which the rules are yet to be applied
@@ -464,6 +474,15 @@ public class Context {
 			}
 		}
 	}
+	
+	public IndexedClassExpression[] getDisjointSubsumers(
+			IndexedDisjointnessAxiom axiom) {
+		if (disjointnessAxioms_ == null) {
+			return null;
+		}
+		
+		return disjointnessAxioms_.get(axiom);
+	}
 
 	public boolean hasClash() {
 		return hasClash_;
@@ -718,6 +737,36 @@ public class Context {
 			return input.negativeSubsumers_.add(conclusion.getExpression());
 		}
 
+		@Override
+		public Boolean visit(DisjointSubsumer conclusion, Context input) {
+			if (input.disjointnessAxioms_ == null) {
+				input.disjointnessAxioms_ = new ArrayHashMap<IndexedDisjointnessAxiom, IndexedClassExpression[]>();
+			}
+			IndexedDisjointnessAxiom axiom = conclusion.getAxiom();
+			IndexedClassExpression member = conclusion.getMember();
+			IndexedClassExpression[] members = input.disjointnessAxioms_
+					.get(axiom);
+			if (members == null) {
+				// at most two members are stored; it is sufficient to detect
+				// inconsistency
+				members = new IndexedClassExpression[2];
+				input.disjointnessAxioms_.put(axiom, members);
+			}
+			if (members[0] == null) {
+				members[0] = member;
+				return true;
+			}
+			if (members[0] == member) {
+				return false;
+			}
+			if (members[1] == null) {
+				members[1] = member;
+				return true;
+			}
+			// else
+			return false;
+		}
+
 	}
 
 	static class ConclusionDeleter implements
@@ -960,5 +1009,40 @@ public class Context {
 			return false;
 		}
 
+		@Override
+		public Boolean visit(DisjointSubsumer conclusion, Context input) {
+			if (input.disjointnessAxioms_ == null) {
+				return false;
+			}
+			IndexedDisjointnessAxiom axiom = conclusion.getAxiom();
+			IndexedClassExpression member = conclusion.getMember();
+			IndexedClassExpression[] members = input.disjointnessAxioms_
+					.get(axiom);
+			if (members == null)
+				return false;
+			if (members[0] == null)
+				return false;
+			if (members[0] == member) {
+				if (members[1] == null) {
+					// delete the record
+					input.disjointnessAxioms_.remove(axiom);
+					if (input.disjointnessAxioms_.isEmpty())
+						input.disjointnessAxioms_ = null;
+				} else {
+					// shift
+					members[0] = members[1];
+					members[1] = null;
+				}
+				return true;
+			}
+			if (members[1] == null)
+				return false;
+			if (members[1] == member) {
+				members[1] = null;
+				return true;
+			}
+			// else
+			return false;
+		}
 	}
 }

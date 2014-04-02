@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConjectureNonSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
@@ -143,6 +144,11 @@ class DummyConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 
 	@Override
 	public O visit(ConjectureNonSubsumer conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(DisjointSubsumer conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 

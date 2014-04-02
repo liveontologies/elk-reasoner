@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.alc.indexing.hierarchy;
 
+import java.util.List;
+
 import org.semanticweb.elk.alc.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -91,7 +93,13 @@ public class TestAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	@Override
 	public void indexTransitiveProperty(ElkObjectProperty property) {
 		// no-op
-		
 	}
 
+	@Override
+	public void indexDisjointClassesAxiom(
+			List<? extends ElkClassExpression> disjointClasses) {
+		// TODO
+	}
+
+	
 }

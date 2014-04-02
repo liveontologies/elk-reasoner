@@ -22,6 +22,9 @@
  */
 package org.semanticweb.elk.alc.indexing.hierarchy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.semanticweb.elk.alc.indexing.visitors.IndexedAxiomFilter;
 import org.semanticweb.elk.alc.indexing.visitors.IndexedObjectFilter;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -101,6 +104,20 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 
 		axiomUpdateFilter_.visit(new IndexedSubClassOfAxiom(subIndexedClass,
 				superIndexedClass));
+	}
+	
+	
+
+	@Override
+	public void indexDisjointClassesAxiom(
+			List<? extends ElkClassExpression> disjointClasses) {
+		List<IndexedClassExpression> members = new ArrayList<IndexedClassExpression>(disjointClasses.size());
+		
+		for (ElkClassExpression clazz : disjointClasses) {
+			members.add(clazz.accept(negativeIndexer));
+		}
+		
+		axiomUpdateFilter_.visit(new IndexedDisjointnessAxiom(members));
 	}
 
 	@Override

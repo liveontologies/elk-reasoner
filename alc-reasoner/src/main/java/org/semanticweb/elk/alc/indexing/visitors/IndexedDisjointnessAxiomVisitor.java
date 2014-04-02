@@ -1,5 +1,7 @@
 package org.semanticweb.elk.alc.indexing.visitors;
 
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedDisjointnessAxiom;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,8 +24,9 @@ package org.semanticweb.elk.alc.indexing.visitors;
  * #L%
  */
 
-public interface IndexedAxiomVisitor<O> extends
-		IndexedSubClassOfAxiomVisitor<O>, IndexedDisjointnessAxiomVisitor<O> {
 
-	// nothing else
+public interface IndexedDisjointnessAxiomVisitor<O> {
+
+	O visit(IndexedDisjointnessAxiom axiom);
+
 }

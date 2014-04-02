@@ -35,10 +35,12 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SaturationTest {
 
-	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(SaturationTest.class);
 
 	private final Owl2ParserFactory parserFactory_ = new Owl2FunctionalStyleParserFactory();
 
@@ -336,36 +338,7 @@ public class SaturationTest {
 		);
 	}
 	
-	@Test
-	public void testTransitivityWithHierarchyNonDeterministic() throws ElkLoadingException {
-		/*
-		 * testing that transitive propagations get propagated via possible propagated existentials
-		 */
-		testSaturation(// Ontology:
-				"Prefix(:=<>)"//
-						+ "Ontology("//
-						+ "TransitiveObjectProperty(:R)"//
-						+ "SubObjectPropertyOf(:R :S)"//	
-						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
-						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :C))"//						
-						+ "SubClassOf(:C ObjectUnionOf(:D1 :D2))"//
-						+ "SubClassOf(ObjectSomeValuesFrom(:S :D1) :E)"//
-						+ "SubClassOf(ObjectSomeValuesFrom(:S :D2) :E)"//
-						+ ")",
-				// Expected subsumptions:
-				"Prefix(:=<>)"//
-						+ "Ontology("//
-						+ "SubClassOf(:A :A)"//
-						+ "SubClassOf(:A :E)"//
-						+ ")",//
-				// Expected non-subsumptions:
-				"Prefix(:=<>)"//
-						+ "Ontology("//
-						+ "SubClassOf(:A :C)"//
-						+ "SubClassOf(:A :B)"//
-						+ ")"//
-		);
-	}
+	
 
 	@Test
 	public void testCyclicExistentialsSimple() throws ElkLoadingException {
@@ -1169,4 +1142,82 @@ public class SaturationTest {
 		);
 	}
 
+	@Test
+	public void testDisjointnessSimple() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectUnionOf(:B :C))"//
+						+ "SubClassOf(:B ObjectIntersectionOf(:BB :BC))"//
+						+ "DisjointClasses(:A :BC)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :C)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :B)"//						
+						+ ")"//
+		);
+	}	
+	
+	@Test
+	public void testDisjointnessSelfInconsistency() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :B)"//
+						+ "DisjointClasses(:B :C :B)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A <http://www.w3.org/2002/07/owl#Nothing>)"//
+						+ "SubClassOf(:B <http://www.w3.org/2002/07/owl#Nothing>)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+					
+						+ ")"//
+		);
+	}
+	
+	@Test
+	public void testTransitivityWithHierarchyNonDeterministic() throws ElkLoadingException {
+		
+		LOGGER_.info("TRANSITIVITY TEST STARTED");
+		/*
+		 * testing that transitive propagations get propagated via possible propagated existentials
+		 */
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "TransitiveObjectProperty(:R)"//
+						+ "SubObjectPropertyOf(:R :S)"//	
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :C))"//						
+						+ "SubClassOf(:C ObjectUnionOf(:D1 :D2))"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :D1) :E)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :D2) :E)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :A)"//
+						+ "SubClassOf(:A :E)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :C)"//
+						+ "SubClassOf(:A :B)"//
+						+ ")"//
+		);
+		
+		LOGGER_.info("TRANSITIVITY TEST ENDED");
+	}	
 }

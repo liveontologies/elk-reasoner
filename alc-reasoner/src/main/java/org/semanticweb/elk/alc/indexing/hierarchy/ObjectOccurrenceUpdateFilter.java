@@ -116,4 +116,9 @@ class ObjectOccurrenceUpdateFilter implements IndexedObjectFilter {
 		return update(cache_.visit(axiom));
 	}
 
+	@Override
+	public IndexedDisjointnessAxiom visit(IndexedDisjointnessAxiom axiom) {
+		return update(cache_.visit(axiom));
+	}
+
 }

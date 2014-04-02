@@ -22,15 +22,18 @@
  */
 package org.semanticweb.elk.alc.indexing.entries;
 
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedAxiom;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObject;
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedSubClassOfAxiom;
-import org.semanticweb.elk.alc.indexing.visitors.IndexedObjectVisitor;
+import org.semanticweb.elk.alc.indexing.visitors.IndexedAxiomVisitor;
+import org.semanticweb.elk.alc.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.alc.indexing.visitors.IndexedObjectPropertyVisitor;
 import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
 
@@ -47,7 +50,9 @@ import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
  * @see KeyEntryHashSet
  */
 public class IndexedEntryConverter<T> implements
-		IndexedObjectVisitor<KeyEntry<T, ? extends IndexedObject>> {
+		IndexedClassExpressionVisitor<KeyEntry<T, ? extends IndexedClassExpression>>,
+		IndexedObjectPropertyVisitor<KeyEntry<T, ? extends IndexedObjectProperty>>,
+		IndexedAxiomVisitor<KeyEntry<T, ? extends IndexedAxiom>> {
 
 	@Override
 	public IndexedClassExpressionEntry<T, IndexedClass> visit(
@@ -85,6 +90,12 @@ public class IndexedEntryConverter<T> implements
 	public KeyEntry<T, ? extends IndexedSubClassOfAxiom> visit(
 			IndexedSubClassOfAxiom axiom) {
 		return new IndexedSubClassOfAxiomEntry<T, IndexedSubClassOfAxiom>(axiom);
+	}
+
+	@Override
+	public KeyEntry<T, ? extends IndexedDisjointnessAxiom> visit(
+			IndexedDisjointnessAxiom axiom) {
+		return new IndexedDisjointnessAxiomEntry<T, IndexedDisjointnessAxiom>(axiom);
 	}
 
 }

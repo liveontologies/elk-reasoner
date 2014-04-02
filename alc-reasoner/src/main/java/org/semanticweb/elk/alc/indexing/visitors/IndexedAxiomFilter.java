@@ -22,10 +22,11 @@ package org.semanticweb.elk.alc.indexing.visitors;
  * #L%
  */
 
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedSubClassOfAxiom;
 
 public interface IndexedAxiomFilter extends
-		IndexedSubClassOfAxiomVisitor<IndexedSubClassOfAxiom> {
+		IndexedSubClassOfAxiomVisitor<IndexedSubClassOfAxiom>, IndexedDisjointnessAxiomVisitor<IndexedDisjointnessAxiom> {
 
 	// nothing else
 

@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
@@ -61,4 +62,5 @@ public interface LocalDeterministicConclusionVisitor<I, O> {
 
 	public O visit(Clash conclusion, I input);
 
+	public O visit(DisjointSubsumer conclusion, I input);
 }

@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashI
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DisjointSubsumerImpl;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +95,19 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 * {@link IndexedClassExpression} is a subclass.
 	 */
 	Set<IndexedClassExpression> toldSuperClasses_;
+	
+	/**
+	 */
+	Set<IndexedDisjointnessAxiom> disjointnessAxioms_;
 
+	Set<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
+		if (disjointnessAxioms_ == null) {
+			return Collections.emptySet();
+		}
+		
+		return disjointnessAxioms_;
+	}
+	
 	Map<IndexedClassExpression, IndexedObjectIntersectionOf> getConjunctionsByConjunct() {
 		if (conjunctionsByConjunct_ == null)
 			return Collections.emptyMap();
@@ -298,12 +311,24 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 				}
 			}
 		}
+		
 		if (toldSuperClasses_ != null) {
 			// expand under told super-classes
 			for (IndexedClassExpression toldSuper : toldSuperClasses_) {
 				producer.produce(new DecomposedSubsumerImpl(toldSuper));
 			}
-
+		}
+		
+		if (disjointnessAxioms_ != null) {
+			// generate disjoint subsumers
+			for (IndexedDisjointnessAxiom axiom : disjointnessAxioms_) {
+				if (axiom.getInconsistentMembers().contains(this)) {
+					producer.produce(ClashImpl.getInstance());
+				}
+				else {
+					producer.produce(new DisjointSubsumerImpl(axiom, this));
+				}
+			}
 		}
 	}	
 

@@ -47,6 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSu
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConjectureNonSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
@@ -329,6 +330,17 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	@Override
 	public Void visit(ConjectureNonSubsumer conclusion, Context input) {
 		visitNegation(conclusion.getExpression(), input);
+		return null;
+	}
+
+	@Override
+	public Void visit(DisjointSubsumer conclusion, Context input) {
+		IndexedClassExpression[] disjointSubsumers = input.getDisjointSubsumers(conclusion.getAxiom());
+		
+		if (disjointSubsumers != null && disjointSubsumers[1] != null) {
+			producer_.produce(ClashImpl.getInstance());
+		}
+		
 		return null;
 	}
 
