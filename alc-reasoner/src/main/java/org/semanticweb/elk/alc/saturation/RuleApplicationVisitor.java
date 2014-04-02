@@ -86,7 +86,8 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 
 	@Override
 	public Void visit(ComposedSubsumer conclusion, Context input) {
-		//IndexedClassExpression.applyCompositionRules(conclusion.getExpression(), input, producer_);
+		// IndexedClassExpression.applyCompositionRules(conclusion.getExpression(),
+		// input, producer_);
 		conclusion.getExpression().applyCompositionRules(input, producer_);
 		return null;
 	}
@@ -96,7 +97,8 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		IndexedClassExpression expression = conclusion.getExpression();
 		expression.accept(subsumerDecompositionVisitor_);
 		if (input.isDeterministic()) {
-			//IndexedClassExpression.applyCompositionRules(expression, input, producer_);
+			// IndexedClassExpression.applyCompositionRules(expression, input,
+			// producer_);
 			conclusion.getExpression().applyCompositionRules(input, producer_);
 		} else {
 			producer_.produce(new ComposedSubsumerImpl(expression));
@@ -107,21 +109,24 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	@Override
 	public Void visit(PropagatedComposedSubsumer conclusion, Context input) {
 		IndexedObjectProperty propagationRelation = conclusion.getRelation();
-		//FIXME generics to avoid the cast
-		IndexedObjectSomeValuesFrom carry = (IndexedObjectSomeValuesFrom)conclusion.getExpression();
-		
-		if (propagationRelation.isTransitive() && propagationRelation != carry.getRelation()) {
+		// FIXME generics to avoid the cast
+		IndexedObjectSomeValuesFrom carry = (IndexedObjectSomeValuesFrom) conclusion
+				.getExpression();
+
+		if (propagationRelation.isTransitive()
+				&& propagationRelation != carry.getRelation()) {
 			// if the existential was propagated via a transitive role, we
 			// produce a propagation in this context to propagate it further.
 			// It's unnecessary if the relation of the carry is the same as the
 			// propagation relation (and not a super-role) because
 			// in that case we'll generate the propagation when processing the
-			// carry as a subsumer (and only if it's not been done before). 
-			producer_.produce(new PropagationImpl(conclusion.getRelation(), carry));
+			// carry as a subsumer (and only if it's not been done before).
+			producer_.produce(new PropagationImpl(conclusion.getRelation(),
+					carry));
 		}
-		
+
 		producer_.produce(new ComposedSubsumerImpl(conclusion.getExpression()));
-		
+
 		return null;
 	}
 
@@ -179,48 +184,62 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			producer_.produce(conclusion.getSource(), new PropagatedClashImpl(
 					relation, input.getRoot()));
 		}
-		
+
 		Root root = conclusion.getSource();
-		
+
 		if (Saturation.DEFERRED_PROPAGATION_GENERATION) {
-			// generate propagations if this is the first backward link for this relation
+			// generate propagations if this is the first backward link for this
+			// relation
 			if (input.getBackwardLinks().get(relation).size() == 1) {
-				IndexedClassExpression.generatePropagations(producer_, input, relation);	
+				IndexedClassExpression.generatePropagations(producer_, input,
+						relation);
 			}
-			// apply previously generated propagations	
+			// apply previously generated propagations
 			applyAllPropagationsForRelation(relation, relation, input, root);
-		}
-		else {
+		} else {
 			// apply all stored propagations over the super-roles of this link
-			for (IndexedObjectProperty superProperty : new LazySetIntersection<IndexedObjectProperty>(relation.getSaturatedProperty().getSuperProperties(), input.getPropagations().keySet())) {
-				applyAllPropagationsForRelation(superProperty, relation, input, root);
+			for (IndexedObjectProperty superProperty : new LazySetIntersection<IndexedObjectProperty>(
+					relation.getSaturatedProperty().getSuperProperties(), input
+							.getPropagations().keySet())) {
+				applyAllPropagationsForRelation(superProperty, relation, input,
+						root);
 			}
 		}
-		
+
 		return null;
 	}
-	
-	void applyAllPropagationsForRelation(IndexedObjectProperty relation, IndexedObjectProperty linkRelation, Context input, Root target) {
-		// propagations are done over the link's relation otherwise they will be filtered as not relevant
+
+	void applyAllPropagationsForRelation(IndexedObjectProperty relation,
+			IndexedObjectProperty linkRelation, Context input, Root target) {
+		// propagations are done over the link's relation otherwise they will be
+		// filtered as not relevant
 		if (input.isDeterministic()) {
-			for (IndexedObjectSomeValuesFrom propagatedSubsumer : input.getPropagations().get(relation)) {
-				producer_.produce(target, new PropagatedComposedSubsumerImpl(linkRelation, input.getRoot(), propagatedSubsumer));
+			for (IndexedObjectSomeValuesFrom propagatedSubsumer : input
+					.getPropagations().get(relation)) {
+				producer_.produce(target, new PropagatedComposedSubsumerImpl(
+						linkRelation, input.getRoot(), propagatedSubsumer));
 			}
 		} else {
-			for (IndexedObjectSomeValuesFrom propagatedSubsumer : input.getPropagations().get(relation)) {
-				producer_.produce(target,	new PossiblePropagatedExistentialImpl(linkRelation,	input.getRoot(), propagatedSubsumer));
+			for (IndexedObjectSomeValuesFrom propagatedSubsumer : input
+					.getPropagations().get(relation)) {
+				producer_.produce(target,
+						new PossiblePropagatedExistentialImpl(linkRelation,
+								input.getRoot(), propagatedSubsumer));
 			}
 		}
 	}
-	
-	void applyPropagationForRelation(Propagation propagation, IndexedObjectProperty relation, Context input) {
+
+	void applyPropagationForRelation(Propagation propagation,
+			IndexedObjectProperty relation, Context input) {
 		if (input.isDeterministic()) {
 			for (Root root : input.getBackwardLinks().get(relation)) {
-				producer_.produce(root, new PropagatedComposedSubsumerImpl(relation, input.getRoot(), propagation.getCarry()));
+				producer_.produce(root, new PropagatedComposedSubsumerImpl(
+						relation, input.getRoot(), propagation.getCarry()));
 			}
 		} else {
 			for (Root root : input.getBackwardLinks().get(relation)) {
-				producer_.produce(root, new PossiblePropagatedExistentialImpl(relation, input.getRoot(), propagation.getCarry()));
+				producer_.produce(root, new PossiblePropagatedExistentialImpl(
+						relation, input.getRoot(), propagation.getCarry()));
 			}
 		}
 	}
@@ -231,17 +250,20 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		// TODO: for the future: propagations of universals should be decomposed
 		// subsumer!
 		IndexedObjectProperty relation = conclusion.getRelation();
-		
+
 		if (Saturation.DEFERRED_PROPAGATION_GENERATION) {
-			applyPropagationForRelation(conclusion, conclusion.getRelation(), input);	
-		}
-		else {
-			// apply this propagation over the stored links for sub-roles of the propagations' relation
-			for (IndexedObjectProperty subProperty : new LazySetIntersection<IndexedObjectProperty>(relation.getSaturatedProperty().getSubProperties(), input.getBackwardLinks().keySet())) {
+			applyPropagationForRelation(conclusion, conclusion.getRelation(),
+					input);
+		} else {
+			// apply this propagation over the stored links for sub-roles of the
+			// propagations' relation
+			for (IndexedObjectProperty subProperty : new LazySetIntersection<IndexedObjectProperty>(
+					relation.getSaturatedProperty().getSubProperties(), input
+							.getBackwardLinks().keySet())) {
 				applyPropagationForRelation(conclusion, subProperty, input);
-			}	
+			}
 		}
-		
+
 		return null;
 	}
 
@@ -270,20 +292,22 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		IndexedClassExpression negatedCarry = conclusion.getNegatedCarry();
 		Collection<IndexedClassExpression> newNegativeRootMembers = input
 				.getNegativePropagations().get(relation);
-		
-		for (IndexedObjectProperty linkRelation : relation.getSaturatedProperty().getSubProperties()) {
+
+		for (IndexedObjectProperty linkRelation : new LazySetIntersection<IndexedObjectProperty>(
+				relation.getSaturatedProperty().getSubProperties(), input
+						.getForwardLinks().keySet())) {
 			for (IndexedClassExpression positiveMember : input
 					.getForwardLinks().get(linkRelation)) {
 				ExternalDeterministicConclusion toBacktrack = new BacktrackedBackwardLinkImpl(
 						root, linkRelation);
-				ExternalDeterministicConclusion toAdd = new BackwardLinkImpl(root,
-						linkRelation);				
+				ExternalDeterministicConclusion toAdd = new BackwardLinkImpl(
+						root, linkRelation);
 				Root newTargetRoot = new Root(positiveMember,
 						newNegativeRootMembers);
 				Root oldTargetRoot = Root.removeNegativeMember(newTargetRoot,
 						negatedCarry);
 				input.removePropagatedConclusions(oldTargetRoot);
-				
+
 				if (oldTargetRoot != newTargetRoot) {
 					producer_.produce(oldTargetRoot, toBacktrack);
 					producer_.produce(newTargetRoot, toAdd);
@@ -322,13 +346,16 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	@Override
 	public Void visit(PossiblePropagatedExistential conclusion, Context input) {
 		IndexedObjectProperty propagationRelation = conclusion.getRelation();
-		IndexedObjectSomeValuesFrom carry = (IndexedObjectSomeValuesFrom)conclusion.getExpression();
-		
-		if (propagationRelation.isTransitive() && propagationRelation != carry.getRelation()) {
-			producer_.produce(new PropagationImpl(conclusion.getRelation(), carry));
+		IndexedObjectSomeValuesFrom carry = conclusion.getExpression();
+
+		if (propagationRelation.isTransitive()
+				&& propagationRelation != carry.getRelation()) {
+			producer_.produce(new PropagationImpl(conclusion.getRelation(),
+					carry));
 		}
-		
-		producer_.produce(new PossibleComposedSubsumerImpl(conclusion.getExpression()));
+
+		producer_.produce(new PossibleComposedSubsumerImpl(conclusion
+				.getExpression()));
 		return null;
 	}
 
@@ -340,12 +367,13 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 
 	@Override
 	public Void visit(DisjointSubsumer conclusion, Context input) {
-		IndexedClassExpression[] disjointSubsumers = input.getDisjointSubsumers(conclusion.getAxiom());
-		
+		IndexedClassExpression[] disjointSubsumers = input
+				.getDisjointSubsumers(conclusion.getAxiom());
+
 		if (disjointSubsumers != null && disjointSubsumers[1] != null) {
 			producer_.produce(ClashImpl.getInstance());
 		}
-		
+
 		return null;
 	}
 
