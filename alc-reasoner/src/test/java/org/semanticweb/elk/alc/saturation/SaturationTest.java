@@ -313,8 +313,9 @@ public class SaturationTest {
 		testSaturation(// Ontology:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
-						+ "TransitiveObjectProperty(:R)"//
-						+ "SubObjectPropertyOf(:R :S)"//	
+						+ "TransitiveObjectProperty(:T)"//
+						+ "SubObjectPropertyOf(:R :T)"//
+						+ "SubObjectPropertyOf(:T :S)"//	
 						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
 						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :C))"//						
 						+ "EquivalentClasses(:C :D)"//
@@ -1194,8 +1195,9 @@ public class SaturationTest {
 		testSaturation(// Ontology:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
-						+ "TransitiveObjectProperty(:R)"//
-						+ "SubObjectPropertyOf(:R :S)"//	
+						+ "TransitiveObjectProperty(:T)"//
+						+ "SubObjectPropertyOf(:R :T)"//	
+						+ "SubObjectPropertyOf(:T :S)"//	
 						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
 						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :C))"//						
 						+ "SubClassOf(:C ObjectUnionOf(:D1 :D2))"//
