@@ -270,22 +270,27 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		IndexedClassExpression negatedCarry = conclusion.getNegatedCarry();
 		Collection<IndexedClassExpression> newNegativeRootMembers = input
 				.getNegativePropagations().get(relation);
-		ExternalDeterministicConclusion toBacktrack = new BacktrackedBackwardLinkImpl(
-				root, conclusion.getRelation());
-		ExternalDeterministicConclusion toAdd = new BackwardLinkImpl(root,
-				conclusion.getRelation());
-		for (IndexedClassExpression positiveMember : input.getForwardLinks()
-				.get(relation)) {
-			Root newTargetRoot = new Root(positiveMember,
-					newNegativeRootMembers);
-			Root oldTargetRoot = Root.removeNegativeMember(newTargetRoot,
-					negatedCarry);
-			input.removePropagatedConclusions(oldTargetRoot);
-			if (oldTargetRoot != newTargetRoot) {
-				producer_.produce(oldTargetRoot, toBacktrack);
-				producer_.produce(newTargetRoot, toAdd);
+		
+		for (IndexedObjectProperty linkRelation : relation.getSaturatedProperty().getSubProperties()) {
+			for (IndexedClassExpression positiveMember : input
+					.getForwardLinks().get(linkRelation)) {
+				ExternalDeterministicConclusion toBacktrack = new BacktrackedBackwardLinkImpl(
+						root, linkRelation);
+				ExternalDeterministicConclusion toAdd = new BackwardLinkImpl(root,
+						linkRelation);				
+				Root newTargetRoot = new Root(positiveMember,
+						newNegativeRootMembers);
+				Root oldTargetRoot = Root.removeNegativeMember(newTargetRoot,
+						negatedCarry);
+				input.removePropagatedConclusions(oldTargetRoot);
+				
+				if (oldTargetRoot != newTargetRoot) {
+					producer_.produce(oldTargetRoot, toBacktrack);
+					producer_.produce(newTargetRoot, toAdd);
+				}
 			}
 		}
+
 		return null;
 	}
 

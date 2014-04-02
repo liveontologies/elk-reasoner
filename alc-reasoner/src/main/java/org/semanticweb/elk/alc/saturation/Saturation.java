@@ -50,6 +50,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.RetractedC
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -436,6 +437,31 @@ public class Saturation {
 		producedBufferedBackwardLinks(context);
 	}
 
+	private boolean isNotRelevant(PropagatedConclusion conclusion, Context context) {
+		IndexedObjectProperty relation = conclusion.getRelation();
+		Root sourceRoot = conclusion.getSourceRoot();
+		
+		if (!context.getForwardLinks().get(relation).contains(sourceRoot.getPositiveMember())) {
+			return true;
+		}
+		
+		Set<IndexedClassExpression> negativeMembers = sourceRoot.getNegatitveMembers();
+		
+		if (!negativeMembers.isEmpty()) {
+			// TODO this can probably be optimized for propagated existentials, we may just use the role under the quantifier to get to the negative propagations?
+			// the stored negative propagations may have one of the super-roles of the given conclusion
+			for (IndexedObjectProperty negPropagationRole : new LazySetIntersection<IndexedObjectProperty>(context.getNegativePropagations().keySet(), relation.getSaturatedProperty().getSuperProperties())) {
+				if (negativeMembers.equals(context.getNegativePropagations().get(negPropagationRole))) {
+					return false;
+				}
+			}
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
 	private void process(Context context, Conclusion conclusion) {
 		LOGGER_.trace("{}: processing {}", context, conclusion);
 		if (conclusion instanceof RetractedConclusion) {
@@ -447,13 +473,7 @@ public class Saturation {
 		}
 		if (conclusion instanceof PropagatedConclusion) {
 			// check if the conclusion is still relevant
-			PropagatedConclusion propagatedConclusion = ((PropagatedConclusion) conclusion);
-			IndexedObjectProperty relation = propagatedConclusion.getRelation();
-			Root sourceRoot = propagatedConclusion.getSourceRoot();
-			if (!context.getForwardLinks().get(relation)
-					.contains(sourceRoot.getPositiveMember())
-					|| !context.getNegativePropagations().get(relation)
-							.equals(sourceRoot.getNegatitveMembers())) {
+			if (isNotRelevant((PropagatedConclusion) conclusion, context)) {
 				LOGGER_.trace("{}: conclusion not relevant {}", context,
 						conclusion);
 				return;

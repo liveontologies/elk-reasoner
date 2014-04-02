@@ -35,12 +35,10 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SaturationTest {
 
-	private static final Logger LOGGER_ = LoggerFactory.getLogger(SaturationTest.class);
+	//private static final Logger LOGGER_ = LoggerFactory.getLogger(SaturationTest.class);
 
 	private final Owl2ParserFactory parserFactory_ = new Owl2FunctionalStyleParserFactory();
 
@@ -1189,7 +1187,7 @@ public class SaturationTest {
 	@Test
 	public void testTransitivityWithHierarchyNonDeterministic() throws ElkLoadingException {
 		
-		LOGGER_.info("TRANSITIVITY TEST STARTED");
+		//LOGGER_.info("TRANSITIVITY TEST STARTED");
 		/*
 		 * testing that transitive propagations get propagated via possible propagated existentials
 		 */
@@ -1209,6 +1207,7 @@ public class SaturationTest {
 						+ "Ontology("//
 						+ "SubClassOf(:A :A)"//
 						+ "SubClassOf(:A :E)"//
+						+ "SubClassOf(:B :E)"//
 						+ ")",//
 				// Expected non-subsumptions:
 				"Prefix(:=<>)"//
@@ -1218,6 +1217,32 @@ public class SaturationTest {
 						+ ")"//
 		);
 		
-		LOGGER_.info("TRANSITIVITY TEST ENDED");
+		//LOGGER_.info("TRANSITIVITY TEST ENDED");
 	}	
+	
+	@Test
+	public void testRoleHierarchyWithBacktracking() throws ElkLoadingException {
+		// testing that negative propagations work OK with role hierarchies so
+		// that "S some D_1" is properly propagated after "S some D1" is negated
+		// (or vice versa).
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubObjectPropertyOf(:R :S)"//	
+						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :C))"//						
+						+ "SubClassOf(:C ObjectUnionOf(:D1 :D2))"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :D1) :E)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :D2) :E)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:B :E)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
+	}
 }
