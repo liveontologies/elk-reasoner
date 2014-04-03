@@ -119,7 +119,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 						.getSaturatedProperty().getTransitiveSubProperties())) {
 			// if there exists a transitive role in the hierarchy between the
 			// propagation role and the carry role, we produce a propagation in
-			// this context to propagate it further. I.e. if R => T => S, where
+			// this context to propagate the carry further. I.e. if R => T => S, where
 			// R is the link role, T is transitive, and S is the carry role,
 			// then, "S some X" here implies "R some X" and "T some X"
 			// (propagation is over R and R => T). Thus

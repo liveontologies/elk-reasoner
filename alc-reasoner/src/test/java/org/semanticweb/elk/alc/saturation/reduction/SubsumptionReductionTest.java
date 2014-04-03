@@ -53,9 +53,9 @@ public class SubsumptionReductionTest {
 	private final Owl2ParserFactory parserFactory_ = new Owl2FunctionalStyleParserFactory();
 	
 	/**
-	 * FIXME reuse some parts of the similar method in {@link SaturationTest}
+	 * FIXME reuse some parts the code in the conditions
 	 */
-	void testTransitiveResuction(String ontology, String expectedDirectSubsumers,
+	void testTransitiveReduction(String ontology, String expectedDirectSubsumers,
 			String expectedNonSubsumptions, String expectedEquivalences) throws ElkLoadingException {
 		final Reasoner reasoner = new Reasoner(new Owl2StreamLoader(parserFactory_,
 				ontology));
@@ -80,6 +80,11 @@ public class SubsumptionReductionTest {
 				}
 			}
 			
+			@Override
+			public String toString() {
+				return "direct subsumption expected";
+			}
+			
 		};
 		Condition<IndexedSubClassOfAxiom> nonSubsumptionCondition = new Condition<IndexedSubClassOfAxiom>() {
 
@@ -99,6 +104,11 @@ public class SubsumptionReductionTest {
 					LOGGER_.error("Exception during reasoning", e);
 					return false;
 				}
+			}
+			
+			@Override
+			public String toString() {
+				return "direct subsumption NOT expected";
 			}
 			
 		};
@@ -124,69 +134,51 @@ public class SubsumptionReductionTest {
 				}
 			}
 			
+			@Override
+			public String toString() {
+				return "symmetric equivalence expected";
+			}
+			
 		};
-		// TODO disentangle this spaghetti...
-		IndexedAxiomVisitor<Void> subsumptionChecker = new SubsumptionCheckingAxiomVisitor(
-				subsumptionCondition);
-		IndexedAxiomVisitor<Void> nonSubsumptionChecker = new SubsumptionCheckingAxiomVisitor(
-				nonSubsumptionCondition);
-		IndexedAxiomVisitor<Void> equivalenceChecker = new SubsumptionCheckingAxiomVisitor(
-				equivalenceCondition);
+		
 		reasoner.forceLoading();
+		
 		OntologyIndex index = reasoner.getOntologyIndex();
-		TestAxiomIndexerVisitor subsumptionIndexer = new TestAxiomIndexerVisitor(
+		// check expected direct subsumers
+		loadAndCheck(expectedDirectSubsumers, subsumptionCondition, index);
+		// check that these are not direct subsumers (or maybe not subsumers at all)
+		loadAndCheck(expectedNonSubsumptions, nonSubsumptionCondition, index);
+		// check expected equivalences
+		loadAndCheck(expectedEquivalences, equivalenceCondition, index);
+	}
+
+	void loadAndCheck(String axioms, Condition<IndexedSubClassOfAxiom> conditionToCheck, OntologyIndex index)  throws ElkLoadingException {
+		IndexedAxiomVisitor<Void> subsumptionChecker = new SubsumptionCheckingAxiomVisitor(
+				conditionToCheck);
+		TestAxiomIndexerVisitor indexer = new TestAxiomIndexerVisitor(
 				index, subsumptionChecker);
-		TestAxiomIndexerVisitor nonSubsumptionIndexer = new TestAxiomIndexerVisitor(
-				index, nonSubsumptionChecker);
-		TestAxiomIndexerVisitor equivalenceIndexer = new TestAxiomIndexerVisitor(
-				index, equivalenceChecker);
-		AxiomLoader expectedSubsumptionsLoader = new Owl2StreamLoader(
-				parserFactory_, expectedDirectSubsumers);
-		AxiomLoader expectedNonSubsumptionsLoader = new Owl2StreamLoader(
-				parserFactory_, expectedNonSubsumptions);
-		AxiomLoader expectedEquivalencesLoader = new Owl2StreamLoader(
-				parserFactory_, expectedEquivalences);
-		ElkAxiomProcessor expectedSubsumptionsInserter = new ChangeIndexingProcessor(
-				subsumptionIndexer);
-		ElkAxiomProcessor expectedNonSubsumptionsInserter = new ChangeIndexingProcessor(
-				nonSubsumptionIndexer);
-		ElkAxiomProcessor expectedEquivalencesInserter = new ChangeIndexingProcessor(
-				equivalenceIndexer);
-		ElkAxiomProcessor dummyAxiomDeletor = new ElkAxiomProcessor() {
+		AxiomLoader loader = new Owl2StreamLoader(
+				parserFactory_, axioms);
+		ElkAxiomProcessor deleter = new ElkAxiomProcessor() {
 			@Override
 			public void visit(ElkAxiom elkAxiom) {
 				// does nothing
 			}
 		};
+		ElkAxiomProcessor inserter = new ChangeIndexingProcessor(indexer);
+		
 		try {
-			expectedNonSubsumptionsLoader.load(expectedNonSubsumptionsInserter,
-					dummyAxiomDeletor);
+			loader.load(inserter, deleter);
 		} finally {
-			expectedNonSubsumptionsLoader.dispose();
-			// clear interrupt status
-			Thread.interrupted();
-		}
-		try {
-			expectedSubsumptionsLoader.load(expectedSubsumptionsInserter,
-					dummyAxiomDeletor);
-		} finally {
-			expectedSubsumptionsLoader.dispose();
-			// clear interrupt status
-			Thread.interrupted();
-		}
-		try {
-			expectedEquivalencesLoader.load(expectedEquivalencesInserter,
-					dummyAxiomDeletor);
-		} finally {
-			expectedEquivalencesLoader.dispose();
+			loader.dispose();
 			// clear interrupt status
 			Thread.interrupted();
 		}
 	}
-
+	
 	@Test
 	public void testSimpleAncestors() throws ElkLoadingException {
-		testTransitiveResuction(// Ontology:
+		testTransitiveReduction(// Ontology:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :B)"//
@@ -215,7 +207,7 @@ public class SubsumptionReductionTest {
 
 	@Test
 	public void testSimpleEquivalences() throws ElkLoadingException {
-		testTransitiveResuction(// Ontology:
+		testTransitiveReduction(// Ontology:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :B)"//

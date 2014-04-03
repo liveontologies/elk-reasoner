@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.alc.saturation.Context;
@@ -43,24 +44,26 @@ public class SubsumptionTransitiveReduction {
 		LOGGER_.trace("{}: transitive reduction started", context);
 		
 		Iterator<IndexedClass> subsumerIterator = context.getSaturatedContext().getAtomicSubsumers().iterator();
-		IndexedClass contextRoot = (IndexedClass) context.getRoot().getPositiveMember();
+		IndexedClass root = (IndexedClass) context.getRoot().getPositiveMember();
 		SubsumptionReduct classReduct = new SubsumptionReduct();
 		
 		while(subsumerIterator.hasNext()) {
 			boolean isCandidateDirect = true;
 			IndexedClass candidate = subsumerIterator.next();
 			// adding itself, is it necessary?
-			if (candidate == contextRoot) {
+			if (candidate == root) {
 				classReduct.equivalent.add(candidate);
 				continue;
 			}
 			
 			Context candidateCxt = saturationState.getContext(candidate);
-			Iterator<IndexedClass> directSubsumerIterator = classReduct.directSubsumers.iterator();
 			
 			assertSaturated(candidateCxt);
 			
-			if (candidateCxt.getSaturatedContext().getAtomicSubsumers().contains(contextRoot)) {
+			Set<IndexedClass> candidateSupers = candidateCxt.getSaturatedContext().getAtomicSubsumers();
+			Iterator<IndexedClass> directSubsumerIterator = classReduct.directSubsumers.iterator();
+			
+			if (candidateSupers.contains(root)) {
 				//root subsumes the candidate and vice versa -- they're equivalent
 				classReduct.equivalent.add(candidate);
 				continue;
@@ -74,9 +77,23 @@ public class SubsumptionTransitiveReduction {
 				// checking if the candidate subsumes some current direct subsumer, then it can't be direct
 				if (directSubsumerCxt.getSaturatedContext().getAtomicSubsumers().contains(candidate)) {
 					isCandidateDirect = false;
+					
+					if (candidateSupers.contains(directSubsumer)) {
+						// the candidate is equivalent to the direct subsumer
+						SubsumptionReduct directSubsumerReduct = reduct.get(directSubsumer);
+						
+						if (directSubsumerReduct == null) {
+							directSubsumerReduct = new SubsumptionReduct();
+							reduct.put(directSubsumer, directSubsumerReduct);
+						}
+						
+						directSubsumerReduct.equivalent.add(candidate);
+					}
+					
+					break;
 				}
 				// checking if some current direct subsumer subsumes the candidate, then it's not direct anymore
-				if (candidateCxt.getSaturatedContext().getAtomicSubsumers().contains(directSubsumer)) {
+				if (candidateSupers.contains(directSubsumer)) {
 					directSubsumerIterator.remove();
 				}
 			}
@@ -86,7 +103,7 @@ public class SubsumptionTransitiveReduction {
 			}
 		}
 		
-		reduct.put(contextRoot, classReduct);
+		reduct.put(root, classReduct);
 		
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("{}: transitive reduction finished", context);
