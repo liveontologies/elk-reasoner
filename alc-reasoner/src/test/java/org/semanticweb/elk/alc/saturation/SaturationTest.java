@@ -397,7 +397,6 @@ public class SaturationTest {
 						+ "Ontology("//
 						+ "SubClassOf(:A :C)"//
 						+ "SubClassOf(:A :D)"//
-						+ "SubClassOf(:AA :E)"//
 						+ ")"//
 		);
 	}

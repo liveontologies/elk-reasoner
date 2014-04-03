@@ -98,25 +98,4 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 				+ ')';
 	}
 
-	/*@Override
-	public void applyCompositionRules(Context premises,
-			ConclusionProducer producer) {
-		super.applyCompositionRules(premises, producer);
-		// the rule for transitivity
-		Set<IndexedObjectProperty> transitiveSuperRoles = property_
-				.getSaturatedProperty().getTransitiveSuperProperties();
-
-		if (!transitiveSuperRoles.isEmpty()
-				&& filler_.negativeExistentials_ != null) {
-			for (IndexedObjectSomeValuesFrom e : filler_.negativeExistentials_) {
-				if (!new LazySetIntersection<IndexedObjectProperty>(
-						transitiveSuperRoles, e.getRelation()
-								.getSaturatedProperty().getTransitiveSubProperties())
-						.isEmpty()) {
-					producer.produce(new PropagationImpl(property_, this));
-				}
-			}
-		}
-	}*/
-
 }
