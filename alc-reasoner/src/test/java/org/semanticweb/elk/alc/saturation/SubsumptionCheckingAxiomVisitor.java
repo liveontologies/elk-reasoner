@@ -39,8 +39,8 @@ public class SubsumptionCheckingAxiomVisitor implements
 		condition_ = condition;
 	}
 	
-	static Void failVisit(IndexedAxiom axiom) {
-		fail("Subsumption should hold: " + axiom);
+	Void failVisit(IndexedAxiom axiom) {
+		fail("Condition violated: " + condition_ + ": " + axiom);
 		return null;
 	}
 

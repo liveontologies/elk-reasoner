@@ -46,9 +46,20 @@ public class PropertyHierarchyComputation {
 			if (superProperty == null) {
 				break;
 			}
-			
-			superProperty.getSaturatedProperty().addSubProperty(property);
-			property.getSaturatedProperty().addSuperProperty(superProperty);
+
+			if (property.isTransitive()) {
+				superProperty.getSaturatedProperty().addTransitiveSubProperty(property);
+			}
+			else {
+				superProperty.getSaturatedProperty().addSubProperty(property);
+			}
+
+			if (superProperty.isTransitive()) {
+				property.getSaturatedProperty().addTransitiveSuperProperty(superProperty);
+			}
+			else {
+				property.getSaturatedProperty().addSuperProperty(superProperty);
+			}
 			
 			for (IndexedObjectProperty toldSuper : superProperty.getToldSuperProperties()) {
 				toDo_.add(toldSuper);

@@ -219,57 +219,6 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
 
-/*	public static void applyCompositionRules(IndexedClassExpression subsumer,
-			Context premises, ConclusionProducer producer) {
-		if (premises.getNegativeSubsumers().contains(subsumer)) {
-			// generate clash
-			producer.produce(ClashImpl.getInstance());
-			// nothing else should be derived
-			return;
-		}
-		if (subsumer.conjunctionsByConjunct_ != null) {
-			// conjunction introduction
-			for (IndexedClassExpression common : new LazySetIntersection<IndexedClassExpression>(
-					premises.getSubsumers(),
-					subsumer.conjunctionsByConjunct_.keySet())) {
-				producer.produce(new ComposedSubsumerImpl(
-						subsumer.conjunctionsByConjunct_.get(common)));
-			}
-		}
-		
-		if (subsumer.negativeDisjunctions_ != null) {
-			// generate disjunctions
-			for (IndexedObjectUnionOf disjunction : subsumer.negativeDisjunctions_) {
-				producer.produce(new ComposedSubsumerImpl(disjunction));
-			}
-		}
-		
-		if (subsumer.negativeExistentials_ != null) {
-			for (IndexedObjectSomeValuesFrom existential : subsumer.negativeExistentials_) {
-				if (Saturation.DEFERRED_PROPAGATION_GENERATION) {
-					// generate propagations for relevant roles 
-					Set<IndexedObjectProperty> subProperties = existential.getRelation().getSaturatedProperty().getSubProperties();
-
-					for (IndexedObjectProperty property : subProperties) {
-						if (!premises.getBackwardLinks().get(property).isEmpty()) {
-							producer.produce(new PropagationImpl(property, existential));
-						}
-					}
-				}
-				else {
-					producer.produce(new PropagationImpl(existential.getRelation(), existential));
-				}
-			}
-		}
-		if (subsumer.toldSuperClasses_ != null) {
-			// expand under told super-classes
-			for (IndexedClassExpression toldSuper : subsumer.toldSuperClasses_) {
-				producer.produce(new DecomposedSubsumerImpl(toldSuper));
-			}
-
-		}
-	}*/
-	
 	public void applyCompositionRules(Context premises, ConclusionProducer producer) {
 		if (premises.getNegativeSubsumers().contains(this)) {
 			// generate clash

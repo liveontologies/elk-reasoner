@@ -113,16 +113,21 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		IndexedObjectSomeValuesFrom carry = (IndexedObjectSomeValuesFrom) conclusion
 				.getExpression();
 
-		if (propagationRelation.isTransitive()
-				&& propagationRelation != carry.getRelation()) {
-			// if the existential was propagated via a transitive role, we
-			// produce a propagation in this context to propagate it further.
-			// It's unnecessary if the relation of the carry is the same as the
-			// propagation relation (and not a super-role) because
-			// in that case we'll generate the propagation when processing the
-			// carry as a subsumer (and only if it's not been done before).
-			producer_.produce(new PropagationImpl(conclusion.getRelation(),
-					carry));
+		for (IndexedObjectProperty transitive : new LazySetIntersection<IndexedObjectProperty>(
+				propagationRelation.getSaturatedProperty()
+						.getTransitiveSuperProperties(), carry.getRelation()
+						.getSaturatedProperty().getTransitiveSubProperties())) {
+			// if there exists a transitive role in the hierarchy between the
+			// propagation role and the carry role, we produce a propagation in
+			// this context to propagate it further. I.e. if R => T => S, where
+			// R is the link role, T is transitive, and S is the carry role,
+			// then, "S some X" here implies "R some X" and "T some X"
+			// (propagation is over R and R => T). Thus
+			// "R some S some X" implies "T some T some X" which, in turn,
+			// implies "T some X" (via transitivity) and "S some X" (by T => S),
+			// which is precisely what we propagate further.
+			//TODO it suffices to only consider the maximal such Ts w.r.t. the role hierarchy 
+			producer_.produce(new PropagationImpl(transitive, carry));
 		}
 
 		producer_.produce(new ComposedSubsumerImpl(conclusion.getExpression()));
@@ -348,10 +353,11 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		IndexedObjectProperty propagationRelation = conclusion.getRelation();
 		IndexedObjectSomeValuesFrom carry = conclusion.getExpression();
 
-		if (propagationRelation.isTransitive()
-				&& propagationRelation != carry.getRelation()) {
-			producer_.produce(new PropagationImpl(conclusion.getRelation(),
-					carry));
+		for (IndexedObjectProperty transitive : new LazySetIntersection<IndexedObjectProperty>(
+				propagationRelation.getSaturatedProperty()
+						.getTransitiveSuperProperties(), carry.getRelation()
+						.getSaturatedProperty().getTransitiveSubProperties())) {
+			producer_.produce(new PropagationImpl(transitive, carry));
 		}
 
 		producer_.produce(new PossibleComposedSubsumerImpl(conclusion

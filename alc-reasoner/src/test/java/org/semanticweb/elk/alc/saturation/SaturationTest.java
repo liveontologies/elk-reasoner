@@ -61,6 +61,11 @@ public class SaturationTest {
 					return false;
 				}
 			}
+
+			@Override
+			public String toString() {
+				return "subsumption expected";
+			}
 			
 		};
 		Condition<IndexedSubClassOfAxiom> nonSubsumptionCondition = new Condition<IndexedSubClassOfAxiom>() {
@@ -73,6 +78,11 @@ public class SaturationTest {
 					LOGGER_.error("Exception during subsumption check", e);
 					return false;
 				}
+			}
+			
+			@Override
+			public String toString() {
+				return "subsumption NOT expected";
 			}
 			
 		};
@@ -341,13 +351,36 @@ public class SaturationTest {
 	}
 	
 	@Test
+	public void testTransitivityWithComplexFiller() throws ElkLoadingException {
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "TransitiveObjectProperty(:R)"//						
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+						+ "SubClassOf(:B ObjectSomeValuesFrom(:R ObjectIntersectionOf(:C :D)))"//						
+						+ "SubClassOf(ObjectSomeValuesFrom(:R ObjectIntersectionOf(:C :D)) :E)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :A)"//
+						+ "SubClassOf(:A :E)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")"//
+		);
+	}
+	
+	@Test
 	public void testTransitivityWithHierarchy() throws ElkLoadingException {
 		testSaturation(// Ontology:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
 						+ "TransitiveObjectProperty(:T)"//
 						+ "SubObjectPropertyOf(:R :T)"//
-						+ "SubObjectPropertyOf(:T :S)"//	
+						+ "SubObjectPropertyOf(:T :S)"//
 						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
 						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :C))"//						
 						+ "EquivalentClasses(:C :D)"//
@@ -364,12 +397,67 @@ public class SaturationTest {
 						+ "Ontology("//
 						+ "SubClassOf(:A :C)"//
 						+ "SubClassOf(:A :D)"//
-						+ "SubClassOf(:A :B)"//
+						+ "SubClassOf(:AA :E)"//
 						+ ")"//
 		);
 	}
 	
+	@Test
+	public void testTransitivityWithHierarchyNonSubsumptions() throws ElkLoadingException {
+		// here we shouldn't generate the Propagation(S, S some D) in B (even though R => T => S, and T is transitive)
+		// because then "S some D" gets propagated over other sub-roles of S to A and we infer A => E. That's wrong
+		// because H o R doesn't imply S. Instead B should have Propagation(T, S some D). 
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "TransitiveObjectProperty(:T)"//
+						+ "SubObjectPropertyOf(:R :T)"//
+						+ "SubObjectPropertyOf(:T :S)"//
+						+ "SubObjectPropertyOf(:H :S)"//
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:H :B))"//
+						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :C))"//						
+						+ "EquivalentClasses(:C :D)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :D) :E)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :E)"//
+						+ ")"//
+		);
+	}
 	
+	@Test
+	public void testTransitivityWithHierarchyNonSubsumptions2() throws ElkLoadingException {
+		// here the role hierarchy is such that the transitive role T is
+		// unrelated to S thus we shouldn't infer A => E
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "TransitiveObjectProperty(:T)"//
+						+ "SubObjectPropertyOf(:R :T)"//
+						+ "SubObjectPropertyOf(:R :S)"//	
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :C))"//						
+						+ "EquivalentClasses(:C :D)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :D) :E)"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:B :E)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :E)"//
+						+ ")"//
+		);
+	}
 
 	@Test
 	public void testCyclicExistentialsSimple() throws ElkLoadingException {
@@ -1219,8 +1307,6 @@ public class SaturationTest {
 	
 	@Test
 	public void testTransitivityWithHierarchyNonDeterministic() throws ElkLoadingException {
-		
-		//LOGGER_.info("TRANSITIVITY TEST STARTED");
 		/*
 		 * testing that transitive propagations get propagated via possible propagated existentials
 		 */
@@ -1250,15 +1336,13 @@ public class SaturationTest {
 						+ "SubClassOf(:A :B)"//
 						+ ")"//
 		);
-		
-		//LOGGER_.info("TRANSITIVITY TEST ENDED");
 	}	
 	
 	@Test
 	public void testRoleHierarchyWithBacktracking() throws ElkLoadingException {
 		// testing that negative propagations work OK with role hierarchies so
 		// that "S some D_1" is properly propagated after "S some D1" is negated
-		// (or vice versa).
+		// (or vice versa) and the link is retracted.
 		testSaturation(// Ontology:
 				"Prefix(:=<>)"//
 						+ "Ontology("//
