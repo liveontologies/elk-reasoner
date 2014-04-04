@@ -560,18 +560,22 @@ public class Saturation {
 			return rootContext.getSaturatedContext().getAtomicSubsumers();
 		}
 
+		Set<IndexedClass> subsumers = null;
+		
 		if (rootContext.isInconsistent()) {
 			LOGGER_.trace("{} is unsatisfiable", rootClass);
 			
-			rootContext.setSaturatedContext(new SaturatedContext(Collections.singleton(owlNothing_)));
-			
-			return null;
+			subsumers = Collections.singleton(owlNothing_);
 		}
-
-		LOGGER_.trace("Started computing subsumers for {}", rootClass);
-		rootContext.setSaturatedContext(new SaturatedContext(
-				getSubsumersOptimized(rootContext)));
-		return rootContext.getSaturatedContext().getAtomicSubsumers();
+		else {
+			LOGGER_.trace("Started computing subsumers for {}", rootClass);
+		
+			subsumers = getSubsumersOptimized(rootContext);
+		}
+		
+		rootContext.setSaturatedContext(new SaturatedContext(subsumers));
+		
+		return subsumers;
 
 	}
 
