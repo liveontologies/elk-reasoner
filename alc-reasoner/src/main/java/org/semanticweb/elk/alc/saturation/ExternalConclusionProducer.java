@@ -22,9 +22,9 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ExternalConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ExternalPossibleConclusion;
 
 /**
  * An object using which {@link ExternalConclusion}s of inferences can be

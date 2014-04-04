@@ -68,7 +68,8 @@ public class SubsumptionReductionTest {
 			public boolean holds(IndexedSubClassOfAxiom axiom) {
 				try {
 					if (taxonomy_ == null) {
-						taxonomy_ = reasoner.classifyAndReduce();
+						reasoner.classifyOptimized();
+						taxonomy_ = reasoner.reduce();
 					}
 					
 					SubsumptionReduct reduct = taxonomy_.get(axiom.getSubClass());
@@ -94,7 +95,8 @@ public class SubsumptionReductionTest {
 			public boolean holds(IndexedSubClassOfAxiom axiom) {
 				try {
 					if (taxonomy_ == null) {
-						taxonomy_ = reasoner.classifyAndReduce();
+						reasoner.classifyOptimized();
+						taxonomy_ = reasoner.reduce();
 					}
 					
 					SubsumptionReduct reduct = taxonomy_.get(axiom.getSubClass());
@@ -121,7 +123,8 @@ public class SubsumptionReductionTest {
 			public boolean holds(IndexedSubClassOfAxiom axiom) {
 				try {
 					if (taxonomy_ == null) {
-						taxonomy_ = reasoner.classifyAndReduce();
+						reasoner.classifyOptimized();
+						taxonomy_ = reasoner.reduce();
 					}
 					
 					IndexedClassExpression first = axiom.getSubClass();

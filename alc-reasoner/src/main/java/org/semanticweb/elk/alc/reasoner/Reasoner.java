@@ -23,7 +23,6 @@ package org.semanticweb.elk.alc.reasoner;
  */
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -40,12 +39,15 @@ import org.semanticweb.elk.alc.loading.ComposedAxiomLoader;
 import org.semanticweb.elk.alc.loading.ElkLoadingException;
 import org.semanticweb.elk.alc.saturation.Context;
 import org.semanticweb.elk.alc.saturation.PropertyHierarchyComputation;
+import org.semanticweb.elk.alc.saturation.SaturatedContext;
 import org.semanticweb.elk.alc.saturation.Saturation;
 import org.semanticweb.elk.alc.saturation.SaturationState;
+import org.semanticweb.elk.alc.saturation.SaturationStatistics;
 import org.semanticweb.elk.alc.saturation.reduction.SubsumptionReduct;
 import org.semanticweb.elk.alc.saturation.reduction.SubsumptionTransitiveReduction;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.logging.Statistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +85,8 @@ public class Reasoner {
 	private boolean satisfiabilityCheckingFinished_ = false;
 
 	private boolean classificationFinished_ = false;
+	
+	private final SaturationStatistics statistics_ = new SaturationStatistics();
 
 	public Reasoner() {
 		ontologyIndex_ = new OntologyIndex();
@@ -177,6 +181,8 @@ public class Reasoner {
 	public void checkSatisfiability() throws ElkLoadingException {
 		if (satisfiabilityCheckingFinished_)
 			return;
+		
+		statistics_.reset();
 		forceLoading();
 		computePropertyHierarchy();
 		saturationState_ = new SaturationState();
@@ -190,20 +196,29 @@ public class Reasoner {
 				if (PRINT_STATS_) {
 					count++;
 					if ((count / 1000) * 1000 == count)
-						LOGGER_.info("{} concepts processed", count);
+						LOGGER_.debug("{} concepts processed", count);
 				}
 			}
 		} finally {
+			SaturationStatistics saturationStats = saturation.getStatistics();
+			
+			statistics_.add(saturation.getStatistics());
+			
 			Statistics.logOperationFinish("concept satisfiability testing",
 					LOGGER_);
 			Statistics.logMemoryUsage(LOGGER_);
+			LOGGER_.debug("Conclusions added: {}, removed: {}",
+					saturationStats.addedConclusions,
+					saturationStats.removedConclusions);
 		}
 		satisfiabilityCheckingFinished_ = true;
 	}
 
 	public void classify() throws ElkLoadingException {
 		if (classificationFinished_)
-			return;
+			return; 
+		
+		statistics_.reset();
 		checkSatisfiability();
 		Saturation saturation = new Saturation(saturationState_, ontologyIndex_.getIndexedOwlNothing());
 		Statistics.logOperationStart("classification", LOGGER_);
@@ -218,12 +233,17 @@ public class Reasoner {
 				Context context = saturationState_.getContext(initialClass);
 				Set<IndexedClassExpression> allSubsumers = context
 						.getSubsumers();
+				Set<IndexedClass> atomicSubsumers = new ArrayHashSet<IndexedClass>(allSubsumers.size());
+				
 				for (IndexedClassExpression subsumer : allSubsumers) {
-					if (subsumer instanceof IndexedClass)
-						countSubsumers++;
+					if (subsumer instanceof IndexedClass) {
+						//countSubsumers++;
+						atomicSubsumers.add((IndexedClass) subsumer);
+					}
 				}
 				// contains possible subsumers remained to be tested
 				Queue<IndexedClass> subsumersToTest = null;
+				
 				for (;;) {
 					Set<IndexedClassExpression> possibleSubsumers = context
 							.getComposedSubsumers();
@@ -239,7 +259,7 @@ public class Reasoner {
 					} else {
 						// filtering out subsumers that are no longer derived
 						// non-deterministically
-						allSubsumers = context.getSubsumers();
+						/*allSubsumers = context.getSubsumers();
 						Iterator<IndexedClass> subsumersToTestIterator = subsumersToTest
 								.iterator();
 						while (subsumersToTestIterator.hasNext()) {
@@ -250,48 +270,60 @@ public class Reasoner {
 							subsumersToTestIterator.remove();
 							if (!allSubsumers.contains(next)) {
 								// not derived deterministically either
-								countSubsumers--;
+								//countSubsumers--;
+								atomicSubsumers.remove(next);
 							}
-						}
+						}*/
 					}
 					IndexedClass possibleSubsumer = subsumersToTest.poll();
 					if (possibleSubsumer == null)
 						break;
 					if (!saturation.checkSubsumer(context, possibleSubsumer)) {
-						countSubsumers--;
+						//countSubsumers--;
+						atomicSubsumers.remove(possibleSubsumer);
 						countNegativeSubsumerTests++;
 					}
 					countSubsumerTests++;
 				}
+				
+				countSubsumers += atomicSubsumers.size();
+				context.setSaturatedContext(new SaturatedContext(atomicSubsumers));
 
 				if (PRINT_STATS_) {
 					if ((countClasses / 1000) * 1000 == countClasses)
 						LOGGER_.info(
 								"{} concepts processed (average: {} subsumers, {} subsumer tests, {} positive)",
 								countClasses,
-								countSubsumers / countClasses,
+								atomicSubsumers.size() / countClasses,
 								countSubsumerTests / countClasses,
 								(countSubsumerTests - countNegativeSubsumerTests)
 										/ countClasses);
 				}
 			}
 		} finally {
-			LOGGER_.debug(
+			SaturationStatistics saturationStats = saturation.getStatistics();
+			
+			statistics_.add(saturation.getStatistics());
+			
+			LOGGER_.info(
 					"Total classes: {}, subsumers: {}, subsumer tests: {}, positive: {}",
 					countClasses, countSubsumers, countSubsumerTests,
 					countSubsumerTests - countNegativeSubsumerTests);
 			LOGGER_.debug("Conclusions added: {}, removed: {}",
-					saturation.getAddedConclusionsCount(),
-					saturation.getRemovedConclusionsCount());
+					saturationStats.addedConclusions,
+					saturationStats.removedConclusions);
 			Statistics.logOperationFinish("classification", LOGGER_);
 			Statistics.logMemoryUsage(LOGGER_);
 		}
+		
 		classificationFinished_ = true;
 	}
 	
 	public void classifyOptimized() throws ElkLoadingException {
 		if (classificationFinished_)
 			return;
+		
+		statistics_.reset();
 		checkSatisfiability();
 		Saturation saturation = new Saturation(saturationState_, ontologyIndex_.getIndexedOwlNothing());
 		Statistics.logOperationStart("classification", LOGGER_);
@@ -329,22 +361,30 @@ public class Reasoner {
 				}
 			}
 		} finally {
+			SaturationStatistics saturationStats = saturation.getStatistics();
+			
+			statistics_.add(saturation.getStatistics());
+			
 			LOGGER_.debug(
 					"Total classes: {}, subsumers: {}, subsumer tests: {}, positive: {}",
 					countClasses, countSubsumers, countSubsumerTests,
 					countSubsumerTests - countNegativeSubsumerTests);
 			LOGGER_.debug("Conclusions added: {}, removed: {}",
-					saturation.getAddedConclusionsCount(),
-					saturation.getRemovedConclusionsCount());
+					saturationStats.addedConclusions,
+					saturationStats.removedConclusions);
 			Statistics.logOperationFinish("classification", LOGGER_);
 			Statistics.logMemoryUsage(LOGGER_);
 		}
+		
 		classificationFinished_ = true;
 	}
 	
-	public Map<IndexedClass, SubsumptionReduct> classifyAndReduce() throws ElkLoadingException {
-		classifyOptimized();
-		
+	// TODO hide this method
+	public Map<IndexedClass, SubsumptionReduct> reduce() {
 		return new SubsumptionTransitiveReduction().compute(ontologyIndex_.getIndexedClasses(), saturationState_);
+	}
+	
+	public SaturationStatistics getStatistics() {
+		return statistics_;
 	}
 }

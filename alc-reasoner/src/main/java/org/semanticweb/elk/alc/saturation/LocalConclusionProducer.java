@@ -22,9 +22,9 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalDeterministicConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalPossibleConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.LocalConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.LocalDeterministicConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.LocalPossibleConclusion;
 
 /**
  * An object using which {@link LocalConclusion}s of inferences can be produced

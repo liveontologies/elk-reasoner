@@ -22,14 +22,14 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConjectureNonSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalDeterministicConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalPossibleConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.NegatedSubsumerImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ConjectureNonSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.LocalDeterministicConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.LocalPossibleConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleComposedSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.visitors.LocalConclusionVisitor;
 
 /**
  * A {@link LocalConclusionVisitor} that reverts the visited

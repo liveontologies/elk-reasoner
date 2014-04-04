@@ -27,11 +27,11 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.alc.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.ClashImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.DecomposedSubsumerImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.DisjunctionImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjunctionImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 
 /**
  * An {@link IndexedClassExpressionVisitor} applying decomposition rules using a

@@ -33,29 +33,29 @@ import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Clash;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConjectureNonSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Disjunction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossiblePropagatedExistential;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedClash;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Clash;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ComposedSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ConjectureNonSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ContextInitialization;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.DecomposedSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.DisjointSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Disjunction;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ExternalConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.LocalConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.NegatedSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.NegativePropagation;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleComposedSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossiblePropagatedExistential;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PropagatedClash;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Propagation;
+import org.semanticweb.elk.alc.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
@@ -518,7 +518,8 @@ public class Context {
 		return (localHistory_ == null || localHistory_.isEmpty());
 	}
 	
-	void setSaturatedContext(SaturatedContext saturated) {
+	//TODO make package protected
+	public void setSaturatedContext(SaturatedContext saturated) {
 		saturated_ = saturated;
 	}
 	

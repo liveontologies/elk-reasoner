@@ -33,23 +33,23 @@ import java.util.Set;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ClashImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.NegatedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalDeterministicConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalPossibleConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PropagatedConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.RetractedConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.BackwardLinkImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.ClashImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.ComposedSubsumerImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.NegatedSubsumerImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.BackwardLink;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ExternalPossibleConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.LocalConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.LocalDeterministicConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.LocalPossibleConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PropagatedConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.RetractedConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.alc.saturation.conclusions.visitors.LocalConclusionVisitor;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -117,13 +117,11 @@ public class Saturation {
 
 	// FIXME this is a kluge, needed only for returning it as the sole subsumer
 	// of unsatisfiable classes.
-	// Use another way of indicating that a class is unsatisfiable.
+	// Use another way of indicating that a class is unsatisfiable
 	private final IndexedClass owlNothing_;
 	
 	// some statistics counters
-	private static int inconsistentRootCount_ = 0;
-	private static int addedConclusions_ = 0;
-	private static int removedConclusions_ = 0;
+	private final SaturationStatistics statistics_ = new SaturationStatistics();
 
 	public Saturation(SaturationState saturationState, IndexedClass owlNothing) {
 		this.owlNothing_ = owlNothing;
@@ -242,7 +240,7 @@ public class Saturation {
 			if (!context.removeConclusion(toBacktrack))
 				LOGGER_.error("{}: cannot backtrack {}", context, toBacktrack);
 			LOGGER_.trace("{}: backtracking {}", context, toBacktrack);
-			removedConclusions_++;
+			statistics_.removedConclusions++;
 		}
 		restoreValidConclusions(context);
 		if (context.getSubsumers().contains(possibleSubsumer)) {
@@ -263,7 +261,7 @@ public class Saturation {
 		// definite conclusions should result in fewer non-deterministic steps
 		LocalConclusion conjecture = new NegatedSubsumerImpl(possibleSubsumer);
 		if (context.addConclusion(conjecture)) {
-			addedConclusions_++;
+			statistics_.addedConclusions++;
 			context.pushToHistory(conjecture);
 			// start applying the rules
 			conjecture.accept(ruleApplicationVisitor_, context);
@@ -315,7 +313,7 @@ public class Saturation {
 					LOGGER_.error("{}: cannot backtrack {}", context,
 							toBacktrack);
 				LOGGER_.trace("{}: backtracking {}", context, toBacktrack);
-				removedConclusions_++;
+				statistics_.removedConclusions++;
 			}
 			restoreValidConclusions(context);
 			// re-saturate for the new choices
@@ -387,12 +385,8 @@ public class Saturation {
 			saturationState_.checkSaturation();
 	}
 
-	public int getAddedConclusionsCount() {
-		return addedConclusions_;
-	}
-
-	public int getRemovedConclusionsCount() {
-		return removedConclusions_;
+	public SaturationStatistics getStatistics() {
+		return statistics_;
 	}
 
 	private void producedBufferedBackwardLinks(Context context) {
@@ -457,7 +451,9 @@ public class Saturation {
 		if (!negativeMembers.isEmpty()) {
 			// TODO this can probably be optimized for propagated existentials, we may just use the role under the quantifier to get to the negative propagations?
 			// the stored negative propagations may have one of the super-roles of the given conclusion
-			for (IndexedObjectProperty negPropagationRole : new LazySetIntersection<IndexedObjectProperty>(context.getNegativePropagations().keySet(), relation.getSaturatedProperty().getSuperProperties())) {
+			for (IndexedObjectProperty negPropagationRole : new LazySetIntersection<IndexedObjectProperty>(
+					context.getNegativePropagations().keySet(), relation
+							.getSaturatedProperty().getSuperProperties())) {
 				if (negativeMembers.equals(context.getNegativePropagations().get(negPropagationRole))) {
 					return false;
 				}
@@ -475,7 +471,7 @@ public class Saturation {
 			if (!context.removeConclusion(conclusion))
 				LOGGER_.error("{}: retracted conclusion not found: {}!",
 						context, conclusion);
-			removedConclusions_++;
+			statistics_.removedConclusions++;
 			return;
 		}
 		if (conclusion instanceof PropagatedConclusion) {
@@ -489,15 +485,15 @@ public class Saturation {
 		if (!context.addConclusion(conclusion))
 			return;
 
-		addedConclusions_++;
+		statistics_.addedConclusions++;
 
 		if (PRINT_STATS_) {
 			if (conclusion == ClashImpl.getInstance()
 					&& context.isInconsistent()) {
-				inconsistentRootCount_++;
-				if ((inconsistentRootCount_ / 1000) * 1000 == inconsistentRootCount_)
+				statistics_.inconsistentRoots++;
+				if ((statistics_.inconsistentRoots / 1000) * 1000 == statistics_.inconsistentRoots)
 					LOGGER_.info("{} inconsistent roots",
-							inconsistentRootCount_);
+							statistics_.inconsistentRoots);
 			}
 		}
 
@@ -530,7 +526,7 @@ public class Saturation {
 							toBacktrack);
 				LOGGER_.trace("{}: backtracking {}", context, toBacktrack);
 
-				removedConclusions_++;
+				statistics_.removedConclusions++;
 			}
 
 			restoreValidConclusions(context);

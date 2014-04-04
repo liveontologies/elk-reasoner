@@ -22,7 +22,7 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Conclusion;
 
 /**
  * An object using which {@link Conclusion}s of inferences can be produced

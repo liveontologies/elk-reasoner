@@ -26,21 +26,21 @@ import java.util.Collection;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ConjectureNonSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegatedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.NegativePropagation;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleComposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractLocalConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalConclusionVisitor;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.BackwardLinkImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ConjectureNonSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.LocalConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.NegatedSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.NegativePropagation;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleComposedSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.visitors.AbstractLocalConclusionVisitor;
+import org.semanticweb.elk.alc.saturation.conclusions.visitors.LocalConclusionVisitor;
 
 /**
  * A {@link LocalConclusionVisitor} that reverts the visited

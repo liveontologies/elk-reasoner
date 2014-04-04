@@ -29,12 +29,12 @@ import java.util.Queue;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ExternalPossibleConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.LocalPossibleConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.PossibleConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ExternalDeterministicConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ExternalPossibleConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.LocalPossibleConclusion;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleConclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
