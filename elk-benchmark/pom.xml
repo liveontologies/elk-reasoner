@@ -51,6 +51,11 @@
 			<artifactId>elk-util-logging</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+    <dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>alc-reasoner</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-reasoner</artifactId>
