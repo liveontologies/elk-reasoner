@@ -38,7 +38,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkObjectUnionOfImpl extends ElkClassExpressionListObject
 		implements ElkObjectUnionOf {
 
-	ElkObjectUnionOfImpl(List<? extends ElkClassExpression> classExpressions) {
+	public ElkObjectUnionOfImpl(List<? extends ElkClassExpression> classExpressions) {
 		super(classExpressions);
 	}
 

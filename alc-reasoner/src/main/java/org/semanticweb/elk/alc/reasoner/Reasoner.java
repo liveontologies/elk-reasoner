@@ -32,8 +32,10 @@ import org.semanticweb.elk.alc.indexing.hierarchy.ChangeIndexingProcessor;
 import org.semanticweb.elk.alc.indexing.hierarchy.ElkAxiomIndexingVisitor;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.alc.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.alc.indexing.hierarchy.TransitivityEncoder;
 import org.semanticweb.elk.alc.loading.AxiomLoader;
 import org.semanticweb.elk.alc.loading.ComposedAxiomLoader;
 import org.semanticweb.elk.alc.loading.ElkLoadingException;
@@ -174,8 +176,8 @@ public class Reasoner {
 		}
 	}
 	
-	private void computePropertyHierarchy() {
-		new PropertyHierarchyComputation().compute(ontologyIndex_);
+	private Collection<IndexedObjectProperty> computePropertyHierarchy() {
+		return new PropertyHierarchyComputation().compute(ontologyIndex_);
 	}
 
 	public void checkSatisfiability() throws ElkLoadingException {
@@ -184,7 +186,7 @@ public class Reasoner {
 		
 		statistics_.reset();
 		forceLoading();
-		computePropertyHierarchy();
+		encodeTransitivity(computePropertyHierarchy());
 		saturationState_ = new SaturationState();
 		Saturation saturation = new Saturation(saturationState_, ontologyIndex_.getIndexedOwlNothing());
 		Statistics.logOperationStart("concept satisfiability testing", LOGGER_);
@@ -212,6 +214,15 @@ public class Reasoner {
 					saturationStats.removedConclusions);
 		}
 		satisfiabilityCheckingFinished_ = true;
+	}
+
+	private void encodeTransitivity(
+			Collection<IndexedObjectProperty> propsWithTransitiveSubProperties) {
+		LOGGER_.trace("Encoding transitivity started");
+		
+		new TransitivityEncoder().encode(ontologyIndex_, propsWithTransitiveSubProperties);
+		
+		LOGGER_.trace("Encoding transitivity finished");
 	}
 
 	public void classify() throws ElkLoadingException {
@@ -291,7 +302,7 @@ public class Reasoner {
 
 				if (PRINT_STATS_) {
 					if ((countClasses / 1000) * 1000 == countClasses)
-						LOGGER_.info(
+						LOGGER_.debug(
 								"{} concepts processed (average: {} subsumers, {} subsumer tests, {} positive)",
 								countClasses,
 								atomicSubsumers.size() / countClasses,
@@ -350,7 +361,7 @@ public class Reasoner {
 				
 				if (PRINT_STATS_) {
 					if ((countClasses / 1000) * 1000 == countClasses) {
-						LOGGER_.info(
+						LOGGER_.debug(
 								"{} concepts processed (average: {} subsumers, {} subsumer tests, {} positive)",
 								countClasses,
 								countSubsumers / countClasses,

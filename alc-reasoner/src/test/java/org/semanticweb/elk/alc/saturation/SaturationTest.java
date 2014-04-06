@@ -1335,7 +1335,40 @@ public class SaturationTest {
 						+ "SubClassOf(:A :B)"//
 						+ ")"//
 		);
-	}	
+	}
+	
+	@Test
+	public void testEncodedTransitivityNonDeterministic() throws ElkLoadingException {
+
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :C))"//						
+						+ "SubClassOf(:C ObjectUnionOf(:D1 :D2))"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :D1) :E)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :D2) :E)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:R :D1) :E)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:R :D2) :E)"//
+						// encoding transitivity of R
+						+ "SubClassOf(ObjectSomeValuesFrom(:R ObjectSomeValuesFrom(:R :D1)) ObjectSomeValuesFrom(:R :D1))"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:R ObjectSomeValuesFrom(:R :D2)) ObjectSomeValuesFrom(:R :D2))"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :A)"//
+						+ "SubClassOf(:A :E)"//
+						+ "SubClassOf(:B :E)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :C)"//
+						+ "SubClassOf(:A :B)"//
+						+ ")"//
+		);
+	}
 	
 	@Test
 	public void testRoleHierarchyWithBacktracking() throws ElkLoadingException {

@@ -40,7 +40,6 @@ import org.semanticweb.elk.alc.saturation.conclusions.implementation.PossibleDec
 import org.semanticweb.elk.alc.saturation.conclusions.implementation.PossiblePropagatedExistentialImpl;
 import org.semanticweb.elk.alc.saturation.conclusions.implementation.PropagatedClashImpl;
 import org.semanticweb.elk.alc.saturation.conclusions.implementation.PropagatedComposedSubsumerImpl;
-import org.semanticweb.elk.alc.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ComposedSubsumer;
@@ -108,28 +107,6 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 
 	@Override
 	public Void visit(PropagatedComposedSubsumer conclusion, Context input) {
-		IndexedObjectProperty propagationRelation = conclusion.getRelation();
-		// FIXME generics to avoid the cast
-		IndexedObjectSomeValuesFrom carry = (IndexedObjectSomeValuesFrom) conclusion
-				.getExpression();
-
-		for (IndexedObjectProperty transitive : new LazySetIntersection<IndexedObjectProperty>(
-				propagationRelation.getSaturatedProperty()
-						.getTransitiveSuperProperties(), carry.getRelation()
-						.getSaturatedProperty().getTransitiveSubProperties())) {
-			// if there exists a transitive role in the hierarchy between the
-			// propagation role and the carry role, we produce a propagation in
-			// this context to propagate the carry further. I.e. if R => T => S, where
-			// R is the link role, T is transitive, and S is the carry role,
-			// then, "S some X" here implies "R some X" and "T some X"
-			// (propagation is over R and R => T). Thus
-			// "R some S some X" implies "T some T some X" which, in turn,
-			// implies "T some X" (via transitivity) and "S some X" (by T => S),
-			// which is precisely what we propagate further.
-			//TODO it suffices to only consider the maximal such Ts w.r.t. the role hierarchy 
-			producer_.produce(new PropagationImpl(transitive, carry));
-		}
-
 		producer_.produce(new ComposedSubsumerImpl(conclusion.getExpression()));
 
 		return null;
@@ -350,18 +327,18 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 
 	@Override
 	public Void visit(PossiblePropagatedExistential conclusion, Context input) {
-		IndexedObjectProperty propagationRelation = conclusion.getRelation();
-		IndexedObjectSomeValuesFrom carry = conclusion.getExpression();
-
-		for (IndexedObjectProperty transitive : new LazySetIntersection<IndexedObjectProperty>(
-				propagationRelation.getSaturatedProperty()
-						.getTransitiveSuperProperties(), carry.getRelation()
-						.getSaturatedProperty().getTransitiveSubProperties())) {
-			producer_.produce(new PropagationImpl(transitive, carry));
-		}
-
-		producer_.produce(new PossibleComposedSubsumerImpl(conclusion
-				.getExpression()));
+		IndexedObjectSomeValuesFrom expression = conclusion.getExpression();
+		//TODO this is the fix for the roots with negative existentials
+		/*if (input.getNegativeSubsumers().contains(expression)) {
+			// this is basically a clash so instead of producing the expression,
+			// we immediately produce the negative propagation
+			producer_.produce(new NegativePropagationImpl(expression));
+		} else {
+			producer_.produce(new PossibleComposedSubsumerImpl(expression));
+		}*/
+		
+		producer_.produce(new PossibleComposedSubsumerImpl(expression));
+		
 		return null;
 	}
 

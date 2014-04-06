@@ -21,6 +21,7 @@ package org.semanticweb.elk.alc.indexing.hierarchy;
  * #L%
  */
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -104,4 +105,8 @@ public class OntologyIndex {
 					"Cannot remove indexed object from the cache " + oldObject);
 	}
 
+	
+	public Collection<IndexedClassExpression> getIndexedClassExpressions() {
+		return objectCache_.indexedClassExpressionLookup;
+	}
 }

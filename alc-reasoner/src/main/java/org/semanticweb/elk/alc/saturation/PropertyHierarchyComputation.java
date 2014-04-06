@@ -24,11 +24,15 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.alc.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +47,7 @@ public class PropertyHierarchyComputation {
 	//TODO make a local var?
 	private final Queue<IndexedObjectProperty> toDo_ = new LinkedList<IndexedObjectProperty>();
 	
+	private Set<IndexedObjectProperty> propsWithTransitiveSubProps_ = null;
 	/**
 	 * Computes the transitive closure of the told object property hierarchy.
 	 * 
@@ -50,10 +55,24 @@ public class PropertyHierarchyComputation {
 	 * 
 	 * @param index
 	 */
-	public void compute(OntologyIndex index) {
+	public Collection<IndexedObjectProperty> compute(OntologyIndex index) {		
 		for (IndexedObjectProperty nextProperty : index.getIndexedObjectProperties()) {
 			addToSuperProperties(nextProperty);
 		}
+		
+		return propsWithTransitiveSubProps_ == null ? Collections.<IndexedObjectProperty>emptySet() : propsWithTransitiveSubProps_;
+	}
+	
+	private void addPropertyWithTransitiveSubProperty(IndexedObjectProperty property) {
+		if (propsWithTransitiveSubProps_ == null) {
+			propsWithTransitiveSubProps_ = new ArrayHashSet<IndexedObjectProperty>(4);
+		}
+		
+		propsWithTransitiveSubProps_.add(property);
+	}
+	
+	public Collection<IndexedObjectProperty> getPropertiesWithTransitiveSubProperties() {
+		return propsWithTransitiveSubProps_;
 	}
 
 	private void addToSuperProperties(IndexedObjectProperty property) {
@@ -70,6 +89,8 @@ public class PropertyHierarchyComputation {
 
 			if (property.isTransitive()) {
 				superProperty.getSaturatedProperty().addTransitiveSubProperty(property);
+				//for transitivity encoding
+				addPropertyWithTransitiveSubProperty(superProperty);
 			}
 			else {
 				superProperty.getSaturatedProperty().addSubProperty(property);

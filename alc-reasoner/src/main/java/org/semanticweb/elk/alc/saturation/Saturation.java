@@ -326,6 +326,9 @@ public class Saturation {
 				context.setHistoryExplored();
 				break;
 			}
+			
+			LOGGER_.trace("{}: next branch explored, filtering candidates", context);
+			
 			// filter out subsumer candidates
 			Set<IndexedClassExpression> newPossibleSubsumers = context
 					.getComposedSubsumers();
@@ -340,11 +343,11 @@ public class Saturation {
 					subsumerCandidatesIterator.remove();
 				}
 			}
-			if (context.getPossibleComposedSubsumers().isEmpty()
+			/*if (context.getPossibleComposedSubsumers().isEmpty()
 					&& context.getPossibleDecomposedSubsumers().isEmpty()) {
 				// no choices left anymore, we are at the last branch
 				break;
-			}
+			}*/
 		}
 		// finally adding all deterministically derived subsumers
 		Set<IndexedClassExpression> nonDeterministicSubsumers = context
@@ -469,8 +472,7 @@ public class Saturation {
 		LOGGER_.trace("{}: processing {}", context, conclusion);
 		if (conclusion instanceof RetractedConclusion) {
 			if (!context.removeConclusion(conclusion))
-				LOGGER_.error("{}: retracted conclusion not found: {}!",
-						context, conclusion);
+				LOGGER_.error("{}: retracted conclusion not found: {}!", context, conclusion);
 			statistics_.removedConclusions++;
 			return;
 		}

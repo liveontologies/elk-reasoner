@@ -41,7 +41,7 @@ public class ElkObjectSomeValuesFromImpl
 		ElkPropertyRestrictionQualifiedImpl<ElkObjectPropertyExpression, ElkClassExpression>
 		implements ElkObjectSomeValuesFrom {
 
-	ElkObjectSomeValuesFromImpl(
+	public ElkObjectSomeValuesFromImpl(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			ElkClassExpression classExpression) {
 		super(objectPropertyExpression, classExpression);

@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.benchmark;
 
-import org.semanticweb.elk.benchmark.reasoning.ALCClassificationTask;
+import org.semanticweb.elk.benchmark.reasoning.ClassificationTask;
 
 
 
@@ -43,12 +43,13 @@ public class CLIDriver {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		BenchmarkUtils.runTask(ALCClassificationTask.class.getName(),
-				0, 1,
-				new String[]{"/home/pavel/ulm/data/snomed/sep-hierarchy.owl", "false"});
-		/*BenchmarkUtils.runTask(ClassificationTask.class.getName(),
-				0, 5,
-				new String[]{"/home/pavel/ulm/data/snomed/snomedStated_INT_20130731.owl", "4"});*/
+		/*BenchmarkUtils.runTask(ALCClassificationTask.class.getName(),
+				2, 5,
+				//new String[]{"/home/pavel/ulm/data/snomed/snomedStated_INT_20130731.owl", "true"});
+				new String[]{"/home/pavel/ulm/data/galens/EL-GALEN.owl", "true"});*/
+		BenchmarkUtils.runTask(ClassificationTask.class.getName(),
+				2, 5,
+				new String[]{"/home/pavel/ulm/data/snomed/snomedStated_INT_20130731.owl", "1"});
 		/*BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
 				0, 1,
 				new String[]{"/home/pavel/ulm/data/snomed/incremental-1", "4"});*/
