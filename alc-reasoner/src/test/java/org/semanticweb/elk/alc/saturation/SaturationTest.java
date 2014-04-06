@@ -1346,8 +1346,6 @@ public class SaturationTest {
 						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
 						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :C))"//						
 						+ "SubClassOf(:C ObjectUnionOf(:D1 :D2))"//
-						+ "SubClassOf(ObjectSomeValuesFrom(:S :D1) :E)"//
-						+ "SubClassOf(ObjectSomeValuesFrom(:S :D2) :E)"//
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :D1) :E)"//
 						+ "SubClassOf(ObjectSomeValuesFrom(:R :D2) :E)"//
 						// encoding transitivity of R
@@ -1369,6 +1367,41 @@ public class SaturationTest {
 						+ ")"//
 		);
 	}
+	
+	@Test
+	public void testEncodedTransitivityWithHierarchiesNonDeterministic() throws ElkLoadingException {
+
+		testSaturation(// Ontology:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubObjectPropertyOf(:R :T)"//	
+						+ "SubObjectPropertyOf(:T :S)"//
+						+ "SubClassOf(:A ObjectSomeValuesFrom(:R :B))"//
+						+ "SubClassOf(:B ObjectSomeValuesFrom(:R :C))"//						
+						+ "SubClassOf(:C ObjectUnionOf(:D1 :D2))"//						
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :D1) :E)"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:S :D2) :E)"//
+						// encoding transitivity of T
+						+ "SubClassOf(ObjectSomeValuesFrom(:T ObjectSomeValuesFrom(:T :D1)) ObjectSomeValuesFrom(:T :D1))"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:T :D1) ObjectSomeValuesFrom(:S :D1))"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:T ObjectSomeValuesFrom(:T :D2)) ObjectSomeValuesFrom(:T :D2))"//
+						+ "SubClassOf(ObjectSomeValuesFrom(:T :D2) ObjectSomeValuesFrom(:S :D2))"//
+						+ ")",
+				// Expected subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :A)"//
+						+ "SubClassOf(:A :E)"//
+						+ "SubClassOf(:B :E)"//
+						+ ")",//
+				// Expected non-subsumptions:
+				"Prefix(:=<>)"//
+						+ "Ontology("//
+						+ "SubClassOf(:A :C)"//
+						+ "SubClassOf(:A :B)"//
+						+ ")"//
+		);
+	}	
 	
 	@Test
 	public void testRoleHierarchyWithBacktracking() throws ElkLoadingException {

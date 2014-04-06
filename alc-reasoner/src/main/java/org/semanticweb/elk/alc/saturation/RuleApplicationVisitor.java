@@ -329,15 +329,15 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(PossiblePropagatedExistential conclusion, Context input) {
 		IndexedObjectSomeValuesFrom expression = conclusion.getExpression();
 		//TODO this is the fix for the roots with negative existentials
-		/*if (input.getNegativeSubsumers().contains(expression)) {
+		if (input.getNegativeSubsumers().contains(expression)) {
 			// this is basically a clash so instead of producing the expression,
 			// we immediately produce the negative propagation
 			producer_.produce(new NegativePropagationImpl(expression));
 		} else {
 			producer_.produce(new PossibleComposedSubsumerImpl(expression));
-		}*/
+		}
 		
-		producer_.produce(new PossibleComposedSubsumerImpl(expression));
+		//producer_.produce(new PossibleComposedSubsumerImpl(expression));
 		
 		return null;
 	}
