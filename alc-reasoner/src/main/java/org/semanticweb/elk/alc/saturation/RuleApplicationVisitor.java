@@ -61,6 +61,8 @@ import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.alc.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.Operations.Condition;
 
 public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> {
 
@@ -78,7 +80,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(ContextInitialization conclusion, Context input) {
 		Root root = input.getRoot();
 		producer_.produce(new DecomposedSubsumerImpl(root.getPositiveMember()));
-		for (IndexedClassExpression negativeMember : root.getNegatitveMembers())
+		for (IndexedClassExpression negativeMember : root.getNegativeMembers())
 			producer_.produce(new NegatedSubsumerImpl(negativeMember));
 		return null;
 	}
@@ -130,10 +132,12 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			producer_.produce(ClashImpl.getInstance());
 			return;
 		}
+		
 		for (IndexedClassExpression propagatedDisjunct : input
 				.getPropagatedDisjunctionsByWatched().get(negatedExpression)) {
 			producer_.produce(new DecomposedSubsumerImpl(propagatedDisjunct));
 		}
+		
 		if (input.getPossibleExistentials().contains(negatedExpression)) {
 			IndexedObjectSomeValuesFrom negatedExistential = (IndexedObjectSomeValuesFrom) negatedExpression;
 			producer_.produce(new NegativePropagationImpl(negatedExistential));
@@ -150,11 +154,21 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	@Override
 	public Void visit(ForwardLink conclusion, Context input) {
 		Root root = input.getRoot();
-		IndexedObjectProperty relation = conclusion.getRelation();
-		Root fillerRoot = new Root(conclusion.getTarget(), input
-				.getNegativePropagations().get(relation));
-		producer_.produce(fillerRoot,
-				new BackwardLinkImpl(root, conclusion.getRelation()));
+		IndexedObjectProperty linkRelation = conclusion.getRelation();
+		Multimap<IndexedObjectProperty, IndexedClassExpression> negativePropagations = input.getNegativePropagations();
+		
+		if (negativePropagations.isEmpty()) {
+			producer_.produce(new Root(conclusion.getTarget()), new BackwardLinkImpl(root, linkRelation));
+			return null;
+		}
+		// there're some stored negative propagations, need to create backward links in the corresponding contexts 
+		for (IndexedObjectProperty relation : new LazySetIntersection<IndexedObjectProperty>(linkRelation.getSaturatedProperty().getSuperProperties(), negativePropagations.keySet())) {
+			Root fillerRoot = new Root(conclusion.getTarget(), negativePropagations.get(relation));
+
+			producer_.produce(fillerRoot, new BackwardLinkImpl(root, linkRelation));
+		}
+		
+		
 		return null;
 	}
 
@@ -255,42 +269,54 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			return null;
 		// propagate to backward links only if the clash is derived
 		// deterministically
-		Multimap<IndexedObjectProperty, Root> backwardLinks = input
-				.getBackwardLinks();
+		Multimap<IndexedObjectProperty, Root> backwardLinks = input.getBackwardLinks();
 		Root root = input.getRoot();
+		
 		for (IndexedObjectProperty relation : backwardLinks.keySet()) {
-			ExternalDeterministicConclusion propagatedClash = new PropagatedClashImpl(
-					relation, root);
-			for (Root target : backwardLinks.get(relation))
+			ExternalDeterministicConclusion propagatedClash = new PropagatedClashImpl(relation, root);
+			
+			for (Root target : backwardLinks.get(relation)) {
 				producer_.produce(target, propagatedClash);
+			}
 		}
 		return null;
 	}
 
+	//TODO doc required
 	@Override
 	public Void visit(NegativePropagation conclusion, Context input) {
 		Root root = input.getRoot();
 		IndexedObjectProperty relation = conclusion.getRelation();
-		IndexedClassExpression negatedCarry = conclusion.getNegatedCarry();
-		Collection<IndexedClassExpression> newNegativeRootMembers = input
-				.getNegativePropagations().get(relation);
+		final IndexedClassExpression negatedCarry = conclusion.getNegatedCarry();
 
-		for (IndexedObjectProperty linkRelation : new LazySetIntersection<IndexedObjectProperty>(
-				relation.getSaturatedProperty().getSubProperties(), input
-						.getForwardLinks().keySet())) {
-			for (IndexedClassExpression positiveMember : input
-					.getForwardLinks().get(linkRelation)) {
-				ExternalDeterministicConclusion toBacktrack = new BacktrackedBackwardLinkImpl(
-						root, linkRelation);
-				ExternalDeterministicConclusion toAdd = new BackwardLinkImpl(
-						root, linkRelation);
-				Root newTargetRoot = new Root(positiveMember,
-						newNegativeRootMembers);
-				Root oldTargetRoot = Root.removeNegativeMember(newTargetRoot,
-						negatedCarry);
+		for (IndexedObjectProperty linkRelation : new LazySetIntersection<IndexedObjectProperty>(relation.getSaturatedProperty().getSubProperties(), input.getForwardLinks().keySet())) {
+			Collection<IndexedClassExpression> newNegativeRootMembers = input.getFillersInNegativePropagations(linkRelation);
+			ExternalDeterministicConclusion toBacktrack = new BacktrackedBackwardLinkImpl(root, linkRelation);
+			ExternalDeterministicConclusion toAdd = new BackwardLinkImpl(root, linkRelation);
+			
+			for (IndexedClassExpression positiveMember : input.getForwardLinks().get(linkRelation)) {
+				Root newTargetRoot = new Root(positiveMember, newNegativeRootMembers);
+				// fillers from all other negative propagations excluding this
+				// one. The same expression can be excluded only once, 2nd
+				// occurrence means that there's another propagation with the
+				// same filler
+				Root oldTargetRoot = new Root(positiveMember, Operations.filter(newNegativeRootMembers, new Condition<IndexedClassExpression>(){
+					private boolean excluded = false;
+					
+					@Override
+					public boolean holds(IndexedClassExpression element) {
+						if (element == negatedCarry && !excluded) {
+							excluded = true;
+							
+							return false;
+						}
+						
+						return true;
+					}}));
+						
 				input.removePropagatedConclusions(oldTargetRoot);
 
-				if (oldTargetRoot != newTargetRoot) {
+				if (oldTargetRoot.getNegativeMembers().size() != newTargetRoot.getNegativeMembers().size()) {
 					producer_.produce(oldTargetRoot, toBacktrack);
 					producer_.produce(newTargetRoot, toAdd);
 				}
@@ -299,6 +325,7 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 
 		return null;
 	}
+	
 
 	@Override
 	public Void visit(Disjunction conclusion, Context input) {
@@ -328,10 +355,10 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	@Override
 	public Void visit(PossiblePropagatedExistential conclusion, Context input) {
 		IndexedObjectSomeValuesFrom expression = conclusion.getExpression();
-		//TODO this is the fix for the roots with negative existentials
+
 		if (input.getNegativeSubsumers().contains(expression)) {
-			// this is basically a clash so instead of producing the expression,
-			// we immediately produce the negative propagation
+			// this is basically a clash right there so instead of producing the
+			// expression, we immediately produce the negative propagation
 			producer_.produce(new NegativePropagationImpl(expression));
 		} else {
 			producer_.produce(new PossibleComposedSubsumerImpl(expression));

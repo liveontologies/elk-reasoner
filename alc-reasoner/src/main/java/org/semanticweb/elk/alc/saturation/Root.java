@@ -24,6 +24,7 @@ package org.semanticweb.elk.alc.saturation;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
@@ -68,6 +69,21 @@ public class Root {
 				negativeMembers_.add(negativeMember);
 		}
 	}
+	
+	public Root(IndexedClassExpression positiveMember,
+			Iterable<IndexedClassExpression> negativeMembers) {
+		this.positiveMember_ = positiveMember;
+		
+		Iterator<IndexedClassExpression> negativeIterator = negativeMembers.iterator();
+		
+		if (negativeIterator.hasNext()) {
+			this.negativeMembers_ = new ArrayHashSet<IndexedClassExpression>(4);
+			
+			while (negativeIterator.hasNext()) {
+				negativeMembers_.add(negativeIterator.next());
+			}
+		}
+	}
 
 	/**
 	 * @param root
@@ -78,7 +94,7 @@ public class Root {
 	public static Root addNegativeMember(Root root,
 			IndexedClassExpression negativeMember) {
 		Set<IndexedClassExpression> negativeMembers = root
-				.getNegatitveMembers();
+				.getNegativeMembers();
 		if (negativeMembers.contains(negativeMember))
 			return root;
 		// else
@@ -96,7 +112,7 @@ public class Root {
 	public static Root removeNegativeMember(Root root,
 			IndexedClassExpression negativeMember) {
 		Set<IndexedClassExpression> negativeMembers = root
-				.getNegatitveMembers();
+				.getNegativeMembers();
 		if (!negativeMembers.contains(negativeMember))
 			return root;
 		// else
@@ -109,7 +125,7 @@ public class Root {
 		return this.positiveMember_;
 	}
 
-	public Set<IndexedClassExpression> getNegatitveMembers() {
+	public Set<IndexedClassExpression> getNegativeMembers() {
 		if (negativeMembers_ == null)
 			return Collections.emptySet();
 		// else
@@ -117,13 +133,13 @@ public class Root {
 	}
 
 	public int size() {
-		return getNegatitveMembers().size() + 1;
+		return getNegativeMembers().size() + 1;
 	}
 
 	@Override
 	public int hashCode() {
 		return HashGenerator.combinedHashCode(positiveMember_,
-				getNegatitveMembers());
+				getNegativeMembers());
 	}
 
 	@Override
@@ -133,15 +149,15 @@ public class Root {
 		// else
 		Root otherRoot = (Root) o;
 		return positiveMember_.equals(otherRoot.positiveMember_)
-				&& getNegatitveMembers()
-						.equals(otherRoot.getNegatitveMembers());
+				&& getNegativeMembers()
+						.equals(otherRoot.getNegativeMembers());
 	}
 
 	@Override
 	public String toString() {
 		return positiveMember_.toString()
 				+ (negativeMembers_ == null ? "" : "~"
-						+ getNegatitveMembers().toString());
+						+ getNegativeMembers().toString());
 	}
 
 	boolean addNegativeMember(IndexedClassExpression negativeMember) {

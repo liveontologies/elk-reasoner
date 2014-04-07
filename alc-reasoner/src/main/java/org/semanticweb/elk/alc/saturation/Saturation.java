@@ -51,7 +51,6 @@ import org.semanticweb.elk.alc.saturation.conclusions.interfaces.RetractedConclu
 import org.semanticweb.elk.alc.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.alc.saturation.conclusions.visitors.LocalConclusionVisitor;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
-import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +85,8 @@ public class Saturation {
 	 */
 	public final static boolean DEFERRED_PROPAGATION_GENERATION = false;
 	
+	public final static boolean BUFFER_BACKWARD_LINKS = true;
+	
 	/**
 	 * if {@code true}, some statistics will be printed
 	 */
@@ -113,11 +114,11 @@ public class Saturation {
 	 * the backward links being added and removed
 	 */
 	private final Multimap<IndexedObjectProperty, Root> producedBackwardLinks_;
-	private final Multimap<IndexedObjectProperty, Root> rectractedBackwardLinks_;
+	private final Multimap<IndexedObjectProperty, Root> retractedBackwardLinks_;
 
 	// FIXME this is a kluge, needed only for returning it as the sole subsumer
 	// of unsatisfiable classes.
-	// Use another way of indicating that a class is unsatisfiable
+	// Use some other way of indicating that a class is unsatisfiable
 	private final IndexedClass owlNothing_;
 	
 	// some statistics counters
@@ -130,7 +131,7 @@ public class Saturation {
 				1024);
 		this.producedBackwardLinks_ = new HashSetMultimap<IndexedObjectProperty, Root>(
 				64);
-		this.rectractedBackwardLinks_ = new HashSetMultimap<IndexedObjectProperty, Root>(
+		this.retractedBackwardLinks_ = new HashSetMultimap<IndexedObjectProperty, Root>(
 				64);
 		this.conclusionProducer_ = new ConclusionProducer() {
 			@Override
@@ -143,12 +144,12 @@ public class Saturation {
 			public void produce(Root root,
 					ExternalDeterministicConclusion conclusion) {
 				LOGGER_.trace("{}: produced {}", root, conclusion);
-				if (conclusion instanceof BackwardLink) {
+				if (BUFFER_BACKWARD_LINKS && conclusion instanceof BackwardLink) {
 					BackwardLink link = (BackwardLink) conclusion;
 					IndexedObjectProperty relation = link.getRelation();
 					if (link instanceof RetractedConclusion) {
 						if (!producedBackwardLinks_.remove(relation, root))
-							rectractedBackwardLinks_.add(relation, root);
+							retractedBackwardLinks_.add(relation, root);
 					} else {
 						producedBackwardLinks_.add(relation, root);
 					}
@@ -392,22 +393,22 @@ public class Saturation {
 		return statistics_;
 	}
 
-	private void producedBufferedBackwardLinks(Context context) {
+	private void produceBufferedBackwardLinks(Context context) {
+		LOGGER_.trace("{}: producing buffered backward links (direct and backtracked)", context);
+		
 		Root sourceRoot = context.getRoot();
-		for (IndexedObjectProperty relation : rectractedBackwardLinks_.keySet()) {
-			for (Root root : rectractedBackwardLinks_.get(relation)) {
-				saturationState_.produce(root, new BacktrackedBackwardLinkImpl(
-						sourceRoot, relation));
+		for (IndexedObjectProperty relation : retractedBackwardLinks_.keySet()) {
+			for (Root root : retractedBackwardLinks_.get(relation)) {
+				saturationState_.produce(root, new BacktrackedBackwardLinkImpl(sourceRoot, relation));
 				context.removePropagatedConclusions(root);
 			}
 		}
 		for (IndexedObjectProperty relation : producedBackwardLinks_.keySet()) {
 			for (Root root : producedBackwardLinks_.get(relation)) {
-				saturationState_.produce(root, new BackwardLinkImpl(sourceRoot,
-						relation));
+				saturationState_.produce(root, new BackwardLinkImpl(sourceRoot, relation));
 			}
 		}
-		rectractedBackwardLinks_.clear();
+		retractedBackwardLinks_.clear();
 		producedBackwardLinks_.clear();
 	}
 
@@ -422,7 +423,10 @@ public class Saturation {
 			}
 			process(context, conclusion);
 		}
-		producedBufferedBackwardLinks(context);
+		
+		if (BUFFER_BACKWARD_LINKS) {
+			produceBufferedBackwardLinks(context);
+		}
 	}
 
 	private void process(Context context) {
@@ -438,7 +442,10 @@ public class Saturation {
 			}
 			process(context, conclusion);
 		}
-		producedBufferedBackwardLinks(context);
+		
+		if (BUFFER_BACKWARD_LINKS) {
+			produceBufferedBackwardLinks(context);
+		}
 	}
 
 	private boolean isNotRelevant(PropagatedConclusion conclusion, Context context) {
@@ -449,20 +456,20 @@ public class Saturation {
 			return true;
 		}
 		
-		Set<IndexedClassExpression> negativeMembers = sourceRoot.getNegatitveMembers();
+		Set<IndexedClassExpression> negativeMembers = sourceRoot.getNegativeMembers();
 		
 		if (!negativeMembers.isEmpty()) {
-			// TODO this can probably be optimized for propagated existentials, we may just use the role under the quantifier to get to the negative propagations?
 			// the stored negative propagations may have one of the super-roles of the given conclusion
-			for (IndexedObjectProperty negPropagationRole : new LazySetIntersection<IndexedObjectProperty>(
+			Collection<IndexedClassExpression> negativeMembersInPropagations = context.getFillersInNegativePropagations(relation);
+			// TODO this can be pretty slow
+			return !negativeMembersInPropagations.containsAll(negativeMembers);
+			/*for (IndexedObjectProperty negPropagationRole : new LazySetIntersection<IndexedObjectProperty>(
 					context.getNegativePropagations().keySet(), relation
 							.getSaturatedProperty().getSuperProperties())) {
 				if (negativeMembers.equals(context.getNegativePropagations().get(negPropagationRole))) {
 					return false;
 				}
-			}
-			
-			return true;
+			}*/
 		}
 		
 		return false;

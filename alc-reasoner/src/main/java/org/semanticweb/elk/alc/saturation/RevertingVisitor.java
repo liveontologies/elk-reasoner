@@ -41,6 +41,10 @@ import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleCompose
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
 import org.semanticweb.elk.alc.saturation.conclusions.visitors.AbstractLocalConclusionVisitor;
 import org.semanticweb.elk.alc.saturation.conclusions.visitors.LocalConclusionVisitor;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
+import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.Operations.Condition;
 
 /**
  * A {@link LocalConclusionVisitor} that reverts the visited
@@ -101,37 +105,66 @@ public class RevertingVisitor extends
 
 	@Override
 	public Boolean visit(ForwardLink conclusion, Context input) {
-		IndexedObjectProperty relation = conclusion.getRelation();
+		IndexedObjectProperty linkRelation = conclusion.getRelation();
 		Root root = input.getRoot();
-		Root fillerRoot = new Root(conclusion.getTarget(), input
-				.getNegativePropagations().get(relation));
-		producer_.produce(fillerRoot, new BacktrackedBackwardLinkImpl(root,
-				relation));
-		input.removePropagatedConclusions(fillerRoot);
+		Multimap<IndexedObjectProperty, IndexedClassExpression> negativePropagations = input.getNegativePropagations();
+		
+		if (negativePropagations.isEmpty()) {
+			Root fillerRoot = new Root(conclusion.getTarget());
+			producer_.produce(fillerRoot, new BacktrackedBackwardLinkImpl(root, linkRelation));
+			input.removePropagatedConclusions(fillerRoot);
+			return true;
+		}
+		
+		for (IndexedObjectProperty relation : new LazySetIntersection<IndexedObjectProperty>(linkRelation.getSaturatedProperty().getSuperProperties(), negativePropagations.keySet())) {
+			Root fillerRoot = new Root(conclusion.getTarget(), negativePropagations.get(relation));
+
+			producer_.produce(fillerRoot, new BacktrackedBackwardLinkImpl(root, linkRelation));
+			input.removePropagatedConclusions(fillerRoot);
+		}
+		
 		return true;
 	}
 
+	// TODO reduce copy-paste from RuleApplicationVisitor.visit(NegativePropagation..)
 	@Override
 	public Boolean visit(NegativePropagation conclusion, Context input) {
 		IndexedObjectProperty relation = conclusion.getRelation();
 		Root root = input.getRoot();
-		IndexedClassExpression negatedCarry = conclusion.getNegatedCarry();
-		Collection<IndexedClassExpression> oldNegativeRootMembers = input
-				.getNegativePropagations().get(relation);
-		ExternalDeterministicConclusion toAdd = new BackwardLinkImpl(root,
-				relation);
-		ExternalDeterministicConclusion toBacktrack = new BacktrackedBackwardLinkImpl(
-				root, relation);
-		for (IndexedClassExpression positiveMember : input.getForwardLinks()
-				.get(relation)) {
-			Root oldTargetRoot = new Root(positiveMember,
-					oldNegativeRootMembers);
-			Root newTargetRoot = Root.removeNegativeMember(oldTargetRoot,
-					negatedCarry);
-			input.removePropagatedConclusions(oldTargetRoot);
-			producer_.produce(oldTargetRoot, toBacktrack);
-			producer_.produce(newTargetRoot, toAdd);
+		final IndexedClassExpression negatedCarry = conclusion.getNegatedCarry();
+		
+		for (IndexedObjectProperty linkRelation : new LazySetIntersection<IndexedObjectProperty>(
+				relation.getSaturatedProperty().getSubProperties(), input.getForwardLinks().keySet())) {
+
+			Collection<IndexedClassExpression> oldNegativeRootMembers = input.getFillersInNegativePropagations(linkRelation);
+			ExternalDeterministicConclusion toAdd = new BackwardLinkImpl(root, linkRelation);
+			ExternalDeterministicConclusion toBacktrack = new BacktrackedBackwardLinkImpl(root, linkRelation);
+			
+			for (IndexedClassExpression positiveMember : input.getForwardLinks().get(linkRelation)) {
+				Root oldTargetRoot = new Root(positiveMember, oldNegativeRootMembers);
+				// fillers from all other negative propagations excluding this
+				// one. The same expression can be excluded only once, 2nd
+				// occurrence means that there's another propagation with the
+				// same filler
+				Root newTargetRoot = new Root(positiveMember, Operations.filter(oldNegativeRootMembers, new Condition<IndexedClassExpression>(){
+					private boolean excluded = false;
+					@Override
+					public boolean holds(IndexedClassExpression element) {
+						if (element == negatedCarry && !excluded) {
+							excluded = true;
+							
+							return false;
+						}
+						
+						return true;
+					}}));
+				
+				input.removePropagatedConclusions(oldTargetRoot);
+				producer_.produce(oldTargetRoot, toBacktrack);
+				producer_.produce(newTargetRoot, toAdd);
+			}
 		}
+
 		return true;
 	}
 
