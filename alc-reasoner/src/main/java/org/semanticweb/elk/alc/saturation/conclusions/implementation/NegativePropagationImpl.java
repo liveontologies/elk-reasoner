@@ -31,21 +31,29 @@ import org.semanticweb.elk.alc.saturation.conclusions.visitors.LocalDeterministi
 public class NegativePropagationImpl extends
 		AbstractLocalDeterministicConclusion implements NegativePropagation {
 
-	private final IndexedObjectSomeValuesFrom negatedExistential_;
+	private final IndexedObjectProperty property_;
+	
+	private final IndexedClassExpression filler_;
 
 	public NegativePropagationImpl(
 			IndexedObjectSomeValuesFrom negatedExistential) {
-		this.negatedExistential_ = negatedExistential;
+		property_ = negatedExistential.getRelation();
+		filler_ = negatedExistential.getFiller();
+	}
+	
+	public NegativePropagationImpl(IndexedObjectProperty property, IndexedClassExpression filler) {
+		property_ = property;
+		filler_ = filler;
 	}
 
 	@Override
 	public IndexedObjectProperty getRelation() {
-		return negatedExistential_.getRelation();
+		return property_;
 	}
 
 	@Override
 	public IndexedClassExpression getNegatedCarry() {
-		return negatedExistential_.getFiller();
+		return filler_;
 	}
 
 	@Override

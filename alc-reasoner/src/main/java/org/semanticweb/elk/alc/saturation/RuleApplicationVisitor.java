@@ -141,6 +141,12 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		if (input.getPossibleExistentials().contains(negatedExpression)) {
 			IndexedObjectSomeValuesFrom negatedExistential = (IndexedObjectSomeValuesFrom) negatedExpression;
 			producer_.produce(new NegativePropagationImpl(negatedExistential));
+			// transitivity handling: producing a negative propagation for the
+			// existential (in addition to a propagation of the filler)
+			// if the relation is transitive.
+			if (negatedExistential.getRelation().isTransitive() && negatedExistential.occursNegatively()) {
+				producer_.produce(new NegativePropagationImpl(negatedExistential.getRelation(), negatedExistential));
+			}
 		}
 	}
 

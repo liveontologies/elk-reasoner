@@ -18,11 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Encodes transitivity axioms syntactically by doing the following for each transitive property R:
- * 
- * i)   For each negatively occurring "S some C", where R => S and some C, it indexes "R some C" negatively
- * ii)  Adds "S some C" to told subsumers of "R some C"
- * iii) Adds "R some C" to negative existentials of "S some C"
+ * Encodes transitivity axioms syntactically.
  * 
  * @author Pavel Klinov
  *
@@ -66,32 +62,25 @@ public class TransitivityEncoder {
 				toIndex.add(e, existentialToIndex);
 			}
 		}
-		// second, index them, i.e. add R some R some C => R some C and R some C => T some C (if R => T)
+		// second, index them
 		for (IndexedObjectSomeValuesFrom existingExistential : toIndex.keySet()) {
 			for (ElkObjectSomeValuesFrom toBeIndexed : toIndex.get(existingExistential)) {
-				ElkObjectSomeValuesFrom nested = factory.getObjectSomeValuesFrom(toBeIndexed.getProperty(), toBeIndexed);
+				/*ElkObjectSomeValuesFrom nested = factory.getObjectSomeValuesFrom(toBeIndexed.getProperty(), toBeIndexed);
 				IndexedObjectSomeValuesFrom indexedNested = (IndexedObjectSomeValuesFrom) nested.accept(converter);
-				IndexedObjectSomeValuesFrom indexedExistential = (IndexedObjectSomeValuesFrom) indexedNested.getFiller();
+				IndexedObjectSomeValuesFrom indexedExistential = (IndexedObjectSomeValuesFrom) indexedNested.getFiller();*/
 				
-				//IndexedObjectSomeValuesFrom indexedExistential = (IndexedObjectSomeValuesFrom) toBeIndexed.accept(converter);
+				IndexedObjectSomeValuesFrom indexedExistential = (IndexedObjectSomeValuesFrom) toBeIndexed.accept(converter);
 				
 				// update the counters
 				indexer.update(indexedExistential);
-				indexer.update(indexedNested);
-				
-				/*if (existingExistential.negativeExistentials_ == null) {
-					existingExistential.negativeExistentials_ = new ArrayHashSet<IndexedObjectSomeValuesFrom>(
-							16);
-				}
-				
-				LOGGER_.trace("Adding {} as a negative existential for {}", indexedExistential, existingExistential);
-				existingExistential.negativeExistentials_.add(indexedExistential);*/
-				if (indexedNested.toldSuperClasses_ == null) {
+				//indexer.update(indexedNested);
+
+				/*if (indexedNested.toldSuperClasses_ == null) {
 					indexedNested.toldSuperClasses_ = new ArrayHashSet<IndexedClassExpression>(
 							16);
 				}
 				
-				indexedNested.toldSuperClasses_.add(indexedExistential);
+				indexedNested.toldSuperClasses_.add(indexedExistential);*/
 				
 				if (indexedExistential.toldSuperClasses_ == null) {
 					indexedExistential.toldSuperClasses_ = new ArrayHashSet<IndexedClassExpression>(
