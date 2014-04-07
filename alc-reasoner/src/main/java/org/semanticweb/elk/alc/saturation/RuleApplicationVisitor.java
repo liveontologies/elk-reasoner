@@ -142,7 +142,6 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			IndexedObjectSomeValuesFrom negatedExistential = (IndexedObjectSomeValuesFrom) negatedExpression;
 			producer_.produce(new NegativePropagationImpl(negatedExistential));
 		}
-
 	}
 
 	@Override
@@ -155,19 +154,9 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	public Void visit(ForwardLink conclusion, Context input) {
 		Root root = input.getRoot();
 		IndexedObjectProperty linkRelation = conclusion.getRelation();
-		Multimap<IndexedObjectProperty, IndexedClassExpression> negativePropagations = input.getNegativePropagations();
+		Root fillerRoot = new Root(conclusion.getTarget(), input.getFillersInNegativePropagations(linkRelation));
 		
-		if (negativePropagations.isEmpty()) {
-			producer_.produce(new Root(conclusion.getTarget()), new BackwardLinkImpl(root, linkRelation));
-			return null;
-		}
-		// there're some stored negative propagations, need to create backward links in the corresponding contexts 
-		for (IndexedObjectProperty relation : new LazySetIntersection<IndexedObjectProperty>(linkRelation.getSaturatedProperty().getSuperProperties(), negativePropagations.keySet())) {
-			Root fillerRoot = new Root(conclusion.getTarget(), negativePropagations.get(relation));
-
-			producer_.produce(fillerRoot, new BackwardLinkImpl(root, linkRelation));
-		}
-		
+		producer_.produce(fillerRoot, new BackwardLinkImpl(root, linkRelation));
 		
 		return null;
 	}

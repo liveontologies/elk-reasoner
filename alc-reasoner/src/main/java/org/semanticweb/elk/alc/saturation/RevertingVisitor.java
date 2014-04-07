@@ -42,7 +42,6 @@ import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleDecompo
 import org.semanticweb.elk.alc.saturation.conclusions.visitors.AbstractLocalConclusionVisitor;
 import org.semanticweb.elk.alc.saturation.conclusions.visitors.LocalConclusionVisitor;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
-import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Condition;
 
@@ -107,21 +106,10 @@ public class RevertingVisitor extends
 	public Boolean visit(ForwardLink conclusion, Context input) {
 		IndexedObjectProperty linkRelation = conclusion.getRelation();
 		Root root = input.getRoot();
-		Multimap<IndexedObjectProperty, IndexedClassExpression> negativePropagations = input.getNegativePropagations();
+		Root fillerRoot = new Root(conclusion.getTarget(), input.getFillersInNegativePropagations(linkRelation));
 		
-		if (negativePropagations.isEmpty()) {
-			Root fillerRoot = new Root(conclusion.getTarget());
-			producer_.produce(fillerRoot, new BacktrackedBackwardLinkImpl(root, linkRelation));
-			input.removePropagatedConclusions(fillerRoot);
-			return true;
-		}
-		
-		for (IndexedObjectProperty relation : new LazySetIntersection<IndexedObjectProperty>(linkRelation.getSaturatedProperty().getSuperProperties(), negativePropagations.keySet())) {
-			Root fillerRoot = new Root(conclusion.getTarget(), negativePropagations.get(relation));
-
-			producer_.produce(fillerRoot, new BacktrackedBackwardLinkImpl(root, linkRelation));
-			input.removePropagatedConclusions(fillerRoot);
-		}
+		producer_.produce(fillerRoot, new BacktrackedBackwardLinkImpl(root, linkRelation));
+		input.removePropagatedConclusions(fillerRoot);
 		
 		return true;
 	}

@@ -62,7 +62,8 @@ public class Root {
 	public Root(IndexedClassExpression positiveMember,
 			Collection<IndexedClassExpression> negativeMembers) {
 		this.positiveMember_ = positiveMember;
-		if (negativeMembers.size() > 0) {
+		
+		if (!negativeMembers.isEmpty()) {
 			this.negativeMembers_ = new ArrayHashSet<IndexedClassExpression>(
 					negativeMembers.size());
 			for (IndexedClassExpression negativeMember : negativeMembers)

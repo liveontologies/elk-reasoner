@@ -613,7 +613,7 @@ public class Context {
 			@Override
 			public int size() {
 				// lower approximation
-				return superProperties.size();
+				return Math.min(superProperties.size(), getNegativePropagations().keySet().size());
 			}
 
 		};
