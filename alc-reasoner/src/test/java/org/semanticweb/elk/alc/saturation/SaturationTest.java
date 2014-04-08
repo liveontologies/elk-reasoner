@@ -1455,18 +1455,22 @@ public class SaturationTest {
 						+ "SubClassOf(ObjectSomeValuesFrom(:S :C) :F)"//
 						+ "SubClassOf(ObjectSomeValuesFrom(:T :D) :F)"//
 						+ "SubClassOf(ObjectSomeValuesFrom(:H :E) :F)"//
+						
+						//+ "SubClassOf(ObjectUnionOf(:D :E) :X)"//
+						//+ "SubClassOf(:C <http://www.w3.org/2002/07/owl#Nothing>)"//
 						+ ")",
 				// Expected subsumptions:
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
 						+ "SubClassOf(:A :F)"//
+						//+ "SubClassOf(:B :X)"//
 						+ ")",//
 				// Expected non-subsumptions:
 				"Prefix(:=<>)"//
 						+ "Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"//
 						+ "Ontology("//
-						+ "SubClassOf(:B owl:Nothing)"//
+						//+ "SubClassOf(:B owl:Nothing)"//
 						+ ")"//
 		);
 	}

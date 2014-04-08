@@ -22,14 +22,10 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
-import java.util.AbstractCollection;
 import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Set;
 
@@ -553,91 +549,6 @@ public class Context {
 		return historyExplored_;
 	}
 	
-	// returns the collection of fillers of all negative propagations for
-	// super-roles of the given relation
-	Collection<IndexedClassExpression> getFillersInNegativePropagations(IndexedObjectProperty relation) {
-		if (negativePropagations_ == null) {
-			return Collections.emptyList();
-		}
-		
-		final Set<IndexedObjectProperty> superProperties = relation.getSaturatedProperty().getSuperProperties();
-
-		return new AbstractCollection<IndexedClassExpression>() {
-			
-			@Override
-			public Iterator<IndexedClassExpression> iterator() {
-				return new Iterator<IndexedClassExpression>() {
-
-					private final Iterator<IndexedObjectProperty> superPropertiesIterator_ = superProperties.iterator();
-					private IndexedObjectProperty currentProperty_ = null;
-					private Iterator<IndexedClassExpression> currentNegativeMembers_ = null;
-					private IndexedClassExpression current_ = null;
-
-					@Override
-					public boolean hasNext() {
-						for (;;) {
-							if (current_ != null) {
-								return true;
-							}
-
-							if (currentNegativeMembers_ != null && currentNegativeMembers_.hasNext()) {
-								current_ = currentNegativeMembers_.next();
-								return true;
-							}
-							// move on the properties iterator
-							if (superPropertiesIterator_.hasNext()) {
-								currentProperty_ = superPropertiesIterator_.next();
-								currentNegativeMembers_ = getNegativePropagations().get(currentProperty_).iterator();
-							} else {
-								return false;
-							}
-						}
-					}
-
-					@Override
-					public IndexedClassExpression next() {
-						if (!hasNext()) {
-							throw new NoSuchElementException();
-						}
-
-						IndexedClassExpression toReturn = current_;
-
-						current_ = null;
-
-						return toReturn;
-					}
-
-					@Override
-					public void remove() {
-						throw new UnsupportedOperationException();
-					}
-				};
-			}
-
-			@Override
-			public int size() {
-				// lower approximation
-				return Math.min(superProperties.size(), getNegativePropagations().keySet().size());
-			}
-
-			@Override
-			public boolean contains(Object o) {
-				if (negativePropagations_ == null) {
-					return false;
-				}
-				
-				for (IndexedObjectProperty property : superProperties) {
-					if (negativePropagations_.get(property).contains(o)) {
-						return true;
-					}
-				}
-				
-				return false;
-			}
-
-		};
-	}	
-
 	static class ConclusionInserter implements
 			ConclusionVisitor<Context, Boolean> {
 

@@ -22,11 +22,13 @@ package org.semanticweb.elk.alc.saturation;
  * #L%
  */
 
+import java.util.AbstractCollection;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Set;
 
@@ -86,6 +88,16 @@ public class Saturation {
 	public final static boolean DEFERRED_PROPAGATION_GENERATION = false;
 	
 	public final static boolean BUFFER_BACKWARD_LINKS = true;
+	/**
+	 * if {@code true}, negative propagations are generated for all sub-roles of
+	 * the role so that they can be easily look-up when processing negative
+	 * propagations and forward links.
+	 * 
+	 * If true, there could be multiple backtracked backward links generated for
+	 * the same link, so some may be processed when the link has already been
+	 * deleted, so that check must be disabled.
+	 */
+	public final static boolean GENERATE_NEGATIVE_PROPAGATIONS_FOR_SUBROLES = false;
 	
 	/**
 	 * if {@code true}, some statistics will be printed
@@ -237,10 +249,15 @@ public class Saturation {
 				LOGGER_.trace("{}: nothing to backtrack", context);
 				break;
 			}
-			toBacktrack.accept(revertingVisitor_, context);
-			if (!context.removeConclusion(toBacktrack))
-				LOGGER_.error("{}: cannot backtrack {}", context, toBacktrack);
+			
 			LOGGER_.trace("{}: backtracking {}", context, toBacktrack);
+			
+			toBacktrack.accept(revertingVisitor_, context);
+			
+			if (!context.removeConclusion(toBacktrack)) {
+				LOGGER_.error("{}: cannot backtrack {}", context, toBacktrack);
+			}
+			
 			statistics_.removedConclusions++;
 		}
 		restoreValidConclusions(context);
@@ -309,11 +326,16 @@ public class Saturation {
 						LOGGER_.trace("{}: history fully explored", context);
 					break;
 				}
+				
+				LOGGER_.trace("{}: backtracking {}", context, toBacktrack);
+				
 				proceedNext = toBacktrack.accept(branchExplorer, context);
-				if (!context.removeConclusion(toBacktrack))
+				
+				if (!context.removeConclusion(toBacktrack)) {
 					LOGGER_.error("{}: cannot backtrack {}", context,
 							toBacktrack);
-				LOGGER_.trace("{}: backtracking {}", context, toBacktrack);
+				}
+				
 				statistics_.removedConclusions++;
 			}
 			restoreValidConclusions(context);
@@ -455,21 +477,14 @@ public class Saturation {
 		if (!context.getForwardLinks().get(relation).contains(sourceRoot.getPositiveMember())) {
 			return true;
 		}
-		
+		// TODO: can't we instead just check for the presence of the backward link in the source context?
 		Set<IndexedClassExpression> negativeMembers = sourceRoot.getNegativeMembers();
 		
 		if (!negativeMembers.isEmpty()) {
 			// the stored negative propagations may have one of the super-roles of the given conclusion
-			Collection<IndexedClassExpression> negativeMembersInPropagations = context.getFillersInNegativePropagations(relation);
+			Collection<IndexedClassExpression> negativeMembersInPropagations = getFillersInNegativePropagations(context, relation);
 			// TODO this can be pretty slow
 			return !negativeMembersInPropagations.containsAll(negativeMembers);
-			/*for (IndexedObjectProperty negPropagationRole : new LazySetIntersection<IndexedObjectProperty>(
-					context.getNegativePropagations().keySet(), relation
-							.getSaturatedProperty().getSuperProperties())) {
-				if (negativeMembers.equals(context.getNegativePropagations().get(negPropagationRole))) {
-					return false;
-				}
-			}*/
 		}
 		
 		return false;
@@ -478,9 +493,15 @@ public class Saturation {
 	private void process(Context context, Conclusion conclusion) {
 		LOGGER_.trace("{}: processing {}", context, conclusion);
 		if (conclusion instanceof RetractedConclusion) {
+			/*if (context.removeConclusion(conclusion)) {
+				statistics_.removedConclusions++;	
+			}*/
+			
 			if (!context.removeConclusion(conclusion))
 				LOGGER_.error("{}: retracted conclusion not found: {}!", context, conclusion);
+				
 			statistics_.removedConclusions++;
+			
 			return;
 		}
 		if (conclusion instanceof PropagatedConclusion) {
@@ -588,4 +609,88 @@ public class Saturation {
 
 	}
 
+	// returns the collection of fillers of all negative propagations for
+	// super-roles of the given relation
+	static Collection<IndexedClassExpression> getFillersInNegativePropagations(final Context context, IndexedObjectProperty relation) {
+		if (GENERATE_NEGATIVE_PROPAGATIONS_FOR_SUBROLES) {
+			return context.getNegativePropagations().get(relation);
+		}
+
+		final Set<IndexedObjectProperty> superProperties = relation.getSaturatedProperty().getSuperProperties();
+
+		return new AbstractCollection<IndexedClassExpression>() {
+
+			@Override
+			public Iterator<IndexedClassExpression> iterator() {
+				return new Iterator<IndexedClassExpression>() {
+
+					private final Iterator<IndexedObjectProperty> superPropertiesIterator_ = superProperties.iterator();
+					private IndexedObjectProperty currentProperty_ = null;
+					private Iterator<IndexedClassExpression> currentNegativeMembers_ = null;
+					private IndexedClassExpression current_ = null;
+
+					@Override
+					public boolean hasNext() {
+						for (;;) {
+							if (current_ != null) {
+								return true;
+							}
+
+							if (currentNegativeMembers_ != null && currentNegativeMembers_.hasNext()) {
+								current_ = currentNegativeMembers_.next();
+								return true;
+							}
+							// move on the properties iterator
+							if (superPropertiesIterator_.hasNext()) {
+								currentProperty_ = superPropertiesIterator_.next();
+								currentNegativeMembers_ = context.getNegativePropagations().get(currentProperty_).iterator();
+							} else {
+								return false;
+							}
+						}
+					}
+
+					@Override
+					public IndexedClassExpression next() {
+						if (!hasNext()) {
+							throw new NoSuchElementException();
+						}
+
+						IndexedClassExpression toReturn = current_;
+
+						current_ = null;
+
+						return toReturn;
+					}
+
+					@Override
+					public void remove() {
+						throw new UnsupportedOperationException();
+					}
+				};
+			}
+
+			@Override
+			public int size() {
+				// lower approximation
+				return Math.min(superProperties.size(), context.getNegativePropagations().keySet().size());
+			}
+
+			@Override
+			public boolean contains(Object o) {
+				if (context.getNegativePropagations().isEmpty()) {
+					return false;
+				}
+
+				for (IndexedObjectProperty property : superProperties) {
+					if (context.getNegativePropagations().get(property).contains(o)) {
+						return true;
+					}
+				}
+
+				return false;
+			}
+
+		};
+	}		
 }

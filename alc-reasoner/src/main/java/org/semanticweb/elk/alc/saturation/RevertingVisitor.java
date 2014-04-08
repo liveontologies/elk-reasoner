@@ -106,7 +106,7 @@ public class RevertingVisitor extends
 	public Boolean visit(ForwardLink conclusion, Context input) {
 		IndexedObjectProperty linkRelation = conclusion.getRelation();
 		Root root = input.getRoot();
-		Root fillerRoot = new Root(conclusion.getTarget(), input.getFillersInNegativePropagations(linkRelation));
+		Root fillerRoot = new Root(conclusion.getTarget(), Saturation.getFillersInNegativePropagations(input, linkRelation));
 		
 		producer_.produce(fillerRoot, new BacktrackedBackwardLinkImpl(root, linkRelation));
 		input.removePropagatedConclusions(fillerRoot);
@@ -124,7 +124,7 @@ public class RevertingVisitor extends
 		for (IndexedObjectProperty linkRelation : new LazySetIntersection<IndexedObjectProperty>(
 				relation.getSaturatedProperty().getSubProperties(), input.getForwardLinks().keySet())) {
 
-			Collection<IndexedClassExpression> oldNegativeRootMembers = input.getFillersInNegativePropagations(linkRelation);
+			Collection<IndexedClassExpression> oldNegativeRootMembers = Saturation.getFillersInNegativePropagations(input, linkRelation);
 			ExternalDeterministicConclusion toAdd = new BackwardLinkImpl(root, linkRelation);
 			ExternalDeterministicConclusion toBacktrack = new BacktrackedBackwardLinkImpl(root, linkRelation);
 			
