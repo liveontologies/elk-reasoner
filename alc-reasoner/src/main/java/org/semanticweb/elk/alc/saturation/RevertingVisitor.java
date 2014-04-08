@@ -156,7 +156,4 @@ public class RevertingVisitor extends
 		return true;
 	}
 
-	final ConclusionProducer getProducer() {
-		return producer_;
-	}
 }

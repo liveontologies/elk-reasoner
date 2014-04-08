@@ -37,6 +37,7 @@ import org.semanticweb.elk.alc.saturation.conclusions.interfaces.NegativePropaga
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleComposedSubsumer;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossiblePropagatedExistential;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossiblePropagation;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Propagation;
@@ -149,6 +150,11 @@ class DummyConclusionVisitor<I, O> implements ConclusionVisitor<I, O> {
 
 	@Override
 	public O visit(DisjointSubsumer conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(PossiblePropagation conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 

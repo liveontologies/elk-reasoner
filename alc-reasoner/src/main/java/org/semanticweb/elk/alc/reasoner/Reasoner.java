@@ -186,7 +186,9 @@ public class Reasoner {
 		
 		statistics_.reset();
 		forceLoading();
-		encodeTransitivity(computePropertyHierarchy());
+		//encodeTransitivity(computePropertyHierarchy());
+		computePropertyHierarchy();
+		
 		saturationState_ = new SaturationState();
 		Saturation saturation = new Saturation(saturationState_, ontologyIndex_.getIndexedOwlNothing());
 		Statistics.logOperationStart("concept satisfiability testing", LOGGER_);

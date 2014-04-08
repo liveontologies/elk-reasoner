@@ -26,6 +26,7 @@ import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ConjectureNonSu
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.LocalConclusion;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleComposedSubsumer;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossiblePropagation;
 
 /**
  * A visitor pattern for {@link LocalConclusion}s together with additional input
@@ -45,5 +46,7 @@ public interface LocalPossibleConclusionVisitor<I, O> {
 	public O visit(PossibleDecomposedSubsumer conclusion, I input);
 
 	public O visit(ConjectureNonSubsumer conclusion, I input);
+	
+	public O visit(PossiblePropagation conclusion, I input);
 
 }

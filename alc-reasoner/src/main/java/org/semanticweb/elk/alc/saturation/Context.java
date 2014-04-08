@@ -56,6 +56,7 @@ import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleCompose
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleConclusion;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossiblePropagatedExistential;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossiblePropagation;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Propagation;
@@ -177,7 +178,8 @@ public class Context {
 	 * possible existentials that are propagated from successor {@link Root}s;
 	 * they should be guessed
 	 */
-	private Multimap<IndexedObjectSomeValuesFrom, Root> possibleExistentials_;
+	//private Multimap<IndexedObjectSomeValuesFrom, Root> possibleExistentials_;
+	private Multimap<IndexedObjectSomeValuesFrom, IndexedObjectProperty> possibleExistentials_;
 
 	/**
 	 * inconsistent {@link Root}s that are reachable by forward links (together
@@ -331,6 +333,13 @@ public class Context {
 			return Collections.emptySet();
 		// else
 		return possibleExistentials_.keySet();
+	}
+	
+	public Collection<IndexedObjectProperty> getRelationsForPossibleExistential(IndexedObjectSomeValuesFrom possibleExistential) {
+		if (possibleExistentials_ == null)
+			return Collections.emptySet();
+		// else
+		return possibleExistentials_.get(possibleExistential);
 	}
 
 	public Set<Root> getInconsistentSuccessors() {
@@ -716,12 +725,14 @@ public class Context {
 		public Boolean visit(PossiblePropagatedExistential conclusion,
 				Context input) {
 			if (input.possibleExistentials_ == null) {
-				input.possibleExistentials_ = new HashSetMultimap<IndexedObjectSomeValuesFrom, Root>(
+				input.possibleExistentials_ = new HashSetMultimap<IndexedObjectSomeValuesFrom, IndexedObjectProperty>(
 						8);
 			}
 			IndexedObjectSomeValuesFrom expression = conclusion.getExpression();
-			Root root = conclusion.getSourceRoot();
-			if (input.possibleExistentials_.add(expression, root)) {
+			//Root root = conclusion.getSourceRoot();
+			
+			//if (input.possibleExistentials_.add(expression, root)) {
+			if (input.possibleExistentials_.add(expression, conclusion.getRelation())) {
 				return true;
 			}
 			// else
@@ -836,6 +847,11 @@ public class Context {
 			}
 			// else
 			return false;
+		}
+
+		@Override
+		public Boolean visit(PossiblePropagation conclusion, Context input) {
+			return visit((Propagation)conclusion, input);
 		}
 
 	}
@@ -1114,6 +1130,11 @@ public class Context {
 			}
 			// else
 			return false;
+		}
+
+		@Override
+		public Boolean visit(PossiblePropagation conclusion, Context input) {
+			return visit((Propagation)conclusion, input);
 		}
 	}
 }

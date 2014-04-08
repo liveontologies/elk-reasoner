@@ -35,6 +35,7 @@ import org.semanticweb.elk.alc.saturation.conclusions.interfaces.NegatedSubsumer
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.NegativePropagation;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleComposedSubsumer;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossiblePropagation;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Propagation;
 
 /**
@@ -120,6 +121,11 @@ class DummyLocalConclusionVisitor<I, O> implements LocalConclusionVisitor<I, O> 
 
 	@Override
 	public O visit(DisjointSubsumer conclusion, I input) {
+		return defaultVisit(conclusion, input);
+	}
+
+	@Override
+	public O visit(PossiblePropagation conclusion, I input) {
 		return defaultVisit(conclusion, input);
 	}
 

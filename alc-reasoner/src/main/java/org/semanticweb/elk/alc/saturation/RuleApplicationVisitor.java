@@ -38,8 +38,10 @@ import org.semanticweb.elk.alc.saturation.conclusions.implementation.NegativePro
 import org.semanticweb.elk.alc.saturation.conclusions.implementation.PossibleComposedSubsumerImpl;
 import org.semanticweb.elk.alc.saturation.conclusions.implementation.PossibleDecomposedSubsumerImpl;
 import org.semanticweb.elk.alc.saturation.conclusions.implementation.PossiblePropagatedExistentialImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.PossiblePropagationImpl;
 import org.semanticweb.elk.alc.saturation.conclusions.implementation.PropagatedClashImpl;
 import org.semanticweb.elk.alc.saturation.conclusions.implementation.PropagatedComposedSubsumerImpl;
+import org.semanticweb.elk.alc.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Clash;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.ComposedSubsumer;
@@ -55,6 +57,7 @@ import org.semanticweb.elk.alc.saturation.conclusions.interfaces.NegativePropaga
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleComposedSubsumer;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossibleDecomposedSubsumer;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossiblePropagatedExistential;
+import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PossiblePropagation;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PropagatedClash;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.PropagatedComposedSubsumer;
 import org.semanticweb.elk.alc.saturation.conclusions.interfaces.Propagation;
@@ -110,6 +113,34 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 	@Override
 	public Void visit(PropagatedComposedSubsumer conclusion, Context input) {
 		producer_.produce(new ComposedSubsumerImpl(conclusion.getExpression()));
+		// transitivity handling
+		IndexedObjectProperty propagationRelation = conclusion.getRelation();
+		// FIXME generics to avoid the cast
+		IndexedObjectSomeValuesFrom carry = (IndexedObjectSomeValuesFrom) conclusion
+				.getExpression();
+		
+		if (propagationRelation == carry.getRelation() && propagationRelation.isTransitive()) {
+			// the simple case, propagation over the same relation
+			producer_.produce(new PropagationImpl(propagationRelation, carry));
+			return null;
+		}
+		
+		for (IndexedObjectProperty transitive : new LazySetIntersection<IndexedObjectProperty>(
+				propagationRelation.getSaturatedProperty()
+						.getTransitiveSuperProperties(), carry.getRelation()
+						.getSaturatedProperty().getTransitiveSubProperties())) {
+			// if there exists a transitive role in the hierarchy between the
+			// propagation role and the carry role, we produce a propagation in
+			// this context to propagate the carry further. I.e. if R => T => S, where
+			// R is the link role, T is transitive, and S is the carry role,
+			// then, "S some X" here implies "R some X" and "T some X"
+			// (propagation is over R and R => T). Thus
+			// "R some S some X" implies "T some T some X" which, in turn,
+			// implies "T some X" (via transitivity) and "S some X" (by T => S),
+			// which is precisely what we propagate further.
+			//TODO it suffices to only consider the maximal such Ts w.r.t. the role hierarchy 
+			producer_.produce(new PropagationImpl(transitive, carry));
+		}		
 
 		return null;
 	}
@@ -140,12 +171,24 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		
 		if (input.getPossibleExistentials().contains(negatedExpression)) {
 			IndexedObjectSomeValuesFrom negatedExistential = (IndexedObjectSomeValuesFrom) negatedExpression;
+			
 			producer_.produce(new NegativePropagationImpl(negatedExistential));
 			// transitivity handling: producing a negative propagation for the
 			// existential (in addition to a propagation of the filler)
 			// if the relation is transitive.
-			if (negatedExistential.getRelation().isTransitive() && negatedExistential.occursNegatively()) {
-				producer_.produce(new NegativePropagationImpl(negatedExistential.getRelation(), negatedExistential));
+			for (IndexedObjectProperty propagationRelation : input.getRelationsForPossibleExistential(negatedExistential)) {
+				//the simple case
+				if (propagationRelation == negatedExistential.getRelation() && propagationRelation.isTransitive()) {
+					producer_.produce(new NegativePropagationImpl(propagationRelation, negatedExistential));
+					continue;
+				}
+				
+				for (IndexedObjectProperty transitive : new LazySetIntersection<IndexedObjectProperty>(
+						propagationRelation.getSaturatedProperty()
+								.getTransitiveSuperProperties(), negatedExistential.getRelation()
+								.getSaturatedProperty().getTransitiveSubProperties())) {
+					producer_.produce(new NegativePropagationImpl(transitive, negatedExistential));
+				}
 			}
 		}
 	}
@@ -357,9 +400,22 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 			producer_.produce(new NegativePropagationImpl(expression));
 		} else {
 			producer_.produce(new PossibleComposedSubsumerImpl(expression));
+			
+			//transitivity handling
+			IndexedObjectProperty propagationRelation = conclusion.getRelation();
+			
+			if (propagationRelation == expression.getRelation() && propagationRelation.isTransitive()) {
+				producer_.produce(new PossiblePropagationImpl(propagationRelation, expression));
+				return null;
+			}
+
+			for (IndexedObjectProperty transitive : new LazySetIntersection<IndexedObjectProperty>(
+					propagationRelation.getSaturatedProperty()
+							.getTransitiveSuperProperties(), expression.getRelation()
+							.getSaturatedProperty().getTransitiveSubProperties())) {
+				producer_.produce(new PossiblePropagationImpl(transitive, expression));
+			}
 		}
-		
-		//producer_.produce(new PossibleComposedSubsumerImpl(expression));
 		
 		return null;
 	}
@@ -380,6 +436,11 @@ public class RuleApplicationVisitor implements ConclusionVisitor<Context, Void> 
 		}
 
 		return null;
+	}
+
+	@Override
+	public Void visit(PossiblePropagation conclusion, Context input) {
+		return visit((Propagation) conclusion, input);
 	}
 
 }
