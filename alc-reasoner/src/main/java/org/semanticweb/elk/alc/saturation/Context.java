@@ -556,8 +556,12 @@ public class Context {
 	// returns the collection of fillers of all negative propagations for
 	// super-roles of the given relation
 	Collection<IndexedClassExpression> getFillersInNegativePropagations(IndexedObjectProperty relation) {
+		if (negativePropagations_ == null) {
+			return Collections.emptyList();
+		}
+		
 		final Set<IndexedObjectProperty> superProperties = relation.getSaturatedProperty().getSuperProperties();
-		//TODO implement contains()?
+
 		return new AbstractCollection<IndexedClassExpression>() {
 			
 			@Override
@@ -614,6 +618,21 @@ public class Context {
 			public int size() {
 				// lower approximation
 				return Math.min(superProperties.size(), getNegativePropagations().keySet().size());
+			}
+
+			@Override
+			public boolean contains(Object o) {
+				if (negativePropagations_ == null) {
+					return false;
+				}
+				
+				for (IndexedObjectProperty property : superProperties) {
+					if (negativePropagations_.get(property).contains(o)) {
+						return true;
+					}
+				}
+				
+				return false;
 			}
 
 		};
