@@ -35,6 +35,7 @@ import java.util.Set;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.alc.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.alc.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.alc.saturation.conclusions.implementation.BacktrackedBackwardLinkImpl;
 import org.semanticweb.elk.alc.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.alc.saturation.conclusions.implementation.ClashImpl;
@@ -54,6 +55,8 @@ import org.semanticweb.elk.alc.saturation.conclusions.visitors.ConclusionVisitor
 import org.semanticweb.elk.alc.saturation.conclusions.visitors.LocalConclusionVisitor;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.Operations.FunctorEx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,16 +131,13 @@ public class Saturation {
 	private final Multimap<IndexedObjectProperty, Root> producedBackwardLinks_;
 	private final Multimap<IndexedObjectProperty, Root> retractedBackwardLinks_;
 
-	// FIXME this is a kluge, needed only for returning it as the sole subsumer
-	// of unsatisfiable classes.
-	// Use some other way of indicating that a class is unsatisfiable
-	private final IndexedClass owlNothing_;
+	private final OntologyIndex ontologyIndex_;
 	
 	// some statistics counters
 	private final SaturationStatistics statistics_ = new SaturationStatistics();
 
-	public Saturation(SaturationState saturationState, IndexedClass owlNothing) {
-		this.owlNothing_ = owlNothing;
+	public Saturation(SaturationState saturationState, OntologyIndex index) {
+		this.ontologyIndex_ = index;
 		this.saturationState_ = saturationState;
 		this.localDeterministicConclusions_ = new ArrayDeque<LocalDeterministicConclusion>(
 				1024);
@@ -589,13 +589,40 @@ public class Saturation {
 			// everything has been computed and is up-to-date
 			return rootContext.getSaturatedContext().getAtomicSubsumers();
 		}
-
+		
 		Set<IndexedClass> subsumers = null;
+		
+		if (rootContext.isDeterministic()) {
+			// a shortcut when the context is deterministic
+			rootContext.setSaturatedContext(new SaturatedContext(Operations.map(rootContext.getSubsumers(), new FunctorEx<IndexedClassExpression, IndexedClass>(){
+
+				@Override
+				public IndexedClass apply(IndexedClassExpression element) {
+					if (element instanceof IndexedClass) {
+						return (IndexedClass) element;
+					}
+					
+					return null;
+				}
+
+				@Override
+				public IndexedClassExpression deapply(Object element) {
+					if (element instanceof IndexedClass) {
+						return (IndexedClass) element;
+					}
+					
+					return null;
+				}
+				
+			})));
+			
+			return rootContext.getSaturatedContext().getAtomicSubsumers();
+		}
 		
 		if (rootContext.isInconsistent()) {
 			LOGGER_.trace("{} is unsatisfiable", rootClass);
 			
-			subsumers = Collections.singleton(owlNothing_);
+			subsumers = Collections.singleton(ontologyIndex_.getIndexedOwlNothing());
 		}
 		else {
 			LOGGER_.trace("Started computing subsumers for {}", rootClass);

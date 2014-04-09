@@ -164,7 +164,7 @@ public class Reasoner {
 			return true;
 		}
 
-		Saturation saturation = new Saturation(saturationState_, ontologyIndex_.getIndexedOwlNothing());
+		Saturation saturation = new Saturation(saturationState_, ontologyIndex_);
 		//TODO this is temporary
 		if (second instanceof IndexedClass) {
 			Collection<? extends IndexedClassExpression> atomicSubsumers = saturation.getAtomicSubsumers(first);
@@ -188,7 +188,7 @@ public class Reasoner {
 		forceLoading();
 		encodeTransitivity(computePropertyHierarchy());
 		saturationState_ = new SaturationState();
-		Saturation saturation = new Saturation(saturationState_, ontologyIndex_.getIndexedOwlNothing());
+		Saturation saturation = new Saturation(saturationState_, ontologyIndex_);
 		Statistics.logOperationStart("concept satisfiability testing", LOGGER_);
 		try {
 			int count = 0;
@@ -231,7 +231,7 @@ public class Reasoner {
 		
 		statistics_.reset();
 		checkSatisfiability();
-		Saturation saturation = new Saturation(saturationState_, ontologyIndex_.getIndexedOwlNothing());
+		Saturation saturation = new Saturation(saturationState_, ontologyIndex_);
 		Statistics.logOperationStart("classification", LOGGER_);
 		int countClasses = 0;
 		int countSubsumers = 0;
@@ -302,7 +302,7 @@ public class Reasoner {
 
 				if (PRINT_STATS_) {
 					if ((countClasses / 1000) * 1000 == countClasses)
-						LOGGER_.debug(
+						LOGGER_.info(
 								"{} concepts processed (average: {} subsumers, {} subsumer tests, {} positive)",
 								countClasses,
 								atomicSubsumers.size() / countClasses,
@@ -336,7 +336,7 @@ public class Reasoner {
 		
 		statistics_.reset();
 		checkSatisfiability();
-		Saturation saturation = new Saturation(saturationState_, ontologyIndex_.getIndexedOwlNothing());
+		Saturation saturation = new Saturation(saturationState_, ontologyIndex_);
 		Statistics.logOperationStart("classification", LOGGER_);
 		int countClasses = 0;
 		int countSubsumers = 0;
@@ -350,13 +350,10 @@ public class Reasoner {
 				
 				Collection<IndexedClass> atomicSubsumers = saturation.getAtomicSubsumers(initialClass);
 				
-				if (atomicSubsumers == null) {
-					//currently this means the class is unsatisfiable 
-					LOGGER_.debug("{}: is unsatisfiable", initialClass);
-					countSubsumers += 1;//owl:Nothing is the only subsumer
-				}
-				else {
-					countSubsumers += atomicSubsumers.size();
+				if (LOGGER_.isDebugEnabled()) {
+					for (@SuppressWarnings("unused") IndexedClass subsumer : atomicSubsumers) {
+						countSubsumers++;
+					}
 				}
 				
 				if (PRINT_STATS_) {
@@ -376,7 +373,7 @@ public class Reasoner {
 			
 			statistics_.add(saturation.getStatistics());
 			
-			LOGGER_.debug(
+			LOGGER_.info(
 					"Total classes: {}, subsumers: {}, subsumer tests: {}, positive: {}",
 					countClasses, countSubsumers, countSubsumerTests,
 					countSubsumerTests - countNegativeSubsumerTests);

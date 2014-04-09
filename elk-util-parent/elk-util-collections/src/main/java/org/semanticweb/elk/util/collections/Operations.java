@@ -644,6 +644,8 @@ public class Operations {
 		private final Iterator<? extends I> iter_;
 		private final Functor<I, O> functor_;
 		
+		private O next_;
+		
 		MapIterator(Iterator<? extends I> iter, Functor<I, O> functor) {
 			iter_ = iter;
 			functor_ = functor;
@@ -651,12 +653,28 @@ public class Operations {
 
 		@Override
 		public boolean hasNext() {
-			return iter_.hasNext();
+			if (next_ != null) {
+				return true;
+			}
+			
+			while (iter_.hasNext() && next_ == null) {
+				next_ = functor_.apply(iter_.next());
+			}
+			
+			return next_ != null;
 		}
 
 		@Override
 		public O next() {
-			return functor_.apply(iter_.next());
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			
+			O toReturn = next_;
+			
+			next_ = null;
+			
+			return toReturn;
 		}
 
 		@Override
