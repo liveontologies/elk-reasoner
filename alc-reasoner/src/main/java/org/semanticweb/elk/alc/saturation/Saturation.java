@@ -312,6 +312,7 @@ public class Saturation {
 		for (;;) {
 			context.setHistoryNotExplored();
 			// we are going to re-saturate this context
+			//context.setNotSaturated();
 			activeContext_ = context;
 			// visitor for exploring branches
 			LocalConclusionVisitor<Context, Boolean> branchExplorer = new SubsumptionExploringVisitor(
@@ -366,12 +367,16 @@ public class Saturation {
 					subsumerCandidatesIterator.remove();
 				}
 			}
-			/*if (context.getPossibleComposedSubsumers().isEmpty()
+			
+			if (context.getPossibleComposedSubsumers().isEmpty()
 					&& context.getPossibleDecomposedSubsumers().isEmpty()) {
 				// no choices left anymore, we are at the last branch
 				break;
-			}*/
+			}
 		}
+		
+		//context.setSaturated();
+		
 		// finally adding all deterministically derived subsumers
 		Set<IndexedClassExpression> nonDeterministicSubsumers = context
 				.getComposedSubsumers();
@@ -381,6 +386,7 @@ public class Saturation {
 				subsumerCandidates.add((IndexedClass) subsumer);
 			}
 		}
+		
 		return subsumerCandidates;
 	}
 
