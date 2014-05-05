@@ -12,16 +12,23 @@ import org.semanticweb.elk.reasoner.saturation.SaturationJob;
  *
  * pavel.klinov@uni-ulm.de
  */
-class SubContextSaturationJob extends SaturationJob<IndexedClassExpression> {
+class SubContextSaturationJob<J> extends SaturationJob<IndexedClassExpression> {
 
 	private final IndexedObjectProperty subRoot_;
 	
-	SubContextSaturationJob(IndexedClassExpression root, IndexedObjectProperty subRoot) {
+	private final J initiatorJob_;
+	
+	SubContextSaturationJob(IndexedClassExpression root, IndexedObjectProperty subRoot, J initiatorJob) {
 		super(root);
 		subRoot_ = subRoot;
+		initiatorJob_ = initiatorJob;
 	}
 	
 	IndexedObjectProperty getSubRoot() {
 		return subRoot_;
+	}
+	
+	J getInitiatorJob() {
+		return initiatorJob_;
 	}
 }

@@ -37,7 +37,7 @@ public class RecursiveTracingComputation extends
 			ProgressMonitor progressMonitor) {
 		super(getInputJobs(traceState.getTracingMap()), new RecursiveContextTracingFactory(
 				saturationState, traceState.getSaturationState(),
-				traceState.getTraceStore()), executor, maxWorkers,
+				traceState.getTraceStore(), maxWorkers), executor, maxWorkers,
 				progressMonitor);
 	}
 	

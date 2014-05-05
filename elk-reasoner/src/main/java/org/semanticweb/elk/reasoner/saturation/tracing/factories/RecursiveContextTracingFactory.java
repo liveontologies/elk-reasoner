@@ -3,21 +3,22 @@
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.factories;
 
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.DummyClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.PremiseVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.OnDemandTracingReader;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceUnwindingState;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.PremiseVisitor;
 import org.semanticweb.elk.util.collections.Pair;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.slf4j.Logger;
@@ -35,13 +36,24 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveContextTracingFactory.class);
 	
-	private final NonRecursiveContextTracingFactory singleContextTracingFactory_;
+	private final NonRecursiveContextTracingFactory<ContextTracingJob> singleContextTracingFactory_;
 	
 	private final TraceStore traceStore_;
 	
-	public RecursiveContextTracingFactory(SaturationState<?> mainSaturationState, SaturationState<TracedContext> tracingSaturationState, TraceStore traceStore) {
+	private final Queue<RecursiveContextTracingJob> jobsToDo_;
+	
+	private final Queue<TraceUnwindingState> jobsInProgress_;
+	
+	public RecursiveContextTracingFactory(SaturationState<?> mainSaturationState, SaturationState<TracedContext> tracingSaturationState, TraceStore traceStore, int maxWorkers) {
 		traceStore_ = traceStore;
-		singleContextTracingFactory_ = new NonRecursiveContextTracingFactory(mainSaturationState, tracingSaturationState, traceStore);
+		singleContextTracingFactory_ = new NonRecursiveContextTracingFactory<ContextTracingJob>(
+				mainSaturationState,
+				tracingSaturationState,
+				traceStore,
+				maxWorkers,
+				new DummyClassExpressionSaturationListener<ContextTracingJob>());
+		jobsToDo_ = new ConcurrentLinkedQueue<RecursiveContextTracingJob>();
+		jobsInProgress_ = new ConcurrentLinkedQueue<TraceUnwindingState>();
 	}
 	
 	@Override
@@ -63,16 +75,13 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 	 * A simple wrapper around {@link RecursiveTraceUnwinder} which does all the
 	 * heavy lifting.
 	 */
-	public class Engine implements InputProcessor<RecursiveContextTracingJob> {
+	class Engine implements InputProcessor<RecursiveContextTracingJob> {
 		
-		private final Queue<RecursiveContextTracingJob> jobsToDo_;
-
 		private final TraceStore.Reader reader_;
 		
-		private TraceUnwindingState currentJobState_;
+		private TraceUnwindingState currentState_;
 		
 		private Engine() {
-			jobsToDo_ = new LinkedList<RecursiveContextTracingJob>();
 			reader_ = new OnDemandTracingReader(
 					singleContextTracingFactory_.getTracingSaturationState(),
 					traceStore_.getReader(), singleContextTracingFactory_);
@@ -80,50 +89,58 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 
 		@Override
 		public void process() throws InterruptedException {
+			LOGGER_.trace("Recursive tracing started");
+			
 			for (;;) {
-				LOGGER_.trace("Recursive tracing started");
-				
-				if (currentJobState_ != null) {
-					// this is a leftover from the previous run
-					unwind();
-				}
-				else {
-					RecursiveContextTracingJob nextJob = jobsToDo_.poll();
-					
-					if (nextJob == null) {
-						break;
-					}
-					
-					currentJobState_ = new TraceUnwindingState();
-					currentJobState_.addToUnwindingQueue(nextJob.getTarget(), nextJob.getInput());
-					unwind();
-				}
-				
 				if (Thread.currentThread().isInterrupted()) {
 					LOGGER_.trace("Recursive tracing interrupted");
+					finish();
+					
 					break;
 				}
-				// finished the current job, clearing the state
-				currentJobState_ = null;
+				
+				// first, continue some existing unwinding
+				currentState_ = jobsInProgress_.poll();
+				
+				if (currentState_ != null) {
+					unwindCurrentState();
+					continue;
+				}
+				// second, start new unwinding
+				RecursiveContextTracingJob job = jobsToDo_.poll();
+				
+				if (job == null) {
+					LOGGER_.trace("Recursive tracing finished");
+					
+					break;
+				}
+				
+				currentState_ = new TraceUnwindingState();
+				currentState_.addToUnwindingQueue(job.getTarget(), job.getInput());
+				
+				unwindCurrentState();
 			}
 		}
 
-		private void unwind() throws InterruptedException {
+		private void unwindCurrentState() throws InterruptedException {
 			for (;;) {
-				Pair<Conclusion, IndexedClassExpression> next = currentJobState_.pollFromUnwindingQueue();
+				Pair<Conclusion, IndexedClassExpression> next = currentState_.pollFromUnwindingQueue();
 
 				if (next == null) {
-					LOGGER_.trace("Nothing to unwind");
+					LOGGER_.trace("Unwinding finished, the unwinding state set to null");
+					currentState_ = null;
 					break;
 				}
 
-				LOGGER_.trace("Unwinding started: {} {}", next.getSecond(), next.getFirst());
+				LOGGER_.trace("Unwinding of {} in {}", next.getFirst(), next.getSecond());
 				
 				unwind(next.getFirst(), next.getSecond());
 				
 				if (Thread.currentThread().isInterrupted()) {
-					LOGGER_.trace("Unwinding interrupted, putting the last element back to the queue");
-					currentJobState_.addToUnwindingQueue(next.getFirst(), next.getSecond());
+					LOGGER_.trace("Unwinding interrupted at {} in {}", next.getFirst(), next.getSecond());
+					// will re-start from this point later
+					currentState_.addToUnwindingQueue(next.getFirst(), next.getSecond());
+					
 					break;
 				}
 
@@ -135,7 +152,7 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 
 				@Override
 				protected Void defaultVisit(Conclusion premise, IndexedClassExpression inferenceContext) {
-					currentJobState_.addToUnwindingQueue(premise, inferenceContext);
+					currentState_.addToUnwindingQueue(premise, inferenceContext);
 					return null;
 				}
 			};
@@ -145,7 +162,7 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 
 						@Override
 						protected Void defaultTracedVisit(Inference inference, Void _ignored) {
-							if (currentJobState_.addToProcessed(inference)) {
+							if (currentState_.addToProcessed(inference)) {
 								IndexedClassExpression inferenceContextRoot = inference.getInferenceContextRoot(rootWhereStored);
 								// visit the premises to put into the queue
 								inference.acceptTraced(premiseVisitor, inferenceContextRoot);
@@ -159,6 +176,17 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 
 		@Override
 		public void finish() {
+			// saving the unfinished job
+			if (currentState_ != null) {
+				LOGGER_.trace("Unwinding interrupted but will be resumed");
+				
+				jobsInProgress_.add(currentState_);
+			}
+			else {
+				LOGGER_.trace("Unwinding won't be resumed, finished normally");
+			}
+			
+			currentState_ = null;
 		}
 
 		@Override

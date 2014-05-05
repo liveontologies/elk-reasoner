@@ -68,8 +68,11 @@ public abstract class AbstractRuleEngine<I extends RuleApplicationInput> impleme
 	public void process() throws InterruptedException {
 		try {
 			for (;;) {
-				if (Thread.currentThread().isInterrupted())
+				if (Thread.currentThread().isInterrupted()) {
+					LOGGER_.trace("Rule application interrupted");
+					
 					break;
+				}
 				Context nextContext = getNextActiveContext();
 				if (nextContext == null) {
 					break;

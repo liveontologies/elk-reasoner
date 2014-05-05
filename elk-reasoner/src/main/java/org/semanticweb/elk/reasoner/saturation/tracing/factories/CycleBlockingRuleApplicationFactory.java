@@ -35,23 +35,29 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriterWrap;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ConclusionEntry;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.HybridLocalRuleApplicationConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.WorkerLocalTodo;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.IsInferenceCyclic;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.GetInferenceTarget;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceInsertionVisitor;
+import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
  * This factory should be used for tracing already made inferences whose
@@ -116,7 +122,7 @@ public class CycleBlockingRuleApplicationFactory extends
 				new InferenceInserter(new ConclusionInsertionVisitor(
 						cycleBlocker), cycleBlocker, getSaturationStatistics()),
 				// apply only local rules and produce conclusion only to the
-				// locally copies
+				// local copy
 				new HybridLocalRuleApplicationConclusionVisitor(
 						mainSaturationState_, ruleVisitor, ruleVisitor,
 						cycleBlocker, cycleBlocker));
@@ -130,6 +136,19 @@ public class CycleBlockingRuleApplicationFactory extends
 			context.clearBlockedInferences();
 		}
 	}
+	
+	@Override
+	protected InputProcessor<RuleApplicationInput> getEngine(
+			ConclusionVisitor<? super Context, Boolean> conclusionProcessor,
+			SaturationStateWriter<? extends TracedContext> saturationStateWriter,
+			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
+		return new TracingRuleEngine<RuleApplicationInput>(conclusionProcessor,
+				localTodo, saturationStateWriter,
+				new ContextInitializationImpl(mainSaturationState_.getOntologyIndex()),
+				localStatistics, localStatistics);
+	}
+
+
 
 	/**
 	 * Blocks cyclic inferences when producing conclusions.
@@ -265,49 +284,36 @@ public class CycleBlockingRuleApplicationFactory extends
 	private class MissingContextChecker extends AbstractConclusionVisitor<Context, Boolean> {
 		
 		@Override
-		protected Boolean defaultVisit(Conclusion conclusion,
-				Context context) {
+		public Boolean visit(BackwardLink subConclusion, Context context) {
 			IndexedClassExpression root = context.getRoot();
 			Context mainContext = mainSaturationState_.getContext(root);
-			TracedContext localContext = getSaturationState().getContext(conclusion.getSourceRoot(root));
+			TracedContext localContext = getSaturationState().getContext(subConclusion.getSourceRoot(root));
 			
-			if (needsTracing(mainContext, localContext, conclusion)) {
-				// If the main context isn't saturated, then it can't be used
-				// for tracing yet since it can be saturating concurrently due
-				// to a parallel tracing job.
-				localContext.addMissingConclusion(root, conclusion);
+			if (needsTracing(mainContext, localContext, subConclusion)) {
+				localContext.addMissingSubConclusion(root, subConclusion);
 				
 				return Boolean.FALSE;
 			}
 			
 			return Boolean.TRUE;
 		}
-		
+
 		/**
-		 * Decides if saturation of the main context is required for tracing of
-		 * the local context. The answer is yes if either the main context
-		 * doesn't exist or hasn't been saturated yet or has been saturated but
-		 * doesn't contain the given conclusion (e.g. a backward link). Note
-		 * that the context could already be saturated but not yet marked as
-		 * saturated. Then, if its saturation was triggered by tracing this
-		 * local context, it will be stored in the local context.
 		 */
 		private boolean needsTracing(Context mainContext,
-				TracedContext tracedContext, Conclusion conclusion) {
-			if (mainContext == null) {
+				TracedContext tracedContext, SubConclusion subconclusion) {
+			if (mainContext == null || !mainContext.isSaturated()) {
 				return true;
 			}
 
-			IndexedClassExpression root = mainContext.getRoot();
-			
-			if (root == tracedContext.getRoot()) {
-				return false;
-			}
+			SubContextPremises subContext = mainContext.getSubContextPremisesByObjectProperty().get(subconclusion.getSubRoot());
 
-			return !mainContext.isSaturated()
-					&& !tracedContext.isMainContextSaturated(root)
-					|| !mainContext.containsConclusion(conclusion)
-					&& !tracedContext.getMissingConclusions().contains(root, conclusion);
+			return subContext == null || !subContext.isInitialized();
+		}
+
+		@Override
+		protected Boolean defaultVisit(Conclusion conclusion, Context input) {
+			return Boolean.TRUE;
 		}
 
 	}

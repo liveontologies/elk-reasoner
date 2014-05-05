@@ -25,6 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -35,6 +38,7 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.incremental.TestChangesLoader;
+import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 
 /**
  * Tests that the tracing is correct and complete even when the closure is
@@ -68,10 +72,16 @@ public class TracingWithRedundancyTest {
 		changeLoader.add(factory.getSubClassOfAxiom(a, rSomeRSomeC));
 		
 		reasoner.getTaxonomyQuietly();
-		//now test that when we trace A, we also trace inferences in R some (R some C)
+		// the should be no context for R some C just yet
+		assertNull(ReasonerStateAccessor.getContext(reasoner, ReasonerStateAccessor.transform(reasoner, rSomeC)));
+		// now test that when we trace A, we also trace inferences in R some (R some C)
 		reasoner.explainSubsumption(a, rSomeD);
-		// will fail if no context for "R some C" has been created or if it hasn't been traced
+		// now R some C must exist
+		assertNotNull(ReasonerStateAccessor.getContext(reasoner, ReasonerStateAccessor.transform(reasoner, rSomeC)));
+		// will fail if no context for "R some C" has been traced
 		TracingTestUtils.checkNumberOfInferences(rSomeC, d, reasoner, 1);
+		// one propagation from B and one from R some C
+		TracingTestUtils.checkNumberOfInferences(a, rSomeD, reasoner, 2);
 	}
 	
 }

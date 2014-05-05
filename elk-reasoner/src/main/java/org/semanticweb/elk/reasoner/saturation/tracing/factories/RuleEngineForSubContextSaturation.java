@@ -13,9 +13,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleEngin
 import org.semanticweb.elk.reasoner.saturation.rules.factories.WorkerLocalTodo;
 
 /**
+ * Starts the rule application process by initializing the given sub-context.
+ * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class RuleEngineForSubContextSaturation extends
 		AbstractRuleEngineWithStatistics<SubContextRuleApplicationInput> {

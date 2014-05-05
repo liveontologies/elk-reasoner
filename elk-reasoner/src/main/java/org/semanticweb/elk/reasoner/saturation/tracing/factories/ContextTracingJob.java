@@ -37,17 +37,19 @@ import org.semanticweb.elk.reasoner.saturation.SaturationJob;
  */
 public class ContextTracingJob extends SaturationJob<IndexedClassExpression> {
 
-	public ContextTracingJob(IndexedClassExpression input) {
+private final ContextTracingListener callback_;
+	
+	public ContextTracingJob(IndexedClassExpression input, ContextTracingListener callback) {
 		super(input);
+		callback_ = callback;
+	}
+	
+	public ContextTracingJob(IndexedClassExpression input) {
+		this(input, ContextTracingListener.DUMMY);
 	}
 
 	public ContextTracingListener getCallback() {
-		return ContextTracingListener.DUMMY;
-	}
-
-	@Override
-	public String toString() {
-		return getInput().toString();
+		return callback_;
 	}
 	
 	

@@ -25,7 +25,11 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -34,6 +38,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -41,9 +47,24 @@ import org.semanticweb.elk.reasoner.TestReasonerUtils;
  *         pavel.klinov@uni-ulm.de
  */
 public class TracingSaturationTest {
+	
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(TracingSaturationTest.class);
+	
+	@Rule public TestName testName = new TestName();
 
+	@Before
+	public void beforeTest() {
+		LOGGER_.trace("Starting test {}", testName.getMethodName());
+	}
+	
+	@After
+	public void afterTest() {
+		LOGGER_.trace("Finishing test {}", testName.getMethodName());
+	}
+	
 	@Test
 	public void testBasicTracing() throws Exception {
+		
 		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/DuplicateExistential.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
@@ -186,7 +207,7 @@ public class TracingSaturationTest {
 	/*
 	 */
 	@Test
-	public void testAvoidTracingDueToCyclicInferences() throws Exception {
+	public void testAvoidTracingDueToCyclicInferences() throws Exception {		
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/TrivialPropagation.owl");
 

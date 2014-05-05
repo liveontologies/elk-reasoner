@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
@@ -34,10 +33,10 @@ import org.semanticweb.elk.reasoner.saturation.ContextFactory;
 import org.semanticweb.elk.reasoner.saturation.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.MapSaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
@@ -109,62 +108,34 @@ public class LocalTracingSaturationState extends
 		 * rules, e.g. only non-redundant rules). Indexed by roots of contexts
 		 * where these conclusions should be stored.
 		 */
-		private Multimap<IndexedClassExpression, Conclusion> missingConclusions_ = new HashListMultimap<IndexedClassExpression, Conclusion>();
-		/**
-		 * The set of roots of contexts in the main saturation state whose
-		 * saturation was triggered by tracing this context. We remember such
-		 * contexts because we can't simply mark *specific* contexts in the main
-		 * state as saturated during tracing. We can only mark *all* unsaturated
-		 * contexts as saturated which is only possible when all concurrent
-		 * tracing jobs finish.
-		 * 
-		 * TODO I'd happily get rid of this if I could
-		 */
-		private final Set<IndexedClassExpression> saturatedMainContexts_ = new ArrayHashSet<IndexedClassExpression>(4);
+		private Multimap<IndexedClassExpression, SubConclusion> missingConclusions_ = new HashListMultimap<IndexedClassExpression, SubConclusion>();
 
 		public TracedContext(IndexedClassExpression root) {
 			super(root);
 		}
 
-		public Multimap<IndexedClassExpression, Conclusion> getMissingConclusions() {
-			if (!beingTraced_.get()) {
+		public Multimap<IndexedClassExpression, SubConclusion> getMissingSubConclusions() {
+			/*if (!beingTraced_.get()) {
 				throw new RuntimeException("The context isn't being traced now: " + getRoot() + ", finished? " + (isInitialized() && isSaturated()));
-			}
+			}*/
 			
 			return missingConclusions_;
 		}
 		
-		public void addMissingConclusion(IndexedClassExpression root, Conclusion conclusion) {
-			if (!beingTraced_.get()) {
+		public void addMissingSubConclusion(IndexedClassExpression root, SubConclusion conclusion) {
+			/*if (!beingTraced_.get()) {
 				throw new RuntimeException("The context isn't being traced now: " + getRoot() + ", finished? " + (isInitialized() && isSaturated()));
-			}
+			}*/
 			
 			missingConclusions_.add(root, conclusion);
 		}
 		
 		public void clearMissingConclusions() {
-			if (!beingTraced_.get()) {
+			/*if (!beingTraced_.get()) {
 				throw new RuntimeException("The context isn't being traced now: " + getRoot() + ", finished? " + (isInitialized() && isSaturated()));
-			}
+			}*/
 			
 			missingConclusions_.clear();
-			//missingConclusions_ = null;
-		}
-		
-		public void addSaturatedMainContext(IndexedClassExpression root) {
-			saturatedMainContexts_.add(root);
-		}
-		
-		public void addSaturatedMainContexts(Set<IndexedClassExpression> roots) {
-			saturatedMainContexts_.addAll(roots);
-		}
-		
-		public boolean isMainContextSaturated(IndexedClassExpression root) {
-			return saturatedMainContexts_.contains(root);
-		}
-		
-		public void clearSaturatedMainContexts() {
-			saturatedMainContexts_.clear();
 		}
 		
 		public Multimap<Conclusion, Inference> getBlockedInferences() {

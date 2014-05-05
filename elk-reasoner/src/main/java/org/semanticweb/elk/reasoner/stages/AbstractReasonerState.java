@@ -56,15 +56,9 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.OnDemandTracingReader;
-import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.factories.ContextTracingFactory;
-import org.semanticweb.elk.reasoner.saturation.tracing.factories.ContextTracingJob;
-import org.semanticweb.elk.reasoner.saturation.tracing.factories.NonRecursiveContextTracingFactory;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
@@ -645,7 +639,7 @@ public abstract class AbstractReasonerState {
 		traceState.clearTracingMap();
 	}
 	
-	void simpleTrace(IndexedClassExpression subsumee, IndexedClassExpression subsumer) {
+	/*void simpleTrace(IndexedClassExpression subsumee, IndexedClassExpression subsumer) {
 		ContextTracingFactory<ContextTracingJob> factory = new NonRecursiveContextTracingFactory(
 				saturationState, traceState.getSaturationState(),
 				traceState.getTraceStore());
@@ -660,7 +654,7 @@ public abstract class AbstractReasonerState {
 		unwinder.accept(subsumee,
 				convertTraceTarget(subsumee, subsumer),
 				new DummyConclusionVisitor<IndexedClassExpression>());
-	}
+	}*/
 
 	private Conclusion convertTraceTarget(IndexedClassExpression subsumee, IndexedClassExpression subsumer) {
 		Context subsumeeContext = saturationState.getContext(subsumee);
