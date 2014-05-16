@@ -51,7 +51,7 @@ public class NativeRunnerWithEagerLoading extends NativeRunner {
 	protected void loadOntology(Reasoner reasoner) throws ElkException {
 		//long ts = System.currentTimeMillis();
 		
-		reasoner.loadOntology();
+		reasoner.forceLoading();
 		
 		//System.out.println((System.currentTimeMillis() - ts) + " loading done");
 	}

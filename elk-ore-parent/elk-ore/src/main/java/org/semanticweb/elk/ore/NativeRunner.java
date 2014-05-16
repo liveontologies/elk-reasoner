@@ -30,9 +30,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
-import org.semanticweb.elk.loading.EmptyChangesLoader;
-import org.semanticweb.elk.loading.OntologyLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
@@ -91,13 +90,11 @@ public class NativeRunner {
 		// create reasoner
 		ReasonerFactory reasoningFactory = new ReasonerFactory();
 		Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
-		OntologyLoader loader = new Owl2StreamLoader(parserFactory, input);
+		AxiomLoader loader = new Owl2StreamLoader(parserFactory, input);
 		Reasoner reasoner = reasoningFactory.createReasoner(loader,
 				new SimpleStageExecutor());
 
 		try {
-			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
-			
 			loadOntology(reasoner);
 			
 			long ts = System.currentTimeMillis();
