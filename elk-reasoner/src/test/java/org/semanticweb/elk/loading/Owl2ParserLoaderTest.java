@@ -43,19 +43,21 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 public class Owl2ParserLoaderTest {
 
 	private void load(String ontology) throws ElkLoadingException {
-		StringReader reader = null;
-
+		StringReader reader = new StringReader(ontology);
 		try {
 			Owl2ParserLoader loader = new Owl2ParserLoader(
-					new Owl2FunctionalStyleParserFactory().getParser(reader = new StringReader(
-							ontology)), new ElkAxiomProcessor() {
-						@Override
-						public void visit(ElkAxiom elkAxiom) {
+					new Owl2FunctionalStyleParserFactory().getParser(reader));
 
-						}
-					});
+			ElkAxiomProcessor dummyProcessor = new ElkAxiomProcessor() {
 
-			loader.load();
+				@Override
+				public void visit(ElkAxiom elkAxiom) {
+					// does nothing
+				}
+
+			};
+
+			loader.load(dummyProcessor, dummyProcessor);
 		} finally {
 			reader.close();
 		}
@@ -90,6 +92,7 @@ public class Owl2ParserLoaderTest {
 		load(ontology);
 	}
 
+	@SuppressWarnings("static-method")
 	@After
 	public void cleanUp() {
 		Thread.interrupted();

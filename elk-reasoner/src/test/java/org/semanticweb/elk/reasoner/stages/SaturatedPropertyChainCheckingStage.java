@@ -22,12 +22,14 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.VerifySymmetricPropertySaturation;
 import org.semanticweb.elk.reasoner.saturation.properties.VerifySymmetricPropertySaturation.AsymmetricCompositionHook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Checking invariants for {@code SaturatedPropertyChain}s
@@ -38,7 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.properties.VerifySymmetricPropert
 public class SaturatedPropertyChainCheckingStage extends
 		BasePostProcessingStage {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SaturatedPropertyChainCheckingStage.class);
 
 	private final OntologyIndex index_;
@@ -72,7 +74,9 @@ public class SaturatedPropertyChainCheckingStage extends
 			};
 
 			VerifySymmetricPropertySaturation.testLeftCompositions(ipc, hook);
-			VerifySymmetricPropertySaturation.testRightCompositions(ipc, hook);
+			if (ipc instanceof IndexedObjectProperty)
+				VerifySymmetricPropertySaturation.testRightCompositions(
+						(IndexedObjectProperty) ipc, hook);
 		}
 
 	}

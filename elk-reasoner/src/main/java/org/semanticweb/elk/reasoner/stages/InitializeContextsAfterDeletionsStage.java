@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.stages;
  */
 
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
+import org.semanticweb.elk.reasoner.saturation.context.ContextRootCollection;
 
 /**
  * 
@@ -53,8 +54,8 @@ class InitializeContextsAfterDeletionsStage extends
 					+ reasoner.saturationState.getNotSaturatedContexts());
 		}
 
-		this.todo = reasoner.saturationState.getNotSaturatedContexts()
-				.iterator();
+		this.todo = new ContextRootCollection(
+				reasoner.saturationState.getNotSaturatedContexts()).iterator();
 		this.maxContexts = reasoner.saturationState.getNotSaturatedContexts()
 				.size();
 		this.initContexts = 0;

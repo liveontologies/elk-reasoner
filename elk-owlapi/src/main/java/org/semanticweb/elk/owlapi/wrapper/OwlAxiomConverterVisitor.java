@@ -61,6 +61,7 @@ import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
 import org.semanticweb.owlapi.model.OWLSymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLTransitiveObjectPropertyAxiom;
+import org.semanticweb.owlapi.model.SWRLRule;
 
 /**
  * An implementation of the visitor pattern for OWL axioms to convert OWL axioms
@@ -295,4 +296,10 @@ public class OwlAxiomConverterVisitor extends
 	public ElkAxiom visit(OWLDatatypeDefinitionAxiom axiom) {
 		return CONVERTER.convert(axiom);
 	}
+
+	@Override
+	public ElkAxiom visit(SWRLRule rule) {
+		return CONVERTER.convert(rule);
+	}
+	
 }

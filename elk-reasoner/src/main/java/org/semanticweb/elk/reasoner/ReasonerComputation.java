@@ -22,62 +22,31 @@
  */
 package org.semanticweb.elk.reasoner;
 
-import java.util.Collection;
-import java.util.Iterator;
-
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputation;
-import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.ProcessorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ConcurrentComputation} used for executing of reasoner stages
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <I>
- *            the input that can be processed by the computation
  * @param <F>
  *            the type of the factory for the input processors
  */
-public class ReasonerComputation<I, F extends InputProcessorFactory<I, ?>>
-		extends ConcurrentComputation<I, F> {
+public class ReasonerComputation<F extends ProcessorFactory<?>> extends
+		ConcurrentComputation<F> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ReasonerComputation.class);
 
-	/**
-	 * the progress monitor used to report the progress of this computation
-	 */
-	protected final ProgressMonitor progressMonitor;
-	/**
-	 * the inputs to be processed
-	 */
-	protected final Iterator<? extends I> todo;
-	/**
-	 * the final value of the progress monitor: the total number of inputs
-	 */
-	private final int maxProgress;
-	/**
-	 * the current value of the progress monitors: the current input
-	 */
-	private int progress;
-	/**
-	 * next input to be submitted
-	 */
-	I nextInput;
-
-	public ReasonerComputation(Collection<? extends I> inputs,
-			F inputProcessorFactory, ComputationExecutor executor,
-			int maxWorkers, ProgressMonitor progressMonitor) {
+	public ReasonerComputation(F inputProcessorFactory,
+			ComputationExecutor executor, int maxWorkers) {
 		super(inputProcessorFactory, executor, maxWorkers);
-		this.progressMonitor = progressMonitor;
-		this.todo = inputs.iterator();
-		this.maxProgress = inputs.size();
-		this.progress = 0;
-		this.nextInput = null;
 	}
 
 	/**
@@ -94,17 +63,6 @@ public class ReasonerComputation<I, F extends InputProcessorFactory<I, ?>>
 		}
 
 		try {
-			// submit the leftover from the previous run
-			if (nextInput != null) {
-				if (!processNextInput())
-					return;
-			}
-			// repeatedly submit the next inputs from todo
-			while (todo.hasNext()) {
-				nextInput = todo.next();
-				if (!processNextInput())
-					return;
-			}
 			finish();
 		} catch (InterruptedException e) {
 			// interrupt all workers
@@ -122,14 +80,4 @@ public class ReasonerComputation<I, F extends InputProcessorFactory<I, ?>>
 		}
 	}
 
-	private boolean processNextInput() throws InterruptedException {
-		submit(nextInput);
-		nextInput = null;
-		if (Thread.currentThread().isInterrupted()) {
-			interrupt();
-			return false;
-		}
-		progressMonitor.report(++progress, maxProgress);
-		return true;
-	}
 }

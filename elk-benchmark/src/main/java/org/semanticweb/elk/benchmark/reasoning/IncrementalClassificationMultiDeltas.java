@@ -30,14 +30,14 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.benchmark.AllFilesTaskCollection;
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
 import org.semanticweb.elk.io.IOUtils;
-import org.semanticweb.elk.loading.EmptyChangesLoader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -74,7 +74,7 @@ public class IncrementalClassificationMultiDeltas extends
 		AllFilesTaskCollection {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = Logger.getLogger(IncrementalClassificationMultiDeltas.class);
+	protected static final Logger LOGGER_ = LoggerFactory.getLogger(IncrementalClassificationMultiDeltas.class);
 	
 	private static final String ADDITION_SUFFIX = "delta-plus";
 	private static final String DELETION_SUFFIX = "delta-minus";
@@ -201,6 +201,9 @@ public class IncrementalClassificationMultiDeltas extends
 		public String getName() {
 			return "Classify first ontology: " + ontologyFile_.getName();
 		}
+		
+		@Override
+		public void postRun() throws TaskException {}
 
 		@Override
 		public void prepare() throws TaskException {
@@ -234,13 +237,11 @@ public class IncrementalClassificationMultiDeltas extends
 				throw new TaskException(e);
 			}
 			try {
-				OntologyLoader loader = new Owl2StreamLoader(
+				AxiomLoader loader = new Owl2StreamLoader(
 						new Owl2FunctionalStyleParserFactory(), stream);
 				reasoner = new ReasonerFactory().createReasoner(loader,
 						stageExecutor, config);
 				reasoner.setAllowIncrementalMode(false);
-				reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
-				reasoner.loadOntology();
 			} catch (Exception e) {
 				throw new TaskException(e);
 			} finally {
@@ -274,6 +275,9 @@ public class IncrementalClassificationMultiDeltas extends
 		}
 
 		@Override
+		public void postRun() throws TaskException {}
+		
+		@Override
 		public String getName() {
 			return "Classify incrementally";
 		}
@@ -291,33 +295,26 @@ public class IncrementalClassificationMultiDeltas extends
 			final AxiomCountingProcessor addProcessor = new AxiomCountingProcessor(loader, true);
 			final AxiomCountingProcessor removeProcessor = new AxiomCountingProcessor(loader, false);
 
-			reasoner.registerOntologyChangesLoader(loader);
+			reasoner.registerAxiomLoader(loader);
 
-			try {
-				load(ADDITION_SUFFIX, addProcessor);
-				
-				/*if (addProcessor.getAxiomCounter() > 0) {
-					metrics.updateLongMetric(ADDED_AXIOM_COUNT, addProcessor.getAxiomCounter());
-				}*/
-				
-				stageExecutor.notifyAdditionCount((int)addProcessor.getAxiomCounter());
-				load(DELETION_SUFFIX, removeProcessor);
-				
-				/*if (removeProcessor.getAxiomCounter() > 0) {
-					metrics.updateLongMetric(DELETED_AXIOM_COUNT, removeProcessor.getAxiomCounter());
-				}*/
-				
-				stageExecutor.notifyDeletionCount((int)removeProcessor.getAxiomCounter());
-				// measure only for revisions with both additions and deletions
-				if (addProcessor.getAxiomCounter() > 0 && removeProcessor.getAxiomCounter() > 0) {
-					metrics.updateLongMetric(ADDED_AXIOM_COUNT, addProcessor.getAxiomCounter());
-					metrics.updateLongMetric(DELETED_AXIOM_COUNT, removeProcessor.getAxiomCounter());
-				}
-
-				reasoner.loadChanges();
-
-			} catch (ElkException e) {
-				throw new TaskException(e);
+			load(ADDITION_SUFFIX, addProcessor);
+			
+			/*if (addProcessor.getAxiomCounter() > 0) {
+				metrics.updateLongMetric(ADDED_AXIOM_COUNT, addProcessor.getAxiomCounter());
+			}*/
+			
+			stageExecutor.notifyAdditionCount((int)addProcessor.getAxiomCounter());
+			load(DELETION_SUFFIX, removeProcessor);
+			
+			/*if (removeProcessor.getAxiomCounter() > 0) {
+				metrics.updateLongMetric(DELETED_AXIOM_COUNT, removeProcessor.getAxiomCounter());
+			}*/
+			
+			stageExecutor.notifyDeletionCount((int)removeProcessor.getAxiomCounter());
+			// measure only for revisions with both additions and deletions
+			if (addProcessor.getAxiomCounter() > 0 && removeProcessor.getAxiomCounter() > 0) {
+				metrics.updateLongMetric(ADDED_AXIOM_COUNT, addProcessor.getAxiomCounter());
+				metrics.updateLongMetric(DELETED_AXIOM_COUNT, removeProcessor.getAxiomCounter());
 			}
 		}
 

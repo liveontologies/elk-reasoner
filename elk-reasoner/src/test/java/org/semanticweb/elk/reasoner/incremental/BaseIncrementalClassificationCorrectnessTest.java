@@ -25,11 +25,10 @@ package org.semanticweb.elk.reasoner.incremental;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -74,31 +73,31 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 	@Override
 	protected void correctnessCheck(Reasoner standardReasoner,
 			Reasoner incrementalReasoner, long seed) throws ElkException {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("======= Computing Expected Taxonomy =======");
+		LOGGER_.trace("======= Computing Expected Taxonomy =======");
 
 		Taxonomy<ElkClass> expected = standardReasoner.getTaxonomyQuietly();
 
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("======= Computing Incremental Taxonomy =======");
+		LOGGER_.trace("======= Computing Incremental Taxonomy =======");
 
-		Taxonomy<ElkClass> incremental = incrementalReasoner.getTaxonomyQuietly();
+		Taxonomy<ElkClass> incremental = incrementalReasoner
+				.getTaxonomyQuietly();
 
-		try {
-			assertEquals("Seed " + seed, TaxonomyHasher.hash(expected),
-					TaxonomyHasher.hash(incremental));
-		} catch (AssertionError e) {
+		if (TaxonomyHasher.hash(expected) != TaxonomyHasher.hash(incremental)) {
+			StringWriter writer = new StringWriter();
+
 			try {
-				Writer writer = new OutputStreamWriter(System.out);
+				writer.write("EXPECTED TAXONOMY:\n");
 				TaxonomyPrinter.dumpClassTaxomomy(expected, writer, false);
+				writer.write("INCREMENTAL TAXONOMY:\n");
 				TaxonomyPrinter.dumpClassTaxomomy(incremental, writer, false);
 				writer.flush();
-				
-				throw e;
 			} catch (IOException ioe) {
-				ioe.printStackTrace();
+				// TODO
 			}
+
+			fail("Seed: " + seed + "\n" + writer.getBuffer().toString());
 		}
+
 	}
 
 	@Config

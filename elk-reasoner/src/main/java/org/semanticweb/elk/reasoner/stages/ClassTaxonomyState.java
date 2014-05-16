@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +25,7 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,15 +48,23 @@ public class ClassTaxonomyState {
 
 	private UpdateableTaxonomy<ElkClass> taxonomy_ = null;
 
-	final Set<ElkClass> classesForModifiedNodes = Collections
+	private final Set<ElkClass> classesForModifiedNodes_ = Collections
 			.newSetFromMap(new ConcurrentHashMap<ElkClass, Boolean>());
-	
-	final List<IndexedClass> removedClasses = new LinkedList<IndexedClass>();
+
+	private final List<IndexedClass> removedClasses_ = new LinkedList<IndexedClass>();
 
 	public UpdateableTaxonomy<ElkClass> getTaxonomy() {
 		return taxonomy_;
 	}
-	
+
+	Set<ElkClass> getClassesWithModifiedNodes() {
+		return classesForModifiedNodes_;
+	}
+
+	Collection<IndexedClass> getRemovedClasses() {
+		return removedClasses_;
+	}
+
 	public Writer getWriter() {
 		return new Writer();
 	}
@@ -71,13 +81,13 @@ public class ClassTaxonomyState {
 		void setTaxonomy(UpdateableTaxonomy<ElkClass> classTaxonomy) {
 			taxonomy_ = classTaxonomy;
 		}
-		
+
 		public void clearTaxonomy() {
 			taxonomy_ = null;
 		}
-		
+
 		public void markClassForModifiedNode(final ElkClass elkClass) {
-			classesForModifiedNodes.add(elkClass);
+			classesForModifiedNodes_.add(elkClass);
 		}
 
 		public void markClassesForModifiedNode(final Node<ElkClass> node) {
@@ -87,23 +97,23 @@ public class ClassTaxonomyState {
 				}
 			}
 		}
-		
+
 		public void markRemovedClass(final IndexedClass clazz) {
-			removedClasses.add(clazz);
+			removedClasses_.add(clazz);
 		}
 
 		public void clearModifiedNodeObjects() {
-			classesForModifiedNodes.clear();
+			classesForModifiedNodes_.clear();
 		}
-		
+
 		public void clearRemovedClasses() {
-			removedClasses.clear();
+			removedClasses_.clear();
 		}
-		
+
 		public void clear() {
 			clearTaxonomy();
 			clearModifiedNodeObjects();
 			clearRemovedClasses();
-		}		
+		}
 	}
 }

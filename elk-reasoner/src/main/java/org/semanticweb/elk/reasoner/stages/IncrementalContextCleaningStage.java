@@ -26,11 +26,12 @@ package org.semanticweb.elk.reasoner.stages;
  */
 
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationNoInput;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextCleaningFactory;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationDeletionNotSaturatedFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 
+// TODO: obsolete?
 /**
  * @author Pavel Klinov
  * 
@@ -38,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
  */
 public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 
-	private ClassExpressionNoInputSaturation cleaning_ = null;
+	private ClassExpressionSaturationNoInput cleaning_ = null;
 
 	public IncrementalContextCleaningStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -54,11 +55,10 @@ public class IncrementalContextCleaningStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(
+		RuleApplicationFactory<?> cleaningFactory = new RuleApplicationDeletionNotSaturatedFactory(
 				reasoner.saturationState);
-		this.cleaning_ = new ClassExpressionNoInputSaturation(
-				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), cleaningFactory,
+		this.cleaning_ = new ClassExpressionSaturationNoInput(
+				reasoner.getProcessExecutor(), workerNo, cleaningFactory,
 				ContextModificationListener.DUMMY);
 		return true;
 	}

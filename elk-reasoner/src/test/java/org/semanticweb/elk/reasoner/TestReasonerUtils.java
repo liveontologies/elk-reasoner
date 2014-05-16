@@ -25,9 +25,7 @@ package org.semanticweb.elk.reasoner;
  * #L%
  */
 
-import java.util.concurrent.Executors;
-
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
 
@@ -38,25 +36,25 @@ import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
  */
 public class TestReasonerUtils {
 
-	public static Reasoner createTestReasoner(OntologyLoader ontologyLoader,
+	public static Reasoner createTestReasoner(AxiomLoader axiomLoader,
 			ReasonerStageExecutor stageExecutor, ReasonerConfiguration config) {
-		return new ReasonerFactory().createReasoner(ontologyLoader,
-				stageExecutor, Executors.newSingleThreadExecutor(), config);
+		return new ReasonerFactory().createReasoner(axiomLoader, stageExecutor,
+				config);
 	}
 
-	public static Reasoner createTestReasoner(OntologyLoader ontologyLoader,
+	public static Reasoner createTestReasoner(AxiomLoader axiomLoader,
 			ReasonerStageExecutor stageExecutor) {
-		return createTestReasoner(ontologyLoader, stageExecutor,
+		return createTestReasoner(axiomLoader, stageExecutor,
 				ReasonerConfiguration.getConfiguration());
 	}
 
-	public static Reasoner createTestReasoner(OntologyLoader ontologyLoader,
+	public static Reasoner createTestReasoner(AxiomLoader axiomLoader,
 			ReasonerStageExecutor stageExecutor, int maxWorkers) {
 		ReasonerConfiguration config = ReasonerConfiguration.getConfiguration();
 
 		config.setParameter(ReasonerConfiguration.NUM_OF_WORKING_THREADS,
 				String.valueOf(maxWorkers));
 
-		return createTestReasoner(ontologyLoader, stageExecutor, config);
+		return createTestReasoner(axiomLoader, stageExecutor, config);
 	}
 }

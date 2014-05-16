@@ -37,13 +37,15 @@ public class TaxonomyDiffManifest<EO extends ClassTaxonomyTestOutput, AO extends
 	public void compare(AO actualOutput) throws TestResultComparisonException {
 
 		// FIXME Implement taxonomy comparison and diff
-		if (getExpectedOutput().getHashCode() != (actualOutput.getHashCode())) {
+		int expectedHash = getExpectedOutput().getHashCode();
+		int actualHash = actualOutput.getHashCode();
+		if (expectedHash != actualHash) {
 			// FIXME: where do I see the expected and actual values (if I do not
 			// print them myself as below)?
 			throw new TestResultComparisonException("\n"
-					+ "EXPECTED TAXONOMY:\n" + getExpectedOutput()
-					+ "ACTUAL TAXONOMY:\n" + actualOutput, getExpectedOutput(),
-					actualOutput);
+					+ "EXPECTED TAXONOMY: (hash=" + expectedHash + ")\n" + getExpectedOutput()
+					+ "ACTUAL TAXONOMY: (hash=" + actualHash +")\n" + actualOutput, 
+					getExpectedOutput(), actualOutput);
 		}
 	}
 }

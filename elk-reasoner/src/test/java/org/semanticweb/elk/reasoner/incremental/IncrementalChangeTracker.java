@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -45,9 +46,9 @@ public class IncrementalChangeTracker<T> {
 	 */
 	private final OnOffVector<T> changingAxioms_;
 	/**
-	 * the queue in which to append the generated changes
+	 * the queue in which to append the indexes of the generated changes
 	 */
-	private final Deque<IncrementalChange<T>> changes_ = new LinkedList<IncrementalChange<T>>();
+	private final Deque<IncrementalChange<Integer>> history_ = new LinkedList<IncrementalChange<Integer>>();
 	/**
 	 * The number of added and removed axioms to generate
 	 */
@@ -62,28 +63,48 @@ public class IncrementalChangeTracker<T> {
 	}
 
 	public IncrementalChange<T> generateNextChange() {
-		IncrementalChange<T> change = new IncrementalChange<T>();
+		return convert(generateNextIndexChange());
+	}
 
+	public IncrementalChange<T> revertChange() {
+		IncrementalChange<Integer> lastChange = history_.pollLast();
+		if (lastChange == null)
+			return null;
+		// else deapplying the change
+		for (int idxAdd : lastChange.getAdditions())
+			changingAxioms_.flipOnOff(idxAdd);
+		for (int idxDel : lastChange.getDeletions())
+			changingAxioms_.flipOnOff(idxDel);
+		return convert(lastChange);
+	}
+
+	IncrementalChange<Integer> generateNextIndexChange() {
+		IncrementalChange<Integer> change = new IncrementalChange<Integer>();
 		for (int i = 0; i < changeSize_; i++) {
 			int index = rnd_.nextInt(changingAxioms_.size());
-			T axiom = changingAxioms_.get(index);
 			// removing a random axiom if its status was "on", that is,
 			// it was loaded to the reasoner; otherwise adding this
 			// axiom; the status is flip
 			if (changingAxioms_.flipOnOff(index)) {
-				change.registerDeletion(axiom);
+				change.registerDeletion(index);
 			} else {
-				change.registerAddition(axiom);
+				change.registerAddition(index);
 			}
 		}
-
-		changes_.add(change);
+		history_.add(change);
 
 		return change;
 	}
 
-	Deque<IncrementalChange<T>> getChangeHistory() {
-		return changes_;
+	IncrementalChange<T> convert(IncrementalChange<Integer> indexChange) {
+		IncrementalChange<T> change = new IncrementalChange<T>();
+		for (int idxAdd : indexChange.getAdditions()) {
+			change.registerAddition(changingAxioms_.get(idxAdd));
+		}
+		for (int idxDel : indexChange.getDeletions()) {
+			change.registerDeletion(changingAxioms_.get(idxDel));
+		}
+		return change;
 	}
 
 	int getChangeSize() {
@@ -91,6 +112,6 @@ public class IncrementalChangeTracker<T> {
 	}
 
 	void clearHistory() {
-		changes_.clear();
+		history_.clear();
 	}
 }

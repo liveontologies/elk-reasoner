@@ -36,7 +36,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.util.Comparators;
@@ -59,7 +60,7 @@ public class IndividualNode implements
 		UpdateableInstanceNode<ElkClass, ElkNamedIndividual> {
 
 	// logger for events
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndividualNode.class);
 
 	/**
@@ -102,8 +103,8 @@ public class IndividualNode implements
 	 */
 	@Override
 	public void addDirectTypeNode(UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(this + ": new direct type-node " + typeNode);
+		LOGGER_.trace("{}: new direct type-node {}", this, typeNode);
+		
 		directTypeNodes_.add(typeNode);
 	}
 
@@ -141,8 +142,7 @@ public class IndividualNode implements
 	}
 	
 	public void setMembers(Collection<ElkNamedIndividual> members) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(this + ": updating members to " + members);
+		LOGGER_.trace("{}: updating members to {}", this, members);
 		members_.clear();
 		members_.addAll(members);
 		Collections.sort(this.members_, Comparators.ELK_NAMED_INDIVIDUAL_COMPARATOR);
@@ -213,9 +213,7 @@ public class IndividualNode implements
 	@Override
 	public void removeDirectTypeNode(
 			UpdateableTypeNode<ElkClass, ElkNamedIndividual> typeNode) {
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace(this + ": removing direct type node: " + typeNode);
-		}
+		LOGGER_.trace("{}: removing direct type node: {}", this, typeNode);
 		
 		directTypeNodes_.remove(typeNode);
 	}

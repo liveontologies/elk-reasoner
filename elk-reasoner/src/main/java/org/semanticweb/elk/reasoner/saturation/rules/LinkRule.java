@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,10 +22,12 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.util.collections.chains.Link;
 
-public interface LinkRule<E> extends Rule<E>, Link<LinkRule<E>> {
+public interface LinkRule<P> extends Rule<P>, Link<LinkRule<P>> {
 
-	public void accept(RuleApplicationVisitor visitor, BasicSaturationStateWriter writer, E element);
+	@Override
+	public void accept(RuleVisitor visitor, P premise,
+			ContextPremises premises, ConclusionProducer producer);
 }

@@ -35,7 +35,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.semanticweb.elk.owlapi.ElkReasoner;
-import org.semanticweb.elk.util.logging.MessageDialogAppender;
+import org.semanticweb.elk.protege.ui.MessageDialogAppender;
 
 /**
  * A {@link MessageDialogAppender} for Protege that uses additional

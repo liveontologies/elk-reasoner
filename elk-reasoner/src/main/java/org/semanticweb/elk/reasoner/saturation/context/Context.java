@@ -22,188 +22,41 @@ package org.semanticweb.elk.reasoner.saturation.context;
  * #L%
  */
 
-import java.util.Set;
-
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.ModifiableLinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
-import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
- * An object representing an elementary unit of computation for saturation of an
- * {@link IndexedClassExpression}, stored as a <em>root</em> of the
- * {@link Context}. This interface specifies method that can be used to access
- * the result of the computation in addition to the methods used by a
- * {@link RuleApplicationFactory} to perform the computation concurrently.
+ * An object representing an elementary unit of computation for
+ * {@link Conclusion}s that can be used as premises of inferences associated
+ * with the {@link IndexedClassExpression}, stored as a <em>root</em> of this
+ * {@link Context} ({@link Context#getRoot()}). The computation is organized in
+ * a saturation process where all {@link Conclusion}s to which inferences should
+ * be applied are added to the "todo" queue using
+ * {@link #addConclusion(Conclusion)} and when the rules are applied, they are
+ * repeatedly taken from this queue using {@link #takeToDo()}. The object
+ * provides some methods in addition to {@link ConclusionSet} to store, test and
+ * remove information for {@link Conclusion}s in this {@link Context}, and some
+ * bookkeeping methods for the saturation process.
  * 
  * @author "Yevgeny Kazakov"
- * @see RuleApplicationFactory
+ * @see RuleApplicationAdditionFactory
  * 
  */
-public interface Context {
-
-	/**
-	 * @return the {@link IndexedClassExpression} for which this {@link Context}
-	 *         is assigned. This may never been {@code null}.
-	 */
-	public IndexedClassExpression getRoot();
-
-	/**
-	 * @return the object representing all derived (implied)
-	 *         {@link IndexedClassExpression}s that subsume the root
-	 *         {@link IndexedClassExpression}
-	 */
-	public Set<IndexedClassExpression> getSubsumers();
-
-	/**
-	 * @return the {@link Context}s from which there exists an (implied)
-	 *         "existential relation" with this {@link Context} indexed by the
-	 *         {@link IndexedPropertyChain} of this relation. For example, if
-	 *         the input ontology contains an axiom
-	 *         {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B)} then an
-	 *         existential link between the context with root {@code :A} and the
-	 *         context with root {@code :B} with property {@code :r} will be
-	 *         created. For technical reasons, this link is stored in the
-	 *         context for {@code :B}, as a "backward link" {@code <:r, :A>}
-	 *         indexed by {@code :r} in the {@link Multimap} returned by this
-	 *         method. The returned {@link Multimap} is not thread safe and
-	 *         should be accessed from at most one thread at a time. This is
-	 *         never {@code null}.
-	 */
-	public Multimap<IndexedPropertyChain, Context> getBackwardLinksByObjectProperty();
-
-	/**
-	 * @return the first backward link rule assigned to this {@link Context}, or
-	 *         {@code null} if there no such rules; all other rules can be
-	 *         obtained by traversing over {@link LinkRule#next()}; this method
-	 *         should be used to access the rules without modifying them.
-	 */
-	public LinkRule<BackwardLink> getBackwardLinkRuleHead();
+public interface Context extends ConclusionSet, ContextPremises {
 
 	/**
 	 * @return the {@link Chain} view of all backward link rules assigned to
-	 *         this {@link Context}; this is always not {@code null}. This
-	 *         method can be used for convenient search and modification
+	 *         this {@link ContextPremises}; this is always not {@code null}.
+	 *         This method can be used for convenient search and modification
 	 *         (addition and deletion) of the rules using the methods of the
 	 *         {@link Chain} interface without without worrying about
 	 *         {@code null} values.
 	 */
-	public Chain<ModifiableLinkRule<BackwardLink>> getBackwardLinkRuleChain();
-
-	/**
-	 * Adds the given {@code BackwardLink} to this {@link Context}.
-	 * 
-	 * @param link
-	 *            the {@code BackwardLink} being added to this {@link Context}
-	 * @return {@code true} if this {@link Context} has changed as the result
-	 *         this method, i.e., the given {@code BackwardLink} has not been
-	 *         added before to this {@link Context}. This method is not thread
-	 *         safe.
-	 */
-	public boolean addBackwardLink(BackwardLink link);
-
-	/**
-	 * TODO
-	 * 
-	 * @param link
-	 * @return
-	 */
-	public boolean removeBackwardLink(BackwardLink link);
-
-	public boolean containsBackwardLink(BackwardLink link);
-
-	/**
-	 * Adds the given {@link IndexedClassExpression} to the subsumers of the
-	 * root {@link IndexedClassExpression} of this {@link Context}.
-	 * 
-	 * @param expression
-	 *            the {@link IndexedClassExpression} to be added as a susbumer
-	 *            of the root {@link IndexedClassExpression} of this
-	 *            {@link Context}.
-	 * @return {@code true} if the set of subsumers of this {@link Context} has
-	 *         changed as the result of calling this method, i.e., the input
-	 *         {@code IndexedClassExpression} was not a subsumer before. This
-	 *         method is not thread safe.
-	 */
-	public boolean addSubsumer(IndexedClassExpression expression);
-
-	/**
-	 * Removes the given {@link IndexedClassExpression} from the subsumers of
-	 * the root {@link IndexedClassExpression} of this {@link Context}.
-	 * 
-	 * @param expression
-	 *            the {@link IndexedClassExpression} to be removed from the
-	 *            subsumers of the root in this {@link Context}
-	 * @return {@code true} if the set of subsumers of this {@link Context} has
-	 *         changed as the result of calling this method, i.e., the input
-	 *         {@code IndexedClassExpression} was a subsumer before. This method
-	 *         is not thread safe.
-	 */
-	public boolean removeSubsumer(IndexedClassExpression expression);
-
-	/**
-	 * Tests whether the given {@link IndexedClassExpression} is a subsumer of
-	 * the root {@link IndexedClassExpression} of this {@link Context}.
-	 * 
-	 * @param expression
-	 *            the {@link IndexedClassExpression} to be tested for this
-	 *            {@link Context}
-	 * @return {@code true} if the given {@link IndexedClassExpression} is a
-	 *         subsumer of the root in this {@link Context}. This method is not
-	 *         thread safe.
-	 */
-	public boolean containsSubsumer(IndexedClassExpression expression);
-
-	/**
-	 * Adds one instance of {@link IndexedDisjointnessAxiom} to this
-	 * {@link Context}.
-	 * 
-	 * @param axiom
-	 *            the {@link IndexedDisjointnessAxiom} to be added to this
-	 *            {@link Context}
-	 * @return {@code true} if adding the axiom changes the state of this
-	 *         {@link Context}, i.e., some rules need to be applied
-	 */
-	public boolean addDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
-
-	/**
-	 * Removes one instance of the given {@link IndexedDisjointnessAxiom} from
-	 * this {@link Context}.
-	 * 
-	 * @param axiom
-	 *            the {@link IndexedDisjointnessAxiom} to be removed from this
-	 *            {@link Context}
-	 * @return {@code true} if the state of this {@link Context} has changed as
-	 *         the result of calling this method, i.e., the context has
-	 *         contained this {@link IndexedDisjointnessAxiom}
-	 */
-	public boolean removeDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
-
-	/**
-	 * @param axiom
-	 *            the {@link IndexedDisjointnessAxiom} to be checked for
-	 *            occurrences in this {@link Context}
-	 * 
-	 * @return {@code true} if the given {@link IndexedDisjointnessAxiom} occurs
-	 *         in this {@link Context}
-	 */
-	public boolean containsDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
-
-	/**
-	 * @param axiom
-	 *            the {@link IndexedDisjointnessAxiom} to be checked for causing
-	 *            inconsistency in this {@link Context}
-	 * 
-	 * @return {@code true} if the given {@link IndexedDisjointnessAxiom} causes
-	 *         inconsistency of this {@link Context}
-	 */
-	public boolean inconsistencyDisjointnessAxiom(IndexedDisjointnessAxiom axiom);
+	public Chain<LinkableBackwardLinkRule> getBackwardLinkRuleChain();
 
 	/**
 	 * Adds the given {@link Conclusion} to be processed within this
@@ -235,45 +88,13 @@ public interface Context {
 	public Conclusion takeToDo();
 
 	/**
-	 * @return {@code true} if a contradiction has not been derived for the root
-	 *         {@link IndexedClassExpression}
-	 */
-	public boolean isInconsistent();
-
-	/**
 	 * @return {@code true} if all {@link Conclusion}s for this {@link Context},
 	 *         as determined by the function
-	 *         {@link Conclusion#getSourceContext(Context)}, are already
-	 *         computed.
+	 *         {@link Conclusion#getSourceRoot(IndexedClassExpression)}, except
+	 *         for {@link SubConclusion}s are already computed.
 	 */
 	public boolean isSaturated();
-
-	/**
-	 * Sets the inconsistency of this {@code Context} to the given value.
-	 * 
-	 * @return the previous inconsistency value
-	 */
-	public boolean setInconsistent(boolean consistent);
-
-	/**
-	 * Marks this {@code Context} as saturated. This means that all all
-	 * {@link Conclusion}s for this {@link Context} are already computed.
-	 * 
-	 * @return the previous value of the saturation state for this
-	 *         {@link Context}
-	 */
-	public boolean setSaturated(boolean saturated);
-
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isEmpty();
-
-	/**
-	 * removes links to the next and previous contexts, effectively removing
-	 * this {@link Context} from the chain of contexts
-	 */
-	public void removeLinks(); // TODO: find a way to hide this
+	
+	public boolean isInitialized();
 
 }

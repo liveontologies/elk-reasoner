@@ -35,24 +35,27 @@ import org.semanticweb.elk.testing.PolySuite.Configuration;
  * Runs classification tests for all test input in the test directory
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
- *
+ * 
+ *         pavel.klinov@uni-ulm.de
+ * 
  */
 @RunWith(PolySuite.class)
-public abstract class HashClassificationCorrectnessTest extends BaseClassificationCorrectnessTest<HashTestOutput> {
-	
-	public HashClassificationCorrectnessTest(ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> testManifest) {
+public abstract class HashClassificationCorrectnessTest extends
+		BaseClassificationCorrectnessTest<HashTestOutput> {
+
+	public HashClassificationCorrectnessTest(
+			ReasoningTestManifest<HashTestOutput, ClassTaxonomyTestOutput> testManifest) {
 		super(testManifest);
 	}
-	
+
 	/*
-	 * ---------------------------------------------
-	 * Configuration: loading all test input data
-	 * ---------------------------------------------
-	 */	
+	 * --------------------------------------------- Configuration: loading all
+	 * test input data ---------------------------------------------
+	 */
 	@Config
-	public static Configuration getConfig() throws URISyntaxException, IOException {
-		return HashConfigurationUtils.<ClassTaxonomyTestOutput>loadConfiguration(INPUT_DATA_LOCATION, HashClassificationCorrectnessTest.class);
+	public static Configuration getConfig() throws URISyntaxException,
+			IOException {
+		return HashConfigurationUtils
+				.<ClassTaxonomyTestOutput> loadConfiguration(INPUT_DATA_LOCATION);
 	}
 }

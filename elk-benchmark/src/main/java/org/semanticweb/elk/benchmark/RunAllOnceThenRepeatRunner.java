@@ -24,11 +24,11 @@ package org.semanticweb.elk.benchmark;
  * #L%
  */
 
-import java.util.Collection;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.semanticweb.elk.MutableInteger;
 import org.semanticweb.elk.util.logging.ElkTimer;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -40,7 +40,7 @@ import org.semanticweb.elk.util.logging.ElkTimer;
  */
 public class RunAllOnceThenRepeatRunner {
 
-	private static final Logger LOGGER_ = Logger.getLogger(RunAllOnceThenRepeatRunner.class);
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(RunAllOnceThenRepeatRunner.class);
 	
 	protected final int warmups;
 	protected final int runs;
@@ -50,29 +50,49 @@ public class RunAllOnceThenRepeatRunner {
 		this.runs = runs;
 	}
 	
-	private void runOnce(TaskCollection collection) throws TaskException {
-		int cnt = 0;
-		Collection<Task> tasks = collection.getTasks();
+	private void runOnce(final VisitorTaskCollection collection, final Metrics aggregateMetrics) throws TaskException {
+		final MutableInteger cnt = new MutableInteger(0);
 		
-		for (Task task : tasks) {
-			ElkTimer timer = ElkTimer.getNamedTimer(task.getName());
+		collection.visitTasks(new TaskVisitor() {
 			
-			System.err.println("Running " + task.getName() + ", " + (++cnt) + "/" + tasks.size());
-			
-			task.prepare();
-			timer.start();
-			task.run();
-			timer.stop();
-			
-			//logStats(collection);
-		}
+			@Override
+			public void visit(Task task) throws TaskException {
+				cnt.increment();
+				//FIXME
+				/*if (cnt.get() > 10000) {
+					logStats(collection);
+					throw new RuntimeException("enough");
+				}*/
+				
+				ElkTimer timer = ElkTimer.getNamedTimer(task.getName());
+				
+				//if (cnt.get() % 10000 == 0) {
+				System.err.println("Running " + task.getName() + ", " + cnt);
+				//}
+				
+				task.prepare();
+				
+				timer.start();
+				task.run();
+				timer.stop();
+				
+				task.postRun();
+				
+				if (task.getMetrics() != null && aggregateMetrics != null) {
+					//task.getMetrics().printAverages(LOGGER_, LogLevel.WARN);
+					task.getMetrics().updateLongMetric(task.getName() + " time", timer.getAvgWallTime());
+					aggregateMetrics.add(task.getMetrics());
+				}
+			}
+		});
 	}
 	
-	public void run(TaskCollection collection) throws TaskException {
+	public void run(VisitorTaskCollection collection) throws TaskException {
+		
 		for (int i = 0; i < warmups; i++) {
 			System.out.println("Warm-up run #" + i);
 			
-			runOnce(collection);
+			runOnce(collection, null);
 		}
 		
 		for (ElkTimer timer : ElkTimer.getNamedTimers()) {
@@ -83,21 +103,21 @@ public class RunAllOnceThenRepeatRunner {
 		for (int i = 0; i < runs; i++) {
 			System.out.println("Actual run #" + i);
 			
-			runOnce(collection);
+			runOnce(collection, collection.getMetrics());
 		}
 		
 		logStats(collection);		
 		collection.dispose();
 	}
 	
-	public void logStats(TaskCollection collection) {
+	public void logStats(VisitorTaskCollection collection) {
 		for (ElkTimer timer : ElkTimer.getNamedTimers()) {
-			timer.log(LOGGER_, Level.INFO);
+			timer.log(LOGGER_, LogLevel.ERROR);
 		}
 				
 		if (collection.getMetrics() != null) {
-			System.err.println(collection.getMetrics());
-			collection.getMetrics().printAverages(LOGGER_, Level.WARN);
+			//System.err.println(collection.getMetrics());
+			collection.getMetrics().printAverages(LOGGER_, LogLevel.ERROR);
 		}
 	}
 }

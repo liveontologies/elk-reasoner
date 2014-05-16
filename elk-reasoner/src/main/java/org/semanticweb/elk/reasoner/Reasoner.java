@@ -23,21 +23,29 @@
 package org.semanticweb.elk.reasoner;
 
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AbstractAxiomLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
+import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.owl.util.Comparators;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
 import org.semanticweb.elk.reasoner.stages.ReasonerStageExecutor;
+import org.semanticweb.elk.reasoner.taxonomy.model.AnonymousNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.FreshInstanceNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.FreshTaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.FreshTypeNode;
@@ -46,6 +54,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The class for querying the results of the reasoning tasks for a given
@@ -60,7 +70,8 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 public class Reasoner extends AbstractReasonerState {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger.getLogger(Reasoner.class);
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(Reasoner.class);
 
 	/**
 	 * The progress monitor that is used for reporting progress.
@@ -80,6 +91,12 @@ public class Reasoner extends AbstractReasonerState {
 	private int workerNo_;
 
 	/**
+	 * A factory for creating new {@link ElkObject}s; mainly use for answering
+	 * complex queries
+	 */
+	private ElkObjectFactory elkFactory = new ElkObjectFactoryImpl();
+
+	/**
 	 * Should fresh entities in reasoner queries be accepted (configuration
 	 * setting). If false, a {@link ElkFreshEntitiesException} will be thrown
 	 * when encountering entities that did not occur in the ontology.
@@ -90,15 +107,15 @@ public class Reasoner extends AbstractReasonerState {
 	 * Constructor. In most cases, Reasoners should be created by the
 	 * {@link ReasonerFactory}.
 	 * */
-	protected Reasoner(OntologyLoader ontologyLoader,
-			ReasonerStageExecutor stageExecutor, ExecutorService executor) {
-		super(ontologyLoader);
+	protected Reasoner(AxiomLoader axiomLoader,
+			ReasonerStageExecutor stageExecutor) {
+		super(axiomLoader);
 
 		this.stageExecutor = stageExecutor;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
-		if (LOGGER_.isInfoEnabled())
-			LOGGER_.info("ELK reasoner was created");
+
+		LOGGER_.info("ELK reasoner was created");
 	}
 
 	/**
@@ -107,7 +124,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * 
 	 * @param progressMonitor
 	 */
-	public void setProgressMonitor(ProgressMonitor progressMonitor) {
+	public synchronized void setProgressMonitor(ProgressMonitor progressMonitor) {
 		this.progressMonitor = progressMonitor;
 	}
 
@@ -120,7 +137,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * 
 	 * @param allow
 	 */
-	public void setAllowFreshEntities(boolean allow) {
+	public synchronized void setAllowFreshEntities(boolean allow) {
 		allowFreshEntities = allow;
 	}
 
@@ -130,7 +147,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * 
 	 * @return {@code true} if fresh entities are allowed
 	 */
-	public boolean getAllowFreshEntities() {
+	public synchronized boolean getAllowFreshEntities() {
 		return allowFreshEntities;
 	}
 
@@ -138,37 +155,38 @@ public class Reasoner extends AbstractReasonerState {
 	protected int getNumberOfWorkers() {
 		return workerNo_;
 	}
-	
+
 	/**
 	 * Sets the number of working threads. Shouldn't be used during reasoning.
 	 * 
 	 * @param workerNo
 	 */
-	public void setNumberOfWorkers(int workerNo) {
+	public synchronized void setNumberOfWorkers(int workerNo) {
 		workerNo_ = workerNo;
 	}
-	
+
 	/**
 	 * This supposed to be the central place where the reasoner gets its
 	 * configuration options
 	 * 
 	 * @param config
 	 */
-	public final void setConfigurationOptions(ReasonerConfiguration config) {
+	public synchronized void setConfigurationOptions(
+			ReasonerConfiguration config) {
 		int newWorkerNo = config
-				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS); 
-		
+				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
+
 		setAllowIncrementalMode(config
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED));
 		setAllowIncrementalTaxonomy(config
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_TAXONOMY));
-		
+
 		if (newWorkerNo > workerNo_) {
 			// need to re-create the executor since it may have already created
 			// a pool with a fixed number of threads
 			executor_ = null;
 		}
-		
+
 		workerNo_ = newWorkerNo;
 	}
 
@@ -200,7 +218,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws InterruptedException
 	 *             if the current thread was interrupted
 	 */
-	public boolean shutdown(long timeout, TimeUnit unit)
+	public synchronized boolean shutdown(long timeout, TimeUnit unit)
 			throws InterruptedException {
 		if (executor_ == null)
 			return true;
@@ -209,8 +227,7 @@ public class Reasoner extends AbstractReasonerState {
 		boolean success = executor_.isShutdown();
 		executor_ = null;
 		if (success) {
-			if (LOGGER_.isInfoEnabled())
-				LOGGER_.info("ELK reasoner has shut down");
+			LOGGER_.info("ELK reasoner has shut down");
 		} else {
 			LOGGER_.error("ELK reasoner failed to shut down!");
 		}
@@ -225,7 +242,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws InterruptedException
 	 *             if the current thread was interrupted
 	 */
-	public boolean shutdown() throws InterruptedException {
+	public synchronized boolean shutdown() throws InterruptedException {
 		return shutdown(1, TimeUnit.MINUTES);
 	}
 
@@ -240,14 +257,13 @@ public class Reasoner extends AbstractReasonerState {
 	protected TaxonomyNode<ElkClass> getTaxonomyNode(ElkClass elkClass)
 			throws ElkException {
 		TaxonomyNode<ElkClass> node = getTaxonomy().getNode(elkClass);
-		if (node == null) {
-			if (allowFreshEntities) {
-				node = new FreshTaxonomyNode<ElkClass>(elkClass, getTaxonomy());
-			} else {
-				throw new ElkFreshEntitiesException(elkClass);
-			}
-		}
-		return node;
+		if (node != null)
+			return node;
+		// else
+		if (allowFreshEntities)
+			return new FreshTaxonomyNode<ElkClass>(elkClass, getTaxonomy());
+		// else
+		throw new ElkFreshEntitiesException(elkClass);
 	}
 
 	/**
@@ -262,15 +278,14 @@ public class Reasoner extends AbstractReasonerState {
 			ElkNamedIndividual elkNamedIndividual) throws ElkException {
 		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
 				.getInstanceNode(elkNamedIndividual);
-		if (node == null) {
-			if (allowFreshEntities) {
-				node = new FreshInstanceNode<ElkClass, ElkNamedIndividual>(
-						elkNamedIndividual, getInstanceTaxonomy());
-			} else {
-				throw new ElkFreshEntitiesException(elkNamedIndividual);
-			}
-		}
-		return node;
+		if (node != null)
+			return node;
+		// else
+		if (allowFreshEntities)
+			return new FreshInstanceNode<ElkClass, ElkNamedIndividual>(
+					elkNamedIndividual, getInstanceTaxonomy());
+		// else
+		throw new ElkFreshEntitiesException(elkNamedIndividual);
 	}
 
 	/**
@@ -285,42 +300,79 @@ public class Reasoner extends AbstractReasonerState {
 			ElkClass elkClass) throws ElkException {
 		TypeNode<ElkClass, ElkNamedIndividual> node = getInstanceTaxonomy()
 				.getTypeNode(elkClass);
-		if (node == null) {
-			if (allowFreshEntities) {
-				node = new FreshTypeNode<ElkClass, ElkNamedIndividual>(
-						elkClass, getInstanceTaxonomy());
-			} else {
-				throw new ElkFreshEntitiesException(elkClass);
-			}
-		}
-		return node;
+		if (node != null)
+			return node;
+		// else
+		if (allowFreshEntities)
+			return new FreshTypeNode<ElkClass, ElkNamedIndividual>(elkClass,
+					getInstanceTaxonomy());
+		// else
+		throw new ElkFreshEntitiesException(elkClass);
 	}
 
 	/**
-	 * Get the {@link Node} for the given {@link ElkClass}. Calling of this
-	 * method may trigger the computation of the taxonomy, if it has not been
-	 * done yet. If the given {@link ElkClass} does not occur in the ontology
-	 * and fresh entities are not allowed, a {@link ElkFreshEntitiesException}
-	 * will be thrown.
+	 * Return the {@link TaxonomyNode} for the given {@link ElkClassExpression}.
+	 * Calling of this method may trigger the computation of the taxonomy, if it
+	 * has not been done yet. If the input is an {@link ElkClass} that does not
+	 * occur in the ontology and fresh entities are not allowed, a
+	 * {@link ElkFreshEntitiesException} will be thrown.
 	 * 
-	 * @param elkClass
-	 *            the {@link ElkClass} for which to return the {@link Node}
-	 * @return the class node for the given {@link ElkClass}
+	 * @param classExpression
+	 *            the {@link ElkClassExpression} for which to return the
+	 *            {@link Node}
+	 * @return the {@link TaxonomyNode} for the given {@link ElkClassExpression}
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public Node<ElkClass> getClassNode(ElkClass elkClass) throws ElkException {
-		return getTaxonomyNode(elkClass);
+	public synchronized TaxonomyNode<ElkClass> getClassNode(
+			ElkClassExpression classExpression) throws ElkException {
+		if (classExpression instanceof ElkClass) {
+			return getTaxonomyNode((ElkClass) classExpression);
+		}
+		// else
+		ElkClass queryClass = elkFactory.getClass(new ElkFullIri(
+				OwlFunctionalStylePrinter.toString(classExpression)));
+		ElkAxiom materializedQuery = elkFactory.getEquivalentClassesAxiom(
+				queryClass, classExpression);
+		return getQueryTaxonomyNode(queryClass, materializedQuery);
+	}
+
+	/**
+	 * Return the {@code Node} containing equivalent classes of the given
+	 * {@link ElkClassExpression}. Calling of this method may trigger the
+	 * computation of the taxonomy, if it has not been done yet.
+	 * 
+	 * @param classExpression
+	 *            the {@link ElkClassExpression} for which to return the
+	 *            {@link Node}
+	 * @return the set of {@link Node} whose members are {@link ElkClass}es
+	 *         equivalent to the given {@link ElkClassExpression}
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	public synchronized Node<ElkClass> getEquivalentClasses(
+			ElkClassExpression classExpression) throws ElkException {
+		if (classExpression instanceof ElkClass) {
+			return getTaxonomyNode((ElkClass) classExpression);
+		}
+		// else
+		ElkClass queryClass = elkFactory.getClass(new ElkFullIri(
+				OwlFunctionalStylePrinter.toString(classExpression)));
+		ElkAxiom materializedQuery = elkFactory.getEquivalentClassesAxiom(
+				queryClass, classExpression);
+		Node<ElkClass> queryNode = getQueryTaxonomyNode(queryClass,
+				materializedQuery);
+
+		return new AnonymousNode<ElkClass>(queryClass, queryNode.getMembers(),
+				Comparators.ELK_CLASS_COMPARATOR);
 	}
 
 	/**
 	 * Return the (direct or indirect) subclasses of the given
-	 * {@link ElkClassExpression} as specified by the parameter. Currently, only
-	 * instances of {@link ElkClass} are supported. If called with other
-	 * objects, an {@link ElkUnsupportedReasoningTaskException} will be thrown.
-	 * The method returns a set of {@link Node}s, each of which representing an
-	 * equivalent class of subclasses. Calling of this method may trigger the
-	 * computation of the taxonomy, if it has not been done yet.
+	 * {@link ElkClassExpression} as specified by the parameter. The method
+	 * returns a set of {@link Node}s, each of which representing an equivalent
+	 * class of subclasses. Calling of this method may trigger the computation
+	 * of the taxonomy, if it has not been done yet.
 	 * 
 	 * @param classExpression
 	 *            the {@link ElkClassExpression} for which to return the
@@ -333,26 +385,22 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public Set<? extends Node<ElkClass>> getSubClasses(
+	public synchronized Set<? extends Node<ElkClass>> getSubClasses(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkException {
-		if (classExpression instanceof ElkClass) {
-			TaxonomyNode<ElkClass> node = getTaxonomyNode((ElkClass) classExpression);
-			return (direct) ? node.getDirectSubNodes() : node.getAllSubNodes();
-		} else { // TODO: complex class expressions currently not supported
-			throw new ElkUnsupportedReasoningTaskException(
-					"ELK does not support computation of subclasses for complex class expressions.");
-		}
+
+		TaxonomyNode<ElkClass> queryNode = getClassNode(classExpression);
+
+		return (direct) ? queryNode.getDirectSubNodes() : queryNode
+				.getAllSubNodes();
 	}
 
 	/**
 	 * Return the (direct or indirect) superclasses of the given
-	 * {@link ElkClassExpression} as specified by the parameter. Currently, only
-	 * instances of {@link ElkClass} are supported. If called with other
-	 * objects, an {@link ElkUnsupportedReasoningTaskException} will be thrown.
-	 * The method returns a set of {@link Node}s, each of which representing an
-	 * equivalent class of superclasses. Calling of this method may trigger the
-	 * computation of the taxonomy, if it has not been done yet.
+	 * {@link ElkClassExpression} as specified by the parameter. The method
+	 * returns a set of {@link Node}s, each of which representing an equivalent
+	 * class of superclasses. Calling of this method may trigger the computation
+	 * of the taxonomy, if it has not been done yet.
 	 * 
 	 * @param classExpression
 	 *            the {@link ElkClassExpression} for which to return the
@@ -365,27 +413,22 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public Set<? extends Node<ElkClass>> getSuperClasses(
+	public synchronized Set<? extends Node<ElkClass>> getSuperClasses(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkException {
-		if (classExpression instanceof ElkClass) {
-			TaxonomyNode<ElkClass> node = getTaxonomyNode((ElkClass) classExpression);
-			return (direct) ? node.getDirectSuperNodes() : node
-					.getAllSuperNodes();
-		} else { // TODO: complex class expressions currently not supported
-			throw new ElkUnsupportedReasoningTaskException(
-					"ELK does not support computation of superclasses for complex class expressions.");
-		}
+
+		TaxonomyNode<ElkClass> queryNode = getClassNode(classExpression);
+
+		return (direct) ? queryNode.getDirectSuperNodes() : queryNode
+				.getAllSuperNodes();
 	}
 
 	/**
 	 * Return the (direct or indirect) instances of the given
-	 * {@link ElkClassExpression} as specified by the parameter. Currently, only
-	 * instances of {@link ElkClass} are supported. If called with other
-	 * objects, an {@link ElkUnsupportedReasoningTaskException} will be thrown.
-	 * The method returns a set of {@link Node}s, each of which representing an
-	 * equivalent class of instances. Calling of this method may trigger the
-	 * computation of the realization, if it has not been done yet.
+	 * {@link ElkClassExpression} as specified by the parameter. The method
+	 * returns a set of {@link Node}s, each of which representing an equivalent
+	 * class of instances. Calling of this method may trigger the computation of
+	 * the realization, if it has not been done yet.
 	 * 
 	 * @param classExpression
 	 *            the {@link ElkClassExpression} for which to return the
@@ -398,17 +441,24 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public Set<? extends Node<ElkNamedIndividual>> getInstances(
+	public synchronized Set<? extends Node<ElkNamedIndividual>> getInstances(
 			ElkClassExpression classExpression, boolean direct)
 			throws ElkException {
+
+		TypeNode<ElkClass, ElkNamedIndividual> queryNode;
 		if (classExpression instanceof ElkClass) {
-			TypeNode<ElkClass, ElkNamedIndividual> node = getTypeNode((ElkClass) classExpression);
-			return direct ? node.getDirectInstanceNodes() : node
-					.getAllInstanceNodes();
-		} else { // TODO: complex class expressions currently not supported
-			throw new ElkUnsupportedReasoningTaskException(
-					"ELK does not support retrieval of instances for unnamed class expressions.");
+			queryNode = getTypeNode((ElkClass) classExpression);
+		} else {
+			ElkClass queryClass = elkFactory.getClass(new ElkFullIri(
+					OwlFunctionalStylePrinter.toString(classExpression)));
+			ElkAxiom materializedQuery = elkFactory.getSubClassOfAxiom(
+					classExpression, queryClass);
+			queryNode = getQueryTypeNode(queryClass, materializedQuery);
 		}
+
+		return direct ? queryNode.getDirectInstanceNodes() : queryNode
+				.getAllInstanceNodes();
+
 	}
 
 	/**
@@ -429,7 +479,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public Set<? extends Node<ElkClass>> getTypes(
+	public synchronized Set<? extends Node<ElkClass>> getTypes(
 			ElkNamedIndividual elkNamedIndividual, boolean direct)
 			throws ElkException {
 		InstanceNode<ElkClass, ElkNamedIndividual> node = getInstanceNode(elkNamedIndividual);
@@ -438,13 +488,11 @@ public class Reasoner extends AbstractReasonerState {
 
 	/**
 	 * Check if the given {@link ElkClassExpression} is satisfiable, that is, if
-	 * it can possibly have instances. Currently, only instances of
-	 * {@link ElkClass} are supported. If called with other objects, an
-	 * {@link ElkUnsupportedReasoningTaskException} will be thrown.
-	 * {@link ElkClassExpression}s are not satisfiable if they are equivalent to
-	 * {@code owl:Nothing}. A satisfiable {@link ElkClassExpression} is also
-	 * called consistent or coherent. Calling of this method may trigger the
-	 * computation of the taxonomy, if it has not been done yet.
+	 * it can possibly have instances. {@link ElkClassExpression}s are not
+	 * satisfiable if they are equivalent to {@code owl:Nothing}. A satisfiable
+	 * {@link ElkClassExpression} is also called consistent or coherent. Calling
+	 * of this method may trigger the computation of the taxonomy, if it has not
+	 * been done yet.
 	 * 
 	 * @param classExpression
 	 *            the {@link ElkClassExpression} for which to check
@@ -453,15 +501,142 @@ public class Reasoner extends AbstractReasonerState {
 	 * @throws ElkException
 	 *             if the result cannot be computed
 	 */
-	public boolean isSatisfiable(ElkClassExpression classExpression)
+	public synchronized boolean isSatisfiable(ElkClassExpression classExpression)
 			throws ElkException {
+
+		Node<ElkClass> queryNode;
 		if (classExpression instanceof ElkClass) {
-			Node<ElkClass> classNode = getClassNode((ElkClass) classExpression);
-			return (!classNode.getMembers().contains(
-					PredefinedElkClass.OWL_NOTHING));
-		} else { // TODO: complex class expressions currently not supported
-			throw new ElkUnsupportedReasoningTaskException(
-					"ELK does not support satisfiability checking for unnamed class expressions");
+			queryNode = getClassNode(classExpression);
+		} else {
+			ElkClass queryClass = elkFactory.getClass(new ElkFullIri(
+					OwlFunctionalStylePrinter.toString(classExpression)));
+			ElkAxiom materializedQuery = elkFactory.getSubClassOfAxiom(
+					queryClass, classExpression);
+			queryNode = getQueryNode(queryClass, materializedQuery);
+		}
+
+		return !queryNode.getMembers().contains(PredefinedElkClass.OWL_NOTHING);
+	}
+
+	/**
+	 * @param materializedQuery
+	 *            An {@link ElkAxiom} introduced for the query
+	 * @param addition
+	 *            {@code true} if the axiom should be added, {@code false} if it
+	 *            should be removed
+	 * @return an {@code AxiomLoader} that performs addition, or respectively,
+	 *         removal of the given axiom
+	 */
+	static AxiomLoader getQueryLoader(final ElkAxiom materializedQuery,
+			final boolean addition) {
+
+		return new AbstractAxiomLoader() {
+
+			boolean finished = false;
+
+			@Override
+			public void load(ElkAxiomProcessor axiomInserter,
+					ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
+				(addition ? axiomInserter : axiomDeleter)
+						.visit(materializedQuery);
+				if (LOGGER_.isTraceEnabled())
+					LOGGER_.trace((addition ? "adding materialized quiery axiom: "
+							: "removing materialized quiery axiom: ")
+							+ OwlFunctionalStylePrinter
+									.toString(materializedQuery));
+				finished = true;
+			}
+
+			@Override
+			public boolean isLoadingFinished() {
+				return finished;
+			}
+		};
+
+	}
+
+	/**
+	 * Computes a {@link Node} for the given {@link ElkClass} in the taxonomy
+	 * resulted from adding the given {@link ElkAxiom}
+	 * 
+	 * @param queryClass
+	 *            the {@link ElkClass} for which to return the node
+	 * @param materializedQuery
+	 *            the {@link ElkAxiom} that should be added to the ontology
+	 *            before computing the {@link Node}
+	 * @return the {@link Node} for the given {@link ElkClass} in the taxonomy
+	 *         resulted from adding the given {@link ElkAxiom}
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	Node<ElkClass> getQueryNode(ElkClass queryClass,
+			final ElkAxiom materializedQuery) throws ElkException {
+
+		boolean oldIsAllowIncrementalMode = isAllowIncrementalMode();
+		setAllowIncrementalMode(true);
+		registerAxiomLoader(getQueryLoader(materializedQuery, true));
+		try {
+			return getClassNode(queryClass);
+		} finally {
+			registerAxiomLoader(getQueryLoader(materializedQuery, false));
+			setAllowIncrementalMode(oldIsAllowIncrementalMode);
+		}
+	}
+
+	/**
+	 * Compute a {@link TypeNode} for the given {@link ElkClass} in the taxonomy
+	 * resulted from adding the given {@link ElkAxiom}
+	 * 
+	 * @param queryClass
+	 *            the {@link ElkClass} for which to return the node
+	 * @param materializedQuery
+	 *            the {@link ElkAxiom} that should be added to the ontology
+	 *            before computing the {@link TypeNode}
+	 * @return the {@link TypeNode} for the given {@link ElkClass} in the
+	 *         taxonomy resulted from adding the given {@link ElkAxiom}
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	TypeNode<ElkClass, ElkNamedIndividual> getQueryTypeNode(
+			ElkClass queryClass, final ElkAxiom materializedQuery)
+			throws ElkException {
+
+		boolean oldIsAllowIncrementalMode = isAllowIncrementalMode();
+		setAllowIncrementalMode(true);
+		registerAxiomLoader(getQueryLoader(materializedQuery, true));
+		try {
+			return getTypeNode(queryClass);
+		} finally {
+			registerAxiomLoader(getQueryLoader(materializedQuery, false));
+			setAllowIncrementalMode(oldIsAllowIncrementalMode);
+		}
+	}
+
+	/**
+	 * Compute a {@link TaxonomyNode} for the given {@link ElkClass} in the
+	 * taxonomy resulted from adding the given {@link ElkAxiom}
+	 * 
+	 * @param queryClass
+	 *            the {@link ElkClass} for which to return the node
+	 * @param materializedQuery
+	 *            the {@link ElkAxiom} that should be added to the ontology
+	 *            before computing the {@link TaxonomyNode}
+	 * @return the {@link TaxonomyNode} for the given {@link ElkClass} in the
+	 *         taxonomy resulted from adding the given {@link ElkAxiom}
+	 * @throws ElkException
+	 *             if the result cannot be computed
+	 */
+	TaxonomyNode<ElkClass> getQueryTaxonomyNode(ElkClass queryClass,
+			final ElkAxiom materializedQuery) throws ElkException {
+
+		boolean oldIsAllowIncrementalMode = isAllowIncrementalMode();
+		setAllowIncrementalMode(true);
+		registerAxiomLoader(getQueryLoader(materializedQuery, true));
+		try {
+			return getTaxonomyNode(queryClass);
+		} finally {
+			registerAxiomLoader(getQueryLoader(materializedQuery, false));
+			setAllowIncrementalMode(oldIsAllowIncrementalMode);
 		}
 	}
 

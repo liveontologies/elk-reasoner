@@ -27,11 +27,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A common implementation of {@link ReasonerStage}s for a given reasoner.
@@ -42,7 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 abstract class AbstractReasonerStage implements ReasonerStage {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractReasonerStage.class);
 
 	final AbstractReasonerState reasoner;
@@ -175,8 +176,13 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 
 	@Override
 	public void execute() throws ElkException {
+		if (LOGGER_.isInfoEnabled())
+			LOGGER_.info(getName() + " using " + workerNo + " workers");
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.info("=== " + getName() + " using " + workerNo + " workers"
+					+ " ===");
 		progressMonitor.start(getName());
-		
+
 		try {
 			for (;;) {
 				executeStage();
@@ -243,11 +249,11 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	}
 
 	protected void markAllContextsAsSaturated() {
-		for (IndexedClassExpression ice : reasoner.saturationState
-				.getNotSaturatedContexts()) {
-			if (ice.getContext() != null) {
-				ice.getContext().setSaturated(true);
-			}
+		for (;;) {
+			Context context = reasoner.saturationState
+					.setNextContextSaturated();
+			if (context == null)
+				return;
 		}
 	}
 

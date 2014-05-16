@@ -29,14 +29,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
-import org.semanticweb.elk.loading.EmptyChangesLoader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
@@ -45,11 +43,13 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.incremental.ClassAxiomTrackingOntologyLoader;
+import org.semanticweb.elk.reasoner.incremental.ClassAxiomTrackingLoader;
 import org.semanticweb.elk.reasoner.incremental.OnOffVector;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkIncrementalClassificationRunner;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkRunnerIO;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TODO docs
@@ -61,7 +61,7 @@ import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 public class RandomWalkIncrementalClassificationTask implements Task {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RandomWalkIncrementalClassificationTask.class);
 
 	protected Reasoner reasoner_;
@@ -95,23 +95,23 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 	}
 
 	@Override
+	public void postRun() throws TaskException {}
+	
+	@Override
 	public void prepare() throws TaskException {
 		try {
 			File ontologyFile = BenchmarkUtils.getFile(ontologyFile_);
 
 			changingAxioms_ = new OnOffVector<ElkAxiom>(128);
 			staticAxioms_ = new ArrayList<ElkAxiom>();
-			OntologyLoader fileLoader = new Owl2StreamLoader(
+			AxiomLoader fileLoader = new Owl2StreamLoader(
 					new Owl2FunctionalStyleParserFactory(
 							new ElkObjectFactoryImpl(new ElkEntityRecycler())),
 					ontologyFile);
-			OntologyLoader trackingLoader = getAxiomTrackingLoader(
-					fileLoader, changingAxioms_, staticAxioms_);
+			AxiomLoader trackingLoader = getAxiomTrackingLoader(fileLoader,
+					changingAxioms_, staticAxioms_);
 			reasoner_ = TestReasonerUtils.createTestReasoner(trackingLoader,
 					new PostProcessingStageExecutor(), reasonerConfig_);
-
-			reasoner_.registerOntologyChangesLoader(new EmptyChangesLoader());
-			reasoner_.loadOntology();
 		} catch (Exception e) {
 			throw new TaskException(e);
 		}
@@ -149,9 +149,9 @@ public class RandomWalkIncrementalClassificationTask implements Task {
 		return null;
 	}
 
-	protected OntologyLoader getAxiomTrackingLoader(OntologyLoader fileLoader,
+	protected AxiomLoader getAxiomTrackingLoader(AxiomLoader fileLoader,
 			OnOffVector<ElkAxiom> changingAxioms, List<ElkAxiom> staticAxioms) {
-		return new ClassAxiomTrackingOntologyLoader(fileLoader, changingAxioms,
+		return new ClassAxiomTrackingLoader(fileLoader, changingAxioms,
 				staticAxioms);
 	}
 

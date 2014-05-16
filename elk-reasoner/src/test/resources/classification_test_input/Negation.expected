@@ -1,0 +1,5 @@
+Ontology(
+Declaration(Class(<http://example.org/A>))
+Declaration(Class(<http://example.org/B>))
+EquivalentClasses(<http://www.w3.org/2002/07/owl#Nothing> <http://example.org/A>)
+)

@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.properties;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -46,13 +48,13 @@ public class VerifySymmetricPropertySaturation {
 		SaturatedPropertyChain saturation = ipc.getSaturated();
 		if (saturation == null)
 			return;
-		Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByLeft = saturation
+		Multimap<IndexedObjectProperty, IndexedBinaryPropertyChain> compositionsByLeft = saturation
 				.getCompositionsByLeftSubProperty();
-		for (IndexedPropertyChain left : compositionsByLeft.keySet()) {
-			for (IndexedPropertyChain composition : compositionsByLeft
+		for (IndexedObjectProperty left : compositionsByLeft.keySet()) {
+			for (IndexedBinaryPropertyChain composition : compositionsByLeft
 					.get(left)) {
 				SaturatedPropertyChain leftSaturation = left.getSaturated();
-				Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByRight = leftSaturation
+				Multimap<IndexedPropertyChain, IndexedBinaryPropertyChain> compositionsByRight = leftSaturation
 						.getCompositionsByRightSubProperty();
 				if (!compositionsByRight.contains(ipc, composition)) {
 					hook.error(left, ipc, composition, ipc);
@@ -65,23 +67,23 @@ public class VerifySymmetricPropertySaturation {
 	 * checking that all compositions of this property to the right are computed
 	 * in the saturations for the respective right properties
 	 * 
-	 * @param ipc
+	 * @param ip
 	 */
-	public static void testRightCompositions(IndexedPropertyChain ipc,
+	public static void testRightCompositions(IndexedObjectProperty ip,
 			AsymmetricCompositionHook hook) {
-		SaturatedPropertyChain saturation = ipc.getSaturated();
+		SaturatedPropertyChain saturation = ip.getSaturated();
 		if (saturation == null)
 			return;
-		Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByRight = saturation
+		Multimap<IndexedPropertyChain, IndexedBinaryPropertyChain> compositionsByRight = saturation
 				.getCompositionsByRightSubProperty();
 		for (IndexedPropertyChain right : compositionsByRight.keySet()) {
-			for (IndexedPropertyChain composition : compositionsByRight
+			for (IndexedBinaryPropertyChain composition : compositionsByRight
 					.get(right)) {
 				SaturatedPropertyChain rightSaturation = right.getSaturated();
-				Multimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByLeft = rightSaturation
+				Multimap<IndexedObjectProperty, IndexedBinaryPropertyChain> compositionsByLeft = rightSaturation
 						.getCompositionsByLeftSubProperty();
-				if (!compositionsByLeft.contains(ipc, composition)) {
-					hook.error(ipc, right, composition, ipc);
+				if (!compositionsByLeft.contains(ip, composition)) {
+					hook.error(ip, right, composition, ip);
 				}
 			}
 		}

@@ -28,10 +28,13 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Collection;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -44,18 +47,20 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  */
 public class ContextSaturationFlagCheckingStage extends BasePostProcessingStage {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContextSaturationFlagCheckingStage.class);
 
 	private final Collection<IndexedClassExpression> classes_;
-	private final Set<IndexedClassExpression> nonSaturated_;
+	private final Set<Context> nonSaturated_;
+	private final SaturationState<?> saturationState_;
 
 	public ContextSaturationFlagCheckingStage(AbstractReasonerState reasoner) {
 		classes_ = reasoner.ontologyIndex.getIndexedClassExpressions();
-		nonSaturated_ = new ArrayHashSet<IndexedClassExpression>(
-				reasoner.saturationState.getNotSaturatedContexts().size());
+		nonSaturated_ = new ArrayHashSet<Context>(reasoner.saturationState
+				.getNotSaturatedContexts().size());
 		nonSaturated_
 				.addAll(reasoner.saturationState.getNotSaturatedContexts());
+		saturationState_ = reasoner.saturationState;
 	}
 
 	@Override
@@ -67,21 +72,21 @@ public class ContextSaturationFlagCheckingStage extends BasePostProcessingStage 
 	public void execute() throws ElkException {
 
 		for (IndexedClassExpression ice : classes_) {
+			Context context = saturationState_.getContext(ice);
 
-			if (ice.getContext() == null) {
+			if (context == null) {
 				continue;
 			}
 
-			if (ice.getContext().isSaturated() && nonSaturated_.contains(ice)) {
-				LOGGER_.error("Context "
-						+ ice
-						+ " IS saturated but contained in the not saturated queue");
+			if (context.isSaturated() && nonSaturated_.contains(context)) {
+				LOGGER_.error("{}: context IS saturated but contained in the not saturated queue"
+						+ context);
 			}
 
-			if (!ice.getContext().isSaturated() && !nonSaturated_.contains(ice)) {
-				LOGGER_.error("Context "
-						+ ice
-						+ " is NOT saturated and NOT contained in the not saturated queue");
+			if (!context.isSaturated() && !nonSaturated_.contains(context)) {
+				LOGGER_.error(
+						"{}: context  is NOT saturated and NOT contained in the not saturated queue",
+						context);
 			}
 		}
 	}

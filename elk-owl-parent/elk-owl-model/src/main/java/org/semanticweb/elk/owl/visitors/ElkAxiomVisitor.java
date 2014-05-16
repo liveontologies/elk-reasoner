@@ -38,5 +38,5 @@ public interface ElkAxiomVisitor<O> extends ElkDeclarationAxiomVisitor<O>,
 		ElkClassAxiomVisitor<O>, ElkObjectPropertyAxiomVisitor<O>,
 		ElkDataPropertyAxiomVisitor<O>, ElkDatatypeDefinitionVisitor<O>,
 		ElkHasKeyAxiomVisitor<O>, ElkAssertionAxiomVisitor<O>,
-		ElkAnnotationAxiomVisitor<O> {
+		ElkAnnotationAxiomVisitor<O>, ElkSWRLRuleVisitor<O> {
 }

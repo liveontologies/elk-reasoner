@@ -23,12 +23,10 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionFactory;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
@@ -60,7 +58,7 @@ public class ClassTaxonomyComputationFactory implements
 		InputProcessorFactory<Collection<IndexedClass>, Engine> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassTaxonomyComputationFactory.class);
 
 	/**
@@ -77,10 +75,6 @@ public class ClassTaxonomyComputationFactory implements
 	 * transitive reduction
 	 */
 	private final TransitiveReductionOutputProcessor outputProcessor_;
-	/**
-	 * The reference to cache the value of the top node for frequent use
-	 */
-	private final AtomicReference<UpdateableTaxonomyNode<ElkClass>> topNodeRef_;
 
 	/**
 	 * Create a shared engine for the input ontology index and a partially
@@ -96,14 +90,13 @@ public class ClassTaxonomyComputationFactory implements
 	 *            the (partially pre-computed) class taxonomy object to store
 	 *            results in
 	 */
-	public ClassTaxonomyComputationFactory(SaturationState saturationState,
+	public ClassTaxonomyComputationFactory(SaturationState<?> saturationState,
 			int maxWorkers, UpdateableTaxonomy<ElkClass> partialTaxonomy) {
 		this.taxonomy_ = partialTaxonomy;
 		this.transitiveReductionShared_ = new TransitiveReductionFactory<IndexedClass, TransitiveReductionJob<IndexedClass>>(
 				saturationState, maxWorkers,
 				new ThisTransitiveReductionListener());
 		this.outputProcessor_ = new TransitiveReductionOutputProcessor();
-		this.topNodeRef_ = new AtomicReference<UpdateableTaxonomyNode<ElkClass>>();
 	}
 
 	/**
@@ -114,7 +107,7 @@ public class ClassTaxonomyComputationFactory implements
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 */
-	public ClassTaxonomyComputationFactory(SaturationState saturationState,
+	public ClassTaxonomyComputationFactory(SaturationState<?> saturationState,
 			int maxWorkers) {
 		this(saturationState, maxWorkers, new ConcurrentClassTaxonomy());
 	}
@@ -151,26 +144,18 @@ public class ClassTaxonomyComputationFactory implements
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
 
+			// LOGGER_.trace("+++ creating node for equivalent classes: " +
+			// output.getEquivalent());
+
 			UpdateableTaxonomyNode<ElkClass> node = taxonomy_
 					.getCreateNode(output.getEquivalent());
 
-			if (node.getMembers().contains(PredefinedElkClass.OWL_THING)) {
-				topNodeRef_.compareAndSet(null, node);
-				node.trySetModified(false);
-				return;
-			}
-
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
 					.getDirectSubsumers()) {
+
 				UpdateableTaxonomyNode<ElkClass> superNode = taxonomy_
 						.getCreateNode(directSuperEquivalent.getEquivalent());
 				assignDirectSuperClassNode(node, superNode);
-			}
-			// if there are no direct super nodes, then the top node is the
-			// only direct super node
-			if (node.getDirectSuperNodes().isEmpty()) {
-				UpdateableTaxonomyNode<ElkClass> topNode = getCreateTopNode();
-				assignDirectSuperClassNode(node, topNode);
 			}
 
 			node.trySetModified(false);
@@ -194,25 +179,6 @@ public class ClassTaxonomyComputationFactory implements
 			throw new IllegalArgumentException();
 		}
 
-	}
-
-	/**
-	 * This function is called only when some (non-top) nodes have no direct
-	 * parents. This can happen only when owl:Thing does not occur negatively in
-	 * the ontology, so that owl:Thing is not explicitly derived as a superclass
-	 * of each class. Under these conditions, it is safe to create a singleton
-	 * top node.
-	 * 
-	 */
-	UpdateableTaxonomyNode<ElkClass> getCreateTopNode() {
-		if (topNodeRef_.get() == null) {
-			UpdateableTaxonomyNode<ElkClass> topNode = taxonomy_
-					.getCreateNode(Collections
-							.<ElkClass> singleton(PredefinedElkClass.OWL_THING));
-			topNode.trySetModified(false);
-			topNodeRef_.compareAndSet(null, topNode);
-		}
-		return topNodeRef_.get();
 	}
 
 	/**
@@ -287,9 +253,8 @@ public class ClassTaxonomyComputationFactory implements
 		@Override
 		public final void submit(Collection<IndexedClass> input) {
 			for (IndexedClass ic : input) {
-				if (LOGGER_.isTraceEnabled()) {
-					LOGGER_.trace(ic + ": taxonomy construction started");
-				}
+				LOGGER_.trace("{}: taxonomy construction started", ic);
+
 				transitiveReductionEngine
 						.submit(new TransitiveReductionJob<IndexedClass>(ic));
 			}

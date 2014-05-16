@@ -34,7 +34,7 @@ public interface JavaCCLexerFactory<T> {
 	/**
 	 * 
 	 * @param nativeLexer The lexer which has physical access to the input stream of characters
-	 * @return
+	 * @return a JavaCC warpper lexer
 	 */
 	public T createLexer(T nativeLexer);
 }

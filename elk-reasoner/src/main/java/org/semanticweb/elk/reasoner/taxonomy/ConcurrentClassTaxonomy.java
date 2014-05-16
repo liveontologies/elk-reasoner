@@ -33,7 +33,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.iris.ElkIri;
@@ -60,7 +61,7 @@ import org.semanticweb.elk.util.collections.Operations.Condition;
 public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 
 	// logger for events
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ConcurrentClassTaxonomy.class);
 
 	/** thread safe map from class IRIs to class nodes */
@@ -172,9 +173,9 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 			return previous;
 
 		allSatisfiableClassNodes_.add(node);
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("node created: " + node);
-		}
+		
+		LOGGER_.trace("node created: {}", node);
+		
 		for (ElkClass member : members) {
 			if (member != canonical)
 				classNodeLookup_.put(getKey(member), node);
@@ -204,8 +205,8 @@ public class ConcurrentClassTaxonomy implements UpdateableTaxonomy<ElkClass> {
 				changed |= classNodeLookup_.remove(getKey(member)) != null;
 			}
 
-			if (changed && LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace(node + ": node removed");
+			if (changed) {
+				LOGGER_.trace("{}: node removed", node);
 			}
 		}
 

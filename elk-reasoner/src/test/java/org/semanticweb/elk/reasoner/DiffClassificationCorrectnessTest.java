@@ -70,6 +70,7 @@ public abstract class DiffClassificationCorrectnessTest extends
 						"owl",
 						"expected",
 						new TestManifestCreator<URLTestIO, ClassTaxonomyTestOutput, ClassTaxonomyTestOutput>() {
+							@SuppressWarnings("resource")
 							@Override
 							public TestManifest<URLTestIO, ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> create(
 									URL input, URL output) throws IOException {

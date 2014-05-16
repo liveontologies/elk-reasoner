@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Benchmarking Package
@@ -48,70 +49,83 @@ public class CleaningRedundancyStageExecutor extends SimpleStageExecutor {
 
 	private Map<IndexedClassExpression, Set<IndexedClassExpression>> subsumerMap_ = null;
 	private final Metrics metrics_;
-	
+
 	public static final String CLEANED_CONTEXT_COUNT = "contexts.cleaned";
 	public static final String RESATURATED_TO_THE_SAME_STATE = "contexts.resaturated-to-the-same-state";
-	
+
 	public CleaningRedundancyStageExecutor(Metrics m) {
 		metrics_ = m;
 	}
-	
+
 	@Override
 	public void execute(ReasonerStage stage) throws ElkException {
-		
+
 		AbstractReasonerStage reasonerStage = (AbstractReasonerStage) stage;
-		
+
 		if (stage.getClass().equals(IncrementalDeletionStage.class)) {
-			subsumerMap_ = new ArrayHashMap<IndexedClassExpression, Set<IndexedClassExpression>>(1024);
-			//toClean_ = ((AbstractReasonerStage)stage).reasoner.getContextMap();
-			for (IndexedClassExpression ice : reasonerStage.reasoner.ontologyIndex.getIndexedClassExpressions()) {
-				Context context = ice.getContext();
-				
+			subsumerMap_ = new ArrayHashMap<IndexedClassExpression, Set<IndexedClassExpression>>(
+					1024);
+			// toClean_ =
+			// ((AbstractReasonerStage)stage).reasoner.getContextMap();
+			for (IndexedClassExpression ice : reasonerStage.reasoner.ontologyIndex
+					.getIndexedClassExpressions()) {
+				Context context = reasonerStage.reasoner.saturationState
+						.getContext(ice);
+
 				if (context == null)
 					continue;
-				
-				subsumerMap_.put(ice, new HashSet<IndexedClassExpression>(context.getSubsumers()));
+
+				subsumerMap_.put(ice, new HashSet<IndexedClassExpression>(
+						context.getSubsumers()));
 			}
-			
+
 		}
-		
+
 		super.execute(stage);
-		
+
 		if (stage.getClass().equals(IncrementalAdditionStage.class)) {
-			//Map<IndexedClassExpression, Context> resaturatedContexts = ((AbstractReasonerStage)stage).reasoner.getContextMap();
-			//how many are exactly the same (wrt atomic subsumers)?
+			// Map<IndexedClassExpression, Context> resaturatedContexts =
+			// ((AbstractReasonerStage)stage).reasoner.getContextMap();
+			// how many are exactly the same (wrt atomic subsumers)?
 			int sameCount = 0;
-			int cleanedCount = reasonerStage.reasoner.saturationState.getNotSaturatedContexts().size();
-			
-			for (IndexedClassExpression ice : reasonerStage.reasoner.saturationState.getNotSaturatedContexts()) {
-				if (ice.getContext() == null || !subsumerMap_.containsKey(ice)) {
+			int cleanedCount = reasonerStage.reasoner.saturationState
+					.getNotSaturatedContexts().size();
+
+			for (Context context : reasonerStage.reasoner.saturationState
+					.getNotSaturatedContexts()) {
+				IndexedClassExpression root = context.getRoot();
+				if (!subsumerMap_.containsKey(root)) {
 					continue;
 				}
-				
-				if (sameSubsumers(subsumerMap_.get(ice), ice.getContext())) {
+
+				if (sameSubsumers(subsumerMap_.get(root), context)) {
 					sameCount++;
 				}
 			}
-			
+
 			if (cleanedCount > 0) {
 				metrics_.updateLongMetric(CLEANED_CONTEXT_COUNT, cleanedCount);
-				metrics_.updateLongMetric(RESATURATED_TO_THE_SAME_STATE, sameCount);
+				metrics_.updateLongMetric(RESATURATED_TO_THE_SAME_STATE,
+						sameCount);
 			}
-			
-			System.err.println(cleanedCount + " contexts cleaned, " + sameCount + " are the same after re-saturation");
+
+			System.err.println(cleanedCount + " contexts cleaned, " + sameCount
+					+ " are the same after re-saturation");
 		}
 	}
 
-
-	private boolean sameSubsumers(Set<IndexedClassExpression> subsumers, Context context) {
-		for (IndexedClassExpression ice : new LazyCollectionMinusSet<IndexedClassExpression>(subsumers, context.getSubsumers())) {
+	private boolean sameSubsumers(Set<IndexedClassExpression> subsumers,
+			Context context) {
+		for (IndexedClassExpression ice : new LazyCollectionMinusSet<IndexedClassExpression>(
+				subsumers, context.getSubsumers())) {
 			if (ice instanceof IndexedClass) {
 				return false;
 			}
 		}
-		
-		for (IndexedClassExpression ice : new LazyCollectionMinusSet<IndexedClassExpression>(context.getSubsumers(), subsumers)) {
-			
+
+		for (IndexedClassExpression ice : new LazyCollectionMinusSet<IndexedClassExpression>(
+				context.getSubsumers(), subsumers)) {
+
 			if (ice instanceof IndexedClass) {
 				return false;
 			}

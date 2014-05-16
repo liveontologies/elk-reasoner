@@ -42,7 +42,8 @@ import org.semanticweb.elk.util.collections.Operations;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class IncrementalClassTaxonomyComputationStage extends AbstractReasonerStage {
+public class IncrementalClassTaxonomyComputationStage extends
+		AbstractReasonerStage {
 
 	// private static final Logger LOGGER_ = Logger
 	// .getLogger(IncrementalClassTaxonomyComputationStage.class);
@@ -73,15 +74,17 @@ public class IncrementalClassTaxonomyComputationStage extends AbstractReasonerSt
 			public IndexedClass transform(ElkClass element) {
 				IndexedClass indexedClass = (IndexedClass) element
 						.accept(reasoner.objectCache_.getIndexObjectConverter());
-				
+
 				return indexedClass.occurs() ? indexedClass : null;
 			}
 		};
-		
-		Collection<IndexedClass> modified = Operations.getCollection(
-				Operations.map(reasoner.classTaxonomyState.classesForModifiedNodes, transformation),
-				// an upper bound
-				reasoner.classTaxonomyState.classesForModifiedNodes.size());
+
+		Collection<IndexedClass> modified = Operations.getCollection(Operations
+				.map(reasoner.classTaxonomyState.getClassesWithModifiedNodes(),
+						transformation),
+		// an upper bound
+				reasoner.classTaxonomyState.getClassesWithModifiedNodes()
+						.size());
 
 		this.computation_ = new ClassTaxonomyComputation(Operations.split(
 				modified, 64), reasoner.getProcessExecutor(), workerNo,

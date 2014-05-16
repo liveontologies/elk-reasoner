@@ -26,20 +26,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.DisjointnessAxiom;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.collections.chains.Chain;
-import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
-import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
-import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Defines the disjointness inference rule for indexed class expressions
@@ -51,7 +43,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexedDisjointnessAxiom.class);
 
 	/**
@@ -142,194 +134,13 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	private void registerCompositionRule(ModifiableOntologyIndex index) {
-		for (IndexedClassExpression ice : inconsistentMembers_)
-			index.add(ice, new ThisContradictionRule());
-		for (IndexedClassExpression ice : disjointMembers_) {
-			index.add(ice, new ThisCompositionRule(this));
-		}
+		ContradictionFromDisjointnessRule.addRulesFor(this, index);
+		DisjointSubsumerFromMemberRule.addRulesFor(this, index);
 	}
 
 	private void deregisterCompositionRule(ModifiableOntologyIndex index) {
-		for (IndexedClassExpression ice : inconsistentMembers_)
-			index.remove(ice, new ThisContradictionRule());
-		for (IndexedClassExpression ice : disjointMembers_) {
-			index.remove(ice, new ThisCompositionRule(this));
-		}
-	}
-
-	/**
-	 * {@link ThisCompositionRule} derives the disjointness axioms as a new kind
-	 * of element. For each subsumer, all disjointness axioms containing this
-	 * subsumer are registered using this rule.
-	 * 
-	 * @author Pavel Klinov
-	 * 
-	 *         pavel.klinov@uni-ulm.de
-	 * @author "Yevgeny Kazakov"
-	 */
-	public static class ThisCompositionRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
-
-		public static final String NAME = "DisjointClasses Introduction";
-
-		/**
-		 * Set of relevant {@link IndexedDisjointnessAxiom}s in which the
-		 * member, for which this rule is registered, appears.
-		 */
-		private final Set<IndexedDisjointnessAxiom> disjointnessAxioms_;
-
-		private ThisCompositionRule(ChainableRule<Context> tail) {
-			super(tail);
-			disjointnessAxioms_ = new ArrayHashSet<IndexedDisjointnessAxiom>();
-		}
-
-		ThisCompositionRule(IndexedDisjointnessAxiom axiom) {
-			this((ChainableRule<Context>) null);
-			disjointnessAxioms_.add(axiom);
-		}
-
-		public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
-			return disjointnessAxioms_;
-		}
-
-		@Override
-		public String getName() {
-			return NAME;
-		}
-
-		@Override
-		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, Context context) {
-			visitor.visit(this, writer, context);
-		}
-
-		@Override
-		public void apply(BasicSaturationStateWriter writer, Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + context);
-			}
-			for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
-				writer.produce(context, new DisjointnessAxiom(disAxiom));
-		}
-
-		protected boolean isEmpty() {
-			return disjointnessAxioms_.isEmpty();
-		}
-
-		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
-			ThisCompositionRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
-			return rule.disjointnessAxioms_.addAll(this.disjointnessAxioms_);
-		}
-
-		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
-			ThisCompositionRule rule = ruleChain.find(MATCHER_);
-			boolean changed = false;
-			if (rule != null) {
-				changed = rule.disjointnessAxioms_
-						.removeAll(this.disjointnessAxioms_);
-				if (rule.isEmpty())
-					ruleChain.remove(MATCHER_);
-			}
-			return changed;
-		}
-
-		private static Matcher<ChainableRule<Context>, ThisCompositionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisCompositionRule>(
-				ThisCompositionRule.class);
-
-		private static ReferenceFactory<ChainableRule<Context>, ThisCompositionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisCompositionRule>() {
-			@Override
-			public ThisCompositionRule create(ChainableRule<Context> tail) {
-				return new ThisCompositionRule(tail);
-			}
-		};
-	}
-
-	/**
-	 * A rule which derives a {@link Contradiction} for inconsistent members of
-	 * this {@link IndexedDisjointnessAxiom}.
-	 * 
-	 * @author "Yevgeny Kazakov"
-	 * 
-	 */
-	public static class ThisContradictionRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
-
-		public static final String NAME = "DisjointClasses Contradiction Introduction";
-
-		/**
-		 * The number of {@link IndexedDisjointnessAxiom}s in which the
-		 * {@link IndexedClassExpression}, for which this rule is registered,
-		 * occurs more than once.
-		 */
-		private int contradictionCounter;
-
-		public ThisContradictionRule(ChainableRule<Context> tail) {
-			super(tail);
-			this.contradictionCounter = 0;
-		}
-
-		ThisContradictionRule() {
-			this((ChainableRule<Context>) null);
-			this.contradictionCounter++;
-		}
-
-		@Override
-		public String getName() {
-			return NAME;
-		}
-
-		@Override
-		public void apply(BasicSaturationStateWriter writer, Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + context);
-			}
-			writer.produce(context, Contradiction.getInstance());
-		}
-
-		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
-			ThisContradictionRule rule = ruleChain
-					.getCreate(MATCHER_, FACTORY_);
-			rule.contradictionCounter += this.contradictionCounter;
-			return this.contradictionCounter != 0;
-		}
-
-		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
-			ThisContradictionRule rule = ruleChain.find(MATCHER_);
-			if (rule == null) {
-				return false;
-			}
-			rule.contradictionCounter -= this.contradictionCounter;
-			if (rule.isEmpty())
-				ruleChain.remove(MATCHER_);
-			return this.contradictionCounter != 0;
-		}
-
-		@Override
-		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, Context context) {
-			visitor.visit(this, writer, context);
-		}
-
-		protected boolean isEmpty() {
-			return this.contradictionCounter == 0;
-		}
-
-		private static Matcher<ChainableRule<Context>, ThisContradictionRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ThisContradictionRule>(
-				ThisContradictionRule.class);
-
-		private static ReferenceFactory<ChainableRule<Context>, ThisContradictionRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ThisContradictionRule>() {
-			@Override
-			public ThisContradictionRule create(ChainableRule<Context> tail) {
-				return new ThisContradictionRule(tail);
-			}
-		};
-
+		ContradictionFromDisjointnessRule.removeRulesFor(this, index);
+		DisjointSubsumerFromMemberRule.removeRulesFor(this, index);
 	}
 
 }

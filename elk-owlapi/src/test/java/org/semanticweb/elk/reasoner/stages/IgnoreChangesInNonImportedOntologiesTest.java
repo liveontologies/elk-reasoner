@@ -78,6 +78,9 @@ public class IgnoreChangesInNonImportedOntologiesTest {
 		// Create an ELK reasoner.
 		ElkReasoner reasoner = (ElkReasoner) new ElkReasonerFactory()
 				.createReasoner(root);
+		// make sure the reasoner loads the ontology
+		reasoner.flush();
+		reasoner.isConsistent();
 
 		try {
 			OWLOntology nonImported = loadOntology(man, "nonImported.owl");
@@ -89,7 +92,7 @@ public class IgnoreChangesInNonImportedOntologiesTest {
 			AbstractReasonerState state = (AbstractReasonerState) reasoner
 					.getInternalReasoner();
 
-			assertTrue(state.stageManager.changesLoadingStage.isCompleted);
+			assertTrue(state.stageManager.axiomLoadingStage.isCompleted);
 		} finally {
 			reasoner.dispose();
 		}

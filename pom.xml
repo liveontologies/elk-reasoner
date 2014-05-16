@@ -1,8 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.semanticweb.elk</groupId>
 	<artifactId>elk-parent</artifactId>
-	<version>0.4.0-SNAPSHOT</version>
+	<version>0.5.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
@@ -36,6 +37,7 @@
 		<connection>scm:git:https://code.google.com/p/elk-reasoner/</connection>
 		<developerConnection>scm:git:git@github.com:klinovp/elk.git</developerConnection>
 		<url>http://elk-reasoner.googlecode.com/git/</url>
+		<tag>HEAD</tag>
 	</scm>
 
 	<licenses>
@@ -108,9 +110,34 @@
 				<version>4.11</version>
 			</dependency>
 			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.7.5</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-log4j12</artifactId>
+				<version>1.7.5</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+				<version>1.7.5</version>
+			</dependency>
+			<dependency>
 				<groupId>log4j</groupId>
 				<artifactId>log4j</artifactId>
 				<version>1.2.14</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>1.0.13</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-core</artifactId>
+				<version>1.0.13</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -169,11 +196,12 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<owlapi.version>3.4.2</owlapi.version>
-		<protege.version>4.1.0</protege.version>
+		<owlapi.version>3.4.5</owlapi.version>
+		<!--protege.version>5.0.0-beta-05-SNAPSHOT</protege.version-->
+		<protege.version>4.3.0</protege.version>
 		<java.required.version>1.6</java.required.version>
 		<!-- TODO: get current year automatically -->
-		<currentYear>2013</currentYear>
+		<currentYear>2014</currentYear>
 	</properties>
 
 	<build>

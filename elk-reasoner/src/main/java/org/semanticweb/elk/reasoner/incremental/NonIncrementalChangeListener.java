@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -30,17 +31,18 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  * TODO doc
  * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public interface NonIncrementalChangeListener<T> {
 
 	public void notify(T axiom);
-	
+
 	public static NonIncrementalChangeListener<ElkAxiom> DUMMY = new NonIncrementalChangeListener<ElkAxiom>() {
 
 		@Override
 		public void notify(ElkAxiom axiom) {
-		}		
+			// does nothing
+		}
 	};
 }

@@ -37,9 +37,7 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.EmptyChangesLoader;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -57,6 +55,8 @@ import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.logging.Statistics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -69,7 +69,7 @@ import org.semanticweb.elk.util.logging.Statistics;
  */
 public class Main {
 	// logger for this class
-	private static final Logger LOGGER_ = Logger.getLogger(Main.class);
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(Main.class);
 
 	/**
 	 * @param args
@@ -148,7 +148,11 @@ public class Main {
 			System.err.println("Cannot set more than one logging level!");
 			return;
 		}
-		Logger allLoggers = Logger.getLogger("org.semanticweb.elk");
+		// SLF4J does not allow setting the logging level; we use a concrete
+		// binding
+		org.apache.log4j.Logger allLoggers = org.apache.log4j.Logger
+				.getLogger("org.semanticweb.elk");
+
 		if (options.has(logging))
 			allLoggers.setLevel(Level.toLevel(options.valueOf(logging),
 					Level.INFO));
@@ -170,14 +174,12 @@ public class Main {
 		// create reasoner
 		ReasonerFactory reasoningFactory = new ReasonerFactory();
 		Owl2ParserFactory parserFactory = new Owl2FunctionalStyleParserFactory();
-		OntologyLoader loader = new Owl2StreamLoader(parserFactory,
+		AxiomLoader loader = new Owl2StreamLoader(parserFactory,
 				options.valueOf(inputFile));
 		Reasoner reasoner = reasoningFactory.createReasoner(loader,
 				new LoggingStageExecutor(), configuration);
 
 		try {
-			reasoner.registerOntologyChangesLoader(new EmptyChangesLoader());
-
 			if (options.has(satisfiable)) {
 				boolean inconsistent = reasoner.isInconsistent();
 				if (options.hasArgument(outputFile)) {
@@ -185,13 +187,16 @@ public class Main {
 							!inconsistent);
 				}
 			}
+			
+			boolean addHash = options.has(printHash);
 
 			if (options.has(classify)) {
 				Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
+			
 				if (options.hasArgument(outputFile))
 					writeClassTaxonomyToFile(options.valueOf(outputFile),
-							taxonomy);
-				if (options.has(printHash))
+							taxonomy, addHash);
+				if (addHash)
 					printTaxonomyHash(taxonomy);
 			}
 
@@ -200,8 +205,8 @@ public class Main {
 				taxonomy = reasoner.getInstanceTaxonomyQuietly();
 				if (options.hasArgument(outputFile))
 					writeInstanceTaxonomyToFile(options.valueOf(outputFile),
-							taxonomy);
-				if (options.has(printHash))
+							taxonomy, addHash);
+				if (addHash)
 					printTaxonomyHash(taxonomy);
 			}
 
@@ -212,9 +217,8 @@ public class Main {
 
 	static void writeConsistencyToFile(File file, Boolean consistent)
 			throws IOException, ElkException {
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Writing consistency to " + file);
-		}
+		LOGGER_.info("Writing consistency to {}", file);
+
 		FileWriter fstream = new FileWriter(file);
 		BufferedWriter writer = new BufferedWriter(fstream);
 		writer.write(consistent.toString() + "\n");
@@ -223,26 +227,24 @@ public class Main {
 		writer.close();
 	}
 
-	static void writeClassTaxonomyToFile(File file, Taxonomy<ElkClass> taxonomy)
+	static void writeClassTaxonomyToFile(File file, Taxonomy<ElkClass> taxonomy, boolean printHash)
 			throws IOException, ElkInconsistentOntologyException, ElkException {
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Writing taxonomy to " + file);
-		}
+		LOGGER_.info("Writing taxonomy to {}", file);
+
 		Statistics.logOperationStart("Writing taxonomy", LOGGER_);
-		TaxonomyPrinter.dumpClassTaxomomyToFile(taxonomy, file.getPath(), true);
+		TaxonomyPrinter.dumpClassTaxomomyToFile(taxonomy, file.getPath(), printHash);
 		Statistics.logOperationFinish("Writing taxonomy", LOGGER_);
 	}
 
 	static void writeInstanceTaxonomyToFile(File file,
-			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy)
+			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy, boolean printHash)
 			throws IOException, ElkInconsistentOntologyException, ElkException {
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Writing taxonomy with instances to " + file);
-		}
+		LOGGER_.info("Writing taxonomy with instances to {}", file);
+
 		Statistics
 				.logOperationStart("Writing taxonomy with instances", LOGGER_);
 		TaxonomyPrinter.dumpInstanceTaxomomyToFile(taxonomy, file.getPath(),
-				true);
+				printHash);
 		Statistics.logOperationFinish("Writing taxonomy with instances",
 				LOGGER_);
 	}

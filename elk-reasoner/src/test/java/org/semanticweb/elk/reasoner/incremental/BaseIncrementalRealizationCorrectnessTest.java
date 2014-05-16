@@ -25,11 +25,10 @@ package org.semanticweb.elk.reasoner.incremental;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -75,31 +74,28 @@ public abstract class BaseIncrementalRealizationCorrectnessTest<T>
 	@Override
 	protected void correctnessCheck(Reasoner standardReasoner,
 			Reasoner incrementalReasoner, long seed) throws ElkException {
-		if (LOGGER_.isDebugEnabled())
-			LOGGER_.debug("======= Computing Expected Instance Taxonomy =======");
+		LOGGER_.debug("======= Computing Expected Instance Taxonomy =======");
 
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual> expected = standardReasoner.getInstanceTaxonomyQuietly();
 
-		if (LOGGER_.isDebugEnabled())
-			LOGGER_.debug("======= Computing Incremental Instance Taxonomy =======");
+		LOGGER_.debug("======= Computing Incremental Instance Taxonomy =======");
 
 		InstanceTaxonomy<ElkClass, ElkNamedIndividual>  incremental = incrementalReasoner.getInstanceTaxonomyQuietly();
 
-		try {
-			assertEquals("Seed " + seed, TaxonomyHasher.hash(expected),
-					TaxonomyHasher.hash(incremental));
-		} catch (AssertionError e) {
+		if (TaxonomyHasher.hash(expected) != TaxonomyHasher.hash(incremental)){
+			StringWriter writer = new StringWriter();
+			
 			try {
-				Writer writer = new OutputStreamWriter(System.out);
-				System.out.println("======= Expected Taxonomy =======");
-				TaxonomyPrinter.dumpClassTaxomomy(expected, writer, false);
-				System.out.println("======= Incremental Taxonomy =======");
-				TaxonomyPrinter.dumpClassTaxomomy(incremental, writer, false);
+				writer.write("EXPECTED TAXONOMY:\n");
+				TaxonomyPrinter.dumpInstanceTaxomomy(expected, writer, false);
+				writer.write("\nINCREMENTAL TAXONOMY:\n");
+				TaxonomyPrinter.dumpInstanceTaxomomy(incremental, writer, false);
 				writer.flush();
-				throw e;
-			} catch (IOException ioe) {
-				ioe.printStackTrace();
+			} catch (IOException ioe) {	
+				// TODO
 			}
+			
+			fail("Seed: " + seed + "\n" + writer.getBuffer().toString());
 		}
 	}
 

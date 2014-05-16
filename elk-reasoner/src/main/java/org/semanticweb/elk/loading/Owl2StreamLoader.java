@@ -30,25 +30,24 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * A {@link OntologyLoader} which loads ontology from streams (e.g., backed by
+ * A {@link AxiomLoader} which loads ontology from streams (e.g., backed by
  * files or strings) using a given {@link Owl2ParserFactory}
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public class Owl2StreamLoader implements OntologyLoader {
+public class Owl2StreamLoader extends Owl2ParserLoader implements AxiomLoader {
 
-	private final Owl2ParserFactory owlParserFactory_;
 	private final InputStream stream_;
 
 	public Owl2StreamLoader(Owl2ParserFactory parserFactory, InputStream stream) {
-		this.owlParserFactory_ = parserFactory;
+		super(parserFactory.getParser(stream));
 		this.stream_ = stream;
 	}
 
+	@SuppressWarnings("resource")
 	public Owl2StreamLoader(Owl2ParserFactory parserFactory, File file)
 			throws FileNotFoundException {
 		this(parserFactory, new FileInputStream(file));
@@ -59,19 +58,13 @@ public class Owl2StreamLoader implements OntologyLoader {
 	}
 
 	@Override
-	public Loader getLoader(ElkAxiomProcessor axiomLoader) {
-		return new Owl2ParserLoader(owlParserFactory_.getParser(stream_),
-				axiomLoader) {
-			@Override
-			public void disposeParserResources() {
-				super.disposeParserResources();
-				try {
-					stream_.close();
-				} catch (IOException e) {
-					exception = new ElkLoadingException(
-							"Cannot close the input stream!", e);
-				}
-			}
-		};
+	public void disposeParserResources() {
+		super.disposeParserResources();
+		try {
+			stream_.close();
+		} catch (IOException e) {
+			exception = new ElkLoadingException(
+					"Cannot close the input stream!", e);
+		}
 	}
 }

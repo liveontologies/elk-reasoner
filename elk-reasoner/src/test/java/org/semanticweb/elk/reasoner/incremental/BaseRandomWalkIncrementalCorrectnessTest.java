@@ -32,12 +32,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.RandomSeedProvider;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
@@ -52,6 +51,8 @@ import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.testing.PolySuite;
 import org.semanticweb.elk.testing.TestInput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for unit tests based on the random walk runners
@@ -63,7 +64,7 @@ import org.semanticweb.elk.testing.TestInput;
 public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 
 	// logger for this class
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(BaseRandomWalkIncrementalCorrectnessTest.class);
 
 	/**
@@ -88,7 +89,11 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 
 	}
 
-	protected boolean ignore(TestInput input) {
+	/**
+	 * @param input
+	 *            dummy parameter
+	 */
+	protected static boolean ignore(TestInput input) {
 		return false;
 	}
 
@@ -101,22 +106,20 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 		Reasoner incrementalReasoner;
 		long seed = RandomSeedProvider.VALUE;
 
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info("Initial load of test axioms");
-		}
+		LOGGER_.info("Initial load of test axioms");
 
 		InputStream stream = manifest.getInput().getInputStream();
-		OntologyLoader fileLoader = new Owl2StreamLoader(
+		AxiomLoader fileLoader = new Owl2StreamLoader(
 				new Owl2FunctionalStyleParserFactory(new ElkObjectFactoryImpl(
 						new ElkEntityRecycler())), stream);
-		OntologyLoader trackingLoader = getAxiomTrackingLoader(fileLoader,
+		AxiomLoader trackingLoader = getAxiomTrackingLoader(fileLoader,
 				changingAxioms, staticAxioms);
 		incrementalReasoner = TestReasonerUtils.createTestReasoner(
 				trackingLoader, new PostProcessingStageExecutor());
 		incrementalReasoner.setAllowIncrementalMode(true);
 
 		try {
-			incrementalReasoner.loadOntology();
+			// incrementalReasoner.loadAxioms();
 			// let the runner run..
 			getRandomWalkRunner(MAX_ROUNDS, ITERATIONS).run(
 					incrementalReasoner, changingAxioms, staticAxioms, seed);
@@ -124,12 +127,13 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 		} catch (Exception e) {
 			throw new ElkRuntimeException("Seed " + seed, e);
 		} finally {
+			stream.close();
 			incrementalReasoner.shutdown();
 		}
 	}
 
-	protected abstract OntologyLoader getAxiomTrackingLoader(
-			OntologyLoader fileLoader, OnOffVector<ElkAxiom> changingAxioms,
+	protected abstract AxiomLoader getAxiomTrackingLoader(
+			AxiomLoader fileLoader, OnOffVector<ElkAxiom> changingAxioms,
 			List<ElkAxiom> staticAxioms);
 
 	protected abstract RandomWalkIncrementalClassificationRunner<ElkAxiom> getRandomWalkRunner(

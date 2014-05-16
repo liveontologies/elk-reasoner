@@ -40,7 +40,7 @@ import org.semanticweb.owlapi.model.OWLPropertyExpressionVisitorEx;
 import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 
 /**
- * Testing correctness of {@link OWLObjectPropertyExpressionConverterVisitor}
+ * Testing correctness of {@link OwlObjectPropertyExpressionConverterVisitor}
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"

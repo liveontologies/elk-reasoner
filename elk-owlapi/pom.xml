@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>elk-parent</artifactId>
 		<groupId>org.semanticweb.elk</groupId>
-		<version>0.4.0-SNAPSHOT</version>
+		<version>0.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>elk-owlapi</artifactId>
@@ -84,7 +84,17 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
+			<scope>test</scope>
 		</dependency>
+		<dependency> 
+        	<groupId>org.slf4j</groupId>
+        	<artifactId>slf4j-api</artifactId>
+      	</dependency>
+      	<dependency> 
+        	<groupId>org.slf4j</groupId>
+        	<artifactId>slf4j-log4j12</artifactId>
+        	<scope>test</scope>
+      	</dependency>		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

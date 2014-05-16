@@ -34,7 +34,7 @@ interface DirectAccess<E> {
 
 	/**
 	 * @return the array storing the elements of this object; some elements in
-	 *         the array could be {@link null}
+	 *         the array could be null
 	 */
 	E[] getRawData();
 

@@ -25,9 +25,10 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -41,7 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  */
 public class CheckContextInvariants extends BasePostProcessingStage {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(CheckContextInvariants.class);
 
 	private final AbstractReasonerState reasoner_;

@@ -42,12 +42,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -67,18 +68,33 @@ public class IncrementalAdditionInitializationStage extends
 		return IncrementalStages.ADDITIONS_INIT;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
+	 */
 	@Override
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
 
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
-		ChainableRule<Context> changedInitRules = null;
-		Map<IndexedClassExpression, ChainableRule<Context>> changedRulesByCE = null;
+		LinkedContextInitRule changedInitRules = null;
+		Map<IndexedClassExpression, ChainableSubsumerRule> changedRulesByCE = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
-		RuleApplicationVisitor initRuleAppVisitor = SaturationUtils
-				.getStatsAwareCompositionRuleAppVisitor(stageStatistics_
-						.getRuleStatistics());
 		ContextCreationListener contextCreationListener = SaturationUtils
 				.addStatsToContextCreationListener(
 						ContextCreationListener.DUMMY,
@@ -87,17 +103,19 @@ public class IncrementalAdditionInitializationStage extends
 				.addStatsToContextModificationListener(
 						ContextModificationListener.DUMMY,
 						stageStatistics_.getContextStatistics());
-		ConclusionVisitor<?> conclusionVisitor = SaturationUtils
-				.addStatsToConclusionVisitor(stageStatistics_
-						.getConclusionStatistics());
 
 		// first, create and init contexts for new classes
 		final IndexObjectConverter converter = reasoner.objectCache_
 				.getIndexObjectConverter();
-		final ExtendedSaturationStateWriter writer = reasoner.saturationState
-				.getExtendedWriter(contextCreationListener,
-						contextModificationListener, initRuleAppVisitor,
-						conclusionVisitor, true);
+		final SaturationStateWriter<?> writer =
+
+		SaturationUtils.getStatsAwareWriter(reasoner.saturationState
+				.getContextCreatingWriter(contextCreationListener,
+						contextModificationListener), stageStatistics_);
+
+		// used to initialize new contexts
+		Conclusion contextInitConclusion = new ContextInitializationImpl(
+				reasoner.saturationState.getOntologyIndex());
 
 		for (ElkEntity newEntity : Operations.concat(
 				reasoner.ontologyIndex.getAddedClasses(),
@@ -141,9 +159,8 @@ public class IncrementalAdditionInitializationStage extends
 						}
 					});
 
-			if (ice.getContext() == null) {
-				writer.getCreateContext(ice);
-			}
+			if (reasoner.saturationState.getContext(ice) == null)
+				writer.produce(ice, contextInitConclusion);
 		}
 
 		changedInitRules = diffIndex.getAddedContextInitRules();

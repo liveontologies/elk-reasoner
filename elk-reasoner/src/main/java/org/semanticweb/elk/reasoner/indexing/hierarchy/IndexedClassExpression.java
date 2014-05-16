@@ -22,17 +22,18 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.DecompositionRuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.IndexedObjectWithContext;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkClassExpression} in an ontology.
@@ -42,17 +43,17 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * @author "Yevgeny Kazakov"
  * @author Pavel Klinov
  */
-abstract public class IndexedClassExpression extends IndexedObject implements
-		Comparable<IndexedClassExpression> {
+abstract public class IndexedClassExpression extends IndexedObjectWithContext
+		implements Comparable<IndexedClassExpression> {
 
-	protected static final Logger LOGGER_ = Logger
+	protected static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexedClassExpression.class);
 
 	/**
 	 * The first composition rule assigned to this
 	 * {@link IndexedClassExpression}
 	 */
-	ChainableRule<Context> compositionRuleHead;
+	ChainableSubsumerRule compositionRuleHead;
 
 	/**
 	 * This counts how often this object occurred positively. Some indexing
@@ -72,12 +73,6 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 
 	/** Hash code for this object. */
 	private final int hashCode_ = HashGenerator.generateNextHashCode();
-
-	/**
-	 * /** the reference to a {@link Context} assigned to this
-	 * {@link IndexedClassExpression}
-	 */
-	private volatile Context context_ = null;
 
 	/**
 	 * This method should always return true apart from intermediate steps
@@ -141,36 +136,6 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	}
 
 	/**
-	 * @return The corresponding context, null if none was assigned.
-	 */
-	public Context getContext() {
-		return context_;
-	}
-
-	/**
-	 * Sets the corresponding context if none was yet assigned.
-	 * 
-	 * @param context
-	 *            the {@link Context} which will be assigned to this
-	 *            {@link IndexedClassExpression}
-	 * 
-	 * @return {@code true} if the operation succeeded.
-	 */
-	public synchronized boolean setContext(Context context) {
-		if (context_ != null)
-			return false;
-		context_ = context;
-		return true;
-	}
-
-	/**
-	 * Resets the corresponding context to null.
-	 */
-	public synchronized void resetContext() {
-		context_ = null;
-	}
-
-	/**
 	 * Get an integer hash code to be used for this object.
 	 * 
 	 * @return Hash code.
@@ -202,7 +167,7 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 *         {@link LinkRule#next()}; this method should be used to access the
 	 *         rules without modifying them.
 	 */
-	public LinkRule<Context> getCompositionRuleHead() {
+	public LinkedSubsumerRule getCompositionRuleHead() {
 		return compositionRuleHead;
 	}
 
@@ -211,18 +176,18 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 	 *         {@link IndexedClassExpression}; this is always not {@code null}.
 	 *         This method can be used for convenient search and modification
 	 *         (addition and deletion) of the rules using the methods of the
-	 *         {@link Chain} interface without without worrying about
-	 *         {@code null} values.
+	 *         {@link Chain} interface without worrying about {@code null}
+	 *         values.
 	 */
-	Chain<ChainableRule<Context>> getCompositionRuleChain() {
-		return new AbstractChain<ChainableRule<Context>>() {
+	Chain<ChainableSubsumerRule> getCompositionRuleChain() {
+		return new AbstractChain<ChainableSubsumerRule>() {
 			@Override
-			public ChainableRule<Context> next() {
+			public ChainableSubsumerRule next() {
 				return compositionRuleHead;
 			}
 
 			@Override
-			public void setNext(ChainableRule<Context> tail) {
+			public void setNext(ChainableSubsumerRule tail) {
 				compositionRuleHead = tail;
 			}
 		};
@@ -233,17 +198,5 @@ abstract public class IndexedClassExpression extends IndexedObject implements
 		return accept((IndexedClassExpressionVisitor<O>) visitor);
 	}
 
-	/**
-	 * 
-	 * @param visitor
-	 * @return
-	 */
 	public abstract <O> O accept(IndexedClassExpressionVisitor<O> visitor);
-
-	/**
-	 * 
-	 * @param visitor
-	 */
-	public abstract void accept(DecompositionRuleApplicationVisitor visitor,
-			Context context);
 }

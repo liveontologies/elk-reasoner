@@ -79,6 +79,11 @@ public class Operations {
 		public void clear() {
 		}
 
+		@Override
+		public Collection<Object> remove(Object key) {
+			return Collections.emptySet();
+		}
+
 	};
 
 	@SuppressWarnings("unchecked")
@@ -598,8 +603,7 @@ public class Operations {
 	}
 
 	/**
-	 * A simple object that transforms objects of type {@link I} to objects of
-	 * type {@link O}
+	 * A simple object that transforms objects of type I to objects of type O
 	 * 
 	 * @author Pavel Klinov
 	 * 
@@ -620,9 +624,9 @@ public class Operations {
 	public interface FunctorEx<I, O> extends Functor<I, O> {
 		
 		/**
-		 * The reason this method takes Objects rather than {@link O} is because
+		 * The reason this method takes Objects rather than instances of O is because
 		 * it's primarily used for an efficient implementation of
-		 * {@link Set.contains}, which takes an Object
+		 * {@link Set#contains(Object)}, which takes an Object
 		 * 
 		 * @return Can return null if the transformation is not possible
 		 */
@@ -668,7 +672,7 @@ public class Operations {
 	 * 
 	 * @param input
 	 * @param functor
-	 * @return
+	 * @return a set which contains the results of applying the functor to the elements in the input set
 	 */
 	public static <I,O> Set<O> map(final Set<? extends I> input, final FunctorEx<I,O> functor) {
 		return new AbstractSet<O>() { 

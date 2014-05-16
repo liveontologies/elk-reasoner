@@ -27,14 +27,15 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.ExtendedSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.CountingConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -45,10 +46,8 @@ abstract class AbstractIncrementalContextInitializationStage extends
 		AbstractReasonerStage {
 
 	// logger for this class
-	static final Logger LOGGER_ = Logger
+	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractIncrementalContextInitializationStage.class);
-
-	static final boolean COLLECT_CONCLUSION_COUNTS = LOGGER_.isDebugEnabled();
 
 	protected final SaturationStatistics stageStatistics_ = new SaturationStatistics();
 
@@ -66,7 +65,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	 */
 	protected Iterator<IndexedClassExpression> todo = null;
 
-	private ExtendedSaturationStateWriter writer_;
+	private SaturationStateWriter<?> writer_;
 
 	public AbstractIncrementalContextInitializationStage(
 			AbstractReasonerState reasoner, AbstractReasonerStage... preStages) {
@@ -78,21 +77,13 @@ abstract class AbstractIncrementalContextInitializationStage extends
 		return stage().toString();
 	}
 
-	protected ConclusionVisitor<?> getConclusionVisitor(
-			ConclusionStatistics conclusionStatistics) {
-
-		return COLLECT_CONCLUSION_COUNTS ? new CountingConclusionVisitor(
-				conclusionStatistics.getProducedConclusionCounts())
-				: ConclusionVisitor.DUMMY;
-	}
-
 	@Override
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		final ConclusionVisitor<?> visitor = getConclusionVisitor(stageStatistics_
-				.getConclusionStatistics());
-		this.writer_ = reasoner.saturationState.getExtendedWriter(visitor);
+		this.writer_ = SaturationUtils.getStatsAwareWriter(
+				reasoner.saturationState.getContextCreatingWriter(),
+				stageStatistics_);
 		return true;
 	}
 
@@ -103,8 +94,11 @@ abstract class AbstractIncrementalContextInitializationStage extends
 				break;
 			IndexedClassExpression ice = todo.next();
 
-			if (ice.getContext() != null) {
-				writer_.initContext(ice.getContext());
+			Conclusion init = new ContextInitializationImpl(
+					reasoner.saturationState.getOntologyIndex());
+
+			if (reasoner.saturationState.getContext(ice) != null) {
+				writer_.produce(ice, init);
 			}
 
 			initContexts++;

@@ -1,6 +1,32 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.apache.log4j.Logger;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
+import org.semanticweb.elk.util.logging.statistics.AbstractStatistics;
+import org.semanticweb.elk.util.logging.statistics.StatisticsPrinter;
+import org.slf4j.Logger;
 
 /*
  * #%L
@@ -31,159 +57,162 @@ import org.apache.log4j.Logger;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class RuleStatistics {
+public class RuleStatistics extends AbstractStatistics {
 
 	// TODO: limit access
-	public final RuleApplicationCounter ruleCounter = new RuleApplicationCounter();
+	public final RuleCounter ruleCounter = new RuleCounter();
 	public final RuleApplicationTimer ruleTimer = new RuleApplicationTimer();
-	public final DecompositionRuleApplicationCounter decompositionRuleCounter = new DecompositionRuleApplicationCounter();
-	public final DecompositionRuleApplicationTimer decompositionRuleTimer = new DecompositionRuleApplicationTimer();
 
-	/**
-	 * The number of times measurements were taken in different threads. Used to
-	 * average the wall time results.
-	 */
-	private int numOfMeasurements_ = 0;
-
-	public void startMeasurements() {
-		if (numOfMeasurements_ < 1) {
-			numOfMeasurements_ = 1;
-		}
-	}
-	
-	private boolean measurementsTaken() {
-		return numOfMeasurements_ > 0;
-	}
-	
 	/**
 	 * Reset all timers to zero.
 	 */
+	@Override
 	public void reset() {
-		decompositionRuleCounter.reset();
-		decompositionRuleTimer.reset();
+		super.reset();
 		ruleCounter.reset();
 		ruleTimer.reset();
-		numOfMeasurements_ = 0;
 	}
 
 	public synchronized void add(RuleStatistics stats) {
-		if (stats.measurementsTaken()) {
-			numOfMeasurements_ += stats.numOfMeasurements_;
-			decompositionRuleCounter.add(stats.decompositionRuleCounter);
-			decompositionRuleTimer.add(stats.decompositionRuleTimer);
-			ruleCounter.add(stats.ruleCounter);
-			ruleTimer.add(stats.ruleTimer);
-		}
+		super.add(stats);
+		ruleCounter.add(stats.ruleCounter);
+		ruleTimer.add(stats.ruleTimer);
 	}
 
-	// TODO: can use rule names for printing
+	void print(StatisticsPrinter printer, String name, int count, int time) {
+		if (count == 0)
+			return;
+
+		printer.print(name, count, time / getNumberOfMeasurements());
+
+	}
+
 	public void print(Logger logger) {
 		if (!logger.isDebugEnabled() || !measurementsTaken())
 			return;
 
-		if (ruleCounter.countForwardLinkBackwardLinkRule > 0)
-			logger.debug("Forward link from backward link rules: "
-					+ ruleCounter.countForwardLinkBackwardLinkRule + " ("
-					+ ruleTimer.timeForwardLinkBackwardLinkRule / numOfMeasurements_
-					+ " ms)");
+		if (ruleCounter.getTotalRuleAppCount() == 0)
+			return;
 
-		if (ruleCounter.countDisjointnessAxiomContradictionRule > 0)
-			logger.debug("Disjointness axiom contradiction rules: "
-					+ ruleCounter.countDisjointnessAxiomContradictionRule
-					+ " (" + ruleTimer.timeDisjointnessAxiomContradictionRule
-					/ numOfMeasurements_ + " ms)");
+		StatisticsPrinter printer = new StatisticsPrinter(logger,
+				"%{RULES:}s %,{count}d [%,{time}d ms]", "TOTAL RULES",
+				ruleCounter.getTotalRuleAppCount(),
+				ruleTimer.getTotalRuleAppTime());
 
-		if (ruleCounter.countDisjointnessAxiomCompositionRule > 0)
-			logger.debug("Disjointness axiom composition rules: "
-					+ ruleCounter.countDisjointnessAxiomCompositionRule + " ("
-					+ ruleTimer.timeDisjointnessAxiomCompositionRule
-					/ numOfMeasurements_ + " ms)");
+		// TODO: sort in a better order
 
-		if (ruleCounter.countOwlThingContextInitializationRule > 0)
-			logger.debug("owl:Thing context init rules: "
-					+ ruleCounter.countOwlThingContextInitializationRule + " ("
-					+ ruleTimer.timeOwlThingContextInitializationRule
-					/ numOfMeasurements_ + " ms)");
-		
-		if (ruleCounter.countContextRootInitializationRule > 0)
-			logger.debug("Context root init rules: "
-					+ ruleCounter.countContextRootInitializationRule + " ("
-					+ ruleTimer.timeContextRootInitializationRule
-					/ numOfMeasurements_ + " ms)");
+		printer.printHeader();
 
-		if (ruleCounter.countSubClassOfAxiomCompositionRule > 0)
-			logger.debug("Subclass expansions: "
-					+ ruleCounter.countSubClassOfAxiomCompositionRule + " ("
-					+ ruleTimer.timeSubClassOfAxiomCompositionRule / numOfMeasurements_
-					+ " ms)");
+		print(printer, BackwardLinkChainFromBackwardLinkRule.NAME,
+				ruleCounter.countBackwardLinkChainFromBackwardLinkRule,
+				ruleTimer.timeBackwardLinkChainFromBackwardLinkRule);
 
-		if (ruleCounter.countContradictionBottomBackwardLinkRule > 0)
-			logger.debug("Propagations of inconsistency: "
-					+ ruleCounter.countContradictionBottomBackwardLinkRule
-					+ " (" + ruleTimer.timeContradictionBottomBackwardLinkRule
-					/ numOfMeasurements_ + " ms)");
+		print(printer, BackwardLinkFromForwardLinkRule.NAME,
+				ruleCounter.countBackwardLinkFromForwardLinkRule,
+				ruleTimer.timeBackwardLinkFromForwardLinkRule);
 
-		if (ruleCounter.countPropagationBackwardLinkRule > 0)
-			logger.debug("Propagations via backward links: "
-					+ ruleCounter.countPropagationBackwardLinkRule + " ("
-					+ ruleTimer.timePropagationBackwardLinkRule / numOfMeasurements_
-					+ " ms)");
+		print(printer, NonReflexiveBackwardLinkCompositionRule.NAME,
+				ruleCounter.countNonReflexiveBackwardLinkCompositionRule,
+				ruleTimer.timeNonReflexiveBackwardLinkCompositionRule);
 
-		if (ruleCounter.countObjectSomeValuesFromCompositionRule
-				+ decompositionRuleCounter.countIndexedObjectSomeValuesFromDecompositionRule > 0)
-			logger.debug("ObjectSomeValuesFrom composition/decomposition rules: "
-					+ ruleCounter.countObjectSomeValuesFromCompositionRule
-					+ "/"
-					+ decompositionRuleCounter.countIndexedObjectSomeValuesFromDecompositionRule
-					+ " (" + ruleTimer.timeObjectSomeValuesFromCompositionRule
-					/ numOfMeasurements_ + "/"
-					+ decompositionRuleTimer.timeIndexedObjectSomeValuesFrom
-					/ numOfMeasurements_ + " ms)");
+		print(printer, ContradicitonCompositionRule.NAME,
+				ruleCounter.countContradicitonCompositionRule,
+				ruleTimer.timeContradicitonCompositionRule);
 
-		if (ruleCounter.countObjectIntersectionOfCompositionRule
-				+ decompositionRuleCounter.countIndexedObjectIntersectionOfDecompositionRule > 0)
-			logger.debug("ObjectIntersectionOf composition/decomposition rules: "
-					+ ruleCounter.countObjectIntersectionOfCompositionRule
-					+ "/"
-					+ decompositionRuleCounter.countIndexedObjectIntersectionOfDecompositionRule
-					+ " ("
-					+ ruleTimer.timeObjectIntersectionOfCompositionRule
-					/ numOfMeasurements_
-					+ "/"
-					+ decompositionRuleTimer.timeIndexedObjectIntersectionOf
-					/ numOfMeasurements_ + " ms)");
+		print(printer, ContradictionFromDisjointnessRule.NAME,
+				ruleCounter.countContradictionFromDisjointnessRule,
+				ruleTimer.timeContradictionFromDisjointnessRule);
 
-		if (decompositionRuleCounter.countIndexedClassDecompositionRule > 0)
-			logger.debug("Class decomposition rules: "
-					+ decompositionRuleCounter.countIndexedClassDecompositionRule + " ("
-					+ decompositionRuleTimer.timeIndexedClass / numOfMeasurements_
-					+ " ms)");
+		print(printer, ContradictionFromNegationRule.NAME,
+				ruleCounter.countContradictionFromNegationRule,
+				ruleTimer.timeContradictionFromNegationRule);
 
-		logger.debug("Total rule time: "
-				+ (ruleTimer.timeContradictionBottomBackwardLinkRule
-						+ ruleTimer.timeDisjointnessAxiomCompositionRule
-						+ ruleTimer.timeDisjointnessAxiomContradictionRule
-						+ ruleTimer.timeForwardLinkBackwardLinkRule
-						+ ruleTimer.timeObjectIntersectionOfCompositionRule
-						+ ruleTimer.timeObjectSomeValuesFromCompositionRule
-						+ ruleTimer.timeOwlThingContextInitializationRule
-						+ ruleTimer.timeContextRootInitializationRule
-						+ ruleTimer.timePropagationBackwardLinkRule
-						+ ruleTimer.timeSubClassOfAxiomCompositionRule
-						+ decompositionRuleTimer.timeIndexedClass
-						+ decompositionRuleTimer.timeIndexedDataHasValue
-						+ decompositionRuleTimer.timeIndexedObjectIntersectionOf + decompositionRuleTimer.timeIndexedObjectSomeValuesFrom)
-				/ numOfMeasurements_ + " ms");
+		print(printer, ContradictionFromOwlNothingRule.NAME,
+				ruleCounter.countContradictionFromOwlNothingRule,
+				ruleTimer.timeContradictionFromOwlNothingRule);
+
+		print(printer, ContradictionOverBackwardLinkRule.NAME,
+				ruleCounter.countContradictionOverBackwardLinkRule,
+				ruleTimer.timeContradictionOverBackwardLinkRule);
+
+		print(printer, ContradictionPropagationRule.NAME,
+				ruleCounter.countContradictionPropagationRule,
+				ruleTimer.timeContradictionPropagationRule);
+
+		print(printer, DisjointSubsumerFromMemberRule.NAME,
+				ruleCounter.countDisjointSubsumerFromMemberRule,
+				ruleTimer.timeDisjointSubsumerFromMemberRule);
+
+		print(printer, IndexedObjectComplementOfDecomposition.NAME,
+				ruleCounter.countIndexedObjectComplementOfDecomposition,
+				ruleTimer.timeIndexedObjectComplementOfDecomposition);
+
+		print(printer, IndexedObjectIntersectionOfDecomposition.NAME,
+				ruleCounter.countIndexedObjectIntersectionOfDecomposition,
+				ruleTimer.timeIndexedObjectIntersectionOfDecomposition);
+
+		print(printer, IndexedObjectSomeValuesFromDecomposition.NAME,
+				ruleCounter.countIndexedObjectSomeValuesFromDecomposition,
+				ruleTimer.timeIndexedObjectSomeValuesFromDecomposition);
+
+		print(printer, NonReflexivePropagationRule.NAME,
+				ruleCounter.countNonReflexivePropagationRule,
+				ruleTimer.timeNonReflexivePropagationRule);
+
+		print(printer, ObjectIntersectionFromConjunctRule.NAME,
+				ruleCounter.countObjectIntersectionFromConjunctRule,
+				ruleTimer.timeObjectIntersectionFromConjunctRule);
+
+		print(printer, ObjectUnionFromDisjunctRule.NAME,
+				ruleCounter.countObjectUnionFromDisjunctRule,
+				ruleTimer.timeObjectUnionFromDisjunctRule);
+
+		print(printer, OwlThingContextInitRule.NAME,
+				ruleCounter.countOwlThingContextInitRule,
+				ruleTimer.timeOwlThingContextInitRule);
+
+		print(printer, PropagationFromExistentialFillerRule.NAME,
+				ruleCounter.countPropagationFromExistentialFillerRule,
+				ruleTimer.timePropagationFromExistentialFillerRule);
+
+		print(printer, ReflexivePropagationRule.NAME,
+				ruleCounter.countReflexivePropagationRule,
+				ruleTimer.timeReflexivePropagationRule);
+
+		print(printer, RootContextInitializationRule.NAME,
+				ruleCounter.countRootContextInitializationRule,
+				ruleTimer.timeRootContextInitializationRule);
+
+		print(printer, SubsumerBackwardLinkRule.NAME,
+				ruleCounter.countSubsumerBackwardLinkRule,
+				ruleTimer.timeSubsumerBackwardLinkRule);
+
+		print(printer, SuperClassFromSubClassRule.NAME,
+				ruleCounter.countSuperClassFromSubClassRule,
+				ruleTimer.timeSuperClassFromSubClassRule);
+
+		print(printer, ReflexiveBackwardLinkCompositionRule.NAME,
+				ruleCounter.countReflexiveBackwardLinkCompositionRule,
+				ruleTimer.timeReflexiveBackwardLinkCompositionRule);
+
+		print(printer, PropagationInitializationRule.NAME,
+				ruleCounter.countPropagationInitializationRule,
+				ruleTimer.timePropagationInitializationRule);
+
+		printer.printSeparator();
+
+		print(printer, "TOTAL RULES:", ruleCounter.getTotalRuleAppCount(),
+				ruleTimer.getTotalRuleAppTime());
+
+		printer.printSeparator();
 	}
 
 	public long getTotalRuleAppCount() {
-		return ruleCounter.getTotalRuleAppCount() + decompositionRuleCounter.getTotalRuleAppCount();
+		return ruleCounter.getTotalRuleAppCount();
 	}
-	
+
 	public double getTotalRuleTime() {
-		double compTotal = numOfMeasurements_ == 0 ? 0 : 1d*ruleTimer.getTotalRuleAppTime() / numOfMeasurements_;
-		double decompTotal = numOfMeasurements_ == 0 ? 0 : 1d*decompositionRuleTimer.getTotalRuleAppTime() / numOfMeasurements_;
-		
-		return compTotal + decompTotal;
+		return getNumberOfMeasurements() == 0 ? 0 : 1d
+				* ruleTimer.getTotalRuleAppTime() / getNumberOfMeasurements();
 	}
 }

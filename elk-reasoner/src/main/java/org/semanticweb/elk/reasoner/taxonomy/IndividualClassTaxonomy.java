@@ -34,6 +34,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableInstanceTaxonomy;
  * 
  */
 
-public interface IndividualClassTaxonomy extends UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> {
-	
+public interface IndividualClassTaxonomy extends
+		UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> {
+	// nothing more
 }

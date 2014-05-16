@@ -1,11 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-	http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>elk-parent</artifactId>
 		<groupId>org.semanticweb.elk</groupId>
-		<version>0.4.0-SNAPSHOT</version>
+		<version>0.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>elk-distribution</artifactId>
@@ -71,7 +69,6 @@
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-distribution</artifactId>
 			<version>${owlapi.version}</version>
-			<classifier>bin</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -173,16 +170,6 @@
 						<configuration>
 							<outputDirectory>${project.build.directory}</outputDirectory>
 							<resources>
-								<!-- filtering of the update.properties and version-info.txt files used for Protege
-										4 auto-update feature -->
-								<!--resource>
-									<directory>${basedir}/src/main/resources/protege</directory>
-									<filtering>true</filtering>
-									<includes>
-										<include>update.properties</include>
-										<include>version-info.txt</include>
-									</includes>
-								</resource-->
 								<resource>
 									<!-- filtering of the changes.xml file -->
 									<directory>${basedir}/src/changes</directory>
@@ -194,7 +181,6 @@
 							</resources>
 						</configuration>
 					</execution>
-
 
 					<execution>
 						<id>copy-update-properties-to-site</id>
@@ -252,7 +238,7 @@
 						</property>
 						<property>
 							<name>owlapi-path</name>
-							<value>${net.sourceforge.owlapi:owlapi-distribution:jar:bin}</value>
+							<value>${net.sourceforge.owlapi:owlapi-distribution:jar}</value>
 						</property>
 					</systemProperties>
 				</configuration>

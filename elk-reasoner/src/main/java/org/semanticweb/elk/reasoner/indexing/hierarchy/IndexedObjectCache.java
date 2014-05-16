@@ -22,15 +22,15 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.entries.IndexedEntryConverter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.collections.entryset.KeyEntry;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryFactory;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A cache of {@link IndexedObject}s in the ontology backed by a
@@ -44,13 +44,11 @@ import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
- * @seenElkObjectIndexerVisitor
- * 
  */
 public class IndexedObjectCache implements IndexedObjectFilter {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexedObjectCache.class);
 
 	protected final KeyEntryHashSet<IndexedClassExpression> indexedClassExpressionLookup;
@@ -61,8 +59,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	protected int indexedObjectPropertyCount = 0;
 
 	public IndexedObjectCache() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Creating new cache");
+		LOGGER_.trace("Creating new cache");
 
 		indexedClassExpressionLookup = new KeyEntryHashSet<IndexedClassExpression>(
 				new IndexedClassExpressionViewFactory(), 1024);
@@ -77,8 +74,8 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	}
 
 	public void clear() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Clear cache");
+		LOGGER_.trace("Clear cache");
+
 		indexedClassExpressionLookup.clear();
 		indexedPropertyChainLookup.clear();
 		indexedAxiomLookup.clear();
@@ -111,9 +108,6 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			if (ice.getCompositionRuleHead() != null)
 				throw new ElkUnexpectedIndexingException(
 						"Deleting object with registered rules: " + ice);
-			Context context = ice.getContext();
-			if (context != null)
-				context.removeLinks();
 			if (!ice.accept(deletor))
 				throw new ElkUnexpectedIndexingException(
 						"Cannot remove indexed object from the cache " + ice);
@@ -145,6 +139,14 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	}
 
 	@Override
+	public IndexedObjectComplementOf visit(IndexedObjectComplementOf element) {
+		return resolveCache(
+				(IndexedObjectComplementOf) indexedClassExpressionLookup
+						.get(element),
+				element);
+	}
+
+	@Override
 	public IndexedObjectIntersectionOf visit(IndexedObjectIntersectionOf element) {
 		return resolveCache(
 				(IndexedObjectIntersectionOf) indexedClassExpressionLookup
@@ -156,6 +158,14 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	public IndexedObjectSomeValuesFrom visit(IndexedObjectSomeValuesFrom element) {
 		return resolveCache(
 				(IndexedObjectSomeValuesFrom) indexedClassExpressionLookup
+						.get(element),
+				element);
+	}
+
+	@Override
+	public IndexedObjectUnionOf visit(IndexedObjectUnionOf element) {
+		return resolveCache(
+				(IndexedObjectUnionOf) indexedClassExpressionLookup
 						.get(element),
 				element);
 	}
@@ -201,55 +211,60 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	final IndexedObjectVisitor<Boolean> inserter = new IndexedObjectVisitor<Boolean>() {
 		@Override
 		public Boolean visit(IndexedClass element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
 			if (indexedClassExpressionLookup.add(element)) {
 				indexedClassCount++;
 				return true;
-			} else
-				return false;
+			}
+			return false;
 		}
 
 		@Override
 		public Boolean visit(IndexedIndividual element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
 			if (indexedClassExpressionLookup.add(element)) {
 				indexedIndividualCount++;
 				return true;
-			} else
-				return false;
+			}
+			return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectComplementOf element) {
+			LOGGER_.trace("Adding {}", element);
+			return indexedClassExpressionLookup.add(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectIntersectionOf element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
 			return indexedClassExpressionLookup.add(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectSomeValuesFrom element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
+			return indexedClassExpressionLookup.add(element);
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectUnionOf element) {
+			LOGGER_.trace("Adding {}", element);
 			return indexedClassExpressionLookup.add(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedDataHasValue element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
 			return indexedClassExpressionLookup.add(element);
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectProperty element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
 			if (indexedPropertyChainLookup.add(element)) {
 				indexedObjectPropertyCount++;
-				if (SaturatedPropertyChain.isRelevant(element))
-					SaturatedPropertyChain.getCreate(element);
+				SaturatedPropertyChain.getCreate(element);
 				return true;
 			}
 			return false;
@@ -257,11 +272,10 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedBinaryPropertyChain element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + element);
+			LOGGER_.trace("Adding {}", element);
+
 			if (indexedPropertyChainLookup.add(element)) {
-				if (SaturatedPropertyChain.isRelevant(element))
-					SaturatedPropertyChain.getCreate(element);
+				SaturatedPropertyChain.getCreate(element);
 				return true;
 			}
 			return false;
@@ -275,78 +289,80 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedDisjointnessAxiom axiom) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Adding " + axiom);
+			LOGGER_.trace("Adding {}", axiom);
 			return indexedAxiomLookup.add(axiom);
 		}
+
 	};
 
 	final IndexedObjectVisitor<Boolean> deletor = new IndexedObjectVisitor<Boolean>() {
 
 		@Override
 		public Boolean visit(IndexedClass element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+			LOGGER_.trace("Removing {}", element);
 
 			if (indexedClassExpressionLookup.removeEntry(element) != null) {
 				indexedClassCount--;
 				return true;
-			} else
-				return false;
+			}
+			return false;
 		}
 
 		@Override
 		public Boolean visit(IndexedIndividual element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+			LOGGER_.trace("Removing {}", element);
 
 			if (indexedClassExpressionLookup.removeEntry(element) != null) {
 				indexedIndividualCount--;
 				return true;
-			} else
-				return false;
+			}
+			return false;
+		}
+
+		@Override
+		public Boolean visit(IndexedObjectComplementOf element) {
+			LOGGER_.trace("Removing {}", element);
+			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectIntersectionOf element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
-
+			LOGGER_.trace("Removing {}", element);
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectSomeValuesFrom element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+			LOGGER_.trace("Removing {}", element);
+			return indexedClassExpressionLookup.removeEntry(element) != null;
+		}
 
+		@Override
+		public Boolean visit(IndexedObjectUnionOf element) {
+			LOGGER_.trace("Removing {}", element);
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
 		public Boolean visit(IndexedDataHasValue element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
-
+			LOGGER_.trace("Removing {}", element);
 			return indexedClassExpressionLookup.removeEntry(element) != null;
 		}
 
 		@Override
 		public Boolean visit(IndexedObjectProperty element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+			LOGGER_.trace("Removing {}", element);
 
 			if (indexedPropertyChainLookup.removeEntry(element) != null) {
 				indexedObjectPropertyCount--;
 				return true;
-			} else
-				return false;
+			}
+			return false;
 		}
 
 		@Override
 		public Boolean visit(IndexedBinaryPropertyChain element) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + element);
+			LOGGER_.trace("Removing {}", element);
 
 			return indexedPropertyChainLookup.removeEntry(element) != null;
 		}
@@ -359,11 +375,11 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedDisjointnessAxiom axiom) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("Removing " + axiom);
+			LOGGER_.trace("Removing {}", axiom);
 
 			return indexedAxiomLookup.removeEntry(axiom) != null;
 		}
+
 	};
 
 	private class IndexedAxiomViewFactory implements

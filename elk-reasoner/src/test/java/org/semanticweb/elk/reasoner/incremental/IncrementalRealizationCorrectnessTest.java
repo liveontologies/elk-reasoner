@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.log4j.Level;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
@@ -44,6 +43,8 @@ import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
 
 /**
  * @author Pavel Klinov
@@ -61,21 +62,21 @@ public class IncrementalRealizationCorrectnessTest extends
 
 	@Override
 	protected void applyChanges(final Reasoner reasoner,
-			final Iterable<ElkAxiom> changes,
-			final IncrementalChangeType type) {
-		reasoner.registerOntologyChangesLoader(new TestChangesLoader(changes, type));
+			final Iterable<ElkAxiom> changes, final IncrementalChangeType type) {
+		reasoner.registerAxiomLoader(new TestChangesLoader(changes, type));
 	}
 
 	@Override
-	protected void dumpChangeToLog(ElkAxiom change, Level level) {
-		LOGGER_.log(level, OwlFunctionalStylePrinter.toString(change) + ": deleted");
+	protected void dumpChangeToLog(ElkAxiom change, LogLevel level) {
+		LoggerWrap.log(LOGGER_, level,
+				OwlFunctionalStylePrinter.toString(change) + ": deleted");
 	}
 
 	@Override
 	protected void loadAxioms(InputStream stream,
-			final List<ElkAxiom> staticAxioms,
-			final OnOffVector<ElkAxiom> changingAxioms) throws IOException,
-			Owl2ParseException {
+			final List<ElkAxiom> inputStaticAxioms,
+			final OnOffVector<ElkAxiom> inputChangingAxioms)
+			throws IOException, Owl2ParseException {
 
 		Owl2Parser parser = new Owl2FunctionalStyleParserFactory()
 				.getParser(stream);
@@ -83,18 +84,18 @@ public class IncrementalRealizationCorrectnessTest extends
 
 			@Override
 			public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
+				// does nothing
 			}
 
 			@Override
 			public void visit(ElkAxiom elkAxiom) throws Owl2ParseException {
-				/*if (elkAxiom instanceof ElkClassAxiom
-						|| elkAxiom instanceof ElkAssertionAxiom) {
-					changingAxioms.add(elkAxiom);
-				} else {
-					staticAxioms.add(elkAxiom);
-				}*/
+				/*
+				 * if (elkAxiom instanceof ElkClassAxiom || elkAxiom instanceof
+				 * ElkAssertionAxiom) { changingAxioms.add(elkAxiom); } else {
+				 * staticAxioms.add(elkAxiom); }
+				 */
 				// all axioms are dynamic
-				changingAxioms.add(elkAxiom);
+				inputChangingAxioms.add(elkAxiom);
 			}
 
 			@Override
@@ -107,7 +108,8 @@ public class IncrementalRealizationCorrectnessTest extends
 	@Override
 	protected Reasoner getReasoner(final Iterable<ElkAxiom> axioms) {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(
-				new TestChangesLoader(axioms, IncrementalChangeType.ADD), new PostProcessingStageExecutor());
+				new TestChangesLoader(axioms, IncrementalChangeType.ADD),
+				new PostProcessingStageExecutor());
 
 		return reasoner;
 	}

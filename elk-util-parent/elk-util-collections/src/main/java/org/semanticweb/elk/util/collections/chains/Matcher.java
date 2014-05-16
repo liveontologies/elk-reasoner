@@ -41,7 +41,7 @@ public interface Matcher<I, O> {
 	 *            the candidate element to test
 	 * @return the element which is physically equal (according to {@code ==})
 	 *         to the input element, if the input element satisfies the matching
-	 *         condition, or {@link null} otherwise.
+	 *         condition, or {@code null} otherwise.
 	 */
 	O match(I candidate);
 

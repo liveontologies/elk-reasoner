@@ -28,9 +28,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.reasoner.ReasonerComputation;
+import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
@@ -38,13 +37,17 @@ import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ReasonerComputation} for checking consistency of the ontology. This
- * is done by checking consistency of {@code owl:Thing} and of all individuals
- * occurring in the ontology.
+ * A {@link ReasonerComputationWithInputs} for checking consistency of the
+ * ontology. This is done by checking consistency of {@code owl:Thing} and of
+ * all individuals occurring in the ontology.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
@@ -52,10 +55,10 @@ import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
  */
 public class ConsistencyChecking
 		extends
-		ReasonerComputation<SaturationJob<IndexedClassEntity>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>> {
+		ReasonerComputationWithInputs<SaturationJob<IndexedClassEntity>, ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ConsistencyChecking.class);
 
 	/**
@@ -101,8 +104,6 @@ public class ConsistencyChecking
 	 *            the entities to check for consistency
 	 * @param consistencyMonitor
 	 *            the monitor for the consistency status
-	 * @param ontologyIndex
-	 *            the indexed representation of the ontology
 	 * @param executor
 	 *            the executor service used for running the tasks by the
 	 *            reasoner
@@ -113,22 +114,22 @@ public class ConsistencyChecking
 	 */
 	public ConsistencyChecking(Collection<IndexedClassEntity> inputEntities,
 			ConsistencyMonitor consistencyMonitor,
-			SaturationState saturationState, ComputationExecutor executor,
+			SaturationState<?> saturationState, ComputationExecutor executor,
 			int maxWorkers, ProgressMonitor progressMonitor) {
 		this(
 				new TodoJobs(inputEntities, consistencyMonitor),
 				consistencyMonitor,
 				new ClassExpressionSaturationFactory<SaturationJob<IndexedClassEntity>>(
-						saturationState, maxWorkers,
-						new ThisClassExpressionSaturationListener(
+						new RuleApplicationAdditionFactory(saturationState),
+						maxWorkers, new ThisClassExpressionSaturationListener(
 								consistencyMonitor)), executor, maxWorkers,
 				progressMonitor);
 	}
 
 	public SaturationStatistics getRuleAndConclusionStatistics() {
-		return inputProcessorFactory.getRuleAndConclusionStatistics();
-	}	
-	
+		return processorFactory.getRuleAndConclusionStatistics();
+	}
+
 	/**
 	 * @param ontologyIndex
 	 *            the representation of the ontology
@@ -139,36 +140,35 @@ public class ConsistencyChecking
 	public static Collection<IndexedClassEntity> getTestEntities(
 			final OntologyIndex ontologyIndex) {
 		if (!ontologyIndex.getIndexedOwlNothing().occursPositively()) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("owl:Nothing does not occur positively; ontology is consistent");
+			LOGGER_.trace("owl:Nothing does not occur positively; ontology is consistent");
 			/*
 			 * if the ontology does not have any positive occurrence of bottom,
 			 * everything is always consistent
 			 */
 			return Collections.emptySet();
-		} else {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("owl:Nothing occurs positively");
-			/*
-			 * first consistency is checked for {@code owl:Thing}, then for the
-			 * individuals in the ontology
-			 */
-			return new AbstractCollection<IndexedClassEntity>() {
-
-				@Override
-				public Iterator<IndexedClassEntity> iterator() {
-					return Operations.concat(
-							Operations.singleton(ontologyIndex
-									.getIndexedOwlThing()),
-							ontologyIndex.getIndexedIndividuals()).iterator();
-				}
-
-				@Override
-				public int size() {
-					return ontologyIndex.getIndexedIndividuals().size() + 1;
-				}
-			};
 		}
+		// else
+		LOGGER_.trace("owl:Nothing occurs positively");
+		/*
+		 * first consistency is checked for {@code owl:Thing}, then for the
+		 * individuals in the ontology
+		 */
+		return new AbstractCollection<IndexedClassEntity>() {
+
+			@Override
+			public Iterator<IndexedClassEntity> iterator() {
+				return Operations
+						.concat(Operations.singleton(ontologyIndex
+								.getIndexedOwlThing()),
+								ontologyIndex.getIndexedIndividuals())
+						.iterator();
+			}
+
+			@Override
+			public int size() {
+				return ontologyIndex.getIndexedIndividuals().size() + 1;
+			}
+		};
 	}
 
 	/**
@@ -186,7 +186,7 @@ public class ConsistencyChecking
 	 */
 	public ConsistencyChecking(ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor, OntologyIndex ontologyIndex,
-			SaturationState saturationState) {
+			SaturationState<?> saturationState) {
 		this(getTestEntities(ontologyIndex), new ConsistencyMonitor(),
 				saturationState, executor, maxWorkers, progressMonitor);
 	}
@@ -211,7 +211,7 @@ public class ConsistencyChecking
 	 * Print statistics about consistency checking
 	 */
 	public void printStatistics() {
-		inputProcessorFactory.printStatistics();
+		processorFactory.printStatistics();
 	}
 
 	/**
@@ -232,12 +232,14 @@ public class ConsistencyChecking
 
 		@Override
 		public void notifyFinished(SaturationJob<IndexedClassEntity> job) {
-			if (job.getOutput().isInconsistent())
+			if (job.getOutput().containsConclusion(
+					ContradictionImpl.getInstance()))
 				consistenceMonitor.setInconsistent();
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(job.getInput()
 						+ ": consistency checking finished: "
-						+ (job.getOutput().isInconsistent() ? "inconsistent"
+						+ (job.getOutput().containsConclusion(
+								ContradictionImpl.getInstance()) ? "inconsistent"
 								: "satisfiable"));
 		}
 
@@ -252,10 +254,10 @@ public class ConsistencyChecking
 	 */
 	static class ConsistencyMonitor {
 		private volatile boolean inconsistent_ = false;
-		private volatile Thread controlThread;
+		private volatile Thread controlThread_;
 
 		public void registerThreadToInterrupt(Thread controlThread) {
-			this.controlThread = controlThread;
+			this.controlThread_ = controlThread;
 		}
 
 		public void registerCurrentThreadToInterrupt() {
@@ -263,7 +265,7 @@ public class ConsistencyChecking
 		}
 
 		public void clearThreadToInterrupt() {
-			this.controlThread = null;
+			this.controlThread_ = null;
 		}
 
 		public boolean isInconsistent() {
@@ -273,8 +275,8 @@ public class ConsistencyChecking
 		public void setInconsistent() {
 			inconsistent_ = true;
 			// interrupt the reasoner
-			if (controlThread != null)
-				controlThread.interrupt();
+			if (controlThread_ != null)
+				controlThread_.interrupt();
 		}
 
 	}
@@ -316,22 +318,21 @@ public class ConsistencyChecking
 				public boolean hasNext() {
 					if (consistencyMonitor.isInconsistent())
 						return false;
-					else
-						return inputsIterator.hasNext();
+					// else
+					return inputsIterator.hasNext();
 				}
 
 				@Override
 				public SaturationJob<IndexedClassEntity> next() {
 					if (consistencyMonitor.isInconsistent())
 						throw new NoSuchElementException();
-					else {
-						SaturationJob<IndexedClassEntity> job = new SaturationJob<IndexedClassEntity>(
-								inputsIterator.next());
-						if (LOGGER_.isTraceEnabled())
-							LOGGER_.trace(job.getInput()
-									+ ": consistency checking submitted");
-						return job;
-					}
+					// else
+					SaturationJob<IndexedClassEntity> job = new SaturationJob<IndexedClassEntity>(
+							inputsIterator.next());
+					if (LOGGER_.isTraceEnabled())
+						LOGGER_.trace(job.getInput()
+								+ ": consistency checking submitted");
+					return job;
 				}
 
 				@Override

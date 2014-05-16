@@ -76,10 +76,6 @@ public class InstanceTaxonomyComputationFactory implements
 	 * transitive reduction
 	 */
 	private final TransitiveReductionOutputProcessor outputProcessor_;
-	/**
-	 * The reference to cache the value of the top node for frequent use
-	 */
-	private final UpdateableTypeNode<ElkClass, ElkNamedIndividual> topNode_;//NonBottomClassNode topNode_;
 
 	/**
 	 * Create a shared engine for the input ontology index and a partially
@@ -96,7 +92,7 @@ public class InstanceTaxonomyComputationFactory implements
 	 *            results in
 	 */
 	public InstanceTaxonomyComputationFactory(
-			SaturationState saturationState,
+			SaturationState<?> saturationState,
 			int maxWorkers,
 			UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> partialTaxonomy) {
 		this.taxonomy_ = partialTaxonomy;
@@ -104,7 +100,6 @@ public class InstanceTaxonomyComputationFactory implements
 				saturationState, maxWorkers,
 				new ThisTransitiveReductionListener());
 		this.outputProcessor_ = new TransitiveReductionOutputProcessor();
-		this.topNode_ = partialTaxonomy.getUpdateableTopNode();
 	}
 
 	/**
@@ -152,12 +147,7 @@ public class InstanceTaxonomyComputationFactory implements
 								.getEquivalent());
 				assignDirectTypeNode(node, superNode);
 			}
-			// if there are no direct type nodes, then the top node is the
-			// only direct type node
-			if (node.getDirectTypeNodes().isEmpty()) {
-				assignDirectTypeNode(node, topNode_);
-			}
-			
+
 			node.trySetModified(false);
 		}
 

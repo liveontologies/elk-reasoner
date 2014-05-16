@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.reduction;
 import java.util.Iterator;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.SaturationState;
 
 /**
  * The intermediate state of the transitive reduction computation.
@@ -56,12 +57,13 @@ class TransitiveReductionState<R extends IndexedClassExpression, J extends Trans
 	 * saturation is already computed for the root of the initiator job.
 	 * 
 	 * @param initiatorJob
+	 * @param saturationState
 	 */
-	TransitiveReductionState(J initiatorJob) {
+	TransitiveReductionState(J initiatorJob, SaturationState<?> saturationState) {
 		this.initiatorJob = initiatorJob;
 		R root = initiatorJob.getInput();
 		this.output = new TransitiveReductionOutputEquivalentDirect<R>(root);
-		this.subsumerIterator = root.getContext().getSubsumers()
+		this.subsumerIterator = saturationState.getContext(root).getSubsumers()
 				.iterator();
 	}
 }

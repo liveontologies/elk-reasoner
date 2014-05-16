@@ -68,12 +68,10 @@ public class IncrementalModeSwitchTest {
 	@Test
 	public void testAddedTransitivity() throws ElkException {
 		TestChangesLoader loader = new TestChangesLoader();
-		TestChangesLoader changeLoader = new TestChangesLoader();
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(loader,
 				new PostProcessingStageExecutor());
 
 		reasoner.setAllowIncrementalMode(false);
-		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
 		ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
@@ -97,6 +95,9 @@ public class IncrementalModeSwitchTest {
 				.contains(taxonomy.getNode(D)));
 
 		reasoner.setAllowIncrementalMode(true);
+		TestChangesLoader changeLoader = new TestChangesLoader();
+		reasoner.registerAxiomLoader(changeLoader);
+
 		changeLoader.add(axTransR);
 
 		taxonomy = reasoner.getTaxonomyQuietly();
@@ -120,13 +121,11 @@ public class IncrementalModeSwitchTest {
 		List<ElkAxiom> ontology = loadAxioms(new StringReader(initial));
 		List<ElkAxiom> additions = loadAxioms(new StringReader(toAdd));
 		TestChangesLoader initialLoader = new TestChangesLoader();
-		TestChangesLoader changeLoader = new TestChangesLoader();
 
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(initialLoader,
 				new LoggingStageExecutor());
 
 		reasoner.setAllowIncrementalMode(false);
-		reasoner.registerOntologyChangesLoader(changeLoader);
 
 		for (ElkAxiom axiom : ontology) {
 			initialLoader.add(axiom);
@@ -138,6 +137,9 @@ public class IncrementalModeSwitchTest {
 		System.out.println("===========================================");
 
 		reasoner.setAllowIncrementalMode(true);
+
+		TestChangesLoader changeLoader = new TestChangesLoader();
+		reasoner.registerAxiomLoader(changeLoader);
 
 		for (ElkAxiom add : additions) {
 			changeLoader.add(add);
@@ -156,6 +158,7 @@ public class IncrementalModeSwitchTest {
 
 			@Override
 			public void visit(ElkPrefix elkPrefix) throws Owl2ParseException {
+				// does nothing
 			}
 
 			@Override

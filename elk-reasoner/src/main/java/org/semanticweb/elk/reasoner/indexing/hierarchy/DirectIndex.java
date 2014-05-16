@@ -28,25 +28,18 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
-import org.semanticweb.elk.reasoner.saturation.conclusions.PositiveSubsumer;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
-import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
-import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.ModifiableLinkImpl;
-import org.semanticweb.elk.util.collections.chains.ReferenceFactory;
-import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * 
@@ -54,19 +47,18 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  */
 public class DirectIndex implements ModifiableOntologyIndex {
 
-	protected static final Logger LOGGER_ = Logger
-			.getLogger(DirectIndex.class);
-	
 	final IndexedClass indexedOwlThing, indexedOwlNothing;
 
 	final IndexedObjectCache objectCache;
-	// the context root initialization rule is always registered
-	private ChainableRule<Context> contextInitRules_ = new ContextRootInitializationRule();
+	private ChainableContextInitRule contextInitRules_;
 
 	private final Set<IndexedObjectProperty> reflexiveObjectProperties_;
 
 	public DirectIndex(IndexedObjectCache objectCache) {
 		this.objectCache = objectCache;
+
+		// the context root initialization rule is always registered
+		RootContextInitializationRule.addRuleFor(this);
 
 		// index predefined entities
 		MainAxiomIndexerVisitor tmpAxiomInserter = new MainAxiomIndexerVisitor(
@@ -88,7 +80,7 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	/* read-only methods required by the interface */
 
 	@Override
-	public LinkRule<Context> getContextInitRuleHead() {
+	public LinkedContextInitRule getContextInitRuleHead() {
 		return contextInitRules_;
 	}
 
@@ -196,12 +188,12 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	@Override
-	public void addContextInitRule(ChainableRule<Context> newRule) {
+	public void addContextInitRule(ChainableContextInitRule newRule) {
 		newRule.addTo(getContextInitRuleChain());
 	}
 
 	@Override
-	public void removeContextInitRule(ChainableRule<Context> oldRule) {
+	public void removeContextInitRule(ChainableContextInitRule oldRule) {
 		if (!oldRule.removeFrom(getContextInitRuleChain()))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove context initialization rule "
@@ -209,13 +201,12 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	@Override
-	public void add(IndexedClassExpression target, ChainableRule<Context> rule) {
+	public void add(IndexedClassExpression target, ChainableSubsumerRule rule) {
 		rule.addTo(target.getCompositionRuleChain());
 	}
 
 	@Override
-	public void remove(IndexedClassExpression target,
-			ChainableRule<Context> rule) {
+	public void remove(IndexedClassExpression target, ChainableSubsumerRule rule) {
 		if (!rule.removeFrom(target.getCompositionRuleChain()))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove composition rule " + rule.getName()
@@ -232,12 +223,6 @@ public class DirectIndex implements ModifiableOntologyIndex {
 		if (!oldObject.accept(objectCache.deletor))
 			throw new ElkUnexpectedIndexingException(
 					"Cannot remove indexed object from the cache " + oldObject);
-		if (oldObject instanceof IndexedClassExpression) {
-			IndexedClassExpression ice = (IndexedClassExpression) oldObject;
-			Context context = ice.getContext();
-			if (context != null)
-				context.removeLinks();
-		}
 	}
 
 	@Override
@@ -259,87 +244,19 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	 *         this {@link OntologyIndex}; it can be used for inserting new
 	 *         rules or deleting existing ones
 	 */
-	public Chain<ChainableRule<Context>> getContextInitRuleChain() {
-		return new AbstractChain<ChainableRule<Context>>() {
+	public Chain<ChainableContextInitRule> getContextInitRuleChain() {
+		return new AbstractChain<ChainableContextInitRule>() {
 
 			@Override
-			public ChainableRule<Context> next() {
+			public ChainableContextInitRule next() {
 				return contextInitRules_;
 			}
 
 			@Override
-			public void setNext(ChainableRule<Context> tail) {
+			public void setNext(ChainableContextInitRule tail) {
 				contextInitRules_ = tail;
 			}
 		};
 	}
-	
-	
-	/**
-	 * Adds root to the context
-	 */
-	public static class ContextRootInitializationRule extends
-			ModifiableLinkImpl<ChainableRule<Context>> implements
-			ChainableRule<Context> {
-
-		public static final String NAME = "Root Introduction";
-
-		private ContextRootInitializationRule(ChainableRule<Context> tail) {
-			super(tail);
-		}
-
-		public ContextRootInitializationRule() {
-			super(null);
-		}
-
-		@Override
-		public String getName() {
-			return NAME;
-		}
-
-		@Override
-		public void apply(BasicSaturationStateWriter writer, Context context) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Applying " + NAME + " to " + context);
-			}
-			
-			writer.produce(context, new PositiveSubsumer(context.getRoot()));
-		}
-
-		private static final Matcher<ChainableRule<Context>, ContextRootInitializationRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableRule<Context>, ContextRootInitializationRule>(
-				ContextRootInitializationRule.class);
-
-		private static final ReferenceFactory<ChainableRule<Context>, ContextRootInitializationRule> FACTORY_ = new ReferenceFactory<ChainableRule<Context>, ContextRootInitializationRule>() {
-			@Override
-			public ContextRootInitializationRule create(
-					ChainableRule<Context> tail) {
-				return new ContextRootInitializationRule(tail);
-			}
-		};
-
-		@Override
-		public boolean addTo(Chain<ChainableRule<Context>> ruleChain) {
-			ContextRootInitializationRule rule = ruleChain.find(MATCHER_);
-
-			if (rule == null) {
-				ruleChain.getCreate(MATCHER_, FACTORY_);
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-		@Override
-		public boolean removeFrom(Chain<ChainableRule<Context>> ruleChain) {
-			return ruleChain.remove(MATCHER_) != null;
-		}
-
-		@Override
-		public void accept(RuleApplicationVisitor visitor,
-				BasicSaturationStateWriter writer, Context context) {
-			visitor.visit(this, writer, context);
-		}
-
-	}	
 
 }

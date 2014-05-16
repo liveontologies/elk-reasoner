@@ -31,7 +31,7 @@ import java.io.IOException;
 import org.junit.Test;
 import org.semanticweb.elk.config.ConfigurationException;
 import org.semanticweb.elk.config.ConfigurationFactory;
-import org.semanticweb.elk.loading.EmptyOntologyLoader;
+import org.semanticweb.elk.loading.EmptyAxiomLoader;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.stages.FailingOnInterruptStageExecutor;
 
@@ -48,8 +48,7 @@ public class ReasonerFactoryTest {
 	@Test
 	public void createReasonerDefaultConfig() {
 		Reasoner reasoner = new ReasonerFactory().createReasoner(
-				new EmptyOntologyLoader(),
-				new FailingOnInterruptStageExecutor());
+				new EmptyAxiomLoader(), new FailingOnInterruptStageExecutor());
 
 		assertEquals(Runtime.getRuntime().availableProcessors(),
 				reasoner.getNumberOfWorkers());
@@ -59,8 +58,7 @@ public class ReasonerFactoryTest {
 	public void createReasonerCustomConfig() throws ConfigurationException,
 			IOException {
 		Reasoner reasoner = new ReasonerFactory().createReasoner(
-				new EmptyOntologyLoader(),
-				new FailingOnInterruptStageExecutor(),
+				new EmptyAxiomLoader(), new FailingOnInterruptStageExecutor(),
 				(ReasonerConfiguration) new ConfigurationFactory()
 						.getConfiguration(getClass().getClassLoader()
 								.getResourceAsStream("elk_test.properties"),

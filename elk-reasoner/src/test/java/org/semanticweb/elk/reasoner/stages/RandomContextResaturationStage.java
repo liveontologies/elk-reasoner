@@ -32,16 +32,20 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationNoInput;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.ContextCleaningFactory;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationDeletionNotSaturatedFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Pavel Klinov
@@ -50,7 +54,7 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  */
 public class RandomContextResaturationStage extends AbstractReasonerStage {
 
-	static final Logger LOGGER_ = Logger
+	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(RandomContextResaturationStage.class);
 
 	private final double RATIO_ = 0.2;
@@ -72,45 +76,42 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		// init them for deletions
 		initContexts(contexts);
 		// and now clean then up
-		RuleApplicationFactory cleaningFactory = new ContextCleaningFactory(
+		RuleApplicationFactory<?> cleaningFactory = new RuleApplicationDeletionNotSaturatedFactory(
 				reasoner.saturationState);
 
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Starting random contexts cleaning");
-		}
+		LOGGER_.trace("Starting random contexts cleaning");
 
-		ClassExpressionNoInputSaturation cleaning = new ClassExpressionNoInputSaturation(
+		ClassExpressionSaturationNoInput cleaning = new ClassExpressionSaturationNoInput(
 				reasoner.getProcessExecutor(), reasoner.getNumberOfWorkers(),
-				reasoner.getProgressMonitor(), cleaningFactory,
-				ContextModificationListener.DUMMY);
+				cleaningFactory, ContextModificationListener.DUMMY);
 
 		cleaning.process();
 
 		initContexts(contexts);
 		// re-saturate
-		RuleApplicationFactory resatFactory = new RuleApplicationFactory(
+		RuleApplicationAdditionFactory resatFactory = new RuleApplicationAdditionFactory(
 				reasoner.saturationState);
 
-		ClassExpressionNoInputSaturation saturation = new ClassExpressionNoInputSaturation(
+		ClassExpressionSaturationNoInput saturation = new ClassExpressionSaturationNoInput(
 				reasoner.getProcessExecutor(), reasoner.getNumberOfWorkers(),
-				reasoner.getProgressMonitor(), resatFactory,
-				ContextModificationListener.DUMMY);
+				resatFactory, ContextModificationListener.DUMMY);
 
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Starting random contexts resaturation");
-		}
+		LOGGER_.trace("Starting random contexts resaturation");
 
 		saturation.process();
 
 		markAllContextsAsSaturated();
 	}
 
-	private void initContexts(Collection<IndexedClassExpression> contexts) {
-		for (IndexedClassExpression ice : contexts) {
-			if (ice.getContext() != null) {
-				reasoner.saturationState.getExtendedWriter(
-						ConclusionVisitor.DUMMY).initContext(ice.getContext());
-			}
+	private void initContexts(Collection<IndexedClassExpression> roots) {
+		Conclusion init = new ContextInitializationImpl(
+				reasoner.saturationState.getOntologyIndex());
+
+		SaturationStateWriter<?> writer = reasoner.saturationState
+				.getContextCreatingWriter();
+		for (IndexedClassExpression root : roots) {
+			if (reasoner.saturationState.getContext(root) != null)
+				writer.produce(root, init);
 		}
 	}
 
@@ -129,21 +130,16 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 		int i = 0;
 
 		for (IndexedClassExpression ice : ices) {
+			SaturationStateWriter<?> writer = reasoner.saturationState
+					.getContextModifyingWriter();
 			if (indexes.contains(i)) {
-				if (ice.getContext() != null) {
-					reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY)
-							.markAsNotSaturated(ice.getContext());
-				}
-
+				writer.markAsNotSaturated(ice);
 				contexts.add(ice);
 			}
-
 			i++;
 		}
 
-		if (LOGGER_.isTraceEnabled()) {
-			LOGGER_.trace("Random contexts picked: " + contexts);
-		}
+		LOGGER_.trace("Random contexts picked: {}", contexts);
 
 		return contexts;
 	}
@@ -160,6 +156,7 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
+		// nothing
 	}
 
 }

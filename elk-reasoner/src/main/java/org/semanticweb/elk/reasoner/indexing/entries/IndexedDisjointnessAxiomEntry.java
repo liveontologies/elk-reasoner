@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <T> {@in
+ * @param <T> 
  *            The type of the elements in the set where this entry is used
  * 
  * @param <K>

@@ -21,7 +21,8 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.taxonomy.BasicTaxonomyValidator;
@@ -41,7 +42,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
  */
 public class ValidateTaxonomyStage extends BasePostProcessingStage {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContextSaturationFlagCheckingStage.class);	
 
 	private final Taxonomy<ElkClass> taxonomy_;

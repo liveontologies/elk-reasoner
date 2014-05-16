@@ -81,9 +81,16 @@ public interface Multimap<Key, Value> {
 	 * @param value
 	 *            the value of the pair
 	 * @return <tt>true</tt> if the multimap has changed as a result of the
-	 *         operation, <tt>fase</tt> otherwise
+	 *         operation, <tt>false</tt> otherwise
 	 */
 	boolean remove(Object key, Object value);
+	
+	/**
+	 * Removes all values for the given key
+	 * @param key
+	 * @return 
+	 */
+	Collection<Value> remove(Object key);
 
 	/**
 	 * Checks if this multimap is empty

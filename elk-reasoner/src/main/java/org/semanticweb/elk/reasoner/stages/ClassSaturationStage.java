@@ -22,9 +22,17 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.NonRedundantRuleApplicationVisitorFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RedundantRuleApplicationVisitorFactory;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.RuleApplicationVisitorFactory;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.tracing.factories.RuleApplicationFactoryWithTracing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ReasonerStage} which computes saturation for every class of the
@@ -35,7 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
 public class ClassSaturationStage extends AbstractReasonerStage {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassSaturationStage.class);
 
 	/**
@@ -57,10 +65,31 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
+
+		RuleApplicationFactory<Context> ruleFactory = null;
+		RuleApplicationVisitorFactory ruleAppVisitorFactory = null;
+		
+		if (reasoner.REDUNDANT_RULES) {
+			ruleAppVisitorFactory = new RedundantRuleApplicationVisitorFactory();
+		}
+		else {
+			ruleAppVisitorFactory = new NonRedundantRuleApplicationVisitorFactory();
+		}
+
+		if (reasoner.FULL_TRACING) {
+			reasoner.resetTraceState();
+			ruleFactory = new RuleApplicationFactoryWithTracing(
+					reasoner.saturationState, reasoner.traceState
+							.getTraceStore().getWriter(), ruleAppVisitorFactory);
+		} else {
+			ruleFactory = new RuleApplicationAdditionFactory(
+					reasoner.saturationState, ruleAppVisitorFactory);
+		}
+
 		this.computation_ = new ClassExpressionSaturation<IndexedClass>(
 				reasoner.ontologyIndex.getIndexedClasses(),
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), reasoner.saturationState);
+				reasoner.getProgressMonitor(), ruleFactory);
 		if (LOGGER_.isInfoEnabled())
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		return true;

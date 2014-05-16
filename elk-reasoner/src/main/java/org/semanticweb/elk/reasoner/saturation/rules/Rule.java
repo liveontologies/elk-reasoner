@@ -1,6 +1,9 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
 
-import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 
 /*
  * #%L
@@ -25,30 +28,42 @@ import org.semanticweb.elk.reasoner.saturation.BasicSaturationStateWriter;
  */
 
 /**
- * A rule that can be applied to elements of a particular type within a
- * {@link SaturationStateImpl.AbstractWriter}.
+ * A rule that can be applied to a given {@link Conclusion} together with other
+ * {@link Conclusion}s stored in within {@link ContextPremises}. The rule
+ * produces other {@link Conclusion}s using the given
+ * {@link SaturationStateWriter}.
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <E>
- *            the type of elements to which the rule can be applied
+ * @param <P>
+ *            the type of premises to which the rule can be applied
  */
-public interface Rule<E> {
-
-	/**
-	 * Applying the rule to an element within a {@link SaturationStateImpl.Writer}
-	 * 
-	 * @param engine
-	 *            a {@link BasicSaturationStateWriter} which could be changed as a
-	 *            result of this rule's application
-	 * @param element
-	 *            the element to which the rule is applied
-	 */
-	public void apply(BasicSaturationStateWriter engine, E element);
+public interface Rule<P> {
 
 	/**
 	 * @return the name of this rule
 	 */
 	public String getName();
+
+	/**
+	 * Applying the rule to the given premise within the given {@link Context}
+	 * and producing {@link Conclusion}s using the given
+	 * {@link SaturationStateWriter}
+	 * 
+	 * @param premise
+	 *            the element to which the rule is applied
+	 * @param premises
+	 *            the {@link Context} from which other matching premises of the
+	 *            rule are taken
+	 * @param producer
+	 *            the {@link ConclusionProducer} using which {@link Conclusion}s
+	 *            of the inferences are produced
+	 * 
+	 */
+	public void apply(P premise, ContextPremises premises,
+			ConclusionProducer producer);
+
+	public void accept(RuleVisitor visitor, P premise,
+			ContextPremises premises, ConclusionProducer producer);
 
 }

@@ -77,8 +77,8 @@ public class ActivationStack<E> {
 			if (top_.compareAndSet(oldHead, newHead)) {
 				if (oldHead == null)
 					return true;
-				else
-					return false;
+				// else
+				return false;
 			}
 		}
 	}

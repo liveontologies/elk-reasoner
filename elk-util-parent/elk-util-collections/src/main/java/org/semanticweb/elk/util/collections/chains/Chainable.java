@@ -30,12 +30,13 @@ package org.semanticweb.elk.util.collections.chains;
  * @param <T>
  *            the types of the elements in the chain
  */
-public interface Chainable<T extends ModifiableLink<T>> {
+public interface Chainable<T extends ModifiableLink<T>> extends
+		ModifiableLink<T> {
 
 	/**
 	 * Adds this element to the given {@link Chain}
 	 * 
-	 * @param ruleChain
+	 * @param chain
 	 * @return {@code true} if the input {@link Chain} has been modified
 	 * 
 	 */
@@ -44,7 +45,8 @@ public interface Chainable<T extends ModifiableLink<T>> {
 	/**
 	 * Removes this element from the given {@link Chain}
 	 * 
-	 * @param ruleChain
+	 * @param chain
+	 *            to be removed
 	 * @return {@code true} if the input {@link Chain} has been modified
 	 */
 	public boolean removeFrom(Chain<T> chain);

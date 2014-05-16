@@ -31,9 +31,6 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.BackwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
@@ -50,29 +47,6 @@ import org.semanticweb.elk.util.collections.Operations;
 public class SaturatedPropertyChain {
 
 	/**
-	 * If set to true, then binary property chains that do not occur on the
-	 * right of another chain are skipped in the derivation and replaced
-	 * directly by all their told super-properties. For example, given an
-	 * inclusion SubObjectPropertyOf(ObjectPropertyChain(R1 R2) R), the
-	 * composition of R1 and R2 derives directly R skipping the auxiliary binary
-	 * chain representing [R1 R2].
-	 */
-	public static final boolean REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES = true;
-
-	/**
-	 * If set to true, then compositions between each pair of R1 and R2 are
-	 * reduced under role hierarchies. For example, given
-	 * 
-	 * SubObjectPropertyOf(ObjectPropertyChain(R1 R2) S1),
-	 * SubObjectPropertyOf(ObjectPropertyChain(R1 R2) S2), and
-	 * SubObjectPropertyOf(S1 S2),
-	 * 
-	 * the composition of R1 and R2 derives only S1 and not S2. Note that this
-	 * only makes sense if REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES is also on.
-	 */
-	public static final boolean ELIMINATE_IMPLIED_COMPOSITIONS = true;
-
-	/**
 	 * the {@code IndexedPropertyChain} for which this saturation is computed
 	 */
 	final IndexedPropertyChain root;
@@ -83,21 +57,44 @@ public class SaturatedPropertyChain {
 	private volatile boolean isDerivedReflexive_ = false;
 
 	/**
+	 * the {@code IndexedObjectProperty}s which are subsumed by {@link #root}
+	 */
+	Set<IndexedObjectProperty> derivedSubProperties;
+
+	/**
 	 * the {@code IndexedPropertyChain}s which are subsumed by {@link #root}
 	 */
-	Set<IndexedPropertyChain> derivedSubProperties;
+	Set<IndexedPropertyChain> derivedSubProperyChains;
+
+	/**
+	 * {@code true} if {@link #derivedSubProperties} and
+	 * {@link #derivedSubProperyChains} are not {@code null} and fully computed
+	 */
+	volatile boolean derivedSubPropertiesComputed = false;
+
+	/**
+	 * a multimap T -> {S} such that both S and ObjectPropertyChain(S, T) imply
+	 * {@link #root}
+	 */
+	Multimap<IndexedObjectProperty, IndexedObjectProperty> leftSubComposableSubPropertiesByRightProperties;
+
+	/**
+	 * {@code true} if {@link #leftSubComposableSubPropertiesByRightProperties}
+	 * is not {@code null} and was fully computed
+	 */
+	volatile boolean leftSubComposableSubPropertiesByRightPropertiesComputed = false;
 
 	/**
 	 * A {@link Multimap} from R to S such that ObjectPropertyChain(R, root)
 	 * implies S
 	 */
-	AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByLeftSubProperty;
+	AbstractHashMultimap<IndexedObjectProperty, IndexedBinaryPropertyChain> compositionsByLeftSubProperty;
 
 	/**
 	 * A {@link Multimap} from R to S such that ObjectPropertyChain(root, R)
 	 * implies S
 	 */
-	AbstractHashMultimap<IndexedPropertyChain, IndexedPropertyChain> compositionsByRightSubProperty;
+	AbstractHashMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain> compositionsByRightSubProperty;
 
 	public SaturatedPropertyChain(IndexedPropertyChain ipc) {
 		this.root = ipc;
@@ -109,6 +106,10 @@ public class SaturatedPropertyChain {
 	public void clear() {
 		isDerivedReflexive_ = false;
 		derivedSubProperties = null;
+		derivedSubProperyChains = null;
+		derivedSubPropertiesComputed = false;
+		leftSubComposableSubPropertiesByRightProperties = null;
+		leftSubComposableSubPropertiesByRightPropertiesComputed = false;
 		compositionsByLeftSubProperty = null;
 		compositionsByRightSubProperty = null;
 	}
@@ -116,31 +117,39 @@ public class SaturatedPropertyChain {
 	/**
 	 * @return {@code true} if there is no derived information in this
 	 *         {@link SaturatedPropertyChain}, that is, its state is the same as
-	 *         after applying {{@link #clear()}
+	 *         after applying {@link #clear()}
 	 */
 	public boolean isClear() {
 		return isDerivedReflexive_ == false && derivedSubProperties == null
+				&& derivedSubProperyChains == null
+				&& leftSubComposableSubPropertiesByRightProperties == null
 				&& compositionsByLeftSubProperty == null
 				&& compositionsByRightSubProperty == null;
 	}
 
-	@Override
-	public SaturatedPropertyChain clone() {
-		SaturatedPropertyChain result = new SaturatedPropertyChain(root);
-		result.isDerivedReflexive_ = this.isDerivedReflexive_;
-		result.derivedSubProperties = this.derivedSubProperties;
-		result.compositionsByLeftSubProperty = this.compositionsByLeftSubProperty;
-		result.compositionsByRightSubProperty = this.compositionsByRightSubProperty;
-		return result;
+	/**
+	 * @return All sub-{@link IndexedObjectProperty} of root including root, if
+	 *         it is an {@link IndexedObjectProperty} itself.
+	 */
+	public Set<IndexedObjectProperty> getSubProperties() {
+		if (derivedSubProperties != null)
+			return derivedSubProperties;
+		// else
+		if (root instanceof IndexedObjectProperty)
+			return Collections
+					.<IndexedObjectProperty> singleton((IndexedObjectProperty) root);
+		// else
+		return Collections.emptySet();
 	}
 
 	/**
-	 * @return All sub-properties R of root including root itself. Computed in
-	 *         the {@link ObjectPropertyHierarchyComputationStage}.
+	 * @return All sub-{@link IndexedPropertyChain} of root including root
+	 *         itself.
 	 */
-	public Set<IndexedPropertyChain> getSubProperties() {
-		return derivedSubProperties == null ? Collections
-				.<IndexedPropertyChain> singleton(root) : derivedSubProperties;
+	public Set<IndexedPropertyChain> getSubPropertyChains() {
+		return derivedSubProperyChains == null ? Collections
+				.<IndexedPropertyChain> singleton(root)
+				: derivedSubProperyChains;
 	}
 
 	/**
@@ -154,9 +163,9 @@ public class SaturatedPropertyChain {
 	 * @return A {@link Multimap} from R to S such that ObjectPropertyChain(R,
 	 *         root) implies S
 	 */
-	public Multimap<IndexedPropertyChain, IndexedPropertyChain> getCompositionsByLeftSubProperty() {
+	public Multimap<IndexedObjectProperty, IndexedBinaryPropertyChain> getCompositionsByLeftSubProperty() {
 		return compositionsByLeftSubProperty == null ? Operations
-				.<IndexedPropertyChain, IndexedPropertyChain> emptyMultimap()
+				.<IndexedObjectProperty, IndexedBinaryPropertyChain> emptyMultimap()
 				: compositionsByLeftSubProperty;
 	}
 
@@ -164,9 +173,9 @@ public class SaturatedPropertyChain {
 	 * @return A {@link Multimap} from R to S such that
 	 *         ObjectPropertyChain(root, R) implies S
 	 */
-	public Multimap<IndexedPropertyChain, IndexedPropertyChain> getCompositionsByRightSubProperty() {
+	public Multimap<IndexedPropertyChain, IndexedBinaryPropertyChain> getCompositionsByRightSubProperty() {
 		return compositionsByRightSubProperty == null ? Operations
-				.<IndexedPropertyChain, IndexedPropertyChain> emptyMultimap()
+				.<IndexedPropertyChain, IndexedBinaryPropertyChain> emptyMultimap()
 				: compositionsByRightSubProperty;
 	}
 
@@ -204,18 +213,6 @@ public class SaturatedPropertyChain {
 	}
 
 	/**
-	 * Determines if the given {@link IndexedPropertyChain} can be produced in
-	 * {@link BackwardLink}s or {@link ForwardLink}s.
-	 * 
-	 * @param ipc
-	 * @return
-	 */
-	public static boolean isRelevant(IndexedPropertyChain ipc) {
-		return !REPLACE_CHAINS_BY_TOLD_SUPER_PROPERTIES
-				|| ipc.accept(TOLD_SUPER_PROPERRTY_CHECKER_);
-	}
-
-	/**
 	 * Prints differences with other {@link SaturatedPropertyChain}
 	 * 
 	 * @param other
@@ -236,10 +233,12 @@ public class SaturatedPropertyChain {
 					+ this.isDerivedReflexive_ + "; other relfexive: "
 					+ other.isDerivedReflexive_ + "\n");
 		// comparing derived sub-properties
-		Operations.dumpDiff(this.getSubProperties(), other.getSubProperties(),
-				writer, root + ": this sub-property not in other: ");
-		Operations.dumpDiff(other.getSubProperties(), this.getSubProperties(),
-				writer, root + ": other sub-property not in this: ");
+		Operations.dumpDiff(this.getSubPropertyChains(),
+				other.getSubPropertyChains(), writer, root
+						+ ": this sub-property not in other: ");
+		Operations.dumpDiff(other.getSubPropertyChains(),
+				this.getSubPropertyChains(), writer, root
+						+ ": other sub-property not in this: ");
 		// comparing derived compositions
 		Operations.dumpDiff(this.getCompositionsByLeftSubProperty(),
 				other.getCompositionsByLeftSubProperty(), writer, root
@@ -254,23 +253,4 @@ public class SaturatedPropertyChain {
 				this.getCompositionsByRightSubProperty(), writer, root
 						+ ": other right composition not in this: ");
 	}
-
-	/**
-	 * an {@link IndexedPropertyChainVisitor} that determines if an
-	 * {@link IndexedPropertyChain} can be a told super-property.
-	 */
-	private static final IndexedPropertyChainVisitor<Boolean> TOLD_SUPER_PROPERRTY_CHECKER_ = new IndexedPropertyChainVisitor<Boolean>() {
-
-		@Override
-		public Boolean visit(IndexedObjectProperty element) {
-			return true;
-		}
-
-		@Override
-		public Boolean visit(IndexedBinaryPropertyChain element) {
-			return !element.getRightChains().isEmpty();
-		}
-
-	};
-
 }

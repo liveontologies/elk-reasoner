@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,24 +26,50 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.HashSetMultimap;
+import org.semanticweb.elk.util.collections.LazySetIntersection;
+import org.semanticweb.elk.util.collections.Multimap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * A collection of utilities for computing entailed sub-properties of
+ * {@link IndexedObjectProperty}
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 
 	// logger for this class
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SubPropertyExplorer.class);
 
-	final private Set<IndexedPropertyChain> allSubProperties_ = new ArrayHashSet<IndexedPropertyChain>();
+	/**
+	 * the set that will be closed under sub-properties
+	 */
+	final private Set<IndexedPropertyChain> subPropertyChains_;
+	/**
+	 * the subset of {@link #subProperties_} consisting of
+	 * {@link IndexedObjectProperty}s
+	 */
+	final private Set<IndexedObjectProperty> subProperties_;
+	/**
+	 * the sub-properties for which the told sub-properties may not be yet
+	 * expanded
+	 */
 	final private Queue<IndexedPropertyChain> toDoSubProperties_ = new LinkedList<IndexedPropertyChain>();
-	final private Set<IndexedPropertyChain> relevantSubProperties_ = new ArrayHashSet<IndexedPropertyChain>();
 
-	SubPropertyExplorer(IndexedPropertyChain element) {
+	SubPropertyExplorer(IndexedPropertyChain element,
+			Set<IndexedPropertyChain> subPropertyChains,
+			Set<IndexedObjectProperty> subProperties) {
+		this.subPropertyChains_ = subPropertyChains;
+		this.subProperties_ = subProperties;
 		toDo(element);
 	}
 
@@ -67,15 +94,15 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	}
 
 	private void toDo(IndexedPropertyChain element) {
-		if (allSubProperties_.add(element)) {
+		if (subPropertyChains_.add(element)) {
 			toDoSubProperties_.add(element);
-			if (SaturatedPropertyChain.isRelevant(element)) {
-				relevantSubProperties_.add(element);
+			if (element instanceof IndexedObjectProperty) {
+				subProperties_.add((IndexedObjectProperty) element);
 			}
 		}
 	}
 
-	private void doAll() {
+	void process() {
 		for (;;) {
 			IndexedPropertyChain next = toDoSubProperties_.poll();
 			if (next == null)
@@ -84,48 +111,105 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		}
 	}
 
-	private Set<IndexedPropertyChain> getRelevantSubProperties() {
-		doAll();
-		return relevantSubProperties_;
+	private static void expandUnderSubProperties(IndexedPropertyChain property,
+			Set<IndexedPropertyChain> currentSubPropertyChains,
+			Set<IndexedObjectProperty> currentSubProperties) {
+		new SubPropertyExplorer(property, currentSubPropertyChains,
+				currentSubProperties).process();
+		LOGGER_.trace("{} sub-property chains: {}, sub-properties", property,
+				currentSubPropertyChains, currentSubProperties);
 	}
 
-	static Set<IndexedPropertyChain> getSetRelevantSubProperties(
+	private static SaturatedPropertyChain computeSubProperties(
 			IndexedPropertyChain element) {
-		return element.accept(SUB_PROPERTY_FINDER_);
+		SaturatedPropertyChain saturation = SaturatedPropertyChain
+				.getCreate(element);
+		if (saturation.derivedSubPropertiesComputed)
+			return saturation;
+		// else
+		if (saturation.derivedSubProperyChains == null) {
+			synchronized (saturation) {
+				if (saturation.derivedSubProperyChains == null)
+					saturation.derivedSubProperyChains = new ArrayHashSet<IndexedPropertyChain>(
+							8);
+			}
+		}
+		synchronized (saturation.derivedSubProperyChains) {
+			if (saturation.derivedSubPropertiesComputed)
+				return saturation;
+			// else
+			if (saturation.derivedSubProperties == null)
+				saturation.derivedSubProperties = new ArrayHashSet<IndexedObjectProperty>(
+						8);
+			expandUnderSubProperties(element,
+					saturation.derivedSubProperyChains,
+					saturation.derivedSubProperties);
+			saturation.derivedSubPropertiesComputed = true;
+		}
+		return saturation;
 	}
 
-	static Set<IndexedPropertyChain> getSetRelevantSubProperties(
+	/**
+	 * @param element
+	 * @return the sub-{@link IndexedPropertyChain}s of the given
+	 *         {@link IndexedPropertyChain}
+	 */
+	static Set<IndexedPropertyChain> getSubPropertyChains(
+			IndexedPropertyChain element) {
+		return computeSubProperties(element).getSubPropertyChains();
+	}
+
+	/**
+	 * @param element
+	 * @return the sub-{@link IndexedObjectProperty} of the given
+	 *         {@link IndexedPropertyChain}
+	 */
+	static Set<IndexedObjectProperty> getSubProperties(
+			IndexedPropertyChain element) {
+		return computeSubProperties(element).getSubProperties();
+	}
+
+	/**
+	 * @param element
+	 * @return a multimap T -> {S} such that both S and ObjectPropertyChain(S,
+	 *         T) are sub-properties of the given {@link IndexedObjectProperty}
+	 */
+	static Multimap<IndexedObjectProperty, IndexedObjectProperty> getLeftSubComposableSubPropertiesByRightProperties(
 			IndexedObjectProperty element) {
 		SaturatedPropertyChain saturation = SaturatedPropertyChain
 				.getCreate(element);
-		synchronized (saturation) {
-			if (saturation.derivedSubProperties == null)
-				saturation.derivedSubProperties = getRelevantSubProperties(element);
+		if (saturation.leftSubComposableSubPropertiesByRightPropertiesComputed)
+			return saturation.leftSubComposableSubPropertiesByRightProperties;
+		// else
+		if (saturation.leftSubComposableSubPropertiesByRightProperties == null) {
+			synchronized (saturation) {
+				if (saturation.leftSubComposableSubPropertiesByRightProperties == null)
+					saturation.leftSubComposableSubPropertiesByRightProperties = new HashSetMultimap<IndexedObjectProperty, IndexedObjectProperty>();
+			}
 		}
-		return saturation.derivedSubProperties;
+		synchronized (saturation.leftSubComposableSubPropertiesByRightProperties) {
+			if (saturation.leftSubComposableSubPropertiesByRightPropertiesComputed)
+				return saturation.leftSubComposableSubPropertiesByRightProperties;
+			// else compute it
+			Set<IndexedObjectProperty> subProperties = getSubProperties(element);
+			for (IndexedPropertyChain subPropertyChain : getSubPropertyChains(element)) {
+				if (subPropertyChain instanceof IndexedBinaryPropertyChain) {
+					IndexedBinaryPropertyChain composition = (IndexedBinaryPropertyChain) subPropertyChain;
+					Set<IndexedObjectProperty> leftSubProperties = getSubProperties(composition
+							.getLeftProperty());
+					Set<IndexedObjectProperty> commonSubProperties = new LazySetIntersection<IndexedObjectProperty>(
+							subProperties, leftSubProperties);
+					if (commonSubProperties.isEmpty())
+						continue;
+					for (IndexedObjectProperty rightSubProperty : getSubProperties(composition
+							.getRightProperty()))
+						for (IndexedObjectProperty commonLeft : commonSubProperties)
+							saturation.leftSubComposableSubPropertiesByRightProperties
+									.add(rightSubProperty, commonLeft);
+				}
+			}
+			saturation.leftSubComposableSubPropertiesByRightPropertiesComputed = true;
+		}
+		return saturation.leftSubComposableSubPropertiesByRightProperties;
 	}
-
-	static Set<IndexedPropertyChain> getRelevantSubProperties(
-			IndexedPropertyChain property) {
-		Set<IndexedPropertyChain> result = new SubPropertyExplorer(property)
-				.getRelevantSubProperties();
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(property + " relevant subproperties: " + result);
-		return result;
-	}
-
-	private final static IndexedPropertyChainVisitor<Set<IndexedPropertyChain>> SUB_PROPERTY_FINDER_ = new IndexedPropertyChainVisitor<Set<IndexedPropertyChain>>() {
-
-		@Override
-		public Set<IndexedPropertyChain> visit(IndexedObjectProperty element) {
-			return getSetRelevantSubProperties(element);
-		}
-
-		@Override
-		public Set<IndexedPropertyChain> visit(
-				IndexedBinaryPropertyChain element) {
-			return getRelevantSubProperties(element);
-		}
-	};
-
 }

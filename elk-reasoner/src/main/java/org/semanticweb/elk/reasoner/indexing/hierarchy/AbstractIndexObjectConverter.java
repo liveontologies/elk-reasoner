@@ -62,7 +62,7 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
  * A converter from {@link ElkClassExpression}s,
  * {@link ElkSubObjectPropertyExpression}s, and {@link ElkIndividual}s to
  * corresponding {@link IndexedObject}s that simply throws an
- * {@link IndexingException} on all arguments.
+ * {@link ElkIndexingException} on all arguments.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
@@ -73,16 +73,17 @@ public abstract class AbstractIndexObjectConverter implements
 		ElkSubObjectPropertyExpressionVisitor<IndexedPropertyChain>,
 		ElkIndividualVisitor<IndexedIndividual> {
 
-	protected IndexedClassExpression defaultVisit(ElkClassExpression expression) {
+	protected static IndexedClassExpression defaultVisit(
+			ElkClassExpression expression) {
 		throw new ElkIndexingUnsupportedException(expression);
 	}
 
-	protected IndexedPropertyChain defaultVisit(
+	protected static IndexedPropertyChain defaultVisit(
 			ElkSubObjectPropertyExpression expression) {
 		throw new ElkIndexingUnsupportedException(expression);
 	}
 
-	protected IndexedIndividual defaultVisit(ElkIndividual expression) {
+	protected static IndexedIndividual defaultVisit(ElkIndividual expression) {
 		throw new ElkIndexingUnsupportedException(expression);
 	}
 

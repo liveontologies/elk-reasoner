@@ -27,10 +27,9 @@ package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.saturation.ClassExpressionNoInputSaturation;
+import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationNoInput;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleApplicationFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 
 /**
  * Completes saturation of all contexts which are not saturated at this point.
@@ -46,9 +45,9 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 
 	// logger for this class
 	// private static final Logger LOGGER_ =
-	// Logger.getLogger(IncrementalCompletionStage.class);
+	// LoggerFactory.getLogger(IncrementalCompletionStage.class);
 
-	private ClassExpressionNoInputSaturation completion_ = null;
+	private ClassExpressionSaturationNoInput completion_ = null;
 
 	public IncrementalCompletionStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -64,10 +63,9 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		completion_ = new ClassExpressionNoInputSaturation(
+		completion_ = new ClassExpressionSaturationNoInput(
 				reasoner.getProcessExecutor(), workerNo,
-				reasoner.getProgressMonitor(), new RuleApplicationFactory(
-						reasoner.saturationState),
+				new RuleApplicationAdditionFactory(reasoner.saturationState),
 				ContextModificationListener.DUMMY);
 		return true;
 	}
@@ -87,20 +85,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 			return false;
 		reasoner.ruleAndConclusionStats.add(completion_
 				.getRuleAndConclusionStatistics());
-		markAllContextsAsSaturated();
-		/*
-		 * TODO: at some point we need to clear non-saturated contexts when
-		 * everything is fine currently this is cleaned during the taxonomy
-		 * cleaning stage, but this stage might not be executed at all; also,
-		 * the non saturated contexts are not cleaned at all during incremental
-		 * consistency checking. Something needs to be done about it.
-		 */
-		reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY)
-				.clearNotSaturatedContexts();
-		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
-		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
 		completion_ = null;
-		
 		return true;
 	}
 

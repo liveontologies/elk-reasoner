@@ -22,6 +22,9 @@
  */
 package org.semanticweb.elk.util.logging;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -33,6 +36,8 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  */
 public class ElkMessage {
 
+	private final static Pattern PATTERN_ = Pattern.compile("\\[(.+)\\](.*)");
+	
 	protected final String message;
 	protected final String messageType;
 
@@ -69,6 +74,25 @@ public class ElkMessage {
 	@Override
 	public int hashCode() {
 		return HashGenerator.combinedHashCode(message, messageType);
+	}
+	
+	public static ElkMessage deserialize(String message) {
+		Matcher matcher = PATTERN_.matcher(message);
+		
+		if (matcher.find()) {
+			// the first group is the type, the second is the body. this should
+			// hold no matter which pattern we use.
+			String type = matcher.group(1);
+			String body = matcher.group(2);
+			
+			return new ElkMessage(body, type);
+		}
+		
+		return null;
+	}
+	
+	public static String serialize(String type, String message) {
+		return String.format("[%s]%s", type, message);
 	}
 
 }

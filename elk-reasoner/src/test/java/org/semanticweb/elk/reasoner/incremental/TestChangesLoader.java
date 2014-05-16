@@ -28,17 +28,14 @@ package org.semanticweb.elk.reasoner.incremental;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.semanticweb.elk.loading.AxiomChangeListener;
-import org.semanticweb.elk.loading.ChangesLoader;
+import org.semanticweb.elk.loading.AbstractAxiomLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
-import org.semanticweb.elk.loading.Loader;
-import org.semanticweb.elk.loading.OntologyLoader;
-import org.semanticweb.elk.loading.SimpleElkAxiomChange;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 
 /**
- * A simple {@link ChangesLoader} which internally keeps sets of axioms to be
+ * A simple {@link AxiomLoader} which internally keeps sets of axioms to be
  * added or removed
  * 
  * @author Pavel Klinov
@@ -47,19 +44,20 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class TestChangesLoader implements ChangesLoader, OntologyLoader {
+public class TestChangesLoader extends AbstractAxiomLoader implements
+		AxiomLoader {
 
 	// axioms that are coming in the changes
 	private final Queue<ElkAxiom> axioms_ = new LinkedList<ElkAxiom>();
 	// sequence of changes: true - additions, false - deletions
 	private final Queue<Boolean> changes_ = new LinkedList<Boolean>();
-	private AxiomChangeListener listener_ = null;
 
 	public TestChangesLoader() {
-		
+
 	}
-	
-	public TestChangesLoader(Iterable<ElkAxiom> axioms, IncrementalChangeType type) {
+
+	public TestChangesLoader(Iterable<ElkAxiom> axioms,
+			IncrementalChangeType type) {
 		for (ElkAxiom axiom : axioms) {
 			switch (type) {
 			case ADD:
@@ -71,84 +69,48 @@ public class TestChangesLoader implements ChangesLoader, OntologyLoader {
 			}
 		}
 	}
-	
-	public TestChangesLoader(Iterable<ElkAxiom> additions, Iterable<ElkAxiom> deletions) {
+
+	public TestChangesLoader(Iterable<ElkAxiom> additions,
+			Iterable<ElkAxiom> deletions) {
 		for (ElkAxiom addition : additions) {
 			add(addition);
 		}
-		
+
 		for (ElkAxiom deletion : deletions) {
 			remove(deletion);
 		}
 	}
-	
-	public TestChangesLoader add(final ElkAxiom axiom) {
-		if (listener_ != null) {
-			listener_.notify(new SimpleElkAxiomChange(axiom, 1));
+
+	@Override
+	public void load(ElkAxiomProcessor axiomInserter,
+			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
+		for (;;) {
+			ElkAxiom axiom = axioms_.poll();
+			if (axiom == null)
+				break;
+			boolean isAdded = changes_.poll();
+			if (isAdded)
+				axiomInserter.visit(axiom);
+			else
+				axiomDeleter.visit(axiom);
 		}
+	}
+
+	@Override
+	public boolean isLoadingFinished() {
+		return axioms_.isEmpty();
+	}
+
+	public TestChangesLoader add(final ElkAxiom axiom) {
 		axioms_.add(axiom);
 		changes_.add(true);
 		return this;
 	}
 
 	public TestChangesLoader remove(final ElkAxiom axiom) {
-		if (listener_ != null) {
-			listener_.notify(new SimpleElkAxiomChange(axiom, -1));
-		}
 		axioms_.add(axiom);
 		changes_.add(false);
 		return this;
 	}
 
-	@Override
-	public Loader getLoader(ElkAxiomProcessor axiomInserter,
-			ElkAxiomProcessor axiomDeleter) {
-		return new TestLoader(axiomInserter, axiomDeleter);
-	}
-
-	@Override
-	public Loader getLoader(ElkAxiomProcessor axiomLoader) {
-		return new TestLoader(axiomLoader, new ElkAxiomProcessor() {
-			@Override
-			public void visit(ElkAxiom elkAxiom) {
-				// does nothing
-			}
-		});
-	}
-
-	@Override
-	public void registerChangeListener(AxiomChangeListener listener) {
-		listener_ = listener;
-	}
-
-	/**
-	 * 
-	 */
-	class TestLoader implements Loader {
-
-		private final ElkAxiomProcessor inserter_, deleter_;
-
-		TestLoader(ElkAxiomProcessor inserter, ElkAxiomProcessor deleter) {
-			inserter_ = inserter;
-			deleter_ = deleter;
-		}
-
-		@Override
-		public void load() throws ElkLoadingException {
-			for (;;) {
-				ElkAxiom axiom = axioms_.poll();
-				if (axiom == null)
-					break;
-				boolean isAdded = changes_.poll();
-				if (isAdded)
-					inserter_.visit(axiom);
-				else
-					deleter_.visit(axiom);
-			}
-		}
-
-		@Override
-		public void dispose() {
-		}
-	}
 }

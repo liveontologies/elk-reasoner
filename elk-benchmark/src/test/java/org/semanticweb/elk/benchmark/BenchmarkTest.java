@@ -131,12 +131,12 @@ public class BenchmarkTest {
 				Integer.valueOf(System.getProperty(Constants.RUNS, "1")),
 				new String[] { System.getProperty("incremental.dir") });
 	}
-
+	
 	@Test
 	public void incrementalRandomWalkTBoxABox() throws Exception {
 		Assume.assumeTrue(testsToRun_.contains(testName.getMethodName()));
 
-		TaskCollection collection = new AllFilesTaskCollection(
+		VisitorTaskCollection collection = new AllFilesTaskCollection(
 				new String[] { System.getProperty("incremental.dir") }) {
 
 			@Override
@@ -156,4 +156,5 @@ public class BenchmarkTest {
 			throw e;
 		}
 	}
+
 }

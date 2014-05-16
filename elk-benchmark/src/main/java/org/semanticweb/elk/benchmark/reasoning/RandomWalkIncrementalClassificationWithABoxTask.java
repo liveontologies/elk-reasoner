@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.benchmark.reasoning;
+
 /*
  * #%L
  * ELK Benchmarking Package
@@ -28,17 +29,17 @@ import java.util.List;
 
 import org.semanticweb.elk.RandomSeedProvider;
 import org.semanticweb.elk.benchmark.TaskException;
-import org.semanticweb.elk.loading.OntologyLoader;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.reasoner.incremental.ClassAndIndividualAxiomTrackingOntologyLoader;
+import org.semanticweb.elk.reasoner.incremental.ClassAndIndividualAxiomTrackingLoader;
 import org.semanticweb.elk.reasoner.incremental.OnOffVector;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkIncrementalRealizationRunner;
 import org.semanticweb.elk.reasoner.incremental.RandomWalkRunnerIO;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class RandomWalkIncrementalClassificationWithABoxTask extends
 		RandomWalkIncrementalClassificationTask {
@@ -46,7 +47,7 @@ public class RandomWalkIncrementalClassificationWithABoxTask extends
 	public RandomWalkIncrementalClassificationWithABoxTask(String[] args) {
 		super(args);
 	}
-	
+
 	@Override
 	public void run() throws TaskException {
 		long seed = RandomSeedProvider.VALUE;
@@ -66,12 +67,10 @@ public class RandomWalkIncrementalClassificationWithABoxTask extends
 	}
 
 	@Override
-	protected OntologyLoader getAxiomTrackingLoader(OntologyLoader fileLoader,
+	protected AxiomLoader getAxiomTrackingLoader(AxiomLoader fileLoader,
 			OnOffVector<ElkAxiom> changingAxioms, List<ElkAxiom> staticAxioms) {
-		return new ClassAndIndividualAxiomTrackingOntologyLoader(fileLoader, changingAxioms,
-				staticAxioms);
+		return new ClassAndIndividualAxiomTrackingLoader(fileLoader,
+				changingAxioms, staticAxioms);
 	}
-
-	
 
 }

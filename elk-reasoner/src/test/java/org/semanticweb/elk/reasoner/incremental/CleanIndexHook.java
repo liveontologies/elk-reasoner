@@ -27,7 +27,8 @@ package org.semanticweb.elk.reasoner.incremental;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
@@ -45,7 +46,7 @@ import org.semanticweb.elk.util.collections.Operations;
  */
 public class CleanIndexHook implements RandomWalkTestHook {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(CleanIndexHook.class);
 
 	@Override
@@ -59,9 +60,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 			Iterable<ElkAxiom> axioms) throws ElkException {
 		int size = getIndexSize(reasoner);
 
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("initial size is " + size);
-		}
+		LOGGER_.debug("initial size is {}", size);
 
 		// remove everything from the index
 		TestChangesLoader loader = new TestChangesLoader();
@@ -73,11 +72,9 @@ public class CleanIndexHook implements RandomWalkTestHook {
 			}
 		}
 
-		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug("Cleaning the index...");
-		}
+		LOGGER_.debug("Cleaning the index...");
 
-		reasoner.registerOntologyChangesLoader(loader);
+		reasoner.registerAxiomLoader(loader);
 		reasoner.setAllowIncrementalMode(false);
 		// trigger removal
 		reasoner.getTaxonomyQuietly();
@@ -97,7 +94,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 			}
 		}
 
-		reasoner.registerOntologyChangesLoader(loader);
+		reasoner.registerAxiomLoader(loader);
 		reasoner.getTaxonomyQuietly();
 
 		cnt = getIndexSize(reasoner);

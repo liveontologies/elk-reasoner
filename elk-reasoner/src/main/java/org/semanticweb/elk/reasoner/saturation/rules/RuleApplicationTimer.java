@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.rules;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,19 +22,35 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Contradiction;
-import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkChainFromBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 
 /**
  * An object which can be used to measure time spent within a methods of a
- * {@link RuleApplicationVisitor}. The fields of the timer correspond to the
- * methods of {@link RuleApplicationVisitor}.
+ * {@link RuleVisitor}. The fields of the timer correspond to the methods of
+ * {@link RuleVisitor}.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -41,70 +58,124 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 public class RuleApplicationTimer {
 
 	/**
-	 * timer for {@link IndexedClass.OwlThingContextInitializationRule}
+	 * timer for {@link BackwardLinkChainFromBackwardLinkRule}
 	 */
-	int timeOwlThingContextInitializationRule;
-	
-	/**
-	 * timer for {@link DirectIndex.ContextRootInitializationRule}
-	 */
-	int timeContextRootInitializationRule;
+	int timeBackwardLinkChainFromBackwardLinkRule;
 
 	/**
-	 * timer for {@link IndexedDisjointnessAxiom.ThisCompositionRule}
+	 * timer for {@link BackwardLinkFromForwardLinkRule}
 	 */
-	int timeDisjointnessAxiomCompositionRule;
+	int timeBackwardLinkFromForwardLinkRule;
 
 	/**
-	 * timer for {@link IndexedDisjointnessAxiom.ThisContradictionRule}
+	 * time for {@link ContradicitonCompositionRule}
 	 */
-	int timeDisjointnessAxiomContradictionRule;
+	int timeContradicitonCompositionRule;
 
 	/**
-	 * timer for {@link IndexedObjectIntersectionOf.ThisCompositionRule}
+	 * timer for {@link ContradictionFromDisjointnessRule}
 	 */
-	int timeObjectIntersectionOfCompositionRule;
+	int timeContradictionFromDisjointnessRule;
 
 	/**
-	 * timer for {@link IndexedSubClassOfAxiom.ThisCompositionRule}
+	 * timer for {@link ContradictionFromNegationRule}
 	 */
-	public int timeSubClassOfAxiomCompositionRule;
+	int timeContradictionFromNegationRule;
 
 	/**
-	 * timer for {@link IndexedObjectSomeValuesFrom.ThisCompositionRule}
+	 * timer for {@link ContradictionFromOwlNothingRule}
 	 */
-	int timeObjectSomeValuesFromCompositionRule;
+	int timeContradictionFromOwlNothingRule;
 
 	/**
-	 * timer for {@link ForwardLink.ThisBackwardLinkRule}
+	 * timer for {@link ContradictionOverBackwardLinkRule}
 	 */
-	int timeForwardLinkBackwardLinkRule;
+	int timeContradictionOverBackwardLinkRule;
 
 	/**
-	 * timer for {@link Propagation.ThisBackwardLinkRule}
+	 * time for {@link ContradictionPropagationRule}
 	 */
-	int timePropagationBackwardLinkRule;
+	int timeContradictionPropagationRule;
 
 	/**
-	 * timer for {@link Contradiction.ContradictionBackwardLinkRule}
+	 * timer for {@link DisjointSubsumerFromMemberRule}
 	 */
-	int timeContradictionBottomBackwardLinkRule;
+	int timeDisjointSubsumerFromMemberRule;
 
 	/**
-	 * Reset all timers to zero.
+	 * timer for {@link IndexedObjectComplementOfDecomposition}
 	 */
-	public void reset() {
-		timeOwlThingContextInitializationRule = 0;
-		timeContextRootInitializationRule = 0;
-		timeDisjointnessAxiomCompositionRule = 0;
-		timeDisjointnessAxiomContradictionRule = 0;
-		timeObjectIntersectionOfCompositionRule = 0;
-		timeSubClassOfAxiomCompositionRule = 0;
-		timeObjectSomeValuesFromCompositionRule = 0;
-		timeForwardLinkBackwardLinkRule = 0;
-		timePropagationBackwardLinkRule = 0;
-		timeContradictionBottomBackwardLinkRule = 0;
-	}
+	int timeIndexedObjectComplementOfDecomposition;
+
+	/**
+	 * time for {@link IndexedObjectIntersectionOfDecomposition}
+	 */
+	int timeIndexedObjectIntersectionOfDecomposition;
+
+	/**
+	 * time for {@link IndexedObjectSomeValuesFromDecomposition}
+	 */
+	int timeIndexedObjectSomeValuesFromDecomposition;
+
+	/**
+	 * time for {@link NonReflexiveBackwardLinkCompositionRule}
+	 */
+	int timeNonReflexiveBackwardLinkCompositionRule;
+
+	/**
+	 * timer for {@link NonReflexivePropagationRule}
+	 */
+	int timeNonReflexivePropagationRule;
+
+	/**
+	 * timer for {@link ObjectIntersectionFromConjunctRule}
+	 */
+	int timeObjectIntersectionFromConjunctRule;
+
+	/**
+	 * timer for {@link ObjectUnionFromDisjunctRule}
+	 */
+	int timeObjectUnionFromDisjunctRule;
+
+	/**
+	 * timer for {@link OwlThingContextInitRule}
+	 */
+	int timeOwlThingContextInitRule;
+
+	/**
+	 * timer for {@link PropagationFromExistentialFillerRule}
+	 */
+	int timePropagationFromExistentialFillerRule;
+
+	/**
+	 * timer for {@link PropagationInitializationRule}
+	 */
+	int timePropagationInitializationRule;
+
+	/**
+	 * timer for {@link ReflexiveBackwardLinkCompositionRule}
+	 */
+	int timeReflexiveBackwardLinkCompositionRule;
+
+	/**
+	 * timer for {@link ReflexivePropagationRule}
+	 */
+	int timeReflexivePropagationRule;
+
+	/**
+	 * timer for {@link RootContextInitializationRule}
+	 */
+	int timeRootContextInitializationRule;
+
+	/**
+	 * timer for {@link SubsumerBackwardLinkRule}
+	 */
+	int timeSubsumerBackwardLinkRule;
+
+	/**
+	 * timer for {@link SuperClassFromSubClassRule}
+	 */
+	int timeSuperClassFromSubClassRule;
 
 	/**
 	 * Add the values the corresponding values of the given timer
@@ -112,29 +183,86 @@ public class RuleApplicationTimer {
 	 * @param timer
 	 */
 	public synchronized void add(RuleApplicationTimer timer) {
-		timeOwlThingContextInitializationRule += timer.timeOwlThingContextInitializationRule;
-		timeContextRootInitializationRule += timer.timeContextRootInitializationRule;
-		timeDisjointnessAxiomCompositionRule += timer.timeDisjointnessAxiomCompositionRule;
-		timeDisjointnessAxiomContradictionRule += timer.timeDisjointnessAxiomContradictionRule;
-		timeObjectIntersectionOfCompositionRule += timer.timeObjectIntersectionOfCompositionRule;
-		timeSubClassOfAxiomCompositionRule += timer.timeSubClassOfAxiomCompositionRule;
-		timeObjectSomeValuesFromCompositionRule += timer.timeObjectSomeValuesFromCompositionRule;
-		timeForwardLinkBackwardLinkRule += timer.timeForwardLinkBackwardLinkRule;
-		timePropagationBackwardLinkRule += timer.timePropagationBackwardLinkRule;
-		timeContradictionBottomBackwardLinkRule += timer.timeContradictionBottomBackwardLinkRule;
+		timeOwlThingContextInitRule += timer.timeOwlThingContextInitRule;
+		timeRootContextInitializationRule += timer.timeRootContextInitializationRule;
+		timeDisjointSubsumerFromMemberRule += timer.timeDisjointSubsumerFromMemberRule;
+		timeContradictionFromDisjointnessRule += timer.timeContradictionFromDisjointnessRule;
+		timeContradictionFromNegationRule += timer.timeContradictionFromNegationRule;
+		timeObjectIntersectionFromConjunctRule += timer.timeObjectIntersectionFromConjunctRule;
+		timeSuperClassFromSubClassRule += timer.timeSuperClassFromSubClassRule;
+		timePropagationFromExistentialFillerRule += timer.timePropagationFromExistentialFillerRule;
+		timeObjectUnionFromDisjunctRule += timer.timeObjectUnionFromDisjunctRule;
+		timeBackwardLinkChainFromBackwardLinkRule += timer.timeBackwardLinkChainFromBackwardLinkRule;
+		timeReflexiveBackwardLinkCompositionRule += timer.timeReflexiveBackwardLinkCompositionRule;
+		timeNonReflexiveBackwardLinkCompositionRule += timer.timeNonReflexiveBackwardLinkCompositionRule;
+		timeSubsumerBackwardLinkRule += timer.timeSubsumerBackwardLinkRule;
+		timeContradictionOverBackwardLinkRule += timer.timeContradictionOverBackwardLinkRule;
+		timeContradictionPropagationRule += timer.timeContradictionPropagationRule;
+		timeContradicitonCompositionRule += timer.timeContradicitonCompositionRule;
+		timeIndexedObjectIntersectionOfDecomposition += timer.timeIndexedObjectIntersectionOfDecomposition;
+		timeIndexedObjectSomeValuesFromDecomposition += timer.timeIndexedObjectSomeValuesFromDecomposition;
+		timeIndexedObjectComplementOfDecomposition += timer.timeIndexedObjectComplementOfDecomposition;
+		timeContradictionFromOwlNothingRule += timer.timeContradictionFromOwlNothingRule;
+		timeNonReflexivePropagationRule += timer.timeNonReflexivePropagationRule;
+		timeReflexivePropagationRule += timer.timeReflexivePropagationRule;
+		timePropagationInitializationRule += timer.timePropagationInitializationRule;
+		timeBackwardLinkFromForwardLinkRule += timer.timeBackwardLinkFromForwardLinkRule;
 	}
 
 	public int getTotalRuleAppTime() {
-		return timeOwlThingContextInitializationRule
-				+ timeContextRootInitializationRule
-				+ timeDisjointnessAxiomCompositionRule
-				+ timeDisjointnessAxiomContradictionRule
-				+ timeObjectIntersectionOfCompositionRule
-				+ timeSubClassOfAxiomCompositionRule
-				+ timeObjectSomeValuesFromCompositionRule
-				+ timeForwardLinkBackwardLinkRule
-				+ timePropagationBackwardLinkRule
-				+ timeContradictionBottomBackwardLinkRule;
+		return timeOwlThingContextInitRule + timeRootContextInitializationRule
+				+ timeDisjointSubsumerFromMemberRule
+				+ timeContradictionFromDisjointnessRule
+				+ timeContradictionFromNegationRule
+				+ timeObjectIntersectionFromConjunctRule
+				+ timeSuperClassFromSubClassRule
+				+ timePropagationFromExistentialFillerRule
+				+ timeObjectUnionFromDisjunctRule
+				+ timeBackwardLinkChainFromBackwardLinkRule
+				+ timeSubsumerBackwardLinkRule
+				+ timeContradictionOverBackwardLinkRule
+				+ timeContradictionPropagationRule
+				+ timeContradicitonCompositionRule
+				+ timeNonReflexiveBackwardLinkCompositionRule
+				+ timeReflexiveBackwardLinkCompositionRule
+				+ timeIndexedObjectIntersectionOfDecomposition
+				+ timeIndexedObjectSomeValuesFromDecomposition
+				+ timeIndexedObjectComplementOfDecomposition
+				+ timeContradictionFromOwlNothingRule
+				+ timeNonReflexivePropagationRule
+				+ timeReflexivePropagationRule
+				+ timePropagationInitializationRule
+				+ timeBackwardLinkFromForwardLinkRule;
+	}
+
+	/**
+	 * Reset all timers to zero.
+	 */
+	public void reset() {
+		timeOwlThingContextInitRule = 0;
+		timeRootContextInitializationRule = 0;
+		timeDisjointSubsumerFromMemberRule = 0;
+		timeContradictionFromDisjointnessRule = 0;
+		timeContradictionFromNegationRule = 0;
+		timeObjectIntersectionFromConjunctRule = 0;
+		timeSuperClassFromSubClassRule = 0;
+		timePropagationFromExistentialFillerRule = 0;
+		timeObjectUnionFromDisjunctRule = 0;
+		timeBackwardLinkChainFromBackwardLinkRule = 0;
+		timeSubsumerBackwardLinkRule = 0;
+		timeContradictionOverBackwardLinkRule = 0;
+		timeContradictionPropagationRule = 0;
+		timeContradicitonCompositionRule = 0;
+		timeNonReflexiveBackwardLinkCompositionRule = 0;
+		timeReflexiveBackwardLinkCompositionRule = 0;
+		timeIndexedObjectIntersectionOfDecomposition = 0;
+		timeIndexedObjectSomeValuesFromDecomposition = 0;
+		timeIndexedObjectComplementOfDecomposition = 0;
+		timeContradictionFromOwlNothingRule = 0;
+		timeNonReflexivePropagationRule = 0;
+		timeReflexivePropagationRule = 0;
+		timePropagationInitializationRule = 0;
+		timeBackwardLinkFromForwardLinkRule = 0;
 	}
 
 }

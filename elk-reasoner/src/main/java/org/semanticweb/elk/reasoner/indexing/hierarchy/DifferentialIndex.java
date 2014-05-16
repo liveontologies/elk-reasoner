@@ -26,16 +26,17 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.ChainableRule;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An object representing incremental changes in the index. The changes are
@@ -50,7 +51,7 @@ import org.semanticweb.elk.util.collections.chains.Chain;
  */
 public class DifferentialIndex extends DirectIndex {
 
-	private static final Logger LOGGER_ = Logger
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(DifferentialIndex.class);
 
 	/**
@@ -77,13 +78,13 @@ public class DifferentialIndex extends DirectIndex {
 	/**
 	 * The added and removed initialization {@link Rule}s
 	 */
-	private ChainableRule<Context> addedContextInitRules_,
+	private ChainableContextInitRule addedContextInitRules_,
 			removedContextInitRules_;
 
 	/**
 	 * The maps of added and removed {@link Rule}s for index class expressions;
 	 */
-	private Map<IndexedClassExpression, ChainableRule<Context>> addedContextRuleHeadByClassExpressions_,
+	private Map<IndexedClassExpression, ChainableSubsumerRule> addedContextRuleHeadByClassExpressions_,
 			removedContextRuleHeadByClassExpressions_;
 
 	public DifferentialIndex(IndexedObjectCache objectCache) {
@@ -102,23 +103,23 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	public void initClassSignatureChanges() {
-		this.addedClasses_ = new ArrayHashSet<ElkClass>(32);		
+		this.addedClasses_ = new ArrayHashSet<ElkClass>(32);
 	}
-	
+
 	public void initIndividualSignatureChanges() {
 		this.addedIndividuals_ = new ArrayHashSet<ElkNamedIndividual>(32);
 	}
 
 	public void initAdditions() {
 		this.addedContextInitRules_ = null;
-		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
+		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableSubsumerRule>(
 				32);
 	}
 
 	public void initDeletions() {
 		this.removedContextInitRules_ = null;
 		this.todoDeletions_ = new IndexedObjectCache();
-		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableRule<Context>>(
+		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableSubsumerRule>(
 				32);
 	}
 
@@ -166,8 +167,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	@Override
-	public void add(IndexedClassExpression target,
-			ChainableRule<Context> newRule) {
+	public void add(IndexedClassExpression target, ChainableSubsumerRule newRule) {
 		if (incrementalMode) {
 			if (newRule.removeFrom(getRemovedContextRuleChain(target))) {
 				newRule.addTo(target.getCompositionRuleChain());
@@ -180,7 +180,7 @@ public class DifferentialIndex extends DirectIndex {
 
 	@Override
 	public void remove(IndexedClassExpression target,
-			ChainableRule<Context> oldRule) {
+			ChainableSubsumerRule oldRule) {
 		if (incrementalMode) {
 			if (!oldRule.removeFrom(getAddedContextRuleChain(target))) {
 				oldRule.addTo(getRemovedContextRuleChain(target));
@@ -195,7 +195,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	@Override
-	public void addContextInitRule(ChainableRule<Context> newRule) {
+	public void addContextInitRule(ChainableContextInitRule newRule) {
 		if (incrementalMode) {
 			if (newRule.removeFrom(getRemovedContextInitRuleChain())) {
 				newRule.addTo(getContextInitRuleChain());
@@ -208,7 +208,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	@Override
-	public void removeContextInitRule(ChainableRule<Context> oldRule) {
+	public void removeContextInitRule(ChainableContextInitRule oldRule) {
 		if (incrementalMode) {
 			if (!oldRule.removeFrom(getAddedContextInitRuleChain())) {
 				oldRule.addTo(getRemovedContextInitRuleChain());
@@ -234,8 +234,7 @@ public class DifferentialIndex extends DirectIndex {
 	@Override
 	public void remove(IndexedObject oldObject) {
 		if (incrementalMode) {
-			if (LOGGER_.isTraceEnabled())
-				LOGGER_.trace("To remove: " + oldObject);
+			LOGGER_.trace("To remove: {}", oldObject);
 			oldObject.accept(todoDeletions_.inserter);
 		} else {
 			super.remove(oldObject);
@@ -248,7 +247,7 @@ public class DifferentialIndex extends DirectIndex {
 	 * @return the context initialization rules added during the last
 	 *         incremental session
 	 */
-	public ChainableRule<Context> getAddedContextInitRules() {
+	public ChainableContextInitRule getAddedContextInitRules() {
 		return addedContextInitRules_;
 	}
 
@@ -256,7 +255,7 @@ public class DifferentialIndex extends DirectIndex {
 	 * @return the context initialization rules removed during the last
 	 *         incremental session
 	 */
-	public ChainableRule<Context> getRemovedContextInitRules() {
+	public ChainableContextInitRule getRemovedContextInitRules() {
 		return removedContextInitRules_;
 	}
 
@@ -264,7 +263,7 @@ public class DifferentialIndex extends DirectIndex {
 	 * @return the map from indexed class expressions to the corresponding
 	 *         objects containing index additions for these class expressions
 	 */
-	public Map<IndexedClassExpression, ChainableRule<Context>> getAddedContextRulesByClassExpressions() {
+	public Map<IndexedClassExpression, ChainableSubsumerRule> getAddedContextRulesByClassExpressions() {
 		return this.addedContextRuleHeadByClassExpressions_;
 	}
 
@@ -272,7 +271,7 @@ public class DifferentialIndex extends DirectIndex {
 	 * @return the map from indexed class expressions to the corresponding
 	 *         objects containing index deletions for these class expressions
 	 */
-	public Map<IndexedClassExpression, ChainableRule<Context>> getRemovedContextRulesByClassExpressions() {
+	public Map<IndexedClassExpression, ChainableSubsumerRule> getRemovedContextRulesByClassExpressions() {
 		return this.removedContextRuleHeadByClassExpressions_;
 	}
 
@@ -284,7 +283,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	/**
-	 * @return
+	 * @return the collection of named individuals added to the signature
 	 */
 	public Collection<ElkNamedIndividual> getAddedIndividuals() {
 		return this.addedIndividuals_;
@@ -314,26 +313,29 @@ public class DifferentialIndex extends DirectIndex {
 	 */
 	public void commitAddedRules() {
 		// commit changes in the context initialization rules
-		ChainableRule<Context> nextRule;
-		Chain<ChainableRule<Context>> chain;
+		ChainableContextInitRule nextContextInitRule;
+		Chain<ChainableContextInitRule> contextInitRuleChain;
 
-		nextRule = addedContextInitRules_;
-		chain = getContextInitRuleChain();
-		while (nextRule != null) {
-			nextRule.addTo(chain);
-			nextRule = nextRule.next();
+		nextContextInitRule = addedContextInitRules_;
+		contextInitRuleChain = getContextInitRuleChain();
+		while (nextContextInitRule != null) {
+			nextContextInitRule.addTo(contextInitRuleChain);
+			nextContextInitRule = nextContextInitRule.next();
 		}
 
+		// commit changes in rules for IndexedClassExpression
+		ChainableSubsumerRule nextClassExpressionRule;
+		Chain<ChainableSubsumerRule> classExpressionRuleChain;
 		for (IndexedClassExpression target : addedContextRuleHeadByClassExpressions_
 				.keySet()) {
-			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Committing context rule additions for " + target);
-			}
-			nextRule = addedContextRuleHeadByClassExpressions_.get(target);
-			chain = target.getCompositionRuleChain();
-			while (nextRule != null) {
-				nextRule.addTo(chain);
-				nextRule = nextRule.next();
+			LOGGER_.trace("Committing context rule additions for {}", target);
+
+			nextClassExpressionRule = addedContextRuleHeadByClassExpressions_
+					.get(target);
+			classExpressionRuleChain = target.getCompositionRuleChain();
+			while (nextClassExpressionRule != null) {
+				nextClassExpressionRule.addTo(classExpressionRuleChain);
+				nextClassExpressionRule = nextClassExpressionRule.next();
 			}
 		}
 		initAdditions();
@@ -386,16 +388,16 @@ public class DifferentialIndex extends DirectIndex {
 	 * @return the chain of added context initialization rules suitable for
 	 *         modifications (addition or deletions) of rules
 	 */
-	private Chain<ChainableRule<Context>> getAddedContextInitRuleChain() {
-		return new AbstractChain<ChainableRule<Context>>() {
+	private Chain<ChainableContextInitRule> getAddedContextInitRuleChain() {
+		return new AbstractChain<ChainableContextInitRule>() {
 
 			@Override
-			public ChainableRule<Context> next() {
+			public ChainableContextInitRule next() {
 				return addedContextInitRules_;
 			}
 
 			@Override
-			public void setNext(ChainableRule<Context> tail) {
+			public void setNext(ChainableContextInitRule tail) {
 				addedContextInitRules_ = tail;
 			}
 		};
@@ -405,16 +407,16 @@ public class DifferentialIndex extends DirectIndex {
 	 * @return the chain of removed context initialization rules suitable for
 	 *         modifications (addition or deletions) of rules
 	 */
-	private Chain<ChainableRule<Context>> getRemovedContextInitRuleChain() {
-		return new AbstractChain<ChainableRule<Context>>() {
+	private Chain<ChainableContextInitRule> getRemovedContextInitRuleChain() {
+		return new AbstractChain<ChainableContextInitRule>() {
 
 			@Override
-			public ChainableRule<Context> next() {
+			public ChainableContextInitRule next() {
 				return removedContextInitRules_;
 			}
 
 			@Override
-			public void setNext(ChainableRule<Context> tail) {
+			public void setNext(ChainableContextInitRule tail) {
 				removedContextInitRules_ = tail;
 			}
 		};
@@ -429,7 +431,7 @@ public class DifferentialIndex extends DirectIndex {
 	 *         {@link IndexedClassExpression} that is suitable for modifications
 	 *         (addition or deletions) of rules
 	 */
-	private Chain<ChainableRule<Context>> getAddedContextRuleChain(
+	private Chain<ChainableSubsumerRule> getAddedContextRuleChain(
 			final IndexedClassExpression target) {
 		return AbstractChain.getMapBackedChain(
 				addedContextRuleHeadByClassExpressions_, target);
@@ -444,15 +446,15 @@ public class DifferentialIndex extends DirectIndex {
 	 *         {@link IndexedClassExpression} that is suitable for modifications
 	 *         (addition or deletions) of rules
 	 */
-	private Chain<ChainableRule<Context>> getRemovedContextRuleChain(
+	private Chain<ChainableSubsumerRule> getRemovedContextRuleChain(
 			final IndexedClassExpression target) {
 		return AbstractChain.getMapBackedChain(
 				removedContextRuleHeadByClassExpressions_, target);
 	}
 
 	void addIndexedObject(IndexedObject iobj) {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace("Adding: " + iobj);
+		LOGGER_.trace("Adding: {}", iobj);
+
 		if (!iobj.accept(todoDeletions_.deletor))
 			iobj.accept(objectCache.inserter);
 

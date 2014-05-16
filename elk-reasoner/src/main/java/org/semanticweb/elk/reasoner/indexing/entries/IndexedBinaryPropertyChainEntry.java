@@ -58,13 +58,13 @@ public class IndexedBinaryPropertyChainEntry<T, K extends IndexedBinaryPropertyC
 
 		if (other instanceof IndexedBinaryPropertyChainEntry<?, ?>) {
 			IndexedBinaryPropertyChainEntry<?, ?> otherEntry = (IndexedBinaryPropertyChainEntry<?, ?>) other;
-			
+
 			return this.key.getLeftProperty().equals(
 					otherEntry.key.getLeftProperty())
 					&& this.key.getRightProperty().equals(
 							otherEntry.key.getRightProperty());
-		} else {
-			return false;
 		}
+		// else
+		return false;
 	}
 }
