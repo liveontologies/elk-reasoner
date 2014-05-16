@@ -34,18 +34,14 @@ import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.parsing.Owl2ParserFactory;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
@@ -60,7 +56,29 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 public class NativeRunner {
 	
 	enum Task {
-		SAT, QUERY, CLASSIFICATION, CONSISTENCY
+		CLASSIFICATION {
+		
+			@Override
+			public String toString() {
+				return "classification";
+			}
+		},
+		
+		CONSISTENCY {
+		
+			@Override
+			public String toString() {
+				return "consistency";
+			}
+		},
+		
+		REALISATION {
+			
+			@Override
+			public String toString() {
+				return "realisation";
+			}
+		},
 	};
 
 	/**
@@ -102,20 +120,6 @@ public class NativeRunner {
 			System.out.println("Started " + task.toString() + " on " + input);
 
 			switch (task) {
-			case SAT:
-				String sep = System.getProperty("line.separator");
-				ElkObjectFactory factory = new ElkObjectFactoryImpl();
-				boolean isSat = reasoner.isSatisfiable(factory
-						.getClass(new ElkFullIri(args[3])));
-
-				printTime(ts);
-
-				writeStringToFile(output, args[3] + "," + String.valueOf(isSat)
-						+ sep, true);
-
-				printCompleted(task, input);
-
-				break;
 			case CLASSIFICATION:
 				Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
 
@@ -126,6 +130,16 @@ public class NativeRunner {
 				printCompleted(task, input);
 
 				break;
+			case REALISATION:
+				InstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = reasoner.getInstanceTaxonomyQuietly();
+
+				printTime(ts);
+
+				writeInstanceTaxonomyToFile(output, instanceTaxonomy);
+
+				printCompleted(task, input);
+
+				break;				
 			case CONSISTENCY:
 				boolean isConsistent = reasoner.isInconsistent();
 
@@ -197,18 +211,9 @@ public class NativeRunner {
 			}
 		}
 
-		if (Task.SAT == task && args.length < 4) {
-			System.out.println("Missing concept URI for the SAT task");
-			return null;
-		}
-
 		// strip possible quotes
 		args[1] = stripQuotes(args[1]);
 		args[2] = stripQuotes(args[2]);
-
-		if (args.length >= 4) {
-			args[3] = stripQuotes(args[3]);
-		}
 
 		return task;
 	}
@@ -220,10 +225,9 @@ public class NativeRunner {
 	static void printHelp() {
 		System.out
 				.println("The system requires the following command line arguments:\n"
-						+ "* name of the reasoning task, one of: SAT, QUERY (not supported), CONSISTENCY, CLASSIFICATION, case insensitive\n"
+						+ "* name of the reasoning task, one of: CONSISTENCY, CLASSIFICATION, REALISATION case insensitive\n"
 						+ "* path to the ontology file\n"
-						+ "* path to the output file\n"
-						+ "* concept URI, in case of SAT");
+						+ "* path to the output file\n");
 	}
 
 	void writeStringToFile(File file, String string, boolean append)
@@ -238,16 +242,13 @@ public class NativeRunner {
 
 	void writeClassTaxonomyToFile(File file, Taxonomy<ElkClass> taxonomy)
 			throws IOException, ElkInconsistentOntologyException, ElkException {
-
-		TaxonomyPrinter
-				.dumpClassTaxomomyToFile(taxonomy, file.getPath(), false);
+		OreTaxonomyPrinter.printClassTaxonomy(taxonomy, file);
 	}
 
 	void writeInstanceTaxonomyToFile(File file,
 			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy)
 			throws IOException, ElkInconsistentOntologyException, ElkException {
-		TaxonomyPrinter.dumpInstanceTaxomomyToFile(taxonomy, file.getPath(),
-				false);
+		OreTaxonomyPrinter.printInstanceTaxonomy(taxonomy, file);
 	}
 
 }
