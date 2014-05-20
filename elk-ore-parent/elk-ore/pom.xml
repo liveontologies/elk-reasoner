@@ -12,7 +12,7 @@
 	<artifactId>elk-ore</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELK ORE build</name>
+	<name>ELK ORE Build</name>
 	<description>ELK build for the Ontology Reasoner Evaluation competition</description>
 
 	<dependencies>
