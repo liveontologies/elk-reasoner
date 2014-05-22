@@ -7,7 +7,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.DummyClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
@@ -51,7 +50,7 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 				tracingSaturationState,
 				traceStore,
 				maxWorkers,
-				new DummyClassExpressionSaturationListener<ContextTracingJob>());
+				ContextTracingListener.DUMMY);
 		jobsToDo_ = new ConcurrentLinkedQueue<RecursiveContextTracingJob>();
 		jobsInProgress_ = new ConcurrentLinkedQueue<TraceUnwindingState>();
 	}
