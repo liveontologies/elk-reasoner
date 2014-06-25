@@ -31,6 +31,7 @@ import org.semanticweb.elk.benchmark.BenchmarkUtils;
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
 import org.semanticweb.elk.benchmark.TaskException;
+import org.semanticweb.elk.benchmark.reasoning.tracing.ContextSizeCalculator;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
@@ -39,7 +40,8 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.stages.RuleAndConclusionCountMeasuringExecutor;
+import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
+import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -78,8 +80,9 @@ public class ClassificationTask implements Task {
 			AxiomLoader loader = new Owl2StreamLoader(
 					new Owl2FunctionalStyleParserFactory(), ontologyFile);
 			reasoner_ = new ReasonerFactory().createReasoner(loader,
+					new SimpleStageExecutor(),
 					//new LoggingStageExecutor(),
-					new RuleAndConclusionCountMeasuringExecutor( new SimpleStageExecutor(), metrics_),
+					//new RuleAndConclusionCountMeasuringExecutor( new SimpleStageExecutor(), metrics_),
 					//new TimingStageExecutor(new SimpleStageExecutor(), metrics_),
 					reasonerConfig_);
 		} catch (Exception e) {
@@ -118,5 +121,9 @@ public class ClassificationTask implements Task {
 	}
 
 	@Override
-	public void postRun() throws TaskException {}
+	public void postRun() throws TaskException {
+		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner_);
+		
+		ContextSizeCalculator.calculate(traceState.getTraceStore(), metrics_);
+	}
 }

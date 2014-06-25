@@ -59,7 +59,7 @@ public class RunAllOnceThenRepeatRunner {
 			public void visit(Task task) throws TaskException {
 				cnt.increment();
 				//FIXME
-				/*if (cnt.get() > 10000) {
+				/*if (cnt.get() > 1000) {
 					logStats(collection);
 					throw new RuntimeException("enough");
 				}*/

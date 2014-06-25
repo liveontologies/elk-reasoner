@@ -38,6 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.DecomposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -265,6 +266,51 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 	@Override
 	public boolean addInference(Inference conclusion) {
 		return conclusion.acceptTraced(inferenceWriter_, null);
+	}
+	
+	/*
+	 * Visits all conclusions for which at least one inference is stored.
+	 */
+	@Override
+	public void visitConclusions(ConclusionVisitor<?, ?> visitor) {
+		// subsumers
+		for (IndexedClassExpression ice : subsumerInferenceMap_.keySet()) {
+			TracingUtils.getSubsumerWrapper(ice).accept(visitor, null);
+		}
+		// backward links
+		for (IndexedPropertyChain linkRelation : backwardLinkInferenceMap_
+				.keySet()) {
+			Multimap<Context, Inference> contextMap = backwardLinkInferenceMap_
+					.get(linkRelation);
+
+			for (Context source : contextMap.keySet()) {
+				TracingUtils.getBackwardLinkWrapper(linkRelation, source)
+						.accept(visitor, null);
+			}
+		}
+		// forward links
+		for (IndexedPropertyChain linkRelation : forwardLinkInferenceMap_
+				.keySet()) {
+
+			Multimap<Context, Inference> contextMap = forwardLinkInferenceMap_
+					.get(linkRelation);
+
+			for (Context target : contextMap.keySet()) {
+				TracingUtils.getForwardLinkWrapper(linkRelation, target)
+						.accept(visitor, null);
+			}
+		}
+		// propagations
+		for (IndexedPropertyChain propRelation : propagationMap_.keySet()) {
+
+			Multimap<IndexedObjectSomeValuesFrom, Inference> carryMap = propagationMap_
+					.get(propRelation);
+
+			for (IndexedObjectSomeValuesFrom carry : carryMap.keySet()) {
+				TracingUtils.getPropagationWrapper(propRelation, carry).accept(
+						visitor, null);
+			}
+		}
 	}
 
 	@Override

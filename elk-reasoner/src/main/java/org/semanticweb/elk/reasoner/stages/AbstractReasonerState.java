@@ -95,7 +95,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * If true, inferences for each produced conclusion will be stored.
 	 */
-	final static boolean FULL_TRACING = false; 
+	final static boolean FULL_TRACING = true; 
 	
 	final ExtendedSaturationState saturationState;
 

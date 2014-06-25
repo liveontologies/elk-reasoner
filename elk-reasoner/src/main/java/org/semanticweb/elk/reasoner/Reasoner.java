@@ -195,8 +195,8 @@ public class Reasoner extends AbstractReasonerState {
 		if (executor_ == null) {
 			executor_ = new ComputationExecutor(workerNo_, "elk-reasoner");
 			//FIXME HACK to enable experiments with justifications
-			//executor_.setKeepAliveTime(1, TimeUnit.MINUTES);
-			//executor_.allowCoreThreadTimeOut(true);
+			executor_.setKeepAliveTime(1, TimeUnit.MINUTES);
+			executor_.allowCoreThreadTimeOut(true);
 		}
 		return executor_;
 	}

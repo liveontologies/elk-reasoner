@@ -26,7 +26,9 @@
 package org.semanticweb.elk.benchmark.reasoning.owlapi;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.MutableInteger;
@@ -39,7 +41,6 @@ import org.semanticweb.elk.benchmark.TaskVisitor;
 import org.semanticweb.elk.benchmark.reasoning.tracing.SideConditionCollector;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
-import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -50,7 +51,15 @@ import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.BaseConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -63,10 +72,13 @@ import org.semanticweb.elk.reasoner.saturation.tracing.util.TracingUtils;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
+import org.semanticweb.elk.util.collections.LazySetUnion;
+import org.semanticweb.elk.util.collections.Pair;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -91,7 +103,7 @@ public class FindJustificationsForAllSubsumptions implements TaskCollection2 {
 
 	//private static final Logger LOGGER_ = LoggerFactory.getLogger(FindJustificationsForAllSubsumptions.class);
 	
-	private static final int JUSTIFICATION_NO_THRESHOLD = 1;
+	private static final int JUSTIFICATION_NO_THRESHOLD = 1;//Integer.MAX_VALUE;
 	
 	final String ontologyFile_;
 	private Reasoner reasoner_;
@@ -103,6 +115,7 @@ public class FindJustificationsForAllSubsumptions implements TaskCollection2 {
 	OWLOntology ontology;
 	OntologySegmenter extractor;
 	Taxonomy<ElkClass> taxonomy;
+	Set<OWLAxiom> propertyAxioms;
 	
 	public FindJustificationsForAllSubsumptions(String... args) {
 		ontologyFile_ = args[0];
@@ -115,6 +128,13 @@ public class FindJustificationsForAllSubsumptions implements TaskCollection2 {
 		if (ontology == null) {
 			ontology = manager.loadOntologyFromOntologyDocument(new File(ontologyFile_));
 			extractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
+			propertyAxioms = new HashSet<OWLAxiom>();
+			
+			for (OWLAxiom axiom : ontology.getLogicalAxioms()) {
+				if (axiom.isOfType(AxiomType.SUB_OBJECT_PROPERTY, AxiomType.TRANSITIVE_OBJECT_PROPERTY, AxiomType.SUB_PROPERTY_CHAIN_OF)) {
+					propertyAxioms.add(axiom);
+				}
+			}
 		}
 	}
 	
@@ -212,8 +232,8 @@ public class FindJustificationsForAllSubsumptions implements TaskCollection2 {
 		final Metrics metrics = new Metrics();
 		private final ElkClassExpression subsumee_;
 		private final ElkClassExpression subsumer_;
-		
-		OWLOntology module = null;
+		// either the module or the union of all subsumption axioms used in the proofs
+		private OWLOntology relevantPartOfOntology_ = null;
 		
 		GenerateJustifications(ElkClassExpression sub, ElkClassExpression sup, int threshold) {
 			IRI subIri = IRI.create(((ElkClass)sub).getIri().getFullIriAsString());
@@ -230,7 +250,7 @@ public class FindJustificationsForAllSubsumptions implements TaskCollection2 {
 			return "Generating justifications ";// + axiomToExplain;
 		}
 
-		private void doTracing() throws ElkException {
+		private void doTracing() throws Exception {
 			reasoner_.resetTraceState();
 			reasoner_.explainSubsumption(subsumee_, subsumer_);
 			//collect all useful metrics
@@ -245,11 +265,34 @@ public class FindJustificationsForAllSubsumptions implements TaskCollection2 {
 			
 			traceUnwinder.accept(sub.getContext(), subsumerConclusion, new BaseConclusionVisitor<Boolean, Context>(), collector);
 			
+			String iri = "http://test.org/" + System.currentTimeMillis();
+			
+			Set<OWLAxiom> relevant = new LazySetUnion<OWLAxiom>(propertyAxioms, convertAxioms(collector.getSubClassOfAxioms()));
+			
+			relevantPartOfOntology_ = OWLManager.createOWLOntologyManager().createOntology(relevant, IRI.create(iri));
 			int subClassAxiomNo = collector.getSubClassOfAxioms().size();
 			
 			metrics.updateLongMetric(SUBCLASSOF_AXIOM_COUNT, subClassAxiomNo);
 		}
 		
+		/*
+		 * Converts pairs of indexed subsumee-subsumers to the OWL API axioms 
+		 */
+		private Set<OWLAxiom> convertAxioms(
+				Set<Pair<IndexedClassExpression, IndexedClassExpression>> indexedAxioms) {
+			Set<OWLAxiom> convertedAxioms = new HashSet<OWLAxiom>(indexedAxioms.size());
+			IndexedClassExpressionVisitor<OWLClassExpression> converter = new IceToOwlApiConverter(factory);
+			
+			for (Pair<IndexedClassExpression, IndexedClassExpression> pair : indexedAxioms) {
+				OWLClassExpression sub = pair.getFirst().accept(converter);
+				OWLClassExpression sup = pair.getSecond().accept(converter);
+				
+				convertedAxioms.add(factory.getOWLSubClassOfAxiom(sub, sup));
+			}
+			
+			return convertedAxioms;
+		}
+
 		/**
 		 * 
 		 */
@@ -266,17 +309,19 @@ public class FindJustificationsForAllSubsumptions implements TaskCollection2 {
 			
 			metrics.updateLongMetric(MODULE_SIZE, subsumptionCounter);
 			
-			module = OWLManager.createOWLOntologyManager().createOntology(moduleAxioms, IRI.create(iri));
+			relevantPartOfOntology_ = OWLManager.createOWLOntologyManager().createOntology(moduleAxioms, IRI.create(iri));
 		}
 		
 		/**
 		 * 
 		 */
-		void computeJustifications() throws Exception {
-			final Set<OWLAxiom> subclassAxioms = new HashSet<OWLAxiom>();
+		void computeJustifications(OWLOntology relevantAxioms) throws Exception {
+			final List<OWLAxiom> subclassAxioms = new ArrayList<OWLAxiom>();
 			final MutableInteger counter = new MutableInteger(0);
 			
-			DefaultExplanationGenerator multExplGen = new DefaultExplanationGenerator(module.getOWLOntologyManager(), reasonerFactory, module, new ExplanationProgressMonitor() {
+			//System.err.println("Number of relevant axioms: " + relevantAxioms.getAxiomCount());
+			
+			DefaultExplanationGenerator multExplGen = new DefaultExplanationGenerator(relevantAxioms.getOWLOntologyManager(), reasonerFactory, relevantAxioms, new ExplanationProgressMonitor() {
 				
 				@Override
 				public boolean isCancelled() {
@@ -292,6 +337,10 @@ public class FindJustificationsForAllSubsumptions implements TaskCollection2 {
 							subclassAxioms.add((OWLSubClassOfAxiom)ax);
 						}
 
+					}
+					
+					if (counter.get() > 1) {
+						System.err.println("Found " + counter.get() + " justifications");
 					}
 				}
 				
@@ -315,7 +364,7 @@ public class FindJustificationsForAllSubsumptions implements TaskCollection2 {
 			try {
 				metrics.incrementRunCount();
 				
-				//doTracing();
+				doTracing();
 				//extractModule();
 				//System.err.println("module extracted, " + module.getAxiomCount() + " axioms");
 				
@@ -327,14 +376,15 @@ public class FindJustificationsForAllSubsumptions implements TaskCollection2 {
 		@Override
 		public void run() throws TaskException {
 			try {
-				extractModule();
-				//computeJustifications();
+				//doTracing();
+				//extractModule();
+				computeJustifications(relevantPartOfOntology_);
 				
 			} catch (Throwable e) {
 				throw new TaskException(e);
 			}
 			finally {
-				module = null;
+				relevantPartOfOntology_ = null;
 			}
 		}
 		
@@ -353,4 +403,63 @@ public class FindJustificationsForAllSubsumptions implements TaskCollection2 {
 		}
 	}
 
+	/**
+	 * Converts indexed class expressions to OWL API class expression.
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private static class IceToOwlApiConverter implements IndexedClassExpressionVisitor<OWLClassExpression> {
+
+		private final OWLDataFactory factory_;
+		
+		IceToOwlApiConverter(OWLDataFactory factory) {
+			factory_ = factory;
+		}
+		
+		@Override
+		public OWLClassExpression visit(IndexedClass element) {
+			return factory_.getOWLClass(IRI.create(element.getElkClass().getIri().getFullIriAsString()));
+		}
+
+		@Override
+		public OWLClassExpression visit(IndexedIndividual element) {
+			return factory_.getOWLObjectOneOf(factory_.getOWLNamedIndividual(IRI.create(element.getElkNamedIndividual().getIri().getFullIriAsString())));
+		}
+
+		@Override
+		public OWLClassExpression visit(IndexedObjectComplementOf element) {
+			return factory_.getOWLObjectComplementOf(element.getNegated().accept(this));
+		}
+
+		@Override
+		public OWLClassExpression visit(IndexedObjectIntersectionOf element) {
+			return factory_.getOWLObjectIntersectionOf(element.getFirstConjunct().accept(this), element.getSecondConjunct().accept(this));
+		}
+
+		@Override
+		public OWLClassExpression visit(IndexedObjectSomeValuesFrom element) {
+			return factory_.getOWLObjectSomeValuesFrom(factory_.getOWLObjectProperty(IRI.create(element.getRelation().getElkObjectProperty().getIri().getFullIriAsString())),
+					element.getFiller().accept(this));
+		}
+
+		@Override
+		public OWLClassExpression visit(IndexedObjectUnionOf element) {
+			OWLClassExpression[] disjuncts = new OWLClassExpression[element.getDisjuncts().size()];
+			int i = 0;
+			
+			for (IndexedClassExpression ice : element.getDisjuncts()) {
+				disjuncts[i++] = ice.accept(this);
+			}
+			
+			return factory_.getOWLObjectUnionOf(disjuncts);
+		}
+
+		@Override
+		public OWLClassExpression visit(IndexedDataHasValue element) {
+			throw new UnsupportedOperationException("data range conversion not supported");
+		}
+		
+	}
 }

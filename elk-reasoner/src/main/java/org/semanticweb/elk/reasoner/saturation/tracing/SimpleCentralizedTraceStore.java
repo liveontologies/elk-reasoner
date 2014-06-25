@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +82,15 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 			
 			if (tracer != null) {
 				tracer.visitInferences(visitor);
+			}
+		}
+		
+		@Override
+		public void visitConclusions(IndexedClassExpression root, ConclusionVisitor<?, ?> visitor) {
+			ContextTraceStore tracer = storage_.get(root);
+			
+			if (tracer != null) {
+				tracer.visitConclusions(visitor);
 			}
 		}
 		

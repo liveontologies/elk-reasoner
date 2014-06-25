@@ -5,6 +5,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 
 /**
  * Delegates all calls to the underlying reader.
@@ -37,4 +38,11 @@ abstract class DelegatingTraceReader implements TraceStore.Reader {
 		reader.visitInferences(root, visitor);
 	}
 
+	@Override
+	public void visitConclusions(IndexedClassExpression root,
+			ConclusionVisitor<?, ?> visitor) {
+		reader.visitConclusions(root, visitor);
+	}
+
+	
 }

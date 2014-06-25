@@ -72,7 +72,7 @@ public class InferenceInsertionVisitor extends BaseConclusionVisitor<Boolean, Co
 			return ((Inference) conclusion).acceptTraced(getTracedConclusionVisitor(), cxt);	
 		}
 		else {
-			LOGGER_.warn("Tracing is ON but {} is not traced", conclusion);
+			LOGGER_.trace("Tracing is ON but {} is not traced", conclusion);
 			
 			return true;
 		}
