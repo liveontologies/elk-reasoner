@@ -39,6 +39,8 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
+import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.Operations.Transformation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.slf4j.Logger;
@@ -325,11 +327,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			if (output.directSubsumers.isEmpty()
 					&& !output.getEquivalent().contains(
 							PredefinedElkClass.OWL_THING)) {
-				output.directSubsumers.add(defaultTopOutput_);
+				//output.directSubsumers.add(defaultTopOutput_);
+				output.addDirectSubsumer(defaultTopOutput_.getRoot());
 			}
-			// if (output.equivalent.isEmpty()) {
-			// LOGGER_.error("{}: empty equivalent class!", output.getRoot());
-			// }
 
 			state.initiatorJob.setOutput(output);
 			listener_.notifyFinished(state.initiatorJob);
@@ -340,7 +340,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				for (ElkClass equivalent : output.equivalent) {
 					LOGGER_.trace(root + ": equivalent " + equivalent.getIri());
 				}
-				for (TransitiveReductionOutputEquivalent<IndexedClass> direct : output.directSubsumers) {
+				for (TransitiveReductionOutputEquivalent<IndexedClass> direct : output.getDirectSubsumers()) {
 					String message = root + ": direct super class ["
 							+ direct.getRoot();
 					for (ElkClass equivalent : direct.equivalent)
@@ -349,6 +349,20 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 					LOGGER_.trace(message);
 				}
 			}
+		}
+		
+		private Iterable<IndexedClass> getAtomicClasses(Iterable<IndexedClassExpression> ices) {
+			return Operations.map(ices, new Transformation<IndexedClassExpression, IndexedClass>(){
+
+				@Override
+				public IndexedClass transform(IndexedClassExpression ice) {
+					return ice instanceof IndexedClass ? (IndexedClass) ice : null;
+				}});
+		}
+		
+		// TODO get rid of this
+		private IndexedClass getTop() {
+			return defaultTopOutput_.getRoot();
 		}
 
 		/**
@@ -382,69 +396,120 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 * candidate is equivalent to the root
 			 */
 			if (candidateSupers.contains(root)) {
-				output.equivalent.add(candidate.getElkClass());
+				output.equivalent.add(candidate.getElkClass());			
 				return;
 			}
-
+			// TODO It makes sense to store atomic subsumers separately
+			// first, check if the candidate is a subsumer of some current direct subsumer
+			boolean isNonDirect = output.allSubsumers.contains(candidate) || (!output.allSubsumers.isEmpty() && isTop(candidate));
+			
+			if (isNonDirect) {
+				boolean topChecked = false;
+				// see if the candidate is equivalent to some current direct subsumer
+				for (IndexedClass candidateSubsumer : getAtomicClasses(candidateSupers)) {
+					TransitiveReductionOutputEquivalent<IndexedClass> directSuperClassEquivalent = output.getTransitiveReductionOutputForDirectSubsumer(candidateSubsumer);
+					
+					if (directSuperClassEquivalent != null) {
+						// this direct subsumer is equivalent to the candidate, make them equivalent
+						directSuperClassEquivalent.equivalent.add(candidate.getElkClass());
+						return;
+					}
+					
+					topChecked |= candidate == getTop();
+				}
+				// TODO make it prettier, we need to account for owl:Thing which may not be explicitly derived
+				if (!topChecked) {
+					TransitiveReductionOutputEquivalent<IndexedClass> topEquivalent = output.getTransitiveReductionOutputForDirectSubsumer(getTop());
+					
+					if (topEquivalent != null) {
+						topEquivalent.equivalent.add(candidate.getElkClass());
+						return;
+					}
+				}
+			}
+			else {
+				// the candidate is going to become (for now) a new direct subsumer
+				if (candidate != getTop()) {
+					// if owl:Thing was previously a direct subsumer, it shouldn't be any longer
+					output.removeDirectSubsumer(getTop());
+				}
+				
+				// see if the candidate makes some current direct subsumer non-direct
+				for (IndexedClass candidateSubsumer : getAtomicClasses(candidateSupers)) {
+					output.removeDirectSubsumer(candidateSubsumer);
+					// update the set of subsumers of the current direct subsumers
+					// (this set never shrinks)
+					output.allSubsumers.add(candidateSubsumer);
+				}
+				// make it a new direct subsumer
+				output.addDirectSubsumer(candidate);
+			}
+			
 			/*
 			 * To check if the candidate should be added to the list of direct
 			 * super-classes, we iterate over the direct super classes computed
 			 * so far.
 			 */
-			boolean isCandidateTop = isTop(candidate);
-			Iterator<TransitiveReductionOutputEquivalent<IndexedClass>> iteratorDirectSuperClasses = output.directSubsumers
-					.iterator();
-
-			while (iteratorDirectSuperClasses.hasNext()) {
-				TransitiveReductionOutputEquivalent<IndexedClass> directSuperClassEquivalent = iteratorDirectSuperClasses
-						.next();
-				IndexedClass directSuperClass = directSuperClassEquivalent
-						.getRoot();
-				boolean isDirectSuperClassTop = isTop(directSuperClass);
-
-				/*
-				 * If the (already computed) saturation for the direct
-				 * super-class contains the candidate, it cannot be direct.
-				 */
-				if (isCandidateTop
-						|| saturationState_.getContext(directSuperClass)
-								.getSubsumers().contains(candidate)) {
-					/*
-					 * If, in addition, the saturation for the candidate
-					 * contains the direct super class, they are equivalent, so
-					 * the candidate is added to the equivalence class of the
-					 * direct super class.
-					 */
-					if (candidateSupers.contains(directSuperClass)
-							|| isDirectSuperClassTop)
-						directSuperClassEquivalent.equivalent.add(candidate
-								.getElkClass());
-					return;
-				}
-				/*
-				 * At this point we know that the candidate is not contained in
-				 * the saturation of the direct super-class. We check, if
-				 * conversely, the saturation of the candidate contains the
-				 * direct super-class. In this case the direct super-class is
-				 * not direct anymore and should be removed from the list.
-				 */
-				if (candidateSupers.contains(directSuperClass)
-						|| isDirectSuperClassTop) {
-					iteratorDirectSuperClasses.remove();
-				}
-			}
-			/*
-			 * if the candidate has survived all the tests, then it is a direct
-			 * super-class
-			 */
-			TransitiveReductionOutputEquivalent<IndexedClass> candidateOutput = new TransitiveReductionOutputEquivalent<IndexedClass>(
-					candidate);
-			candidateOutput.equivalent.add(candidate.getElkClass());
-			output.directSubsumers.add(candidateOutput);
+//			boolean isCandidateTop = isTop(candidate);
+//			Iterator<TransitiveReductionOutputEquivalent<IndexedClass>> iteratorDirectSuperClasses = output.directSubsumers
+//					.iterator();
+//
+//			while (iteratorDirectSuperClasses.hasNext()) {
+//				TransitiveReductionOutputEquivalent<IndexedClass> directSuperClassEquivalent = iteratorDirectSuperClasses
+//						.next();
+//				IndexedClass directSuperClass = directSuperClassEquivalent
+//						.getRoot();
+//				boolean isDirectSuperClassTop = isTop(directSuperClass);
+//
+//				/*
+//				 * If the (already computed) saturation for the direct
+//				 * super-class contains the candidate, it cannot be direct.
+//				 */
+//				if (isCandidateTop
+//						|| saturationState_.getContext(directSuperClass)
+//								.getSubsumers().contains(candidate)) {
+//					/*
+//					 * If, in addition, the saturation for the candidate
+//					 * contains the direct super class, they are equivalent, so
+//					 * the candidate is added to the equivalence class of the
+//					 * direct super class.
+//					 */
+//					/*if (candidateSupers.contains(directSuperClass)
+//							|| isDirectSuperClassTop)
+//						directSuperClassEquivalent.equivalent.add(candidate
+//								.getElkClass());*/ 
+//					return;
+//				}
+//				/*
+//				 * At this point we know that the candidate is not contained in
+//				 * the saturation of the direct super-class. We check, if
+//				 * conversely, the saturation of the candidate contains the
+//				 * direct super-class. In this case the direct super-class is
+//				 * not direct anymore and should be removed from the list.
+//				 */
+//				if (candidateSupers.contains(directSuperClass)
+//						|| isDirectSuperClassTop) {
+//					iteratorDirectSuperClasses.remove();
+//				}
+//			}
+//			/*
+//			 * if the candidate has survived all the tests, then it is a direct
+//			 * super-class
+//			 */
+//			TransitiveReductionOutputEquivalent<IndexedClass> candidateOutput = new TransitiveReductionOutputEquivalent<IndexedClass>(
+//					candidate);
+//			candidateOutput.equivalent.add(candidate.getElkClass());
+//			output.directSubsumers.add(candidateOutput);
 		}
 	}
 
-	private boolean isTop(IndexedClass clazz) {
+	private boolean isTop(IndexedClassExpression ice) {
+		if (!(ice instanceof IndexedClass)) {
+			return false;
+		}
+		
+		IndexedClass clazz = (IndexedClass) ice;
+		
 		return clazz.getElkClass().getIri() == PredefinedElkIri.OWL_THING.get();
 	}
 
