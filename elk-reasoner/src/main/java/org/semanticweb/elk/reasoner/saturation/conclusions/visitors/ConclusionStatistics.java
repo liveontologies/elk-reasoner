@@ -108,7 +108,6 @@ public class ConclusionStatistics extends AbstractStatistics {
 		this.conclusionProcessingTimer_.add(stats.conclusionProcessingTimer_);
 	}
 
-	@SuppressWarnings("unused")
 	public void check(Logger logger) {
 		// TODO
 	}

@@ -47,7 +47,6 @@ public class Owl2StreamLoader extends Owl2ParserLoader implements AxiomLoader {
 		this.stream_ = stream;
 	}
 
-	@SuppressWarnings("resource")
 	public Owl2StreamLoader(Owl2ParserFactory parserFactory, File file)
 			throws FileNotFoundException {
 		this(parserFactory, new FileInputStream(file));
