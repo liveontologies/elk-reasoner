@@ -182,20 +182,28 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 
 		@Override
 		public void run() {
-			try {
-				job.run();
-			} catch (Throwable e) {
-				exception = new ComputationRuntimeException(
-						"Uncaught exception in a worker thread:", e);
-				executorThread.interrupt();
-			} finally {
-				done.countDown();
-				/*
-				 * clear the interrupt status so that this thread can be reused
-				 * for other jobs
-				 */
-				Thread.interrupted();
+			for (;;) {
+				try {
+					job.run();
+					
+					return;
+				} catch (Throwable e) {
+					handleUnexpectedException(e);
+				} finally {
+					done.countDown();
+					/*
+					 * clear the interrupt status so that this thread can be
+					 * reused for other jobs
+					 */
+					Thread.interrupted();
+				}
 			}
+		}
+		
+		private void handleUnexpectedException(Throwable e) {
+			exception = new ComputationRuntimeException(
+					"Uncaught exception in a worker thread:", e);
+			executorThread.interrupt();
 		}
 	}
 

@@ -51,6 +51,9 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 	 * the internal buffer for queuing input
 	 */
 	protected final BlockingQueue<I> buffer;
+	// we are never going to call any method on this object
+	@SuppressWarnings("unchecked")
+	private I POISION_PILL = (I) new Object();
 
 	/**
 	 * Creating a {@link ConcurrentComputationWithInputs} instance.
@@ -131,6 +134,16 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 		return new Worker();
 	}
 
+	@Override
+	public void finish() throws InterruptedException {
+		if (!finishRequested) {
+			finishRequested = true;
+			buffer.put(POISION_PILL);
+		}
+		executor.waitDone();
+		processorFactory.finish();
+	}
+	
 	/**
 	 * The {@link Runnable} for workers processing the input
 	 * 
@@ -146,7 +159,7 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 
 		@Override
 		public final void run() {
-			I nextInput;
+			I nextInput = null;
 			// we use one engine per worker run
 			InputProcessor<I> inputProcessor = processorFactory.getEngine();
 
@@ -164,8 +177,12 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 							doneProcess = true;
 						}
 						if (finishRequested) {
+							// do not poll if we've already eaten the poison pill
 							nextInput = buffer.poll();
-							if (nextInput == null) {
+							//if (nextInput == null) {
+							if (nextInput == POISION_PILL || nextInput == null) {
+								// let's poison the workers blocked by the empty buffer
+								buffer.put(POISION_PILL);
 								// make sure nothing is left unprocessed
 								inputProcessor.process(); // can be interrupted
 								if (!interrupted && Thread.interrupted())
@@ -174,6 +191,10 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 							}
 						} else {
 							nextInput = buffer.take();
+							
+							if (nextInput == POISION_PILL) {
+								continue;
+							}
 						}
 						inputProcessor.submit(nextInput); // should never fail
 						inputProcessor.process(); // can be interrupted
