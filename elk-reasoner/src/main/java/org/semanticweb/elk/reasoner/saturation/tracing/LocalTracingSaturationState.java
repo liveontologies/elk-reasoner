@@ -33,7 +33,6 @@ import org.semanticweb.elk.reasoner.saturation.ContextFactory;
 import org.semanticweb.elk.reasoner.saturation.ContextImpl;
 import org.semanticweb.elk.reasoner.saturation.MapSaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
@@ -102,42 +101,11 @@ public class LocalTracingSaturationState extends
 		 * I from C.
 		 */
 		private Multimap<Conclusion, Inference> blockedInferences_;
-		/**
-		 * The set of conclusions missing in the main saturation state at the
-		 * time of tracing (if the closure was computed w.r.t. a subset of all
-		 * rules, e.g. only non-redundant rules). Indexed by roots of contexts
-		 * where these conclusions should be stored.
-		 */
-		private Multimap<IndexedClassExpression, SubConclusion> missingConclusions_ = new HashListMultimap<IndexedClassExpression, SubConclusion>();
 
 		public TracedContext(IndexedClassExpression root) {
 			super(root);
 		}
 
-		public Multimap<IndexedClassExpression, SubConclusion> getMissingSubConclusions() {
-			/*if (!beingTraced_.get()) {
-				throw new RuntimeException("The context isn't being traced now: " + getRoot() + ", finished? " + (isInitialized() && isSaturated()));
-			}*/
-			
-			return missingConclusions_;
-		}
-		
-		public void addMissingSubConclusion(IndexedClassExpression root, SubConclusion conclusion) {
-			/*if (!beingTraced_.get()) {
-				throw new RuntimeException("The context isn't being traced now: " + getRoot() + ", finished? " + (isInitialized() && isSaturated()));
-			}*/
-			
-			missingConclusions_.add(root, conclusion);
-		}
-		
-		public void clearMissingConclusions() {
-			/*if (!beingTraced_.get()) {
-				throw new RuntimeException("The context isn't being traced now: " + getRoot() + ", finished? " + (isInitialized() && isSaturated()));
-			}*/
-			
-			missingConclusions_.clear();
-		}
-		
 		public Multimap<Conclusion, Inference> getBlockedInferences() {
 			if (blockedInferences_ == null) {
 				blockedInferences_ = new HashListMultimap<Conclusion, Inference>();

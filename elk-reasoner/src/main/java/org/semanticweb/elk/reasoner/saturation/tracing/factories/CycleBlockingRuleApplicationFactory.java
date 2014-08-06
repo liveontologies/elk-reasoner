@@ -35,29 +35,25 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStateWriterWrap;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ConclusionEntry;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ComposedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionInsertionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionOccurrenceCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.HybridLocalRuleApplicationConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.LocalizedConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
-import org.semanticweb.elk.reasoner.saturation.rules.factories.WorkerLocalTodo;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.IsInferenceCyclic;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.GetInferenceTarget;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceInsertionVisitor;
-import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 
 /**
  * This factory should be used for tracing already made inferences whose
@@ -113,10 +109,10 @@ public class CycleBlockingRuleApplicationFactory extends
 				localWriter);
 
 		return new ComposedConclusionVisitor<Context>(
-		// Checking the conclusion against the main saturation state and saves
-		// conclusions if the context doesn't yet exist. Returns true when the
-		// context exists but the conclusion is missing.
-				new MissingContextChecker(),
+		// Checking the conclusion against the main saturation state
+				new LocalizedConclusionVisitor(
+						new ConclusionOccurrenceCheckingVisitor(),
+						mainSaturationState_),
 				// if all fine, insert the conclusion to the local context copy
 				// and write the inference
 				new InferenceInserter(new ConclusionInsertionVisitor(
@@ -137,19 +133,6 @@ public class CycleBlockingRuleApplicationFactory extends
 		}
 	}
 	
-	@Override
-	protected InputProcessor<RuleApplicationInput> getEngine(
-			ConclusionVisitor<? super Context, Boolean> conclusionProcessor,
-			SaturationStateWriter<? extends TracedContext> saturationStateWriter,
-			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
-		return new TracingRuleEngine<RuleApplicationInput>(conclusionProcessor,
-				localTodo, saturationStateWriter,
-				new ContextInitializationImpl(mainSaturationState_.getOntologyIndex()),
-				localStatistics, localStatistics);
-	}
-
-
-
 	/**
 	 * Blocks cyclic inferences when producing conclusions.
 	 */
@@ -273,49 +256,6 @@ public class CycleBlockingRuleApplicationFactory extends
 				}
 			}
 		}
-	}
-	
-	/**
-	 * 
-	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
-	 */
-	private class MissingContextChecker extends AbstractConclusionVisitor<Context, Boolean> {
-		
-		@Override
-		public Boolean visit(BackwardLink subConclusion, Context context) {
-			IndexedClassExpression root = context.getRoot();
-			Context mainContext = mainSaturationState_.getContext(root);
-			TracedContext localContext = getSaturationState().getContext(subConclusion.getSourceRoot(root));
-			
-			if (needsTracing(mainContext, localContext, subConclusion)) {
-				localContext.addMissingSubConclusion(root, subConclusion);
-				
-				return Boolean.FALSE;
-			}
-			
-			return Boolean.TRUE;
-		}
-
-		/**
-		 */
-		private boolean needsTracing(Context mainContext,
-				TracedContext tracedContext, SubConclusion subconclusion) {
-			if (mainContext == null || !mainContext.isSaturated()) {
-				return true;
-			}
-
-			SubContextPremises subContext = mainContext.getSubContextPremisesByObjectProperty().get(subconclusion.getSubRoot());
-
-			return subContext == null || !subContext.isInitialized();
-		}
-
-		@Override
-		protected Boolean defaultVisit(Conclusion conclusion, Context input) {
-			return Boolean.TRUE;
-		}
-
 	}
 
 }

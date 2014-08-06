@@ -30,7 +30,6 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
@@ -220,8 +219,6 @@ public class PropagationFromExistentialFillerRule extends
 		for (IndexedObjectSomeValuesFrom e : negExistentials_) {
 			if (e.getRelation().getSaturated().getSubPropertyChains()
 					.contains(property)) {
-				// producer.produce(premises.getRoot(), new
-				// Propagation(property, e));
 				producer.produce(premises.getRoot(), new TracedPropagation(
 						property, e));
 			}

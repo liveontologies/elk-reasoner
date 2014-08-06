@@ -25,15 +25,11 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
  * #L%
  */
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubConclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
@@ -61,18 +57,8 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> impl
 	 * application factory.
 	 */
 	private final ClassExpressionSaturationFactory<J> tracingFactory_;
-	/**
-	 * This factory saturates sub-contexts which were found missing during tracing
-	 */
-	private final ContextSubContextSaturationFactory<SubContextSaturationJob<J>> subContextSaturationFactory_;
 
 	private final SaturationState<TracedContext> tracingState_;
-
-	private final Queue<SubContextSaturationJob<J>> jobsToSaturateSubContext_;
-	/**
-	 * The queue for jobs to resume saturation of a context after its context finished saturation.
-	 */
-	private final Queue<J> jobsToResume_;
 	/**
 	 * The queue of started jobs, indexed by the root. Useful because the same
 	 * context can be submitted for tracing concurrently. It must be traced by
@@ -98,9 +84,6 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> impl
 		tracingState_ = tracingState;
 		tracingFactory_ = new ClassExpressionSaturationFactory<J>(
 				ruleTracingFactory, maxWorkers, new ThisTracingListener());
-		subContextSaturationFactory_ = new ContextSubContextSaturationFactory<SubContextSaturationJob<J>>(saturationState, maxWorkers, new ThisSubContextSaturationVisitor());
-		jobsToSaturateSubContext_ = new ConcurrentLinkedQueue<SubContextSaturationJob<J>>();
-		jobsToResume_ = new ConcurrentLinkedQueue<J>();
 		jobsInProgress_ = new HashListMultimap<IndexedClassExpression, J>();
 		tracingFinishedListener_ = listener;
 		aggregateStatistics_ = new SaturationStatistics();
@@ -115,10 +98,7 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> impl
 	public void finish() {
 		// aggregating statistics over both factories
 		aggregateStatistics_.add(tracingFactory_.getRuleAndConclusionStatistics());
-		//TODO add stats from the sub-context saturation factory
-		
 		tracingFactory_.finish();
-		subContextSaturationFactory_.finish();
 	}
 
 	@Override
@@ -130,15 +110,13 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> impl
 		return tracingState_;
 	}
 	
-	private void finishTracing(J job) /*throws InterruptedException*/ {
+	private void finishTracing(J job) {
 		IndexedClassExpression root = job.getInput();
 		TracedContext context = tracingState_.getContext(root);
 		
 		LOGGER_.info("{} finished tracing", root);
 		// cleaning up the auxiliary data structures
 		context.clearBlockedInferences();
-		context.clearMissingConclusions();
-		
 		context.setSaturated(true);
 		
 		notifyCallers(job.getInput());
@@ -159,6 +137,7 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> impl
 	}
 	
 	/**
+	 * TODO doc
 	 * 
 	 * @author Pavel Klinov
 	 * 
@@ -167,8 +146,6 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> impl
 	public class Engine implements InputProcessor<J> {
 
 		private final ClassExpressionSaturationFactory<J>.Engine tracingEngine_ = tracingFactory_.getEngine();
-
-		private final ContextSubContextSaturationFactory<SubContextSaturationJob<J>>.Engine subContextSaturationEngine_ = subContextSaturationFactory_.getEngine();
 		
 		@Override
 		public void submit(J job) {
@@ -193,56 +170,12 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> impl
 
 		@Override
 		public void process() throws InterruptedException {
-			for (;;) {
-				if (Thread.currentThread().isInterrupted()) {
-					LOGGER_.trace("Tracing has been interrupted");					
-					break;
-				}
-				// first, do tracing
-				tracingEngine_.process();
-				
-				if (jobsToSaturateSubContext_.isEmpty()) {
-					break;
-				}
-				
-				// second, saturate the relevant sub-contexts in the main saturation state
-				submitSubContextSaturationJobs();
-				subContextSaturationEngine_.process();
-				// third, submit the jobs to resume tracing
-				submitResumeTracingJobs();
-			}
+			tracingEngine_.process();
 		}
 		
-		private void submitResumeTracingJobs() {
-			// it's not interruptable
-			for (;;) {
-				J job = jobsToResume_.poll();
-
-				if (job == null) {
-					break;
-				}
-
-				tracingEngine_.submit(job);
-			}
-		}
-
-		private void submitSubContextSaturationJobs() {
-			// it's not interruptable
-			for (;;) {
-				SubContextSaturationJob<J> job = jobsToSaturateSubContext_.poll();
-				
-				if (job == null) {
-					break;
-				}
-				
-				subContextSaturationEngine_.submit(job);
-			}
-		}
-
 		@Override
 		public void finish() {
 			tracingEngine_.finish();
-			subContextSaturationEngine_.finish();
 		}
 	}
 
@@ -256,39 +189,9 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> impl
 
 		@Override
 		public void notifyFinished(J job) throws InterruptedException {
-			TracedContext context = getTracingSaturationState().getContext(job.getInput());
-			
-			if (context.getMissingSubConclusions().isEmpty()) {
-				// done with tracing this context
-				finishTracing(job);
-			}
-			else {
-				// initiating saturation of sub-contexts in the main state which were not initialized (or even existed) during tracing
-				for (IndexedClassExpression root : context.getMissingSubConclusions().keySet()) {
-					for (SubConclusion missing : context.getMissingSubConclusions().get(root)) {
-						jobsToSaturateSubContext_.add(new SubContextSaturationJob<J>(root, missing.getSubRoot(), job));
-					}
-				}
-				
-				context.clearMissingConclusions();
-			}
+			// done with tracing this context
+			finishTracing(job);
 		}
-		
 	}
-	
-	/**
-	 * Gets notifications when sub-contexts get saturated.
-	 * 
-	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
-	 */
-	private class ThisSubContextSaturationVisitor implements ClassExpressionSaturationListener<SubContextSaturationJob<J>> {
 
-		@Override
-		public void notifyFinished(SubContextSaturationJob<J> job) throws InterruptedException {
-			jobsToResume_.add(job.getInitiatorJob());
-		}
-		
-	}
 }

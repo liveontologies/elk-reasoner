@@ -53,7 +53,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestUtils;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
-import org.semanticweb.elk.reasoner.stages.RuleAndConclusionCountMeasuringExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.collections.HashListMultimap;
@@ -144,8 +143,8 @@ public class RandomConcurrentTracingTaskCollection implements VisitorTaskCollect
 					new Owl2FunctionalStyleParserFactory(), ontFile);
 			
 			reasoner_ = new ReasonerFactory().createReasoner(loader,
-					/*new SimpleStageExecutor(),*/
-					new RuleAndConclusionCountMeasuringExecutor(new SimpleStageExecutor(), metrics_),
+					new SimpleStageExecutor(),
+					//new RuleAndConclusionCountMeasuringExecutor(new SimpleStageExecutor(), metrics_),
 					reasonerConfig_);
 			
 			Taxonomy<ElkClass> taxonomy = reasoner_.getTaxonomy();

@@ -97,7 +97,6 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 					
 					break;
 				}
-				
 				// first, continue some existing unwinding
 				currentState_ = jobsInProgress_.poll();
 				
@@ -126,7 +125,7 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 				Pair<Conclusion, IndexedClassExpression> next = currentState_.pollFromUnwindingQueue();
 
 				if (next == null) {
-					LOGGER_.trace("Unwinding finished, the unwinding state set to null");
+					// end of unwinding
 					currentState_ = null;
 					break;
 				}
@@ -142,7 +141,6 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 					
 					break;
 				}
-
 			}
 		}
 
@@ -182,7 +180,7 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 				jobsInProgress_.add(currentState_);
 			}
 			else {
-				LOGGER_.trace("Unwinding won't be resumed, finished normally");
+				LOGGER_.trace("Unwinding finished normally");
 			}
 			
 			currentState_ = null;
