@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.MapSaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
@@ -100,15 +100,15 @@ public class LocalTracingSaturationState extends
 		 * derived through the inference I, then we store C -> I when we derive
 		 * I from C.
 		 */
-		private Multimap<Conclusion, Inference> blockedInferences_;
+		private Multimap<Conclusion, ClassInference> blockedInferences_;
 
 		public TracedContext(IndexedClassExpression root) {
 			super(root);
 		}
 
-		public Multimap<Conclusion, Inference> getBlockedInferences() {
+		public Multimap<Conclusion, ClassInference> getBlockedInferences() {
 			if (blockedInferences_ == null) {
-				blockedInferences_ = new HashListMultimap<Conclusion, Inference>();
+				blockedInferences_ = new HashListMultimap<Conclusion, ClassInference>();
 			}
 
 			return blockedInferences_;

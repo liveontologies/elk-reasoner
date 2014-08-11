@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Decomp
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Represents a {@link Contradiction} produced when processing either a subsumer
@@ -61,7 +61,7 @@ public class ContradictionFromNegation extends ContradictionFromSubsumer<Indexed
 	}
 
 	@Override
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

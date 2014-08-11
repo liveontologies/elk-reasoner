@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Decomp
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Represents an inference of the {@link DisjointSubsumer} from a regular subsumer.
@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DisjointSubsumerFromSubsumer extends DisjointSubsumerImpl implements Inference {
+public class DisjointSubsumerFromSubsumer extends DisjointSubsumerImpl implements ClassInference {
 
 	public DisjointSubsumerFromSubsumer(IndexedDisjointnessAxiom axiom,
 			IndexedClassExpression member) {
@@ -51,7 +51,7 @@ public class DisjointSubsumerFromSubsumer extends DisjointSubsumerImpl implement
 	}
 
 	@Override
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

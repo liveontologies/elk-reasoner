@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Represents a {@link Contradiction} as the result of a class occurrsing
@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ContradictionFromInconsistentDisjointnessAxiom extends ContradictionFromSubsumer<IndexedClassExpression> implements Contradiction, Inference {
+public class ContradictionFromInconsistentDisjointnessAxiom extends ContradictionFromSubsumer<IndexedClassExpression> implements Contradiction, ClassInference {
 
 	public ContradictionFromInconsistentDisjointnessAxiom(IndexedClassExpression p) {
 		super(p);
@@ -58,7 +58,7 @@ public class ContradictionFromInconsistentDisjointnessAxiom extends Contradictio
 	}
 
 	@Override
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

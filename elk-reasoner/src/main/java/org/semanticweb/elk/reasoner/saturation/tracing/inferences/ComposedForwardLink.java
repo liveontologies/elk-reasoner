@@ -33,7 +33,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Backwa
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * A {@link ForwardLink} obtained by composition of a {@link BackwardLink} with
@@ -41,7 +44,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ComposedForwardLink extends ForwardLinkImpl implements Inference {
+public class ComposedForwardLink extends ForwardLinkImpl implements ClassInference {
 
 	private final IndexedClassExpression backwardLinkSource_;
 
@@ -65,7 +68,7 @@ public class ComposedForwardLink extends ForwardLinkImpl implements Inference {
 	}
 
 	@Override
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 
@@ -75,6 +78,26 @@ public class ComposedForwardLink extends ForwardLinkImpl implements Inference {
 
 	public ForwardLink getForwardLink() {
 		return new ForwardLinkImpl(forwardLinkChain_, getTarget());
+	}
+	
+	private IndexedBinaryPropertyChain getComposition() {
+		// TODO parameterize forward links to get rid of this cast. Composed forward links are always compositions, never atomic properties.
+		return (IndexedBinaryPropertyChain) getRelation();
+	}
+	
+	public SubObjectProperty getLeftSubObjectProperty() {
+		return new SubObjectProperty(backwardLinkRelation_, getComposition().getLeftProperty());
+	}
+	
+	public ObjectPropertyConclusion getRightSubObjectPropertyChain() {
+		if (forwardLinkChain_ instanceof IndexedObjectProperty) {
+			// property-property composition
+			return new SubObjectProperty((IndexedObjectProperty) forwardLinkChain_, (IndexedObjectProperty) getComposition().getRightProperty());
+		}
+		// property-chain composition
+		assert forwardLinkChain_ == getComposition().getRightProperty();
+		
+		return new SubPropertyChain((IndexedBinaryPropertyChain) forwardLinkChain_);
 	}
 
 	@Override

@@ -29,12 +29,12 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 
 /**
- * Given an {@link Inference}, returns the root of the context to which this
+ * Given an {@link ClassInference}, returns the root of the context to which this
  * inference should be produced.
  * 
  * @author Pavel Klinov
@@ -42,10 +42,10 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwar
  *         pavel.klinov@uni-ulm.de
  */
 public class GetInferenceTarget extends
-		AbstractInferenceVisitor<Context, IndexedClassExpression> {
+		AbstractClassInferenceVisitor<Context, IndexedClassExpression> {
 
 	@Override
-	protected IndexedClassExpression defaultTracedVisit(Inference conclusion,
+	protected IndexedClassExpression defaultTracedVisit(ClassInference conclusion,
 			Context premiseContext) {
 		// by default produce to the context where the inference has been
 		// made (where its premises are stored)

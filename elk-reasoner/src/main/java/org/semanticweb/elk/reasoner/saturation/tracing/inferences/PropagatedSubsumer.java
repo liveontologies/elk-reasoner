@@ -33,7 +33,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Compos
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Represents an existential composition inference from a {@link BackwardLink}
@@ -44,7 +45,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  *         pavel.klinov@uni-ulm.de
  */
 public class PropagatedSubsumer extends
-		ComposedSubsumerImpl<IndexedObjectSomeValuesFrom> implements Inference {
+		ComposedSubsumerImpl<IndexedObjectSomeValuesFrom> implements ClassInference {
 
 	private final IndexedObjectProperty linkRelation_;
 
@@ -76,9 +77,13 @@ public class PropagatedSubsumer extends
 	public BackwardLink getBackwardLink() {
 		return new BackwardLinkImpl(linkSourceRoot_, linkRelation_);
 	}
+	
+	public SubObjectProperty getSubPropertyInference() {
+		return new SubObjectProperty(linkRelation_, getExpression().getRelation());
+	}
 
 	@Override
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

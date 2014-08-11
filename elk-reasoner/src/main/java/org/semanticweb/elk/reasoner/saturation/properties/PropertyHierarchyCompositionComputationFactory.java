@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChai
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -52,6 +53,15 @@ public class PropertyHierarchyCompositionComputationFactory
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(PropertyHierarchyCompositionComputationFactory.class);
+	
+	/**
+	 * used to record sub-property inferences
+	 */
+	final private TraceStore.Writer traceWriter_;
+	
+	public PropertyHierarchyCompositionComputationFactory(TraceStore.Writer writer) {
+		traceWriter_ = writer;
+	}
 
 	@Override
 	public Engine getEngine() {
@@ -82,12 +92,12 @@ public class PropertyHierarchyCompositionComputationFactory
 
 	}
 
-	private final static IndexedPropertyChainVisitor<Void> PROCESSOR_ = new IndexedPropertyChainVisitor<Void>() {
+	private final IndexedPropertyChainVisitor<Void> PROCESSOR_ = new IndexedPropertyChainVisitor<Void>() {
 
 		@Override
 		public Void visit(IndexedObjectProperty element) {
 			// ensure that sub-properties are computed
-			SubPropertyExplorer.getSubPropertyChains(element);
+			SubPropertyExplorer.getSubPropertyChains(element, traceWriter_);
 			return null;
 		}
 
@@ -114,11 +124,11 @@ public class PropertyHierarchyCompositionComputationFactory
 			IndexedObjectProperty left = element.getLeftProperty();
 			IndexedPropertyChain right = element.getRightProperty();
 			Set<IndexedObjectProperty> leftSubProperties = SubPropertyExplorer
-					.getSubProperties(left);
+					.getSubProperties(left, traceWriter_);
 			if (leftSubProperties.isEmpty())
 				return null;
 			Set<IndexedPropertyChain> rightSubProperties = SubPropertyExplorer
-					.getSubPropertyChains(right);
+					.getSubPropertyChains(right, traceWriter_);
 			if (rightSubProperties.isEmpty())
 				return null;
 
@@ -147,7 +157,7 @@ public class PropertyHierarchyCompositionComputationFactory
 								.getLeftProperty();
 						redundantLeftProperties = SubPropertyExplorer
 								.getLeftSubComposableSubPropertiesByRightProperties(
-										left).get(rightLeftSubProperty);
+										left, traceWriter_).get(rightLeftSubProperty);
 					}
 				}
 

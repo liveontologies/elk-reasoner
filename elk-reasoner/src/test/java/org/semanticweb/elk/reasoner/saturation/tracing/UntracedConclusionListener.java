@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 
 /**
  * Gets notifications if there're no inferences stored for a particular
@@ -39,11 +40,18 @@ public interface UntracedConclusionListener {
 
 	public void notifyUntraced(Conclusion conclusion, IndexedClassExpression root);
 	
+	public void notifyUntraced(ObjectPropertyConclusion conclusion);
+	
 	public static final UntracedConclusionListener DUMMY = new UntracedConclusionListener() {
 
 		@Override
 		public void notifyUntraced(Conclusion conclusion, IndexedClassExpression root) {
 			//no-op			
+		}
+
+		@Override
+		public void notifyUntraced(ObjectPropertyConclusion conclusion) {
+			//no-op
 		}
 		
 	};

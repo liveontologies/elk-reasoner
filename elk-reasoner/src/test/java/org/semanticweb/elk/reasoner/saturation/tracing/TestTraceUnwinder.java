@@ -32,25 +32,22 @@ import java.util.Set;
 
 import org.semanticweb.elk.MutableInteger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.PremiseVisitor;
 
 /**
  * Recursively visits all conclusions which were used to produce a given
- * conclusion. Never traces a non-traced context but stops there without
- * attempting to read traces from it.
- * 
- * Works analogously to {@link RecursiveTraceUnwinder} except that, first, it
- * can notify the caller if some visited conclusion has not been traced (this is
- * useful for testing) and, second, it will not attempt to visit inferences for
- * a conclusion which belongs to not yet traced context.
+ * conclusion. It can notify the caller if some visited conclusion has not been
+ * traced (this is useful for testing). 
  * 
  * @author Pavel Klinov
  * 
@@ -60,68 +57,116 @@ public class TestTraceUnwinder implements TraceUnwinder {
 
 	private final TraceStore.Reader traceReader_;
 
-	private final SaturationState<TracedContext> tracingState_;
-
 	private final UntracedConclusionListener listener_;
 
-	private final static InferenceVisitor<IndexedClassExpression, ?> DUMMY_INFERENCE_VISITOR = new AbstractInferenceVisitor<IndexedClassExpression, Void>() {
+	private final static ClassInferenceVisitor<IndexedClassExpression, ?> DUMMY_INFERENCE_VISITOR = new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
 		@Override
-		protected Void defaultTracedVisit(Inference conclusion,
+		protected Void defaultTracedVisit(ClassInference conclusion,
 				IndexedClassExpression input) {
 			return null;
 		}
 	};
 
-	public TestTraceUnwinder(TraceStore.Reader reader,
-			LocalTracingSaturationState state) {
-		this(reader, state, UntracedConclusionListener.DUMMY);
+	public TestTraceUnwinder(TraceStore.Reader reader) {
+		this(reader, UntracedConclusionListener.DUMMY);
 	}
 
 	TestTraceUnwinder(TraceStore.Reader reader,
-			SaturationState<TracedContext> state,
 			UntracedConclusionListener listener) {
 		traceReader_ = reader;
 		listener_ = listener;
-		tracingState_ = state;
 	}
 
 	public void accept(IndexedClassExpression context,
 			final Conclusion conclusion,
 			final ConclusionVisitor<IndexedClassExpression, ?> premiseVisitor) {
-		accept(context, conclusion, premiseVisitor, DUMMY_INFERENCE_VISITOR);
+		accept(context, conclusion, premiseVisitor, DUMMY_INFERENCE_VISITOR, ObjectPropertyConclusionVisitor.DUMMY, ObjectPropertyInferenceVisitor.DUMMY);
+	}
+	
+	// unwind only property conclusions
+	@Override
+	public void accept(ObjectPropertyConclusion conclusion,
+			final ObjectPropertyConclusionVisitor<?, ?> premiseVisitor,
+			final ObjectPropertyInferenceVisitor<?, ?> inferenceVisitor) {
+		final Queue<ObjectPropertyInference> toDo = new LinkedList<ObjectPropertyInference>();
+		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
+
+		addToQueue(conclusion, toDo, seenInferences, premiseVisitor);
+		// set it off
+		unwindPropertyConclusions(toDo, premiseVisitor, inferenceVisitor);		
+	}
+	
+	private void unwindPropertyConclusions(final Queue<ObjectPropertyInference> toDo,
+			final ObjectPropertyConclusionVisitor<?, ?> premiseVisitor,
+			final ObjectPropertyInferenceVisitor<?, ?> inferenceVisitor) {
+		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
+
+		// this visitor visits all premises and putting them into the todo queue
+		PremiseVisitor<Void, ?> unwinder = new PremiseVisitor<Void, Void>() {
+
+			@Override
+			protected Void defaultVisit(ObjectPropertyConclusion premise) {
+				addToQueue(premise, toDo, seenInferences, premiseVisitor);
+				return null;
+			}
+		};
+
+		for (;;) {
+			final ObjectPropertyInference next = toDo.poll();
+
+			if (next == null) {
+				break;
+			}
+
+			next.acceptTraced(inferenceVisitor, null);
+			next.acceptTraced(unwinder, null);
+		}		
 	}
 
 	/**
+	 * Unwinds both class and property conclusions
 	 * 
 	 * @param context
 	 * @param conclusion
-	 * @param premiseVisitor
+	 * @param classConclusionVisitor
 	 *            Visitor over all conclusions which were used as premises
 	 * @param inferenceVisitor
 	 *            Visitor over all
 	 */
 	@Override
-	public void accept(IndexedClassExpression context,
+	public void accept(
+			final IndexedClassExpression context,
 			final Conclusion conclusion,
-			final ConclusionVisitor<IndexedClassExpression, ?> premiseVisitor,
-			final InferenceVisitor<IndexedClassExpression, ?> inferenceVisitor) {
+			final ConclusionVisitor<IndexedClassExpression, ?> classConclusionVisitor,
+			final ClassInferenceVisitor<IndexedClassExpression, ?> inferenceVisitor,
+			final ObjectPropertyConclusionVisitor<?, ?> propertyConclusionVisitor,
+			final ObjectPropertyInferenceVisitor<?, ?> propertyInferenceVisitor) {
 		final Queue<InferenceWrapper> toDo = new LinkedList<InferenceWrapper>();
-		final Set<Inference> seenInferences = new HashSet<Inference>();
+		final Queue<ObjectPropertyInference> propertyInferenceToDo = new LinkedList<ObjectPropertyInference>();
+		final Set<ClassInference> seenInferences = new HashSet<ClassInference>();
+		final Set<ObjectPropertyInference> seenPropertyInferences = new HashSet<ObjectPropertyInference>();
 
-		addToQueue(context, conclusion, toDo, seenInferences, premiseVisitor,
-				inferenceVisitor);
+		addToQueue(context, conclusion, toDo, seenInferences, classConclusionVisitor);
 		// this visitor visits all premises and putting them into the todo queue
-		PremiseVisitor<IndexedClassExpression, ?> tracedVisitor = new PremiseVisitor<IndexedClassExpression, Void>() {
+		PremiseVisitor<IndexedClassExpression, ?> premiseVisitor = new PremiseVisitor<IndexedClassExpression, Void>() {
 
 			@Override
 			protected Void defaultVisit(Conclusion premise,
 					IndexedClassExpression cxt) {
 				// the context passed into this method is the context where the
 				// inference has been made
-				addToQueue(cxt, premise, toDo, seenInferences, premiseVisitor,
-						inferenceVisitor);
+				addToQueue(cxt, premise, toDo, seenInferences, classConclusionVisitor);
 				return null;
 			}
+
+			@Override
+			protected Void defaultVisit(ObjectPropertyConclusion premise) {
+				addToQueue(premise, propertyInferenceToDo, seenPropertyInferences, propertyConclusionVisitor);
+				
+				return null;
+			}
+			
+			
 		};
 
 		for (;;) {
@@ -131,43 +176,34 @@ public class TestTraceUnwinder implements TraceUnwinder {
 				break;
 			}
 
-			next.inference.acceptTraced(tracedVisitor, next.contextRoot);
+			next.inference.acceptTraced(inferenceVisitor, null);
+			next.inference.acceptTraced(premiseVisitor, next.contextRoot);
 		}
+		
+		// finally, unwind all property traces
+		unwindPropertyConclusions(propertyInferenceToDo, propertyConclusionVisitor, propertyInferenceVisitor);
 	}
 
 	private void addToQueue(final IndexedClassExpression root,
 			final Conclusion conclusion, final Queue<InferenceWrapper> toDo,
-			final Set<Inference> seenInferences,
-			final ConclusionVisitor<IndexedClassExpression, ?> visitor,
-			final InferenceVisitor<IndexedClassExpression, ?> inferenceVisitor) {
+			final Set<ClassInference> seenInferences,
+			final ConclusionVisitor<IndexedClassExpression, ?> visitor) {
 
-		Context tracedContext = tracingState_.getContext(conclusion
-				.getSourceRoot(root));
-
-		conclusion.accept(visitor, tracedContext.getRoot());
-
-		if (!tracedContext.isSaturated()) {
-			// must stop unwinding because the context to which the next
-			// conclusion belongs isn't yet traced
-			return;
-		}
+		conclusion.accept(visitor, root);
 
 		final MutableInteger traced = new MutableInteger(0);
 		// finding all inferences that produced the given conclusion (if we are
 		// here, the inference must have premises, i.e. it's not an
 		// initialization inference)
 		traceReader_.accept(root, conclusion,
-				new AbstractInferenceVisitor<Void, Void>() {
+				new AbstractClassInferenceVisitor<Void, Void>() {
 
 					@Override
-					protected Void defaultTracedVisit(Inference inference,
+					protected Void defaultTracedVisit(ClassInference inference,
 							Void v) {
 						if (!seenInferences.contains(inference)) {
 							IndexedClassExpression inferenceContextRoot = inference
 									.getInferenceContextRoot(root);
-
-							inference.acceptTraced(inferenceVisitor,
-									inferenceContextRoot);
 
 							seenInferences.add(inference);
 							toDo.add(new InferenceWrapper(inference,
@@ -185,6 +221,39 @@ public class TestTraceUnwinder implements TraceUnwinder {
 			listener_.notifyUntraced(conclusion, root);
 		}
 	}
+	
+	private void addToQueue(final ObjectPropertyConclusion conclusion, final Queue<ObjectPropertyInference> toDo,
+			final Set<ObjectPropertyInference> seenInferences,
+			final ObjectPropertyConclusionVisitor<?, ?> visitor) {
+
+		conclusion.accept(visitor, null);
+		
+		final MutableInteger traced = new MutableInteger(0);
+		// finding all inferences that produced the given conclusion (if we are
+		// here, the inference must have premises, i.e. it's not an
+		// initialization inference)
+		traceReader_.accept(conclusion,
+				new AbstractObjectPropertyInferenceVisitor<Void, Void>() {
+
+					@Override
+					protected Void defaultTracedVisit(ObjectPropertyInference inference, Void _ignored) {
+						if (!seenInferences.contains(inference)) {
+							seenInferences.add(inference);
+							
+							toDo.add(inference);
+						}
+
+						traced.increment();
+
+						return null;
+					}
+
+				});
+
+		if (traced.get() == 0) {
+			listener_.notifyUntraced(conclusion);
+		}
+	}	
 
 	/*
 	 * Used to propagate context which normally isn't stored inside each traced
@@ -192,10 +261,10 @@ public class TestTraceUnwinder implements TraceUnwinder {
 	 */
 	private static class InferenceWrapper {
 
-		final Inference inference;
+		final ClassInference inference;
 		final IndexedClassExpression contextRoot;
 
-		InferenceWrapper(Inference inf, IndexedClassExpression root) {
+		InferenceWrapper(ClassInference inf, IndexedClassExpression root) {
 			inference = inf;
 			contextRoot = root;
 		}

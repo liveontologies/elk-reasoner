@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationSta
 import org.semanticweb.elk.reasoner.saturation.tracing.factories.ContextTracingFactory;
 import org.semanticweb.elk.reasoner.saturation.tracing.factories.ContextTracingJob;
 import org.semanticweb.elk.reasoner.saturation.tracing.factories.ContextTracingListener;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +69,7 @@ public class OnDemandTracingReader extends DelegatingTraceReader {
 	}
 	
 	@Override
-	public void accept(final IndexedClassExpression root, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
+	public void accept(final IndexedClassExpression root, final Conclusion conclusion, final ClassInferenceVisitor<?, ?> visitor) {
 		IndexedClassExpression conclusionContextRoot = conclusion.getSourceRoot(root);
 		TracedContext tracedContext = tracingContextWriter_.getCreateContext(conclusionContextRoot);	
 		

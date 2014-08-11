@@ -48,6 +48,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectsCreator;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.VerifySymmetricPropertySaturation.AsymmetricCompositionHook;
+import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
@@ -189,7 +190,7 @@ public class IndexedPropertyChainSaturationTest {
 		int maxThreads = Runtime.getRuntime().availableProcessors();
 		PropertyHierarchyCompositionComputation computation = new PropertyHierarchyCompositionComputation(
 				Arrays.asList(H, S3, S2, S1, P3, P2, P1, R, RR),
-				new PropertyHierarchyCompositionComputationFactory(),
+				new PropertyHierarchyCompositionComputationFactory(TraceStore.Writer.Dummy),
 				new ComputationExecutor(maxThreads,
 						"test-hierarchy-compositions"), maxThreads,
 				new DummyProgressMonitor());

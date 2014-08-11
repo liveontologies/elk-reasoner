@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,8 +27,11 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 
 /**
  * A generic interfaces for objects which recursively unwind previously stored
@@ -39,7 +43,18 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  */
 public interface TraceUnwinder {
 
-	public void accept(IndexedClassExpression root, Conclusion conclusion,
-			ConclusionVisitor<IndexedClassExpression, ?> conclusionVisitor,
-			InferenceVisitor<IndexedClassExpression, ?> inferenceVisitor);
+	/*
+	 * class trace unwinding involves both class and property inferences.
+	 */
+	public void accept(
+			IndexedClassExpression context,
+			Conclusion conclusion,
+			ConclusionVisitor<IndexedClassExpression, ?> premiseVisitor,
+			ClassInferenceVisitor<IndexedClassExpression, ?> inferenceVisitor,
+			ObjectPropertyConclusionVisitor<?, ?> propertyPremiseVisitor,
+			ObjectPropertyInferenceVisitor<?, ?> propertyInferenceVisitor);
+
+	public void accept(ObjectPropertyConclusion conclusion,
+			ObjectPropertyConclusionVisitor<?, ?> conclusionVisitor,
+			ObjectPropertyInferenceVisitor<?, ?> inferenceVisitor);
 }

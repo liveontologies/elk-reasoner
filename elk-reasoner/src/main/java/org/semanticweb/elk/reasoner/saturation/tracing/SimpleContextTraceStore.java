@@ -56,7 +56,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExis
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjunctionComposition;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
@@ -64,7 +64,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsu
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -85,38 +85,38 @@ import org.semanticweb.elk.util.collections.Multimap;
  */
 public class SimpleContextTraceStore implements ContextTraceStore {
 
-	private final List<Inference> contradictionInferences_;
+	private final List<ClassInference> contradictionInferences_;
 	
-	private final Map<IndexedClassExpression, Multimap<IndexedDisjointnessAxiom, Inference>> disjointSubsumerInferenceMap_;
+	private final Map<IndexedClassExpression, Multimap<IndexedDisjointnessAxiom, ClassInference>> disjointSubsumerInferenceMap_;
 	
-	private final Multimap<IndexedClassExpression, Inference> subsumerInferenceMap_;
+	private final Multimap<IndexedClassExpression, ClassInference> subsumerInferenceMap_;
 
-	private final Map<IndexedPropertyChain, Multimap<IndexedClassExpression, Inference>> backwardLinkInferenceMap_;
+	private final Map<IndexedPropertyChain, Multimap<IndexedClassExpression, ClassInference>> backwardLinkInferenceMap_;
 
-	private final Map<IndexedPropertyChain, Multimap<IndexedClassExpression, Inference>> forwardLinkInferenceMap_;
+	private final Map<IndexedPropertyChain, Multimap<IndexedClassExpression, ClassInference>> forwardLinkInferenceMap_;
 
-	private final Map<IndexedPropertyChain, Multimap<IndexedObjectSomeValuesFrom, Inference>> propagationMap_;
+	private final Map<IndexedPropertyChain, Multimap<IndexedObjectSomeValuesFrom, ClassInference>> propagationMap_;
 
-	private final ConclusionVisitor<InferenceVisitor<?, ?>, Void> inferenceReader_ = new ConclusionVisitor<InferenceVisitor<?, ?>, Void>() {
+	private final ConclusionVisitor<ClassInferenceVisitor<?, ?>, Void> inferenceReader_ = new ConclusionVisitor<ClassInferenceVisitor<?, ?>, Void>() {
 
-		private void visitAll(Iterable<Inference> conclusions,
-				InferenceVisitor<?, ?> visitor) {
+		private void visitAll(Iterable<ClassInference> conclusions,
+				ClassInferenceVisitor<?, ?> visitor) {
 			if (conclusions != null) {
-				for (Inference inf : conclusions) {
+				for (ClassInference inf : conclusions) {
 					inf.acceptTraced(visitor, null);
 				}
 			}
 		}
 
 		private void visitBackwardLinkInferences(IndexedPropertyChain relation,
-				IndexedClassExpression source, InferenceVisitor<?, ?> visitor) {
+				IndexedClassExpression source, ClassInferenceVisitor<?, ?> visitor) {
 			synchronized (relation) {
-				Multimap<IndexedClassExpression, Inference> sourceToInferenceMap = backwardLinkInferenceMap_
+				Multimap<IndexedClassExpression, ClassInference> sourceToInferenceMap = backwardLinkInferenceMap_
 						.get(relation);
 
 				if (sourceToInferenceMap != null) {
 					synchronized (source) {
-						for (Inference inference : sourceToInferenceMap
+						for (ClassInference inference : sourceToInferenceMap
 								.get(source)) {
 							inference.acceptTraced(visitor, null);
 						}
@@ -127,7 +127,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 
 		@Override
 		public Void visit(ComposedSubsumer<?> negSCE,
-				InferenceVisitor<?, ?> visitor) {
+				ClassInferenceVisitor<?, ?> visitor) {
 			visitAll(getSubsumerInferences(negSCE.getExpression()), visitor);
 
 			return null;
@@ -135,14 +135,14 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 
 		@Override
 		public Void visit(DecomposedSubsumer<?> posSCE,
-				InferenceVisitor<?, ?> visitor) {
+				ClassInferenceVisitor<?, ?> visitor) {
 			visitAll(getSubsumerInferences(posSCE.getExpression()), visitor);
 
 			return null;
 		}
 
 		@Override
-		public Void visit(BackwardLink link, InferenceVisitor<?, ?> visitor) {
+		public Void visit(BackwardLink link, ClassInferenceVisitor<?, ?> visitor) {
 			visitBackwardLinkInferences(link.getRelation(), link.getSource(),
 					visitor);
 
@@ -150,7 +150,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		}
 
 		@Override
-		public Void visit(ForwardLink link, InferenceVisitor<?, ?> visitor) {
+		public Void visit(ForwardLink link, ClassInferenceVisitor<?, ?> visitor) {
 			visitAll(
 					getInferences(forwardLinkInferenceMap_,
 							link.getRelation(), link.getTarget()), visitor);
@@ -160,7 +160,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 
 		@Override
 		public Void visit(Propagation propagation,
-				InferenceVisitor<?, ?> visitor) {
+				ClassInferenceVisitor<?, ?> visitor) {
 			visitAll(
 					getInferences(propagationMap_,
 							propagation.getRelation(), propagation.getCarry()),
@@ -171,33 +171,33 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 
 		@Override
 		public Void visit(SubContextInitialization subConclusion,
-				InferenceVisitor<?, ?> input) {
+				ClassInferenceVisitor<?, ?> input) {
 			// no-op
 			return null;
 		}
 
 		@Override
 		public Void visit(ContextInitialization conclusion,
-				InferenceVisitor<?, ?> input) {
+				ClassInferenceVisitor<?, ?> input) {
 			// no-op
 			return null;
 		}
 
 		@Override
-		public Void visit(Contradiction conclusion, InferenceVisitor<?, ?> input) {
+		public Void visit(Contradiction conclusion, ClassInferenceVisitor<?, ?> input) {
 			visitAll(contradictionInferences_, input);
 			return null;
 		}
 
 		@Override
-		public Void visit(DisjointSubsumer conclusion, InferenceVisitor<?, ?> input) {
+		public Void visit(DisjointSubsumer conclusion, ClassInferenceVisitor<?, ?> input) {
 			visitAll(getInferences(disjointSubsumerInferenceMap_, conclusion.getMember(), conclusion.getAxiom()), input);
 			return null;
 		}
 
 	};
 
-	private final InferenceVisitor<?, Boolean> inferenceWriter_ = new InferenceVisitor<Void, Boolean>() {
+	private final ClassInferenceVisitor<?, Boolean> inferenceWriter_ = new ClassInferenceVisitor<Void, Boolean>() {
 
 		@Override
 		public Boolean visit(InitializationSubsumer<?> conclusion, Void param) {
@@ -313,24 +313,24 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 	 * 
 	 */
 	public SimpleContextTraceStore() {
-		contradictionInferences_ = new ArrayList<Inference>(2);
-		disjointSubsumerInferenceMap_ = new ArrayHashMap<IndexedClassExpression, Multimap<IndexedDisjointnessAxiom, Inference>>();
-		subsumerInferenceMap_ = new HashListMultimap<IndexedClassExpression, Inference>();
-		backwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedClassExpression, Inference>>();
-		forwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedClassExpression, Inference>>();
-		propagationMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedObjectSomeValuesFrom, Inference>>();
+		contradictionInferences_ = new ArrayList<ClassInference>(2);
+		disjointSubsumerInferenceMap_ = new ArrayHashMap<IndexedClassExpression, Multimap<IndexedDisjointnessAxiom, ClassInference>>();
+		subsumerInferenceMap_ = new HashListMultimap<IndexedClassExpression, ClassInference>();
+		backwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedClassExpression, ClassInference>>();
+		forwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedClassExpression, ClassInference>>();
+		propagationMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedObjectSomeValuesFrom, ClassInference>>();
 	}
 
 	protected Boolean addTracedBackwardLink(IndexedPropertyChain relation,
-			IndexedClassExpression source, Inference link) {
+			IndexedClassExpression source, ClassInference link) {
 		// TODO need a synchronized multimap here
 		synchronized (relation) {
-			Multimap<IndexedClassExpression, Inference> sourceToInferenceMap = backwardLinkInferenceMap_
+			Multimap<IndexedClassExpression, ClassInference> sourceToInferenceMap = backwardLinkInferenceMap_
 					.get(relation);
 
 			synchronized (source) {
 				if (sourceToInferenceMap == null) {
-					sourceToInferenceMap = new HashListMultimap<IndexedClassExpression, Inference>();
+					sourceToInferenceMap = new HashListMultimap<IndexedClassExpression, ClassInference>();
 					sourceToInferenceMap.add(source, link);
 					backwardLinkInferenceMap_.put(relation,
 							sourceToInferenceMap);
@@ -374,21 +374,21 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		return traces.add(value, trace);
 	}
 
-	protected Boolean addContradictionInference(Inference inf) {
+	protected Boolean addContradictionInference(ClassInference inf) {
 		return contradictionInferences_.add(inf);
 	}
 	
 	protected Boolean addSubsumerInference(IndexedClassExpression ice,
-			Inference inf) {
+			ClassInference inf) {
 		return subsumerInferenceMap_.add(ice, inf);
 	}
 
 	@Override
-	public void accept(Conclusion conclusion, InferenceVisitor<?, ?> visitor) {
+	public void accept(Conclusion conclusion, ClassInferenceVisitor<?, ?> visitor) {
 		conclusion.accept(inferenceReader_, visitor);
 	}
 
-	public Iterable<Inference> getSubsumerInferences(
+	public Iterable<ClassInference> getSubsumerInferences(
 			IndexedClassExpression conclusion) {
 		return subsumerInferenceMap_.get(conclusion);
 	}
@@ -401,26 +401,26 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 	}
 
 	@Override
-	public boolean addInference(Inference conclusion) {
+	public boolean addInference(ClassInference conclusion) {
 		return conclusion.acceptTraced(inferenceWriter_, null);
 	}
 
 	@Override
-	public void visitInferences(InferenceVisitor<?, ?> visitor) {
+	public void visitInferences(ClassInferenceVisitor<?, ?> visitor) {
 		// subsumers
 		for (IndexedClassExpression ice : subsumerInferenceMap_.keySet()) {
-			for (Inference inference : subsumerInferenceMap_.get(ice)) {
+			for (ClassInference inference : subsumerInferenceMap_.get(ice)) {
 				inference.acceptTraced(visitor, null);
 			}
 		}
 		// backward links
 		for (IndexedPropertyChain linkRelation : backwardLinkInferenceMap_
 				.keySet()) {
-			Multimap<IndexedClassExpression, Inference> contextMap = backwardLinkInferenceMap_
+			Multimap<IndexedClassExpression, ClassInference> contextMap = backwardLinkInferenceMap_
 					.get(linkRelation);
 
 			for (IndexedClassExpression source : contextMap.keySet()) {
-				for (Inference inference : contextMap.get(source)) {
+				for (ClassInference inference : contextMap.get(source)) {
 					inference.acceptTraced(visitor, null);
 				}
 			}
@@ -429,11 +429,11 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		for (IndexedPropertyChain linkRelation : forwardLinkInferenceMap_
 				.keySet()) {
 
-			Multimap<IndexedClassExpression, Inference> contextMap = forwardLinkInferenceMap_
+			Multimap<IndexedClassExpression, ClassInference> contextMap = forwardLinkInferenceMap_
 					.get(linkRelation);
 
 			for (IndexedClassExpression target : contextMap.keySet()) {
-				for (Inference inference : contextMap.get(target)) {
+				for (ClassInference inference : contextMap.get(target)) {
 					inference.acceptTraced(visitor, null);
 				}
 			}
@@ -441,11 +441,11 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		// propagations
 		for (IndexedPropertyChain propRelation : propagationMap_.keySet()) {
 
-			Multimap<IndexedObjectSomeValuesFrom, Inference> carryMap = propagationMap_
+			Multimap<IndexedObjectSomeValuesFrom, ClassInference> carryMap = propagationMap_
 					.get(propRelation);
 
 			for (IndexedObjectSomeValuesFrom carry : carryMap.keySet()) {
-				for (Inference inference : carryMap.get(carry)) {
+				for (ClassInference inference : carryMap.get(carry)) {
 					inference.acceptTraced(visitor, null);
 				}
 			}

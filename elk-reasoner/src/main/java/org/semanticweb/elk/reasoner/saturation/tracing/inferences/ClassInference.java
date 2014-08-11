@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Represents an inference as an extended conclusion. All premises can be
@@ -37,9 +37,9 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface Inference extends Conclusion {
+public interface ClassInference extends Conclusion {
 
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter);
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter);
 	
 	/**
 	 * Returns the root of the {@link Context} where this inference has been

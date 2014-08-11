@@ -26,12 +26,15 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 
 /**
  * The main object responsible for storing and retrieving inferences for {@link Conclusion}s.
- * Inferences are represented using {@link Inference}.
+ * Inferences are represented using {@link ClassInference}.
  * 
  * @author Pavel Klinov
  * 
@@ -51,11 +54,18 @@ public interface TraceStore {
 		 * @param conclusion
 		 * @param visitor
 		 */
-		public void accept(IndexedClassExpression root, Conclusion conclusion, InferenceVisitor<?,?> visitor);
+		public void accept(IndexedClassExpression root, Conclusion conclusion, ClassInferenceVisitor<?,?> visitor);
+		/**
+		 * Visiting all {@link ObjectPropertyInference}s for the given {@link ObjectPropertyConclusion}.
+		 * 
+		 * @param conclusion
+		 * @param visitor
+		 */
+		public void accept(ObjectPropertyConclusion conclusion, ObjectPropertyInferenceVisitor<?,?> visitor);
 		
 		public Iterable<IndexedClassExpression> getContextRoots();
 		
-		public void visitInferences(IndexedClassExpression root, InferenceVisitor<?, ?> visitor);
+		public void visitInferences(IndexedClassExpression root, ClassInferenceVisitor<?, ?> visitor);
 	}
 
 	/**
@@ -70,7 +80,26 @@ public interface TraceStore {
 		 * @param inference
 		 * @return
 		 */
-		public boolean addInference(IndexedClassExpression root, Inference conclusion);
+		public boolean addInference(IndexedClassExpression root, ClassInference conclusion);
+		
+		public boolean addObjectPropertyInference(ObjectPropertyInference conclusion);
+		
+		
+		public static final Writer Dummy = new Writer() {
+
+			@Override
+			public boolean addInference(IndexedClassExpression root, ClassInference conclusion) {
+				// no-op
+				return false;
+			}
+			
+			@Override
+			public boolean addObjectPropertyInference(ObjectPropertyInference conclusion) {
+				// no-op
+				return false;
+			}
+			
+		};
 	}
 
 	/**

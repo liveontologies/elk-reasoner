@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Backwa
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Represents a decomposition of {@link IndexedObjectSomeValuesFrom} which
@@ -42,7 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  *         pavel.klinov@uni-ulm.de
  */
 public class DecomposedExistentialBackwardLink extends BackwardLinkImpl
-		implements Inference {
+		implements ClassInference {
 
 	private final IndexedClassExpression inferenceContext_;
 
@@ -59,7 +59,7 @@ public class DecomposedExistentialBackwardLink extends BackwardLinkImpl
 	}
 
 	@Override
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

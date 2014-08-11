@@ -30,7 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersection
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ComposedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * A {@link ComposedSubsumer} for {@link IndexedObjectIntersectionOf}
@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  *         pavel.klinov@uni-ulm.de
  */
 public class ComposedConjunction extends
-		ComposedSubsumerImpl<IndexedObjectIntersectionOf> implements Inference {
+		ComposedSubsumerImpl<IndexedObjectIntersectionOf> implements ClassInference {
 
 	/**
 	 */
@@ -60,7 +60,7 @@ public class ComposedConjunction extends
 	}
 
 	@Override
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

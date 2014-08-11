@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Decomp
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * A {@link ForwardLink} that is obtained by decomposing an
@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  * 
  */
 public class DecomposedExistentialForwardLink extends ForwardLinkImpl implements
-		Inference {
+		ClassInference {
 
 	private final IndexedObjectSomeValuesFrom existential_;
 
@@ -54,7 +54,7 @@ public class DecomposedExistentialForwardLink extends ForwardLinkImpl implements
 	}
 
 	@Override
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

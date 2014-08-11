@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradict
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Represents a {@link Contradiction} as the result of processing a
@@ -43,7 +43,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ContradictionFromDisjointSubsumers extends AbstractConclusion implements Contradiction, Inference {
+public class ContradictionFromDisjointSubsumers extends AbstractConclusion implements Contradiction, ClassInference {
 
 	/**
 	 * Subsumer for which the contradiction rule was applied
@@ -73,7 +73,7 @@ public class ContradictionFromDisjointSubsumers extends AbstractConclusion imple
 	}
 
 	@Override
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

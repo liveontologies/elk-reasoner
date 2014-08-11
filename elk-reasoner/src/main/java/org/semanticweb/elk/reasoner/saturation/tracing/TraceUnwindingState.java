@@ -27,8 +27,10 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Pair;
 
@@ -44,24 +46,42 @@ import org.semanticweb.elk.util.collections.Pair;
  */
 public class TraceUnwindingState {
 
-	private final Queue<Pair<Conclusion, IndexedClassExpression>> toUnwind_;
+	private final Queue<Pair<Conclusion, IndexedClassExpression>> classConclusionsToUnwind_;
+	
+	private final Queue<ObjectPropertyConclusion> propertyConclusionsToUnwind_;
 
-	private final Set<Inference> processedInferences_;
+	private final Set<ClassInference> processedClassInferences_;
+	
+	private final Set<ObjectPropertyInference> processedPropertyInferences_;
 
 	public TraceUnwindingState() {
-		toUnwind_ = new LinkedList<Pair<Conclusion, IndexedClassExpression>>();
-		processedInferences_ = new ArrayHashSet<Inference>();
+		classConclusionsToUnwind_ = new LinkedList<Pair<Conclusion, IndexedClassExpression>>();
+		propertyConclusionsToUnwind_ = new LinkedList<ObjectPropertyConclusion>();
+		processedClassInferences_ = new ArrayHashSet<ClassInference>();
+		processedPropertyInferences_ = new ArrayHashSet<ObjectPropertyInference>();
 	}
 
-	public void addToUnwindingQueue(Conclusion conclusion, IndexedClassExpression rootWhereStored) {
-		toUnwind_.add(new Pair<Conclusion, IndexedClassExpression>(conclusion, rootWhereStored));
+	public void addToClassUnwindingQueue(Conclusion conclusion, IndexedClassExpression rootWhereStored) {
+		classConclusionsToUnwind_.add(new Pair<Conclusion, IndexedClassExpression>(conclusion, rootWhereStored));
+	}
+	
+	public void addToPropertyUnwindingQueue(ObjectPropertyConclusion conclusion) {
+		propertyConclusionsToUnwind_.add(conclusion);
 	}
 
-	public Pair<Conclusion, IndexedClassExpression> pollFromUnwindingQueue() {
-		return toUnwind_.poll();
+	public Pair<Conclusion, IndexedClassExpression> pollFromClassUnwindingQueue() {
+		return classConclusionsToUnwind_.poll();
+	}
+	
+	public ObjectPropertyConclusion pollFromPropertyUnwindingQueue() {
+		return propertyConclusionsToUnwind_.poll();
 	}
 
-	public boolean addToProcessed(Inference inference) {
-		return processedInferences_.add(inference);
+	public boolean addToProcessed(ClassInference inference) {
+		return processedClassInferences_.add(inference);
+	}
+	
+	public boolean addToProcessed(ObjectPropertyInference inference) {
+		return processedPropertyInferences_.add(inference);
 	}
 }

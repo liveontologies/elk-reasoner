@@ -26,11 +26,11 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
- * Stores and retrieves {@link Inference} for {@link Conclusion}s stored in a single {@link Context}.
+ * Stores and retrieves {@link ClassInference} for {@link Conclusion}s stored in a single {@link Context}.
  * 
  * @author Pavel Klinov
  *
@@ -38,9 +38,9 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  */
 public interface ContextTraceStore {
 
-	public void accept(Conclusion conclusion, InferenceVisitor<?,?> visitor);
+	public void accept(Conclusion conclusion, ClassInferenceVisitor<?,?> visitor);
 	
-	public void visitInferences(InferenceVisitor<?, ?> visitor);
+	public void visitInferences(ClassInferenceVisitor<?, ?> visitor);
 	
-	public boolean addInference(Inference inference);
+	public boolean addInference(ClassInference inference);
 }

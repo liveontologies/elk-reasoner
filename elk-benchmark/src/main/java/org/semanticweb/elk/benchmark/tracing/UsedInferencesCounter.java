@@ -1,18 +1,18 @@
 package org.semanticweb.elk.benchmark.tracing;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
 
 /**
- * Counts the number of visited inferences (instances of {@link Inference}).
+ * Counts the number of visited inferences (instances of {@link ClassInference}).
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
 public class UsedInferencesCounter extends
-		AbstractInferenceVisitor<IndexedClassExpression, Void> {
+		AbstractClassInferenceVisitor<IndexedClassExpression, Void> {
 
 	private int infCounter_ = 0;
 
@@ -20,7 +20,7 @@ public class UsedInferencesCounter extends
 	// HashSet<TracedConclusion>();
 
 	@Override
-	protected Void defaultTracedVisit(Inference conclusion,
+	protected Void defaultTracedVisit(ClassInference conclusion,
 			IndexedClassExpression parameter) {
 		infCounter_++;
 		// inferences.add(conclusion);

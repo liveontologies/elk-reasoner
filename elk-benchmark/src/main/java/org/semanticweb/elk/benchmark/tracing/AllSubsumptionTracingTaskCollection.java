@@ -49,11 +49,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionTracingTests;
-import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
+import org.semanticweb.elk.reasoner.saturation.tracing.TestTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestUtils;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.reasoner.stages.RuleAndConclusionCountMeasuringExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
@@ -226,11 +228,12 @@ public class AllSubsumptionTracingTaskCollection implements VisitorTaskCollectio
 				IndexedClassExpression sup = ReasonerStateAccessor.transform(reasoner, subsumer);
 				TraceStore.Reader inferenceReader = traceState.getTraceStore().getReader();
 				//TraceStore.Reader inferenceReader = new FirstNInferencesReader(traceState.getTraceStore().getReader(), 1);
-				RecursiveTraceUnwinder traceUnwinder = new RecursiveTraceUnwinder(inferenceReader);
+				TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader);
+				//RecursiveTraceUnwinder traceUnwinder = new RecursiveTraceUnwinder(inferenceReader);
 				SideConditionCollector counter = new SideConditionCollector();
 				//SaturationStatistics stats = traceState.getContextTracingFactory().getStatistics();
 				
-				traceUnwinder.accept(sub, new DecomposedSubsumerImpl<IndexedClassExpression>(sup), new DummyConclusionVisitor<IndexedClassExpression>(), counter);
+				traceUnwinder.accept(sub, new DecomposedSubsumerImpl<IndexedClassExpression>(sup), new DummyConclusionVisitor<IndexedClassExpression>(), counter, ObjectPropertyConclusionVisitor.DUMMY, ObjectPropertyInferenceVisitor.DUMMY);
 				
 				int subClassAxiomNo = counter.getSubClassOfAxioms().size();
 				

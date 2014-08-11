@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Decomp
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Represents an inference which creates a {@link Propagation} from a
@@ -42,7 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TracedPropagation extends PropagationImpl implements Inference {
+public class TracedPropagation extends PropagationImpl implements ClassInference {
 
 	public TracedPropagation(IndexedObjectProperty relation,
 			IndexedObjectSomeValuesFrom carry) {
@@ -55,7 +55,7 @@ public class TracedPropagation extends PropagationImpl implements Inference {
 	}
 
 	@Override
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExis
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjunctionComposition;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
@@ -47,16 +47,16 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubs
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
 
 /**
- * A skeleton implementation of {@link InferenceVisitor}.
+ * A skeleton implementation of {@link ClassInferenceVisitor}.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public abstract class AbstractInferenceVisitor<I, O> implements
-		InferenceVisitor<I, O> {
+public abstract class AbstractClassInferenceVisitor<I, O> implements
+		ClassInferenceVisitor<I, O> {
 
-	protected abstract O defaultTracedVisit(Inference conclusion, I input);
+	protected abstract O defaultTracedVisit(ClassInference conclusion, I input);
 
 	@Override
 	public O visit(ComposedBackwardLink conclusion, I input) {
@@ -153,6 +153,5 @@ public abstract class AbstractInferenceVisitor<I, O> implements
 	public O visit(DisjunctionComposition conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
-	
-	
+
 }

@@ -1,0 +1,14 @@
+Prefix( : = <http://example.org/> ) 
+
+Ontology(
+SubObjectPropertyOf(:H :HH)
+SubObjectPropertyOf(:S :H)
+SubObjectPropertyOf(:S :R)
+SubObjectPropertyOf(:R :RR)
+SubObjectPropertyOf(:R :HH)
+
+SubClassOf(:A ObjectSomeValuesFrom(:S :B))
+SubClassOf(:B :C)
+SubClassOf(ObjectSomeValuesFrom(:HH :C) :D)
+)
+

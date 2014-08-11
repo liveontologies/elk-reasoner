@@ -15,7 +15,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExis
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjunctionComposition;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
@@ -47,13 +47,13 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagat
  */
 
 /**
- * A visitor over the {@link Inference} hierarchy.
+ * A visitor over the {@link ClassInference} hierarchy.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface InferenceVisitor<I, O> {
+public interface ClassInferenceVisitor<I, O> {
 
 	public O visit(InitializationSubsumer<?> conclusion, I parameter);
 
@@ -93,10 +93,10 @@ public interface InferenceVisitor<I, O> {
 	
 	public O visit(DisjunctionComposition conclusion, I input);
 
-	public static final InferenceVisitor<?, ?> DUMMY = new AbstractInferenceVisitor<Void, Void>() {
+	public static final ClassInferenceVisitor<?, ?> DUMMY = new AbstractClassInferenceVisitor<Void, Void>() {
 
 		@Override
-		protected Void defaultTracedVisit(Inference conclusion, Void input) {
+		protected Void defaultTracedVisit(ClassInference conclusion, Void input) {
 			return null;
 		}
 	};

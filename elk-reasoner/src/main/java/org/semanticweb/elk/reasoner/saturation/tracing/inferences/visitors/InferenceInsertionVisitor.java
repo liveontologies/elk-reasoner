@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,10 +49,10 @@ public class InferenceInsertionVisitor extends
 
 	private final TraceStore.Writer traceWriter_;
 
-	private final InferenceVisitor<Context, Boolean> inferenceInserter_ = new AbstractInferenceVisitor<Context, Boolean>() {
+	private final ClassInferenceVisitor<Context, Boolean> inferenceInserter_ = new AbstractClassInferenceVisitor<Context, Boolean>() {
 
 		@Override
-		protected Boolean defaultTracedVisit(Inference conclusion,
+		protected Boolean defaultTracedVisit(ClassInference conclusion,
 				Context context) {
 			traceWriter_.addInference(context.getRoot(), conclusion);
 
@@ -69,8 +69,8 @@ public class InferenceInsertionVisitor extends
 
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, Context cxt) {
-		if (conclusion instanceof Inference) {
-			return ((Inference) conclusion).acceptTraced(
+		if (conclusion instanceof ClassInference) {
+			return ((ClassInference) conclusion).acceptTraced(
 					inferenceInserter_, cxt);
 		}
 		LOGGER_.trace(

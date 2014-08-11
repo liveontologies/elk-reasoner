@@ -58,14 +58,13 @@ public class BackwardLinkFromForwardLinkRule extends AbstractForwardLinkRule {
 		IndexedPropertyChain relation = premise.getRelation();
 		IndexedClassExpression source = premises.getRoot();
 		IndexedClassExpression target = premise.getTarget();
+
 		if (relation instanceof IndexedObjectProperty) {
 			producer.produce(target, new ReversedForwardLink(source,
 					(IndexedObjectProperty) relation, premise));
 		} else {
 			for (IndexedObjectProperty toldSuper : relation
 					.getToldSuperProperties()) {
-				// producer.produce(target, new BackwardLink(source,
-				// toldSuper));
 				producer.produce(target, new ReversedForwardLink(source,
 						toldSuper, premise));
 			}

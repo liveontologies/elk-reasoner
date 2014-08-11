@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
  *
  * pavel.klinov@uni-ulm.de
  */
-abstract class ContradictionFromSubsumer<S extends IndexedClassExpression> implements Inference {
+abstract class ContradictionFromSubsumer<S extends IndexedClassExpression> implements ClassInference {
 
 	protected S premise;
 	

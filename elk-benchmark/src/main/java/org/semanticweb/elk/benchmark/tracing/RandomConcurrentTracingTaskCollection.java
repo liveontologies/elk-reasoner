@@ -47,11 +47,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionTracingTests;
-import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
+import org.semanticweb.elk.reasoner.saturation.tracing.TestTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestUtils;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -239,10 +241,10 @@ public class RandomConcurrentTracingTaskCollection implements VisitorTaskCollect
 			IndexedClassExpression sub = ReasonerStateAccessor.transform(reasoner, subsumee);
 			IndexedClassExpression sup = ReasonerStateAccessor.transform(reasoner, subsumer);
 			TraceStore.Reader inferenceReader = traceState.getTraceStore().getReader();
-			RecursiveTraceUnwinder traceUnwinder = new RecursiveTraceUnwinder(inferenceReader);
+			TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader);
 			SideConditionCollector counter = new SideConditionCollector();
 			
-			traceUnwinder.accept(sub, new DecomposedSubsumerImpl<IndexedClassExpression>(sup), new DummyConclusionVisitor<IndexedClassExpression>(), counter);
+			traceUnwinder.accept(sub, new DecomposedSubsumerImpl<IndexedClassExpression>(sup), new DummyConclusionVisitor<IndexedClassExpression>(), counter, ObjectPropertyConclusionVisitor.DUMMY, ObjectPropertyInferenceVisitor.DUMMY);
 			
 			int subClassAxiomNo = counter.getSubClassOfAxioms().size();
 			

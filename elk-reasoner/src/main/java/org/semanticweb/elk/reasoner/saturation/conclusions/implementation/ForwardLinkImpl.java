@@ -117,7 +117,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 					.getToldSuperProperties()) {
 				producer.produce(target, new ComposedBackwardLink(source,
 						backwardRelation, inferenceRoot, forwardRelation,
-						target, toldSuper));
+						target, composition, toldSuper));
 			}
 		} else {
 			producer.produce(source, new ComposedForwardLink(source,

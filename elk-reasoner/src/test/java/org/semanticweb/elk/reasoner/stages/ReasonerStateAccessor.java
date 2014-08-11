@@ -25,7 +25,11 @@ package org.semanticweb.elk.reasoner.stages;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 
@@ -44,6 +48,14 @@ public class ReasonerStateAccessor {
 	}
 	
 	public static IndexedClassExpression transform(AbstractReasonerState reasoner, ElkClassExpression ce) {
+		return reasoner.transform(ce);
+	}
+	
+	public static IndexedObjectProperty transform(AbstractReasonerState reasoner, ElkObjectProperty ce) {
+		return reasoner.transform(ce);
+	}
+	
+	public static IndexedPropertyChain transform(AbstractReasonerState reasoner, ElkSubObjectPropertyExpression ce) {
 		return reasoner.transform(ce);
 	}
 	

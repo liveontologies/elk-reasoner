@@ -28,15 +28,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.InferencePrinter;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A simple {@link TraceStore} which uses a centralized concurrent data structure to
- * store and retrieve {@link Inference}s.
+ * store and retrieve {@link ClassInference}s.
  * 
  * @author Pavel Klinov
  * 
@@ -47,6 +50,8 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private final static Logger LOGGER_ = LoggerFactory.getLogger(SimpleCentralizedTraceStore.class);	
 
 	private final ConcurrentHashMap<IndexedClassExpression, ContextTraceStore> storage_ = new ConcurrentHashMap<IndexedClassExpression, ContextTraceStore>();
+	
+	private final ObjectPropertyInferenceStore propertyInferenceStore_ = new SimpleObjectPropertyInferenceStore();
 	
 	@Override
 	public TraceStore.Reader getReader() {
@@ -65,7 +70,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private class Reader implements TraceStore.Reader {
 
 		@Override
-		public void accept(IndexedClassExpression root, Conclusion conclusion, InferenceVisitor<?,?> visitor) {
+		public void accept(IndexedClassExpression root, Conclusion conclusion, ClassInferenceVisitor<?,?> visitor) {
 			ContextTraceStore tracer = storage_.get(root);
 			
 			if (tracer != null) {
@@ -79,12 +84,18 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 		}
 		
 		@Override
-		public void visitInferences(IndexedClassExpression root, InferenceVisitor<?, ?> visitor) {
+		public void visitInferences(IndexedClassExpression root, ClassInferenceVisitor<?, ?> visitor) {
 			ContextTraceStore tracer = storage_.get(root);
 			
 			if (tracer != null) {
 				tracer.visitInferences(visitor);
 			}
+		}
+
+		@Override
+		public void accept(ObjectPropertyConclusion conclusion,
+				ObjectPropertyInferenceVisitor<?, ?> visitor) {
+			propertyInferenceStore_.visitInferences(conclusion, visitor);
 		}
 		
 	}
@@ -92,7 +103,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private class Writer implements TraceStore.Writer {
 
 		@Override
-		public boolean addInference(IndexedClassExpression root, Inference conclusion) {
+		public boolean addInference(IndexedClassExpression root, ClassInference conclusion) {
 			ContextTraceStore tracer = storage_.get(root);
 			
 			if (LOGGER_.isTraceEnabled()) {
@@ -105,6 +116,16 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 			}
 			
 			return tracer.addInference(conclusion);
+		}
+
+		@Override
+		public boolean addObjectPropertyInference(ObjectPropertyInference conclusion) {
+			
+			if (LOGGER_.isTraceEnabled()) {
+				LOGGER_.trace("Writing property inference {}", conclusion.acceptTraced(new InferencePrinter(), null));
+			}
+			
+			return propertyInferenceStore_.addInference(conclusion);
 		}
 		
 	}

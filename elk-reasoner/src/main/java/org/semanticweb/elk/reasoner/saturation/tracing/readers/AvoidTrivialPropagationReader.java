@@ -32,10 +32,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Reads all inferences for the given conclusion except that propagations which
@@ -54,12 +54,12 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 
 	@Override
 	public void accept(final IndexedClassExpression root,
-			final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
+			final Conclusion conclusion, final ClassInferenceVisitor<?, ?> visitor) {
 		reader.accept(root, conclusion,
-				new AbstractInferenceVisitor<Void, Void>() {
+				new AbstractClassInferenceVisitor<Void, Void>() {
 
 					@Override
-					protected Void defaultTracedVisit(Inference inference,
+					protected Void defaultTracedVisit(ClassInference inference,
 							Void ignored) {
 						inference.acceptTraced(visitor, null);
 
@@ -98,10 +98,10 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 				false);
 
 		reader.accept(inferenceContextRoot, link,
-				new AbstractInferenceVisitor<Void, Boolean>() {
+				new AbstractClassInferenceVisitor<Void, Boolean>() {
 
 					@Override
-					protected Boolean defaultTracedVisit(Inference conclusion,
+					protected Boolean defaultTracedVisit(ClassInference conclusion,
 							Void input) {
 						return false;
 					}

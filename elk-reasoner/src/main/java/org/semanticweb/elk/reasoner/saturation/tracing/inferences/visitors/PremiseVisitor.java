@@ -27,7 +27,9 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
@@ -40,7 +42,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExis
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjunctionComposition;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
@@ -48,18 +49,35 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsu
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChain;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
 
 /**
- * Visits all premises for the given {@link Inference}. Each premise implements
- * {@link Conclusion}.
+ * Visits all premises for the given {@link ClassInference} or {@link ObjectPropertyInference}. Each premise implements
+ * {@link Conclusion} or {@link ObjectPropertyConclusion}.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
 public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
-		implements InferenceVisitor<I, O> {
+		implements ClassInferenceVisitor<I, O>, ObjectPropertyInferenceVisitor<I, O>, ObjectPropertyConclusionVisitor<I, O> {
 
+	@Override
+	protected O defaultVisit(Conclusion conclusion, I input) {
+		// no-op
+		return null;
+	}
+	
+	protected O defaultVisit(@SuppressWarnings("unused") ObjectPropertyConclusion conclusion) {
+		// no-op
+		return null;
+	}	
+	
 	@Override
 	public O visit(InitializationSubsumer<?> conclusion, I parameter) {
 		return null;
@@ -88,6 +106,7 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 	public O visit(PropagatedSubsumer conclusion, I parameter) {
 		conclusion.getBackwardLink().accept(this, parameter);
 		conclusion.getPropagation().accept(this, parameter);
+		conclusion.getSubPropertyInference().accept(this, parameter);
 		return null;
 	}
 
@@ -100,6 +119,9 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 	public O visit(ComposedBackwardLink conclusion, I parameter) {
 		conclusion.getBackwardLink().accept(this, parameter);
 		conclusion.getForwardLink().accept(this, parameter);
+		conclusion.getCompositionInitialization().accept(this, parameter);
+		conclusion.getLeftSubObjectProperty().accept(this, parameter);
+		conclusion.getRightSubObjectPropertyChain().accept(this, parameter);
 		return null;
 	}
 
@@ -107,12 +129,15 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 	public O visit(ComposedForwardLink conclusion, I parameter) {
 		conclusion.getBackwardLink().accept(this, parameter);
 		conclusion.getForwardLink().accept(this, parameter);
+		conclusion.getLeftSubObjectProperty().accept(this, parameter);
+		conclusion.getRightSubObjectPropertyChain().accept(this, parameter);
 		return null;
 	}
 
 	@Override
 	public O visit(ReversedForwardLink conclusion, I parameter) {
 		conclusion.getSourceLink().accept(this, parameter);
+		conclusion.getSubPropertyChain().accept(this, parameter);
 		return null;
 	}
 
@@ -181,11 +206,32 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 		conclusion.getPremise().accept(this, input);
 		return null;
 	}
+	
+	@Override
+	public O visit(SubObjectPropertyInference conclusion, I input) {
+		conclusion.getPremise().accept(this, input);
+		return null;
+	}
 
 	@Override
-	protected O defaultVisit(Conclusion conclusion, I input) {
-		// no-op
+	public O visit(PropertyChainInitialization conclusion, I input) {
+		// no premises
 		return null;
-	}	
+	}
+
+	@Override
+	public O visit(SubObjectProperty conclusion, I input) {
+		return defaultVisit(conclusion);
+	}
+
+	@Override
+	public O visit(ReflexivePropertyChain conclusion, I input) {
+		return defaultVisit(conclusion);
+	}
+
+	@Override
+	public O visit(SubPropertyChain conclusion, I input) {
+		return defaultVisit(conclusion);
+	}
 
 }

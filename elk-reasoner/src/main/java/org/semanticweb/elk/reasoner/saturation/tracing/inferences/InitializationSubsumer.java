@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Represents an initialization inference of the form A => A or A => owl:Thing.
@@ -37,14 +37,14 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  *         pavel.klinov@uni-ulm.de
  */
 public class InitializationSubsumer<S extends IndexedClassExpression> extends
-		DecomposedSubsumerImpl<S> implements Inference {
+		DecomposedSubsumerImpl<S> implements ClassInference {
 
 	public InitializationSubsumer(S expression) {
 		super(expression);
 	}
 
 	@Override
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

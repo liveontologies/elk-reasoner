@@ -29,8 +29,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionEqualityChecker;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.util.collections.Operations.Condition;
 
 /**
@@ -50,7 +50,7 @@ public class IsInferenceCyclic {
 	 * @param targetContextRoot The root of the context to which this inference should be produced to (i.e. the target)
 	 * @return
 	 */
-	public static Conclusion check(final Inference inference, final IndexedClassExpression targetContextRoot, final TraceStore.Reader inferenceReader) {
+	public static Conclusion check(final ClassInference inference, final IndexedClassExpression targetContextRoot, final TraceStore.Reader inferenceReader) {
 		// the inference is cyclic if at least one of the premises has been
 		// derived only through this inference's conclusion
 		final IndexedClassExpression inferenceContext = inference.getInferenceContextRoot(targetContextRoot);
@@ -84,10 +84,10 @@ public class IsInferenceCyclic {
 		final MutableBoolean foundAlternative = new MutableBoolean(false);
 		final MutableBoolean anyInference = new MutableBoolean(false);
 
-		inferenceReader.accept(premiseContext, premise, new AbstractInferenceVisitor<Void, Void>(){
+		inferenceReader.accept(premiseContext, premise, new AbstractClassInferenceVisitor<Void, Void>(){
 
 			@Override
-			protected Void defaultTracedVisit(Inference premiseInference, Void ignored) {
+			protected Void defaultTracedVisit(ClassInference premiseInference, Void ignored) {
 				anyInference.set(true);
 				
 				if (isAlternative(premiseInference, conclusion, conclusionContext)) {
@@ -108,7 +108,7 @@ public class IsInferenceCyclic {
 	 * the given conclusion). It is assumed that the premises are stored in the
 	 * same context as the conclusion.
 	 */
-	public static boolean isAlternative(final Inference inference, final Conclusion conclusion, final IndexedClassExpression conclusionContext) {
+	public static boolean isAlternative(final ClassInference inference, final Conclusion conclusion, final IndexedClassExpression conclusionContext) {
 		// if the premise is produced in a context different
 		// from where the conclusion is stored, then it must be
 		// produced by an alternative inference.

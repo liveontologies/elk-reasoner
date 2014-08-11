@@ -34,6 +34,8 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
@@ -48,6 +50,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalChangeCheckingVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -677,6 +681,14 @@ public abstract class AbstractReasonerState {
 	}
 	
 	IndexedClassExpression transform(ElkClassExpression ce) {
+		return ce.accept(objectCache_.getIndexObjectConverter());
+	}
+	
+	IndexedObjectProperty transform(ElkObjectProperty ce) {
+		return (IndexedObjectProperty) ce.accept(objectCache_.getIndexObjectConverter());
+	}
+	
+	IndexedPropertyChain transform(ElkSubObjectPropertyExpression ce) {
 		return ce.accept(objectCache_.getIndexObjectConverter());
 	}
 

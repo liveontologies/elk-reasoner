@@ -28,9 +28,9 @@ import org.semanticweb.elk.MutableInteger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Visits only the first N inferences provided by the underlying
@@ -50,13 +50,13 @@ public class FirstNInferencesReader extends DelegatingTraceReader {
 	}
 	
 	@Override
-	public void accept(IndexedClassExpression root, Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
+	public void accept(IndexedClassExpression root, Conclusion conclusion, final ClassInferenceVisitor<?, ?> visitor) {
 		final MutableInteger counter = new MutableInteger(0);
 		
-		reader.accept(root, conclusion, new AbstractInferenceVisitor<Void, Void>() {
+		reader.accept(root, conclusion, new AbstractClassInferenceVisitor<Void, Void>() {
 
 			@Override
-			protected Void defaultTracedVisit(Inference inference,	Void ignored) {
+			protected Void defaultTracedVisit(ClassInference inference,	Void ignored) {
 				if (counter.get() < numberOfInferencesToVisit_) {
 					counter.increment();
 					inference.acceptTraced(visitor, null);

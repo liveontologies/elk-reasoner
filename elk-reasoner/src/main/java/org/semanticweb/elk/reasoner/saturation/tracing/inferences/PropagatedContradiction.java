@@ -32,7 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Contra
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Represents a {@link Contradiction} produced via a propagation over a {@link BackwardLink}.
@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  *
  * pavel.klinov@uni-ulm.de
  */
-public class PropagatedContradiction extends AbstractConclusion implements Contradiction, Inference {
+public class PropagatedContradiction extends AbstractConclusion implements Contradiction, ClassInference {
 
 	private final IndexedObjectProperty premiseRelation_;
 	
@@ -72,7 +72,7 @@ public class PropagatedContradiction extends AbstractConclusion implements Contr
 	}
 
 	@Override
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 	

@@ -30,11 +30,11 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedConjunction;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Ignores all inferences for the root of a context (except of the
@@ -53,14 +53,14 @@ public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 	@Override
 	public void accept(final IndexedClassExpression root,
 			final Conclusion inferredConclusion,
-			final InferenceVisitor<?, ?> visitor) {
+			final ClassInferenceVisitor<?, ?> visitor) {
 		reader.accept(
 				root,
 				inferredConclusion,
-				new AbstractInferenceVisitor<IndexedClassExpression, Boolean>() {
+				new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
 
 					@Override
-					protected Boolean defaultTracedVisit(Inference conclusion,
+					protected Boolean defaultTracedVisit(ClassInference conclusion,
 							IndexedClassExpression contextRoot) {
 						conclusion.acceptTraced(visitor, null);
 

@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Represents a {@link IndexedObjectUnionOf} derived for a disjunct.
@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DisjunctionComposition extends ComposedSubsumerImpl<IndexedObjectUnionOf> implements Inference {
+public class DisjunctionComposition extends ComposedSubsumerImpl<IndexedObjectUnionOf> implements ClassInference {
 
 	private final IndexedClassExpression disjunct_;
 	
@@ -52,7 +52,7 @@ public class DisjunctionComposition extends ComposedSubsumerImpl<IndexedObjectUn
 	}
 	
 	@Override
-	public <I, O> O acceptTraced(InferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

@@ -50,7 +50,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.factories.AbstractRuleAppli
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.IsInferenceCyclic;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.GetInferenceTarget;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceInsertionVisitor;
@@ -152,13 +152,13 @@ public class CycleBlockingRuleApplicationFactory extends
 			// conclusions are applied only once.
 			final TracedContext thisContext = tracingState.getContext(root);
 
-			if (thisContext == null || !(conclusion instanceof Inference)
+			if (thisContext == null || !(conclusion instanceof ClassInference)
 					|| !CYCLE_AVOIDANCE) {
 				super.produce(root, conclusion);
 				return;
 			}
 
-			final Inference inference = (Inference) conclusion;
+			final ClassInference inference = (ClassInference) conclusion;
 			// get the premise which blocks this inference, if any
 			Conclusion cyclicPremise = IsInferenceCyclic.check(inference, root,
 					inferenceReader_);
@@ -212,23 +212,23 @@ public class CycleBlockingRuleApplicationFactory extends
 			// write the inference and count it as used conclusion (if needed)
 			conclusion.accept(inferenceInserter_, cxt);
 			// see if some inferences can now be unblocked
-			if (CYCLE_AVOIDANCE && conclusion instanceof Inference) {
-				unblockInferences((Inference) conclusion, (TracedContext) cxt);
+			if (CYCLE_AVOIDANCE && conclusion instanceof ClassInference) {
+				unblockInferences((ClassInference) conclusion, (TracedContext) cxt);
 			}
 			// insert into context
 			return conclusion.accept(contextInserter_, cxt);
 		}
 
-		private void unblockInferences(final Inference premiseInference,
+		private void unblockInferences(final ClassInference premiseInference,
 				final TracedContext cxt) {
-			Collection<Inference> blocked = cxt.getBlockedInferences().get(
+			Collection<ClassInference> blocked = cxt.getBlockedInferences().get(
 					new ConclusionEntry(premiseInference));
 
 			if (blocked != null) {
-				Iterator<Inference> inferenceIter = blocked.iterator();
+				Iterator<ClassInference> inferenceIter = blocked.iterator();
 
 				for (; inferenceIter.hasNext();) {
-					final Inference blockedInference = inferenceIter.next();
+					final ClassInference blockedInference = inferenceIter.next();
 
 					LOGGER_.trace(
 							"Checking if {} should be unblocked in {} since we derived {}",

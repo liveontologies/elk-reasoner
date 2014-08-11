@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.util;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
@@ -39,7 +40,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExis
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjunctionComposition;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
@@ -47,18 +47,21 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsu
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 
 /**
- * A utility to pretty-print {@link Inference}s.
+ * A utility to pretty-print {@link ClassInference}s.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class InferencePrinter implements InferenceVisitor<Void, String> {
+public class InferencePrinter implements ClassInferenceVisitor<Void, String>, ObjectPropertyInferenceVisitor<Void, String> {
 
-	public static String print(Inference conclusion) {
+	public static String print(ClassInference conclusion) {
 		return conclusion.acceptTraced(new InferencePrinter(), null);
 	}
 
@@ -169,6 +172,16 @@ public class InferencePrinter implements InferenceVisitor<Void, String> {
 	@Override
 	public String visit(DisjunctionComposition conclusion, Void input) {
 		return "Composed disjunction " + conclusion.getExpression() + " from " + conclusion.getPremise();
-	}	
+	}
+
+	@Override
+	public String visit(SubObjectPropertyInference inference, Void input) {
+		return inference.toString();
+	}
+
+	@Override
+	public String visit(PropertyChainInitialization inference, Void input) {
+		return "Initialization (" + inference.getPropertyChain() + ")";
+	}
 
 }
