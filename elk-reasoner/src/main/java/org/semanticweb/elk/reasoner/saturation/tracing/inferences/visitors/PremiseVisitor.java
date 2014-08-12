@@ -49,12 +49,16 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsu
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChain;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyChain;
 
 /**
  * Visits all premises for the given {@link ClassInference} or {@link ObjectPropertyInference}. Each premise implements
@@ -112,6 +116,7 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 
 	@Override
 	public O visit(ReflexiveSubsumer<?> conclusion, I parameter) {
+		conclusion.getReflexivityPremise().accept(this, parameter);
 		return null;
 	}
 
@@ -119,7 +124,7 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 	public O visit(ComposedBackwardLink conclusion, I parameter) {
 		conclusion.getBackwardLink().accept(this, parameter);
 		conclusion.getForwardLink().accept(this, parameter);
-		conclusion.getCompositionInitialization().accept(this, parameter);
+		conclusion.getSubPropertyChain().accept(this, parameter);
 		conclusion.getLeftSubObjectProperty().accept(this, parameter);
 		conclusion.getRightSubObjectPropertyChain().accept(this, parameter);
 		return null;
@@ -208,30 +213,56 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 	}
 	
 	@Override
-	public O visit(SubObjectPropertyInference conclusion, I input) {
-		conclusion.getPremise().accept(this, input);
-		return null;
-	}
-
-	@Override
 	public O visit(PropertyChainInitialization conclusion, I input) {
 		// no premises
 		return null;
 	}
 
 	@Override
-	public O visit(SubObjectProperty conclusion, I input) {
+	public O visit(ReflexivePropertyChain<?> conclusion, I input) {
 		return defaultVisit(conclusion);
 	}
 
 	@Override
-	public O visit(ReflexivePropertyChain conclusion, I input) {
+	public O visit(SubPropertyChain<?, ?> conclusion, I input) {
 		return defaultVisit(conclusion);
 	}
 
 	@Override
-	public O visit(SubPropertyChain conclusion, I input) {
-		return defaultVisit(conclusion);
+	public O visit(ToldReflexiveProperty inference, I input) {
+		inference.getPropertyInitialization().accept(this, input);
+		return null;
+	}
+
+	@Override
+	public O visit(ReflexiveToldSubObjectProperty inference, I input) {
+		inference.getSubProperty().accept(this, input);
+		return null;
+	}
+
+	@Override
+	public O visit(ReflexivePropertyChainInference inference, I input) {
+		inference.getLeftReflexiveProperty().accept(this, input);
+		inference.getRightReflexivePropertyChain().accept(this, input);
+		return null;
+	}
+
+	@Override
+	public O visit(LeftReflexiveSubPropertyChainInference inference, I input) {
+		inference.getReflexivePremise().accept(this, input);
+		return null;
+	}
+
+	@Override
+	public O visit(RightReflexiveSubPropertyChainInference inference, I input) {
+		inference.getReflexivePremise().accept(this, input);
+		return null;
+	}
+
+	@Override
+	public O visit(ToldSubPropertyChain inference, I input) {
+		inference.getPremise().accept(this, input);
+		return null;
 	}
 
 }

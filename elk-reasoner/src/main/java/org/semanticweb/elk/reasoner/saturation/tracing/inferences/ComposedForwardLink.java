@@ -97,7 +97,7 @@ public class ComposedForwardLink extends ForwardLinkImpl implements ClassInferen
 		// property-chain composition
 		assert forwardLinkChain_ == getComposition().getRightProperty();
 		
-		return new SubPropertyChain((IndexedBinaryPropertyChain) forwardLinkChain_);
+		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(forwardLinkChain_, forwardLinkChain_);
 	}
 
 	@Override

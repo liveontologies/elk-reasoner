@@ -104,12 +104,11 @@ public class ComposedBackwardLink extends BackwardLinkImpl implements ClassInfer
 		// property-chain composition
 		assert forwardLinkRelation_ == composition_.getRightProperty();
 		
-		return new SubPropertyChain((IndexedBinaryPropertyChain) forwardLinkRelation_);
+		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(forwardLinkRelation_, forwardLinkRelation_);
 	}
 	
-	public SubPropertyChain getCompositionInitialization() {
-		// TODO there should be a side-condition instead of this premise
-		return new SubPropertyChain(composition_);
+	public SubPropertyChain<IndexedBinaryPropertyChain, IndexedObjectProperty> getSubPropertyChain() {
+		return new SubPropertyChain<IndexedBinaryPropertyChain, IndexedObjectProperty>(composition_, getRelation());
 	}
 	
 	@Override

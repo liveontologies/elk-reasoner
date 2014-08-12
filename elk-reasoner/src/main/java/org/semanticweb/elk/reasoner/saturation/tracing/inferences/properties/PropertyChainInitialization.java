@@ -35,4 +35,5 @@ public class PropertyChainInitialization implements ObjectPropertyInference {
 		return visitor.visit(this, input);
 	}
 
+
 }

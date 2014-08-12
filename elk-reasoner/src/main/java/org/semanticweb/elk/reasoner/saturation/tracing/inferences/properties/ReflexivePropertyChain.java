@@ -14,15 +14,15 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Objec
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReflexivePropertyChain implements ObjectPropertyConclusion {
+public class ReflexivePropertyChain<P extends IndexedPropertyChain> implements ObjectPropertyConclusion {
 
-	private final IndexedPropertyChain propertyChain_;
+	private final P propertyChain_;
 	
-	public ReflexivePropertyChain(IndexedPropertyChain chain) {
+	public ReflexivePropertyChain(P chain) {
 		propertyChain_ = chain;
 	}
 
-	public IndexedPropertyChain getPropertyChain() {
+	public P getPropertyChain() {
 		return propertyChain_;
 	}
 	
@@ -31,17 +31,11 @@ public class ReflexivePropertyChain implements ObjectPropertyConclusion {
 			I input) {
 		return visitor.visit(this, input);
 	}
-	
-	/*@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
-		return null;
-	}
 
 	@Override
-	public IndexedClassExpression getSourceRoot(
-			IndexedClassExpression rootWhereStored) {
-		// FIXME
-		return rootWhereStored;
-	}*/
+	public String toString() {
+		return propertyChain_.toString();
+	}
 
+	
 }

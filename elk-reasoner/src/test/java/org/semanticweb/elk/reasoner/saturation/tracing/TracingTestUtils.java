@@ -214,6 +214,8 @@ public class TracingTestUtils {
 	
 	/*
 	 * Either the class inference visitor or the property inference visitor should return true for some used inference in the trace.
+	 * 
+	 * TODO Generalize this to look for multiple inferences in the trace.
 	 */
 	public static void checkConditionOverUsedInferences(
 			ElkClassExpression sub,

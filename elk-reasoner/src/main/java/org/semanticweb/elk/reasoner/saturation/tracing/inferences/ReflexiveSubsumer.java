@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
@@ -53,6 +54,11 @@ public class ReflexiveSubsumer<S extends IndexedObjectSomeValuesFrom> extends
 		return getExpression().getRelation();
 	}
 
+	// this is a premise of this inference
+	public ReflexivePropertyChain<?> getReflexivityPremise() {
+		return new ReflexivePropertyChain<IndexedPropertyChain>(getExpression().getRelation());
+	}
+	
 	@Override
 	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);

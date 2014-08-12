@@ -31,8 +31,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyChain;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -90,13 +93,11 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	@Override
 	public Void visit(IndexedObjectProperty element) {
 		for (IndexedPropertyChain sub : element.getToldSubProperties())
-			if (superProperty_ != null && sub instanceof IndexedObjectProperty) {
-				IndexedObjectProperty subProperty = (IndexedObjectProperty) sub;
+			if (superProperty_ != null) {
 				// with tracing
-				toDoWithTracing(subProperty, new SubObjectPropertyInference(
-						subProperty, superProperty_, element));
+				toDoWithTracing(sub, new ToldSubPropertyChain(sub, superProperty_, element));	
 			} else {
-				// without
+				// without tracing
 				toDo(sub);
 			}
 		return null;
@@ -108,13 +109,29 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		IndexedPropertyChain right = element.getRightProperty();
 		SaturatedPropertyChain leftSaturation = left.getSaturated();
 		SaturatedPropertyChain rightSaturation = right.getSaturated();
-		// TODO this is a special sub-property inference, via reflexivity, trace
-		// these too
-		if (leftSaturation != null && leftSaturation.isDerivedReflexive())
-			toDo(right);
-		if (rightSaturation != null && rightSaturation.isDerivedReflexive())
-			toDo(left);
+		// reflexivity-based inferences
+		if (leftSaturation != null && leftSaturation.isDerivedReflexive()) {
+			toDoReflexive(element, left, right, new LeftReflexiveSubPropertyChainInference(right, element));
+		}
+		if (rightSaturation != null && rightSaturation.isDerivedReflexive()) {
+			toDoReflexive(element, right, left, new RightReflexiveSubPropertyChainInference(left, element));
+		}
+		
 		return null;
+	}
+	
+	private void toDoReflexive(IndexedBinaryPropertyChain chain, IndexedPropertyChain reflexive, IndexedPropertyChain other, ReflexiveSubPropertyChainInference inference) {
+		LOGGER_.trace("{} is reflexive thus {} is a sub-property of {}", reflexive, other, chain);
+		
+		traceWriter_.addObjectPropertyInference(inference);
+		
+		if (superProperty_ != null) {
+			// with tracing
+			toDoWithTracing(other, new ToldSubPropertyChain(other, superProperty_, chain));	
+		} else {
+			// without tracing
+			toDo(other);
+		}	
 	}
 
 	private void toDo(IndexedPropertyChain subProperty) {
@@ -126,13 +143,15 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 			}
 		}
 	}
-
-	private void toDoWithTracing(IndexedObjectProperty subProperty,
+	
+	private void toDoWithTracing(IndexedPropertyChain subProperty,
 			ObjectPropertyInference subPropertyInference) {
 		if (subPropertyChains_.add(subProperty)) {
 			toDoSubProperties_.add(subProperty);
 
-			subProperties_.add(subProperty);
+			if (subProperty instanceof IndexedObjectProperty) {
+				subProperties_.add((IndexedObjectProperty) subProperty);
+			}
 		}
 		
 		LOGGER_.trace("{}: new sub-property inference {}, inference {}",

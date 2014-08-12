@@ -25,9 +25,14 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyChain;
 
 /**
  * A skeleton implementation of {@link ObjectPropertyInferenceVisitor}.
@@ -42,13 +47,39 @@ public abstract class AbstractObjectPropertyInferenceVisitor<I, O> implements
 	protected abstract O defaultTracedVisit(ObjectPropertyInference inference, I input);
 
 	@Override
-	public O visit(SubObjectPropertyInference inference, I input) {
-		return defaultTracedVisit(inference, input);
-	}
-
-	@Override
 	public O visit(PropertyChainInitialization inference, I input) {
 		return defaultTracedVisit(inference, input);
 	}
 
+	@Override
+	public O visit(ToldReflexiveProperty inference, I input) {
+		return defaultTracedVisit(inference, input);
+	}
+
+	@Override
+	public O visit(ReflexiveToldSubObjectProperty inference, I input) {
+		return defaultTracedVisit(inference, input);
+	}
+
+	@Override
+	public O visit(ReflexivePropertyChainInference inference, I input) {
+		return defaultTracedVisit(inference, input);
+	}
+
+	@Override
+	public O visit(LeftReflexiveSubPropertyChainInference inference, I input) {
+		return defaultTracedVisit(inference, input);
+	}
+
+	@Override
+	public O visit(RightReflexiveSubPropertyChainInference inference, I input) {
+		return defaultTracedVisit(inference, input);
+	}
+	
+	@Override
+	public O visit(ToldSubPropertyChain inference, I input) {
+		return defaultTracedVisit(inference, input);
+
+	}
+	
 }

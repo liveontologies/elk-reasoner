@@ -25,16 +25,12 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
@@ -70,23 +66,8 @@ public class ReversedForwardLink extends BackwardLinkImpl implements ClassInfere
 		return sourceLink_;
 	}
 	
-	public ObjectPropertyConclusion getSubPropertyChain() {
-		IndexedPropertyChain sourceChain = sourceLink_.getRelation();
-		
-		return sourceChain.accept(new IndexedPropertyChainVisitor<ObjectPropertyConclusion>() {
-
-			@Override
-			public ObjectPropertyConclusion visit(IndexedObjectProperty element) {
-				return new SubObjectProperty(element, element);
-			}
-
-			@Override
-			public ObjectPropertyConclusion visit(
-					IndexedBinaryPropertyChain element) {
-				return new SubPropertyChain(element);
-			}
-			
-		});
+	public SubPropertyChain<IndexedPropertyChain, IndexedObjectProperty> getSubPropertyChain() {
+		return new SubPropertyChain<IndexedPropertyChain, IndexedObjectProperty>(sourceLink_.getRelation(), getRelation());
 	}
 
 	@Override

@@ -3,32 +3,39 @@
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyConclusionVisitor;
 
 /**
- * TODO merge with {@link PropertyChainInitialization}? 
+ * Represents a conclusion that a chain is a sub-property chain of another chain
  * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class SubPropertyChain implements ObjectPropertyConclusion {
+public class SubPropertyChain<R extends IndexedPropertyChain, S extends IndexedPropertyChain> implements ObjectPropertyConclusion {
 
-	private final IndexedBinaryPropertyChain chain_;
+	private final R chain_;
 	
-	public SubPropertyChain(IndexedBinaryPropertyChain chain) {
+	private final S superProperty_;
+	
+	public SubPropertyChain(R chain, S sup) {
 		chain_ = chain;
+		superProperty_ = sup;
 	}
 	
-	public IndexedBinaryPropertyChain getPropertyChain() {
+	public R getSubPropertyChain() {
 		return chain_;
+	}
+	
+	public S getSuperPropertyChain() {
+		return superProperty_;
 	}
 
 	@Override
 	public String toString() {
-		return "SubPropertyChain(" + chain_ + " " + chain_ + ")";
+		return "SubPropertyChain(" + chain_ + " " + superProperty_ + ")";
 	}
 
 	@Override

@@ -47,8 +47,13 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsu
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 
@@ -175,13 +180,38 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>, Ob
 	}
 
 	@Override
-	public String visit(SubObjectPropertyInference inference, Void input) {
-		return inference.toString();
+	public String visit(PropertyChainInitialization inference, Void input) {
+		return "Initialization (" + inference.getPropertyChain() + ")";
 	}
 
 	@Override
-	public String visit(PropertyChainInitialization inference, Void input) {
-		return "Initialization (" + inference.getPropertyChain() + ")";
+	public String visit(ToldReflexiveProperty inference, Void input) {
+		return "Told reflexive property " + inference.getPropertyChain();
+	}
+
+	@Override
+	public String visit(ReflexiveToldSubObjectProperty inference, Void input) {
+		return inference.getPropertyChain() + "is reflexive because its told sub-property " + inference.getSubProperty() + " is reflexive";
+	}
+
+	@Override
+	public String visit(ReflexivePropertyChainInference inference, Void input) {
+		return inference.getPropertyChain() + "is reflexive because of composition of reflexive chains";
+	}
+
+	@Override
+	public String visit(LeftReflexiveSubPropertyChainInference inference, Void input) {
+		return "Left part of " + inference.getSuperPropertyChain() + " is reflexive";
+	}
+
+	@Override
+	public String visit(RightReflexiveSubPropertyChainInference inference, 	Void input) {
+		return "Right part of " + inference.getSuperPropertyChain() + " is reflexive";
+	}
+
+	@Override
+	public String visit(ToldSubPropertyChain inference, Void input) {
+		return "Told super-property " + inference.getSubPropertyChain() + " -> " + inference.getSuperPropertyChain();
 	}
 
 }

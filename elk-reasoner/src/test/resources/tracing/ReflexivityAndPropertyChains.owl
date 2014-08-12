@@ -1,0 +1,10 @@
+Prefix( : = <http://example.org/> ) 
+Ontology(
+SubClassOf(:A ObjectSomeValuesFrom(:H :B))
+SubClassOf(:B :C)
+SubClassOf(ObjectSomeValuesFrom(:SH :C) :D)
+ReflexiveObjectProperty(:R)
+SubObjectPropertyOf(:R :S)
+# S is entailed reflexive thus H should be entailed as a sub-property of SH
+SubObjectPropertyOf(ObjectPropertyChain(:S :H) :SH)
+)

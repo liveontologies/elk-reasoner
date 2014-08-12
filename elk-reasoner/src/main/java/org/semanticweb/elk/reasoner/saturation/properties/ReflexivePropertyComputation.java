@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
@@ -42,10 +43,11 @@ public class ReflexivePropertyComputation
 		ReasonerComputationWithInputs<IndexedObjectProperty, ReflexivePropertyComputationFactory> {
 
 	public ReflexivePropertyComputation(OntologyIndex ontIndex,
+			TraceStore.Writer traceWriter,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		this(ontIndex.getReflexiveObjectProperties(),
-				new ReflexivePropertyComputationFactory(), executor,
+				new ReflexivePropertyComputationFactory(traceWriter), executor,
 				maxWorkers, progressMonitor);
 	}
 

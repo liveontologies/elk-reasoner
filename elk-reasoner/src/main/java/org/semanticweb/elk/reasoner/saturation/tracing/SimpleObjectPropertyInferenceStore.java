@@ -3,17 +3,22 @@
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChain;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.util.collections.HashListMultimap;
@@ -27,10 +32,8 @@ import org.semanticweb.elk.util.collections.Multimap;
  * pavel.klinov@uni-ulm.de
  */
 public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferenceStore {
-	// object property inferences and chain inferences are stored separately
-	private final ConcurrentHashMap<IndexedObjectProperty, ObjectPropertyInferences> propertyToInferencesMap_ = new ConcurrentHashMap<IndexedObjectProperty, ObjectPropertyInferences>();
-	
-	//private final ConcurrentHashMap<IndexedBinaryPropertyChain, PropertyChainInferences> chainToInferencesMap_ = new ConcurrentHashMap<IndexedBinaryPropertyChain, PropertyChainInferences>();
+	// TODO separate out property inferences and chain inferences?
+	private final ConcurrentHashMap<IndexedPropertyChain, BasePropertyInferences> propertyToInferencesMap_ = new ConcurrentHashMap<IndexedPropertyChain, BasePropertyInferences>();
 
 	/**
 	 * records object property inferences
@@ -38,31 +41,76 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 	private final ObjectPropertyInferenceVisitor<Void, Boolean> inferenceWriter_ = new ObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 		@Override
-		public Boolean visit(SubObjectPropertyInference conclusion, Void input) {
-			ObjectPropertyInferences inferences = propertyToInferencesMap_.get(conclusion.getSuperProperty());
-			boolean newProperty = false;
-			boolean modified = false;
-			
-			if (inferences == null) {
-				inferences = new ObjectPropertyInferences();
-				newProperty = true; 
-			}
-			
-			modified = inferences.subPropertyInfences.add(conclusion.getSubProperty(), conclusion);
-			
-			if (newProperty) {
-				propertyToInferencesMap_.put(conclusion.getSuperProperty(), inferences);
-			}
-			
-			return modified;
-		}
-
-		@Override
 		public Boolean visit(PropertyChainInitialization conclusion, Void input) {
 			// we aren't writing initialization inferences, will always generate them on the fly
 			return false;
 		}
 
+		@Override
+		public Boolean visit(ToldReflexiveProperty inference, Void input) {
+			return writeReflexivityInference(inference.getPropertyChain(), inference);
+		}
+
+		@Override
+		public Boolean visit(ReflexiveToldSubObjectProperty inference,
+				Void input) {
+			return writeReflexivityInference(inference.getPropertyChain(), inference);
+		}
+
+		@Override
+		public Boolean visit(ReflexivePropertyChainInference inference,
+				Void input) {
+			return writeReflexivityInference(inference.getPropertyChain(), inference);
+		}
+		
+		private BasePropertyInferences getInferences(IndexedPropertyChain chain) {
+			BasePropertyInferences stored = propertyToInferencesMap_.get(chain);
+			
+			return stored != null ? stored : new BasePropertyInferences();
+		}
+		
+		private void setInferences(IndexedPropertyChain chain, final BasePropertyInferences inferences) {
+			propertyToInferencesMap_.put(chain, inferences);
+		}
+		
+		private boolean writeReflexivityInference(IndexedPropertyChain chain, ObjectPropertyInference inference) {
+			final BasePropertyInferences inferences = getInferences(chain);			
+			
+			boolean modified = inferences.reflexivityInferences.add(inference);
+			
+			setInferences(chain, inferences);
+			
+			return modified;
+		}
+
+		@Override
+		public Boolean visit(LeftReflexiveSubPropertyChainInference inference, 	Void input) {
+			return writeSubPropertyChainInference(inference.getSubPropertyChain(), inference.getSuperPropertyChain(), inference);
+		}
+
+		@Override
+		public Boolean visit(RightReflexiveSubPropertyChainInference inference, Void input) {
+			return writeSubPropertyChainInference(inference.getSubPropertyChain(), inference.getSuperPropertyChain(), inference);
+		}
+
+		@Override
+		public Boolean visit(ToldSubPropertyChain inference, Void input) {
+			return writeSubPropertyChainInference(inference.getSubPropertyChain(), inference.getSuperPropertyChain(), inference);
+		}
+		
+		private Boolean writeSubPropertyChainInference(
+				IndexedPropertyChain subPropertyChain,
+				IndexedPropertyChain superPropertyChain,
+				ObjectPropertyInference inference) {
+			
+			BasePropertyInferences inferences = getInferences(superPropertyChain);			
+			boolean modified = inferences.subPropertyInfences.add(subPropertyChain, inference);
+			
+			setInferences(superPropertyChain, inferences);
+			
+			return modified;
+		}
+		
 	};
 	
 	/**
@@ -71,43 +119,47 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 	private final ObjectPropertyConclusionVisitor<ObjectPropertyInferenceVisitor<?,?>, Void> inferenceReader_ = new ObjectPropertyConclusionVisitor<ObjectPropertyInferenceVisitor<?,?>, Void>() {
 
 		@Override
-		public Void visit(SubObjectProperty conclusion, ObjectPropertyInferenceVisitor<?,?> visitor) {
-			if (conclusion.getSubProperty() == conclusion.getSuperProperty()) {
-				// there should always be an initialization inference
-				visitInitializationInference(conclusion.getSubProperty(), visitor);
-			} else {
-				// such inferences are indexed by the super-property
-				ObjectPropertyInferences inferences = propertyToInferencesMap_.get(conclusion.getSuperProperty());
-				
-				if (inferences == null) {
-					return null;
-				}
-				
-				for (ObjectPropertyInference inference : inferences.subPropertyInfences.get(conclusion.getSubProperty())) {
-					inference.acceptTraced(visitor, null);
+		public Void visit(SubPropertyChain<?, ?> conclusion, ObjectPropertyInferenceVisitor<?, ?> visitor) {
+			if (conclusion.getSubPropertyChain() == conclusion.getSuperPropertyChain()) {
+				visitInitializationInference(conclusion.getSubPropertyChain(), visitor);
+			}
+			else {
+				visitSuperPropertyInferences(conclusion.getSuperPropertyChain(), conclusion.getSubPropertyChain(), visitor);
+			}
+			return null;
+		}
+
+		@Override
+		public Void visit(ReflexivePropertyChain<?> conclusion, final ObjectPropertyInferenceVisitor<?,?> visitor) {
+			visitReflexivityInferences(propertyToInferencesMap_.get(conclusion.getPropertyChain()), visitor);
+			
+			return null;
+		}
+
+		private void visitReflexivityInferences(BasePropertyInferences inferences, ObjectPropertyInferenceVisitor<?,?> visitor) {
+			if (inferences != null) {
+				for (ObjectPropertyInference inf : inferences.reflexivityInferences) {
+					inf.acceptTraced(visitor, null);
 				}
 			}
 			
-			return null;
-		}
-
-		@Override
-		public Void visit(ReflexivePropertyChain conclusion, ObjectPropertyInferenceVisitor<?,?> visitor) {
-			// TODO 
-			throw new UnsupportedOperationException("NYI");
-		}
-
-		@Override
-		public Void visit(SubPropertyChain conclusion,
-				ObjectPropertyInferenceVisitor<?, ?> visitor) {
-			visitInitializationInference(conclusion.getPropertyChain(), visitor);
-			
-			return null;
-		}
+		}		
 
 		private void visitInitializationInference(	IndexedPropertyChain subChain, ObjectPropertyInferenceVisitor<?, ?> visitor) {
 			// assume that this inference is always there and generate it on the fly
 			new PropertyChainInitialization(subChain).acceptTraced(visitor, null);	
+		}
+		
+		private void visitSuperPropertyInferences(IndexedPropertyChain superChain, IndexedPropertyChain subChain, ObjectPropertyInferenceVisitor<?,?> visitor) {
+			BasePropertyInferences inferences = propertyToInferencesMap_.get(superChain);
+
+			if (inferences == null) {
+				return;
+			}
+
+			for (ObjectPropertyInference inference : inferences.subPropertyInfences.get(subChain)) {
+				inference.acceptTraced(visitor, null);
+			}
 		}
 		
 	};
@@ -134,18 +186,9 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 	}
 
 	private static class BasePropertyInferences implements PropertyInferences {
-		// TODO 
-		//final List<PropertyInferences> reflexivityInferences = null;
-		//PropertyChainInitialization initialization;
-	}
-	
-	private static class ObjectPropertyInferences  extends BasePropertyInferences {
 		
+		final List<ObjectPropertyInference> reflexivityInferences = new ArrayList<ObjectPropertyInference>(1);
 		final Multimap<IndexedPropertyChain, ObjectPropertyInference> subPropertyInfences = new HashListMultimap<IndexedPropertyChain, ObjectPropertyInference>(2);
-		
 	}
-	
-	/*private static class PropertyChainInferences extends BasePropertyInferences {
-		
-	}*/
+
 }

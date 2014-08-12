@@ -24,14 +24,19 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The factory of engines that compute implied reflexivity of object property
@@ -48,6 +53,16 @@ public class ReflexivePropertyComputationFactory
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ReflexivePropertyComputationFactory.class);
+	
+	private final TraceStore.Writer traceWriter_;
+	
+	public ReflexivePropertyComputationFactory() {
+		this(TraceStore.Writer.Dummy);
+	}
+	
+	public ReflexivePropertyComputationFactory(TraceStore.Writer traceWriter) {
+		traceWriter_ = traceWriter;
+	}
 
 	/**
 	 * A queue of reflexive {@code IndexedPropertyChain}s that are yet to be
@@ -66,19 +81,21 @@ public class ReflexivePropertyComputationFactory
 		// nothing to do
 	}
 
-	private void toDo(IndexedPropertyChain ipc) {
+	private void toDo(IndexedPropertyChain ipc, ObjectPropertyInference inference) {
 		SaturatedPropertyChain saturation = SaturatedPropertyChain
 				.getCreate(ipc);
 		if (saturation.setReflexive()) {
 			LOGGER_.trace("{}: set reflexive", ipc);
 
 			toDo_.add(ipc);
+			// record the reflexivity inference
+			traceWriter_.addObjectPropertyInference(inference);
 		}
 	}
 
 	private void toDoSuperProperties(IndexedPropertyChain ipc) {
-		for (IndexedPropertyChain sup : ipc.getToldSuperProperties()) {
-			toDo(sup);
+		for (IndexedObjectProperty sup : ipc.getToldSuperProperties()) {
+			toDo(sup, new ReflexiveToldSubObjectProperty(sup, ipc));
 		}
 	}
 
@@ -88,7 +105,7 @@ public class ReflexivePropertyComputationFactory
 					.getSaturated();
 			if (rightSaturation == null || !rightSaturation.isDerivedReflexive())
 				continue;
-			toDo(chain);
+			toDo(chain, new ReflexivePropertyChainInference(chain));
 		}
 	}
 
@@ -98,7 +115,7 @@ public class ReflexivePropertyComputationFactory
 					.getSaturated();
 			if (leftSaturation == null || !leftSaturation.isDerivedReflexive())
 				continue;
-			toDo(chain);
+			toDo(chain, new ReflexivePropertyChainInference(chain));
 		}
 	}
 
@@ -130,7 +147,7 @@ public class ReflexivePropertyComputationFactory
 
 		@Override
 		public void submit(IndexedObjectProperty job) {
-			toDo(job);
+			toDo(job, new ToldReflexiveProperty(job));
 		}
 
 		@Override
