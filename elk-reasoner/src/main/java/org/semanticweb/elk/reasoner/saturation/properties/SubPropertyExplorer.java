@@ -33,9 +33,10 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisito
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.BottomUpPropertySubsumptionInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.TopDownPropertySubsumptionInference;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -95,7 +96,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		for (IndexedPropertyChain sub : element.getToldSubProperties())
 			if (superProperty_ != null) {
 				// with tracing
-				toDoWithTracing(sub, new ToldSubPropertyChain(sub, superProperty_, element));	
+				toDoWithTracing(sub, new TopDownPropertySubsumptionInference(sub, superProperty_, element));	
 			} else {
 				// without tracing
 				toDo(sub);
@@ -127,7 +128,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		
 		if (superProperty_ != null) {
 			// with tracing
-			toDoWithTracing(other, new ToldSubPropertyChain(other, superProperty_, chain));	
+			toDoWithTracing(other, new BottomUpPropertySubsumptionInference(other, superProperty_, chain));	
 		} else {
 			// without tracing
 			toDo(other);
@@ -154,8 +155,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 			}
 		}
 		
-		LOGGER_.trace("{}: new sub-property inference {}, inference {}",
-				superProperty_, subProperty, subPropertyInference);
+		LOGGER_.trace("{}: new sub-property inference {}, inference {}", superProperty_, subProperty, subPropertyInference);
 		// record the inference
 		traceWriter_.addObjectPropertyInference(subPropertyInference);		
 	}

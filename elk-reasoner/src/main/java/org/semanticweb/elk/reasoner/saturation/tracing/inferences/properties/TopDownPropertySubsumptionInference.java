@@ -8,23 +8,26 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 
 /**
+ * Property hierarchy inference based on a told sub-property subsumption.
+ * R <= S if H <= S and R is a told sub-property of H. This class stores H as the premise.
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ToldSubPropertyChain extends SubPropertyChain<IndexedPropertyChain, IndexedObjectProperty>
+public class TopDownPropertySubsumptionInference extends SubPropertyChain<IndexedPropertyChain, IndexedObjectProperty>
 		implements ObjectPropertyInference {
 
 	private final IndexedPropertyChain premise_;
 	
-	public ToldSubPropertyChain(IndexedPropertyChain chain,
+	public TopDownPropertySubsumptionInference(IndexedPropertyChain chain,
 			IndexedObjectProperty sup, IndexedPropertyChain premise) {
 		super(chain, sup);
 		premise_ = premise;
 	}
 
 	public SubPropertyChain<?, ?> getPremise() {
-		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(getSubPropertyChain(), premise_);
+		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(premise_, getSuperPropertyChain());
 	}
 	
 	@Override
