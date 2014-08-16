@@ -130,6 +130,9 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 			// with tracing
 			toDoWithTracing(other, new BottomUpPropertySubsumptionInference(other, superProperty_, chain));	
 		} else {
+			
+			LOGGER_.trace("NOT WRITING: {} is a sub-property of {}", other, chain);
+			
 			// without tracing
 			toDo(other);
 		}	

@@ -33,7 +33,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Backwa
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
@@ -96,17 +95,11 @@ public class ComposedBackwardLink extends BackwardLinkImpl implements ClassInfer
 		return new SubObjectProperty(backwardLinkRelation_, composition_.getLeftProperty());
 	}
 	
-	public ObjectPropertyConclusion getRightSubObjectPropertyChain() {
-		if (forwardLinkRelation_ instanceof IndexedObjectProperty) {
-			// property-property composition
-			return new SubObjectProperty((IndexedObjectProperty) forwardLinkRelation_, (IndexedObjectProperty) composition_.getRightProperty());
-		}
-		// property-chain composition
-		assert forwardLinkRelation_ == composition_.getRightProperty();
-		
-		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(forwardLinkRelation_, forwardLinkRelation_);
+	public SubPropertyChain<?,?> getRightSubObjectPropertyChain() {
+		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(forwardLinkRelation_, composition_.getRightProperty());
 	}
 	
+	//this is a side-condition, not a premise 
 	public SubPropertyChain<IndexedBinaryPropertyChain, IndexedObjectProperty> getSubPropertyChain() {
 		return new SubPropertyChain<IndexedBinaryPropertyChain, IndexedObjectProperty>(composition_, getRelation());
 	}

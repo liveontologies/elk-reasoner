@@ -44,7 +44,7 @@ public class TraceState {
 
 	private final TraceStore traceStore_;
 
-	private final LocalTracingSaturationState tracingSaturationState_;
+	private LocalTracingSaturationState tracingSaturationState_;
 
 	private final Multimap<IndexedClassExpression, Conclusion> toTraceMap_ = new HashListMultimap<IndexedClassExpression, Conclusion>();
 
@@ -76,5 +76,18 @@ public class TraceState {
 	
 	public void clearTracingMap() {
 		toTraceMap_.clear();
+	}
+	
+	/**
+	 * Wipes out all information about class inferences but keeps object
+	 * property inferences.
+	 * 
+	 * TODO remove this as soon as we can re-generate property inferences on-demand.
+	 */
+	public void clearClassTraces() {
+		traceStore_.cleanClassInferences();
+		tracingSaturationState_ = new LocalTracingSaturationState(
+				tracingSaturationState_.getOntologyIndex());
+		clearTracingMap();
 	}
 }

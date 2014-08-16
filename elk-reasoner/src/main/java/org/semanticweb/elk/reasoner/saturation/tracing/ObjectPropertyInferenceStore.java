@@ -19,4 +19,6 @@ public interface ObjectPropertyInferenceStore {
 	public boolean addInference(ObjectPropertyInference inference);
 	
 	public void visitInferences(ObjectPropertyConclusion conclusion, ObjectPropertyInferenceVisitor<?, ?> visitor);
+	
+	public void clear();
 }

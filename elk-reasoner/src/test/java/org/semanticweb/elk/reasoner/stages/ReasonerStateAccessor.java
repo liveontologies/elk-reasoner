@@ -47,6 +47,18 @@ public class ReasonerStateAccessor {
 		return reasoner.getTraceState();
 	}
 	
+	public static void cleanClassTraces(AbstractReasonerState reasoner) {
+		if (reasoner.getTraceState() != null) {
+			reasoner.getTraceState().clearClassTraces();
+		}
+	}
+	
+	public static void cleanObjectPropertyTraces(AbstractReasonerState reasoner) {
+		if (reasoner.getTraceState() != null) {
+			reasoner.getTraceState().getTraceStore().cleanObjectPropertyInferences();
+		}
+	}
+	
 	public static IndexedClassExpression transform(AbstractReasonerState reasoner, ElkClassExpression ce) {
 		return reasoner.transform(ce);
 	}

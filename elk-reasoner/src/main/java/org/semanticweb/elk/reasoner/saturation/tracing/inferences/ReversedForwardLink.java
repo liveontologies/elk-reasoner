@@ -66,6 +66,7 @@ public class ReversedForwardLink extends BackwardLinkImpl implements ClassInfere
 		return sourceLink_;
 	}
 	
+	// this is a side condition
 	public SubPropertyChain<IndexedPropertyChain, IndexedObjectProperty> getSubPropertyChain() {
 		return new SubPropertyChain<IndexedPropertyChain, IndexedObjectProperty>(sourceLink_.getRelation(), getRelation());
 	}

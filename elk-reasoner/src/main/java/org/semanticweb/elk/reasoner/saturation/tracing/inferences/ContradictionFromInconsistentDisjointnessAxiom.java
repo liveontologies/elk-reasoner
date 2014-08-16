@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVi
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
- * Represents a {@link Contradiction} as the result of a class occurrsing
+ * Represents a {@link Contradiction} as the result of a class occurring
  * multiple times in one {@link IndexedDisjointnessAxiom}.
  * 
  * TODO store the inconsistent disjointness axiom explicitly as the side

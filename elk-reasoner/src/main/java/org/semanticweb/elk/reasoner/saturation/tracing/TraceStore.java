@@ -113,4 +113,10 @@ public interface TraceStore {
 	 * @return
 	 */
 	public Writer getWriter();
+	
+	// TODO these methods are used mostly for debugging, hide them
+	
+	public void cleanClassInferences();
+	
+	public void cleanObjectPropertyInferences();
 }

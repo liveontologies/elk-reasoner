@@ -47,6 +47,7 @@ import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
+import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
@@ -101,12 +102,12 @@ public class TracingTest {
 				
 				@Override
 				public boolean visit(ElkClassExpression subsumee, 	ElkClassExpression subsumer) {
-					
-					reasoner.resetTraceState();
+					//reasoner.resetTraceState();
+					ReasonerStateAccessor.cleanClassTraces(reasoner);
 					
 					try {
 						
-						LOGGER_.trace("Tracing test: " + subsumee + " => " + subsumer);
+						LOGGER_.trace("Tracing test: {} => {}", subsumee, subsumer);
 						
 						reasoner.explainSubsumption(subsumee, subsumer);
 							

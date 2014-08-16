@@ -120,7 +120,6 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 
 		@Override
 		public boolean addObjectPropertyInference(ObjectPropertyInference conclusion) {
-			
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Writing property inference {}", conclusion.acceptTraced(new InferencePrinter(), null));
 			}
@@ -128,6 +127,16 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 			return propertyInferenceStore_.addInference(conclusion);
 		}
 		
+	}
+
+	@Override
+	public void cleanClassInferences() {
+		storage_.clear();
+	}
+
+	@Override
+	public void cleanObjectPropertyInferences() {
+		propertyInferenceStore_.clear();
 	}
 
 }

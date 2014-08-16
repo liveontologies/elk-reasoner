@@ -83,7 +83,6 @@ public class ContradictionFromDisjointnessRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		//producer.produce(premises.getRoot(), ContradictionImpl.getInstance());
 		producer.produce(premises.getRoot(), new ContradictionFromInconsistentDisjointnessAxiom(premise));
 	}
 

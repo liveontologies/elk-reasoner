@@ -78,7 +78,7 @@ public class PropagatedSubsumer extends
 		return new BackwardLinkImpl(linkSourceRoot_, linkRelation_);
 	}
 	
-	public SubObjectProperty getSubPropertyInference() {
+	public SubObjectProperty getSubPropertyPremise() {
 		return new SubObjectProperty(linkRelation_, getExpression().getRelation());
 	}
 

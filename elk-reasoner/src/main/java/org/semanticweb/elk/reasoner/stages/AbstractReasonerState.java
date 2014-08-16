@@ -643,23 +643,6 @@ public abstract class AbstractReasonerState {
 		traceState.clearTracingMap();
 	}
 	
-	/*void simpleTrace(IndexedClassExpression subsumee, IndexedClassExpression subsumer) {
-		ContextTracingFactory<ContextTracingJob> factory = new NonRecursiveContextTracingFactory(
-				saturationState, traceState.getSaturationState(),
-				traceState.getTraceStore());
-		TraceStore.Reader onDemandTracer = new OnDemandTracingReader(
-				traceState.getSaturationState(), traceState.getTraceStore()
-						.getReader(), factory);
-		// TraceStore.Reader inferenceReader = new FirstNInferencesReader(onDemandTracer, 1);
-		TraceStore.Reader inferenceReader = onDemandTracer;
-		RecursiveTraceUnwinder unwinder = new RecursiveTraceUnwinder(
-				inferenceReader);
-		
-		unwinder.accept(subsumee,
-				convertTraceTarget(subsumee, subsumer),
-				new DummyConclusionVisitor<IndexedClassExpression>());
-	}*/
-
 	private Conclusion convertTraceTarget(IndexedClassExpression subsumee, IndexedClassExpression subsumer) {
 		Context subsumeeContext = saturationState.getContext(subsumee);
 		

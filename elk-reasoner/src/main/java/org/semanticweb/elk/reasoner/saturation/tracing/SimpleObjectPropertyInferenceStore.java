@@ -9,10 +9,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.BottomUpPropertySubsumptionInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.BottomUpPropertySubsumptionInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
@@ -33,6 +33,9 @@ import org.semanticweb.elk.util.collections.Multimap;
  * pavel.klinov@uni-ulm.de
  */
 public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferenceStore {
+	
+	//private final static Logger LOGGER_ = LoggerFactory.getLogger(SimpleObjectPropertyInferenceStore.class);
+	
 	// TODO separate out property inferences and chain inferences?
 	private final ConcurrentHashMap<IndexedPropertyChain, BasePropertyInferences> propertyToInferencesMap_ = new ConcurrentHashMap<IndexedPropertyChain, BasePropertyInferences>();
 
@@ -114,6 +117,8 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 			
 			setInferences(superPropertyChain, inferences);
 			
+			//LOGGER_.trace("writing sub-chain inference: {} -> {}, inference: {}, store: {}", subPropertyChain, superPropertyChain, inference, hashCode());
+			
 			return modified;
 		}
 		
@@ -160,6 +165,7 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 			BasePropertyInferences inferences = propertyToInferencesMap_.get(superChain);
 
 			if (inferences == null) {
+				//LOGGER_.trace("not found sub-chain inferences: {} -> {}, store: {}", subChain, superChain, hashCode());
 				return;
 			}
 
@@ -178,6 +184,11 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 	@Override
 	public void visitInferences(ObjectPropertyConclusion conclusion, ObjectPropertyInferenceVisitor<?, ?> visitor) {
 		conclusion.accept(inferenceReader_, visitor);
+	}
+	
+	@Override
+	public void clear() {
+		propertyToInferencesMap_.clear();
 	}
 	
 	/**
