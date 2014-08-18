@@ -111,7 +111,6 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 	public O visit(PropagatedSubsumer conclusion, I parameter) {
 		conclusion.getBackwardLink().accept(this, parameter);
 		conclusion.getPropagation().accept(this, parameter);
-		conclusion.getSubPropertyPremise().accept(this, parameter);
 		return null;
 	}
 
@@ -125,7 +124,6 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 	public O visit(ComposedBackwardLink conclusion, I parameter) {
 		conclusion.getBackwardLink().accept(this, parameter);
 		conclusion.getForwardLink().accept(this, parameter);
-		//conclusion.getSubPropertyChain().accept(this, parameter);
 		conclusion.getLeftSubObjectProperty().accept(this, parameter);
 		conclusion.getRightSubObjectPropertyChain().accept(this, parameter);
 		return null;
@@ -143,7 +141,6 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 	@Override
 	public O visit(ReversedForwardLink conclusion, I parameter) {
 		conclusion.getSourceLink().accept(this, parameter);
-		//conclusion.getSubPropertyChain().accept(this, parameter);
 		return null;
 	}
 
@@ -161,7 +158,8 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 
 	@Override
 	public O visit(TracedPropagation conclusion, I parameter) {
-		conclusion.getPremise().accept(this, parameter);
+		conclusion.getSubsumer().accept(this, parameter);
+		conclusion.getSubPropertyPremise().accept(this, parameter);
 		return null;
 	}
 

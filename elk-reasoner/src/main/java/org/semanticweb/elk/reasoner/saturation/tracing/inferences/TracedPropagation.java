@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Decomp
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
@@ -49,9 +50,13 @@ public class TracedPropagation extends PropagationImpl implements ClassInference
 		super(relation, carry);
 	}
 
-	public Subsumer<?> getPremise() {
+	public Subsumer<?> getSubsumer() {
 		return new DecomposedSubsumerImpl<IndexedClassExpression>(getCarry()
 				.getFiller());
+	}
+	
+	public SubObjectProperty getSubPropertyPremise() {
+		return new SubObjectProperty(getRelation(), getCarry().getRelation());
 	}
 
 	@Override

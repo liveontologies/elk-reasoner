@@ -33,7 +33,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Compos
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
@@ -78,9 +77,9 @@ public class PropagatedSubsumer extends
 		return new BackwardLinkImpl(linkSourceRoot_, linkRelation_);
 	}
 	
-	public SubObjectProperty getSubPropertyPremise() {
+	/*public SubObjectProperty getSubPropertyPremise() {
 		return new SubObjectProperty(linkRelation_, getExpression().getRelation());
-	}
+	}*/
 
 	@Override
 	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {

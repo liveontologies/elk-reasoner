@@ -139,7 +139,7 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>, Ob
 
 	@Override
 	public String visit(TracedPropagation conclusion, Void parameter) {
-		return "Creating propagation from " + conclusion.getPremise();
+		return "Creating propagation from " + conclusion.getSubsumer();
 	}
 
 	@Override
