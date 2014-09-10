@@ -134,7 +134,9 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	private void registerCompositionRule(ModifiableOntologyIndex index) {
+		// to derive contradiction from inconsistent disjointness axioms
 		ContradictionFromDisjointnessRule.addRulesFor(this, index);
+		// to derive disjoint subsumers from subsumers 
 		DisjointSubsumerFromMemberRule.addRulesFor(this, index);
 	}
 

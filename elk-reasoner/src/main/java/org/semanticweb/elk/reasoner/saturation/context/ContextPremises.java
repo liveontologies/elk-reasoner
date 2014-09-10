@@ -31,7 +31,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
@@ -96,15 +95,15 @@ public interface ContextPremises {
 
 	/**
 	 * @param axiom
-	 *            the {@link IndexedDisjointnessAxiom} to be checked for causing
-	 *            inconsistency in this {@link ContextPremises}
+	 *            the {@link IndexedDisjointnessAxiom} whose members could be
+	 *            subsumers in this {@link ContextPremises}.
 	 * 
-	 * @return {@code true} if the given {@link IndexedDisjointnessAxiom} makes
-	 *         this {@link ContextPremises} inconsistent, that is, this context
-	 *         contains at least two different {@link DisjointSubsumer}s for
-	 *         this {@link IndexedDisjointnessAxiom}
+	 * @return the derived {@link IndexedClassExpression} subsumers by
+	 *         {@link IndexedDisjointnessAxiom}s in which they occur as members
 	 */
-	public IndexedClassExpression[] getDisjointSubsumers(IndexedDisjointnessAxiom axiom);
+	public IndexedClassExpression[] getDisjointSubsumers(
+			IndexedDisjointnessAxiom axiom);
 
-	public Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(IndexedPropertyChain subRoot);
+	public Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(
+			IndexedPropertyChain subRoot);
 }
