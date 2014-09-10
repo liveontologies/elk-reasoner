@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionF
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ContradicitonCompositionRule extends AbstractDisjointSubsumerRule {
+public class ContradictionCompositionRule extends AbstractDisjointSubsumerRule {
 
 	public static final String NAME = "Contradiction by Disjointness Axiom";
 
@@ -48,7 +48,6 @@ public class ContradicitonCompositionRule extends AbstractDisjointSubsumerRule {
 	@Override
 	public void apply(DisjointSubsumer premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		//producer.produce(premises.getRoot(), ContradictionImpl.getInstance());
 		IndexedClassExpression[] disjointSubsumers = premises.getDisjointSubsumers(premise.getAxiom());
 		
 		if (disjointSubsumers[1] != null) {

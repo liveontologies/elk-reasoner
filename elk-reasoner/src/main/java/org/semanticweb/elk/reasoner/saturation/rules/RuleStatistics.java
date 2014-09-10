@@ -6,7 +6,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackw
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
-import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradictionCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.NonReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
@@ -115,7 +115,7 @@ public class RuleStatistics extends AbstractStatistics {
 				ruleCounter.countNonReflexiveBackwardLinkCompositionRule,
 				ruleTimer.timeNonReflexiveBackwardLinkCompositionRule);
 
-		print(printer, ContradicitonCompositionRule.NAME,
+		print(printer, ContradictionCompositionRule.NAME,
 				ruleCounter.countContradicitonCompositionRule,
 				ruleTimer.timeContradicitonCompositionRule);
 

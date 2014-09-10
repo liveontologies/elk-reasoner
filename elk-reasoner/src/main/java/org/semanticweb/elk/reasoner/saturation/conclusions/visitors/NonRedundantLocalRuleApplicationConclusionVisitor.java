@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkedBackwar
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
-import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradictionCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.BackwardLinkFromForwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwardLinkCompositionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
@@ -69,7 +69,7 @@ public class NonRedundantLocalRuleApplicationConclusionVisitor extends
 	/**
 	 * cached rules for frequent use
 	 */
-	private static ContradicitonCompositionRule CONTRADICTION_COMPOSITION_RULE_ = new ContradicitonCompositionRule();
+	private static ContradictionCompositionRule CONTRADICTION_COMPOSITION_RULE_ = new ContradictionCompositionRule();
 
 	public NonRedundantLocalRuleApplicationConclusionVisitor(
 			RuleVisitor ruleAppVisitor, ConclusionProducer producer) {
@@ -154,10 +154,8 @@ public class NonRedundantLocalRuleApplicationConclusionVisitor extends
 
 	@Override
 	public Boolean visit(DisjointSubsumer conclusion, ContextPremises premises) {
-		//if (premises.isInconsistForDisjointnessAxiom(conclusion.getAxiom())) {
 		ruleAppVisitor.visit(CONTRADICTION_COMPOSITION_RULE_, conclusion,
 					premises, producer);
-		//}
 		return true;
 	}
 

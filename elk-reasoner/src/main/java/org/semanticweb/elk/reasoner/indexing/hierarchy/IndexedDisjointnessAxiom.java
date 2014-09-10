@@ -59,7 +59,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	private final Set<IndexedClassExpression> disjointMembers_;
 
 	/**
-	 * This counts how often this {@link IndexedDisjointnessAxiom} occurrs in
+	 * This counts how often this {@link IndexedDisjointnessAxiom} occurs in
 	 * the ontology.
 	 */
 	int occurrenceNo = 0;

@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.contradiction.Contradiction
  */
 public interface DisjointSubsumerRuleVisitor {
 
-	void visit(ContradicitonCompositionRule rule, DisjointSubsumer premise,
+	void visit(ContradictionCompositionRule rule, DisjointSubsumer premise,
 			ContextPremises premises, ConclusionProducer producer);
 
 }
