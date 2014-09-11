@@ -64,20 +64,20 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 	 * Correctness of axioms deletions requires that toldSuperClassExpressions
 	 * is a List.
 	 */
-	private final List<IndexedClassExpression> toldSuperClassExpressions_;
+	protected final List<IndexedClassExpression> toldSuperClassExpressions;
 
-	private SuperClassFromSubClassRule(ChainableSubsumerRule tail) {
+	SuperClassFromSubClassRule(ChainableSubsumerRule tail) {
 		super(tail);
-		this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
+		this.toldSuperClassExpressions = new ArrayList<IndexedClassExpression>(
 				1);
 	}
 
-	private SuperClassFromSubClassRule(IndexedClassExpression ice) {
+	SuperClassFromSubClassRule(IndexedClassExpression ice) {
 		super(null);
-		this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
+		this.toldSuperClassExpressions = new ArrayList<IndexedClassExpression>(
 				1);
 
-		toldSuperClassExpressions_.add(ice);
+		toldSuperClassExpressions.add(ice);
 	}
 
 	public static void addRuleFor(IndexedSubClassOfAxiom axiom,
@@ -94,7 +94,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 
 	// TODO: hide this method
 	public Collection<IndexedClassExpression> getToldSuperclasses() {
-		return toldSuperClassExpressions_;
+		return toldSuperClassExpressions;
 	}
 
 	@Override
@@ -105,54 +105,57 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		for (IndexedClassExpression implied : toldSuperClassExpressions_) {
+		for (IndexedClassExpression implied : toldSuperClassExpressions) {
 			producer.produce(premises.getRoot(),
 					new SubClassOfSubsumer<IndexedClassExpression>(premise,
 							implied));
 		}
 	}
 
+	protected SuperClassFromSubClassRule getCreate(Chain<ChainableSubsumerRule> ruleChain) {
+		return ruleChain.getCreate(MATCHER_, FACTORY_);
+	}
+	
+	protected SuperClassFromSubClassRule get(Chain<ChainableSubsumerRule> ruleChain) {
+		return ruleChain.find(MATCHER_);
+	}
+	
 	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
-		SuperClassFromSubClassRule rule = ruleChain.getCreate(
-				SuperClassFromSubClassRule.MATCHER_,
-				SuperClassFromSubClassRule.FACTORY_);
+		SuperClassFromSubClassRule rule = getCreate(ruleChain);
 		boolean changed = false;
 
-		for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-			LOGGER_.trace("Adding {} to {}", ice, NAME);
-
-			changed |= rule.addToldSuperClassExpression(ice);
+		for (int i = 0; i < toldSuperClassExpressions.size(); i++) {
+			changed |= rule.addToldSuperClassExpression(toldSuperClassExpressions.get(i));
 		}
 
 		return changed;
-
 	}
 
 	@Override
 	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
-		SuperClassFromSubClassRule rule = ruleChain
-				.find(SuperClassFromSubClassRule.MATCHER_);
+		SuperClassFromSubClassRule rule = get(ruleChain);
 		boolean changed = false;
 
 		if (rule != null) {
-			for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-				LOGGER_.trace("Removing {} from {}", ice, NAME);
-
-				changed |= rule.removeToldSuperClassExpression(ice);
+			for (int i = 0; i < toldSuperClassExpressions.size(); i++) {
+				changed |= rule.removeToldSuperClassExpression(toldSuperClassExpressions.get(i));
 			}
 
 			if (rule.isEmpty()) {
-				ruleChain.remove(SuperClassFromSubClassRule.MATCHER_);
-
-				LOGGER_.trace("{}: removed ", NAME);
-
-				return true;
+				return removeEmpty(ruleChain, MATCHER_);
 			}
 		}
 
 		return changed;
+	}
+	
+	protected boolean removeEmpty(Chain<ChainableSubsumerRule> ruleChain, Matcher<ChainableSubsumerRule, ? extends SuperClassFromSubClassRule> matcher) {
+		ruleChain.remove(matcher);
 
+		LOGGER_.trace("{}: removed ", NAME);
+
+		return true;
 	}
 
 	@Override
@@ -164,7 +167,9 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 
 	protected boolean addToldSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
-		return toldSuperClassExpressions_.add(superClassExpression);
+		LOGGER_.trace("Adding {} to {}", superClassExpression, NAME);
+		
+		return toldSuperClassExpressions.add(superClassExpression);
 	}
 
 	/**
@@ -173,19 +178,21 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 	 */
 	protected boolean removeToldSuperClassExpression(
 			IndexedClassExpression superClassExpression) {
-		return toldSuperClassExpressions_.remove(superClassExpression);
+		LOGGER_.trace("Removing {} from {}", superClassExpression, NAME);
+		
+		return toldSuperClassExpressions.remove(superClassExpression);
 	}
 
 	/**
 	 * @return {@code true} if this rule never does anything
 	 */
-	private boolean isEmpty() {
-		return toldSuperClassExpressions_.isEmpty();
+	protected boolean isEmpty() {
+		return toldSuperClassExpressions.isEmpty();
 	}
 
 	@Override
 	public String toString() {
-		return getName() + ": " + toldSuperClassExpressions_;
+		return getName() + ": " + toldSuperClassExpressions;
 	}
 
 	private static final Matcher<ChainableSubsumerRule, SuperClassFromSubClassRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableSubsumerRule, SuperClassFromSubClassRule>(

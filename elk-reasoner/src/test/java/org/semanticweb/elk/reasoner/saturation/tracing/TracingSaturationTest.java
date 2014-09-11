@@ -50,7 +50,8 @@ public class TracingSaturationTest {
 	
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(TracingSaturationTest.class);
 	
-	@Rule public TestName testName = new TestName();
+	@Rule 
+	public TestName testName = new TestName();
 
 	@Before
 	public void beforeTest() {
@@ -75,19 +76,6 @@ public class TracingSaturationTest {
 		TracingTestUtils.checkTracingMinimality(a, d, reasoner);
 	}
 	
-	/*
-	 * @Test public void testGalen() throws Exception { Reasoner reasoner =
-	 * load("tracing/EL-GALEN.owl"); ElkObjectFactory factory = new
-	 * ElkObjectFactoryImpl(); IndexedClassExpression clazz =
-	 * ReasonerStateAccessor.transform(reasoner, factory.getClass(new
-	 * ElkFullIri("http://www.co-ode.org/ontologies/galen#IndexFingerNail")));
-	 * TraceState state = ReasonerStateAccessor.getTraceState(reasoner);
-	 * 
-	 * InputProcessor<ContextTracingJob> engine =
-	 * state.getContextTracingFactory().getEngine(); engine.submit(new
-	 * ContextTracingJob(clazz)); engine.process(); }
-	 */
-
 	@Test
 	public void testDuplicateInferenceOfConjunction() throws Exception {
 		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/DuplicateConjunction.owl");

@@ -50,13 +50,13 @@ public class FirstNInferencesReader extends DelegatingTraceReader {
 	}
 	
 	@Override
-	public void accept(IndexedClassExpression root, Conclusion conclusion, final ClassInferenceVisitor<?, ?> visitor) {
+	public void accept(IndexedClassExpression root, Conclusion conclusion, final ClassInferenceVisitor<IndexedClassExpression, ?> visitor) {
 		final MutableInteger counter = new MutableInteger(0);
 		
-		reader.accept(root, conclusion, new AbstractClassInferenceVisitor<Void, Void>() {
+		reader.accept(root, conclusion, new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
 
 			@Override
-			protected Void defaultTracedVisit(ClassInference inference,	Void ignored) {
+			protected Void defaultTracedVisit(ClassInference inference, IndexedClassExpression ignored) {
 				if (counter.get() < numberOfInferencesToVisit_) {
 					counter.increment();
 					inference.acceptTraced(visitor, null);

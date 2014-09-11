@@ -61,6 +61,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Contra
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.rules.AxiomBindingRuleToIndexWriter;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleToIndexWriter;
+import org.semanticweb.elk.reasoner.saturation.rules.SimpleRuleToIndexWriter;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
@@ -103,6 +106,13 @@ public abstract class AbstractReasonerState {
 	 * rules will be applied.
 	 */
 	final boolean REDUNDANT_RULES = false;
+	/**
+	 * If true, the reasoner will bind asserted axioms to the inference rules
+	 * which use them as side conditions. As a result, it'll be possible to
+	 * access the axioms when exploring traced inferences. It will cause a
+	 * certain memory overhead because otherwise we don't store asserted axioms.
+	 */
+	final boolean BIND_AXIOMS = true;
 
 	final SaturationState<? extends Context> saturationState;
 
@@ -193,9 +203,13 @@ public abstract class AbstractReasonerState {
 	TraceState traceState;
 
 	protected AbstractReasonerState() {
+		RuleToIndexWriter ruleWriter = BIND_AXIOMS ? new AxiomBindingRuleToIndexWriter()
+				: new SimpleRuleToIndexWriter();
+
 		this.objectCache_ = new IndexedObjectCache();
 		this.ontologyIndex = new DifferentialIndex(objectCache_);
-		this.axiomInserter_ = new MainAxiomIndexerVisitor(ontologyIndex, true);
+		this.axiomInserter_ = new MainAxiomIndexerVisitor(ontologyIndex,
+				ruleWriter, true);
 		this.axiomDeleter_ = new MainAxiomIndexerVisitor(ontologyIndex, false);
 		this.saturationState = SaturationStateFactory
 				.createSaturationState(ontologyIndex);

@@ -98,8 +98,8 @@ public class NonIncrementalChangeCheckingVisitor extends
 
 	@Override
 	public void indexSubClassOfAxiom(ElkClassExpression subClass,
-			ElkClassExpression superClass) {
-		getIndexingVisitor().indexSubClassOfAxiom(subClass, superClass);
+			ElkClassExpression superClass, ElkAxiom assertedAxiom) {
+		getIndexingVisitor().indexSubClassOfAxiom(subClass, superClass, assertedAxiom);
 	}
 
 	@Override
@@ -112,8 +112,8 @@ public class NonIncrementalChangeCheckingVisitor extends
 
 	@Override
 	public void indexClassAssertion(ElkIndividual individual,
-			ElkClassExpression type) {
-		getIndexingVisitor().indexClassAssertion(individual, type);
+			ElkClassExpression type, ElkAxiom assertedAxiom) {
+		getIndexingVisitor().indexClassAssertion(individual, type, assertedAxiom);
 	}
 
 	@Override

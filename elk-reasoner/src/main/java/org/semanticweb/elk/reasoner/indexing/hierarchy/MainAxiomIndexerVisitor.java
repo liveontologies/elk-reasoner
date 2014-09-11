@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
@@ -35,6 +36,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainFilter;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleToIndexWriter;
+import org.semanticweb.elk.reasoner.saturation.rules.AxiomBindingRuleToIndexWriter;
 
 /**
  * An object that indexes axioms into a given ontology index. Each instance can
@@ -67,7 +70,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	 * and a negative occurrence of {@link IndexedClassExpression}s.
 	 */
 	private final IndexObjectConverter neutralIndexer, positiveIndexer,
-			negativeIndexer;// , noOpConverter;
+			negativeIndexer;
 
 	/**
 	 * An {@link IndexedAxiomFilter} used to update occurrences of
@@ -83,6 +86,11 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	 * never occurs positively in this way, then no inconsistency can be caused.
 	 */
 	private final IndexedClass owlNothing_;
+	
+	/**
+	 * A facade to add or remove inference rules to {@link ModifiableOntologyIndex}. 
+	 */
+	private final RuleToIndexWriter ruleWriter_;
 
 	/**
 	 * @param index
@@ -91,6 +99,10 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	 *            specifies whether this objects inserts or deletes axioms
 	 */
 	public MainAxiomIndexerVisitor(ModifiableOntologyIndex index, boolean insert) {
+		this(index, new AxiomBindingRuleToIndexWriter(), insert);
+	}
+	
+	public MainAxiomIndexerVisitor(ModifiableOntologyIndex index, RuleToIndexWriter ruleWriter, boolean insert) {
 		this.index_ = index;
 		this.objectCache_ = index.getIndexedObjectCache();
 		this.owlNothing_ = index.getIndexedOwlNothing();
@@ -114,13 +126,9 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 				new ClassOccurrenceUpdateFilter(multiplicity_, multiplicity_, 0),
 				propertyOccurrenceUpdateFilter, negativeIndexerFactory);
 		this.negativeIndexer = positiveIndexer.getComplementaryConverter();
-		/*
-		 * this.noOpConverter = new IndexObjectConverter( new
-		 * ClassOccurrenceUpdateFilter(0, 0, 0),
-		 * propertyOccurrenceUpdateFilter);
-		 */
 		this.axiomUpdateFilter = new AxiomOccurrenceUpdateFilter(multiplicity_);
-	}
+		this.ruleWriter_ = ruleWriter;
+	}	
 
 	@Override
 	public int getMultiplicity() {
@@ -129,7 +137,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 
 	@Override
 	public void indexSubClassOfAxiom(ElkClassExpression subElkClass,
-			ElkClassExpression superElkClass) {
+			ElkClassExpression superElkClass, ElkAxiom assertedAxiom) {
 		// If this is uncommented, deleting a subsumption C => D would
 		// effectively replace it by C => T. This means there will be fewer
 		// rule deletions during the deletion stage.
@@ -146,12 +154,12 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 				.accept(positiveIndexer);
 
 		axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(subIndexedClass,
-				superIndexedClass));
+				superIndexedClass, assertedAxiom));
 	}
 
 	@Override
 	public void indexClassAssertion(ElkIndividual individual,
-			ElkClassExpression type) {
+			ElkClassExpression type, ElkAxiom assertedAxiom) {
 
 		IndexedClassExpression indexedIndividual = individual
 				.accept(negativeIndexer);
@@ -159,7 +167,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 		IndexedClassExpression indexedType = type.accept(positiveIndexer);
 
 		axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(indexedIndividual,
-				indexedType));
+				indexedType, assertedAxiom));
 	}
 
 	@Override
@@ -381,7 +389,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 			if (!axiom.occurs() && increment > 0)
 				index_.add(axiom);
 
-			axiom.updateOccurrenceNumbers(index_, increment);
+			axiom.updateOccurrenceNumbers(index_, ruleWriter_, increment);
 
 			if (!axiom.occurs() && increment < 0)
 				index_.remove(axiom);

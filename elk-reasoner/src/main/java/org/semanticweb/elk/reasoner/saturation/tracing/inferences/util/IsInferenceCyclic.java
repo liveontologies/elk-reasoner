@@ -84,10 +84,10 @@ public class IsInferenceCyclic {
 		final MutableBoolean foundAlternative = new MutableBoolean(false);
 		final MutableBoolean anyInference = new MutableBoolean(false);
 
-		inferenceReader.accept(premiseContext, premise, new AbstractClassInferenceVisitor<Void, Void>(){
+		inferenceReader.accept(premiseContext, premise, new AbstractClassInferenceVisitor<IndexedClassExpression, Void>(){
 
 			@Override
-			protected Void defaultTracedVisit(ClassInference premiseInference, Void ignored) {
+			protected Void defaultTracedVisit(ClassInference premiseInference, IndexedClassExpression ignored) {
 				anyInference.set(true);
 				
 				if (isAlternative(premiseInference, conclusion, conclusionContext)) {

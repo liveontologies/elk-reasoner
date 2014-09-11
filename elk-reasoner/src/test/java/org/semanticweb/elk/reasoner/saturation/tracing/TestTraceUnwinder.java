@@ -83,6 +83,14 @@ public class TestTraceUnwinder implements TraceUnwinder {
 		accept(context, conclusion, premiseVisitor, DUMMY_INFERENCE_VISITOR, ObjectPropertyConclusionVisitor.DUMMY, ObjectPropertyInferenceVisitor.DUMMY);
 	}
 	
+	// visit only class inferences
+	public void accept(IndexedClassExpression context,
+			final Conclusion conclusion,
+			final ConclusionVisitor<IndexedClassExpression, ?> premiseVisitor,
+			final ClassInferenceVisitor<IndexedClassExpression, ?> inferenceVisitor) {
+		accept(context, conclusion, premiseVisitor, inferenceVisitor, ObjectPropertyConclusionVisitor.DUMMY, ObjectPropertyInferenceVisitor.DUMMY);
+	}	
+	
 	// unwind only property conclusions
 	@Override
 	public void accept(ObjectPropertyConclusion conclusion,
@@ -196,11 +204,11 @@ public class TestTraceUnwinder implements TraceUnwinder {
 		// here, the inference must have premises, i.e. it's not an
 		// initialization inference)
 		traceReader_.accept(root, conclusion,
-				new AbstractClassInferenceVisitor<Void, Void>() {
+				new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
 
 					@Override
 					protected Void defaultTracedVisit(ClassInference inference,
-							Void v) {
+							IndexedClassExpression v) {
 						if (!seenInferences.contains(inference)) {
 							IndexedClassExpression inferenceContextRoot = inference
 									.getInferenceContextRoot(root);

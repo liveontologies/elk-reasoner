@@ -22,8 +22,9 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleToIndexWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +34,16 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 			.getLogger(IndexedSubClassOfAxiom.class);
 
 	private final IndexedClassExpression subClass_, superClass_;
+	/*
+	 * this shouldn't cause much memory overhead because we don't cache indexed subclass axioms. 
+	 */
+	private final ElkAxiom assertedAxiom_;
 
 	protected IndexedSubClassOfAxiom(IndexedClassExpression subClass,
-			IndexedClassExpression superClass) {
+			IndexedClassExpression superClass, ElkAxiom assertedAxiom) {
 		this.subClass_ = subClass;
 		this.superClass_ = superClass;
+		this.assertedAxiom_ = assertedAxiom;
 	}
 
 	public IndexedClassExpression getSubClass() {
@@ -67,12 +73,14 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
+	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index, final RuleToIndexWriter ruleWriter,
 			final int increment) {
 		if (increment > 0) {
-			SuperClassFromSubClassRule.addRuleFor(this, index);
+			//SuperClassFromSubClassRule.addRuleFor(this, index);
+			ruleWriter.addSuperClassFromSubClassRule(this, index, assertedAxiom_);
 		} else {
-			SuperClassFromSubClassRule.removeRuleFor(this, index);
+			//SuperClassFromSubClassRule.removeRuleFor(this, index);
+			ruleWriter.removeSuperClassFromSubClassRule(this, index);
 		}
 	}
 

@@ -29,12 +29,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.MutableBoolean;
 import org.semanticweb.elk.MutableInteger;
+import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
+import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
@@ -54,8 +60,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Obj
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.GetInferenceTarget;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.GetInferenceTarget;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.PremiseVisitor;
@@ -161,11 +167,11 @@ public class TracingTestUtils {
 		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
 				ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger inferenceCount = new AtomicInteger(0);
-		ClassInferenceVisitor<Context, Boolean> counter = new AbstractClassInferenceVisitor<Context, Boolean>() {
+		ClassInferenceVisitor<IndexedClassExpression, Boolean> counter = new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
 
 			@Override
 			protected Boolean defaultTracedVisit(ClassInference inference,
-					Context context) {
+					IndexedClassExpression root) {
 
 				LOGGER_.trace("{}: traced inference {}", subsumee, inference);
 
@@ -264,56 +270,71 @@ public class TracingTestUtils {
 	}
 	
 	/*
-	 * Check that at least one axiom used as a side condition satisfies the given condition.
-	 * TODO complete this test when we have a principled method of retrieving side conditions
 	 */
-	/*public static void checkConditionOverUsedAxioms(
-			ElkClassExpression sub,
-			ElkClassExpression sup,
-			Reasoner reasoner,
-			final ElkAxiomVisitor<Boolean> axiomConditionChecker) {
+	public static Set<ElkAxiom> getSideConditions(ElkClassExpression sub,
+			ElkClassExpression sup, Reasoner reasoner) {
+		final Set<ElkAxiom> sideConditions = new HashSet<ElkAxiom>();
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
-		Conclusion conclusion = getConclusionToTrace(
-				ReasonerStateAccessor.getContext(reasoner, subsumee),
+		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
 				ReasonerStateAccessor.transform(reasoner, sup));
-		final MutableBoolean classInferenceCondition = new MutableBoolean(false);
-		final MutableBoolean propertyInferenceCondition = new MutableBoolean(false);
-		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
+		SideConditionVisitor sideConditionVisitor = new SideConditionVisitor(new AbstractElkAxiomVisitor<Void>() {
 
-		new TestTraceUnwinder(traceState.getTraceStore().getReader(),
-				UNTRACED_LISTENER).accept(subsumee, conclusion,
-				new DummyConclusionVisitor<IndexedClassExpression>(), 
-				new AbstractInferenceVisitor<IndexedClassExpression, Boolean>() {
+			@Override
+			protected Void defaultLogicalVisit(ElkAxiom axiom) {
+				sideConditions.add(axiom);
+				return null;
+			}
+			
+		});
 
-					@Override
-					protected Boolean defaultTracedVisit(Inference conclusion,
-							IndexedClassExpression input) {
-						return false;
-					}
+		ReasonerStateAccessor.getTraceState(reasoner).getTraceStore()
+				.getReader().accept(subsumee, conclusion, sideConditionVisitor);
 
-					@Override
-					public Boolean visit(SubClassOfSubsumer<?> conclusion, 	IndexedClassExpression input) {
-						return false;
-					}
-					
-					
-				},
-				ObjectPropertyConclusionVisitor.DUMMY, 
-				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
+		return sideConditions;
+	}	
+	
+	/*
+	 * checks that the axiom visitor returns true for at least one side condition
+	 */
+	public static void checkSideConditions(ElkClassExpression sub,
+			ElkClassExpression sup, Reasoner reasoner, final ElkAxiomVisitor<Boolean> checker) throws ElkException {
+		final IndexedClassExpression subsumee = ReasonerStateAccessor
+				.transform(reasoner, sub);
+		final MutableBoolean checkPassed = new MutableBoolean(false);
+		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
+				ReasonerStateAccessor.transform(reasoner, sup));
+		TraceStore.Reader inferenceReader = ReasonerStateAccessor.getTraceState(reasoner).getTraceStore().getReader();
+		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader);
+		SideConditionVisitor sideConditionVisitor = new SideConditionVisitor(new AbstractElkAxiomVisitor<Void>() {
 
-					@Override
-					protected Boolean defaultTracedVisit(
-							ObjectPropertyInference inference, Void input) {
-						return false;
-					}
-					
-				});		
-		
+			@Override
+			protected Void defaultLogicalVisit(ElkAxiom axiom) {
+				checkPassed.or(axiom.accept(checker));
+				return null;
+			}
+			
+		});
 
-		assertTrue("The condition failed on used all class axioms", classInferenceCondition.get());
-		assertTrue("The condition failed on all property inferences", propertyInferenceCondition.get());
-	}*/	
+		reasoner.explainSubsumption(sub, sup);
+		traceUnwinder.accept(subsumee, conclusion, new DummyConclusionVisitor<IndexedClassExpression>(), sideConditionVisitor);
+
+		assertTrue("The condition is false for all used side conditions", checkPassed.get());
+	}	
+	
+	public static void visitClassInferences(ElkClassExpression sub,
+			ElkClassExpression sup, Reasoner reasoner, ClassInferenceVisitor<IndexedClassExpression, Void> visitor) throws ElkException {
+		final IndexedClassExpression subsumee = ReasonerStateAccessor
+				.transform(reasoner, sub);
+		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
+				ReasonerStateAccessor.transform(reasoner, sup));
+		TraceStore.Reader inferenceReader = ReasonerStateAccessor.getTraceState(reasoner).getTraceStore().getReader();
+		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader);
+
+		reasoner.explainSubsumption(sub, sup);
+		traceUnwinder.accept(subsumee, conclusion, new DummyConclusionVisitor<IndexedClassExpression>(), visitor);		
+	}	
+	
 
 	public static int checkInferenceAcyclicity(Reasoner reasoner) {
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
@@ -328,11 +349,11 @@ public class TracingTestUtils {
 		for (final IndexedClassExpression root : traceReader.getContextRoots()) {
 
 			traceReader.visitInferences(root,
-					new AbstractClassInferenceVisitor<Void, Void>() {
+					new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
 
 						@Override
 						protected Void defaultTracedVisit(ClassInference inference,
-								Void ignored) {
+								IndexedClassExpression ignored) {
 							counter.increment();
 
 							if (isInferenceCyclic(inference, root, traceReader)) {
@@ -347,9 +368,6 @@ public class TracingTestUtils {
 
 					});
 		}
-
-		// System.err.println(counter +
-		// " saved inferences checked for acyclicity");
 
 		// now check if some blocked inferences are, in fact, acyclic
 		counter.set(0);
@@ -375,9 +393,6 @@ public class TracingTestUtils {
 			}
 		}
 
-		// System.err.println(counter +
-		// " blocked inferences checked for acyclicity");
-
 		return conclusionCount.get();
 	}
 
@@ -396,11 +411,11 @@ public class TracingTestUtils {
 			protected Void defaultVisit(final Conclusion premise, Void ignored) {
 
 				traceReader.accept(inferenceContextRoot, premise,
-						new AbstractClassInferenceVisitor<Void, Void>() {
+						new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
 
 							@Override
 							protected Void defaultTracedVisit(
-									ClassInference premiseInference, Void nothing) {
+									ClassInference premiseInference, IndexedClassExpression ignored) {
 
 								premiseInferenceMap.add(premise,
 										premiseInference);
@@ -484,5 +499,5 @@ public class TracingTestUtils {
 			return true;
 		}
 	};
-	
+
 }

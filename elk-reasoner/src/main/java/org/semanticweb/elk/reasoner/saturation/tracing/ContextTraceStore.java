@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
@@ -38,9 +39,9 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  */
 public interface ContextTraceStore {
 
-	public void accept(Conclusion conclusion, ClassInferenceVisitor<?,?> visitor);
+	public void accept(Conclusion conclusion, ClassInferenceVisitor<IndexedClassExpression, ?> visitor);
 	
-	public void visitInferences(ClassInferenceVisitor<?, ?> visitor);
+	public void visitInferences(ClassInferenceVisitor<IndexedClassExpression, ?> visitor);
 	
 	public boolean addInference(ClassInference inference);
 }

@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
@@ -44,14 +45,14 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 public interface ElkAxiomIndexer {
 
 	public void indexSubClassOfAxiom(ElkClassExpression subClass,
-			ElkClassExpression superClass);
+			ElkClassExpression superClass, ElkAxiom assertedAxiom);
 
 	public void indexSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subProperty,
 			ElkObjectPropertyExpression superProperty);
 
 	public void indexClassAssertion(ElkIndividual individual,
-			ElkClassExpression type);
+			ElkClassExpression type, ElkAxiom assertedAxiom);
 
 	public void indexDisjointClassExpressions(
 			List<? extends ElkClassExpression> list);

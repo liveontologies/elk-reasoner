@@ -186,10 +186,10 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 			};
 
 			reader_.accept(rootWhereStored, conclusion,
-					new AbstractClassInferenceVisitor<Void, Void>() {
+					new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
 
 						@Override
-						protected Void defaultTracedVisit(ClassInference inference, Void _ignored) {
+						protected Void defaultTracedVisit(ClassInference inference, IndexedClassExpression _ignored) {
 							if (currentState_.addToProcessed(inference)) {
 								IndexedClassExpression inferenceContextRoot = inference.getInferenceContextRoot(rootWhereStored);
 								// visit the premises to put into the queue

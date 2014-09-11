@@ -101,7 +101,8 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 	public Void visit(ElkObjectPropertyDomainAxiom axiom) {
 		indexSubClassOfAxiom(objectFactory.getObjectSomeValuesFrom(
 				axiom.getProperty(), PredefinedElkClass.OWL_THING),
-				axiom.getDomain());
+				axiom.getDomain(),
+				axiom);
 		return null;
 	}
 
@@ -162,8 +163,8 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 			if (first == null)
 				first = c;
 			else {
-				indexSubClassOfAxiom(first, c);
-				indexSubClassOfAxiom(c, first);
+				indexSubClassOfAxiom(first, c, axiom);
+				indexSubClassOfAxiom(c, first, axiom);
 			}
 		}
 		return null;
@@ -181,7 +182,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 	@Override
 	public Void visit(ElkSubClassOfAxiom axiom) {
 		indexSubClassOfAxiom(axiom.getSubClassExpression(),
-				axiom.getSuperClassExpression());
+				axiom.getSuperClassExpression(), axiom);
 		return null;
 	}
 
@@ -217,7 +218,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 						selfFound = true;
 				} else
 					indexSubClassOfAxiom(objectFactory.getObjectIntersectionOf(
-							member, otherMember), objectFactory.getOwlNothing());
+							member, otherMember), objectFactory.getOwlNothing(), axiom);
 			}
 		}
 		return null;
@@ -233,7 +234,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 	 */
 	@Override
 	public Void visit(ElkClassAssertionAxiom axiom) {
-		indexClassAssertion(axiom.getIndividual(), axiom.getClassExpression());
+		indexClassAssertion(axiom.getIndividual(), axiom.getClassExpression(), axiom);
 		return null;
 	}
 
@@ -245,7 +246,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 		indexClassAssertion(
 				axiom.getSubject(),
 				objectFactory.getObjectHasValue(axiom.getProperty(),
-						axiom.getObject()));
+						axiom.getObject()), axiom);
 		return null;
 	}
 

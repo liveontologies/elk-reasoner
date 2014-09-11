@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
@@ -32,12 +33,14 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
@@ -46,6 +49,10 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -62,7 +69,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Tests tracing for all atomic subsumption inferences in all our standard test ontologies.
+ * Tests tracing and axiom binding for all atomic subsumption inferences in all
+ * our standard test ontologies.
  * 
  * @author Pavel Klinov
  * 
@@ -89,43 +97,105 @@ public class TracingTest {
 	}
 
 	@Test
+	@Ignore
 	public void tracingTest() throws Exception {
 		AxiomLoader fileLoader = new Owl2StreamLoader(
 				new Owl2FunctionalStyleParserFactory(new ElkObjectFactoryImpl(
 						new ElkEntityRecycler())), manifest.getInput().getInputStream());
-		final Reasoner reasoner = TestReasonerUtils.createTestReasoner(fileLoader, new PostProcessingStageExecutor());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(fileLoader, new PostProcessingStageExecutor());
 
 		try {
 			TracingTests tests = getTracingTests(reasoner.getTaxonomy());
 			
-			tests.accept(new TracingTestVisitor() {
-				
-				@Override
-				public boolean visit(ElkClassExpression subsumee, 	ElkClassExpression subsumer) {
-					//reasoner.resetTraceState();
-					ReasonerStateAccessor.cleanClassTraces(reasoner);
-					
-					try {
-						
-						LOGGER_.trace("Tracing test: {} => {}", subsumee, subsumer);
-						
-						reasoner.explainSubsumption(subsumee, subsumer);
-							
-						TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner);
-						TracingTestUtils.checkTracingMinimality(subsumee, subsumer, reasoner);
-					} catch (ElkException e) {
-						throw new RuntimeException(e);
-					}
-					
-					return true;
-				}
-			});
+			tests.accept(getTracingTestVisitor(reasoner));
 		} catch (ElkInconsistentOntologyException e) {
 			//swallow..
 			LOGGER_.trace("The test ontology is inconsistent so tracing tests do not make sense");
 		} finally {
 			reasoner.shutdown();
 		}
+	}
+	
+	// test that we can always look up asserted axioms for certain types of inferences.
+	// this test makes sense only if the reasoner stores the asserted axioms which may depend on a configuration option.
+	@Test
+	public void axiomBindingTest() throws Exception {
+		AxiomLoader fileLoader = new Owl2StreamLoader(
+				new Owl2FunctionalStyleParserFactory(new ElkObjectFactoryImpl(
+						new ElkEntityRecycler())), manifest.getInput().getInputStream());
+		Reasoner reasoner = TestReasonerUtils.createTestReasoner(fileLoader, new PostProcessingStageExecutor());
+
+		try {
+			TracingTests tests = getTracingTests(reasoner.getTaxonomy());
+			
+			tests.accept(getAxiomBindingTestVisitor(reasoner));
+		} catch (ElkInconsistentOntologyException e) {
+			//swallow..
+			LOGGER_.trace("The test ontology is inconsistent so tracing tests do not make sense");
+		} finally {
+			reasoner.shutdown();
+		}
+	}	
+
+	private TracingTestVisitor getAxiomBindingTestVisitor(final Reasoner reasoner) {
+		return new TracingTestVisitor() {
+			
+			@Override
+			public boolean visit(ElkClassExpression subsumee, 	ElkClassExpression subsumer) {
+				ReasonerStateAccessor.cleanClassTraces(reasoner);
+				
+				try {
+					LOGGER_.trace("Axiom binding test: {} => {}", subsumee, subsumer);
+					
+					TracingTestUtils.visitClassInferences(subsumee, subsumer, reasoner, new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
+
+						@Override
+						protected Void defaultTracedVisit(ClassInference inference, IndexedClassExpression root) {
+							return null;
+						}
+						
+						// axioms used as side conditions of this rule, should be able to look them up
+						@Override
+						public Void visit(SubClassOfSubsumer<?> inference, IndexedClassExpression root) {
+							ElkAxiom axiom = new SideConditionLookup().lookup(inference);
+							
+							//System.err.println(OwlFunctionalStylePrinter.toString(axiom));
+							
+							assertNotNull("Failed to look up the ontology axiom for the class inference " + inference, axiom);
+							return null;
+						}
+					});
+				} catch (ElkException e) {
+					throw new RuntimeException(e);
+				}
+				
+				return true;
+			}
+		};
+	}
+
+	private TracingTestVisitor getTracingTestVisitor(final Reasoner reasoner) {
+		return new TracingTestVisitor() {
+			
+			@Override
+			public boolean visit(ElkClassExpression subsumee, 	ElkClassExpression subsumer) {
+				ReasonerStateAccessor.cleanClassTraces(reasoner);
+				
+				try {
+					
+					LOGGER_.trace("Tracing test: {} => {}", subsumee, subsumer);
+					
+					reasoner.explainSubsumption(subsumee, subsumer);
+						
+					TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner);
+					TracingTestUtils.checkTracingMinimality(subsumee, subsumer, reasoner);
+				} catch (ElkException e) {
+					throw new RuntimeException(e);
+				}
+				
+				return true;
+			}
+		};
 	}
 
 	protected TracingTests getTracingTests(Taxonomy<ElkClass> taxonomy) {

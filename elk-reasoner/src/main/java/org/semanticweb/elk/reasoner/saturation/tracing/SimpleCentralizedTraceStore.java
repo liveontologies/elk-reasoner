@@ -70,7 +70,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private class Reader implements TraceStore.Reader {
 
 		@Override
-		public void accept(IndexedClassExpression root, Conclusion conclusion, ClassInferenceVisitor<?,?> visitor) {
+		public void accept(IndexedClassExpression root, Conclusion conclusion, ClassInferenceVisitor<IndexedClassExpression,?> visitor) {
 			ContextTraceStore tracer = storage_.get(root);
 			
 			if (tracer != null) {
@@ -84,7 +84,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 		}
 		
 		@Override
-		public void visitInferences(IndexedClassExpression root, ClassInferenceVisitor<?, ?> visitor) {
+		public void visitInferences(IndexedClassExpression root, ClassInferenceVisitor<IndexedClassExpression, ?> visitor) {
 			ContextTraceStore tracer = storage_.get(root);
 			
 			if (tracer != null) {
@@ -111,7 +111,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 			}
 			
 			if (tracer == null) {
-				tracer = new SimpleContextTraceStore();
+				tracer = new SimpleContextTraceStore(root);
 				storage_.putIfAbsent(root, tracer);
 			}
 			

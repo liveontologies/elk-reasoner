@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.RuleToIndexWriter;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -101,7 +102,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 
 	@Override
 	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			final int increment) {
+			final RuleToIndexWriter ruleWriter, final int increment) {
 
 		if (occurrenceNo == 0 && increment > 0) {
 			// first occurrence of this axiom

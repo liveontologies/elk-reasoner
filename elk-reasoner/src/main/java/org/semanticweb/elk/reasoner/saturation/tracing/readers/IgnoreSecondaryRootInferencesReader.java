@@ -53,7 +53,7 @@ public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 	@Override
 	public void accept(final IndexedClassExpression root,
 			final Conclusion inferredConclusion,
-			final ClassInferenceVisitor<?, ?> visitor) {
+			final ClassInferenceVisitor<IndexedClassExpression, ?> visitor) {
 		reader.accept(
 				root,
 				inferredConclusion,

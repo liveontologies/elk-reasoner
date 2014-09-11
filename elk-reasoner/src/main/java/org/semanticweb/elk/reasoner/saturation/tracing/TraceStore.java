@@ -54,7 +54,7 @@ public interface TraceStore {
 		 * @param conclusion
 		 * @param visitor
 		 */
-		public void accept(IndexedClassExpression root, Conclusion conclusion, ClassInferenceVisitor<?,?> visitor);
+		public void accept(IndexedClassExpression root, Conclusion conclusion, ClassInferenceVisitor<IndexedClassExpression, ?> visitor);
 		/**
 		 * Visiting all {@link ObjectPropertyInference}s for the given {@link ObjectPropertyConclusion}.
 		 * 
@@ -65,7 +65,7 @@ public interface TraceStore {
 		
 		public Iterable<IndexedClassExpression> getContextRoots();
 		
-		public void visitInferences(IndexedClassExpression root, ClassInferenceVisitor<?, ?> visitor);
+		public void visitInferences(IndexedClassExpression root, ClassInferenceVisitor<IndexedClassExpression, ?> visitor);
 	}
 
 	/**

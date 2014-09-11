@@ -49,7 +49,7 @@ abstract class DelegatingTraceReader implements Reader {
 	
 	@Override
 	public void accept(IndexedClassExpression root, Conclusion conclusion,
-			ClassInferenceVisitor<?, ?> visitor) {
+			ClassInferenceVisitor<IndexedClassExpression, ?> visitor) {
 		reader.accept(root, conclusion, visitor);
 	}
 
@@ -59,7 +59,7 @@ abstract class DelegatingTraceReader implements Reader {
 	}
 
 	@Override
-	public void visitInferences(IndexedClassExpression root, ClassInferenceVisitor<?, ?> visitor) {
+	public void visitInferences(IndexedClassExpression root, ClassInferenceVisitor<IndexedClassExpression, ?> visitor) {
 		reader.visitInferences(root, visitor);
 	}
 
