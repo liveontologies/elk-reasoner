@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleToIndexWriter;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -101,8 +100,7 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			final RuleToIndexWriter ruleWriter, final int increment) {
+	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index, final int increment) {
 
 		if (occurrenceNo == 0 && increment > 0) {
 			// first occurrence of this axiom
@@ -134,14 +132,14 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		return "DisjointClasses(" + members + ")";
 	}
 
-	private void registerCompositionRule(ModifiableOntologyIndex index) {
+	protected void registerCompositionRule(ModifiableOntologyIndex index) {
 		// to derive contradiction from inconsistent disjointness axioms
 		ContradictionFromDisjointnessRule.addRulesFor(this, index);
 		// to derive disjoint subsumers from subsumers 
 		DisjointSubsumerFromMemberRule.addRulesFor(this, index);
 	}
 
-	private void deregisterCompositionRule(ModifiableOntologyIndex index) {
+	protected void deregisterCompositionRule(ModifiableOntologyIndex index) {
 		ContradictionFromDisjointnessRule.removeRulesFor(this, index);
 		DisjointSubsumerFromMemberRule.removeRulesFor(this, index);
 	}

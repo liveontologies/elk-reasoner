@@ -118,8 +118,8 @@ public class NonIncrementalChangeCheckingVisitor extends
 
 	@Override
 	public void indexDisjointClassExpressions(
-			List<? extends ElkClassExpression> list) {
-		getIndexingVisitor().indexDisjointClassExpressions(list);
+			List<? extends ElkClassExpression> list, ElkAxiom assertedAxiom) {
+		getIndexingVisitor().indexDisjointClassExpressions(list, assertedAxiom);
 	}
 
 	@Override

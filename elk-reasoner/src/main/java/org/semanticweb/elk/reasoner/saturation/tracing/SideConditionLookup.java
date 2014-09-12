@@ -4,9 +4,13 @@
 package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiomWithBinding;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRuleWithAxiomBinding;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
@@ -47,6 +51,27 @@ public class SideConditionLookup {
 
 			return null;
 		}
+
+		@Override
+		public ElkAxiom visit(DisjointSubsumerFromSubsumer inference,
+				Void input) {
+			IndexedDisjointnessAxiom indexedAxiom = inference.getAxiom();
+			
+			return indexedAxiom instanceof IndexedDisjointnessAxiomWithBinding 
+					? ((IndexedDisjointnessAxiomWithBinding) indexedAxiom).getAssertedAxiom() 
+					: null;
+		}
+		
+		@Override
+		public ElkAxiom visit(ContradictionFromDisjointSubsumers inference,
+				Void input) {
+			IndexedDisjointnessAxiom indexedAxiom = inference.getAxiom();
+			
+			return indexedAxiom instanceof IndexedDisjointnessAxiomWithBinding 
+					? ((IndexedDisjointnessAxiomWithBinding) indexedAxiom).getAssertedAxiom() 
+					: null;
+		}
+		
 
 	};
 

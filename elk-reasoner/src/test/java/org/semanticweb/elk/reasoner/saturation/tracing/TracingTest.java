@@ -51,6 +51,7 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
@@ -159,11 +160,17 @@ public class TracingTest {
 						public Void visit(SubClassOfSubsumer<?> inference, IndexedClassExpression root) {
 							ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 							
-							//System.err.println(OwlFunctionalStylePrinter.toString(axiom));
-							
-							assertNotNull("Failed to look up the ontology axiom for the class inference " + inference, axiom);
+							assertNotNull("Failed to look up the ontology axiom for the subsumption inference " + inference, axiom);
 							return null;
 						}
+						
+						@Override
+						public Void visit(DisjointSubsumerFromSubsumer inference, IndexedClassExpression root) {
+							ElkAxiom axiom = new SideConditionLookup().lookup(inference);
+							
+							assertNotNull("Failed to look up the ontology axiom for the disjoint subsumer inference " + inference, axiom);
+							return null;
+						}						
 					});
 				} catch (ElkException e) {
 					throw new RuntimeException(e);

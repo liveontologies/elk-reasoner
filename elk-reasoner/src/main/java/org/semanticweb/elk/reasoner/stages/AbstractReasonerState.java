@@ -46,6 +46,8 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ChangeIndexingProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexingVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiomFactory;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiomFactoryWithBinding;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
@@ -54,6 +56,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalChangeCheckingVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.PlainIndexedAxiomFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -61,9 +64,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Contra
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.AxiomBindingRuleToIndexWriter;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleToIndexWriter;
-import org.semanticweb.elk.reasoner.saturation.rules.SimpleRuleToIndexWriter;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
@@ -203,13 +203,13 @@ public abstract class AbstractReasonerState {
 	TraceState traceState;
 
 	protected AbstractReasonerState() {
-		RuleToIndexWriter ruleWriter = BIND_AXIOMS ? new AxiomBindingRuleToIndexWriter()
-				: new SimpleRuleToIndexWriter();
+		IndexedAxiomFactory factory = BIND_AXIOMS ? new IndexedAxiomFactoryWithBinding()
+				: new PlainIndexedAxiomFactory();
 
 		this.objectCache_ = new IndexedObjectCache();
 		this.ontologyIndex = new DifferentialIndex(objectCache_);
 		this.axiomInserter_ = new MainAxiomIndexerVisitor(ontologyIndex,
-				ruleWriter, true);
+				factory, true);
 		this.axiomDeleter_ = new MainAxiomIndexerVisitor(ontologyIndex, false);
 		this.saturationState = SaturationStateFactory
 				.createSaturationState(ontologyIndex);

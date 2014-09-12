@@ -2,7 +2,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleToIndexWriter;
 
 /*
  * #%L
@@ -31,8 +30,7 @@ public abstract class IndexedAxiom extends IndexedObject {
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
-	abstract void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			final RuleToIndexWriter writer, final int increment);
+	abstract void updateOccurrenceNumbers(final ModifiableOntologyIndex index, final int increment);
 
 	public abstract <O> O accept(IndexedAxiomVisitor<O> visitor);
 

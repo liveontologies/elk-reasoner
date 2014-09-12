@@ -55,7 +55,7 @@ public interface ElkAxiomIndexer {
 			ElkClassExpression type, ElkAxiom assertedAxiom);
 
 	public void indexDisjointClassExpressions(
-			List<? extends ElkClassExpression> list);
+			List<? extends ElkClassExpression> list, ElkAxiom assertedAxiom);
 
 	public void indexReflexiveObjectProperty(
 			ElkObjectPropertyExpression reflexiveProperty);

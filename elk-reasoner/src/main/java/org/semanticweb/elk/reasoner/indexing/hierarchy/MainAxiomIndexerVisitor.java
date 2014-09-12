@@ -36,8 +36,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainFilter;
-import org.semanticweb.elk.reasoner.saturation.rules.RuleToIndexWriter;
-import org.semanticweb.elk.reasoner.saturation.rules.AxiomBindingRuleToIndexWriter;
 
 /**
  * An object that indexes axioms into a given ontology index. Each instance can
@@ -88,9 +86,9 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	private final IndexedClass owlNothing_;
 	
 	/**
-	 * A facade to add or remove inference rules to {@link ModifiableOntologyIndex}. 
+	 *  
 	 */
-	private final RuleToIndexWriter ruleWriter_;
+	private final IndexedAxiomFactory indexedAxiomFactory_;
 
 	/**
 	 * @param index
@@ -99,10 +97,10 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	 *            specifies whether this objects inserts or deletes axioms
 	 */
 	public MainAxiomIndexerVisitor(ModifiableOntologyIndex index, boolean insert) {
-		this(index, new AxiomBindingRuleToIndexWriter(), insert);
+		this(index, new PlainIndexedAxiomFactory(), insert);
 	}
 	
-	public MainAxiomIndexerVisitor(ModifiableOntologyIndex index, RuleToIndexWriter ruleWriter, boolean insert) {
+	public MainAxiomIndexerVisitor(ModifiableOntologyIndex index, IndexedAxiomFactory indexedAxiomFactory, boolean insert) {
 		this.index_ = index;
 		this.objectCache_ = index.getIndexedObjectCache();
 		this.owlNothing_ = index.getIndexedOwlNothing();
@@ -127,7 +125,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 				propertyOccurrenceUpdateFilter, negativeIndexerFactory);
 		this.negativeIndexer = positiveIndexer.getComplementaryConverter();
 		this.axiomUpdateFilter = new AxiomOccurrenceUpdateFilter(multiplicity_);
-		this.ruleWriter_ = ruleWriter;
+		this.indexedAxiomFactory_ = indexedAxiomFactory;
 	}	
 
 	@Override
@@ -153,8 +151,8 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 		IndexedClassExpression superIndexedClass = superElkClass
 				.accept(positiveIndexer);
 
-		axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(subIndexedClass,
-				superIndexedClass, assertedAxiom));
+		//axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(subIndexedClass,	superIndexedClass, assertedAxiom));
+		axiomUpdateFilter.visit(indexedAxiomFactory_.createSubClassOfAxiom(subIndexedClass, superIndexedClass, assertedAxiom));
 	}
 
 	@Override
@@ -166,8 +164,8 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 
 		IndexedClassExpression indexedType = type.accept(positiveIndexer);
 
-		axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(indexedIndividual,
-				indexedType, assertedAxiom));
+		//axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(indexedIndividual, indexedType, assertedAxiom));
+		axiomUpdateFilter.visit(indexedAxiomFactory_.createSubClassOfAxiom(indexedIndividual, indexedType, assertedAxiom));
 	}
 
 	@Override
@@ -194,7 +192,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 
 	@Override
 	public void indexDisjointClassExpressions(
-			List<? extends ElkClassExpression> disjointClasses) {
+			List<? extends ElkClassExpression> disjointClasses, ElkAxiom axiom) {
 
 		// treat this as a positive occurrence of owl:Nothing
 		if (owlNothing_ == null)
@@ -212,7 +210,8 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 			indexed.add(c.accept(negativeIndexer));
 		}
 
-		axiomUpdateFilter.visit(new IndexedDisjointnessAxiom(indexed));
+		//axiomUpdateFilter.visit(new IndexedDisjointnessAxiom(indexed));
+		axiomUpdateFilter.visit(indexedAxiomFactory_.createDisjointnessAxiom(indexed, axiom));
 	}
 
 	@Override
@@ -389,7 +388,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 			if (!axiom.occurs() && increment > 0)
 				index_.add(axiom);
 
-			axiom.updateOccurrenceNumbers(index_, ruleWriter_, increment);
+			axiom.updateOccurrenceNumbers(index_, increment);
 
 			if (!axiom.occurs() && increment < 0)
 				index_.remove(axiom);

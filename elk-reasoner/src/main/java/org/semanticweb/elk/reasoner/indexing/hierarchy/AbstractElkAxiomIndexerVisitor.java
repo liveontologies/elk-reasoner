@@ -204,7 +204,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 		// if the axiom contains sufficiently many disjoint classes, convert it
 		// natively
 		if (axiom.getClassExpressions().size() > DISJOINT_AXIOM_BINARIZATION_THRESHOLD) {
-			indexDisjointClassExpressions(axiom.getClassExpressions());
+			indexDisjointClassExpressions(axiom.getClassExpressions(), axiom);
 			return null;
 		}
 		// create a binary disjointness axiom for all pairs (member,
