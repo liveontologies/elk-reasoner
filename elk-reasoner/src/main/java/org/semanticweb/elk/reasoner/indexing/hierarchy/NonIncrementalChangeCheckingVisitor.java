@@ -33,6 +33,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
@@ -105,9 +106,10 @@ public class NonIncrementalChangeCheckingVisitor extends
 	@Override
 	public void indexSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subProperty,
-			ElkObjectPropertyExpression superProperty) {
+			ElkObjectPropertyExpression superProperty,
+			ElkObjectPropertyAxiom axiom) {
 		getIndexingVisitor().indexSubObjectPropertyOfAxiom(subProperty,
-				superProperty);
+				superProperty, axiom);
 	}
 
 	@Override
@@ -124,8 +126,8 @@ public class NonIncrementalChangeCheckingVisitor extends
 
 	@Override
 	public void indexReflexiveObjectProperty(
-			ElkObjectPropertyExpression reflexiveProperty) {
-		getIndexingVisitor().indexReflexiveObjectProperty(reflexiveProperty);
+			ElkReflexiveObjectPropertyAxiom axiom) {
+		getIndexingVisitor().indexReflexiveObjectProperty(axiom);
 	}
 
 	@Override

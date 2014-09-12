@@ -93,7 +93,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	/**
-	 * Initializes all datastructures
+	 * Initializes all data structures
 	 */
 	private void init() {
 		initClassSignatureChanges();
@@ -118,7 +118,7 @@ public class DifferentialIndex extends DirectIndex {
 
 	public void initDeletions() {
 		this.removedContextInitRules_ = null;
-		this.todoDeletions_ = new IndexedObjectCache();
+		this.todoDeletions_ = new IndexedObjectCache(new PlainIndexedAxiomFactory());
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableSubsumerRule>(
 				32);
 	}

@@ -23,11 +23,15 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
 
 public interface IndexedAxiomFilter extends
 		IndexedSubClassOfAxiomVisitor<IndexedSubClassOfAxiom>,
 		IndexedDisjointnessAxiomVisitor<IndexedDisjointnessAxiom> {
 
-	// nothing else
+	public IndexedSubObjectPropertyOfAxiom<?> visit(IndexedSubObjectPropertyOfAxiom<?> axiom);
+	
+	public IndexedReflexiveObjectPropertyAxiom<?> visit(IndexedReflexiveObjectPropertyAxiom<?> axiom);
 	
 }

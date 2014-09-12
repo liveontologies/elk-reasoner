@@ -73,12 +73,8 @@ public class DirectIndex implements ModifiableOntologyIndex {
 				64);
 	}
 
-	public DirectIndex() {
-		this(new IndexedObjectCache());
-	}
-
 	/* read-only methods required by the interface */
-
+	
 	@Override
 	public LinkedContextInitRule getContextInitRuleHead() {
 		return contextInitRules_;

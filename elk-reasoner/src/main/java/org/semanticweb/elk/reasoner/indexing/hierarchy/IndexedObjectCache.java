@@ -57,8 +57,9 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	protected int indexedClassCount = 0;
 	protected int indexedIndividualCount = 0;
 	protected int indexedObjectPropertyCount = 0;
+	private final IndexedObjectFactory objectFactory_;
 
-	public IndexedObjectCache() {
+	public IndexedObjectCache(IndexedObjectFactory factory) {
 		LOGGER_.trace("Creating new cache");
 
 		indexedClassExpressionLookup = new KeyEntryHashSet<IndexedClassExpression>(
@@ -67,10 +68,11 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 				new IndexedPropertyChainViewFactory(), 128);
 		indexedAxiomLookup = new KeyEntryHashSet<IndexedAxiom>(
 				new IndexedAxiomViewFactory(), 1024);
+		objectFactory_ = factory;
 	}
 
 	public IndexObjectConverter getIndexObjectConverter() {
-		return new IndexObjectConverter(this, this);
+		return new IndexObjectConverter(this, this, objectFactory_);
 	}
 
 	public void clear() {
@@ -197,6 +199,20 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		// caching not supported
 		return axiom;
 	}
+	
+	@Override
+	public IndexedSubObjectPropertyOfAxiom<?> visit(
+			IndexedSubObjectPropertyOfAxiom<?> axiom) {
+		// caching not supported
+		return axiom;
+	}
+	
+	@Override
+	public IndexedReflexiveObjectPropertyAxiom<?> visit(
+			IndexedReflexiveObjectPropertyAxiom<?> axiom) {
+		// caching not supported
+		return axiom;
+	}
 
 	@Override
 	public IndexedDisjointnessAxiom visit(IndexedDisjointnessAxiom axiom) {
@@ -293,6 +309,18 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			return indexedAxiomLookup.add(axiom);
 		}
 
+		@Override
+		public Boolean visit(IndexedSubObjectPropertyOfAxiom<?> axiom) {
+			// caching not supported
+			return true;
+		}
+		
+		@Override
+		public Boolean visit(IndexedReflexiveObjectPropertyAxiom<?> axiom) {
+			// caching not supported
+			return true;
+		}
+
 	};
 
 	final IndexedObjectVisitor<Boolean> deletor = new IndexedObjectVisitor<Boolean>() {
@@ -380,6 +408,18 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			return indexedAxiomLookup.removeEntry(axiom) != null;
 		}
 
+		@Override
+		public Boolean visit(IndexedSubObjectPropertyOfAxiom<?> axiom) {
+			// caching not supported
+			return true;
+		}
+		
+		@Override
+		public Boolean visit(IndexedReflexiveObjectPropertyAxiom<?> axiom) {
+			// caching not supported
+			return true;
+		}
+
 	};
 
 	private class IndexedAxiomViewFactory implements
@@ -420,5 +460,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		}
 
 	}
+
+	
 
 }

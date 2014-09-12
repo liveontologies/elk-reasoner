@@ -38,9 +38,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.PlainIndexedAxiomFactory;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
@@ -70,7 +72,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ElkObjectProperty s = objectFactory.getObjectProperty(new ElkFullIri(
 				"S"));
 
-		ModifiableOntologyIndex index = new DirectIndex();
+		IndexedObjectFactory factory = new PlainIndexedAxiomFactory();
+		ModifiableOntologyIndex index = new DirectIndex(new IndexedObjectCache(factory));
 		ComputationExecutor executor = new ComputationExecutor(16, "test");
 
 		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(
@@ -83,8 +86,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		inserter.visit(objectFactory.getSubObjectPropertyOfAxiom(r, s));
 
 		IndexedObjectCache objectCache = index.getIndexedObjectCache();
-		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
-				objectCache);
+		IndexObjectConverter converter = objectCache.getIndexObjectConverter();//new IndexObjectConverter(objectCache,	objectCache);
 
 		IndexedClassExpression A = a.accept(converter);
 		IndexedClassExpression D = d.accept(converter);
@@ -120,7 +122,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 		ElkClass c = objectFactory.getClass(new ElkFullIri(":C"));
 		ElkClass d = objectFactory.getClass(new ElkFullIri(":D"));
 
-		final ModifiableOntologyIndex index = new DirectIndex();
+		final ModifiableOntologyIndex index = new DirectIndex(new IndexedObjectCache(new PlainIndexedAxiomFactory()));
 		ComputationExecutor executor = new ComputationExecutor(16, "test");
 		final ElkAxiomProcessor inserter = new ChangeIndexingProcessor(
 				new MainAxiomIndexerVisitor(index, true));
@@ -131,8 +133,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 				objectFactory.getObjectIntersectionOf(b, c), d));
 
 		IndexedObjectCache objectCache = index.getIndexedObjectCache();
-		IndexObjectConverter converter = new IndexObjectConverter(objectCache,
-				objectCache);
+		IndexObjectConverter converter = objectCache.getIndexObjectConverter();//new IndexObjectConverter(objectCache, objectCache);
 
 		IndexedClassExpression A = a.accept(converter);
 		IndexedClassExpression B = b.accept(converter);

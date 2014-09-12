@@ -89,8 +89,8 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 			if (first == null)
 				first = p;
 			else {
-				indexSubObjectPropertyOfAxiom(first, p);
-				indexSubObjectPropertyOfAxiom(p, first);
+				indexSubObjectPropertyOfAxiom(first, p, axiom);
+				indexSubObjectPropertyOfAxiom(p, first, axiom);
 			}
 		}
 
@@ -108,7 +108,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 
 	@Override
 	public Void visit(ElkReflexiveObjectPropertyAxiom axiom) {
-		indexReflexiveObjectProperty(axiom.getProperty());
+		indexReflexiveObjectProperty(axiom);
 		return null;
 	}
 
@@ -124,7 +124,7 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 	@Override
 	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
 		indexSubObjectPropertyOfAxiom(axiom.getSubObjectPropertyExpression(),
-				axiom.getSuperObjectPropertyExpression());
+				axiom.getSuperObjectPropertyExpression(), axiom);
 		return null;
 	}
 
@@ -143,7 +143,8 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 		ElkObjectPropertyExpression ope = axiom.getProperty();
 		indexSubObjectPropertyOfAxiom(
 				objectFactory.getObjectPropertyChain(Arrays.asList(ope, ope)),
-				ope);
+				ope,
+				axiom);
 		return null;
 	}
 

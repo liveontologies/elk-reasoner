@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
 /*
  * #%L
  * ELK Reasoner
@@ -32,7 +33,9 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 /**
@@ -49,7 +52,8 @@ public interface ElkAxiomIndexer {
 
 	public void indexSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subProperty,
-			ElkObjectPropertyExpression superProperty);
+			ElkObjectPropertyExpression superProperty,
+			ElkObjectPropertyAxiom axiom);
 
 	public void indexClassAssertion(ElkIndividual individual,
 			ElkClassExpression type, ElkAxiom assertedAxiom);
@@ -58,7 +62,7 @@ public interface ElkAxiomIndexer {
 			List<? extends ElkClassExpression> list, ElkAxiom assertedAxiom);
 
 	public void indexReflexiveObjectProperty(
-			ElkObjectPropertyExpression reflexiveProperty);
+			ElkReflexiveObjectPropertyAxiom axiom);
 
 	public IndexedClass indexClassDeclaration(ElkClass ec);
 

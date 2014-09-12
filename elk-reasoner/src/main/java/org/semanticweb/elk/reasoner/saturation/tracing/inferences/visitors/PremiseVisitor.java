@@ -266,7 +266,8 @@ public class PremiseVisitor<I, O> extends AbstractConclusionVisitor<I, O>
 	
 	@Override
 	public O visit(BottomUpPropertySubsumptionInference inference, I input) {
-		inference.getPremise().accept(this, input);
+		inference.getFirstPremise().accept(this, input);
+		inference.getSecondPremise().accept(this, input);
 		return null;
 	}
 

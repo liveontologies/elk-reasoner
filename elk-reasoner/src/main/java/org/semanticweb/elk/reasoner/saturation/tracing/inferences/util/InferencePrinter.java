@@ -217,7 +217,7 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>, Ob
 	
 	@Override
 	public String visit(BottomUpPropertySubsumptionInference inference, Void input) {
-		return "Told sub-chain: " + inference.getSubPropertyChain() + " => " + inference.getSuperPropertyChain() + ", premise: " + inference.getPremise();
+		return "Told sub-chain: " + inference.getSubPropertyChain() + " => " + inference.getSuperPropertyChain() + ", premise: " + inference.getFirstPremise();
 	}
 
 }

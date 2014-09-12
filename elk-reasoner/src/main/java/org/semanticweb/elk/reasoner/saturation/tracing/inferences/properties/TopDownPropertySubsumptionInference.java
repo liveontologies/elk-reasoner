@@ -18,16 +18,16 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Objec
 public class TopDownPropertySubsumptionInference extends SubPropertyChain<IndexedPropertyChain, IndexedObjectProperty>
 		implements ObjectPropertyInference {
 
-	private final IndexedPropertyChain premise_;
+	private final IndexedObjectProperty premise_;
 	
 	public TopDownPropertySubsumptionInference(IndexedPropertyChain chain,
-			IndexedObjectProperty sup, IndexedPropertyChain premise) {
+			IndexedObjectProperty sup, IndexedObjectProperty premise) {
 		super(chain, sup);
 		premise_ = premise;
 	}
 
-	public SubPropertyChain<?, ?> getPremise() {
-		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(premise_, getSuperPropertyChain());
+	public SubPropertyChain<IndexedObjectProperty, IndexedObjectProperty> getPremise() {
+		return new SubPropertyChain<IndexedObjectProperty, IndexedObjectProperty>(premise_, getSuperPropertyChain());
 	}
 	
 	@Override

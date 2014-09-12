@@ -46,7 +46,7 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ChangeIndexingProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexingVisitor;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiomFactory;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiomFactoryWithBinding;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -203,10 +203,10 @@ public abstract class AbstractReasonerState {
 	TraceState traceState;
 
 	protected AbstractReasonerState() {
-		IndexedAxiomFactory factory = BIND_AXIOMS ? new IndexedAxiomFactoryWithBinding()
+		IndexedObjectFactory factory = BIND_AXIOMS ? new IndexedAxiomFactoryWithBinding()
 				: new PlainIndexedAxiomFactory();
 
-		this.objectCache_ = new IndexedObjectCache();
+		this.objectCache_ = new IndexedObjectCache(factory);
 		this.ontologyIndex = new DifferentialIndex(objectCache_);
 		this.axiomInserter_ = new MainAxiomIndexerVisitor(ontologyIndex,
 				factory, true);

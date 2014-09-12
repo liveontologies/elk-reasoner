@@ -81,7 +81,7 @@ public class PropertyInferenceTracingTest {
 	}
 	
 	@Test
-	public void testSimplePropertyHierarchy() throws Exception {
+	public void testPropertyHierarchy() throws Exception {
 		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/DeepPropertyHierarchy.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
@@ -117,7 +117,7 @@ public class PropertyInferenceTracingTest {
 	}
 	
 	@Test
-	public void testSimpleCompositionInferences() throws Exception {
+	public void testCompositionInferences() throws Exception {
 		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/SimpleCompositions.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));

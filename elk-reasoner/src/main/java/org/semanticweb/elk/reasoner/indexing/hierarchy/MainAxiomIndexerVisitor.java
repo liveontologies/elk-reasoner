@@ -31,7 +31,9 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomFilter;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionFilter;
@@ -88,7 +90,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	/**
 	 *  
 	 */
-	private final IndexedAxiomFactory indexedAxiomFactory_;
+	private final IndexedObjectFactory indexedAxiomFactory_;
 
 	/**
 	 * @param index
@@ -100,7 +102,8 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 		this(index, new PlainIndexedAxiomFactory(), insert);
 	}
 	
-	public MainAxiomIndexerVisitor(ModifiableOntologyIndex index, IndexedAxiomFactory indexedAxiomFactory, boolean insert) {
+	public MainAxiomIndexerVisitor(ModifiableOntologyIndex index, IndexedObjectFactory indexedAxiomFactory, boolean insert) {
+		this.indexedAxiomFactory_ = indexedAxiomFactory;
 		this.index_ = index;
 		this.objectCache_ = index.getIndexedObjectCache();
 		this.owlNothing_ = index.getIndexedOwlNothing();
@@ -109,7 +112,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 				multiplicity_);
 		this.neutralIndexer = new IndexObjectConverter(
 				new ClassOccurrenceUpdateFilter(multiplicity_, 0, 0),
-				propertyOccurrenceUpdateFilter);
+				propertyOccurrenceUpdateFilter, indexedAxiomFactory_);
 		IndexObjectConverterFactory negativeIndexerFactory = new IndexObjectConverterFactory() {
 			@Override
 			public IndexObjectConverter create(
@@ -117,15 +120,14 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 				return new IndexObjectConverter(
 						new ClassOccurrenceUpdateFilter(multiplicity_, 0,
 								multiplicity_), propertyOccurrenceUpdateFilter,
-						complementary);
+						complementary, indexedAxiomFactory_);
 			}
 		};
 		this.positiveIndexer = new IndexObjectConverter(
 				new ClassOccurrenceUpdateFilter(multiplicity_, multiplicity_, 0),
-				propertyOccurrenceUpdateFilter, negativeIndexerFactory);
+				propertyOccurrenceUpdateFilter, negativeIndexerFactory, indexedAxiomFactory_);
 		this.negativeIndexer = positiveIndexer.getComplementaryConverter();
 		this.axiomUpdateFilter = new AxiomOccurrenceUpdateFilter(multiplicity_);
-		this.indexedAxiomFactory_ = indexedAxiomFactory;
 	}	
 
 	@Override
@@ -171,7 +173,8 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	@Override
 	public void indexSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subElkProperty,
-			ElkObjectPropertyExpression superElkProperty) {
+			ElkObjectPropertyExpression superElkProperty,
+			ElkObjectPropertyAxiom axiom) {
 
 		IndexedPropertyChain subIndexedProperty = subElkProperty
 				.accept(negativeIndexer);
@@ -179,7 +182,9 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 		IndexedObjectProperty superIndexedProperty = (IndexedObjectProperty) superElkProperty
 				.accept(positiveIndexer);
 
-		if (multiplicity_ == 1) {
+		axiomUpdateFilter.visit(indexedAxiomFactory_.createdSubObjectPropertyOfAxiom(subIndexedProperty, superIndexedProperty, axiom));
+		
+		/*if (multiplicity_ == 1) {
 			subIndexedProperty.addToldSuperObjectProperty(superIndexedProperty);
 			superIndexedProperty.addToldSubPropertyChain(subIndexedProperty);
 		} else {
@@ -187,7 +192,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 					.removeToldSuperObjectProperty(superIndexedProperty);
 			superIndexedProperty
 					.removeToldSubObjectProperty(subIndexedProperty);
-		}
+		}*/
 	}
 
 	@Override
@@ -216,12 +221,11 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 
 	@Override
 	public void indexReflexiveObjectProperty(
-			ElkObjectPropertyExpression reflexiveProperty) {
+			ElkReflexiveObjectPropertyAxiom axiom) {
 
-		IndexedObjectProperty indexedReflexiveProperty = (IndexedObjectProperty) reflexiveProperty
-				.accept(positiveIndexer);
+		IndexedObjectProperty indexedReflexiveProperty = (IndexedObjectProperty) axiom.getProperty().accept(positiveIndexer);
 
-		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
+		/*if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
 				&& multiplicity_ > 0)
 			// first occurrence of reflexivity axiom
 			index_.addReflexiveProperty(indexedReflexiveProperty);
@@ -231,7 +235,8 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
 				&& multiplicity_ < 0)
 			// no occurrence of reflexivity axiom
-			index_.removeReflexiveProperty(indexedReflexiveProperty);
+			index_.removeReflexiveProperty(indexedReflexiveProperty);*/
+		axiomUpdateFilter.visit(indexedAxiomFactory_.createReflexiveObjectPropertyAxiom(indexedReflexiveProperty, axiom));
 	}
 
 	@Override
@@ -403,6 +408,18 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 
 		@Override
 		public IndexedDisjointnessAxiom visit(IndexedDisjointnessAxiom axiom) {
+			return update(objectCache_.visit(axiom));
+		}
+
+		@Override
+		public IndexedSubObjectPropertyOfAxiom<?> visit(
+				IndexedSubObjectPropertyOfAxiom<?> axiom) {
+			return update(objectCache_.visit(axiom));
+		}
+
+		@Override
+		public IndexedReflexiveObjectPropertyAxiom<?> visit(
+				IndexedReflexiveObjectPropertyAxiom<?> axiom) {
 			return update(objectCache_.visit(axiom));
 		}
 

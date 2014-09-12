@@ -75,6 +75,8 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 	 * the converter for {@link IndexedObject}s of the complementary polarity
 	 */
 	private final IndexObjectConverter complementaryConverter_;
+	
+	private final IndexedObjectFactory objectFactory_;
 
 	/**
 	 * @param objectFilter
@@ -96,10 +98,12 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 	public IndexObjectConverter(
 			IndexedClassExpressionFilter indexedClassFilter,
 			IndexedPropertyChainFilter indexedPropertyFilter,
-			IndexObjectConverter complementaryConverter) {
+			IndexObjectConverter complementaryConverter,
+			IndexedObjectFactory objectGactory) {
 		this.indexedClassFilter_ = indexedClassFilter;
 		this.indexedPropertyFilter_ = indexedPropertyFilter;
 		this.complementaryConverter_ = complementaryConverter;
+		this.objectFactory_ = objectGactory;
 	}
 
 	/**
@@ -113,10 +117,12 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 	 */
 	public IndexObjectConverter(
 			IndexedClassExpressionFilter indexedClassFilter,
-			IndexedPropertyChainFilter indexedPropertyFilter) {
+			IndexedPropertyChainFilter indexedPropertyFilter,
+			IndexedObjectFactory objectGactory) {
 		this.indexedClassFilter_ = indexedClassFilter;
 		this.indexedPropertyFilter_ = indexedPropertyFilter;
 		this.complementaryConverter_ = this;
+		this.objectFactory_ = objectGactory;
 	}
 
 	/**
@@ -134,11 +140,13 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 	public IndexObjectConverter(
 			IndexedClassExpressionFilter indexedClassFilter,
 			IndexedPropertyChainFilter indexedPropertyFilter,
-			IndexObjectConverterFactory complementaryConverterFactory) {
+			IndexObjectConverterFactory complementaryConverterFactory,
+			IndexedObjectFactory objectGactory) {
 		this.indexedClassFilter_ = indexedClassFilter;
 		this.indexedPropertyFilter_ = indexedPropertyFilter;
 		this.complementaryConverter_ = complementaryConverterFactory
 				.create(this);
+		this.objectFactory_ = objectGactory;
 	}
 
 	public IndexObjectConverter getComplementaryConverter() {
@@ -222,8 +230,8 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 
 	@Override
 	public IndexedPropertyChain visit(ElkObjectProperty elkObjectProperty) {
-		return indexedPropertyFilter_.visit(new IndexedObjectProperty(
-				elkObjectProperty));
+		return indexedPropertyFilter_.visit(objectFactory_.createdIndexedObjectProperty(elkObjectProperty));
+		//return indexedPropertyFilter_.visit(new IndexedObjectProperty(	elkObjectProperty));
 	}
 
 	/*

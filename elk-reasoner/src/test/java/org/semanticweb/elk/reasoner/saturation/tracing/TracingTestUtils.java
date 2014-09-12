@@ -335,6 +335,24 @@ public class TracingTestUtils {
 		traceUnwinder.accept(subsumee, conclusion, new DummyConclusionVisitor<IndexedClassExpression>(), visitor);		
 	}	
 	
+	public static void visitInferences(ElkClassExpression sub,
+			ElkClassExpression sup, Reasoner reasoner, 
+			ClassInferenceVisitor<IndexedClassExpression, ?> classInferenceVisitor,
+			ObjectPropertyInferenceVisitor<?, ?> propertyInferenceVisitor) throws ElkException {
+		final IndexedClassExpression subsumee = ReasonerStateAccessor
+				.transform(reasoner, sub);
+		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
+				ReasonerStateAccessor.transform(reasoner, sup));
+		TraceStore.Reader inferenceReader = ReasonerStateAccessor.getTraceState(reasoner).getTraceStore().getReader();
+		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader);
+
+		reasoner.explainSubsumption(sub, sup);
+		traceUnwinder.accept(subsumee, conclusion,
+				new DummyConclusionVisitor<IndexedClassExpression>(),
+				classInferenceVisitor, ObjectPropertyConclusionVisitor.DUMMY,
+				propertyInferenceVisitor);		
+	}
+	
 
 	public static int checkInferenceAcyclicity(Reasoner reasoner) {
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
