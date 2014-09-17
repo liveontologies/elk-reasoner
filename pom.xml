@@ -24,6 +24,7 @@
 		<module>elk-owl-parent</module>
 		<module>elk-util-parent</module>
 		<module>elk-reasoner</module>
+    <module>elk-proofs</module>
 		<module>elk-owlapi</module>
 		<module>elk-protege</module>
 		<module>elk-cli</module>
