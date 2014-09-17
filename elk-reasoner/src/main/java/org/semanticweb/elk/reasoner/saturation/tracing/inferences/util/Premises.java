@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.PremiseVisitor;
-import org.semanticweb.elk.util.collections.Operations.Condition;
+import org.semanticweb.elk.util.collections.Condition;
 
 /**
  * @author Pavel Klinov

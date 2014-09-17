@@ -1,10 +1,7 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+package org.semanticweb.elk.util.collections;
 /*
  * #%L
- * ELK Reasoner
+ * ELK Utilities Collections
  * $Id:$
  * $HeadURL:$
  * %%
@@ -24,19 +21,21 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyConclusionVisitor;
-
-
 /**
- * The interface for objects representing object property inferences. Used
- * primarily for tracing.
+ * Boolean conditions over some type.
  * 
- * @author Pavel Klinov
+ * @param <T>
+ *            the type of elements which can be used with this condition
  * 
- *         pavel.klinov@uni-ulm.de
  */
-public interface ObjectPropertyConclusion {
-
-	public <I, O> O accept(ObjectPropertyConclusionVisitor<I, O> visitor, I input);
-
+public interface Condition<T> {
+	/**
+	 * Checks if the condition holds for an element
+	 * 
+	 * @param element
+	 *            the element for which to check the condition
+	 * @return {@code true} if the condition holds for the element and
+	 *         otherwise {@code false}
+	 */
+	public boolean holds(T element);
 }

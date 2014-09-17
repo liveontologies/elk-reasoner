@@ -33,8 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.iris.ElkIri;
@@ -44,9 +42,11 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableBottomNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
+import org.semanticweb.elk.util.collections.Condition;
 import org.semanticweb.elk.util.collections.LazySetUnion;
 import org.semanticweb.elk.util.collections.Operations;
-import org.semanticweb.elk.util.collections.Operations.Condition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class taxonomy that is suitable for concurrent processing. Taxonomy objects

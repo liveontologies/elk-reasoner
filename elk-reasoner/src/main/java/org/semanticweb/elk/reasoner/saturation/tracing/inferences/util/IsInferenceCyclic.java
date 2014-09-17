@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionEq
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
-import org.semanticweb.elk.util.collections.Operations.Condition;
+import org.semanticweb.elk.util.collections.Condition;
 
 /**
  * A stateless procedure to check if the given inference is cyclic.

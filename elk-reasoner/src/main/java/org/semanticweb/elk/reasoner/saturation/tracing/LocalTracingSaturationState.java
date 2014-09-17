@@ -36,10 +36,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
+import org.semanticweb.elk.util.collections.Condition;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.Operations;
-import org.semanticweb.elk.util.collections.Operations.Condition;
 
 /**
  * A specialization of {@link MapSaturationState} for inference tracing.

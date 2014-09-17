@@ -44,8 +44,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.Node;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 import org.semanticweb.elk.reasoner.taxonomy.model.TypeNode;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.Condition;
 import org.semanticweb.elk.util.collections.Operations;
-import org.semanticweb.elk.util.collections.Operations.Condition;
 
 /**
  * @author Pavel Klinov
