@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Objec
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 
 /**
- * A generic interfaces for objects which recursively unwind previously stored
+ * A generic interface for objects which recursively unwind previously stored
  * inferences and let the calling code visit conclusions and inferences.
  * 
  * @author Pavel Klinov
@@ -54,6 +54,9 @@ public interface TraceUnwinder {
 			ObjectPropertyConclusionVisitor<?, ?> propertyPremiseVisitor,
 			ObjectPropertyInferenceVisitor<?, ?> propertyInferenceVisitor);
 
+	/*
+	 * unwinds only object property inferences.
+	 */
 	public void accept(ObjectPropertyConclusion conclusion,
 			ObjectPropertyConclusionVisitor<?, ?> conclusionVisitor,
 			ObjectPropertyInferenceVisitor<?, ?> inferenceVisitor);

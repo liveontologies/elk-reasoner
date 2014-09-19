@@ -305,7 +305,7 @@ public class TracingTestUtils {
 		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
 				ReasonerStateAccessor.transform(reasoner, sup));
 		TraceStore.Reader inferenceReader = ReasonerStateAccessor.getTraceState(reasoner).getTraceStore().getReader();
-		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader);
+		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader, UNTRACED_LISTENER);
 		SideConditionVisitor sideConditionVisitor = new SideConditionVisitor(new AbstractElkAxiomVisitor<Void>() {
 
 			@Override
@@ -329,7 +329,7 @@ public class TracingTestUtils {
 		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
 				ReasonerStateAccessor.transform(reasoner, sup));
 		TraceStore.Reader inferenceReader = ReasonerStateAccessor.getTraceState(reasoner).getTraceStore().getReader();
-		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader);
+		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader, UNTRACED_LISTENER);
 
 		reasoner.explainSubsumption(sub, sup);
 		traceUnwinder.accept(subsumee, conclusion, new DummyConclusionVisitor<IndexedClassExpression>(), visitor);		
@@ -344,7 +344,7 @@ public class TracingTestUtils {
 		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
 				ReasonerStateAccessor.transform(reasoner, sup));
 		TraceStore.Reader inferenceReader = ReasonerStateAccessor.getTraceState(reasoner).getTraceStore().getReader();
-		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader);
+		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader, UNTRACED_LISTENER);
 
 		reasoner.explainSubsumption(sub, sup);
 		traceUnwinder.accept(subsumee, conclusion,
