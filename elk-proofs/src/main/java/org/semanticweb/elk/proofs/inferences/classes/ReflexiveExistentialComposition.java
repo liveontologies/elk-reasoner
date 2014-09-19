@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences;
+package org.semanticweb.elk.proofs.inferences.classes;
 /*
  * #%L
  * ELK Reasoner
@@ -33,30 +33,32 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ExistentialCompositionInference extends
+public class ReflexiveExistentialComposition extends
 		AbstractClassInference {
 
-	private final Expression<ElkSubClassOfAxiom> existentialPremise_;
+	private final Expression<ElkReflexiveObjectPropertyAxiom> reflexPremise_;
 	
 	private final Expression<ElkSubClassOfAxiom> subsumerPremise_;
 	
 	private final Expression<ElkSubObjectPropertyOfAxiom> propertyPremise_;
 	
-	ExistentialCompositionInference(ElkClassExpression sub, ElkSubClassOfAxiom exPremise, ElkSubClassOfAxiom subPremise, ElkSubObjectPropertyOfAxiom propPremise, ElkObjectFactory factory) {
+	ReflexiveExistentialComposition(ElkClassExpression sub, ElkReflexiveObjectPropertyAxiom reflPremise, ElkSubClassOfAxiom subPremise, ElkSubObjectPropertyOfAxiom propPremise, ElkObjectFactory factory) {
 		super(getConclusion(sub, subPremise, propPremise, factory));
 		
-		existentialPremise_ = new SingleAxiomExpression<ElkSubClassOfAxiom>(exPremise);
+		reflexPremise_ = new SingleAxiomExpression<ElkReflexiveObjectPropertyAxiom>(reflPremise);
 		subsumerPremise_ = new SingleAxiomExpression<ElkSubClassOfAxiom>(subPremise);
 		propertyPremise_ = new SingleAxiomExpression<ElkSubObjectPropertyOfAxiom>(propPremise);
 	}
@@ -90,7 +92,7 @@ public class ExistentialCompositionInference extends
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<? extends Expression<? extends ElkAxiom>> getPremises() {
-		return Arrays.asList(existentialPremise_, subsumerPremise_, propertyPremise_);
+		return Arrays.asList(reflexPremise_, subsumerPremise_, propertyPremise_);
 	}
 
 }

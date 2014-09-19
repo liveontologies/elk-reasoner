@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences;
+package org.semanticweb.elk.proofs.inferences.classes;
 /*
  * #%L
  * ELK Reasoner
@@ -24,34 +24,44 @@ package org.semanticweb.elk.proofs.inferences;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ThingInitialization extends AbstractClassInference {
+public class NegationContradiction extends
+		AbstractClassInference {
 
-	public ThingInitialization(ElkClassExpression expr, ElkObjectFactory factory) {
-		super(factory.getSubClassOfAxiom(expr, PredefinedElkClass.OWL_THING));
-	}
+	private final Expression<?> positivePremise_;
 	
+	private final Expression<?> negativePremise_;
+	
+	NegationContradiction(ElkClassExpression sub, Expression<?> firstPremise, Expression<?> secondPremise, ElkObjectFactory factory) {
+		super(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING));
+
+		positivePremise_ = firstPremise;
+		negativePremise_ = secondPremise;
+	}
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<Expression<?>> getPremises() {
-		return Collections.emptyList();
+		return Arrays.asList(positivePremise_, negativePremise_);
 	}
 
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
+		//return visitor.visit(this, input);
 		return null;
-		//return visitor.visit(this);
 	}
 
 }

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences;
+package org.semanticweb.elk.proofs.inferences.classes;
 /*
  * #%L
  * ELK Reasoner
@@ -29,27 +29,36 @@ import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ClassInitialization extends AbstractClassInference {
+public class ConjunctionDecomposition extends
+		AbstractClassInference {
 
-	public ClassInitialization(ElkClassExpression expr, ElkObjectFactory factory) {
-		super(factory.getSubClassOfAxiom(expr, expr));
-	}
+	private final Expression<ElkSubClassOfAxiom> premise_;
 	
+	// the first conjunct is the super class 
+	ConjunctionDecomposition(ElkClassExpression sub, ElkClassExpression sup, ElkClassExpression otherConjunct, ElkObjectFactory factory) {
+		super(factory.getSubClassOfAxiom(sub, sup));
+
+		premise_ = new SingleAxiomExpression<ElkSubClassOfAxiom>(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(sup, otherConjunct)));
+	}
+
 	@Override
-	public Collection<Expression<?>> getPremises() {
-		return Collections.emptyList();
+	public Collection<Expression<ElkSubClassOfAxiom>> getPremises() {
+		return Collections.singletonList(premise_);
 	}
 
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
-		//return visitor.visit(this);
+		//return visitor.visit(this, input);
 		return null;
 	}
 

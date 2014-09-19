@@ -1,8 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences;
-
+package org.semanticweb.elk.proofs.inferences.classes;
 /*
  * #%L
  * ELK Reasoner
@@ -26,27 +25,34 @@ package org.semanticweb.elk.proofs.inferences;
  */
 
 import java.util.Collection;
+import java.util.Collections;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.sideconditions.SideCondition;
+import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
 /**
- * Represents an elementary component of proofs reported to the user. Each
- * inference has a set of premises and a conclusion, which are
- * {@link Expression}s and, optionally, a side {@link SideCondition}.
- * 
  * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public interface Inference {
+public class ThingInitialization extends AbstractClassInference {
 
-	public Collection<? extends Expression<? extends ElkAxiom>> getPremises();
+	public ThingInitialization(ElkClassExpression expr, ElkObjectFactory factory) {
+		super(factory.getSubClassOfAxiom(expr, PredefinedElkClass.OWL_THING));
+	}
+	
+	@Override
+	public Collection<Expression<?>> getPremises() {
+		return Collections.emptyList();
+	}
 
-	public Expression<?> getConclusion();
+	@Override
+	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
+		return null;
+		//return visitor.visit(this);
+	}
 
-	public SideCondition getSideCondition();
-
-	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input);
 }

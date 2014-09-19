@@ -3,8 +3,6 @@
  */
 package org.semanticweb.elk.proofs.expressions;
 
-import java.util.Collection;
-
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
 /**
@@ -14,5 +12,5 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  */
 public interface Expression<E extends ElkAxiom> {
 
-	public Collection<E> getAxioms();
+	public Iterable<E> getAxioms();
 }

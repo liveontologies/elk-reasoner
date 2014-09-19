@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences;
+package org.semanticweb.elk.proofs.inferences.classes;
 /*
  * #%L
  * ELK Reasoner
@@ -24,34 +24,33 @@ package org.semanticweb.elk.proofs.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import java.util.Collection;
+import java.util.Collections;
+
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
-import org.semanticweb.elk.proofs.sideconditions.SideCondition;
+import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
 /**
- * The base class for class inferences whose conclusions are always subsumption
- * axioms.
- * 
  * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ *
+ * pavel.klinov@uni-ulm.de
  */
-abstract class AbstractClassInference implements ClassInference {
+public class ClassInitialization extends AbstractClassInference {
 
-	final Expression<ElkSubClassOfAxiom> conclusion;
-
-	AbstractClassInference(ElkSubClassOfAxiom c) {
-		conclusion = new SingleAxiomExpression<ElkSubClassOfAxiom>(c);
+	public ClassInitialization(ElkClassExpression expr, ElkObjectFactory factory) {
+		super(factory.getSubClassOfAxiom(expr, expr));
+	}
+	
+	@Override
+	public Collection<Expression<?>> getPremises() {
+		return Collections.emptyList();
 	}
 
 	@Override
-	public Expression<ElkSubClassOfAxiom> getConclusion() {
-		return conclusion;
-	}
-
-	@Override
-	public SideCondition getSideCondition() {
+	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
+		//return visitor.visit(this);
 		return null;
 	}
 

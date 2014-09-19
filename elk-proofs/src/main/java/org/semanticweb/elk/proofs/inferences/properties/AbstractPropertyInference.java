@@ -1,8 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences;
-
+package org.semanticweb.elk.proofs.inferences.properties;
 /*
  * #%L
  * ELK Reasoner
@@ -25,28 +24,35 @@ package org.semanticweb.elk.proofs.inferences;
  * #L%
  */
 
-import java.util.Collection;
-
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
 /**
- * Represents an elementary component of proofs reported to the user. Each
- * inference has a set of premises and a conclusion, which are
- * {@link Expression}s and, optionally, a side {@link SideCondition}.
+ * The base class for class inferences whose conclusions are always subsumption
+ * axioms.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface Inference {
+abstract class AbstractPropertyInference implements PropertyInference {
 
-	public Collection<? extends Expression<? extends ElkAxiom>> getPremises();
+	final Expression<ElkObjectPropertyAxiom> conclusion;
 
-	public Expression<?> getConclusion();
+	AbstractPropertyInference(ElkObjectPropertyAxiom c) {
+		conclusion = new SingleAxiomExpression<ElkObjectPropertyAxiom>(c);
+	}
 
-	public SideCondition getSideCondition();
+	@Override
+	public Expression<ElkObjectPropertyAxiom> getConclusion() {
+		return conclusion;
+	}
 
-	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input);
+	@Override
+	public SideCondition getSideCondition() {
+		return null;
+	}
+
 }

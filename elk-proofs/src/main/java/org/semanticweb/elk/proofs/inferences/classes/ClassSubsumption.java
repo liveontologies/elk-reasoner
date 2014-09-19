@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences;
+package org.semanticweb.elk.proofs.inferences.classes;
 /*
  * #%L
  * ELK Reasoner
@@ -24,43 +24,54 @@ package org.semanticweb.elk.proofs.inferences;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
+import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class DisjunctionCompositionInference extends
-		AbstractClassInference {
+public class ClassSubsumption extends AbstractClassInference {
 
-	private final Expression<ElkSubClassOfAxiom> firstPremise_;
-	
-	private final Expression<ElkSubClassOfAxiom> secondPremise_;
-	
-	DisjunctionCompositionInference(ElkClassExpression sub, ElkClassExpression firstConjunct, ElkClassExpression secondConjunct, ElkObjectFactory factory) {
-		super(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(firstConjunct, secondConjunct)));
+	private final Expression<ElkSubClassOfAxiom> premise_;
 
-		firstPremise_ = new SingleAxiomExpression<ElkSubClassOfAxiom>(factory.getSubClassOfAxiom(sub, firstConjunct));
-		secondPremise_ = new SingleAxiomExpression<ElkSubClassOfAxiom>(factory.getSubClassOfAxiom(sub, secondConjunct));
+	private final SideCondition sideCondition_;
+
+	// we aren't yet checking correctness (or mutual consistency) of these
+	// parameters. Perhaps we could have an inference factory which would do it.
+	public ClassSubsumption(ElkAxiom sideCondition,
+			ElkClassExpression sub, ElkClassExpression sup,
+			ElkClassExpression premise, ElkObjectFactory factory) {
+		super(factory.getSubClassOfAxiom(sub, sup));
+
+		premise_ = new SingleAxiomExpression<ElkSubClassOfAxiom>(factory.getSubClassOfAxiom(sub, premise));
+		sideCondition_ = new AxiomPresenceCondition<ElkAxiom>(sideCondition);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<Expression<ElkSubClassOfAxiom>> getPremises() {
-		return Arrays.asList(firstPremise_, secondPremise_);
+		return Collections.<Expression<ElkSubClassOfAxiom>>singletonList(premise_);
+	}
+
+	@Override
+	public SideCondition getSideCondition() {
+		return sideCondition_;
 	}
 
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
-		//return visitor.visit(this, input);
+		//return visitor.visit(this);
 		return null;
 	}
 

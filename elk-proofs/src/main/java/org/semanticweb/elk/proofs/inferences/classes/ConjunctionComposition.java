@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences;
+package org.semanticweb.elk.proofs.inferences.classes;
 /*
  * #%L
  * ELK Reasoner
@@ -24,35 +24,39 @@ package org.semanticweb.elk.proofs.inferences;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DisjunctionDecompositionInference extends
+public class ConjunctionComposition extends
 		AbstractClassInference {
 
-	private final Expression<ElkSubClassOfAxiom> premise_;
+	private final Expression<ElkSubClassOfAxiom> firstPremise_;
 	
-	// the first conjunct is the super class 
-	DisjunctionDecompositionInference(ElkClassExpression sub, ElkClassExpression sup, ElkClassExpression otherConjunct, ElkObjectFactory factory) {
-		super(factory.getSubClassOfAxiom(sub, sup));
+	private final Expression<ElkSubClassOfAxiom> secondPremise_;
+	
+	ConjunctionComposition(ElkClassExpression sub, ElkClassExpression firstConjunct, ElkClassExpression secondConjunct, ElkObjectFactory factory) {
+		super(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(firstConjunct, secondConjunct)));
 
-		premise_ = new SingleAxiomExpression<ElkSubClassOfAxiom>(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(sup, otherConjunct)));
+		firstPremise_ = new SingleAxiomExpression<ElkSubClassOfAxiom>(factory.getSubClassOfAxiom(sub, firstConjunct));
+		secondPremise_ = new SingleAxiomExpression<ElkSubClassOfAxiom>(factory.getSubClassOfAxiom(sub, secondConjunct));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<Expression<ElkSubClassOfAxiom>> getPremises() {
-		return Collections.singletonList(premise_);
+		return Arrays.asList(firstPremise_, secondPremise_);
 	}
 
 	@Override

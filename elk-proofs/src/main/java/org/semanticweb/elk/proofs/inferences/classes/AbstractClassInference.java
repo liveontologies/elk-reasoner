@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences;
+package org.semanticweb.elk.proofs.inferences.classes;
 /*
  * #%L
  * ELK Reasoner
@@ -26,14 +26,34 @@ package org.semanticweb.elk.proofs.inferences;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
 /**
+ * The base class for class inferences whose conclusions are always subsumption
+ * axioms.
+ * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public interface ClassInference extends Inference {
+abstract class AbstractClassInference implements Inference {
+
+	final Expression<ElkSubClassOfAxiom> conclusion;
+
+	AbstractClassInference(ElkSubClassOfAxiom c) {
+		conclusion = new SingleAxiomExpression<ElkSubClassOfAxiom>(c);
+	}
 
 	@Override
-	public Expression<ElkSubClassOfAxiom> getConclusion();	
+	public Expression<ElkSubClassOfAxiom> getConclusion() {
+		return conclusion;
+	}
+
+	@Override
+	public SideCondition getSideCondition() {
+		return null;
+	}
+
 }
