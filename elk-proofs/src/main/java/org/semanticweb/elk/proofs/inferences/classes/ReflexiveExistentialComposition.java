@@ -85,8 +85,7 @@ public class ReflexiveExistentialComposition extends
 	
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
-		//return visitor.visit(this, input);
-		return null;
+		return visitor.visit(this, input);
 	}
 
 	@SuppressWarnings("unchecked")

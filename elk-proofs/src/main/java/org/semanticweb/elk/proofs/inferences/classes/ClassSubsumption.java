@@ -71,8 +71,7 @@ public class ClassSubsumption extends AbstractClassInference {
 
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
-		//return visitor.visit(this);
-		return null;
+		return visitor.visit(this, input);
 	}
 
 }

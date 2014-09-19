@@ -25,7 +25,7 @@ import org.semanticweb.elk.proofs.utils.ProofUtils;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ExistentialViaChainComposition implements Inference {
+public class ExistentialCompositionViaChain implements Inference {
 
 	private final Expression<?> firstExistentialPremise_;
 
@@ -39,7 +39,7 @@ public class ExistentialViaChainComposition implements Inference {
 	
 	private final Expression<?> conclusion_;
 
-	private ExistentialViaChainComposition(
+	private ExistentialCompositionViaChain(
 			Expression<?> conclusion,
 			Expression<?> firstExPremise,
 			Expression<?> secondExPremise,
@@ -55,7 +55,7 @@ public class ExistentialViaChainComposition implements Inference {
 	}	
 	
 	// inference with a side condition and a single subsumption axiom with a simple existential on the right as the conclusion
-	public ExistentialViaChainComposition(ElkSubClassOfAxiom firstExPremise,
+	public ExistentialCompositionViaChain(ElkSubClassOfAxiom firstExPremise,
 			Expression<?> secondExPremise,
 			ElkClassExpression existential,
 			ElkSubObjectPropertyOfAxiom propSubsumption,
@@ -75,7 +75,7 @@ public class ExistentialViaChainComposition implements Inference {
 	
 	// inference with a complex existential in the conclusion and no side condition
 	@SuppressWarnings("unchecked")
-	public ExistentialViaChainComposition(
+	public ExistentialCompositionViaChain(
 			Expression<ElkAxiom> firstExPremise,
 			Expression<ElkAxiom> secondExPremise,
 			Expression<ElkSubObjectPropertyOfAxiom> propSubsumption,
@@ -102,8 +102,7 @@ public class ExistentialViaChainComposition implements Inference {
 
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
-		// TODO Auto-generated method stub
-		return null;
+		return visitor.visit(this, input);
 	}
 
 	@Override

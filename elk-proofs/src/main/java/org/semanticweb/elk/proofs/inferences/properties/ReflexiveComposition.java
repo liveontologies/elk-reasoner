@@ -42,8 +42,7 @@ public class ReflexiveComposition implements Inference {
 	
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
-		// TODO Auto-generated method stub
-		return null;
+		return visitor.visit(this, input);
 	}
 
 	@Override

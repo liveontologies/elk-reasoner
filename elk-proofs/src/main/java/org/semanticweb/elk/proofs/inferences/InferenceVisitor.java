@@ -31,7 +31,7 @@ package org.semanticweb.elk.proofs.inferences;
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface InferenceVisitor<I, O> {
+public interface InferenceVisitor<I, O> extends ClassInferenceVisitor<I, O>, PropertyInferenceVisitor<I, O> {
 
-	//public 
+	//nothing here
 }
