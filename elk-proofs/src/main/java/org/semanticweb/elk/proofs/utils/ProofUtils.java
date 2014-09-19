@@ -38,11 +38,11 @@ public class ProofUtils {
 		});
 	}
 	
-	public static Expression<?> merge(Expression<?>... expressions) {
-		return new MultiAxiomExpression<ElkAxiom>(Operations.concat(Operations.map(Arrays.asList(expressions), new Transformation<Expression<?>, Iterable<? extends ElkAxiom>>() {
+	public static <E extends ElkAxiom> Expression<E> mergeExpressions(Expression<? extends E>... expressions) {
+		return new MultiAxiomExpression<E>(Operations.concat(Operations.map(Arrays.asList(expressions), new Transformation<Expression<? extends E>, Iterable<? extends E>>() {
 
 			@Override
-			public Iterable<? extends ElkAxiom> transform(Expression<?> expr) {
+			public Iterable<? extends E> transform(Expression<? extends E> expr) {
 				return expr.getAxioms();
 			}
 			

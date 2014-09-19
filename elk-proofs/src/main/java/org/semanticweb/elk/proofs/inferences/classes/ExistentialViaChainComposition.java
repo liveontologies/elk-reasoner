@@ -74,13 +74,14 @@ public class ExistentialViaChainComposition implements Inference {
 	}
 	
 	// inference with a complex existential in the conclusion and no side condition
+	@SuppressWarnings("unchecked")
 	public ExistentialViaChainComposition(
-			Expression<?> firstExPremise,
-			Expression<?> secondExPremise,
+			Expression<ElkAxiom> firstExPremise,
+			Expression<ElkAxiom> secondExPremise,
 			Expression<ElkSubObjectPropertyOfAxiom> propSubsumption,
 			Expression<ElkSubObjectPropertyOfAxiom> chainSubsumption
 			) {
-		this(ProofUtils.merge(firstExPremise, secondExPremise, propSubsumption, chainSubsumption),
+		this(ProofUtils.mergeExpressions(firstExPremise, secondExPremise, propSubsumption, chainSubsumption),
 			firstExPremise, 
 			secondExPremise, 
 			propSubsumption, 

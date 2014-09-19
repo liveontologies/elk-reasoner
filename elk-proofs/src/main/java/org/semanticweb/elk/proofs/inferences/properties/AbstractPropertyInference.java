@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.proofs.inferences.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,14 +25,16 @@ package org.semanticweb.elk.proofs.inferences.properties;
  * #L%
  */
 
+import java.util.Collection;
+
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
 /**
- * The base class for class inferences whose conclusions are always subsumption
- * axioms.
+ * The base class for class inferences whose conclusions are always object
+ * property axioms.
  * 
  * @author Pavel Klinov
  * 
@@ -55,4 +58,11 @@ abstract class AbstractPropertyInference implements PropertyInference {
 		return null;
 	}
 
+	@Override
+	public Collection<? extends Expression<? extends ElkObjectPropertyAxiom>> getPremises() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 }
