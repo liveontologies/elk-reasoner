@@ -278,7 +278,7 @@ public class TracingTestUtils {
 				.transform(reasoner, sub);
 		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
 				ReasonerStateAccessor.transform(reasoner, sup));
-		SideConditionVisitor sideConditionVisitor = new SideConditionVisitor(new AbstractElkAxiomVisitor<Void>() {
+		ClassInferenceVisitor<IndexedClassExpression, ?> sideConditionVisitor = SideConditions.getClassSideConditionVisitor(new AbstractElkAxiomVisitor<Void>() {
 
 			@Override
 			protected Void defaultLogicalVisit(ElkAxiom axiom) {
@@ -306,7 +306,7 @@ public class TracingTestUtils {
 				ReasonerStateAccessor.transform(reasoner, sup));
 		TraceStore.Reader inferenceReader = ReasonerStateAccessor.getTraceState(reasoner).getTraceStore().getReader();
 		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader, UNTRACED_LISTENER);
-		SideConditionVisitor sideConditionVisitor = new SideConditionVisitor(new AbstractElkAxiomVisitor<Void>() {
+		ClassInferenceVisitor<IndexedClassExpression, ?> sideConditionVisitor = SideConditions.getClassSideConditionVisitor(new AbstractElkAxiomVisitor<Void>() {
 
 			@Override
 			protected Void defaultLogicalVisit(ElkAxiom axiom) {
