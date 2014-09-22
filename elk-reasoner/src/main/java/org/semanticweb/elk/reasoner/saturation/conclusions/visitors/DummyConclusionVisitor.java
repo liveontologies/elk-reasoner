@@ -33,11 +33,11 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
  * @author "Yevgeny Kazakov"
  * 
  */
-public class DummyConclusionVisitor<I> extends
-		AbstractConclusionVisitor<I, Void> {
+public class DummyConclusionVisitor<I, O> extends
+		AbstractConclusionVisitor<I, O> {
 
 	@Override
-	protected Void defaultVisit(Conclusion conclusion, I input) {
+	protected O defaultVisit(Conclusion conclusion, I input) {
 		return null;
 	}
 

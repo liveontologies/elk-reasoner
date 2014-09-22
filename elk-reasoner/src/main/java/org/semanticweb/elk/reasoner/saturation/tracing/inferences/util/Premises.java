@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.util;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.PremiseVisitor;
 import org.semanticweb.elk.util.collections.Condition;
@@ -49,8 +50,7 @@ public class Premises {
 	public static Conclusion find(ClassInference inference, final Condition<Conclusion> premiseCondition) {
 		final AtomicReference<Conclusion> found = new AtomicReference<Conclusion>();
 		
-		inference.acceptTraced(new PremiseVisitor<Void, Void>() {
-
+		inference.acceptTraced(new PremiseVisitor<Void, Void>(new AbstractConclusionVisitor<Void, Void>() {
 			@Override
 			protected Void defaultVisit(Conclusion premise, Void cxt) {
 				if (found.get() == null && premiseCondition.holds(premise)) {
@@ -59,8 +59,7 @@ public class Premises {
 				
 				return null;
 			}
-			
-		}, null);
+		}), null);
 		
 		return found.get();
 	}

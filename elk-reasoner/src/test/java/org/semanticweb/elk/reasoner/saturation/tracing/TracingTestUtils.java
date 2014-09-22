@@ -53,6 +53,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConc
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionEqualityChecker;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
@@ -62,7 +63,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Abstr
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.GetInferenceTarget;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.PremiseVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
@@ -240,7 +240,7 @@ public class TracingTestUtils {
 
 		new TestTraceUnwinder(traceState.getTraceStore().getReader(),
 				UNTRACED_LISTENER).accept(subsumee, conclusion,
-				new DummyConclusionVisitor<IndexedClassExpression>(), 
+				new DummyConclusionVisitor<IndexedClassExpression, Void>(), 
 				new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
 
 					@Override
@@ -317,7 +317,7 @@ public class TracingTestUtils {
 		});
 
 		reasoner.explainSubsumption(sub, sup);
-		traceUnwinder.accept(subsumee, conclusion, new DummyConclusionVisitor<IndexedClassExpression>(), sideConditionVisitor);
+		traceUnwinder.accept(subsumee, conclusion, new DummyConclusionVisitor<IndexedClassExpression, Void>(), sideConditionVisitor);
 
 		assertTrue("The condition is false for all used side conditions", checkPassed.get());
 	}	
@@ -332,7 +332,7 @@ public class TracingTestUtils {
 		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader, UNTRACED_LISTENER);
 
 		reasoner.explainSubsumption(sub, sup);
-		traceUnwinder.accept(subsumee, conclusion, new DummyConclusionVisitor<IndexedClassExpression>(), visitor);		
+		traceUnwinder.accept(subsumee, conclusion, new DummyConclusionVisitor<IndexedClassExpression, Void>(), visitor);		
 	}	
 	
 	public static void visitInferences(ElkClassExpression sub,
@@ -348,7 +348,7 @@ public class TracingTestUtils {
 
 		reasoner.explainSubsumption(sub, sup);
 		traceUnwinder.accept(subsumee, conclusion,
-				new DummyConclusionVisitor<IndexedClassExpression>(),
+				new DummyConclusionVisitor<IndexedClassExpression, Void>(),
 				classInferenceVisitor, ObjectPropertyConclusionVisitor.DUMMY,
 				propertyInferenceVisitor);		
 	}
@@ -423,8 +423,7 @@ public class TracingTestUtils {
 		final IndexedClassExpression inferenceContextRoot = inference
 				.getInferenceContextRoot(inferenceTargetRoot);
 
-		inference.acceptTraced(new PremiseVisitor<Void, Void>() {
-
+		inference.acceptTraced(new PremiseVisitor<Void, Void>(new AbstractConclusionVisitor<Void, Void>() {
 			@Override
 			protected Void defaultVisit(final Conclusion premise, Void ignored) {
 
@@ -445,8 +444,7 @@ public class TracingTestUtils {
 
 				return null;
 			}
-
-		}, null);
+		}), null);
 
 		// now, let's see if there's an alternative inference for every premise
 		for (Conclusion premise : premiseInferenceMap.keySet()) {
@@ -456,11 +454,10 @@ public class TracingTestUtils {
 				final MutableBoolean isPremiseInferenceCyclic = new MutableBoolean(
 						false);
 				// does it use the given conclusion as a premise?
-				if (premiseInference
-						.getInferenceContextRoot(inferenceContextRoot) == inferenceTargetRoot) {
+				if (premiseInference.getInferenceContextRoot(inferenceContextRoot) == inferenceTargetRoot) {
+					
 					premiseInference.acceptTraced(
-							new PremiseVisitor<Void, Void>() {
-
+							new PremiseVisitor<Void, Void>(new AbstractConclusionVisitor<Void, Void>() {
 								@Override
 								protected Void defaultVisit(
 										Conclusion premiseOfPremise,
@@ -476,8 +473,7 @@ public class TracingTestUtils {
 
 									return null;
 								}
-
-							}, null);
+							}), null);
 				} else {
 					// ok, the premise was inferred in a context different from
 					// where the current inference was made.

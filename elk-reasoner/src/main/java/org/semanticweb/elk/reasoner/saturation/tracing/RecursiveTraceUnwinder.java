@@ -33,13 +33,15 @@ import org.semanticweb.elk.MutableInteger;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractObjectPropertyConclusionVIsitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.PremiseVisitor;
 
@@ -103,14 +105,13 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
 
 		// this visitor visits all premises and putting them into the todo queue
-		PremiseVisitor<Void, ?> unwinder = new PremiseVisitor<Void, Void>() {
-
+		PremiseVisitor<Void, ?> unwinder = new PremiseVisitor<Void, Void>(new AbstractObjectPropertyConclusionVIsitor<Void, Void>() {
 			@Override
-			protected Void defaultVisit(ObjectPropertyConclusion premise) {
+			protected Void defaultVisit(ObjectPropertyConclusion premise, Void _ignored) {
 				addToQueue(premise, seenInferences, premiseVisitor);
 				return null;
 			}
-		};
+		});
 
 		for (;;) {
 			final ObjectPropertyInference next = propertyInferencesToDo_.poll();
@@ -148,26 +149,26 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 		classInferencesToDo_.clear();
 		addToQueue(context, conclusion, seenInferences, classConclusionVisitor);
 		// this visitor visits all premises and putting them into the todo queue
-		PremiseVisitor<IndexedClassExpression, ?> premiseVisitor = new PremiseVisitor<IndexedClassExpression, Void>() {
-
-			@Override
-			protected Void defaultVisit(Conclusion premise,
-					IndexedClassExpression cxt) {
-				// the context passed into this method is the context where the
-				// inference has been made
-				addToQueue(cxt, premise, seenInferences, classConclusionVisitor);
-				return null;
-			}
-
-			@Override
-			protected Void defaultVisit(ObjectPropertyConclusion premise) {
-				addToQueue(premise, seenPropertyInferences, propertyConclusionVisitor);
-				
-				return null;
-			}
-			
-			
-		};
+		PremiseVisitor<IndexedClassExpression, ?> premiseVisitor = 
+				new PremiseVisitor<IndexedClassExpression, Void>(
+						new AbstractConclusionVisitor<IndexedClassExpression, Void>() {
+							@Override
+							protected Void defaultVisit(Conclusion premise,
+									IndexedClassExpression cxt) {
+								// the context passed into this method is the context where the
+								// inference has been made
+								addToQueue(cxt, premise, seenInferences, classConclusionVisitor);
+								return null;
+							}
+						},
+						new AbstractObjectPropertyConclusionVIsitor<IndexedClassExpression, Void>() {
+							@Override
+							protected Void defaultVisit(ObjectPropertyConclusion premise, IndexedClassExpression _ignored) {
+								addToQueue(premise, seenPropertyInferences, propertyConclusionVisitor);
+								
+								return null;
+							}
+						});
 
 		for (;;) {
 			// take the first element

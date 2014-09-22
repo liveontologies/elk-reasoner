@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors;
+package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
 /*
  * #%L
  * ELK Reasoner

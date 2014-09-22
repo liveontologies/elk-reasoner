@@ -32,8 +32,11 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractObjectPropertyConclusionVIsitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.OnDemandTracingReader;
+import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceUnwindingState;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
@@ -189,22 +192,21 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 		}
 
 		private void unwindClassConclusion(final Conclusion conclusion, final IndexedClassExpression rootWhereStored) {
-			final PremiseVisitor<IndexedClassExpression, ?> premiseVisitor = new PremiseVisitor<IndexedClassExpression, Void>() {
-
-				@Override
-				protected Void defaultVisit(Conclusion premise, IndexedClassExpression inferenceContext) {
-					currentState_.addToClassUnwindingQueue(premise, inferenceContext);
-					return null;
-				}
-
-				@Override
-				protected Void defaultVisit(ObjectPropertyConclusion premise) {
-					// property conclusions are put into another queue
-					currentState_.addToPropertyUnwindingQueue(premise);
-					return null;
-				}
-				
-			};
+			final PremiseVisitor<IndexedClassExpression, ?> premiseVisitor = 
+					new PremiseVisitor<IndexedClassExpression, Void>(new AbstractConclusionVisitor<IndexedClassExpression, Void>() {
+						@Override
+						protected Void defaultVisit(Conclusion premise, IndexedClassExpression inferenceContext) {
+							currentState_.addToClassUnwindingQueue(premise, inferenceContext);
+							return null;
+						}						
+					}, new AbstractObjectPropertyConclusionVIsitor<IndexedClassExpression, Void>() {
+						@Override
+						protected Void defaultVisit(ObjectPropertyConclusion premise, IndexedClassExpression _ignored) {
+							// property conclusions are put into another queue
+							currentState_.addToPropertyUnwindingQueue(premise);
+							return null;
+						}
+					});
 
 			reader_.accept(rootWhereStored, conclusion,
 					new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
@@ -224,16 +226,14 @@ public class RecursiveContextTracingFactory implements ContextTracingFactory<Rec
 		}
 		
 		private void unwindPropertyConclusion(final ObjectPropertyConclusion conclusion) {
-			final PremiseVisitor<?, ?> premiseVisitor = new PremiseVisitor<Void, Void>() {
-
+			final PremiseVisitor<?, ?> premiseVisitor = new PremiseVisitor<Void, Void>(new AbstractObjectPropertyConclusionVIsitor<Void, Void>() {
 				@Override
-				protected Void defaultVisit(ObjectPropertyConclusion premise) {
+				protected Void defaultVisit(ObjectPropertyConclusion premise, Void _ignored) {
 					// property conclusions are put into another queue
 					currentState_.addToPropertyUnwindingQueue(premise);
 					return null;
 				}
-				
-			};
+			});
 
 			reader_.accept(conclusion, new AbstractObjectPropertyInferenceVisitor<Void, Void>() {
 
