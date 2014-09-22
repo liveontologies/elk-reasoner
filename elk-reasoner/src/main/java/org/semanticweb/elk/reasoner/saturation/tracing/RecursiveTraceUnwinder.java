@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.MutableInteger;
@@ -55,6 +54,10 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Premi
 public class RecursiveTraceUnwinder implements TraceUnwinder {
 
 	private final TraceStore.Reader traceReader_;
+	
+	private final LinkedList<InferenceWrapper> classInferencesToDo_ = new LinkedList<InferenceWrapper>();
+	
+	private final LinkedList<ObjectPropertyInference> propertyInferencesToDo_ = new LinkedList<ObjectPropertyInference>();
 
 	private final static ClassInferenceVisitor<IndexedClassExpression, ?> DUMMY_INFERENCE_VISITOR = new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
 		@Override
@@ -87,15 +90,14 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 	public void accept(ObjectPropertyConclusion conclusion,
 			final ObjectPropertyConclusionVisitor<?, ?> premiseVisitor,
 			final ObjectPropertyInferenceVisitor<?, ?> inferenceVisitor) {
-		final Queue<ObjectPropertyInference> toDo = new LinkedList<ObjectPropertyInference>();
 		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
 
-		addToQueue(conclusion, toDo, seenInferences, premiseVisitor);
+		addToQueue(conclusion, seenInferences, premiseVisitor);
 		// set it off
-		unwindPropertyConclusions(toDo, premiseVisitor, inferenceVisitor);		
+		unwindPropertyConclusions(premiseVisitor, inferenceVisitor);		
 	}
 	
-	private void unwindPropertyConclusions(final Queue<ObjectPropertyInference> toDo,
+	private void unwindPropertyConclusions(
 			final ObjectPropertyConclusionVisitor<?, ?> premiseVisitor,
 			final ObjectPropertyInferenceVisitor<?, ?> inferenceVisitor) {
 		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
@@ -105,13 +107,13 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 
 			@Override
 			protected Void defaultVisit(ObjectPropertyConclusion premise) {
-				addToQueue(premise, toDo, seenInferences, premiseVisitor);
+				addToQueue(premise, seenInferences, premiseVisitor);
 				return null;
 			}
 		};
 
 		for (;;) {
-			final ObjectPropertyInference next = toDo.poll();
+			final ObjectPropertyInference next = propertyInferencesToDo_.poll();
 
 			if (next == null) {
 				break;
@@ -140,12 +142,11 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 			final ClassInferenceVisitor<IndexedClassExpression, ?> inferenceVisitor,
 			final ObjectPropertyConclusionVisitor<?, ?> propertyConclusionVisitor,
 			final ObjectPropertyInferenceVisitor<?, ?> propertyInferenceVisitor) {
-		final Queue<InferenceWrapper> toDo = new LinkedList<InferenceWrapper>();
-		final Queue<ObjectPropertyInference> propertyInferenceToDo = new LinkedList<ObjectPropertyInference>();
 		final Set<ClassInference> seenInferences = new HashSet<ClassInference>();
 		final Set<ObjectPropertyInference> seenPropertyInferences = new HashSet<ObjectPropertyInference>();
-
-		addToQueue(context, conclusion, toDo, seenInferences, classConclusionVisitor);
+		// should be empty anyways
+		classInferencesToDo_.clear();
+		addToQueue(context, conclusion, seenInferences, classConclusionVisitor);
 		// this visitor visits all premises and putting them into the todo queue
 		PremiseVisitor<IndexedClassExpression, ?> premiseVisitor = new PremiseVisitor<IndexedClassExpression, Void>() {
 
@@ -154,13 +155,13 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 					IndexedClassExpression cxt) {
 				// the context passed into this method is the context where the
 				// inference has been made
-				addToQueue(cxt, premise, toDo, seenInferences, classConclusionVisitor);
+				addToQueue(cxt, premise, seenInferences, classConclusionVisitor);
 				return null;
 			}
 
 			@Override
 			protected Void defaultVisit(ObjectPropertyConclusion premise) {
-				addToQueue(premise, propertyInferenceToDo, seenPropertyInferences, propertyConclusionVisitor);
+				addToQueue(premise, seenPropertyInferences, propertyConclusionVisitor);
 				
 				return null;
 			}
@@ -169,23 +170,24 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 		};
 
 		for (;;) {
-			final InferenceWrapper next = toDo.poll();
+			// take the first element
+			final InferenceWrapper next = classInferencesToDo_.poll();
 
 			if (next == null) {
 				break;
 			}
-
+			// user visitor
 			next.inference.acceptTraced(inferenceVisitor, null);
+			// visiting premises
 			next.inference.acceptTraced(premiseVisitor, next.contextRoot);
 		}
 		
 		// finally, unwind all property traces
-		unwindPropertyConclusions(propertyInferenceToDo, propertyConclusionVisitor, propertyInferenceVisitor);
+		unwindPropertyConclusions(propertyConclusionVisitor, propertyInferenceVisitor);
 	}
 
 	private void addToQueue(final IndexedClassExpression root,
 			final Conclusion conclusion, 
-			final Queue<InferenceWrapper> toDo,
 			final Set<ClassInference> seenInferences,
 			final ConclusionVisitor<IndexedClassExpression, ?> visitor) {
 
@@ -206,7 +208,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 									.getInferenceContextRoot(root);
 
 							seenInferences.add(inference);
-							toDo.add(new InferenceWrapper(inference,
+							classInferencesToDo_.addFirst(new InferenceWrapper(inference,
 									inferenceContextRoot));
 						}
 
@@ -222,7 +224,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 		}
 	}
 	
-	private void addToQueue(final ObjectPropertyConclusion conclusion, final Queue<ObjectPropertyInference> toDo,
+	private void addToQueue(final ObjectPropertyConclusion conclusion,
 			final Set<ObjectPropertyInference> seenInferences,
 			final ObjectPropertyConclusionVisitor<?, ?> visitor) {
 
@@ -240,7 +242,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 						if (!seenInferences.contains(inference)) {
 							seenInferences.add(inference);
 							
-							toDo.add(inference);
+							propertyInferencesToDo_.add(inference);
 						}
 
 						traced.increment();
