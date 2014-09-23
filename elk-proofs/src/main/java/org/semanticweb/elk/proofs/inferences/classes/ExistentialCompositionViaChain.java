@@ -87,9 +87,9 @@ public class ExistentialCompositionViaChain implements Inference {
 			) {
 		this(ProofUtils.fromPremiseExplanations(
 				Arrays.asList(
-						Collections.singletonList(new Explanation(Collections.<ElkAxiom>singletonList(firstExPremise))),
+						Collections.singletonList(new Explanation(firstExPremise)),
 						secondExPremise.getExplanations(),
-						Collections.singletonList(new Explanation(Collections.<ElkAxiom>singletonList(propSubsumption))),
+						Collections.singletonList(new Explanation(propSubsumption)),
 						chainSubsumption.getExplanations())), 
 				new SingleAxiomExpression(firstExPremise),	secondExPremise, new SingleAxiomExpression(propSubsumption), chainSubsumption, null);
 	}
