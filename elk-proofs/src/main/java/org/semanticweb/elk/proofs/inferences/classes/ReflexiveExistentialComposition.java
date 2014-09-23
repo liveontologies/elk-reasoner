@@ -27,7 +27,6 @@ package org.semanticweb.elk.proofs.inferences.classes;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
@@ -49,18 +48,18 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 public class ReflexiveExistentialComposition extends
 		AbstractClassInference {
 
-	private final Expression<ElkReflexiveObjectPropertyAxiom> reflexPremise_;
+	private final Expression reflexPremise_;
 	
-	private final Expression<ElkSubClassOfAxiom> subsumerPremise_;
+	private final Expression subsumerPremise_;
 	
-	private final Expression<ElkSubObjectPropertyOfAxiom> propertyPremise_;
+	private final Expression propertyPremise_;
 	
-	ReflexiveExistentialComposition(ElkClassExpression sub, ElkReflexiveObjectPropertyAxiom reflPremise, ElkSubClassOfAxiom subPremise, ElkSubObjectPropertyOfAxiom propPremise, ElkObjectFactory factory) {
-		super(getConclusion(sub, subPremise, propPremise, factory));
+	public ReflexiveExistentialComposition(ElkClassExpression sub, ElkSubClassOfAxiom subsumerPremise, ElkReflexiveObjectPropertyAxiom reflPremise, ElkSubObjectPropertyOfAxiom propPremise, ElkObjectFactory factory) {
+		super(getConclusion(sub, subsumerPremise, propPremise, factory));
 		
-		reflexPremise_ = new SingleAxiomExpression<ElkReflexiveObjectPropertyAxiom>(reflPremise);
-		subsumerPremise_ = new SingleAxiomExpression<ElkSubClassOfAxiom>(subPremise);
-		propertyPremise_ = new SingleAxiomExpression<ElkSubObjectPropertyOfAxiom>(propPremise);
+		reflexPremise_ = new SingleAxiomExpression(reflPremise);
+		subsumerPremise_ = new SingleAxiomExpression(subsumerPremise);
+		propertyPremise_ = new SingleAxiomExpression(propPremise);
 	}
 
 	private static ElkSubClassOfAxiom getConclusion(ElkClassExpression sub, ElkSubClassOfAxiom subPremise, ElkSubObjectPropertyOfAxiom propPremise, ElkObjectFactory factory) {
@@ -88,9 +87,8 @@ public class ReflexiveExistentialComposition extends
 		return visitor.visit(this, input);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<? extends Expression<? extends ElkAxiom>> getPremises() {
+	public Collection<? extends Expression> getPremises() {
 		return Arrays.asList(reflexPremise_, subsumerPremise_, propertyPremise_);
 	}
 

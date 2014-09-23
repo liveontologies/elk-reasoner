@@ -29,7 +29,6 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -42,20 +41,19 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 public class ConjunctionComposition extends
 		AbstractClassInference {
 
-	private final Expression<ElkSubClassOfAxiom> firstPremise_;
+	private final Expression firstPremise_;
 	
-	private final Expression<ElkSubClassOfAxiom> secondPremise_;
+	private final Expression secondPremise_;
 	
-	ConjunctionComposition(ElkClassExpression sub, ElkClassExpression firstConjunct, ElkClassExpression secondConjunct, ElkObjectFactory factory) {
+	public ConjunctionComposition(ElkClassExpression sub, ElkClassExpression firstConjunct, ElkClassExpression secondConjunct, ElkObjectFactory factory) {
 		super(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(firstConjunct, secondConjunct)));
 
-		firstPremise_ = new SingleAxiomExpression<ElkSubClassOfAxiom>(factory.getSubClassOfAxiom(sub, firstConjunct));
-		secondPremise_ = new SingleAxiomExpression<ElkSubClassOfAxiom>(factory.getSubClassOfAxiom(sub, secondConjunct));
+		firstPremise_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, firstConjunct));
+		secondPremise_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, secondConjunct));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<Expression<ElkSubClassOfAxiom>> getPremises() {
+	public Collection<Expression> getPremises() {
 		return Arrays.asList(firstPremise_, secondPremise_);
 	}
 

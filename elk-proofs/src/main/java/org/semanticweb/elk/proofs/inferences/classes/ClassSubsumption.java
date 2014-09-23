@@ -30,7 +30,6 @@ import java.util.Collections;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -44,7 +43,7 @@ import org.semanticweb.elk.proofs.sideconditions.SideCondition;
  */
 public class ClassSubsumption extends AbstractClassInference {
 
-	private final Expression<ElkSubClassOfAxiom> premise_;
+	private final Expression premise_;
 
 	private final SideCondition sideCondition_;
 
@@ -55,13 +54,13 @@ public class ClassSubsumption extends AbstractClassInference {
 			ElkClassExpression premise, ElkObjectFactory factory) {
 		super(factory.getSubClassOfAxiom(sub, sup));
 
-		premise_ = new SingleAxiomExpression<ElkSubClassOfAxiom>(factory.getSubClassOfAxiom(sub, premise));
+		premise_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, premise));
 		sideCondition_ = new AxiomPresenceCondition<ElkAxiom>(sideCondition);
 	}
 
 	@Override
-	public Collection<Expression<ElkSubClassOfAxiom>> getPremises() {
-		return Collections.<Expression<ElkSubClassOfAxiom>>singletonList(premise_);
+	public Collection<Expression> getPremises() {
+		return Collections.singletonList(premise_);
 	}
 
 	@Override

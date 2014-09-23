@@ -32,6 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
@@ -44,23 +45,22 @@ import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 public class DisjointnessContradiction extends
 		AbstractClassInference {
 
-	private final Expression<?> firstPremise_;
+	private final Expression firstPremise_;
 	
-	private final Expression<?> secondPremise_;
+	private final Expression secondPremise_;
 	
 	private final ElkDisjointClassesAxiom sideCondition_;
 	
-	DisjointnessContradiction(ElkClassExpression sub, Expression<?> firstPremise, Expression<?> secondPremise, ElkDisjointClassesAxiom sideCondition, ElkObjectFactory factory) {
+	public DisjointnessContradiction(ElkClassExpression sub, ElkClassExpression firstSup, ElkClassExpression secondSup, ElkDisjointClassesAxiom sideCondition, ElkObjectFactory factory) {
 		super(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING));
 
-		firstPremise_ = firstPremise;
-		secondPremise_ = secondPremise;
+		firstPremise_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, firstSup));
+		secondPremise_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, secondSup));
 		sideCondition_ = sideCondition;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<Expression<?>> getPremises() {
+	public Collection<Expression> getPremises() {
 		return Arrays.asList(firstPremise_, secondPremise_);
 	}
 	

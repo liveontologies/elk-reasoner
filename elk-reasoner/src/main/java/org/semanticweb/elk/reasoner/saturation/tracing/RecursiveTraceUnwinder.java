@@ -49,6 +49,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Premi
  * Recursively visits all inferences which were used to produce a given
  * conclusion.
  * 
+ * It guarantees that for each inference that it visits, it will unwind its premises in the order determined by the {@link PremiseVisitor} that the outer code supplied.
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
@@ -178,7 +180,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 				break;
 			}
 			// user visitor
-			next.inference.acceptTraced(inferenceVisitor, null);
+			next.inference.acceptTraced(inferenceVisitor, next.contextRoot);
 			// visiting premises
 			next.inference.acceptTraced(premiseVisitor, next.contextRoot);
 		}

@@ -6,7 +6,6 @@ package org.semanticweb.elk.proofs.inferences.properties;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -19,17 +18,17 @@ import org.semanticweb.elk.proofs.sideconditions.SideCondition;
  */
 public class SubsumptionViaReflexivity implements Inference  {
 	
-	private final Expression<ElkObjectPropertyAxiom> premise_;
+	private final Expression premise_;
 	
-	private final Expression<ElkObjectPropertyAxiom> conclusion_;
+	private final Expression conclusion_;
 	
-	public SubsumptionViaReflexivity(Expression<ElkObjectPropertyAxiom> premise, Expression<ElkObjectPropertyAxiom> conclusion) {
+	public SubsumptionViaReflexivity(Expression premise, Expression conclusion) {
 		premise_ = premise;
 		conclusion_ = conclusion;
 	}
 	
 	@Override
-	public Collection<? extends Expression<? extends ElkObjectPropertyAxiom>> getPremises() {
+	public Collection<? extends Expression> getPremises() {
 		return Collections.singletonList(premise_);
 	}
 
@@ -44,7 +43,7 @@ public class SubsumptionViaReflexivity implements Inference  {
 	}
 
 	@Override
-	public Expression<ElkObjectPropertyAxiom> getConclusion() {
+	public Expression getConclusion() {
 		return conclusion_;
 	}
 

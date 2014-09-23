@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.proofs.inferences.classes;
+
 /*
  * #%L
  * ELK Reasoner
@@ -32,37 +33,41 @@ import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class InconsistentDisjointness extends
-		AbstractClassInference {
+public class InconsistentDisjointness extends AbstractClassInference {
 
-	private final Expression<?> premise_;
-	
+	private final Expression premise_;
+
 	private final ElkDisjointClassesAxiom sideCondition_;
-	
-	InconsistentDisjointness(ElkClassExpression sub, Expression<?> firstPremise, ElkDisjointClassesAxiom sideCondition, ElkObjectFactory factory) {
+
+	public InconsistentDisjointness(ElkClassExpression sub,
+			ElkClassExpression sup, ElkDisjointClassesAxiom sideCondition,
+			ElkObjectFactory factory) {
 		super(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING));
 
-		premise_ = firstPremise;
+		premise_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub,
+				sup));
 		sideCondition_ = sideCondition;
 	}
 
 	@Override
 	public SideCondition getSideCondition() {
-		return new AxiomPresenceCondition<ElkDisjointClassesAxiom>(sideCondition_);
+		return new AxiomPresenceCondition<ElkDisjointClassesAxiom>(
+				sideCondition_);
 	}
 
 	@Override
-	public Collection<Expression<?>> getPremises() {
-		return Collections.<Expression<?>>singletonList(premise_);
+	public Collection<Expression> getPremises() {
+		return Collections.<Expression> singletonList(premise_);
 	}
 
 	@Override

@@ -40,14 +40,14 @@ import org.semanticweb.elk.proofs.sideconditions.SideCondition;
  */
 abstract class AbstractClassInference implements Inference {
 
-	final Expression<ElkSubClassOfAxiom> conclusion;
+	final Expression conclusion;
 
 	AbstractClassInference(ElkSubClassOfAxiom c) {
-		conclusion = new SingleAxiomExpression<ElkSubClassOfAxiom>(c);
+		conclusion = new SingleAxiomExpression(c);
 	}
 
 	@Override
-	public Expression<ElkSubClassOfAxiom> getConclusion() {
+	public Expression getConclusion() {
 		return conclusion;
 	}
 

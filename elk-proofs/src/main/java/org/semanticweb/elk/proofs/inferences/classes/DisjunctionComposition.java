@@ -30,7 +30,6 @@ import java.util.Collections;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -43,16 +42,16 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 public class DisjunctionComposition extends
 		AbstractClassInference {
 
-	private final Expression<ElkSubClassOfAxiom> premise_;
+	private final Expression premise_;
 	
-	DisjunctionComposition(ElkClassExpression sub, ElkObjectUnionOf sup, ElkClassExpression premise, ElkObjectFactory factory) {
+	public DisjunctionComposition(ElkClassExpression sub, ElkObjectUnionOf sup, ElkClassExpression premise, ElkObjectFactory factory) {
 		super(factory.getSubClassOfAxiom(sub, sup));
 
-		premise_ = new SingleAxiomExpression<ElkSubClassOfAxiom>(factory.getSubClassOfAxiom(sub, premise));
+		premise_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, premise));
 	}
 
 	@Override
-	public Collection<Expression<ElkSubClassOfAxiom>> getPremises() {
+	public Collection<Expression> getPremises() {
 		return Collections.singletonList(premise_);
 	}
 

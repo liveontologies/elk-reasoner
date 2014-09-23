@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
 /**
@@ -41,21 +42,20 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 public class NegationContradiction extends
 		AbstractClassInference {
 
-	private final Expression<?> positivePremise_;
+	private final Expression subsumer_;
 	
-	private final Expression<?> negativePremise_;
+	private final Expression negativeSubsumer_;
 	
-	NegationContradiction(ElkClassExpression sub, Expression<?> firstPremise, Expression<?> secondPremise, ElkObjectFactory factory) {
+	public NegationContradiction(ElkClassExpression sub, ElkClassExpression sup, ElkObjectFactory factory) {
 		super(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING));
 
-		positivePremise_ = firstPremise;
-		negativePremise_ = secondPremise;
+		subsumer_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, sup));
+		negativeSubsumer_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, factory.getObjectComplementOf(sup)));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<Expression<?>> getPremises() {
-		return Arrays.asList(positivePremise_, negativePremise_);
+	public Collection<Expression> getPremises() {
+		return Arrays.asList(subsumer_, negativeSubsumer_);
 	}
 
 	@Override

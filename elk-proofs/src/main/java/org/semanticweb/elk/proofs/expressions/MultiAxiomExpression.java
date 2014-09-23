@@ -3,24 +3,24 @@
  */
 package org.semanticweb.elk.proofs.expressions;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class MultiAxiomExpression<E extends ElkAxiom> implements Expression<E> {
+public class MultiAxiomExpression implements Expression {
 
-	private final Iterable<E> axioms_;
+	private final Iterable<Explanation> explanations_;
 	
-	public MultiAxiomExpression(Iterable<E> axioms) {
-		axioms_ = axioms;
+	// single explanation
+	public MultiAxiomExpression(Iterable<Explanation> expl) {
+		explanations_ = expl;
 	}
 
 	@Override
-	public Iterable<E> getAxioms() {
-		return axioms_;
+	public Iterable<Explanation> getExplanations() {
+		return explanations_;
 	}
 
 }

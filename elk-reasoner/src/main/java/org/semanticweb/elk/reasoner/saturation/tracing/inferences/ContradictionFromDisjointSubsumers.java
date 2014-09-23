@@ -50,7 +50,7 @@ public class ContradictionFromDisjointSubsumers extends AbstractConclusion imple
 	 */
 	private final IndexedClassExpression premise_;
 	/**
-	 * Previously derived disjoint subsumers occurring the same disjointness axiom.
+	 * Previously derived disjoint subsumers occurring in the same disjointness axiom.
 	 */
 	private final IndexedClassExpression[] disjointSubsumers_;
 	

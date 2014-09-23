@@ -30,6 +30,7 @@ import java.util.Collection;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
 /**
@@ -40,16 +41,16 @@ import org.semanticweb.elk.proofs.sideconditions.SideCondition;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-abstract class AbstractPropertyInference implements PropertyInference {
+abstract class AbstractPropertyInference implements Inference {
 
-	final Expression<ElkObjectPropertyAxiom> conclusion;
+	final Expression conclusion;
 
 	AbstractPropertyInference(ElkObjectPropertyAxiom c) {
-		conclusion = new SingleAxiomExpression<ElkObjectPropertyAxiom>(c);
+		conclusion = new SingleAxiomExpression(c);
 	}
 
 	@Override
-	public Expression<ElkObjectPropertyAxiom> getConclusion() {
+	public Expression getConclusion() {
 		return conclusion;
 	}
 
@@ -59,8 +60,7 @@ abstract class AbstractPropertyInference implements PropertyInference {
 	}
 
 	@Override
-	public Collection<? extends Expression<? extends ElkObjectPropertyAxiom>> getPremises() {
-		// TODO Auto-generated method stub
+	public Collection<? extends Expression> getPremises() {
 		return null;
 	}
 

@@ -28,12 +28,12 @@ package org.semanticweb.elk.proofs.inferences.classes;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
 /**
@@ -43,21 +43,24 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
  */
 public class ExistentialComposition extends AbstractClassInference {
 
-	private final Expression<?> existentialPremise_;
+	private final Expression existentialPremise_;
 
-	private final Expression<?> subsumerPremise_;
+	private final Expression subsumerPremise_;
 
-	private final Expression<ElkObjectPropertyAxiom> propertyPremise_;
+	private final Expression propertyPremise_;
 
-	ExistentialComposition(ElkClassExpression sub, ElkObjectSomeValuesFrom sup,
-			Expression<?> exPremise, Expression<?> subPremise,
-			Expression<ElkObjectPropertyAxiom> propPremise,
+	public ExistentialComposition(
+			ElkClassExpression sub, 
+			ElkClassExpression sup,
+			ElkSubClassOfAxiom exPremise, 
+			ElkSubClassOfAxiom subPremise,
+			ElkSubObjectPropertyOfAxiom propPremise,
 			ElkObjectFactory factory) {
 		super(factory.getSubClassOfAxiom(sub, sup));
 
-		existentialPremise_ = exPremise;
-		subsumerPremise_ = subPremise;
-		propertyPremise_ = propPremise;
+		existentialPremise_ = new SingleAxiomExpression(exPremise);
+		subsumerPremise_ = new SingleAxiomExpression(subPremise);
+		propertyPremise_ = new SingleAxiomExpression(propPremise);
 	}
 
 	@Override
@@ -65,9 +68,8 @@ public class ExistentialComposition extends AbstractClassInference {
 		return visitor.visit(this, input);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<? extends Expression<? extends ElkAxiom>> getPremises() {
+	public Collection<? extends Expression> getPremises() {
 		return Arrays.asList(existentialPremise_, subsumerPremise_,
 				propertyPremise_);
 	}

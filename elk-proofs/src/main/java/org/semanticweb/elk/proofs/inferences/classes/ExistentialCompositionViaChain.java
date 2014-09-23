@@ -5,12 +5,14 @@ package org.semanticweb.elk.proofs.inferences.classes;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.proofs.expressions.Explanation;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
@@ -27,24 +29,24 @@ import org.semanticweb.elk.proofs.utils.ProofUtils;
  */
 public class ExistentialCompositionViaChain implements Inference {
 
-	private final Expression<?> firstExistentialPremise_;
+	private final Expression firstExistentialPremise_;
 
-	private final Expression<?> secondExistentialPremise_;
+	private final Expression secondExistentialPremise_;
 
-	private final Expression<ElkSubObjectPropertyOfAxiom> firstPropertySubsumptionPremise_;
+	private final Expression firstPropertySubsumptionPremise_;
 
-	private final Expression<ElkSubObjectPropertyOfAxiom> secondPropertySubsumptionPremise_;
+	private final Expression secondPropertySubsumptionPremise_;
 
 	private final ElkSubObjectPropertyOfAxiom chainAxiom_;
 	
-	private final Expression<?> conclusion_;
+	private final Expression conclusion_;
 
 	private ExistentialCompositionViaChain(
-			Expression<?> conclusion,
-			Expression<?> firstExPremise,
-			Expression<?> secondExPremise,
-			Expression<ElkSubObjectPropertyOfAxiom> propSubsumption,
-			Expression<ElkSubObjectPropertyOfAxiom> chainSubsumption,
+			Expression conclusion,
+			Expression firstExPremise,
+			Expression secondExPremise,
+			Expression propSubsumption,
+			Expression chainSubsumption,
 			ElkSubObjectPropertyOfAxiom chainAxiom) {
 		conclusion_ = conclusion;
 		firstExistentialPremise_ = firstExPremise;
@@ -55,20 +57,22 @@ public class ExistentialCompositionViaChain implements Inference {
 	}	
 	
 	// inference with a side condition and a single subsumption axiom with a simple existential on the right as the conclusion
-	public ExistentialCompositionViaChain(ElkSubClassOfAxiom firstExPremise,
-			Expression<?> secondExPremise,
+	public ExistentialCompositionViaChain(
 			ElkClassExpression existential,
+			ElkSubClassOfAxiom firstExPremise,
+			Expression secondExPremise,
 			ElkSubObjectPropertyOfAxiom propSubsumption,
-			Expression<ElkSubObjectPropertyOfAxiom> chainSubsumption,
-			ElkSubObjectPropertyOfAxiom chainAxiom, ElkObjectFactory factory) {
-		this(new SingleAxiomExpression<ElkSubClassOfAxiom>(factory.getSubClassOfAxiom(
+			Expression chainSubsumption,
+			ElkSubObjectPropertyOfAxiom chainAxiom, 
+			ElkObjectFactory factory) {
+		this(new SingleAxiomExpression(factory.getSubClassOfAxiom(
 				firstExPremise.getSubClassExpression(), 
 				factory.getObjectSomeValuesFrom(
 						ProofUtils.asObjectProperty(chainAxiom.getSuperObjectPropertyExpression()),
 						existential))),
-			new SingleAxiomExpression<ElkSubClassOfAxiom>(firstExPremise), 
+			new SingleAxiomExpression(firstExPremise), 
 			secondExPremise, 
-			new SingleAxiomExpression<ElkSubObjectPropertyOfAxiom>(propSubsumption), 
+			new SingleAxiomExpression(propSubsumption), 
 			chainSubsumption, 
 			chainAxiom);
 	}
@@ -76,22 +80,22 @@ public class ExistentialCompositionViaChain implements Inference {
 	// inference with a complex existential in the conclusion and no side condition
 	@SuppressWarnings("unchecked")
 	public ExistentialCompositionViaChain(
-			Expression<ElkAxiom> firstExPremise,
-			Expression<ElkAxiom> secondExPremise,
-			Expression<ElkSubObjectPropertyOfAxiom> propSubsumption,
-			Expression<ElkSubObjectPropertyOfAxiom> chainSubsumption
+			ElkSubClassOfAxiom firstExPremise,
+			Expression secondExPremise,
+			ElkSubObjectPropertyOfAxiom propSubsumption,
+			Expression chainSubsumption
 			) {
-		this(ProofUtils.mergeExpressions(firstExPremise, secondExPremise, propSubsumption, chainSubsumption),
-			firstExPremise, 
-			secondExPremise, 
-			propSubsumption, 
-			chainSubsumption, 
-			null);
+		this(ProofUtils.fromPremiseExplanations(
+				Arrays.asList(
+						Collections.singletonList(new Explanation(Collections.<ElkAxiom>singletonList(firstExPremise))),
+						secondExPremise.getExplanations(),
+						Collections.singletonList(new Explanation(Collections.<ElkAxiom>singletonList(propSubsumption))),
+						chainSubsumption.getExplanations())), 
+				new SingleAxiomExpression(firstExPremise),	secondExPremise, new SingleAxiomExpression(propSubsumption), chainSubsumption, null);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<? extends Expression<? extends ElkAxiom>> getPremises() {
+	public Collection<? extends Expression> getPremises() {
 		return Arrays.asList(firstExistentialPremise_, secondExistentialPremise_, firstPropertySubsumptionPremise_, secondPropertySubsumptionPremise_);
 	}
 	
@@ -106,7 +110,7 @@ public class ExistentialCompositionViaChain implements Inference {
 	}
 
 	@Override
-	public Expression<?> getConclusion() {
+	public Expression getConclusion() {
 		return conclusion_;
 	}
 

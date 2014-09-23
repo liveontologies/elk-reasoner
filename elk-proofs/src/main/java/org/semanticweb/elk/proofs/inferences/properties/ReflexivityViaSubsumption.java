@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -23,9 +22,9 @@ public class ReflexivityViaSubsumption extends AbstractPropertyInference {
 
 	private final ElkSubObjectPropertyOfAxiom sideCondition_;
 	
-	private final Expression<ElkObjectPropertyAxiom> premise_;
+	private final Expression premise_;
 	
-	public ReflexivityViaSubsumption(ElkSubObjectPropertyOfAxiom axiom, Expression<ElkObjectPropertyAxiom> premise, ElkObjectFactory factory) {
+	public ReflexivityViaSubsumption(ElkSubObjectPropertyOfAxiom axiom, Expression premise, ElkObjectFactory factory) {
 		super(factory.getReflexiveObjectPropertyAxiom(axiom.getSuperObjectPropertyExpression()));
 		
 		sideCondition_ = axiom;
@@ -33,7 +32,7 @@ public class ReflexivityViaSubsumption extends AbstractPropertyInference {
 	}
 	
 	@Override
-	public Collection<? extends Expression<? extends ElkObjectPropertyAxiom>> getPremises() {
+	public Collection<? extends Expression> getPremises() {
 		return Collections.singletonList(premise_);
 	}
 	

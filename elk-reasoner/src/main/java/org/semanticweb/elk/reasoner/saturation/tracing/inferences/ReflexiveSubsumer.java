@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
@@ -50,13 +51,13 @@ public class ReflexiveSubsumer<S extends IndexedObjectSomeValuesFrom> extends
 		super(existential);
 	}
 
-	public IndexedPropertyChain getRelation() {
+	public IndexedObjectProperty getRelation() {
 		return getExpression().getRelation();
 	}
 
 	// this is a premise of this inference
-	public ReflexivePropertyChain<?> getReflexivityPremise() {
-		return new ReflexivePropertyChain<IndexedPropertyChain>(getExpression().getRelation());
+	public ReflexivePropertyChain<IndexedObjectProperty> getReflexivityPremise() {
+		return new ReflexivePropertyChain<IndexedObjectProperty>(getExpression().getRelation());
 	}
 	
 	@Override

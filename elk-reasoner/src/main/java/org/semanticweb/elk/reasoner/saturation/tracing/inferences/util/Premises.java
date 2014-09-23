@@ -33,6 +33,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Premi
 import org.semanticweb.elk.util.collections.Condition;
 
 /**
+ * Utilities to work with premises of inferences.
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de

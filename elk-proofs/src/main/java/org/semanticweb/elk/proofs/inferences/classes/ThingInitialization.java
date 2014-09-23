@@ -45,7 +45,7 @@ public class ThingInitialization extends AbstractClassInference {
 	}
 	
 	@Override
-	public Collection<Expression<?>> getPremises() {
+	public Collection<Expression> getPremises() {
 		return Collections.emptyList();
 	}
 

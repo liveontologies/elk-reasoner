@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
@@ -24,39 +22,38 @@ import org.semanticweb.elk.proofs.sideconditions.SideCondition;
  */
 public class ChainSubsumption implements Inference {
 
-	private final Expression<ElkObjectPropertyAxiom> firstPremise_;
+	private final Expression firstPremise_;
 
-	private final Expression<ElkObjectPropertyAxiom> secondPremise_;
+	private final Expression secondPremise_;
 
-	private final Expression<? extends ElkObjectPropertyAxiom> conclusion_;
+	private final Expression conclusion_;
 
 	private final ElkSubObjectPropertyOfAxiom sideCondition_;
 
 	// one premise and a side condition
-	public ChainSubsumption(ElkSubObjectPropertyOfAxiom conclusion,
-			Expression<ElkObjectPropertyAxiom> premise,
+	public ChainSubsumption(
+			ElkSubObjectPropertyOfAxiom conclusion,
+			ElkSubObjectPropertyOfAxiom premise, 
 			ElkSubObjectPropertyOfAxiom sideCondition) {
-		firstPremise_ = premise;
+		firstPremise_ = new SingleAxiomExpression(premise);
 		secondPremise_ = null;
-		conclusion_ = new SingleAxiomExpression<ElkSubObjectPropertyOfAxiom>(
-				conclusion);
+		conclusion_ = new SingleAxiomExpression(conclusion);
 		sideCondition_ = sideCondition;
 	}
 
 	// two premises and no side condition
-	public ChainSubsumption(ElkSubObjectPropertyOfAxiom conclusion,
-			Expression<ElkObjectPropertyAxiom> first,
-			Expression<ElkObjectPropertyAxiom> second) {
+	public ChainSubsumption(
+			ElkSubObjectPropertyOfAxiom conclusion,
+			Expression first, 
+			ElkSubObjectPropertyOfAxiom second) {
 		firstPremise_ = first;
-		secondPremise_ = second;
-		conclusion_ = new SingleAxiomExpression<ElkSubObjectPropertyOfAxiom>(
-				conclusion);
+		secondPremise_ = new SingleAxiomExpression(second);
+		conclusion_ = new SingleAxiomExpression(conclusion);
 		sideCondition_ = null;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<? extends Expression<? extends ElkAxiom>> getPremises() {
+	public Collection<? extends Expression> getPremises() {
 		if (secondPremise_ == null) {
 			return Collections.singletonList(firstPremise_);
 		}
@@ -65,7 +62,7 @@ public class ChainSubsumption implements Inference {
 	}
 
 	@Override
-	public Expression<? extends ElkObjectPropertyAxiom> getConclusion() {
+	public Expression getConclusion() {
 		return conclusion_;
 	}
 

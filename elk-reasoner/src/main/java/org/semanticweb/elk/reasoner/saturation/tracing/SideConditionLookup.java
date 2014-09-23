@@ -55,6 +55,8 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
  * Given a {@link ClassInference} or a {@link ObjectPropertyInference} tries to
  * look up its side condition, if one exists, using the axiom binding.
  * 
+ * TODO make it a visitor over class and object property inferences,
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de

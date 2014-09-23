@@ -3,8 +3,8 @@
  */
 package org.semanticweb.elk.proofs.expressions;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
@@ -13,25 +13,21 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class SingleAxiomExpression<E extends ElkAxiom> implements Expression<E> {
+public class SingleAxiomExpression implements Expression {
 
-	private final E axiom_;
+	private final Explanation singleton_;
 	
-	public SingleAxiomExpression(E ax) {
-		axiom_ = ax;
+	public SingleAxiomExpression(ElkAxiom ax) {
+		singleton_ = new Explanation(Collections.singletonList(ax));
 	}
 	
-	public E getAxiom() {
-		return axiom_;
+	public ElkAxiom getAxiom() {
+		return singleton_.getAxioms().iterator().next();
 	}
 	
-	private Collection<E> asCollection() {
-		return Collections.singleton(axiom_);
-	}
-
 	@Override
-	public Collection<E> getAxioms() {
-		return asCollection();
+	public List<Explanation> getExplanations() {
+		return Collections.singletonList(singleton_);
 	}
 	
 }

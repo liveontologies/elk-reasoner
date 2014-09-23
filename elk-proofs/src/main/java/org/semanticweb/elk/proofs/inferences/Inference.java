@@ -27,7 +27,6 @@ package org.semanticweb.elk.proofs.inferences;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
@@ -42,9 +41,9 @@ import org.semanticweb.elk.proofs.sideconditions.SideCondition;
  */
 public interface Inference {
 
-	public Collection<? extends Expression<? extends ElkAxiom>> getPremises();
+	public Collection<? extends Expression> getPremises();
 
-	public Expression<?> getConclusion();
+	public Expression getConclusion();
 
 	public SideCondition getSideCondition();
 

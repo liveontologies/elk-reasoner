@@ -6,7 +6,7 @@ package org.semanticweb.elk.proofs.inferences.properties;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
+import org.semanticweb.elk.proofs.expressions.Explanation;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -20,23 +20,22 @@ import org.semanticweb.elk.proofs.utils.ProofUtils;
  */
 public class ReflexiveComposition implements Inference {
 
-	private final Expression<ElkObjectPropertyAxiom> firstReflexive_;
+	private final Expression firstReflexive_;
 	
-	private final Expression<ElkObjectPropertyAxiom> secondReflexive_;
+	private final Expression secondReflexive_;
 	
-	private final Expression<ElkObjectPropertyAxiom> conclusion_;
+	private final Expression conclusion_;
 	
 	@SuppressWarnings("unchecked")
-	public ReflexiveComposition(Expression<ElkObjectPropertyAxiom> firstRefl, Expression<ElkObjectPropertyAxiom> secondRefl) {
-		conclusion_ = ProofUtils.mergeExpressions(firstRefl, secondRefl);
+	public ReflexiveComposition(Expression firstRefl, Expression secondRefl) {
+		conclusion_ = ProofUtils.fromPremiseExplanations(Arrays.<Iterable<Explanation>>asList(firstRefl.getExplanations(), secondRefl.getExplanations()));
 		
 		firstReflexive_ = firstRefl;
 		secondReflexive_ = secondRefl;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<? extends Expression<ElkObjectPropertyAxiom>> getPremises() {
+	public Collection<? extends Expression> getPremises() {
 		return Arrays.asList(firstReflexive_, secondReflexive_);
 	}
 	
@@ -46,7 +45,7 @@ public class ReflexiveComposition implements Inference {
 	}
 
 	@Override
-	public Expression<ElkObjectPropertyAxiom> getConclusion() {
+	public Expression getConclusion() {
 		return conclusion_;
 	}
 
