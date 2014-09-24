@@ -104,6 +104,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Top
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.TracingUtils;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Transformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Maps one or more lower-level inferences to a single {@link Inference}. 
@@ -114,6 +116,8 @@ import org.semanticweb.elk.util.collections.Operations.Transformation;
  *         pavel.klinov@uni-ulm.de
  */
 public class SingleInferenceMapper {
+	
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(SingleInferenceMapper.class);
 	
 	private final TraceStore.Reader traceReader_;
 	
@@ -129,11 +133,23 @@ public class SingleInferenceMapper {
 	
 	public Inference map(ClassInference inference,
 			IndexedClassExpression whereStored) {
-		return inference.acceptTraced(new MappingVisitor(), whereStored);
+		LOGGER_.trace("Mapping {} in {}", inference, whereStored);
+		
+		Inference userInf = inference.acceptTraced(new MappingVisitor(), whereStored);
+		
+		LOGGER_.trace("Mapped {} in {} => {}", inference, whereStored, userInf);
+		
+		return userInf;
 	}
 
 	public Inference map(ObjectPropertyInference inference) {
-		return inference.acceptTraced(new MappingVisitor(), null);
+		LOGGER_.trace("Mapping {}", inference);
+		
+		Inference userInf = inference.acceptTraced(new MappingVisitor(), null);
+		
+		LOGGER_.trace("Mapped {} => {}", inference, userInf);
+		
+		return userInf;
 	}
 
 	/**
@@ -149,7 +165,11 @@ public class SingleInferenceMapper {
 			@Override
 			public Iterable<Explanation> transform(ClassInference inf) {
 				// recursion here
-				Inference userInf = map(inf, root); 
+				Inference userInf = map(inf, root);
+				
+				if (userInf == null) {
+					throw new IllegalStateException(String.format("Mapping failed for %s in %s", inf, root));
+				}
 				
 				return userInf.getConclusion().getExplanations();
 			}
@@ -173,12 +193,17 @@ public class SingleInferenceMapper {
 				// recursion here
 				Inference userInf = map(inf); 
 				
-				return userInf.getConclusion().getExplanations();
+				return userInf == null ? noExplanations() : userInf.getConclusion().getExplanations();
 			}
 			
 		});
 		// finally, union explanations for each conclusion
 		return ProofUtils.fromInferenceConclusions(explanations);
+	}
+	
+	// for initialization inferences
+	private Iterable<Explanation> noExplanations() {
+		return Collections.singletonList(new Explanation(Collections.<ElkAxiom>emptyList()));
 	}
 	
 	/**
@@ -279,10 +304,10 @@ public class SingleInferenceMapper {
 			SubObjectProperty leftPropertyPremise = inference.getLeftSubObjectProperty();
 			SubPropertyChain<?,?> rightChainPremise = inference.getRightSubObjectPropertyChain();			
 			ElkObjectProperty r = Deindexer.deindex(leftPropertyPremise.getSubPropertyChain());
-			ElkClassExpression c = Deindexer.deindex(inference.getSource());
-			ElkClassExpression d = Deindexer.deindex(whereStored);
+			ElkClassExpression c = Deindexer.deindex(inference.getBackwardLink().getSource());
+			ElkClassExpression d = Deindexer.deindex(inference.getInferenceContextRoot(whereStored));
 			ElkClassExpression rSomeD = factory_.getObjectSomeValuesFrom(r, d);
-			ElkClassExpression e = Deindexer.deindex(whereStored);
+			ElkClassExpression e = Deindexer.deindex(inference.getForwardLink().getTarget());
 			ElkObjectProperty h = Deindexer.deindex(inference.getRelation());
 			ElkClassExpression hSomeE = factory_.getObjectSomeValuesFrom(h, e);
 			// the first premise is a simple axiom with an existential on the right
@@ -306,7 +331,7 @@ public class SingleInferenceMapper {
 				ElkObjectProperty ssPrime = Deindexer.deindex((IndexedObjectProperty) rightChainPremise.getSuperPropertyChain());
 				ElkClassExpression ssSomeE = factory_.getObjectSomeValuesFrom(ss, e);
 				Expression secondExPremise = new SingleAxiomExpression(factory_.getSubClassOfAxiom(d, ssSomeE));
-				Expression chainSubsumption = new SingleAxiomExpression(factory_.getSubObjectPropertyOfAxiom(ss, ssPrime));
+				ElkSubObjectPropertyOfAxiom chainSubsumption = factory_.getSubObjectPropertyOfAxiom(ss, ssPrime);
 				
 				return new ExistentialCompositionViaChain(hSomeE, firstExPremise, secondExPremise, propSubsumption, chainSubsumption, chainAxiom, factory_);
 			}
@@ -318,9 +343,9 @@ public class SingleInferenceMapper {
 			SubPropertyChain<?,?> rightChainPremise = inference.getRightSubObjectPropertyChain();			
 			ElkObjectProperty r = Deindexer.deindex(leftPropertyPremise.getSubPropertyChain());
 			ElkClassExpression c = Deindexer.deindex(whereStored);
-			ElkClassExpression d = Deindexer.deindex(inference.getTarget());
+			ElkClassExpression d = Deindexer.deindex(inference.getInferenceContextRoot(whereStored));
 			ElkClassExpression rSomeD = factory_.getObjectSomeValuesFrom(r, d);
-			ElkClassExpression e = Deindexer.deindex(whereStored);
+			ElkClassExpression e = Deindexer.deindex(inference.getTarget());
 			// the first premise is a simple axiom with an existential on the right
 			ElkSubClassOfAxiom firstExPremise = factory_.getSubClassOfAxiom(c, rSomeD);
 			ElkObjectProperty rPrime = Deindexer.deindex(leftPropertyPremise.getSuperPropertyChain());
@@ -339,8 +364,8 @@ public class SingleInferenceMapper {
 				ElkObjectProperty ss = Deindexer.deindex((IndexedObjectProperty) rightChainPremise.getSubPropertyChain());
 				ElkObjectProperty ssPrime = Deindexer.deindex((IndexedObjectProperty) rightChainPremise.getSuperPropertyChain());
 				ElkClassExpression ssSomeE = factory_.getObjectSomeValuesFrom(ss, e);
-				Expression secondExPremise = new SingleAxiomExpression(factory_.getSubClassOfAxiom(d, ssSomeE));
-				Expression chainSubsumption = new SingleAxiomExpression(factory_.getSubObjectPropertyOfAxiom(ss, ssPrime));
+				ElkSubClassOfAxiom secondExPremise = factory_.getSubClassOfAxiom(d, ssSomeE);
+				ElkSubObjectPropertyOfAxiom chainSubsumption = factory_.getSubObjectPropertyOfAxiom(ss, ssPrime);
 				
 				return new ExistentialCompositionViaChain(firstExPremise, secondExPremise, propSubsumption, chainSubsumption);				
 			}

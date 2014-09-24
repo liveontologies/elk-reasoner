@@ -32,6 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.Printer;
 
 /**
  * @author Pavel Klinov
@@ -60,4 +61,8 @@ public class ConjunctionDecomposition extends
 		return visitor.visit(this, input);
 	}
 
+	@Override
+	public String toString() {
+		return Printer.print(this);
+	}
 }

@@ -3,6 +3,7 @@
  */
 package org.semanticweb.elk.proofs.expressions;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.semanticweb.elk.proofs.utils.ProofUtils;
@@ -30,13 +31,8 @@ public class CartesianExpression implements Expression {
 	
 	@Override
 	public Iterable<Explanation> getExplanations() {
-		if (explanations_ == null) {
-			// expanding the cartesian
-			// TODO lazy eval here?
-			explanations_ = ProofUtils.fromPremiseExplanations(explanationList_);
-		}
-		
-		return explanations_;
+		// the Cartesian product won't be computed until starting iteration
+		return new CartesianIterable();
 	}
 
 	@Override
@@ -55,4 +51,22 @@ public class CartesianExpression implements Expression {
 		})) + ")";
 	}
 
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	private class CartesianIterable implements Iterable<Explanation> {
+
+		@Override
+		public Iterator<Explanation> iterator() {
+			if (explanations_ == null) {
+				explanations_ = ProofUtils.fromPremiseExplanations(explanationList_);
+			}
+			
+			return explanations_.iterator();
+		}
+		
+	}
 }

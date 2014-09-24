@@ -37,6 +37,8 @@ public class AxiomPresenceCondition<E extends ElkAxiom> implements SideCondition
 	private final E axiom_;
 	
 	public AxiomPresenceCondition(E ax) {
+		assert ax != null : "Axiom should not be null";
+		
 		axiom_ = ax;
 	}
 	

@@ -182,7 +182,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 			// user visitor
 			next.inference.acceptTraced(inferenceVisitor, next.contextRoot);
 			// visiting premises
-			next.inference.acceptTraced(premiseVisitor, next.contextRoot);
+			next.inference.acceptTraced(premiseVisitor, next.inference.getInferenceContextRoot(next.contextRoot));
 		}
 		
 		// finally, unwind all property traces
@@ -207,12 +207,11 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 					protected Void defaultTracedVisit(ClassInference inference,
 							IndexedClassExpression v) {
 						if (!seenInferences.contains(inference)) {
-							IndexedClassExpression inferenceContextRoot = inference
-									.getInferenceContextRoot(root);
+							//IndexedClassExpression inferenceContextRoot = inference.getInferenceContextRoot(root);
 
 							seenInferences.add(inference);
-							classInferencesToDo_.addFirst(new InferenceWrapper(inference,
-									inferenceContextRoot));
+							//classInferencesToDo_.addFirst(new InferenceWrapper(inference, inferenceContextRoot));
+							classInferencesToDo_.addFirst(new InferenceWrapper(inference, root));
 						}
 
 						traced.increment();

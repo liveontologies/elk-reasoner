@@ -57,6 +57,11 @@ public class Explanation {
 
 	@Override
 	public String toString() {
+		if (!axioms_.iterator().hasNext()) {
+			// don't render empty explanations
+			return "";
+		}
+		
 		return "{" + Operations.toString(Operations.map(axioms_, new Transformation<ElkAxiom, String>() {
 
 			@Override

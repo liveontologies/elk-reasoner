@@ -32,6 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.Printer;
 
 /**
  * @author Pavel Klinov
@@ -51,8 +52,11 @@ public class ThingInitialization extends AbstractClassInference {
 
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
-		return null;
-		//return visitor.visit(this);
+		return visitor.visit(this, input);
 	}
 
+	@Override
+	public String toString() {
+		return Printer.print(this);
+	}
 }

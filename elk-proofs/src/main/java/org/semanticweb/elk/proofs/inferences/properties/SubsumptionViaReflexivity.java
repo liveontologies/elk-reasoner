@@ -30,6 +30,7 @@ import java.util.Collections;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.Printer;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
 /**
@@ -68,4 +69,8 @@ public class SubsumptionViaReflexivity implements Inference  {
 		return conclusion_;
 	}
 
+	@Override
+	public String toString() {
+		return Printer.print(this);
+	}
 }

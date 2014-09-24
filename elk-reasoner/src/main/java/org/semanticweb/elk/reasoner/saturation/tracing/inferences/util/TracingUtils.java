@@ -8,8 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
@@ -53,5 +56,17 @@ public class TracingUtils {
 		});
 		
 		return inferences;
-	}	
+	}
+	
+	public static Conclusion getConclusionToTrace(Context context, IndexedClassExpression subsumer) {
+		if (context != null) {
+			if (context.containsConclusion(ContradictionImpl.getInstance())) {
+				return ContradictionImpl.getInstance();
+			}
+			
+			return new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer);
+		}
+		
+		throw new IllegalArgumentException("Context may not be null");
+	}		
 }

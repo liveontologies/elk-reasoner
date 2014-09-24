@@ -683,11 +683,16 @@ public class Operations {
 		boolean first = true;
 		
 		for (T elem : iterable) {
-			if (!first) {
+			String elemStr = elem.toString();
+			
+			if (!first && !elemStr.isEmpty()) {
 				builder.append(' ');
 			}
 			
-			builder.append(elem.toString());
+			if (!elemStr.isEmpty()) {
+				builder.append(elemStr);
+			}
+
 			first = false;
 		}
 		

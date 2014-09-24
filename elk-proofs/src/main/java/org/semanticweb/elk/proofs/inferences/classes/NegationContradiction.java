@@ -33,6 +33,7 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.Printer;
 
 /**
  * @author Pavel Klinov
@@ -63,4 +64,8 @@ public class NegationContradiction extends
 		return visitor.visit(this, input);
 	}
 
+	@Override
+	public String toString() {
+		return Printer.print(this);
+	}
 }

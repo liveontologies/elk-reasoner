@@ -33,6 +33,7 @@ import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.Printer;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
 /**
@@ -76,4 +77,8 @@ public class ReflexiveComposition implements Inference {
 		return null;
 	}
 
+	@Override
+	public String toString() {
+		return Printer.print(this);
+	}
 }

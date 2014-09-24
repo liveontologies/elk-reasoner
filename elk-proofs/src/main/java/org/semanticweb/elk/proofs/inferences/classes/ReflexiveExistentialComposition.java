@@ -39,6 +39,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.Printer;
 
 /**
  * @author Pavel Klinov
@@ -92,4 +93,8 @@ public class ReflexiveExistentialComposition extends
 		return Arrays.asList(reflexPremise_, subsumerPremise_, propertyPremise_);
 	}
 
+	@Override
+	public String toString() {
+		return Printer.print(this);
+	}
 }

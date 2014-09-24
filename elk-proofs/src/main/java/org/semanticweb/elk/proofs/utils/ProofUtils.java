@@ -28,7 +28,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
@@ -36,6 +38,15 @@ import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.Explanation;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.MultiAxiomExpression;
+import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.mapping.InferenceMapper;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.TracingUtils;
+import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
+import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Transformation;
 
@@ -68,7 +79,7 @@ public class ProofUtils {
 	
 	// merging a list of expressions (represented as iterables over their explanations) into one, computing the n-ary cartesian product
 	public static Iterable<Explanation> fromPremiseExplanations(List<Iterable<Explanation>> explanations) {
-		// TODO not optimized
+		// combining the lists of premise explanations
 		List<Iterable<Explanation>> cartesian = cartesian(explanations);
 		// merging iterables of explanations into explanations
 		List<Explanation> merged = new ArrayList<Explanation>(cartesian.size());
@@ -90,7 +101,7 @@ public class ProofUtils {
 		return merged;
 	}
 	
-	protected static List<Iterable<Explanation>> cartesian(List<Iterable<Explanation>> lists) {
+	private static List<Iterable<Explanation>> cartesian(List<Iterable<Explanation>> lists) {
 		List<Iterable<Explanation>> resultLists = new ArrayList<Iterable<Explanation>>();
 
 		if (lists.size() == 0) {
@@ -109,4 +120,23 @@ public class ProofUtils {
 
 		return resultLists;
 	}
+	
+	// explainSubsumption() should be called first
+	public static void visitProofs(AbstractReasonerState reasoner,
+			ElkClassExpression subsumee, ElkClassExpression subsumer,
+			InferenceVisitor<?, ?> visitor) throws ElkException {
+		final IndexedClassExpression sub = ReasonerStateAccessor.transform(
+				reasoner, subsumee);
+		Context cxt = ReasonerStateAccessor.getContext(reasoner, sub);
+		Conclusion conclusion = TracingUtils.getConclusionToTrace(cxt,
+				ReasonerStateAccessor.transform(reasoner, subsumer));
+
+		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
+		InferenceMapper mapper = new InferenceMapper(traceState.getTraceStore()
+				.getReader());
+
+		mapper.map(cxt.getRoot(), conclusion, visitor);
+	}
+	
+
 }

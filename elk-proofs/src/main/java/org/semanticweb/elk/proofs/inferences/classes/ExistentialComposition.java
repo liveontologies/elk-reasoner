@@ -32,9 +32,11 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.proofs.expressions.EmptyExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.Printer;
 
 /**
  * @author Pavel Klinov
@@ -60,8 +62,22 @@ public class ExistentialComposition extends AbstractClassInference {
 
 		existentialPremise_ = new SingleAxiomExpression(exPremise);
 		subsumerPremise_ = new SingleAxiomExpression(subPremise);
-		propertyPremise_ = new SingleAxiomExpression(propPremise);
+		propertyPremise_ = getPropertySubsumption(propPremise);
 	}
+	
+	static Expression getPropertySubsumption(ElkSubObjectPropertyOfAxiom ax) {
+		/*if (ax.getSubObjectPropertyExpression() != ax.getSuperObjectPropertyExpression()) {
+			return new SingleAxiomExpression(ax);
+		}
+		else {
+			// ignore trivial property subsumptions. we can't represent trivial
+			// chain initializations so punt on property initializations as well
+			// for consistency
+			return new EmptyExpression();
+		}*/
+		
+		return new SingleAxiomExpression(ax);
+	}	
 
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
@@ -74,4 +90,8 @@ public class ExistentialComposition extends AbstractClassInference {
 				propertyPremise_);
 	}
 
+	@Override
+	public String toString() {
+		return Printer.print(this);
+	}
 }

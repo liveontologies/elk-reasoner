@@ -20,6 +20,7 @@ import org.semanticweb.elk.proofs.inferences.properties.ReflexiveComposition;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexivityViaSubsumption;
 import org.semanticweb.elk.proofs.inferences.properties.SubsumptionViaReflexivity;
 import org.semanticweb.elk.proofs.inferences.properties.ToldReflexivity;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * Prints inferences
@@ -37,22 +38,24 @@ public class Printer {
 	private static class PrintingVisitor implements InferenceVisitor<Void, String> {
 
 		private String defaultVisit(Inference inf, String rulePrefix) {
+			String premises = Operations.toString(inf.getPremises());
+			
 			if (inf.getSideCondition() == null) {
-				return String.format("%s( %s ) |- %s", rulePrefix, inf.getPremises(), inf.getConclusion());
+				return String.format("%s( %s ) |- %s", rulePrefix, premises, inf.getConclusion());
 			}
 			else {
-				return String.format("%s( %s ) : %s |- %s", rulePrefix, inf.getPremises(), inf.getSideCondition(), inf.getConclusion());
+				return String.format("%s( %s ) : %s |- %s", rulePrefix, premises, inf.getSideCondition(), inf.getConclusion());
 			}
 		}
 		
 		@Override
 		public String visit(ClassInitialization inf, Void input) {
-			return String.format("Init( %s )", inf.getConclusion());
+			return String.format("R_init( %s )", inf.getConclusion());
 		}
 
 		@Override
 		public String visit(ThingInitialization inf, Void input) {
-			return String.format("Init( %s )", inf.getConclusion());
+			return String.format("R_init( %s )", inf.getConclusion());
 		}
 
 		@Override

@@ -33,6 +33,7 @@ import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.Printer;
 import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
@@ -99,4 +100,8 @@ public class ChainSubsumption implements Inference {
 		return visitor.visit(this, input);
 	}
 
+	@Override
+	public String toString() {
+		return Printer.print(this);
+	}
 }

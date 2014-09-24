@@ -49,7 +49,11 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Abstr
  */
 public class InferenceMapper {
 
-	private TraceStore.Reader traceReader_;
+	private final TraceStore.Reader traceReader_;
+	
+	public InferenceMapper(TraceStore.Reader reader) {
+		traceReader_ = reader;
+	}
 	
 	public void map(final IndexedClassExpression cxt, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
 		final SingleInferenceMapper singleMapper = new SingleInferenceMapper(traceReader_);

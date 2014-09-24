@@ -35,6 +35,7 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.Printer;
 import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
@@ -75,4 +76,8 @@ public class InconsistentDisjointness extends AbstractClassInference {
 		return visitor.visit(this, input);
 	}
 
+	@Override
+	public String toString() {
+		return Printer.print(this);
+	}
 }
