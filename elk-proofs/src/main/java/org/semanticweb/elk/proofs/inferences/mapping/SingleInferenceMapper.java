@@ -2,6 +2,27 @@
  * 
  */
 package org.semanticweb.elk.proofs.inferences.mapping;
+/*
+ * #%L
+ * ELK Proofs Package
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
 import java.util.Collections;
 
@@ -85,7 +106,8 @@ import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.Operations.Transformation;
 
 /**
- * Produces a single {@link Inference} mapping one or more lower-level inferences.
+ * Maps one or more lower-level inferences to a single {@link Inference}. 
+ * It returns {@code null} if the low-level inference does not correspond to any {@link Inference}. 
  * 
  * @author Pavel Klinov
  * 
@@ -526,7 +548,7 @@ public class SingleInferenceMapper {
 			ElkObjectProperty r = inference.getLeftReflexiveProperty().getPropertyChain().getElkObjectProperty();
 			Expression second = inference.getRightReflexivePropertyChain().getPropertyChain().accept(reflexiveChainExpressionCreator(inference.getRightReflexivePropertyChain()));
 			
-			return new ReflexiveComposition(new SingleAxiomExpression(factory_.getReflexiveObjectPropertyAxiom(r)), second);
+			return new ReflexiveComposition(factory_.getReflexiveObjectPropertyAxiom(r), second);
 		}
 
 		@Override

@@ -1,7 +1,9 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions;
+package org.semanticweb.elk.proofs.inferences.mapping;
+
+import org.junit.Test;
 /*
  * #%L
  * ELK Proofs Package
@@ -24,31 +26,21 @@ package org.semanticweb.elk.proofs.expressions;
  * #L%
  */
 
-import java.util.Collections;
-
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-
 /**
- * A collection of axioms which entailes a particular conclusion which may not
- * be representable as an axiom.
- * 
  * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public class Explanation {
-
-	private final Iterable<ElkAxiom> axioms_;
-
-	public Explanation(Iterable<ElkAxiom> axioms) {
-		axioms_ = axioms;
+public class InferenceMapperTest {
+	
+	@Test
+	public void testSimpleChainMapping() {
+		
 	}
 	
-	public Explanation(ElkAxiom axiom) {
-		axioms_ = Collections.singletonList(axiom);
+	@Test
+	public void testExistentialMapping() {
+		
 	}
 
-	public Iterable<ElkAxiom> getAxioms() {
-		return axioms_;
-	}
 }
