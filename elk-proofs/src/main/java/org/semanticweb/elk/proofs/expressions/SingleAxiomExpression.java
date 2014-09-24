@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 
 /**
  * @author Pavel Klinov
@@ -49,6 +50,11 @@ public class SingleAxiomExpression implements Expression {
 	@Override
 	public List<Explanation> getExplanations() {
 		return Collections.singletonList(singleton_);
+	}
+
+	@Override
+	public String toString() {
+		return OwlFunctionalStylePrinter.toString(singleton_.getAxioms().iterator().next());
 	}
 	
 }

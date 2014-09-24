@@ -2,6 +2,8 @@
  * 
  */
 package org.semanticweb.elk.proofs.expressions;
+
+import org.semanticweb.elk.util.collections.Operations;
 /*
  * #%L
  * ELK Proofs Package
@@ -34,7 +36,6 @@ public class MultiAxiomExpression implements Expression {
 
 	private final Iterable<Explanation> explanations_;
 	
-	// single explanation
 	public MultiAxiomExpression(Iterable<Explanation> expl) {
 		explanations_ = expl;
 	}
@@ -42,6 +43,11 @@ public class MultiAxiomExpression implements Expression {
 	@Override
 	public Iterable<Explanation> getExplanations() {
 		return explanations_;
+	}
+	
+	@Override
+	public String toString() {
+		return Operations.toString(explanations_);
 	}
 
 }

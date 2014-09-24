@@ -36,106 +36,112 @@ public class Printer {
 	
 	private static class PrintingVisitor implements InferenceVisitor<Void, String> {
 
+		private String defaultVisit(Inference inf, String rulePrefix) {
+			if (inf.getSideCondition() == null) {
+				return String.format("%s( %s ) |- %s", rulePrefix, inf.getPremises(), inf.getConclusion());
+			}
+			else {
+				return String.format("%s( %s ) : %s |- %s", rulePrefix, inf.getPremises(), inf.getSideCondition(), inf.getConclusion());
+			}
+		}
+		
 		@Override
 		public String visit(ClassInitialization inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			return String.format("Init( %s )", inf.getConclusion());
 		}
 
 		@Override
 		public String visit(ThingInitialization inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			return String.format("Init( %s )", inf.getConclusion());
 		}
 
 		@Override
 		public String visit(ClassSubsumption inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			return defaultVisit(inf, "R_sub");
 		}
 
 		@Override
 		public String visit(ConjunctionComposition inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return defaultVisit(inf, "R_and+");
 		}
 
 		@Override
 		public String visit(ConjunctionDecomposition inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return defaultVisit(inf, "R_and-");
 		}
 
 		@Override
 		public String visit(DisjointnessContradiction inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return defaultVisit(inf, "R_disj_bot");
 		}
 
 		@Override
 		public String visit(DisjunctionComposition inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return defaultVisit(inf, "R_or+");
 		}
 
 		@Override
 		public String visit(ExistentialComposition inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return defaultVisit(inf, "R_exists+");
 		}
 
 		@Override
 		public String visit(ExistentialCompositionViaChain inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return defaultVisit(inf, "R_chain");
 		}
 
 		@Override
 		public String visit(InconsistentDisjointness inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return defaultVisit(inf, "R_disj_inc");
 		}
 
 		@Override
 		public String visit(NegationContradiction inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return defaultVisit(inf, "R_neg_bot");
 		}
 
 		@Override
 		public String visit(ReflexiveExistentialComposition inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return defaultVisit(inf, "R_exists_reflex");
 		}
 
 		@Override
 		public String visit(ChainSubsumption inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return defaultVisit(inf, "R_role_sub");
 		}
 
 		@Override
 		public String visit(ReflexiveComposition inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return defaultVisit(inf, "R_reflex_chain");
 		}
 
 		@Override
 		public String visit(ReflexivityViaSubsumption inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return defaultVisit(inf, "R_reflex_via_sub");
 		}
 
 		@Override
 		public String visit(SubsumptionViaReflexivity inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return defaultVisit(inf, "R_sub_via_reflex");
 		}
 
 		@Override
 		public String visit(ToldReflexivity inf, Void input) {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return defaultVisit(inf, "R_reflex");
 		}
 		
 	}

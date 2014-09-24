@@ -25,6 +25,7 @@ package org.semanticweb.elk.proofs.sideconditions;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 
 /**
  * @author Pavel Klinov
@@ -42,4 +43,10 @@ public class AxiomPresenceCondition<E extends ElkAxiom> implements SideCondition
 	public E getAxiom() {
 		return axiom_;
 	}
+
+	@Override
+	public String toString() {
+		return OwlFunctionalStylePrinter.toString(axiom_);
+	}
+	
 }

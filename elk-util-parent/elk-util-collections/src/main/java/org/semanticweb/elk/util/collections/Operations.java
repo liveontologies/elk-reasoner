@@ -649,7 +649,7 @@ public class Operations {
 	}
 	
 	/**
-	 * A simple second-order map function
+	 * A simple second-order map function for sets
 	 * 
 	 * @param input
 	 * @param functor
@@ -676,5 +676,21 @@ public class Operations {
 			}
 			
 		};
+	}
+	
+	public static <T> String toString(Iterable<T> iterable) {
+		StringBuilder builder = new StringBuilder();
+		boolean first = true;
+		
+		for (T elem : iterable) {
+			if (!first) {
+				builder.append(' ');
+			}
+			
+			builder.append(elem.toString());
+			first = false;
+		}
+		
+		return builder.toString();
 	}
 }

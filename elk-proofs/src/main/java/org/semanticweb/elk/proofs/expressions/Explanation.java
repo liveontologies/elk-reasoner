@@ -27,6 +27,9 @@ package org.semanticweb.elk.proofs.expressions;
 import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.Operations.Transformation;
 
 /**
  * A collection of axioms which entailes a particular conclusion which may not
@@ -51,4 +54,17 @@ public class Explanation {
 	public Iterable<ElkAxiom> getAxioms() {
 		return axioms_;
 	}
+
+	@Override
+	public String toString() {
+		return "{" + Operations.toString(Operations.map(axioms_, new Transformation<ElkAxiom, String>() {
+
+			@Override
+			public String transform(ElkAxiom element) {
+				return OwlFunctionalStylePrinter.toString(element);
+			}
+			
+		})) + "}";
+	}
+	
 }
