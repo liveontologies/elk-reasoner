@@ -27,11 +27,15 @@ package org.semanticweb.elk.proofs.inferences.properties;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
+import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.Printer;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
  * @author Pavel Klinov
@@ -44,9 +48,14 @@ public class SubsumptionViaReflexivity implements Inference  {
 	
 	private final Expression conclusion_;
 	
-	public SubsumptionViaReflexivity(Expression premise, Expression conclusion) {
+	public SubsumptionViaReflexivity(ElkSubPropertyChainOfLemma conclusion, ElkReflexiveObjectPropertyAxiom premise) {
+		premise_ = new AxiomExpression(premise);
+		conclusion_ = new LemmaExpression(conclusion);
+	}
+	
+	public SubsumptionViaReflexivity(ElkSubPropertyChainOfLemma conclusion, Expression premise) {
 		premise_ = premise;
-		conclusion_ = conclusion;
+		conclusion_ = new LemmaExpression(conclusion);
 	}
 	
 	@Override
@@ -71,6 +80,6 @@ public class SubsumptionViaReflexivity implements Inference  {
 
 	@Override
 	public String toString() {
-		return Printer.print(this);
+		return InferencePrinter.print(this);
 	}
 }

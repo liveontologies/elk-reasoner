@@ -30,11 +30,11 @@ import java.util.Collections;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.Printer;
 import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
  * @author Pavel Klinov
@@ -51,7 +51,7 @@ public class ToldReflexivity extends AbstractPropertyInference {
 		super(axiom);
 		
 		sideCondition_ = axiom;
-		premise_ = new SingleAxiomExpression(factory.getSubObjectPropertyOfAxiom(axiom.getProperty(), axiom.getProperty()));
+		premise_ = new AxiomExpression(factory.getSubObjectPropertyOfAxiom(axiom.getProperty(), axiom.getProperty()));
 	}
 	
 	@Override
@@ -72,6 +72,6 @@ public class ToldReflexivity extends AbstractPropertyInference {
 
 	@Override
 	public String toString() {
-		return Printer.print(this);
+		return InferencePrinter.print(this);
 	}
 }

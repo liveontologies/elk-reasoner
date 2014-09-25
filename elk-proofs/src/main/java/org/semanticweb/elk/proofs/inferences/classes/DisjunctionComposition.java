@@ -31,9 +31,9 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.Printer;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
  * @author Pavel Klinov
@@ -48,7 +48,7 @@ public class DisjunctionComposition extends
 	public DisjunctionComposition(ElkClassExpression sub, ElkObjectUnionOf sup, ElkClassExpression premise, ElkObjectFactory factory) {
 		super(factory.getSubClassOfAxiom(sub, sup));
 
-		premise_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, premise));
+		premise_ = new AxiomExpression(factory.getSubClassOfAxiom(sub, premise));
 	}
 
 	@Override
@@ -63,6 +63,6 @@ public class DisjunctionComposition extends
 
 	@Override
 	public String toString() {
-		return Printer.print(this);
+		return InferencePrinter.print(this);
 	}
 }

@@ -56,7 +56,7 @@ public class InferenceMapper {
 	}
 	
 	public void map(final IndexedClassExpression cxt, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
-		final SingleInferenceMapper singleMapper = new SingleInferenceMapper(traceReader_);
+		final SingleInferenceMapper singleMapper = new SingleInferenceMapper();
 		TraceUnwinder unwinder = new RecursiveTraceUnwinder(traceReader_);
 		
 		unwinder.accept(cxt, conclusion, 

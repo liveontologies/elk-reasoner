@@ -31,11 +31,11 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.Printer;
 import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
  * @author Pavel Klinov
@@ -55,7 +55,7 @@ public class ClassSubsumption extends AbstractClassInference {
 			ElkClassExpression premise, ElkObjectFactory factory) {
 		super(factory.getSubClassOfAxiom(sub, sup));
 
-		premise_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, premise));
+		premise_ = new AxiomExpression(factory.getSubClassOfAxiom(sub, premise));
 		sideCondition_ = new AxiomPresenceCondition<ElkAxiom>(sideCondition);
 	}
 
@@ -76,6 +76,6 @@ public class ClassSubsumption extends AbstractClassInference {
 
 	@Override
 	public String toString() {
-		return Printer.print(this);
+		return InferencePrinter.print(this);
 	}
 }

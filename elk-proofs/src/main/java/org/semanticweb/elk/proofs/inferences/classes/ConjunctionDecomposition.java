@@ -30,9 +30,9 @@ import java.util.Collections;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.Printer;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
  * @author Pavel Klinov
@@ -48,7 +48,7 @@ public class ConjunctionDecomposition extends
 	public ConjunctionDecomposition(ElkClassExpression sub, ElkClassExpression sup, ElkClassExpression otherConjunct, ElkObjectFactory factory) {
 		super(factory.getSubClassOfAxiom(sub, sup));
 
-		premise_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(sup, otherConjunct)));
+		premise_ = new AxiomExpression(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(sup, otherConjunct)));
 	}
 
 	@Override
@@ -63,6 +63,6 @@ public class ConjunctionDecomposition extends
 
 	@Override
 	public String toString() {
-		return Printer.print(this);
+		return InferencePrinter.print(this);
 	}
 }

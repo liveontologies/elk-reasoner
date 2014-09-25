@@ -31,7 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.proofs.inferences.Printer;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 import org.semanticweb.elk.proofs.utils.ProofUtils;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
@@ -59,7 +59,7 @@ public class InferenceMapperTest {
 			@Override
 			protected Void defaultVisit(Inference inference, Void input) {
 				
-				System.out.println(Printer.print(inference));
+				System.out.println(InferencePrinter.print(inference));
 				
 				return null;
 			}

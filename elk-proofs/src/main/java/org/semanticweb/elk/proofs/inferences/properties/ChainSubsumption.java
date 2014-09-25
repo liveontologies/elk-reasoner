@@ -30,12 +30,12 @@ import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.Printer;
 import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
  * @author Pavel Klinov
@@ -57,9 +57,9 @@ public class ChainSubsumption implements Inference {
 			ElkSubObjectPropertyOfAxiom conclusion,
 			ElkSubObjectPropertyOfAxiom premise, 
 			ElkSubObjectPropertyOfAxiom sideCondition) {
-		firstPremise_ = new SingleAxiomExpression(premise);
+		firstPremise_ = new AxiomExpression(premise);
 		secondPremise_ = null;
-		conclusion_ = new SingleAxiomExpression(conclusion);
+		conclusion_ = new AxiomExpression(conclusion);
 		sideCondition_ = sideCondition;
 	}
 
@@ -69,8 +69,8 @@ public class ChainSubsumption implements Inference {
 			Expression first, 
 			ElkSubObjectPropertyOfAxiom second) {
 		firstPremise_ = first;
-		secondPremise_ = new SingleAxiomExpression(second);
-		conclusion_ = new SingleAxiomExpression(conclusion);
+		secondPremise_ = new AxiomExpression(second);
+		conclusion_ = new AxiomExpression(conclusion);
 		sideCondition_ = null;
 	}
 
@@ -102,6 +102,6 @@ public class ChainSubsumption implements Inference {
 
 	@Override
 	public String toString() {
-		return Printer.print(this);
+		return InferencePrinter.print(this);
 	}
 }

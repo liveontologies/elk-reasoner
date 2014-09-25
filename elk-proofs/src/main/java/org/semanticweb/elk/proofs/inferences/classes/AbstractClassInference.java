@@ -26,7 +26,7 @@ package org.semanticweb.elk.proofs.inferences.classes;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
@@ -43,7 +43,7 @@ abstract class AbstractClassInference implements Inference {
 	final Expression conclusion;
 
 	AbstractClassInference(ElkSubClassOfAxiom c) {
-		conclusion = new SingleAxiomExpression(c);
+		conclusion = new AxiomExpression(c);
 	}
 
 	@Override

@@ -24,12 +24,11 @@ package org.semanticweb.elk.proofs.expressions;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 
 /**
- * An expression is either an {@link ElkAxiom}, if it can be represented as a
- * single axiom, or a collection of explanations each of which is an
- * {@link ElkAxiom}.
+ * An expression is either an axiom or a lemma. Axiom expressions are represented (syntactically) as OWL axioms.
+ * Lemma expressions cannot be represented as OWL axioms. Depending on implementation they can be represented
+ * using some extended axiom syntax or as inferences that derived them.
  * 
  * @author Pavel Klinov
  * 
@@ -37,5 +36,12 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  */
 public interface Expression {
 
-	public Iterable<Explanation> getExplanations();
+	public static Expression EMPTY = new Expression() {
+
+		@Override
+		public String toString() {
+			return "";
+		}
+		
+	};
 }

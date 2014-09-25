@@ -30,9 +30,9 @@ import java.util.Collection;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.Printer;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
  * @author Pavel Klinov
@@ -49,8 +49,8 @@ public class ConjunctionComposition extends
 	public ConjunctionComposition(ElkClassExpression sub, ElkClassExpression firstConjunct, ElkClassExpression secondConjunct, ElkObjectFactory factory) {
 		super(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(firstConjunct, secondConjunct)));
 
-		firstPremise_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, firstConjunct));
-		secondPremise_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, secondConjunct));
+		firstPremise_ = new AxiomExpression(factory.getSubClassOfAxiom(sub, firstConjunct));
+		secondPremise_ = new AxiomExpression(factory.getSubClassOfAxiom(sub, secondConjunct));
 	}
 
 	@Override
@@ -65,6 +65,6 @@ public class ConjunctionComposition extends
 
 	@Override
 	public String toString() {
-		return Printer.print(this);
+		return InferencePrinter.print(this);
 	}
 }

@@ -1,8 +1,10 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences;
+package org.semanticweb.elk.proofs.utils;
 
+import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.classes.ClassInitialization;
 import org.semanticweb.elk.proofs.inferences.classes.ClassSubsumption;
 import org.semanticweb.elk.proofs.inferences.classes.ConjunctionComposition;
@@ -29,7 +31,7 @@ import org.semanticweb.elk.util.collections.Operations;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class Printer {
+public class InferencePrinter {
 
 	public static String print(Inference inference) {
 		return inference.accept(new PrintingVisitor(), null);

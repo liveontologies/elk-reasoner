@@ -31,9 +31,9 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.Printer;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
  * @author Pavel Klinov
@@ -50,8 +50,8 @@ public class NegationContradiction extends
 	public NegationContradiction(ElkClassExpression sub, ElkClassExpression sup, ElkObjectFactory factory) {
 		super(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING));
 
-		subsumer_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, sup));
-		negativeSubsumer_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub, factory.getObjectComplementOf(sup)));
+		subsumer_ = new AxiomExpression(factory.getSubClassOfAxiom(sub, sup));
+		negativeSubsumer_ = new AxiomExpression(factory.getSubClassOfAxiom(sub, factory.getObjectComplementOf(sup)));
 	}
 
 	@Override
@@ -66,6 +66,6 @@ public class NegationContradiction extends
 
 	@Override
 	public String toString() {
-		return Printer.print(this);
+		return InferencePrinter.print(this);
 	}
 }

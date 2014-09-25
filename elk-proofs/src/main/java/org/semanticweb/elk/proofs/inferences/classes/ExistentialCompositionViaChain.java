@@ -26,21 +26,18 @@ package org.semanticweb.elk.proofs.inferences.classes;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.proofs.expressions.CartesianExpression;
-import org.semanticweb.elk.proofs.expressions.Explanation;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
+import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
+import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.Printer;
 import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
-import org.semanticweb.elk.proofs.utils.ProofUtils;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
  * The existential inference based on role composition. 
@@ -80,80 +77,65 @@ public class ExistentialCompositionViaChain implements Inference {
 	
 	// inference with a side condition, a simple right property premise and a simple conclusion
 	public ExistentialCompositionViaChain(
-			ElkClassExpression existential,
+			ElkSubClassOfAxiom conclusion,
 			ElkSubClassOfAxiom firstExPremise,
-			Expression secondExPremise,
+			ElkSubClassOfAxiom secondExPremise,
 			ElkSubObjectPropertyOfAxiom propSubsumption,
 			ElkSubObjectPropertyOfAxiom chainSubsumption,
-			ElkSubObjectPropertyOfAxiom chainAxiom, 
-			ElkObjectFactory factory) {
-		this(new SingleAxiomExpression(factory.getSubClassOfAxiom(
-				firstExPremise.getSubClassExpression(), 
-				factory.getObjectSomeValuesFrom(
-						ProofUtils.asObjectProperty(chainAxiom.getSuperObjectPropertyExpression()),
-						existential))),
-			new SingleAxiomExpression(firstExPremise), 
-			secondExPremise, 
-			ExistentialComposition.getPropertySubsumption(propSubsumption), 
-			ExistentialComposition.getPropertySubsumption(chainSubsumption), 
+			ElkSubObjectPropertyOfAxiom chainAxiom) {
+		this(new AxiomExpression(conclusion),
+			new AxiomExpression(firstExPremise), 
+			new AxiomExpression(secondExPremise), 
+			new AxiomExpression(propSubsumption), 
+			new AxiomExpression(chainSubsumption), 
 			chainAxiom);
 	}
 
 	// inference with a side condition, a complex right property premise and a simple conclusion
 	public ExistentialCompositionViaChain(
-			ElkClassExpression subsumer,
+			ElkSubClassOfAxiom conclusion,
 			ElkSubClassOfAxiom firstExPremise,
-			Expression secondExPremise,
+			ElkSubClassOfLemma secondExPremise,
 			ElkSubObjectPropertyOfAxiom propSubsumption,
-			Expression chainSubsumption,
-			ElkSubObjectPropertyOfAxiom chainAxiom, 
-			ElkObjectFactory factory) {
-		this(new SingleAxiomExpression(factory.getSubClassOfAxiom(
-				firstExPremise.getSubClassExpression(), 
-				subsumer)),
-			new SingleAxiomExpression(firstExPremise), 
-			secondExPremise, 
-			ExistentialComposition.getPropertySubsumption(propSubsumption), 
-			chainSubsumption, 
+			ElkSubPropertyChainOfLemma chainSubsumption,
+			ElkSubObjectPropertyOfAxiom chainAxiom) {
+		this(new AxiomExpression(conclusion),
+			new AxiomExpression(firstExPremise), 
+			new LemmaExpression(secondExPremise), 
+			new AxiomExpression(propSubsumption), 
+			new LemmaExpression(chainSubsumption), 
 			chainAxiom);
 	}
 	
 	// inference with a complex chain premise, a complex existential in the conclusion and no side condition
-	@SuppressWarnings("unchecked")
 	public ExistentialCompositionViaChain(
+			ElkSubClassOfLemma conclusion,
 			ElkSubClassOfAxiom firstExPremise,
-			Expression secondExPremise,
+			ElkSubClassOfLemma secondExPremise,
 			ElkSubObjectPropertyOfAxiom propSubsumption,
-			Expression chainSubsumption
+			ElkSubPropertyChainOfLemma chainSubsumption
 			) {
-		this(new CartesianExpression(
-				Arrays.asList(
-						ExistentialComposition.getPropertySubsumption(propSubsumption).getExplanations(),
-						//Collections.singletonList(new Explanation(firstExPremise)),
-						secondExPremise.getExplanations(),
-						Collections.singletonList(new Explanation(propSubsumption)),
-						chainSubsumption.getExplanations())), 
-				new SingleAxiomExpression(firstExPremise),	secondExPremise, ExistentialComposition.getPropertySubsumption(propSubsumption), chainSubsumption, null);
+		this(	new LemmaExpression(conclusion), 
+				new AxiomExpression(firstExPremise), 
+				new LemmaExpression(secondExPremise), 
+				new AxiomExpression(propSubsumption), 
+				new LemmaExpression(chainSubsumption), 
+				null);
 	}
 	
 	// inference with a simple chain premise, complex existential in the conclusion and no side condition
-	@SuppressWarnings("unchecked")
 	public ExistentialCompositionViaChain(
+			ElkSubClassOfLemma conclusion,
 			ElkSubClassOfAxiom firstExPremise,
 			ElkSubClassOfAxiom secondExPremise,
 			ElkSubObjectPropertyOfAxiom leftPropSubsumption,
 			ElkSubObjectPropertyOfAxiom rightPropSubsumption
 			) {
-		this(new CartesianExpression(
-				Arrays.<Iterable<Explanation>>asList(
-						Collections.singletonList(new Explanation(firstExPremise)),
-						Collections.singletonList(new Explanation(secondExPremise)),
-						ExistentialComposition.getPropertySubsumption(leftPropSubsumption).getExplanations(),
-						ExistentialComposition.getPropertySubsumption(rightPropSubsumption).getExplanations())), 
-				new SingleAxiomExpression(firstExPremise),	
-				new SingleAxiomExpression(secondExPremise), 
-				ExistentialComposition.getPropertySubsumption(leftPropSubsumption), 
-				ExistentialComposition.getPropertySubsumption(rightPropSubsumption), null);
+		this(	new LemmaExpression(conclusion),
+				new AxiomExpression(firstExPremise),	
+				new AxiomExpression(secondExPremise), 
+				new AxiomExpression(leftPropSubsumption), 
+				new AxiomExpression(rightPropSubsumption), null);
 	}
 	
 	@Override
@@ -178,6 +160,6 @@ public class ExistentialCompositionViaChain implements Inference {
 
 	@Override
 	public String toString() {
-		return Printer.print(this);
+		return InferencePrinter.print(this);
 	}
 }

@@ -29,7 +29,7 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
@@ -46,7 +46,7 @@ abstract class AbstractPropertyInference implements Inference {
 	final Expression conclusion;
 
 	AbstractPropertyInference(ElkObjectPropertyAxiom c) {
-		conclusion = new SingleAxiomExpression(c);
+		conclusion = new AxiomExpression(c);
 	}
 
 	@Override

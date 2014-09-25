@@ -36,6 +36,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -46,6 +47,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersection
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 
@@ -60,6 +62,21 @@ public class Deindexer implements IndexedClassExpressionVisitor<ElkClassExpressi
 	
 	public static ElkClassExpression deindex(IndexedClassExpression ice) {
 		return ice.accept(new Deindexer());
+	}
+	
+	public static ElkSubObjectPropertyExpression deindex(IndexedPropertyChain ipc) {
+		return ipc.accept(new IndexedPropertyChainVisitor<ElkSubObjectPropertyExpression>() {
+
+			@Override
+			public ElkSubObjectPropertyExpression visit(IndexedObjectProperty element) {
+				return deindex(element);
+			}
+
+			@Override
+			public ElkSubObjectPropertyExpression visit(IndexedBinaryPropertyChain element) {
+				return deindex(element);
+			}
+		});
 	}
 	
 	public static ElkObjectProperty deindex(IndexedObjectProperty ip) {

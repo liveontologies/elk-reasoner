@@ -28,13 +28,14 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.proofs.expressions.CartesianExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
+import org.semanticweb.elk.proofs.expressions.lemmas.ElkReflexivePropertyChainLemma;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.Printer;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
  * @author Pavel Klinov
@@ -49,12 +50,10 @@ public class ReflexiveComposition implements Inference {
 	
 	private final Expression conclusion_;
 	
-	@SuppressWarnings("unchecked")
-	public ReflexiveComposition(ElkReflexiveObjectPropertyAxiom firstRefl, Expression secondRefl) {
-		firstReflexive_ = new SingleAxiomExpression(firstRefl);
+	public ReflexiveComposition(ElkReflexivePropertyChainLemma conclusion, ElkReflexiveObjectPropertyAxiom firstRefl, Expression secondRefl) {
+		firstReflexive_ = new AxiomExpression(firstRefl);
 		secondReflexive_ = secondRefl;
-		
-		conclusion_ = new CartesianExpression(Arrays.asList(firstReflexive_.getExplanations(), secondReflexive_.getExplanations()));
+		conclusion_ = new LemmaExpression(conclusion);
 	}
 	
 	@Override
@@ -79,6 +78,6 @@ public class ReflexiveComposition implements Inference {
 
 	@Override
 	public String toString() {
-		return Printer.print(this);
+		return InferencePrinter.print(this);
 	}
 }

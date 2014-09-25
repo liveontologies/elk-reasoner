@@ -37,9 +37,9 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.Printer;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
  * @author Pavel Klinov
@@ -58,9 +58,9 @@ public class ReflexiveExistentialComposition extends
 	public ReflexiveExistentialComposition(ElkClassExpression sub, ElkSubClassOfAxiom subsumerPremise, ElkReflexiveObjectPropertyAxiom reflPremise, ElkSubObjectPropertyOfAxiom propPremise, ElkObjectFactory factory) {
 		super(getConclusion(sub, subsumerPremise, propPremise, factory));
 		
-		reflexPremise_ = new SingleAxiomExpression(reflPremise);
-		subsumerPremise_ = new SingleAxiomExpression(subsumerPremise);
-		propertyPremise_ = new SingleAxiomExpression(propPremise);
+		reflexPremise_ = new AxiomExpression(reflPremise);
+		subsumerPremise_ = new AxiomExpression(subsumerPremise);
+		propertyPremise_ = new AxiomExpression(propPremise);
 	}
 
 	private static ElkSubClassOfAxiom getConclusion(ElkClassExpression sub, ElkSubClassOfAxiom subPremise, ElkSubObjectPropertyOfAxiom propPremise, ElkObjectFactory factory) {
@@ -95,6 +95,6 @@ public class ReflexiveExistentialComposition extends
 
 	@Override
 	public String toString() {
-		return Printer.print(this);
+		return InferencePrinter.print(this);
 	}
 }

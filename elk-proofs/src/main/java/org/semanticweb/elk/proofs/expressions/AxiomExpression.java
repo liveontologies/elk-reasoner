@@ -2,8 +2,6 @@
  * 
  */
 package org.semanticweb.elk.proofs.expressions;
-
-import org.semanticweb.elk.util.collections.Operations;
 /*
  * #%L
  * ELK Proofs Package
@@ -26,28 +24,31 @@ import org.semanticweb.elk.util.collections.Operations;
  * #L%
  */
 
+import java.util.Collections;
+
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class MultiAxiomExpression implements Expression {
+public class AxiomExpression implements Expression {
 
-	private final Iterable<Explanation> explanations_;
+	private final Explanation singleton_;
 	
-	public MultiAxiomExpression(Iterable<Explanation> expl) {
-		explanations_ = expl;
+	public AxiomExpression(ElkAxiom ax) {
+		singleton_ = new Explanation(Collections.singletonList(ax));
 	}
-
-	@Override
-	public Iterable<Explanation> getExplanations() {
-		return explanations_;
+	
+	public ElkAxiom getAxiom() {
+		return singleton_.getAxioms().iterator().next();
 	}
 	
 	@Override
 	public String toString() {
-		return Operations.toString(explanations_);
+		return OwlFunctionalStylePrinter.toString(singleton_.getAxioms().iterator().next());
 	}
-
+	
 }

@@ -32,11 +32,10 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.proofs.expressions.EmptyExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.Printer;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
  * @author Pavel Klinov
@@ -60,25 +59,11 @@ public class ExistentialComposition extends AbstractClassInference {
 			ElkObjectFactory factory) {
 		super(factory.getSubClassOfAxiom(sub, sup));
 
-		existentialPremise_ = new SingleAxiomExpression(exPremise);
-		subsumerPremise_ = new SingleAxiomExpression(subPremise);
-		propertyPremise_ = getPropertySubsumption(propPremise);
+		existentialPremise_ = new AxiomExpression(exPremise);
+		subsumerPremise_ = new AxiomExpression(subPremise);
+		propertyPremise_ = new AxiomExpression(propPremise);
 	}
 	
-	static Expression getPropertySubsumption(ElkSubObjectPropertyOfAxiom ax) {
-		/*if (ax.getSubObjectPropertyExpression() != ax.getSuperObjectPropertyExpression()) {
-			return new SingleAxiomExpression(ax);
-		}
-		else {
-			// ignore trivial property subsumptions. we can't represent trivial
-			// chain initializations so punt on property initializations as well
-			// for consistency
-			return new EmptyExpression();
-		}*/
-		
-		return new SingleAxiomExpression(ax);
-	}	
-
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
@@ -92,6 +77,6 @@ public class ExistentialComposition extends AbstractClassInference {
 
 	@Override
 	public String toString() {
-		return Printer.print(this);
+		return InferencePrinter.print(this);
 	}
 }

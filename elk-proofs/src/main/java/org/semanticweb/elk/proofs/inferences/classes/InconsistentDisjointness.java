@@ -33,11 +33,11 @@ import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.SingleAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.Printer;
 import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
  * @author Pavel Klinov
@@ -55,7 +55,7 @@ public class InconsistentDisjointness extends AbstractClassInference {
 			ElkObjectFactory factory) {
 		super(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING));
 
-		premise_ = new SingleAxiomExpression(factory.getSubClassOfAxiom(sub,
+		premise_ = new AxiomExpression(factory.getSubClassOfAxiom(sub,
 				sup));
 		sideCondition_ = sideCondition;
 	}
@@ -78,6 +78,6 @@ public class InconsistentDisjointness extends AbstractClassInference {
 
 	@Override
 	public String toString() {
-		return Printer.print(this);
+		return InferencePrinter.print(this);
 	}
 }
