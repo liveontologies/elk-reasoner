@@ -28,4 +28,8 @@ public class LemmaExpression implements Expression {
 		return ElkLemmaPrinter.print(lemma_);
 	}
 	
+	@Override
+	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
+	}	
 }

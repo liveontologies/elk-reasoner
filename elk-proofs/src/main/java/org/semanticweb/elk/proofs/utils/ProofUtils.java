@@ -64,7 +64,6 @@ public class ProofUtils {
 	}
 	
 	// explainSubsumption() should be called first
-	@Deprecated
 	public static void visitProofs(AbstractReasonerState reasoner,
 			ElkClassExpression subsumee, ElkClassExpression subsumer,
 			InferenceVisitor<?, ?> visitor) throws ElkException {

@@ -36,11 +36,18 @@ package org.semanticweb.elk.proofs.expressions;
  */
 public interface Expression {
 
+	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input);
+	
 	public static Expression EMPTY = new Expression() {
 
 		@Override
 		public String toString() {
 			return "";
+		}
+
+		@Override
+		public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input) {
+			return null;
 		}
 		
 	};

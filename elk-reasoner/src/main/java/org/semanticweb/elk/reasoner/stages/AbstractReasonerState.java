@@ -46,6 +46,7 @@ import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ChangeIndexingProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexingVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiomFactoryWithBinding;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
@@ -630,7 +631,6 @@ public abstract class AbstractReasonerState {
 		IndexedClassExpression subsumer = sup.accept(objectCache_
 				.getIndexObjectConverter());
 
-		//simpleTrace(subsumee, subsumer);
 		stageBasedTrace(subsumee, subsumer);
 
 		return traceState.getTraceStore().getReader();
@@ -677,16 +677,23 @@ public abstract class AbstractReasonerState {
 		throw new IllegalArgumentException("Unknown class: " + subsumee);
 	}
 	
+	@Deprecated
 	IndexedClassExpression transform(ElkClassExpression ce) {
 		return ce.accept(objectCache_.getIndexObjectConverter());
 	}
 	
+	@Deprecated
 	IndexedObjectProperty transform(ElkObjectProperty ce) {
 		return (IndexedObjectProperty) ce.accept(objectCache_.getIndexObjectConverter());
 	}
 	
+	@Deprecated
 	IndexedPropertyChain transform(ElkSubObjectPropertyExpression ce) {
 		return ce.accept(objectCache_.getIndexObjectConverter());
+	}
+	
+	IndexObjectConverter getIndexObjectConverter() {
+		return objectCache_.getIndexObjectConverter(); 
 	}
 
 	public void resetTraceState() {

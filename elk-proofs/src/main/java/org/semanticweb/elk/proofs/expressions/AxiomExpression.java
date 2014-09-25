@@ -24,8 +24,6 @@ package org.semanticweb.elk.proofs.expressions;
  * #L%
  */
 
-import java.util.Collections;
-
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 
@@ -36,19 +34,24 @@ import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
  */
 public class AxiomExpression implements Expression {
 
-	private final Explanation singleton_;
+	private final ElkAxiom axiom_;
 	
 	public AxiomExpression(ElkAxiom ax) {
-		singleton_ = new Explanation(Collections.singletonList(ax));
+		axiom_ = ax;
 	}
 	
 	public ElkAxiom getAxiom() {
-		return singleton_.getAxioms().iterator().next();
+		return axiom_;
 	}
 	
 	@Override
 	public String toString() {
-		return OwlFunctionalStylePrinter.toString(singleton_.getAxioms().iterator().next());
+		return OwlFunctionalStylePrinter.toString(axiom_);
+	}
+
+	@Override
+	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 	
 }

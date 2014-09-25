@@ -59,14 +59,17 @@ public class ReasonerStateAccessor {
 		}
 	}
 	
+	@Deprecated
 	public static IndexedClassExpression transform(AbstractReasonerState reasoner, ElkClassExpression ce) {
 		return reasoner.transform(ce);
 	}
 	
+	@Deprecated
 	public static IndexedObjectProperty transform(AbstractReasonerState reasoner, ElkObjectProperty ce) {
 		return reasoner.transform(ce);
 	}
 	
+	@Deprecated
 	public static IndexedPropertyChain transform(AbstractReasonerState reasoner, ElkSubObjectPropertyExpression ce) {
 		return reasoner.transform(ce);
 	}

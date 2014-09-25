@@ -25,11 +25,11 @@ public class ElkLemmaPrinter implements ElkLemmaVisitor<Void, String> {
 		return lemma.accept(PRINTER_, null);
 	}
 	
-	private String print(ElkObject obj) {
+	private static String print(ElkObject obj) {
 		return OwlFunctionalStylePrinter.toString(obj);
 	}
 	
-	private String print(ElkComplexClassExpression obj) {
+	public static String print(ElkComplexClassExpression obj) {
 		return ElkComplexClassExpressionPrinter.print(obj);
 	}
 	
