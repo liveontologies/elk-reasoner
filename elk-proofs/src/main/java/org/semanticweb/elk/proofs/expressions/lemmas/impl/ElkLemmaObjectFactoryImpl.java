@@ -35,7 +35,7 @@ public class ElkLemmaObjectFactoryImpl implements ElkLemmaObjectFactory {
 
 	@Override
 	public ElkSubClassOfLemma getComplexSubClassOfAxiom(
-			ElkComplexClassExpression subclass,
+			ElkClassExpression subclass,
 			ElkComplexClassExpression superclass) {
 		return new ElkSubClassOfLemmaImpl(subclass, superclass);
 	}

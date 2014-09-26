@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.stages;
+package org.semanticweb.elk.proofs.inferences.mapping;
 
 /**
  * @author Pavel Klinov

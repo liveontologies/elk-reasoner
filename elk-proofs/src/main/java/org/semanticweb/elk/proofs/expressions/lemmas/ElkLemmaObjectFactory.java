@@ -17,7 +17,7 @@ public interface ElkLemmaObjectFactory {
 	
 	public ElkSubPropertyChainOfLemma getComplexSubPropertyChainAxiom(ElkSubObjectPropertyExpression subchain, ElkSubObjectPropertyExpression superchain);
 	
-	public ElkSubClassOfLemma getComplexSubClassOfAxiom(ElkComplexClassExpression subclass, ElkComplexClassExpression superclass);
+	public ElkSubClassOfLemma getComplexSubClassOfAxiom(ElkClassExpression subclass, ElkComplexClassExpression superclass);
 	
 	public ElkComplexObjectSomeValuesFrom getComplexObjectSomeValuesFrom(ElkSubObjectPropertyExpression chain, ElkClassExpression filler);
 

@@ -35,8 +35,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractObjectPropertyConclusionVIsitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
@@ -63,46 +61,29 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 	
 	private final LinkedList<ObjectPropertyInference> propertyInferencesToDo_ = new LinkedList<ObjectPropertyInference>();
 
-	private final static ClassInferenceVisitor<IndexedClassExpression, ?> DUMMY_INFERENCE_VISITOR = new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
-		@Override
-		protected Void defaultTracedVisit(ClassInference conclusion,
-				IndexedClassExpression input) {
-			return null;
-		}
-	};
-
 	public RecursiveTraceUnwinder(TraceStore.Reader reader) {
 		traceReader_ = reader;
 	}
 
-	public void accept(IndexedClassExpression context,
-			final Conclusion conclusion,
-			final ConclusionVisitor<IndexedClassExpression, ?> premiseVisitor) {
-		accept(context, conclusion, premiseVisitor, DUMMY_INFERENCE_VISITOR, ObjectPropertyConclusionVisitor.DUMMY, ObjectPropertyInferenceVisitor.DUMMY);
-	}
-	
 	// visit only class inferences
 	public void accept(IndexedClassExpression context,
 			final Conclusion conclusion,
-			final ConclusionVisitor<IndexedClassExpression, ?> premiseVisitor,
 			final ClassInferenceVisitor<IndexedClassExpression, ?> inferenceVisitor) {
-		accept(context, conclusion, premiseVisitor, inferenceVisitor, ObjectPropertyConclusionVisitor.DUMMY, ObjectPropertyInferenceVisitor.DUMMY);
+		accept(context, conclusion, inferenceVisitor, ObjectPropertyInferenceVisitor.DUMMY);
 	}	
 	
 	// unwind only property conclusions
 	@Override
 	public void accept(ObjectPropertyConclusion conclusion,
-			final ObjectPropertyConclusionVisitor<?, ?> premiseVisitor,
 			final ObjectPropertyInferenceVisitor<?, ?> inferenceVisitor) {
 		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
 
-		addToQueue(conclusion, seenInferences, premiseVisitor);
+		addToQueue(conclusion, seenInferences);
 		// set it off
-		unwindPropertyConclusions(premiseVisitor, inferenceVisitor);		
+		unwindPropertyConclusions(inferenceVisitor);
 	}
 	
 	private void unwindPropertyConclusions(
-			final ObjectPropertyConclusionVisitor<?, ?> premiseVisitor,
 			final ObjectPropertyInferenceVisitor<?, ?> inferenceVisitor) {
 		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
 
@@ -110,7 +91,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 		PremiseVisitor<Void, ?> unwinder = new PremiseVisitor<Void, Void>(new AbstractObjectPropertyConclusionVIsitor<Void, Void>() {
 			@Override
 			protected Void defaultVisit(ObjectPropertyConclusion premise, Void _ignored) {
-				addToQueue(premise, seenInferences, premiseVisitor);
+				addToQueue(premise, seenInferences);
 				return null;
 			}
 		});
@@ -141,15 +122,13 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 	public void accept(
 			final IndexedClassExpression context,
 			final Conclusion conclusion,
-			final ConclusionVisitor<IndexedClassExpression, ?> classConclusionVisitor,
 			final ClassInferenceVisitor<IndexedClassExpression, ?> inferenceVisitor,
-			final ObjectPropertyConclusionVisitor<?, ?> propertyConclusionVisitor,
 			final ObjectPropertyInferenceVisitor<?, ?> propertyInferenceVisitor) {
 		final Set<ClassInference> seenInferences = new HashSet<ClassInference>();
 		final Set<ObjectPropertyInference> seenPropertyInferences = new HashSet<ObjectPropertyInference>();
 		// should be empty anyways
 		classInferencesToDo_.clear();
-		addToQueue(context, conclusion, seenInferences, classConclusionVisitor);
+		addToQueue(context, conclusion, seenInferences);
 		// this visitor visits all premises and putting them into the todo queue
 		PremiseVisitor<IndexedClassExpression, ?> premiseVisitor = 
 				new PremiseVisitor<IndexedClassExpression, Void>(
@@ -159,14 +138,14 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 									IndexedClassExpression cxt) {
 								// the context passed into this method is the context where the
 								// inference has been made
-								addToQueue(cxt, premise, seenInferences, classConclusionVisitor);
+								addToQueue(cxt, premise, seenInferences);
 								return null;
 							}
 						},
 						new AbstractObjectPropertyConclusionVIsitor<IndexedClassExpression, Void>() {
 							@Override
 							protected Void defaultVisit(ObjectPropertyConclusion premise, IndexedClassExpression _ignored) {
-								addToQueue(premise, seenPropertyInferences, propertyConclusionVisitor);
+								addToQueue(premise, seenPropertyInferences);
 								
 								return null;
 							}
@@ -186,15 +165,12 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 		}
 		
 		// finally, unwind all property traces
-		unwindPropertyConclusions(propertyConclusionVisitor, propertyInferenceVisitor);
+		unwindPropertyConclusions(propertyInferenceVisitor);
 	}
 
 	private void addToQueue(final IndexedClassExpression root,
 			final Conclusion conclusion, 
-			final Set<ClassInference> seenInferences,
-			final ConclusionVisitor<IndexedClassExpression, ?> visitor) {
-
-		conclusion.accept(visitor, root);
+			final Set<ClassInference> seenInferences) {
 
 		final MutableInteger traced = new MutableInteger(0);
 		// finding all inferences that produced the given conclusion (if we are
@@ -207,10 +183,8 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 					protected Void defaultTracedVisit(ClassInference inference,
 							IndexedClassExpression v) {
 						if (!seenInferences.contains(inference)) {
-							//IndexedClassExpression inferenceContextRoot = inference.getInferenceContextRoot(root);
 
 							seenInferences.add(inference);
-							//classInferencesToDo_.addFirst(new InferenceWrapper(inference, inferenceContextRoot));
 							classInferencesToDo_.addFirst(new InferenceWrapper(inference, root));
 						}
 
@@ -227,11 +201,8 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 	}
 	
 	private void addToQueue(final ObjectPropertyConclusion conclusion,
-			final Set<ObjectPropertyInference> seenInferences,
-			final ObjectPropertyConclusionVisitor<?, ?> visitor) {
+			final Set<ObjectPropertyInference> seenInferences) {
 
-		conclusion.accept(visitor, null);
-		
 		final MutableInteger traced = new MutableInteger(0);
 		// finding all inferences that produced the given conclusion (if we are
 		// here, the inference must have premises, i.e. it's not an

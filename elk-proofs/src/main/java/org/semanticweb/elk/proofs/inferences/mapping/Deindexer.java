@@ -52,6 +52,8 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisi
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 
 /**
+ * Converts indexed objects to ELK OWL objects i.e. the inverse of indexing.
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de

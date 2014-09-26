@@ -29,10 +29,6 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyObjectPropertyConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
@@ -50,19 +46,37 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Abstr
  */
 public class InferenceMapper {
 
-	private final TraceStore.Reader traceReader_;
+	private final TraceUnwinder unwinder_;
 	
-	public InferenceMapper(TraceStore.Reader reader) {
-		traceReader_ = reader;
+	public InferenceMapper(TraceUnwinder unwinder) {
+		unwinder_ = unwinder;
+	}
+	
+	public void map(final Iterable<? extends TracingInput> inputs, final InferenceVisitor<?, ?> visitor) {
+		for (TracingInput input : inputs) {
+			//TODO visitor here?
+			if (input instanceof ClassTracingInput) {
+				ClassTracingInput ci = (ClassTracingInput) input;
+				
+				map(ci.root, ci.conclusion, visitor);
+			}
+			else if (input instanceof ObjectPropertyTracingInput) {
+				ObjectPropertyTracingInput pi = (ObjectPropertyTracingInput) input;
+				
+				map(pi.conclusion, visitor);
+			}
+			else {
+				throw new IllegalArgumentException("Unsupported tracing input " + input.getClass());
+			}
+		}
 	}
 	
 	// class and object property inferences
 	public void map(final IndexedClassExpression cxt, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
 		final SingleInferenceMapper singleMapper = new SingleInferenceMapper();
-		TraceUnwinder unwinder = new RecursiveTraceUnwinder(traceReader_);
 		
-		unwinder.accept(cxt, conclusion, 
-				new DummyConclusionVisitor<IndexedClassExpression, Void>(), 
+		unwinder_.accept(cxt, conclusion, 
+				//new DummyConclusionVisitor<IndexedClassExpression, Void>(), 
 				new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
 
 					@Override
@@ -77,7 +91,7 @@ public class InferenceMapper {
 						return null;
 					}
 				}, 
-				new DummyObjectPropertyConclusionVisitor<IndexedClassExpression, Void>(), 
+				//new DummyObjectPropertyConclusionVisitor<IndexedClassExpression, Void>(), 
 				new AbstractObjectPropertyInferenceVisitor<Void, Void>() {
 
 					@Override
@@ -97,11 +111,10 @@ public class InferenceMapper {
 	// only object property inferences
 	public void map(final ObjectPropertyConclusion conclusion, final InferenceVisitor<?, ?> visitor) {
 		final SingleInferenceMapper singleMapper = new SingleInferenceMapper();
-		TraceUnwinder unwinder = new RecursiveTraceUnwinder(traceReader_);
 		
-		unwinder.accept(
+		unwinder_.accept(
 				conclusion,
-				new DummyObjectPropertyConclusionVisitor<IndexedClassExpression, Void>(), 
+				//new DummyObjectPropertyConclusionVisitor<IndexedClassExpression, Void>(), 
 				new AbstractObjectPropertyInferenceVisitor<Void, Void>() {
 
 					@Override

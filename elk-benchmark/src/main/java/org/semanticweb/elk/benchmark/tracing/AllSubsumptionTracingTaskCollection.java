@@ -47,8 +47,6 @@ import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionTracingTests;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
@@ -234,7 +232,7 @@ public class AllSubsumptionTracingTaskCollection implements VisitorTaskCollectio
 				SideConditionCollector counter = new SideConditionCollector();
 				//SaturationStatistics stats = traceState.getContextTracingFactory().getStatistics();
 				
-				traceUnwinder.accept(sub, new DecomposedSubsumerImpl<IndexedClassExpression>(sup), new DummyConclusionVisitor<IndexedClassExpression, Void>(), counter, ObjectPropertyConclusionVisitor.DUMMY, ObjectPropertyInferenceVisitor.DUMMY);
+				traceUnwinder.accept(sub, new DecomposedSubsumerImpl<IndexedClassExpression>(sup), counter, ObjectPropertyInferenceVisitor.DUMMY);
 				
 				int subClassAxiomNo = counter.getSubClassOfAxioms().size();
 				

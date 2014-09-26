@@ -51,9 +51,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionEqualityChecker;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
@@ -118,14 +115,13 @@ public class TracingTestUtils {
 				ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
-		ConclusionVisitor<IndexedClassExpression, Boolean> counter = new AbstractConclusionVisitor<IndexedClassExpression, Boolean>() {
+		ClassInferenceVisitor<IndexedClassExpression, Boolean> counter = new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
 
 			@Override
-			protected Boolean defaultVisit(Conclusion conclusion,
-					IndexedClassExpression root) {
+			protected Boolean defaultTracedVisit(ClassInference conclusion,
+					IndexedClassExpression input) {
 				conclusionCount.incrementAndGet();
-
-				return true;
+				return null;
 			}
 		};
 
@@ -240,7 +236,6 @@ public class TracingTestUtils {
 
 		new TestTraceUnwinder(traceState.getTraceStore().getReader(),
 				UNTRACED_LISTENER).accept(subsumee, conclusion,
-				new DummyConclusionVisitor<IndexedClassExpression, Void>(), 
 				new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
 
 					@Override
@@ -251,7 +246,6 @@ public class TracingTestUtils {
 					}
 					
 				},
-				ObjectPropertyConclusionVisitor.DUMMY, 
 				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 					@Override
@@ -317,7 +311,7 @@ public class TracingTestUtils {
 		});
 
 		reasoner.explainSubsumption(sub, sup);
-		traceUnwinder.accept(subsumee, conclusion, new DummyConclusionVisitor<IndexedClassExpression, Void>(), sideConditionVisitor);
+		traceUnwinder.accept(subsumee, conclusion, sideConditionVisitor);
 
 		assertTrue("The condition is false for all used side conditions", checkPassed.get());
 	}	
@@ -332,7 +326,7 @@ public class TracingTestUtils {
 		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader, UNTRACED_LISTENER);
 
 		reasoner.explainSubsumption(sub, sup);
-		traceUnwinder.accept(subsumee, conclusion, new DummyConclusionVisitor<IndexedClassExpression, Void>(), visitor);		
+		traceUnwinder.accept(subsumee, conclusion, visitor);		
 	}	
 	
 	public static void visitInferences(ElkClassExpression sub,
@@ -347,9 +341,7 @@ public class TracingTestUtils {
 		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader, UNTRACED_LISTENER);
 
 		reasoner.explainSubsumption(sub, sup);
-		traceUnwinder.accept(subsumee, conclusion,
-				new DummyConclusionVisitor<IndexedClassExpression, Void>(),
-				classInferenceVisitor, ObjectPropertyConclusionVisitor.DUMMY,
+		traceUnwinder.accept(subsumee, conclusion, classInferenceVisitor,
 				propertyInferenceVisitor);		
 	}
 	
