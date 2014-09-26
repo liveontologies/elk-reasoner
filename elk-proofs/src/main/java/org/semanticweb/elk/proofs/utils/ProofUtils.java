@@ -24,21 +24,10 @@ package org.semanticweb.elk.proofs.utils;
  * #L%
  */
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.mapping.InferenceMapper;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.TracingUtils;
-import org.semanticweb.elk.reasoner.stages.AbstractReasonerState;
-import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 
 /**
  * @author Pavel Klinov
@@ -62,23 +51,5 @@ public class ProofUtils {
 			
 		});
 	}
-	
-	// explainSubsumption() should be called first
-	public static void visitProofs(AbstractReasonerState reasoner,
-			ElkClassExpression subsumee, ElkClassExpression subsumer,
-			InferenceVisitor<?, ?> visitor) throws ElkException {
-		final IndexedClassExpression sub = ReasonerStateAccessor.transform(
-				reasoner, subsumee);
-		Context cxt = ReasonerStateAccessor.getContext(reasoner, sub);
-		Conclusion conclusion = TracingUtils.getConclusionToTrace(cxt,
-				ReasonerStateAccessor.transform(reasoner, subsumer));
-
-		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
-		InferenceMapper mapper = new InferenceMapper(traceState.getTraceStore()
-				.getReader());
-
-		mapper.map(cxt.getRoot(), conclusion, visitor);
-	}
-	
 
 }

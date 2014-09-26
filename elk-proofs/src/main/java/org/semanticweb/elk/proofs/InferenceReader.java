@@ -4,6 +4,7 @@
 package org.semanticweb.elk.proofs;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 
@@ -18,5 +19,7 @@ import org.semanticweb.elk.proofs.inferences.Inference;
  */
 public interface InferenceReader {
 
+	public void initialize(ElkAxiom subsumption) throws ElkException;
+	
 	public Iterable<Inference> getInferences(Expression expression) throws ElkException;
 }

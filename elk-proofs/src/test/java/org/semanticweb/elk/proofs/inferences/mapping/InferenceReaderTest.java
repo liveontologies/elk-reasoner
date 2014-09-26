@@ -4,6 +4,18 @@
 package org.semanticweb.elk.proofs.inferences.mapping;
 
 import org.junit.Test;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.proofs.InferenceReader;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
+import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.TestReasonerUtils;
+import org.semanticweb.elk.reasoner.stages.RecursiveReasonerInferenceReader;
 /*
  * #%L
  * ELK Proofs Package
@@ -25,25 +37,15 @@ import org.junit.Test;
  * limitations under the License.
  * #L%
  */
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.proofs.utils.InferencePrinter;
-import org.semanticweb.elk.proofs.utils.ProofUtils;
-import org.semanticweb.elk.reasoner.Reasoner;
-import org.semanticweb.elk.reasoner.TestReasonerUtils;
 
 /**
- * Basic tests for {@link InferenceMapper}.
+ * Basic tests for various {@link InferenceReader}s and {@link InferenceMapper}.
  * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class InferenceMapperTest {
+public class InferenceReaderTest {
 	
 	@Test
 	public void testSimpleChainMapping() throws Exception {
@@ -51,20 +53,16 @@ public class InferenceMapperTest {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass g = factory.getClass(new ElkFullIri("http://example.org/G"));
+		ElkSubClassOfAxiom ax = factory.getSubClassOfAxiom(a, g);
+		RecursiveReasonerInferenceReader reader = new RecursiveReasonerInferenceReader(reasoner);
+		// tracing happens here
+		reader.initialize(ax);
+		// reading all inferences recursively
+		for (Inference inf : reader.getInferences(new AxiomExpression(ax))) {
+			System.out.println(InferencePrinter.print(inf));
+		}
 		
-		reasoner.explainSubsumption(a, g);
-		// now do mapping
-		ProofUtils.visitProofs(reasoner, a, g, new AbstractInferenceVisitor<Void, Void>() {
-
-			@Override
-			protected Void defaultVisit(Inference inference, Void input) {
-				
-				System.out.println(InferencePrinter.print(inference));
-				
-				return null;
-			}
-			
-		});
+		reasoner.shutdown();
 	}
 	
 	@Test

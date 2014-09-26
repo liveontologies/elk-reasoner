@@ -6,8 +6,11 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.proofs.InferenceReader;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.Inference;
@@ -31,22 +34,37 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Abstr
  */
 public class ReasonerInferenceReader implements InferenceReader {
 
-	private final AbstractReasonerState reasoner_;
+	final AbstractReasonerState reasoner;
 	
-	public ReasonerInferenceReader(AbstractReasonerState reasoner) {
-		reasoner_ = reasoner;
+	public ReasonerInferenceReader(AbstractReasonerState r) {
+		reasoner = r;
 	}
-	
-	public void initialize(ElkSubClassOfAxiom subsumption) throws ElkException {
-		reasoner_.explainSubsumption(subsumption.getSubClassExpression(), subsumption.getSuperClassExpression());
+
+	@Override
+	public void initialize(ElkAxiom subsumption) throws ElkException {
+		ElkSubClassOfAxiom ax = subsumption.accept(new AbstractElkAxiomVisitor<ElkSubClassOfAxiom>() {
+
+			@Override
+			public ElkSubClassOfAxiom visit(ElkSubClassOfAxiom elkSubClassOfAxiom) {
+				return elkSubClassOfAxiom;
+			}
+			
+		});
+		
+		if (ax != null) {
+			reasoner.explainSubsumption(ax.getSubClassExpression(), ax.getSuperClassExpression());
+		}
+		else {
+			throw new IllegalArgumentException(String.format("Only support explanations for SubClassOf axioms: %s", OwlFunctionalStylePrinter.toString(subsumption)));
+		}
 	}
 	
 	@Override
 	public Iterable<Inference> getInferences(Expression expression) throws ElkException {
 		final SingleInferenceMapper mapper = new SingleInferenceMapper();
 		// first transform the expression into an input for trace reader
-		TracingInput input = expression.accept(new ExpressionTracingInputVisitor(reasoner_.getIndexObjectConverter()), null);
-		TraceStore.Reader traceReader = reasoner_.getTraceState().getTraceStore().getReader();
+		TracingInput input = expression.accept(new ExpressionTracingInputVisitor(reasoner.getIndexObjectConverter()), null);
+		TraceStore.Reader traceReader = reasoner.getTraceState().getTraceStore().getReader();
 		// TODO the input shouldn't be null, we expect the above code to throw an exception if it can't transform the input
 		// now requesting tracing inferences and mapping them to user inferencess
 		if (input instanceof ClassTracingInput) {

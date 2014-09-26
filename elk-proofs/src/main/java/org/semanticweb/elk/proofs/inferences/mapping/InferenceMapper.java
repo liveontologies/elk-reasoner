@@ -28,6 +28,7 @@ import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
@@ -55,6 +56,7 @@ public class InferenceMapper {
 		traceReader_ = reader;
 	}
 	
+	// class and object property inferences
 	public void map(final IndexedClassExpression cxt, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
 		final SingleInferenceMapper singleMapper = new SingleInferenceMapper();
 		TraceUnwinder unwinder = new RecursiveTraceUnwinder(traceReader_);
@@ -91,4 +93,28 @@ public class InferenceMapper {
 					}
 				});
 	}
+	
+	// only object property inferences
+	public void map(final ObjectPropertyConclusion conclusion, final InferenceVisitor<?, ?> visitor) {
+		final SingleInferenceMapper singleMapper = new SingleInferenceMapper();
+		TraceUnwinder unwinder = new RecursiveTraceUnwinder(traceReader_);
+		
+		unwinder.accept(
+				conclusion,
+				new DummyObjectPropertyConclusionVisitor<IndexedClassExpression, Void>(), 
+				new AbstractObjectPropertyInferenceVisitor<Void, Void>() {
+
+					@Override
+					protected Void defaultTracedVisit(
+							ObjectPropertyInference inference, Void input) {
+						Inference mapped = singleMapper.map(inference);
+						
+						if (mapped != null) {
+							mapped.accept(visitor, null);
+						}
+						
+						return null;
+					}
+				});
+	}	
 }
