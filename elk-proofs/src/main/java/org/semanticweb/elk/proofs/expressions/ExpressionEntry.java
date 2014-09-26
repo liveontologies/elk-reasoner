@@ -10,9 +10,9 @@ package org.semanticweb.elk.proofs.expressions;
  */
 public class ExpressionEntry implements Expression {
 
-	private static final ExpressionHasher HASHER_ = null;
+	private static final ExpressionHasher HASHER_ = new StructuralEquivalenceHasher();
 			
-	private static final ExpressionEqualityChecker EQUALITY_CHECKER = null;
+	private static final ExpressionEqualityChecker EQUALITY_CHECKER = new StructuralEquivalenceChecker();
 	
 	private final Expression expr_;
 	
