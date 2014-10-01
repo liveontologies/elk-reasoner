@@ -175,6 +175,13 @@ public class ContextImpl implements ExtendedContext {
 		return subContextsByObjectProperty_;
 	}
 
+	SubContext getSubContext(IndexedObjectProperty subRoot) {
+		if (subContextsByObjectProperty_ == null) {
+			return null;
+		}
+		return subContextsByObjectProperty_.get(subRoot);
+	}
+	
 	SubContext getCreateSubContext(IndexedObjectProperty subRoot) {
 		if (subContextsByObjectProperty_ == null)
 			subContextsByObjectProperty_ = new ArrayHashMap<IndexedObjectProperty, SubContext>(
@@ -544,7 +551,7 @@ public class ContextImpl implements ExtendedContext {
 								.getRelation());
 			}
 			// else non-reflexive
-			SubContext subContext = input.getCreateSubContext(subConclusion
+			SubContext subContext = input.getSubContext(subConclusion
 					.getRelation());
 			return subContext != null
 					&& subContext.containsSubConclusion(subConclusion);

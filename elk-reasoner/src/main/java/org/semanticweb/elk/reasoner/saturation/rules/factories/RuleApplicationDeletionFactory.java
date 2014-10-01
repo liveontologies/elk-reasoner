@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.ConclusionPresenceCheckingWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
-import org.semanticweb.elk.reasoner.saturation.ContextExistenceCheckingWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
@@ -77,7 +77,10 @@ public class RuleApplicationDeletionFactory extends
 	SaturationStateWriter<Context> getFinalWriter(
 			SaturationStateWriter<? extends Context> writer) {
 		// only write to exiting contexts
-		return new ContextExistenceCheckingWriter<Context>(writer,
+		// return new ContextExistenceCheckingWriter<Context>(writer,
+		// getSaturationState());
+		// only produce conclusions that are present
+		return new ConclusionPresenceCheckingWriter<Context>(writer,
 				getSaturationState());
 	}
 
