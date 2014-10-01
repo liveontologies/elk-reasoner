@@ -60,122 +60,122 @@ public class RuleApplicationTimer {
 	/**
 	 * timer for {@link BackwardLinkChainFromBackwardLinkRule}
 	 */
-	int timeBackwardLinkChainFromBackwardLinkRule;
+	long timeBackwardLinkChainFromBackwardLinkRule;
 
 	/**
 	 * timer for {@link BackwardLinkFromForwardLinkRule}
 	 */
-	int timeBackwardLinkFromForwardLinkRule;
+	long timeBackwardLinkFromForwardLinkRule;
 
 	/**
 	 * time for {@link ContradicitonCompositionRule}
 	 */
-	int timeContradicitonCompositionRule;
+	long timeContradicitonCompositionRule;
 
 	/**
 	 * timer for {@link ContradictionFromDisjointnessRule}
 	 */
-	int timeContradictionFromDisjointnessRule;
+	long timeContradictionFromDisjointnessRule;
 
 	/**
 	 * timer for {@link ContradictionFromNegationRule}
 	 */
-	int timeContradictionFromNegationRule;
+	long timeContradictionFromNegationRule;
 
 	/**
 	 * timer for {@link ContradictionFromOwlNothingRule}
 	 */
-	int timeContradictionFromOwlNothingRule;
+	long timeContradictionFromOwlNothingRule;
 
 	/**
 	 * timer for {@link ContradictionOverBackwardLinkRule}
 	 */
-	int timeContradictionOverBackwardLinkRule;
+	long timeContradictionOverBackwardLinkRule;
 
 	/**
 	 * time for {@link ContradictionPropagationRule}
 	 */
-	int timeContradictionPropagationRule;
+	long timeContradictionPropagationRule;
 
 	/**
 	 * timer for {@link DisjointSubsumerFromMemberRule}
 	 */
-	int timeDisjointSubsumerFromMemberRule;
+	long timeDisjointSubsumerFromMemberRule;
 
 	/**
 	 * timer for {@link IndexedObjectComplementOfDecomposition}
 	 */
-	int timeIndexedObjectComplementOfDecomposition;
+	long timeIndexedObjectComplementOfDecomposition;
 
 	/**
 	 * time for {@link IndexedObjectIntersectionOfDecomposition}
 	 */
-	int timeIndexedObjectIntersectionOfDecomposition;
+	long timeIndexedObjectIntersectionOfDecomposition;
 
 	/**
 	 * time for {@link IndexedObjectSomeValuesFromDecomposition}
 	 */
-	int timeIndexedObjectSomeValuesFromDecomposition;
+	long timeIndexedObjectSomeValuesFromDecomposition;
 
 	/**
 	 * time for {@link NonReflexiveBackwardLinkCompositionRule}
 	 */
-	int timeNonReflexiveBackwardLinkCompositionRule;
+	long timeNonReflexiveBackwardLinkCompositionRule;
 
 	/**
 	 * timer for {@link NonReflexivePropagationRule}
 	 */
-	int timeNonReflexivePropagationRule;
+	long timeNonReflexivePropagationRule;
 
 	/**
 	 * timer for {@link ObjectIntersectionFromConjunctRule}
 	 */
-	int timeObjectIntersectionFromConjunctRule;
+	long timeObjectIntersectionFromConjunctRule;
 
 	/**
 	 * timer for {@link ObjectUnionFromDisjunctRule}
 	 */
-	int timeObjectUnionFromDisjunctRule;
+	long timeObjectUnionFromDisjunctRule;
 
 	/**
 	 * timer for {@link OwlThingContextInitRule}
 	 */
-	int timeOwlThingContextInitRule;
+	long timeOwlThingContextInitRule;
 
 	/**
 	 * timer for {@link PropagationFromExistentialFillerRule}
 	 */
-	int timePropagationFromExistentialFillerRule;
+	long timePropagationFromExistentialFillerRule;
 
 	/**
 	 * timer for {@link PropagationInitializationRule}
 	 */
-	int timePropagationInitializationRule;
+	long timePropagationInitializationRule;
 
 	/**
 	 * timer for {@link ReflexiveBackwardLinkCompositionRule}
 	 */
-	int timeReflexiveBackwardLinkCompositionRule;
+	long timeReflexiveBackwardLinkCompositionRule;
 
 	/**
 	 * timer for {@link ReflexivePropagationRule}
 	 */
-	int timeReflexivePropagationRule;
+	long timeReflexivePropagationRule;
 
 	/**
 	 * timer for {@link RootContextInitializationRule}
 	 */
-	int timeRootContextInitializationRule;
+	long timeRootContextInitializationRule;
 
 	/**
 	 * timer for {@link SubsumerBackwardLinkRule}
 	 */
-	int timeSubsumerBackwardLinkRule;
+	long timeSubsumerBackwardLinkRule;
 
 	/**
 	 * timer for {@link SuperClassFromSubClassRule}
 	 */
-	int timeSuperClassFromSubClassRule;
+	long timeSuperClassFromSubClassRule;
 
 	/**
 	 * Add the values the corresponding values of the given timer
@@ -209,7 +209,7 @@ public class RuleApplicationTimer {
 		timeBackwardLinkFromForwardLinkRule += timer.timeBackwardLinkFromForwardLinkRule;
 	}
 
-	public int getTotalRuleAppTime() {
+	public long getTotalRuleAppTime() {
 		return timeOwlThingContextInitRule + timeRootContextInitializationRule
 				+ timeDisjointSubsumerFromMemberRule
 				+ timeContradictionFromDisjointnessRule

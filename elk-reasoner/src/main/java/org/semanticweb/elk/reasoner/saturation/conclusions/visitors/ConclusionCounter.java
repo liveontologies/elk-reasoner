@@ -44,47 +44,47 @@ public class ConclusionCounter {
 	/**
 	 * counter for {@link BackwardLink}s
 	 */
-	int countBackwardLinks;
+	long countBackwardLinks;
 
 	/**
 	 * counter for {@link ContextInitialization}s
 	 */
-	int countContextInitializations;
+	long countContextInitializations;
 
 	/**
 	 * counter for {@link Contradiction}s
 	 */
-	int countContradictions;
+	long countContradictions;
 
 	/**
 	 * counter for {@link DisjointSubsumer}s
 	 */
-	int countDisjointSubsumers;
+	long countDisjointSubsumers;
 
 	/**
 	 * counter for {@link ForwardLink}s
 	 */
-	int countForwardLinks;
+	long countForwardLinks;
 
 	/**
 	 * counter for {@link DecomposedSubsumer}s
 	 */
-	int countDecomposedSubsumers;
+	long countDecomposedSubsumers;
 
 	/**
 	 * counter for {@link ComposedSubsumer}s
 	 */
-	int countComposedSubsumers;
+	long countComposedSubsumers;
 
 	/**
 	 * counter for {@link Propagation}s
 	 */
-	int countPropagations;
+	long countPropagations;
 
 	/**
 	 * counter for {@link SubContextInitialization}s
 	 */
-	int countSubContextInitializations;
+	long countSubContextInitializations;
 
 	/**
 	 * Adds all counters of the argument to the corresponding counters of this
@@ -107,43 +107,43 @@ public class ConclusionCounter {
 		this.countSubContextInitializations += counter.countSubContextInitializations;
 	}
 
-	public int getCountBackwardLinks() {
+	public long getCountBackwardLinks() {
 		return countBackwardLinks;
 	}
 
-	public int getCountBottoms() {
+	public long getCountBottoms() {
 		return countContradictions;
 	}
 
-	public int getCountContextInitializations() {
+	public long getCountContextInitializations() {
 		return countContextInitializations;
 	}
 
-	public int getCountDisjointSubsumers() {
+	public long getCountDisjointSubsumers() {
 		return countDisjointSubsumers;
 	}
 
-	public int getCountForwardLinks() {
+	public long getCountForwardLinks() {
 		return countForwardLinks;
 	}
 
-	public int getCountDecomposedSubsumers() {
+	public long getCountDecomposedSubsumers() {
 		return countDecomposedSubsumers;
 	}
 
-	public int getCountComposedSubsumers() {
+	public long getCountComposedSubsumers() {
 		return countComposedSubsumers;
 	}
 
-	public int getCountPropagations() {
+	public long getCountPropagations() {
 		return countPropagations;
 	}
 
-	public int getCountSubContextInitializations() {
+	public long getCountSubContextInitializations() {
 		return countSubContextInitializations;
 	}
 
-	public int getTotalCount() {
+	public long getTotalCount() {
 		return countDecomposedSubsumers + countComposedSubsumers
 				+ countBackwardLinks + countForwardLinks + countContradictions
 				+ countPropagations + countDisjointSubsumers

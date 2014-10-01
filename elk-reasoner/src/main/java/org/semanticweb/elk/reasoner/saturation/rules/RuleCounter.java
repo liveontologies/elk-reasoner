@@ -59,122 +59,122 @@ public class RuleCounter {
 	/**
 	 * counter for {@link BackwardLinkChainFromBackwardLinkRule}
 	 */
-	int countBackwardLinkChainFromBackwardLinkRule;
+	long countBackwardLinkChainFromBackwardLinkRule;
 
 	/**
 	 * counter for {@link BackwardLinkFromForwardLinkRule}
 	 */
-	int countBackwardLinkFromForwardLinkRule;
+	long countBackwardLinkFromForwardLinkRule;
 
 	/**
 	 * counter for {@link ContradicitonCompositionRule}
 	 */
-	int countContradicitonCompositionRule;
+	long countContradicitonCompositionRule;
 
 	/**
 	 * counter for {@link ContradictionFromDisjointnessRule}
 	 */
-	int countContradictionFromDisjointnessRule;
+	long countContradictionFromDisjointnessRule;
 
 	/**
 	 * counter for {@link ContradictionFromNegationRule}
 	 */
-	int countContradictionFromNegationRule;
+	long countContradictionFromNegationRule;
 
 	/**
 	 * counter for {@link ContradictionFromOwlNothingRule}
 	 */
-	int countContradictionFromOwlNothingRule;
+	long countContradictionFromOwlNothingRule;
 
 	/**
 	 * counter for {@link ContradictionOverBackwardLinkRule}
 	 */
-	int countContradictionOverBackwardLinkRule;
+	long countContradictionOverBackwardLinkRule;
 
 	/**
 	 * counter for {@link ContradictionPropagationRule}
 	 */
-	int countContradictionPropagationRule;
+	long countContradictionPropagationRule;
 
 	/**
 	 * counter for {@link DisjointSubsumerFromMemberRule}
 	 */
-	int countDisjointSubsumerFromMemberRule;
+	long countDisjointSubsumerFromMemberRule;
 
 	/**
 	 * counter for {@link IndexedObjectComplementOfDecomposition}
 	 */
-	int countIndexedObjectComplementOfDecomposition;
+	long countIndexedObjectComplementOfDecomposition;
 
 	/**
 	 * counter for {@link IndexedObjectIntersectionOfDecomposition}
 	 */
-	int countIndexedObjectIntersectionOfDecomposition;
+	long countIndexedObjectIntersectionOfDecomposition;
 
 	/**
 	 * counter for {@link IndexedObjectSomeValuesFromDecomposition}
 	 */
-	int countIndexedObjectSomeValuesFromDecomposition;
+	long countIndexedObjectSomeValuesFromDecomposition;
 
 	/**
 	 * counter for {@link NonReflexiveBackwardLinkCompositionRule}
 	 */
-	int countNonReflexiveBackwardLinkCompositionRule;
+	long countNonReflexiveBackwardLinkCompositionRule;
 
 	/**
 	 * counter for {@link NonReflexivePropagationRule}
 	 */
-	int countNonReflexivePropagationRule;
+	long countNonReflexivePropagationRule;
 
 	/**
 	 * counter for {@link ObjectIntersectionFromConjunctRule}
 	 */
-	int countObjectIntersectionFromConjunctRule;
+	long countObjectIntersectionFromConjunctRule;
 
 	/**
 	 * counter for {@link ObjectUnionFromDisjunctRule}
 	 */
-	int countObjectUnionFromDisjunctRule;
+	long countObjectUnionFromDisjunctRule;
 
 	/**
 	 * counter for {@link OwlThingContextInitRule}
 	 */
-	int countOwlThingContextInitRule;
+	long countOwlThingContextInitRule;
 
 	/**
 	 * counter for {@link PropagationFromExistentialFillerRule}
 	 */
-	int countPropagationFromExistentialFillerRule;
+	long countPropagationFromExistentialFillerRule;
 
 	/**
 	 * counter for {@link PropagationInitializationRule}
 	 */
-	int countPropagationInitializationRule;
+	long countPropagationInitializationRule;
 
 	/**
 	 * counter for {@link ReflexiveBackwardLinkCompositionRule}
 	 */
-	int countReflexiveBackwardLinkCompositionRule;
+	long countReflexiveBackwardLinkCompositionRule;
 
 	/**
 	 * counter for {@link ReflexivePropagationRule}
 	 */
-	int countReflexivePropagationRule;
+	long countReflexivePropagationRule;
 
 	/**
 	 * counter for {@link RootContextInitializationRule}
 	 */
-	int countRootContextInitializationRule;
+	long countRootContextInitializationRule;
 
 	/**
 	 * counter for {@link SubsumerBackwardLinkRule}
 	 */
-	int countSubsumerBackwardLinkRule;
+	long countSubsumerBackwardLinkRule;
 
 	/**
 	 * counter for {@link SuperClassFromSubClassRule}
 	 */
-	int countSuperClassFromSubClassRule;
+	long countSuperClassFromSubClassRule;
 
 	/**
 	 * Add the values the corresponding values of the given counter
@@ -208,7 +208,7 @@ public class RuleCounter {
 		countBackwardLinkFromForwardLinkRule += counter.countBackwardLinkFromForwardLinkRule;
 	}
 
-	public int getTotalRuleAppCount() {
+	public long getTotalRuleAppCount() {
 		return countOwlThingContextInitRule
 				+ countRootContextInitializationRule
 				+ countDisjointSubsumerFromMemberRule

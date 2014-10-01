@@ -112,8 +112,8 @@ public class ConclusionStatistics extends AbstractStatistics {
 		// TODO
 	}
 
-	void print(StatisticsPrinter printer, String name, int processedCount,
-			int usedCount, int producedCount, long time) {
+	void print(StatisticsPrinter printer, String name, long processedCount,
+			long usedCount, long producedCount, long time) {
 		if (processedCount == 0)
 			return;
 
