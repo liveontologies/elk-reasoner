@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
-import org.semanticweb.elk.reasoner.saturation.ConclusionAbsenceCheckingWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -54,14 +53,15 @@ public class RuleApplicationAdditionFactory extends
 		AbstractRuleApplicationFactory<Context> {
 
 	private final RuleApplicationVisitorFactory ruleAppVisitorFactory_;
-
-	public RuleApplicationAdditionFactory(SaturationState<?> saturationState) {
+	
+	public RuleApplicationAdditionFactory(
+			SaturationState<?> saturationState) {
 		// this factory applies non-redundant rules by default
 		this(saturationState, new NonRedundantRuleApplicationVisitorFactory());
 	}
-
-	public RuleApplicationAdditionFactory(SaturationState<?> saturationState,
-			RuleApplicationVisitorFactory factory) {
+	
+	public RuleApplicationAdditionFactory(
+			SaturationState<?> saturationState, RuleApplicationVisitorFactory factory) {
 		super(saturationState);
 		ruleAppVisitorFactory_ = factory;
 	}
@@ -69,15 +69,7 @@ public class RuleApplicationAdditionFactory extends
 	protected final RuleApplicationVisitorFactory getRuleApplicationVisitorFactory() {
 		return ruleAppVisitorFactory_;
 	}
-
-	@Override
-	SaturationStateWriter<Context> getFinalWriter(
-			SaturationStateWriter<? extends Context> writer) {
-		// only write conclusions that are absent
-		return new ConclusionAbsenceCheckingWriter<Context>(writer,
-				getSaturationState());
-	}
-
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	protected ConclusionVisitor<? super Context, Boolean> getConclusionProcessor(
