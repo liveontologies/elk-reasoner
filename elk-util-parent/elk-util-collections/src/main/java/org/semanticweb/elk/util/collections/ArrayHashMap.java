@@ -203,9 +203,11 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 			throw new NullPointerException();
 		// to avoid problems in the middle of resizing, we copy keys and values
 		// when they have the same size
+		K[] keys;
+		V[] values;
 		for (;;) {
-			K[] keys = this.keys;
-			V[] values = this.values;
+			keys = this.keys;
+			values = this.values;
 			if (keys.length == values.length)
 				break;
 		}
