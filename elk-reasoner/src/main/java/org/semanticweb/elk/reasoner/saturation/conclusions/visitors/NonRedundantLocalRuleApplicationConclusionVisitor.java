@@ -147,7 +147,7 @@ public class NonRedundantLocalRuleApplicationConclusionVisitor extends
 	@Override
 	public Boolean visit(DecomposedSubsumer<?> conclusion,
 			ContextPremises premises) {
-		applyCompositionRules(conclusion, premises);
+//		applyCompositionRules(conclusion, premises);
 		applyDecompositionRules(conclusion, premises);
 		return true;
 	}

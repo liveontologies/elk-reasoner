@@ -35,6 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwa
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
@@ -66,6 +67,11 @@ public class RuleApplicationTimer {
 	 * timer for {@link BackwardLinkFromForwardLinkRule}
 	 */
 	long timeBackwardLinkFromForwardLinkRule;
+
+	/**
+	 * timer for {@link ComposedFromDecomposedSubsumerRule}
+	 */
+	long timeComposedFromDecomposedSubsumerRule;
 
 	/**
 	 * time for {@link ContradicitonCompositionRule}
@@ -207,6 +213,7 @@ public class RuleApplicationTimer {
 		timeReflexivePropagationRule += timer.timeReflexivePropagationRule;
 		timePropagationInitializationRule += timer.timePropagationInitializationRule;
 		timeBackwardLinkFromForwardLinkRule += timer.timeBackwardLinkFromForwardLinkRule;
+		timeComposedFromDecomposedSubsumerRule += timer.timeComposedFromDecomposedSubsumerRule;
 	}
 
 	public long getTotalRuleAppTime() {
@@ -232,7 +239,8 @@ public class RuleApplicationTimer {
 				+ timeNonReflexivePropagationRule
 				+ timeReflexivePropagationRule
 				+ timePropagationInitializationRule
-				+ timeBackwardLinkFromForwardLinkRule;
+				+ timeBackwardLinkFromForwardLinkRule
+				+ timeComposedFromDecomposedSubsumerRule;
 	}
 
 	/**
@@ -263,6 +271,7 @@ public class RuleApplicationTimer {
 		timeReflexivePropagationRule = 0;
 		timePropagationInitializationRule = 0;
 		timeBackwardLinkFromForwardLinkRule = 0;
+		timeComposedFromDecomposedSubsumerRule = 0;
 	}
 
 }

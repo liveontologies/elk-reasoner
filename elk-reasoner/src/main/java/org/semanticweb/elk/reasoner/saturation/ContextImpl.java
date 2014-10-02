@@ -101,7 +101,8 @@ public class ContextImpl implements ExtendedContext {
 	private Map<IndexedDisjointnessAxiom, IndexedClassExpression[]> disjointnessAxioms_;
 
 	/**
-	 * {@code true} if {@code owl:Nothing} is stored in {@link #subsumers_}
+	 * {@code true} if {@code owl:Nothing} is stored in
+	 * {@link #composedSubsumers_}
 	 */
 	private volatile boolean isInconsistent_ = false;
 
@@ -112,17 +113,25 @@ public class ContextImpl implements ExtendedContext {
 	private volatile boolean isSaturated_ = true;
 
 	/**
-	 * the root {@link IndexedClassExpression} for which the {@link #subsumers_}
-	 * are computed
+	 * the root {@link IndexedClassExpression} for which the
+	 * {@link #composedSubsumers_} are computed
 	 * 
 	 */
 	private final IndexedClassExpression root_;
 
 	/**
 	 * the derived {@link IndexedClassExpression}s that are subsumers (i.e,
-	 * super-classes) of {@link #root_}
+	 * super-classes) of {@link #root_} and for which composition rules should
+	 * be applied
 	 */
-	private final Set<IndexedClassExpression> subsumers_;
+	private final Set<IndexedClassExpression> composedSubsumers_;
+
+	/**
+	 * the derived {@link IndexedClassExpression}s that are subsumers (i.e,
+	 * super-classes) of {@link #root_} and for which decomposition rules should
+	 * be applied
+	 */
+	private final Set<IndexedClassExpression> decomposedSubsumers_;
 
 	/**
 	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
@@ -144,7 +153,8 @@ public class ContextImpl implements ExtendedContext {
 	public ContextImpl(IndexedClassExpression root) {
 		this.root_ = root;
 		this.toDo_ = new ActivationStack<Conclusion>();
-		this.subsumers_ = new ArrayHashSet<IndexedClassExpression>(13);
+		this.composedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(13);
+		this.decomposedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(13);
 	}
 
 	@Override
@@ -230,21 +240,17 @@ public class ContextImpl implements ExtendedContext {
 
 	@Override
 	public Set<IndexedClassExpression> getSubsumers() {
-		return subsumers_;
+		return composedSubsumers_;
 	}
 
-	/*@Override
-	public boolean isInconsistForDisjointnessAxiom(
-			IndexedDisjointnessAxiom axiom) {
-		if (disjointnessAxioms_ == null)
-			return false;
-		IndexedClassExpression[] members = disjointnessAxioms_.get(axiom);
-		if (members == null)
-			return false;
-		// check if both members are not null; this is always when the second
-		// member is not null
-		return (members[1] != null);
-	}*/
+	/*
+	 * @Override public boolean isInconsistForDisjointnessAxiom(
+	 * IndexedDisjointnessAxiom axiom) { if (disjointnessAxioms_ == null) return
+	 * false; IndexedClassExpression[] members = disjointnessAxioms_.get(axiom);
+	 * if (members == null) return false; // check if both members are not null;
+	 * this is always when the second // member is not null return (members[1]
+	 * != null); }
+	 */
 
 	@Override
 	public IndexedClassExpression[] getDisjointSubsumers(
@@ -252,7 +258,7 @@ public class ContextImpl implements ExtendedContext {
 		if (disjointnessAxioms_ == null) {
 			return null;
 		}
-		
+
 		return disjointnessAxioms_.get(axiom);
 	}
 
@@ -305,10 +311,6 @@ public class ContextImpl implements ExtendedContext {
 	private static class ConclusionInserter implements
 			ConclusionVisitor<ContextImpl, Boolean> {
 
-		static Boolean visit(Subsumer<?> conclusion, ContextImpl input) {
-			return input.subsumers_.add(conclusion.getExpression());
-		}
-
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
 			IndexedObjectProperty relation = subConclusion.getRelation();
@@ -328,7 +330,7 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(ComposedSubsumer<?> conclusion, ContextImpl input) {
-			return visit((Subsumer<?>) conclusion, input);
+			return input.composedSubsumers_.add(conclusion.getExpression());
 		}
 
 		@Override
@@ -351,7 +353,7 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
-			return visit((Subsumer<?>) conclusion, input);
+			return input.decomposedSubsumers_.add(conclusion.getExpression());
 		}
 
 		@Override
@@ -431,13 +433,9 @@ public class ContextImpl implements ExtendedContext {
 			return changed;
 		}
 
-		static boolean visit(Subsumer<?> conclusion, ContextImpl input) {
-			return input.subsumers_.remove(conclusion.getExpression());
-		}
-
 		@Override
 		public Boolean visit(ComposedSubsumer<?> conclusion, ContextImpl input) {
-			return visit((Subsumer<?>) conclusion, input);
+			return input.composedSubsumers_.remove(conclusion.getExpression());
 		}
 
 		@Override
@@ -460,7 +458,8 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
-			return visit((Subsumer<?>) conclusion, input);
+			return input.decomposedSubsumers_
+					.remove(conclusion.getExpression());
 		}
 
 		@Override
@@ -531,10 +530,6 @@ public class ContextImpl implements ExtendedContext {
 	private static class ConclusionOccurrenceChecker implements
 			ConclusionVisitor<ContextImpl, Boolean> {
 
-		static boolean visit(Subsumer<?> conclusion, ContextImpl input) {
-			return input.subsumers_.contains(conclusion.getExpression());
-		}
-
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
 			if (subConclusion.getSourceRoot(input.root_) == input.root_) {
@@ -552,7 +547,8 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(ComposedSubsumer<?> conclusion, ContextImpl input) {
-			return visit((Subsumer<?>) conclusion, input);
+			return input.composedSubsumers_
+					.contains(conclusion.getExpression());
 		}
 
 		@Override
@@ -567,7 +563,8 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
-			return visit((Subsumer<?>) conclusion, input);
+			return input.decomposedSubsumers_.contains(conclusion
+					.getExpression());
 		}
 
 		@Override

@@ -64,6 +64,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwa
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
@@ -395,6 +396,13 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				ForwardLink premise, ContextPremises premises,
 				ConclusionProducer producer) {
 			// nothing is stored in the rule
+		}
+
+		@Override
+		public void visit(ComposedFromDecomposedSubsumerRule rule,
+				IndexedClassExpression premise, ContextPremises premises,
+				ConclusionProducer producer) {
+			// nothing is stored in the rule			
 		}
 
 	}

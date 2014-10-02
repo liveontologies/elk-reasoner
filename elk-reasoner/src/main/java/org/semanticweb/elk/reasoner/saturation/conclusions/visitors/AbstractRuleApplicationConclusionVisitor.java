@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -27,6 +28,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecompositionVisitor;
 
@@ -62,9 +64,11 @@ public abstract class AbstractRuleApplicationConclusionVisitor extends
 
 	void applyDecompositionRules(Subsumer<?> conclusion,
 			ContextPremises premises) {
-		conclusion.getExpression().accept(
-				new SubsumerDecompositionVisitor(ruleAppVisitor, premises,
-						producer));
+		IndexedClassExpression subsumer = conclusion.getExpression();
+		subsumer.accept(new SubsumerDecompositionVisitor(ruleAppVisitor,
+				premises, producer));
+		ComposedFromDecomposedSubsumerRule.getInstance().accept(ruleAppVisitor,
+				subsumer, premises, producer);
 	}
 
 }

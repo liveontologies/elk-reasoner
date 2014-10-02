@@ -47,6 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwa
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
@@ -120,6 +121,17 @@ public class RuleApplicationTimerVisitor implements RuleVisitor {
 				.getCurrentTimeMillis();
 		visitor_.visit(rule, premise, premises, producer);
 		timer_.timeBackwardLinkFromForwardLinkRule += CachedTimeThread
+				.getCurrentTimeMillis();
+	}
+
+	@Override
+	public void visit(ComposedFromDecomposedSubsumerRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		timer_.timeComposedFromDecomposedSubsumerRule -= CachedTimeThread
+				.getCurrentTimeMillis();
+		visitor_.visit(rule, premise, premises, producer);
+		timer_.timeComposedFromDecomposedSubsumerRule += CachedTimeThread
 				.getCurrentTimeMillis();
 	}
 

@@ -44,10 +44,6 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerRuleVisit
  * 
  * @author "Yevgeny Kazakov"
  */
-/**
- * @author "Yevgeny Kazakov"
- * 
- */
 public interface RuleVisitor extends SubsumerRuleVisitor,
 		BackwardLinkRuleVisitor, ContextInitRuleVisitor,
 		SubContextInitRuleVisitor, ContradictionRuleVisitor,

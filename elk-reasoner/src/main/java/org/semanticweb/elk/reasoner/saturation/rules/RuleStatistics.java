@@ -13,6 +13,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwa
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
@@ -114,6 +115,10 @@ public class RuleStatistics extends AbstractStatistics {
 		print(printer, NonReflexiveBackwardLinkCompositionRule.NAME,
 				ruleCounter.countNonReflexiveBackwardLinkCompositionRule,
 				ruleTimer.timeNonReflexiveBackwardLinkCompositionRule);
+
+		print(printer, ComposedFromDecomposedSubsumerRule.NAME,
+				ruleCounter.countComposedFromDecomposedSubsumerRule,
+				ruleTimer.timeComposedFromDecomposedSubsumerRule);
 
 		print(printer, ContradicitonCompositionRule.NAME,
 				ruleCounter.countContradicitonCompositionRule,

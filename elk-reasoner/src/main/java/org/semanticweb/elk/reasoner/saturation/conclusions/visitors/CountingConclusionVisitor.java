@@ -58,7 +58,7 @@ public class CountingConclusionVisitor<I> implements
 
 	@Override
 	public Boolean visit(ComposedSubsumer<?> conclusion, I input) {
-		counter_.countDecomposedSubsumers++;
+		counter_.countComposedSubsumers++;
 		return true;
 	}
 
@@ -76,7 +76,7 @@ public class CountingConclusionVisitor<I> implements
 
 	@Override
 	public Boolean visit(DecomposedSubsumer<?> conclusion, I input) {
-		counter_.countComposedSubsumers++;
+		counter_.countDecomposedSubsumers++;
 		return true;
 	}
 
