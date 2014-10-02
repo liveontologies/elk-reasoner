@@ -35,6 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.forwardlink.ReflexiveBackwa
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.NonReflexivePropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.propagations.ReflexivePropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subcontextinit.PropagationInitializationRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ComposedFromDecomposedSubsumerRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
@@ -65,6 +66,11 @@ public class RuleCounter {
 	 * counter for {@link BackwardLinkFromForwardLinkRule}
 	 */
 	long countBackwardLinkFromForwardLinkRule;
+
+	/**
+	 * counter for {@link ComposedFromDecomposedSubsumerRule}
+	 */
+	long countComposedFromDecomposedSubsumerRule;
 
 	/**
 	 * counter for {@link ContradicitonCompositionRule}
@@ -206,6 +212,7 @@ public class RuleCounter {
 		countReflexiveBackwardLinkCompositionRule += counter.countReflexiveBackwardLinkCompositionRule;
 		countPropagationInitializationRule += counter.countPropagationInitializationRule;
 		countBackwardLinkFromForwardLinkRule += counter.countBackwardLinkFromForwardLinkRule;
+		countComposedFromDecomposedSubsumerRule += counter.countComposedFromDecomposedSubsumerRule;
 	}
 
 	public long getTotalRuleAppCount() {
@@ -232,7 +239,8 @@ public class RuleCounter {
 				+ countNonReflexivePropagationRule
 				+ countReflexivePropagationRule
 				+ countPropagationInitializationRule
-				+ countBackwardLinkFromForwardLinkRule;
+				+ countBackwardLinkFromForwardLinkRule
+				+ countComposedFromDecomposedSubsumerRule;
 	}
 
 	/**
@@ -263,5 +271,6 @@ public class RuleCounter {
 		countReflexivePropagationRule = 0;
 		countPropagationInitializationRule = 0;
 		countBackwardLinkFromForwardLinkRule = 0;
+		countComposedFromDecomposedSubsumerRule = 0;
 	}
 }
