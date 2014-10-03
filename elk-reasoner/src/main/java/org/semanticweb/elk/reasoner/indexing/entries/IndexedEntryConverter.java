@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChai
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
@@ -129,6 +130,12 @@ public class IndexedEntryConverter<T>
 			IndexedDisjointnessAxiom axiom) {
 		return new IndexedDisjointnessAxiomEntry<T, IndexedDisjointnessAxiom>(
 				axiom);
+	}
+
+	@Override
+	public KeyEntry<T, ? extends IndexedDefinitionAxiom> visit(
+			IndexedDefinitionAxiom axiom) {
+		return new IndexedDefinitionAxiomEntry<T, IndexedDefinitionAxiom>(axiom);
 	}
 
 }

@@ -31,6 +31,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
@@ -69,6 +70,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
@@ -402,7 +405,22 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		public void visit(ComposedFromDecomposedSubsumerRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
-			// nothing is stored in the rule			
+			// nothing is stored in the rule
+		}
+
+		@Override
+		public void visit(IndexedClassDecomposition rule, IndexedClass premise,
+				ContextPremises premises, ConclusionProducer producer) {
+			// nothing is stored in the rule
+		}
+
+		@Override
+		public void visit(IndexedClassFromDefinitionRule rule,
+				IndexedClassExpression premise, ContextPremises premises,
+				ConclusionProducer producer) {
+			for (IndexedClassExpression ice : rule.getDefinedClasses()) {
+				iceValidator_.checkNew(ice);
+			}
 		}
 
 	}

@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
@@ -51,6 +52,16 @@ public class IndexedClass extends IndexedClassEntity {
 	protected int occurrenceNo = 0;
 
 	/**
+	 * The {@link IndexedClassExpression} corresponding to an
+	 * {@link ElkClassExpression} defined equivalent to the enclosed
+	 * {@link ElkClass} in the ontology. There can be several such equivalent
+	 * {@link ElkClassExpression}s in the ontology, but at most one of them
+	 * should be chosen as the definition; the value can be {@code null} if
+	 * there are no such equivalent {@link ElkClassExpression}s.
+	 */
+	protected IndexedClassExpression definedClassExpression;
+
+	/**
 	 * Creates an object representing the given ElkClass.
 	 */
 	protected IndexedClass(ElkClass clazz) {
@@ -62,6 +73,10 @@ public class IndexedClass extends IndexedClassEntity {
 	 */
 	public ElkClass getElkClass() {
 		return elkClass;
+	}
+
+	public IndexedClassExpression getDefinedClassExpression() {
+		return this.definedClassExpression;
 	}
 
 	public <O> O accept(IndexedClassVisitor<O> visitor) {

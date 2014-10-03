@@ -70,7 +70,9 @@ public class SubsumerDecompositionVisitor implements
 
 	@Override
 	public Void visit(IndexedClass element) {
-		// no rules are applicable
+		if (element.getDefinedClassExpression() != null)
+			IndexedClassDecomposition.getInstance().accept(ruleVisitor_,
+					element, premises_, producer_);
 		return null;
 	}
 

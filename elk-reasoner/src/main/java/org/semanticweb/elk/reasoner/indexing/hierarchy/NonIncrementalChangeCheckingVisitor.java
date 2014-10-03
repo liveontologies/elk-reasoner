@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
 /*
  * #%L
  * ELK Reasoner
@@ -100,6 +101,13 @@ public class NonIncrementalChangeCheckingVisitor extends
 	public void indexSubClassOfAxiom(ElkClassExpression subClass,
 			ElkClassExpression superClass) {
 		getIndexingVisitor().indexSubClassOfAxiom(subClass, superClass);
+	}
+
+	@Override
+	public void indexEquivalentClasses(ElkClassExpression firstClassExpression,
+			ElkClassExpression secondClassExpression) {
+		getIndexingVisitor().indexEquivalentClasses(firstClassExpression,
+				secondClassExpression);
 	}
 
 	@Override
