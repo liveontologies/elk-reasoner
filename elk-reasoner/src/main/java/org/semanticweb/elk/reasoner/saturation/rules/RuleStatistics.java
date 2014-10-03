@@ -18,6 +18,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
@@ -148,6 +150,10 @@ public class RuleStatistics extends AbstractStatistics {
 				ruleCounter.countDisjointSubsumerFromMemberRule,
 				ruleTimer.timeDisjointSubsumerFromMemberRule);
 
+		print(printer, IndexedClassDecomposition.NAME,
+				ruleCounter.countIndexedClassDecomposition,
+				ruleTimer.timeIndexedClassDecomposition);
+
 		print(printer, IndexedObjectComplementOfDecomposition.NAME,
 				ruleCounter.countIndexedObjectComplementOfDecomposition,
 				ruleTimer.timeIndexedObjectComplementOfDecomposition);
@@ -195,6 +201,10 @@ public class RuleStatistics extends AbstractStatistics {
 		print(printer, SuperClassFromSubClassRule.NAME,
 				ruleCounter.countSuperClassFromSubClassRule,
 				ruleTimer.timeSuperClassFromSubClassRule);
+
+		print(printer, IndexedClassFromDefinitionRule.NAME,
+				ruleCounter.countIndexedClassFromDefinitionRule,
+				ruleTimer.timeIndexedClassFromDefinitionRule);
 
 		print(printer, ReflexiveBackwardLinkCompositionRule.NAME,
 				ruleCounter.countReflexiveBackwardLinkCompositionRule,

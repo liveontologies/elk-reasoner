@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
@@ -52,6 +53,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
@@ -175,6 +178,21 @@ public class RuleCounterVisitor implements RuleVisitor {
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		counter_.countDisjointSubsumerFromMemberRule++;
+		visitor_.visit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public void visit(IndexedClassDecomposition rule, IndexedClass premise,
+			ContextPremises premises, ConclusionProducer producer) {
+		counter_.countIndexedClassDecomposition++;
+		visitor_.visit(rule, premise, premises, producer);
+	}
+
+	@Override
+	public void visit(IndexedClassFromDefinitionRule rule,
+			IndexedClassExpression premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		counter_.countIndexedClassFromDefinitionRule++;
 		visitor_.visit(rule, premise, premises, producer);
 	}
 

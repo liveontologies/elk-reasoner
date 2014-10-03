@@ -199,6 +199,12 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	}
 
 	@Override
+	public IndexedDefinitionAxiom visit(IndexedDefinitionAxiom axiom) {
+		// caching not supported
+		return axiom;
+	}
+
+	@Override
 	public IndexedDisjointnessAxiom visit(IndexedDisjointnessAxiom axiom) {
 		return resolveCache(
 				(IndexedDisjointnessAxiom) indexedAxiomLookup.get(axiom), axiom);
@@ -293,6 +299,12 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			return indexedAxiomLookup.add(axiom);
 		}
 
+		@Override
+		public Boolean visit(IndexedDefinitionAxiom axiom) {
+			// caching not supported
+			return null;
+		}
+
 	};
 
 	final IndexedObjectVisitor<Boolean> deletor = new IndexedObjectVisitor<Boolean>() {
@@ -378,6 +390,12 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 			LOGGER_.trace("Removing {}", axiom);
 
 			return indexedAxiomLookup.removeEntry(axiom) != null;
+		}
+
+		@Override
+		public Boolean visit(IndexedDefinitionAxiom axiom) {
+			// // caching not supported
+			return null;
 		}
 
 	};

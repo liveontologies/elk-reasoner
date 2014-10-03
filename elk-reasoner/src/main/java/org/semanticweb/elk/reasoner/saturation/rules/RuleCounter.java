@@ -40,6 +40,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectComplementOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectIntersectionOfDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedObjectSomeValuesFromDecomposition;
@@ -106,6 +108,16 @@ public class RuleCounter {
 	 * counter for {@link DisjointSubsumerFromMemberRule}
 	 */
 	long countDisjointSubsumerFromMemberRule;
+
+	/**
+	 * counter for {@link IndexedClassDecomposition}
+	 */
+	long countIndexedClassDecomposition;
+
+	/**
+	 * counter for {@link IndexedClassFromDefinitionRule}
+	 */
+	long countIndexedClassFromDefinitionRule;
 
 	/**
 	 * counter for {@link IndexedObjectComplementOfDecomposition}
@@ -213,6 +225,8 @@ public class RuleCounter {
 		countPropagationInitializationRule += counter.countPropagationInitializationRule;
 		countBackwardLinkFromForwardLinkRule += counter.countBackwardLinkFromForwardLinkRule;
 		countComposedFromDecomposedSubsumerRule += counter.countComposedFromDecomposedSubsumerRule;
+		countIndexedClassDecomposition += counter.countIndexedClassDecomposition;
+		countIndexedClassFromDefinitionRule += counter.countIndexedClassFromDefinitionRule;
 	}
 
 	public long getTotalRuleAppCount() {
@@ -240,7 +254,9 @@ public class RuleCounter {
 				+ countReflexivePropagationRule
 				+ countPropagationInitializationRule
 				+ countBackwardLinkFromForwardLinkRule
-				+ countComposedFromDecomposedSubsumerRule;
+				+ countComposedFromDecomposedSubsumerRule
+				+ countIndexedClassDecomposition
+				+ countIndexedClassFromDefinitionRule;
 	}
 
 	/**
@@ -272,5 +288,7 @@ public class RuleCounter {
 		countPropagationInitializationRule = 0;
 		countBackwardLinkFromForwardLinkRule = 0;
 		countComposedFromDecomposedSubsumerRule = 0;
+		countIndexedClassDecomposition = 0;
+		countIndexedClassFromDefinitionRule = 0;
 	}
 }

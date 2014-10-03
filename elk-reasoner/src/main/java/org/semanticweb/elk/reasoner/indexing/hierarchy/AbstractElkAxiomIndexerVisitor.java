@@ -162,8 +162,9 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 			if (first == null)
 				first = c;
 			else {
-				indexSubClassOfAxiom(first, c);
-				indexSubClassOfAxiom(c, first);
+				 indexEquivalentClasses(first, c);
+//				indexSubClassOfAxiom(first, c);
+//				indexSubClassOfAxiom(c, first);
 			}
 		}
 		return null;

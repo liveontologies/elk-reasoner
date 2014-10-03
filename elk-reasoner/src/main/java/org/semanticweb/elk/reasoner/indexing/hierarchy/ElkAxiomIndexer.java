@@ -45,6 +45,9 @@ public interface ElkAxiomIndexer {
 
 	public void indexSubClassOfAxiom(ElkClassExpression subClass,
 			ElkClassExpression superClass);
+	
+	public void indexEquivalentClasses(ElkClassExpression firstClass,
+			ElkClassExpression secondClass);
 
 	public void indexSubObjectPropertyOfAxiom(
 			ElkSubObjectPropertyExpression subProperty,

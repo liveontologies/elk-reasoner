@@ -22,14 +22,9 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 
-public interface IndexedAxiomFilter extends
-		IndexedSubClassOfAxiomVisitor<IndexedSubClassOfAxiom>,
-		IndexedDefinitionAxiomVisitor<IndexedDefinitionAxiom>,
-		IndexedDisjointnessAxiomVisitor<IndexedDisjointnessAxiom> {
+public interface IndexedDefinitionAxiomVisitor<O> {
 
-	// nothing else
-	
+	O visit(IndexedDefinitionAxiom axiom);
+
 }

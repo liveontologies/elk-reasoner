@@ -64,16 +64,17 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 
 	/**
 	 * {@link IndexObjectConverter}s used for indexing a neutral, a positive,
-	 * and a negative occurrence of {@link IndexedClassExpression}s.
+	 * and a negative, and both positive and negative occurrences of
+	 * {@link IndexedClassExpression}s.
 	 */
-	private final IndexObjectConverter neutralIndexer, positiveIndexer,
-			negativeIndexer;// , noOpConverter;
+	private final IndexObjectConverter neutralIndexer_, positiveIndexer_,
+			negativeIndexer_, positiveNegativeIndexer_;// , noOpConverter;
 
 	/**
 	 * An {@link IndexedAxiomFilter} used to update occurrences of
 	 * {@link IndexedAxiom}s
 	 */
-	private final IndexedAxiomFilter axiomUpdateFilter;
+	private final IndexedAxiomFilter axiomUpdateFilter_;
 
 	/**
 	 * A reference to the indexed {@code owl:Nothing}, which occurrence counters
@@ -97,9 +98,12 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 		this.multiplicity_ = insert ? 1 : -1;
 		final IndexedPropertyChainFilter propertyOccurrenceUpdateFilter = new PropertyOccurrenceUpdateFilter(
 				multiplicity_);
-		this.neutralIndexer = new IndexObjectConverter(
+		this.neutralIndexer_ = new IndexObjectConverter(
 				new ClassOccurrenceUpdateFilter(multiplicity_, 0, 0),
 				propertyOccurrenceUpdateFilter);
+		this.positiveNegativeIndexer_ = new IndexObjectConverter(
+				new ClassOccurrenceUpdateFilter(multiplicity_, multiplicity_,
+						multiplicity_), propertyOccurrenceUpdateFilter);
 		IndexObjectConverterFactory negativeIndexerFactory = new IndexObjectConverterFactory() {
 			@Override
 			public IndexObjectConverter create(
@@ -110,16 +114,16 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 						complementary);
 			}
 		};
-		this.positiveIndexer = new IndexObjectConverter(
+		this.positiveIndexer_ = new IndexObjectConverter(
 				new ClassOccurrenceUpdateFilter(multiplicity_, multiplicity_, 0),
 				propertyOccurrenceUpdateFilter, negativeIndexerFactory);
-		this.negativeIndexer = positiveIndexer.getComplementaryConverter();
+		this.negativeIndexer_ = positiveIndexer_.getComplementaryConverter();
 		/*
 		 * this.noOpConverter = new IndexObjectConverter( new
 		 * ClassOccurrenceUpdateFilter(0, 0, 0),
 		 * propertyOccurrenceUpdateFilter);
 		 */
-		this.axiomUpdateFilter = new AxiomOccurrenceUpdateFilter(multiplicity_);
+		this.axiomUpdateFilter_ = new AxiomOccurrenceUpdateFilter(multiplicity_);
 	}
 
 	@Override
@@ -140,13 +144,46 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 		 */
 
 		IndexedClassExpression subIndexedClass = subElkClass
-				.accept(negativeIndexer);
+				.accept(negativeIndexer_);
 
 		IndexedClassExpression superIndexedClass = superElkClass
-				.accept(positiveIndexer);
+				.accept(positiveIndexer_);
 
-		axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(subIndexedClass,
+		axiomUpdateFilter_.visit(new IndexedSubClassOfAxiom(subIndexedClass,
 				superIndexedClass));
+	}
+
+	@Override
+	public void indexEquivalentClasses(ElkClassExpression firstClassExpression,
+			ElkClassExpression secondClassExpression) {
+		IndexedClassExpression firstIndexedClassExpression = firstClassExpression
+				.accept(positiveNegativeIndexer_);
+		IndexedClassExpression secondIndexedClassExpression = secondClassExpression
+				.accept(positiveNegativeIndexer_);
+		// TODO: move this code to processing of IndexedDefinitionAxiom
+		// try to index the equivalences as definitions if possible
+		if (!tryIndexDefinition(firstIndexedClassExpression,
+				secondIndexedClassExpression)
+				&& !tryIndexDefinition(secondIndexedClassExpression,
+						firstIndexedClassExpression)) {
+			// else index as sub-class axioms
+			axiomUpdateFilter_.visit(new IndexedSubClassOfAxiom(
+					firstIndexedClassExpression, secondIndexedClassExpression));
+		}
+	}
+
+	public boolean tryIndexDefinition(IndexedClassExpression definedExpression,
+			IndexedClassExpression definition) {
+		if (definedExpression instanceof IndexedClass) {
+			IndexedClass definedClass = (IndexedClass) definedExpression;
+			if (definedClass.definedClassExpression == null) {
+				definedClass.definedClassExpression = definition;
+				axiomUpdateFilter_.visit(new IndexedDefinitionAxiom(
+						definedClass, definition));
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -154,11 +191,11 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 			ElkClassExpression type) {
 
 		IndexedClassExpression indexedIndividual = individual
-				.accept(negativeIndexer);
+				.accept(negativeIndexer_);
 
-		IndexedClassExpression indexedType = type.accept(positiveIndexer);
+		IndexedClassExpression indexedType = type.accept(positiveIndexer_);
 
-		axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(indexedIndividual,
+		axiomUpdateFilter_.visit(new IndexedSubClassOfAxiom(indexedIndividual,
 				indexedType));
 	}
 
@@ -168,10 +205,10 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 			ElkObjectPropertyExpression superElkProperty) {
 
 		IndexedPropertyChain subIndexedProperty = subElkProperty
-				.accept(negativeIndexer);
+				.accept(negativeIndexer_);
 
 		IndexedObjectProperty superIndexedProperty = (IndexedObjectProperty) superElkProperty
-				.accept(positiveIndexer);
+				.accept(positiveIndexer_);
 
 		if (multiplicity_ == 1) {
 			subIndexedProperty.addToldSuperObjectProperty(superIndexedProperty);
@@ -201,10 +238,10 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 		List<IndexedClassExpression> indexed = new ArrayList<IndexedClassExpression>(
 				disjointClasses.size());
 		for (ElkClassExpression c : disjointClasses) {
-			indexed.add(c.accept(negativeIndexer));
+			indexed.add(c.accept(negativeIndexer_));
 		}
 
-		axiomUpdateFilter.visit(new IndexedDisjointnessAxiom(indexed));
+		axiomUpdateFilter_.visit(new IndexedDisjointnessAxiom(indexed));
 	}
 
 	@Override
@@ -212,7 +249,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 			ElkObjectPropertyExpression reflexiveProperty) {
 
 		IndexedObjectProperty indexedReflexiveProperty = (IndexedObjectProperty) reflexiveProperty
-				.accept(positiveIndexer);
+				.accept(positiveIndexer_);
 
 		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
 				&& multiplicity_ > 0)
@@ -229,19 +266,19 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 
 	@Override
 	public IndexedClass indexClassDeclaration(ElkClass ec) {
-		return (IndexedClass) ec.accept(neutralIndexer);
+		return (IndexedClass) ec.accept(neutralIndexer_);
 	}
 
 	@Override
 	public IndexedObjectProperty indexObjectPropertyDeclaration(
 			ElkObjectProperty ep) {
-		return (IndexedObjectProperty) ep.accept(neutralIndexer);
+		return (IndexedObjectProperty) ep.accept(neutralIndexer_);
 	}
 
 	@Override
 	public IndexedIndividual indexNamedIndividualDeclaration(
 			ElkNamedIndividual eni) {
-		return eni.accept(neutralIndexer);
+		return eni.accept(neutralIndexer_);
 	}
 
 	/**
@@ -391,6 +428,11 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 
 		@Override
 		public IndexedSubClassOfAxiom visit(IndexedSubClassOfAxiom axiom) {
+			return update(objectCache_.visit(axiom));
+		}
+
+		@Override
+		public IndexedDefinitionAxiom visit(IndexedDefinitionAxiom axiom) {
 			return update(objectCache_.visit(axiom));
 		}
 
