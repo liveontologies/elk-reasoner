@@ -214,6 +214,28 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	@Override
+	public boolean tryAddDefinition(IndexedClass target,
+			IndexedClassExpression definition) {
+		if (target.definedClassExpression != null)
+			// already defined
+			return false;
+		// else
+		target.definedClassExpression = definition;
+		return true;
+	}
+
+	@Override
+	public boolean tryRemoveDefinition(IndexedClass target,
+			IndexedClassExpression definition) {
+		if (target.definedClassExpression != definition)
+			// it was not defined by this definition
+			return false;
+		// else
+		target.definedClassExpression = null;
+		return true;
+	}
+
+	@Override
 	public void add(IndexedObject newObject) {
 		newObject.accept(objectCache.inserter);
 	}

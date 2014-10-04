@@ -154,36 +154,27 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	}
 
 	@Override
-	public void indexEquivalentClasses(ElkClassExpression firstClassExpression,
-			ElkClassExpression secondClassExpression) {
-		IndexedClassExpression firstIndexedClassExpression = firstClassExpression
+	public void indexEquivalentClasses(ElkClassExpression firstExpression,
+			ElkClassExpression secondExpression) {
+		IndexedClassExpression firstIndexedExpression = firstExpression
 				.accept(positiveNegativeIndexer_);
-		IndexedClassExpression secondIndexedClassExpression = secondClassExpression
+		IndexedClassExpression secondIndexedExpression = secondExpression
 				.accept(positiveNegativeIndexer_);
-		// TODO: move this code to processing of IndexedDefinitionAxiom
-		// try to index the equivalences as definitions if possible
-		if (!tryIndexDefinition(firstIndexedClassExpression,
-				secondIndexedClassExpression)
-				&& !tryIndexDefinition(secondIndexedClassExpression,
-						firstIndexedClassExpression)) {
-			// else index as sub-class axioms
+		if (firstIndexedExpression instanceof IndexedClass)
+			axiomUpdateFilter_.visit(new IndexedDefinitionAxiom(
+					(IndexedClass) firstIndexedExpression,
+					secondIndexedExpression));
+		else if (secondIndexedExpression instanceof IndexedClass)
+			axiomUpdateFilter_.visit(new IndexedDefinitionAxiom(
+					(IndexedClass) secondIndexedExpression,
+					firstIndexedExpression));
+		else {
+			// index as two subsumptions
 			axiomUpdateFilter_.visit(new IndexedSubClassOfAxiom(
-					firstIndexedClassExpression, secondIndexedClassExpression));
+					firstIndexedExpression, secondIndexedExpression));
+			axiomUpdateFilter_.visit(new IndexedSubClassOfAxiom(
+					secondIndexedExpression, firstIndexedExpression));
 		}
-	}
-
-	public boolean tryIndexDefinition(IndexedClassExpression definedExpression,
-			IndexedClassExpression definition) {
-		if (definedExpression instanceof IndexedClass) {
-			IndexedClass definedClass = (IndexedClass) definedExpression;
-			if (definedClass.definedClassExpression == null) {
-				definedClass.definedClassExpression = definition;
-				axiomUpdateFilter_.visit(new IndexedDefinitionAxiom(
-						definedClass, definition));
-				return true;
-			}
-		}
-		return false;
 	}
 
 	@Override

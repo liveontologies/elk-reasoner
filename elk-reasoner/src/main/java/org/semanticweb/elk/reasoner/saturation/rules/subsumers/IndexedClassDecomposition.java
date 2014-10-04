@@ -24,6 +24,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -52,6 +54,18 @@ public class IndexedClassDecomposition extends
 	@Override
 	public String getName() {
 		return NAME;
+	}
+
+	public static boolean tryAddRuleFor(IndexedDefinitionAxiom axiom,
+			ModifiableOntologyIndex index) {
+		return index.tryAddDefinition(axiom.getDefinedClass(),
+				axiom.getDefinition());
+	}
+
+	public static boolean tryRemoveRuleFor(IndexedDefinitionAxiom axiom,
+			ModifiableOntologyIndex index) {
+		return index.tryRemoveDefinition(axiom.getDefinedClass(),
+				axiom.getDefinition());
 	}
 
 	@Override
