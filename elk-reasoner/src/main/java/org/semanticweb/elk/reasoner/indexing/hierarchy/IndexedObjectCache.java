@@ -302,7 +302,7 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		@Override
 		public Boolean visit(IndexedDefinitionAxiom axiom) {
 			// caching not supported
-			return null;
+			return true;
 		}
 
 	};
@@ -394,8 +394,8 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedDefinitionAxiom axiom) {
-			// // caching not supported
-			return null;
+			// caching not supported
+			return true;
 		}
 
 	};
