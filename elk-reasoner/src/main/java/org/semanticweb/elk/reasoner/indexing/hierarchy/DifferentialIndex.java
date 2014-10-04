@@ -87,6 +87,9 @@ public class DifferentialIndex extends DirectIndex {
 	private Map<IndexedClassExpression, ChainableSubsumerRule> addedContextRuleHeadByClassExpressions_,
 			removedContextRuleHeadByClassExpressions_;
 
+	private Map<IndexedClass, IndexedClassExpression> addedDefinitions_,
+			removedDefinitions_;
+
 	public DifferentialIndex(IndexedObjectCache objectCache) {
 		super(objectCache);
 		init();
@@ -114,12 +117,16 @@ public class DifferentialIndex extends DirectIndex {
 		this.addedContextInitRules_ = null;
 		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableSubsumerRule>(
 				32);
+		this.addedDefinitions_ = new ArrayHashMap<IndexedClass, IndexedClassExpression>(
+				32);
 	}
 
 	public void initDeletions() {
 		this.removedContextInitRules_ = null;
 		this.todoDeletions_ = new IndexedObjectCache();
 		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableSubsumerRule>(
+				32);
+		this.removedDefinitions_ = new ArrayHashMap<IndexedClass, IndexedClassExpression>(
 				32);
 	}
 
@@ -192,6 +199,49 @@ public class DifferentialIndex extends DirectIndex {
 		} else {
 			super.remove(target, oldRule);
 		}
+	}
+
+	@Override
+	public boolean tryAddDefinition(IndexedClass target,
+			IndexedClassExpression definition) {
+		if (!incrementalMode)
+			return super.tryAddDefinition(target, definition);
+		// for incremental mode:
+		IndexedClassExpression removedDefintion = removedDefinitions_
+				.get(target);
+		if (target.definedClassExpression != removedDefintion
+				|| addedDefinitions_.get(target) != null) {
+			// the existing definition was not removed or some definition has
+			// been added
+			return false;
+		}
+		// else removing
+		if (removedDefintion == definition)
+			removedDefinitions_.remove(target);
+		else
+			addedDefinitions_.put(target, definition);
+		return true;
+	}
+
+	@Override
+	public boolean tryRemoveDefinition(IndexedClass target,
+			IndexedClassExpression definition) {
+		if (!incrementalMode)
+			return super.tryRemoveDefinition(target, definition);
+		// for incremental mode:
+		IndexedClassExpression addedDefintion = addedDefinitions_.get(target);
+		if (addedDefintion == definition) {
+			addedDefinitions_.remove(target);
+			return true;
+		}
+		// else
+		if (addedDefintion != null
+				|| target.definedClassExpression != definition)
+			return false;
+		// else
+		target.definedClassExpression = null;
+		removedDefinitions_.put(target, definition);
+		return true;
 	}
 
 	@Override
@@ -328,7 +378,7 @@ public class DifferentialIndex extends DirectIndex {
 		Chain<ChainableSubsumerRule> classExpressionRuleChain;
 		for (IndexedClassExpression target : addedContextRuleHeadByClassExpressions_
 				.keySet()) {
-			LOGGER_.trace("Committing context rule additions for {}", target);
+			LOGGER_.trace("{}: committing context rule additions", target);
 
 			nextClassExpressionRule = addedContextRuleHeadByClassExpressions_
 					.get(target);
@@ -337,6 +387,11 @@ public class DifferentialIndex extends DirectIndex {
 				nextClassExpressionRule.addTo(classExpressionRuleChain);
 				nextClassExpressionRule = nextClassExpressionRule.next();
 			}
+		}
+		for (IndexedClass target : addedDefinitions_.keySet()) {
+			IndexedClassExpression definition = addedDefinitions_.get(target);
+			LOGGER_.trace("{}: committing definition addition {}", target,
+					definition);
 		}
 		initAdditions();
 	}
