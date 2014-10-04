@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
@@ -90,6 +91,22 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 			ModifiableOntologyIndex index) {
 		index.remove(axiom.getSubClass(),
 				new SuperClassFromSubClassRule(axiom.getSuperClass()));
+	}
+
+	public static void addRulesFor(IndexedDefinitionAxiom axiom,
+			ModifiableOntologyIndex index) {
+		index.add(axiom.getDefinedClass(),
+				new SuperClassFromSubClassRule(axiom.getDefinition()));
+		index.add(axiom.getDefinition(),
+				new SuperClassFromSubClassRule(axiom.getDefinedClass()));
+	}
+
+	public static void removeRulesFor(IndexedDefinitionAxiom axiom,
+			ModifiableOntologyIndex index) {
+		index.remove(axiom.getDefinedClass(), new SuperClassFromSubClassRule(
+				axiom.getDefinition()));
+		index.remove(axiom.getDefinition(), new SuperClassFromSubClassRule(
+				axiom.getDefinedClass()));
 	}
 
 	// TODO: hide this method

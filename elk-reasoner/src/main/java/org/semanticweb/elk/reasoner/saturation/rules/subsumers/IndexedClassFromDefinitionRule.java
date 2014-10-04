@@ -69,22 +69,21 @@ public class IndexedClassFromDefinitionRule extends
 		this.definedClasses_.add(defined);
 	}
 
+	public static void addRuleFor(IndexedDefinitionAxiom axiom,
+			ModifiableOntologyIndex index) {
+		index.add(axiom.getDefinition(), new IndexedClassFromDefinitionRule(
+				axiom.getDefinedClass()));
+	}
+
+	public static void removeRuleFor(IndexedDefinitionAxiom axiom,
+			ModifiableOntologyIndex index) {
+		index.remove(axiom.getDefinition(), new IndexedClassFromDefinitionRule(
+				axiom.getDefinedClass()));
+	}
+
 	@Override
 	public String getName() {
 		return NAME;
-	}
-
-	public static void addRulesFor(IndexedDefinitionAxiom axiom,
-			ModifiableOntologyIndex index) {
-		IndexedClass defined = axiom.getDefinedClass();
-		IndexedClassExpression definition = axiom.getDefinition();
-		index.add(definition, new IndexedClassFromDefinitionRule(defined));
-	}
-
-	public static void removeRulesFor(IndexedDefinitionAxiom axiom,
-			ModifiableOntologyIndex index) {
-		index.remove(axiom.getDefinedClass(),
-				new IndexedClassFromDefinitionRule(axiom.getDefinedClass()));
 	}
 
 	// TODO: hide this method

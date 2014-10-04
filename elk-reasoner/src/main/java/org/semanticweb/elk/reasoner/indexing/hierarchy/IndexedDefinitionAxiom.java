@@ -23,7 +23,9 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  */
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,9 +74,15 @@ public class IndexedDefinitionAxiom extends IndexedAxiom {
 	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
 			final int increment) {
 		if (increment > 0) {
-			IndexedClassFromDefinitionRule.addRulesFor(this, index);
+			if (IndexedClassDecomposition.tryAddRuleFor(this, index))
+				IndexedClassFromDefinitionRule.addRuleFor(this, index);
+			else
+				SuperClassFromSubClassRule.addRulesFor(this, index);
 		} else {
-			IndexedClassFromDefinitionRule.removeRulesFor(this, index);
+			if (IndexedClassDecomposition.tryRemoveRuleFor(this, index))
+				IndexedClassFromDefinitionRule.removeRuleFor(this, index);
+			else
+				SuperClassFromSubClassRule.removeRulesFor(this, index);
 		}
 	}
 

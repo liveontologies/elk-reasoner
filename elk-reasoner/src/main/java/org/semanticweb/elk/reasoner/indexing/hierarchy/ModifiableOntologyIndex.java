@@ -171,7 +171,39 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 *             if the given rule was not registered with this
 	 *             {@link IndexedClassExpression}
 	 */
-	public void remove(IndexedClassExpression target, ChainableSubsumerRule oldRule)
+	public void remove(IndexedClassExpression target,
+			ChainableSubsumerRule oldRule)
 			throws ElkUnexpectedIndexingException;
+
+	/**
+	 * Tries to set the given {@link IndexedClassExpression} as definition for
+	 * the given target {@link IndexedClass}. There can be at most one
+	 * definition set for each {@link IndexedClass}.
+	 * 
+	 * @param target
+	 *            the {@link IndexClass} for which to add a new definition
+	 * @param definition
+	 *            the {@link IndexedClassExpression} to be added as a definition
+	 * @return {@code true} if the definition was set and {@code false} if this
+	 *         operation was not successful
+	 */
+	public boolean tryAddDefinition(IndexedClass target,
+			IndexedClassExpression definition);
+
+	/**
+	 * Tries to remove the given {@link IndexedClassExpression} from the
+	 * definition of the given target {@link IndexedClass}. The definition is
+	 * removed if it is set for exactly the given {@link IndexedClassExpression}
+	 * 
+	 * @param target
+	 *            the {@link IndexClass} for which to remove the definition
+	 * @param definition
+	 *            the {@link IndexedClassExpression} that was defined for the
+	 *            given {@link IndexClass} and should be now removed
+	 * @return {@code true} if the definition was removed and {@code false} if
+	 *         this operation was not successful
+	 */
+	public boolean tryRemoveDefinition(IndexedClass target,
+			IndexedClassExpression definition);
 
 }
