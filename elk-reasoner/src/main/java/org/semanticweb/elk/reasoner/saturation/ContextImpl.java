@@ -239,8 +239,13 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	@Override
-	public Set<IndexedClassExpression> getSubsumers() {
+	public Set<IndexedClassExpression> getComposedSubsumers() {
 		return composedSubsumers_;
+	}
+
+	@Override
+	public Set<IndexedClassExpression> getDecomposedSubsumers() {
+		return decomposedSubsumers_;
 	}
 
 	/*
@@ -334,6 +339,11 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
+		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
+			return input.decomposedSubsumers_.add(conclusion.getExpression());
+		}
+
+		@Override
 		public Boolean visit(ContextInitialization conclusion, ContextImpl input) {
 			if (input.isInitialized_)
 				// nothing changes
@@ -349,11 +359,6 @@ public class ContextImpl implements ExtendedContext {
 			input.isInconsistent_ = true;
 			ContradictionOverBackwardLinkRule.addTo(input);
 			return before != input.isInconsistent_;
-		}
-
-		@Override
-		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
-			return input.decomposedSubsumers_.add(conclusion.getExpression());
 		}
 
 		@Override
@@ -439,6 +444,12 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
+		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
+			return input.decomposedSubsumers_
+					.remove(conclusion.getExpression());
+		}
+
+		@Override
 		public Boolean visit(ContextInitialization conclusion, ContextImpl input) {
 			if (!input.isInitialized_)
 				// nothing changes
@@ -454,12 +465,6 @@ public class ContextImpl implements ExtendedContext {
 			input.isInconsistent_ = false;
 			ContradictionOverBackwardLinkRule.removeFrom(input);
 			return before != input.isInconsistent_;
-		}
-
-		@Override
-		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
-			return input.decomposedSubsumers_
-					.remove(conclusion.getExpression());
 		}
 
 		@Override
@@ -552,6 +557,12 @@ public class ContextImpl implements ExtendedContext {
 		}
 
 		@Override
+		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
+			return input.decomposedSubsumers_.contains(conclusion
+					.getExpression());
+		}
+
+		@Override
 		public Boolean visit(ContextInitialization conclusion, ContextImpl input) {
 			return input.isInitialized_;
 		}
@@ -559,12 +570,6 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(Contradiction conclusion, ContextImpl input) {
 			return input.isInconsistent_;
-		}
-
-		@Override
-		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
-			return input.decomposedSubsumers_.contains(conclusion
-					.getExpression());
 		}
 
 		@Override

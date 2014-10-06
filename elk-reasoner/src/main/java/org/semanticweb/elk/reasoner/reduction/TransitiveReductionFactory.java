@@ -392,7 +392,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			}
 
 			Set<IndexedClassExpression> candidateSupers = candidateSaturation
-					.getSubsumers();
+					.getComposedSubsumers();
 			/*
 			 * If the saturation for the candidate contains the root, the
 			 * candidate is equivalent to the root
@@ -527,7 +527,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				TransitiveReductionOutputEquivalent<IndexedClass> directSuperClassEquivalent = directSuperClassEquivalentEntry.getValue();
 				IndexedClass directSuperClass = directSuperClassEquivalentEntry.getKey();
 				boolean isDirectSuperClassTop = isTop(directSuperClass);
-				Set<IndexedClassExpression> directSubsumerSupers = saturationState_.getContext(directSuperClass).getSubsumers();
+				Set<IndexedClassExpression> directSubsumerSupers = saturationState_.getContext(directSuperClass).getComposedSubsumers();
 
 				/*
 				 * If the (already computed) saturation for the direct

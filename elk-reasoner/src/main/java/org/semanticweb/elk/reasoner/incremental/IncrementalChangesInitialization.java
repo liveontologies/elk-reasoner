@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -56,12 +57,13 @@ public class IncrementalChangesInitialization
 	public IncrementalChangesInitialization(
 			Collection<ArrayList<Context>> inputs,
 			LinkedContextInitRule changedInitRules,
-			Map<IndexedClassExpression, ChainableSubsumerRule> changes,
+			Map<IndexedClassExpression, ChainableSubsumerRule> changedCompositionRules,
+			Map<IndexedClass, IndexedClassExpression> changedDefinitions,
 			SaturationState<?> state, ComputationExecutor executor,
 			SaturationStatistics stageStats, int maxWorkers,
 			ProgressMonitor progressMonitor) {
-		super(inputs, new ContextInitializationFactory(state, changes,
-				changedInitRules, stageStats), executor, maxWorkers,
-				progressMonitor);
+		super(inputs, new ContextInitializationFactory(state, changedInitRules,
+				changedCompositionRules, changedDefinitions, stageStats),
+				executor, maxWorkers, progressMonitor);
 	}
 }

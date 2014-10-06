@@ -30,6 +30,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Decomp
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link SubsumerDecompositionRule} that processes an {@link IndexedClass}
@@ -43,13 +45,11 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 public class IndexedClassDecomposition extends
 		AbstractSubsumerDecompositionRule<IndexedClass> {
 
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(IndexedClassDecomposition.class);
+
 	public static final String NAME = "Definition Expansion";
-
-	private static IndexedClassDecomposition INSTANCE_ = new IndexedClassDecomposition();
-
-	public static IndexedClassDecomposition getInstance() {
-		return INSTANCE_;
-	}
 
 	@Override
 	public String getName() {
@@ -58,21 +58,28 @@ public class IndexedClassDecomposition extends
 
 	public static boolean tryAddRuleFor(IndexedDefinitionAxiom axiom,
 			ModifiableOntologyIndex index) {
-		return index.tryAddDefinition(axiom.getDefinedClass(),
-				axiom.getDefinition());
+		IndexedClass definedClass = axiom.getDefinedClass();
+		IndexedClassExpression definition = axiom.getDefinition();
+		boolean success = index.tryAddDefinition(definedClass, definition);
+		if (success)
+			LOGGER_.trace("{}: added definition {}", definedClass, definition);
+		return success;
 	}
 
 	public static boolean tryRemoveRuleFor(IndexedDefinitionAxiom axiom,
 			ModifiableOntologyIndex index) {
-		return index.tryRemoveDefinition(axiom.getDefinedClass(),
-				axiom.getDefinition());
+		IndexedClass definedClass = axiom.getDefinedClass();
+		IndexedClassExpression definition = axiom.getDefinition();
+		boolean success = index.tryRemoveDefinition(definedClass, definition);
+		if (success)
+			LOGGER_.trace("{}: removed definition {}", definedClass, definition);
+		return success;
 	}
 
 	@Override
 	public void apply(IndexedClass premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		IndexedClassExpression definedExpression = premise
-				.getDefinedClassExpression();
+		IndexedClassExpression definedExpression = getDefinedClassExpression(premise);
 		if (definedExpression == null)
 			return;
 		producer.produce(premises.getRoot(),
@@ -87,6 +94,14 @@ public class IndexedClassDecomposition extends
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
 
+	}
+
+	@SuppressWarnings("static-method")
+	protected IndexedClassExpression getDefinedClassExpression(
+			IndexedClass premise) {
+		// by default take from the premise, but it may be overridden, e.g., for
+		// incremental reasoning
+		return premise.getDefinedClassExpression();
 	}
 
 }

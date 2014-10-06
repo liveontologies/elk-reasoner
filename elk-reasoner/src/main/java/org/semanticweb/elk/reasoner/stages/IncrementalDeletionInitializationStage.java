@@ -69,12 +69,15 @@ public class IncrementalDeletionInitializationStage extends
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		LinkedContextInitRule changedInitRules = null;
 		Map<IndexedClassExpression, ChainableSubsumerRule> changedRulesByCE = null;
+		Map<IndexedClass, IndexedClassExpression> changedDefinitions = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 
 		changedInitRules = diffIndex.getRemovedContextInitRules();
 		changedRulesByCE = diffIndex.getRemovedContextRulesByClassExpressions();
+		changedDefinitions = diffIndex.getRemovedDefinitions();
 
-		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
+		if (changedInitRules != null || !changedRulesByCE.isEmpty()
+				|| !changedDefinitions.isEmpty()) {
 
 			inputs = Operations.split(reasoner.saturationState.getContexts(),
 					8 * workerNo);
@@ -83,9 +86,9 @@ public class IncrementalDeletionInitializationStage extends
 		// System.err.println(changedRulesByCE.keySet().size());
 
 		this.initialization_ = new IncrementalChangesInitialization(inputs,
-				changedInitRules, changedRulesByCE, reasoner.saturationState,
-				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
-				reasoner.getProgressMonitor());
+				changedInitRules, changedRulesByCE, changedDefinitions,
+				reasoner.saturationState, reasoner.getProcessExecutor(),
+				stageStatistics_, workerNo, reasoner.getProgressMonitor());
 
 		return true;
 	}
