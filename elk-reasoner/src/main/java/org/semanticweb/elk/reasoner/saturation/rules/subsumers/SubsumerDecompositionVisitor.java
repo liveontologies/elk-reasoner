@@ -60,6 +60,8 @@ public class SubsumerDecompositionVisitor implements
 	 */
 	private final ConclusionProducer producer_;
 
+	private final SubsumerDecompositionRule<IndexedClass> classDecomposition_ = new IndexedClassDecomposition();
+
 	public SubsumerDecompositionVisitor(
 			SubsumerDecompositionRuleVisitor ruleVisitor,
 			ContextPremises premises, ConclusionProducer producer) {
@@ -70,9 +72,7 @@ public class SubsumerDecompositionVisitor implements
 
 	@Override
 	public Void visit(IndexedClass element) {
-		if (element.getDefinedClassExpression() != null)
-			IndexedClassDecomposition.getInstance().accept(ruleVisitor_,
-					element, premises_, producer_);
+		classDecomposition_.accept(ruleVisitor_, element, premises_, producer_);
 		return null;
 	}
 

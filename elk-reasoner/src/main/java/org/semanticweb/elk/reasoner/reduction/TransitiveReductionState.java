@@ -66,7 +66,7 @@ class TransitiveReductionState<R extends IndexedClassExpression, J extends Trans
 		// TODO it makes sense to iterate over subsumer is some order, e.g.,
 		// first check those which are more likely to be direct (like have more
 		// subsumers)
-		this.subsumerIterator = saturationState.getContext(root).getSubsumers()
+		this.subsumerIterator = saturationState.getContext(root).getComposedSubsumers()
 				.iterator();
 	}
 }

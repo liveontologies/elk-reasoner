@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
@@ -34,7 +36,9 @@ import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SubsumerDecompositionRule;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
@@ -56,25 +60,44 @@ class ContextInitializationFactory
 			.getLogger(ContextInitializationFactory.class);
 
 	private final SaturationState<?> saturationState_;
-	private final Map<IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges_;
-	private final IndexedClassExpression[] indexChangesKeys_;
+	private final IndexedClassExpression[] changedComposedSubsumers_;
+	private final IndexedClass[] changedDecomposedSubsumers_;
 	private final LinkedContextInitRule changedGlobalRuleHead_;
-	private AtomicInteger ruleHits = new AtomicInteger(0);
+	private final Map<IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules_;
+	private AtomicInteger compositionRuleHits_ = new AtomicInteger(0);
+	private AtomicInteger decompositionRuleHits_ = new AtomicInteger(0);
 	private final SaturationStatistics stageStatistics_;
+
+	private final SubsumerDecompositionRule<IndexedClass> classDecomposition_;
 
 	public ContextInitializationFactory(
 			SaturationState<?> state,
-			Map<IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges,
 			LinkedContextInitRule changedGlobalRuleHead,
+			Map<IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules,
+			final Map<IndexedClass, IndexedClassExpression> changedDefinitions,
 			SaturationStatistics stageStats) {
 
 		saturationState_ = state;
-		indexChanges_ = indexChanges;
-		indexChangesKeys_ = new IndexedClassExpression[indexChanges.keySet()
-				.size()];
-		indexChanges.keySet().toArray(indexChangesKeys_);
+		changedCompositionRules_ = changedCompositionRules;
+		changedComposedSubsumers_ = new IndexedClassExpression[changedCompositionRules
+				.keySet().size()];
+		changedCompositionRules.keySet().toArray(changedComposedSubsumers_);
+		changedDecomposedSubsumers_ = new IndexedClass[changedDefinitions
+				.keySet().size()];
+		changedDefinitions.keySet().toArray(changedDecomposedSubsumers_);
 		changedGlobalRuleHead_ = changedGlobalRuleHead;
 		stageStatistics_ = stageStats;
+
+		classDecomposition_ = new IndexedClassDecomposition() {
+			private final Map<IndexedClass, IndexedClassExpression> changedDefinitions_ = changedDefinitions;
+
+			@Override
+			protected IndexedClassExpression getDefinedClassExpression(
+					IndexedClass premise) {
+				// get the premise from the changed definitions
+				return changedDefinitions_.get(premise);
+			}
+		};
 	}
 
 	@Override
@@ -97,7 +120,8 @@ class ContextInitializationFactory
 
 		return new ContextProcessor() {
 
-			int localRuleHits = 0;
+			private int localCompsitionRuleHits_ = 0;
+			private int localDecompositionRuleHits_ = 0;
 
 			@Override
 			public void process(Context context) {
@@ -113,20 +137,40 @@ class ContextInitializationFactory
 							saturationStateWriter);
 					nextGlobalRule = nextGlobalRule.next();
 				}
-				// apply all changed rules for indexed class expressions
-				Set<IndexedClassExpression> subsumers = context.getSubsumers();
-				if (subsumers.size() > indexChangesKeys_.length >> 2) {
+				// apply all changed composition rules for composed subsumers
+				Set<IndexedClassExpression> composedSubsumers = context
+						.getComposedSubsumers();
+				if (composedSubsumers.size() > changedComposedSubsumers_.length >> 2) {
 					// iterate over changes, check subsumers
-					for (int j = 0; j < indexChangesKeys_.length; j++) {
-						IndexedClassExpression changedICE = indexChangesKeys_[j];
-						if (subsumers.contains(changedICE)) {
-							applyLocalRules(context, changedICE);
+					for (int j = 0; j < changedComposedSubsumers_.length; j++) {
+						IndexedClassExpression changedICE = changedComposedSubsumers_[j];
+						if (composedSubsumers.contains(changedICE)) {
+							applyCompositionRules(context, changedICE);
 						}
 					}
 				} else {
 					// iterate over subsumers, check changes
-					for (IndexedClassExpression changedICE : subsumers) {
-						applyLocalRules(context, changedICE);
+					for (IndexedClassExpression changedICE : composedSubsumers) {
+						applyCompositionRules(context, changedICE);
+					}
+				}
+				// apply all definition expansion rules for decomposed subsumers
+				Set<IndexedClassExpression> decomposedSubsumers = context
+						.getDecomposedSubsumers();
+				if (decomposedSubsumers.size() > changedDecomposedSubsumers_.length >> 2) {
+					// iterate over changes, check subsumers
+					for (int j = 0; j < changedDecomposedSubsumers_.length; j++) {
+						IndexedClass changedIC = changedDecomposedSubsumers_[j];
+						if (decomposedSubsumers.contains(changedIC)) {
+							applyDecompositionRules(context, changedIC);
+						}
+					}
+				} else {
+					// iterate over subsumers, check changes
+					for (IndexedClassExpression changedICE : decomposedSubsumers) {
+						if (changedICE instanceof IndexedClass)
+							applyDecompositionRules(context,
+									(IndexedClass) changedICE);
 					}
 				}
 			}
@@ -134,18 +178,19 @@ class ContextInitializationFactory
 			@Override
 			public void finish() {
 				stageStatistics_.add(localStatistics);
-				ruleHits.addAndGet(localRuleHits);
+				compositionRuleHits_.addAndGet(localCompsitionRuleHits_);
+				decompositionRuleHits_.addAndGet(localDecompositionRuleHits_);
 			}
 
-			private void applyLocalRules(Context context,
+			private void applyCompositionRules(Context context,
 					IndexedClassExpression changedICE) {
-				LinkedSubsumerRule nextLocalRule = indexChanges_
+				LinkedSubsumerRule nextLocalRule = changedCompositionRules_
 						.get(changedICE);
 				if (nextLocalRule != null) {
-					localRuleHits++;
+					localCompsitionRuleHits_++;
 
-					LOGGER_.trace("{}: applying rules for {}", context,
-							changedICE);
+					LOGGER_.trace("{}: applying composition rules for {}",
+							context, changedICE);
 				}
 				while (nextLocalRule != null) {
 					nextLocalRule.accept(ruleAppVisitor, changedICE, context,
@@ -153,6 +198,16 @@ class ContextInitializationFactory
 					nextLocalRule = nextLocalRule.next();
 				}
 			}
+
+			private void applyDecompositionRules(Context context,
+					IndexedClass changedICE) {
+				localDecompositionRuleHits_++;
+				LOGGER_.trace("{}: applying decomposition rules for {}",
+						context, changedICE);
+				classDecomposition_.accept(ruleAppVisitor, changedICE, context,
+						saturationStateWriter);
+			}
+
 		};
 	}
 
@@ -169,8 +224,12 @@ class ContextInitializationFactory
 
 	@Override
 	public void finish() {
-		if (LOGGER_.isDebugEnabled())
-			LOGGER_.debug("Rule hits: " + ruleHits.get());
+		if (LOGGER_.isDebugEnabled()) {
+			LOGGER_.debug("Composition rule hits: "
+					+ compositionRuleHits_.get());
+			LOGGER_.debug("Decomposition rule hits: "
+					+ decompositionRuleHits_.get());
+		}
 	}
 
 	/**

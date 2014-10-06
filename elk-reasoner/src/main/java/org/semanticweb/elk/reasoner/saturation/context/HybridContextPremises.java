@@ -64,9 +64,15 @@ public class HybridContextPremises implements ContextPremises {
 	}
 
 	@Override
-	public Set<IndexedClassExpression> getSubsumers() {
+	public Set<IndexedClassExpression> getComposedSubsumers() {
 		// local
-		return localPremises_.getSubsumers();
+		return localPremises_.getComposedSubsumers();
+	}
+
+	@Override
+	public Set<IndexedClassExpression> getDecomposedSubsumers() {
+		// local
+		return localPremises_.getDecomposedSubsumers();
 	}
 
 	@Override
@@ -81,13 +87,11 @@ public class HybridContextPremises implements ContextPremises {
 		return localPremises_.getBackwardLinkRuleHead();
 	}
 
-	/*@Override
-	public boolean isInconsistForDisjointnessAxiom(
-			IndexedDisjointnessAxiom axiom) {
-		// local
-		return localPremises_.isInconsistForDisjointnessAxiom(axiom);
-	}*/
-	
+	/*
+	 * @Override public boolean isInconsistForDisjointnessAxiom(
+	 * IndexedDisjointnessAxiom axiom) { // local return
+	 * localPremises_.isInconsistForDisjointnessAxiom(axiom); }
+	 */
 
 	@Override
 	public Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(

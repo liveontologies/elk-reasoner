@@ -470,8 +470,13 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				LOGGER_.error("Invalid root for " + context);
 
 			// validating subsumers recursively
-			for (IndexedClassExpression subsumer : context.getSubsumers()) {
-				iceValidator_.checkNew(subsumer);
+			for (IndexedClassExpression composedSubsumer : context
+					.getComposedSubsumers()) {
+				iceValidator_.checkNew(composedSubsumer);
+			}
+			for (IndexedClassExpression decomposedSubsumer : context
+					.getDecomposedSubsumers()) {
+				iceValidator_.checkNew(decomposedSubsumer);
 			}
 
 			// validating sub-contexts

@@ -39,6 +39,7 @@ import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
@@ -94,6 +95,7 @@ public class IncrementalAdditionInitializationStage extends
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		LinkedContextInitRule changedInitRules = null;
 		Map<IndexedClassExpression, ChainableSubsumerRule> changedRulesByCE = null;
+		Map<IndexedClass, IndexedClassExpression> changedDefinitions = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 		ContextCreationListener contextCreationListener = SaturationUtils
 				.addStatsToContextCreationListener(
@@ -165,16 +167,18 @@ public class IncrementalAdditionInitializationStage extends
 
 		changedInitRules = diffIndex.getAddedContextInitRules();
 		changedRulesByCE = diffIndex.getAddedContextRulesByClassExpressions();
+		changedDefinitions = diffIndex.getAddedDefinitions();
 
-		if (changedInitRules != null || !changedRulesByCE.isEmpty()) {
+		if (changedInitRules != null || !changedRulesByCE.isEmpty()
+				|| !changedDefinitions.isEmpty()) {
 			inputs = Operations.split(reasoner.saturationState.getContexts(),
 					8 * workerNo);
 		}
 
 		this.initialization_ = new IncrementalChangesInitialization(inputs,
-				changedInitRules, changedRulesByCE, reasoner.saturationState,
-				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
-				reasoner.getProgressMonitor());
+				changedInitRules, changedRulesByCE, changedDefinitions,
+				reasoner.saturationState, reasoner.getProcessExecutor(),
+				stageStatistics_, workerNo, reasoner.getProgressMonitor());
 
 		return true;
 	}

@@ -107,7 +107,7 @@ public class ConcurrentSaturatorTest extends TestCase {
 				.submit(new SaturationJob<IndexedClassExpression>(A));
 		classExpressionSaturation.finish();
 
-		assertTrue("A contains D", saturationState.getContext(A).getSubsumers()
+		assertTrue("A contains D", saturationState.getContext(A).getComposedSubsumers()
 				.contains(D));
 
 	}
@@ -152,11 +152,11 @@ public class ConcurrentSaturatorTest extends TestCase {
 		classExpressionSaturation.finish();
 		Context context = saturationState.getContext(A);
 
-		assertTrue("A contains A", context.getSubsumers().contains(A));
-		assertTrue("A contains B", context.getSubsumers().contains(B));
-		assertTrue("A contains C", context.getSubsumers().contains(C));
-		assertTrue("A contains I", context.getSubsumers().contains(I));
-		assertTrue("A contains D", context.getSubsumers().contains(D));
+		assertTrue("A contains A", context.getComposedSubsumers().contains(A));
+		assertTrue("A contains B", context.getComposedSubsumers().contains(B));
+		assertTrue("A contains C", context.getComposedSubsumers().contains(C));
+		assertTrue("A contains I", context.getComposedSubsumers().contains(I));
+		assertTrue("A contains D", context.getComposedSubsumers().contains(D));
 	}
 
 }

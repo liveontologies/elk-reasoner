@@ -216,9 +216,10 @@ public class DifferentialIndex extends DirectIndex {
 			return false;
 		}
 		// else removing
-		if (removedDefintion == definition)
+		if (removedDefintion == definition) {
 			removedDefinitions_.remove(target);
-		else
+			target.definedClassExpression = definition;
+		} else
 			addedDefinitions_.put(target, definition);
 		return true;
 	}
@@ -326,6 +327,20 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	/**
+	 * @return the added definitions for {@link IndexedClass}es
+	 */
+	public Map<IndexedClass, IndexedClassExpression> getAddedDefinitions() {
+		return this.addedDefinitions_;
+	}
+
+	/**
+	 * @return the removed definitions for {@link IndexedClass}es
+	 */
+	public Map<IndexedClass, IndexedClassExpression> getRemovedDefinitions() {
+		return this.removedDefinitions_;
+	}
+
+	/**
 	 * @return the {@link ElkClass} added during the last incremental session
 	 */
 	public Collection<ElkClass> getAddedClasses() {
@@ -392,6 +407,7 @@ public class DifferentialIndex extends DirectIndex {
 			IndexedClassExpression definition = addedDefinitions_.get(target);
 			LOGGER_.trace("{}: committing definition addition {}", target,
 					definition);
+			target.definedClassExpression = definition;
 		}
 		initAdditions();
 	}

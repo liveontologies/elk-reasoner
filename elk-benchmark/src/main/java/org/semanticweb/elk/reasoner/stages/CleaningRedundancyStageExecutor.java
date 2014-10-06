@@ -76,7 +76,7 @@ public class CleaningRedundancyStageExecutor extends SimpleStageExecutor {
 					continue;
 
 				subsumerMap_.put(ice, new HashSet<IndexedClassExpression>(
-						context.getSubsumers()));
+						context.getComposedSubsumers()));
 			}
 
 		}
@@ -117,14 +117,14 @@ public class CleaningRedundancyStageExecutor extends SimpleStageExecutor {
 	private boolean sameSubsumers(Set<IndexedClassExpression> subsumers,
 			Context context) {
 		for (IndexedClassExpression ice : new LazyCollectionMinusSet<IndexedClassExpression>(
-				subsumers, context.getSubsumers())) {
+				subsumers, context.getComposedSubsumers())) {
 			if (ice instanceof IndexedClass) {
 				return false;
 			}
 		}
 
 		for (IndexedClassExpression ice : new LazyCollectionMinusSet<IndexedClassExpression>(
-				context.getSubsumers(), subsumers)) {
+				context.getComposedSubsumers(), subsumers)) {
 
 			if (ice instanceof IndexedClass) {
 				return false;
