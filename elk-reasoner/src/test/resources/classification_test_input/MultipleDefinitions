@@ -1,0 +1,8 @@
+Prefix(:=<http://example.org/>) 
+Ontology(
+EquivalentClasses(:A ObjectSomeValuesFrom(:R :B))
+EquivalentClasses(:A ObjectSomeValuesFrom(:R :C))
+EquivalentClasses(:B ObjectSomeValuesFrom(:R :C))
+EquivalentClasses(:D ObjectSomeValuesFrom(:R :B))
+EquivalentClasses(:D ObjectSomeValuesFrom(:R :B))
+)
