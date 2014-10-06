@@ -3,8 +3,6 @@
  */
 package org.semanticweb.elk.proofs.expressions.lemmas;
 
-
-
 /**
  * Class expressions not representable in the OWL syntax, e.g. existentials with a complex property chain.
  * 

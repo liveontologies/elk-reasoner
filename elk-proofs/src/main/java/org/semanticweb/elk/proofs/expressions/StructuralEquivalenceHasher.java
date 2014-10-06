@@ -3,6 +3,8 @@
  */
 package org.semanticweb.elk.proofs.expressions;
 
+import java.util.List;
+
 import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -27,6 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.AbstractElkObjectVisitor;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkClassExpressionWrap;
+import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexObjectSomeValuesFrom;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
@@ -34,6 +37,7 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaVisitor;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkReflexivePropertyChainLemma;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * @author Pavel Klinov
@@ -42,18 +46,26 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
  */
 public class StructuralEquivalenceHasher implements ExpressionHasher {
 
+	static int hashCode(ElkObject obj) {
+		return EntityHasher.hashCode(obj);
+	}
+	
+	static int hashCode(ElkAxiom obj) {
+		return AxiomHasher.hashCode(obj);
+	}
+	
 	@Override
 	public int hashCode(Expression expression) {
 		return expression.accept(new ExpressionVisitor<Void, Integer>() {
 
 			@Override
 			public Integer visit(AxiomExpression expr, Void input) {
-				return new AxiomHasher().hashCode(expr.getAxiom());
+				return AxiomHasher.hashCode(expr.getAxiom());
 			}
 
 			@Override
 			public Integer visit(LemmaExpression expr, Void input) {
-				return new LemmaHasher().hashCode(expr.getLemma());
+				return LemmaHasher.hashCode(expr.getLemma());
 			}
 			
 		}, null);
@@ -61,35 +73,32 @@ public class StructuralEquivalenceHasher implements ExpressionHasher {
 
 	private static class LemmaHasher implements ElkLemmaVisitor<ElkLemma, Integer> {
 
-		int hashCode(ElkLemma lemma) {
+		static int hashCode(ElkLemma lemma) {
 			return lemma.hashCode();
 		}
 		
 		@Override
 		public Integer visit(ElkReflexivePropertyChainLemma lemma,
 				ElkLemma input) {
-			// TODO Auto-generated method stub
-			return null;
+			return HashGenerator.combineListHash(ElkReflexivePropertyChainLemma.class.hashCode(), EntityHasher.hashCode(lemma.getPropertyChain()));
 		}
 
 		@Override
 		public Integer visit(ElkSubClassOfLemma lemma, ElkLemma input) {
-			// TODO Auto-generated method stub
-			return null;
+			return HashGenerator.combineListHash(ElkSubClassOfLemma.class.hashCode(), EntityHasher.hashCode(lemma.getSubClass()), EntityHasher.hashCode(lemma.getSuperClass()));
 		}
 
 		@Override
 		public Integer visit(ElkSubPropertyChainOfLemma lemma, ElkLemma input) {
-			// TODO Auto-generated method stub
-			return null;
+			return HashGenerator.combineListHash(ElkSubPropertyChainOfLemma.class.hashCode(), EntityHasher.hashCode(lemma.getSubPropertyChain()), EntityHasher.hashCode(lemma.getSuperPropertyChain()));
 		}
 		
 	}
 	
 	private static class AxiomHasher extends AbstractElkAxiomVisitor<Integer> {
 
-		int hashCode(ElkAxiom ax) {
-			return ax.accept(this);
+		static int hashCode(ElkAxiom ax) {
+			return ax.accept(new AxiomHasher());
 		}
 		
 		@Override
@@ -104,73 +113,70 @@ public class StructuralEquivalenceHasher implements ExpressionHasher {
 
 		@Override
 		public Integer visit(ElkDisjointClassesAxiom elkDisjointClasses) {
-			// TODO Auto-generated method stub
-			return super.visit(elkDisjointClasses);
+			return HashGenerator.combineMultisetHash(true, hashes(ElkDisjointClassesAxiom.class.hashCode(), elkDisjointClasses.getClassExpressions()));
 		}
 
 		@Override
 		public Integer visit(ElkEquivalentClassesAxiom elkEquivalentClassesAxiom) {
-			// TODO Auto-generated method stub
-			return super.visit(elkEquivalentClassesAxiom);
+			return HashGenerator.combineMultisetHash(true, hashes(ElkEquivalentClassesAxiom.class.hashCode(), elkEquivalentClassesAxiom.getClassExpressions()));
 		}
 
 		@Override
-		public Integer visit(ElkSubClassOfAxiom elkSubClassOfAxiom) {
-			// TODO Auto-generated method stub
-			return super.visit(elkSubClassOfAxiom);
+		public Integer visit(ElkSubClassOfAxiom ax) {
+			return HashGenerator.combineListHash(ElkSubClassOfAxiom.class.hashCode(), EntityHasher.hashCode(ax.getSubClassExpression()), EntityHasher.hashCode(ax.getSuperClassExpression()));
 		}
 
 		@Override
-		public Integer visit(
-				ElkEquivalentObjectPropertiesAxiom elkEquivalentObjectProperties) {
-			// TODO Auto-generated method stub
-			return super.visit(elkEquivalentObjectProperties);
+		public Integer visit(ElkEquivalentObjectPropertiesAxiom ax) {
+			return HashGenerator.combineMultisetHash(true, hashes(ElkEquivalentObjectPropertiesAxiom.class.hashCode(), ax.getObjectPropertyExpressions()));
 		}
 
 		@Override
 		public Integer visit(
-				ElkObjectPropertyDomainAxiom elkObjectPropertyDomainAxiom) {
-			// TODO Auto-generated method stub
-			return super.visit(elkObjectPropertyDomainAxiom);
+				ElkObjectPropertyDomainAxiom ax) {
+			return HashGenerator.combineListHash(ElkObjectPropertyDomainAxiom.class.hashCode(), EntityHasher.hashCode(ax.getProperty()), EntityHasher.hashCode(ax.getDomain()));
 		}
 
 		@Override
 		public Integer visit(
-				ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
-			// TODO Auto-generated method stub
-			return super.visit(elkReflexiveObjectPropertyAxiom);
+				ElkReflexiveObjectPropertyAxiom ax) {
+			return HashGenerator.combineListHash(ElkReflexiveObjectPropertyAxiom.class.hashCode(), EntityHasher.hashCode(ax.getProperty()));
 		}
 
 		@Override
 		public Integer visit(
-				ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom) {
-			// TODO Auto-generated method stub
-			return super.visit(elkSubObjectPropertyOfAxiom);
+				ElkSubObjectPropertyOfAxiom ax) {
+			return HashGenerator.combineListHash(ElkSubObjectPropertyOfAxiom.class.hashCode(), EntityHasher.hashCode(ax.getSubObjectPropertyExpression()),EntityHasher.hashCode(ax.getSuperObjectPropertyExpression()));
 		}
 
 		@Override
 		public Integer visit(
-				ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom) {
-			// TODO Auto-generated method stub
-			return super.visit(elkTransitiveObjectPropertyAxiom);
+				ElkTransitiveObjectPropertyAxiom ax) {
+			return HashGenerator.combineListHash(ElkReflexiveObjectPropertyAxiom.class.hashCode(), EntityHasher.hashCode(ax.getProperty()));
 		}
-		
 		
 	}
 	
 	private static class EntityHasher extends AbstractElkObjectVisitor<Integer> implements ElkComplexClassExpressionVisitor<ElkObject, Integer> {
 
+		static int hashCode(ElkObject obj) {
+			return obj.accept(new EntityHasher());
+		}
+		
+		static int hashCode(ElkComplexClassExpression obj) {
+			return obj.accept(new EntityHasher(), null);
+		}
 		
 		@Override
 		public Integer visit(ElkComplexObjectSomeValuesFrom ce, ElkObject input) {
-			// TODO Auto-generated method stub
-			return null;
+			return HashGenerator.combineListHash(
+					ElkComplexObjectSomeValuesFrom.class.hashCode(),
+					hashCode(ce.getPropertyChain()), hashCode(ce.getFiller()));
 		}
 
 		@Override
 		public Integer visit(ElkClassExpressionWrap ce, ElkObject input) {
-			// TODO Auto-generated method stub
-			return null;
+			return hashCode(ce.getClassExpression());
 		}
 
 		@Override
@@ -180,70 +186,71 @@ public class StructuralEquivalenceHasher implements ExpressionHasher {
 
 		@Override
 		public Integer visit(ElkSameIndividualAxiom obj) {
-			// TODO Auto-generated method stub
-			return super.visit(obj);
+			return HashGenerator.combineMultisetHash(true, hashes(ElkSameIndividualAxiom.class.hashCode(), obj.getIndividuals()));
 		}
 
 		@Override
 		public Integer visit(ElkClass obj) {
-			// TODO Auto-generated method stub
-			return super.visit(obj);
+			return obj.getIri().hashCode();
 		}
 
 		@Override
 		public Integer visit(ElkObjectComplementOf obj) {
-			// TODO Auto-generated method stub
-			return super.visit(obj);
+			return HashGenerator.combineListHash(ElkObjectComplementOf.class.hashCode(), hashCode(obj.getClassExpression()));
 		}
 
 		@Override
 		public Integer visit(ElkObjectIntersectionOf obj) {
-			// TODO Auto-generated method stub
-			return super.visit(obj);
+			return HashGenerator.combineMultisetHash(true, hashes(ElkObjectIntersectionOf.class.hashCode(), obj.getClassExpressions()));
 		}
 
 		@Override
 		public Integer visit(ElkObjectOneOf obj) {
-			// TODO Auto-generated method stub
-			return super.visit(obj);
+			return HashGenerator.combineMultisetHash(true, hashes(ElkObjectOneOf.class.hashCode(), obj.getIndividuals()));
 		}
 
 		@Override
 		public Integer visit(ElkObjectSomeValuesFrom obj) {
-			// TODO Auto-generated method stub
-			return super.visit(obj);
+			return HashGenerator.combineListHash(hashCode(obj.getProperty()), hashCode(obj.getFiller()));
 		}
 
 		@Override
 		public Integer visit(ElkObjectUnionOf obj) {
-			// TODO Auto-generated method stub
-			return super.visit(obj);
+			return HashGenerator.combineMultisetHash(true, hashes(ElkObjectUnionOf.class.hashCode(), obj.getClassExpressions()));
 		}
 
 		@Override
 		public Integer visit(ElkObjectPropertyChain obj) {
-			// TODO Auto-generated method stub
-			return super.visit(obj);
+			return HashGenerator.combineListHash(hashes(ElkObjectPropertyChain.class.hashCode(), obj.getObjectPropertyExpressions()));
 		}
 
 		@Override
 		public Integer visit(ElkObjectProperty obj) {
-			// TODO Auto-generated method stub
-			return super.visit(obj);
+			return obj.getIri().hashCode();
 		}
 
 		@Override
-		public Integer visit(ElkNamedIndividual elkNamedIndividual) {
-			// TODO Auto-generated method stub
-			return super.visit(elkNamedIndividual);
+		public Integer visit(ElkNamedIndividual obj) {
+			return obj.getIri().hashCode();
 		}
 
 		@Override
 		public Integer visit(ElkIri iri) {
-			// TODO Auto-generated method stub
-			return super.visit(iri);
+			return iri.hashCode();
 		}
 		
-		
 	}	
+	
+	
+	private static int[] hashes(int classHash, List<? extends ElkObject> objects) {
+		int[] hashes = new int[objects.size() + 1];
+		
+		hashes[0] = classHash;
+		
+		for (int i = 0; i < objects.size(); i++) {
+			hashes[i + 1] = hashCode(objects.get(i));
+		}
+		
+		return hashes;
+	}
 }
