@@ -70,7 +70,7 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 	
 	@Override
 	public boolean equal(final Expression first, final Expression second) {
-		return first.accept(this , second);
+		return first.accept(this, second);
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 
 	@Override
 	public Boolean visit(LemmaExpression expr, Expression second) {
-		return second instanceof ElkLemma ? LemmaEquivalenceChecker.equal(expr.getLemma(), ((LemmaExpression)second).getLemma()) : Boolean.FALSE;
+		return second instanceof LemmaExpression ? LemmaEquivalenceChecker.equal(expr.getLemma(), ((LemmaExpression)second).getLemma()) : Boolean.FALSE;
 	}
 
 	private static class DefaultLemmaChecker  implements ElkLemmaVisitor<ElkLemma, Boolean> {

@@ -190,7 +190,7 @@ public class EntryHashSet<E extends Entry<E>> extends AbstractCollection<E> {
 		this.overloadFactor = DEFAULT_OVERLOAD_FACTOR;
 		undersize = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_UNDERLOAD_FACTOR);
 		oversize = (int) (DEFAULT_INITIAL_CAPACITY * DEFAULT_OVERLOAD_FACTOR);
-		buckets = (E[]) new Object[DEFAULT_INITIAL_CAPACITY];
+		buckets = (E[]) new Entry[DEFAULT_INITIAL_CAPACITY];
 		init();
 	}
 

@@ -50,8 +50,16 @@ public class StructuralEquivalenceHasher implements ExpressionHasher {
 		return EntityHasher.hashCode(obj);
 	}
 	
+	static int hashCode(ElkComplexClassExpression obj) {
+		return EntityHasher.hashCode(obj);
+	}
+	
 	static int hashCode(ElkAxiom obj) {
 		return AxiomHasher.hashCode(obj);
+	}
+	
+	static int hashCode(ElkLemma obj) {
+		return LemmaHasher.hashCode(obj);
 	}
 	
 	@Override
@@ -74,7 +82,7 @@ public class StructuralEquivalenceHasher implements ExpressionHasher {
 	private static class LemmaHasher implements ElkLemmaVisitor<ElkLemma, Integer> {
 
 		static int hashCode(ElkLemma lemma) {
-			return lemma.hashCode();
+			return lemma.accept(new LemmaHasher(), null);
 		}
 		
 		@Override

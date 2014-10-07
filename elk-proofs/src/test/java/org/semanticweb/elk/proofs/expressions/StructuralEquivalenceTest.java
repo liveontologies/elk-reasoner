@@ -91,13 +91,14 @@ public class StructuralEquivalenceTest {
 	public void lemmas() {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(getIri("A"));
+		ElkClass b = factory.getClass(getIri("B"));
 		ElkObjectProperty r = factory.getObjectProperty(getIri("R"));
 		ElkObjectProperty s = factory.getObjectProperty(getIri("S"));
 		ElkLemmaObjectFactory lemmaObjFactory = new ElkLemmaObjectFactoryImpl();
 		ElkObjectPropertyChain rs = factory.getObjectPropertyChain(Arrays.asList(r, s));
 		// subclass lemmas
-		assertTrue(StructuralEquivalenceChecker.equal(lemmaObjFactory.getComplexSubClassOfAxiom(a, lemmaObjFactory.getComplexObjectSomeValuesFrom(rs, a)), 
-				lemmaObjFactory.getComplexSubClassOfAxiom(a, lemmaObjFactory.getComplexObjectSomeValuesFrom(rs, TestEntities.a))));
+		assertTrue(StructuralEquivalenceChecker.equal(lemmaObjFactory.getComplexSubClassOfAxiom(a, lemmaObjFactory.getComplexObjectSomeValuesFrom(rs, b)), 
+				lemmaObjFactory.getComplexSubClassOfAxiom(a, lemmaObjFactory.getComplexObjectSomeValuesFrom(rs, TestEntities.b))));
 		// reflexive chains
 		assertTrue(StructuralEquivalenceChecker.equal(lemmaObjFactory.getReflexivePropertyChain(rs), lemmaObjFactory.getReflexivePropertyChain(rs)));
 		// subchains
