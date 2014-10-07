@@ -5,10 +5,11 @@ package org.semanticweb.elk.proofs.expressions.entries;
 
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
-import static org.semanticweb.elk.proofs.expressions.TestEntities.*;
+import static org.semanticweb.elk.proofs.expressions.TestEntities.a;
 import static org.semanticweb.elk.proofs.expressions.TestEntities.b;
 import static org.semanticweb.elk.proofs.expressions.TestEntities.c;
 import static org.semanticweb.elk.proofs.expressions.TestEntities.d;
+import static org.semanticweb.elk.proofs.expressions.TestEntities.q;
 import static org.semanticweb.elk.proofs.expressions.TestEntities.r;
 import static org.semanticweb.elk.proofs.expressions.TestEntities.s;
 
@@ -64,13 +65,13 @@ public class ExpressionFactoryWithCachingTest {
 		ExpressionFactory factory = new ExpressionFactoryWithCaching();
 		// complex existentials
 		ElkObjectPropertyChain rs = objFactory_.getObjectPropertyChain(Arrays.asList(r, s));
-		Expression first = factory.create(lemmaFactory_.getComplexSubClassOfAxiom(a, lemmaFactory_.getComplexObjectSomeValuesFrom(rs, b)));
-		Expression second = factory.create(lemmaFactory_.getComplexSubClassOfAxiom(a, lemmaFactory_.getComplexObjectSomeValuesFrom(rs, b)));
+		Expression first = factory.create(lemmaFactory_.getSubClassOfLemma(a, lemmaFactory_.getComplexObjectSomeValuesFrom(rs, b)));
+		Expression second = factory.create(lemmaFactory_.getSubClassOfLemma(a, lemmaFactory_.getComplexObjectSomeValuesFrom(rs, b)));
 		
 		assertSame(first, second);
 		// reflexive chain
-		first = factory.create(lemmaFactory_.getReflexivePropertyChain(rs));
-		second = factory.create(lemmaFactory_.getReflexivePropertyChain(rs));
+		first = factory.create(lemmaFactory_.getReflexivePropertyChainLemma(rs));
+		second = factory.create(lemmaFactory_.getReflexivePropertyChainLemma(rs));
 		
 		assertSame(first, second);
 		// complex chain subsumption
@@ -78,12 +79,12 @@ public class ExpressionFactoryWithCachingTest {
 		ElkObjectPropertyChain rsq2 = objFactory_.getObjectPropertyChain(Arrays.asList(r, s, q));
 		ElkObjectPropertyChain rqs = objFactory_.getObjectPropertyChain(Arrays.asList(r, q, s));
 		
-		first = factory.create(lemmaFactory_.getComplexSubPropertyChainAxiom(rs, rsq));
-		second = factory.create(lemmaFactory_.getComplexSubPropertyChainAxiom(rs, rsq2));
+		first = factory.create(lemmaFactory_.getSubPropertyChainOfLemma(rs, rsq));
+		second = factory.create(lemmaFactory_.getSubPropertyChainOfLemma(rs, rsq2));
 		
 		assertSame(first, second);
 		
-		second = factory.create(lemmaFactory_.getComplexSubPropertyChainAxiom(rs, rqs));
+		second = factory.create(lemmaFactory_.getSubPropertyChainOfLemma(rs, rqs));
 		
 		assertNotSame(first, second);
 	}

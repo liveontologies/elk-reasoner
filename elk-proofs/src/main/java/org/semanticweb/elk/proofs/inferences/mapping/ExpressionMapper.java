@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Sub
  */
 public class ExpressionMapper {
 
-	public static Iterable<TracingInput> convertExpressionToTracingInput(
+	public static Iterable<TracingInput> convertExpressionToTracingInputs(
 			Expression expression, IndexObjectConverter converter) {
 		return expression.accept(new Converter(converter), null);
 	}

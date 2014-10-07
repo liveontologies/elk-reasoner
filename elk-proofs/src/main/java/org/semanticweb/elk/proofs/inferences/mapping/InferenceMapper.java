@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Abstr
 /**
  * Visits all used low level {@link ClassInference}s and
  * {@link ObjectPropertyInference}, maps them to higher level {@link Inference}s
- * and passes the provided visitor.
+ * and passes to the provided visitor.
  * 
  * @author Pavel Klinov
  * 
@@ -54,7 +54,7 @@ public class InferenceMapper {
 	
 	public void map(final Iterable<? extends TracingInput> inputs, final InferenceVisitor<?, ?> visitor) {
 		for (TracingInput input : inputs) {
-			//TODO visitor here?
+			//TODO visitor here (that would get rid of the exception at the bottom)?
 			if (input instanceof ClassTracingInput) {
 				ClassTracingInput ci = (ClassTracingInput) input;
 				
@@ -76,7 +76,6 @@ public class InferenceMapper {
 		final SingleInferenceMapper singleMapper = new SingleInferenceMapper();
 		
 		unwinder_.accept(cxt, conclusion, 
-				//new DummyConclusionVisitor<IndexedClassExpression, Void>(), 
 				new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
 
 					@Override
@@ -91,7 +90,6 @@ public class InferenceMapper {
 						return null;
 					}
 				}, 
-				//new DummyObjectPropertyConclusionVisitor<IndexedClassExpression, Void>(), 
 				new AbstractObjectPropertyInferenceVisitor<Void, Void>() {
 
 					@Override
@@ -114,7 +112,6 @@ public class InferenceMapper {
 		
 		unwinder_.accept(
 				conclusion,
-				//new DummyObjectPropertyConclusionVisitor<IndexedClassExpression, Void>(), 
 				new AbstractObjectPropertyInferenceVisitor<Void, Void>() {
 
 					@Override

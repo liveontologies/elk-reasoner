@@ -53,8 +53,8 @@ public class StructuralHasherTest {
 	public void lemmas() {
 		ElkObjectPropertyChain rs = objFactory_.getObjectPropertyChain(Arrays.asList(r, s));
 		
-		assertEquals(StructuralEquivalenceHasher.hashCode(lemmaFactory_.getComplexSubClassOfAxiom(a, lemmaFactory_.getComplexObjectSomeValuesFrom(rs, b))), 
-				StructuralEquivalenceHasher.hashCode(lemmaFactory_.getComplexSubClassOfAxiom(a, lemmaFactory_.getComplexObjectSomeValuesFrom(rs, b))));
+		assertEquals(StructuralEquivalenceHasher.hashCode(lemmaFactory_.getSubClassOfLemma(a, lemmaFactory_.getComplexObjectSomeValuesFrom(rs, b))), 
+				StructuralEquivalenceHasher.hashCode(lemmaFactory_.getSubClassOfLemma(a, lemmaFactory_.getComplexObjectSomeValuesFrom(rs, b))));
 	}
 	
 }

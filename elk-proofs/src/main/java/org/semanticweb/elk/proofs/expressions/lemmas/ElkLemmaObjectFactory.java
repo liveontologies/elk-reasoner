@@ -13,11 +13,11 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
  */
 public interface ElkLemmaObjectFactory {
 
-	public ElkReflexivePropertyChainLemma getReflexivePropertyChain(ElkSubObjectPropertyExpression chain);
+	public ElkReflexivePropertyChainLemma getReflexivePropertyChainLemma(ElkSubObjectPropertyExpression chain);
 	
-	public ElkSubPropertyChainOfLemma getComplexSubPropertyChainAxiom(ElkSubObjectPropertyExpression subchain, ElkSubObjectPropertyExpression superchain);
+	public ElkSubPropertyChainOfLemma getSubPropertyChainOfLemma(ElkSubObjectPropertyExpression subchain, ElkSubObjectPropertyExpression superchain);
 	
-	public ElkSubClassOfLemma getComplexSubClassOfAxiom(ElkClassExpression subclass, ElkComplexClassExpression superclass);
+	public ElkSubClassOfLemma getSubClassOfLemma(ElkClassExpression subclass, ElkComplexClassExpression superclass);
 	
 	public ElkComplexObjectSomeValuesFrom getComplexObjectSomeValuesFrom(ElkSubObjectPropertyExpression chain, ElkClassExpression filler);
 

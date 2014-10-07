@@ -49,7 +49,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 	@Override
 	public Iterable<Inference> getInferences(Expression expression) throws ElkException {
 		// first transform the expression into inputs for the trace reader
-		Iterable<TracingInput> inputs = ExpressionMapper.convertExpressionToTracingInput(expression, reasoner.getIndexObjectConverter());
+		Iterable<TracingInput> inputs = ExpressionMapper.convertExpressionToTracingInputs(expression, reasoner.getIndexObjectConverter());
 		TraceStore.Reader traceReader = reasoner.getTraceState().getTraceStore().getReader();
 		final InferenceMapper mapper = new InferenceMapper(getTraceUnwinder(traceReader));
 		final List<Inference> userInferences = new LinkedList<Inference>();
@@ -62,7 +62,8 @@ public class ReasonerInferenceReader implements InferenceReader {
 			}
 			
 		};
-
+		// transformation happens here, each user-level inference will be passed
+		// to the collector
 		mapper.map(inputs, collector);
 		
 		return userInferences;

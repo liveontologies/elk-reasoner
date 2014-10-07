@@ -21,20 +21,20 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkReflexivePropertyChainLe
 public class ElkLemmaObjectFactoryImpl implements ElkLemmaObjectFactory {
 
 	@Override
-	public ElkReflexivePropertyChainLemma getReflexivePropertyChain(
+	public ElkReflexivePropertyChainLemma getReflexivePropertyChainLemma(
 			ElkSubObjectPropertyExpression chain) {
 		return new ElkReflexivePropertyChainLemmaImpl(chain);
 	}
 
 	@Override
-	public ElkSubPropertyChainOfLemma getComplexSubPropertyChainAxiom(
+	public ElkSubPropertyChainOfLemma getSubPropertyChainOfLemma(
 			ElkSubObjectPropertyExpression subchain,
 			ElkSubObjectPropertyExpression superchain) {
 		return new ElkSubPropertyChainOfLemmaImpl(subchain, superchain);
 	}
 
 	@Override
-	public ElkSubClassOfLemma getComplexSubClassOfAxiom(
+	public ElkSubClassOfLemma getSubClassOfLemma(
 			ElkClassExpression subclass,
 			ElkComplexClassExpression superclass) {
 		return new ElkSubClassOfLemmaImpl(subclass, superclass);

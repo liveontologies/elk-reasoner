@@ -97,12 +97,12 @@ public class StructuralEquivalenceTest {
 		ElkLemmaObjectFactory lemmaObjFactory = new ElkLemmaObjectFactoryImpl();
 		ElkObjectPropertyChain rs = factory.getObjectPropertyChain(Arrays.asList(r, s));
 		// subclass lemmas
-		assertTrue(StructuralEquivalenceChecker.equal(lemmaObjFactory.getComplexSubClassOfAxiom(a, lemmaObjFactory.getComplexObjectSomeValuesFrom(rs, b)), 
-				lemmaObjFactory.getComplexSubClassOfAxiom(a, lemmaObjFactory.getComplexObjectSomeValuesFrom(rs, TestEntities.b))));
+		assertTrue(StructuralEquivalenceChecker.equal(lemmaObjFactory.getSubClassOfLemma(a, lemmaObjFactory.getComplexObjectSomeValuesFrom(rs, b)), 
+				lemmaObjFactory.getSubClassOfLemma(a, lemmaObjFactory.getComplexObjectSomeValuesFrom(rs, TestEntities.b))));
 		// reflexive chains
-		assertTrue(StructuralEquivalenceChecker.equal(lemmaObjFactory.getReflexivePropertyChain(rs), lemmaObjFactory.getReflexivePropertyChain(rs)));
+		assertTrue(StructuralEquivalenceChecker.equal(lemmaObjFactory.getReflexivePropertyChainLemma(rs), lemmaObjFactory.getReflexivePropertyChainLemma(rs)));
 		// subchains
-		assertTrue(StructuralEquivalenceChecker.equal(lemmaObjFactory.getComplexSubPropertyChainAxiom(rs, rs), lemmaObjFactory.getComplexSubPropertyChainAxiom(rs, rs)));
+		assertTrue(StructuralEquivalenceChecker.equal(lemmaObjFactory.getSubPropertyChainOfLemma(rs, rs), lemmaObjFactory.getSubPropertyChainOfLemma(rs, rs)));
 	}
 	
 	
