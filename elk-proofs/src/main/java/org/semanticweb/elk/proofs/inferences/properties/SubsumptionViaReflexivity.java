@@ -28,9 +28,9 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.LemmaExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -44,22 +44,22 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  */
 public class SubsumptionViaReflexivity implements Inference  {
 	
-	private final Expression premise_;
+	private final DerivedExpression premise_;
 	
-	private final Expression conclusion_;
+	private final DerivedExpression conclusion_;
 	
-	public SubsumptionViaReflexivity(ElkSubPropertyChainOfLemma conclusion, ElkReflexiveObjectPropertyAxiom premise) {
-		premise_ = new AxiomExpression(premise);
-		conclusion_ = new LemmaExpression(conclusion);
+	public SubsumptionViaReflexivity(ElkSubPropertyChainOfLemma conclusion, ElkReflexiveObjectPropertyAxiom premise, DerivedExpressionFactory exprFactory) {
+		premise_ = exprFactory.create(premise);
+		conclusion_ = exprFactory.create(conclusion);
 	}
 	
-	public SubsumptionViaReflexivity(ElkSubPropertyChainOfLemma conclusion, Expression premise) {
+	public SubsumptionViaReflexivity(ElkSubPropertyChainOfLemma conclusion, DerivedExpression premise, DerivedExpressionFactory exprFactory) {
 		premise_ = premise;
-		conclusion_ = new LemmaExpression(conclusion);
+		conclusion_ = exprFactory.create(conclusion);
 	}
 	
 	@Override
-	public Collection<? extends Expression> getPremises() {
+	public Collection<? extends DerivedExpression> getPremises() {
 		return Collections.singletonList(premise_);
 	}
 

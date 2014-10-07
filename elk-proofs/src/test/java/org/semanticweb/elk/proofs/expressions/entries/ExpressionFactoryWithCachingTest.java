@@ -19,9 +19,10 @@ import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.proofs.InferenceReader;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
-import org.semanticweb.elk.proofs.expressions.ExpressionFactoryWithCaching;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactoryWithCaching;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryImpl;
 
@@ -37,7 +38,7 @@ public class ExpressionFactoryWithCachingTest {
 	
 	@Test
 	public void axiomCaching() {
-		ExpressionFactory factory = new ExpressionFactoryWithCaching();
+		DerivedExpressionFactory factory = new DerivedExpressionFactoryWithCaching(InferenceReader.DUMMY);
 		
 		Expression first = factory.create(objFactory_.getSubClassOfAxiom(a, b));
 		Expression second = factory.create(objFactory_.getSubClassOfAxiom(a, b));
@@ -62,7 +63,7 @@ public class ExpressionFactoryWithCachingTest {
 	
 	@Test
 	public void lemmaCaching() {
-		ExpressionFactory factory = new ExpressionFactoryWithCaching();
+		DerivedExpressionFactory factory = new DerivedExpressionFactoryWithCaching(InferenceReader.DUMMY);
 		// complex existentials
 		ElkObjectPropertyChain rs = objFactory_.getObjectPropertyChain(Arrays.asList(r, s));
 		Expression first = factory.create(lemmaFactory_.getSubClassOfLemma(a, lemmaFactory_.getComplexObjectSomeValuesFrom(rs, b)));

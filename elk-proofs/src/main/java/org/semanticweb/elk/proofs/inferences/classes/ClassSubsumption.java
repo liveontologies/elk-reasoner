@@ -30,8 +30,8 @@ import java.util.Collections;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
@@ -44,7 +44,7 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  */
 public class ClassSubsumption extends AbstractClassInference {
 
-	private final Expression premise_;
+	private final DerivedExpression premise_;
 
 	private final SideCondition sideCondition_;
 
@@ -52,15 +52,15 @@ public class ClassSubsumption extends AbstractClassInference {
 	// parameters. Perhaps we could have an inference factory which would do it.
 	public ClassSubsumption(ElkAxiom sideCondition,
 			ElkClassExpression sub, ElkClassExpression sup,
-			ElkClassExpression premise, ElkObjectFactory factory) {
-		super(factory.getSubClassOfAxiom(sub, sup));
+			ElkClassExpression premise, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
+		super(factory.getSubClassOfAxiom(sub, sup), exprFactory);
 
-		premise_ = new AxiomExpression(factory.getSubClassOfAxiom(sub, premise));
+		premise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, premise));
 		sideCondition_ = new AxiomPresenceCondition<ElkAxiom>(sideCondition);
 	}
 
 	@Override
-	public Collection<Expression> getPremises() {
+	public Collection<DerivedExpression> getPremises() {
 		return Collections.singletonList(premise_);
 	}
 

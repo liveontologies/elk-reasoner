@@ -32,8 +32,8 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.proofs.expressions.AxiomExpression;
-import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
@@ -44,11 +44,11 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  */
 public class ExistentialComposition extends AbstractClassInference {
 
-	private final Expression existentialPremise_;
+	private final DerivedExpression existentialPremise_;
 
-	private final Expression subsumerPremise_;
+	private final DerivedExpression subsumerPremise_;
 
-	private final Expression propertyPremise_;
+	private final DerivedExpression propertyPremise_;
 
 	public ExistentialComposition(
 			ElkClassExpression sub, 
@@ -56,12 +56,13 @@ public class ExistentialComposition extends AbstractClassInference {
 			ElkSubClassOfAxiom exPremise, 
 			ElkSubClassOfAxiom subPremise,
 			ElkSubObjectPropertyOfAxiom propPremise,
-			ElkObjectFactory factory) {
-		super(factory.getSubClassOfAxiom(sub, sup));
+			ElkObjectFactory factory, 
+			DerivedExpressionFactory exprFactory) {
+		super(factory.getSubClassOfAxiom(sub, sup), exprFactory);
 
-		existentialPremise_ = new AxiomExpression(exPremise);
-		subsumerPremise_ = new AxiomExpression(subPremise);
-		propertyPremise_ = new AxiomExpression(propPremise);
+		existentialPremise_ = exprFactory.create(exPremise);
+		subsumerPremise_ = exprFactory.create(subPremise);
+		propertyPremise_ = exprFactory.create(propPremise);
 	}
 	
 	@Override
@@ -70,7 +71,7 @@ public class ExistentialComposition extends AbstractClassInference {
 	}
 
 	@Override
-	public Collection<? extends Expression> getPremises() {
+	public Collection<? extends DerivedExpression> getPremises() {
 		return Arrays.asList(existentialPremise_, subsumerPremise_,
 				propertyPremise_);
 	}

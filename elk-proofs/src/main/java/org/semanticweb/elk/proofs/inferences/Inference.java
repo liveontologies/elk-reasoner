@@ -28,6 +28,7 @@ package org.semanticweb.elk.proofs.inferences;
 import java.util.Collection;
 
 import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
 /**
@@ -41,7 +42,7 @@ import org.semanticweb.elk.proofs.sideconditions.SideCondition;
  */
 public interface Inference {
 
-	public Collection<? extends Expression> getPremises();
+	public Collection<? extends DerivedExpression> getPremises();
 
 	public Expression getConclusion();
 

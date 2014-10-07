@@ -24,6 +24,7 @@ package org.semanticweb.elk.proofs.inferences.mapping;
  * #L%
  */
 
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -48,8 +49,11 @@ public class InferenceMapper {
 
 	private final TraceUnwinder unwinder_;
 	
-	public InferenceMapper(TraceUnwinder unwinder) {
+	private final DerivedExpressionFactory exprFactory_;
+	
+	public InferenceMapper(TraceUnwinder unwinder, DerivedExpressionFactory factory) {
 		unwinder_ = unwinder;
+		exprFactory_ = factory;
 	}
 	
 	public void map(final Iterable<? extends TracingInput> inputs, final InferenceVisitor<?, ?> visitor) {
@@ -73,7 +77,7 @@ public class InferenceMapper {
 	
 	// class and object property inferences
 	public void map(final IndexedClassExpression cxt, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
-		final SingleInferenceMapper singleMapper = new SingleInferenceMapper();
+		final SingleInferenceMapper singleMapper = new SingleInferenceMapper(exprFactory_);
 		
 		unwinder_.accept(cxt, conclusion, 
 				new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
@@ -108,7 +112,7 @@ public class InferenceMapper {
 	
 	// only object property inferences
 	public void map(final ObjectPropertyConclusion conclusion, final InferenceVisitor<?, ?> visitor) {
-		final SingleInferenceMapper singleMapper = new SingleInferenceMapper();
+		final SingleInferenceMapper singleMapper = new SingleInferenceMapper(exprFactory_);
 		
 		unwinder_.accept(
 				conclusion,

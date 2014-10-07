@@ -29,7 +29,8 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
@@ -45,8 +46,8 @@ abstract class AbstractPropertyInference implements Inference {
 
 	final Expression conclusion;
 
-	AbstractPropertyInference(ElkObjectPropertyAxiom c) {
-		conclusion = new AxiomExpression(c);
+	AbstractPropertyInference(ElkObjectPropertyAxiom c, DerivedExpressionFactory factory) {
+		conclusion = factory.create(c);
 	}
 
 	@Override
@@ -60,7 +61,7 @@ abstract class AbstractPropertyInference implements Inference {
 	}
 
 	@Override
-	public Collection<? extends Expression> getPremises() {
+	public Collection<? extends DerivedExpression> getPremises() {
 		return null;
 	}
 

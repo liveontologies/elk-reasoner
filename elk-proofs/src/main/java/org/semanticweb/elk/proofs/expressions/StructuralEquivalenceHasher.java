@@ -28,6 +28,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.AbstractElkObjectVisitor;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkClassExpressionWrap;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpressionVisitor;
@@ -67,12 +69,12 @@ public class StructuralEquivalenceHasher implements ExpressionHasher {
 		return expression.accept(new ExpressionVisitor<Void, Integer>() {
 
 			@Override
-			public Integer visit(AxiomExpression expr, Void input) {
+			public Integer visit(DerivedAxiomExpression expr, Void input) {
 				return AxiomHasher.hashCode(expr.getAxiom());
 			}
 
 			@Override
-			public Integer visit(LemmaExpression expr, Void input) {
+			public Integer visit(DerivedLemmaExpression expr, Void input) {
 				return LemmaHasher.hashCode(expr.getLemma());
 			}
 			

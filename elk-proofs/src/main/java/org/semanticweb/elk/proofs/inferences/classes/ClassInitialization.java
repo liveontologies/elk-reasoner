@@ -29,7 +29,8 @@ import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
@@ -40,12 +41,12 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  */
 public class ClassInitialization extends AbstractClassInference {
 
-	public ClassInitialization(ElkClassExpression expr, ElkObjectFactory factory) {
-		super(factory.getSubClassOfAxiom(expr, expr));
+	public ClassInitialization(ElkClassExpression expr, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
+		super(factory.getSubClassOfAxiom(expr, expr), exprFactory);
 	}
 	
 	@Override
-	public Collection<Expression> getPremises() {
+	public Collection<DerivedExpression> getPremises() {
 		return Collections.emptyList();
 	}
 

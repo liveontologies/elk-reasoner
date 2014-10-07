@@ -10,6 +10,7 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.InferenceReader;
 import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactoryWithCaching;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -51,7 +52,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 		// first transform the expression into inputs for the trace reader
 		Iterable<TracingInput> inputs = ExpressionMapper.convertExpressionToTracingInputs(expression, reasoner.getIndexObjectConverter());
 		TraceStore.Reader traceReader = reasoner.getTraceState().getTraceStore().getReader();
-		final InferenceMapper mapper = new InferenceMapper(getTraceUnwinder(traceReader));
+		final InferenceMapper mapper = new InferenceMapper(getTraceUnwinder(traceReader), new DerivedExpressionFactoryWithCaching(this));
 		final List<Inference> userInferences = new LinkedList<Inference>();
 		InferenceVisitor<Void, Void> collector = new AbstractInferenceVisitor<Void, Void>() {
 
@@ -62,8 +63,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 			}
 			
 		};
-		// transformation happens here, each user-level inference will be passed
-		// to the collector
+		// transformation happens here, each user-level inference will be passed to the collector
 		mapper.map(inputs, collector);
 		
 		return userInferences;

@@ -32,6 +32,8 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.AbstractElkObjectVisitor;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkClassExpressionWrap;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpressionVisitor;
@@ -74,13 +76,13 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 	}
 
 	@Override
-	public Boolean visit(AxiomExpression expr, Expression second) {
-		return second instanceof AxiomExpression ? AxiomEquivalenceChecker.equal(expr.getAxiom(), ((AxiomExpression) second).getAxiom()) : Boolean.FALSE;
+	public Boolean visit(DerivedAxiomExpression expr, Expression second) {
+		return second instanceof DerivedAxiomExpression ? AxiomEquivalenceChecker.equal(expr.getAxiom(), ((DerivedAxiomExpression) second).getAxiom()) : Boolean.FALSE;
 	}
 
 	@Override
-	public Boolean visit(LemmaExpression expr, Expression second) {
-		return second instanceof LemmaExpression ? LemmaEquivalenceChecker.equal(expr.getLemma(), ((LemmaExpression)second).getLemma()) : Boolean.FALSE;
+	public Boolean visit(DerivedLemmaExpression expr, Expression second) {
+		return second instanceof DerivedLemmaExpression ? LemmaEquivalenceChecker.equal(expr.getLemma(), ((DerivedLemmaExpression)second).getLemma()) : Boolean.FALSE;
 	}
 
 	private static class DefaultLemmaChecker  implements ElkLemmaVisitor<ElkLemma, Boolean> {

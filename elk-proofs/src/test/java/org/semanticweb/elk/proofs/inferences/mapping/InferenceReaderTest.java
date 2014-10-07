@@ -10,7 +10,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.proofs.InferenceReader;
-import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.DummyExpressionfactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 import org.semanticweb.elk.reasoner.Reasoner;
@@ -48,7 +48,7 @@ import org.semanticweb.elk.reasoner.stages.RecursiveReasonerInferenceReader;
 public class InferenceReaderTest {
 	
 	@Test
-	public void testSimpleChainMapping() throws Exception {
+	public void simpleChainMapping() throws Exception {
 		Reasoner reasoner = TestReasonerUtils.loadAndClassify("PropertyCompositions.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
@@ -58,7 +58,7 @@ public class InferenceReaderTest {
 		// tracing happens here
 		reader.initialize(ax);
 		// reading all inferences recursively
-		for (Inference inf : reader.getInferences(new AxiomExpression(ax))) {
+		for (Inference inf : reader.getInferences(new DummyExpressionfactory().create(ax))) {
 			System.out.println(InferencePrinter.print(inf));
 		}
 		

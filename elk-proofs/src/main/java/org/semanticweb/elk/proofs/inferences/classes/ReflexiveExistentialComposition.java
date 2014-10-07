@@ -36,8 +36,8 @@ import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
-import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
@@ -49,18 +49,21 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
 public class ReflexiveExistentialComposition extends
 		AbstractClassInference {
 
-	private final Expression reflexPremise_;
+	private final DerivedExpression reflexPremise_;
 	
-	private final Expression subsumerPremise_;
+	private final DerivedExpression subsumerPremise_;
 	
-	private final Expression propertyPremise_;
+	private final DerivedExpression propertyPremise_;
 	
-	public ReflexiveExistentialComposition(ElkClassExpression sub, ElkSubClassOfAxiom subsumerPremise, ElkReflexiveObjectPropertyAxiom reflPremise, ElkSubObjectPropertyOfAxiom propPremise, ElkObjectFactory factory) {
-		super(getConclusion(sub, subsumerPremise, propPremise, factory));
+	public ReflexiveExistentialComposition(ElkClassExpression sub,
+			ElkSubClassOfAxiom subsumerPremise,
+			ElkReflexiveObjectPropertyAxiom reflPremise,
+			ElkSubObjectPropertyOfAxiom propPremise, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
+		super(getConclusion(sub, subsumerPremise, propPremise, factory), exprFactory);
 		
-		reflexPremise_ = new AxiomExpression(reflPremise);
-		subsumerPremise_ = new AxiomExpression(subsumerPremise);
-		propertyPremise_ = new AxiomExpression(propPremise);
+		reflexPremise_ = exprFactory.create(reflPremise);
+		subsumerPremise_ = exprFactory.create(subsumerPremise);
+		propertyPremise_ = exprFactory.create(propPremise);
 	}
 
 	private static ElkSubClassOfAxiom getConclusion(ElkClassExpression sub, ElkSubClassOfAxiom subPremise, ElkSubObjectPropertyOfAxiom propPremise, ElkObjectFactory factory) {
@@ -89,7 +92,7 @@ public class ReflexiveExistentialComposition extends
 	}
 
 	@Override
-	public Collection<? extends Expression> getPremises() {
+	public Collection<? extends DerivedExpression> getPremises() {
 		return Arrays.asList(reflexPremise_, subsumerPremise_, propertyPremise_);
 	}
 

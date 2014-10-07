@@ -31,8 +31,8 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
@@ -46,22 +46,22 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
 public class DisjointnessContradiction extends
 		AbstractClassInference {
 
-	private final Expression firstPremise_;
+	private final DerivedExpression firstPremise_;
 	
-	private final Expression secondPremise_;
+	private final DerivedExpression secondPremise_;
 	
 	private final ElkDisjointClassesAxiom sideCondition_;
 	
-	public DisjointnessContradiction(ElkClassExpression sub, ElkClassExpression firstSup, ElkClassExpression secondSup, ElkDisjointClassesAxiom sideCondition, ElkObjectFactory factory) {
-		super(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING));
+	public DisjointnessContradiction(ElkClassExpression sub, ElkClassExpression firstSup, ElkClassExpression secondSup, ElkDisjointClassesAxiom sideCondition, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
+		super(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING), exprFactory);
 
-		firstPremise_ = new AxiomExpression(factory.getSubClassOfAxiom(sub, firstSup));
-		secondPremise_ = new AxiomExpression(factory.getSubClassOfAxiom(sub, secondSup));
+		firstPremise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, firstSup));
+		secondPremise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, secondSup));
 		sideCondition_ = sideCondition;
 	}
 
 	@Override
-	public Collection<Expression> getPremises() {
+	public Collection<DerivedExpression> getPremises() {
 		return Arrays.asList(firstPremise_, secondPremise_);
 	}
 	

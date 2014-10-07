@@ -30,7 +30,8 @@ import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
@@ -44,11 +45,11 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  */
 public class ChainSubsumption implements Inference {
 
-	private final Expression firstPremise_;
+	private final DerivedExpression firstPremise_;
 
-	private final Expression secondPremise_;
+	private final DerivedExpression secondPremise_;
 
-	private final Expression conclusion_;
+	private final DerivedExpression conclusion_;
 
 	private final ElkSubObjectPropertyOfAxiom sideCondition_;
 
@@ -56,26 +57,28 @@ public class ChainSubsumption implements Inference {
 	public ChainSubsumption(
 			ElkSubObjectPropertyOfAxiom conclusion,
 			ElkSubObjectPropertyOfAxiom premise, 
-			ElkSubObjectPropertyOfAxiom sideCondition) {
-		firstPremise_ = new AxiomExpression(premise);
+			ElkSubObjectPropertyOfAxiom sideCondition,
+			DerivedExpressionFactory exprFactory) {
+		firstPremise_ = exprFactory.create(premise);
 		secondPremise_ = null;
-		conclusion_ = new AxiomExpression(conclusion);
+		conclusion_ = exprFactory.create(conclusion);
 		sideCondition_ = sideCondition;
 	}
 
 	// two premises and no side condition
 	public ChainSubsumption(
 			ElkSubObjectPropertyOfAxiom conclusion,
-			Expression first, 
-			ElkSubObjectPropertyOfAxiom second) {
+			DerivedExpression first, 
+			ElkSubObjectPropertyOfAxiom second,
+			DerivedExpressionFactory exprFactory) {
 		firstPremise_ = first;
-		secondPremise_ = new AxiomExpression(second);
-		conclusion_ = new AxiomExpression(conclusion);
+		secondPremise_ = exprFactory.create(second);
+		conclusion_ = exprFactory.create(conclusion);
 		sideCondition_ = null;
 	}
 
 	@Override
-	public Collection<? extends Expression> getPremises() {
+	public Collection<? extends DerivedExpression> getPremises() {
 		if (secondPremise_ == null) {
 			return Collections.singletonList(firstPremise_);
 		}

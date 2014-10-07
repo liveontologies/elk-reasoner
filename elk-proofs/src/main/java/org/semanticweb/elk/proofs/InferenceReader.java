@@ -3,6 +3,8 @@
  */
 package org.semanticweb.elk.proofs;
 
+import java.util.Collections;
+
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.Inference;
@@ -19,4 +21,14 @@ import org.semanticweb.elk.proofs.inferences.Inference;
 public interface InferenceReader {
 
 	public Iterable<Inference> getInferences(Expression expression) throws ElkException;
+	
+	// no-op reader
+	public static InferenceReader DUMMY = new InferenceReader() {
+
+		@Override
+		public Iterable<Inference> getInferences(Expression expression) throws ElkException {
+			return Collections.emptyList();
+		}
+		
+	};
 }

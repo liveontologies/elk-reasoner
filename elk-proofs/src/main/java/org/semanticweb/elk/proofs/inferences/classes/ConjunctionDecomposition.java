@@ -29,8 +29,8 @@ import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
@@ -42,17 +42,17 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
 public class ConjunctionDecomposition extends
 		AbstractClassInference {
 
-	private final Expression premise_;
+	private final DerivedExpression premise_;
 	
 	// the first conjunct is the super class 
-	public ConjunctionDecomposition(ElkClassExpression sub, ElkClassExpression sup, ElkClassExpression otherConjunct, ElkObjectFactory factory) {
-		super(factory.getSubClassOfAxiom(sub, sup));
+	public ConjunctionDecomposition(ElkClassExpression sub, ElkClassExpression sup, ElkClassExpression otherConjunct, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
+		super(factory.getSubClassOfAxiom(sub, sup), exprFactory);
 
-		premise_ = new AxiomExpression(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(sup, otherConjunct)));
+		premise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(sup, otherConjunct)));
 	}
 
 	@Override
-	public Collection<Expression> getPremises() {
+	public Collection<DerivedExpression> getPremises() {
 		return Collections.singletonList(premise_);
 	}
 

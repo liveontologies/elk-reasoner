@@ -28,9 +28,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.LemmaExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkReflexivePropertyChainLemma;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -44,20 +44,20 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  */
 public class ReflexiveComposition implements Inference {
 
-	private final Expression firstReflexive_;
+	private final DerivedExpression firstReflexive_;
 	
-	private final Expression secondReflexive_;
+	private final DerivedExpression secondReflexive_;
 	
-	private final Expression conclusion_;
+	private final DerivedExpression conclusion_;
 	
-	public ReflexiveComposition(ElkReflexivePropertyChainLemma conclusion, ElkReflexiveObjectPropertyAxiom firstRefl, Expression secondRefl) {
-		firstReflexive_ = new AxiomExpression(firstRefl);
+	public ReflexiveComposition(ElkReflexivePropertyChainLemma conclusion, ElkReflexiveObjectPropertyAxiom firstRefl, DerivedExpression secondRefl, DerivedExpressionFactory exprFactory) {
+		firstReflexive_ = exprFactory.create(firstRefl);
 		secondReflexive_ = secondRefl;
-		conclusion_ = new LemmaExpression(conclusion);
+		conclusion_ = exprFactory.create(conclusion);
 	}
 	
 	@Override
-	public Collection<? extends Expression> getPremises() {
+	public Collection<? extends DerivedExpression> getPremises() {
 		return Arrays.asList(firstReflexive_, secondReflexive_);
 	}
 	

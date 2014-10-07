@@ -29,8 +29,8 @@ import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
@@ -45,17 +45,17 @@ public class ToldReflexivity extends AbstractPropertyInference {
 
 	private final ElkReflexiveObjectPropertyAxiom sideCondition_;
 	
-	private final Expression premise_;
+	private final DerivedExpression premise_;
 	
-	public ToldReflexivity(ElkReflexiveObjectPropertyAxiom axiom, ElkObjectFactory factory) {
-		super(axiom);
+	public ToldReflexivity(ElkReflexiveObjectPropertyAxiom axiom, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
+		super(axiom, exprFactory);
 		
 		sideCondition_ = axiom;
-		premise_ = new AxiomExpression(factory.getSubObjectPropertyOfAxiom(axiom.getProperty(), axiom.getProperty()));
+		premise_ = exprFactory.create(factory.getSubObjectPropertyOfAxiom(axiom.getProperty(), axiom.getProperty()));
 	}
 	
 	@Override
-	public Collection<? extends Expression> getPremises() {
+	public Collection<? extends DerivedExpression> getPremises() {
 		return Collections.singletonList(premise_);
 	}
 	
