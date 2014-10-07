@@ -53,6 +53,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.Contradiction
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.ArraySlicedSet;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
@@ -121,17 +122,23 @@ public class ContextImpl implements ExtendedContext {
 
 	/**
 	 * the derived {@link IndexedClassExpression}s that are subsumers (i.e,
-	 * super-classes) of {@link #root_} and for which composition rules should
-	 * be applied
+	 * super-classes) of {@link #root_}; this set is sliced on
+	 * {@link IndexedClassExpression}s that are obtained by composition rules,
+	 * and those obtained by decomposition rules
 	 */
-	private final Set<IndexedClassExpression> composedSubsumers_;
+	private final ArraySlicedSet<IndexedClassExpression> subsumers_;
 
 	/**
-	 * the derived {@link IndexedClassExpression}s that are subsumers (i.e,
-	 * super-classes) of {@link #root_} and for which decomposition rules should
-	 * be applied
+	 * the identifier of the slice of {@link #subsumers_} obtained by
+	 * composition rules
 	 */
-	private final Set<IndexedClassExpression> decomposedSubsumers_;
+	private final static int COMPOSED_SUBSUMERS_SLICE_ = 0;
+
+	/**
+	 * the identifier of the slice of {@link #subsumers_} obtained by
+	 * decomposition rules
+	 */
+	private final static int DECOMPOSED_SUBSUMERS_SLICE_ = 1;
 
 	/**
 	 * the queue of unprocessed {@code Conclusion}s of this {@link Context}
@@ -153,8 +160,7 @@ public class ContextImpl implements ExtendedContext {
 	public ContextImpl(IndexedClassExpression root) {
 		this.root_ = root;
 		this.toDo_ = new ActivationStack<Conclusion>();
-		this.composedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(13);
-		this.decomposedSubsumers_ = new ArrayHashSet<IndexedClassExpression>(13);
+		this.subsumers_ = new ArraySlicedSet<IndexedClassExpression>(13);
 	}
 
 	@Override
@@ -240,12 +246,12 @@ public class ContextImpl implements ExtendedContext {
 
 	@Override
 	public Set<IndexedClassExpression> getComposedSubsumers() {
-		return composedSubsumers_;
+		return subsumers_.getSlice(COMPOSED_SUBSUMERS_SLICE_);
 	}
 
 	@Override
 	public Set<IndexedClassExpression> getDecomposedSubsumers() {
-		return decomposedSubsumers_;
+		return subsumers_.getSlice(DECOMPOSED_SUBSUMERS_SLICE_);
 	}
 
 	/*
@@ -335,12 +341,14 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(ComposedSubsumer<?> conclusion, ContextImpl input) {
-			return input.composedSubsumers_.add(conclusion.getExpression());
+			return input.subsumers_.add(COMPOSED_SUBSUMERS_SLICE_,
+					conclusion.getExpression());
 		}
 
 		@Override
 		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
-			return input.decomposedSubsumers_.add(conclusion.getExpression());
+			return input.subsumers_.add(DECOMPOSED_SUBSUMERS_SLICE_,
+					conclusion.getExpression());
 		}
 
 		@Override
@@ -440,13 +448,14 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(ComposedSubsumer<?> conclusion, ContextImpl input) {
-			return input.composedSubsumers_.remove(conclusion.getExpression());
+			return input.subsumers_.remove(COMPOSED_SUBSUMERS_SLICE_,
+					conclusion.getExpression());
 		}
 
 		@Override
 		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
-			return input.decomposedSubsumers_
-					.remove(conclusion.getExpression());
+			return input.subsumers_.remove(DECOMPOSED_SUBSUMERS_SLICE_,
+					conclusion.getExpression());
 		}
 
 		@Override
@@ -552,14 +561,14 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(ComposedSubsumer<?> conclusion, ContextImpl input) {
-			return input.composedSubsumers_
-					.contains(conclusion.getExpression());
+			return input.subsumers_.contains(COMPOSED_SUBSUMERS_SLICE_,
+					conclusion.getExpression());
 		}
 
 		@Override
 		public Boolean visit(DecomposedSubsumer<?> conclusion, ContextImpl input) {
-			return input.decomposedSubsumers_.contains(conclusion
-					.getExpression());
+			return input.subsumers_.contains(DECOMPOSED_SUBSUMERS_SLICE_,
+					conclusion.getExpression());
 		}
 
 		@Override
