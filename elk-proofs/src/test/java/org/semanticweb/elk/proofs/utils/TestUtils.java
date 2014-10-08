@@ -35,7 +35,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.ProofReader;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
-import org.semanticweb.elk.proofs.expressions.derived.AssertedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
@@ -74,16 +73,23 @@ public class TestUtils {
 		}
 
 		for (Inference inf : expr.getInferences()) {
-			// see if this inference proves the expression
+			// see if this inference proves the expression. it does if it is an
+			// initialization inference or there exists a not yet visited
+			// premise which is provable. 
 			boolean proves = true;
+			boolean initInference = true;
+			boolean newPremise = false;
 
 			for (DerivedExpression premise : inf.getPremises()) {
+				initInference = false;
+				
 				if (seen.add(premise)) {
+					newPremise = true;
 					proves &= proved(premise, seen);
 				}
 			}
 
-			if (proves) {
+			if (proves && (initInference || newPremise)) {
 				return true;
 			}
 		}
