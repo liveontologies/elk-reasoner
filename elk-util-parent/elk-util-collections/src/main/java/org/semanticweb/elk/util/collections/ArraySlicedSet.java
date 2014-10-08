@@ -184,7 +184,16 @@ public class ArraySlicedSet<E> {
 	public boolean contains(int n, Object o) {
 		if (o == null)
 			throw new NullPointerException();
-		E[] d = this.data;
+		// to avoid problems in the middle of resizing, we copy data and masks
+		// when they have the same size
+		E[] d;
+		byte[] m;
+		for (;;) {
+			d = this.data;
+			m = this.masks;
+			if (d.length == m.length)
+				break;
+		}
 		int i = getIndex(o, d.length);
 		int j = i; // for cycle detection
 		byte mask = (byte) (1 << n);
@@ -193,11 +202,9 @@ public class ArraySlicedSet<E> {
 			if (probe == null)
 				return false;
 			else if (o.equals(probe))
-				return ((masks[i] & mask) == mask);
-			if (i == 0)
-				i = d.length - 1;
-			else
-				i--;
+				return ((m[i] & mask) == mask);
+			if (++i == d.length)
+				i = 0;
 			if (i == j) // full cycle
 				return false;
 		}
@@ -212,16 +219,14 @@ public class ArraySlicedSet<E> {
 				masks[i] = mask;
 				return 0;
 			} else if (e.equals(probe)) {
-				byte newMask = (byte) (masks[i] | mask);
 				byte oldMask = masks[i];
+				byte newMask = (byte) (oldMask | mask);
 				if (newMask != oldMask)
 					masks[i] = newMask;
 				return oldMask;
 			}
-			if (i == 0)
-				i = data.length - 1;
-			else
-				i--;
+			if (++i == data.length)
+				i = 0;
 		}
 	}
 
@@ -240,12 +245,10 @@ public class ArraySlicedSet<E> {
 		int j = i; // testing if the element at this position can still be
 					// found by linear probing
 		for (;;) {
-			if (j == 0)
-				j = data.length - 1;
-			else
-				j--;
-			// invariant: interval [j, del[ contains non-null elements whose
-			// index is in [j, del[
+			if (++j == data.length)
+				j = 0;
+			// invariant: interval ]del, j] contains non-null elements whose
+			// index is in ]del, j]
 			if (j == del) {
 				// we made a full cycle; no elements have to be shifted
 				data[del] = null;
@@ -253,15 +256,14 @@ public class ArraySlicedSet<E> {
 			}
 			E test = data[j];
 			if (test == null) {
-				// no further elements to the left need to be shifted
+				// no further elements need to be shifted
 				data[del] = null;
 				return;
 			}
 			int k = getIndex(test, data.length);
-			// check if k is in [j, del[
-			if ((j < del) ? (j <= k) && (k < del) : (j <= k) || (k < del))
-				// the index is in [j, del[, so the test element should not be
-				// shifted
+			// check if k is in ]del, j] (possibly wrapped over)
+			if ((del < j) ? (del < k) && (k <= j) : (k <= j) || (del < k))
+				// the test element should not be shifted
 				continue;
 			// else
 			// copy the element to the position of deleted element and
@@ -269,7 +271,6 @@ public class ArraySlicedSet<E> {
 			data[del] = test;
 			masks[del] = masks[j];
 			del = j;
-			continue;
 		}
 	}
 
@@ -283,21 +284,15 @@ public class ArraySlicedSet<E> {
 				return 0;
 			} else if (o.equals(probe)) {
 				byte oldMask = masks[i];
-				if ((oldMask & mask) != mask)
-					// element not present
-					return 0;
-				// else present, flip the bits
-				byte newMask = (byte) (masks[i] ^ (mask));
+				byte newMask = (byte) (oldMask & (~mask));
 				if (newMask == 0)
 					shift(data, masks, i);
 				else
 					masks[i] = newMask;
 				return oldMask;
 			}
-			if (i == 0)
-				i = data.length - 1;
-			else
-				i--;
+			if (++i == data.length)
+				i = 0;
 			if (i == j) // full cycle
 				return 0;
 		}
@@ -371,9 +366,10 @@ public class ArraySlicedSet<E> {
 			stretch();
 		byte mask = (byte) (1 << s);
 		byte oldMask = addMask(data, masks, e, mask);
+		byte newMask = (byte) (oldMask | mask);
 		if (oldMask == 0)
 			occupied++;
-		if ((oldMask & mask) == mask)
+		if (newMask == oldMask)
 			return false;
 		// else
 		sizes[s]++;
@@ -397,9 +393,10 @@ public class ArraySlicedSet<E> {
 			throw new NullPointerException();
 		byte mask = (byte) (1 << s);
 		byte oldMask = removeMask(data, masks, o, mask);
-		if (oldMask == mask)
+		byte newMask = (byte) (oldMask & ~mask);
+		if (newMask == 0)
 			occupied--;
-		if ((oldMask & mask) != mask)
+		if (newMask == oldMask)
 			return false;
 		// else
 		sizes[s]--;
@@ -427,6 +424,30 @@ public class ArraySlicedSet<E> {
 	}
 
 	/**
+	 * Removes all elements in the given slice
+	 * 
+	 * @param s
+	 *            the slice id (between 0 and 7) from which elements should be
+	 *            removed
+	 */
+	public void clear(int s) {
+		byte mask = (byte) (1 << s);
+		for (int i = 0; i < data.length; i++) {
+			for (;;) {
+				byte oldMask = masks[i];
+				byte newMask = (byte) (oldMask & ~mask);
+				if (newMask == 0 && data[i] != null)
+					shift(data, masks, i);
+				else {
+					masks[i] = newMask;
+					break;
+				}
+			}
+		}
+		sizes[s] = 0;
+	}
+
+	/**
 	 * Clears all slices of this {@link ArraySlicedSet}. After calling this
 	 * methods, all slices are empty.
 	 */
@@ -440,8 +461,8 @@ public class ArraySlicedSet<E> {
 			this.sizes[i] = 0;
 		this.data = (E[]) new Object[capacity];
 		this.masks = new byte[capacity];
-		upperSize = computeUpperSize(capacity);
-		// lowerSize = computeLowerSize(capacity);
+		this.upperSize = computeUpperSize(capacity);
+		// this.lowerSize = computeLowerSize(capacity);
 	}
 
 	/**
@@ -456,48 +477,51 @@ public class ArraySlicedSet<E> {
 
 	private class Slice extends AbstractSet<E> implements Set<E> {
 
-		private final byte s_;
+		/**
+		 * the slice which is viewed by this set
+		 */
+		final byte s;
 
-		private Slice(int s) {
+		Slice(int s) {
 			if (s > 7 || s < 0)
 				throw new IllegalArgumentException("Slice should be in [0;7]: "
 						+ s);
-			this.s_ = (byte) s;
+			this.s = (byte) s;
 		}
 
 		@Override
 		public int size() {
-			return sizes[s_];
+			return ArraySlicedSet.this.size(s);
 		}
 
 		@Override
 		public boolean isEmpty() {
-			return ArraySlicedSet.this.isEmpty(s_);
+			return ArraySlicedSet.this.isEmpty(s);
 		}
 
 		@Override
 		public boolean contains(Object o) {
-			return ArraySlicedSet.this.contains(s_, o);
+			return ArraySlicedSet.this.contains(s, o);
 		}
 
 		@Override
 		public boolean add(E e) {
-			return ArraySlicedSet.this.add(s_, e);
+			return ArraySlicedSet.this.add(s, e);
 		}
 
 		@Override
 		public boolean remove(Object o) {
-			return ArraySlicedSet.this.remove(s_, o);
+			return ArraySlicedSet.this.remove(s, o);
 		}
 
 		@Override
 		public boolean removeAll(Collection<?> c) {
-			return ArraySlicedSet.this.removeAll(s_, c);
+			return ArraySlicedSet.this.removeAll(s, c);
 		}
 
 		@Override
 		public Iterator<E> iterator() {
-			return new ElementIterator(s_);
+			return new ElementIterator(s);
 		}
 
 		@Override
@@ -507,18 +531,14 @@ public class ArraySlicedSet<E> {
 
 		@Override
 		public void clear() {
-			byte mask = (byte) (1 << s_);
-			for (int i = 0; i < data.length; i++) {
-				if ((masks[i] & mask) == mask)
-					masks[i] = (byte) (masks[i] ^ mask);
-			}
-			sizes[s_] = 0;
+			ArraySlicedSet.this.clear(s);
 		}
 	}
 
 	private class ElementIterator implements Iterator<E> {
 
-		private final byte n_;
+		// the slice over which iterating
+		final byte s;
 		// copy of the data
 		final E[] dataSnapshot;
 		// copy of masks
@@ -531,7 +551,7 @@ public class ArraySlicedSet<E> {
 		E nextElement;
 
 		ElementIterator(byte n) {
-			this.n_ = n;
+			this.s = n;
 			this.expectedSize = sizes[n];
 			this.dataSnapshot = data;
 			this.masksSnapshot = masks;
@@ -540,7 +560,7 @@ public class ArraySlicedSet<E> {
 		}
 
 		void seekNext() {
-			byte mask = (byte) (1 << n_);
+			byte mask = (byte) (1 << s);
 			while (cursor < dataSnapshot.length) {
 				int currentCursor = cursor++;
 				if ((nextElement = dataSnapshot[currentCursor]) != null
@@ -558,7 +578,7 @@ public class ArraySlicedSet<E> {
 
 		@Override
 		public E next() {
-			if (expectedSize != sizes[n_])
+			if (expectedSize != sizes[s])
 				throw new ConcurrentModificationException();
 			if (nextElement == null)
 				throw new NoSuchElementException();
@@ -571,7 +591,5 @@ public class ArraySlicedSet<E> {
 		public void remove() {
 			throw new UnsupportedOperationException();
 		}
-
 	}
-
 }

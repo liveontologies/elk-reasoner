@@ -73,14 +73,6 @@ public class ArraySlicedSetTest extends TestCase {
 			testSetEquality(referenceSets[i], slicedSet.getSlice(i));
 	}
 
-	static <E> void clearSets(Set<E>[] referenceSets,
-			ArraySlicedSet<E> slicedSet) {
-		for (int i = 0; i < SLICES_; i++) {
-			referenceSets[i].clear();
-			slicedSet.getSlice(i).clear();
-		}
-	}
-
 	@SuppressWarnings("static-method")
 	@Test
 	public void testAddRemoveContains() {
@@ -115,6 +107,7 @@ public class ArraySlicedSetTest extends TestCase {
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
 				int s = generator.nextInt(SLICES_);
+				// System.out.println(s + ": adding " + element);
 				testSet = slicedSet.getSlice(s);
 				referenceSet = referenceSets[s];
 				expected = referenceSet.add(element);
@@ -129,6 +122,7 @@ public class ArraySlicedSetTest extends TestCase {
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
 				int s = generator.nextInt(SLICES_);
+				// System.out.println(s + ": removing " + element);
 				testSet = slicedSet.getSlice(s);
 				referenceSet = referenceSets[s];
 				expected = referenceSet.remove(element);
@@ -146,10 +140,12 @@ public class ArraySlicedSetTest extends TestCase {
 				testSet = slicedSet.getSlice(s);
 				referenceSet = referenceSets[s];
 				if (generator.nextBoolean()) {
+					// System.out.println(s + ": adding " + element);
 					expected = referenceSet.add(element);
 					assertEquals(!expected, testSet.contains(element));
 					actual = testSet.add(element);
 				} else {
+					// System.out.println(s + ": removing " + element);
 					expected = referenceSet.remove(element);
 					assertEquals(expected, testSet.contains(element));
 					actual = testSet.remove(element);
@@ -158,8 +154,14 @@ public class ArraySlicedSetTest extends TestCase {
 				assertEquals(referenceSet.size(), testSet.size());
 			}
 			testSetsEquality(referenceSets, slicedSet);
-
-			clearSets(referenceSets, slicedSet);
+			// clear random sets
+			for (int s = 0; s < SLICES_; s++) {
+				if (generator.nextBoolean())
+					continue;
+				// else
+				referenceSets[s].clear();
+				slicedSet.getSlice(s).clear();
+			}
 			testSetsEquality(referenceSets, slicedSet);
 		}
 
