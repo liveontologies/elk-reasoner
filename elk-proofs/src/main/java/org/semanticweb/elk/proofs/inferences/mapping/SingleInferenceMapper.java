@@ -30,6 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
@@ -242,6 +243,54 @@ public class SingleInferenceMapper {
 					factory_.getReflexiveObjectPropertyAxiom(property),
 					propertySubsumption, factory_, exprFactory_);
 		}
+		
+		// Creates existential composition inferences by analyzing the chain premise. Depending on whether
+		// its LHS and RHS are object properties or chains, it creates the corresponding premise expressions (out of lemmas or axioms).
+		private ExistentialCompositionViaChain createExistentialCompositionInference(
+				DerivedExpression conclusion,
+				ElkClassExpression d,
+				ElkClassExpression e,
+				SubPropertyChain<?,?> chainPremise,
+				ElkSubClassOfAxiom leftExistentialPremise,
+				ElkSubObjectPropertyOfAxiom leftChainPremise,
+				ElkObjectPropertyAxiom chainAxiom
+				) {
+			DerivedExpression rightExistentialPremise = null;
+			DerivedExpression rightChainSubsumptionPremise = null;
+			ElkSubObjectPropertyExpression ss = null;
+			// create the right property chain premise
+			if (chainPremise.getSubPropertyChain() instanceof IndexedBinaryPropertyChain) {
+				ss = Deindexer.deindex(chainPremise.getSubPropertyChain());
+				// a lemma
+				rightExistentialPremise = exprFactory_.create(lemmaObjectFactory_.getSubClassOfLemma(d, lemmaObjectFactory_.getComplexObjectSomeValuesFrom(ss, e)));
+			}
+			else {
+				ss = Deindexer.deindex(chainPremise.getSubPropertyChain());
+				// an axiom
+				rightExistentialPremise = exprFactory_.create(factory_.getSubClassOfAxiom(d, factory_.getObjectSomeValuesFrom((ElkObjectProperty) ss, d)));
+			}
+			// now create the right existential premise
+			if (chainPremise.getSuperPropertyChain() instanceof IndexedBinaryPropertyChain) {
+				// a lemma
+				ElkSubObjectPropertyExpression ssPrime = Deindexer.deindex(chainPremise.getSuperPropertyChain());				
+				
+				rightChainSubsumptionPremise = exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(ss, ssPrime));
+			}
+			else {
+				// an axiom
+				ElkObjectProperty ssPrime = (ElkObjectProperty) Deindexer.deindex(chainPremise.getSuperPropertyChain());
+				
+				rightChainSubsumptionPremise = exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(ss, ssPrime));
+			}
+			
+			return new ExistentialCompositionViaChain(
+					conclusion, 
+					exprFactory_.create(leftExistentialPremise), 
+					rightExistentialPremise, 
+					exprFactory_.create(leftChainPremise), 
+					rightChainSubsumptionPremise, 
+					chainAxiom);
+		}
 
 		@Override
 		public Inference visit(ComposedBackwardLink inference, 	IndexedClassExpression whereStored) {
@@ -259,29 +308,9 @@ public class SingleInferenceMapper {
 			ElkSubObjectPropertyOfAxiom propSubsumption = factory_.getSubObjectPropertyOfAxiom(r, rPrime);
 			ElkSubClassOfAxiom conclusion = factory_.getSubClassOfAxiom(c, hSomeE);
 			// TODO will get rid of this cast later
-			ElkSubObjectPropertyOfAxiom chainAxiom = (ElkSubObjectPropertyOfAxiom) sideConditionLookup_.lookup(inference);			
+			ElkObjectPropertyAxiom chainAxiom = (ElkObjectPropertyAxiom) sideConditionLookup_.lookup(inference);		
 			
-			if (inference.getForwardLink().getRelation() instanceof IndexedBinaryPropertyChain) {
-				// the second premise is not representable as an OWL axiom
-				ElkSubObjectPropertyExpression chain = Deindexer.deindex(inference.getForwardLink().getRelation()); 
-				ElkSubClassOfLemma secondExPremise = lemmaObjectFactory_.getSubClassOfLemma(d, lemmaObjectFactory_.getComplexObjectSomeValuesFrom(chain, e));
-				// complex right property premise
-				ElkSubObjectPropertyExpression subchain = Deindexer.deindex(rightChainPremise.getSubPropertyChain());
-				ElkSubObjectPropertyExpression superchain = Deindexer.deindex(rightChainPremise.getSuperPropertyChain());				
-				ElkSubPropertyChainOfLemma chainSubsumption = lemmaObjectFactory_.getSubPropertyChainOfLemma(subchain, superchain);
-				
-				return new ExistentialCompositionViaChain(conclusion, firstExPremise, secondExPremise, propSubsumption, chainSubsumption, chainAxiom, exprFactory_);
-			}
-			else {
-				// the right property premise is a simple property inclusion axiom
-				ElkObjectProperty ss = Deindexer.deindex((IndexedObjectProperty) rightChainPremise.getSubPropertyChain());
-				ElkObjectProperty ssPrime = Deindexer.deindex((IndexedObjectProperty) rightChainPremise.getSuperPropertyChain());
-				ElkClassExpression ssSomeE = factory_.getObjectSomeValuesFrom(ss, e);
-				ElkSubClassOfAxiom secondExPremise = factory_.getSubClassOfAxiom(d, ssSomeE);
-				ElkSubObjectPropertyOfAxiom chainSubsumption = factory_.getSubObjectPropertyOfAxiom(ss, ssPrime);
-				
-				return new ExistentialCompositionViaChain(conclusion, firstExPremise, secondExPremise, propSubsumption, chainSubsumption, chainAxiom, exprFactory_);
-			}
+			return createExistentialCompositionInference(exprFactory_.create(conclusion), d, e, rightChainPremise, firstExPremise, propSubsumption, chainAxiom);
 		}
 
 		@Override
@@ -299,27 +328,7 @@ public class SingleInferenceMapper {
 			ElkSubObjectPropertyExpression conclusionChain = Deindexer.deindex(inference.getRelation()); 
 			ElkSubClassOfLemma conclusion = lemmaObjectFactory_.getSubClassOfLemma(c, lemmaObjectFactory_.getComplexObjectSomeValuesFrom(conclusionChain, e));
 			
-			if (inference.getForwardLink().getRelation() instanceof IndexedBinaryPropertyChain) {
-				// the second premise is not representable as an OWL axiom
-				ElkSubObjectPropertyExpression chain = Deindexer.deindex(inference.getForwardLink().getRelation());
-				ElkSubClassOfLemma secondExPremise = lemmaObjectFactory_.getSubClassOfLemma(d, lemmaObjectFactory_.getComplexObjectSomeValuesFrom(chain, e));
-				// complex right property premise
-				ElkSubObjectPropertyExpression subchain = Deindexer.deindex(rightChainPremise.getSubPropertyChain());
-				ElkSubObjectPropertyExpression superchain = Deindexer.deindex(rightChainPremise.getSuperPropertyChain());
-				ElkSubPropertyChainOfLemma chainSubsumption = lemmaObjectFactory_.getSubPropertyChainOfLemma(subchain, superchain);
-				
-				return new ExistentialCompositionViaChain(conclusion, firstExPremise, secondExPremise, propSubsumption, chainSubsumption, exprFactory_);
-			}
-			else {
-				// the second premise is representable as an OWL axiom
-				ElkObjectProperty ss = Deindexer.deindex((IndexedObjectProperty) rightChainPremise.getSubPropertyChain());
-				ElkObjectProperty ssPrime = Deindexer.deindex((IndexedObjectProperty) rightChainPremise.getSuperPropertyChain());
-				ElkClassExpression ssSomeE = factory_.getObjectSomeValuesFrom(ss, e);
-				ElkSubClassOfAxiom secondExPremise = factory_.getSubClassOfAxiom(d, ssSomeE);
-				ElkSubObjectPropertyOfAxiom chainSubsumption = factory_.getSubObjectPropertyOfAxiom(ss, ssPrime);
-				
-				return new ExistentialCompositionViaChain(conclusion, firstExPremise, secondExPremise, propSubsumption, chainSubsumption, exprFactory_);				
-			}
+			return createExistentialCompositionInference(exprFactory_.create(conclusion), d, e, rightChainPremise, firstExPremise, propSubsumption, null);
 		}
 
 		@Override

@@ -41,7 +41,6 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
@@ -150,7 +149,7 @@ public class TracingTest {
 		return new TracingTestVisitor() {
 			
 			@Override
-			public boolean visit(ElkClassExpression subsumee, 	ElkClassExpression subsumer) {
+			public boolean visit(ElkClass subsumee, ElkClass subsumer) {
 				ReasonerStateAccessor.cleanClassTraces(reasoner);
 				
 				try {
@@ -263,7 +262,7 @@ public class TracingTest {
 		return new TracingTestVisitor() {
 			
 			@Override
-			public boolean visit(ElkClassExpression subsumee, 	ElkClassExpression subsumer) {
+			public boolean visit(ElkClass subsumee, ElkClass subsumer) {
 				ReasonerStateAccessor.cleanClassTraces(reasoner);
 				
 				try {

@@ -90,7 +90,7 @@ public class AllSubsumptionTracingTaskCollection implements VisitorTaskCollectio
 			new ComprehensiveSubsumptionTracingTests(taxonomy).accept(new TracingTestVisitor() {
 				
 				@Override
-				public boolean visit(ElkClassExpression subsumee, 	ElkClassExpression subsumer) throws Exception {
+				public boolean visit(ElkClass subsumee, ElkClass subsumer) throws Exception {
 					
 					visitor.visit(createSpecificTask(subsumee, subsumer));
 					

@@ -11,7 +11,6 @@ import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.proofs.inferences.mapping.InferenceMapper;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.TestUtils;
@@ -52,7 +51,7 @@ public class InferenceReaderTest {
 	
 	@Test
 	public void simpleChainMapping() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify("PropertyCompositions.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositions.owl");
 		ElkClass a = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass g = factory_.getClass(new ElkFullIri("http://example.org/G"));
 		// print inferences 

@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 
 /**
  * @author Pavel Klinov
@@ -33,5 +33,5 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
  */
 public interface TracingTestVisitor {
 
-	public boolean visit(ElkClassExpression subsumee, ElkClassExpression subsumer) throws Exception;
+	public boolean visit(ElkClass subsumee, ElkClass subsumer) throws Exception;
 }

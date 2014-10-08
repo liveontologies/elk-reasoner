@@ -27,13 +27,9 @@ package org.semanticweb.elk.proofs.inferences.classes;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
@@ -56,17 +52,17 @@ public class ExistentialCompositionViaChain implements Inference {
 
 	private final DerivedExpression secondPropertySubsumptionPremise_;
 
-	private final ElkSubObjectPropertyOfAxiom chainAxiom_;
+	private final ElkObjectPropertyAxiom chainAxiom_;
 	
 	private final DerivedExpression conclusion_;
 
-	private ExistentialCompositionViaChain(
+	public ExistentialCompositionViaChain(
 			DerivedExpression conclusion,
 			DerivedExpression firstExPremise,
 			DerivedExpression secondExPremise,
 			DerivedExpression propSubsumption,
 			DerivedExpression chainSubsumption,
-			ElkSubObjectPropertyOfAxiom chainAxiom) {
+			ElkObjectPropertyAxiom chainAxiom) {
 		conclusion_ = conclusion;
 		firstExistentialPremise_ = firstExPremise;
 		secondExistentialPremise_ = secondExPremise;
@@ -75,79 +71,14 @@ public class ExistentialCompositionViaChain implements Inference {
 		chainAxiom_ = chainAxiom;
 	}	
 	
-	// inference with a side condition, a simple right property premise and a simple conclusion
-	public ExistentialCompositionViaChain(
-			ElkSubClassOfAxiom conclusion,
-			ElkSubClassOfAxiom firstExPremise,
-			ElkSubClassOfAxiom secondExPremise,
-			ElkSubObjectPropertyOfAxiom propSubsumption,
-			ElkSubObjectPropertyOfAxiom chainSubsumption,
-			ElkSubObjectPropertyOfAxiom chainAxiom,
-			DerivedExpressionFactory exprFactory) {
-		this(	exprFactory.create(conclusion),
-				exprFactory.create(firstExPremise), 
-				exprFactory.create(secondExPremise), 
-				exprFactory.create(propSubsumption), 
-				exprFactory.create(chainSubsumption), 
-				chainAxiom);
-	}
-
-	// inference with a side condition, a complex right property premise and a simple conclusion
-	public ExistentialCompositionViaChain(
-			ElkSubClassOfAxiom conclusion,
-			ElkSubClassOfAxiom firstExPremise,
-			ElkSubClassOfLemma secondExPremise,
-			ElkSubObjectPropertyOfAxiom propSubsumption,
-			ElkSubPropertyChainOfLemma chainSubsumption,
-			ElkSubObjectPropertyOfAxiom chainAxiom,
-			DerivedExpressionFactory exprFactory) {
-		this(	exprFactory.create(conclusion),
-				exprFactory.create(firstExPremise), 
-				exprFactory.create(secondExPremise), 
-				exprFactory.create(propSubsumption), 
-				exprFactory.create(chainSubsumption), 
-				chainAxiom);
-	}
-	
-	// inference with a complex chain premise, a complex existential in the conclusion and no side condition
-	public ExistentialCompositionViaChain(
-			ElkSubClassOfLemma conclusion,
-			ElkSubClassOfAxiom firstExPremise,
-			ElkSubClassOfLemma secondExPremise,
-			ElkSubObjectPropertyOfAxiom propSubsumption,
-			ElkSubPropertyChainOfLemma chainSubsumption,
-			DerivedExpressionFactory exprFactory) {
-		this(	exprFactory.create(conclusion), 
-				exprFactory.create(firstExPremise), 
-				exprFactory.create(secondExPremise), 
-				exprFactory.create(propSubsumption), 
-				exprFactory.create(chainSubsumption), 
-				null);
-	}
-	
-	// inference with a simple chain premise, complex existential in the conclusion and no side condition
-	public ExistentialCompositionViaChain(
-			ElkSubClassOfLemma conclusion,
-			ElkSubClassOfAxiom firstExPremise,
-			ElkSubClassOfAxiom secondExPremise,
-			ElkSubObjectPropertyOfAxiom leftPropSubsumption,
-			ElkSubObjectPropertyOfAxiom rightPropSubsumption,
-			DerivedExpressionFactory exprFactory) {
-		this(	exprFactory.create(conclusion),
-				exprFactory.create(firstExPremise),	
-				exprFactory.create(secondExPremise), 
-				exprFactory.create(leftPropSubsumption), 
-				exprFactory.create(rightPropSubsumption), null);
-	}
-	
 	@Override
 	public Collection<? extends DerivedExpression> getPremises() {
 		return Arrays.asList(firstExistentialPremise_, secondExistentialPremise_, firstPropertySubsumptionPremise_, secondPropertySubsumptionPremise_);
 	}
 	
 	@Override
-	public AxiomPresenceCondition<ElkSubObjectPropertyOfAxiom> getSideCondition() {
-		return chainAxiom_ == null ? null : new AxiomPresenceCondition<ElkSubObjectPropertyOfAxiom>(chainAxiom_);
+	public AxiomPresenceCondition<ElkObjectPropertyAxiom> getSideCondition() {
+		return chainAxiom_ == null ? null : new AxiomPresenceCondition<ElkObjectPropertyAxiom>(chainAxiom_);
 	}
 
 	@Override
