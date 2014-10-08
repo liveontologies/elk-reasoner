@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -49,18 +48,6 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 		DirectAccess<E> {
 
 	/**
-	 * The default initial capacity - MUST be a power of two.
-	 */
-	static final int DEFAULT_INITIAL_CAPACITY = 16;
-
-	/**
-	 * The maximum capacity, used if a higher value is implicitly specified by
-	 * either of the constructors with arguments. MUST be a power of two <=
-	 * 1<<30.
-	 */
-	static final int MAXIMUM_CAPACITY = 1 << 30;
-
-	/**
 	 * The table for the elements; the length MUST always be a power of two.
 	 */
 	transient E[] data;
@@ -72,22 +59,14 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 
 	@SuppressWarnings("unchecked")
 	public ArrayHashSet(int initialCapacity) {
-		if (initialCapacity < 0)
-			throw new IllegalArgumentException("Illegal Capacity: "
-					+ initialCapacity);
-		if (initialCapacity > MAXIMUM_CAPACITY)
-			initialCapacity = MAXIMUM_CAPACITY;
-		// Find a power of 2 >= initialCapacity
-		int capacity = 1;
-		while (capacity < initialCapacity)
-			capacity <<= 1;
+		int capacity = LinearProbing.getInitialCapacity(initialCapacity);
 		this.data = (E[]) new Object[capacity];
 		this.size = 0;
 	}
 
 	@SuppressWarnings("unchecked")
 	public ArrayHashSet() {
-		int capacity = DEFAULT_INITIAL_CAPACITY;
+		int capacity = LinearProbing.DEFAULT_INITIAL_CAPACITY;
 		this.data = (E[]) new Object[capacity];
 		this.size = 0;
 	}
@@ -103,152 +82,14 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 	}
 
 	/**
-	 * Computes a maximum size of the table for a given capacity after which to
-	 * stretch the table.
-	 * 
-	 * @param capacity
-	 *            the capacity of the table.
-	 * @return maximum size of the table for a given capacity after which to
-	 *         stretch the table.
-	 */
-	private static int getUpperSize(int capacity) {
-		if (capacity > 64)
-			return (3 * capacity) / 4; // max 75% filled
-		// else
-		return capacity - 1;
-	}
-
-	/**
-	 * Computes a minimum size of the table for a given capacity after which to
-	 * shrink the table.
-	 * 
-	 * @param capacity
-	 *            the capacity of the table.
-	 * @return minimum size of the table for a given capacity after which to
-	 *         shrink the table
-	 */
-	private static int getLowerSize(int capacity) {
-		return capacity / 4;
-	}
-
-	private static int getIndex(Object o, int length) {
-		return o.hashCode() & (length - 1);
-	}
-
-	@Override
-	public boolean contains(Object o) {
-		if (o == null)
-			throw new NullPointerException();
-		E[] d = this.data;
-		int i = getIndex(o, d.length);
-		int j = i; // for cycle detection
-		for (;;) {
-			Object probe = d[i];
-			if (probe == null)
-				return false;
-			else if (o.equals(probe))
-				return true;
-			if (++i == d.length)
-				i = 0;
-			if (i == j) // full cycle
-				return false;
-		}
-	}
-
-	/**
-	 * Adds the element to the set represented by given data array, if it did
-	 * not contain there already.
-	 * 
-	 * @param d
-	 *            the elements of the set
-	 * @param e
-	 *            the element to be added to the set
-	 * @return <tt>true</tt> if the set has changed (the element is added),
-	 *         <tt>false</tt> otherwise
-	 */
-	private static <E> boolean addElement(E[] d, E e) {
-		int i = getIndex(e, d.length);
-		for (;;) {
-			Object probe = d[i];
-			if (probe == null) {
-				d[i] = e;
-				return true;
-			} else if (e.equals(probe))
-				return false;
-			if (++i == d.length)
-				i = 0;
-		}
-	}
-
-	/**
-	 * Removes an element at position <tt>i</tt> of <tt>data</tt> shifting, if
-	 * necessary, other elements so that all elements can be found by linear
-	 * probing.
-	 * 
-	 * @param d
-	 *            the array of the elements
-	 * @param i
-	 *            the position of data at which to delete the element
-	 */
-	private static <E> void shift(E[] d, int i) {
-		int del = i; // the position at which the element is about to be deleted
-		int j = i; // testing if the element at this position can still be
-					// found by linear probing
-		for (;;) {
-			if (++j == d.length)
-				j = 0;
-			// invariant: interval ]del, j] contains only non-null elements
-			// whose index is in ]del, j]
-			if (j == del) {
-				// we made a full cycle; no elements have to be shifted
-				d[del] = null;
-				return;
-			}
-			E test = d[j];
-			if (test == null) {
-				// no further elements need to be shifted
-				d[del] = null;
-				return;
-			}
-			int k = getIndex(test, d.length);
-			// check if k is in ]del, j] (this interval can wrap over)
-			if ((del < j) ? (del < k) && (k <= j) : (del < k) || (k <= j))
-				// the test element should not be shifted
-				continue;
-			// else copy the element to the position of deleted element and
-			// start deleting its previous location
-			d[del] = test;
-			del = j;
-		}
-	}
-
-	private static <E> boolean removeElement(E[] d, Object o) {
-		int i = getIndex(o, d.length);
-		int j = i; // for cycle detection
-		for (;;) {
-			Object probe = d[i];
-			if (probe == null) {
-				return false;
-			} else if (o.equals(probe)) {
-				shift(d, i);
-				return true;
-			}
-			if (++i == d.length)
-				i = 0;
-			if (i == j) // full cycle
-				return false;
-		}
-	}
-
-	/**
 	 * Increasing the capacity of the table
 	 */
-	private void stretch() {
+	private void enlarge() {
 		int oldCapacity = data.length;
-		if (oldCapacity == MAXIMUM_CAPACITY)
+		if (oldCapacity == LinearProbing.MAXIMUM_CAPACITY)
 			throw new IllegalArgumentException(
 					"The set cannot grow beyond the capacity: "
-							+ MAXIMUM_CAPACITY);
+							+ LinearProbing.MAXIMUM_CAPACITY);
 		E[] oldData = data;
 		int newCapacity = oldCapacity << 1;
 		@SuppressWarnings("unchecked")
@@ -256,7 +97,7 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 		for (int i = 0; i < oldCapacity; i++) {
 			E e = oldData[i];
 			if (e != null)
-				addElement(newData, e);
+				LinearProbing.add(newData, e);
 		}
 		this.data = newData;
 	}
@@ -275,33 +116,40 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 		for (int i = 0; i < oldCapacity; i++) {
 			E e = oldData[i];
 			if (e != null)
-				addElement(newData, e);
+				LinearProbing.add(newData, e);
 		}
 		this.data = newData;
+	}
+
+	@Override
+	public boolean contains(Object o) {
+		if (o == null)
+			throw new NullPointerException();
+		return LinearProbing.contains(data, o);
 	}
 
 	@Override
 	public boolean add(E e) {
 		if (e == null)
 			throw new NullPointerException();
-		if (size == getUpperSize(data.length))
-			stretch();
-		boolean result = addElement(data, e);
-		if (result)
+		if (size == LinearProbing.getUpperSize(data.length))
+			enlarge();
+		boolean added = LinearProbing.add(data, e);
+		if (added)
 			size++;
-		return result;
+		return added;
 	}
 
 	@Override
 	public boolean remove(Object o) {
 		if (o == null)
 			throw new NullPointerException();
-		boolean result = removeElement(data, o);
-		if (result)
+		boolean removed = LinearProbing.remove(data, o);
+		if (removed)
 			size--;
-		if (size == getLowerSize(data.length))
+		if (size == LinearProbing.getLowerSize(data.length))
 			shrink();
-		return result;
+		return removed;
 	}
 
 	@Override
@@ -338,89 +186,28 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 		return data;
 	}
 
-	private class ElementIterator implements Iterator<E> {
-		// copy of the data
-		final E[] dataSnapshot;
-		// expected size to check for concurrent modifications
-		int expectedSize;
-		// the element at which to start iteration
-		int start;
-		// cursor of the current element
-		int current;
-		// cursor of the next element
-		int next;
+	private class ElementIterator extends LinearProbingIterator<E, E> {
 
 		ElementIterator() {
-			this.expectedSize = size;
-			this.dataSnapshot = data;
-			this.start = seekFirstNull();
-			this.next = seekNext(start);
-			this.current = next;
-		}
-
-		/**
-		 * @return the position of the first {@code null} element
-		 */
-		int seekFirstNull() {
-			for (int i = 0; i < dataSnapshot.length; i++) {
-				if (dataSnapshot[i] == null)
-					return i;
-			}
-			throw new RuntimeException("Set is full!");
-		}
-
-		/**
-		 * Searches for the next non-{@code null} element after the given
-		 * position before the start position
-		 * 
-		 * @param pos
-		 *            position after which to search
-		 * @return the position of the non-{@code null} element, or
-		 *         {@link #start} if there are no such element
-		 */
-		int seekNext(int pos) {
-			for (;;) {
-				if (++pos == dataSnapshot.length)
-					pos = 0;
-				if (pos == start || dataSnapshot[pos] != null)
-					return pos;
-			}
+			super(data, size);
 		}
 
 		@Override
-		public boolean hasNext() {
-			return next != start;
-		}
-
-		@Override
-		public E next() {
+		void checkSize(int expectedSize) {
 			if (expectedSize != size)
 				throw new ConcurrentModificationException();
-			if (next == start)
-				throw new NoSuchElementException();
-			this.current = next;
-			E result = dataSnapshot[current];
-			this.next = seekNext(current);
-			return result;
 		}
 
 		@Override
-		public void remove() {
-			if (expectedSize != size)
-				throw new ConcurrentModificationException();
-			if (current == next)
-				// the current element was not returned or was already removed
-				throw new IllegalStateException();
-			shift(dataSnapshot, current);
-			if (dataSnapshot[current] != null)
-				// something was copied to the current position
-				next = current;
-			else
-				current = next;
+		void remove(E[] expectedData, int pos) {
+			LinearProbing.remove(expectedData, pos);
 			size--;
-			expectedSize--;
 		}
 
+		@Override
+		E getValue(E element, int pos) {
+			return element;
+		}
 	}
 
 }
