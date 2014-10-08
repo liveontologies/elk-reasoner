@@ -1,14 +1,14 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions;
+package org.semanticweb.elk.proofs.expressions.derived.entries;
 
 import static org.junit.Assert.assertEquals;
-import static org.semanticweb.elk.proofs.expressions.TestEntities.a;
-import static org.semanticweb.elk.proofs.expressions.TestEntities.b;
-import static org.semanticweb.elk.proofs.expressions.TestEntities.c;
-import static org.semanticweb.elk.proofs.expressions.TestEntities.r;
-import static org.semanticweb.elk.proofs.expressions.TestEntities.s;
+import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.a;
+import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.b;
+import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.c;
+import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.r;
+import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.s;
 
 import java.util.Arrays;
 
@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceHasher;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryImpl;
 

@@ -4,8 +4,8 @@
 package org.semanticweb.elk.proofs.expressions.derived;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.proofs.InferenceReader;
 import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.inferences.InferenceReader;
 
 /**
  * @author Pavel Klinov

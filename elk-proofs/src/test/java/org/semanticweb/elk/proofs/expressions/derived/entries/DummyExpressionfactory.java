@@ -1,14 +1,14 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions;
+package org.semanticweb.elk.proofs.expressions.derived.entries;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.proofs.InferenceReader;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
+import org.semanticweb.elk.proofs.inferences.InferenceReader;
 
 /**
  * @author Pavel Klinov

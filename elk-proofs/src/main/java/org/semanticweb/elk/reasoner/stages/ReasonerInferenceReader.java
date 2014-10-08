@@ -7,12 +7,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.proofs.InferenceReader;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactoryWithCaching;
+import org.semanticweb.elk.proofs.expressions.derived.entries.DummyExpressionfactory;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.inferences.InferenceReader;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.mapping.ExpressionMapper;
 import org.semanticweb.elk.proofs.inferences.mapping.InferenceMapper;
@@ -35,12 +39,19 @@ public class ReasonerInferenceReader implements InferenceReader {
 
 	final AbstractReasonerState reasoner;
 	
+	private DerivedExpressionFactory expressionFactory_ = new DummyExpressionfactory();
+	
 	public ReasonerInferenceReader(AbstractReasonerState r) {
 		reasoner = r;
 	}
 	
-	public void initialize(ElkSubClassOfAxiom subsumption) throws ElkException {
-		reasoner.explainSubsumption(subsumption.getSubClassExpression(), subsumption.getSuperClassExpression());
+	public DerivedExpression initialize(ElkClass sub, ElkClass sup) throws ElkException {
+		// trace it
+		reasoner.explainSubsumption(sub, sup);
+		// this expression factory will guarantee pointer equality for structurally equivalent expressions 
+		expressionFactory_ = new DerivedExpressionFactoryWithCaching(this);
+		// create and return the first derived expression which corresponds to the initial subsumption
+		return expressionFactory_.create(new ElkObjectFactoryImpl().getSubClassOfAxiom(sub, sup));
 	}
 	
 	protected TraceUnwinder getTraceUnwinder(TraceStore.Reader reader) {
@@ -52,7 +63,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 		// first transform the expression into inputs for the trace reader
 		Iterable<TracingInput> inputs = ExpressionMapper.convertExpressionToTracingInputs(expression, reasoner.getIndexObjectConverter());
 		TraceStore.Reader traceReader = reasoner.getTraceState().getTraceStore().getReader();
-		final InferenceMapper mapper = new InferenceMapper(getTraceUnwinder(traceReader), new DerivedExpressionFactoryWithCaching(this));
+		final InferenceMapper mapper = new InferenceMapper(getTraceUnwinder(traceReader), expressionFactory_);
 		final List<Inference> userInferences = new LinkedList<Inference>();
 		InferenceVisitor<Void, Void> collector = new AbstractInferenceVisitor<Void, Void>() {
 
@@ -67,6 +78,11 @@ public class ReasonerInferenceReader implements InferenceReader {
 		mapper.map(inputs, collector);
 		
 		return userInferences;
+	}
+
+	@Override
+	public DerivedExpressionFactory getExpressionFactory() {
+		return expressionFactory_;
 	}
 
 }

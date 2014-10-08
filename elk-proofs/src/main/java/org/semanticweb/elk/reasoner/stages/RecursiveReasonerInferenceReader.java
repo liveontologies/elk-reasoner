@@ -9,7 +9,9 @@ import org.semanticweb.elk.reasoner.saturation.tracing.TraceUnwinder;
 
 
 /**
- * Similar to {@link ReasonerInferenceReader} but recursively requests all used inferences.
+ * Similar to {@link ReasonerInferenceReader} but uses the internal
+ * {@link RecursiveTraceUnwinder} which implementts recusive unwinding for
+ * low-level inferences.
  * 
  * @author Pavel Klinov
  * 

@@ -19,5 +19,10 @@ import org.semanticweb.elk.proofs.inferences.Inference;
  */
 public interface DerivedExpression extends Expression {
 
+	/**
+	 * 
+	 * @return
+	 * @throws ElkException
+	 */
 	public Iterable<Inference> getInferences() throws ElkException;
 }

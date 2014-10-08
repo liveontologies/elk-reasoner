@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
@@ -51,6 +52,11 @@ public class ExpressionMapper {
 
 		public Converter(IndexObjectConverter c) {
 			converter_ = c;
+		}
+		
+		@Override
+		protected Iterable<TracingInput> defaultLogicalVisit(ElkAxiom axiom) {
+			return Collections.emptyList();
 		}
 
 		@Override

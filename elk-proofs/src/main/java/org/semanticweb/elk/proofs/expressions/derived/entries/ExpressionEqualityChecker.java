@@ -1,7 +1,9 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions;
+package org.semanticweb.elk.proofs.expressions.derived.entries;
+
+import org.semanticweb.elk.proofs.expressions.Expression;
 
 
 /**

@@ -5,13 +5,13 @@ package org.semanticweb.elk.proofs.expressions.entries;
 
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
-import static org.semanticweb.elk.proofs.expressions.TestEntities.a;
-import static org.semanticweb.elk.proofs.expressions.TestEntities.b;
-import static org.semanticweb.elk.proofs.expressions.TestEntities.c;
-import static org.semanticweb.elk.proofs.expressions.TestEntities.d;
-import static org.semanticweb.elk.proofs.expressions.TestEntities.q;
-import static org.semanticweb.elk.proofs.expressions.TestEntities.r;
-import static org.semanticweb.elk.proofs.expressions.TestEntities.s;
+import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.a;
+import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.b;
+import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.c;
+import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.d;
+import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.q;
+import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.r;
+import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.s;
 
 import java.util.Arrays;
 
@@ -19,12 +19,12 @@ import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
-import org.semanticweb.elk.proofs.InferenceReader;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactoryWithCaching;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryImpl;
+import org.semanticweb.elk.proofs.inferences.InferenceReader;
 
 /**
  * @author Pavel Klinov

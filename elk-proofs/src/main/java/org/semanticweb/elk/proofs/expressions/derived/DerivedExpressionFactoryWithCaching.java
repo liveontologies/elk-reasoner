@@ -4,9 +4,9 @@
 package org.semanticweb.elk.proofs.expressions.derived;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.proofs.InferenceReader;
 import org.semanticweb.elk.proofs.expressions.derived.entries.ExpressionEntryFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
+import org.semanticweb.elk.proofs.inferences.InferenceReader;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
 
 /**

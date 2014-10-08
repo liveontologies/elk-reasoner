@@ -1,21 +1,17 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences.mapping;
+package org.semanticweb.elk.proofs.inferences;
 
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.proofs.InferenceReader;
-import org.semanticweb.elk.proofs.expressions.DummyExpressionfactory;
-import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.inferences.mapping.InferenceMapper;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.stages.RecursiveReasonerInferenceReader;
 /*
  * #%L
  * ELK Proofs Package
@@ -47,27 +43,25 @@ import org.semanticweb.elk.reasoner.stages.RecursiveReasonerInferenceReader;
  */
 public class InferenceReaderTest {
 	
+	private final static ElkObjectFactory factory_ = new ElkObjectFactoryImpl();
+	
 	@Test
 	public void simpleChainMapping() throws Exception {
 		Reasoner reasoner = TestReasonerUtils.loadAndClassify("PropertyCompositions.owl");
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
-		ElkClass g = factory.getClass(new ElkFullIri("http://example.org/G"));
-		ElkSubClassOfAxiom ax = factory.getSubClassOfAxiom(a, g);
-		RecursiveReasonerInferenceReader reader = new RecursiveReasonerInferenceReader(reasoner);
-		// tracing happens here
-		reader.initialize(ax);
-		// reading all inferences recursively
-		for (Inference inf : reader.getInferences(new DummyExpressionfactory().create(ax))) {
-			System.out.println(InferencePrinter.print(inf));
-		}
+		ElkClass a = factory_.getClass(new ElkFullIri("http://example.org/A"));
+		ElkClass g = factory_.getClass(new ElkFullIri("http://example.org/G"));
+		
+		RecursiveInferenceVisitor.visitInferences(reasoner, a, g, new AbstractInferenceVisitor<Void, Void>() {
+
+			@Override
+			protected Void defaultVisit(Inference inference, Void input) {
+				System.out.println(InferencePrinter.print(inference));
+				return null;
+			}
+			
+		});
 		
 		reasoner.shutdown();
 	}
 	
-	@Test
-	public void testExistentialMapping() {
-		
-	}
-
 }
