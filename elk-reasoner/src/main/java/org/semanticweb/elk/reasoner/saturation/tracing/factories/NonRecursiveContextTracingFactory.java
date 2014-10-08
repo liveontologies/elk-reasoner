@@ -114,7 +114,7 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> impl
 		IndexedClassExpression root = job.getInput();
 		TracedContext context = tracingState_.getContext(root);
 		
-		LOGGER_.info("{} finished tracing", root);
+		LOGGER_.trace("{} finished tracing", root);
 		// cleaning up the auxiliary data structures
 		context.clearBlockedInferences();
 		context.setSaturated(true);
