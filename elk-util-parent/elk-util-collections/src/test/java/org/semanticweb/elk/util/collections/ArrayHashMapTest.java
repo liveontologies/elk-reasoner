@@ -32,6 +32,8 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
+
 /**
  * @author Yevgeny Kazakov
  * 
@@ -48,7 +50,7 @@ public class ArrayHashMapTest extends TestCase {
 	 * @param referenceMap
 	 * @param testMap
 	 */
-	<K, V> void testMapEquality(Map<K, V> referenceMap, Map<K, V> testMap) {
+	static <K, V> void testMapEquality(Map<K, V> referenceMap, Map<K, V> testMap) {
 		int i = 0;
 		for (Entry<K, V> entry : referenceMap.entrySet()) {
 			assertEquals(entry.getValue(), testMap.get(entry.getKey()));
@@ -64,8 +66,8 @@ public class ArrayHashMapTest extends TestCase {
 		assertEquals(referenceMap.size(), i);
 	}
 
-
-	public void testPutGet() {
+	@Test
+	public static void testPutGet() {
 		// random number generator for elements
 		Random generator = new Random(123);
 		// number of iterations of filling in elements

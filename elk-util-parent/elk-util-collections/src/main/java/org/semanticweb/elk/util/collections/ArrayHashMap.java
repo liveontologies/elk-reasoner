@@ -79,20 +79,6 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	 */
 	protected transient int size;
 
-	/**
-	 * The next upper size value at which to stretch the table.
-	 * 
-	 * @serial
-	 */
-	int upperSize;
-
-	/**
-	 * The next lower size value at which to shrink the table.
-	 * 
-	 * @serial
-	 */
-	int lowerSize;
-
 	@SuppressWarnings("unchecked")
 	public ArrayHashMap(int initialCapacity) {
 		if (initialCapacity < 0)
@@ -107,8 +93,6 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		this.keys = (K[]) new Object[capacity];
 		this.values = (V[]) new Object[capacity];
 		this.size = 0;
-		this.upperSize = computeUpperSize(capacity);
-		this.lowerSize = computeLowerSize(capacity);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -117,8 +101,6 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		this.keys = (K[]) new Object[capacity];
 		this.values = (V[]) new Object[capacity];
 		this.size = 0;
-		this.upperSize = computeUpperSize(capacity);
-		this.lowerSize = computeLowerSize(capacity);
 	}
 
 	@Override
@@ -140,11 +122,11 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	 * @return maximum size of the table for a given capacity after which to
 	 *         stretch the tables.
 	 */
-	static private int computeUpperSize(int capacity) {
+	static private int getUpperSize(int capacity) {
 		if (capacity > 64)
 			return (3 * capacity) / 4; // max 75% filled
-		else
-			return capacity;
+		// else
+		return capacity;
 	}
 
 	/**
@@ -156,7 +138,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	 * @return minimum size of the table for a given capacity after which to
 	 *         shrink the tables
 	 */
-	static private int computeLowerSize(int capacity) {
+	static private int getLowerSize(int capacity) {
 		return capacity / 4;
 	}
 
@@ -168,17 +150,17 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	public boolean containsKey(Object key) {
 		if (key == null)
 			throw new NullPointerException();
-		K[] keys = this.keys;
-		int i = getIndex(key, keys.length);
+		K[] k = this.keys;
+		int i = getIndex(key, k.length);
 		int j = i; // for cycle detection
 		for (;;) {
-			K probe = keys[i];
+			K probe = k[i];
 			if (probe == null)
 				return false;
 			else if (key.equals(probe))
 				return true;
 			if (i == 0)
-				i = keys.length - 1;
+				i = k.length - 1;
 			else
 				i--;
 			if (i == j) // full cycle
@@ -190,9 +172,9 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	public boolean containsValue(Object value) {
 		if (value == null)
 			throw new NullPointerException();
-		V[] values = this.values;
+		V[] v = this.values;
 		for (int i = 0; i < keys.length; i++)
-			if (value.equals(values[i]))
+			if (value.equals(v[i]))
 				return true;
 		return false;
 	}
@@ -203,24 +185,24 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 			throw new NullPointerException();
 		// to avoid problems in the middle of resizing, we copy keys and values
 		// when they have the same size
-		K[] keys;
-		V[] values;
+		K[] k;
+		V[] v;
 		for (;;) {
-			keys = this.keys;
-			values = this.values;
-			if (keys.length == values.length)
+			k = this.keys;
+			v = this.values;
+			if (k.length == v.length)
 				break;
 		}
-		int i = getIndex(key, keys.length);
+		int i = getIndex(key, k.length);
 		int j = i;
 		for (;;) {
-			K probe = keys[i];
+			K probe = k[i];
 			if (probe == null)
 				return null;
 			else if (key.equals(probe))
-				return values[i];
+				return v[i];
 			if (i == 0)
-				i = keys.length - 1;
+				i = k.length - 1;
 			else
 				i--;
 			if (i == j) // full cycle
@@ -245,7 +227,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	 * @return the previous value associated with the key or <tt>null</tt> if
 	 *         there was no such a previous value.
 	 */
-	private V putKeyValue(K[] keys, V[] values, K key, V value) {
+	private static <K, V> V putKeyValue(K[] keys, V[] values, K key, V value) {
 		int i = getIndex(key, keys.length);
 		for (;;) {
 			K probe = keys[i];
@@ -277,7 +259,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	 * @param i
 	 *            the position at which to delete the key and value
 	 */
-	private void shift(K[] keys, V[] values, int i) {
+	private static <K, V> void shift(K[] keys, V[] values, int i) {
 		int del = i; // the position at which to delete
 		int j = i; // the position at which to test if the key can be
 					// found by linear probing
@@ -308,14 +290,12 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 				// the index is in [j, del[, so the test element should not be
 				// shifted
 				continue;
-			else {
-				// copying the keys and values to the position of deleted
-				// element and start deleting their previous locations
-				keys[del] = test;
-				values[del] = values[j];
-				del = j;
-				continue;
-			}
+			// else copying the keys and values to the position of deleted
+			// element and start deleting their previous locations
+			keys[del] = test;
+			values[del] = values[j];
+			del = j;
+			continue;
 		}
 	}
 
@@ -332,7 +312,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	 * @return the value of the deleted entry, <tt>null</tt> if nothing has been
 	 *         deleted
 	 */
-	private V removeEntry(K[] keys, V[] values, Object key) {
+	private static <K, V> V removeEntry(K[] keys, V[] values, Object key) {
 		int i = getIndex(key, keys.length);
 		int j = i; // for cycle detection
 		for (;;) {
@@ -375,8 +355,6 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		}
 		this.keys = newKeys;
 		this.values = newValues;
-		this.upperSize = computeUpperSize(newCapacity);
-		this.lowerSize = computeLowerSize(newCapacity);
 	}
 
 	/**
@@ -400,15 +378,13 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		}
 		this.keys = newKeys;
 		this.values = newValues;
-		this.upperSize = computeUpperSize(newCapacity);
-		this.lowerSize = computeLowerSize(newCapacity);
 	}
 
 	@Override
 	public V put(K key, V value) {
 		if (key == null)
 			throw new NullPointerException();
-		if (size == upperSize)
+		if (size == getUpperSize(keys.length))
 			stretch();
 		V result = putKeyValue(keys, values, key, value);
 		if (result == null)
@@ -423,7 +399,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		V result = removeEntry(keys, values, key);
 		if (result != null)
 			size--;
-		if (size == lowerSize)
+		if (size == getLowerSize(keys.length))
 			shrink();
 		return result;
 	}
@@ -435,8 +411,6 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		if (capacity == 0)
 			capacity = 1;
 		size = 0;
-		upperSize = computeUpperSize(capacity);
-		lowerSize = computeLowerSize(capacity);
 		this.keys = (K[]) new Object[capacity];
 		this.values = (V[]) new Object[capacity];
 	}
@@ -504,7 +478,8 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 
 	}
 
-	private final class KeySet extends AbstractSet<K> implements DirectAccess<K> {
+	private final class KeySet extends AbstractSet<K> implements
+			DirectAccess<K> {
 
 		@Override
 		public Iterator<K> iterator() {
