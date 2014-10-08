@@ -26,15 +26,12 @@ package org.semanticweb.elk.proofs.inferences.properties;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
-import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
@@ -50,7 +47,7 @@ public class ChainSubsumption implements Inference {
 
 	private final DerivedExpression conclusion_;
 
-	private final ElkSubObjectPropertyOfAxiom sideCondition_;
+	private final DerivedExpression axiom_;
 
 	// one premise and a side condition
 	public ChainSubsumption(
@@ -61,7 +58,7 @@ public class ChainSubsumption implements Inference {
 		firstPremise_ = exprFactory.create(premise);
 		secondPremise_ = null;
 		conclusion_ = exprFactory.create(conclusion);
-		sideCondition_ = sideCondition;
+		axiom_ = exprFactory.createAsserted(sideCondition);
 	}
 
 	// two premises and no side condition
@@ -73,13 +70,13 @@ public class ChainSubsumption implements Inference {
 		firstPremise_ = first;
 		secondPremise_ = exprFactory.create(second);
 		conclusion_ = exprFactory.create(conclusion);
-		sideCondition_ = null;
+		axiom_ = null;
 	}
 
 	@Override
 	public Collection<? extends DerivedExpression> getPremises() {
 		if (secondPremise_ == null) {
-			return Collections.singletonList(firstPremise_);
+			return Arrays.asList(firstPremise_, axiom_);
 		}
 
 		return Arrays.asList(firstPremise_, secondPremise_);
@@ -88,13 +85,6 @@ public class ChainSubsumption implements Inference {
 	@Override
 	public DerivedExpression getConclusion() {
 		return conclusion_;
-	}
-
-	@Override
-	public SideCondition getSideCondition() {
-		return sideCondition_ == null ? null
-				: new AxiomPresenceCondition<ElkSubObjectPropertyOfAxiom>(
-						sideCondition_);
 	}
 
 	@Override

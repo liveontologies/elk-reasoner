@@ -54,6 +54,11 @@ public abstract class AbstractInferenceVisitor<I ,O> implements InferenceVisitor
 	protected abstract O defaultVisit(Inference inference, I input);
 
 	@Override
+	public O visit(AssertedInference inf, I input) {
+		return defaultVisit(inf, input);
+	}
+	
+	@Override
 	public O visit(ChainSubsumption inf, I input) {
 		
 		return defaultVisit(inf, input);

@@ -25,6 +25,7 @@ package org.semanticweb.elk.proofs.expressions.derived.entries;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.proofs.expressions.derived.AssertedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
@@ -46,6 +47,11 @@ public class DummyExpressionfactory implements DerivedExpressionFactory {
 	@Override
 	public DerivedLemmaExpression create(ElkLemma lemma) {
 		return new DerivedLemmaExpression(lemma, InferenceReader.DUMMY);
+	}
+
+	@Override
+	public DerivedAxiomExpression createAsserted(ElkAxiom axiom) {
+		return new AssertedExpression<ElkAxiom>(axiom, InferenceReader.DUMMY);
 	}
 
 }

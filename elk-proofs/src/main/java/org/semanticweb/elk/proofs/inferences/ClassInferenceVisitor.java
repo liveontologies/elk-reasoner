@@ -44,6 +44,8 @@ import org.semanticweb.elk.proofs.inferences.classes.ThingInitialization;
  * pavel.klinov@uni-ulm.de
  */
 public interface ClassInferenceVisitor<I, O> {
+	
+	public O visit(AssertedInference inf, I input);
 
 	public O visit(ClassInitialization inf, I input);
 	

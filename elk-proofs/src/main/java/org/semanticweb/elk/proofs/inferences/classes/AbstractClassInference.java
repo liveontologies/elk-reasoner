@@ -28,7 +28,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
 /**
  * The base class for class inferences whose conclusions are always subsumption
@@ -49,11 +48,6 @@ abstract class AbstractClassInference implements Inference {
 	@Override
 	public DerivedExpression getConclusion() {
 		return conclusion;
-	}
-
-	@Override
-	public SideCondition getSideCondition() {
-		return null;
 	}
 
 }

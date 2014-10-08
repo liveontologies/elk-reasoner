@@ -33,7 +33,6 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkReflexivePropertyChainLemma;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
@@ -68,11 +67,6 @@ public class ReflexiveComposition implements Inference {
 	@Override
 	public DerivedExpression getConclusion() {
 		return conclusion_;
-	}
-
-	@Override
-	public SideCondition getSideCondition() {
-		return null;
 	}
 
 	@Override

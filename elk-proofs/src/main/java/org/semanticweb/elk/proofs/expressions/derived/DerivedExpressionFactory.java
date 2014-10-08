@@ -25,11 +25,10 @@ package org.semanticweb.elk.proofs.expressions.derived;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
 
 /**
- * Creates {@link Expression}s.
+ * Creates {@link DerivedExpression}s.
  * 
  * @author Pavel Klinov
  * 
@@ -37,6 +36,16 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
  */
 public interface DerivedExpressionFactory {
 
+	/**
+	 * If this expression doesn't yet exists, it will be created as an instance
+	 * of {@link AssertedExpression}, otherwise the old instance will be
+	 * returned as usual.
+	 * 
+	 * @param axiom
+	 * @return
+	 */
+	public DerivedAxiomExpression createAsserted(ElkAxiom axiom);
+	
 	public DerivedAxiomExpression create(ElkAxiom axiom);
 	
 	public DerivedLemmaExpression create(ElkLemma lemma);

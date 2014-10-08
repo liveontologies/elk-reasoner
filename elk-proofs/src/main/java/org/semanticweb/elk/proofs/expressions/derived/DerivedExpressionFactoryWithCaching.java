@@ -63,4 +63,11 @@ public class DerivedExpressionFactoryWithCaching implements DerivedExpressionFac
 		return lemmaLookup_.merge(newExpr);
 	}
 
+	@Override
+	public DerivedAxiomExpression createAsserted(ElkAxiom axiom) {
+		AssertedExpression<?> newExpr = new AssertedExpression<ElkAxiom>(axiom, reader_);
+		
+		return axiomLookup_.merge(newExpr);
+	}
+
 }

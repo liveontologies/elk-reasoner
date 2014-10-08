@@ -24,6 +24,7 @@ package org.semanticweb.elk.proofs.utils;
  * #L%
  */
 
+import org.semanticweb.elk.proofs.inferences.AssertedInference;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.classes.ClassInitialization;
@@ -63,12 +64,12 @@ public class InferencePrinter {
 		private String defaultVisit(Inference inf, String rulePrefix) {
 			String premises = Operations.toString(inf.getPremises());
 			
-			if (inf.getSideCondition() == null) {
-				return String.format("%s( %s ) |- %s", rulePrefix, premises, inf.getConclusion());
-			}
-			else {
-				return String.format("%s( %s ) : %s |- %s", rulePrefix, premises, inf.getSideCondition(), inf.getConclusion());
-			}
+			return String.format("%s( %s ) |- %s", rulePrefix, premises, inf.getConclusion());
+		}
+		
+		@Override
+		public String visit(AssertedInference inf, Void input) {
+			return String.format("R_asserted( %s )", inf.getConclusion());
 		}
 		
 		@Override

@@ -289,7 +289,7 @@ public class SingleInferenceMapper {
 					rightExistentialPremise, 
 					exprFactory_.create(leftChainPremise), 
 					rightChainSubsumptionPremise, 
-					chainAxiom);
+					chainAxiom == null ? null : exprFactory_.createAsserted(chainAxiom));
 		}
 
 		@Override

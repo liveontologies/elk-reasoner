@@ -24,16 +24,14 @@ package org.semanticweb.elk.proofs.inferences.properties;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
-import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
@@ -43,28 +41,22 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  */
 public class ToldReflexivity extends AbstractPropertyInference {
 
-	private final ElkReflexiveObjectPropertyAxiom sideCondition_;
+	private final DerivedExpression axiom_;
 	
 	private final DerivedExpression premise_;
 	
 	public ToldReflexivity(ElkReflexiveObjectPropertyAxiom axiom, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
 		super(axiom, exprFactory);
 		
-		sideCondition_ = axiom;
+		axiom_ = exprFactory.createAsserted(axiom);
 		premise_ = exprFactory.create(factory.getSubObjectPropertyOfAxiom(axiom.getProperty(), axiom.getProperty()));
 	}
 	
 	@Override
 	public Collection<? extends DerivedExpression> getPremises() {
-		return Collections.singletonList(premise_);
+		return Arrays.asList(premise_, axiom_);
 	}
 	
-
-	@Override
-	public SideCondition getSideCondition() {
-		return new AxiomPresenceCondition<ElkReflexiveObjectPropertyAxiom>(sideCondition_);
-	}
-
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);

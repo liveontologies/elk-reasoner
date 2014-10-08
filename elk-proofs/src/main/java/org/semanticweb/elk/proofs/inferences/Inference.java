@@ -29,12 +29,11 @@ import java.util.Collection;
 
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 
 /**
  * Represents an elementary component of proofs reported to the user. Each
  * inference has a set of premises and a conclusion, which are
- * {@link Expression}s and, optionally, a side {@link SideCondition}.
+ * {@link Expression}s.
  * 
  * @author Pavel Klinov
  * 
@@ -45,8 +44,6 @@ public interface Inference {
 	public Collection<? extends DerivedExpression> getPremises();
 
 	public DerivedExpression getConclusion();
-
-	public SideCondition getSideCondition();
 
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input);
 }

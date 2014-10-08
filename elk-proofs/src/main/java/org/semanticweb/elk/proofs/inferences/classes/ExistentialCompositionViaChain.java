@@ -27,11 +27,9 @@ package org.semanticweb.elk.proofs.inferences.classes;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
@@ -51,7 +49,7 @@ public class ExistentialCompositionViaChain implements Inference {
 
 	private final DerivedExpression secondPropertySubsumptionPremise_;
 
-	private final ElkObjectPropertyAxiom chainAxiom_;
+	private final DerivedExpression axiom_;
 	
 	private final DerivedExpression conclusion_;
 
@@ -61,25 +59,25 @@ public class ExistentialCompositionViaChain implements Inference {
 			DerivedExpression secondExPremise,
 			DerivedExpression propSubsumption,
 			DerivedExpression chainSubsumption,
-			ElkObjectPropertyAxiom chainAxiom) {
+			DerivedExpression chainAxiom) {
 		conclusion_ = conclusion;
 		firstExistentialPremise_ = firstExPremise;
 		secondExistentialPremise_ = secondExPremise;
 		firstPropertySubsumptionPremise_ = propSubsumption;
 		secondPropertySubsumptionPremise_ = chainSubsumption;
-		chainAxiom_ = chainAxiom;
+		axiom_ = chainAxiom;
 	}	
 	
 	@Override
 	public Collection<? extends DerivedExpression> getPremises() {
-		return Arrays.asList(firstExistentialPremise_, secondExistentialPremise_, firstPropertySubsumptionPremise_, secondPropertySubsumptionPremise_);
+		if (axiom_ != null) {
+			return Arrays.asList(firstExistentialPremise_, secondExistentialPremise_, firstPropertySubsumptionPremise_, secondPropertySubsumptionPremise_, axiom_);
+		}
+		else {
+			return Arrays.asList(firstExistentialPremise_, secondExistentialPremise_, firstPropertySubsumptionPremise_, secondPropertySubsumptionPremise_);
+		}
 	}
 	
-	@Override
-	public AxiomPresenceCondition<ElkObjectPropertyAxiom> getSideCondition() {
-		return chainAxiom_ == null ? null : new AxiomPresenceCondition<ElkObjectPropertyAxiom>(chainAxiom_);
-	}
-
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);

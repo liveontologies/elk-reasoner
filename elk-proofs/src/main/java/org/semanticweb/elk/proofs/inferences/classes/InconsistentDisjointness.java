@@ -25,8 +25,8 @@ package org.semanticweb.elk.proofs.inferences.classes;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
@@ -35,8 +35,6 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.sideconditions.AxiomPresenceCondition;
-import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
@@ -48,7 +46,7 @@ public class InconsistentDisjointness extends AbstractClassInference {
 
 	private final DerivedExpression premise_;
 
-	private final ElkDisjointClassesAxiom sideCondition_;
+	private final DerivedExpression axiom_;
 
 	public InconsistentDisjointness(ElkClassExpression sub,
 			ElkClassExpression sup, ElkDisjointClassesAxiom sideCondition,
@@ -57,18 +55,12 @@ public class InconsistentDisjointness extends AbstractClassInference {
 				exprFactory);
 
 		premise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, sup));
-		sideCondition_ = sideCondition;
-	}
-
-	@Override
-	public SideCondition getSideCondition() {
-		return new AxiomPresenceCondition<ElkDisjointClassesAxiom>(
-				sideCondition_);
+		axiom_ = exprFactory.createAsserted(sideCondition);
 	}
 
 	@Override
 	public Collection<DerivedExpression> getPremises() {
-		return Collections.singletonList(premise_);
+		return Arrays.asList(premise_, axiom_);
 	}
 
 	@Override

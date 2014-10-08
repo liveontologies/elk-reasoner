@@ -33,7 +33,6 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.sideconditions.SideCondition;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
@@ -60,11 +59,6 @@ public class SubsumptionViaReflexivity implements Inference  {
 	@Override
 	public Collection<? extends DerivedExpression> getPremises() {
 		return Collections.singletonList(premise_);
-	}
-
-	@Override
-	public SideCondition getSideCondition() {
-		return null;
 	}
 
 	@Override
