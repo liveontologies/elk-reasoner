@@ -29,9 +29,9 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import org.semanticweb.elk.util.collections.ArrayHashSet;
-
 import junit.framework.TestCase;
+
+import org.junit.Test;
 
 /**
  * 
@@ -50,7 +50,7 @@ public class ArrayHashSetTest extends TestCase {
 	 * @param referenceSet
 	 * @param testSet
 	 */
-	<E> void testSetEquality(Set<E> referenceSet, Set<E> testSet) {
+	static <E> void testSetEquality(Set<E> referenceSet, Set<E> testSet) {
 		int i = 0;
 		for (E e : referenceSet) {
 			assertTrue(testSet.contains(e));
@@ -65,7 +65,8 @@ public class ArrayHashSetTest extends TestCase {
 		assertEquals(referenceSet.size(), i);
 	}
 
-	public void testAddRemoveContains() {
+	@Test
+	public static void testAddRemoveContains() {
 		// random number generator for elements
 		Random generator = new Random(123);
 		// number of test iterations

@@ -132,8 +132,8 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 	static private int computeUpperSize(int capacity) {
 		if (capacity > 64)
 			return (3 * capacity) / 4; // max 75% filled
-		else
-			return capacity;
+		// else
+		return capacity;
 	}
 
 	/**
@@ -157,19 +157,17 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 	public boolean contains(Object o) {
 		if (o == null)
 			throw new NullPointerException();
-		E[] data = this.data;
-		int i = getIndex(o, data.length);
+		E[] d = this.data;
+		int i = getIndex(o, d.length);
 		int j = i; // for cycle detection
 		for (;;) {
-			Object probe = data[i];
+			Object probe = d[i];
 			if (probe == null)
 				return false;
 			else if (o.equals(probe))
 				return true;
-			if (i == 0)
-				i = data.length - 1;
-			else
-				i--;
+			if (++i == d.length)
+				i = 0;
 			if (i == j) // full cycle
 				return false;
 		}
@@ -179,26 +177,24 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 	 * Adds the element to the set represented by given data array, if it did
 	 * not contain there already.
 	 * 
-	 * @param data
+	 * @param d
 	 *            the elements of the set
 	 * @param e
 	 *            the element to be added to the set
 	 * @return <tt>true</tt> if the set has changed (the element is added),
 	 *         <tt>false</tt> otherwise
 	 */
-	private boolean addElement(E[] data, E e) {
-		int i = getIndex(e, data.length);
+	private static <E> boolean addElement(E[] d, E e) {
+		int i = getIndex(e, d.length);
 		for (;;) {
-			Object probe = data[i];
+			Object probe = d[i];
 			if (probe == null) {
-				data[i] = e;
+				d[i] = e;
 				return true;
 			} else if (e.equals(probe))
 				return false;
-			if (i == 0)
-				i = data.length - 1;
-			else
-				i--;
+			if (++i == d.length)
+				i = 0;
 		}
 	}
 
@@ -207,64 +203,56 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 	 * necessary, other elements so that all elements can be found by linear
 	 * probing.
 	 * 
-	 * @param data
+	 * @param d
 	 *            the array of the elements
 	 * @param i
 	 *            the position of data at which to delete the element
 	 */
-	private void shift(E[] data, int i) {
+	private static <E> void shift(E[] d, int i) {
 		int del = i; // the position at which the element is about to be deleted
 		int j = i; // testing if the element at this position can still be
 					// found by linear probing
 		for (;;) {
-			if (j == 0)
-				j = data.length - 1;
-			else
-				j--;
-			// invariant: interval [j, del[ contains non-null elements whose
-			// index is in [j, del[
+			if (++j == d.length)
+				j = 0;
+			// invariant: interval ]del, j] contains non-null elements whose
+			// index is in ]del, j]
 			if (j == del) {
 				// we made a full cycle; no elements have to be shifted
-				data[del] = null;
+				d[del] = null;
 				return;
 			}
-			E test = data[j];
+			E test = d[j];
 			if (test == null) {
 				// no further elements to the left need to be shifted
-				data[del] = null;
+				d[del] = null;
 				return;
 			}
-			int k = getIndex(test, data.length);
-			// check if k is in [j, del[
-			if ((j < del) ? (j <= k) && (k < del) : (j <= k) || (k < del))
-				// the index is in [j, del[, so the test element should not be
-				// shifted
+			int k = getIndex(test, d.length);
+			// check if k is in ]del, j] (possibly wrapping over)
+			if ((del < j) ? (del < k) && (k <= j) : (del < k) || (k <= j))
+				// the test element should not be shifted
 				continue;
-			else {
-				// copy the element to the position of deleted element and
-				// start deleting its previous location
-				data[del] = test;
-				del = j;
-				continue;
-			}
+			// else copy the element to the position of deleted element and
+			// start deleting its previous location
+			d[del] = test;
+			del = j;
 		}
 	}
 
-	private boolean removeElement(E[] data, Object o) {
-		int i = getIndex(o, data.length);
+	private static <E> boolean removeElement(E[] d, Object o) {
+		int i = getIndex(o, d.length);
 		int j = i; // for cycle detection
 		for (;;) {
-			Object probe = data[i];
+			Object probe = d[i];
 			if (probe == null) {
 				return false;
 			} else if (o.equals(probe)) {
-				shift(data, i);
+				shift(d, i);
 				return true;
 			}
-			if (i == 0)
-				i = data.length - 1;
-			else
-				i--;
+			if (++i == d.length)
+				i = 0;
 			if (i == j) // full cycle
 				return false;
 		}
