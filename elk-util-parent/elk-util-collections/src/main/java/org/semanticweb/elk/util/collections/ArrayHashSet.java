@@ -70,20 +70,6 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 	 */
 	transient int size;
 
-	/**
-	 * The next upper size value at which to stretch the table.
-	 * 
-	 * @serial
-	 */
-	int upperSize;
-
-	/**
-	 * The next lower size value at which to shrink the table.
-	 * 
-	 * @serial
-	 */
-	int lowerSize;
-
 	@SuppressWarnings("unchecked")
 	public ArrayHashSet(int initialCapacity) {
 		if (initialCapacity < 0)
@@ -97,8 +83,6 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 			capacity <<= 1;
 		this.data = (E[]) new Object[capacity];
 		this.size = 0;
-		this.upperSize = computeUpperSize(capacity);
-		this.lowerSize = computeLowerSize(capacity);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -106,8 +90,6 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 		int capacity = DEFAULT_INITIAL_CAPACITY;
 		this.data = (E[]) new Object[capacity];
 		this.size = 0;
-		this.upperSize = computeUpperSize(capacity);
-		this.lowerSize = computeLowerSize(capacity);
 	}
 
 	@Override
@@ -129,7 +111,7 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 	 * @return maximum size of the table for a given capacity after which to
 	 *         stretch the table.
 	 */
-	static private int computeUpperSize(int capacity) {
+	private static int getUpperSize(int capacity) {
 		if (capacity > 64)
 			return (3 * capacity) / 4; // max 75% filled
 		// else
@@ -145,11 +127,11 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 	 * @return minimum size of the table for a given capacity after which to
 	 *         shrink the table
 	 */
-	static private int computeLowerSize(int capacity) {
+	private static int getLowerSize(int capacity) {
 		return capacity / 4;
 	}
 
-	static private int getIndex(Object o, int length) {
+	private static int getIndex(Object o, int length) {
 		return o.hashCode() & (length - 1);
 	}
 
@@ -277,8 +259,6 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 				addElement(newData, e);
 		}
 		this.data = newData;
-		this.upperSize = computeUpperSize(newCapacity);
-		this.lowerSize = computeLowerSize(newCapacity);
 	}
 
 	/**
@@ -298,15 +278,13 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 				addElement(newData, e);
 		}
 		this.data = newData;
-		this.upperSize = computeUpperSize(newCapacity);
-		this.lowerSize = computeLowerSize(newCapacity);
 	}
 
 	@Override
 	public boolean add(E e) {
 		if (e == null)
 			throw new NullPointerException();
-		if (size == upperSize)
+		if (size == getUpperSize(data.length))
 			stretch();
 		boolean result = addElement(data, e);
 		if (result)
@@ -321,7 +299,7 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 		boolean result = removeElement(data, o);
 		if (result)
 			size--;
-		if (size == lowerSize)
+		if (size == getLowerSize(data.length))
 			shrink();
 		return result;
 	}
@@ -347,8 +325,6 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 		if (capacity == 0)
 			capacity = 1;
 		size = 0;
-		upperSize = computeUpperSize(capacity);
-		lowerSize = computeLowerSize(capacity);
 		this.data = (E[]) new Object[capacity];
 	}
 
