@@ -159,10 +159,8 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 				return false;
 			else if (key.equals(probe))
 				return true;
-			if (i == 0)
-				i = k.length - 1;
-			else
-				i--;
+			if (++i == k.length)
+				i = 0;
 			if (i == j) // full cycle
 				return false;
 		}
@@ -201,10 +199,8 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 				return null;
 			else if (key.equals(probe))
 				return v[i];
-			if (i == 0)
-				i = k.length - 1;
-			else
-				i--;
+			if (++i == k.length)
+				i = 0;
 			if (i == j) // full cycle
 				return null;
 		}
@@ -240,10 +236,8 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 				values[i] = value;
 				return oldValue;
 			}
-			if (i == 0)
-				i = keys.length - 1;
-			else
-				i--;
+			if (++i == keys.length)
+				i = 0;
 		}
 	}
 
@@ -264,13 +258,11 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		int j = i; // the position at which to test if the key can be
 					// found by linear probing
 		for (;;) {
-			// decrement j modulo the length of the arrays
-			if (j == 0)
-				j = keys.length - 1;
-			else
-				j--;
-			// invariant: interval [j, del[ contains non-null elements whose
-			// index is in [j, del[
+			// increment j modulo the length of the arrays
+			if (++j == keys.length)
+				j = 0;
+			// invariant: interval ]del, j] contains only non-null elements
+			// whose index is in ]del, j]
 			if (j == del) {
 				// we made a full cycle; no elements have to be shifted
 				keys[del] = null;
@@ -279,16 +271,15 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 			}
 			K test = keys[j];
 			if (test == null) {
-				// no further elements to the left need to be shifted
+				// no further elements need to be shifted
 				keys[del] = null;
 				values[del] = null;
 				return;
 			}
 			int k = getIndex(test, keys.length);
-			// check if k is in [j, del[
-			if ((j < del) ? (j <= k) && (k < del) : (j <= k) || (k < del))
-				// the index is in [j, del[, so the test element should not be
-				// shifted
+			// check if k is in ]del, j] (this interval can wrap over)
+			if ((del < j) ? (del < k) && (k <= j) : (del < k) || (k <= j))
+				// the test element should not be shifted
 				continue;
 			// else copying the keys and values to the position of deleted
 			// element and start deleting their previous locations
@@ -324,10 +315,8 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 				shift(keys, values, i);
 				return result;
 			}
-			if (i == 0)
-				i = keys.length - 1;
-			else
-				i--;
+			if (++i == keys.length)
+				i = 0;
 			if (i == j) // full cycle
 				return null;
 		}

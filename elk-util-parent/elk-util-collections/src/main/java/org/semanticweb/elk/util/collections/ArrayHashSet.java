@@ -197,8 +197,8 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 		for (;;) {
 			if (++j == d.length)
 				j = 0;
-			// invariant: interval ]del, j] contains non-null elements whose
-			// index is in ]del, j]
+			// invariant: interval ]del, j] contains only non-null elements
+			// whose index is in ]del, j]
 			if (j == del) {
 				// we made a full cycle; no elements have to be shifted
 				d[del] = null;
@@ -206,12 +206,12 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 			}
 			E test = d[j];
 			if (test == null) {
-				// no further elements to the left need to be shifted
+				// no further elements need to be shifted
 				d[del] = null;
 				return;
 			}
 			int k = getIndex(test, d.length);
-			// check if k is in ]del, j] (possibly wrapping over)
+			// check if k is in ]del, j] (this interval can wrap over)
 			if ((del < j) ? (del < k) && (k <= j) : (del < k) || (k <= j))
 				// the test element should not be shifted
 				continue;
