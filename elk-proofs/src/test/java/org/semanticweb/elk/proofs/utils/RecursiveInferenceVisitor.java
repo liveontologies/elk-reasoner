@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences;
+package org.semanticweb.elk.proofs.utils;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -12,6 +12,8 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.proofs.ProofReader;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 
 /**
@@ -30,6 +32,7 @@ public class RecursiveInferenceVisitor {
 		Set<DerivedExpression> done = new HashSet<DerivedExpression>();
 		
 		toDo.add(next);
+		done.add(next);
 		
 		for (;;) {
 			next = toDo.poll();

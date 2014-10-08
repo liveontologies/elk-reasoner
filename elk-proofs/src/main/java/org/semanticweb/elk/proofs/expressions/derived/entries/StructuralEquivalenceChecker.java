@@ -56,19 +56,19 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
  */
 public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, ExpressionVisitor<Expression, Boolean> {
 
-	static boolean equal(ElkObject first, ElkObject second) {
+	public static boolean equal(ElkObject first, ElkObject second) {
 		return EntityEquivalenceChecker.equal(first, second);
 	}
 	
-	static boolean equal(ElkAxiom first, ElkAxiom second) {
+	public static boolean equal(ElkAxiom first, ElkAxiom second) {
 		return AxiomEquivalenceChecker.equal(first, second);
 	}
 	
-	static boolean equal(ElkLemma first, ElkLemma second) {
+	public static boolean equal(ElkLemma first, ElkLemma second) {
 		return LemmaEquivalenceChecker.equal(first, second);
 	}
 	
-	static boolean equal(ElkComplexClassExpression first, ElkComplexClassExpression second) {
+	public static boolean equal(ElkComplexClassExpression first, ElkComplexClassExpression second) {
 		return EntityEquivalenceChecker.equal(first, second);
 	}
 	

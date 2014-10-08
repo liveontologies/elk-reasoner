@@ -3,6 +3,9 @@
  */
 package org.semanticweb.elk.proofs.inferences;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -10,6 +13,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.proofs.inferences.mapping.InferenceMapper;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
+import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;
+import org.semanticweb.elk.proofs.utils.TestUtils;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 /*
@@ -35,7 +40,7 @@ import org.semanticweb.elk.reasoner.TestReasonerUtils;
  */
 
 /**
- * Basic tests for various {@link InferenceReader}s and {@link InferenceMapper}.
+ * Basic low-level tests for reading inferences.
  * 
  * @author Pavel Klinov
  *
@@ -50,7 +55,7 @@ public class InferenceReaderTest {
 		Reasoner reasoner = TestReasonerUtils.loadAndClassify("PropertyCompositions.owl");
 		ElkClass a = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass g = factory_.getClass(new ElkFullIri("http://example.org/G"));
-		
+		// print inferences 
 		RecursiveInferenceVisitor.visitInferences(reasoner, a, g, new AbstractInferenceVisitor<Void, Void>() {
 
 			@Override
@@ -60,6 +65,12 @@ public class InferenceReaderTest {
 			}
 			
 		});
+		
+		assertTrue(TestUtils.provabilityTest(reasoner, a, g));
+		
+		ElkClass notDerived = factory_.getClass(new ElkFullIri("http://example.org/Invalid"));
+		
+		assertFalse(TestUtils.provabilityTest(reasoner, a, notDerived));
 		
 		reasoner.shutdown();
 	}
