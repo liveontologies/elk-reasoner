@@ -25,7 +25,7 @@ package org.semanticweb.elk.proofs.inferences.classes;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.sideconditions.SideCondition;
@@ -40,14 +40,14 @@ import org.semanticweb.elk.proofs.sideconditions.SideCondition;
  */
 abstract class AbstractClassInference implements Inference {
 
-	final Expression conclusion;
+	final DerivedExpression conclusion;
 
 	AbstractClassInference(ElkSubClassOfAxiom c, DerivedExpressionFactory factory) {
 		conclusion = factory.create(c);
 	}
 
 	@Override
-	public Expression getConclusion() {
+	public DerivedExpression getConclusion() {
 		return conclusion;
 	}
 

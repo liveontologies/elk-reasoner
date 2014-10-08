@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
@@ -87,7 +86,7 @@ public class ChainSubsumption implements Inference {
 	}
 
 	@Override
-	public Expression getConclusion() {
+	public DerivedExpression getConclusion() {
 		return conclusion_;
 	}
 

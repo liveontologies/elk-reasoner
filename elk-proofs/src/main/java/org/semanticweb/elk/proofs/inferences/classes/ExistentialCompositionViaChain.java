@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
-import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -87,7 +86,7 @@ public class ExistentialCompositionViaChain implements Inference {
 	}
 
 	@Override
-	public Expression getConclusion() {
+	public DerivedExpression getConclusion() {
 		return conclusion_;
 	}
 

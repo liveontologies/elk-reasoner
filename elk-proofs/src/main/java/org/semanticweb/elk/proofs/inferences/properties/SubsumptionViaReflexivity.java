@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
@@ -74,7 +73,7 @@ public class SubsumptionViaReflexivity implements Inference  {
 	}
 
 	@Override
-	public Expression getConclusion() {
+	public DerivedExpression getConclusion() {
 		return conclusion_;
 	}
 

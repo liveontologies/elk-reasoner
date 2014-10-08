@@ -28,7 +28,6 @@ package org.semanticweb.elk.proofs.inferences.properties;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
-import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
@@ -44,14 +43,14 @@ import org.semanticweb.elk.proofs.sideconditions.SideCondition;
  */
 abstract class AbstractPropertyInference implements Inference {
 
-	final Expression conclusion;
+	final DerivedExpression conclusion;
 
 	AbstractPropertyInference(ElkObjectPropertyAxiom c, DerivedExpressionFactory factory) {
 		conclusion = factory.create(c);
 	}
 
 	@Override
-	public Expression getConclusion() {
+	public DerivedExpression getConclusion() {
 		return conclusion;
 	}
 

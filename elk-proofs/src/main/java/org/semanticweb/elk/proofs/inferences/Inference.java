@@ -44,7 +44,7 @@ public interface Inference {
 
 	public Collection<? extends DerivedExpression> getPremises();
 
-	public Expression getConclusion();
+	public DerivedExpression getConclusion();
 
 	public SideCondition getSideCondition();
 

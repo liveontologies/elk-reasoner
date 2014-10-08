@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkReflexivePropertyChainLemma;
@@ -67,7 +66,7 @@ public class ReflexiveComposition implements Inference {
 	}
 
 	@Override
-	public Expression getConclusion() {
+	public DerivedExpression getConclusion() {
 		return conclusion_;
 	}
 
