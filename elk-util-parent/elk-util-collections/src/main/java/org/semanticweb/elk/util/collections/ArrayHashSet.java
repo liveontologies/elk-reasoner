@@ -133,7 +133,7 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 		if (capacity > 64)
 			return (3 * capacity) / 4; // max 75% filled
 		// else
-		return capacity;
+		return capacity - 1;
 	}
 
 	/**
@@ -366,46 +366,83 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 		// copy of the data
 		final E[] dataSnapshot;
 		// expected size to check for concurrent modifications
-		final int expectedSize;
-		// current cursor
-		int cursor;
-		// next element to return
-		E nextElement;
+		int expectedSize;
+		// the element at which to start iteration
+		int start;
+		// cursor of the current element
+		int current;
+		// cursor of the next element
+		int next;
 
 		ElementIterator() {
 			this.expectedSize = size;
 			this.dataSnapshot = data;
-			cursor = 0;
-			seekNext();
+			this.start = seekFirstNull();
+			this.next = seekNext(start);
+			this.current = next;
 		}
 
-		void seekNext() {
-			while (cursor < dataSnapshot.length)
-				if ((nextElement = dataSnapshot[cursor++]) != null)
-					return;
-			// no next element
-			nextElement = null;
+		/**
+		 * @return the position of the first {@code null} element
+		 */
+		int seekFirstNull() {
+			for (int i = 0; i < dataSnapshot.length; i++) {
+				if (dataSnapshot[i] == null)
+					return i;
+			}
+			throw new RuntimeException("Set is full!");
+		}
+
+		/**
+		 * Searches for the next non-{@code null} element after the given
+		 * position before the start position
+		 * 
+		 * @param pos
+		 *            position after which to search
+		 * @return the position of the non-{@code null} element, or
+		 *         {@link #start} if there are no such element
+		 */
+		int seekNext(int pos) {
+			for (;;) {
+				if (++pos == dataSnapshot.length)
+					pos = 0;
+				if (pos == start || dataSnapshot[pos] != null)
+					return pos;
+			}
 		}
 
 		@Override
 		public boolean hasNext() {
-			return nextElement != null;
+			return next != start;
 		}
 
 		@Override
 		public E next() {
 			if (expectedSize != size)
 				throw new ConcurrentModificationException();
-			if (nextElement == null)
+			if (next == start)
 				throw new NoSuchElementException();
-			E result = nextElement;
-			seekNext();
+			this.current = next;
+			E result = dataSnapshot[current];
+			this.next = seekNext(current);
 			return result;
 		}
 
 		@Override
 		public void remove() {
-			throw new UnsupportedOperationException();
+			if (expectedSize != size)
+				throw new ConcurrentModificationException();
+			if (current == next)
+				// the current element was not returned or was already removed
+				throw new IllegalStateException();
+			shift(dataSnapshot, current);
+			if (dataSnapshot[current] != null)
+				// something was copied to the current position
+				next = current;
+			else
+				current = next;
+			size--;
+			expectedSize--;
 		}
 
 	}

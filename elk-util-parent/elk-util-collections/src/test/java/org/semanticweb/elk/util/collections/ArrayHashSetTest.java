@@ -26,6 +26,7 @@
 package org.semanticweb.elk.util.collections;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
@@ -91,6 +92,7 @@ public class ArrayHashSetTest extends TestCase {
 			// adding random elements
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
+				// System.out.println("adding " + element);
 				expected = referenceSet.add(element);
 				assertEquals(expected, !testSet.contains(element));
 				actual = testSet.add(element);
@@ -102,6 +104,7 @@ public class ArrayHashSetTest extends TestCase {
 			// removing random elements
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
+				// System.out.println("removing " + element);
 				expected = referenceSet.remove(element);
 				assertEquals(expected, testSet.contains(element));
 				actual = testSet.remove(element);
@@ -110,15 +113,40 @@ public class ArrayHashSetTest extends TestCase {
 			}
 			testSetEquality(referenceSet, testSet);
 
+			// removing through iterator
+			Iterator<Integer> iterator = testSet.iterator();
+			while (iterator.hasNext()) {
+				Integer element = iterator.next();
+				assertTrue(testSet.contains(element));
+				assertTrue(referenceSet.contains(element));
+				if (generator.nextBoolean()) {
+					// removing
+					// System.out.println("removing " + element);
+					iterator.remove();
+					referenceSet.remove(element);
+					assertFalse(testSet.contains(element));
+					// the second removal attempt should fail
+					try {
+						iterator.remove();
+						fail();
+					} catch (IllegalStateException e) {
+						// this exception should always takes place
+					}
+				}
+			}
+			testSetEquality(referenceSet, testSet);
+
 			// randomly adding and removing
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
 				if (generator.nextBoolean()) {
+					// System.out.println("adding " + element);
 					expected = referenceSet.add(element);
 					assertEquals(expected, !testSet.contains(element));
 					actual = testSet.add(element);
 				} else {
 					expected = referenceSet.remove(element);
+					// System.out.println("removing " + element);
 					assertEquals(expected, testSet.contains(element));
 					actual = testSet.remove(element);
 				}
