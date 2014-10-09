@@ -55,12 +55,14 @@ public class ArraySlicedSetTest extends TestCase {
 	static <E> void testSetEquality(Set<E> referenceSet, Set<E> testSet) {
 		int i = 0;
 		for (E e : referenceSet) {
+			// System.out.println("refs: " + e);
 			assertTrue(testSet.contains(e));
 			i++;
 		}
 		assertEquals(i, testSet.size());
 		i = 0;
 		for (E e : testSet) {
+			// System.out.println("test: " + e);
 			assertTrue(referenceSet.contains(e));
 			i++;
 		}
@@ -69,8 +71,10 @@ public class ArraySlicedSetTest extends TestCase {
 
 	static <E> void testSetsEquality(Set<E>[] referenceSets,
 			ArraySlicedSet<E> slicedSet) {
-		for (int i = 0; i < SLICES_; i++)
+		for (int i = 0; i < SLICES_; i++) {
+			// System.out.println("Test equality for: " + i);
 			testSetEquality(referenceSets[i], slicedSet.getSlice(i));
+		}
 	}
 
 	@SuppressWarnings("static-method")
@@ -159,6 +163,7 @@ public class ArraySlicedSetTest extends TestCase {
 				if (generator.nextBoolean())
 					continue;
 				// else
+				// System.out.println(s + ": clear");
 				referenceSets[s].clear();
 				slicedSet.getSlice(s).clear();
 			}

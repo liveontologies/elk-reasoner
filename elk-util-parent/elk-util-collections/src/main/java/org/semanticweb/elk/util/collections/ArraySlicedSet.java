@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -52,18 +51,6 @@ import java.util.Set;
 public class ArraySlicedSet<E> {
 
 	/**
-	 * The default initial capacity - MUST be a power of two.
-	 */
-	static final int DEFAULT_INITIAL_CAPACITY = 16;
-
-	/**
-	 * The maximum capacity, used if a higher value is implicitly specified by
-	 * either of the constructors with arguments. MUST be a power of two <=
-	 * 1<<30.
-	 */
-	static final int MAXIMUM_CAPACITY = 1 << 30;
-
-	/**
 	 * The table for the elements; the length MUST always be a power of two.
 	 */
 	transient E[] data;
@@ -83,50 +70,24 @@ public class ArraySlicedSet<E> {
 	 */
 	transient int occupied = 0;
 
-	/**
-	 * The next upper size value at which to stretch the table.
-	 * 
-	 * @serial
-	 */
-	int upperSize;
-
-	/**
-	 * The next lower size value at which to shrink the table.
-	 * 
-	 * @serial
-	 */
-	// int lowerSize;
-
 	@SuppressWarnings("unchecked")
 	public ArraySlicedSet(int initialCapacity) {
-		if (initialCapacity < 0)
-			throw new IllegalArgumentException("Illegal Capacity: "
-					+ initialCapacity);
-		if (initialCapacity > MAXIMUM_CAPACITY)
-			initialCapacity = MAXIMUM_CAPACITY;
-		// Find a power of 2 >= initialCapacity
-		int capacity = 1;
-		while (capacity < initialCapacity)
-			capacity <<= 1;
+		int capacity = LinearProbing.getInitialCapacity(initialCapacity);
 		this.data = (E[]) new Object[capacity];
 		this.masks = new byte[capacity];
 		this.sizes = new int[8];
 		for (int i = 0; i < 8; i++)
 			this.sizes[i] = 0;
-		this.upperSize = computeUpperSize(capacity);
-		// this.lowerSize = computeLowerSize(capacity);
 	}
 
 	@SuppressWarnings("unchecked")
 	public ArraySlicedSet() {
-		int capacity = DEFAULT_INITIAL_CAPACITY;
+		int capacity = LinearProbing.DEFAULT_INITIAL_CAPACITY;
 		this.data = (E[]) new Object[capacity];
 		this.masks = new byte[capacity];
 		this.sizes = new int[8];
 		for (int i = 0; i < 8; i++)
 			this.sizes[i] = 0;
-		this.upperSize = computeUpperSize(capacity);
-		// this.lowerSize = computeLowerSize(capacity);
 	}
 
 	/**
@@ -149,164 +110,14 @@ public class ArraySlicedSet<E> {
 	}
 
 	/**
-	 * Computes a maximum size of the table for a given capacity after which to
-	 * stretch the table.
-	 * 
-	 * @param capacity
-	 *            the capacity of the table.
-	 * @return maximum size of the table for a given capacity after which to
-	 *         stretch the table.
-	 */
-	static private int computeUpperSize(int capacity) {
-		if (capacity > 64)
-			return (3 * capacity) / 4; // max 75% filled
-		// else
-		return capacity;
-	}
-
-	/**
-	 * Computes a minimum size of the table for a given capacity after which to
-	 * shrink the table.
-	 * 
-	 * @param capacity
-	 *            the capacity of the table.
-	 * @return minimum size of the table for a given capacity after which to
-	 *         shrink the table
-	 */
-	// static private int computeLowerSize(int capacity) {
-	// return capacity / 4;
-	// }
-
-	static private int getIndex(Object o, int length) {
-		return o.hashCode() & (length - 1);
-	}
-
-	public boolean contains(int n, Object o) {
-		if (o == null)
-			throw new NullPointerException();
-		// to avoid problems in the middle of resizing, we copy data and masks
-		// when they have the same size
-		E[] d;
-		byte[] m;
-		for (;;) {
-			d = this.data;
-			m = this.masks;
-			if (d.length == m.length)
-				break;
-		}
-		int i = getIndex(o, d.length);
-		int j = i; // for cycle detection
-		byte mask = (byte) (1 << n);
-		for (;;) {
-			Object probe = d[i];
-			if (probe == null)
-				return false;
-			else if (o.equals(probe))
-				return ((m[i] & mask) == mask);
-			if (++i == d.length)
-				i = 0;
-			if (i == j) // full cycle
-				return false;
-		}
-	}
-
-	private static <E> byte addMask(E[] data, byte[] masks, E e, byte mask) {
-		int i = getIndex(e, data.length);
-		for (;;) {
-			Object probe = data[i];
-			if (probe == null) {
-				data[i] = e;
-				masks[i] = mask;
-				return 0;
-			} else if (e.equals(probe)) {
-				byte oldMask = masks[i];
-				byte newMask = (byte) (oldMask | mask);
-				if (newMask != oldMask)
-					masks[i] = newMask;
-				return oldMask;
-			}
-			if (++i == data.length)
-				i = 0;
-		}
-	}
-
-	/**
-	 * Removes an element at position <tt>i</tt> of <tt>data</tt> shifting, if
-	 * necessary, other elements so that all elements can be found by linear
-	 * probing.
-	 * 
-	 * @param data
-	 *            the array of the elements
-	 * @param i
-	 *            the position of data at which to delete the element
-	 */
-	private static <E> void shift(E[] data, byte[] masks, int i) {
-		int del = i; // the position at which the element is about to be deleted
-		int j = i; // testing if the element at this position can still be
-					// found by linear probing
-		for (;;) {
-			if (++j == data.length)
-				j = 0;
-			// invariant: interval ]del, j] contains non-null elements whose
-			// index is in ]del, j]
-			if (j == del) {
-				// we made a full cycle; no elements have to be shifted
-				data[del] = null;
-				return;
-			}
-			E test = data[j];
-			if (test == null) {
-				// no further elements need to be shifted
-				data[del] = null;
-				return;
-			}
-			int k = getIndex(test, data.length);
-			// check if k is in ]del, j] (possibly wrapped over)
-			if ((del < j) ? (del < k) && (k <= j) : (k <= j) || (del < k))
-				// the test element should not be shifted
-				continue;
-			// else
-			// copy the element to the position of deleted element and
-			// start deleting its previous location
-			data[del] = test;
-			masks[del] = masks[j];
-			del = j;
-		}
-	}
-
-	private static <E> byte removeMask(E[] data, byte[] masks, Object o,
-			byte mask) {
-		int i = getIndex(o, data.length);
-		int j = i; // for cycle detection
-		for (;;) {
-			Object probe = data[i];
-			if (probe == null) {
-				return 0;
-			} else if (o.equals(probe)) {
-				byte oldMask = masks[i];
-				byte newMask = (byte) (oldMask & (~mask));
-				if (newMask == 0)
-					shift(data, masks, i);
-				else
-					masks[i] = newMask;
-				return oldMask;
-			}
-			if (++i == data.length)
-				i = 0;
-			if (i == j) // full cycle
-				return 0;
-		}
-	}
-
-	/**
 	 * Increasing the capacity of the table
 	 */
-	private void stretch() {
+	private void enlarge() {
 		int oldCapacity = data.length;
-		if (oldCapacity == MAXIMUM_CAPACITY)
+		if (oldCapacity == LinearProbing.MAXIMUM_CAPACITY)
 			throw new IllegalArgumentException(
 					"The set cannot grow beyond the capacity: "
-							+ MAXIMUM_CAPACITY);
+							+ LinearProbing.MAXIMUM_CAPACITY);
 		E[] oldData = data;
 		byte[] oldMasks = masks;
 		int newCapacity = oldCapacity << 1;
@@ -320,33 +131,92 @@ public class ArraySlicedSet<E> {
 		}
 		this.data = newData;
 		this.masks = newMasks;
-		this.upperSize = computeUpperSize(newCapacity);
-		// this.lowerSize = computeLowerSize(newCapacity);
 	}
 
 	/**
 	 * Decreasing the capacity of the table
 	 */
-	// private void shrink() {
-	// int oldCapacity = data.length;
-	// if (oldCapacity == 1)
-	// return;
-	// E[] oldData = data;
-	// byte[] oldMasks = masks;
-	// int newCapacity = oldCapacity >> 1;
-	// @SuppressWarnings("unchecked")
-	// E[] newData = (E[]) new Object[newCapacity];
-	// byte[] newMasks = new byte[newCapacity];
-	// for (int i = 0; i < oldCapacity; i++) {
-	// E e = oldData[i];
-	// if (e != null)
-	// addMask(newData, newMasks, e, oldMasks[i]);
-	// }
-	// this.data = newData;
-	// this.masks = newMasks;
-	// this.upperSize = computeUpperSize(newCapacity);
-	// // this.lowerSize = computeLowerSize(newCapacity);
-	// }
+	private void shrink() {
+		int oldCapacity = data.length;
+		if (oldCapacity == 1)
+			return;
+		E[] oldData = data;
+		byte[] oldMasks = masks;
+		int newCapacity = oldCapacity >> 1;
+		@SuppressWarnings("unchecked")
+		E[] newData = (E[]) new Object[newCapacity];
+		byte[] newMasks = new byte[newCapacity];
+		for (int i = 0; i < oldCapacity; i++) {
+			E e = oldData[i];
+			if (e != null)
+				addMask(newData, newMasks, e, oldMasks[i]);
+		}
+		this.data = newData;
+		this.masks = newMasks;
+	}
+
+	public boolean contains(int s, Object o) {
+		if (o == null)
+			throw new NullPointerException();
+		// to avoid problems in the middle of resizing, we copy data and masks
+		// when they have the same size
+		E[] d;
+		byte[] m;
+		for (;;) {
+			d = this.data;
+			m = this.masks;
+			if (d.length == m.length)
+				break;
+		}
+		int pos = LinearProbing.getPosition(d, o);
+		if (d[pos] == null)
+			return false;
+		// else
+		byte mask = (byte) (1 << s);
+		return ((m[pos] & mask) == mask);
+	}
+
+	private static <E> byte addMask(E[] data, byte[] masks, E e, byte mask) {
+		int pos = LinearProbing.getPosition(data, e);
+		if (data[pos] == null) {
+			data[pos] = e;
+			masks[pos] = mask;
+			return 0;
+		}
+		// else
+		byte oldMask = masks[pos];
+		byte newMask = (byte) (oldMask | mask);
+		if (newMask != oldMask)
+			masks[pos] = newMask;
+		return oldMask;
+	}
+
+	private static <K, V> void remove(K[] k, byte[] masks, int pos) {
+		for (;;) {
+			int next = LinearProbing.getMovedPosition(k, pos);
+			K moved = k[pos] = k[next];
+			masks[pos] = masks[next];
+			if (moved == null)
+				return;
+			// else
+			pos = next;
+		}
+	}
+
+	private static <E> byte removeMask(E[] data, byte[] masks, Object o,
+			byte mask) {
+		int pos = LinearProbing.getPosition(data, o);
+		if (data[pos] == null)
+			return 0;
+		// else
+		byte oldMask = masks[pos];
+		byte newMask = (byte) (oldMask & (~mask));
+		if (newMask == 0)
+			remove(data, masks, pos);
+		else
+			masks[pos] = newMask;
+		return oldMask;
+	}
 
 	/**
 	 * Inserts a given element into the given slice
@@ -362,16 +232,14 @@ public class ArraySlicedSet<E> {
 	public boolean add(int s, E e) {
 		if (e == null)
 			throw new NullPointerException();
-		if (occupied == upperSize)
-			stretch();
 		byte mask = (byte) (1 << s);
 		byte oldMask = addMask(data, masks, e, mask);
 		byte newMask = (byte) (oldMask | mask);
-		if (oldMask == 0)
-			occupied++;
 		if (newMask == oldMask)
 			return false;
-		// else
+		else if (oldMask == 0
+				&& ++occupied == LinearProbing.getUpperSize(data.length))
+			enlarge();
 		sizes[s]++;
 		return true;
 	}
@@ -394,11 +262,12 @@ public class ArraySlicedSet<E> {
 		byte mask = (byte) (1 << s);
 		byte oldMask = removeMask(data, masks, o, mask);
 		byte newMask = (byte) (oldMask & ~mask);
-		if (newMask == 0)
-			occupied--;
 		if (newMask == oldMask)
 			return false;
 		// else
+		if (newMask == 0
+				&& --occupied == LinearProbing.getLowerSize(data.length))
+			shrink();
 		sizes[s]--;
 		return true;
 	}
@@ -424,30 +293,6 @@ public class ArraySlicedSet<E> {
 	}
 
 	/**
-	 * Removes all elements in the given slice
-	 * 
-	 * @param s
-	 *            the slice id (between 0 and 7) from which elements should be
-	 *            removed
-	 */
-	public void clear(int s) {
-		byte mask = (byte) (1 << s);
-		for (int i = 0; i < data.length; i++) {
-			for (;;) {
-				byte oldMask = masks[i];
-				byte newMask = (byte) (oldMask & ~mask);
-				if (newMask == 0 && data[i] != null)
-					shift(data, masks, i);
-				else {
-					masks[i] = newMask;
-					break;
-				}
-			}
-		}
-		sizes[s] = 0;
-	}
-
-	/**
 	 * Clears all slices of this {@link ArraySlicedSet}. After calling this
 	 * methods, all slices are empty.
 	 */
@@ -461,8 +306,6 @@ public class ArraySlicedSet<E> {
 			this.sizes[i] = 0;
 		this.data = (E[]) new Object[capacity];
 		this.masks = new byte[capacity];
-		this.upperSize = computeUpperSize(capacity);
-		// this.lowerSize = computeLowerSize(capacity);
 	}
 
 	/**
@@ -529,67 +372,46 @@ public class ArraySlicedSet<E> {
 			return Arrays.toString(toArray());
 		}
 
-		@Override
-		public void clear() {
-			ArraySlicedSet.this.clear(s);
-		}
 	}
 
-	private class ElementIterator implements Iterator<E> {
+	private class ElementIterator extends LinearProbingIterator<E, E> {
 
-		// the slice over which iterating
-		final byte s;
-		// copy of the data
-		final E[] dataSnapshot;
-		// copy of masks
-		final byte[] masksSnapshot;
-		// expected size to check for concurrent modifications
-		final int expectedSize;
-		// current cursor
-		int cursor;
-		// next element to return
-		E nextElement;
+		final int s;
+		final int mask;
 
-		ElementIterator(byte n) {
-			this.s = n;
-			this.expectedSize = sizes[n];
-			this.dataSnapshot = data;
-			this.masksSnapshot = masks;
-			cursor = 0;
-			seekNext();
-		}
-
-		void seekNext() {
-			byte mask = (byte) (1 << s);
-			while (cursor < dataSnapshot.length) {
-				int currentCursor = cursor++;
-				if ((nextElement = dataSnapshot[currentCursor]) != null
-						&& (masksSnapshot[currentCursor] & mask) == mask)
-					return;
-			}
-			// no next element
-			nextElement = null;
+		ElementIterator(int s) {
+			super(data, sizes[s]);
+			this.s = s;
+			mask = (1 << s);
+			init();
 		}
 
 		@Override
-		public boolean hasNext() {
-			return nextElement != null;
-		}
-
-		@Override
-		public E next() {
+		void checkSize(int expectedSize) {
 			if (expectedSize != sizes[s])
 				throw new ConcurrentModificationException();
-			if (nextElement == null)
-				throw new NoSuchElementException();
-			E result = nextElement;
-			seekNext();
-			return result;
 		}
 
 		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
+		boolean isOccupied(int pos) {
+			return (dataSnapshot[pos] != null && (masks[pos] & mask) == mask);
+		}
+
+		@Override
+		void remove(int pos) {
+			byte oldMask = masks[pos];
+			byte newMask = (byte) (oldMask & (~mask));
+			if (newMask == 0) {
+				ArraySlicedSet.remove(data, masks, pos);
+				occupied--;
+			} else
+				masks[pos] = newMask;
+			sizes[s]--;
+		}
+
+		@Override
+		E getValue(E element, int pos) {
+			return element;
 		}
 	}
 }
