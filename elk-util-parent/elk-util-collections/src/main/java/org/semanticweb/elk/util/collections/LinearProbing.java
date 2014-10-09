@@ -58,9 +58,9 @@ class LinearProbing {
 	 */
 	static int getUpperSize(int capacity) {
 		if (capacity > 64)
-			return (3 * capacity) / 4; // max 75% filled
+			return (capacity >> 1) + (capacity >> 2); // max 75% filled
 		// else
-		return capacity - 1;
+		return capacity;
 	}
 
 	/**
@@ -73,7 +73,7 @@ class LinearProbing {
 	 *         shrink the table
 	 */
 	static int getLowerSize(int capacity) {
-		return capacity / 4;
+		return capacity >> 2;
 	}
 
 	/**

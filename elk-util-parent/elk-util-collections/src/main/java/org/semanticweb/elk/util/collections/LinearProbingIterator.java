@@ -31,6 +31,9 @@ abstract class LinearProbingIterator<E, V> implements Iterator<V> {
 	LinearProbingIterator(E[] data, int size) {
 		this.dataSnapshot = data;
 		this.sizeSnapshot_ = size;
+	}
+
+	void init() {
 		this.start_ = seekFirstNull();
 		this.next_ = seekNext(start_);
 		this.current_ = next_;
@@ -44,13 +47,12 @@ abstract class LinearProbingIterator<E, V> implements Iterator<V> {
 	abstract void checkSize(int expectedSize);
 
 	/**
-	 * Removes the element of the data at the given position, moving other
-	 * elements if necessary
+	 * Removes the element at the given position, moving other elements if
+	 * necessary
 	 * 
-	 * @param data
 	 * @param pos
 	 */
-	abstract void remove(E[] data, int pos);
+	abstract void remove(int pos);
 
 	/**
 	 * Converts the given element and its position in the data to the
@@ -70,7 +72,17 @@ abstract class LinearProbingIterator<E, V> implements Iterator<V> {
 			if (dataSnapshot[pos] == null)
 				return pos;
 		}
-		throw new RuntimeException("Set is full!");
+		throw new RuntimeException("Set is full! (" + dataSnapshot.length
+				+ " elements)");
+	}
+
+	/**
+	 * @param pos
+	 *            the position to test
+	 * @return {@code true} if it is occupied
+	 */
+	boolean isOccupied(int pos) {
+		return dataSnapshot[pos] != null;
 	}
 
 	/**
@@ -86,7 +98,7 @@ abstract class LinearProbingIterator<E, V> implements Iterator<V> {
 		for (;;) {
 			if (++pos == dataSnapshot.length)
 				pos = 0;
-			if (pos == start_ || dataSnapshot[pos] != null)
+			if (pos == start_ || isOccupied(pos))
 				return pos;
 		}
 	}
@@ -113,8 +125,8 @@ abstract class LinearProbingIterator<E, V> implements Iterator<V> {
 		if (current_ == next_)
 			// the current element was not returned or was already removed
 			throw new IllegalStateException();
-		remove(dataSnapshot, current_);
-		if (dataSnapshot[current_] != null)
+		remove(current_);
+		if (isOccupied(current_))
 			// something was copied to the current position
 			next_ = current_;
 		else

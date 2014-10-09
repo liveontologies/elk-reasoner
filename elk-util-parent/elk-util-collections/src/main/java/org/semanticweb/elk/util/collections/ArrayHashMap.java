@@ -237,11 +237,9 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	public V put(K key, V value) {
 		if (key == null)
 			throw new NullPointerException();
-		if (size == LinearProbing.getUpperSize(keys.length))
-			enlarge();
 		V result = putKeyValue(keys, values, key, value);
-		if (result == null)
-			size++;
+		if (result == null && ++size == LinearProbing.getUpperSize(keys.length))
+			enlarge();
 		return result;
 	}
 
@@ -250,9 +248,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		if (key == null)
 			throw new NullPointerException();
 		V result = removeEntry(keys, values, key);
-		if (result != null)
-			size--;
-		if (size == LinearProbing.getLowerSize(keys.length))
+		if (result != null && --size == LinearProbing.getLowerSize(keys.length))
 			shrink();
 		return result;
 	}
@@ -287,6 +283,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 
 		KeyIterator() {
 			super(keys, size);
+			init();
 		}
 
 		@Override
@@ -296,8 +293,8 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		}
 
 		@Override
-		void remove(K[] expectedKeys, int pos) {
-			LinearProbing.remove(expectedKeys, values, pos);
+		void remove(int pos) {
+			LinearProbing.remove(dataSnapshot, values, pos);
 			size--;
 		}
 
@@ -347,6 +344,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 
 		ValueIterator() {
 			super(values, size);
+			init();
 		}
 
 		@Override
@@ -356,8 +354,8 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		}
 
 		@Override
-		void remove(V[] expectedValues, int pos) {
-			LinearProbing.remove(keys, expectedValues, pos);
+		void remove(int pos) {
+			LinearProbing.remove(keys, dataSnapshot, pos);
 			size--;
 		}
 
@@ -401,6 +399,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		EntryIterator() {
 			super(keys, size);
 			this.valuesSnapshot = values;
+			init();
 		}
 
 		@Override
@@ -410,8 +409,8 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		}
 
 		@Override
-		void remove(K[] expectedKeys, int pos) {
-			LinearProbing.remove(expectedKeys, values, pos);
+		void remove(int pos) {
+			LinearProbing.remove(dataSnapshot, values, pos);
 			size--;
 		}
 

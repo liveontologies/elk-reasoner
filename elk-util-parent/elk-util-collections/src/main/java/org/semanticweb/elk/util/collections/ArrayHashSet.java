@@ -132,11 +132,9 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 	public boolean add(E e) {
 		if (e == null)
 			throw new NullPointerException();
-		if (size == LinearProbing.getUpperSize(data.length))
-			enlarge();
 		boolean added = LinearProbing.add(data, e);
-		if (added)
-			size++;
+		if (added && ++size == LinearProbing.getUpperSize(data.length))
+			enlarge();
 		return added;
 	}
 
@@ -145,9 +143,7 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 		if (o == null)
 			throw new NullPointerException();
 		boolean removed = LinearProbing.remove(data, o);
-		if (removed)
-			size--;
-		if (size == LinearProbing.getLowerSize(data.length))
+		if (removed && --size == LinearProbing.getLowerSize(data.length))
 			shrink();
 		return removed;
 	}
@@ -190,6 +186,7 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 
 		ElementIterator() {
 			super(data, size);
+			init();
 		}
 
 		@Override
@@ -199,8 +196,8 @@ public class ArrayHashSet<E> extends AbstractSet<E> implements Set<E>,
 		}
 
 		@Override
-		void remove(E[] expectedData, int pos) {
-			LinearProbing.remove(expectedData, pos);
+		void remove(int pos) {
+			LinearProbing.remove(dataSnapshot, pos);
 			size--;
 		}
 
