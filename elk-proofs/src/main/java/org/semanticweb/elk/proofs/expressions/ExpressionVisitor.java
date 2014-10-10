@@ -24,6 +24,7 @@ package org.semanticweb.elk.proofs.expressions;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
 
@@ -34,7 +35,7 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
  */
 public interface ExpressionVisitor<I, O> {
 
-	public O visit(DerivedAxiomExpression<?> expr, I input);
+	public O visit(DerivedAxiomExpression<? extends ElkAxiom> expr, I input);
 	
 	public O visit(DerivedLemmaExpression expr, I input);
 }

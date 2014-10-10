@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
@@ -66,7 +66,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 		reasoner = r;
 	}
 	
-	public DerivedExpression initialize(ElkClass sub, ElkClass sup) throws ElkException {
+	public DerivedExpression initialize(ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
 		// trace it
 		reasoner.explainSubsumption(sub, sup);
 		// this expression factory will guarantee pointer equality for structurally equivalent expressions 

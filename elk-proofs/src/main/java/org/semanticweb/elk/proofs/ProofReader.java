@@ -26,6 +26,7 @@ package org.semanticweb.elk.proofs;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
@@ -52,8 +53,8 @@ public class ProofReader {
 	 * @return
 	 * @throws ElkException
 	 */
-	public static DerivedExpression start(Reasoner reasoner, ElkClass subsumee,
-			ElkClass subsumer) throws ElkException {
+	public static DerivedExpression start(Reasoner reasoner, ElkClassExpression subsumee,
+			ElkClassExpression subsumer) throws ElkException {
 		ReasonerInferenceReader reader = new ReasonerInferenceReader(reasoner);
 
 		return reader.initialize(subsumee, subsumer);
