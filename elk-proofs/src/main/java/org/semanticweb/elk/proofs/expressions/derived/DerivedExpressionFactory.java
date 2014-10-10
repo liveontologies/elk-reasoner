@@ -38,15 +38,15 @@ public interface DerivedExpressionFactory {
 
 	/**
 	 * If this expression doesn't yet exists, it will be created as an instance
-	 * of {@link AssertedExpression}, otherwise the old instance will be
+	 * of {@link AssertedAxiomExpression}, otherwise the old instance will be
 	 * returned as usual.
 	 * 
 	 * @param axiom
 	 * @return
 	 */
-	public DerivedAxiomExpression createAsserted(ElkAxiom axiom);
+	public DerivedAxiomExpression<?> createAsserted(ElkAxiom axiom);
 	
-	public DerivedAxiomExpression create(ElkAxiom axiom);
+	public DerivedAxiomExpression<?> create(ElkAxiom axiom);
 	
 	public DerivedLemmaExpression create(ElkLemma lemma);
 }

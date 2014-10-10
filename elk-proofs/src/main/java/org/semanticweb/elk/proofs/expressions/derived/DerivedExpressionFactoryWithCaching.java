@@ -37,21 +37,21 @@ import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
  */
 public class DerivedExpressionFactoryWithCaching implements DerivedExpressionFactory {
 
-	private final KeyEntryHashSet<DerivedAxiomExpression> axiomLookup_;
+	private final KeyEntryHashSet<DerivedAxiomExpression<ElkAxiom>> axiomLookup_;
 	
 	private final KeyEntryHashSet<DerivedLemmaExpression> lemmaLookup_;
 	
 	private final InferenceReader reader_;
 
 	public DerivedExpressionFactoryWithCaching(InferenceReader reader) {
-		axiomLookup_ = new KeyEntryHashSet<DerivedAxiomExpression>(new ExpressionEntryFactory<DerivedAxiomExpression>(), 128);
+		axiomLookup_ = new KeyEntryHashSet<DerivedAxiomExpression<ElkAxiom>>(new ExpressionEntryFactory<DerivedAxiomExpression<ElkAxiom>>(), 128);
 		lemmaLookup_ = new KeyEntryHashSet<DerivedLemmaExpression>(new ExpressionEntryFactory<DerivedLemmaExpression>(), 32);
 		reader_ = reader;
 	}
 	
 	@Override
-	public DerivedAxiomExpression create(ElkAxiom axiom) {
-		DerivedAxiomExpression newExpr = new DerivedAxiomExpression(axiom, reader_);
+	public DerivedAxiomExpression<?> create(ElkAxiom axiom) {
+		DerivedAxiomExpression<ElkAxiom> newExpr = new DerivedAxiomExpression<ElkAxiom>(axiom, reader_);
 		
 		return axiomLookup_.merge(newExpr);
 	}
@@ -64,10 +64,16 @@ public class DerivedExpressionFactoryWithCaching implements DerivedExpressionFac
 	}
 
 	@Override
-	public DerivedAxiomExpression createAsserted(ElkAxiom axiom) {
-		AssertedExpression<?> newExpr = new AssertedExpression<ElkAxiom>(axiom, reader_);
+	public DerivedAxiomExpression<?> createAsserted(ElkAxiom axiom) {
+		//AssertedAxiomExpression<ElkAxiom> newExpr = new AssertedAxiomExpression<ElkAxiom>(axiom, reader_);
+		DerivedAxiomExpression<ElkAxiom> newExpr = new DerivedAxiomExpression<ElkAxiom>(axiom, reader_, true);
+		DerivedAxiomExpression<ElkAxiom> oldExpr = axiomLookup_.merge(newExpr);
 		
-		return axiomLookup_.merge(newExpr);
+		if (!oldExpr.isAsserted()) {
+			oldExpr.setAsserted();
+		}
+		
+		return oldExpr;
 	}
 
 }

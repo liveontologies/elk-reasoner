@@ -37,8 +37,6 @@ import org.semanticweb.elk.proofs.inferences.properties.ToldReflexivity;
  */
 public interface PropertyInferenceVisitor<I, O> {
 
-	public O visit(AssertedInference inf, I input);
-	
 	public O visit(ChainSubsumption inf, I input);
 	
 	public O visit(ReflexiveComposition inf, I input);

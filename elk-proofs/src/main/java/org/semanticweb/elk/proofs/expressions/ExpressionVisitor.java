@@ -34,7 +34,7 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
  */
 public interface ExpressionVisitor<I, O> {
 
-	public O visit(DerivedAxiomExpression expr, I input);
+	public O visit(DerivedAxiomExpression<?> expr, I input);
 	
 	public O visit(DerivedLemmaExpression expr, I input);
 }

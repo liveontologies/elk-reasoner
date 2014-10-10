@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.proofs.expressions;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -25,13 +26,25 @@ package org.semanticweb.elk.proofs.expressions;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 
 /**
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public interface AxiomExpression extends Expression {
+public interface AxiomExpression<E extends ElkAxiom> extends Expression {
 
-	public ElkAxiom getAxiom();
+	public E getAxiom();
+
+	/**
+	 * Returns {@code true} if the axiom is asserted in the ontology. Note that
+	 * it does not mean that {@link DerivedExpression#getInferences()} should
+	 * return an empty iterable. Asserted axioms can also be derivable from
+	 * other axioms in case of redundancy.
+	 * 
+	 * @return
+	 */
+	public boolean isAsserted();
+
 }

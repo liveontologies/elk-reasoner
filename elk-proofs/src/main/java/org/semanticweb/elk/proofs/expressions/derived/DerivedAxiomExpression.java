@@ -35,18 +35,34 @@ import org.semanticweb.elk.proofs.inferences.InferenceReader;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DerivedAxiomExpression extends AbstractDerivedExpression implements AxiomExpression {
+public class DerivedAxiomExpression<E extends ElkAxiom> extends AbstractDerivedExpression implements AxiomExpression<E> {
 
-	private final ElkAxiom axiom_;
+	private final E axiom_;
 	
-	public DerivedAxiomExpression(ElkAxiom ax, InferenceReader r) {
+	private boolean asserted_;
+	
+	public DerivedAxiomExpression(E ax, InferenceReader r) {
+		this(ax, r, false);
+	}
+	
+	public DerivedAxiomExpression(E ax, InferenceReader r, boolean asserted) {
 		super(r);
 		axiom_ = ax;
+		asserted_ = asserted;
 	}
 	
 	@Override
-	public ElkAxiom getAxiom() {
+	public E getAxiom() {
 		return axiom_;
+	}
+	
+	void setAsserted() {
+		asserted_ = true;
+	}
+	
+	@Override
+	public boolean isAsserted() {
+		return asserted_;
 	}
 	
 	@Override

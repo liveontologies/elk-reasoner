@@ -24,7 +24,6 @@ package org.semanticweb.elk.proofs.utils;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.inferences.AssertedInference;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.classes.ClassInitialization;
@@ -65,11 +64,6 @@ public class InferencePrinter {
 			String premises = Operations.toString(inf.getPremises());
 			
 			return String.format("%s( %s ) |- %s", rulePrefix, premises, inf.getConclusion());
-		}
-		
-		@Override
-		public String visit(AssertedInference inf, Void input) {
-			return String.format("R_asserted( %s )", inf.getConclusion());
 		}
 		
 		@Override

@@ -99,8 +99,8 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 	}
 
 	@Override
-	public Boolean visit(DerivedAxiomExpression expr, Expression second) {
-		return second instanceof DerivedAxiomExpression ? AxiomEquivalenceChecker.equal(expr.getAxiom(), ((DerivedAxiomExpression) second).getAxiom()) : Boolean.FALSE;
+	public Boolean visit(DerivedAxiomExpression<?> expr, Expression second) {
+		return second instanceof DerivedAxiomExpression ? AxiomEquivalenceChecker.equal(expr.getAxiom(), ((DerivedAxiomExpression<?>) second).getAxiom()) : Boolean.FALSE;
 	}
 
 	@Override

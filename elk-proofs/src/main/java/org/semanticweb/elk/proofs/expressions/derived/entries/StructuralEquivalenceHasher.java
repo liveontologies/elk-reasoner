@@ -92,7 +92,7 @@ public class StructuralEquivalenceHasher implements ExpressionHasher {
 		return expression.accept(new ExpressionVisitor<Void, Integer>() {
 
 			@Override
-			public Integer visit(DerivedAxiomExpression expr, Void input) {
+			public Integer visit(DerivedAxiomExpression<?> expr, Void input) {
 				return AxiomHasher.hashCode(expr.getAxiom());
 			}
 

@@ -68,7 +68,7 @@ public class TestUtils {
 	private static boolean proved(DerivedExpression expr,
 			HashSet<DerivedExpression> seen) throws ElkException {
 		// check if the expression doesn't require a proof
-		if (isTautology(expr)) {
+		if (isTautology(expr) || isAsserted(expr)) {
 			return true;
 		}
 
@@ -95,6 +95,23 @@ public class TestUtils {
 		}
 
 		return false;
+	}
+
+	private static boolean isAsserted(DerivedExpression expr) {
+		return expr.accept(new ExpressionVisitor<Void, Boolean>() {
+
+			@Override
+			public Boolean visit(DerivedAxiomExpression<?> expr, Void input) {
+				return expr.isAsserted();
+			}
+
+			@Override
+			public Boolean visit(DerivedLemmaExpression expr, Void input) {
+				// lemmas can not be asserted
+				return false;
+			}
+			
+		}, null);
 	}
 
 	private static boolean isTautology(DerivedExpression expr) {
@@ -135,7 +152,7 @@ public class TestUtils {
 		}
 
 		@Override
-		public Boolean visit(DerivedAxiomExpression expr,
+		public Boolean visit(DerivedAxiomExpression<?> expr,
 				Void input) {
 			return expr.getAxiom().accept(this);
 		}
