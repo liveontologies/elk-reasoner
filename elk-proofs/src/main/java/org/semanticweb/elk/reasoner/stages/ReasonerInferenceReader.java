@@ -34,7 +34,7 @@ import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactoryWithCaching;
-import org.semanticweb.elk.proofs.expressions.derived.entries.DummyExpressionfactory;
+import org.semanticweb.elk.proofs.expressions.derived.DummyExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceReader;
@@ -60,7 +60,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 
 	final AbstractReasonerState reasoner;
 	
-	private DerivedExpressionFactory expressionFactory_ = new DummyExpressionfactory();
+	private DerivedExpressionFactory expressionFactory_ = new DummyExpressionFactory();
 	
 	public ReasonerInferenceReader(AbstractReasonerState r) {
 		reasoner = r;

@@ -29,7 +29,7 @@ import java.util.Collections;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
-import org.semanticweb.elk.proofs.expressions.derived.entries.DummyExpressionfactory;
+import org.semanticweb.elk.proofs.expressions.derived.DummyExpressionFactory;
 
 
 /**
@@ -56,7 +56,7 @@ public interface InferenceReader {
 
 		@Override
 		public DerivedExpressionFactory getExpressionFactory() {
-			return new DummyExpressionfactory();
+			return new DummyExpressionFactory();
 		}
 		
 	};

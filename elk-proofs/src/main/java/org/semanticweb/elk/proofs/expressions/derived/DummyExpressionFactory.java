@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions.derived.entries;
+package org.semanticweb.elk.proofs.expressions.derived;
 /*
  * #%L
  * ELK Proofs Package
@@ -25,9 +25,6 @@ package org.semanticweb.elk.proofs.expressions.derived.entries;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
 import org.semanticweb.elk.proofs.inferences.InferenceReader;
 
@@ -36,7 +33,7 @@ import org.semanticweb.elk.proofs.inferences.InferenceReader;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DummyExpressionfactory implements DerivedExpressionFactory {
+public class DummyExpressionFactory implements DerivedExpressionFactory {
 
 	@Override
 	public DerivedAxiomExpression<?> create(ElkAxiom axiom) {
