@@ -133,7 +133,7 @@ public class ExpressionMapper {
 		}
 
 		@Override
-		public Iterable<TracingInput> visit(DerivedAxiomExpression expr, Void input) {
+		public Iterable<TracingInput> visit(DerivedAxiomExpression<?> expr, Void input) {
 			return expr.getAxiom().accept(this);
 		}
 

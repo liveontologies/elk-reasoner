@@ -24,7 +24,6 @@ package org.semanticweb.elk.proofs.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.inferences.classes.ClassInitialization;
 import org.semanticweb.elk.proofs.inferences.classes.ClassSubsumption;
 import org.semanticweb.elk.proofs.inferences.classes.ConjunctionComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ConjunctionDecomposition;
@@ -35,7 +34,6 @@ import org.semanticweb.elk.proofs.inferences.classes.ExistentialCompositionViaCh
 import org.semanticweb.elk.proofs.inferences.classes.InconsistentDisjointness;
 import org.semanticweb.elk.proofs.inferences.classes.NegationContradiction;
 import org.semanticweb.elk.proofs.inferences.classes.ReflexiveExistentialComposition;
-import org.semanticweb.elk.proofs.inferences.classes.ThingInitialization;
 
 /**
  * 
@@ -44,10 +42,6 @@ import org.semanticweb.elk.proofs.inferences.classes.ThingInitialization;
  * pavel.klinov@uni-ulm.de
  */
 public interface ClassInferenceVisitor<I, O> {
-	
-	public O visit(ClassInitialization inf, I input);
-	
-	public O visit(ThingInitialization inf, I input);
 	
 	public O visit(ClassSubsumption inf, I input);
 	

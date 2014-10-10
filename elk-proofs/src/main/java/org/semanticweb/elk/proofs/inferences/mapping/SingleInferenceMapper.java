@@ -47,7 +47,6 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryImpl;
 import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.proofs.inferences.classes.ClassInitialization;
 import org.semanticweb.elk.proofs.inferences.classes.ClassSubsumption;
 import org.semanticweb.elk.proofs.inferences.classes.ConjunctionComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ConjunctionDecomposition;
@@ -166,8 +165,8 @@ public class SingleInferenceMapper {
 		@Override
 		public Inference visit(InitializationSubsumer<?> inference,
 				IndexedClassExpression parameter) {
-			return new ClassInitialization(
-					Deindexer.deindex(inference.getExpression()), factory_, exprFactory_);
+			// don't map init inferences
+			return null;
 		}
 
 		@Override

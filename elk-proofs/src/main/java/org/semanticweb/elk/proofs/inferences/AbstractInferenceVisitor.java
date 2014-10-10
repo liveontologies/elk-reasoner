@@ -24,7 +24,6 @@ package org.semanticweb.elk.proofs.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.inferences.classes.ClassInitialization;
 import org.semanticweb.elk.proofs.inferences.classes.ClassSubsumption;
 import org.semanticweb.elk.proofs.inferences.classes.ConjunctionComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ConjunctionDecomposition;
@@ -35,7 +34,6 @@ import org.semanticweb.elk.proofs.inferences.classes.ExistentialCompositionViaCh
 import org.semanticweb.elk.proofs.inferences.classes.InconsistentDisjointness;
 import org.semanticweb.elk.proofs.inferences.classes.NegationContradiction;
 import org.semanticweb.elk.proofs.inferences.classes.ReflexiveExistentialComposition;
-import org.semanticweb.elk.proofs.inferences.classes.ThingInitialization;
 import org.semanticweb.elk.proofs.inferences.properties.ChainSubsumption;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexiveComposition;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexivityViaSubsumption;
@@ -79,18 +77,6 @@ public abstract class AbstractInferenceVisitor<I ,O> implements InferenceVisitor
 
 	@Override
 	public O visit(ToldReflexivity inf, I input) {
-		
-		return defaultVisit(inf, input);
-	}
-
-	@Override
-	public O visit(ClassInitialization inf, I input) {
-		
-		return defaultVisit(inf, input);
-	}
-
-	@Override
-	public O visit(ThingInitialization inf, I input) {
 		
 		return defaultVisit(inf, input);
 	}

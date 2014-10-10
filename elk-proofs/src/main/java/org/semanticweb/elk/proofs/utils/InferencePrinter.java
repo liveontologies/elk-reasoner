@@ -26,7 +26,6 @@ package org.semanticweb.elk.proofs.utils;
 
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.classes.ClassInitialization;
 import org.semanticweb.elk.proofs.inferences.classes.ClassSubsumption;
 import org.semanticweb.elk.proofs.inferences.classes.ConjunctionComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ConjunctionDecomposition;
@@ -37,7 +36,6 @@ import org.semanticweb.elk.proofs.inferences.classes.ExistentialCompositionViaCh
 import org.semanticweb.elk.proofs.inferences.classes.InconsistentDisjointness;
 import org.semanticweb.elk.proofs.inferences.classes.NegationContradiction;
 import org.semanticweb.elk.proofs.inferences.classes.ReflexiveExistentialComposition;
-import org.semanticweb.elk.proofs.inferences.classes.ThingInitialization;
 import org.semanticweb.elk.proofs.inferences.properties.ChainSubsumption;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexiveComposition;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexivityViaSubsumption;
@@ -66,16 +64,6 @@ public class InferencePrinter {
 			return String.format("%s( %s ) |- %s", rulePrefix, premises, inf.getConclusion());
 		}
 		
-		@Override
-		public String visit(ClassInitialization inf, Void input) {
-			return String.format("R_init( %s )", inf.getConclusion());
-		}
-
-		@Override
-		public String visit(ThingInitialization inf, Void input) {
-			return String.format("R_init( %s )", inf.getConclusion());
-		}
-
 		@Override
 		public String visit(ClassSubsumption inf, Void input) {
 			return defaultVisit(inf, "R_sub");
