@@ -21,8 +21,6 @@ package org.semanticweb.elk.owlapi;
  * #L%
  */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
@@ -36,6 +34,8 @@ import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.semanticweb.owlapi.model.RemoveImport;
 import org.semanticweb.owlapi.model.RemoveOntologyAnnotation;
 import org.semanticweb.owlapi.model.SetOntologyID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class OwlOntologyChangeProcessorVisitor implements
 		OWLOntologyChangeVisitorEx<ElkLoadingException> {

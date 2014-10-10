@@ -36,7 +36,12 @@ import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owlapi.proofs.ElkToOwlProofConverter;
+import org.semanticweb.elk.owlapi.wrapper.OwlClassAxiomConverterVisitor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
+import org.semanticweb.elk.proofs.ProofReader;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ElkUnsupportedReasoningTaskException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
@@ -61,6 +66,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLRuntimeException;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.AxiomNotInProfileException;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.reasoner.ClassExpressionNotInProfileException;
@@ -79,6 +86,8 @@ import org.semanticweb.owlapi.reasoner.TimeOutException;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNode;
 import org.semanticweb.owlapi.util.Version;
+import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
+import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +97,7 @@ import org.slf4j.LoggerFactory;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class ElkReasoner implements OWLReasoner {
+public class ElkReasoner implements ExplainingOWLReasoner {
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(ElkReasoner.class);
 
@@ -928,6 +937,30 @@ public class ElkReasoner implements OWLReasoner {
 		}
 
 	}
+	
+	@Override
+	public OWLExpression getDerivedExpression(OWLAxiom axiom) {
+		// support only class subsumptions for the moment
+		if (axiom instanceof OWLSubClassOfAxiom) {
+			OWLSubClassOfAxiom scAxiom = (OWLSubClassOfAxiom) axiom;
+			ElkSubClassOfAxiom elkAxiom = (ElkSubClassOfAxiom) scAxiom.accept(OwlClassAxiomConverterVisitor.getInstance());
+			
+			try {
+				DerivedExpression expr = ProofReader.start(reasoner_, elkAxiom.getSubClassExpression(), elkAxiom.getSuperClassExpression());
+				
+				return ElkToOwlProofConverter.convert(expr);
+				
+			} catch (ElkException e) {
+				LOGGER_.error("Error during proof reconstruction", e);
+				
+				throw new OWLRuntimeException(e);
+			} 
+		}
+		
+		throw new UnsupportedEntailmentTypeException(axiom);
+	}
+
+
 
 	protected class OntologyChangeListener implements OWLOntologyChangeListener {
 		@Override
