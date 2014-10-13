@@ -78,6 +78,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.semanticweb.owlapitools.proofs</groupId>
+			<artifactId>owlapi-proofs-model</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>		
+		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
