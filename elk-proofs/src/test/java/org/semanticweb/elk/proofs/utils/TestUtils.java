@@ -65,15 +65,12 @@ public class TestUtils {
 		}
 
 		for (Inference inf : expr.getInferences()) {
-			// see if this inference proves the expression. it does if it is an
-			// initialization inference or there exists a not yet visited
-			// premise which is provable. 
+			// see if this inference proves the expression. it does if there
+			// exists a not yet visited premise which is provable.
 			boolean proves = true;
-			boolean initInference = true;
 			boolean newPremise = false;
 
 			for (DerivedExpression premise : inf.getPremises()) {
-				initInference = false;
 				
 				if (seen.add(premise)) {
 					newPremise = true;
@@ -81,7 +78,7 @@ public class TestUtils {
 				}
 			}
 
-			if (proves && (initInference || newPremise)) {
+			if (proves && newPremise) {
 				return true;
 			}
 		}
