@@ -27,22 +27,13 @@ package org.semanticweb.elk.proofs.utils;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.ProofReader;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
-import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceChecker;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaVisitor;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkReflexivePropertyChainLemma;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.reasoner.Reasoner;
 
@@ -53,8 +44,9 @@ import org.semanticweb.elk.reasoner.Reasoner;
  */
 public class TestUtils {
 
-	// tests that each derived expression is provably. an expression is provable
-	// if it returns at least one inference such that each of the premises is
+	// tests that each derived expression is provable. an expression is provable
+	// if either it doesn't require a proof (i.e. is a tautology or asserted) or
+	// returns at least one inference such that each of the premises is
 	// provable.
 	public static boolean provabilityTest(Reasoner reasoner, ElkClass sub,
 			ElkClass sup) throws ElkException {
@@ -116,64 +108,6 @@ public class TestUtils {
 
 	private static boolean isTautology(DerivedExpression expr) {
 		return expr.accept(new TautologyChecker(), null);
-	}
-
-	/**
-	 * Checks if an expression is a tautology.
-	 * 
-	 * @author Pavel Klinov
-	 *
-	 * pavel.klinov@uni-ulm.de
-	 */
-	private static class TautologyChecker extends
-			AbstractElkAxiomVisitor<Boolean> implements
-			ExpressionVisitor<Void, Boolean>, ElkLemmaVisitor<Void, Boolean> {
-
-		@Override
-		protected Boolean defaultLogicalVisit(ElkAxiom axiom) {
-			return false;
-		}
-
-		@Override
-		public Boolean visit(
-				ElkReflexivePropertyChainLemma lemma, Void input) {
-			return false;
-		}
-
-		@Override
-		public Boolean visit(ElkSubClassOfLemma lemma, Void input) {
-			return false;
-		}
-
-		@Override
-		public Boolean visit(ElkSubPropertyChainOfLemma lemma,
-				Void input) {
-			return StructuralEquivalenceChecker.equal(lemma.getSubPropertyChain(), lemma.getSuperPropertyChain());
-		}
-
-		@Override
-		public Boolean visit(DerivedAxiomExpression<?> expr,
-				Void input) {
-			return expr.getAxiom().accept(this);
-		}
-
-		@Override
-		public Boolean visit(DerivedLemmaExpression expr,
-				Void input) {
-			return expr.getLemma().accept(this, input);
-		}
-
-		@Override
-		public Boolean visit(ElkSubClassOfAxiom ax) {
-			return StructuralEquivalenceChecker.equal(ax.getSubClassExpression(), ax.getSuperClassExpression());
-		}
-
-		@Override
-		public Boolean visit(
-				ElkSubObjectPropertyOfAxiom ax) {
-			return StructuralEquivalenceChecker.equal(ax.getSubObjectPropertyExpression(), ax.getSuperObjectPropertyExpression());
-		}
-		
 	}
 
 }

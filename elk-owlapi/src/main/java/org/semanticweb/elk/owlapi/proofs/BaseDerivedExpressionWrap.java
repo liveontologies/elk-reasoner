@@ -6,6 +6,7 @@ package org.semanticweb.elk.owlapi.proofs;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.utils.TautologyChecker;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
@@ -39,4 +40,8 @@ public abstract class BaseDerivedExpressionWrap<E extends DerivedExpression> imp
 		}
 	}
 
+	@Override
+	public boolean isTautology() {
+		return expression.accept(new TautologyChecker(), null);
+	}
 }
