@@ -51,4 +51,7 @@ public abstract class ElkAxiomWrap<T extends OWLAxiom> extends ElkObjectWrap<T>
 		return accept((ElkAxiomVisitor<O>) visitor);
 	}
 
+	public T getOWLAxiom() {
+		return owlObject;
+	}
 }
