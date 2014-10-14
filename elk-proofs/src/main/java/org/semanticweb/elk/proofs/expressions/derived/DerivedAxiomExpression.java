@@ -37,7 +37,7 @@ import org.semanticweb.elk.proofs.inferences.InferenceReader;
  */
 public class DerivedAxiomExpression<E extends ElkAxiom> extends AbstractDerivedExpression implements AxiomExpression<E> {
 
-	private final E axiom_;
+	private E axiom_;
 	
 	private boolean asserted_;
 	
@@ -56,7 +56,8 @@ public class DerivedAxiomExpression<E extends ElkAxiom> extends AbstractDerivedE
 		return axiom_;
 	}
 	
-	void setAsserted() {
+	void setAsserted(E axiom) {
+		axiom_ = axiom;
 		asserted_ = true;
 	}
 	

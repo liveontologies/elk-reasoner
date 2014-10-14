@@ -19,6 +19,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.owlapi.wrapper.ElkAxiomWrap;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
@@ -127,6 +128,17 @@ public class ElkToOwlProofConverter {
 				}
 				
 				return factory.getOWLReflexiveObjectPropertyAxiom(convert(axiom.getProperty(), factory));
+			}
+			
+			@Override
+			public OWLAxiom visit(ElkTransitiveObjectPropertyAxiom axiom) {
+				OWLAxiom ax = asOWLAxiom(axiom);
+				
+				if (ax != null) {
+					return ax;
+				}
+				
+				return factory.getOWLTransitiveObjectPropertyAxiom(convert(axiom.getProperty(), factory));
 			}
 
 			@Override

@@ -58,7 +58,10 @@ public class OWLAPITestUtils {
 			throw new Owl2ParseException(e);
 		}
 
-		return new ElkReasoner(ontology, false,
-				new RestartingTestStageExecutor());
+		return createReasoner(ontology);
+	}
+
+	public static ElkReasoner createReasoner(OWLOntology ontology) {
+		return new ElkReasoner(ontology, false, new RestartingTestStageExecutor());
 	}
 }

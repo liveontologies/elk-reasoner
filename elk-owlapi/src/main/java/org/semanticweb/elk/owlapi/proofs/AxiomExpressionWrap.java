@@ -34,5 +34,5 @@ public class AxiomExpressionWrap extends BaseDerivedExpressionWrap<DerivedAxiomE
 	public OWLAxiom getAxiom() {
 		return ElkToOwlProofConverter.convert(expression.getAxiom());
 	}
-
+	
 }

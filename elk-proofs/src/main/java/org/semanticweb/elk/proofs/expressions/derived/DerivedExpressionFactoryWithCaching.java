@@ -65,12 +65,11 @@ public class DerivedExpressionFactoryWithCaching implements DerivedExpressionFac
 
 	@Override
 	public DerivedAxiomExpression<?> createAsserted(ElkAxiom axiom) {
-		//AssertedAxiomExpression<ElkAxiom> newExpr = new AssertedAxiomExpression<ElkAxiom>(axiom, reader_);
 		DerivedAxiomExpression<ElkAxiom> newExpr = new DerivedAxiomExpression<ElkAxiom>(axiom, reader_, true);
 		DerivedAxiomExpression<ElkAxiom> oldExpr = axiomLookup_.merge(newExpr);
 		
 		if (!oldExpr.isAsserted()) {
-			oldExpr.setAsserted();
+			oldExpr.setAsserted(axiom);
 		}
 		
 		return oldExpr;

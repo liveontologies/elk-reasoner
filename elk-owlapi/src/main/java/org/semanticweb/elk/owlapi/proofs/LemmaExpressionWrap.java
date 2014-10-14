@@ -22,5 +22,5 @@ public class LemmaExpressionWrap extends BaseDerivedExpressionWrap<DerivedLemmaE
 	public <O> O accept(OWLExpressionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
-
+	
 }
