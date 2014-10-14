@@ -266,7 +266,7 @@ public class SingleInferenceMapper {
 			else {
 				ss = Deindexer.deindex(chainPremise.getSubPropertyChain());
 				// an axiom
-				rightExistentialPremise = exprFactory_.create(factory_.getSubClassOfAxiom(d, factory_.getObjectSomeValuesFrom((ElkObjectProperty) ss, d)));
+				rightExistentialPremise = exprFactory_.create(factory_.getSubClassOfAxiom(d, factory_.getObjectSomeValuesFrom((ElkObjectProperty) ss, e)));
 			}
 			// now create the right existential premise
 			if (chainPremise.getSuperPropertyChain() instanceof IndexedBinaryPropertyChain) {

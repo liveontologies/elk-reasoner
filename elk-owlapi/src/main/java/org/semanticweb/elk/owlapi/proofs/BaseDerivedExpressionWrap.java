@@ -8,7 +8,6 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceChecker;
 import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceHasher;
 import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.proofs.utils.TautologyChecker;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
@@ -42,11 +41,6 @@ public abstract class BaseDerivedExpressionWrap<E extends DerivedExpression> imp
 		}
 	}
 
-	@Override
-	public boolean isTautology() {
-		return expression.accept(new TautologyChecker(), null);
-	}
-	
 	@Override
 	public int hashCode() {
 		return new StructuralEquivalenceHasher().hashCode(expression);

@@ -27,7 +27,7 @@ package org.semanticweb.elk.proofs.inferences.classes;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
-import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.inferences.AbstractInference;
 
 /**
  * The base class for class inferences whose conclusions are always subsumption
@@ -37,7 +37,7 @@ import org.semanticweb.elk.proofs.inferences.Inference;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-abstract class AbstractClassInference implements Inference {
+abstract class AbstractClassInference extends AbstractInference {
 
 	final DerivedExpression conclusion;
 

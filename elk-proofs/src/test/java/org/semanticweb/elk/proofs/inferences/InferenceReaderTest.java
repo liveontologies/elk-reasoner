@@ -11,8 +11,6 @@ import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.proofs.utils.InferencePrinter;
-import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.TestUtils;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
@@ -55,7 +53,7 @@ public class InferenceReaderTest {
 		ElkClass a = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass g = factory_.getClass(new ElkFullIri("http://example.org/G"));
 		// print inferences 
-		RecursiveInferenceVisitor.visitInferences(reasoner, a, g, new AbstractInferenceVisitor<Void, Void>() {
+		/*RecursiveInferenceVisitor.visitInferences(reasoner, a, g, new AbstractInferenceVisitor<Void, Void>() {
 
 			@Override
 			protected Void defaultVisit(Inference inference, Void input) {
@@ -63,7 +61,7 @@ public class InferenceReaderTest {
 				return null;
 			}
 			
-		});
+		});*/
 		
 		assertTrue(TestUtils.provabilityTest(reasoner, a, g));
 		

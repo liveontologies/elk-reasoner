@@ -55,7 +55,7 @@ public class NegationContradiction extends
 	}
 
 	@Override
-	public Collection<DerivedExpression> getPremises() {
+	public Collection<DerivedExpression> getRawPremises() {
 		return Arrays.asList(subsumer_, negativeSubsumer_);
 	}
 

@@ -25,7 +25,6 @@ package org.semanticweb.elk.proofs.inferences.classes;
  */
 
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -58,11 +57,6 @@ public class ClassSubsumption extends AbstractClassInference {
 	}
 
 	@Override
-	public Collection<DerivedExpression> getPremises() {
-		return Arrays.asList(premise_, axiom_);
-	}
-
-	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
@@ -70,5 +64,10 @@ public class ClassSubsumption extends AbstractClassInference {
 	@Override
 	public String toString() {
 		return InferencePrinter.print(this);
+	}
+
+	@Override
+	protected Iterable<DerivedExpression> getRawPremises() {
+		return Arrays.asList(premise_, axiom_);
 	}
 }

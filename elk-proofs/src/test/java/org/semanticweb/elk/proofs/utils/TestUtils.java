@@ -57,10 +57,9 @@ public class TestUtils {
 
 	// TODO recursion is probably OK for short tests but better to re-write
 	// using queues and loops
-	private static boolean proved(DerivedExpression expr,
-			HashSet<DerivedExpression> seen) throws ElkException {
-		// check if the expression doesn't require a proof
-		if (isTautology(expr) || isAsserted(expr)) {
+	private static boolean proved(DerivedExpression expr, HashSet<DerivedExpression> seen) throws ElkException {
+		// the expression represents an axiom in the ontology
+		if (isAsserted(expr)) {
 			return true;
 		}
 
@@ -69,9 +68,12 @@ public class TestUtils {
 			// exists a not yet visited premise which is provable.
 			boolean proves = true;
 			boolean newPremise = false;
+			// now, after looking at this inferences, we conclude that the expression is, in fact, an asserted axiom
+			if (inf.getConclusion().equals(expr) && isAsserted(inf.getConclusion())) {
+				return true;
+			}
 
 			for (DerivedExpression premise : inf.getPremises()) {
-				
 				if (seen.add(premise)) {
 					newPremise = true;
 					proves &= proved(premise, seen);
@@ -101,10 +103,6 @@ public class TestUtils {
 			}
 			
 		}, null);
-	}
-
-	private static boolean isTautology(DerivedExpression expr) {
-		return expr.accept(new TautologyChecker(), null);
 	}
 
 }

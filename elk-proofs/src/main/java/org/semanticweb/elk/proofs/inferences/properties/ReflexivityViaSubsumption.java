@@ -53,7 +53,7 @@ public class ReflexivityViaSubsumption extends AbstractPropertyInference {
 	}
 	
 	@Override
-	public Collection<? extends DerivedExpression> getPremises() {
+	public Collection<DerivedExpression> getRawPremises() {
 		return Arrays.asList(premise_, axiom_);
 	}
 	

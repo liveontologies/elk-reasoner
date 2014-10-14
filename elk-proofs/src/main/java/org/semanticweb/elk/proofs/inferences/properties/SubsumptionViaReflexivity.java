@@ -31,7 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
-import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
@@ -40,7 +40,7 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class SubsumptionViaReflexivity implements Inference  {
+public class SubsumptionViaReflexivity extends AbstractInference  {
 	
 	private final DerivedExpression premise_;
 	
@@ -57,7 +57,7 @@ public class SubsumptionViaReflexivity implements Inference  {
 	}
 	
 	@Override
-	public Collection<? extends DerivedExpression> getPremises() {
+	public Collection<DerivedExpression> getRawPremises() {
 		return Collections.singletonList(premise_);
 	}
 

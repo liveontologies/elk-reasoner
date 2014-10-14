@@ -71,7 +71,7 @@ public class ExistentialComposition extends AbstractClassInference {
 	}
 
 	@Override
-	public Collection<? extends DerivedExpression> getPremises() {
+	public Collection<DerivedExpression> getRawPremises() {
 		return Arrays.asList(existentialPremise_, subsumerPremise_,
 				propertyPremise_);
 	}

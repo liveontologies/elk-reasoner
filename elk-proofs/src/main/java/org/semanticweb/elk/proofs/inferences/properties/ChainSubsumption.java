@@ -30,7 +30,7 @@ import java.util.Collection;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
-import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
@@ -39,7 +39,7 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ChainSubsumption implements Inference {
+public class ChainSubsumption extends AbstractInference {
 
 	private final DerivedExpression firstPremise_;
 
@@ -74,7 +74,7 @@ public class ChainSubsumption implements Inference {
 	}
 
 	@Override
-	public Collection<? extends DerivedExpression> getPremises() {
+	public Collection<DerivedExpression> getRawPremises() {
 		if (secondPremise_ == null) {
 			return Arrays.asList(firstPremise_, axiom_);
 		}

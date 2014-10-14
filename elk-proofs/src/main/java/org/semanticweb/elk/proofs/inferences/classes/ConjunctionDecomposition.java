@@ -52,7 +52,7 @@ public class ConjunctionDecomposition extends
 	}
 
 	@Override
-	public Collection<DerivedExpression> getPremises() {
+	public Collection<DerivedExpression> getRawPremises() {
 		return Collections.singletonList(premise_);
 	}
 

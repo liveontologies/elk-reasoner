@@ -92,7 +92,7 @@ public class ReflexiveExistentialComposition extends
 	}
 
 	@Override
-	public Collection<? extends DerivedExpression> getPremises() {
+	public Collection<DerivedExpression> getRawPremises() {
 		return Arrays.asList(reflexPremise_, subsumerPremise_, propertyPremise_);
 	}
 

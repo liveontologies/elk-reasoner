@@ -54,7 +54,7 @@ public class ConjunctionComposition extends
 	}
 
 	@Override
-	public Collection<DerivedExpression> getPremises() {
+	public Collection<DerivedExpression> getRawPremises() {
 		return Arrays.asList(firstPremise_, secondPremise_);
 	}
 

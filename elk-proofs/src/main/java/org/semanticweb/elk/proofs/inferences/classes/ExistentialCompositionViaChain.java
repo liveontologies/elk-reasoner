@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
@@ -39,7 +39,7 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ExistentialCompositionViaChain implements Inference {
+public class ExistentialCompositionViaChain extends AbstractInference {
 
 	private final DerivedExpression firstExistentialPremise_;
 
@@ -69,7 +69,7 @@ public class ExistentialCompositionViaChain implements Inference {
 	}	
 	
 	@Override
-	public Collection<? extends DerivedExpression> getPremises() {
+	public Collection<DerivedExpression> getRawPremises() {
 		if (axiom_ != null) {
 			return Arrays.asList(firstExistentialPremise_, secondExistentialPremise_, firstPropertySubsumptionPremise_, secondPropertySubsumptionPremise_, axiom_);
 		}

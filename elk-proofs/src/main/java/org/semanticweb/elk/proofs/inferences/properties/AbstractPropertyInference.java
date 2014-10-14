@@ -25,12 +25,10 @@ package org.semanticweb.elk.proofs.inferences.properties;
  * #L%
  */
 
-import java.util.Collection;
-
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
-import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.inferences.AbstractInference;
 
 /**
  * The base class for class inferences whose conclusions are always object
@@ -40,7 +38,7 @@ import org.semanticweb.elk.proofs.inferences.Inference;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-abstract class AbstractPropertyInference implements Inference {
+abstract class AbstractPropertyInference extends AbstractInference {
 
 	final DerivedExpression conclusion;
 
@@ -52,11 +50,5 @@ abstract class AbstractPropertyInference implements Inference {
 	public DerivedExpression getConclusion() {
 		return conclusion;
 	}
-
-	@Override
-	public Collection<? extends DerivedExpression> getPremises() {
-		return null;
-	}
-
 	
 }

@@ -58,7 +58,7 @@ public class ProofTestUtils {
 
 	private static boolean proved(OWLExpression expr, HashSet<OWLExpression> seen) throws ProofGenerationException {
 		// check if the expression doesn't require a proof
-		if (expr.isTautology() || isAsserted(expr)) {
+		if (isAsserted(expr)) {
 			return true;
 		}
 
@@ -66,9 +66,12 @@ public class ProofTestUtils {
 			// see if this inference proves the expression
 			boolean proves = true;
 			boolean newPremise = false;
+			
+			if (inf.getConclusion().equals(expr) && isAsserted(inf.getConclusion())) {
+				return true;
+			}
 
 			for (OWLExpression premise : inf.getPremises()) {
-				
 				if (seen.add(premise)) {
 					newPremise = true;
 					proves &= proved(premise, seen);

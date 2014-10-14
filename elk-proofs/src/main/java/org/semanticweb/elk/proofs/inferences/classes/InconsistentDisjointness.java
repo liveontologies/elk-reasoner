@@ -59,7 +59,7 @@ public class InconsistentDisjointness extends AbstractClassInference {
 	}
 
 	@Override
-	public Collection<DerivedExpression> getPremises() {
+	public Collection<DerivedExpression> getRawPremises() {
 		return Arrays.asList(premise_, axiom_);
 	}
 
