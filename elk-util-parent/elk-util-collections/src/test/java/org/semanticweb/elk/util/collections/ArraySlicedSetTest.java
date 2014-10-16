@@ -40,8 +40,6 @@ import org.junit.Test;
  */
 public class ArraySlicedSetTest extends TestCase {
 
-	private static int SLICES_ = 2;
-
 	public ArraySlicedSetTest(String testName) {
 		super(testName);
 	}
@@ -71,7 +69,7 @@ public class ArraySlicedSetTest extends TestCase {
 
 	static <E> void testSetsEquality(Set<E>[] referenceSets,
 			ArraySlicedSet<E> slicedSet) {
-		for (int i = 0; i < SLICES_; i++) {
+		for (int i = 0; i < referenceSets.length; i++) {
 			// System.out.println("Test equality for: " + i);
 			testSetEquality(referenceSets[i], slicedSet.getSlice(i));
 		}
@@ -97,12 +95,13 @@ public class ArraySlicedSetTest extends TestCase {
 				noElements <<= 1;
 
 			int initialSize = generator.nextInt(noElements);
+			int slices = generator.nextInt(32) + 1;
 			ArraySlicedSet<Integer> slicedSet = new ArraySlicedSet<Integer>(
-					initialSize);
+					slices, initialSize);
 
 			@SuppressWarnings("unchecked")
-			Set<Integer>[] referenceSets = new Set[SLICES_];
-			for (int s = 0; s < SLICES_; s++)
+			Set<Integer>[] referenceSets = new Set[slices];
+			for (int s = 0; s < slices; s++)
 				referenceSets[s] = new HashSet<Integer>(noElements);
 			Set<Integer> testSet;
 			Set<Integer> referenceSet;
@@ -110,7 +109,7 @@ public class ArraySlicedSetTest extends TestCase {
 			// adding random elements
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
-				int s = generator.nextInt(SLICES_);
+				int s = generator.nextInt(slices);
 				// System.out.println(s + ": adding " + element);
 				testSet = slicedSet.getSlice(s);
 				referenceSet = referenceSets[s];
@@ -125,7 +124,7 @@ public class ArraySlicedSetTest extends TestCase {
 			// removing random elements
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
-				int s = generator.nextInt(SLICES_);
+				int s = generator.nextInt(slices);
 				// System.out.println(s + ": removing " + element);
 				testSet = slicedSet.getSlice(s);
 				referenceSet = referenceSets[s];
@@ -140,7 +139,7 @@ public class ArraySlicedSetTest extends TestCase {
 			// randomly adding and removing
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
-				int s = generator.nextInt(SLICES_);
+				int s = generator.nextInt(slices);
 				testSet = slicedSet.getSlice(s);
 				referenceSet = referenceSets[s];
 				if (generator.nextBoolean()) {
@@ -159,7 +158,7 @@ public class ArraySlicedSetTest extends TestCase {
 			}
 			testSetsEquality(referenceSets, slicedSet);
 			// clear random sets
-			for (int s = 0; s < SLICES_; s++) {
+			for (int s = 0; s < slices; s++) {
 				if (generator.nextBoolean())
 					continue;
 				// else

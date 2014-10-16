@@ -33,12 +33,12 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A compact representation of up to 8 sets (called "slices") that can share
+ * A compact representation of several sets (called "slices") that can share
  * many elements. The representation is backed by arrays that stores the
- * elements and numerical masks indicating to which "slices" those elements
- * belong to. The membership is checked using hash values of elements with
- * linear probing to resolve hash collisions: see [1] p.526. Parts of the code
- * are inspired by the implementation of {@link java.util.HashMap}.
+ * elements and numerical masks encode to which sets those elements belong to.
+ * The membership is checked using hash values of elements with linear probing
+ * to resolve hash collisions: see [1] p.526. Parts of the code are inspired by
+ * the implementation of {@link java.util.HashMap}.
  * 
  * [1] Donald E. Knuth, The Art of Computer Programming, Volume 3, Sorting and
  * Searching, Second Edition
@@ -50,7 +50,11 @@ import java.util.Set;
  */
 public class ArraySlicedSet<E> {
 
-	static int S_ = 1;
+	/**
+	 * the maximal number of slices that can be stored in a
+	 * {@link ArraySlicedSet}
+	 */
+	public static int MAX_SLICES = 32;
 
 	/**
 	 * The table for the elements; the length MUST always be a power of two.
@@ -58,7 +62,8 @@ public class ArraySlicedSet<E> {
 	transient E[] data;
 
 	/**
-	 * The masks encoding the membership of elements in slices
+	 * The table of masks that encode the membership of elements in slices; the
+	 * length MUST be a power of two.
 	 */
 	transient int[] masks;
 
@@ -72,53 +77,126 @@ public class ArraySlicedSet<E> {
 	 */
 	transient int occupied = 0;
 
+	/**
+	 * The upper rounded logarithm for the number of slices; it is used to
+	 * efficiently compute membership of elements
+	 */
+	private final byte logs;
+
+	/**
+	 * Bitwise masks consisting of binary exponential number of 1s.
+	 */
+	private static int[] MSK_ = { 1, (1 << 2) - 1, (1 << 4) - 1, (1 << 8) - 1,
+			(1 << 16) - 1, ~0 };
+
 	@SuppressWarnings("unchecked")
-	public ArraySlicedSet(int initialCapacity) {
+	public ArraySlicedSet(int slices, int initialCapacity) {
+		if (slices <= 0 || slices > MAX_SLICES)
+			throw new IllegalArgumentException(
+					"The nuber of slices should be between 0 and " + MAX_SLICES
+							+ ": " + slices);
 		int capacity = LinearProbing.getInitialCapacity(initialCapacity);
 		this.data = (E[]) new Object[capacity];
-		this.masks = new int[getMaskCapacity(capacity)];
+		this.logs = (byte) upperLog(slices);
+		this.masks = new int[getMaskCapacity(logs, capacity)];
+		this.sizes = new int[slices];
 		initSizes();
 	}
 
-	@SuppressWarnings("unchecked")
-	public ArraySlicedSet() {
-		int capacity = LinearProbing.DEFAULT_INITIAL_CAPACITY;
-		this.data = (E[]) new Object[capacity];
-		this.masks = new int[getMaskCapacity(capacity)];
-		initSizes();
+	public ArraySlicedSet(int slices) {
+		this(slices, LinearProbing.DEFAULT_INITIAL_CAPACITY);
+	}
+
+	static int upperLog(int n) {
+		int log = 0;
+		int exp = 1;
+		while (exp < n) {
+			log++;
+			exp <<= 1;
+		}
+		return log;
 	}
 
 	void initSizes() {
-		int slices = 1 << S_;
-		this.sizes = new int[slices];
-		for (int i = 0; i < slices; i++)
+		for (int i = 0; i < sizes.length; i++)
 			this.sizes[i] = 0;
 	}
 
-	static int getMaskCapacity(int capacity) {
-		int result = capacity >> 4;
+	/**
+	 * Computes the capacity of the mask table given the capacity of the table
+	 * using the property that one integer can represent 32 set membership flags
+	 * (as bits).
+	 * 
+	 * @param sl
+	 * @param capacity
+	 * @return
+	 */
+	static int getMaskCapacity(byte sl, int capacity) {
+		int result = capacity >> (5 - sl);
 		if (result == 0)
 			result = 1;
 		return result;
 	}
 
-	static int msk(int n) {
-		return (1 << (n + 1)) - 1;
+	/**
+	 * Returns the bit fragment that encodes the membership of an element for
+	 * the given position in slices. The returned fragment is an integer whose
+	 * lower bits correspond to whether an element occurs in the slice or not
+	 * (the lowest bit corresponds to the membership in slice = 0, next bit in
+	 * slice = 1, etc)
+	 * 
+	 * @param sl
+	 *            the logarithm of the number of slices
+	 * @param masks
+	 *            the table storing all masks encoding the membership of
+	 *            elements in slices
+	 * @param pos
+	 *            the position of an element in the table for which the fragment
+	 *            should be returned
+	 * @return the integer whose bits encode membership of the element at the
+	 *         given position in slices
+	 */
+	static int getFragment(byte sl, int[] masks, int pos) {
+		/*
+		 * one element of the masks table stores fragments for 32/(2^sl)
+		 * elements; since it is a power of 2, we can divide on this value and
+		 * compute the remainder efficiently
+		 */
+		int shift = (5 - sl);
+		int p = pos >> shift; // = pos / (32/(2^sl))
+		int r = (p << shift) ^ pos; // the remainder after the devision
+		// extract the r-th fragment of the length 2^sl
+		return (masks[p] >> (r << sl)) & MSK_[sl];
 	}
 
-	static int getFragment(int[] masks, int pos) {
-		int shift = (5 - S_);
-		return (masks[pos >> shift] >> ((pos & msk(shift)) << S_)) & msk(S_);
-	}
-
-	static void changeFragment(int[] masks, int pos, int diff) {
-		int shift = (5 - S_);
-		masks[pos >> shift] ^= diff << ((pos & msk(shift)) << S_);
+	/**
+	 * Changes the fragment that corresponds to the encoding of membership of an
+	 * element at the given position. The change is specified by the bits of the
+	 * last parameter: bit 1 means the corresponding value of the fragment
+	 * should flip, bit 0 means it should stay the same.
+	 * 
+	 * @param sl
+	 *            the logarithm of the number of slices
+	 * @param masks
+	 *            the table storing all masks encoding the membership of
+	 *            elements in slices
+	 * @param pos
+	 *            the position of an element in the table for which the fragment
+	 *            should be changed
+	 * @param diff
+	 *            the sequence of bits that describes the change; the new
+	 *            fragment is obtained by applying bitwise XOR operation
+	 */
+	static void changeFragment(byte sl, int[] masks, int pos, int diff) {
+		int shift = (5 - sl);
+		int p = pos >> shift;
+		int r = (p << shift) ^ pos;
+		masks[p] ^= diff << (r << sl);
 	}
 
 	/**
 	 * @param s
-	 *            the slice id (between 0 and 7)
+	 *            the slice id
 	 * @return the number of elements currently stored in the provided slice
 	 */
 	public int size(int s) {
@@ -127,7 +205,7 @@ public class ArraySlicedSet<E> {
 
 	/**
 	 * @param s
-	 *            the slice id (between 0 and 7)
+	 *            the slice id
 	 * @return {@code true} if the given slice does not contain any elements and
 	 *         {@code false} otherwise
 	 */
@@ -135,28 +213,28 @@ public class ArraySlicedSet<E> {
 		return sizes[s] == 0;
 	}
 
-	private static <E> int addMask(E[] data, int[] masks, E e, int mask) {
+	private static <E> int addMask(byte sl, E[] data, int[] masks, E e, int mask) {
 		int pos = LinearProbing.getPosition(data, e);
-		int oldMask = getFragment(masks, pos);
+		int oldMask = getFragment(sl, masks, pos);
 		if (data[pos] == null) {
 			data[pos] = e;
-			changeFragment(masks, pos, oldMask ^ mask);
+			changeFragment(sl, masks, pos, oldMask ^ mask);
 			return 0;
 		}
 		// else
 		int newMask = (oldMask | mask);
 		if (newMask != oldMask)
-			changeFragment(masks, pos, oldMask ^ newMask);
+			changeFragment(sl, masks, pos, oldMask ^ newMask);
 		return oldMask;
 	}
 
-	private static <K, V> void remove(K[] k, int[] masks, int pos) {
-		int oldFragment = getFragment(masks, pos);
+	private static <E> void remove(byte sl, E[] data, int[] masks, int pos) {
+		int oldFragment = getFragment(sl, masks, pos);
 		for (;;) {
-			int next = LinearProbing.getMovedPosition(k, pos);
-			K moved = k[pos] = k[next];
-			int newFragment = getFragment(masks, next);
-			changeFragment(masks, pos, oldFragment ^ newFragment);
+			int next = LinearProbing.getMovedPosition(data, pos);
+			E moved = data[pos] = data[next];
+			int newFragment = getFragment(sl, masks, next);
+			changeFragment(sl, masks, pos, oldFragment ^ newFragment);
 			if (moved == null)
 				return;
 			// else
@@ -165,17 +243,18 @@ public class ArraySlicedSet<E> {
 		}
 	}
 
-	private static <E> int removeMask(E[] data, int[] masks, Object o, int mask) {
+	private static <E> int removeMask(byte sl, E[] data, int[] masks, Object o,
+			int mask) {
 		int pos = LinearProbing.getPosition(data, o);
 		if (data[pos] == null)
 			return 0;
 		// else
-		int oldFragment = getFragment(masks, pos);
+		int oldFragment = getFragment(sl, masks, pos);
 		int newFragment = oldFragment & (~mask);
 		if (newFragment == 0)
-			remove(data, masks, pos);
+			remove(sl, data, masks, pos);
 		else
-			changeFragment(masks, pos, oldFragment ^ newFragment);
+			changeFragment(sl, masks, pos, oldFragment ^ newFragment);
 		return oldFragment;
 	}
 
@@ -193,11 +272,12 @@ public class ArraySlicedSet<E> {
 		int newCapacity = oldCapacity << 1;
 		@SuppressWarnings("unchecked")
 		E[] newData = (E[]) new Object[newCapacity];
-		int[] newMasks = new int[getMaskCapacity(newCapacity)];
+		int[] newMasks = new int[getMaskCapacity(logs, newCapacity)];
 		for (int i = 0; i < oldCapacity; i++) {
 			E e = oldData[i];
 			if (e != null)
-				addMask(newData, newMasks, e, getFragment(oldMasks, i));
+				addMask(logs, newData, newMasks, e,
+						getFragment(logs, oldMasks, i));
 		}
 		this.data = newData;
 		this.masks = newMasks;
@@ -215,11 +295,12 @@ public class ArraySlicedSet<E> {
 		int newCapacity = oldCapacity >> 1;
 		@SuppressWarnings("unchecked")
 		E[] newData = (E[]) new Object[newCapacity];
-		int[] newMasks = new int[getMaskCapacity(newCapacity)];
+		int[] newMasks = new int[getMaskCapacity(logs, newCapacity)];
 		for (int i = 0; i < oldCapacity; i++) {
 			E e = oldData[i];
 			if (e != null)
-				addMask(newData, newMasks, e, getFragment(oldMasks, i));
+				addMask(logs, newData, newMasks, e,
+						getFragment(logs, oldMasks, i));
 		}
 		this.data = newData;
 		this.masks = newMasks;
@@ -235,7 +316,7 @@ public class ArraySlicedSet<E> {
 		for (;;) {
 			d = this.data;
 			m = this.masks;
-			if (m.length == getMaskCapacity(d.length))
+			if (m.length == getMaskCapacity(logs, d.length))
 				break;
 		}
 		int pos = LinearProbing.getPosition(d, o);
@@ -243,14 +324,14 @@ public class ArraySlicedSet<E> {
 			return false;
 		// else
 		int mask = 1 << s;
-		return ((getFragment(m, pos) & mask) == mask);
+		return ((getFragment(logs, m, pos) & mask) == mask);
 	}
 
 	/**
 	 * Inserts a given element into the given slice
 	 * 
 	 * @param s
-	 *            the slice id (between 0 and 7)
+	 *            the slice id
 	 * @param e
 	 *            the elements to be inserted in to the given slice
 	 * @return {@code true} if the given element did not occur in the given
@@ -261,7 +342,7 @@ public class ArraySlicedSet<E> {
 		if (e == null)
 			throw new NullPointerException();
 		int mask = (1 << s);
-		int oldMask = addMask(data, masks, e, mask);
+		int oldMask = addMask(logs, data, masks, e, mask);
 		int newMask = oldMask | mask;
 		if (newMask == oldMask)
 			return false;
@@ -276,7 +357,7 @@ public class ArraySlicedSet<E> {
 	 * Removes the given object from the given slice
 	 * 
 	 * @param s
-	 *            the slice id (between 0 and 7)
+	 *            the slice id
 	 * @param o
 	 *            the object that should be removed from the given slice
 	 * @return {@code true} if the given object is equal to some element of the
@@ -288,7 +369,7 @@ public class ArraySlicedSet<E> {
 		if (o == null)
 			throw new NullPointerException();
 		int mask = 1 << s;
-		int oldMask = removeMask(data, masks, o, mask);
+		int oldMask = removeMask(logs, data, masks, o, mask);
 		int newMask = oldMask & ~mask;
 		if (newMask == oldMask)
 			return false;
@@ -304,7 +385,7 @@ public class ArraySlicedSet<E> {
 	 * Removes all element of the given {@link Collection} from the given slice
 	 * 
 	 * @param s
-	 *            the slice id (between 0 and 7)
+	 *            the slice id
 	 * @param c
 	 *            the collection whose elements should be removed
 	 * @return {@code true} if at least one element is removed from the slice.
@@ -331,12 +412,12 @@ public class ArraySlicedSet<E> {
 			capacity = 1;
 		initSizes();
 		this.data = (E[]) new Object[capacity];
-		this.masks = new int[getMaskCapacity(capacity)];
+		this.masks = new int[getMaskCapacity(logs, capacity)];
 	}
 
 	/**
 	 * @param s
-	 *            the slice id (should be between 0 and 1)
+	 *            the slice id
 	 * @return the set corresponding to this slice backed by this
 	 *         {@link ArraySlicedSet}; it can be modified
 	 */
@@ -352,9 +433,9 @@ public class ArraySlicedSet<E> {
 		final byte s;
 
 		Slice(int s) {
-			if (s > 1 || s < 0)
-				throw new IllegalArgumentException("Slice should be in [0;1]: "
-						+ s);
+			if (s > sizes.length || s < 0)
+				throw new IllegalArgumentException("Slice should be in [0;"
+						+ sizes.length + "]: " + s);
 			this.s = (byte) s;
 		}
 
@@ -420,18 +501,18 @@ public class ArraySlicedSet<E> {
 
 		@Override
 		boolean isOccupied(int pos) {
-			return (dataSnapshot[pos] != null && (getFragment(masks, pos) & mask) == mask);
+			return (dataSnapshot[pos] != null && (getFragment(logs, masks, pos) & mask) == mask);
 		}
 
 		@Override
 		void remove(int pos) {
-			int oldMask = getFragment(masks, pos);
+			int oldMask = getFragment(logs, masks, pos);
 			int newMask = oldMask & (~mask);
 			if (newMask == 0) {
-				ArraySlicedSet.remove(data, masks, pos);
+				ArraySlicedSet.remove(logs, data, masks, pos);
 				occupied--;
 			} else
-				changeFragment(masks, pos, oldMask ^ newMask);
+				changeFragment(logs, masks, pos, oldMask ^ newMask);
 			sizes[s]--;
 		}
 
