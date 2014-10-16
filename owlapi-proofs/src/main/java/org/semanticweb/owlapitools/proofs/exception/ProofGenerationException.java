@@ -1,10 +1,10 @@
 /**
  * 
  */
-package org.semanticweb.elk.owlapi.proofs;
+package org.semanticweb.owlapitools.proofs.exception;
 /*
  * #%L
- * ELK OWL API Binding
+ * OWL API Proofs Model
  * $Id:$
  * $HeadURL:$
  * %%
@@ -24,24 +24,27 @@ package org.semanticweb.elk.owlapi.proofs;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
-import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
-import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
-
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class LemmaExpressionWrap extends BaseDerivedExpressionWrap<DerivedLemmaExpression> implements OWLLemmaExpression { 
+@SuppressWarnings("serial")
+public class ProofGenerationException extends Exception {
 
-	LemmaExpressionWrap(DerivedLemmaExpression expr) {
-		super(expr);
-	}
-
-	@Override
-	public <O> O accept(OWLExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
+	public ProofGenerationException() {
+		this(null, null);
 	}
 	
+	public ProofGenerationException(String msg) {
+		this(msg, null);
+	}
+	
+	public ProofGenerationException(Exception cause) {
+		this(null, cause);
+	}
+	
+	public ProofGenerationException(String msg, Exception cause) {
+		super(msg, cause);
+	}
 }

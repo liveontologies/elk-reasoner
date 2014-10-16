@@ -59,7 +59,14 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-proofs</artifactId>
 			<version>${project.version}</version>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-proofs</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>				
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-reasoner</artifactId>
@@ -87,9 +94,9 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.semanticweb.owlapitools.proofs</groupId>
-			<artifactId>owlapi-proofs-model</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>owlapi-proofs</artifactId>
+			<version>${project.version}</version>
 		</dependency>		
 		<dependency>
 			<groupId>log4j</groupId>

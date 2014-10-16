@@ -1,10 +1,10 @@
 /**
  * 
  */
-package org.semanticweb.elk.owlapi.proofs;
+package org.semanticweb.owlapitools.proofs.expressions;
 /*
  * #%L
- * ELK OWL API Binding
+ * OWL API Proofs Model
  * $Id:$
  * $HeadURL:$
  * %%
@@ -24,24 +24,19 @@ package org.semanticweb.elk.owlapi.proofs;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
-import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
-import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
+import org.semanticweb.owlapi.model.OWLAxiom;
 
 /**
+ * Represent {@link OWLExpression}s which can be represented in the OWL 2 syntax
+ * as axioms.
+ * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class LemmaExpressionWrap extends BaseDerivedExpressionWrap<DerivedLemmaExpression> implements OWLLemmaExpression { 
+public interface OWLAxiomExpression {
 
-	LemmaExpressionWrap(DerivedLemmaExpression expr) {
-		super(expr);
-	}
+	public OWLAxiom getAxiom();
 
-	@Override
-	public <O> O accept(OWLExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-	
+	public boolean isAsserted();
 }
