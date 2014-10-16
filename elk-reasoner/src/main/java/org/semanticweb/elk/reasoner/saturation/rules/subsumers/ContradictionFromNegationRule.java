@@ -86,7 +86,7 @@ public class ContradictionFromNegationRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		if (negation_ != null && premises.getComposedSubsumers().contains(negation_)) {
+		if (negation_ != null && premises.getDecomposedSubsumers().contains(negation_)) {
 			//producer.produce(premises.getRoot(), ContradictionImpl.getInstance());
 			producer.produce(premises.getRoot(), new ContradictionFromNegation(negation_));
 		}
