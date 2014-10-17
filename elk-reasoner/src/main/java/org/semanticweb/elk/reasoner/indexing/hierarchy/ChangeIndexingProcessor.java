@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
 /*
  * #%L
  * ELK Reasoner
@@ -55,18 +56,19 @@ public class ChangeIndexingProcessor implements ElkAxiomProcessor {
 	@Override
 	public void visit(ElkAxiom elkAxiom) {
 		try {
-			elkAxiom.accept(indexer_);
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("$$ indexing "
 						+ OwlFunctionalStylePrinter.toString(elkAxiom)
 						+ " for "
 						+ (indexer_.getMultiplicity() == 1 ? "addition"
 								: "deletion"));
+			elkAxiom.accept(indexer_);
 		} catch (ElkIndexingUnsupportedException e) {
 			if (LOGGER_.isWarnEnabled()) {
-				LoggerWrap.log(LOGGER_, LogLevel.WARN, "reasoner.indexing.axiomIgnored", e.getMessage()
-						+ " Axiom ignored:\n"
-						+ OwlFunctionalStylePrinter.toString(elkAxiom));
+				LoggerWrap.log(LOGGER_, LogLevel.WARN,
+						"reasoner.indexing.axiomIgnored", e.getMessage()
+								+ " Axiom ignored:\n"
+								+ OwlFunctionalStylePrinter.toString(elkAxiom));
 			}
 		}
 	}

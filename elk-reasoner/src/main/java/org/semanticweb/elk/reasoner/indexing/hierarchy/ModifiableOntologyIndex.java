@@ -52,8 +52,10 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 * 
 	 * @param newObject
 	 *            the object to be added
+	 * @return {@code true} if the operation is successful and {@code false} if
+	 *         not; if {@code false} is return, the index remains unchanged
 	 */
-	public void add(IndexedObject newObject);
+	public boolean add(IndexedObject newObject);
 
 	/**
 	 * Removes the given {@link IndexedObject} from this {@link OntologyIndex}
@@ -61,12 +63,10 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 * @param oldObject
 	 *            the object to be removed
 	 * 
-	 * @throws ElkUnexpectedIndexingException
-	 *             if the given object does not occur in this
-	 *             {@link OntologyIndex}
+	 * @return {@code true} if the operation is successful and {@code false} if
+	 *         not; if {@code false} is return, the index remains unchanged
 	 */
-	public void remove(IndexedObject oldObject)
-			throws ElkUnexpectedIndexingException;
+	public boolean remove(IndexedObject oldObject);
 
 	/**
 	 * Add the given {@link ElkClass} to the signature of this
@@ -74,8 +74,10 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 * 
 	 * @param newClass
 	 *            the {@link ElkClass} to be added
+	 * @return {@code true} if the operation is successful and {@code false} if
+	 *         not; if {@code false} is return, the index remains unchanged
 	 */
-	public void addClass(ElkClass newClass);
+	public boolean addClass(ElkClass newClass);
 
 	/**
 	 * Removes the given {@link ElkClass} from the signature of this
@@ -83,9 +85,10 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 * 
 	 * @param oldClass
 	 *            the {@link ElkClass} to be removed
+	 * @return {@code true} if the operation is successful and {@code false} if
+	 *         not; if {@code false} is return, the index remains unchanged
 	 */
-	public void removeClass(ElkClass oldClass)
-			throws ElkUnexpectedIndexingException;
+	public boolean removeClass(ElkClass oldClass);
 
 	/**
 	 * Add the given {@link ElkNamedIndividual} to the signature of this
@@ -93,8 +96,10 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 * 
 	 * @param newIndividual
 	 *            the {@link ElkNamedIndividual} to be added
+	 * @return {@code true} if the operation is successful and {@code false} if
+	 *         not; if {@code false} is return, the index remains unchanged
 	 */
-	public void addNamedIndividual(ElkNamedIndividual newIndividual);
+	public boolean addNamedIndividual(ElkNamedIndividual newIndividual);
 
 	/**
 	 * Removes the given {@link ElkNamedIndividual} from the signature of this
@@ -102,9 +107,10 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 * 
 	 * @param oldIndividual
 	 *            the {@link ElkNamedIndividual} to be removed
+	 * @return {@code true} if the operation is successful and {@code false} if
+	 *         not; if {@code false} is return, the index remains unchanged
 	 */
-	public void removeNamedIndividual(ElkNamedIndividual oldIndividual)
-			throws ElkUnexpectedIndexingException;
+	public boolean removeNamedIndividual(ElkNamedIndividual oldIndividual);
 
 	/**
 	 * Assert reflexivity of the given {@link IndexedObjectProperty}
@@ -112,8 +118,10 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 * @param property
 	 *            the {@link IndexedObjectProperty} which should be asserted
 	 *            reflexive
+	 * @return {@code true} if the operation is successful and {@code false} if
+	 *         not; if {@code false} is return, the index remains unchanged
 	 */
-	public void addReflexiveProperty(IndexedObjectProperty property);
+	public boolean addReflexiveProperty(IndexedObjectProperty property);
 
 	/**
 	 * Retracts reflexivity of the given {@link IndexedObjectProperty}
@@ -121,32 +129,34 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 * @param property
 	 *            the {@link IndexedObjectProperty} which should not be
 	 *            reflexive anymore
+	 * @return {@code true} if the operation is successful and {@code false} if
+	 *         not; if {@code false} is return, the index remains unchanged
 	 */
-	public void removeReflexiveProperty(IndexedObjectProperty property)
-			throws ElkUnexpectedIndexingException;
+	public boolean removeReflexiveProperty(IndexedObjectProperty property);
 
 	/**
 	 * Adds a new context initialization for this {@link OntologyIndex}.
 	 * 
 	 * @param newRule
 	 *            the context initialization rule to be added
+	 * @return {@code true} if the operation is successful and {@code false} if
+	 *         not; if {@code false} is return, the index remains unchanged
+	 * 
 	 * @see OntologyIndex#getContextInitRuleHead()
 	 */
-	public void addContextInitRule(ChainableContextInitRule newRule);
+	public boolean addContextInitRule(ChainableContextInitRule newRule);
 
 	/**
 	 * Removes an existing context initialization for this {@link OntologyIndex}
 	 * 
 	 * @param oldRule
 	 *            the context initialization rule to be removed
-	 * @throws ElkUnexpectedIndexingException
-	 *             if the given rule was not registered with this
-	 *             {@link OntologyIndex}
+	 * @return {@code true} if the operation is successful and {@code false} if
+	 *         not; if {@code false} is return, the index remains unchanged
 	 * 
 	 * @see OntologyIndex#getContextInitRuleHead()
 	 */
-	public void removeContextInitRule(ChainableContextInitRule oldRule)
-			throws ElkUnexpectedIndexingException;
+	public boolean removeContextInitRule(ChainableContextInitRule oldRule);
 
 	/**
 	 * Adds a new context rule for the given {@link IndexedClassExpression}
@@ -155,8 +165,11 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 *            the {@link IndexedClassExpression} for which to add the rule
 	 * @param newRule
 	 *            the context rule to be added
+	 * @return {@code true} if the operation is successful and {@code false} if
+	 *         not; if {@code false} is return, the index remains unchanged
 	 */
-	public void add(IndexedClassExpression target, ChainableSubsumerRule newRule);
+	public boolean add(IndexedClassExpression target,
+			ChainableSubsumerRule newRule);
 
 	/**
 	 * Removes an existing context rule for the given
@@ -167,11 +180,10 @@ public interface ModifiableOntologyIndex extends OntologyIndex {
 	 *            rule
 	 * @param oldRule
 	 *            the context rule to be removed
-	 * @throws ElkUnexpectedIndexingException
-	 *             if the given rule was not registered with this
-	 *             {@link IndexedClassExpression}
+	 * @return {@code true} if the operation is successful and {@code false} if
+	 *         not; if {@code false} is return, the index remains unchanged
 	 */
-	public void remove(IndexedClassExpression target, ChainableSubsumerRule oldRule)
-			throws ElkUnexpectedIndexingException;
+	public boolean remove(IndexedClassExpression target,
+			ChainableSubsumerRule oldRule);
 
 }

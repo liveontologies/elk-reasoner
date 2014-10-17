@@ -56,6 +56,8 @@ public class DirectIndex implements ModifiableOntologyIndex {
 
 	public DirectIndex(IndexedObjectCache objectCache) {
 		this.objectCache = objectCache;
+		this.reflexiveObjectProperties_ = new ArrayHashSet<IndexedObjectProperty>(
+				64);
 
 		// the context root initialization rule is always registered
 		RootContextInitializationRule.addRuleFor(this);
@@ -68,9 +70,6 @@ public class DirectIndex implements ModifiableOntologyIndex {
 				.indexClassDeclaration(PredefinedElkClass.OWL_THING);
 		this.indexedOwlNothing = tmpAxiomInserter
 				.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
-
-		this.reflexiveObjectProperties_ = new ArrayHashSet<IndexedObjectProperty>(
-				64);
 	}
 
 	public DirectIndex() {
@@ -168,73 +167,68 @@ public class DirectIndex implements ModifiableOntologyIndex {
 	}
 
 	@Override
-	public void addClass(ElkClass newClass) {
+	public boolean addClass(ElkClass newClass) {
 		// we do not rack signature changes
+		return true;
 	}
 
 	@Override
-	public void removeClass(ElkClass oldClass) {
+	public boolean removeClass(ElkClass oldClass) {
 		// we do not rack signature changes
+		return true;
 	}
 
 	@Override
-	public void addNamedIndividual(ElkNamedIndividual newIndividual) {
+	public boolean addNamedIndividual(ElkNamedIndividual newIndividual) {
 		// we do not rack signature changes
+		return true;
 	}
 
 	@Override
-	public void removeNamedIndividual(ElkNamedIndividual oldIndividual) {
+	public boolean removeNamedIndividual(ElkNamedIndividual oldIndividual) {
 		// we do not rack signature changes
+		return true;
 	}
 
 	@Override
-	public void addContextInitRule(ChainableContextInitRule newRule) {
-		newRule.addTo(getContextInitRuleChain());
+	public boolean addContextInitRule(ChainableContextInitRule newRule) {
+		return newRule.addTo(getContextInitRuleChain());
 	}
 
 	@Override
-	public void removeContextInitRule(ChainableContextInitRule oldRule) {
-		if (!oldRule.removeFrom(getContextInitRuleChain()))
-			throw new ElkUnexpectedIndexingException(
-					"Cannot remove context initialization rule "
-							+ oldRule.getName());
+	public boolean removeContextInitRule(ChainableContextInitRule oldRule) {
+		return oldRule.removeFrom(getContextInitRuleChain());
 	}
 
 	@Override
-	public void add(IndexedClassExpression target, ChainableSubsumerRule rule) {
-		rule.addTo(target.getCompositionRuleChain());
+	public boolean add(IndexedClassExpression target, ChainableSubsumerRule rule) {
+		return rule.addTo(target.getCompositionRuleChain());
 	}
 
 	@Override
-	public void remove(IndexedClassExpression target, ChainableSubsumerRule rule) {
-		if (!rule.removeFrom(target.getCompositionRuleChain()))
-			throw new ElkUnexpectedIndexingException(
-					"Cannot remove composition rule " + rule.getName()
-							+ " for " + target);
+	public boolean remove(IndexedClassExpression target,
+			ChainableSubsumerRule rule) {
+		return rule.removeFrom(target.getCompositionRuleChain());
 	}
 
 	@Override
-	public void add(IndexedObject newObject) {
-		newObject.accept(objectCache.inserter);
+	public boolean add(IndexedObject newObject) {
+		return newObject.accept(objectCache.inserter);
 	}
 
 	@Override
-	public void remove(IndexedObject oldObject) {
-		if (!oldObject.accept(objectCache.deletor))
-			throw new ElkUnexpectedIndexingException(
-					"Cannot remove indexed object from the cache " + oldObject);
+	public boolean remove(IndexedObject oldObject) {
+		return oldObject.accept(objectCache.deletor);
 	}
 
 	@Override
-	public void addReflexiveProperty(IndexedObjectProperty property) {
-		reflexiveObjectProperties_.add(property);
+	public boolean addReflexiveProperty(IndexedObjectProperty property) {
+		return reflexiveObjectProperties_.add(property);
 	}
 
 	@Override
-	public void removeReflexiveProperty(IndexedObjectProperty property) {
-		if (!reflexiveObjectProperties_.remove(property))
-			throw new ElkUnexpectedIndexingException(
-					"Cannot remove reflexivity of object property " + property);
+	public boolean removeReflexiveProperty(IndexedObjectProperty property) {
+		return reflexiveObjectProperties_.remove(property);
 	}
 
 	/* class-specific methods */

@@ -95,7 +95,7 @@ public class DifferentialIndex extends DirectIndex {
 	/**
 	 * Initializes all datastructures
 	 */
-	private void init() {
+	void init() {
 		initClassSignatureChanges();
 		initIndividualSignatureChanges();
 		initAdditions();
@@ -130,115 +130,132 @@ public class DifferentialIndex extends DirectIndex {
 	/* read-write methods */
 
 	@Override
-	public void addClass(ElkClass newClass) {
-		if (incrementalMode) {
-			addedClasses_.add(newClass);
-		} else {
-			super.addClass(newClass);
+	public boolean addClass(ElkClass newClass) {
+		if (!incrementalMode) {
+			return super.addClass(newClass);
 		}
-
+		// else incrementalMode
+		return addedClasses_.add(newClass);
 	}
 
 	@Override
-	public void removeClass(ElkClass oldClass) {
-		if (incrementalMode) {
-			addedClasses_.remove(oldClass);
-		} else {
-			super.removeClass(oldClass);
+	public boolean removeClass(ElkClass oldClass) {
+		if (!incrementalMode) {
+			return super.removeClass(oldClass);
 		}
+		// else incrementalMode
+		return addedClasses_.remove(oldClass);
 	}
 
 	@Override
-	public void addNamedIndividual(ElkNamedIndividual newIndividual) {
-		if (incrementalMode) {
-			addedIndividuals_.add(newIndividual);
-		} else {
-			super.addNamedIndividual(newIndividual);
+	public boolean addNamedIndividual(ElkNamedIndividual newIndividual) {
+		if (!incrementalMode) {
+			return super.addNamedIndividual(newIndividual);
 		}
+		// else incrementalMode
+		return addedIndividuals_.add(newIndividual);
 	}
 
 	@Override
-	public void removeNamedIndividual(ElkNamedIndividual oldIndividual) {
-		if (incrementalMode) {
-			addedIndividuals_.remove(oldIndividual);
-		} else {
-			super.removeNamedIndividual(oldIndividual);
+	public boolean removeNamedIndividual(ElkNamedIndividual oldIndividual) {
+		if (!incrementalMode) {
+			return super.removeNamedIndividual(oldIndividual);
 		}
+		// else incrementalMode
+		return addedIndividuals_.remove(oldIndividual);
 	}
 
 	@Override
-	public void add(IndexedClassExpression target, ChainableSubsumerRule newRule) {
-		if (incrementalMode) {
-			if (newRule.removeFrom(getRemovedContextRuleChain(target))) {
-				newRule.addTo(target.getCompositionRuleChain());
-			} else
-				newRule.addTo(getAddedContextRuleChain(target));
-		} else {
-			super.add(target, newRule);
+	public boolean add(IndexedClassExpression target,
+			ChainableSubsumerRule newRule) {
+		if (!incrementalMode) {
+			return super.add(target, newRule);
 		}
+		// else incrementalMode
+		if (newRule.removeFrom(getRemovedContextRuleChain(target))) {
+			if (newRule.addTo(target.getCompositionRuleChain()))
+				return true;
+			// else revert
+			newRule.addTo(getRemovedContextRuleChain(target));
+		}
+		// if above fails
+		return newRule.addTo(getAddedContextRuleChain(target));
 	}
 
 	@Override
-	public void remove(IndexedClassExpression target,
+	public boolean remove(IndexedClassExpression target,
 			ChainableSubsumerRule oldRule) {
-		if (incrementalMode) {
-			if (!oldRule.removeFrom(getAddedContextRuleChain(target))) {
-				oldRule.addTo(getRemovedContextRuleChain(target));
-				if (!oldRule.removeFrom(target.getCompositionRuleChain()))
-					throw new ElkUnexpectedIndexingException(
-							"Cannot remove context rule " + oldRule.getName()
-									+ " for " + target);
-			}
-		} else {
-			super.remove(target, oldRule);
+		if (!incrementalMode) {
+			return super.remove(target, oldRule);
 		}
+		// else incrementalMode
+		if (oldRule.removeFrom(getAddedContextRuleChain(target)))
+			return true;
+		// else
+		if (oldRule.addTo(getRemovedContextRuleChain(target))) {
+			if (oldRule.removeFrom(target.getCompositionRuleChain()))
+				return true;
+			// else revert
+			oldRule.removeFrom(getRemovedContextRuleChain(target));
+		}
+		return false;
 	}
 
 	@Override
-	public void addContextInitRule(ChainableContextInitRule newRule) {
-		if (incrementalMode) {
-			if (newRule.removeFrom(getRemovedContextInitRuleChain())) {
-				newRule.addTo(getContextInitRuleChain());
-			} else
-				newRule.addTo(getAddedContextInitRuleChain());
-		} else {
-			super.addContextInitRule(newRule);
+	public boolean addContextInitRule(ChainableContextInitRule newRule) {
+		if (!incrementalMode) {
+			return super.addContextInitRule(newRule);
 		}
-
+		// else incrementalMode
+		if (newRule.removeFrom(getRemovedContextInitRuleChain())) {
+			if (newRule.addTo(getContextInitRuleChain()))
+				return true;
+			// else revert
+			newRule.addTo(getRemovedContextInitRuleChain());
+		}
+		// if above fails
+		return newRule.addTo(getAddedContextInitRuleChain());
 	}
 
 	@Override
-	public void removeContextInitRule(ChainableContextInitRule oldRule) {
-		if (incrementalMode) {
-			if (!oldRule.removeFrom(getAddedContextInitRuleChain())) {
-				oldRule.addTo(getRemovedContextInitRuleChain());
-				if (!oldRule.removeFrom(getContextInitRuleChain()))
-					throw new ElkUnexpectedIndexingException(
-							"Cannot remove context initialization rule "
-									+ oldRule.getName());
-			}
-		} else {
-			super.removeContextInitRule(oldRule);
+	public boolean removeContextInitRule(ChainableContextInitRule oldRule) {
+		if (!incrementalMode) {
+			return super.removeContextInitRule(oldRule);
 		}
+		// else incrementalMode
+		if (oldRule.removeFrom(getAddedContextInitRuleChain()))
+			return true;
+		// else
+		if (oldRule.addTo(getRemovedContextInitRuleChain())) {
+			if (oldRule.removeFrom(getContextInitRuleChain()))
+				return true;
+			// else revert
+			oldRule.removeFrom(getRemovedContextInitRuleChain());
+		}
+		return false;
 	}
 
 	@Override
-	public void add(IndexedObject newObject) {
-		if (incrementalMode) {
-			addIndexedObject(newObject);
-		} else {
-			super.add(newObject);
+	public boolean add(IndexedObject newObject) {
+		if (!incrementalMode) {
+			return super.add(newObject);
 		}
+		// else incrementalMode
+		LOGGER_.trace("{}: to add", newObject);
+		if (newObject.accept(todoDeletions_.deletor))
+			return true;
+		// else
+		return newObject.accept(objectCache.inserter);
 	}
 
 	@Override
-	public void remove(IndexedObject oldObject) {
-		if (incrementalMode) {
-			LOGGER_.trace("To remove: {}", oldObject);
-			oldObject.accept(todoDeletions_.inserter);
-		} else {
-			super.remove(oldObject);
+	public boolean remove(IndexedObject oldObject) {
+		if (!incrementalMode) {
+			return super.remove(oldObject);
 		}
+		// else incrementalMode
+		LOGGER_.trace("{}: to remove", oldObject);
+		return oldObject.accept(todoDeletions_.inserter);
 	}
 
 	/* incremental-specific methods */
@@ -450,13 +467,5 @@ public class DifferentialIndex extends DirectIndex {
 			final IndexedClassExpression target) {
 		return AbstractChain.getMapBackedChain(
 				removedContextRuleHeadByClassExpressions_, target);
-	}
-
-	void addIndexedObject(IndexedObject iobj) {
-		LOGGER_.trace("Adding: {}", iobj);
-
-		if (!iobj.accept(todoDeletions_.deletor))
-			iobj.accept(objectCache.inserter);
-
 	}
 }
