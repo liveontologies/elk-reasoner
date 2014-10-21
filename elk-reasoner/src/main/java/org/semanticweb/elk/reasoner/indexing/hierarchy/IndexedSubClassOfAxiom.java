@@ -34,7 +34,7 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 
 	private final IndexedClassExpression subClass_, superClass_;
 
-	protected IndexedSubClassOfAxiom(IndexedClassExpression subClass,
+	IndexedSubClassOfAxiom(IndexedClassExpression subClass,
 			IndexedClassExpression superClass) {
 		this.subClass_ = subClass;
 		this.superClass_ = superClass;
@@ -67,8 +67,8 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	protected boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index, final int increment) {
+	boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
+			final int increment) {
 		if (increment > 0) {
 			if (!SuperClassFromSubClassRule.addRuleFor(this, index))
 				return false;

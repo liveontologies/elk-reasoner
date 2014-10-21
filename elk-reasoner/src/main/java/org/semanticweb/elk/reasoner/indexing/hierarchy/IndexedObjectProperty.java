@@ -41,7 +41,8 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisito
  */
 
 public class IndexedObjectProperty extends IndexedPropertyChain {
-	protected final ElkObjectProperty elkObjectProperty;
+
+	private final ElkObjectProperty elkObjectProperty_;
 
 	/**
 	 * Collections of all binary role chains in which this
@@ -53,7 +54,7 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	 * Correctness of axioms deletions requires that toldSubProperties is a
 	 * List.
 	 */
-	protected List<IndexedPropertyChain> toldSubProperties;
+	private List<IndexedPropertyChain> toldSubProperties_;
 
 	/**
 	 * Number of occurrence in reflexivity axioms
@@ -63,24 +64,24 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	/**
 	 * Creates an object representing the given ElkObjectProperty.
 	 */
-	protected IndexedObjectProperty(ElkObjectProperty elkObjectProperty) {
-		this.elkObjectProperty = elkObjectProperty;
+	IndexedObjectProperty(ElkObjectProperty elkObjectProperty) {
+		this.elkObjectProperty_ = elkObjectProperty;
 	}
 
 	/**
 	 * @return The represented object property expression.
 	 */
 	public ElkObjectProperty getElkObjectProperty() {
-		return elkObjectProperty;
+		return elkObjectProperty_;
 	}
 
 	/**
 	 * @return All told sub object properties of this object property
 	 */
 	public List<IndexedPropertyChain> getToldSubProperties() {
-		return toldSubProperties == null ? Collections
+		return toldSubProperties_ == null ? Collections
 				.<IndexedPropertyChain> emptyList() : Collections
-				.<IndexedPropertyChain> unmodifiableList(toldSubProperties);
+				.<IndexedPropertyChain> unmodifiableList(toldSubProperties_);
 	}
 
 	/**
@@ -100,11 +101,14 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	 * 
 	 * @param chain
 	 *            the {@link IndexedBinaryPropertyChain} to be added
+	 * @return {@code true} if the operation is successful or {@code false}
+	 *         otherwise; if {@code false} is returned, this
+	 *         {@link IndexedObjectProperty} does not change
 	 */
-	protected void addLeftChain(IndexedBinaryPropertyChain chain) {
+	boolean addLeftChain(IndexedBinaryPropertyChain chain) {
 		if (leftChains_ == null)
 			leftChains_ = new ArrayList<IndexedBinaryPropertyChain>(1);
-		leftChains_.add(chain);
+		return leftChains_.add(chain);
 	}
 
 	/**
@@ -116,7 +120,7 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	 *            the {@link IndexedBinaryPropertyChain} to be removed
 	 * @return {@code true} if successfully removed
 	 */
-	protected boolean removeLeftChain(IndexedBinaryPropertyChain chain) {
+	boolean removeLeftChain(IndexedBinaryPropertyChain chain) {
 		boolean success = false;
 		if (leftChains_ != null) {
 			success = leftChains_.remove(chain);
@@ -145,9 +149,9 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	 *         {@link IndexedObjectProperty} does not change
 	 */
 	boolean addToldSubPropertyChain(IndexedPropertyChain subObjectProperty) {
-		if (toldSubProperties == null)
-			toldSubProperties = new ArrayList<IndexedPropertyChain>(1);
-		toldSubProperties.add(subObjectProperty);
+		if (toldSubProperties_ == null)
+			toldSubProperties_ = new ArrayList<IndexedPropertyChain>(1);
+		toldSubProperties_.add(subObjectProperty);
 		return true;
 	}
 
@@ -163,17 +167,18 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 	 */
 	boolean removeToldSubPropertyChain(IndexedPropertyChain subObjectProperty) {
 		boolean success = false;
-		if (toldSubProperties != null) {
-			success = toldSubProperties.remove(subObjectProperty);
-			if (toldSubProperties.isEmpty())
-				toldSubProperties = null;
+		if (toldSubProperties_ != null) {
+			success = toldSubProperties_.remove(subObjectProperty);
+			if (toldSubProperties_.isEmpty())
+				toldSubProperties_ = null;
 		}
 		return success;
 	}
 
 	@Override
-	protected void updateOccurrenceNumber(int increment) {
+	boolean updateOccurrenceNumber(int increment) {
 		occurrenceNo += increment;
+		return true;
 	}
 
 	public <O> O accept(IndexedObjectPropertyVisitor<O> visitor) {

@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
 /*
  * #%L
  * ELK Reasoner
@@ -32,7 +33,7 @@ public class IndexedReflexiveObjectPropertyAxiom extends IndexedAxiom {
 
 	private final IndexedObjectProperty property_;
 
-	protected IndexedReflexiveObjectPropertyAxiom(IndexedObjectProperty property) {
+	IndexedReflexiveObjectPropertyAxiom(IndexedObjectProperty property) {
 		this.property_ = property;
 	}
 
@@ -57,8 +58,8 @@ public class IndexedReflexiveObjectPropertyAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	protected boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index, final int increment) {
+	boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
+			final int increment) {
 
 		if (property_.reflexiveAxiomOccurrenceNo == 0 && increment > 0) {
 			// first occurrence of reflexivity property

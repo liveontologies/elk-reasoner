@@ -28,6 +28,8 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkClass} in an ontology.
@@ -37,6 +39,10 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFrom
  * 
  */
 public class IndexedClass extends IndexedClassEntity {
+
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(IndexedClass.class);
 
 	/**
 	 * The indexed ElkClass
@@ -53,7 +59,7 @@ public class IndexedClass extends IndexedClassEntity {
 	/**
 	 * Creates an object representing the given ElkClass.
 	 */
-	protected IndexedClass(ElkClass clazz) {
+	IndexedClass(ElkClass clazz) {
 		elkClass = clazz;
 	}
 
@@ -125,9 +131,8 @@ public class IndexedClass extends IndexedClassEntity {
 	}
 
 	@Override
-	protected boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index, int increment,
-			int positiveIncrement, int negativeIncrement) {
+	boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
+			int increment, int positiveIncrement, int negativeIncrement) {
 
 		if (!updateOccurrenceNo(index, increment)) {
 			return false;

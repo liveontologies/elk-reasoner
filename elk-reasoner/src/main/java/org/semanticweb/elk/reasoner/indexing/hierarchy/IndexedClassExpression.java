@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 abstract public class IndexedClassExpression extends IndexedObjectWithContext
 		implements Comparable<IndexedClassExpression> {
 
-	protected static final Logger LOGGER_ = LoggerFactory
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexedClassExpression.class);
 
 	/**

@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
 public abstract class IndexedPropertyChain extends IndexedObject implements
 		Comparable<IndexedPropertyChain> {
 
-	protected static final Logger LOGGER_ = LoggerFactory
+	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(IndexedPropertyChain.class);
 
 	/**
@@ -118,8 +118,7 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 	boolean addToldSuperObjectProperty(IndexedObjectProperty superObjectProperty) {
 		if (toldSuperProperties_ == null)
 			toldSuperProperties_ = new ArrayList<IndexedObjectProperty>(1);
-		toldSuperProperties_.add(superObjectProperty);
-		return true;
+		return toldSuperProperties_.add(superObjectProperty);
 	}
 
 	/**
@@ -150,11 +149,14 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 	 * 
 	 * @param chain
 	 *            the {@link IndexedBinaryPropertyChain} to be added
+	 * @return {@code true} if the operation is successful or {@code false}
+	 *         otherwise; if {@code false} is returned, this
+	 *         {@link IndexedPropertyChain} does not change
 	 */
-	protected void addRightChain(IndexedBinaryPropertyChain chain) {
+	boolean addRightChain(IndexedBinaryPropertyChain chain) {
 		if (rightChains_ == null)
 			rightChains_ = new ArrayList<IndexedBinaryPropertyChain>(1);
-		rightChains_.add(chain);
+		return rightChains_.add(chain);
 	}
 
 	/**
@@ -164,9 +166,11 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 	 * 
 	 * @param chain
 	 *            the {@link IndexedBinaryPropertyChain} to be removed
-	 * @return {@code true} if successfully removed
+	 * @return {@code true} if the operation is successful or {@code false}
+	 *         otherwise; if {@code false} is returned, this
+	 *         {@link IndexedPropertyChain} does not change
 	 */
-	protected boolean removeRightChain(IndexedBinaryPropertyChain chain) {
+	boolean removeRightChain(IndexedBinaryPropertyChain chain) {
 		boolean success = false;
 		if (rightChains_ != null) {
 			success = rightChains_.remove(chain);
@@ -179,7 +183,7 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 	/**
 	 * Non-recursively. The recursion is implemented in indexing visitors.
 	 */
-	abstract void updateOccurrenceNumber(int increment);
+	abstract boolean updateOccurrenceNumber(int increment);
 
 	@Override
 	public boolean occurs() {
@@ -205,9 +209,11 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 					+ " has a negative occurrence: " + printOccurrenceNumbers());
 	}
 
-	public void updateAndCheckOccurrenceNumbers(int increment) {
-		updateOccurrenceNumber(increment);
+	public boolean updateAndCheckOccurrenceNumbers(int increment) {
+		if (!updateOccurrenceNumber(increment))
+			return false;
 		checkOccurrenceNumbers();
+		return true;
 	}
 
 	/**

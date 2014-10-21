@@ -32,6 +32,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDi
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkObjectUnionOf} in an ontology.
@@ -39,6 +41,10 @@ import org.semanticweb.elk.util.logging.LoggerWrap;
  * @author "Yevgeny Kazakov"
  */
 public class IndexedObjectUnionOf extends IndexedClassExpression {
+
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(IndexedObjectUnionOf.class);
 
 	private final Set<IndexedClassExpression> disjuncts_;
 

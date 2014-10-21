@@ -210,23 +210,31 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	private class ClassOccurrenceUpdateFilter implements
 			IndexedClassExpressionFilter {
 
-		protected final int increment, positiveIncrement, negativeIncrement;
+		private final int increment_, positiveIncrement_, negativeIncrement_;
 
 		ClassOccurrenceUpdateFilter(int increment, int positiveIncrement,
 				int negativeIncrement) {
-			this.increment = increment;
-			this.positiveIncrement = positiveIncrement;
-			this.negativeIncrement = negativeIncrement;
+			this.increment_ = increment;
+			this.positiveIncrement_ = positiveIncrement;
+			this.negativeIncrement_ = negativeIncrement;
 		}
 
 		public <T extends IndexedClassExpression> T update(T ice) {
-			if (!ice.occurs() && increment > 0)
+			if (!ice.occurs() && increment_ > 0)
 				index_.add(ice);
 
-			ice.updateAndCheckOccurrenceNumbers(index_, increment,
-					positiveIncrement, negativeIncrement);
+			if (!ice.updateAndCheckOccurrenceNumbers(index_, increment_,
+					positiveIncrement_, negativeIncrement_)) {
+				// revert the change
+				if (!ice.occurs() && increment_ > 0)
+					index_.remove(ice);
+				throw new ElkUnexpectedIndexingException(ice
+						+ ": cannot index class expression! " + "[inc="
+						+ increment_ + "; posIncr=" + positiveIncrement_
+						+ "; negIncr=" + negativeIncrement_ + "]");
+			}
 
-			if (!ice.occurs() && increment < 0) {
+			if (!ice.occurs() && increment_ < 0) {
 				index_.remove(ice);
 			}
 
@@ -285,19 +293,27 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	 */
 	private class PropertyOccurrenceUpdateFilter implements
 			IndexedPropertyChainFilter {
-		protected final int increment;
+
+		private final int increment_;
 
 		PropertyOccurrenceUpdateFilter(int increment) {
-			this.increment = increment;
+			this.increment_ = increment;
 		}
 
 		public <T extends IndexedPropertyChain> T update(T ipc) {
-			if (!ipc.occurs() && increment > 0)
+			if (!ipc.occurs() && increment_ > 0)
 				index_.add(ipc);
 
-			ipc.updateAndCheckOccurrenceNumbers(increment);
+			if (!ipc.updateAndCheckOccurrenceNumbers(increment_)) {
+				// revert the change
+				if (!ipc.occurs() && increment_ > 0)
+					index_.remove(ipc);
+				throw new ElkUnexpectedIndexingException(ipc
+						+ ": cannot index property!" + "[inc=" + increment_
+						+ "]");
+			}
 
-			if (!ipc.occurs() && increment < 0)
+			if (!ipc.occurs() && increment_ < 0)
 				index_.remove(ipc);
 
 			return ipc;
@@ -327,20 +343,28 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	 * 
 	 */
 	private class AxiomOccurrenceUpdateFilter implements IndexedAxiomFilter {
-		protected final int increment;
+
+		private final int increment_;
 
 		AxiomOccurrenceUpdateFilter(int increment) {
-			this.increment = increment;
+			this.increment_ = increment;
 		}
 
 		public <T extends IndexedAxiom> T update(T axiom) {
-			if (!axiom.occurs() && increment > 0) {
+			if (!axiom.occurs() && increment_ > 0) {
 				index_.add(axiom);
 			}
 
-			axiom.updateOccurrenceNumbers(index_, increment);
+			if (!axiom.updateOccurrenceNumbers(index_, increment_)) {
+				// revert the change
+				if (!axiom.occurs() && increment_ > 0) {
+					index_.remove(axiom);
+				}
+				throw new ElkUnexpectedIndexingException(axiom
+						+ ": cannot index axiom!" + "[inc=" + increment_ + "]");
+			}
 
-			if (!axiom.occurs() && increment < 0)
+			if (!axiom.occurs() && increment_ < 0)
 				index_.remove(axiom);
 
 			return axiom;

@@ -28,6 +28,8 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectComplementOfV
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkObjectComplementOf} in an
@@ -37,9 +39,13 @@ import org.semanticweb.elk.util.logging.LoggerWrap;
  */
 public class IndexedObjectComplementOf extends IndexedClassExpression {
 
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(IndexedObjectComplementOf.class);
+
 	private final IndexedClassExpression negated_;
 
-	protected IndexedObjectComplementOf(IndexedClassExpression negated) {
+	IndexedObjectComplementOf(IndexedClassExpression negated) {
 		this.negated_ = negated;
 	}
 

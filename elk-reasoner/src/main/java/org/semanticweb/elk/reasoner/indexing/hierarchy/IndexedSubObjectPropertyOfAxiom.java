@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
 /*
  * #%L
  * ELK Reasoner
@@ -33,8 +34,7 @@ public class IndexedSubObjectPropertyOfAxiom extends IndexedAxiom {
 	private final IndexedPropertyChain subPropertyChain_;
 	private final IndexedObjectProperty superProperty_;
 
-	protected IndexedSubObjectPropertyOfAxiom(
-			IndexedPropertyChain subPropertyChain,
+	IndexedSubObjectPropertyOfAxiom(IndexedPropertyChain subPropertyChain,
 			IndexedObjectProperty superProperty) {
 		this.subPropertyChain_ = subPropertyChain;
 		this.superProperty_ = superProperty;
@@ -66,8 +66,8 @@ public class IndexedSubObjectPropertyOfAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	protected boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index, final int increment) {
+	boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
+			final int increment) {
 		if (increment > 0) {
 			if (!subPropertyChain_.addToldSuperObjectProperty(superProperty_))
 				return false;

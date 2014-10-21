@@ -41,7 +41,7 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 	protected final ElkDataProperty property;
 	protected final ElkLiteral filler;
 
-	protected IndexedDataHasValue(ElkDataHasValue elkDataHasValue) {
+	IndexedDataHasValue(ElkDataHasValue elkDataHasValue) {
 		this.property = (ElkDataProperty) elkDataHasValue.getProperty();
 		this.filler = elkDataHasValue.getFiller();
 	}
@@ -55,9 +55,8 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 	}
 
 	@Override
-	protected boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index, int increment,
-			int positiveIncrement, int negativeIncrement) {
+	boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
+			int increment, int positiveIncrement, int negativeIncrement) {
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
 		return true;

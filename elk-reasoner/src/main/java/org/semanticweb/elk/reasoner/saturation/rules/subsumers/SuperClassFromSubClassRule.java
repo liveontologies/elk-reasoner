@@ -121,12 +121,29 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 		SuperClassFromSubClassRule rule = ruleChain.getCreate(
 				SuperClassFromSubClassRule.MATCHER_,
 				SuperClassFromSubClassRule.FACTORY_);
+		boolean success = true;
+		int added = 0;
 		for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-			LOGGER_.trace("Adding {} to {}", ice, NAME);
-			rule.toldSuperClassExpressions_.add(ice);
+			LOGGER_.trace("{}: adding to {}", ice, NAME);
+			if (rule.toldSuperClassExpressions_.add(ice)) {
+				added++;
+			} else {
+				success = false;
+				break;
+			}
 		}
-		return true;
-
+		if (success) {
+			return true;
+		}
+		// else revert all changes
+		for (IndexedClassExpression ice : toldSuperClassExpressions_) {
+			if (added == 0)
+				break;
+			added--;
+			LOGGER_.trace("{}: removing from {} [revert]", ice, NAME);
+			rule.toldSuperClassExpressions_.remove(ice);
+		}
+		return false;
 	}
 
 	@Override
@@ -141,7 +158,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 		boolean success = true;
 		int removed = 0;
 		for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-			LOGGER_.trace("Removing {} from {}", ice, NAME);
+			LOGGER_.trace("{}: removing from {}", ice, NAME);
 			if (rule.toldSuperClassExpressions_.remove(ice)) {
 				removed++;
 			} else {
@@ -161,7 +178,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 			if (removed == 0)
 				break;
 			removed--;
-			LOGGER_.trace("Adding {} to {} (revert)", ice, NAME);
+			LOGGER_.trace("{}: adding to {} [revert]", ice, NAME);
 			rule.toldSuperClassExpressions_.add(ice);
 		}
 		return false;

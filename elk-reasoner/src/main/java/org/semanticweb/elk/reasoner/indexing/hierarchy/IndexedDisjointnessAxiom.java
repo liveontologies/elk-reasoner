@@ -30,8 +30,6 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Defines the disjointness inference rule for indexed class expressions
@@ -42,9 +40,6 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class IndexedDisjointnessAxiom extends IndexedAxiom {
-
-	protected static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedDisjointnessAxiom.class);
 
 	/**
 	 * {@link IndexedClassExpression}s that have at least two equal occurrences
@@ -100,8 +95,8 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	protected boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index, final int increment) {
+	boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
+			final int increment) {
 
 		if (occurrenceNo == 0 && increment > 0) {
 			// first occurrence of this axiom

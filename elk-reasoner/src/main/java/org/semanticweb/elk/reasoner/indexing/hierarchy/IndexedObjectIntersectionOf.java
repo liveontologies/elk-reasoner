@@ -46,7 +46,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	 */
 	private final IndexedClassExpression firstConjunct_, secondConjunct_;
 
-	protected IndexedObjectIntersectionOf(IndexedClassExpression conjunctA,
+	IndexedObjectIntersectionOf(IndexedClassExpression conjunctA,
 			IndexedClassExpression conjunctB) {
 
 		if (conjunctA.compareTo(conjunctB) < 0) {
@@ -76,7 +76,7 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	protected boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
+	boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
 			int increment, int positiveIncrement, int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {

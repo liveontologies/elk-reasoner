@@ -75,9 +75,9 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	@Override
-	protected boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index, final int increment,
-			final int positiveIncrement, final int negativeIncrement) {
+	boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
+			final int increment, final int positiveIncrement,
+			final int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
