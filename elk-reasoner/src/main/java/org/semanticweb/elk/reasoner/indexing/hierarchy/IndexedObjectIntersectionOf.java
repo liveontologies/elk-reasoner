@@ -76,11 +76,13 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(ModifiableOntologyIndex index,
+	protected boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
 			int increment, int positiveIncrement, int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
-			ObjectIntersectionFromConjunctRule.addRulesFor(this, index);
+			if (!ObjectIntersectionFromConjunctRule.addRulesFor(this, index)) {
+				return false;
+			}
 		}
 
 		positiveOccurrenceNo += positiveIncrement;
@@ -89,9 +91,14 @@ public class IndexedObjectIntersectionOf extends IndexedClassExpression {
 		checkOccurrenceNumbers();
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
-			ObjectIntersectionFromConjunctRule.removeRulesFor(this, index);
+			if (!ObjectIntersectionFromConjunctRule.removeRulesFor(this, index)) {
+				// revert all changes
+				positiveOccurrenceNo -= positiveIncrement;
+				negativeOccurrenceNo -= negativeIncrement;
+				return false;
+			}
 		}
-
+		return true;
 	}
 
 	@Override

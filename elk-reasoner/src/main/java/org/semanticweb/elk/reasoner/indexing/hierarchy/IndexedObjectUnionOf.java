@@ -63,12 +63,13 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 	}
 
 	@Override
-	void updateOccurrenceNumbers(ModifiableOntologyIndex index, int increment,
-			int positiveIncrement, int negativeIncrement) {
+	boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
+			int increment, int positiveIncrement, int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			ObjectUnionFromDisjunctRule.addRulesFor(this, index);
+			if (!ObjectUnionFromDisjunctRule.addRulesFor(this, index))
+				return false;
 		}
 
 		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
@@ -89,8 +90,14 @@ public class IndexedObjectUnionOf extends IndexedClassExpression {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			ObjectUnionFromDisjunctRule.removeRulesFor(this, index);
+			if (!ObjectUnionFromDisjunctRule.removeRulesFor(this, index)) {
+				// revert all changes
+				positiveOccurrenceNo -= positiveIncrement;
+				negativeOccurrenceNo -= negativeIncrement;
+				return false;
+			}
 		}
+		return true;
 	}
 
 	@Override

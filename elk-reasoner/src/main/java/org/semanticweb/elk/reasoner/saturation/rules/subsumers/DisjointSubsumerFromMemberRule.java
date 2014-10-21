@@ -69,16 +69,54 @@ public class DisjointSubsumerFromMemberRule extends
 		disjointnessAxioms_.add(axiom);
 	}
 
-	public static void addRulesFor(IndexedDisjointnessAxiom axiom,
+	public static boolean addRulesFor(IndexedDisjointnessAxiom axiom,
 			ModifiableOntologyIndex index) {
-		for (IndexedClassExpression ice : axiom.getDisjointMembers())
-			index.add(ice, new DisjointSubsumerFromMemberRule(axiom));
+		boolean success = true;
+		int added = 0;
+		for (IndexedClassExpression ice : axiom.getDisjointMembers()) {
+			if (index.add(ice, new DisjointSubsumerFromMemberRule(axiom))) {
+				added++;
+			} else {
+				success = false;
+				break;
+			}
+		}
+		if (success)
+			return true;
+		// else revert the changes made
+		for (IndexedClassExpression ice : axiom.getDisjointMembers()) {
+			if (added == 0)
+				break;
+			// else
+			added--;
+			index.remove(ice, new DisjointSubsumerFromMemberRule(axiom));
+		}
+		return false;
 	}
 
-	public static void removeRulesFor(IndexedDisjointnessAxiom axiom,
+	public static boolean removeRulesFor(IndexedDisjointnessAxiom axiom,
 			ModifiableOntologyIndex index) {
-		for (IndexedClassExpression ice : axiom.getDisjointMembers())
-			index.remove(ice, new DisjointSubsumerFromMemberRule(axiom));
+		boolean success = true;
+		int removed = 0;
+		for (IndexedClassExpression ice : axiom.getDisjointMembers()) {
+			if (index.remove(ice, new DisjointSubsumerFromMemberRule(axiom))) {
+				removed++;
+			} else {
+				success = false;
+				break;
+			}
+		}
+		if (success)
+			return true;
+		// else revert the changes made
+		for (IndexedClassExpression ice : axiom.getDisjointMembers()) {
+			if (removed == 0)
+				break;
+			// else
+			removed--;
+			index.add(ice, new DisjointSubsumerFromMemberRule(axiom));
+		}
+		return false;
 	}
 
 	// TODO: hide this method
@@ -102,33 +140,59 @@ public class DisjointSubsumerFromMemberRule extends
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
-			/*producer.produce(premises.getRoot(), new DisjointSubsumerImpl(
-					disAxiom, premise));*/
-			producer.produce(premises.getRoot(), new DisjointSubsumerFromSubsumer(disAxiom, premise));
-	}
-
-	protected boolean isEmpty() {
-		return disjointnessAxioms_.isEmpty();
+			/*
+			 * producer.produce(premises.getRoot(), new DisjointSubsumerImpl(
+			 * disAxiom, premise));
+			 */
+			producer.produce(premises.getRoot(),
+					new DisjointSubsumerFromSubsumer(disAxiom, premise));
 	}
 
 	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		DisjointSubsumerFromMemberRule rule = ruleChain.getCreate(MATCHER_,
 				FACTORY_);
-		return rule.disjointnessAxioms_.addAll(this.disjointnessAxioms_);
+		rule.disjointnessAxioms_.addAll(this.disjointnessAxioms_);
+		return true;
 	}
 
 	@Override
 	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		DisjointSubsumerFromMemberRule rule = ruleChain.find(MATCHER_);
-		boolean changed = false;
-		if (rule != null) {
-			changed = rule.disjointnessAxioms_
-					.removeAll(this.disjointnessAxioms_);
+		if (rule == null)
+			return false;
+		// else trying to remove the axioms
+		int removed = 0;
+		boolean success = true;
+		for (IndexedDisjointnessAxiom axiom : this.disjointnessAxioms_) {
+			if (rule.disjointnessAxioms_.remove(axiom))
+				removed++;
+			else {
+				success = false;
+				break;
+			}
+		}
+		if (success) {
 			if (rule.isEmpty())
 				ruleChain.remove(MATCHER_);
+			return true;
 		}
-		return changed;
+		// else revert all changes
+		for (IndexedDisjointnessAxiom axiom : this.disjointnessAxioms_) {
+			if (removed == 0)
+				break;
+			removed--;
+			rule.disjointnessAxioms_.add(axiom);
+		}
+		return false;
+	}
+
+	private boolean isEmpty() {
+		return disjointnessAxioms_.isEmpty();
 	}
 
 	private static Matcher<ChainableSubsumerRule, DisjointSubsumerFromMemberRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableSubsumerRule, DisjointSubsumerFromMemberRule>(

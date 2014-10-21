@@ -67,7 +67,7 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	 * and a negative occurrence of {@link IndexedClassExpression}s.
 	 */
 	private final IndexObjectConverter neutralIndexer, positiveIndexer,
-			negativeIndexer;// , noOpConverter;
+			negativeIndexer;
 
 	/**
 	 * An {@link IndexedAxiomFilter} used to update occurrences of
@@ -114,11 +114,6 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 				new ClassOccurrenceUpdateFilter(multiplicity_, multiplicity_, 0),
 				propertyOccurrenceUpdateFilter, negativeIndexerFactory);
 		this.negativeIndexer = positiveIndexer.getComplementaryConverter();
-		/*
-		 * this.noOpConverter = new IndexObjectConverter( new
-		 * ClassOccurrenceUpdateFilter(0, 0, 0),
-		 * propertyOccurrenceUpdateFilter);
-		 */
 		this.axiomUpdateFilter = new AxiomOccurrenceUpdateFilter(multiplicity_);
 	}
 
@@ -130,36 +125,18 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	@Override
 	public void indexSubClassOfAxiom(ElkClassExpression subElkClass,
 			ElkClassExpression superElkClass) {
-		// If this is uncommented, deleting a subsumption C => D would
-		// effectively replace it by C => T. This means there will be fewer
-		// rule deletions during the deletion stage.
-		/*
-		 * IndexedClassExpression subIndexedClass = multiplicity_ > 0 ?
-		 * subElkClass .accept(negativeIndexer) :
-		 * subElkClass.accept(noOpConverter);
-		 */
-
-		IndexedClassExpression subIndexedClass = subElkClass
-				.accept(negativeIndexer);
-
-		IndexedClassExpression superIndexedClass = superElkClass
-				.accept(positiveIndexer);
-
-		axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(subIndexedClass,
-				superIndexedClass));
+		axiomUpdateFilter
+				.visit(new IndexedSubClassOfAxiom(subElkClass
+						.accept(negativeIndexer), superElkClass
+						.accept(positiveIndexer)));
 	}
 
 	@Override
 	public void indexClassAssertion(ElkIndividual individual,
 			ElkClassExpression type) {
 
-		IndexedClassExpression indexedIndividual = individual
-				.accept(negativeIndexer);
-
-		IndexedClassExpression indexedType = type.accept(positiveIndexer);
-
-		axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(indexedIndividual,
-				indexedType));
+		axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(individual
+				.accept(negativeIndexer), type.accept(positiveIndexer)));
 	}
 
 	@Override
@@ -167,21 +144,10 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 			ElkSubObjectPropertyExpression subElkProperty,
 			ElkObjectPropertyExpression superElkProperty) {
 
-		IndexedPropertyChain subIndexedProperty = subElkProperty
-				.accept(negativeIndexer);
-
-		IndexedObjectProperty superIndexedProperty = (IndexedObjectProperty) superElkProperty
-				.accept(positiveIndexer);
-
-		if (multiplicity_ == 1) {
-			subIndexedProperty.addToldSuperObjectProperty(superIndexedProperty);
-			superIndexedProperty.addToldSubPropertyChain(subIndexedProperty);
-		} else {
-			subIndexedProperty
-					.removeToldSuperObjectProperty(superIndexedProperty);
-			superIndexedProperty
-					.removeToldSubObjectProperty(subIndexedProperty);
-		}
+		axiomUpdateFilter.visit(new IndexedSubObjectPropertyOfAxiom(
+				subElkProperty.accept(negativeIndexer),
+				(IndexedObjectProperty) superElkProperty
+						.accept(positiveIndexer)));
 	}
 
 	@Override
@@ -211,20 +177,10 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 	public void indexReflexiveObjectProperty(
 			ElkObjectPropertyExpression reflexiveProperty) {
 
-		IndexedObjectProperty indexedReflexiveProperty = (IndexedObjectProperty) reflexiveProperty
-				.accept(positiveIndexer);
+		axiomUpdateFilter.visit(new IndexedReflexiveObjectPropertyAxiom(
+				(IndexedObjectProperty) reflexiveProperty
+						.accept(positiveIndexer)));
 
-		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
-				&& multiplicity_ > 0)
-			// first occurrence of reflexivity axiom
-			index_.addReflexiveProperty(indexedReflexiveProperty);
-
-		indexedReflexiveProperty.reflexiveAxiomOccurrenceNo += multiplicity_;
-
-		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
-				&& multiplicity_ < 0)
-			// no occurrence of reflexivity axiom
-			index_.removeReflexiveProperty(indexedReflexiveProperty);
 	}
 
 	@Override
@@ -378,8 +334,9 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 		}
 
 		public <T extends IndexedAxiom> T update(T axiom) {
-			if (!axiom.occurs() && increment > 0)
+			if (!axiom.occurs() && increment > 0) {
 				index_.add(axiom);
+			}
 
 			axiom.updateOccurrenceNumbers(index_, increment);
 
@@ -391,6 +348,18 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 
 		@Override
 		public IndexedSubClassOfAxiom visit(IndexedSubClassOfAxiom axiom) {
+			return update(objectCache_.visit(axiom));
+		}
+
+		@Override
+		public IndexedSubObjectPropertyOfAxiom visit(
+				IndexedSubObjectPropertyOfAxiom axiom) {
+			return update(objectCache_.visit(axiom));
+		}
+
+		@Override
+		public IndexedReflexiveObjectPropertyAxiom visit(
+				IndexedReflexiveObjectPropertyAxiom axiom) {
 			return update(objectCache_.visit(axiom));
 		}
 

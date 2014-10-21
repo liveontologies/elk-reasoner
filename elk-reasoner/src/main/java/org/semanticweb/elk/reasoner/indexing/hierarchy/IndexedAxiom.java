@@ -28,10 +28,16 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 public abstract class IndexedAxiom extends IndexedObject {
 
 	/**
-	 * Non-recursively. The recursion is implemented in indexing visitors.
+	 * Updates occurrence numbers of this {@link IndexedAxiom}, updating the
+	 * {@link ModifiableOntologyIndex} if necessary. Occurrence numbers of
+	 * sub-expressions is not affected.
+	 * 
+	 * @return {@code true} if this operation was successful and {@code false}
+	 *         otherwise; if {@code false} is returned, the
+	 *         {@link ModifiableOntologyIndex} should not change
 	 */
-	abstract void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			final int increment);
+	abstract boolean updateOccurrenceNumbers(
+			final ModifiableOntologyIndex index, final int increment);
 
 	public abstract <O> O accept(IndexedAxiomVisitor<O> visitor);
 

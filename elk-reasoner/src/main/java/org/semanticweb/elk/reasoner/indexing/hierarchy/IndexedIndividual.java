@@ -63,11 +63,13 @@ public class IndexedIndividual extends IndexedClassEntity {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
+	protected boolean updateOccurrenceNumbers(
+			final ModifiableOntologyIndex index, int increment,
+			int positiveIncrement, int negativeIncrement) {
 
 		if (occurrenceNo_ == 0 && increment > 0) {
-			index.addNamedIndividual(elkNamedIndividual_);
+			if (!index.addNamedIndividual(elkNamedIndividual_))
+				return false;
 		}
 
 		occurrenceNo_ += increment;
@@ -75,8 +77,15 @@ public class IndexedIndividual extends IndexedClassEntity {
 		negativeOccurrenceNo += negativeIncrement;
 
 		if (occurrenceNo_ == 0 && increment < 0) {
-			index.removeNamedIndividual(elkNamedIndividual_);
+			if (!index.removeNamedIndividual(elkNamedIndividual_)) {
+				// revert all changes
+				occurrenceNo_ -= increment;
+				positiveOccurrenceNo -= positiveIncrement;
+				negativeOccurrenceNo -= negativeIncrement;
+				return false;
+			}
 		}
+		return true;
 	}
 
 	@Override

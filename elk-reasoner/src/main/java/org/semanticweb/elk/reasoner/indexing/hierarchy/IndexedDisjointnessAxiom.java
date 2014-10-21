@@ -100,20 +100,38 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			final int increment) {
+	protected boolean updateOccurrenceNumbers(
+			final ModifiableOntologyIndex index, final int increment) {
 
 		if (occurrenceNo == 0 && increment > 0) {
 			// first occurrence of this axiom
-			registerCompositionRule(index);
+			if (!ContradictionFromDisjointnessRule.addRulesFor(this, index))
+				return false;
+			if (!DisjointSubsumerFromMemberRule.addRulesFor(this, index)) {
+				// revert the changes
+				ContradictionFromDisjointnessRule.removeRulesFor(this, index);
+				return false;
+			}
 		}
 
 		occurrenceNo += increment;
 
 		if (occurrenceNo == 0 && increment < 0) {
 			// last occurrence of this axiom
-			deregisterCompositionRule(index);
+			if (!ContradictionFromDisjointnessRule.removeRulesFor(this, index)) {
+				// revert the changes
+				occurrenceNo -= increment;
+				return false;
+			}
+			if (!DisjointSubsumerFromMemberRule.removeRulesFor(this, index)) {
+				// revert the changes
+				occurrenceNo -= increment;
+				ContradictionFromDisjointnessRule.addRulesFor(this, index);
+				return false;
+			}
 		}
+		// success!
+		return true;
 	}
 
 	@Override
@@ -131,16 +149,6 @@ public class IndexedDisjointnessAxiom extends IndexedAxiom {
 		}
 		members.addAll(disjointMembers_);
 		return "DisjointClasses(" + members + ")";
-	}
-
-	private void registerCompositionRule(ModifiableOntologyIndex index) {
-		ContradictionFromDisjointnessRule.addRulesFor(this, index);
-		DisjointSubsumerFromMemberRule.addRulesFor(this, index);
-	}
-
-	private void deregisterCompositionRule(ModifiableOntologyIndex index) {
-		ContradictionFromDisjointnessRule.removeRulesFor(this, index);
-		DisjointSubsumerFromMemberRule.removeRulesFor(this, index);
 	}
 
 }

@@ -87,15 +87,16 @@ public class PropagationFromExistentialFillerRule extends
 		return negExistentials_;
 	}
 
-	public static void addRuleFor(IndexedObjectSomeValuesFrom existential,
+	public static boolean addRuleFor(IndexedObjectSomeValuesFrom existential,
 			ModifiableOntologyIndex index) {
-		index.add(existential.getFiller(),
+		return index.add(existential.getFiller(),
 				new PropagationFromExistentialFillerRule(existential));
 	}
 
-	public static void removeRuleFor(IndexedObjectSomeValuesFrom existential,
+	public static boolean removeRuleFor(
+			IndexedObjectSomeValuesFrom existential,
 			ModifiableOntologyIndex index) {
-		index.remove(existential.getFiller(),
+		return index.remove(existential.getFiller(),
 				new PropagationFromExistentialFillerRule(existential));
 	}
 
@@ -152,36 +153,45 @@ public class PropagationFromExistentialFillerRule extends
 
 	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		PropagationFromExistentialFillerRule rule = ruleChain.getCreate(
 				MATCHER_, FACTORY_);
-		boolean changed = false;
-
-		for (IndexedObjectSomeValuesFrom negExistential : negExistentials_) {
-			changed |= rule.addNegExistential(negExistential);
-		}
-
-		return changed;
-
+		rule.negExistentials_.addAll(this.negExistentials_);
+		return true;
 	}
 
 	@Override
 	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
-		boolean changed = false;
+		if (isEmpty())
+			return true;
 		PropagationFromExistentialFillerRule rule = ruleChain.find(MATCHER_);
-
-		if (rule != null) {
-			for (IndexedObjectSomeValuesFrom negExistential : negExistentials_) {
-				changed |= rule.removeNegExistential(negExistential);
-			}
-
-			if (rule.isEmpty()) {
-				ruleChain.remove(MATCHER_);
-				changed = true;
+		if (rule == null)
+			return false;
+		// else
+		boolean success = true;
+		int removed = 0;
+		for (IndexedObjectSomeValuesFrom negExistential : this.negExistentials_) {
+			if (rule.negExistentials_.remove(negExistential)) {
+				removed++;
+			} else {
+				success = false;
+				break;
 			}
 		}
-
-		return changed;
-
+		if (success) {
+			if (rule.isEmpty())
+				ruleChain.remove(MATCHER_);
+			return true;
+		}
+		// else revert all changes
+		for (IndexedObjectSomeValuesFrom negExistential : this.negExistentials_) {
+			if (removed == 0)
+				break;
+			removed--;
+			rule.negExistentials_.add(negExistential);
+		}
+		return false;
 	}
 
 	@Override
@@ -189,14 +199,6 @@ public class PropagationFromExistentialFillerRule extends
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
-	}
-
-	private boolean addNegExistential(IndexedObjectSomeValuesFrom existential) {
-		return negExistentials_.add(existential);
-	}
-
-	private boolean removeNegExistential(IndexedObjectSomeValuesFrom existential) {
-		return negExistentials_.remove(existential);
 	}
 
 	/**

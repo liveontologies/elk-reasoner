@@ -1,12 +1,11 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
-
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,42 +22,33 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  */
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IndexedSubClassOfAxiom extends IndexedAxiom {
+public class IndexedReflexiveObjectPropertyAxiom extends IndexedAxiom {
 
 	static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedSubClassOfAxiom.class);
+			.getLogger(IndexedReflexiveObjectPropertyAxiom.class);
 
-	private final IndexedClassExpression subClass_, superClass_;
+	private final IndexedObjectProperty property_;
 
-	protected IndexedSubClassOfAxiom(IndexedClassExpression subClass,
-			IndexedClassExpression superClass) {
-		this.subClass_ = subClass;
-		this.superClass_ = superClass;
+	protected IndexedReflexiveObjectPropertyAxiom(IndexedObjectProperty property) {
+		this.property_ = property;
 	}
 
-	public IndexedClassExpression getSubClass() {
-		return this.subClass_;
-	}
-
-	public IndexedClassExpression getSuperClass() {
-		return this.superClass_;
+	public IndexedPropertyChain getProperty() {
+		return this.property_;
 	}
 
 	@Override
 	public boolean occurs() {
-		// we do not cache sub class axioms
-		// TODO: introduce a method for testing if we cache an object in the
-		// index
+		// not cached
 		return false;
 	}
 
 	@Override
 	public String toStringStructural() {
-		return "SubClassOf(" + this.subClass_ + ' ' + this.superClass_ + ')';
+		return "ReflexiveObjectProperty(" + this.property_ + ')';
 	}
 
 	@Override
@@ -69,14 +59,22 @@ public class IndexedSubClassOfAxiom extends IndexedAxiom {
 	@Override
 	protected boolean updateOccurrenceNumbers(
 			final ModifiableOntologyIndex index, final int increment) {
-		if (increment > 0) {
-			if (!SuperClassFromSubClassRule.addRuleFor(this, index))
+
+		if (property_.reflexiveAxiomOccurrenceNo == 0 && increment > 0) {
+			// first occurrence of reflexivity property
+			if (!index.addReflexiveProperty(property_))
 				return false;
 		}
 
-		if (increment < 0) {
-			if (!SuperClassFromSubClassRule.removeRuleFor(this, index))
+		property_.reflexiveAxiomOccurrenceNo += increment;
+
+		if (property_.reflexiveAxiomOccurrenceNo == 0 && increment < 0) {
+			// no occurrence of reflexivity axiom
+			if (!index.removeReflexiveProperty(property_)) {
+				// revert the changes
+				property_.reflexiveAxiomOccurrenceNo -= increment;
 				return false;
+			}
 		}
 		// success!
 		return true;

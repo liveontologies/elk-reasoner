@@ -35,7 +35,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
@@ -122,6 +124,20 @@ public class IndexedEntryConverter<T>
 	public KeyEntry<T, ? extends IndexedSubClassOfAxiom> visit(
 			IndexedSubClassOfAxiom axiom) {
 		return new IndexedSubClassOfAxiomEntry<T, IndexedSubClassOfAxiom>(axiom);
+	}
+
+	@Override
+	public KeyEntry<T, ? extends IndexedAxiom> visit(
+			IndexedSubObjectPropertyOfAxiom axiom) {
+		return new IndexedSubObjectPropertyOfAxiomEntry<T, IndexedSubObjectPropertyOfAxiom>(
+				axiom);
+	}
+
+	@Override
+	public KeyEntry<T, ? extends IndexedAxiom> visit(
+			IndexedReflexiveObjectPropertyAxiom axiom) {
+		return new IndexedReflexiveObjectPropertyAxiomEntry<T, IndexedReflexiveObjectPropertyAxiom>(
+				axiom);
 	}
 
 	@Override

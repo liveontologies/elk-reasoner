@@ -22,7 +22,6 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
@@ -61,16 +60,16 @@ public class ContradictionFromNegationRule extends
 		this.negation_ = negation;
 	}
 
-	public static void addRulesFor(IndexedObjectComplementOf negation,
+	public static boolean addRulesFor(IndexedObjectComplementOf negation,
 			ModifiableOntologyIndex index) {
-		index.add(negation.getNegated(), new ContradictionFromNegationRule(
-				negation));
+		return index.add(negation.getNegated(),
+				new ContradictionFromNegationRule(negation));
 	}
 
-	public static void removeRulesFor(IndexedObjectComplementOf negation,
+	public static boolean removeRulesFor(IndexedObjectComplementOf negation,
 			ModifiableOntologyIndex index) {
-		index.remove(negation.getNegated(), new ContradictionFromNegationRule(
-				negation));
+		return index.remove(negation.getNegated(),
+				new ContradictionFromNegationRule(negation));
 	}
 
 	@Override
@@ -87,49 +86,45 @@ public class ContradictionFromNegationRule extends
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		if (negation_ != null && premises.getSubsumers().contains(negation_)) {
-			//producer.produce(premises.getRoot(), ContradictionImpl.getInstance());
-			producer.produce(premises.getRoot(), new ContradictionFromNegation(negation_));
+			// producer.produce(premises.getRoot(),
+			// ContradictionImpl.getInstance());
+			producer.produce(premises.getRoot(), new ContradictionFromNegation(
+					negation_));
 		}
 	}
 
 	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		ContradictionFromNegationRule rule = ruleChain.getCreate(MATCHER_,
 				FACTORY_);
-		boolean changed = false;
-
-		if (negation_ != null && rule.negation_ != negation_) {
-			if (rule.negation_ == null)
-				rule.negation_ = negation_;
-			else
-				throw new ElkUnexpectedIndexingException(getName()
-						+ " complement value " + rule.negation_
-						+ " cannot be overwritten with " + negation_);
-			changed = true;
+		if (rule.negation_ != null && rule.negation_ != negation_) {
+			return false;
 		}
-
-		return changed;
-
+		// else
+		rule.negation_ = negation_;
+		return true;
 	}
 
 	@Override
 	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		ContradictionFromNegationRule rule = ruleChain.find(MATCHER_);
-		boolean changed = false;
-
-		if (rule != null) {
-			if (negation_ != null && rule.negation_ == negation_) {
-				rule.negation_ = null;
-				changed = true;
-			}
-
-			if (rule.isEmpty()) {
-				ruleChain.remove(MATCHER_);
-			}
+		if (rule == null) {
+			return false;
 		}
-
-		return changed;
-
+		// else
+		if (rule.negation_ != negation_) {
+			return false;
+		}
+		// else
+		rule.negation_ = null;
+		if (rule.isEmpty()) {
+			ruleChain.remove(MATCHER_);
+		}
+		return true;
 	}
 
 	@Override

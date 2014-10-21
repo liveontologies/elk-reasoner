@@ -66,9 +66,20 @@ public class DifferentialIndex extends DirectIndex {
 	private Set<ElkClass> addedClasses_;
 
 	/**
+	 * the {@link ElkClass} removed during the last incremental session
+	 */
+	private Set<ElkClass> removedClasses_;
+
+	/**
 	 * the {@link ElkNamedIndividual} added during the last incremental session
 	 */
 	private Set<ElkNamedIndividual> addedIndividuals_;
+
+	/**
+	 * the {@link ElkNamedIndividual} removed during the last incremental
+	 * session
+	 */
+	private Set<ElkNamedIndividual> removedIndividuals_;
 
 	/**
 	 * Objects that should be deleted
@@ -104,10 +115,12 @@ public class DifferentialIndex extends DirectIndex {
 
 	public void initClassSignatureChanges() {
 		this.addedClasses_ = new ArrayHashSet<ElkClass>(32);
+		this.removedClasses_ = new ArrayHashSet<ElkClass>(32);
 	}
 
 	public void initIndividualSignatureChanges() {
 		this.addedIndividuals_ = new ArrayHashSet<ElkNamedIndividual>(32);
+		this.removedIndividuals_ = new ArrayHashSet<ElkNamedIndividual>(32);
 	}
 
 	public void initAdditions() {
@@ -135,7 +148,9 @@ public class DifferentialIndex extends DirectIndex {
 			return super.addClass(newClass);
 		}
 		// else incrementalMode
-		return addedClasses_.add(newClass);
+		if (!removedClasses_.remove(newClass))
+			addedClasses_.add(newClass);
+		return true;
 	}
 
 	@Override
@@ -144,7 +159,9 @@ public class DifferentialIndex extends DirectIndex {
 			return super.removeClass(oldClass);
 		}
 		// else incrementalMode
-		return addedClasses_.remove(oldClass);
+		if (!addedClasses_.remove(oldClass))
+			removedClasses_.add(oldClass);
+		return true;
 	}
 
 	@Override
@@ -153,7 +170,9 @@ public class DifferentialIndex extends DirectIndex {
 			return super.addNamedIndividual(newIndividual);
 		}
 		// else incrementalMode
-		return addedIndividuals_.add(newIndividual);
+		if (!removedIndividuals_.remove(newIndividual))
+			addedIndividuals_.add(newIndividual);
+		return true;
 	}
 
 	@Override
@@ -162,7 +181,9 @@ public class DifferentialIndex extends DirectIndex {
 			return super.removeNamedIndividual(oldIndividual);
 		}
 		// else incrementalMode
-		return addedIndividuals_.remove(oldIndividual);
+		if (!addedIndividuals_.remove(oldIndividual))
+			removedIndividuals_.add(oldIndividual);
+		return true;
 	}
 
 	@Override

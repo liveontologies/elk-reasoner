@@ -75,28 +75,35 @@ public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			final int increment, final int positiveIncrement,
-			final int negativeIncrement) {
+	protected boolean updateOccurrenceNumbers(
+			final ModifiableOntologyIndex index, final int increment,
+			final int positiveIncrement, final int negativeIncrement) {
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
 			// first negative occurrence of this expression
-			PropagationFromExistentialFillerRule.addRuleFor(this, index);
+			if (!PropagationFromExistentialFillerRule.addRuleFor(this, index))
+				return false;
 		}
 
-		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
 			// no negative occurrences of this expression left
-			PropagationFromExistentialFillerRule.removeRuleFor(this, index);
+			if (!PropagationFromExistentialFillerRule
+					.removeRuleFor(this, index)) {
+				// revert the changes
+				negativeOccurrenceNo -= negativeIncrement;
+				return false;
+			}
 		}
+		positiveOccurrenceNo += positiveIncrement;
+		return true;
 
 	}
 
 	/**
-	 * Generates {@link PropagationImpl}s for the {@link ContextPremises} that apply
-	 * for the given {@link IndexedObjectProperty}
+	 * Generates {@link PropagationImpl}s for the {@link ContextPremises} that
+	 * apply for the given {@link IndexedObjectProperty}
 	 * 
 	 * @param property
 	 * @param premises

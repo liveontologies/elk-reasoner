@@ -62,9 +62,12 @@ public class RootContextInitializationRule extends
 	 * 
 	 * @param owlThing
 	 * @param index
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is returned, the index remains
+	 *         unchanged
 	 */
-	public static void addRuleFor(ModifiableOntologyIndex index) {
-		index.addContextInitRule(new RootContextInitializationRule());
+	public static boolean addRuleFor(ModifiableOntologyIndex index) {
+		return index.addContextInitRule(new RootContextInitializationRule());
 	}
 
 	/**
@@ -73,9 +76,12 @@ public class RootContextInitializationRule extends
 	 * 
 	 * @param owlThing
 	 * @param index
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is returned, the index remains
+	 *         unchanged
 	 */
-	public static void removeRuleFor(ModifiableOntologyIndex index) {
-		index.removeContextInitRule(new RootContextInitializationRule());
+	public static boolean removeRuleFor(ModifiableOntologyIndex index) {
+		return index.removeContextInitRule(new RootContextInitializationRule());
 	}
 
 	@Override
@@ -98,12 +104,10 @@ public class RootContextInitializationRule extends
 	@Override
 	public boolean addTo(Chain<ChainableContextInitRule> ruleChain) {
 		RootContextInitializationRule rule = ruleChain.find(MATCHER_);
-
 		if (rule == null) {
 			ruleChain.getCreate(MATCHER_, FACTORY_);
-			return true;
 		}
-		return false;
+		return true;
 	}
 
 	@Override

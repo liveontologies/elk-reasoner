@@ -123,16 +123,26 @@ abstract public class IndexedClassExpression extends IndexedObjectWithContext
 	}
 
 	/**
-	 * Non-recursively. The recursion is implemented in indexing visitors.
+	 * Updates occurrence numbers of this {@link IndexedClassExpression}, making
+	 * changes with the {@link ModifiableOntologyIndex} if necessary. Occurrence
+	 * numbers of sub-expressions is not affected.
+	 * 
+	 * @return {@code true} if this operation was successful and {@code false}
+	 *         otherwise; if {@code false} is returned, the
+	 *         {@link ModifiableOntologyIndex} should not change
 	 */
-	abstract void updateOccurrenceNumbers(ModifiableOntologyIndex index,
+	abstract boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
 			int increment, int positiveIncrement, int negativeIncrement);
 
-	void updateAndCheckOccurrenceNumbers(ModifiableOntologyIndex index,
+	boolean updateAndCheckOccurrenceNumbers(ModifiableOntologyIndex index,
 			int increment, int positiveIncrement, int negativeIncrement) {
-		updateOccurrenceNumbers(index, increment, positiveIncrement,
-				negativeIncrement);
+		if (!updateOccurrenceNumbers(index, increment, positiveIncrement,
+				negativeIncrement)) {
+			LOGGER_.trace("{}: cannot index!", this);
+			return false;
+		}
 		checkOccurrenceNumbers();
+		return true;
 	}
 
 	/**

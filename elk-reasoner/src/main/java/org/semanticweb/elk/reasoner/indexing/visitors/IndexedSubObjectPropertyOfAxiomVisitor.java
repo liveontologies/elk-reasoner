@@ -1,12 +1,11 @@
 package org.semanticweb.elk.reasoner.indexing.visitors;
-
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +21,10 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  * #L%
  */
 
-public interface IndexedAxiomVisitor<O> extends
-		IndexedSubClassOfAxiomVisitor<O>,
-		IndexedSubObjectPropertyOfAxiomVisitor<O>,
-		IndexedReflexiveObectPropertyAxiomVisitor<O>,
-		IndexedDisjointnessAxiomVisitor<O> {
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
 
-	// nothing else
+public interface IndexedSubObjectPropertyOfAxiomVisitor<O> {
+
+	O visit(IndexedSubObjectPropertyOfAxiom axiom);
+
 }

@@ -28,14 +28,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkSubObjectPropertyExpression} in an
@@ -111,22 +111,28 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 	 * 
 	 * @param superObjectProperty
 	 *            the {@link IndexedObjectProperty} to be added
+	 * @return {@code true} if the operation is successful or {@code false}
+	 *         otherwise; if {@code false} is returned, this
+	 *         {@link IndexedPropertyChain} does not change
 	 */
-	void addToldSuperObjectProperty(IndexedObjectProperty superObjectProperty) {
+	boolean addToldSuperObjectProperty(IndexedObjectProperty superObjectProperty) {
 		if (toldSuperProperties_ == null)
 			toldSuperProperties_ = new ArrayList<IndexedObjectProperty>(1);
 		toldSuperProperties_.add(superObjectProperty);
+		return true;
 	}
 
 	/**
-	 * Removes the given {@link IndexedObjectProperty} ones from the list of
-	 * super-roles of this {@link IndexedPropertyChain}
+	 * Removes the given {@link IndexedObjectProperty} from super-roles of this
+	 * {@link IndexedPropertyChain}
 	 * 
 	 * @param superObjectProperty
 	 *            the {@link IndexedObjectProperty} to be removed
-	 * @return {@code true} if successfully removed
+	 * @return {@code true} if the operation is successful or {@code false}
+	 *         otherwise; if {@code false} is returned, this
+	 *         {@link IndexedPropertyChain} does not change
 	 */
-	protected boolean removeToldSuperObjectProperty(
+	boolean removeToldSuperObjectProperty(
 			IndexedObjectProperty superObjectProperty) {
 		boolean success = false;
 		if (toldSuperProperties_ != null) {

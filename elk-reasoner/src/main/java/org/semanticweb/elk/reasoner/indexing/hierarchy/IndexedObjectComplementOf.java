@@ -57,11 +57,12 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 	}
 
 	@Override
-	void updateOccurrenceNumbers(ModifiableOntologyIndex index, int increment,
-			int positiveIncrement, int negativeIncrement) {
+	boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
+			int increment, int positiveIncrement, int negativeIncrement) {
 		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
 			// first positive occurrence of this expression
-			ContradictionFromNegationRule.addRulesFor(this, index);
+			if (!ContradictionFromNegationRule.addRulesFor(this, index))
+				return false;
 		}
 
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
@@ -82,8 +83,14 @@ public class IndexedObjectComplementOf extends IndexedClassExpression {
 
 		if (positiveOccurrenceNo == 0 && positiveIncrement < 0) {
 			// no positive occurrences of this expression left
-			ContradictionFromNegationRule.removeRulesFor(this, index);
+			if (!ContradictionFromNegationRule.removeRulesFor(this, index)) {
+				// revert all changes
+				positiveOccurrenceNo -= positiveIncrement;
+				negativeOccurrenceNo -= negativeIncrement;
+				return false;
+			}
 		}
+		return true;
 	}
 
 	@Override

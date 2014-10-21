@@ -80,15 +80,15 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 		toldSuperClassExpressions_.add(ice);
 	}
 
-	public static void addRuleFor(IndexedSubClassOfAxiom axiom,
+	public static boolean addRuleFor(IndexedSubClassOfAxiom axiom,
 			ModifiableOntologyIndex index) {
-		index.add(axiom.getSubClass(),
-				new SuperClassFromSubClassRule(axiom.getSuperClass()));
+		return index.add(axiom.getSubClass(), new SuperClassFromSubClassRule(
+				axiom.getSuperClass()));
 	}
 
-	public static void removeRuleFor(IndexedSubClassOfAxiom axiom,
+	public static boolean removeRuleFor(IndexedSubClassOfAxiom axiom,
 			ModifiableOntologyIndex index) {
-		index.remove(axiom.getSubClass(),
+		return index.remove(axiom.getSubClass(),
 				new SuperClassFromSubClassRule(axiom.getSuperClass()));
 	}
 
@@ -116,45 +116,55 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 
 	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		SuperClassFromSubClassRule rule = ruleChain.getCreate(
 				SuperClassFromSubClassRule.MATCHER_,
 				SuperClassFromSubClassRule.FACTORY_);
-		boolean changed = false;
-
 		for (IndexedClassExpression ice : toldSuperClassExpressions_) {
 			LOGGER_.trace("Adding {} to {}", ice, NAME);
-
-			changed |= rule.addToldSuperClassExpression(ice);
+			rule.toldSuperClassExpressions_.add(ice);
 		}
-
-		return changed;
+		return true;
 
 	}
 
 	@Override
 	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		SuperClassFromSubClassRule rule = ruleChain
 				.find(SuperClassFromSubClassRule.MATCHER_);
-		boolean changed = false;
-
-		if (rule != null) {
-			for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-				LOGGER_.trace("Removing {} from {}", ice, NAME);
-
-				changed |= rule.removeToldSuperClassExpression(ice);
-			}
-
-			if (rule.isEmpty()) {
-				ruleChain.remove(SuperClassFromSubClassRule.MATCHER_);
-
-				LOGGER_.trace("{}: removed ", NAME);
-
-				return true;
+		if (rule == null)
+			return false;
+		// else
+		boolean success = true;
+		int removed = 0;
+		for (IndexedClassExpression ice : toldSuperClassExpressions_) {
+			LOGGER_.trace("Removing {} from {}", ice, NAME);
+			if (rule.toldSuperClassExpressions_.remove(ice)) {
+				removed++;
+			} else {
+				success = false;
+				break;
 			}
 		}
-
-		return changed;
-
+		if (success) {
+			if (rule.isEmpty()) {
+				ruleChain.remove(SuperClassFromSubClassRule.MATCHER_);
+				LOGGER_.trace("{}: removed ", NAME);
+			}
+			return true;
+		}
+		// else revert all changes
+		for (IndexedClassExpression ice : toldSuperClassExpressions_) {
+			if (removed == 0)
+				break;
+			removed--;
+			LOGGER_.trace("Adding {} to {} (revert)", ice, NAME);
+			rule.toldSuperClassExpressions_.add(ice);
+		}
+		return false;
 	}
 
 	@Override
@@ -162,20 +172,6 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
-	}
-
-	protected boolean addToldSuperClassExpression(
-			IndexedClassExpression superClassExpression) {
-		return toldSuperClassExpressions_.add(superClassExpression);
-	}
-
-	/**
-	 * @param superClassExpression
-	 * @return true if successfully removed
-	 */
-	protected boolean removeToldSuperClassExpression(
-			IndexedClassExpression superClassExpression) {
-		return toldSuperClassExpressions_.remove(superClassExpression);
 	}
 
 	/**

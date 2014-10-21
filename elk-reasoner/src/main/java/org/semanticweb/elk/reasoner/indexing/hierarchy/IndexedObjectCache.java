@@ -106,21 +106,21 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 	public void subtract(IndexedObjectCache other) {
 		for (IndexedClassExpression ice : other.indexedClassExpressionLookup) {
 			if (ice.getCompositionRuleHead() != null)
-				throw new ElkUnexpectedIndexingException(
-						"Deleting object with registered rules: " + ice);
+				throw new ElkUnexpectedIndexingException(ice
+						+ ": Deleting object with registered rules!");
 			if (!ice.accept(deletor))
-				throw new ElkUnexpectedIndexingException(
-						"Cannot remove indexed object from the cache " + ice);
+				throw new ElkUnexpectedIndexingException(ice
+						+ ": Cannot remove indexed object from the cache!");
 		}
 		for (IndexedPropertyChain ipc : other.indexedPropertyChainLookup) {
 			if (!ipc.accept(deletor))
-				throw new ElkUnexpectedIndexingException(
-						"Cannot remove indexed object from the cache " + ipc);
+				throw new ElkUnexpectedIndexingException(ipc
+						+ ": Cannot remove indexed object from the cache!");
 		}
 		for (IndexedAxiom ax : other.indexedAxiomLookup)
 			if (!ax.accept(deletor))
-				throw new ElkUnexpectedIndexingException(
-						"Cannot remove indexed object from the cache " + ax);
+				throw new ElkUnexpectedIndexingException(ax
+						+ ": Cannot remove indexed object from the cache!");
 		// the counters should be subtracted during deletion
 	}
 
@@ -194,6 +194,20 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 	@Override
 	public IndexedSubClassOfAxiom visit(IndexedSubClassOfAxiom axiom) {
+		// caching not supported
+		return axiom;
+	}
+
+	@Override
+	public IndexedSubObjectPropertyOfAxiom visit(
+			IndexedSubObjectPropertyOfAxiom axiom) {
+		// caching not supported
+		return axiom;
+	}
+
+	@Override
+	public IndexedReflexiveObjectPropertyAxiom visit(
+			IndexedReflexiveObjectPropertyAxiom axiom) {
 		// caching not supported
 		return axiom;
 	}
@@ -288,6 +302,18 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 		}
 
 		@Override
+		public Boolean visit(IndexedSubObjectPropertyOfAxiom axiom) {
+			// caching not supported
+			return true;
+		}
+
+		@Override
+		public Boolean visit(IndexedReflexiveObjectPropertyAxiom axiom) {
+			// caching not supported
+			return true;
+		}
+
+		@Override
 		public Boolean visit(IndexedDisjointnessAxiom axiom) {
 			LOGGER_.trace("Adding {}", axiom);
 			return indexedAxiomLookup.add(axiom);
@@ -369,6 +395,18 @@ public class IndexedObjectCache implements IndexedObjectFilter {
 
 		@Override
 		public Boolean visit(IndexedSubClassOfAxiom axiom) {
+			// caching not supported
+			return true;
+		}
+
+		@Override
+		public Boolean visit(IndexedSubObjectPropertyOfAxiom axiom) {
+			// caching not supported
+			return true;
+		}
+
+		@Override
+		public Boolean visit(IndexedReflexiveObjectPropertyAxiom axiom) {
 			// caching not supported
 			return true;
 		}

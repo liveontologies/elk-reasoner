@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
 /*
  * #%L
  * ELK Reasoner

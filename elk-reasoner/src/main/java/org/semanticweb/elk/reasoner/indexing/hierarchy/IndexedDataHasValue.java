@@ -55,10 +55,12 @@ public class IndexedDataHasValue extends IndexedClassExpression {
 	}
 
 	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
+	protected boolean updateOccurrenceNumbers(
+			final ModifiableOntologyIndex index, int increment,
+			int positiveIncrement, int negativeIncrement) {
 		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
+		return true;
 	}
 
 	public <O> O accept(IndexedDataHasValueVisitor<O> visitor) {

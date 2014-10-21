@@ -73,41 +73,72 @@ public class IndexedClass extends IndexedClassEntity {
 		return visitor.visit(this);
 	}
 
-	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
+	boolean updateOccurrenceNo(final ModifiableOntologyIndex index,
+			int increment) {
 
 		if (occurrenceNo == 0 && increment > 0) {
-			index.addClass(elkClass);
+			if (!index.addClass(elkClass))
+				return false;
+			if (elkClass == PredefinedElkClass.OWL_NOTHING
+					&& !ContradictionFromOwlNothingRule.addRuleFor(this, index)) {
+				// revert the changes
+				index.removeClass(elkClass);
+				return false;
+			}
 		}
+		occurrenceNo += increment;
+		if (occurrenceNo == 0 && increment < 0) {
+			if (!index.removeClass(elkClass)) {
+				occurrenceNo -= increment;
+				return false;
+			}
+			if (elkClass == PredefinedElkClass.OWL_NOTHING
+					&& !ContradictionFromOwlNothingRule.removeRuleFor(this,
+							index)) {
+				// revert the changes
+				index.addClass(elkClass);
+				occurrenceNo -= increment;
+				return false;
+			}
+		}
+		return true;
+	}
 
+	boolean updateNegativeOccurrenceNo(final ModifiableOntologyIndex index,
+			int negativeIncrement) {
 		if (negativeOccurrenceNo == 0 && negativeIncrement > 0
 				&& elkClass == PredefinedElkClass.OWL_THING) {
-			OwlThingContextInitRule.addRuleFor(this, index);
+			if (!OwlThingContextInitRule.addRuleFor(this, index)) {
+				return false;
+			}
 		}
-
-		if (occurrenceNo == 0 && increment > 0
-				&& elkClass == PredefinedElkClass.OWL_NOTHING) {
-			ContradictionFromOwlNothingRule.addRuleFor(this, index);
-		}
-
-		occurrenceNo += increment;
-		positiveOccurrenceNo += positiveIncrement;
 		negativeOccurrenceNo += negativeIncrement;
-
-		if (occurrenceNo == 0 && increment < 0) {
-			index.removeClass(elkClass);
-		}
-
 		if (negativeOccurrenceNo == 0 && negativeIncrement < 0
 				&& elkClass == PredefinedElkClass.OWL_THING) {
-			OwlThingContextInitRule.removeRuleFor(this, index);
+			if (!OwlThingContextInitRule.removeRuleFor(this, index)) {
+				// revert the changes
+				negativeOccurrenceNo -= negativeIncrement;
+				return false;
+			}
 		}
+		return true;
+	}
 
-		if (occurrenceNo == 0 && increment < 0
-				&& elkClass == PredefinedElkClass.OWL_NOTHING) {
-			ContradictionFromOwlNothingRule.removeRuleFor(this, index);
+	@Override
+	protected boolean updateOccurrenceNumbers(
+			final ModifiableOntologyIndex index, int increment,
+			int positiveIncrement, int negativeIncrement) {
+
+		if (!updateOccurrenceNo(index, increment)) {
+			return false;
 		}
+		if (!updateNegativeOccurrenceNo(index, negativeIncrement)) {
+			// revert the changes
+			updateOccurrenceNo(index, -increment);
+			return false;
+		}
+		positiveOccurrenceNo += positiveIncrement;
+		return true;
 	}
 
 	@Override

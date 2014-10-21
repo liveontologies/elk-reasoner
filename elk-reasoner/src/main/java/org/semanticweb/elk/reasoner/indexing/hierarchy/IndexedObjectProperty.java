@@ -134,19 +134,34 @@ public class IndexedObjectProperty extends IndexedPropertyChain {
 		return reflexiveAxiomOccurrenceNo > 0;
 	}
 
-	protected void addToldSubPropertyChain(
-			IndexedPropertyChain subObjectProperty) {
+	/**
+	 * Adds the given {@link IndexedPropertyChain} as a sub-role of this
+	 * {@link IndexedObjectProperty}
+	 * 
+	 * @param subObjectProperty
+	 *            the {@link IndexedPropertyChain} to be added
+	 * @return {@code true} if the operation is successful or {@code false}
+	 *         otherwise; if {@code false} is returned, this
+	 *         {@link IndexedObjectProperty} does not change
+	 */
+	boolean addToldSubPropertyChain(IndexedPropertyChain subObjectProperty) {
 		if (toldSubProperties == null)
 			toldSubProperties = new ArrayList<IndexedPropertyChain>(1);
 		toldSubProperties.add(subObjectProperty);
+		return true;
 	}
 
 	/**
+	 * Removes the given {@link IndexedPropertyChain} from sub-roles of this
+	 * {@link IndexedObjectProperty}
+	 * 
 	 * @param subObjectProperty
-	 * @return {@code true} if successfully removed
+	 *            the {@link IndexedPropertyChain} to be removed
+	 * @return {@code true} if the operation is successful or {@code false}
+	 *         otherwise; if {@code false} is returned, this
+	 *         {@link IndexedObjectProperty} does not change
 	 */
-	protected boolean removeToldSubObjectProperty(
-			IndexedPropertyChain subObjectProperty) {
+	boolean removeToldSubPropertyChain(IndexedPropertyChain subObjectProperty) {
 		boolean success = false;
 		if (toldSubProperties != null) {
 			success = toldSubProperties.remove(subObjectProperty);
