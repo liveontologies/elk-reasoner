@@ -37,9 +37,9 @@ public interface ElkDataRange extends ElkObject {
 	 * Accept an {@link ElkDataRangeVisitor}.
 	 * 
 	 * @param visitor
-	 *            the visitor that can work with this axiom type
+	 *            the visitor that can work with this object type
 	 * @return the output of the visitor
 	 */
-	public abstract <O> O accept(ElkDataRangeVisitor<O> visitor);
+	public <O> O accept(ElkDataRangeVisitor<O> visitor);
 
 }

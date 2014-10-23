@@ -30,6 +30,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectIntersectionOfVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -48,11 +49,16 @@ public class ElkObjectIntersectionOfImpl extends ElkClassExpressionListObject
 
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkObjectIntersectionOfVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkObjectIntersectionOfVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectIntersectionOfVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

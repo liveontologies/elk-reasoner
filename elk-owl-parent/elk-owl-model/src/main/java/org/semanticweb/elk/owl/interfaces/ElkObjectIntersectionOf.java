@@ -27,6 +27,8 @@ package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.visitors.ElkObjectIntersectionOfVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Intersection_of_Class_Expressions"
@@ -44,5 +46,14 @@ public interface ElkObjectIntersectionOf extends ElkClassExpression {
 	 * @return list of class expressions
 	 */
 	public List<? extends ElkClassExpression> getClassExpressions();
+
+	/**
+	 * Accept an {@link ElkObjectIntersectionOfVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkObjectIntersectionOfVisitor<O> visitor);
 
 }

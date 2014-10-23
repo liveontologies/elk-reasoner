@@ -28,6 +28,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkSameIndividualAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLSameIndividualAxiom;
 
@@ -58,6 +59,11 @@ public class ElkSameIndividualAxiomWrap<T extends OWLSameIndividualAxiom>
 
 	@Override
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {
+		return accept((ElkSameIndividualAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkSameIndividualAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -25,6 +25,8 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkSymmetricObjectPropertyAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLSymmetricObjectPropertyAxiom;
 
 /**
@@ -51,6 +53,16 @@ public class ElkSymmetricObjectPropertyAxiomWrap<T extends OWLSymmetricObjectPro
 
 	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
+		return accept((ElkSymmetricObjectPropertyAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyAxiomVisitor<O> visitor) {
+		return accept((ElkSymmetricObjectPropertyAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkSymmetricObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -27,6 +27,8 @@ package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.visitors.ElkDisjointObjectPropertiesAxiomVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Disjoint_Object_Properties">Disjoint
@@ -45,5 +47,15 @@ public interface ElkDisjointObjectPropertiesAxiom extends
 	 * @return list of disjoint object property expressions
 	 */
 	public List<? extends ElkObjectPropertyExpression> getObjectPropertyExpressions();
+
+	/**
+	 * Accept an {@link ElkDisjointObjectPropertiesAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(
+			ElkDisjointObjectPropertiesAxiomVisitor<O> visitor);
 
 }

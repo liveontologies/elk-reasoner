@@ -1154,7 +1154,7 @@ ElkObjectMinCardinality objectMinCardinality():
 		( y = classExpression() )?
 	<CLOSE_BRACKET> {
 		if (y == null)
-			return getElkObjectFactory().getObjectMinCardinality(x, Integer.parseInt( n.image ));
+			return getElkObjectFactory().getObjectMinCardinalityUnqualified(x, Integer.parseInt( n.image ));
 		else
 			return getElkObjectFactory().getObjectMinCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
@@ -1173,7 +1173,7 @@ ElkObjectMaxCardinality objectMaxCardinality():
 		( y = classExpression() )?
 	<CLOSE_BRACKET> {
 		if (y == null)
-			return getElkObjectFactory().getObjectMaxCardinality(x, Integer.parseInt( n.image ));
+			return getElkObjectFactory().getObjectMaxCardinalityUnqualified(x, Integer.parseInt( n.image ));
 		else
 			return getElkObjectFactory().getObjectMaxCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
@@ -1192,7 +1192,7 @@ ElkObjectExactCardinality objectExactCardinality():
 		( y = classExpression() )?
 	<CLOSE_BRACKET> {
 		if (y == null)
-			return getElkObjectFactory().getObjectExactCardinality(x, Integer.parseInt( n.image ));
+			return getElkObjectFactory().getObjectExactCardinalityUnqualified(x, Integer.parseInt( n.image ));
 		else
 			return getElkObjectFactory().getObjectExactCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
@@ -1295,7 +1295,7 @@ ElkDataMinCardinality dataMinCardinality():
 		( y = dataRange() )?
 	<CLOSE_BRACKET> {
 		if (y == null)
-			return getElkObjectFactory().getDataMinCardinality(x, Integer.parseInt( n.image ));
+			return getElkObjectFactory().getDataMinCardinalityUnqualified(x, Integer.parseInt( n.image ));
 		else
 			return getElkObjectFactory().getDataMinCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
@@ -1314,7 +1314,7 @@ ElkDataMaxCardinality dataMaxCardinality():
 		( y = dataRange() )?
 	<CLOSE_BRACKET> {
 		if (y == null)
-			return getElkObjectFactory().getDataMaxCardinality(x, Integer.parseInt( n.image ));
+			return getElkObjectFactory().getDataMaxCardinalityUnqualified(x, Integer.parseInt( n.image ));
 		else
 			return getElkObjectFactory().getDataMaxCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
@@ -1333,7 +1333,7 @@ ElkDataExactCardinality dataExactCardinality():
 		( y = dataRange() )?
 	<CLOSE_BRACKET> {
 		if (y == null)
-			return getElkObjectFactory().getDataExactCardinality(x, Integer.parseInt( n.image ));
+			return getElkObjectFactory().getDataExactCardinalityUnqualified(x, Integer.parseInt( n.image ));
 		else
 			return getElkObjectFactory().getDataExactCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}

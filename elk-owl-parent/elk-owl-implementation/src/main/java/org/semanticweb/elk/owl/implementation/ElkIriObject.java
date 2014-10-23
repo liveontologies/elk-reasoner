@@ -31,18 +31,18 @@ import org.semanticweb.elk.owl.iris.ElkIri;
  */
 public abstract class ElkIriObject extends ElkObjectImpl {
 
-	protected final ElkIri iri;
+	private final ElkIri iri_;
 
 	ElkIriObject(ElkIri iri) {
-		this.iri = iri;
+		this.iri_ = iri;
 	}
 
 	public ElkIri getIri() {
-		return iri;
+		return iri_;
 	}
-	
+
 	@Override
 	public String toString() {
-		return iri.toString();
+		return iri_.toString();
 	}
 }

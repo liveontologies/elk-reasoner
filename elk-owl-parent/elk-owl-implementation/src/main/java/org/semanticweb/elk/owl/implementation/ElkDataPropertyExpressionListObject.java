@@ -41,6 +41,6 @@ public abstract class ElkDataPropertyExpressionListObject extends
 	}
 
 	public List<? extends ElkDataPropertyExpression> getDataPropertyExpressions() {
-		return elkObjects;
+		return getObjects();
 	}
 }

@@ -31,7 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
  * @author "Yevgeny Kazakov"
  * 
  * @param <O>
- *            the output type of the visitor
+ *            the type of the output of this visitor
  */
 public interface ElkLiteralVisitor<O> {
 

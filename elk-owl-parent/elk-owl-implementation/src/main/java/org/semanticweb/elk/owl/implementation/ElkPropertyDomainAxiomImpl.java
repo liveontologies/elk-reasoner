@@ -23,6 +23,8 @@
 package org.semanticweb.elk.owl.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkPropertyDomainAxiom;
+import org.semanticweb.elk.owl.visitors.ElkPropertyAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyDomainAxiomVisitor;
 
 /**
  * Implementation of {@link ElkPropertyDomainAxiom}
@@ -37,16 +39,20 @@ import org.semanticweb.elk.owl.interfaces.ElkPropertyDomainAxiom;
 public abstract class ElkPropertyDomainAxiomImpl<P, D> extends
 		ElkPropertyAxiomImpl<P> implements ElkPropertyDomainAxiom<P, D> {
 
-	protected final D domain;
+	private final D domain_;
 
 	public ElkPropertyDomainAxiomImpl(P property, D domain) {
 		super(property);
-		this.domain = domain;
+		this.domain_ = domain;
 	}
 
 	@Override
 	public D getDomain() {
-		return this.domain;
+		return this.domain_;
 	}
 
+	@Override
+	public <O> O accept(ElkPropertyAxiomVisitor<O> visitor) {
+		return accept((ElkPropertyDomainAxiomVisitor<O>) visitor);
+	}
 }

@@ -77,7 +77,7 @@ public enum PredefinedElkIri {
 
 		if (isOwl0 == isOwl1)
 			return firstIri.compareTo(secondIri);
-		else
-			return isOwl0 ? -1 : 1;
+		// else
+		return isOwl0 ? -1 : 1;
 	}
 }

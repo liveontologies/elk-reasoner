@@ -34,9 +34,9 @@ import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
  * @author "Yevgeny Kazakov"
  * 
  * @param <O>
- *            the output type of the visitor
+ *            the type of the output of this visitor
  */
 public interface ElkHasKeyAxiomVisitor<O> {
 
-	O visit(ElkHasKeyAxiom elkHasKey);
+	O visit(ElkHasKeyAxiom axiom);
 }

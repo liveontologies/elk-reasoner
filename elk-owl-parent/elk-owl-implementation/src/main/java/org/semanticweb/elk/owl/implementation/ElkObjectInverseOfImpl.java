@@ -27,6 +27,7 @@ package org.semanticweb.elk.owl.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.visitors.ElkObjectInverseOfVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
@@ -42,29 +43,34 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 public class ElkObjectInverseOfImpl extends ElkObjectImpl implements
 		ElkObjectInverseOf {
 
-	protected final ElkObjectProperty objectProperty;
+	protected final ElkObjectProperty objectProperty_;
 
 	ElkObjectInverseOfImpl(ElkObjectProperty objectProperty) {
-		this.objectProperty = objectProperty;
+		this.objectProperty_ = objectProperty;
 	}
 
 	@Override
 	public ElkObjectProperty getObjectProperty() {
-		return objectProperty;
+		return objectProperty_;
 	}
 
 	@Override
 	public <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkObjectInverseOfVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkSubObjectPropertyExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkObjectInverseOfVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkObjectInverseOfVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectInverseOfVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

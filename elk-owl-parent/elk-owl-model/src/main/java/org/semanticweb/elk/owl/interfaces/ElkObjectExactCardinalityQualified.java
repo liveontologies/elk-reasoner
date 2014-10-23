@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkObjectExactCardinalityQualifiedVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Exact_Cardinality">exact cardinality
@@ -37,5 +39,14 @@ public interface ElkObjectExactCardinalityQualified
 		extends
 		ElkObjectExactCardinality,
 		ElkCardinalityRestrictionQualified<ElkObjectPropertyExpression, ElkClassExpression> {
+
+	/**
+	 * Accept an {@link ElkObjectExactCardinalityQualifiedVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkObjectExactCardinalityQualifiedVisitor<O> visitor);
 
 }

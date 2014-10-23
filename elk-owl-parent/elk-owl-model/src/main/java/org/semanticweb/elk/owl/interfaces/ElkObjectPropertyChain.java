@@ -27,6 +27,8 @@ package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.visitors.ElkObjectPropertyChainVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Object_Subproperties">object property
@@ -44,5 +46,14 @@ public interface ElkObjectPropertyChain extends ElkSubObjectPropertyExpression {
 	 * @return list of object property expressions
 	 */
 	public List<? extends ElkObjectPropertyExpression> getObjectPropertyExpressions();
+
+	/**
+	 * Accept an {@link ElkObjectPropertyChainVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkObjectPropertyChainVisitor<O> visitor);
 
 }

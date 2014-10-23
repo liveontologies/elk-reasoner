@@ -24,7 +24,8 @@ package org.semanticweb.elk.owl.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
-import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectHasSelfVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionVisitor;
 
 /**
  * Implementation of {@link ElkObjectHasSelf}
@@ -42,7 +43,13 @@ public class ElkObjectHasSelfImpl extends
 	}
 
 	@Override
-	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+	public <O> O accept(ElkPropertyRestrictionVisitor<O> visitor) {
+		return accept((ElkObjectHasSelfVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectHasSelfVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
+
 }

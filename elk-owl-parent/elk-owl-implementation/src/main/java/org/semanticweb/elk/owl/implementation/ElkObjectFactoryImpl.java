@@ -39,14 +39,14 @@ import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
-import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
-import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
@@ -84,17 +84,17 @@ import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxio
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
@@ -204,10 +204,10 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	}
 
 	@Override
-	public ElkDataExactCardinality getDataExactCardinality(
+	public ElkDataExactCardinalityUnqualified getDataExactCardinalityUnqualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality) {
-		return (ElkDataExactCardinality) objectRecycler_
-				.recycle(new ElkDataExactCardinalityImpl(
+		return (ElkDataExactCardinalityUnqualified) objectRecycler_
+				.recycle(new ElkDataExactCardinalityUnqualifiedImpl(
 						dataPropertyExpression, cardinality));
 	}
 
@@ -246,11 +246,11 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	}
 
 	@Override
-	public ElkDataMaxCardinality getDataMaxCardinality(
+	public ElkDataMaxCardinalityUnqualified getDataMaxCardinalityUnqualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality) {
-		return (ElkDataMaxCardinality) objectRecycler_
-				.recycle(new ElkDataMaxCardinalityImpl(dataPropertyExpression,
-						cardinality));
+		return (ElkDataMaxCardinalityUnqualified) objectRecycler_
+				.recycle(new ElkDataMaxCardinalityUnqualifiedImpl(
+						dataPropertyExpression, cardinality));
 	}
 
 	@Override
@@ -263,11 +263,11 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	}
 
 	@Override
-	public ElkDataMinCardinality getDataMinCardinality(
+	public ElkDataMinCardinalityUnqualified getDataMinCardinalityUnqualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality) {
-		return (ElkDataMinCardinality) objectRecycler_
-				.recycle(new ElkDataMinCardinalityImpl(dataPropertyExpression,
-						cardinality));
+		return (ElkDataMinCardinalityUnqualified) objectRecycler_
+				.recycle(new ElkDataMinCardinalityUnqualifiedImpl(
+						dataPropertyExpression, cardinality));
 	}
 
 	@Override
@@ -613,11 +613,11 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	}
 
 	@Override
-	public ElkObjectExactCardinality getObjectExactCardinality(
+	public ElkObjectExactCardinalityUnqualified getObjectExactCardinalityUnqualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality) {
-		return (ElkObjectExactCardinality) objectRecycler_
-				.recycle(new ElkObjectExactCardinalityImpl(
+		return (ElkObjectExactCardinalityUnqualified) objectRecycler_
+				.recycle(new ElkObjectExactCardinalityUnqualifiedImpl(
 						objectPropertyExpression, cardinality));
 	}
 
@@ -672,11 +672,11 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	}
 
 	@Override
-	public ElkObjectMaxCardinality getObjectMaxCardinality(
+	public ElkObjectMaxCardinalityUnqualified getObjectMaxCardinalityUnqualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality) {
-		return (ElkObjectMaxCardinality) objectRecycler_
-				.recycle(new ElkObjectMaxCardinalityImpl(
+		return (ElkObjectMaxCardinalityUnqualified) objectRecycler_
+				.recycle(new ElkObjectMaxCardinalityUnqualifiedImpl(
 						objectPropertyExpression, cardinality));
 	}
 
@@ -690,11 +690,11 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 	}
 
 	@Override
-	public ElkObjectMinCardinality getObjectMinCardinality(
+	public ElkObjectMinCardinalityUnqualified getObjectMinCardinalityUnqualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality) {
-		return (ElkObjectMinCardinality) objectRecycler_
-				.recycle(new ElkObjectMinCardinalityImpl(
+		return (ElkObjectMinCardinalityUnqualified) objectRecycler_
+				.recycle(new ElkObjectMinCardinalityUnqualifiedImpl(
 						objectPropertyExpression, cardinality));
 	}
 

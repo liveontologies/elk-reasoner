@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkObjectSomeValuesFromVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Existential_Quantification">Existential
@@ -35,5 +37,14 @@ package org.semanticweb.elk.owl.interfaces;
 public interface ElkObjectSomeValuesFrom
 		extends
 		ElkPropertyRestrictionQualified<ElkObjectPropertyExpression, ElkClassExpression> {
+
+	/**
+	 * Accept an {@link ElkObjectSomeValuesFromVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkObjectSomeValuesFromVisitor<O> visitor);
 
 }

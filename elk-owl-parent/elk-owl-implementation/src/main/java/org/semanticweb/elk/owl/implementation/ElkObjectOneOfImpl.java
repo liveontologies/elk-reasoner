@@ -27,6 +27,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectOneOfVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -39,23 +40,27 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkObjectOneOfImpl extends ElkObjectListObject<ElkIndividual>
 		implements ElkObjectOneOf {
 
-	ElkObjectOneOfImpl(
-			List<? extends ElkIndividual> individuals) {
+	ElkObjectOneOfImpl(List<? extends ElkIndividual> individuals) {
 		super(individuals);
 	}
 
 	@Override
 	public List<? extends ElkIndividual> getIndividuals() {
-		return elkObjects;
+		return getObjects();
 	}
 
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkObjectOneOfVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkObjectOneOfVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectOneOfVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

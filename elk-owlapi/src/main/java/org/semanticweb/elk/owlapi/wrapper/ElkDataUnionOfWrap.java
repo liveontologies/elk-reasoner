@@ -28,6 +28,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
 import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataUnionOfVisitor;
 import org.semanticweb.owlapi.model.OWLDataRange;
 import org.semanticweb.owlapi.model.OWLDataUnionOf;
 
@@ -58,6 +59,11 @@ public class ElkDataUnionOfWrap<T extends OWLDataUnionOf> extends
 
 	@Override
 	public <O> O accept(ElkDataRangeVisitor<O> visitor) {
+		return accept((ElkDataUnionOfVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDataUnionOfVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 }

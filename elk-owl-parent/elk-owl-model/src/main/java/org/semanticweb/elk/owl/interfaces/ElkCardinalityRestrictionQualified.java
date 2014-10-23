@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkCardinalityRestrictionQualifiedVisitor;
+
 /**
  * A generic interface for restrictions on properties with fillers (qualifiers)
  * and cardinality constraints.
@@ -35,5 +37,14 @@ package org.semanticweb.elk.owl.interfaces;
  */
 public interface ElkCardinalityRestrictionQualified<P, F> extends
 		ElkCardinalityRestriction<P>, ElkPropertyRestrictionQualified<P, F> {
+
+	/**
+	 * Accept an {@link ElkCardinalityRestrictionQualifiedVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkCardinalityRestrictionQualifiedVisitor<O> visitor);
 
 }

@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Reasoner
+ * ELK OWL Object Interfaces
  * 
  * $Id$
  * $HeadURL$
@@ -20,30 +20,28 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.implementation;
+package org.semanticweb.elk.owl.interfaces;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
-import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataMaxCardinalityUnqualifiedVisitor;
 
 /**
- * Implementation of {@link ElkDataMaxCardinality}.
+ * Corresponds to an <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Maximum_Cardinality_2">maximum cardinality
+ * restriction<a> in the OWL 2 specification in the case the qualified data
+ * range is empty.
  * 
- * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ElkDataMaxCardinalityImpl extends
-		ElkCardinalityRestrictionImpl<ElkDataPropertyExpression> implements
-		ElkDataMaxCardinality {
+public interface ElkDataMaxCardinalityUnqualified extends ElkDataMaxCardinality {
 
-	ElkDataMaxCardinalityImpl(ElkDataPropertyExpression dataPropertyExpression,
-			int cardinality) {
-		super(dataPropertyExpression, cardinality);
-	}
+	/**
+	 * Accept an {@link ElkDataMaxCardinalityUnqualifiedVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkDataMaxCardinalityUnqualifiedVisitor<O> visitor);
 
-	@Override
-	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
 }

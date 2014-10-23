@@ -26,6 +26,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkClassAssertionAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 
 /**
@@ -56,6 +57,11 @@ public class ElkClassAssertionAxiomWrap<T extends OWLClassAssertionAxiom>
 
 	@Override
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {
+		return accept((ElkClassAssertionAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkClassAssertionAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

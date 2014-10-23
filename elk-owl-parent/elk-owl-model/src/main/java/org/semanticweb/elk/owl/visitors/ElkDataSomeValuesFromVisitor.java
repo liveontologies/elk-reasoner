@@ -1,11 +1,12 @@
+package org.semanticweb.elk.owl.visitors;
+
 /*
  * #%L
  * ELK OWL Object Interfaces
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,23 +21,19 @@
  * limitations under the License.
  * #L%
  */
-/**
- * 
- */
-package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.owl.interfaces.ElkDatatypeDefinitionAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 
 /**
- * @author Pavel Klinov
+ * Visitor pattern interface for instances of {@link ElkDataSomeValuesFrom}.
  * 
- *         pavel.klinov@uni-ulm.de
  * @author "Yevgeny Kazakov"
  * 
  * @param <O>
- *            the output type of the visitor
+ *            the type of the output of this visitor
  */
-public interface ElkDatatypeDefinitionVisitor<O> {
+public interface ElkDataSomeValuesFromVisitor<O> {
 
-	O visit(ElkDatatypeDefinitionAxiom datatypeDefn);
+	public O visit(ElkDataSomeValuesFrom expression);
+
 }

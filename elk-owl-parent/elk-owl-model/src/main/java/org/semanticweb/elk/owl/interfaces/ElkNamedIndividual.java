@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkNamedIndividualVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Named_Individuals">Named Individuals<a> in
@@ -33,4 +35,14 @@ package org.semanticweb.elk.owl.interfaces;
  * @author Markus Kroetzsch
  */
 public interface ElkNamedIndividual extends ElkIndividual, ElkEntity {
+
+	/**
+	 * Accept an {@link ElkNamedIndividualVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkNamedIndividualVisitor<O> visitor);
+
 }

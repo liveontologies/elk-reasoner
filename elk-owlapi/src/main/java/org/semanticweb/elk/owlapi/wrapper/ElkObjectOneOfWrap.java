@@ -28,6 +28,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectOneOfVisitor;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObjectOneOf;
 
@@ -58,6 +59,11 @@ public class ElkObjectOneOfWrap<T extends OWLObjectOneOf> extends
 
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+		return accept((ElkObjectOneOfVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectOneOfVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

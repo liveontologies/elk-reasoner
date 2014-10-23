@@ -27,6 +27,8 @@ package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.visitors.ElkObjectUnionOfVisitor;
+
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Union_of_Class_Expressions" >Union of
@@ -44,5 +46,14 @@ public interface ElkObjectUnionOf extends ElkClassExpression {
 	 * @return list of class expressions
 	 */
 	public List<? extends ElkClassExpression> getClassExpressions();
+
+	/**
+	 * Accept an {@link ElkObjectUnionOfVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkObjectUnionOfVisitor<O> visitor);
 
 }

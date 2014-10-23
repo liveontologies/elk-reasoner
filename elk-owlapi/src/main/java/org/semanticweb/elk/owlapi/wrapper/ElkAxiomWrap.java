@@ -44,9 +44,6 @@ public abstract class ElkAxiomWrap<T extends OWLAxiom> extends ElkObjectWrap<T>
 	}
 
 	@Override
-	public abstract <O> O accept(ElkAxiomVisitor<O> visitor);
-
-	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return accept((ElkAxiomVisitor<O>) visitor);
 	}

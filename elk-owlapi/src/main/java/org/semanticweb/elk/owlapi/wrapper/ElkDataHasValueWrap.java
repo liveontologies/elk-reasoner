@@ -26,6 +26,9 @@ import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataHasValueVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionQualifiedVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionVisitor;
 import org.semanticweb.owlapi.model.OWLDataHasValue;
 
 /**
@@ -56,6 +59,21 @@ public class ElkDataHasValueWrap<T extends OWLDataHasValue> extends
 
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyRestrictionQualifiedVisitor<O> visitor) {
+		return accept((ElkDataHasValueVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyRestrictionVisitor<O> visitor) {
+		return accept((ElkDataHasValueVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDataHasValueVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 }

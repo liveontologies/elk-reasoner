@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkDeclarationAxiomVisitor;
+
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Entity_Declarations_and_Typing"
@@ -40,6 +42,15 @@ public interface ElkDeclarationAxiom extends ElkAxiom {
 	 * 
 	 * @return the entity that the declaration refers to
 	 */
-	public abstract ElkEntity getEntity();
+	public ElkEntity getEntity();
+
+	/**
+	 * Accept an {@link ElkDeclarationAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkDeclarationAxiomVisitor<O> visitor);
 
 }

@@ -1,6 +1,6 @@
 /*
  * #%L
- * ELK Reasoner
+ * ELK OWL Object Interfaces
  * 
  * $Id$
  * $HeadURL$
@@ -20,31 +20,28 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.implementation;
+package org.semanticweb.elk.owl.interfaces;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
-import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectExactCardinalityUnqualifiedVisitor;
 
 /**
- * Implementation of {@link ElkObjectExactCardinality}.
+ * Corresponds to an <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Exact_Cardinality">exact cardinality
+ * restriction<a> in the OWL 2 specification in the case the qualified class
+ * expression is not specified.
  * 
  * @author Markus Kroetzsch
- * @author "Yevgeny Kazakov"
- * 
  */
-public class ElkObjectExactCardinalityImpl extends
-		ElkCardinalityRestrictionImpl<ElkObjectPropertyExpression> implements
+public interface ElkObjectExactCardinalityUnqualified extends
 		ElkObjectExactCardinality {
 
-	ElkObjectExactCardinalityImpl(
-			ElkObjectPropertyExpression objectPropertyExpression,
-			int cardinality) {
-		super(objectPropertyExpression, cardinality);
-	}
+	/**
+	 * Accept an {@link ElkObjectExactCardinalityUnqualifiedVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkObjectExactCardinalityUnqualifiedVisitor<O> visitor);
 
-	@Override
-	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
 }

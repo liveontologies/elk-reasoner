@@ -25,6 +25,9 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkNegativeDataPropertyAssertionAxiomVisitor;
+
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Negative_Data_Property_Assertions"
@@ -36,4 +39,14 @@ package org.semanticweb.elk.owl.interfaces;
 public interface ElkNegativeDataPropertyAssertionAxiom
 		extends
 		ElkPropertyAssertionAxiom<ElkDataPropertyExpression, ElkIndividual, ElkLiteral> {
+
+	/**
+	 * Accept an {@link ElkNegativeDataPropertyAssertionAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(
+			ElkNegativeDataPropertyAssertionAxiomVisitor<O> visitor);
 }

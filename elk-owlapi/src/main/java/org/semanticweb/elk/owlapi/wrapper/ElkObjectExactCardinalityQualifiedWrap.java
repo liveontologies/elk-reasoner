@@ -24,6 +24,9 @@ package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
+import org.semanticweb.elk.owl.visitors.ElkCardinalityRestrictionQualifiedVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectExactCardinalityQualifiedVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionQualifiedVisitor;
 import org.semanticweb.owlapi.model.OWLObjectExactCardinality;
 
 /**
@@ -46,6 +49,21 @@ public class ElkObjectExactCardinalityQualifiedWrap<T extends OWLObjectExactCard
 	@Override
 	public ElkClassExpression getFiller() {
 		return converter.convert(this.owlObject.getFiller());
+	}
+
+	@Override
+	public <O> O accept(ElkCardinalityRestrictionQualifiedVisitor<O> visitor) {
+		return accept((ElkObjectExactCardinalityQualifiedVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyRestrictionQualifiedVisitor<O> visitor) {
+		return accept((ElkObjectExactCardinalityQualifiedVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectExactCardinalityQualifiedVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

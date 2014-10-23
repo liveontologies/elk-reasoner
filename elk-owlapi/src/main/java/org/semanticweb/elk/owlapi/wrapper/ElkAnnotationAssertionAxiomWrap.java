@@ -29,6 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
+import org.semanticweb.elk.owl.visitors.ElkAnnotationAssertionAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAnnotationAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
@@ -51,16 +52,6 @@ public class ElkAnnotationAssertionAxiomWrap<T extends OWLAnnotationAssertionAxi
 	}
 
 	@Override
-	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
 	public ElkAnnotationSubject getSubject() {
 		return converter.convert(owlObject.getSubject());
 	}
@@ -73,6 +64,21 @@ public class ElkAnnotationAssertionAxiomWrap<T extends OWLAnnotationAssertionAxi
 	@Override
 	public ElkAnnotationValue getValue() {
 		return converter.convert(owlObject.getValue());
+	}
+
+	@Override
+	public <O> O accept(ElkAxiomVisitor<O> visitor) {
+		return accept((ElkAnnotationAssertionAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor) {
+		return accept((ElkAnnotationAssertionAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkAnnotationAssertionAxiomVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

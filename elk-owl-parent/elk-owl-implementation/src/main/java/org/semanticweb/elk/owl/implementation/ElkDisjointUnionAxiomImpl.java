@@ -29,6 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDisjointUnionAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -41,31 +42,37 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkDisjointUnionAxiomImpl extends ElkClassExpressionListObject
 		implements ElkDisjointUnionAxiom {
 
-	protected final ElkClass definedClass;
+	private final ElkClass definedClass_;
 
 	ElkDisjointUnionAxiomImpl(ElkClass definedClass,
 			List<? extends ElkClassExpression> disjointClassExpressions) {
 		super(disjointClassExpressions);
-		this.definedClass = definedClass;
+		this.definedClass_ = definedClass;
 	}
 
 	@Override
 	public ElkClass getDefinedClass() {
-		return definedClass;
+		return definedClass_;
 	}
 
 	@Override
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkDisjointUnionAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkDisjointUnionAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkDisjointUnionAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDisjointUnionAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
+
 }

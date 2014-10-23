@@ -37,12 +37,12 @@ import org.semanticweb.elk.owl.visitors.ElkDataPropertyAxiomVisitor;
 public interface ElkDataPropertyAxiom extends ElkAxiom {
 
 	/**
-	 * Accept an ElkDataPropertyAxiomVisitor.
+	 * Accept an {@link ElkDataPropertyAxiomVisitor}.
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
 	 * @return the output of the visitor
 	 */
-	public abstract <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor);
+	public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor);
 
 }

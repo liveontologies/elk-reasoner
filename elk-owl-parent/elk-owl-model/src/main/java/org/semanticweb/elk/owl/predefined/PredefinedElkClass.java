@@ -25,6 +25,7 @@ package org.semanticweb.elk.owl.predefined;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkClassVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
@@ -56,16 +57,21 @@ public enum PredefinedElkClass implements ElkClass {
 
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkClassVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkClassVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkEntityVisitor<O> visitor) {
+		return accept((ElkClassVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkClassVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

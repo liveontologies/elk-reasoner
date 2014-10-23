@@ -33,13 +33,13 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
-import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
-import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
@@ -74,15 +74,15 @@ import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxio
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -101,7 +101,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -367,7 +368,7 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	}
 
 	@Override
-	public String visit(ElkObjectExactCardinality elkObjectExactCardinality) {
+	public String visit(ElkObjectExactCardinalityUnqualified elkObjectExactCardinality) {
 		return "ObjectExactCardinality";
 	}
 
@@ -393,7 +394,7 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	}
 
 	@Override
-	public String visit(ElkObjectMaxCardinality elkObjectMaxCardinality) {
+	public String visit(ElkObjectMaxCardinalityUnqualified elkObjectMaxCardinality) {
 		return "ObjectMaxCardinality";
 	}
 
@@ -404,7 +405,7 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	}
 
 	@Override
-	public String visit(ElkObjectMinCardinality elkObjectMinCardinality) {
+	public String visit(ElkObjectMinCardinalityUnqualified elkObjectMinCardinality) {
 		return "ObjectMinCardinality";
 	}
 
@@ -435,7 +436,7 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	}
 
 	@Override
-	public String visit(ElkDataMaxCardinality elkDataMaxCardinality) {
+	public String visit(ElkDataMaxCardinalityUnqualified elkDataMaxCardinality) {
 		return "DataMaxCardinality";
 	}
 
@@ -446,7 +447,7 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	}
 
 	@Override
-	public String visit(ElkDataMinCardinality elkDataMinCardinality) {
+	public String visit(ElkDataMinCardinalityUnqualified elkDataMinCardinality) {
 		return "DataMinCardinality";
 	}
 
@@ -457,7 +458,7 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	}
 
 	@Override
-	public String visit(ElkDataExactCardinality elkDataExactCardinality) {
+	public String visit(ElkDataExactCardinalityUnqualified elkDataExactCardinality) {
 		return "DataMinCardinality ";
 	}
 
@@ -553,8 +554,13 @@ public class OwlObjectNameVisitor implements ElkObjectVisitor<String> {
 	}
 
 	@Override
-	public String visit(ElkIri iri) {
-		return "IRI";
+	public String visit(ElkFullIri iri) {
+		return "FullIRI";
+	}
+
+	@Override
+	public String visit(ElkAbbreviatedIri abbrIri) {
+		return "AbbreviatedIri";
 	}
 
 	/*

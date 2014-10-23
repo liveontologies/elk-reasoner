@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkClassAssertionAxiomVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Class_Assertions">class assertion axiom<a>
@@ -47,5 +49,14 @@ public interface ElkClassAssertionAxiom extends ElkAssertionAxiom {
 	 * @return class expression
 	 */
 	public ElkClassExpression getClassExpression();
+
+	/**
+	 * Accept an {@link ElkClassAssertionAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkClassAssertionAxiomVisitor<O> visitor);
 
 }

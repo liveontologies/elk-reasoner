@@ -28,6 +28,7 @@ package org.semanticweb.elk.owl.implementation;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkInverseObjectPropertiesAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
@@ -42,38 +43,42 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkInverseObjectPropertiesAxiomImpl extends ElkObjectImpl
 		implements ElkInverseObjectPropertiesAxiom {
 
-	protected final ElkObjectPropertyExpression firstObjectPropertyExpression;
-	protected final ElkObjectPropertyExpression secondObjectPropertyExpression;
+	private final ElkObjectPropertyExpression first_;
+	private final ElkObjectPropertyExpression second_;
 
-	ElkInverseObjectPropertiesAxiomImpl(
-			ElkObjectPropertyExpression firstObjectPropertyExpression,
-			ElkObjectPropertyExpression secondObjectPropertyExpression) {
-		this.firstObjectPropertyExpression = firstObjectPropertyExpression;
-		this.secondObjectPropertyExpression = secondObjectPropertyExpression;
+	ElkInverseObjectPropertiesAxiomImpl(ElkObjectPropertyExpression first,
+			ElkObjectPropertyExpression second) {
+		this.first_ = first;
+		this.second_ = second;
 	}
 
 	@Override
 	public ElkObjectPropertyExpression getFirstObjectPropertyExpression() {
-		return firstObjectPropertyExpression;
+		return first_;
 	}
 
 	@Override
 	public ElkObjectPropertyExpression getSecondObjectPropertyExpression() {
-		return secondObjectPropertyExpression;
+		return second_;
 	}
 
 	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkInverseObjectPropertiesAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkInverseObjectPropertiesAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkInverseObjectPropertiesAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkInverseObjectPropertiesAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

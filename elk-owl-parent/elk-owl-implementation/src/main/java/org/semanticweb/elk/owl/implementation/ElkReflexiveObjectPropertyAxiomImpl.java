@@ -24,8 +24,9 @@ package org.semanticweb.elk.owl.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkReflexiveObjectPropertyAxiomVisitor;
 
 /**
  * Implementation of {@link ElkReflexiveObjectPropertyAxiom}.
@@ -44,11 +45,16 @@ public class ElkReflexiveObjectPropertyAxiomImpl extends
 
 	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkReflexiveObjectPropertyAxiomVisitor<O>) visitor);
 	}
 
 	@Override
-	public <O> O accept(ElkAxiomVisitor<O> visitor) {
+	public <O> O accept(ElkPropertyAxiomVisitor<O> visitor) {
+		return accept((ElkReflexiveObjectPropertyAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkReflexiveObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

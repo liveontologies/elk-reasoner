@@ -34,13 +34,12 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 public abstract class ElkLiteralListObject extends
 		ElkObjectListObject<ElkLiteral> {
 
-	ElkLiteralListObject(
-			List<? extends ElkLiteral> literals) {
+	ElkLiteralListObject(List<? extends ElkLiteral> literals) {
 		super(literals);
 	}
 
 	public List<? extends ElkLiteral> getIndividuals() {
-		return elkObjects;
+		return getObjects();
 	}
 
 }

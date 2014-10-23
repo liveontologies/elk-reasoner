@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkDataAllValuesFromVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Universal_Quantification_2">Universal
@@ -32,6 +34,16 @@ package org.semanticweb.elk.owl.interfaces;
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkDataAllValuesFrom extends ElkDataPropertyListRestrictionQualified {
+public interface ElkDataAllValuesFrom extends
+		ElkDataPropertyListRestrictionQualified {
+
+	/**
+	 * Accept an {@link ElkDataAllValuesFromVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkDataAllValuesFromVisitor<O> visitor);
 
 }

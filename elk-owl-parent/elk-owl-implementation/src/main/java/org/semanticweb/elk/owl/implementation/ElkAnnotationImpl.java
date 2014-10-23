@@ -28,36 +28,44 @@ package org.semanticweb.elk.owl.implementation;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
+import org.semanticweb.elk.owl.visitors.ElkAnnotationVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  *
  */
 public class ElkAnnotationImpl implements ElkAnnotation {
 
-	private final ElkAnnotationProperty annProperty;
-	private final ElkAnnotationValue annValue;
-	
-	ElkAnnotationImpl(ElkAnnotationProperty annProperty, ElkAnnotationValue annValue) {
-		this.annProperty = annProperty;
-		this.annValue = annValue;
+	private final ElkAnnotationProperty annProperty_;
+	private final ElkAnnotationValue annValue_;
+
+	ElkAnnotationImpl(ElkAnnotationProperty annProperty,
+			ElkAnnotationValue annValue) {
+		this.annProperty_ = annProperty;
+		this.annValue_ = annValue;
 	}
-	
+
 	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
+	public <O> O accept(ElkAnnotationVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 
 	@Override
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkAnnotationVisitor<O>) visitor);
+	}
+
+	@Override
 	public ElkAnnotationProperty getProperty() {
-		return annProperty;
+		return annProperty_;
 	}
 
 	@Override
 	public ElkAnnotationValue getValue() {
-		return annValue;
+		return annValue_;
 	}
+
 }

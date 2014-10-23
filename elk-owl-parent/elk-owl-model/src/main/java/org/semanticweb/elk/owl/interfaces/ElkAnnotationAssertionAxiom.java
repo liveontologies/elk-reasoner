@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkAnnotationAssertionAxiomVisitor;
+
 /**
  * Annotation assertion axiom as defined in <a
  * href="http://www.w3.org/TR/owl2-syntax/#Annotation_Assertion"> Section
@@ -47,4 +49,13 @@ public interface ElkAnnotationAssertionAxiom extends ElkAnnotationAxiom {
 	public ElkAnnotationProperty getProperty();
 
 	public ElkAnnotationValue getValue();
+
+	/**
+	 * Accept an {@link ElkAnnotationAssertionAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkAnnotationAssertionAxiomVisitor<O> visitor);
 }

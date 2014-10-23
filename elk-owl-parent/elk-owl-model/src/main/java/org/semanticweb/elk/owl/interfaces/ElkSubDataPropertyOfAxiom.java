@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkSubDataPropertyOfAxiomVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Data_Subproperties">Data Subproperty
@@ -47,5 +49,14 @@ public interface ElkSubDataPropertyOfAxiom extends ElkDataPropertyAxiom {
 	 * @return super data property expression
 	 */
 	public ElkDataPropertyExpression getSuperDataPropertyExpression();
+
+	/**
+	 * Accept an {@link ElkSubDataPropertyOfAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(ElkSubDataPropertyOfAxiomVisitor<O> visitor);
 
 }

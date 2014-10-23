@@ -28,6 +28,7 @@ package org.semanticweb.elk.owl.implementation;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDeclarationAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -42,24 +43,29 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkDeclarationAxiomImpl extends ElkObjectImpl implements
 		ElkDeclarationAxiom {
 
-	protected final ElkEntity entity;
+	private final ElkEntity entity_;
 
 	ElkDeclarationAxiomImpl(ElkEntity entity) {
-		this.entity = entity;
+		this.entity_ = entity;
 	}
 
 	@Override
 	public ElkEntity getEntity() {
-		return entity;
+		return entity_;
 	}
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkDeclarationAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkDeclarationAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDeclarationAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

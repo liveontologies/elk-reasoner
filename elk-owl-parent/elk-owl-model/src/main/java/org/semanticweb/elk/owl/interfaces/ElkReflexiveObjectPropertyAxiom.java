@@ -25,8 +25,7 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
-import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.visitors.ElkReflexiveObjectPropertyAxiomVisitor;
 
 /**
  * Corresponds to a <a href=
@@ -38,4 +37,15 @@ import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
  */
 public interface ElkReflexiveObjectPropertyAxiom extends
 		ElkObjectPropertyAxiom, ElkPropertyAxiom<ElkObjectPropertyExpression> {
+
+	/**
+	 * Accept an {@link ElkReflexiveObjectPropertyAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(
+			ElkReflexiveObjectPropertyAxiomVisitor<O> visitor);
+
 }

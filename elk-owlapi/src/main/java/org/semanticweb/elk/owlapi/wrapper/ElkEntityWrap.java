@@ -50,9 +50,6 @@ public abstract class ElkEntityWrap<T extends OWLEntity> extends
 	}
 
 	@Override
-	public abstract <O> O accept(ElkEntityVisitor<O> visitor);
-
-	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return accept((ElkEntityVisitor<O>) visitor);
 	}

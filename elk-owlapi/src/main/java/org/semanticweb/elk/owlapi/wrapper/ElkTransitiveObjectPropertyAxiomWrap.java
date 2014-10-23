@@ -25,6 +25,8 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkTransitiveObjectPropertyAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLTransitiveObjectPropertyAxiom;
 
 /**
@@ -52,6 +54,16 @@ public class ElkTransitiveObjectPropertyAxiomWrap<T extends OWLTransitiveObjectP
 
 	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
+		return accept((ElkTransitiveObjectPropertyAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyAxiomVisitor<O> visitor) {
+		return accept((ElkTransitiveObjectPropertyAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkTransitiveObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -26,6 +26,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyOfAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
 
 /**
@@ -57,6 +58,11 @@ public class ElkSubObjectPropertyOfAxiomWrap<T extends OWLSubObjectPropertyOfAxi
 
 	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
+		return accept((ElkSubObjectPropertyOfAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkSubObjectPropertyOfAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

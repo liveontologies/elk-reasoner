@@ -25,6 +25,7 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectPropertyVisitor;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 
@@ -51,11 +52,16 @@ public class ElkObjectPropertyWrap<T extends OWLObjectProperty> extends
 
 	@Override
 	public <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkObjectPropertyVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkSubObjectPropertyExpressionVisitor<O> visitor) {
+		return accept((ElkObjectPropertyVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectPropertyVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

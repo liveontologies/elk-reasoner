@@ -26,7 +26,8 @@ import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyDomainAxiom;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkAnnotationAxiomVisitor;
-import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAnnotationPropertyDomainAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyDomainAxiomVisitor;
 
 /**
  * Implementation of {@link ElkAnnotationPropertyDomainAxiom}.
@@ -34,10 +35,9 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
  * @author Frantisek Simancik
  *
  */
-public class ElkAnnotationPropertyDomainAxiomImpl
-		extends
-		ElkPropertyDomainAxiomImpl<ElkAnnotationProperty, ElkIri>
-		implements ElkAnnotationPropertyDomainAxiom {
+public class ElkAnnotationPropertyDomainAxiomImpl extends
+		ElkPropertyDomainAxiomImpl<ElkAnnotationProperty, ElkIri> implements
+		ElkAnnotationPropertyDomainAxiom {
 
 	ElkAnnotationPropertyDomainAxiomImpl(ElkAnnotationProperty property,
 			ElkIri domain) {
@@ -45,14 +45,18 @@ public class ElkAnnotationPropertyDomainAxiomImpl
 	}
 
 	@Override
-	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+	public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor) {
+		return accept((ElkAnnotationPropertyDomainAxiomVisitor<O>) visitor);
 	}
 
 	@Override
-	public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+	public <O> O accept(ElkPropertyDomainAxiomVisitor<O> visitor) {
+		return accept((ElkAnnotationPropertyDomainAxiomVisitor<O>) visitor);
 	}
 
+	@Override
+	public <O> O accept(ElkAnnotationPropertyDomainAxiomVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
 
 }

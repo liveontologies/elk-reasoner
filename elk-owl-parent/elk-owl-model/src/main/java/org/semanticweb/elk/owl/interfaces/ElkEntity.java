@@ -46,7 +46,7 @@ public interface ElkEntity extends ElkObject {
 	 * Accept an {@link ElkEntityVisitor}.
 	 * 
 	 * @param visitor
-	 *            the visitor that can work with this axiom type
+	 *            the visitor that can work with this object type
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkEntityVisitor<O> visitor);

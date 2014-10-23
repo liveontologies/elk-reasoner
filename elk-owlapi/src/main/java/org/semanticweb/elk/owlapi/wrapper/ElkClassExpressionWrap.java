@@ -44,9 +44,6 @@ public abstract class ElkClassExpressionWrap<T extends OWLClassExpression>
 	}
 
 	@Override
-	public abstract <O> O accept(ElkClassExpressionVisitor<O> visitor);
-
-	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
 		return accept((ElkClassExpressionVisitor<O>) visitor);
 	}

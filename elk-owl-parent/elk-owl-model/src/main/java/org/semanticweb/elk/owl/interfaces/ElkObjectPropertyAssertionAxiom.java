@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAssertionAxiomVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Positive_Object_Property_Assertions"
@@ -36,4 +38,14 @@ package org.semanticweb.elk.owl.interfaces;
 public interface ElkObjectPropertyAssertionAxiom
 		extends
 		ElkPropertyAssertionAxiom<ElkObjectPropertyExpression, ElkIndividual, ElkIndividual> {
+
+	/**
+	 * Accept an {@link ElkObjectPropertyAssertionAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(
+			ElkObjectPropertyAssertionAxiomVisitor<O> visitor);
 }

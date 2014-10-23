@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 /**
@@ -33,11 +32,11 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
  * @author "Yevgeny Kazakov"
  * 
  * @param <O>
- *            the output type of the visitor
+ *            the type of the output of this visitor
  */
 public interface ElkSubObjectPropertyExpressionVisitor<O> extends
-		ElkObjectPropertyExpressionVisitor<O> {
+		ElkObjectPropertyChainVisitor<O>, ElkObjectPropertyExpressionVisitor<O> {
 
-	O visit(ElkObjectPropertyChain elkObjectPropertyChain);
+	// combined visitor
 
 }

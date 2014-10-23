@@ -1,11 +1,11 @@
+package org.semanticweb.elk.owl.interfaces;
 /*
  * #%L
  * ELK OWL Object Interfaces
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,26 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.interfaces;
+
+import org.semanticweb.elk.owl.visitors.ElkObjectExactCardinalityVisitor;
 
 /**
- * Corresponds to an <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Exact_Cardinality">exact cardinality
- * restriction<a> in the OWL 2 specification in the case the qualified class
- * expression is not specified.
+ * A common interface for qualified and unqualified min cardinality restrictions
+ * on objects.
  * 
- * @author Markus Kroetzsch
+ * @author "Yevgeny Kazakov"
+ *
  */
 public interface ElkObjectExactCardinality extends
 		ElkCardinalityRestriction<ElkObjectPropertyExpression> {
+
+	/**
+	 * Accept an {@link ElkObjectExactCardinalityVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkObjectExactCardinalityVisitor<O> visitor);
+
 }
