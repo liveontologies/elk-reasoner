@@ -1,5 +1,4 @@
-package org.semanticweb.elk.owl.visitors;
-
+package org.semanticweb.elk.owl.filters;
 /*
  * #%L
  * ELK OWL Object Interfaces
@@ -22,19 +21,19 @@ package org.semanticweb.elk.owl.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
+import org.semanticweb.elk.owl.visitors.ElkDataAllValuesFromVisitor;
 
 /**
- * Visitor pattern interface for instances of {@link ElkIri}.
+ * A filter producing objects in {@link ElkDataAllValuesFrom} from objects of
+ * this type.
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <O>
- *            the type of the output of this visitor
  */
-public interface ElkIriVisitor<O> extends ElkFullIriVisitor<O>,
-		ElkAbbreviatedIriVisitor<O> {
+public interface ElkDataAllValuesFromFilter extends
+		ElkDataAllValuesFromVisitor<ElkDataAllValuesFrom> {
 
-	// combined visitor
+	// nothing else
 
 }

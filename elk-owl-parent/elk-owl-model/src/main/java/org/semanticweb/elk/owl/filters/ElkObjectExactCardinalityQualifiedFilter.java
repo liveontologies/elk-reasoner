@@ -1,4 +1,4 @@
-package org.semanticweb.elk.owl.iris;
+package org.semanticweb.elk.owl.filters;
 /*
  * #%L
  * ELK OWL Object Interfaces
@@ -21,7 +21,20 @@ package org.semanticweb.elk.owl.iris;
  * #L%
  */
 
-public interface ElkAbbreviatedIriVisitor<O> {
+import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
+import org.semanticweb.elk.owl.visitors.ElkObjectExactCardinalityQualifiedVisitor;
 
-	O visit(ElkAbbreviatedIri abbrIri);
+/**
+ * A filter producing objects in {@link ElkObjectExactCardinalityQualified} from
+ * objects of this type.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+public interface ElkObjectExactCardinalityQualifiedFilter
+		extends
+		ElkObjectExactCardinalityQualifiedVisitor<ElkObjectExactCardinalityQualified> {
+
+	// nothing else
+
 }

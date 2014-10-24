@@ -1,12 +1,11 @@
-package org.semanticweb.elk.owl.visitors;
-
 /*
  * #%L
- * ELK OWL Object Interfaces
- * $Id:$
- * $HeadURL:$
+ * ELK Reasoner
+ * 
+ * $Id$
+ * $HeadURL$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,19 +20,19 @@ package org.semanticweb.elk.owl.visitors;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.owl.filters;
 
-import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 
 /**
- * Visitor pattern interface for instances of {@link ElkIri}.
+ * A filter producing objects in {@link ElkIndividual} from objects of this
+ * type.
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <O>
- *            the type of the output of this visitor
  */
-public interface ElkIriVisitor<O> extends ElkFullIriVisitor<O>,
-		ElkAbbreviatedIriVisitor<O> {
+public interface ElkIndividualFilter extends ElkAnonymousIndividualFilter,
+		ElkNamedIndividualFilter {
 
 	// combined visitor
 

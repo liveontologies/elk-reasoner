@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.owl.iris;
 
+import org.semanticweb.elk.owl.visitors.ElkAbbreviatedIriVisitor;
 import org.semanticweb.elk.owl.visitors.ElkIriVisitor;
 
 /**

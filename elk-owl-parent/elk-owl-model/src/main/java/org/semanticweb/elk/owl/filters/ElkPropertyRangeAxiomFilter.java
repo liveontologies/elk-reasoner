@@ -1,4 +1,7 @@
-package org.semanticweb.elk.owl.iris;
+package org.semanticweb.elk.owl.filters;
+
+import org.semanticweb.elk.owl.interfaces.ElkPropertyRangeAxiom;
+
 /*
  * #%L
  * ELK OWL Object Interfaces
@@ -21,7 +24,17 @@ package org.semanticweb.elk.owl.iris;
  * #L%
  */
 
-public interface ElkFullIriVisitor<O> {
+/**
+ * A filter producing objects in {@link ElkPropertyRangeAxiom} from objects of
+ * this type.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+public interface ElkPropertyRangeAxiomFilter extends
+		ElkAnnotationPropertyRangeAxiomFilter, ElkDataPropertyRangeAxiomFilter,
+		ElkObjectPropertyRangeAxiomFilter {
 
-	O visit(ElkFullIri iri);
+	// combined visitor
+
 }

@@ -1,4 +1,6 @@
-package org.semanticweb.elk.owl.visitors;
+package org.semanticweb.elk.owl.filters;
+
+import org.semanticweb.elk.owl.interfaces.ElkDataPropertyListRestrictionQualified;
 
 /*
  * #%L
@@ -22,18 +24,17 @@ package org.semanticweb.elk.owl.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.owl.iris.ElkIri;
-
 /**
- * Visitor pattern interface for instances of {@link ElkIri}.
+ * Visitor pattern interface for instances of
+ * {@link ElkDataPropertyListRestrictionQualified}.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <O>
  *            the type of the output of this visitor
  */
-public interface ElkIriVisitor<O> extends ElkFullIriVisitor<O>,
-		ElkAbbreviatedIriVisitor<O> {
+public interface ElkDataPropertyListRestrictionQualifiedFilter extends
+		ElkDataAllValuesFromFilter, ElkDataSomeValuesFromFilter {
 
 	// combined visitor
 
