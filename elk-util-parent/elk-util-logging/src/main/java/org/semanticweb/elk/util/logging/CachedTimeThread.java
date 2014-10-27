@@ -61,8 +61,10 @@ public class CachedTimeThread extends Thread {
 	@Override
 	public void run() {
 		for (;;) {
-			currentTimeMillis = (int) System.currentTimeMillis();
-			// currentTimeMillis.set(System.currentTimeMillis());
+			long newTime = System.currentTimeMillis();
+			// make sure the time changes monotonically
+			if (newTime > currentTimeMillis)
+				currentTimeMillis = newTime;
 
 			try {
 				Thread.sleep(UPDATE_FREQUENCY_);

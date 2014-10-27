@@ -79,7 +79,7 @@ public class RuleStatistics extends AbstractStatistics {
 		ruleTimer.add(stats.ruleTimer);
 	}
 
-	void print(StatisticsPrinter printer, String name, int count, int time) {
+	void print(StatisticsPrinter printer, String name, long count, long time) {
 		if (count == 0)
 			return;
 

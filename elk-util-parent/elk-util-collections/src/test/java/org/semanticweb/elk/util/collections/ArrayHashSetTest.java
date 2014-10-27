@@ -26,12 +26,13 @@
 package org.semanticweb.elk.util.collections;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
-import org.semanticweb.elk.util.collections.ArrayHashSet;
-
 import junit.framework.TestCase;
+
+import org.junit.Test;
 
 /**
  * 
@@ -50,7 +51,7 @@ public class ArrayHashSetTest extends TestCase {
 	 * @param referenceSet
 	 * @param testSet
 	 */
-	<E> void testSetEquality(Set<E> referenceSet, Set<E> testSet) {
+	static <E> void testSetEquality(Set<E> referenceSet, Set<E> testSet) {
 		int i = 0;
 		for (E e : referenceSet) {
 			assertTrue(testSet.contains(e));
@@ -65,7 +66,8 @@ public class ArrayHashSetTest extends TestCase {
 		assertEquals(referenceSet.size(), i);
 	}
 
-	public void testAddRemoveContains() {
+	@Test
+	public static void testAddRemoveContains() {
 		// random number generator for elements
 		Random generator = new Random(123);
 		// number of test iterations
@@ -90,6 +92,7 @@ public class ArrayHashSetTest extends TestCase {
 			// adding random elements
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
+				// System.out.println("adding " + element);
 				expected = referenceSet.add(element);
 				assertEquals(expected, !testSet.contains(element));
 				actual = testSet.add(element);
@@ -101,6 +104,7 @@ public class ArrayHashSetTest extends TestCase {
 			// removing random elements
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
+				// System.out.println("removing " + element);
 				expected = referenceSet.remove(element);
 				assertEquals(expected, testSet.contains(element));
 				actual = testSet.remove(element);
@@ -109,15 +113,40 @@ public class ArrayHashSetTest extends TestCase {
 			}
 			testSetEquality(referenceSet, testSet);
 
+			// removing through iterator
+			Iterator<Integer> iterator = testSet.iterator();
+			while (iterator.hasNext()) {
+				Integer element = iterator.next();
+				assertTrue(testSet.contains(element));
+				assertTrue(referenceSet.contains(element));
+				if (generator.nextBoolean()) {
+					// removing
+					// System.out.println("removing " + element);
+					iterator.remove();
+					referenceSet.remove(element);
+					assertFalse(testSet.contains(element));
+					// the second removal attempt should fail
+					try {
+						iterator.remove();
+						fail();
+					} catch (IllegalStateException e) {
+						// this exception should always takes place
+					}
+				}
+			}
+			testSetEquality(referenceSet, testSet);
+
 			// randomly adding and removing
 			for (i = 0; i < noElements; i++) {
 				int element = generator.nextInt(noElements / 2);
 				if (generator.nextBoolean()) {
+					// System.out.println("adding " + element);
 					expected = referenceSet.add(element);
 					assertEquals(expected, !testSet.contains(element));
 					actual = testSet.add(element);
 				} else {
 					expected = referenceSet.remove(element);
+					// System.out.println("removing " + element);
 					assertEquals(expected, testSet.contains(element));
 					actual = testSet.remove(element);
 				}

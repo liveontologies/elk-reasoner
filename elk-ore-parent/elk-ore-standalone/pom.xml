@@ -2,21 +2,21 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>elk-parent</artifactId>
+		<artifactId>elk-ore-parent</artifactId>
 		<groupId>org.semanticweb.elk</groupId>
 		<version>0.5.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>elk-standalone</artifactId>
+	<artifactId>elk-ore-standalone</artifactId>
 	<packaging>pom</packaging>
 
-	<name>ELK Reasoner Standalone</name>
-	<description>The module for the stand-alone ELK executable</description>
+	<name>ELK ORE Build Standalone</name>
+	<description>The module for the stand-alone tool for the ORE contest</description>
 
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>elk-cli</artifactId>
+			<artifactId>elk-ore</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
@@ -26,17 +26,24 @@
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
-					<descriptorRefs>
+          <finalName>elk-ore</finalName>
+					<!--descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
+					</descriptorRefs-->
+          <descriptors>
+  					<descriptor>${basedir}/src/main/assembly/standalone.xml</descriptor>
+					</descriptors>
 					<archive>
 						<manifestEntries>
 							<Implementation-Version>${project.version}</Implementation-Version>
 							<Implementation-Title>${project.name}</Implementation-Title>
 						</manifestEntries>
 						<manifest>
-							<mainClass>org.semanticweb.elk.cli.Main</mainClass>
+							<mainClass>org.semanticweb.elk.ore.NativeRunner</mainClass>
 						</manifest>
+            <manifestEntries>
+              <Class-Path>./lib/log4j-1.2.17.jar ./lib/slf4j-api-1.7.6.jar ./lib/slf4j-log4j12-1.7.6.jar</Class-Path>
+            </manifestEntries>
 					</archive>
 					<appendAssemblyId>false</appendAssemblyId>
 				</configuration>

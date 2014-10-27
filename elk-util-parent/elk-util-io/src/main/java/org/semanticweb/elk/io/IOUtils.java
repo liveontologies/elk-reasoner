@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.ArrayList;
@@ -54,6 +55,15 @@ public class IOUtils {
 		if (stream != null) {
 			try {
 				stream.close();
+			} catch (IOException e) {
+			}
+		}
+	}
+	
+	public static void closeQuietly(Writer writer) {
+		if (writer != null) {
+			try {
+				writer.close();
 			} catch (IOException e) {
 			}
 		}

@@ -1,0 +1,25 @@
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+	<id>elk-ore-standalone</id>
+	<baseDirectory>elk-ore-standalone</baseDirectory>
+	<formats>
+		<!-- the type of the archive -->
+		<format>jar</format>
+	</formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+	<dependencySets>
+		<!-- the description of the maven packages to be bundled in the archive -->
+		<dependencySet>
+      <excludes>
+        <exclude>org.slf4j:slf4j-api</exclude>
+        <exclude>log4j:log4j</exclude>
+      </excludes>
+      <outputDirectory>/</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <unpack>true</unpack>
+      <scope>runtime</scope>
+		</dependencySet>
+	</dependencySets>
+</assembly>

@@ -31,6 +31,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Implements basic job queueing and lets subclasses focus
  * on processing single jobs
  * 
+ * TODO delete it
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de

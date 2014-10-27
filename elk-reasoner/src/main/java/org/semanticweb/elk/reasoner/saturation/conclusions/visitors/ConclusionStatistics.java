@@ -108,13 +108,12 @@ public class ConclusionStatistics extends AbstractStatistics {
 		this.conclusionProcessingTimer_.add(stats.conclusionProcessingTimer_);
 	}
 
-	@SuppressWarnings("unused")
 	public void check(Logger logger) {
 		// TODO
 	}
 
-	void print(StatisticsPrinter printer, String name, int processedCount,
-			int usedCount, int producedCount, long time) {
+	void print(StatisticsPrinter printer, String name, long processedCount,
+			long usedCount, long producedCount, long time) {
 		if (processedCount == 0)
 			return;
 

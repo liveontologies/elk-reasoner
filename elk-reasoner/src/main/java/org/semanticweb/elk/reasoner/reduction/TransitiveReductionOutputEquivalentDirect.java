@@ -22,8 +22,12 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -44,11 +48,17 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 public class TransitiveReductionOutputEquivalentDirect<R extends IndexedClassExpression>
 		extends TransitiveReductionOutputEquivalent<R> {
 
-	final List<TransitiveReductionOutputEquivalent<IndexedClass>> directSubsumers;
+	final Map<IndexedClass, TransitiveReductionOutputEquivalent<IndexedClass>> directSubsumers;
+	
+	/**
+	 * the union of the subsumers of the current direct subsumers
+	 */
+	private Set<IndexedClass> allSubsumers;
 
 	public TransitiveReductionOutputEquivalentDirect(R root) {
 		super(root);
-		this.directSubsumers = new LinkedList<TransitiveReductionOutputEquivalent<IndexedClass>>();
+		directSubsumers = new HashMap<IndexedClass, TransitiveReductionOutputEquivalent<IndexedClass>>();
+		
 	}
 
 	/**
@@ -59,10 +69,42 @@ public class TransitiveReductionOutputEquivalentDirect<R extends IndexedClassExp
 	 * @return the list consisting of partial output of transitive reduction for
 	 *         direct subsumers of the root
 	 */
-	public List<TransitiveReductionOutputEquivalent<IndexedClass>> getDirectSubsumers() {
-		return directSubsumers;
+	public Collection<TransitiveReductionOutputEquivalent<IndexedClass>> getDirectSubsumers() {
+		return directSubsumers.values();
 	}
-
+	
+	public void addDirectSubsumer(IndexedClass subsumer) {
+		TransitiveReductionOutputEquivalent<IndexedClass> output = new TransitiveReductionOutputEquivalent<IndexedClass>(
+				subsumer);
+		output.equivalent.add(subsumer.getElkClass());
+		
+		directSubsumers.put(subsumer, output);
+	}
+	
+	public void addToAllSubsumers(IndexedClass subsumer) {
+		if (allSubsumers == null) {
+			allSubsumers = new HashSet<IndexedClass>();
+		}
+		
+		allSubsumers.add(subsumer);
+	}
+	
+	public Set<IndexedClass> getAllSubsumers() {
+		return allSubsumers == null ? Collections.<IndexedClass>emptySet() : allSubsumers;
+	}
+	
+	public void clearAllSubsumers() {
+		allSubsumers = null;
+	}
+	
+	public void removeDirectSubsumer(IndexedClass subsumer) {
+		directSubsumers.remove(subsumer);
+	}
+	
+	public TransitiveReductionOutputEquivalent<IndexedClass> getTransitiveReductionOutputForDirectSubsumer(IndexedClass subsumer) {
+		return directSubsumers.get(subsumer);
+	}
+	
 	@Override
 	public void accept(TransitiveReductionOutputVisitor<R> visitor) {
 		visitor.visit(this);

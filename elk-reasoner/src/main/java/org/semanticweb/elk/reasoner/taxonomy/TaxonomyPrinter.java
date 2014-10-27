@@ -102,7 +102,7 @@ public class TaxonomyPrinter {
 	public static void dumpClassTaxomomy(Taxonomy<ElkClass> taxonomy,
 			Writer writer, boolean addHash) throws IOException {
 		writer.append("Ontology(\n");
-		processTaxomomy(taxonomy, writer);
+		new TaxonomyPrinter().processTaxomomy(taxonomy, writer);
 		writer.append(")\n");
 
 		if (addHash) {
@@ -152,7 +152,7 @@ public class TaxonomyPrinter {
 			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
 			Writer writer, boolean addHash) throws IOException {
 		writer.write("Ontology(\n");
-		processInstanceTaxomomy(taxonomy, writer);
+		new TaxonomyPrinter().processInstanceTaxomomy(taxonomy, writer);
 		writer.write(")\n");
 
 		if (addHash) {
@@ -186,7 +186,7 @@ public class TaxonomyPrinter {
 	 * @param writer
 	 * @throws IOException
 	 */
-	protected static void processTaxomomy(Taxonomy<ElkClass> classTaxonomy,
+	protected void processTaxomomy(Taxonomy<ElkClass> classTaxonomy,
 			Appendable writer) throws IOException {
 
 		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
@@ -225,7 +225,7 @@ public class TaxonomyPrinter {
 	 * @param writer
 	 * @throws IOException
 	 */
-	protected static void printDeclarations(Taxonomy<ElkClass> classTaxonomy,
+	protected void printDeclarations(Taxonomy<ElkClass> classTaxonomy,
 			ElkObjectFactory objectFactory, Appendable writer)
 			throws IOException {
 
@@ -252,7 +252,7 @@ public class TaxonomyPrinter {
 		}
 	}
 
-	protected static void printIndividualDeclarations(
+	protected void printIndividualDeclarations(
 			Set<? extends InstanceNode<ElkClass, ElkNamedIndividual>> individualNodes,
 			ElkObjectFactory objectFactory, Writer writer) throws IOException {
 		for (InstanceNode<ElkClass, ElkNamedIndividual> individualNode : individualNodes) {
@@ -277,7 +277,7 @@ public class TaxonomyPrinter {
 	 * @param writer
 	 * @throws IOException
 	 */
-	protected static void printClassAxioms(ElkClass elkClass,
+	protected void printClassAxioms(ElkClass elkClass,
 			ArrayList<ElkClass> orderedEquivalentClasses,
 			TreeSet<ElkClass> orderedSubClasses, Appendable writer)
 			throws IOException {
@@ -304,7 +304,7 @@ public class TaxonomyPrinter {
 				}
 	}
 
-	protected static void printIndividualAxioms(ElkNamedIndividual individual,
+	protected void printIndividualAxioms(ElkNamedIndividual individual,
 			ArrayList<ElkNamedIndividual> orderedSameIndividuals,
 			TreeSet<ElkClass> orderedDirectClasses,
 			ElkObjectFactory objectFactory, Writer writer) throws IOException {
@@ -328,7 +328,7 @@ public class TaxonomyPrinter {
 		}
 	}
 
-	protected static void processInstanceTaxomomy(
+	protected void processInstanceTaxomomy(
 			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
 			Writer writer) throws IOException {
 

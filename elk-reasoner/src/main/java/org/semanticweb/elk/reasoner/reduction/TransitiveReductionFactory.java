@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.reduction;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -39,6 +40,8 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
+import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.Operations.Transformation;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.slf4j.Logger;
@@ -116,7 +119,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	private final SaturationState<?> saturationState_;
 
 	/**
-	 * The default equivalence classes for owl:Thing to be used when there are
+	 * The default equivalence class for owl:Thing to be used when there are
 	 * no (direct) subsumers
 	 */
 	private final TransitiveReductionOutputEquivalent<IndexedClass> defaultTopOutput_;
@@ -197,6 +200,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	private class SaturationOutputProcessor implements
 			SaturationJobVisitor<R, J> {
 
+		private final int DIRECT_SUBSUMERS_THRESHOLD = 1000;
+		
 		@Override
 		public void visit(SaturationJobRoot<R, J> saturationJob)
 				throws InterruptedException {
@@ -325,11 +330,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			if (output.directSubsumers.isEmpty()
 					&& !output.getEquivalent().contains(
 							PredefinedElkClass.OWL_THING)) {
-				output.directSubsumers.add(defaultTopOutput_);
+				output.addDirectSubsumer(defaultTopOutput_.getRoot());
 			}
-			// if (output.equivalent.isEmpty()) {
-			// LOGGER_.error("{}: empty equivalent class!", output.getRoot());
-			// }
 
 			state.initiatorJob.setOutput(output);
 			listener_.notifyFinished(state.initiatorJob);
@@ -340,7 +342,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				for (ElkClass equivalent : output.equivalent) {
 					LOGGER_.trace(root + ": equivalent " + equivalent.getIri());
 				}
-				for (TransitiveReductionOutputEquivalent<IndexedClass> direct : output.directSubsumers) {
+				for (TransitiveReductionOutputEquivalent<IndexedClass> direct : output.getDirectSubsumers()) {
 					String message = root + ": direct super class ["
 							+ direct.getRoot();
 					for (ElkClass equivalent : direct.equivalent)
@@ -349,6 +351,20 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 					LOGGER_.trace(message);
 				}
 			}
+		}
+		
+		private Iterable<IndexedClass> getAtomicClasses(Iterable<IndexedClassExpression> ices) {
+			return Operations.map(ices, new Transformation<IndexedClassExpression, IndexedClass>(){
+
+				@Override
+				public IndexedClass transform(IndexedClassExpression ice) {
+					return ice instanceof IndexedClass ? (IndexedClass) ice : null;
+				}});
+		}
+		
+		// TODO get rid of this
+		private IndexedClass getTop() {
+			return defaultTopOutput_.getRoot();
 		}
 
 		/**
@@ -382,33 +398,142 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 * candidate is equivalent to the root
 			 */
 			if (candidateSupers.contains(root)) {
-				output.equivalent.add(candidate.getElkClass());
+				output.equivalent.add(candidate.getElkClass());			
 				return;
 			}
-
+			
+			// decide if it's better to iterate over direct subsumers or over candidate's subsumers
+			int directSubsumerSize = output.directSubsumers.size();
+			boolean allSubsumersCreated = !output.getAllSubsumers().isEmpty();
+			final double DAMPING_RATIO = 0.9;
+			
+			if (allSubsumersCreated) {
+				if (directSubsumerSize >= DIRECT_SUBSUMERS_THRESHOLD * DAMPING_RATIO) {
+					// iterating over the candidate subsumers since there many direct subsumers
+					updateOutputWithCandidateSubsumersIteration(output, candidate, candidateSupers);
+				}
+				else {
+					// iterating over the current set of direct subsumers
+					output.clearAllSubsumers();
+					updateOutputWithDirectSubsumersIteration(output, candidate, candidateSupers, false, false);
+				}
+			}
+			else {
+				if (directSubsumerSize >= DIRECT_SUBSUMERS_THRESHOLD) {
+					// switching to iteration over candidate subsumers, need to create the set of all subsumers
+					updateOutputWithDirectSubsumersIteration(output, candidate, candidateSupers, true, true);
+				}
+				else {
+					if (directSubsumerSize < DIRECT_SUBSUMERS_THRESHOLD * DAMPING_RATIO) {
+						output.clearAllSubsumers();
+						updateOutputWithDirectSubsumersIteration(output, candidate, candidateSupers, false, false);
+					}
+					else {
+						// iterating over the direct subsumers but not clearing
+						// the all subsumers set just yet...
+						// to avoid the situation that we'll need to re-create
+						// it very soon (if the size of the set of direct
+						// subsumers fluctuates around the threshold)
+						updateOutputWithDirectSubsumersIteration(output, candidate, candidateSupers, false, true);
+					}
+				}
+			}
+			
+			//updateOutputWithCandidateSubsumersIteration(output, candidate, candidateSupers);
+		}
+		
+		/*
+		 * Updates the output by iterating over the subsumers of the candidate
+		 * to see if some direct subsumers should be deleted. The candidate
+		 * itself is tested by looking up in the set of all subsumers.
+		 * 
+		 * This method is preferred if the set of direct subsumers is large.
+		 */
+		private void updateOutputWithCandidateSubsumersIteration(
+				TransitiveReductionOutputEquivalentDirect<R> output,
+				IndexedClass candidate, Set<IndexedClassExpression> candidateSupers) {
+			IndexedClass top = getTop();
+			// TODO It makes sense to store atomic subsumers separately since we can safely ignore all others here
+			// first, check if the candidate is a subsumer of some current direct subsumer
+			boolean isNonDirect = output.getAllSubsumers().contains(candidate) || (!output.getAllSubsumers().isEmpty() && isTop(candidate));
+			
+			if (isNonDirect) {
+				boolean topChecked = false;
+				// see if the candidate is equivalent to some current direct subsumer
+				for (IndexedClass candidateSubsumer : getAtomicClasses(candidateSupers)) {
+					TransitiveReductionOutputEquivalent<IndexedClass> directSuperClassEquivalent = output.getTransitiveReductionOutputForDirectSubsumer(candidateSubsumer);
+					
+					if (directSuperClassEquivalent != null) {
+						// this direct subsumer is equivalent to the candidate, make them equivalent
+						directSuperClassEquivalent.equivalent.add(candidate.getElkClass());
+						return;
+					}
+					
+					topChecked |= candidate == top;
+				}
+				// TODO make it prettier, we need to account for owl:Thing which may not be explicitly derived
+				// just trying to avoid using a lazy set union for a singleton set...
+				if (!topChecked) {
+					TransitiveReductionOutputEquivalent<IndexedClass> topEquivalent = output.getTransitiveReductionOutputForDirectSubsumer(top);
+					
+					if (topEquivalent != null) {
+						topEquivalent.equivalent.add(candidate.getElkClass());
+						return;
+					}
+				}
+			}
+			else {
+				// the candidate is going to become (for now) a new direct subsumer
+				if (candidate != top) {
+					// if owl:Thing was previously a direct subsumer, it shouldn't be any longer
+					output.removeDirectSubsumer(top);
+				}
+				// see if the candidate makes some current direct subsumer non-direct
+				for (IndexedClass candidateSubsumer : getAtomicClasses(candidateSupers)) {
+					output.removeDirectSubsumer(candidateSubsumer);
+					// update the set of subsumers of the current direct subsumers
+					// (this set never shrinks)
+					output.addToAllSubsumers(candidateSubsumer);
+				}
+				// make it a new direct subsumer
+				output.addDirectSubsumer(candidate);
+			}		
+		}
+		
+		/*
+		 * Updates the output by iterating over the current set of direct
+		 * subsumers and checking if the candidate is a derived subsumer for
+		 * some of them. Some direct subsumers can be removed if derived for the
+		 * candidate (this is done by a look-up in the candidate's set of
+		 * subsumer).
+		 * 
+		 * This method is preferred if the set of direct subsumers is small.
+		 */
+		private void updateOutputWithDirectSubsumersIteration(
+				TransitiveReductionOutputEquivalentDirect<R> output,
+				IndexedClass candidate, Set<IndexedClassExpression> candidateSupers,
+				boolean createAllSubsumers, boolean addCandidateSubsumers) {
 			/*
 			 * To check if the candidate should be added to the list of direct
 			 * super-classes, we iterate over the direct super classes computed
 			 * so far.
 			 */
 			boolean isCandidateTop = isTop(candidate);
-			Iterator<TransitiveReductionOutputEquivalent<IndexedClass>> iteratorDirectSuperClasses = output.directSubsumers
-					.iterator();
+			Iterator<Map.Entry<IndexedClass, TransitiveReductionOutputEquivalent<IndexedClass>>> iteratorDirectSuperClasses = output.directSubsumers.entrySet().iterator();
 
 			while (iteratorDirectSuperClasses.hasNext()) {
-				TransitiveReductionOutputEquivalent<IndexedClass> directSuperClassEquivalent = iteratorDirectSuperClasses
+				Map.Entry<IndexedClass, TransitiveReductionOutputEquivalent<IndexedClass>> directSuperClassEquivalentEntry = iteratorDirectSuperClasses
 						.next();
-				IndexedClass directSuperClass = directSuperClassEquivalent
-						.getRoot();
+				TransitiveReductionOutputEquivalent<IndexedClass> directSuperClassEquivalent = directSuperClassEquivalentEntry.getValue();
+				IndexedClass directSuperClass = directSuperClassEquivalentEntry.getKey();
 				boolean isDirectSuperClassTop = isTop(directSuperClass);
+				Set<IndexedClassExpression> directSubsumerSupers = saturationState_.getContext(directSuperClass).getSubsumers();
 
 				/*
 				 * If the (already computed) saturation for the direct
 				 * super-class contains the candidate, it cannot be direct.
 				 */
-				if (isCandidateTop
-						|| saturationState_.getContext(directSuperClass)
-								.getSubsumers().contains(candidate)) {
+				if (isCandidateTop || directSubsumerSupers.contains(candidate)) {
 					/*
 					 * If, in addition, the saturation for the candidate
 					 * contains the direct super class, they are equivalent, so
@@ -418,8 +543,11 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 					if (candidateSupers.contains(directSuperClass)
 							|| isDirectSuperClassTop)
 						directSuperClassEquivalent.equivalent.add(candidate
-								.getElkClass());
-					return;
+								.getElkClass()); 
+					
+					if (!createAllSubsumers) {
+						return;
+					}
 				}
 				/*
 				 * At this point we know that the candidate is not contained in
@@ -432,21 +560,42 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 						|| isDirectSuperClassTop) {
 					iteratorDirectSuperClasses.remove();
 				}
+				else {
+					if (createAllSubsumers) {
+						// creating the set of all subsumers while updating the transitive reduction state
+						for (IndexedClass directSubsumerSuper : getAtomicClasses(directSubsumerSupers)) {
+							output.addToAllSubsumers(directSubsumerSuper);
+						}
+					}
+				}
 			}
 			/*
 			 * if the candidate has survived all the tests, then it is a direct
 			 * super-class
 			 */
-			TransitiveReductionOutputEquivalent<IndexedClass> candidateOutput = new TransitiveReductionOutputEquivalent<IndexedClass>(
-					candidate);
+			TransitiveReductionOutputEquivalent<IndexedClass> candidateOutput = new TransitiveReductionOutputEquivalent<IndexedClass>(candidate);
 			candidateOutput.equivalent.add(candidate.getElkClass());
-			output.directSubsumers.add(candidateOutput);
+			output.addDirectSubsumer(candidate);	
+			
+			if (createAllSubsumers || addCandidateSubsumers) {
+				// creating the set of all subsumers while updating the transitive reduction state
+				for (IndexedClass candidateSuper : getAtomicClasses(candidateSupers)) {
+					output.addToAllSubsumers(candidateSuper);
+				}
+			}
+		}
+
+		private boolean isTop(IndexedClassExpression ice) {
+			if (!(ice instanceof IndexedClass)) {
+				return false;
+			}
+			
+			IndexedClass clazz = (IndexedClass) ice;
+			
+			return clazz.getElkClass().getIri() == PredefinedElkIri.OWL_THING.get();
 		}
 	}
 
-	private boolean isTop(IndexedClass clazz) {
-		return clazz.getElkClass().getIri() == PredefinedElkIri.OWL_THING.get();
-	}
 
 	public class Engine implements InputProcessor<J> {
 

@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -52,18 +51,6 @@ import java.util.Set;
 public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 
 	/**
-	 * The default initial capacity - MUST be a power of two.
-	 */
-	static final int DEFAULT_INITIAL_CAPACITY = 16;
-
-	/**
-	 * The maximum capacity, used if a higher value is implicitly specified by
-	 * either of the constructors with arguments. MUST be a power of two <=
-	 * 1<<30.
-	 */
-	static final int MAXIMUM_CAPACITY = 1 << 30;
-
-	/**
 	 * The table for the keys; the length MUST always be a power of two.
 	 */
 	protected volatile transient K[] keys;
@@ -79,46 +66,20 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	 */
 	protected transient int size;
 
-	/**
-	 * The next upper size value at which to stretch the table.
-	 * 
-	 * @serial
-	 */
-	int upperSize;
-
-	/**
-	 * The next lower size value at which to shrink the table.
-	 * 
-	 * @serial
-	 */
-	int lowerSize;
-
 	@SuppressWarnings("unchecked")
 	public ArrayHashMap(int initialCapacity) {
-		if (initialCapacity < 0)
-			throw new IllegalArgumentException("Illegal Capacity: "
-					+ initialCapacity);
-		if (initialCapacity > MAXIMUM_CAPACITY)
-			initialCapacity = MAXIMUM_CAPACITY;
-		// Find a power of 2 >= initialCapacity
-		int capacity = 1;
-		while (capacity < initialCapacity)
-			capacity <<= 1;
+		int capacity = LinearProbing.getInitialCapacity(initialCapacity);
 		this.keys = (K[]) new Object[capacity];
 		this.values = (V[]) new Object[capacity];
 		this.size = 0;
-		this.upperSize = computeUpperSize(capacity);
-		this.lowerSize = computeLowerSize(capacity);
 	}
 
 	@SuppressWarnings("unchecked")
 	public ArrayHashMap() {
-		int capacity = DEFAULT_INITIAL_CAPACITY;
+		int capacity = LinearProbing.DEFAULT_INITIAL_CAPACITY;
 		this.keys = (K[]) new Object[capacity];
 		this.values = (V[]) new Object[capacity];
 		this.size = 0;
-		this.upperSize = computeUpperSize(capacity);
-		this.lowerSize = computeLowerSize(capacity);
 	}
 
 	@Override
@@ -131,68 +92,21 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		return size == 0;
 	}
 
-	/**
-	 * Computes a maximum size of the table for a given capacity after which to
-	 * stretch the tables.
-	 * 
-	 * @param capacity
-	 *            the capacity of the table.
-	 * @return maximum size of the table for a given capacity after which to
-	 *         stretch the tables.
-	 */
-	static private int computeUpperSize(int capacity) {
-		if (capacity > 64)
-			return (3 * capacity) / 4; // max 75% filled
-		else
-			return capacity;
-	}
-
-	/**
-	 * Computes a minimum size of the table for a given capacity after which to
-	 * shrink the tables.
-	 * 
-	 * @param capacity
-	 *            the capacity of the table.
-	 * @return minimum size of the table for a given capacity after which to
-	 *         shrink the tables
-	 */
-	static private int computeLowerSize(int capacity) {
-		return capacity / 4;
-	}
-
-	static private int getIndex(Object key, int length) {
-		return key.hashCode() & (length - 1);
-	}
-
 	@Override
 	public boolean containsKey(Object key) {
 		if (key == null)
 			throw new NullPointerException();
-		K[] keys = this.keys;
-		int i = getIndex(key, keys.length);
-		int j = i; // for cycle detection
-		for (;;) {
-			K probe = keys[i];
-			if (probe == null)
-				return false;
-			else if (key.equals(probe))
-				return true;
-			if (i == 0)
-				i = keys.length - 1;
-			else
-				i--;
-			if (i == j) // full cycle
-				return false;
-		}
+		return LinearProbing.contains(keys, key);
 	}
 
 	@Override
 	public boolean containsValue(Object value) {
 		if (value == null)
 			throw new NullPointerException();
-		V[] values = this.values;
+		V[] v = this.values;
+		// we could not do much better than linear search
 		for (int i = 0; i < keys.length; i++)
-			if (value.equals(values[i]))
+			if (value.equals(v[i]))
 				return true;
 		return false;
 	}
@@ -203,27 +117,19 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 			throw new NullPointerException();
 		// to avoid problems in the middle of resizing, we copy keys and values
 		// when they have the same size
+		K[] k;
+		V[] v;
 		for (;;) {
-			K[] keys = this.keys;
-			V[] values = this.values;
-			if (keys.length == values.length)
+			k = this.keys;
+			v = this.values;
+			if (k.length == v.length)
 				break;
 		}
-		int i = getIndex(key, keys.length);
-		int j = i;
-		for (;;) {
-			K probe = keys[i];
-			if (probe == null)
-				return null;
-			else if (key.equals(probe))
-				return values[i];
-			if (i == 0)
-				i = keys.length - 1;
-			else
-				i--;
-			if (i == j) // full cycle
-				return null;
-		}
+		int pos = LinearProbing.getPosition(k, key);
+		if (k[pos] == null)
+			return null;
+		// else
+		return v[pos];
 	}
 
 	/**
@@ -243,78 +149,17 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	 * @return the previous value associated with the key or <tt>null</tt> if
 	 *         there was no such a previous value.
 	 */
-	private V putKeyValue(K[] keys, V[] values, K key, V value) {
-		int i = getIndex(key, keys.length);
-		for (;;) {
-			K probe = keys[i];
-			if (probe == null) {
-				keys[i] = key;
-				values[i] = value;
-				return null;
-			} else if (key.equals(probe)) {
-				V oldValue = values[i];
-				values[i] = value;
-				return oldValue;
-			}
-			if (i == 0)
-				i = keys.length - 1;
-			else
-				i--;
+	private static <K, V> V putKeyValue(K[] keys, V[] values, K key, V value) {
+		int pos = LinearProbing.getPosition(keys, key);
+		if (keys[pos] == null) {
+			keys[pos] = key;
+			values[pos] = value;
+			return null;
 		}
-	}
-
-	/**
-	 * Removes an element at position <tt>i</tt> of <tt>keys</tt> and
-	 * <tt>values</tt> shifting, if necessary, other elements so that all
-	 * elements can be found by linear probing.
-	 * 
-	 * @param keys
-	 *            the keys of the map
-	 * @param values
-	 *            the values of the map
-	 * @param i
-	 *            the position at which to delete the key and value
-	 */
-	private void shift(K[] keys, V[] values, int i) {
-		int del = i; // the position at which to delete
-		int j = i; // the position at which to test if the key can be
-					// found by linear probing
-		for (;;) {
-			// decrement j modulo the length of the arrays
-			if (j == 0)
-				j = keys.length - 1;
-			else
-				j--;
-			// invariant: interval [j, del[ contains non-null elements whose
-			// index is in [j, del[
-			if (j == del) {
-				// we made a full cycle; no elements have to be shifted
-				keys[del] = null;
-				values[del] = null;
-				return;
-			}
-			K test = keys[j];
-			if (test == null) {
-				// no further elements to the left need to be shifted
-				keys[del] = null;
-				values[del] = null;
-				return;
-			}
-			int k = getIndex(test, keys.length);
-			// check if k is in [j, del[
-			if ((j < del) ? (j <= k) && (k < del) : (j <= k) || (k < del))
-				// the index is in [j, del[, so the test element should not be
-				// shifted
-				continue;
-			else {
-				// copying the keys and values to the position of deleted
-				// element and start deleting their previous locations
-				keys[del] = test;
-				values[del] = values[j];
-				del = j;
-				continue;
-			}
-		}
+		// else
+		V oldValue = values[pos];
+		values[pos] = value;
+		return oldValue;
 	}
 
 	/**
@@ -330,35 +175,25 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	 * @return the value of the deleted entry, <tt>null</tt> if nothing has been
 	 *         deleted
 	 */
-	private V removeEntry(K[] keys, V[] values, Object key) {
-		int i = getIndex(key, keys.length);
-		int j = i; // for cycle detection
-		for (;;) {
-			Object probe = keys[i];
-			if (probe == null) {
-				return null;
-			} else if (key.equals(probe)) {
-				V result = values[i];
-				shift(keys, values, i);
-				return result;
-			}
-			if (i == 0)
-				i = keys.length - 1;
-			else
-				i--;
-			if (i == j) // full cycle
-				return null;
-		}
+	private static <K, V> V removeEntry(K[] keys, V[] values, Object key) {
+		int pos = LinearProbing.getPosition(keys, key);
+		if (keys[pos] == null)
+			return null;
+		// else
+		V result = values[pos];
+		LinearProbing.remove(keys, values, pos);
+		return result;
 	}
 
 	/**
 	 * Increasing the capacity of the map
 	 */
-	private void stretch() {
+	private void enlarge() {
 		int oldCapacity = keys.length;
-		if (oldCapacity == MAXIMUM_CAPACITY)
+		if (oldCapacity == LinearProbing.MAXIMUM_CAPACITY)
 			throw new IllegalArgumentException(
-					"Map cannot grow beyond capacity: " + MAXIMUM_CAPACITY);
+					"Map cannot grow beyond capacity: "
+							+ LinearProbing.MAXIMUM_CAPACITY);
 		K oldKeys[] = keys;
 		V oldValues[] = values;
 		int newCapacity = oldCapacity << 1;
@@ -373,8 +208,6 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		}
 		this.keys = newKeys;
 		this.values = newValues;
-		this.upperSize = computeUpperSize(newCapacity);
-		this.lowerSize = computeLowerSize(newCapacity);
 	}
 
 	/**
@@ -382,7 +215,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 	 */
 	private void shrink() {
 		int oldCapacity = keys.length;
-		if (oldCapacity <= DEFAULT_INITIAL_CAPACITY)
+		if (oldCapacity <= LinearProbing.DEFAULT_INITIAL_CAPACITY)
 			return;
 		K oldKeys[] = keys;
 		V oldValues[] = values;
@@ -398,19 +231,15 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		}
 		this.keys = newKeys;
 		this.values = newValues;
-		this.upperSize = computeUpperSize(newCapacity);
-		this.lowerSize = computeLowerSize(newCapacity);
 	}
 
 	@Override
 	public V put(K key, V value) {
 		if (key == null)
 			throw new NullPointerException();
-		if (size == upperSize)
-			stretch();
 		V result = putKeyValue(keys, values, key, value);
-		if (result == null)
-			size++;
+		if (result == null && ++size == LinearProbing.getUpperSize(keys.length))
+			enlarge();
 		return result;
 	}
 
@@ -419,9 +248,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		if (key == null)
 			throw new NullPointerException();
 		V result = removeEntry(keys, values, key);
-		if (result != null)
-			size--;
-		if (size == lowerSize)
+		if (result != null && --size == LinearProbing.getLowerSize(keys.length))
 			shrink();
 		return result;
 	}
@@ -433,8 +260,6 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		if (capacity == 0)
 			capacity = 1;
 		size = 0;
-		upperSize = computeUpperSize(capacity);
-		lowerSize = computeLowerSize(capacity);
 		this.keys = (K[]) new Object[capacity];
 		this.values = (V[]) new Object[capacity];
 	}
@@ -454,55 +279,34 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		return new EntrySet();
 	}
 
-	private class KeyIterator implements Iterator<K> {
-		// copy of the keys
-		final K[] keysSnapshot;
-		// expected size to check for concurrent modifications
-		final int expectedSize;
-		// current cursor
-		int cursor;
-		// reference to the next key
-		K nextKey;
+	private class KeyIterator extends LinearProbingIterator<K, K> {
 
 		KeyIterator() {
-			this.expectedSize = size;
-			this.keysSnapshot = keys;
-			cursor = 0;
-			seekNext();
-		}
-
-		void seekNext() {
-			while (cursor < keysSnapshot.length)
-				if ((nextKey = keysSnapshot[cursor++]) != null)
-					return;
-			// no next key
-			nextKey = null;
+			super(keys, size);
+			init();
 		}
 
 		@Override
-		public boolean hasNext() {
-			return nextKey != null;
-		}
-
-		@Override
-		public K next() {
+		void checkSize(int expectedSize) {
 			if (expectedSize != size)
 				throw new ConcurrentModificationException();
-			if (nextKey == null)
-				throw new NoSuchElementException();
-			K result = nextKey;
-			seekNext();
-			return result;
 		}
 
 		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
+		void remove(int pos) {
+			LinearProbing.remove(dataSnapshot, values, pos);
+			size--;
+		}
+
+		@Override
+		K getValue(K element, int pos) {
+			return element;
 		}
 
 	}
 
-	private final class KeySet extends AbstractSet<K> implements DirectAccess<K> {
+	private final class KeySet extends AbstractSet<K> implements
+			DirectAccess<K> {
 
 		@Override
 		public Iterator<K> iterator() {
@@ -525,57 +329,41 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		}
 
 		@Override
+		public void clear() {
+			ArrayHashMap.this.clear();
+		}
+
+		@Override
 		public K[] getRawData() {
 			return keys;
 		}
 
 	}
 
-	private class ValueIterator implements Iterator<V> {
-		// copy of the values
-		final V[] valuesSnapshot;
-		// expected size to check for concurrent modifications
-		final int expectedSize;
-		// current cursor
-		int cursor;
-		// reference to the next key
-		V nextValue;
+	private class ValueIterator extends LinearProbingIterator<V, V> {
 
 		ValueIterator() {
-			this.expectedSize = size;
-			this.valuesSnapshot = values;
-			cursor = 0;
-			seekNext();
-		}
-
-		void seekNext() {
-			while (cursor < valuesSnapshot.length)
-				if ((nextValue = valuesSnapshot[cursor++]) != null)
-					return;
-			// no next value
-			nextValue = null;
+			super(values, size);
+			init();
 		}
 
 		@Override
-		public boolean hasNext() {
-			return nextValue != null;
-		}
-
-		@Override
-		public V next() {
+		void checkSize(int expectedSize) {
 			if (expectedSize != size)
 				throw new ConcurrentModificationException();
-			if (nextValue == null)
-				throw new NoSuchElementException();
-			V result = nextValue;
-			seekNext();
-			return result;
 		}
 
 		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
+		void remove(int pos) {
+			LinearProbing.remove(keys, dataSnapshot, pos);
+			size--;
 		}
+
+		@Override
+		V getValue(V element, int pos) {
+			return element;
+		}
+
 	}
 
 	private final class ValueCollection extends AbstractCollection<V> implements
@@ -592,62 +380,44 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 		}
 
 		@Override
+		public void clear() {
+			ArrayHashMap.this.clear();
+		}
+
+		@Override
 		public V[] getRawData() {
 			return values;
 		}
 
 	}
 
-	private class EntryIterator implements Iterator<Map.Entry<K, V>> {
-		// copy of the keys
-		final K[] keysSnapshot;
-		// copy of the values
-		final V[] valuesSnapshot;
-		// expected size to check for modification
-		final int expectedSize;
+	private class EntryIterator extends
+			LinearProbingIterator<K, Map.Entry<K, V>> {
 
-		// current cursor
-		int cursor;
-		// reference to the next key
-		K nextKey;
+		final V[] valuesSnapshot;
 
 		EntryIterator() {
-			this.expectedSize = size;
-			this.keysSnapshot = keys;
+			super(keys, size);
 			this.valuesSnapshot = values;
-			this.cursor = 0;
-			seekNext();
-		}
-
-		void seekNext() {
-			while (cursor < keysSnapshot.length)
-				if ((nextKey = keysSnapshot[cursor++]) != null)
-					return;
-			// no next key found
-			nextKey = null;
+			init();
 		}
 
 		@Override
-		public boolean hasNext() {
-			return nextKey != null;
-		}
-
-		@Override
-		public Entry next() {
+		void checkSize(int expectedSize) {
 			if (expectedSize != size)
 				throw new ConcurrentModificationException();
-			if (nextKey == null)
-				throw new NoSuchElementException();
-			Entry result = new Entry(this, cursor - 1);
-			seekNext();
-			return result;
 		}
 
 		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
+		void remove(int pos) {
+			LinearProbing.remove(dataSnapshot, values, pos);
+			size--;
 		}
 
+		@Override
+		Map.Entry<K, V> getValue(K element, int pos) {
+			return new Entry(this, pos);
+		}
 	}
 
 	class Entry implements Map.Entry<K, V> {
@@ -663,7 +433,7 @@ public class ArrayHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 
 		@Override
 		public K getKey() {
-			return iterator.keysSnapshot[cursor];
+			return iterator.dataSnapshot[cursor];
 		}
 
 		@Override
