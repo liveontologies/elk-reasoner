@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.benchmark;
 
-import org.semanticweb.elk.benchmark.reasoning.ClassificationTask;
+import org.semanticweb.elk.benchmark.proofs.ProofsForAllSubsumptionTaskCollection;
 
 
 
@@ -43,10 +43,10 @@ public class CLIDriver {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		BenchmarkUtils.runTask(ClassificationTask.class.getName(),
+		/*BenchmarkUtils.runTask(ClassificationTask.class.getName(),
 				1, 2,
 				//new String[]{"/home/pavel/ulm/data/snomed/snomedStated_INT_20130731.owl", "4"});
-				new String[]{"/home/pavel/tmp/ore-elk-wrong/00757.owl", "4"});
+				new String[]{"/home/pavel/tmp/ore-elk-wrong/00757.owl", "4"});*/
 		/*BenchmarkUtils.runTaskCollection2(IncrementalClassificationMultiDeltas.class.getName(),
 				0, 1,
 				new String[]{"/home/pavel/ulm/data/snomed/incremental-1", "4"});*/
@@ -70,5 +70,8 @@ public class CLIDriver {
 				//new String[]{"/home/pavel/ulm/data/galens/EL-GALEN-rewritten.owl", "1", "10000"});
 				new String[]{"/home/pavel/ulm/data/go/go_merged_rewritten.owl", "1", "100000"});
 				//new String[]{"/home/pavel/ulm/data/snomed/snomedStated_INT_20130731_rewritten.owl", "4", "10000"}); */
+		BenchmarkUtils.runTaskCollection2(ProofsForAllSubsumptionTaskCollection.class.getName(),
+				0, 1,
+				new String[]{"/home/pavel/ulm/data/galens/EL-GALEN.owl", "4"});
 	}
 }

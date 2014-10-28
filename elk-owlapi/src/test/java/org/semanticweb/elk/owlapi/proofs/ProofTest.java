@@ -25,15 +25,13 @@ package org.semanticweb.elk.owlapi.proofs;
  * #L%
  */
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,24 +54,13 @@ import org.semanticweb.elk.testing.VoidTestOutput;
 import org.semanticweb.elk.testing.io.URLTestIO;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.reasoner.InferenceType;
-import org.semanticweb.owlapi.util.InferredAxiomGenerator;
-import org.semanticweb.owlapi.util.InferredEquivalentClassAxiomGenerator;
-import org.semanticweb.owlapi.util.InferredOntologyGenerator;
-import org.semanticweb.owlapi.util.InferredSubClassAxiomGenerator;
 import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
-import org.semanticweb.owlapitools.proofs.OWLInference;
-import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
-import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
+import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,81 +93,33 @@ public class ProofTest {
 
 	@Test
 	public void proofTest() throws Exception {
-		OWLDataFactory factory = OWLManager.getOWLDataFactory();
+		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		// loading and classifying via the OWL API
 		final OWLOntology ontology = loadOntology(manifest.getInput().getInputStream());
-		ExplainingOWLReasoner reasoner = OWLAPITestUtils.createReasoner(ontology);
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		final ExplainingOWLReasoner reasoner = OWLAPITestUtils.createReasoner(ontology);
 
 		try {
-			reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-			
-			List<InferredAxiomGenerator<? extends OWLAxiom>> gens = new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
-	        gens.add(new InferredSubClassAxiomGenerator());
-	        gens.add(new InferredEquivalentClassAxiomGenerator());
-	        // put the inferred axioms into a fresh empty ontology.
-	        OWLOntology infOnt = manager.createOntology();
-	        InferredOntologyGenerator iog = new InferredOntologyGenerator(reasoner, gens);
-	        
-	        iog.fillOntology(manager, infOnt);
+			// get all inferred subclass axioms
+			//OWLOntology infOnt = ProofTestUtils.getInferredTaxonomy(reasoner);
 			// now do testing
-	        OWLInferenceVisitor bindingChecker = new OWLInferenceVisitor() {
+			// this visit checks binding of premises to axioms in the source ontology
+	        final OWLInferenceVisitor bindingChecker = ProofTestUtils.getAxiomBindingChecker(ontology);
+	        
+	        ProofTestUtils.visitAllSubsumptionsForProofTests(reasoner, new ProofTestVisitor<Exception>() {
+	        //ProofTestUtils.visitAllSubsumptionsForProofTests(infOnt, new ProofTestVisitor<Exception>() {
 				
 				@Override
-				public void visit(OWLInference inference) {
-					for (OWLExpression premise : inference.getPremises()) {
-						// all asserted premises must be present in the ontology
-						if (premise instanceof OWLAxiomExpression) {
-							OWLAxiomExpression expr = (OWLAxiomExpression) premise;
-							
-							assertTrue("Asserted premise is not found in the ontology", !expr.isAsserted() || isAsserted(ontology, expr.getAxiom()));
-						}
-					}
+				public void visit(OWLClassExpression subsumee, OWLClassExpression subsumer) {
+					LOGGER_.info("Requesting proofs for {} <= {}", subsumee, subsumer);
 					
-				}
-
-				private boolean isAsserted(OWLOntology ontology, OWLAxiom axiom) {
-					for (OWLAxiom ax : ontology.getAxioms()) {
-						if (ax == axiom) {
-							return true;
-						}
+					try {
+						ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(subsumee, subsumer));
+						RecursiveInferenceVisitor.visitInferences(reasoner, factory.getOWLSubClassOfAxiom(subsumee, subsumer), bindingChecker);
+					} catch (ProofGenerationException e) {
+						fail(e.getMessage());
 					}
-					
-					return false;
 				}
-			};
-	        
-	        for (OWLSubClassOfAxiom ax : infOnt.getAxioms(AxiomType.SUBCLASS_OF)) {
-	        	if (!ax.getSubClass().isOWLNothing() && !ax.getSuperClass().isOWLThing()) {
-	        		LOGGER_.info("Requesting proofs for {}", ax);
-	        		
-	        		ProofTestUtils.provabilityTest(reasoner, ax);
-	        		RecursiveInferenceVisitor.visitInferences(reasoner, ax, bindingChecker);
-	        	}
-	        }
-	        
-	        for (OWLEquivalentClassesAxiom ax : infOnt.getAxioms(AxiomType.EQUIVALENT_CLASSES)) {
-	        	List<? extends OWLClassExpression> classes = ax.getClassExpressionsAsList();
-	        	
-	        	for (int i = 0; i < classes.size() - 1; i++) {
-	        		for (int j = i + 1; j < classes.size(); j++) {
-	        			OWLClassExpression sub = classes.get(i);
-	        			OWLClassExpression sup = classes.get(j);
-	        			
-	        			if (!sub.isOWLNothing() && !sup.isOWLThing()) {
-	        				LOGGER_.info("Requesting proofs for {} <= {}", sub, sup);
-	        				
-	        				ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
-	        				RecursiveInferenceVisitor.visitInferences(reasoner, factory.getOWLSubClassOfAxiom(sub, sup), bindingChecker);
-	        				
-	        				LOGGER_.info("Requesting proofs for {} <= {}", sup, sub);
-	        				
-	        				ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sup, sub));
-	        				RecursiveInferenceVisitor.visitInferences(reasoner, factory.getOWLSubClassOfAxiom(sup, sub), bindingChecker);
-	        			}
-	        		}
-	        	}
-	        }
+			});
 			
 		} catch (Exception e) {
 			//swallow..
