@@ -27,6 +27,7 @@ package org.semanticweb.elk.benchmark.proofs;
 
 import java.io.File;
 
+import org.semanticweb.elk.MutableInteger;
 import org.semanticweb.elk.benchmark.BenchmarkUtils;
 import org.semanticweb.elk.benchmark.Metrics;
 import org.semanticweb.elk.benchmark.Task;
@@ -46,6 +47,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
+import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 
 /**
@@ -155,8 +157,23 @@ public class ProofsForAllSubsumptionTaskCollection implements VisitorTaskCollect
 		@Override
 		public void run() throws TaskException {
 			try {
+				// check that proofs can be reconstructed
 				ProofTestUtils.provabilityTest(reasoner_, entailment_);
-				RecursiveInferenceVisitor.visitInferences(reasoner_, entailment_, checker_);
+				// also count inferences
+				final MutableInteger counter = new MutableInteger(0);
+				
+				RecursiveInferenceVisitor.visitInferences(reasoner_, entailment_, new OWLInferenceVisitor() {
+					
+					@Override
+					public void visit(OWLInference inference) {
+						checker_.visit(inference);
+						counter.increment();
+					}
+				});
+				
+				taskMetrics_.incrementRunCount();
+				taskMetrics_.updateLongMetric("inferences.count", counter.get());
+				
 			} catch (ProofGenerationException e) {
 				throw new TaskException(e);
 			}
@@ -174,7 +191,6 @@ public class ProofsForAllSubsumptionTaskCollection implements VisitorTaskCollect
 
 		@Override
 		public void postRun() throws TaskException {
-			// no-op
 		}
 		
 	}
