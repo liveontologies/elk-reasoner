@@ -34,9 +34,12 @@ import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 
 /**
+ * Wrapper around {@link Inference} to expose all expressions (premises and
+ * conclusion) as {@link OWLExpression}s.
+ * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
 public class InferenceWrap implements OWLInference {
 
@@ -87,6 +90,11 @@ public class InferenceWrap implements OWLInference {
 			}
 			
 		};
+	}
+
+	@Override
+	public String toString() {
+		return inference_.toString();
 	}
 
 }
