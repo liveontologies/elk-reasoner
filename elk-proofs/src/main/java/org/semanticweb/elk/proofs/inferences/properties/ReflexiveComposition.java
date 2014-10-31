@@ -32,6 +32,7 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkReflexivePropertyChainLemma;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
+import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
@@ -72,5 +73,10 @@ public class ReflexiveComposition extends AbstractInference {
 	@Override
 	public String toString() {
 		return InferencePrinter.print(this);
+	}
+	
+	@Override
+	public InferenceRule getRule() {
+		return InferenceRule.R_REFLEXIVE_COMPOSITION;
 	}
 }

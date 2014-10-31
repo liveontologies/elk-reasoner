@@ -44,6 +44,8 @@ public interface Inference {
 	public Collection<? extends DerivedExpression> getPremises();
 
 	public DerivedExpression getConclusion();
+	
+	public InferenceRule getRule();
 
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input);
 }

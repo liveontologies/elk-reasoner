@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
@@ -71,5 +72,10 @@ public class InconsistentDisjointness extends AbstractClassInference {
 	@Override
 	public String toString() {
 		return InferencePrinter.print(this);
+	}
+	
+	@Override
+	public InferenceRule getRule() {
+		return InferenceRule.R_INCONSISTENT_DISJOINTNESS;
 	}
 }

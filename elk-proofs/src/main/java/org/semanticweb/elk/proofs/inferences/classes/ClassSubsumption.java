@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
@@ -69,5 +70,10 @@ public class ClassSubsumption extends AbstractClassInference {
 	@Override
 	protected Iterable<DerivedExpression> getRawPremises() {
 		return Arrays.asList(premise_, axiom_);
+	}
+
+	@Override
+	public InferenceRule getRule() {
+		return InferenceRule.R_SUB;
 	}
 }

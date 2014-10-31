@@ -57,5 +57,7 @@ public interface OWLInference {
 	 * @return
 	 */
 	public Collection<OWLExpression> getPremises();
+	
+	public String getName();
 
 }

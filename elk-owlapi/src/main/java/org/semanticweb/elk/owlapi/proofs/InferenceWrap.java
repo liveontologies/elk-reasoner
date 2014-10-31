@@ -97,4 +97,9 @@ public class InferenceWrap implements OWLInference {
 		return inference_.toString();
 	}
 
+	@Override
+	public String getName() {
+		return inference_.getRule().toString();
+	}
+
 }
