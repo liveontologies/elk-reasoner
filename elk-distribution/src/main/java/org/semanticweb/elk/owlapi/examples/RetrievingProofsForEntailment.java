@@ -28,7 +28,6 @@ package org.semanticweb.elk.owlapi.examples;
 import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
@@ -62,16 +61,16 @@ public class RetrievingProofsForEntailment {
 	 * @throws ProofGenerationException 
 	 */
 	public static void main(String[] args) throws OWLOntologyCreationException, ProofGenerationException {
-		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 
 		// Load your ontology.
-		OWLOntology ont = man.loadOntologyFromOntologyDocument(new File("/home/pavel/ulm/data/galens/EL-GALEN.owl"));
+		OWLOntology ont = manager.loadOntologyFromOntologyDocument(new File("/home/pavel/ulm/data/galens/EL-GALEN.owl"));
 		
 		// Create an instance of ELK
 		OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
 		ExplainingOWLReasoner reasoner = (ExplainingOWLReasoner) reasonerFactory.createReasoner(ont);
 		
-		// Precompute classification
+		// Pre-compute classification
 		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
 
 		// Pick the entailment for which we are interested in proofs
@@ -89,7 +88,7 @@ public class RetrievingProofsForEntailment {
 
 	private static void unwindProofs(OWLExpression expression) throws ProofGenerationException {
 		// Start recursive unwinding
-		Queue<OWLExpression> toDo = new LinkedList<OWLExpression>();
+		LinkedList<OWLExpression> toDo = new LinkedList<OWLExpression>();
 		Set<OWLExpression> done = new HashSet<OWLExpression>();
 		
 		toDo.add(expression);
@@ -108,12 +107,12 @@ public class RetrievingProofsForEntailment {
 				for (OWLExpression premise : inf.getPremises()) {
 					
 					if (done.add(premise)) {
-						toDo.add(premise);
+						toDo.addFirst(premise);
 					}
 				}
 				
 				// Uncomment if only interested in one inference per derived expression (that is sufficient to reconstruct one proof)
-				// break;
+				break;
 			}
 		}
 	}

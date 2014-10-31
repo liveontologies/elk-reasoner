@@ -68,7 +68,7 @@ public class DerivedAxiomExpression<E extends ElkAxiom> extends AbstractDerivedE
 	
 	@Override
 	public String toString() {
-		return OwlFunctionalStylePrinter.toString(axiom_);
+		return OwlFunctionalStylePrinter.toString(axiom_) + (asserted_ ? "*" : "");
 	}
 
 	@Override

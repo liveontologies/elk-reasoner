@@ -89,6 +89,8 @@ public class ProofTestUtils {
 			boolean newPremise = false;
 			
 			if (inf.getConclusion().equals(expr) && isAsserted(inf.getConclusion())) {
+				// it is technically possible to have inferences which derive expressions from themselves
+				// TODO avoid it?
 				return true;
 			}
 
