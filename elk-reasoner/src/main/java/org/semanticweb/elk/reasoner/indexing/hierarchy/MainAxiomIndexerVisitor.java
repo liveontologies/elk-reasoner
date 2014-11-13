@@ -153,7 +153,6 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 		IndexedClassExpression superIndexedClass = superElkClass
 				.accept(positiveIndexer);
 
-		//axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(subIndexedClass,	superIndexedClass, assertedAxiom));
 		axiomUpdateFilter.visit(indexedAxiomFactory_.createSubClassOfAxiom(subIndexedClass, superIndexedClass, assertedAxiom));
 	}
 
@@ -166,7 +165,6 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 
 		IndexedClassExpression indexedType = type.accept(positiveIndexer);
 
-		//axiomUpdateFilter.visit(new IndexedSubClassOfAxiom(indexedIndividual, indexedType, assertedAxiom));
 		axiomUpdateFilter.visit(indexedAxiomFactory_.createSubClassOfAxiom(indexedIndividual, indexedType, assertedAxiom));
 	}
 
@@ -184,15 +182,6 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 
 		axiomUpdateFilter.visit(indexedAxiomFactory_.createdSubObjectPropertyOfAxiom(subIndexedProperty, superIndexedProperty, axiom));
 		
-		/*if (multiplicity_ == 1) {
-			subIndexedProperty.addToldSuperObjectProperty(superIndexedProperty);
-			superIndexedProperty.addToldSubPropertyChain(subIndexedProperty);
-		} else {
-			subIndexedProperty
-					.removeToldSuperObjectProperty(superIndexedProperty);
-			superIndexedProperty
-					.removeToldSubObjectProperty(subIndexedProperty);
-		}*/
 	}
 
 	@Override
@@ -215,7 +204,6 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 			indexed.add(c.accept(negativeIndexer));
 		}
 
-		//axiomUpdateFilter.visit(new IndexedDisjointnessAxiom(indexed));
 		axiomUpdateFilter.visit(indexedAxiomFactory_.createDisjointnessAxiom(indexed, axiom));
 	}
 
@@ -225,17 +213,6 @@ public class MainAxiomIndexerVisitor extends AbstractElkAxiomIndexerVisitor
 
 		IndexedObjectProperty indexedReflexiveProperty = (IndexedObjectProperty) axiom.getProperty().accept(positiveIndexer);
 
-		/*if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
-				&& multiplicity_ > 0)
-			// first occurrence of reflexivity axiom
-			index_.addReflexiveProperty(indexedReflexiveProperty);
-
-		indexedReflexiveProperty.reflexiveAxiomOccurrenceNo += multiplicity_;
-
-		if (indexedReflexiveProperty.reflexiveAxiomOccurrenceNo == 0
-				&& multiplicity_ < 0)
-			// no occurrence of reflexivity axiom
-			index_.removeReflexiveProperty(indexedReflexiveProperty);*/
 		axiomUpdateFilter.visit(indexedAxiomFactory_.createReflexiveObjectPropertyAxiom(indexedReflexiveProperty, axiom));
 	}
 

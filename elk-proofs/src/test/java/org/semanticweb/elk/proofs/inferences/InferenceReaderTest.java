@@ -3,14 +3,13 @@
  */
 package org.semanticweb.elk.proofs.inferences;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
+import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.TestUtils;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
@@ -52,8 +51,33 @@ public class InferenceReaderTest {
 		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositions.owl");
 		ElkClass a = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass g = factory_.getClass(new ElkFullIri("http://example.org/G"));
+		
+		TestUtils.provabilityTest(reasoner, a, g);
+		
+		reasoner.shutdown();
+	}
+	
+	@Test(expected=AssertionError.class)
+	public void noProof() throws Exception {
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositions.owl");
+		ElkClass a = factory_.getClass(new ElkFullIri("http://example.org/A"));
+		ElkClass notDerived = factory_.getClass(new ElkFullIri("http://example.org/Invalid"));
+		
+		try {
+			TestUtils.provabilityTest(reasoner, a, notDerived);
+		}
+		finally {
+			reasoner.shutdown();
+		}
+	}
+	
+	@Test
+	public void basicTest() throws Exception {
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("classification_test_input/Existentials.owl");
+		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
+		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/E"));
 		// print inferences 
-		/*RecursiveInferenceVisitor.visitInferences(reasoner, a, g, new AbstractInferenceVisitor<Void, Void>() {
+		RecursiveInferenceVisitor.visitInferences(reasoner, sub, sup, new AbstractInferenceVisitor<Void, Void>() {
 
 			@Override
 			protected Void defaultVisit(Inference inference, Void input) {
@@ -61,13 +85,9 @@ public class InferenceReaderTest {
 				return null;
 			}
 			
-		});*/
+		});
 		
-		assertTrue(TestUtils.provabilityTest(reasoner, a, g));
-		
-		ElkClass notDerived = factory_.getClass(new ElkFullIri("http://example.org/Invalid"));
-		
-		assertFalse(TestUtils.provabilityTest(reasoner, a, notDerived));
+		TestUtils.provabilityTest(reasoner, sub, sup);
 		
 		reasoner.shutdown();
 	}

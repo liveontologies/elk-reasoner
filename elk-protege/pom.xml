@@ -130,8 +130,9 @@
 						<Implementation-Title>ELK Reasoner</Implementation-Title>
 						<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
 						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
-						<Export-Package>org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui</Export-Package>
-						<Private-Package>org.slf4j.*;org.semanticweb.elk.*;-split-package:=merge-first</Private-Package>
+						<!--Export-Package>org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui</Export-Package-->
+						<Export-Package>org.semanticweb.owlapitools.proofs.*</Export-Package>
+						<Private-Package>org.slf4j.*;org.semanticweb.elk.*;org.semanticweb.owlapitools.*;-split-package:=merge-first</Private-Package>
 						<Bundle-SymbolicName>org.semanticweb.elk;singleton:=true</Bundle-SymbolicName>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
 						<Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>

@@ -28,6 +28,7 @@
     <module>owlapi-proofs</module>
 		<module>elk-owlapi</module>
 		<module>elk-protege</module>
+		<module>elk-explanations</module>
 		<module>elk-cli</module>
 		<module>elk-standalone</module>
 		<module>elk-distribution</module>

@@ -34,8 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  * Represents a {@link Contradiction} as the result of a class occurring
  * multiple times in one {@link IndexedDisjointnessAxiom}.
  * 
- * TODO store the inconsistent disjointness axiom explicitly as the side
- * condition or get it from the rule registered for the premise?
+ * TODO it's possible to get the inconsistent axiom from the premise, however, the number of such axioms is probably so small that we don't mind storing it explicitly.
  * 
  * @author Pavel Klinov
  * 
@@ -43,8 +42,11 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  */
 public class ContradictionFromInconsistentDisjointnessAxiom extends ContradictionFromSubsumer<IndexedClassExpression> implements Contradiction, ClassInference {
 
-	public ContradictionFromInconsistentDisjointnessAxiom(IndexedClassExpression p) {
+	private final IndexedDisjointnessAxiom axiom_;
+	
+	public ContradictionFromInconsistentDisjointnessAxiom(IndexedClassExpression p, IndexedDisjointnessAxiom ax) {
 		super(p);
+		axiom_ = ax;
 	}
 	
 	@Override
@@ -56,7 +58,11 @@ public class ContradictionFromInconsistentDisjointnessAxiom extends Contradictio
 	public String toString() {
 		return "Contradiction from " + premise;
 	}
-
+	
+	public IndexedDisjointnessAxiom getAxiom() {
+		return axiom_;
+	}
+	
 	@Override
 	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
 		return visitor.visit(this, parameter);

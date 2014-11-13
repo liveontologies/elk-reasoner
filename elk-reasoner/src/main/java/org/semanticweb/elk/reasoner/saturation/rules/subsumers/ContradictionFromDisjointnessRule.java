@@ -22,6 +22,9 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
@@ -51,28 +54,46 @@ public class ContradictionFromDisjointnessRule extends
 	 * {@link IndexedClassExpression}, for which this rule is registered, occurs
 	 * more than once.
 	 */
-	private int contradictionCounter_;
+	//private int contradictionCounter_;
+	
+	/**
+	 * All {@link IndexedDisjointnessAxiom}s in which the
+	 * {@link IndexedClassExpression}, for which this rule is registered, occurs
+	 * more than once.
+	 */
+	private List<IndexedDisjointnessAxiom> inconsistentAxioms_ = new ArrayList<IndexedDisjointnessAxiom>(1);
 
 	private ContradictionFromDisjointnessRule(ChainableSubsumerRule tail) {
 		super(tail);
-		this.contradictionCounter_ = 0;
+		//this.contradictionCounter_ = 0;
 	}
 
-	private ContradictionFromDisjointnessRule() {
+	private ContradictionFromDisjointnessRule(IndexedDisjointnessAxiom axiom) {
 		this((ChainableSubsumerRule) null);
-		this.contradictionCounter_++;
+		//this.contradictionCounter_++;
+		inconsistentAxioms_.add(axiom);
 	}
 
 	public static void addRulesFor(IndexedDisjointnessAxiom axiom,
 			ModifiableOntologyIndex index) {
-		for (IndexedClassExpression ice : axiom.getInconsistentMembers())
-			index.add(ice, new ContradictionFromDisjointnessRule());
+		for (IndexedClassExpression ice : axiom.getInconsistentMembers()) {
+			index.add(ice, new ContradictionFromDisjointnessRule(axiom));
+		}
 	}
 
 	public static void removeRulesFor(IndexedDisjointnessAxiom axiom,
 			ModifiableOntologyIndex index) {
-		for (IndexedClassExpression ice : axiom.getInconsistentMembers())
-			index.remove(ice, new ContradictionFromDisjointnessRule());
+		for (IndexedClassExpression ice : axiom.getInconsistentMembers()) {
+ 			index.remove(ice, new ContradictionFromDisjointnessRule(axiom));
+		}
+	}
+	
+	private void addAxioms(List<IndexedDisjointnessAxiom> ax) {
+		inconsistentAxioms_.addAll(ax);
+	}
+	
+	private void removeAxioms(List<IndexedDisjointnessAxiom> ax) {
+		inconsistentAxioms_.removeAll(ax);
 	}
 
 	@Override
@@ -83,27 +104,40 @@ public class ContradictionFromDisjointnessRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		producer.produce(premises.getRoot(), new ContradictionFromInconsistentDisjointnessAxiom(premise));
+		for (IndexedDisjointnessAxiom ax : inconsistentAxioms_) {
+			producer.produce(premises.getRoot(), new ContradictionFromInconsistentDisjointnessAxiom(premise, ax));
+		}
 	}
 
 	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
-		ContradictionFromDisjointnessRule rule = ruleChain.getCreate(MATCHER_,
-				FACTORY_);
-		rule.contradictionCounter_ += this.contradictionCounter_;
-		return this.contradictionCounter_ != 0;
+		ContradictionFromDisjointnessRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
+		//rule.contradictionCounter_ += this.contradictionCounter_;
+		//return this.contradictionCounter_ != 0;
+		rule.addAxioms(inconsistentAxioms_);
+		
+		return isEmpty();
 	}
 
 	@Override
 	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
 		ContradictionFromDisjointnessRule rule = ruleChain.find(MATCHER_);
+		
 		if (rule == null) {
 			return false;
 		}
-		rule.contradictionCounter_ -= this.contradictionCounter_;
+		
+		/*rule.contradictionCounter_ -= this.contradictionCounter_;
 		if (rule.isEmpty())
 			ruleChain.remove(MATCHER_);
-		return this.contradictionCounter_ != 0;
+		return this.contradictionCounter_ != 0;*/
+		rule.removeAxioms(inconsistentAxioms_);
+		
+		if (rule.isEmpty()) {
+			ruleChain.remove(MATCHER_);
+		}
+		
+		return isEmpty();
 	}
 
 	@Override
@@ -114,7 +148,8 @@ public class ContradictionFromDisjointnessRule extends
 	}
 
 	protected boolean isEmpty() {
-		return this.contradictionCounter_ == 0;
+		//return this.contradictionCounter_ == 0;
+		return inconsistentAxioms_.isEmpty();
 	}
 
 	private static Matcher<ChainableSubsumerRule, ContradictionFromDisjointnessRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableSubsumerRule, ContradictionFromDisjointnessRule>(

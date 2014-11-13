@@ -25,9 +25,11 @@ package org.semanticweb.elk.proofs;
  */
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
 
@@ -58,5 +60,30 @@ public class ProofReader {
 		ReasonerInferenceReader reader = new ReasonerInferenceReader(reasoner);
 
 		return reader.initialize(subsumee, subsumer);
+	}
+	
+	/**
+	 * Retrieves the full inference graph in which each expression is mapped to inferences using it as a premise. 
+	 * 
+	 * @param reasoner
+	 * @param subsumee
+	 * @param subsumer
+	 * @return
+	 * @throws ElkException
+	 */
+	public static InferenceGraph readInferenceGraph(Reasoner reasoner, ElkClassExpression subsumee,
+			ElkClassExpression subsumer) throws ElkException {
+		final InferenceGraphImpl graph = new InferenceGraphImpl();
+		
+		RecursiveInferenceVisitor.visitInferences(reasoner, subsumee, subsumer, new AbstractInferenceVisitor<Void, Void>() {
+
+			@Override
+			protected Void defaultVisit(Inference inference, Void input) {
+				graph.addInference(inference);
+				return null;
+			}
+		});
+		
+		return graph;
 	}
 }

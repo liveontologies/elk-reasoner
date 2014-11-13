@@ -99,10 +99,8 @@ public class ProofTest {
 		final ExplainingOWLReasoner reasoner = OWLAPITestUtils.createReasoner(ontology);
 
 		try {
-			// get all inferred subclass axioms
-			//OWLOntology infOnt = ProofTestUtils.getInferredTaxonomy(reasoner);
 			// now do testing
-			// this visit checks binding of premises to axioms in the source ontology
+			// this visitor checks binding of premises to axioms in the source ontology
 	        final OWLInferenceVisitor bindingChecker = ProofTestUtils.getAxiomBindingChecker(ontology);
 	        
 	        ProofTestUtils.visitAllSubsumptionsForProofTests(reasoner, new ProofTestVisitor<Exception>() {
@@ -114,7 +112,7 @@ public class ProofTest {
 					
 					try {
 						ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(subsumee, subsumer));
-						RecursiveInferenceVisitor.visitInferences(reasoner, factory.getOWLSubClassOfAxiom(subsumee, subsumer), bindingChecker);
+						RecursiveInferenceVisitor.visitInferences(reasoner, factory.getOWLSubClassOfAxiom(subsumee, subsumer), bindingChecker, true);
 					} catch (ProofGenerationException e) {
 						fail(e.getMessage());
 					}

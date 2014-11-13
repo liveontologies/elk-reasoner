@@ -24,6 +24,8 @@ package org.semanticweb.elk.proofs.inferences.mapping;
  * #L%
  */
 
+import java.util.Collection;
+
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -47,6 +49,8 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryImpl;
 import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.inferences.InferenceRule;
+import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.classes.ClassSubsumption;
 import org.semanticweb.elk.proofs.inferences.classes.ConjunctionComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ConjunctionDecomposition;
@@ -102,8 +106,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Maps one or more lower-level inferences to a single {@link Inference}. 
- * It returns {@code null} if the low-level inference does not correspond to any {@link Inference}. 
+ * Maps one or more lower-level inferences to a single {@link Inference}. If the given low-level
+ * inference cannot be mapped, one the following is returned:
+ * 
+ * i) {@link #STOP} meaning that the low-level inference is not a part of any higher-level inference (or a part of the inference which already
+ * was produced).
+ * ii) {@link #CONTINUE} meaning that the low-level inference is a part of some higher-level inference and this mapper needs to see
+ * more low-level inferences to produce it.  
  * 
  * @author Pavel Klinov
  * 
@@ -112,6 +121,10 @@ import org.slf4j.LoggerFactory;
 public class SingleInferenceMapper {
 	
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(SingleInferenceMapper.class);
+	
+	static final Inference STOP = new Unmappable();
+	
+	static final Inference CONTINUE = new Unmappable();
 	
 	private final ElkObjectFactory factory_;
 	
@@ -130,8 +143,6 @@ public class SingleInferenceMapper {
 	
 	public Inference map(ClassInference inference,
 			IndexedClassExpression whereStored) {
-		LOGGER_.trace("Mapping {} in {}", inference, whereStored);
-		
 		Inference userInf = inference.acceptTraced(new MappingVisitor(), whereStored);
 		
 		LOGGER_.trace("Mapped {} in {} => {}", inference, whereStored, userInf);
@@ -140,13 +151,42 @@ public class SingleInferenceMapper {
 	}
 
 	public Inference map(ObjectPropertyInference inference) {
-		LOGGER_.trace("Mapping {}", inference);
-		
 		Inference userInf = inference.acceptTraced(new MappingVisitor(), null);
 		
 		LOGGER_.trace("Mapped {} => {}", inference, userInf);
 		
 		return userInf;
+	}
+	
+	/**
+	 * Special kinds of {@link Inference} to return as instructions to the outer code.
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	static class Unmappable implements Inference {
+
+		@Override
+		public Collection<? extends DerivedExpression> getPremises() {
+			return null;
+		}
+
+		@Override
+		public DerivedExpression getConclusion() {
+			return null;
+		}
+
+		@Override
+		public InferenceRule getRule() {
+			return null;
+		}
+
+		@Override
+		public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
+			return null;
+		}
+		
 	}
 	
 	/**
@@ -166,7 +206,7 @@ public class SingleInferenceMapper {
 		public Inference visit(InitializationSubsumer<?> inference,
 				IndexedClassExpression parameter) {
 			// don't map init inferences
-			return null;
+			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
@@ -227,20 +267,14 @@ public class SingleInferenceMapper {
 		public Inference visit(ReflexiveSubsumer<?> inference,
 				IndexedClassExpression input) {
 			ElkClassExpression sub = Deindexer.deindex(input);
-			ElkClassExpression sup = Deindexer.deindex(inference
-					.getExpression());
-			ElkSubClassOfAxiom subsumerPremise = factory_.getSubClassOfAxiom(
-					sub, sup);
+			ElkClassExpression sup = Deindexer.deindex(inference.getExpression());
+			ElkSubClassOfAxiom conclusion = factory_.getSubClassOfAxiom(sub, sup);
 			ElkObjectProperty property = inference.getReflexivityPremise()
 					.getPropertyChain().getElkObjectProperty();
-			ElkSubObjectPropertyOfAxiom propertySubsumption = factory_
-					.getSubObjectPropertyOfAxiom(property,
-							Deindexer.deindex(inference.getRelation()));
 
-			return new ReflexiveExistentialComposition(Deindexer.deindex(input),
-					subsumerPremise,
+			return new ReflexiveExistentialComposition(conclusion,
 					factory_.getReflexiveObjectPropertyAxiom(property),
-					propertySubsumption, factory_, exprFactory_);
+					exprFactory_);
 		}
 		
 		// Creates existential composition inferences by analyzing the chain premise. Depending on whether
@@ -334,28 +368,28 @@ public class SingleInferenceMapper {
 		public Inference visit(ReversedForwardLink inference,
 				IndexedClassExpression input) {
 			// not a self-contained user inference
-			return null;
+			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
 		public Inference visit(DecomposedExistentialBackwardLink inference,
 				IndexedClassExpression input) {
 			// not a self-contained user inference
-			return null;
+			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
 		public Inference visit(DecomposedExistentialForwardLink inference,
 				IndexedClassExpression input) {
 			// not a self-contained user inference
-			return null;
+			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
 		public Inference visit(TracedPropagation inference,
 				IndexedClassExpression input) {
 			// not a self-contained user inference
-			return null;
+			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
@@ -392,8 +426,8 @@ public class SingleInferenceMapper {
 		@Override
 		public Inference visit(ContradictionFromOwlNothing inference,
 				IndexedClassExpression input) {
-			// not a self-contained user inference			
-			return null;
+			// not a self-contained user inference but we need to see inferences for owl:Nothing and map those.
+			return SingleInferenceMapper.CONTINUE;
 		}
 
 		@Override
@@ -404,7 +438,7 @@ public class SingleInferenceMapper {
 			ElkObjectProperty r = Deindexer.deindex(inference.getLinkPremise().getRelation());
 			ElkClassExpression d = Deindexer.deindex(inference.getInferenceContextRoot(whereStored));
 			ElkObjectSomeValuesFrom rSomeD = factory_.getObjectSomeValuesFrom(r, d);
-			// TODO check that we can explain D <= owl:Nothing
+
 			return new ExistentialComposition(c, PredefinedElkClass.OWL_NOTHING,
 					factory_.getSubClassOfAxiom(c, rSomeD),
 					factory_.getSubClassOfAxiom(d, PredefinedElkClass.OWL_NOTHING),
@@ -415,7 +449,7 @@ public class SingleInferenceMapper {
 		public Inference visit(DisjointSubsumerFromSubsumer inference,
 				IndexedClassExpression input) {
 			// not a self-contained user inference
-			return null;
+			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
@@ -487,7 +521,7 @@ public class SingleInferenceMapper {
 				public ChainSubsumption visit(IndexedBinaryPropertyChain hh) {
 					// first premise is not an axiom
 					ElkObjectPropertyChain chain = Deindexer.deindex(hh);
-					DerivedExpression firstPremise = exprFactory_.create(lemmaObjectFactory_.getReflexivePropertyChainLemma(chain));
+					DerivedExpression firstPremise = exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(sub, chain));
 					ElkSubObjectPropertyOfAxiom secondPremise = factory_.getSubObjectPropertyOfAxiom(chain, s);
 					
 					return new ChainSubsumption(factory_.getSubObjectPropertyOfAxiom(sub, s), firstPremise, secondPremise, exprFactory_);
@@ -497,7 +531,7 @@ public class SingleInferenceMapper {
 
 		@Override
 		public Inference visit(PropertyChainInitialization inference, Void input) {
-			return null;
+			return SingleInferenceMapper.STOP;
 		}
 
 		@Override

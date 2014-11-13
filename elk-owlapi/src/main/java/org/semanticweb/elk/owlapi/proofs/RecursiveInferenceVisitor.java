@@ -29,7 +29,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
@@ -43,7 +43,7 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
  */
 public class RecursiveInferenceVisitor {
 
-	public static void visitInferences(ExplainingOWLReasoner reasoner, OWLSubClassOfAxiom axiom, OWLInferenceVisitor visitor) throws ProofGenerationException {
+	public static void visitInferences(ExplainingOWLReasoner reasoner, OWLAxiom axiom, OWLInferenceVisitor visitor, boolean allProofs) throws ProofGenerationException {
 		OWLExpression next = reasoner.getDerivedExpression(axiom);
 		// start recursive unwinding
 		Queue<OWLExpression> toDo = new LinkedList<OWLExpression>();
@@ -68,6 +68,11 @@ public class RecursiveInferenceVisitor {
 					if (done.add(premise)) {
 						toDo.add(premise);
 					}
+				}
+				
+				if (!allProofs) {
+					// a single proofs is sufficient
+					break;
 				}
 			}
 		}

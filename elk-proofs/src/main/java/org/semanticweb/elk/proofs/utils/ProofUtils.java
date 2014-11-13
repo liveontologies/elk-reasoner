@@ -28,6 +28,10 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
+import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
 
 /**
  * @author Pavel Klinov
@@ -50,6 +54,23 @@ public class ProofUtils {
 			}
 			
 		});
+	}
+	
+	public static boolean isAsserted(DerivedExpression expr) {
+		return expr.accept(new ExpressionVisitor<Void, Boolean>() {
+
+			@Override
+			public Boolean visit(DerivedAxiomExpression<?> expr, Void input) {
+				return expr.isAsserted();
+			}
+
+			@Override
+			public Boolean visit(DerivedLemmaExpression expr, Void input) {
+				// lemmas can not be asserted
+				return false;
+			}
+			
+		}, null);
 	}
 
 }

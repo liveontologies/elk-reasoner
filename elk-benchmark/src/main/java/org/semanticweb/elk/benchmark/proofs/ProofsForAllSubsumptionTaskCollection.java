@@ -169,7 +169,7 @@ public class ProofsForAllSubsumptionTaskCollection implements VisitorTaskCollect
 						checker_.visit(inference);
 						counter.increment();
 					}
-				});
+				}, true);
 				
 				taskMetrics_.incrementRunCount();
 				taskMetrics_.updateLongMetric("inferences.count", counter.get());

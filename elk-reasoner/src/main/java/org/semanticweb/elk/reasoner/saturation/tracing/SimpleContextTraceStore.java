@@ -388,7 +388,14 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 
 	@Override
 	public void accept(Conclusion conclusion, ClassInferenceVisitor<IndexedClassExpression, ?> visitor) {
+		//if (contradictionInferences_.isEmpty()) { 
 		conclusion.accept(inferenceReader_, visitor);
+		/*}
+		else {
+			for (ClassInference inf : contradictionInferences_) {
+				inf.acceptTraced(visitor, contextRoot_);
+			}
+		}*/
 	}
 
 	public Iterable<ClassInference> getSubsumerInferences(

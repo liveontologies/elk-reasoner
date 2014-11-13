@@ -24,18 +24,11 @@ package org.semanticweb.elk.proofs.inferences.classes;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
@@ -52,41 +45,15 @@ public class ReflexiveExistentialComposition extends
 
 	private final DerivedExpression reflexPremise_;
 	
-	private final DerivedExpression subsumerPremise_;
-	
-	private final DerivedExpression propertyPremise_;
-	
-	public ReflexiveExistentialComposition(ElkClassExpression sub,
-			ElkSubClassOfAxiom subsumerPremise,
+	public ReflexiveExistentialComposition(
+			ElkSubClassOfAxiom subClassOfAxiom,
 			ElkReflexiveObjectPropertyAxiom reflPremise,
-			ElkSubObjectPropertyOfAxiom propPremise, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
-		super(getConclusion(sub, subsumerPremise, propPremise, factory), exprFactory);
+			DerivedExpressionFactory exprFactory) {
+		super(subClassOfAxiom, exprFactory);
 		
 		reflexPremise_ = exprFactory.create(reflPremise);
-		subsumerPremise_ = exprFactory.create(subsumerPremise);
-		propertyPremise_ = exprFactory.create(propPremise);
 	}
 
-	private static ElkSubClassOfAxiom getConclusion(ElkClassExpression sub, ElkSubClassOfAxiom subPremise, ElkSubObjectPropertyOfAxiom propPremise, ElkObjectFactory factory) {
-		ElkObjectProperty supProperty = propPremise.getSuperObjectPropertyExpression().accept(new ElkObjectPropertyExpressionVisitor<ElkObjectProperty>() {
-
-			@Override
-			public ElkObjectProperty visit(ElkObjectInverseOf elkObjectInverseOf) {
-				throw new IllegalArgumentException("Inverses aren't in EL");
-			}
-
-			@Override
-			public ElkObjectProperty visit(ElkObjectProperty elkObjectProperty) {
-				return elkObjectProperty;
-			}
-			
-		});
-		
-		ElkObjectSomeValuesFrom existential = factory.getObjectSomeValuesFrom(supProperty, subPremise.getSuperClassExpression());
-		
-		return factory.getSubClassOfAxiom(sub, existential);
-	}
-	
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
@@ -94,7 +61,7 @@ public class ReflexiveExistentialComposition extends
 
 	@Override
 	public Collection<DerivedExpression> getRawPremises() {
-		return Arrays.asList(reflexPremise_, subsumerPremise_, propertyPremise_);
+		return Collections.singleton(reflexPremise_);
 	}
 
 	@Override

@@ -635,7 +635,7 @@ public abstract class AbstractReasonerState {
 
 		return traceState.getTraceStore().getReader();
 	}
-	
+	// TODO hide this?
 	public void submitForTracing(ElkClassExpression sub, ElkClassExpression sup) {
 		IndexedClassExpression subsumee = sub.accept(objectCache_
 				.getIndexObjectConverter());
@@ -657,24 +657,24 @@ public abstract class AbstractReasonerState {
 		traceState.clearTracingMap();
 	}
 	
-	private Conclusion convertTraceTarget(IndexedClassExpression subsumee, IndexedClassExpression subsumer) {
+	boolean isSatisfiable(IndexedClassExpression subsumee) {
 		Context subsumeeContext = saturationState.getContext(subsumee);
 		
 		if (subsumeeContext != null) {
-			Conclusion conclusion = null;
-			
-			if (subsumeeContext.containsConclusion(ContradictionImpl.getInstance())) {
-				// the subsumee is unsatisfiable so we explain the unsatisfiability
-				conclusion = ContradictionImpl.getInstance();
-			}
-			else {
-				conclusion = new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer);
-			}
-			
-			return conclusion;
+			return !subsumeeContext.containsConclusion(ContradictionImpl.getInstance());
 		}
 		
-		throw new IllegalArgumentException("Unknown class: " + subsumee);
+		return true;
+	}
+	
+	private Conclusion convertTraceTarget(IndexedClassExpression subsumee, IndexedClassExpression subsumer) {
+		if (!isSatisfiable(subsumee)) {
+				// the subsumee is unsatisfiable so we explain the unsatisfiability
+			return ContradictionImpl.getInstance();
+		}
+		else {
+			return new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer);
+		}
 	}
 	
 	@Deprecated

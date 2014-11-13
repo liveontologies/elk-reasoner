@@ -30,7 +30,7 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceUnwinder;
+import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
@@ -47,11 +47,11 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Abstr
  */
 public class InferenceMapper {
 
-	private final TraceUnwinder unwinder_;
+	private final RecursiveTraceUnwinder unwinder_;
 	
 	private final DerivedExpressionFactory exprFactory_;
 	
-	public InferenceMapper(TraceUnwinder unwinder, DerivedExpressionFactory factory) {
+	public InferenceMapper(RecursiveTraceUnwinder unwinder, DerivedExpressionFactory factory) {
 		unwinder_ = unwinder;
 		exprFactory_ = factory;
 	}
@@ -80,32 +80,39 @@ public class InferenceMapper {
 		final SingleInferenceMapper singleMapper = new SingleInferenceMapper(exprFactory_);
 		
 		unwinder_.accept(cxt, conclusion, 
-				new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
+				new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
 
 					@Override
-					protected Void defaultTracedVisit(ClassInference inference,
+					protected Boolean defaultTracedVisit(ClassInference inference,
 							IndexedClassExpression whereStored) {
 						Inference mapped = singleMapper.map(inference, whereStored);
 						
-						if (mapped != null) {
+						if (mapped == SingleInferenceMapper.CONTINUE) {
+							// continue unwinding and mapping
+							return true;
+						}
+						else if (mapped != SingleInferenceMapper.STOP) {
 							mapped.accept(visitor, null);
 						}
-						
-						return null;
+						// stop because either an inference was mapped or it can be ignored
+						return false;
 					}
 				}, 
-				new AbstractObjectPropertyInferenceVisitor<Void, Void>() {
+				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 					@Override
-					protected Void defaultTracedVisit(
+					protected Boolean defaultTracedVisit(
 							ObjectPropertyInference inference, Void input) {
 						Inference mapped = singleMapper.map(inference);
 						
-						if (mapped != null) {
+						if (mapped == SingleInferenceMapper.CONTINUE) {
+							return true;
+						}
+						else if (mapped != SingleInferenceMapper.STOP) {
 							mapped.accept(visitor, null);
 						}
 						
-						return null;
+						return false;
 					}
 				});
 	}
@@ -116,18 +123,19 @@ public class InferenceMapper {
 		
 		unwinder_.accept(
 				conclusion,
-				new AbstractObjectPropertyInferenceVisitor<Void, Void>() {
+				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 					@Override
-					protected Void defaultTracedVisit(
+					protected Boolean defaultTracedVisit(
 							ObjectPropertyInference inference, Void input) {
 						Inference mapped = singleMapper.map(inference);
 						
 						if (mapped != null) {
 							mapped.accept(visitor, null);
+							return false;
 						}
 						
-						return null;
+						return true;
 					}
 				});
 	}	

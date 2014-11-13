@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<!--parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent-->
+	<parent>
+		<artifactId>elk-parent</artifactId>
+		<groupId>org.semanticweb.elk</groupId>
+		<version>0.5.0-SNAPSHOT</version>
+	</parent>
+	
+	<!--groupId>edu.stanford.protege</groupId>	
+	<artifactId>org.protege.explanation</artifactId>
+	<version>1.0.1-SNAPSHOT</version>
+	<packaging>bundle</packaging-->
+  <artifactId>elk-explanations</artifactId>
+	<packaging>bundle</packaging>
+
+	<name>Explanation Workbench</name>
+	<description>A plug-in that adds explanation facilities to the Protege Desktop ontology editor</description>
+	<url>http://owl.cs.manchester.ac.uk/explanation</url>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<log4j.lower.version>1.2</log4j.lower.version>
+		<log4j.upper.version>2</log4j.upper.version>
+	</properties>
+
+	<developers>
+		<developer>
+			<name>Matthew Horridge</name>
+			<email>matthew.horridge@stanford.edu</email>
+		</developer>
+	</developers>
+	
+	<!--scm>
+		<connection>scm:git:git@github.com:protegeproject/explanation-workbench.git</connection>
+		<developerConnection>scm:git:git@github.com:protegeproject/explanation-workbench.git</developerConnection>
+		<url>https://github.com/protegeproject/explanation-workbench</url>
+	</scm>
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/protegeproject/explanation-workbench/issues</url>
+	</issueManagement-->	
+
+    <repositories>
+      <repository>
+        <id>github</id>
+        <url>https://github.com/protegeproject/mvn-repo/raw/master/releases</url>
+      </repository>
+    </repositories>
+    
+	<dependencies>
+        <dependency>
+			<groupId>edu.stanford.protege</groupId>
+			<artifactId>org.protege.common</artifactId>
+			<version>4.3.0</version>
+        </dependency>
+
+        <dependency>
+			<groupId>edu.stanford.protege</groupId>
+			<artifactId>org.protege.editor.core.application</artifactId>
+			<version>4.3.0</version>
+        </dependency>
+        
+        <dependency>
+			<groupId>edu.stanford.protege</groupId>
+			<artifactId>org.protege.editor.owl</artifactId>
+			<version>4.3.0</version>
+        </dependency>
+        
+		<dependency>
+			<groupId>org.semanticweb.owl</groupId>
+			<artifactId>explanation</artifactId>
+			<version>3.3.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>owlapi-proofs</artifactId>
+			<version>${project.version}</version>
+		</dependency>	
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency> 
+     	<groupId>org.slf4j</groupId>
+     	<artifactId>slf4j-api</artifactId>
+   	</dependency>
+   		<dependency> 
+     		<groupId>org.slf4j</groupId>
+     		<artifactId>slf4j-log4j12</artifactId>
+   		</dependency>
+
+	</dependencies>
+	
+	<build>
+		<plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>3.0</version>
+              <configuration>
+                <source>1.6</source>
+                <target>1.6</target>
+              </configuration>
+            </plugin>
+
+            <plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.3.7</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
+						<Bundle-ClassPath>., {maven-dependencies}</Bundle-ClassPath>
+						<Bundle-SymbolicName>org.semanticweb.owl.proofs;singleton:=true</Bundle-SymbolicName>
+						<Bundle-Vendor>University of Ulm</Bundle-Vendor>
+						<Embed-Dependency>explanation</Embed-Dependency>
+						<Import-Package>
+							org.eclipse.core.runtime;registry=split, 
+							org.protege.editor.core.*;version="4.3", <!-- equivalent to [4.3,infinity) -->
+							org.protege.editor.owl.*;version="4.3",
+							org.apache.log4j.*;version="[${log4j.lower.version},${log4j.upper.version})",
+							org.semanticweb.owlapitools.*="0.4",
+							*
+						</Import-Package>
+						<!--Export-Package>org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui</Export-Package-->
+						<Private-Package>org.slf4j.*;-split-package:=merge-first</Private-Package>						
+						<Include-Resource>plugin.xml, {maven-resources}</Include-Resource>
+					</instructions>
+					<executions>
+						<execution>
+							<id>bundle-manifest</id>
+							<phase>install</phase>
+							<goals>    
+								<goal>manifest</goal>
+							</goals>   
+					</execution>
+                </executions>
+              </configuration>
+            </plugin>
+		</plugins>
+	</build>
+</project>

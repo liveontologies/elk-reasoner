@@ -24,16 +24,16 @@ package org.semanticweb.elk.proofs.utils;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.proofs.InferenceGraph;
 import org.semanticweb.elk.proofs.ProofReader;
-import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.reasoner.Reasoner;
 
@@ -48,61 +48,42 @@ public class TestUtils {
 	// if either it doesn't require a proof (i.e. is a tautology or asserted) or
 	// returns at least one inference such that each of the premises is
 	// provable.
-	public static boolean provabilityTest(Reasoner reasoner, ElkClass sub,
-			ElkClass sup) throws ElkException {
-		DerivedExpression next = ProofReader.start(reasoner, sub, sup);
-
-		return proved(next, new HashSet<DerivedExpression>(Arrays.asList(next)));
-	}
-
-	// TODO recursion is probably OK for short tests but better to re-write
-	// using queues and loops
-	private static boolean proved(DerivedExpression expr, HashSet<DerivedExpression> seen) throws ElkException {
-		// the expression represents an axiom in the ontology
-		if (isAsserted(expr)) {
-			return true;
+	public static void provabilityTest(Reasoner reasoner, ElkClassExpression sub,
+			ElkClassExpression sup) throws ElkException {
+		InferenceGraph graph = ProofReader.readInferenceGraph(reasoner, sub, sup);
+		
+		//System.out.println(graph);
+		
+		if (graph.getExpressions().isEmpty()) {
+			throw new AssertionError(String.format("There is no proof of %s <= %s", sub, sup));
 		}
-
-		for (Inference inf : expr.getInferences()) {
-			// see if this inference proves the expression. it does if there
-			// exists a not yet visited premise which is provable.
-			boolean proves = true;
-			boolean newPremise = false;
-			// now, after looking at this inferences, we conclude that the expression is, in fact, an asserted axiom
-			if (inf.getConclusion().equals(expr) && isAsserted(inf.getConclusion())) {
-				return true;
-			}
-
-			for (DerivedExpression premise : inf.getPremises()) {
-				if (seen.add(premise)) {
-					newPremise = true;
-					proves &= proved(premise, seen);
-				}
-			}
-
-			if (proves && newPremise) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private static boolean isAsserted(DerivedExpression expr) {
-		return expr.accept(new ExpressionVisitor<Void, Boolean>() {
-
-			@Override
-			public Boolean visit(DerivedAxiomExpression<?> expr, Void input) {
-				return expr.isAsserted();
-			}
-
-			@Override
-			public Boolean visit(DerivedLemmaExpression expr, Void input) {
-				// lemmas can not be asserted
-				return false;
+		
+		Set<DerivedExpression> proved = new HashSet<DerivedExpression>(graph.getExpressions().size());
+		Queue<DerivedExpression> toDo = new LinkedList<DerivedExpression>(graph.getRootExpressions()); 
+		
+		for (;;) {
+			DerivedExpression next = toDo.poll();
+			
+			if (next == null) {
+				break;
 			}
 			
-		}, null);
+			if (proved.add(next)) {
+				
+				//System.err.println("Proved: " + next);
+				
+				for (Inference inf : graph.getInferencesForPremise(next)) {
+					if (proved.containsAll(inf.getPremises())) {
+						toDo.add(inf.getConclusion());
+					}
+				}
+			}
+		}
+		
+		for (DerivedExpression expr : graph.getExpressions()) {
+			if (!proved.contains(expr)) {
+				throw new AssertionError(String.format("There is no acyclic proof of %s", expr));
+			}
+		}
 	}
-
 }

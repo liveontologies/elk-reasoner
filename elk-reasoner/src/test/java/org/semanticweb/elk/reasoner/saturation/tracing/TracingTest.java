@@ -155,95 +155,95 @@ public class TracingTest {
 				try {
 					LOGGER_.trace("Axiom binding test: {} => {}", subsumee, subsumer);
 					
-					ClassInferenceVisitor<IndexedClassExpression, Void> classInferenceChecker = new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
+					ClassInferenceVisitor<IndexedClassExpression, Boolean> classInferenceChecker = new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
 
 						@Override
-						protected Void defaultTracedVisit(ClassInference inference, IndexedClassExpression root) {
-							return null;
+						protected Boolean defaultTracedVisit(ClassInference inference, IndexedClassExpression root) {
+							return true;
 						}
 						
 						// axioms used as side conditions of this rule, should be able to look them up
 						@Override
-						public Void visit(SubClassOfSubsumer<?> inference, IndexedClassExpression root) {
+						public Boolean visit(SubClassOfSubsumer<?> inference, IndexedClassExpression root) {
 							ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 							
 							assertNotNull("Failed to look up the ontology axiom for the subsumption inference " + inference, axiom);
-							return null;
+							return true;
 						}
 						
 						@Override
-						public Void visit(DisjointSubsumerFromSubsumer inference, IndexedClassExpression root) {
+						public Boolean visit(DisjointSubsumerFromSubsumer inference, IndexedClassExpression root) {
 							ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 							
 							assertNotNull("Failed to look up the ontology axiom for the disjoint subsumer inference " + inference, axiom);
-							return null;
+							return true;
 						}
 						
 						@Override
-						public Void visit(ComposedBackwardLink inference, IndexedClassExpression root) {
+						public Boolean visit(ComposedBackwardLink inference, IndexedClassExpression root) {
 							IndexedPropertyChain subChain = inference.getSubPropertyChain().getSubPropertyChain();
 							
 							if (subChain != inference.getRelation()) {
 								ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 								
 								assertNotNull("Failed to look up the property axiom for the composition infrence " + inference, axiom);
-								return null;
+								return true;
 							}
 							
-							return null;
+							return true;
 						}
 
 						@Override
-						public Void visit(ReversedForwardLink inference, IndexedClassExpression root) {
+						public Boolean visit(ReversedForwardLink inference, IndexedClassExpression root) {
 							IndexedPropertyChain subChain = inference.getSubPropertyChain().getSubPropertyChain();
 							
 							if (subChain != inference.getRelation()) {
 								ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 								
 								assertNotNull("Failed to look up the property axiom for the composition infrence " + inference, axiom);
-								return null;
+								return true;
 							}
 							
-							return null;
+							return true;
 						}
 						
 					};
 					
-					ObjectPropertyInferenceVisitor<?, ?> propertyInferenceChecker = new AbstractObjectPropertyInferenceVisitor<Void, Void>() {
+					ObjectPropertyInferenceVisitor<?, Boolean> propertyInferenceChecker = new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 						@Override
-						protected Void defaultTracedVisit(
+						protected Boolean defaultTracedVisit(
 								ObjectPropertyInference inference, Void input) {
-							return null;
+							return true;
 						}
 
 						@Override
-						public Void visit(ToldReflexiveProperty inference,
+						public Boolean visit(ToldReflexiveProperty inference,
 								Void input) {
 							ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 							
 							assertNotNull("Failed to look up the axiom for the reflexivity inference " + inference, axiom);
-							return null;
+							return true;
 						}
 
 						@Override
-						public Void visit(
+						public Boolean visit(
 								ReflexiveToldSubObjectProperty inference,
 								Void input) {
 							ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 							
 							assertNotNull("Failed to look up the subsumption axiom for the reflexivity inference " + inference, axiom);
-							return super.visit(inference, input);
+							return true;
 						}
 
 						@Override
-						public Void visit(
+						public Boolean visit(
 								TopDownPropertySubsumptionInference inference,
 								Void input) {
 							ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 							
 							assertNotNull("Failed to look up the axiom for the property subsumption inference " + inference, axiom);
-							return super.visit(inference, input);
+							return true;
 						}
 
 					};

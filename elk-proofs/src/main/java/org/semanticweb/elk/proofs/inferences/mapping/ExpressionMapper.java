@@ -29,7 +29,9 @@ import java.util.Collections;
 
 import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
@@ -43,16 +45,21 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
 
 /**
+ * Converts {@link Expression}s to instances of {@link TracingInput} which can be used to launch tracing. 
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
@@ -60,8 +67,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Sub
 public class ExpressionMapper {
 
 	public static Iterable<TracingInput> convertExpressionToTracingInputs(
-			Expression expression, IndexObjectConverter converter) {
-		return expression.accept(new Converter(converter), null);
+			Expression expression, IndexObjectConverter converter, SatisfiabilityChecker checker) {
+		return expression.accept(new Converter(converter, checker), null);
 	}
 
 	private static class Converter extends
@@ -70,13 +77,18 @@ public class ExpressionMapper {
 			ElkLemmaVisitor<Void, Iterable<TracingInput>> {
 
 		private final IndexObjectConverter converter_;
+		
+		private final SatisfiabilityChecker checker_;
 
-		public Converter(IndexObjectConverter c) {
+		public Converter(IndexObjectConverter c, SatisfiabilityChecker checker) {
 			converter_ = c;
+			checker_ = checker;
 		}
 		
 		@Override
 		protected Iterable<TracingInput> defaultLogicalVisit(ElkAxiom axiom) {
+			// can only get here if the axiom stands for an expression which can
+			// never be derived, e.g. an EquivalentClasses axiom.
 			return Collections.emptyList();
 		}
 
@@ -117,7 +129,12 @@ public class ExpressionMapper {
 
 					}, input);
 
-			return singleton(new ClassTracingInput(subsumee, subsumer));
+			if (checker_.isSatisfiable(subsumee)) {
+				return singleton(new ClassTracingInput(subsumee, subsumer));
+			}
+			else {
+				return Arrays.<TracingInput>asList(new ClassTracingInput(subsumee, subsumer), new ClassTracingInput(subsumee, ContradictionImpl.getInstance()));
+			}
 		}
 
 		@Override
@@ -153,21 +170,36 @@ public class ExpressionMapper {
 					subsumee,
 					new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer));
 			
+			TracingInput contradictionInput = checker_.isSatisfiable(subsumee) ? null : new ClassTracingInput(subsumee, ContradictionImpl.getInstance());
+			
 			if (subsumer instanceof IndexedObjectSomeValuesFrom) {
 				IndexedObjectSomeValuesFrom existential = (IndexedObjectSomeValuesFrom) subsumer;
-				/*
-				 * This expression can also represent a backward link so we
-				 * create that input, too
-				 */
+				 //This expression can also represent a backward link so we create that input, too
 				TracingInput linkInput = new ClassTracingInput(existential.getFiller(), new BackwardLinkImpl(subsumee, existential.getRelation()));
 				
-				return Arrays.asList(subsumptionInput, linkInput);
+				return contradictionInput == null ? Arrays.asList(subsumptionInput, linkInput) : Arrays.asList(subsumptionInput, linkInput, contradictionInput);
 			}
 			else {
-				return singleton(subsumptionInput); 
+				return contradictionInput == null ? singleton(subsumptionInput) : Arrays.asList(contradictionInput, subsumptionInput); 
 			}
 		}
 		
+		@Override
+		public Iterable<TracingInput> visit(ElkSubObjectPropertyOfAxiom ax) {
+			IndexedPropertyChain subchain = ax.getSubObjectPropertyExpression().accept(converter_);
+			IndexedPropertyChain sup = ax.getSuperObjectPropertyExpression().accept(converter_);
+
+			return singleton(new ObjectPropertyTracingInput(
+					new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(subchain, sup)));
+		}
+
+		@Override
+		public Iterable<TracingInput> visit(ElkReflexiveObjectPropertyAxiom ax) {
+			IndexedObjectProperty p = (IndexedObjectProperty) ax.getProperty().accept(converter_);
+			
+			return singleton(new ObjectPropertyTracingInput(new ToldReflexiveProperty(p)));
+		}
+
 		private Iterable<TracingInput> singleton(TracingInput input) {
 			return Collections.singletonList(input);
 		}

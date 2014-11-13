@@ -121,7 +121,7 @@ public class TracingTestUtils {
 			protected Boolean defaultTracedVisit(ClassInference conclusion,
 					IndexedClassExpression input) {
 				conclusionCount.incrementAndGet();
-				return null;
+				return true;
 			}
 		};
 
@@ -288,36 +288,8 @@ public class TracingTestUtils {
 		return sideConditions;
 	}	
 	
-	/*
-	 * checks that the axiom visitor returns true for at least one side condition
-	 */
-	public static void checkSideConditions(ElkClassExpression sub,
-			ElkClassExpression sup, Reasoner reasoner, final ElkAxiomVisitor<Boolean> checker) throws ElkException {
-		final IndexedClassExpression subsumee = ReasonerStateAccessor
-				.transform(reasoner, sub);
-		final MutableBoolean checkPassed = new MutableBoolean(false);
-		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
-				ReasonerStateAccessor.transform(reasoner, sup));
-		TraceStore.Reader inferenceReader = ReasonerStateAccessor.getTraceState(reasoner).getTraceStore().getReader();
-		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader, UNTRACED_LISTENER);
-		ClassInferenceVisitor<IndexedClassExpression, ?> sideConditionVisitor = SideConditions.getClassSideConditionVisitor(new AbstractElkAxiomVisitor<Void>() {
-
-			@Override
-			protected Void defaultLogicalVisit(ElkAxiom axiom) {
-				checkPassed.or(axiom.accept(checker));
-				return null;
-			}
-			
-		});
-
-		reasoner.explainSubsumption(sub, sup);
-		traceUnwinder.accept(subsumee, conclusion, sideConditionVisitor);
-
-		assertTrue("The condition is false for all used side conditions", checkPassed.get());
-	}	
-	
 	public static void visitClassInferences(ElkClassExpression sub,
-			ElkClassExpression sup, Reasoner reasoner, ClassInferenceVisitor<IndexedClassExpression, Void> visitor) throws ElkException {
+			ElkClassExpression sup, Reasoner reasoner, ClassInferenceVisitor<IndexedClassExpression, Boolean> visitor) throws ElkException {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
 		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
@@ -331,8 +303,8 @@ public class TracingTestUtils {
 	
 	public static void visitInferences(ElkClassExpression sub,
 			ElkClassExpression sup, Reasoner reasoner, 
-			ClassInferenceVisitor<IndexedClassExpression, ?> classInferenceVisitor,
-			ObjectPropertyInferenceVisitor<?, ?> propertyInferenceVisitor) throws ElkException {
+			final ClassInferenceVisitor<IndexedClassExpression, Boolean> classInferenceVisitor,
+			final ObjectPropertyInferenceVisitor<?, Boolean> propertyInferenceVisitor) throws ElkException {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
 		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 

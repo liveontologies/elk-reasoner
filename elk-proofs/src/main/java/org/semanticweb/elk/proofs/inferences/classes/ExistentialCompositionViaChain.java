@@ -50,7 +50,7 @@ public class ExistentialCompositionViaChain extends AbstractInference {
 
 	private final DerivedExpression secondPropertySubsumptionPremise_;
 
-	private final DerivedExpression axiom_;
+	private final DerivedExpression chainPremise_;
 	
 	private final DerivedExpression conclusion_;
 
@@ -66,13 +66,13 @@ public class ExistentialCompositionViaChain extends AbstractInference {
 		secondExistentialPremise_ = secondExPremise;
 		firstPropertySubsumptionPremise_ = propSubsumption;
 		secondPropertySubsumptionPremise_ = chainSubsumption;
-		axiom_ = chainAxiom;
+		chainPremise_ = chainAxiom;
 	}	
 	
 	@Override
 	public Collection<DerivedExpression> getRawPremises() {
-		if (axiom_ != null) {
-			return Arrays.asList(firstExistentialPremise_, secondExistentialPremise_, firstPropertySubsumptionPremise_, secondPropertySubsumptionPremise_, axiom_);
+		if (chainPremise_ != null) {
+			return Arrays.asList(firstExistentialPremise_, secondExistentialPremise_, firstPropertySubsumptionPremise_, secondPropertySubsumptionPremise_, chainPremise_);
 		}
 		else {
 			return Arrays.asList(firstExistentialPremise_, secondExistentialPremise_, firstPropertySubsumptionPremise_, secondPropertySubsumptionPremise_);

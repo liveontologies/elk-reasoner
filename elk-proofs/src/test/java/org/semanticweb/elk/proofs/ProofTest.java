@@ -75,7 +75,7 @@ import org.slf4j.LoggerFactory;
 public class ProofTest {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
-	private static final Logger LOGGER_ = LoggerFactory	.getLogger(ProofTest.class);
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(ProofTest.class);
 
 	protected final TracingTestManifest manifest;
 

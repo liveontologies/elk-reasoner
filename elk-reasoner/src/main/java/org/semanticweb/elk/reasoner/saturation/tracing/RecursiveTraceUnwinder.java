@@ -44,16 +44,16 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Objec
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.PremiseVisitor;
 
 /**
- * Recursively visits all inferences which were used to produce a given
- * conclusion.
+ * Recursively visits inferences which were used to produce a given conclusion.
+ * It stops when the inference visitors passed by the outer code returns
+ * {@code false} for a particular inference.
  * 
- * It guarantees that for each inference that it visits, it will unwind its premises in the order determined by the {@link PremiseVisitor} that the outer code supplied.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class RecursiveTraceUnwinder implements TraceUnwinder {
+public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 
 	private final TraceStore.Reader traceReader_;
 	
@@ -68,14 +68,21 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 	// visit only class inferences
 	public void accept(IndexedClassExpression context,
 			final Conclusion conclusion,
-			final ClassInferenceVisitor<IndexedClassExpression, ?> inferenceVisitor) {
-		accept(context, conclusion, inferenceVisitor, ObjectPropertyInferenceVisitor.DUMMY);
+			final ClassInferenceVisitor<IndexedClassExpression, Boolean> inferenceVisitor) {
+		accept(context, conclusion, inferenceVisitor, new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
+
+			@Override
+			protected Boolean defaultTracedVisit(ObjectPropertyInference inference, Void input) {
+				return true;
+			}
+			
+		});
 	}	
 	
 	// unwind only property conclusions
 	@Override
 	public void accept(ObjectPropertyConclusion conclusion,
-			final ObjectPropertyInferenceVisitor<?, ?> inferenceVisitor) {
+			final ObjectPropertyInferenceVisitor<?, Boolean> inferenceVisitor) {
 		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
 
 		addToQueue(conclusion, seenInferences);
@@ -84,7 +91,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 	}
 	
 	private void unwindPropertyConclusions(
-			final ObjectPropertyInferenceVisitor<?, ?> inferenceVisitor) {
+			final ObjectPropertyInferenceVisitor<?, Boolean> inferenceVisitor) {
 		final Set<ObjectPropertyInference> seenInferences = new HashSet<ObjectPropertyInference>();
 
 		// this visitor visits all premises and putting them into the todo queue
@@ -103,8 +110,10 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 				break;
 			}
 
-			next.acceptTraced(inferenceVisitor, null);
-			next.acceptTraced(unwinder, null);
+			if (next.acceptTraced(inferenceVisitor, null)) {
+				// unwind premises unless we're told to stop the recursion
+				next.acceptTraced(unwinder, null);
+			}
 		}		
 	}
 
@@ -122,8 +131,8 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 	public void accept(
 			final IndexedClassExpression context,
 			final Conclusion conclusion,
-			final ClassInferenceVisitor<IndexedClassExpression, ?> inferenceVisitor,
-			final ObjectPropertyInferenceVisitor<?, ?> propertyInferenceVisitor) {
+			final ClassInferenceVisitor<IndexedClassExpression, Boolean> inferenceVisitor,
+			final ObjectPropertyInferenceVisitor<?, Boolean> propertyInferenceVisitor) {
 		final Set<ClassInference> seenInferences = new HashSet<ClassInference>();
 		final Set<ObjectPropertyInference> seenPropertyInferences = new HashSet<ObjectPropertyInference>();
 		// should be empty anyways
@@ -159,9 +168,10 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 				break;
 			}
 			// user visitor
-			next.inference.acceptTraced(inferenceVisitor, next.contextRoot);
-			// visiting premises
-			next.inference.acceptTraced(premiseVisitor, next.inference.getInferenceContextRoot(next.contextRoot));
+			if (next.inference.acceptTraced(inferenceVisitor, next.contextRoot)) {
+				// visiting premises
+				next.inference.acceptTraced(premiseVisitor, next.inference.getInferenceContextRoot(next.contextRoot));
+			}
 		}
 		
 		// finally, unwind all property traces

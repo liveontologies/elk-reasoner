@@ -41,10 +41,11 @@ import org.semanticweb.elk.proofs.inferences.InferenceReader;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.mapping.ExpressionMapper;
 import org.semanticweb.elk.proofs.inferences.mapping.InferenceMapper;
-import org.semanticweb.elk.proofs.inferences.mapping.OneStepTraceUnwinder;
+import org.semanticweb.elk.proofs.inferences.mapping.SatisfiabilityChecker;
 import org.semanticweb.elk.proofs.inferences.mapping.TracingInput;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceUnwinder;
 
 
 /**
@@ -75,16 +76,19 @@ public class ReasonerInferenceReader implements InferenceReader {
 		return expressionFactory_.create(new ElkObjectFactoryImpl().getSubClassOfAxiom(sub, sup));
 	}
 	
-	protected TraceUnwinder getTraceUnwinder(TraceStore.Reader reader) {
-		return new OneStepTraceUnwinder(reader);
-	}
-	
 	@Override
 	public Iterable<Inference> getInferences(Expression expression) throws ElkException {
 		// first transform the expression into inputs for the trace reader
-		Iterable<TracingInput> inputs = ExpressionMapper.convertExpressionToTracingInputs(expression, reasoner.getIndexObjectConverter());
+		Iterable<TracingInput> inputs = ExpressionMapper.convertExpressionToTracingInputs(expression, reasoner.getIndexObjectConverter(), new SatisfiabilityChecker() {
+
+			@Override
+			public boolean isSatisfiable(IndexedClassExpression ice) {
+				return reasoner.isSatisfiable(ice);
+			}
+		});
+		
 		TraceStore.Reader traceReader = reasoner.getTraceState().getTraceStore().getReader();
-		final InferenceMapper mapper = new InferenceMapper(getTraceUnwinder(traceReader), expressionFactory_);
+		final InferenceMapper mapper = new InferenceMapper(new RecursiveTraceUnwinder(traceReader), expressionFactory_);
 		final List<Inference> userInferences = new LinkedList<Inference>();
 		InferenceVisitor<Void, Void> collector = new AbstractInferenceVisitor<Void, Void>() {
 
@@ -95,7 +99,8 @@ public class ReasonerInferenceReader implements InferenceReader {
 			}
 			
 		};
-		// transformation happens here, each user-level inference will be passed to the collector
+		
+		// second, map inferences
 		mapper.map(inputs, collector);
 		
 		return userInferences;

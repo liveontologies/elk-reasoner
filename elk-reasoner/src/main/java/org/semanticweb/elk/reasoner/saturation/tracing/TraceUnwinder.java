@@ -40,18 +40,18 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Objec
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface TraceUnwinder {
+public interface TraceUnwinder<O> {
 
 	/*
 	 * class trace unwinding involves both class and property inferences.
 	 */
 	public void accept(IndexedClassExpression context, Conclusion conclusion,
-			ClassInferenceVisitor<IndexedClassExpression, ?> inferenceVisitor,
-			ObjectPropertyInferenceVisitor<?, ?> propertyInferenceVisitor);
+			ClassInferenceVisitor<IndexedClassExpression, O> inferenceVisitor,
+			ObjectPropertyInferenceVisitor<?, O> propertyInferenceVisitor);
 
 	/*
 	 * unwinds only object property inferences.
 	 */
 	public void accept(ObjectPropertyConclusion conclusion,
-			ObjectPropertyInferenceVisitor<?, ?> inferenceVisitor);
+			ObjectPropertyInferenceVisitor<?, O> inferenceVisitor);
 }

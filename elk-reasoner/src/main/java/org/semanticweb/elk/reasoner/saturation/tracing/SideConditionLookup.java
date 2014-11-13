@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSub
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromInconsistentDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
@@ -101,6 +102,16 @@ public class SideConditionLookup {
 		
 		@Override
 		public ElkAxiom visit(ContradictionFromDisjointSubsumers inference,
+				Void input) {
+			IndexedDisjointnessAxiom indexedAxiom = inference.getAxiom();
+			
+			return indexedAxiom instanceof IndexedDisjointnessAxiomWithBinding 
+					? ((IndexedDisjointnessAxiomWithBinding) indexedAxiom).getAssertedAxiom() 
+					: null;
+		}
+
+		@Override
+		public ElkAxiom visit(ContradictionFromInconsistentDisjointnessAxiom inference,
 				Void input) {
 			IndexedDisjointnessAxiom indexedAxiom = inference.getAxiom();
 			

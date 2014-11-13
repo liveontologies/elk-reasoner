@@ -30,7 +30,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.proofs.ProofReader;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
@@ -46,7 +46,7 @@ import org.semanticweb.elk.reasoner.Reasoner;
  */
 public class RecursiveInferenceVisitor {
 
-	public static void visitInferences(Reasoner reasoner, ElkClass subsumee, ElkClass subsumer, InferenceVisitor<?, ?> visitor) throws ElkException {
+	public static void visitInferences(Reasoner reasoner, ElkClassExpression subsumee, ElkClassExpression subsumer, InferenceVisitor<?, ?> visitor) throws ElkException {
 		DerivedExpression next = ProofReader.start(reasoner, subsumee, subsumer);
 		// start recursive unwinding
 		Queue<DerivedExpression> toDo = new LinkedList<DerivedExpression>();

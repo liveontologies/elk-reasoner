@@ -49,6 +49,8 @@ public class DerivedAxiomExpression<E extends ElkAxiom> extends AbstractDerivedE
 		super(r);
 		axiom_ = ax;
 		asserted_ = asserted;
+		
+		assert ax != null : "cannot create axiom expressions without an axiom";
 	}
 	
 	@Override

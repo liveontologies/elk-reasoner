@@ -80,5 +80,12 @@ public abstract class BaseDerivedExpressionWrap<E extends DerivedExpression> imp
 		}
 		
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return expression.toString();
 	}	
+	
+	
 }
