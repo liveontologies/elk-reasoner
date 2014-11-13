@@ -39,18 +39,15 @@ import org.semanticweb.elk.util.collections.Pair;
 public class SideConditionCollector extends UsedInferencesCounter {
 
 	private Set<Pair<IndexedClassExpression, IndexedClassExpression>> subclassAxioms_ = new HashSet<Pair<IndexedClassExpression, IndexedClassExpression>>();
-	//private Set<SubClassOfSubsumer> subclassAxioms_ = new HashSet<SubClassOfSubsumer>();
 	
 	@Override
-	public Void visit(SubClassOfSubsumer<?> conclusion, IndexedClassExpression input) {
+	public Boolean visit(SubClassOfSubsumer<?> conclusion, IndexedClassExpression input) {
 		subclassAxioms_.add(new Pair<IndexedClassExpression, IndexedClassExpression>(((Subsumer<?>)conclusion.getPremise()).getExpression(), conclusion.getExpression()));
-		//subclassAxioms_.add(conclusion);
 		
 		return super.visit(conclusion, input);
 	}
 	
 	public Set<Pair<IndexedClassExpression, IndexedClassExpression>> getSubClassOfAxioms() {
-	//public Set<SubClassOfSubsumer> getSubClassOfAxioms() {
 		return subclassAxioms_;
 	}
 }

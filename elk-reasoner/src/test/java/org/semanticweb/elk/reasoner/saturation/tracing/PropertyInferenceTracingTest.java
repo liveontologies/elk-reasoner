@@ -166,17 +166,12 @@ public class PropertyInferenceTracingTest {
 						SubObjectProperty left = conclusion.getLeftSubObjectProperty();
 						SubPropertyChain<?,?> right = conclusion.getRightSubObjectPropertyChain();
 						
-						//if (rightPropertyPremise instanceof SubObjectProperty) {
-							
 							return conclusion.getTarget().equals(dIndexed) &&
 									left.getSubPropertyChain().equals(sIndexed) &&
 									left.getSuperPropertyChain().equals(ssIndexed) &&
 									right.getSubPropertyChain().equals(hIndexed) &&
 									right.getSuperPropertyChain().equals(hhIndexed) &&
 									conclusion.getRelation().equals(sshhIndexed);
-						//}
-						
-						//return false;
 					}
 			
 				}, 
@@ -216,7 +211,7 @@ public class PropertyInferenceTracingTest {
 					@Override
 					public Boolean visit(ComposedBackwardLink backwardLink,
 							IndexedClassExpression input) {
-						// check that we use the inference that A <-R- B and B -SS o HH-> D imply A <-T-D  
+						// check that we use the inference that A <-R- B and B -SS o HH-> D imply A <-T- D  
 						return backwardLink.getRelation().equals(tIndexed) &&
 								backwardLink.getSource().equals(aIndexed) &&
 								backwardLink.getBackwardLink().getSource().equals(aIndexed) &&
@@ -236,12 +231,6 @@ public class PropertyInferenceTracingTest {
 						return false;
 					}
 
-					/*@Override
-					public Boolean visit(TopDownPropertySubsumptionInference inference,
-							Void input) {
-						return inference.getSubPropertyChain().equals(rrsshhIndexed) &&
-								inference.getSuperPropertyChain().equals(tIndexed);
-					}*/
 					@Override
 					public Boolean visit(TopDownPropertySubsumptionInference inference,
 							Void input) {
@@ -325,7 +314,7 @@ public class PropertyInferenceTracingTest {
 		
 		reasoner.explainSubsumption(a, d);
 		TracingTestUtils.checkTracingCompleteness(a, d, reasoner);
-		// looking for the inference that H is a sub-property of SH (because S o H -> SH and S is reflexive)
+		// looking for the inference that H is a sub-property of S o H (because S is entailed as reflexive)
 		TracingTestUtils.checkConditionOverUsedInferences(a, d, reasoner, 
 				TracingTestUtils.DUMMY_CLASS_INFERENCE_CHECKER, 
 				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {

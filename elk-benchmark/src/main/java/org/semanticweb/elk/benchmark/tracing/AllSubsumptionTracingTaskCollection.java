@@ -51,10 +51,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionT
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestUtils;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.reasoner.stages.RuleAndConclusionCountMeasuringExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
@@ -152,8 +150,6 @@ public class AllSubsumptionTracingTaskCollection implements VisitorTaskCollectio
 			
 			Taxonomy<ElkClass> taxonomy = reasoner_.getTaxonomy();
 			
-			//TaxonomyPrinter.dumpClassTaxomomyToFile(taxonomy, "/home/pavel/tmp/galen.taxonomy", false);
-			
 			return taxonomy;
 			
 		} catch (Exception e) {
@@ -179,7 +175,7 @@ public class AllSubsumptionTracingTaskCollection implements VisitorTaskCollectio
 	/**
 	 * 
 	 **/
-	static class TracingTask implements Task {
+	public static class TracingTask implements Task {
 		
 		public static final String USED_INFERENCES_COUNT = "used inferences";
 		public static final String SUBCLASSOF_AXIOM_COUNT = "Distinct SubClassOf axioms used";
@@ -188,12 +184,12 @@ public class AllSubsumptionTracingTaskCollection implements VisitorTaskCollectio
 		public static final int MIN_SUBCLASS_AXIOM_NO = 0;
 		public static final int MAX_SUBCLASS_AXIOM_NO = Integer.MAX_VALUE;
 
-		final Reasoner reasoner;
-		final ElkClassExpression subsumee;
-		final ElkClassExpression subsumer;
-		final Metrics metrics = new Metrics();
+		protected final Reasoner reasoner;
+		protected final ElkClassExpression subsumee;
+		protected final ElkClassExpression subsumer;
+		protected final Metrics metrics = new Metrics();
 		
-		TracingTask(Reasoner r, ElkClassExpression sub, ElkClassExpression sup) {
+		protected TracingTask(Reasoner r, ElkClassExpression sub, ElkClassExpression sup) {
 			reasoner = r;
 			subsumee = sub;
 			subsumer = sup;
@@ -227,12 +223,11 @@ public class AllSubsumptionTracingTaskCollection implements VisitorTaskCollectio
 				IndexedClassExpression sup = ReasonerStateAccessor.transform(reasoner, subsumer);
 				TraceStore.Reader inferenceReader = traceState.getTraceStore().getReader();
 				//TraceStore.Reader inferenceReader = new FirstNInferencesReader(traceState.getTraceStore().getReader(), 1);
-				TraceUnwinder traceUnwinder = new RecursiveTraceUnwinder(inferenceReader);
-				//RecursiveTraceUnwinder traceUnwinder = new RecursiveTraceUnwinder(inferenceReader);
+				RecursiveTraceUnwinder traceUnwinder = new RecursiveTraceUnwinder(inferenceReader);
 				SideConditionCollector counter = new SideConditionCollector();
 				//SaturationStatistics stats = traceState.getContextTracingFactory().getStatistics();
 				
-				traceUnwinder.accept(sub, new DecomposedSubsumerImpl<IndexedClassExpression>(sup), counter, ObjectPropertyInferenceVisitor.DUMMY);
+				traceUnwinder.accept(sub, new DecomposedSubsumerImpl<IndexedClassExpression>(sup), counter);
 				
 				int subClassAxiomNo = counter.getSubClassOfAxioms().size();
 				

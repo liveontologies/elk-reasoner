@@ -72,6 +72,6 @@ public class CLIDriver {
 				//new String[]{"/home/pavel/ulm/data/snomed/snomedStated_INT_20130731_rewritten.owl", "4", "10000"}); */
 		BenchmarkUtils.runTaskCollection2(ProofsForAllSubsumptionTaskCollection.class.getName(),
 				0, 1,
-				new String[]{"/home/pavel/ulm/data/galens/EL-GALEN.owl", "4"});
+				new String[]{"/home/pavel/ulm/data/galens/not-galen.owl", "4"});
 	}
 }

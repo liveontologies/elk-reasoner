@@ -36,6 +36,8 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Recursively visits all inferences using {@link ProofReader}
@@ -45,6 +47,8 @@ import org.semanticweb.elk.reasoner.Reasoner;
  * pavel.klinov@uni-ulm.de
  */
 public class RecursiveInferenceVisitor {
+	
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveInferenceVisitor.class);
 
 	public static void visitInferences(Reasoner reasoner, ElkClassExpression subsumee, ElkClassExpression subsumer, InferenceVisitor<?, ?> visitor) throws ElkException {
 		DerivedExpression next = ProofReader.start(reasoner, subsumee, subsumer);
@@ -62,7 +66,10 @@ public class RecursiveInferenceVisitor {
 				break;
 			}
 			
+			boolean derived = false;
+			
 			for (Inference inf : next.getInferences()) {
+				derived = true;
 				// pass to the client
 				inf.accept(visitor, null);
 				// recursively unwind premise inferences
@@ -72,6 +79,10 @@ public class RecursiveInferenceVisitor {
 						toDo.add(premise);
 					}
 				}
+			}
+			
+			if (!derived && !ProofUtils.isAsserted(next) ) {
+				LOGGER_.debug("Inferences not found for {}", next);
 			}
 		}
 	}

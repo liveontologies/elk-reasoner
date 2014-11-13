@@ -50,13 +50,6 @@ public class ContradictionFromDisjointnessRule extends
 	public static final String NAME = "DisjointClasses Contradiction Introduction";
 
 	/**
-	 * The number of {@link IndexedDisjointnessAxiom}s in which the
-	 * {@link IndexedClassExpression}, for which this rule is registered, occurs
-	 * more than once.
-	 */
-	//private int contradictionCounter_;
-	
-	/**
 	 * All {@link IndexedDisjointnessAxiom}s in which the
 	 * {@link IndexedClassExpression}, for which this rule is registered, occurs
 	 * more than once.
@@ -65,12 +58,11 @@ public class ContradictionFromDisjointnessRule extends
 
 	private ContradictionFromDisjointnessRule(ChainableSubsumerRule tail) {
 		super(tail);
-		//this.contradictionCounter_ = 0;
 	}
 
 	private ContradictionFromDisjointnessRule(IndexedDisjointnessAxiom axiom) {
 		this((ChainableSubsumerRule) null);
-		//this.contradictionCounter_++;
+		
 		inconsistentAxioms_.add(axiom);
 	}
 
@@ -112,11 +104,10 @@ public class ContradictionFromDisjointnessRule extends
 	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
 		ContradictionFromDisjointnessRule rule = ruleChain.getCreate(MATCHER_, FACTORY_);
-		//rule.contradictionCounter_ += this.contradictionCounter_;
-		//return this.contradictionCounter_ != 0;
+
 		rule.addAxioms(inconsistentAxioms_);
 		
-		return isEmpty();
+		return !isEmpty();
 	}
 
 	@Override
@@ -127,17 +118,13 @@ public class ContradictionFromDisjointnessRule extends
 			return false;
 		}
 		
-		/*rule.contradictionCounter_ -= this.contradictionCounter_;
-		if (rule.isEmpty())
-			ruleChain.remove(MATCHER_);
-		return this.contradictionCounter_ != 0;*/
 		rule.removeAxioms(inconsistentAxioms_);
 		
 		if (rule.isEmpty()) {
 			ruleChain.remove(MATCHER_);
 		}
 		
-		return isEmpty();
+		return !isEmpty();
 	}
 
 	@Override
@@ -148,7 +135,6 @@ public class ContradictionFromDisjointnessRule extends
 	}
 
 	protected boolean isEmpty() {
-		//return this.contradictionCounter_ == 0;
 		return inconsistentAxioms_.isEmpty();
 	}
 

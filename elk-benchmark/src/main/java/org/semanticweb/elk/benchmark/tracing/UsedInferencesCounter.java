@@ -33,7 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Abstr
  *         pavel.klinov@uni-ulm.de
  */
 public class UsedInferencesCounter extends
-		AbstractClassInferenceVisitor<IndexedClassExpression, Void> {
+		AbstractClassInferenceVisitor<IndexedClassExpression, Boolean> {
 
 	private int infCounter_ = 0;
 
@@ -41,14 +41,14 @@ public class UsedInferencesCounter extends
 	// HashSet<TracedConclusion>();
 
 	@Override
-	protected Void defaultTracedVisit(ClassInference conclusion,
+	protected Boolean defaultTracedVisit(ClassInference conclusion,
 			IndexedClassExpression parameter) {
 		infCounter_++;
 		// inferences.add(conclusion);
 		// System.out.println(parameter + ": " + conclusion + ": " +
 		// InferencePrinter.print(conclusion));
 
-		return null;
+		return true;
 	}
 
 	public void resetCounter() {

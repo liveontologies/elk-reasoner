@@ -49,10 +49,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionT
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestUtils;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
@@ -240,10 +238,10 @@ public class RandomConcurrentTracingTaskCollection implements VisitorTaskCollect
 			IndexedClassExpression sub = ReasonerStateAccessor.transform(reasoner, subsumee);
 			IndexedClassExpression sup = ReasonerStateAccessor.transform(reasoner, subsumer);
 			TraceStore.Reader inferenceReader = traceState.getTraceStore().getReader();
-			TraceUnwinder traceUnwinder = new RecursiveTraceUnwinder(inferenceReader);
+			RecursiveTraceUnwinder traceUnwinder = new RecursiveTraceUnwinder(inferenceReader);
 			SideConditionCollector counter = new SideConditionCollector();
 			
-			traceUnwinder.accept(sub, new DecomposedSubsumerImpl<IndexedClassExpression>(sup), counter, ObjectPropertyInferenceVisitor.DUMMY);
+			traceUnwinder.accept(sub, new DecomposedSubsumerImpl<IndexedClassExpression>(sup), counter);
 			
 			int subClassAxiomNo = counter.getSubClassOfAxioms().size();
 			

@@ -51,7 +51,7 @@ public class TestUtils {
 	public static void provabilityTest(Reasoner reasoner, ElkClassExpression sub,
 			ElkClassExpression sup) throws ElkException {
 		InferenceGraph graph = ProofReader.readInferenceGraph(reasoner, sub, sup);
-		
+		//FIXME
 		//System.out.println(graph);
 		
 		if (graph.getExpressions().isEmpty()) {
@@ -69,7 +69,7 @@ public class TestUtils {
 			}
 			
 			if (proved.add(next)) {
-				
+				//FIXME
 				//System.err.println("Proved: " + next);
 				
 				for (Inference inf : graph.getInferencesForPremise(next)) {

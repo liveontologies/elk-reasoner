@@ -25,6 +25,8 @@ package org.semanticweb.elk.reasoner;
  * #L%
  */
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -75,12 +77,17 @@ public class TestReasonerUtils {
 	}
 	
 	public static Reasoner loadAndClassify(String resource) throws Exception {
+		return loadAndClassify(TestReasonerUtils.class.getClassLoader().getResourceAsStream(resource));
+	}
+	
+	public static Reasoner loadAndClassify(File file) throws Exception {
+		return loadAndClassify(new FileInputStream(file));
+	}	
+	
+	public static Reasoner loadAndClassify(InputStream stream) throws Exception {
 		Reasoner reasoner = null;
-		InputStream stream = null;
 
 		try {
-			stream = TestReasonerUtils.class.getClassLoader().getResourceAsStream(resource);
-
 			List<ElkAxiom> ontology = loadAxioms(stream);
 			TestChangesLoader initialLoader = new TestChangesLoader();
 			ReasonerStageExecutor executor = new LoggingStageExecutor();

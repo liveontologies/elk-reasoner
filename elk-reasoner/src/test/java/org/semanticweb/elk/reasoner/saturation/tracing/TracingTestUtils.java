@@ -107,26 +107,21 @@ public class TracingTestUtils {
 		throw new IllegalArgumentException("Context may not be null");
 	}
 
-	public static int checkTracingCompleteness(ElkClassExpression sub,
-			ElkClassExpression sup, Reasoner reasoner) {
-		IndexedClassExpression subsumee = ReasonerStateAccessor.transform(
-				reasoner, sub);
-		Conclusion subsumer = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
-				ReasonerStateAccessor.transform(reasoner, sup));
+	public static int checkTracingCompleteness(ElkClassExpression sub, ElkClassExpression sup, Reasoner reasoner) {
+		IndexedClassExpression subsumee = ReasonerStateAccessor.transform(reasoner, sub);
+		Conclusion subsumer = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 		ClassInferenceVisitor<IndexedClassExpression, Boolean> counter = new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
 
 			@Override
-			protected Boolean defaultTracedVisit(ClassInference conclusion,
-					IndexedClassExpression input) {
+			protected Boolean defaultTracedVisit(ClassInference conclusion, IndexedClassExpression input) {
 				conclusionCount.incrementAndGet();
 				return true;
 			}
 		};
 
-		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState
-				.getTraceStore().getReader(), UNTRACED_LISTENER);
+		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState.getTraceStore().getReader(), UNTRACED_LISTENER);
 
 		explorer.accept(subsumee, subsumer, counter);
 
@@ -135,21 +130,17 @@ public class TracingTestUtils {
 
 	public static void checkTracingMinimality(ElkClassExpression sub,
 			ElkClassExpression sup, Reasoner reasoner) {
-		IndexedClassExpression subsumee = ReasonerStateAccessor.transform(
-				reasoner, sub);
-		Conclusion subsumer = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
-				ReasonerStateAccessor.transform(reasoner, sup));
+		IndexedClassExpression subsumee = ReasonerStateAccessor.transform(reasoner, sub);
+		Conclusion subsumer = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), ReasonerStateAccessor.transform(reasoner, sup));
 		TracedContextsCollector collector = new TracedContextsCollector();
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 
-		new TestTraceUnwinder(traceState.getTraceStore().getReader(),
-				UNTRACED_LISTENER).accept(subsumee, subsumer, collector);
+		new TestTraceUnwinder(traceState.getTraceStore().getReader(), UNTRACED_LISTENER).accept(subsumee, subsumer, collector);
 
 		for (Context traced : traceState.getTracedContexts()) {
 			IndexedClassExpression root = traced.getRoot();
 
-			assertTrue(root + " has been traced for no good reason", collector
-					.getTracedRoots().contains(traced.getRoot()));
+			assertTrue(root + " has been traced for no good reason", collector.getTracedRoots().contains(traced.getRoot()));
 		}
 	}
 
@@ -225,35 +216,30 @@ public class TracingTestUtils {
 			Reasoner reasoner,
 			final ClassInferenceVisitor<IndexedClassExpression, Boolean> classInferenceVisitor,
 			final ObjectPropertyInferenceVisitor<Void, Boolean> propertyInferenceVisitor) {
-		final IndexedClassExpression subsumee = ReasonerStateAccessor
-				.transform(reasoner, sub);
-		Conclusion conclusion = getConclusionToTrace(
-				ReasonerStateAccessor.getContext(reasoner, subsumee),
-				ReasonerStateAccessor.transform(reasoner, sup));
+		final IndexedClassExpression subsumee = ReasonerStateAccessor.transform(reasoner, sub);
+		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), ReasonerStateAccessor.transform(reasoner, sup));
 		final MutableBoolean classInferenceCondition = new MutableBoolean(false);
 		final MutableBoolean propertyInferenceCondition = new MutableBoolean(false);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 
-		new TestTraceUnwinder(traceState.getTraceStore().getReader(),
-				UNTRACED_LISTENER).accept(subsumee, conclusion,
+		new TestTraceUnwinder(traceState.getTraceStore().getReader(), UNTRACED_LISTENER).accept(subsumee, conclusion,
 				new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
 
 					@Override
 					protected Boolean defaultTracedVisit(ClassInference inference, IndexedClassExpression input) {
 						classInferenceCondition.or(inference.acceptTraced(classInferenceVisitor, input));
 						
-						return classInferenceCondition.get();
+						return true;
 					}
 					
 				},
 				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 					@Override
-					protected Boolean defaultTracedVisit(
-							ObjectPropertyInference inference, Void input) {
+					protected Boolean defaultTracedVisit(ObjectPropertyInference inference, Void input) {
 						propertyInferenceCondition.or(inference.acceptTraced(propertyInferenceVisitor, input));
 						
-						return propertyInferenceCondition.get();
+						return true;
 					}
 					
 				});		
@@ -268,10 +254,8 @@ public class TracingTestUtils {
 	public static Set<ElkAxiom> getSideConditions(ElkClassExpression sub,
 			ElkClassExpression sup, Reasoner reasoner) {
 		final Set<ElkAxiom> sideConditions = new HashSet<ElkAxiom>();
-		final IndexedClassExpression subsumee = ReasonerStateAccessor
-				.transform(reasoner, sub);
-		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
-				ReasonerStateAccessor.transform(reasoner, sup));
+		final IndexedClassExpression subsumee = ReasonerStateAccessor.transform(reasoner, sub);
+		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), ReasonerStateAccessor.transform(reasoner, sup));
 		ClassInferenceVisitor<IndexedClassExpression, ?> sideConditionVisitor = SideConditions.getClassSideConditionVisitor(new AbstractElkAxiomVisitor<Void>() {
 
 			@Override
