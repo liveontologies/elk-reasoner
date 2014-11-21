@@ -324,30 +324,7 @@ public class WorkbenchPanel extends JPanel implements Disposable, OWLModelManage
             explanationDisplayHolder.removeAll();
             explanationDisplayHolder.validate();
 
-           /* Set<Explanation> allExplanations = new HashSet<Explanation>();
             OWLAxiom entailment = workbenchManager.getEntailment();
-            WorkbenchSettings settings = workbenchManager.getWorkbenchSettings();
-            Set<Explanation<OWLAxiom>> justifications = workbenchManager.getJustifications(entailment);
-            List<Explanation<OWLAxiom>> exps = getOrderedExplanations(justifications);
-            allExplanations.addAll(exps);
-            int count = 1;
-            
-            for (Explanation<OWLAxiom> exp : exps) {
-                final ExplanationDisplay explanationDisplayPanel = createExplanationDisplay(exp, count, exps.size(), settings.getLimit());
-
-                ExplanationDisplayList list = new ExplanationDisplayList(editorKit, workbenchManager, explanationDisplayPanel, count);
-                list.setBorder(BorderFactory.createEmptyBorder(2, 0, 10, 0));
-                explanationDisplayHolder.add(list);
-                panels.add(explanationDisplayPanel);
-                count++;
-                if (!settings.isFindAllExplanations() && count > settings.getLimit()) {
-                    break;
-                }
-            }
-            explanationDisplayHolder.add(Box.createVerticalStrut(10));*/
-            
-            OWLAxiom entailment = workbenchManager.getEntailment();
-            WorkbenchSettings settings = workbenchManager.getWorkbenchSettings();
             ProofManager proofManager = workbenchManager.getProofManager();       
             ExplanationDisplay explanationDisplayPanel = createProofExplanationDisplay(proofManager.getProofRoot(entailment), true);
             //GUI

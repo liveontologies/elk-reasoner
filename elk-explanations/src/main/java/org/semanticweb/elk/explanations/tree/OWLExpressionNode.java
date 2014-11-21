@@ -25,10 +25,7 @@ package org.semanticweb.elk.explanations.tree;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -53,9 +50,11 @@ public class OWLExpressionNode extends DefaultMutableTreeNode {
 
 	private final OWLAxiom axiom_;
 
-	private List<OWLInferenceNode> children_;
+	private boolean childrenComputed_ = false;
 
-	OWLExpressionNode(OWLExpression expr) {
+	OWLExpressionNode(OWLExpression expr, OWLInferenceNode parent) {
+		super(parent);
+		
 		expression_ = expr;
 		axiom_ = expr.accept(new OWLExpressionVisitor<OWLAxiom>() {
 
@@ -76,18 +75,22 @@ public class OWLExpressionNode extends DefaultMutableTreeNode {
 	public Enumeration<OWLInferenceNode> children() {
 		assertChildren();
 		
-		return Collections.enumeration(children_);
+		return super.children();
 	}
 	
 	private void assertChildren() {
+		if (childrenComputed_) {
+			return;
+		}
+		
+		childrenComputed_ = true;
+		
+		//System.err.println("children recomputed for " + axiom_);
+		
 		try {
-			System.err.println("caching children");
-			children_ = new ArrayList<OWLInferenceNode>();
-
 			for (OWLInference inf : expression_.getInferences()) {
-				children_.add(new OWLInferenceNode(inf));
+				add(new OWLInferenceNode(inf, this));
 			}
-
 		} catch (ProofGenerationException e) {
 			// TODO render some error nodes saying that inferences can't be
 			// obtained?
@@ -95,6 +98,31 @@ public class OWLExpressionNode extends DefaultMutableTreeNode {
 		}
 	}
 
+	public OWLExpression getExpression() {
+		return expression_;
+	}
+	
+	public OWLAxiom getAxiom() {
+		return axiom_;
+	}
+	
+	// TODO reuse this visitor?
+	public boolean isAsserted() {
+		return expression_.accept(new OWLExpressionVisitor<Boolean>() {
+
+			@Override
+			public Boolean visit(OWLAxiomExpression expression) {
+				return expression.isAsserted();
+			}
+
+			@Override
+			public Boolean visit(OWLLemmaExpression expression) {
+				return false;
+			}
+			
+		});
+	}
+	
 	@Override
 	public String toString() {
 		return expression_.toString();
@@ -103,19 +131,19 @@ public class OWLExpressionNode extends DefaultMutableTreeNode {
 	@Override
 	public boolean isLeaf() {
 		assertChildren();
-		return children_.isEmpty();
+		return super.isLeaf();
 	}
 
 	@Override
 	public int getChildCount() {
 		assertChildren();
-		return children_.size();
+		return super.getChildCount();
 	}
 
 	@Override
 	public TreeNode getChildAt(int index) {
 		assertChildren();
-		return children_.isEmpty() ? null : children_.get(index);
+		return super.getChildAt(index);
 	}
 	
 }

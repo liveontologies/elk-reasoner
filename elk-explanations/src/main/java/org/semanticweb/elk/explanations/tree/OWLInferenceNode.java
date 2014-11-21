@@ -44,9 +44,10 @@ public class OWLInferenceNode extends DefaultMutableTreeNode {
 
 	private final OWLInference inference_;
 	
-	private List<OWLExpressionNode> children_;
+	private boolean childrenComputed_ = false;
 	
-	OWLInferenceNode(OWLInference inf) {
+	OWLInferenceNode(OWLInference inf, OWLExpressionNode parent) {
+		super(parent);
 		inference_ = inf;
 	}
 
@@ -54,7 +55,7 @@ public class OWLInferenceNode extends DefaultMutableTreeNode {
 	public Enumeration<OWLExpressionNode> children() {
 		assertChildren();
 		
-		return Collections.enumeration(children_);
+		return super.children();
 	}
 
 	@Override
@@ -63,32 +64,32 @@ public class OWLInferenceNode extends DefaultMutableTreeNode {
 	}
 
 	private void assertChildren() {
-		if (children_ == null) {
-			children_ = new ArrayList<OWLExpressionNode>();
+		if (!childrenComputed_) {
+			childrenComputed_ = true;
 			
 			for (OWLExpression premise : inference_.getPremises()) {
-				children_.add(new OWLExpressionNode(premise));
+				add(new OWLExpressionNode(premise, this));
 			}
-			
 		}
 	}
 
 	@Override
 	public boolean isLeaf() {
 		assertChildren();
-		return children_.isEmpty();
+		return super.isLeaf();
 	}
 
 	@Override
 	public int getChildCount() {
 		assertChildren();
-		return children_.size();
+		return super.getChildCount();
 	}
 
 	@Override
 	public TreeNode getChildAt(int index) {
 		assertChildren();
-		return children_.isEmpty() ? null : children_.get(index);
+		return super.getChildAt(index);
 	}
+	
 	
 }

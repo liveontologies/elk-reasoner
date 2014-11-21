@@ -1,11 +1,10 @@
 /**
  * 
  */
-package org.semanticweb.elk.explanations.tree;
-
+package org.semanticweb.owlapitools.proofs.expressions;
 /*
  * #%L
- * Explanation Workbench
+ * OWL API Proofs Model
  * $Id:$
  * $HeadURL:$
  * %%
@@ -25,37 +24,27 @@ package org.semanticweb.elk.explanations.tree;
  * #L%
  */
 
-import java.util.Collections;
-import java.util.Enumeration;
-
-import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
+import org.semanticweb.owlapi.model.OWLAxiom;
 
 /**
- * TODO A cycle has been detected so this node is blocked and doesn't have children.
- * 
  * @author pavel
  *
  */
-public class BlockedOWLExpressionNode extends OWLExpressionNode {
+public class ExpressionUtils {
 
+	public static OWLAxiom getAxiom(OWLExpression expression) {
+		return expression.accept(new OWLExpressionVisitor<OWLAxiom>() {
 
-	BlockedOWLExpressionNode(OWLExpression expr) {
-		super(expr);
+			@Override
+			public OWLAxiom visit(OWLAxiomExpression expression) {
+				return expression.getAxiom();
+			}
+
+			@Override
+			public OWLAxiom visit(OWLLemmaExpression expression) {
+				return null;
+			}
+			
+		});
 	}
-
-	@Override
-	public Enumeration<OWLInferenceNode> children() {
-		return Collections.enumeration(Collections.<OWLInferenceNode>emptyList());
-	}
-	
-	@Override
-	public boolean isLeaf() {
-		return true;
-	}
-
-	@Override
-	public int getChildCount() {
-		return 0;
-	}
-
 }

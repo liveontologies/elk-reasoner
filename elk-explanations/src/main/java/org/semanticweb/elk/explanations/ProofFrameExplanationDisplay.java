@@ -21,12 +21,17 @@ package org.semanticweb.elk.explanations;
  * #L%
  */
 
-import java.awt.FlowLayout;
+import java.awt.BorderLayout;
+import java.awt.Color;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
 
 import org.protege.editor.owl.OWLEditorKit;
-import org.semanticweb.elk.explanations.tree.ProofTreeFrame;
+import org.semanticweb.elk.explanations.tree.ProofTree;
+import org.semanticweb.elk.explanations.tree.ProofTreeUI;
 import org.semanticweb.owl.explanation.api.Explanation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
@@ -40,91 +45,22 @@ public class ProofFrameExplanationDisplay extends JPanel implements ExplanationD
 
     private Explanation<OWLAxiom> explanation;
     
-    private JustificationFrame frame;
-
-    private final JustificationFrameList frameList;
-
-    private OWLEditorKit editorKit;
-
-    private Explanation<OWLAxiom> lacExp;
-
-    private WorkbenchManager workbenchManager;
-
-    private AxiomSelectionModel axiomSelectionModel;
-    
-    private boolean transmittingSelectionToModel = false;
-
-    public ProofFrameExplanationDisplay(OWLEditorKit editorKit, AxiomSelectionModel selectionModel, WorkbenchManager workbenchManager, OWLExpression proofRoot) {
-        this.editorKit = editorKit;
-        this.workbenchManager = workbenchManager;
-        this.axiomSelectionModel = selectionModel;
-        //this.explanation = explanation;
-        frame = new JustificationFrame(editorKit);
-        //setLayout(new BorderLayout());
-        frameList =  new JustificationFrameList(editorKit, selectionModel, workbenchManager, frame);
-        //add(frameList, BorderLayout.NORTH);
-        //FIXME
-        JPanel proofFrame = new ProofTreeFrame(editorKit, proofRoot);
+     public ProofFrameExplanationDisplay(OWLEditorKit editorKit, AxiomSelectionModel selectionModel, WorkbenchManager workbenchManager, OWLExpression proofRoot) {
+    	ProofTree tree = new ProofTree(editorKit, proofRoot);
+    	
+    	setLayout(new BorderLayout());
         
-        //setAlignmentX(Component.LEFT_ALIGNMENT);
-        //proofFrame.setAlignmentY(LEFT_ALIGNMENT);
-        setLayout(new FlowLayout(FlowLayout.LEFT));
-        add(proofFrame);
-        
-        /*frame.setRootObject(explanation);
-        frameList.setBorder(BorderFactory.createEmptyBorder(7, 10, 7, 10));
-
-        frameList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                transmitSelectionToModel();
-            }
-        });
-
-        axiomSelectionModel.addAxiomSelectionListener(new AxiomSelectionListener() {
-            public void axiomAdded(AxiomSelectionModel source, OWLAxiom axiom) {
-                respondToAxiomSelectionChange();
-            }
-
-            public void axiomRemoved(AxiomSelectionModel source, OWLAxiom axiom) {
-                respondToAxiomSelectionChange();
-            }
-        });*/
+    	tree.setBorder(BorderFactory.createLineBorder(Color.RED));
+    	tree.setUI(new ProofTreeUI());
+        add(new JScrollPane(tree), BorderLayout.CENTER);
+        tree.setVisible(true);
     }
-
-    private void respondToAxiomSelectionChange() {
-        if(!transmittingSelectionToModel) {
-            frameList.clearSelection();
-            frameList.repaint(frameList.getVisibleRect());
-        }
-        frameList.repaint(frameList.getVisibleRect());
-    }
-
-
-    private void transmitSelectionToModel() {
-        try {
-            transmittingSelectionToModel = true;
-            for(int i = 1; i < frameList.getModel().getSize(); i++) {
-                Object element = frameList.getModel().getElementAt(i);
-                if(element instanceof JustificationFrameSectionRow) {
-                    JustificationFrameSectionRow row = (JustificationFrameSectionRow) element;
-                    OWLAxiom ax = row.getAxiom();
-                    axiomSelectionModel.setAxiomSelected(ax, frameList.isSelectedIndex(i));
-                }
-            }
-        }
-        finally {
-            transmittingSelectionToModel = false;
-        }
-    }
-
-
 
     public Explanation<OWLAxiom> getExplanation() {
         return explanation;
     }
 
     public void dispose() {
-        frame.dispose();
     }
 
     public void axiomAdded(AxiomSelectionModel source, OWLAxiom axiom) {

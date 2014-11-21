@@ -20,125 +20,280 @@ package org.semanticweb.elk.explanations.tree;
  * limitations under the License.
  * #L%
  */
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Rectangle;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.tree.AbstractLayoutCache;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
 
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.event.*;
-import java.awt.*;
-import java.util.*;
-
-public class TestTree extends JPanel {
-  JTree tree;
-  DefaultMutableTreeNode root, node1, node2, node3, node4;
-  public TestTree() {
-    root = new DefaultMutableTreeNode("root", true);
-    node1 = new DefaultMutableTreeNode("node 1", true);
-    node2 = new DefaultMutableTreeNode("node 2" , true);
-    node3 = new DefaultMutableTreeNode("node 3" , true);
-    node4 = new DefaultMutableTreeNode("node 4" , true);
-    root.add(node1);
-    node1.add(node2);
-    root.add(node3);
-    node3.add(node4);
-    setLayout(new BorderLayout());
-    tree = new JTree(root);
-    add(new JScrollPane((JTree)tree),"Center");
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapitools.proofs.OWLInference;
+import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
+import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
+import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
+import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
+import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
+ 
+public class TestTree extends ComponentAdapter {
+    JTree tree;
+ 
+    public void componentResized(ComponentEvent e) {
+        /*if(tree.isVisible()) {
+            registerUI();
+        }*/
+    	registerUI();
+    	//tree.updateUI();
     }
-
-  public Dimension getPreferredSize(){
-    return new Dimension(200, 120);
+ 
+    private JScrollPane getContent() {
+        tree = getTree();
+        tree.setRowHeight(0);
+        tree.addComponentListener(this);
+        
+        return new JScrollPane(tree);
     }
-
-  public static void main(String s[]){
-    MyJFrame frame = new MyJFrame("Tree Collapse Expand");
+ 
+    private JTree getTree() {
+        /*DefaultMutableTreeNode root = new DefaultMutableTreeNode(getNode("root"));
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(getNode("Node 1"));
+        root.insert(node, 0);
+        DefaultMutableTreeNode subNode = new DefaultMutableTreeNode(getNode("Node 11"));
+        node.insert(subNode, 0);
+        node = new DefaultMutableTreeNode(getNode("Node 2 (test test test test test test test test)"));
+        root.insert(node, 1);
+        subNode = new DefaultMutableTreeNode(getNode("Node 21"));
+        node.insert(subNode, 0);
+        subNode = new DefaultMutableTreeNode(getNode("Node 22"));
+        node.insert(subNode, 1);
+        subNode = new DefaultMutableTreeNode(getNode("Node 23"));
+        node.insert(subNode, 2);
+        
+        JTree tree = new JTree();
+        
+        tree.setModel(new DefaultTreeModel(root));
+        
+        return tree;*/
+    	
+    	JTree tree = new JTree();
+        
+        tree.setModel(new DefaultTreeModel(getNode("root")));
+        
+        return tree;
     }
-  }
-
-class WindowCloser extends WindowAdapter {
-  public void windowClosing(WindowEvent e) {
-    Window win = e.getWindow();
-    win.setVisible(false);
-    System.exit(0);
+ 
+    private PanelNode getNode(String s) {
+        return new PanelNode(s, Color.black, Color.pink, null);
     }
-  }
-
-class MyJFrame extends JFrame implements ActionListener {
-  JButton b1, b2, b3;
-  TestTree panel;
-  MyJFrame(String s) {
-    super(s);
-    setForeground(Color.black);
-    setBackground(Color.lightGray);
-    panel = new TestTree();
-    expandAll(panel.tree);
-    getContentPane().add(panel,"Center");
-
-    b1 = new JButton("Expand");
-    b3 = new JButton("Expand to last");
-    b2 = new JButton("Collapse");
-
-    b1.addActionListener(this);
-    b2.addActionListener(this);
-    b3.addActionListener(this);
-    getContentPane().add(b1,"West");
-    getContentPane().add(b3,"North");
-    getContentPane().add(b2,"East");
-    setSize(300,300);
-    setVisible(true);
-    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    addWindowListener(new WindowCloser());
+ 
+    private void registerUI() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                tree.setUI(new BasicWideNodeTreeUI());
+            }
+        });
     }
-
-  public void actionPerformed(ActionEvent ae) {
-    if (ae.getSource() == b1) expandAll(panel.tree);
-    if (ae.getSource() == b3) expandToLast(panel.tree);
-    if (ae.getSource() == b2) collapseAll(panel.tree);
+ 
+    public static void main(String[] args) {
+    	TestTree test = new TestTree();
+        JFrame f = new JFrame();
+        
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.getContentPane().add(test.getContent());
+        f.setSize(400,400);
+        f.setLocation(200,200);
+        f.setVisible(true);
+        
+        test.registerUI();
     }
-
-
-  public void expandAll(JTree tree) {
-    int row = 0;
-    while (row < tree.getRowCount()) {
-      tree.expandRow(row);
-      row++;
-      }
+    
+    /**
+     * Code copied/adapted from BasicTreeUI source code.
+     */
+    class BasicWideNodeTreeUI extends BasicTreeUI {
+     
+        protected TreeCellRenderer createDefaultCellRenderer() {
+            return new PanelNodeRenderer();
+        }
+     
+        @Override
+        protected AbstractLayoutCache.NodeDimensions createNodeDimensions() {
+            return new NodeDimensionsHandler() {
+            	
+                @Override
+                public Rectangle getNodeDimensions(Object value, int row, int depth, boolean expanded, Rectangle size) {
+                    Rectangle dimensions = super.getNodeDimensions(value, row, depth, expanded, size);
+                    
+                    dimensions.width = tree.getParent().getWidth() - getRowX(row, depth);
+                    
+                    int height = getContentHeight(PanelNode.getText(value), dimensions.width);
+                    
+                    //System.err.println(height);
+                    
+                    dimensions.height = height; 
+                    
+                    return dimensions;
+                }
+            };
+        }
+        
+        public int getContentHeight(String content, int width) {
+            JEditorPane dummyEditorPane=new JEditorPane();
+            
+            dummyEditorPane.setSize(width, Short.MAX_VALUE);
+            dummyEditorPane.setText(content);
+            
+            return dummyEditorPane.getPreferredSize().height;
+        }
+        
     }
+}
+ 
 
-
-  public void expandToLast(JTree tree) {
-    // expand to the last leaf from the root
-    DefaultMutableTreeNode  root;
-    root = (DefaultMutableTreeNode) tree.getModel().getRoot();
-    tree.scrollPathToVisible(new TreePath(root.getLastLeaf().getPath()));
+ 
+class PanelNodeRenderer implements TreeCellRenderer {
+    JPanel panel;
+    JTextPane textPane;
+ 
+    public PanelNodeRenderer() {
+        panel = new JPanel();
+        textPane = new JTextPane();
+        panel.setLayout(new BorderLayout());
+        textPane.setOpaque(false);
+        panel.add(textPane);
     }
-
-
-  /*
-  // alternate version, suggested by C.Kaufhold
-  public void expandToLast(JTree tree) {
-    TreeModel data = tree.getModel();
-    Object node = data.getRoot();
-
-    if (node == null) return;
-
-    TreePath p = new TreePath(node);
-    while (true) {
-         int count = data.getChildCount(node);
-         if (count == 0) break;
-         node = data.getChild(node, count - 1);
-         p = p.pathByAddingChild(node);
+ 
+    public Component getTreeCellRendererComponent(JTree tree,
+                                                  Object value,
+                                                  boolean selected,
+                                                  boolean expanded,
+                                                  boolean leaf,
+                                                  int row,
+                                                  boolean hasFocus) {
+        /*DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+        PanelNode panelNode = (PanelNode)node.getUserObject();*/
+        
+    	PanelNode panelNode = (PanelNode) value;
+    	
+        textPane.setText(panelNode.text);
+        textPane.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+        
+        panel.setBorder(BorderFactory.createLineBorder(panelNode.borderColor));
+        panel.setBackground(panelNode.background);
+        
+        return panel;
     }
-    tree.scrollPathToVisible(p);
-  }
-  */
-
-
-  public void collapseAll(JTree tree) {
-    int row = tree.getRowCount() - 1;
-    while (row >= 0) {
-      tree.collapseRow(row);
-      row--;
-      }
+}
+ 
+/*class PanelNode {
+    String text;
+    Color borderColor;
+    Color background;
+    
+    public PanelNode(String text, Color bc, Color bg) {
+        this.text = text;
+        borderColor = bc;
+        background = bg;
     }
- }
+    
+    static String getText(Object value) {
+    	DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+        PanelNode panelNode = (PanelNode)node.getUserObject();
+        
+        return panelNode.text;
+    }
+}*/
+
+class PanelNode extends DefaultMutableTreeNode {
+    String text;
+    Color borderColor;
+    Color background;
+    
+    List<PanelNode> children_;
+    
+    public PanelNode(String text, Color bc, Color bg, PanelNode p) {
+    	super(p);
+        this.text = text;
+        borderColor = bc;
+        background = bg;
+    }
+    
+    static String getText(Object value) {
+    	/*DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+        PanelNode panelNode = (PanelNode)node.getUserObject();
+        
+        return panelNode.text;*/
+    	
+    	PanelNode node = (PanelNode) value;
+        
+        return node.text;
+    }
+    
+	@Override
+	public Enumeration<PanelNode> children() {
+		assertChildren();
+		
+		//return Collections.enumeration(children_);
+		return super.children();
+	}
+	
+	private void assertChildren() {
+		if (children_ != null) {
+			return;
+		}
+		
+		children_ = new ArrayList<PanelNode>();
+		//children_.add(new PanelNode(text + ".child 1", borderColor, background, this));
+		//children_.add(new PanelNode(text + ".child 2", borderColor, background, this));
+		//children_.add(new PanelNode(text + ".child 3", borderColor, background, this));
+		add(new PanelNode(text + ".child 1", borderColor, background, this));
+		add(new PanelNode(text + ".child 1", borderColor, background, this));
+		add(new PanelNode(text + ".child 1", borderColor, background, this));
+	}
+
+	@Override
+	public String toString() {
+		return text;
+	}
+
+	@Override
+	public boolean isLeaf() {
+		assertChildren();
+		//return children_.isEmpty();
+		return super.isLeaf();
+	}
+
+	@Override
+	public int getChildCount() {
+		assertChildren();
+		//return children_.size();
+		return super.getChildCount();
+	}
+
+	@Override
+	public TreeNode getChildAt(int index) {
+		assertChildren();
+		//return children_.isEmpty() ? null : children_.get(index);
+		return super.getChildAt(index);
+	}
+	
+}

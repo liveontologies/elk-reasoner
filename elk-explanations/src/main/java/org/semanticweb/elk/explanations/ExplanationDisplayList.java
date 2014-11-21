@@ -23,20 +23,17 @@ package org.semanticweb.elk.explanations;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
 import org.protege.editor.core.Disposable;
 import org.protege.editor.owl.OWLEditorKit;
-import org.semanticweb.owl.explanation.api.Explanation;
 /*
  * Copyright (C) 2008, University of Manchester
  *
@@ -92,23 +89,16 @@ public class ExplanationDisplayList extends JPanel implements Disposable {
     private void createUI() {
         setLayout(new BorderLayout(2, 2));
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel label = new JLabel("Explanation " + explanationNumber);
+        JLabel label = new JLabel("Proof tree");
+        
         headerPanel.add(label);
-
-        displayLaconicCheckBox.setFont(displayLaconicCheckBox.getFont().deriveFont(10.0f));
-        displayLaconicCheckBox.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
-
-        if (workbenchManager.getWorkbenchSettings().getJustificationType().equals(JustificationType.LACONIC)) {
-            displayLaconicCheckBox.setEnabled(false);
-        }
-        headerPanel.add(displayLaconicCheckBox);
         add(headerPanel, BorderLayout.NORTH);
 
         JPanel displayHolder = new JPanel(new BorderLayout());
         Border marginBorder = BorderFactory.createEmptyBorder(0, 20, 0, 0);
         Border lineBorder = BorderFactory.createLineBorder(Color.LIGHT_GRAY);
         displayHolder.setBorder(BorderFactory.createCompoundBorder(marginBorder, lineBorder));
-        displayHolder.add((JComponent) display);
+        displayHolder.add((Component) display);
         add(displayHolder);
    }
 
