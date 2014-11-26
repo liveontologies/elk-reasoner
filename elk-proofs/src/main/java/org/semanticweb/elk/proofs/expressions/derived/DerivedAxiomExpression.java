@@ -28,7 +28,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
-import org.semanticweb.elk.proofs.inferences.InferenceReader;
+import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
 
 /**
  * @author Pavel Klinov

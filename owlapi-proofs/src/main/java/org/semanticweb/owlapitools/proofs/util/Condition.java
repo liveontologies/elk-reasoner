@@ -1,10 +1,7 @@
-/**
- * 
- */
-package org.semanticweb.elk.proofs.expressions.derived;
+package org.semanticweb.owlapitools.proofs.util;
 /*
  * #%L
- * ELK Proofs Package
+ * ELK Utilities Collections
  * $Id:$
  * $HeadURL:$
  * %%
@@ -24,26 +21,21 @@ package org.semanticweb.elk.proofs.expressions.derived;
  * #L%
  */
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
-
 /**
- * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * Boolean conditions over some type.
+ * 
+ * @param <T>
+ *            the type of elements which can be used with this condition
+ * 
  */
-abstract class AbstractDerivedExpression implements DerivedExpression {
-
-	private final InferenceReader reader_;
-	
-	AbstractDerivedExpression(InferenceReader reader) {
-		reader_ = reader;
-	}
-
-	@Override
-	public Iterable<Inference> getInferences() throws ElkException {
-		return reader_.getInferences(this);
-	}
-
+public interface Condition<T> {
+	/**
+	 * Checks if the condition holds for an element
+	 * 
+	 * @param element
+	 *            the element for which to check the condition
+	 * @return {@code true} if the condition holds for the element and
+	 *         otherwise {@code false}
+	 */
+	public boolean holds(T element);
 }

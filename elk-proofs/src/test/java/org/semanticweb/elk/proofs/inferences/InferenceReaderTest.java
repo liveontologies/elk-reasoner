@@ -10,6 +10,8 @@ import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
+import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.TestUtils;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
@@ -73,11 +75,11 @@ public class InferenceReaderTest {
 	
 	@Test
 	public void basicTest() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify(new File("/home/pavel/ulm/data/galens/not-galen.owl"));
-		ElkClass sub = factory_.getClass(new ElkFullIri("http://www.co-ode.org/ontologies/galen#Recess"));
-		ElkClass sup = factory_.getClass(new ElkFullIri("http://www.co-ode.org/ontologies/galen#ActuallyHollowBodyStructure"));
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/AcyclicUnwinding.owl");
+		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
+		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/C"));
 		// print inferences 
-		/*RecursiveInferenceVisitor.visitInferences(reasoner, sub, sup, new AbstractInferenceVisitor<Void, Void>() {
+		RecursiveInferenceVisitor.visitInferences(reasoner, sub, sup, new AbstractInferenceVisitor<Void, Void>() {
 
 			@Override
 			protected Void defaultVisit(Inference inference, Void input) {
@@ -85,7 +87,7 @@ public class InferenceReaderTest {
 				return null;
 			}
 			
-		});*/
+		});
 		
 		TestUtils.provabilityTest(reasoner, sub, sup);
 		

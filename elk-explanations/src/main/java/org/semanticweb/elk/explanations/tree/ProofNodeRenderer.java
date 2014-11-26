@@ -30,7 +30,6 @@ import java.awt.Component;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JTree;
-import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
@@ -67,7 +66,7 @@ public class ProofNodeRenderer implements TreeCellRenderer {
             if (axiom != null) {
             	OWLModelManager manager = owlEditorKit.getModelManager();
                 String valueToRender = manager.getRendering(axiom);
-                int width = -1;
+                //int width = -1;
                 
                 //owlCellRenderer.setIconObject(axiom);
                 owlCellRenderer.setOntology(owlEditorKit.getOWLModelManager().getActiveOntology());
@@ -93,7 +92,7 @@ public class ProofNodeRenderer implements TreeCellRenderer {
                 
                 result = owlCellRenderer.getTreeCellRendererComponent(tree, valueToRender, selected, expanded, leaf, row, hasFocus);
                 
-                if (node.isAsserted()) {
+                if (!node.isAsserted()) {
                 	if (!selected) {
                 		((JComponent)result).setBorder(BorderFactory.createDashedBorder(Color.LIGHT_GRAY));
                 		result.setBackground(new Color(255, 255, 215));

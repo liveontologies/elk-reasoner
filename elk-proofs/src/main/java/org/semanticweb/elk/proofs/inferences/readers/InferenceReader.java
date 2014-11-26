@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences;
+package org.semanticweb.elk.proofs.inferences.readers;
 /*
  * #%L
  * ELK Proofs Package
@@ -28,8 +28,7 @@ import java.util.Collections;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
-import org.semanticweb.elk.proofs.expressions.derived.DummyExpressionFactory;
+import org.semanticweb.elk.proofs.inferences.Inference;
 
 
 /**
@@ -44,7 +43,7 @@ public interface InferenceReader {
 
 	public Iterable<Inference> getInferences(Expression expression) throws ElkException;
 	
-	public DerivedExpressionFactory getExpressionFactory();
+	//public DerivedExpressionFactory getExpressionFactory();
 	
 	// no-op reader
 	public static InferenceReader DUMMY = new InferenceReader() {
@@ -54,10 +53,10 @@ public interface InferenceReader {
 			return Collections.emptyList();
 		}
 
-		@Override
+		/*@Override
 		public DerivedExpressionFactory getExpressionFactory() {
 			return new DummyExpressionFactory();
-		}
+		}*/
 		
 	};
 }

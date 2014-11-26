@@ -37,12 +37,12 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactoryWi
 import org.semanticweb.elk.proofs.expressions.derived.DummyExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.proofs.inferences.InferenceReader;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.mapping.ExpressionMapper;
 import org.semanticweb.elk.proofs.inferences.mapping.InferenceMapper;
 import org.semanticweb.elk.proofs.inferences.mapping.SatisfiabilityChecker;
 import org.semanticweb.elk.proofs.inferences.mapping.TracingInput;
+import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
@@ -104,11 +104,6 @@ public class ReasonerInferenceReader implements InferenceReader {
 		mapper.map(inputs, collector);
 		
 		return userInferences;
-	}
-
-	@Override
-	public DerivedExpressionFactory getExpressionFactory() {
-		return expressionFactory_;
 	}
 
 }

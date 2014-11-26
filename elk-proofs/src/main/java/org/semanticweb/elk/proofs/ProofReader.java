@@ -24,6 +24,11 @@ package org.semanticweb.elk.proofs;
  * #L%
  */
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
+
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
@@ -32,6 +37,8 @@ import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
+import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.Operations.Transformation;
 
 /**
  * The main entrance point for accessing proofs.
@@ -85,5 +92,56 @@ public class ProofReader {
 		});
 		
 		return graph;
+	}
+	
+	/**
+	 * TODO
+	 * 
+	 * @param reasoner
+	 * @param subsumee
+	 * @param subsumer
+	 * @return
+	 * @throws ElkException
+	 */
+	public static ProofDependencyGraph readDependencyGraph(Reasoner reasoner, ElkClassExpression subsumee, ElkClassExpression subsumer) throws ElkException {
+		final ProofDependencyGraph depGraph = new ProofDependencyGraph();
+		final InferenceGraph infGraph = readInferenceGraph(reasoner, subsumee, subsumer);
+		Queue<DerivedExpression> toDo = new LinkedList<DerivedExpression>(infGraph.getRootExpressions());
+		Set<DerivedExpression> proved = new HashSet<DerivedExpression>(infGraph.getExpressions().size());
+		
+		for (;;) {
+			DerivedExpression next = toDo.poll();
+			
+			if (next == null) {
+				break;
+			}
+			
+			if (proved.add(next)) {
+				//FIXME
+				//System.err.println("Proved: " + next);
+				
+				for (Inference inf : infGraph.getInferencesForPremise(next)) {
+					DerivedExpression conclusion = inf.getConclusion();
+					
+					if (depGraph.getExpressions().containsAll(inf.getPremises())) {
+						Iterable<DerivedExpression> dependencies = Operations.concat(
+								Operations.map(
+										inf.getPremises(), new Transformation<DerivedExpression, Iterable<DerivedExpression>>() {
+
+							@Override
+							public Iterable<DerivedExpression> transform(DerivedExpression thePremise) {
+								return depGraph.getDependencies(thePremise);
+							}
+						}));
+						
+						
+						toDo.add(conclusion);
+						depGraph.updateDependencies(inf.getConclusion(), dependencies);
+					}
+				}
+			}
+		}
+		
+		return depGraph;
 	}
 }

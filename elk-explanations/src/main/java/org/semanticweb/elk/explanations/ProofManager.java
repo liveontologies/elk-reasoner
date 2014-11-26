@@ -59,6 +59,8 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
 import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
+import org.semanticweb.owlapitools.proofs.util.FilteredOWLExpression;
+import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
 
 
 
@@ -158,7 +160,6 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
     
     public OWLExpression getProofRoot(OWLAxiom entailment)  throws ExplanationException {
     	// TODO caching
-        // let's first get the reasoner
         OWLReasonerManager reasonerManager = modelManager.getOWLReasonerManager();
         OWLReasoner reasoner = reasonerManager.getCurrentReasoner();
         
@@ -166,7 +167,7 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
         	ExplainingOWLReasoner explainingReasoner = (ExplainingOWLReasoner) reasoner;
         	
         	try {
-				return explainingReasoner.getDerivedExpression(entailment);
+				return OWLProofUtils.startAcyclicProof(explainingReasoner, entailment);
 			} catch (Exception e) {
 				throw new ExplanationException(e);
 			}

@@ -45,7 +45,7 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactoryWithCaching;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryImpl;
-import org.semanticweb.elk.proofs.inferences.InferenceReader;
+import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
 
 /**
  * @author Pavel Klinov
