@@ -52,7 +52,7 @@ public class OWLExpressionNode extends DefaultMutableTreeNode {
 
 	private boolean childrenComputed_ = false;
 
-	OWLExpressionNode(OWLExpression expr, OWLInferenceNode parent) {
+	OWLExpressionNode(OWLExpression expr, TreeNode parent) {
 		super(parent);
 		
 		expression_ = expr;
@@ -72,7 +72,7 @@ public class OWLExpressionNode extends DefaultMutableTreeNode {
 	}
 
 	@Override
-	public Enumeration<OWLInferenceNode> children() {
+	public Enumeration<?> children() {
 		assertChildren();
 		
 		return super.children();
@@ -85,11 +85,15 @@ public class OWLExpressionNode extends DefaultMutableTreeNode {
 		
 		childrenComputed_ = true;
 		
-		//System.err.println("children recomputed for " + axiom_);
-		
 		try {
 			for (OWLInference inf : expression_.getInferences()) {
-				add(new OWLInferenceNode(inf, this));
+				// the separating node
+				add(new DefaultMutableTreeNode(inf.getName()));
+				
+				for (OWLExpression premise : inf.getPremises()) {
+					add(new OWLExpressionNode(premise, this));
+				}
+				
 			}
 		} catch (ProofGenerationException e) {
 			// TODO render some error nodes saying that inferences can't be

@@ -22,15 +22,13 @@ package org.semanticweb.elk.explanations;
  */
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTree;
 
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.elk.explanations.tree.ProofTree;
+import org.semanticweb.elk.explanations.tree.ProofTreeFrame;
 import org.semanticweb.elk.explanations.tree.ProofTreeUI;
 import org.semanticweb.owl.explanation.api.Explanation;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -46,14 +44,14 @@ public class ProofFrameExplanationDisplay extends JPanel implements ExplanationD
     private Explanation<OWLAxiom> explanation;
     
      public ProofFrameExplanationDisplay(OWLEditorKit editorKit, AxiomSelectionModel selectionModel, WorkbenchManager workbenchManager, OWLExpression proofRoot) {
-    	ProofTree tree = new ProofTree(editorKit, proofRoot);
+    	//ProofTree tree = new ProofTree(editorKit, proofRoot);
     	
     	setLayout(new BorderLayout());
         
-    	tree.setBorder(BorderFactory.createLineBorder(Color.RED));
-    	tree.setUI(new ProofTreeUI());
-        add(new JScrollPane(tree), BorderLayout.CENTER);
-        tree.setVisible(true);
+    	//tree.setUI(new ProofTreeUI());
+        //add(new JScrollPane(tree), BorderLayout.CENTER);
+        //tree.setVisible(true);
+    	add(new ProofTreeFrame(editorKit, proofRoot));
     }
 
     public Explanation<OWLAxiom> getExplanation() {

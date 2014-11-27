@@ -31,22 +31,22 @@ package org.semanticweb.elk.proofs.inferences;
  */
 public enum InferenceRule {
 	/*class inference rules*/
-	R_SUB("R_sub"),
-	R_AND_COMPOSITION("R_and+"),
-	R_AND_DECOMPOSITION("R_and-"),
-	R_CONTRADITION_FROM_DISJOINTNESS("R_disj_bot"),
-	R_OR_COMPOSITION("R_or+"),
-	R_EXIST_COMPOSITION("R_exist+"),
-	R_EXIST_CHAIN_COMPOSITION("R_o"),
-	R_INCONSISTENT_DISJOINTNESS("R_incons_disj"),
-	R_CONTRADITION_FROM_NEGATION("R_bot_neg"),
-	R_REFLEXIVE_EXISTENTIAL("R_exist_reflex"),
+	R_SUB("Subsumption inference"),
+	R_AND_COMPOSITION("Conjunction composition"),
+	R_AND_DECOMPOSITION("Conjunction decomposition"),
+	R_CONTRADITION_FROM_DISJOINTNESS("owl:Nothing inference from disjointness"),
+	R_OR_COMPOSITION("Disjunction composition"),
+	R_EXIST_COMPOSITION("Existential inference"),
+	R_EXIST_CHAIN_COMPOSITION("Existential inference via property composition"),
+	R_INCONSISTENT_DISJOINTNESS("owl:Nothing inference from inconsistent disjointness axiom"),
+	R_CONTRADITION_FROM_NEGATION("owl:Nothing inference from negation"),
+	R_REFLEXIVE_EXISTENTIAL("Existential inference for reflexive property"),
 	/*role inference rules*/
-	R_CHAIN_SUBSUMPTION("R_role_sub"),
-	R_REFLEXIVE_COMPOSITION("R_reflex_chain"),
-	R_REFLEXIVITY_VIA_SUBSUMPTION("R_reflex_sub"),
-	R_SUBSUMPTION_VIA_REFLEXIVITY("R_sub_reflex"),
-	R_TOLD_REFLEXIVITY("R_reflex");
+	R_CHAIN_SUBSUMPTION("Property subsumption inference"),
+	R_REFLEXIVE_COMPOSITION("Composition of reflexive properties"),
+	R_REFLEXIVITY_VIA_SUBSUMPTION("Reflexivity inference from subsumption"),
+	R_SUBSUMPTION_VIA_REFLEXIVITY("Property subsumption inference from reflexivity"),
+	R_TOLD_REFLEXIVITY("Reflexivity inference");
 	
 	private final String text_;
 	

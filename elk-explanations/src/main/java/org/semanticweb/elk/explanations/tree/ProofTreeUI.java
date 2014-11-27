@@ -24,11 +24,13 @@ package org.semanticweb.elk.explanations.tree;
  * #L%
  */
 
-import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.Rectangle;
 
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.AbstractLayoutCache;
+import javax.swing.tree.TreePath;
 
 /**
  * @author pavel
@@ -40,6 +42,10 @@ public class ProofTreeUI extends BasicTreeUI {
 	public int getRowX(int row, int depth) {
 		return super.getRowX(row, depth);
 	}
+	
+	static int getNodePreferredWidth(int visibleWidth, int rowX) {
+		return Math.max(visibleWidth - rowX - 5, visibleWidth / 3);
+	}
 
 	@Override
     protected AbstractLayoutCache.NodeDimensions createNodeDimensions() {
@@ -49,14 +55,11 @@ public class ProofTreeUI extends BasicTreeUI {
             public Rectangle getNodeDimensions(Object value, int row, int depth, boolean expanded, Rectangle size) {
                 Rectangle dimensions = super.getNodeDimensions(value, row, depth, expanded, size);
                 
-                /*Component component = currentCellRenderer.getTreeCellRendererComponent  
-                        (tree, value, tree.isRowSelected(row),  
-                                expanded, treeModel.isLeaf(value), row,  
-                                false);*/  
-                
                 if (tree.getParent() != null) {
-                	dimensions.width = tree.getParent().getWidth() - getRowX(row, depth) - 5;
-                	//dimensions.height = component.getPreferredSize().height;
+                	int visibleWidth = tree.getParent().getWidth();
+                	
+                	dimensions.width = getNodePreferredWidth(visibleWidth, getRowX(row, depth));
+                	//Math.max(visibleWidth - getRowX(row, depth) - 5, visibleWidth / 3);
                 }
                 
                 return dimensions;
@@ -65,4 +68,15 @@ public class ProofTreeUI extends BasicTreeUI {
 			
         };
     }
+
+	@Override
+	protected void paintHorizontalPartOfLeg(Graphics g, Rectangle clipBounds, Insets insets, Rectangle bounds, TreePath path, int row, boolean isExpanded, boolean hasBeenExpanded, boolean isLeaf) {
+		Object node = path.getLastPathComponent();
+		
+		if (node instanceof OWLExpressionNode) {
+			super.paintHorizontalPartOfLeg(g, clipBounds, insets, bounds, path, row, isExpanded, hasBeenExpanded, isLeaf);
+		}
+	}
+	
+	
 }

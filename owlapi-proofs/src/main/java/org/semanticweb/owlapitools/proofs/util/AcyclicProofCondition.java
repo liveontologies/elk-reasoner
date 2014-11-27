@@ -50,29 +50,16 @@ public class AcyclicProofCondition implements Condition<OWLInference> {
 	
 	@Override
 	public boolean holds(OWLInference inference) {
-		if (blockedExpressions_.contains(inference.getConclusion())) {
-			return false;
+		for (OWLExpression premise : inference.getPremises()) {
+			// filtering out single cycles and inferences whose premises have already been used
+			if (premise.equals(inference.getConclusion()) || blockedExpressions_.contains(premise)) {
+				return false;
+			}
 		}
 		
 		blockRecursively(inference.getConclusion());
 		
-		// TODO filter such inferences out elsewhere?
-		if (checkSingleCycle(inference)) {
-			blockedExpressions_.add(inference.getConclusion());
-			return false;
-		}
-		
 		return true;
-	}
-
-	private boolean checkSingleCycle(OWLInference inference) {
-		for (OWLExpression premise : inference.getPremises()) {
-			if (premise.equals(inference.getConclusion())) {
-				return true;
-			}
-		}
-		
-		return false;
 	}
 
 	private void blockRecursively(OWLExpression start) {

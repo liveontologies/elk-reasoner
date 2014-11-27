@@ -26,10 +26,15 @@ package org.semanticweb.elk.explanations.tree;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
@@ -55,7 +60,8 @@ public class ProofNodeRenderer implements TreeCellRenderer {
         this.owlCellRenderer = new PatchedOWLCellRenderer(owlEditorKit);
     }
 
-    @Override
+    @SuppressWarnings("serial")
+	@Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
     	Component result = null;
     	
@@ -66,19 +72,19 @@ public class ProofNodeRenderer implements TreeCellRenderer {
             if (axiom != null) {
             	OWLModelManager manager = owlEditorKit.getModelManager();
                 String valueToRender = manager.getRendering(axiom);
-                //int width = -1;
                 
                 //owlCellRenderer.setIconObject(axiom);
                 owlCellRenderer.setOntology(owlEditorKit.getOWLModelManager().getActiveOntology());
                 owlCellRenderer.setInferred(true);
                 owlCellRenderer.setHighlightKeywords(true);
                 owlCellRenderer.setOpaque(true);
+                owlCellRenderer.useBold(node.isAsserted());
                 
                 if (tree.getParent() != null) {
                 	ProofTreeUI ui = (ProofTreeUI) tree.getUI();
                 	
                 	//owlCellRenderer.setPreferredWidth(tree.getParent().getWidth() * 3 / 4);
-                	owlCellRenderer.setPreferredWidth(tree.getParent().getWidth() - ui.getRowX(row, node.getLevel()) - 5);
+                	owlCellRenderer.setPreferredWidth(ProofTreeUI.getNodePreferredWidth(tree.getParent().getWidth(), ui.getRowX(row, node.getLevel()))/*tree.getParent().getWidth() - ui.getRowX(row, node.getLevel()) - 5*/);
                 	
                 	/*System.err.println(valueToRender);
                 	System.err.println(tree.getParent().getWidth());
@@ -94,7 +100,7 @@ public class ProofNodeRenderer implements TreeCellRenderer {
                 
                 if (!node.isAsserted()) {
                 	if (!selected) {
-                		((JComponent)result).setBorder(BorderFactory.createDashedBorder(Color.LIGHT_GRAY));
+                		((JComponent)result).setBorder(BorderFactory.createDashedBorder(Color.LIGHT_GRAY, 5, 2));
                 		result.setBackground(new Color(255, 255, 215));
                 	}
                 }
@@ -102,15 +108,26 @@ public class ProofNodeRenderer implements TreeCellRenderer {
                 	((JComponent)result).setBorder(BorderFactory.createEmptyBorder());
                 }
                 
-                /*if (width > -1) {
-                	result.setSize(width, );
-                }*/
-                
             }
         }
     	
     	if (result == null) {
     		result = treeCellRendererDelegate.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
+    		
+    		Dimension size = result.getSize();
+    		
+    		JPanel separator = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    		JLabel ruleText = new JLabel();
+    		
+    		ruleText.setForeground(Color.GRAY);
+    		ruleText.setText(((DefaultMutableTreeNode) value).getUserObject().toString());
+    		ruleText.setBackground(tree.getBackground());
+    		ruleText.setVisible(true);
+    		separator.add(ruleText);
+    		separator.setSize(size);
+    		separator.setBackground(tree.getBackground());
+    		separator.setVisible(true);
+    		result = separator;
     	}
     	
     	return result;

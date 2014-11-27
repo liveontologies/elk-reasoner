@@ -25,9 +25,7 @@ package org.semanticweb.elk.explanations.tree;
  */
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import org.protege.editor.owl.OWLEditorKit;
@@ -46,12 +44,14 @@ public class ProofTreeFrame extends JPanel {
     public ProofTreeFrame(OWLEditorKit owlEditorKit, OWLExpression proofRoot) {
     	tree = new ProofTree(owlEditorKit, proofRoot);
         
-    	tree.setBorder(BorderFactory.createLineBorder(Color.RED));
+    	//tree.setBorder(BorderFactory.createLineBorder(Color.RED));
     	
     	setLayout(new BorderLayout());
+    	tree.setUI(new ProofTreeUI());
         add(tree, BorderLayout.CENTER);
 
-        setBorder(BorderFactory.createLineBorder(Color.BLUE));
+        //setBorder(BorderFactory.createLineBorder(Color.BLUE));
+        tree.setVisible(true);
         setVisible(true);
     }
     

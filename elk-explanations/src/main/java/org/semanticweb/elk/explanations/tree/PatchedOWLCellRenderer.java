@@ -172,6 +172,8 @@ public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRender
     private int plainFontHeight;
 
     private boolean opaque = false;
+    
+    private boolean useBold = false;
 
 
     private class OWLCellRendererPanel extends JPanel {
@@ -221,6 +223,9 @@ public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRender
         setupFont();
     }
 
+    public void useBold(boolean use) {
+    	useBold = use;
+    }
 
     public void setForceReadOnlyRendering(boolean forceReadOnlyRendering) {
         this.forceReadOnlyRendering = forceReadOnlyRendering;
@@ -754,13 +759,16 @@ public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRender
         }
 
         if (ontology != null) {
-            if (OWLRendererPreferences.getInstance().isHighlightActiveOntologyStatements() &&
+            /*if (OWLRendererPreferences.getInstance().isHighlightActiveOntologyStatements() &&
                 getOWLModelManager().getActiveOntology().equals(ontology)) {
                 doc.setParagraphAttributes(0, doc.getLength(), boldStyle, false);
             }
             else {
                 doc.setParagraphAttributes(0, doc.getLength(), nonBoldStyle, false);
-            }
+            }*/
+        	boolean bold = useBold & OWLRendererPreferences.getInstance().isHighlightActiveOntologyStatements() & getOWLModelManager().getActiveOntology().equals(ontology);
+        	
+        	doc.setParagraphAttributes(0, doc.getLength(), bold ? boldStyle : nonBoldStyle, false);
         }
         else {
             textPane.setFont(plainFont);
@@ -780,8 +788,11 @@ public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRender
             // Ontology is null.  If the object is an entity then the font
             // should be bold if there are statements about it
             if (value instanceof OWLEntity) {
-                if (activeOntologyContainsAxioms((OWLEntity) value)) {
+                if (activeOntologyContainsAxioms((OWLEntity) value) && useBold) {
                     textPane.setFont(boldFont);
+                }
+                else {
+                	textPane.setFont(plainFont);
                 }
             }
         }
