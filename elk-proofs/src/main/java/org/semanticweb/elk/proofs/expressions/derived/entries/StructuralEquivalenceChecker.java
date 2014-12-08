@@ -253,7 +253,7 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 
 				@Override
 				public Boolean visit(final ElkObjectPropertyDomainAxiom first) {
-					return first.accept(new DefaultAxiomChecker() {
+					return second.accept(new DefaultAxiomChecker() {
 						@Override
 						public Boolean visit(
 								ElkObjectPropertyDomainAxiom second) {
@@ -266,7 +266,7 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 
 				@Override
 				public Boolean visit(final ElkReflexiveObjectPropertyAxiom first) {
-					return first.accept(new DefaultAxiomChecker() {
+					return second.accept(new DefaultAxiomChecker() {
 						@Override
 						public Boolean visit(
 								ElkReflexiveObjectPropertyAxiom second) {
@@ -278,7 +278,7 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 
 				@Override
 				public Boolean visit(final ElkSubObjectPropertyOfAxiom first) {
-					return first.accept(new DefaultAxiomChecker() {
+					return second.accept(new DefaultAxiomChecker() {
 						@Override
 						public Boolean visit(
 								ElkSubObjectPropertyOfAxiom second) {
@@ -291,7 +291,7 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 
 				@Override
 				public Boolean visit(final ElkTransitiveObjectPropertyAxiom first) {
-					return first.accept(new DefaultAxiomChecker() {
+					return second.accept(new DefaultAxiomChecker() {
 						@Override
 						public Boolean visit(
 								ElkTransitiveObjectPropertyAxiom second) {

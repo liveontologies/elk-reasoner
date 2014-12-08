@@ -3,8 +3,6 @@
  */
 package org.semanticweb.elk.proofs.inferences;
 
-import java.io.File;
-
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -75,9 +73,9 @@ public class InferenceReaderTest {
 	
 	@Test
 	public void basicTest() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/AcyclicUnwinding.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/DeepPropertyHierarchy.owl");
 		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
-		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/C"));
+		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/D"));
 		// print inferences 
 		RecursiveInferenceVisitor.visitInferences(reasoner, sub, sup, new AbstractInferenceVisitor<Void, Void>() {
 

@@ -107,6 +107,8 @@ public class StructuralEquivalenceTest {
 		assertTrue(StructuralEquivalenceChecker.equal(factory.getSubObjectPropertyOfAxiom(r, s), factory.getSubObjectPropertyOfAxiom(r, s)));
 		assertTrue(StructuralEquivalenceChecker.equal(factory.getSubObjectPropertyOfAxiom(rs, s), factory.getSubObjectPropertyOfAxiom(rs, s)));
 		assertTrue(StructuralEquivalenceChecker.equal(factory.getReflexiveObjectPropertyAxiom(r), factory.getReflexiveObjectPropertyAxiom(r)));
+		// property axioms are never equal to class axioms
+		assertFalse(StructuralEquivalenceChecker.equal(factory.getSubObjectPropertyOfAxiom(r, s), factory.getSubClassOfAxiom(a, factory.getObjectSomeValuesFrom(s, b))));
 	}
 	
 	@Test
