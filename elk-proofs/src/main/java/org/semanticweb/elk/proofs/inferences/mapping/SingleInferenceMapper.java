@@ -468,7 +468,7 @@ public class SingleInferenceMapper {
 				Void input) {
 			final ElkObjectProperty sup = inference.getSuperPropertyChain().getElkObjectProperty();
 			ElkSubObjectPropertyOfAxiom sideCondition = (ElkSubObjectPropertyOfAxiom) sideConditionLookup_.lookup(inference);
-			ElkObjectProperty h = inference.getPremise().getSuperPropertyChain().getElkObjectProperty();
+			ElkObjectProperty h = inference.getPremise().getSubPropertyChain().getElkObjectProperty();
 			ElkSubObjectPropertyOfAxiom conclusion = inference.getSubPropertyChain().accept(new IndexedPropertyChainVisitor<ElkSubObjectPropertyOfAxiom>() {
 
 				@Override
@@ -486,7 +486,7 @@ public class SingleInferenceMapper {
 				}
 			});
 			
-			return new ChainSubsumption(conclusion, factory_.getSubObjectPropertyOfAxiom(h, sup), sideCondition, exprFactory_);
+			return new ChainSubsumption(conclusion, exprFactory_.createAsserted(sideCondition), factory_.getSubObjectPropertyOfAxiom(h, sup), exprFactory_);
 		}
 
 		@Override

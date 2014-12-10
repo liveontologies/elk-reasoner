@@ -36,6 +36,8 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
+ * TODO
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
@@ -48,21 +50,6 @@ public class ChainSubsumption extends AbstractInference {
 
 	private final DerivedExpression conclusion_;
 
-	private final DerivedExpression axiom_;
-
-	// one premise and a side condition
-	public ChainSubsumption(
-			ElkSubObjectPropertyOfAxiom conclusion,
-			ElkSubObjectPropertyOfAxiom premise, 
-			ElkSubObjectPropertyOfAxiom sideCondition,
-			DerivedExpressionFactory exprFactory) {
-		firstPremise_ = exprFactory.create(premise);
-		secondPremise_ = null;
-		conclusion_ = exprFactory.create(conclusion);
-		axiom_ = exprFactory.createAsserted(sideCondition);
-	}
-
-	// two premises and no side condition
 	public ChainSubsumption(
 			ElkSubObjectPropertyOfAxiom conclusion,
 			DerivedExpression first, 
@@ -71,15 +58,10 @@ public class ChainSubsumption extends AbstractInference {
 		firstPremise_ = first;
 		secondPremise_ = exprFactory.create(second);
 		conclusion_ = exprFactory.create(conclusion);
-		axiom_ = null;
 	}
 
 	@Override
 	public Collection<DerivedExpression> getRawPremises() {
-		if (secondPremise_ == null) {
-			return Arrays.asList(firstPremise_, axiom_);
-		}
-
 		return Arrays.asList(firstPremise_, secondPremise_);
 	}
 

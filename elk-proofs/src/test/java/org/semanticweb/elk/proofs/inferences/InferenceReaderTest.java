@@ -3,6 +3,9 @@
  */
 package org.semanticweb.elk.proofs.inferences;
 
+import java.io.File;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -72,10 +75,11 @@ public class InferenceReaderTest {
 	}
 	
 	@Test
+	@Ignore("not a real test, more for manual debugging")
 	public void basicTest() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/DeepPropertyHierarchy.owl");
-		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
-		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/D"));
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify(new File("/home/pavel/ulm/data/galens/EL-GALEN.owl"));
+		ElkClass sub = factory_.getClass(new ElkFullIri("http://www.co-ode.org/ontologies/galen#GallopingPulseRhythm"));
+		ElkClass sup = factory_.getClass(new ElkFullIri("http://www.co-ode.org/ontologies/galen#CardiacDysrhythmia"));
 		// print inferences 
 		RecursiveInferenceVisitor.visitInferences(reasoner, sub, sup, new AbstractInferenceVisitor<Void, Void>() {
 
