@@ -43,8 +43,6 @@ public interface InferenceReader {
 
 	public Iterable<Inference> getInferences(Expression expression) throws ElkException;
 	
-	//public DerivedExpressionFactory getExpressionFactory();
-	
 	// no-op reader
 	public static InferenceReader DUMMY = new InferenceReader() {
 
@@ -52,11 +50,6 @@ public interface InferenceReader {
 		public Iterable<Inference> getInferences(Expression expression) throws ElkException {
 			return Collections.emptyList();
 		}
-
-		/*@Override
-		public DerivedExpressionFactory getExpressionFactory() {
-			return new DummyExpressionFactory();
-		}*/
 		
 	};
 }

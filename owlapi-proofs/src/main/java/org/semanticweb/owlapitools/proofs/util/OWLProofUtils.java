@@ -29,9 +29,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
-import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
@@ -62,12 +59,6 @@ public class OWLProofUtils {
 		});
 	}
 	
-	public static OWLExpression startAcyclicProof(ExplainingOWLReasoner reasoner, OWLAxiom entailment)  throws ProofGenerationException, UnsupportedEntailmentTypeException {
-		OWLExpression proofRoot = reasoner.getDerivedExpression(entailment);
-		OWLInferenceGraph inferenceGraph = computeInferenceGraph(proofRoot);
-		
-		return new FilteredOWLExpression(proofRoot, new AcyclicProofCondition(inferenceGraph));
-	}
 	
 	public static OWLInferenceGraph computeInferenceGraph(OWLExpression proofRoot) throws ProofGenerationException {
 		OWLInferenceGraph graph = new OWLInferenceGraph();

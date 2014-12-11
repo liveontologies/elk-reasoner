@@ -75,11 +75,12 @@ public class InferenceReaderTest {
 	}
 	
 	@Test
-	@Ignore("not a real test, more for manual debugging")
+	//@Ignore("not a real test, more for manual debugging")
 	public void basicTest() throws Exception {
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify(new File("/home/pavel/ulm/data/galens/EL-GALEN.owl"));
-		ElkClass sub = factory_.getClass(new ElkFullIri("http://www.co-ode.org/ontologies/galen#GallopingPulseRhythm"));
-		ElkClass sup = factory_.getClass(new ElkFullIri("http://www.co-ode.org/ontologies/galen#CardiacDysrhythmia"));
+		//Reasoner reasoner = TestReasonerUtils.loadAndClassify(new File("/home/pavel/ulm/data/galens/EL-GALEN.owl"));
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/AcyclicUnwinding.owl");
+		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
+		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/B"));
 		// print inferences 
 		RecursiveInferenceVisitor.visitInferences(reasoner, sub, sup, new AbstractInferenceVisitor<Void, Void>() {
 

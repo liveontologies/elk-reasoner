@@ -60,7 +60,6 @@ public class ProofNodeRenderer implements TreeCellRenderer {
         this.owlCellRenderer = new PatchedOWLCellRenderer(owlEditorKit);
     }
 
-    @SuppressWarnings("serial")
 	@Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
     	Component result = null;
@@ -83,8 +82,7 @@ public class ProofNodeRenderer implements TreeCellRenderer {
                 if (tree.getParent() != null) {
                 	ProofTreeUI ui = (ProofTreeUI) tree.getUI();
                 	
-                	//owlCellRenderer.setPreferredWidth(tree.getParent().getWidth() * 3 / 4);
-                	owlCellRenderer.setPreferredWidth(ProofTreeUI.getNodePreferredWidth(tree.getParent().getWidth(), ui.getRowX(row, node.getLevel()))/*tree.getParent().getWidth() - ui.getRowX(row, node.getLevel()) - 5*/);
+                	owlCellRenderer.setPreferredWidth(ProofTreeUI.getNodePreferredWidth(tree.getParent().getWidth(), ui.getRowX(row, node.getLevel())));
                 	
                 	/*System.err.println(valueToRender);
                 	System.err.println(tree.getParent().getWidth());
@@ -112,6 +110,7 @@ public class ProofNodeRenderer implements TreeCellRenderer {
         }
     	
     	if (result == null) {
+    		// separator nodes
     		result = treeCellRendererDelegate.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
     		
     		Dimension size = result.getSize();

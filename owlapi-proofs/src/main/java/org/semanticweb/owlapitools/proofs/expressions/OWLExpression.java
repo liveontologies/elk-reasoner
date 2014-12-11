@@ -38,5 +38,5 @@ public interface OWLExpression {
 
 	public <O> O accept(OWLExpressionVisitor<O> visitor);
 	
-	public Iterable<OWLInference> getInferences() throws ProofGenerationException;
+	public Iterable<? extends OWLInference> getInferences() throws ProofGenerationException;
 }

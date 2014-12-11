@@ -27,12 +27,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 import org.protege.editor.core.Disposable;
 import org.protege.editor.owl.model.OWLModelManager;
@@ -40,9 +34,6 @@ import org.protege.editor.owl.model.inference.OWLReasonerManager;
 import org.semanticweb.owl.explanation.api.Explanation;
 import org.semanticweb.owl.explanation.api.ExplanationException;
 import org.semanticweb.owl.explanation.api.ExplanationGenerator;
-import org.semanticweb.owl.explanation.api.ExplanationGeneratorFactory;
-import org.semanticweb.owl.explanation.api.ExplanationManager;
-import org.semanticweb.owl.explanation.api.ExplanationProgressMonitor;
 import org.semanticweb.owl.explanation.impl.blackbox.checker.InconsistentOntologyExplanationGeneratorFactory;
 import org.semanticweb.owl.explanation.impl.laconic.LaconicExplanationGeneratorFactory;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -59,7 +50,8 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
 import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
-import org.semanticweb.owlapitools.proofs.util.FilteredOWLExpression;
+import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
+import org.semanticweb.owlapitools.proofs.util.OWLInferenceGraph;
 import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
 
 
@@ -70,8 +62,6 @@ import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
  *
  */
 public class ProofManager implements Disposable, OWLReasonerProvider {
-
-    private ExecutorService executorService;
 
     private final OWLOntologyChangeListener ontologyChangeListener;
 
@@ -88,8 +78,6 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
     private boolean findAllExplanations;
 
     private JustificationCacheManager justificationCacheManager = new JustificationCacheManager();
-    
-    private JustificationGeneratorProgressDialog progressDialog;
 
     private ProofManager(OWLModelManager modelManager) {
         this.modelManager = modelManager;
@@ -97,10 +85,9 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
         listeners = new ArrayList<ExplanationManagerListener>();
         explanationLimit = 2;
         findAllExplanations = true;
-        progressDialog = new JustificationGeneratorProgressDialog(new JFrame());
-        executorService = Executors.newSingleThreadExecutor();
         ontologyChangeListener = new OWLOntologyChangeListener() {
-            public void ontologiesChanged(List<? extends OWLOntologyChange> changes) throws OWLException {
+            @Override
+			public void ontologiesChanged(List<? extends OWLOntologyChange> changes) throws OWLException {
                 justificationCacheManager.clear();
             }
         };
@@ -136,8 +123,8 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
         fireExplanationLimitChanged();
     }
 
-
-    public OWLReasoner getReasoner() {
+    @Override
+	public OWLReasoner getReasoner() {
         return modelManager.getReasoner();
     }
 
@@ -154,7 +141,7 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
             return cache.get(entailment).size();
         }
         else {
-            return  -1;
+            return -1;
         }
     }
     
@@ -167,7 +154,10 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
         	ExplainingOWLReasoner explainingReasoner = (ExplainingOWLReasoner) reasoner;
         	
         	try {
-				return OWLProofUtils.startAcyclicProof(explainingReasoner, entailment);
+        		OWLExpression root = explainingReasoner.getDerivedExpression(entailment);
+        		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
+        		
+        		return new CycleBlockingExpression(root, iGraph);
 			} catch (Exception e) {
 				throw new ExplanationException(e);
 			}
@@ -179,8 +169,10 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
 
     public Set<Explanation<OWLAxiom>> getJustifications(OWLAxiom entailment, JustificationType type) throws ExplanationException {
         JustificationCache cache = justificationCacheManager.getJustificationCache(type);
+        
         if (!cache.contains(entailment)) {
-            Set<Explanation<OWLAxiom>> expls = computeJustifications(entailment, type);
+            Set<Explanation<OWLAxiom>> expls = computeExplanations(entailment);
+            
             cache.put(expls);
         }
         return cache.get(entailment);
@@ -197,7 +189,7 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
     }
 
 
-    private Set<Explanation<OWLAxiom>> computeJustifications(OWLAxiom entailment, JustificationType justificationType) throws ExplanationException {
+    private Set<Explanation<OWLAxiom>> computeExplanations(OWLAxiom entailment) throws ExplanationException {
         // let's first get the reasoner
         OWLReasonerManager reasonerManager = modelManager.getOWLReasonerManager();
         OWLReasoner reasoner = reasonerManager.getCurrentReasoner();
@@ -220,7 +212,7 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
         }
     }
     
-    // TODO add a generic unwinding method which returns an iterator over inferences
+    // TODO add a generic unwinding method which returns an iterator over axioms
 	private Set<OWLAxiom> getUsedAxioms(ExplainingOWLReasoner reasoner, OWLAxiom entailment) throws ProofGenerationException {
 		final Set<OWLAxiom> allUsedAxioms = new HashSet<OWLAxiom>();
 		OWLExpression expression = reasoner.getDerivedExpression(entailment);
@@ -272,32 +264,6 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
 		return allUsedAxioms;
 	}
 
-    private ExplanationGeneratorFactory<OWLAxiom> getCurrentExplanationGeneratorFactory(JustificationType type) {
-        OWLReasoner reasoner = modelManager.getOWLReasonerManager().getCurrentReasoner();
-        if(reasoner.isConsistent()) {
-            if (type.equals(JustificationType.LACONIC)) {
-                OWLReasonerFactory rf = getReasonerFactory();
-                return ExplanationManager.createLaconicExplanationGeneratorFactory(rf, progressDialog.getProgressMonitor());
-            }
-            else {
-                OWLReasonerFactory rf = getReasonerFactory();
-                return ExplanationManager.createExplanationGeneratorFactory(rf, progressDialog.getProgressMonitor());
-            }    
-        }
-        else {
-            if (type.equals(JustificationType.LACONIC)) {
-                OWLReasonerFactory rf = getReasonerFactory();
-                InconsistentOntologyExplanationGeneratorFactory fac = new InconsistentOntologyExplanationGeneratorFactory(rf, Long.MAX_VALUE);
-                return new LaconicExplanationGeneratorFactory<OWLAxiom>(fac);
-            }
-            else {
-                OWLReasonerFactory rf = getReasonerFactory();
-                return new InconsistentOntologyExplanationGeneratorFactory(rf, Long.MAX_VALUE);
-            }
-        }
-        
-    }
-
     public OWLOntologyManager getExplanationOntologyManager() {
         return modelManager.getOWLOntologyManager();
     }
@@ -329,7 +295,8 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
     }
 
 
-    public void dispose() {
+    @Override
+	public void dispose() {
         rootDerivedGenerator.dispose();
         modelManager.removeOntologyChangeListener(ontologyChangeListener);
     }
@@ -365,62 +332,5 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
         return m;
     }
 
-
-    private class ExplanationGeneratorCallable implements Callable<Set<Explanation<OWLAxiom>>>, ExplanationProgressMonitor<OWLAxiom> {
-
-        private Set<OWLAxiom> axioms;
-
-        private OWLAxiom axiom;
-
-        private int limit = Integer.MAX_VALUE;
-
-        private Set<Explanation<OWLAxiom>> found = new HashSet<Explanation<OWLAxiom>>();
-
-        private JustificationType justificationType;
-
-        private ExplanationGeneratorCallable(Set<OWLAxiom> axioms, OWLAxiom axiom, JustificationType justificationType) {
-            this.axioms = axioms;
-            this.axiom = axiom;
-            this.justificationType = justificationType;
-        }
-
-        /**
-         * Computes a result, or throws an exception if unable to do so.
-         * @return computed result
-         * @throws Exception if unable to compute a result
-         */
-        public Set<Explanation<OWLAxiom>> call() throws Exception {
-            found.clear();
-            ExplanationGeneratorFactory<OWLAxiom> factory = getCurrentExplanationGeneratorFactory(justificationType);
-            ExplanationGenerator<OWLAxiom> delegate = factory.createExplanationGenerator(axioms, this);
-            progressDialog.reset();
-            try {
-                if (findAllExplanations) {
-                    delegate.getExplanations(axiom);
-                }
-                else {
-                    delegate.getExplanations(axiom, limit);
-                }
-            }
-            finally {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        progressDialog.setVisible(false);
-                    }
-                });
-            }
-
-            return found;
-        }
-
-        public void foundExplanation(ExplanationGenerator<OWLAxiom> explanationGenerator, Explanation<OWLAxiom> explanation, Set<Explanation<OWLAxiom>> explanations) {
-            progressDialog.getProgressMonitor().foundExplanation(explanationGenerator, explanation, explanations);
-            found.add(explanation);
-        }
-
-        public boolean isCancelled() {
-            return progressDialog.getProgressMonitor().isCancelled();
-        }
-    }
 
 }

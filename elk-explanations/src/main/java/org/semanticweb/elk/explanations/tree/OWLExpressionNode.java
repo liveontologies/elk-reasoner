@@ -37,6 +37,7 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
 import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
+import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
 
 /**
  * TODO need an immutable implementation
@@ -44,6 +45,7 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
  * @author pavel
  *
  */
+@SuppressWarnings("serial")
 public class OWLExpressionNode extends DefaultMutableTreeNode {
 
 	private final OWLExpression expression_;
@@ -52,6 +54,10 @@ public class OWLExpressionNode extends DefaultMutableTreeNode {
 
 	private boolean childrenComputed_ = false;
 
+	OWLExpressionNode(OWLExpression root) {
+		this(root, null);
+	}
+	
 	OWLExpressionNode(OWLExpression expr, TreeNode parent) {
 		super(parent);
 		
@@ -96,8 +102,7 @@ public class OWLExpressionNode extends DefaultMutableTreeNode {
 				
 			}
 		} catch (ProofGenerationException e) {
-			// TODO render some error nodes saying that inferences can't be
-			// obtained?
+			// TODO render some error nodes saying that inferences can't be obtained?
 			e.printStackTrace();
 		}
 	}
@@ -110,21 +115,8 @@ public class OWLExpressionNode extends DefaultMutableTreeNode {
 		return axiom_;
 	}
 	
-	// TODO reuse this visitor?
 	public boolean isAsserted() {
-		return expression_.accept(new OWLExpressionVisitor<Boolean>() {
-
-			@Override
-			public Boolean visit(OWLAxiomExpression expression) {
-				return expression.isAsserted();
-			}
-
-			@Override
-			public Boolean visit(OWLLemmaExpression expression) {
-				return false;
-			}
-			
-		});
+		return OWLProofUtils.isAsserted(expression_);
 	}
 	
 	@Override
@@ -150,4 +142,43 @@ public class OWLExpressionNode extends DefaultMutableTreeNode {
 		return super.getChildAt(index);
 	}
 	
+	/**
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 * pavel.klinov@uni-ulm.de
+	 */
+	/*private static class CycleBlockingExpression extends FilteredOWLExpression<Condition<OWLInference>> {
+
+		public CycleBlockingExpression(final OWLExpression expr, final TreeNode[] pathFromRoot) {
+			super(expr, new Condition<OWLInference>() {
+				
+				@Override
+				public boolean holds(OWLInference inf) {
+					for (OWLExpression premise : inf.getPremises()) {
+						// TODO create a set instead of traversing the path each time
+						if (inf.getConclusion().equals(premise) || occursInPath(premise)) {
+							return false;
+						}
+					}
+					
+					return true;
+				}
+
+				private boolean occursInPath(OWLExpression expr) {
+					for (TreeNode pathNode : pathFromRoot) {
+						OWLExpression pathExpr = ((OWLExpressionNode) pathNode).getExpression();
+						
+						if (pathExpr.equals(expr)) {
+							return true;
+						}
+					}
+					
+					return false;
+				}
+				
+			});
+		}
+		
+	}*/
 }

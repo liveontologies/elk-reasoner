@@ -34,13 +34,13 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class FilteredOWLExpression implements OWLExpression {
+public class FilteredOWLExpression<C extends Condition<OWLInference>> implements OWLExpression {
 
 	protected final OWLExpression expression;
 	
-	protected final Condition<OWLInference> filter; 
+	protected final C filter; 
 	
-	public FilteredOWLExpression(OWLExpression expr, Condition<OWLInference> f) {
+	public FilteredOWLExpression(OWLExpression expr, C f) {
 		expression = expr;
 		filter = f;
 	}
@@ -51,13 +51,13 @@ public class FilteredOWLExpression implements OWLExpression {
 	}
 
 	@Override
-	public Iterable<OWLInference> getInferences() throws ProofGenerationException {
-		return Operations.map(expression.getInferences(), new Operations.Transformation<OWLInference, OWLInference>() {
+	public Iterable<FilteredOWLInference<C>> getInferences() throws ProofGenerationException {
+		return Operations.map(expression.getInferences(), new Operations.Transformation<OWLInference, FilteredOWLInference<C>>() {
 
 			@Override
-			public OWLInference transform(OWLInference inf) {
+			public FilteredOWLInference<C> transform(OWLInference inf) {
 				if (filter.holds(inf)) {
-					return propagateFilter(inf);
+					return propagateCondition(inf);
 				}
 				
 				return null;
@@ -66,7 +66,33 @@ public class FilteredOWLExpression implements OWLExpression {
 		});
 	}
 
-	private OWLInference propagateFilter(OWLInference inf) {
-		return new FilteredOWLInference(inf, filter);
+	protected FilteredOWLInference<C> propagateCondition(OWLInference inf) {
+		return new FilteredOWLInference<C>(inf, filter);
 	}
+	
+	public C getFilterCondition() {
+		return filter;
+	}
+
+	@Override
+	public String toString() {
+		return expression.toString();
+	}
+	
+	public OWLExpression getExpression() {
+		return expression;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return expression.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return expression.hashCode();
+	}
+	
+	
+	
 }

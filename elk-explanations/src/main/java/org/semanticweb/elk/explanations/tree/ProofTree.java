@@ -43,7 +43,7 @@ public class ProofTree extends JTree {//extends OWLLinkedObjectTree {
     public ProofTree(OWLEditorKit owlEditorKit, OWLExpression proofRoot) {
         //super(owlEditorKit);
         
-        TreeModel model = new DefaultTreeModel(new OWLExpressionNode(proofRoot, null));
+        TreeModel model = new DefaultTreeModel(new OWLExpressionNode(proofRoot));
         
         setModel(model);
         setCellRenderer(new ProofNodeRenderer(owlEditorKit));
@@ -63,6 +63,7 @@ public class ProofTree extends JTree {//extends OWLLinkedObjectTree {
     
 	public void registerUI() {
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				setUI(new ProofTreeUI());
 			}

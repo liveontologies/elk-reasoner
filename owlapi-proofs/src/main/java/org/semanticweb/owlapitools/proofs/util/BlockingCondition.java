@@ -24,51 +24,50 @@ package org.semanticweb.owlapitools.proofs.util;
  * #L%
  */
 
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 
 /**
+ * Blocks inferences which use blocked expressions as premises.
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class FilteredOWLInference<C extends Condition<OWLInference>> implements OWLInference {
+public class BlockingCondition implements Condition<OWLInference> {
 
-	protected final OWLInference inference;
+	private final Set<OWLExpression> blocked_;
 	
-	protected final C filter;
+	public BlockingCondition(Set<OWLExpression> blocked) {
+		blocked_ = blocked;
+	}
 	
-	public FilteredOWLInference(OWLInference inf, C f) {
-		inference = inf;
-		filter = f;
+	public BlockingCondition() {
+		this(new HashSet<OWLExpression>());
 	}
 	
 	@Override
-	public OWLExpression getConclusion() {
-		return propagateCondition(inference.getConclusion());
-	}
-
-	protected FilteredOWLExpression<C> propagateCondition(OWLExpression expr) {
-		return new FilteredOWLExpression<C>(expr, filter);
-	}
-
-	@Override
-	public Collection<? extends FilteredOWLExpression<C>> getPremises() {
-		return Operations.map(inference.getPremises(), new Operations.Transformation<OWLExpression, FilteredOWLExpression<C>>() {
-
-			@Override
-			public FilteredOWLExpression<C> transform(OWLExpression premise) {
-				return propagateCondition(premise);
+	public boolean holds(OWLInference inf) {
+		boolean result = true;
+		
+		for (OWLExpression premise : inf.getPremises()) {
+			if (inf.getConclusion().equals(premise)) {
+				// filtering single cycles
+				return false;
 			}
 			
-		});
+			if (blocked_.contains(premise)) {
+				return false;
+			}
+		}
+		
+		return result;
 	}
 
-	@Override
-	public String getName() {
-		return inference.getName();
+	public Set<OWLExpression> getBlockedExpressions() {
+		return blocked_;
 	}
-
 }

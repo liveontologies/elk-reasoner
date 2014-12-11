@@ -1,16 +1,9 @@
 Prefix( : = <http://example.org/> ) 
 Ontology(
-SubClassOf(:A ObjectSomeValuesFrom(:R :C1))
-SubClassOf(:C1 :C2)
-SubClassOf(ObjectSomeValuesFrom(:R :C2) :C)
-
-SubClassOf(:A ObjectSomeValuesFrom(:R :E1))
-SubClassOf(:E1 :E2)
-SubClassOf(ObjectSomeValuesFrom(:R :E2) :E)
-
-SubClassOf(:C :B)
-SubClassOf(:C :D)
-SubClassOf(:D :B)
-SubClassOf(:E :D)
+SubClassOf(:A ObjectIntersectionOf(:B :C))
+SubClassOf(ObjectIntersectionOf(:A1 :A2) :B)
+SubClassOf(ObjectIntersectionOf(:A3 :A4) ObjectIntersectionOf(:A1 :A2))
+SubClassOf(ObjectIntersectionOf(:A5 :A6) ObjectIntersectionOf(:A3 :A4))
+SubClassOf(:B ObjectIntersectionOf(:A5 :A6))
 )
 

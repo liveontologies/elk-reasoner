@@ -62,7 +62,6 @@ public class ProofFrameExplanationDisplay extends JPanel implements ExplanationD
     }
 
     public void axiomAdded(AxiomSelectionModel source, OWLAxiom axiom) {
-        System.out.println("SEL: " + axiom);
     }
 
     public void axiomRemoved(AxiomSelectionModel source, OWLAxiom axiom) {
