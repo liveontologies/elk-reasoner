@@ -35,6 +35,6 @@ import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
  */
 public interface ElkAnnotationVisitor<O> {
 
-	O visit(ElkAnnotation elkAnnotation);
+	O visit(ElkAnnotation annotation);
 
 }

@@ -34,6 +34,6 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
  */
 public interface ElkNamedIndividualVisitor<O> {
 
-	O visit(ElkNamedIndividual elkNamedIndividual);
+	O visit(ElkNamedIndividual expression);
 
 }

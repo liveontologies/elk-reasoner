@@ -34,6 +34,6 @@ import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
  */
 public interface ElkAnonymousIndividualVisitor<O> {
 
-	O visit(ElkAnonymousIndividual ind);
+	O visit(ElkAnonymousIndividual expression);
 
 }
