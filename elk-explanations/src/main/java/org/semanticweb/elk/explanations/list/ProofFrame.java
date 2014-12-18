@@ -24,16 +24,11 @@ package org.semanticweb.elk.explanations.list;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
 import org.protege.editor.owl.ui.frame.OWLFrameSection;
-import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 
 /**
@@ -44,7 +39,7 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
  */
 public class ProofFrame extends AbstractOWLFrame<OWLExpression> {
 	
-	private static final Set<AxiomType<?>> EDITABLE_AXIOM_TYPES = new HashSet<AxiomType<?>>(Arrays.<AxiomType<?>>asList(AxiomType.SUBCLASS_OF, AxiomType.OBJECT_PROPERTY_DOMAIN, AxiomType.OBJECT_PROPERTY_RANGE));
+	//private static final Set<AxiomType<?>> EDITABLE_AXIOM_TYPES = new HashSet<AxiomType<?>>(Arrays.<AxiomType<?>>asList(AxiomType.SUBCLASS_OF, AxiomType.OBJECT_PROPERTY_DOMAIN, AxiomType.OBJECT_PROPERTY_RANGE));
 	
     public ProofFrame(OWLEditorKit owlEditorKit, OWLExpression proofRoot) {
     	super(owlEditorKit.getOWLModelManager().getOWLOntologyManager());
@@ -56,8 +51,6 @@ public class ProofFrame extends AbstractOWLFrame<OWLExpression> {
 	protected void addSection(OWLFrameSection<? extends Object, ? extends Object, ? extends Object> section, int index) {
 		super.addSection(section, index);
 	}
-	
-	
 	
 	int indexOf(OWLFrameSection<? extends Object, ? extends Object, ? extends Object> section) {
 		int index = 0;

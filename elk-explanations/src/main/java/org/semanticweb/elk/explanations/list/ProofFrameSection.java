@@ -46,13 +46,22 @@ public class ProofFrameSection extends AbstractOWLFrameSection<OWLExpression, OW
     
     private final int depth_;
     
-    public ProofFrameSection(OWLEditorKit editorKit, OWLFrame<OWLExpression> owlFrame, Iterable<? extends OWLExpression> exprs, String label, int depth) {
+    public ProofFrameSection(OWLEditorKit editorKit, OWLFrame<? extends OWLExpression> owlFrame, Iterable<? extends OWLExpression> exprs, String label, int depth) {
         super(editorKit, label, owlFrame);
         expressions_ = exprs;
         depth_ = depth;
     }
 
-    int getDepth() {
+    @Override
+	protected void disposeOfSection() {
+		for (OWLFrameSectionRow<?, OWLAxiom, ?> row : getRows()) {
+			((ProofFrameSectionRow) row).disposeOfRow();
+		}
+		
+		super.disposeOfSection();
+	}
+
+	int getDepth() {
     	return depth_;
     }
     

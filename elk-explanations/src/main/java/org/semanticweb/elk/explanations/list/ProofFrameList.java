@@ -23,31 +23,29 @@ package org.semanticweb.elk.explanations.list;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.JList;
 import javax.swing.ListModel;
 import javax.swing.border.Border;
-import javax.swing.event.ListDataListener;
 
-import org.apache.log4j.Logger;
-import org.protege.editor.core.ProtegeApplication;
 import org.protege.editor.core.ui.list.MListButton;
+import org.protege.editor.core.ui.list.MListDeleteButton;
+import org.protege.editor.core.ui.list.MListEditButton;
 import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.ui.frame.OWLFrameSectionRow;
 import org.protege.editor.owl.ui.framelist.ExplainButton;
 import org.protege.editor.owl.ui.framelist.OWLFrameList;
 import org.protege.editor.owl.ui.framelist.OWLFrameListInferredSectionRowBorder;
 import org.semanticweb.elk.explanations.AxiomSelectionModel;
 import org.semanticweb.elk.explanations.WorkbenchManager;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapitools.proofs.OWLInference;
-import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
+import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 
 /**
@@ -59,165 +57,78 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 @SuppressWarnings("serial")
 public class ProofFrameList extends OWLFrameList<OWLExpression> {
 	
-	private static final Logger LOGGER_ = Logger.getLogger(ProofFrameList.class);
-
 	private static final Border INFERRED_BORDER = new OWLFrameListInferredSectionRowBorder();
-	
-    public static final Color SINGLE_POPULARITY_COLOR = new Color(170, 70, 15);
-
-    public static final Color MULTI_POPULARITY_COLOR = new Color(10, 75, 175);
-
-    public static final Color ALL_POPULARITY_COLOR = new Color(6, 133, 19);
-
-    private OWLEditorKit editorKit;
-
-    private int buttonRunWidth = 0;
-
-    private AxiomSelectionModel axiomSelectionModel;
-    
-    private WorkbenchManager workbenchManager;
 
     public ProofFrameList(OWLEditorKit editorKit, AxiomSelectionModel axiomSelectionModel, WorkbenchManager workbenchManager, ProofFrame proofFrame) {
         super(editorKit, proofFrame);
         
-        this.workbenchManager = workbenchManager;
-        this.axiomSelectionModel = axiomSelectionModel;
-        this.editorKit = editorKit;
-        
         setCellRenderer(new ProofFrameListRenderer(editorKit));
-        
-        /*Action moveUpAction = new AbstractAction("Move up") {
-            public void actionPerformed(ActionEvent e) {
-                handleMoveUp();
-            }
-        };
-        getActionMap().put(moveUpAction.getValue(Action.NAME), moveUpAction);
-        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK), moveUpAction.getValue(Action.NAME));
-
-
-        Action moveDownAction = new AbstractAction("Move down") {
-            public void actionPerformed(ActionEvent e) {
-                handleMoveDown();
-            }
-        };
-        getActionMap().put(moveDownAction.getValue(Action.NAME), moveDownAction);
-        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_MASK), moveDownAction.getValue(Action.NAME));
-
-
-        Action increaseIndentation = new AbstractAction("Increase indentation") {
-            public void actionPerformed(ActionEvent e) {
-                handleIncreaseIndentation();
-            }
-        };
-        getActionMap().put(increaseIndentation.getValue(Action.NAME), increaseIndentation);
-        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK), increaseIndentation.getValue(Action.NAME));
-
-
-        Action decreaseIndentation = new AbstractAction("decrease indentation") {
-            public void actionPerformed(ActionEvent e) {
-                handleDecreaseIndentation();
-            }
-        };
-        getActionMap().put(decreaseIndentation.getValue(Action.NAME), decreaseIndentation);
-        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK), decreaseIndentation.getValue(Action.NAME));*/
-
-
-
     }
     
-    
-/*    private void handleMoveUp() {
-        OWLAxiom selectedAxiom = getSelectedAxiom();
-        if(selectedAxiom == null) {
-            return;
-        }
-        JustificationFormattingManager formattingManager = JustificationFormattingManager.getManager();
-        int newIndex = formattingManager.moveAxiomUp(getRootObject(), selectedAxiom);
-        getFrame().setRootObject(getRootObject());
-        setSelectedIndex(newIndex + 1);
-    }
-    
-    
-
-    private void handleMoveDown() {
-        OWLAxiom selectedAxiom = getSelectedAxiom();
-        if(selectedAxiom == null) {
-            return;
-        }
-        JustificationFormattingManager formattingManager = JustificationFormattingManager.getManager();
-        int newIndex = formattingManager.moveAxiomDown(getRootObject(), selectedAxiom);
-        getFrame().setRootObject(getRootObject());
-        setSelectedIndex(newIndex + 1);
-    }
-    
-    
-    private void handleIncreaseIndentation() {
-        OWLAxiom selectedAxiom = getSelectedAxiom();
-        if(selectedAxiom == null) {
-            return;
-        }
-        JustificationFormattingManager formattingManager = JustificationFormattingManager.getManager();
-        formattingManager.increaseIndentation(getRootObject(), selectedAxiom);
-        int selIndex = getSelectedIndex();
-        getFrame().setRootObject(getRootObject());
-        setSelectedIndex(selIndex);
-    }
-
-    private void handleDecreaseIndentation() {
-        OWLAxiom selectedAxiom = getSelectedAxiom();
-        if(selectedAxiom == null) {
-            return;
-        }
-        JustificationFormattingManager formattingManager = JustificationFormattingManager.getManager();
-        formattingManager.decreaseIndentation(getRootObject(), selectedAxiom);
-        int selIndex = getSelectedIndex();
-        getFrame().setRootObject(getRootObject());
-        setSelectedIndex(selIndex);
-    }
-
-
-
-
-    private OWLAxiom getSelectedAxiom() {
-        int selectedIndex = getSelectedIndex();
-        if(selectedIndex == -1) {
-            return null;
-        }
-        Object element = getModel().getElementAt(selectedIndex);
-        if(!(element instanceof JustificationFrameSectionRow)) {
-            return null;
-        }
-        return ((JustificationFrameSectionRow) element).getAxiom();
-    } */
-
     @Override
     protected List<MListButton> getButtons(final Object value) {
         if (value instanceof ProofFrameSectionRow) {
         	ProofFrameSectionRow row = (ProofFrameSectionRow) value;
         	
 			if (row.isInferred()) {
-				// explain button for inferred expressions
-				List<MListButton> buttons = Arrays.<MListButton> asList(new ExplainButton(
+				if (!row.isExpanded()) {
+					// explain button for inferred expressions
+					return Arrays.<MListButton> asList(new ExplainButton(
 								new AbstractAction() {
 
 									public void actionPerformed(ActionEvent e) {
-										invokeExplanationHandler((ProofFrameSectionRow) value);
+										explainRow((ProofFrameSectionRow) value);
 									}
 								}));
-				buttonRunWidth = buttons.size() * (getButtonDimension() + 2) + 20;
-				
-				return buttons;
+				}
+				else {
+					return Arrays.<MListButton> asList(new CollapseButton(
+							new AbstractAction() {
+
+								public void actionPerformed(ActionEvent e) {
+									collapseRow((ProofFrameSectionRow) value);
+								}
+							}));
+				}
 			}
-			else {
-				// TODO edit and delete buttons here
+			else if (row.getAxiom() instanceof OWLClassAxiom) {
+				// asserted axiom, can edit or delete it
+				return Arrays.<MListButton> asList(
+						new MListEditButton(new AbstractAction() {
+
+							public void actionPerformed(ActionEvent e) {
+								editRow((ProofFrameSectionRow) value);
+							}
+						}),
+						new MListDeleteButton(
+								new AbstractAction() {
+
+									public void actionPerformed(ActionEvent e) {
+										deleteRow((ProofFrameSectionRow) value);
+									}
+								})
+						);
 			}
         }
 
         return Collections.emptyList();
     }
+    
+	protected void editRow(ProofFrameSectionRow expressionRow) {
+    	//TODO show editor
+    }
+    
+    protected void deleteRow(ProofFrameSectionRow expressionRow) {
+    	//TODO
+    }
+    
+    protected void collapseRow(ProofFrameSectionRow expressionRow) {
+    	expressionRow.setExpanded(false);
+    	refreshComponent();
+    }
 
-	protected void invokeExplanationHandler(ProofFrameSectionRow expressionRow) {
-		OWLExpression conclusion = expressionRow.getRootObject();
+	protected void explainRow(ProofFrameSectionRow expressionRow) {
+		/*OWLExpression conclusion = expressionRow.getRootObject();
 		ProofFrame frame = (ProofFrame) getFrame();
 		ProofFrameSection expressionSection = (ProofFrameSection) expressionRow.getFrameSection();
 		int rowDepth = expressionRow.getDepth() + 1;
@@ -272,6 +183,14 @@ public class ProofFrameList extends OWLFrameList<OWLExpression> {
 			frame.addSection(secondSection, sectionIndex + offset);
 		}
 		
+		refreshComponent();*/
+		
+		expressionRow.setExpanded(true);
+		
+		if (!expressionRow.isFilled()) {
+			expressionRow.refillInferenceSections();
+		}
+		
 		refreshComponent();
 	}
 
@@ -291,9 +210,6 @@ public class ProofFrameList extends OWLFrameList<OWLExpression> {
 			Border externalBorder = BorderFactory.createMatteBorder(0, 20 * row.getDepth(), 0, 0, list.getBackground());
 			Border border = BorderFactory.createCompoundBorder(externalBorder, BorderFactory.createCompoundBorder(row.isInferred() ? INFERRED_BORDER : line, internalPadding));
 			
-/*			if (row.isInferred()) {
-                border = BorderFactory.createCompoundBorder(border, INFERRED_BORDER);
-            }*/
 			return border;
 		}
 		
@@ -303,85 +219,109 @@ public class ProofFrameList extends OWLFrameList<OWLExpression> {
 	
 	@Override
 	public ListModel<?> getModel() {
-		final ListModel<?> model = super.getModel();
-		// filtering out sections with empty labels
-		return new ListModel<Object>() {
-			
-			@Override
-			public void addListDataListener(ListDataListener l) {
-				model.addListDataListener(l);
-			}
-			
-			private boolean isFiltered(Object element) {
-				if (element instanceof ProofFrameSection) {
-					ProofFrameSection section = (ProofFrameSection) element;
-					
-					return section.getLabel() == null || section.getLabel().length() == 0;
-				}
-				
-				return false;
-			}
-
-			@Override
-			public Object getElementAt(int index) {
-				for (int i = index; i < model.getSize(); i++) {
-					Object element = model.getElementAt(i);
-					
-					if (!isFiltered(element)) {
-						return element;
-					}
-				}
-				
-				return null;
-			}
-
-			@Override
-			public int getSize() {
-				int size = 0;
-				
-				for (int i = 0; i < model.getSize(); i++) {
-					Object element = model.getElementAt(i);
-					
-					if (!isFiltered(element)) {
-						size++;
-					}
-				}
-				
-				return size;
-			}
-
-			@Override
-			public void removeListDataListener(ListDataListener l) {
-				model.removeListDataListener(l);
-			}
-			
-		};
+		return new FlattenedListModel((ProofFrameSection) this.getFrame().getFrameSections().get(0));
 	}
 
-	
-	
-    /*
-    @Override
-    public void addToPopupMenu(OWLFrameListPopupMenuAction<Explanation<OWLAxiom>> explanationOWLFrameListPopupMenuAction) {
-        // NO MENU FOR US
-    }
+	// TODO cache the list of items for better performance, e.g., constant time lookup by index
+	private static class FlattenedListModel extends AbstractListModel<Object> {
 
-    @Override
-    protected List<MListButton> getListItemButtons(MListItem item) {
-        return Collections.emptyList();
-    }
+		private final ProofFrameSection header_;
+		
+		FlattenedListModel(ProofFrameSection header) {
+			header_ = header;
+		}
+		
+		@Override
+		public Object getElementAt(int arg0) {
+			int i = 0;
+			Iterator<?> iter = iterate();
+			
+			while (iter.hasNext()) {
+				Object item = iter.next();
+				
+				if (i == arg0) {
+					return item;
+				}
+				
+				i++;
+			}
+			
+			return null;
+		}
 
-    @Override
-    protected Border createListItemBorder(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        return super.createListItemBorder(list, value, index, isSelected, cellHasFocus);
-    }
+		@Override
+		public int getSize() {
+			int i = 0;
+			Iterator<?> iter = iterate();
+			
+			while (iter.hasNext()) {
+				iter.next();
+				i++;
+			}
+			
+			return i;
+		}
+		
+		private Iterator<?> iterate() {
+			final LinkedList<Object> todo = new LinkedList<Object>();
+			
+			todo.add(header_);
+			
+			return new Iterator<Object>() {
+				
+				private Object next_ = null;
 
+				@Override
+				public boolean hasNext() {
+					if (next_ != null) {
+						return true;
+					}
 
-    @Override
-    protected Border createPaddingBorder(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        return super.createPaddingBorder(list, value, index, isSelected, cellHasFocus);
-    }
+					next_ = todo.poll();
+					
+					if (next_ == null) {
+						return false;
+					}
+					
+					if (next_ instanceof ProofFrameSection) {
+						ProofFrameSection section = (ProofFrameSection) next_;
+						int i = 0;
+						
+						for (Object row : section.getRows()) {
+							todo.add(i++, row);
+						}
+					}
+					else if (next_ instanceof ProofFrameSectionRow) {
+						ProofFrameSectionRow row = (ProofFrameSectionRow) next_;
+						int i = 0;
+						
+						if (row.isExpanded()) {
+							for (Object section : row.getInferenceSections()) {
+								todo.add(i++, section);
+							}
+						}
+					}
+					
+					return true;
+				}
 
-*/
+				@Override
+				public Object next() {
+					Object tmp = next_;
+					
+					next_ = null;
+					
+					return tmp;
+				}
+
+				@Override
+				public void remove() {
+					// no-op
+				}
+				
+			};
+		}
+		
+	}
 
 }

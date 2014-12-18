@@ -35,6 +35,8 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
  */
 public class ProofBasedExplanationService extends ExplanationService {
 
+	private WorkbenchPanelExplanationResult explanationResult_ = null;
+	
     @Override
     public void initialise() throws Exception {
     	//no-op    	
@@ -49,11 +51,13 @@ public class ProofBasedExplanationService extends ExplanationService {
     public ExplanationResult explain(OWLAxiom entailment) {
         ProofWorkbenchPanel workbenchPanel = new ProofWorkbenchPanel(getOWLEditorKit(), entailment);
         
-        return new WorkbenchPanelExplanationResult(workbenchPanel);
+        return explanationResult_ = new WorkbenchPanelExplanationResult(workbenchPanel);
     }
 
     @Override
 	public void dispose() throws Exception {
-    	//no-op
+    	if (explanationResult_ != null) {
+    		explanationResult_.dispose();
+    	}
     }
 }
