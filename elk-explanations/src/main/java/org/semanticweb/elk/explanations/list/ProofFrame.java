@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.explanations.tree;
+package org.semanticweb.elk.explanations.list;
 /*
  * #%L
  * Explanation Workbench
@@ -24,35 +24,16 @@ package org.semanticweb.elk.explanations.tree;
  * #L%
  */
 
-import java.awt.BorderLayout;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.tree.TreePath;
-
-import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
-import org.protege.editor.core.ui.util.VerifyingOptionPane;
 import org.protege.editor.owl.OWLEditorKit;
-import org.semanticweb.elk.explanations.editing.AxiomExpressionEditor;
-import org.semanticweb.owlapi.model.AddAxiom;
+import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
+import org.protege.editor.owl.ui.frame.OWLFrameSection;
 import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClassAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyChange;
-import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 
 /**
@@ -61,57 +42,46 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class ProofTreeFrame extends JPanel {
-
-	private static final long serialVersionUID = 1L;
+public class ProofFrame extends AbstractOWLFrame<OWLExpression> {
 	
 	private static final Set<AxiomType<?>> EDITABLE_AXIOM_TYPES = new HashSet<AxiomType<?>>(Arrays.<AxiomType<?>>asList(AxiomType.SUBCLASS_OF, AxiomType.OBJECT_PROPERTY_DOMAIN, AxiomType.OBJECT_PROPERTY_RANGE));
 	
-	private final OWLEditorKit kit_;
-	
-	private final ProofTree tree_;
-	
-	private final MouseListener doubleClickListener_ = new MouseAdapter() {
-		@Override
-	    public void mousePressed(MouseEvent e) {
-	        int selRow = tree_.getRowForLocation(e.getX(), e.getY());
-	        
-	        if(selRow != -1) {
-	            if (e.getClickCount() == 2) {
-	            	TreePath selPath = tree_.getPathForLocation(e.getX(), e.getY());
-	            	Object node = selPath.getLastPathComponent();
-	            	
-	            	if (node instanceof OWLExpressionNode) {
-	            		OWLExpressionNode exprNode = (OWLExpressionNode) node;
-	            		
-	            		if (editingEnabled(exprNode)) {
-	            			showAxiomEditor(exprNode.getAxiom());
-	            		}
-	            	}
-	            }
-	        }
-	    }
-
-		private boolean editingEnabled(OWLExpressionNode node) {
-			return node.isAsserted() && node.getAxiom().isOfType(EDITABLE_AXIOM_TYPES);
-		}
-	};
-	
-    public ProofTreeFrame(OWLEditorKit owlEditorKit, OWLExpression proofRoot) {
-    	kit_ = owlEditorKit;
-    	tree_ = new ProofTree(owlEditorKit, proofRoot);
-        
-    	setLayout(new BorderLayout());
-    	tree_.setUI(new ProofTreeUI());
-        add(tree_, BorderLayout.CENTER);
-
-        tree_.setVisible(true);
-        setVisible(true);
-        // setting the listener for handling clicking events
-        tree_.addMouseListener(doubleClickListener_);
+    public ProofFrame(OWLEditorKit owlEditorKit, OWLExpression proofRoot) {
+    	super(owlEditorKit.getOWLModelManager().getOWLOntologyManager());
+    	
+        addSection(new ProofFrameSection(owlEditorKit, this, Collections.singleton(proofRoot), "Proof tree", 0));
     }
+
+	@Override
+	protected void addSection(OWLFrameSection<? extends Object, ? extends Object, ? extends Object> section, int index) {
+		super.addSection(section, index);
+	}
+	
+	
+	
+	int indexOf(OWLFrameSection<? extends Object, ? extends Object, ? extends Object> section) {
+		int index = 0;
+		
+		for (OWLFrameSection<?, ?, ?> sec : getFrameSections()) {
+			if (sec == section) {
+				return index;
+			}
+			
+			index++;
+		}
+		
+		return -1;
+	}
+	
+	void removeSection(int index) {
+		// this works only as long as the returned list isn't a copy of the real
+		// data structure. unfortunately the superclass doesn't provide access
+		// to the underlying list so maybe it's better to not use the superclass
+		// at all.
+		getFrameSections().remove(index);
+	}
     
-    private void showAxiomEditor(final OWLAxiom axiom) {
+    /*private void showAxiomEditor(final OWLAxiom axiom) {
     	final AxiomExpressionEditor editor = new AxiomExpressionEditor(kit_);
         final JComponent editorComponent = editor.getEditorComponent();
         @SuppressWarnings("serial")
@@ -168,6 +138,6 @@ public class ProofTreeFrame extends JPanel {
 		changes.add(new AddAxiom(ontology, newAxiom));
 
 		kit_.getOWLModelManager().applyChanges(changes);
-	}
+	}*/
     
 }

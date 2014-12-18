@@ -59,7 +59,6 @@ public class ProofTreeUI extends BasicTreeUI {
                 	int visibleWidth = tree.getParent().getWidth();
                 	
                 	dimensions.width = getNodePreferredWidth(visibleWidth, getRowX(row, depth));
-                	//Math.max(visibleWidth - getRowX(row, depth) - 5, visibleWidth / 3);
                 }
                 
                 return dimensions;

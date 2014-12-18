@@ -33,9 +33,9 @@ import org.protege.editor.owl.ui.explanation.ExplanationResult;
  */
 public class WorkbenchPanelExplanationResult extends ExplanationResult {
 
-    private WorkbenchPanel workbenchPanel;
+    private ProofWorkbenchPanel workbenchPanel;
 
-    public WorkbenchPanelExplanationResult(WorkbenchPanel workbenchPanel) {
+    public WorkbenchPanelExplanationResult(ProofWorkbenchPanel workbenchPanel) {
         this.workbenchPanel = workbenchPanel;
         setLayout(new BorderLayout());
         add(workbenchPanel);

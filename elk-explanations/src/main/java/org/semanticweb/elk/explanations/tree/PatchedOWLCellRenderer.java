@@ -21,10 +21,8 @@ package org.semanticweb.elk.explanations.tree;
  * #L%
  */
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Composite;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -42,20 +40,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
-import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -98,7 +92,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
  * matthew.horridge@cs.man.ac.uk<br>
  * www.cs.man.ac.uk/~horridgm<br><br>
  */
-public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRenderer, ListCellRenderer {
+public class PatchedOWLCellRenderer implements TreeCellRenderer {
 
     private static final Logger logger = Logger.getLogger(PatchedOWLCellRenderer.class);
     
@@ -134,8 +128,6 @@ public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRender
 
     // The object that determines which icon should be displayed.
     private OWLObject iconObject;
-
-    private int leftMargin = 0;
 
     private int rightMargin = 40;
 
@@ -176,7 +168,8 @@ public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRender
     private boolean useBold = false;
 
 
-    private class OWLCellRendererPanel extends JPanel {
+    @SuppressWarnings("serial")
+	private class OWLCellRendererPanel extends JPanel {
         private OWLCellRendererPanel(LayoutManager layout) {
             super(layout);
         }
@@ -205,7 +198,9 @@ public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRender
         renderingComponent.add(textPane);
 
         entityColorProviders = new ArrayList<OWLEntityColorProvider>();
+        
         OWLEntityColorProviderPluginLoader loader = new OWLEntityColorProviderPluginLoader(getOWLModelManager());
+        
         for (OWLEntityColorProviderPlugin plugin : loader.getPlugins()) {
             try {
                 OWLEntityColorProvider prov = plugin.newInstance();
@@ -395,41 +390,11 @@ public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRender
     private boolean renderLinks;
 
 
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-                                                   int row, int column) {
-        setupLinkedObjectComponent(table, table.getCellRect(row, column, true));
-        preferredWidth = table.getParent().getWidth();
-        componentBeingRendered = table;
-        // Set the size of the table cell
-//        setPreferredWidth(table.getColumnModel().getColumn(column).getWidth());
-        return prepareRenderer(value, isSelected, hasFocus);
-
-//        // This is a bit messy - the row height doesn't get reset if it is larger than the
-//        // desired row height.
-//        // Reset the row height if the text has been wrapped
-//        int desiredRowHeight = getPrefSize(table, table.getGraphics(), c.getText()).height;
-//        if (desiredRowHeight < table.getRowHeight()) {
-//            desiredRowHeight = table.getRowHeight();
-//        }
-//        else if (desiredRowHeight > table.getRowHeight(row)) {
-//            // Add a bit of a margin, because wrapped lines
-//            // tend to merge with adjacent lines too much
-//            desiredRowHeight += 4;
-//        }
-//        if (table.getEditingRow() != row) {
-//            if (table.getRowHeight(row) < desiredRowHeight) {
-//                table.setRowHeight(row, desiredRowHeight);
-//            }
-//        }
-//        reset();
-//        return c;
-    }
-
-
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
                                                   boolean leaf, int row, boolean hasFocus) {
         componentBeingRendered = tree;
         Rectangle cellBounds = new Rectangle();
+        
         if (!gettingCellBounds) {
             gettingCellBounds = true;
             cellBounds = tree.getRowBounds(row);
@@ -440,31 +405,11 @@ public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRender
         minTextHeight = 12;
         
         tree.setToolTipText(value != null ? value.toString() : "");
+        
         Component c = prepareRenderer(value, selected, hasFocus);
+        
         reset();
-        return c;
-    }
-
-
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
-                                                  boolean cellHasFocus) {
-        componentBeingRendered = list;
-        Rectangle cellBounds = new Rectangle();
-        // We need to prevent infinite recursion here!
-        if (!gettingCellBounds) {
-            gettingCellBounds = true;
-            cellBounds = list.getCellBounds(index, index);
-            gettingCellBounds = false;
-        }
-        minTextHeight = 12;
-        if (list.getParent() != null) {
-            preferredWidth = list.getParent().getWidth();
-        }
-//        preferredWidth = -1;
-//        textPane.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2 + rightMargin));
-        setupLinkedObjectComponent(list, cellBounds);
-        Component c = prepareRenderer(value, isSelected, cellHasFocus);
-        reset();
+        
         return c;
     }
 
@@ -555,8 +500,6 @@ public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRender
 
 
         prepareTextPane(getRendering(value), isSelected);
-        //FIXME
-        //textPane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         if (isSelected) {
             renderingComponent.setBackground(SELECTION_BACKGROUND);
@@ -567,8 +510,10 @@ public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRender
             textPane.setForeground(componentBeingRendered.getForeground());
         }
 
-        final Icon icon = getIcon(value);
+        Icon icon = getIcon(value);
+        
         iconLabel.setIcon(icon);
+        
         if (icon != null){
             iconLabel.setPreferredSize(new Dimension(icon.getIconWidth(), plainFontHeight));
         }
@@ -614,9 +559,6 @@ public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRender
             return null;
         }
     }
-
-
-    private Composite disabledComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
 
 
     private OWLModelManager getOWLModelManager() {
@@ -810,8 +752,8 @@ public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRender
         // Highlight text
         StringTokenizer tokenizer = new StringTokenizer(textPane.getText(), " []{}(),\n\t'", true);
         linkRendered = false;
-        annotURIRendered = false;
         int tokenStartIndex = 0;
+        
         while (tokenizer.hasMoreTokens()) {
             // Get the token and determine if it is a keyword or
             // entity (or delimeter)
@@ -835,7 +777,6 @@ public class PatchedOWLCellRenderer implements TableCellRenderer, TreeCellRender
     }
 
 
-    private boolean annotURIRendered = false;
     private boolean linkRendered = false;
     private boolean parenthesisRendered = false;
 

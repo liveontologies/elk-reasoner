@@ -28,10 +28,6 @@ import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -47,12 +43,8 @@ import org.protege.editor.core.Disposable;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
-import org.semanticweb.owl.explanation.api.Explanation;
 import org.semanticweb.owl.explanation.api.ExplanationException;
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.ClassExpressionType;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 /*
  * Copyright (C) 2008, University of Manchester
@@ -79,12 +71,13 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 
 
 /**
- * Author: Matthew Horridge<br> The University Of Manchester<br> Information Management Group<br> Date:
- * 04-Oct-2008<br><br>
- * <p/>
- * Displays a set of explanations
+ * 
+ * @author	Pavel Klinov
+ * 			pavel.klinov@uni-ulm.de
+ *
  */
-public class WorkbenchPanel extends JPanel implements Disposable, OWLModelManagerListener, EntailmentSelectionListener, AxiomSelectionModel, ExplanationManagerListener {
+@SuppressWarnings("serial")
+public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelManagerListener, EntailmentSelectionListener, AxiomSelectionModel, ExplanationManagerListener {
 
     private OWLEditorKit editorKit;
 
@@ -105,7 +98,7 @@ public class WorkbenchPanel extends JPanel implements Disposable, OWLModelManage
 //    private JCheckBox showAllExplanationsCheckBox = new JCheckBox();
 
 
-    public WorkbenchPanel(OWLEditorKit ek, OWLAxiom entailment) {
+    public ProofWorkbenchPanel(OWLEditorKit ek, OWLAxiom entailment) {
         this.editorKit = ek;
         ProofManager proofManager = ProofManager.getExplanationManager(ek.getOWLModelManager());
         
@@ -306,11 +299,6 @@ public class WorkbenchPanel extends JPanel implements Disposable, OWLModelManage
         refill();
     }
 
-
-    protected ExplanationDisplay createExplanationDisplay(Explanation<OWLAxiom> explanation, int num, int total, int limit) {
-        return new JustificationFrameExplanationDisplay(editorKit, this, workbenchManager, explanation);//new ExplanationTable(editorKit, selectionModel, explanation);
-    }
-    
     protected ExplanationDisplay createProofExplanationDisplay(OWLExpression proofRoot, boolean allProofs) {
     	return new ProofFrameExplanationDisplay(editorKit, this, workbenchManager, proofRoot);    	
     }
@@ -339,46 +327,6 @@ public class WorkbenchPanel extends JPanel implements Disposable, OWLModelManage
         catch (ExplanationException e) {
             e.printStackTrace();
         }
-    }
-
-    protected List<Explanation<OWLAxiom>> getOrderedExplanations(Set<Explanation<OWLAxiom>> explanations) {
-        List<Explanation<OWLAxiom>> orderedExplanations = new ArrayList<Explanation<OWLAxiom>>();
-        orderedExplanations.addAll(explanations);
-        Collections.sort(orderedExplanations, new Comparator<Explanation<OWLAxiom>>() {
-            public int compare(Explanation<OWLAxiom> o1, Explanation<OWLAxiom> o2) {
-                int diff = getAxiomTypes(o1).size() - getAxiomTypes(o2).size();
-                if (diff != 0) {
-                    return diff;
-                }
-                diff = getClassExpressionTypes(o1).size() - getClassExpressionTypes(o2).size();
-                if (diff != 0) {
-                    return diff;
-                }
-                return o1.getSize() - o2.getSize();
-            }
-        });
-
-        return orderedExplanations;
-    }
-
-
-    private Set<AxiomType<?>> getAxiomTypes(Explanation<OWLAxiom> explanation) {
-        Set<AxiomType<?>> result = new HashSet<AxiomType<?>>();
-        for (OWLAxiom ax : explanation.getAxioms()) {
-            result.add(ax.getAxiomType());
-        }
-        return result;
-    }
-
-
-    private Set<ClassExpressionType> getClassExpressionTypes(Explanation<OWLAxiom> explanation) {
-        Set<ClassExpressionType> result = new HashSet<ClassExpressionType>();
-        for (OWLAxiom ax : explanation.getAxioms()) {
-            for (OWLClassExpression ce : ax.getNestedClassExpressions()) {
-                result.add(ce.getClassExpressionType());
-            }
-        }
-        return result;
     }
 
     public void dispose() {

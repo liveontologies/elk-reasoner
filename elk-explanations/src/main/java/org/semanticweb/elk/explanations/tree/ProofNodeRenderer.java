@@ -72,7 +72,6 @@ public class ProofNodeRenderer implements TreeCellRenderer {
             	OWLModelManager manager = owlEditorKit.getModelManager();
                 String valueToRender = manager.getRendering(axiom);
                 
-                //owlCellRenderer.setIconObject(axiom);
                 owlCellRenderer.setOntology(owlEditorKit.getOWLModelManager().getActiveOntology());
                 owlCellRenderer.setInferred(true);
                 owlCellRenderer.setHighlightKeywords(true);

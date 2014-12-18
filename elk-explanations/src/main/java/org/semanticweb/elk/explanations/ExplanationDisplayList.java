@@ -62,25 +62,13 @@ import org.protege.editor.owl.OWLEditorKit;
  * Author: Matthew Horridge<br> The University Of Manchester<br> Information Management Group<br> Date:
  * 19-Oct-2008<br><br>
  */
+@SuppressWarnings("serial")
 public class ExplanationDisplayList extends JPanel implements Disposable {
-
-    private OWLEditorKit editorKit;
 
     private ExplanationDisplay display;
 
-    private JCheckBox displayLaconicCheckBox = new JCheckBox();
-
-    private int explanationNumber;
-
-    private int entailmentNumber;
-
-    private WorkbenchManager workbenchManager;
-
     public ExplanationDisplayList(OWLEditorKit editorKit, WorkbenchManager workbenchManager, ExplanationDisplay display, int explanationNumber) {
-        this.editorKit = editorKit;
-        this.workbenchManager = workbenchManager;
         this.display = display;
-        this.explanationNumber = explanationNumber;
         createUI();
 
     }
@@ -89,10 +77,10 @@ public class ExplanationDisplayList extends JPanel implements Disposable {
     private void createUI() {
         setLayout(new BorderLayout(2, 2));
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel label = new JLabel("Proof tree");
+        //JLabel label = new JLabel("Proof tree");
         
-        headerPanel.add(label);
-        add(headerPanel, BorderLayout.NORTH);
+        //headerPanel.add(label);
+        //add(headerPanel, BorderLayout.NORTH);
 
         JPanel displayHolder = new JPanel(new BorderLayout());
         Border marginBorder = BorderFactory.createEmptyBorder(0, 20, 0, 0);

@@ -47,7 +47,7 @@ public class ProofBasedExplanationService extends ExplanationService {
 
     @Override
     public ExplanationResult explain(OWLAxiom entailment) {
-        WorkbenchPanel workbenchPanel = new WorkbenchPanel(getOWLEditorKit(), entailment);
+        ProofWorkbenchPanel workbenchPanel = new ProofWorkbenchPanel(getOWLEditorKit(), entailment);
         
         return new WorkbenchPanelExplanationResult(workbenchPanel);
     }

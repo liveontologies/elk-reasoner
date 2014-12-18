@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
@@ -59,6 +60,21 @@ public class OWLProofUtils {
 		});
 	}
 	
+	public static OWLAxiom getAxiom(OWLExpression expr) {
+		return expr.accept(new OWLExpressionVisitor<OWLAxiom>() {
+
+			@Override
+			public OWLAxiom visit(OWLAxiomExpression e) {
+				return e.getAxiom();
+			}
+
+			@Override
+			public OWLAxiom visit(OWLLemmaExpression e) {
+				return null;
+			}
+
+		});
+	}
 	
 	public static OWLInferenceGraph computeInferenceGraph(OWLExpression proofRoot) throws ProofGenerationException {
 		OWLInferenceGraph graph = new OWLInferenceGraph();

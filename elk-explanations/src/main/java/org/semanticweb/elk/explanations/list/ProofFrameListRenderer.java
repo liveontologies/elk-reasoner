@@ -1,4 +1,4 @@
-package org.semanticweb.elk.explanations;
+package org.semanticweb.elk.explanations.list;
 /*
  * #%L
  * Explanation Workbench
@@ -21,6 +21,9 @@ package org.semanticweb.elk.explanations;
  * #L%
  */
 
+import java.awt.Component;
+
+import javax.swing.JComponent;
 import javax.swing.JList;
 
 import org.protege.editor.owl.OWLEditorKit;
@@ -33,18 +36,27 @@ import org.semanticweb.owlapi.model.OWLObject;
  * Bio-Medical Informatics Research Group<br>
  * Date: 19/03/2012
  */
-public class JustificationFrameListRenderer extends OWLFrameListRenderer {
+public class ProofFrameListRenderer extends OWLFrameListRenderer {
 
-    public JustificationFrameListRenderer(OWLEditorKit owlEditorKit) {
+    public ProofFrameListRenderer(OWLEditorKit owlEditorKit) {
         super(owlEditorKit);
-        setHighlightUnsatisfiableClasses(false);
-        setHighlightUnsatisfiableProperties(false);
+        //setHighlightUnsatisfiableClasses(false);
+        //setHighlightUnsatisfiableProperties(false);
     }
-
-
 
     @Override
     protected OWLObject getIconObject(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         return null;
     }
+
+	@Override
+	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+		
+		//c.setBorder(BorderFactory.createLineBorder(Color.red));
+		
+		return c;
+	}
+    
+    
 }

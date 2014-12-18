@@ -47,6 +47,7 @@ import org.protege.editor.owl.ui.frame.OWLFrame;
 import org.protege.editor.owl.ui.framelist.ExplainButton;
 import org.protege.editor.owl.ui.framelist.OWLFrameList;
 import org.protege.editor.owl.ui.framelist.OWLFrameListPopupMenuAction;
+import org.semanticweb.elk.explanations.list.ProofFrameListRenderer;
 import org.semanticweb.owl.explanation.api.Explanation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
@@ -78,7 +79,7 @@ public class JustificationFrameList extends OWLFrameList<Explanation<OWLAxiom>> 
         this.axiomSelectionModel = axiomSelectionModel;
         this.editorKit = editorKit;
         setWrap(false);
-        setCellRenderer(new JustificationFrameListRenderer(editorKit));
+        setCellRenderer(new ProofFrameListRenderer(editorKit));
         
         Action moveUpAction = new AbstractAction("Move up") {
             public void actionPerformed(ActionEvent e) {

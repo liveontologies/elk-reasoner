@@ -53,7 +53,7 @@ public class InconsistentOntologyExplanationPluginImpl implements InconsistentOn
         OWLModelManager owlModelManager = editorKit.getOWLModelManager();
         OWLDataFactory df = owlModelManager.getOWLDataFactory();
         OWLSubClassOfAxiom entailment = df.getOWLSubClassOfAxiom(df.getOWLThing(), df.getOWLNothing());
-        final WorkbenchPanel panel = new WorkbenchPanel(editorKit, entailment);
+        final ProofWorkbenchPanel panel = new ProofWorkbenchPanel(editorKit, entailment);
 
         JOptionPane op = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION);
         JDialog dlg =op.createDialog("Inconsistent ontology explanation");
