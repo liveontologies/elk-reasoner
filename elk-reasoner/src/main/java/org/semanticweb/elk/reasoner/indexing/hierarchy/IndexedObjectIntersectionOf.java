@@ -23,9 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
 
 /**
  * Represents all occurrences of an {@link ElkObjectIntersectionOf} in an
@@ -35,76 +33,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectio
  * @author "Yevgeny Kazakov"
  * 
  */
-public class IndexedObjectIntersectionOf extends IndexedClassExpression {
+public interface IndexedObjectIntersectionOf extends IndexedClassExpression {
 
-	/**
-	 * The conjunction has only two conjuncts. To ensure uniqueness of a
-	 * conjunction for the conjuncts, the conjuncts are sorted according to the
-	 * comparator of {@link IndexedClassExpression}. This is required for
-	 * correct construction of {@link ObjectIntersectionFromConjunctRule}
-	 * because conjunctions (A & B) and (B & A) result in the same rules.
-	 */
-	private final IndexedClassExpression firstConjunct_, secondConjunct_;
+	public IndexedClassExpression getFirstConjunct();
 
-	IndexedObjectIntersectionOf(IndexedClassExpression conjunctA,
-			IndexedClassExpression conjunctB) {
+	public IndexedClassExpression getSecondConjunct();
 
-		if (conjunctA.compareTo(conjunctB) < 0) {
-			this.firstConjunct_ = conjunctA;
-			this.secondConjunct_ = conjunctB;
-		} else {
-			this.firstConjunct_ = conjunctB;
-			this.secondConjunct_ = conjunctA;
-		}
-	}
-
-	public IndexedClassExpression getFirstConjunct() {
-		return firstConjunct_;
-	}
-
-	public IndexedClassExpression getSecondConjunct() {
-		return secondConjunct_;
-	}
-
-	public <O> O accept(IndexedObjectIntersectionOfVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedObjectIntersectionOfVisitor<O>) visitor);
-	}
-
-	@Override
-	boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
-
-		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
-			if (!ObjectIntersectionFromConjunctRule.addRulesFor(this, index)) {
-				return false;
-			}
-		}
-
-		positiveOccurrenceNo += positiveIncrement;
-		negativeOccurrenceNo += negativeIncrement;
-
-		checkOccurrenceNumbers();
-
-		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
-			if (!ObjectIntersectionFromConjunctRule.removeRulesFor(this, index)) {
-				// revert all changes
-				positiveOccurrenceNo -= positiveIncrement;
-				negativeOccurrenceNo -= negativeIncrement;
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "ObjectIntersectionOf(" + this.firstConjunct_ + ' '
-				+ this.secondConjunct_ + ')';
-	}
+	public <O> O accept(IndexedObjectIntersectionOfVisitor<O> visitor);
 
 }

@@ -22,63 +22,10 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public interface IndexedSubClassOfAxiom extends IndexedAxiom {
 
-public class IndexedSubClassOfAxiom extends IndexedAxiom {
+	public IndexedClassExpression getSubClass();
 
-	static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedSubClassOfAxiom.class);
+	public IndexedClassExpression getSuperClass();
 
-	private final IndexedClassExpression subClass_, superClass_;
-
-	IndexedSubClassOfAxiom(IndexedClassExpression subClass,
-			IndexedClassExpression superClass) {
-		this.subClass_ = subClass;
-		this.superClass_ = superClass;
-	}
-
-	public IndexedClassExpression getSubClass() {
-		return this.subClass_;
-	}
-
-	public IndexedClassExpression getSuperClass() {
-		return this.superClass_;
-	}
-
-	@Override
-	public boolean occurs() {
-		// we do not cache sub class axioms
-		// TODO: introduce a method for testing if we cache an object in the
-		// index
-		return false;
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "SubClassOf(" + this.subClass_ + ' ' + this.superClass_ + ')';
-	}
-
-	@Override
-	public <O> O accept(IndexedAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			final int increment) {
-		if (increment > 0) {
-			if (!SuperClassFromSubClassRule.addRuleFor(this, index))
-				return false;
-		}
-
-		if (increment < 0) {
-			if (!SuperClassFromSubClassRule.removeRuleFor(this, index))
-				return false;
-		}
-		// success!
-		return true;
-	}
 }

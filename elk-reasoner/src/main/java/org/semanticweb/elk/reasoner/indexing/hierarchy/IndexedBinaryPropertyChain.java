@@ -23,9 +23,6 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedBinaryPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 
 /**
  * Represents a complex {@link ElkSubObjectPropertyExpression}s. The chain
@@ -40,102 +37,18 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisito
  * 
  */
 
-public class IndexedBinaryPropertyChain extends IndexedPropertyChain {
-
-	private final IndexedObjectProperty leftProperty_;
-	private final IndexedPropertyChain rightProperty_;
-
-	/**
-	 * Used for creating auxiliary inclusions during binarization.
-	 * 
-	 * @param leftProperty
-	 * @param rightProperty
-	 */
-	IndexedBinaryPropertyChain(IndexedObjectProperty leftProperty,
-			IndexedPropertyChain rightProperty) {
-
-		this.leftProperty_ = leftProperty;
-		this.rightProperty_ = rightProperty;
-	}
+public interface IndexedBinaryPropertyChain extends IndexedPropertyChain {
 
 	/**
 	 * @return The left component of this (binary) complex property inclusion
 	 *         axiom.
 	 */
-	public IndexedObjectProperty getLeftProperty() {
-		return leftProperty_;
-	}
+	public IndexedObjectProperty getLeftProperty();
 
 	/**
 	 * @return The right component of this (binary) complex property inclusion
 	 *         axiom.
 	 */
-	public IndexedPropertyChain getRightProperty() {
-		return rightProperty_;
-	}
+	public IndexedPropertyChain getRightProperty();
 
-	@Override
-	boolean updateOccurrenceNumber(int increment) {
-
-		if (occurrenceNo == 0 && increment > 0) {
-			// first occurrence of this expression
-			if (!rightProperty_.addRightChain(this))
-				return false;
-			if (!leftProperty_.addLeftChain(this)) {
-				// revert all changes
-				rightProperty_.removeRightChain(this);
-				return false;
-			}
-		}
-
-		occurrenceNo += increment;
-
-		if (occurrenceNo == 0 && increment < 0) {
-			// no occurrences of this conjunction left
-			if (!rightProperty_.removeRightChain(this)) {
-				// revert all changes
-				occurrenceNo -= increment;
-				return false;
-			}
-			if (!leftProperty_.removeLeftChain(this)) {
-				// revert all changes
-				rightProperty_.addRightChain(this);
-				occurrenceNo -= increment;
-				return false;
-			}
-		}
-		// success!
-		return true;
-	}
-
-	@Override
-	public <O> O accept(IndexedPropertyChainVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	public <O> O accept(IndexedBinaryPropertyChainVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor,
-			P parameter) {
-		return visitor.visit(this, parameter);
-	}
-
-	/**
-	 * @param ipc
-	 * @return the property chain which is composable with the given property in
-	 *         this chain or null
-	 */
-	public IndexedPropertyChain getComposable(IndexedPropertyChain ipc) {
-		return ipc == leftProperty_ ? rightProperty_
-				: (ipc == rightProperty_ ? leftProperty_ : null);
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "ObjectPropertyChain(" + this.leftProperty_ + ' '
-				+ this.rightProperty_ + ')';
-	}
 }

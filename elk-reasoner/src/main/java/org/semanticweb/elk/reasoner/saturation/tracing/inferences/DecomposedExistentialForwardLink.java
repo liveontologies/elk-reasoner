@@ -49,7 +49,7 @@ public class DecomposedExistentialForwardLink extends ForwardLinkImpl implements
 	 * 
 	 */
 	public DecomposedExistentialForwardLink(IndexedObjectSomeValuesFrom subsumer) {
-		super(subsumer.getRelation(), subsumer.getFiller());
+		super(subsumer.getProperty(), subsumer.getFiller());
 		existential_ = subsumer;
 	}
 

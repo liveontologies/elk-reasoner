@@ -28,11 +28,16 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObject;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedEntityVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.slf4j.Logger;
@@ -61,30 +66,30 @@ public class DifferentialIndex extends DirectIndex {
 	boolean incrementalMode = false;
 
 	/**
-	 * the {@link ElkClass} added during the last incremental session
+	 * added and removed {@link ElkClass}es during the last incremental session
 	 */
-	private Set<ElkClass> addedClasses_;
+	private Set<ElkClass> addedClasses_, removedClasses_;
 
 	/**
-	 * the {@link ElkClass} removed during the last incremental session
-	 */
-	private Set<ElkClass> removedClasses_;
-
-	/**
-	 * the {@link ElkNamedIndividual} added during the last incremental session
-	 */
-	private Set<ElkNamedIndividual> addedIndividuals_;
-
-	/**
-	 * the {@link ElkNamedIndividual} removed during the last incremental
+	 * added and removed {@link ElkNamedIndividual}s during the last incremental
 	 * session
 	 */
-	private Set<ElkNamedIndividual> removedIndividuals_;
+	private Set<ElkNamedIndividual> addedIndividuals_, removedIndividuals_;
 
 	/**
-	 * Objects that should be deleted
+	 * added and removed {@link ElkObjectProperty}ies during the last
+	 * incremental session
 	 */
-	private IndexedObjectCache todoDeletions_;
+	private Set<ElkObjectProperty> addedObjectProperties_,
+			removedObjectProperties_;
+
+	private final IndexedEntityVisitor<Void> entityInsertionListener_ = new EntityInsertionListener(),
+			entityDeletionListener_ = new EntityDeletionListener();
+
+	/**
+	 * Pending deletions of {@link CachedIndexedObject}s
+	 */
+	private Set<CachedIndexedObject<?>> todoDeletions_;
 
 	/**
 	 * The added and removed initialization {@link Rule}s
@@ -95,11 +100,10 @@ public class DifferentialIndex extends DirectIndex {
 	/**
 	 * The maps of added and removed {@link Rule}s for index class expressions;
 	 */
-	private Map<IndexedClassExpression, ChainableSubsumerRule> addedContextRuleHeadByClassExpressions_,
+	private Map<ModifiableIndexedClassExpression, ChainableSubsumerRule> addedContextRuleHeadByClassExpressions_,
 			removedContextRuleHeadByClassExpressions_;
 
-	public DifferentialIndex(IndexedObjectCache objectCache) {
-		super(objectCache);
+	public DifferentialIndex() {
 		init();
 	}
 
@@ -107,32 +111,38 @@ public class DifferentialIndex extends DirectIndex {
 	 * Initializes all datastructures
 	 */
 	void init() {
-		initClassSignatureChanges();
-		initIndividualSignatureChanges();
+		initClassChanges();
+		initIndividualChanges();
+		initObjectPropertyChanges();
 		initAdditions();
 		initDeletions();
 	}
 
-	public void initClassSignatureChanges() {
+	public void initClassChanges() {
 		this.addedClasses_ = new ArrayHashSet<ElkClass>(32);
 		this.removedClasses_ = new ArrayHashSet<ElkClass>(32);
 	}
 
-	public void initIndividualSignatureChanges() {
+	public void initIndividualChanges() {
 		this.addedIndividuals_ = new ArrayHashSet<ElkNamedIndividual>(32);
 		this.removedIndividuals_ = new ArrayHashSet<ElkNamedIndividual>(32);
 	}
 
+	public void initObjectPropertyChanges() {
+		this.addedObjectProperties_ = new ArrayHashSet<ElkObjectProperty>(32);
+		this.removedObjectProperties_ = new ArrayHashSet<ElkObjectProperty>(32);
+	}
+
 	public void initAdditions() {
 		this.addedContextInitRules_ = null;
-		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableSubsumerRule>(
+		this.addedContextRuleHeadByClassExpressions_ = new ArrayHashMap<ModifiableIndexedClassExpression, ChainableSubsumerRule>(
 				32);
 	}
 
 	public void initDeletions() {
 		this.removedContextInitRules_ = null;
-		this.todoDeletions_ = new IndexedObjectCache();
-		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<IndexedClassExpression, ChainableSubsumerRule>(
+		this.todoDeletions_ = new ArrayHashSet<CachedIndexedObject<?>>(1024);
+		this.removedContextRuleHeadByClassExpressions_ = new ArrayHashMap<ModifiableIndexedClassExpression, ChainableSubsumerRule>(
 				32);
 	}
 
@@ -143,51 +153,91 @@ public class DifferentialIndex extends DirectIndex {
 	/* read-write methods */
 
 	@Override
-	public boolean addClass(ElkClass newClass) {
+	public void add(CachedIndexedObject<?> input) {
 		if (!incrementalMode) {
-			return super.addClass(newClass);
+			super.add(input);
+			return;
 		}
 		// else incrementalMode
-		if (!removedClasses_.remove(newClass))
-			addedClasses_.add(newClass);
-		return true;
+		LOGGER_.trace("{}: to add", input);
+		if (input instanceof IndexedEntity)
+			((IndexedEntity) input).accept(entityInsertionListener_);
+		if (todoDeletions_.remove(input))
+			return;
+		// else
+		super.add(input);
 	}
 
 	@Override
-	public boolean removeClass(ElkClass oldClass) {
+	public void remove(CachedIndexedObject<?> input) {
 		if (!incrementalMode) {
-			return super.removeClass(oldClass);
+			super.remove(input);
+			return;
 		}
 		// else incrementalMode
-		if (!addedClasses_.remove(oldClass))
-			removedClasses_.add(oldClass);
-		return true;
+		LOGGER_.trace("{}: to remove", input);
+		if (input instanceof IndexedEntity)
+			((IndexedEntity) input).accept(entityDeletionListener_);
+		todoDeletions_.add(input);
+	}
+
+	private class EntityInsertionListener implements IndexedEntityVisitor<Void> {
+
+		@Override
+		public Void visit(IndexedClass element) {
+			ElkClass entity = element.getElkEntity();
+			if (!removedClasses_.remove(entity))
+				addedClasses_.add(entity);
+			return null;
+		}
+
+		@Override
+		public Void visit(IndexedIndividual element) {
+			ElkNamedIndividual entity = element.getElkEntity();
+			if (!removedIndividuals_.remove(entity))
+				addedIndividuals_.add(entity);
+			return null;
+		}
+
+		@Override
+		public Void visit(IndexedObjectProperty element) {
+			ElkObjectProperty entity = element.getElkEntity();
+			if (!removedObjectProperties_.remove(entity))
+				addedObjectProperties_.add(entity);
+			return null;
+		}
+
+	}
+
+	private class EntityDeletionListener implements IndexedEntityVisitor<Void> {
+
+		@Override
+		public Void visit(IndexedClass element) {
+			ElkClass entity = element.getElkEntity();
+			if (!addedClasses_.remove(entity))
+				removedClasses_.add(entity);
+			return null;
+		}
+
+		@Override
+		public Void visit(IndexedIndividual element) {
+			ElkNamedIndividual entity = element.getElkEntity();
+			if (!addedIndividuals_.remove(entity))
+				removedIndividuals_.add(entity);
+			return null;
+		}
+
+		@Override
+		public Void visit(IndexedObjectProperty element) {
+			ElkObjectProperty entity = element.getElkEntity();
+			if (!addedObjectProperties_.remove(entity))
+				removedObjectProperties_.add(entity);
+			return null;
+		}
 	}
 
 	@Override
-	public boolean addNamedIndividual(ElkNamedIndividual newIndividual) {
-		if (!incrementalMode) {
-			return super.addNamedIndividual(newIndividual);
-		}
-		// else incrementalMode
-		if (!removedIndividuals_.remove(newIndividual))
-			addedIndividuals_.add(newIndividual);
-		return true;
-	}
-
-	@Override
-	public boolean removeNamedIndividual(ElkNamedIndividual oldIndividual) {
-		if (!incrementalMode) {
-			return super.removeNamedIndividual(oldIndividual);
-		}
-		// else incrementalMode
-		if (!addedIndividuals_.remove(oldIndividual))
-			removedIndividuals_.add(oldIndividual);
-		return true;
-	}
-
-	@Override
-	public boolean add(IndexedClassExpression target,
+	public boolean add(ModifiableIndexedClassExpression target,
 			ChainableSubsumerRule newRule) {
 		if (!incrementalMode) {
 			return super.add(target, newRule);
@@ -204,7 +254,7 @@ public class DifferentialIndex extends DirectIndex {
 	}
 
 	@Override
-	public boolean remove(IndexedClassExpression target,
+	public boolean remove(ModifiableIndexedClassExpression target,
 			ChainableSubsumerRule oldRule) {
 		if (!incrementalMode) {
 			return super.remove(target, oldRule);
@@ -256,29 +306,6 @@ public class DifferentialIndex extends DirectIndex {
 		return false;
 	}
 
-	@Override
-	public boolean add(IndexedObject newObject) {
-		if (!incrementalMode) {
-			return super.add(newObject);
-		}
-		// else incrementalMode
-		LOGGER_.trace("{}: to add", newObject);
-		if (newObject.accept(todoDeletions_.deletor))
-			return true;
-		// else
-		return newObject.accept(objectCache.inserter);
-	}
-
-	@Override
-	public boolean remove(IndexedObject oldObject) {
-		if (!incrementalMode) {
-			return super.remove(oldObject);
-		}
-		// else incrementalMode
-		LOGGER_.trace("{}: to remove", oldObject);
-		return oldObject.accept(todoDeletions_.inserter);
-	}
-
 	/* incremental-specific methods */
 
 	/**
@@ -301,7 +328,7 @@ public class DifferentialIndex extends DirectIndex {
 	 * @return the map from indexed class expressions to the corresponding
 	 *         objects containing index additions for these class expressions
 	 */
-	public Map<IndexedClassExpression, ChainableSubsumerRule> getAddedContextRulesByClassExpressions() {
+	public Map<? extends IndexedClassExpression, ChainableSubsumerRule> getAddedContextRulesByClassExpressions() {
 		return this.addedContextRuleHeadByClassExpressions_;
 	}
 
@@ -309,7 +336,7 @@ public class DifferentialIndex extends DirectIndex {
 	 * @return the map from indexed class expressions to the corresponding
 	 *         objects containing index deletions for these class expressions
 	 */
-	public Map<IndexedClassExpression, ChainableSubsumerRule> getRemovedContextRulesByClassExpressions() {
+	public Map<? extends IndexedClassExpression, ChainableSubsumerRule> getRemovedContextRulesByClassExpressions() {
 		return this.removedContextRuleHeadByClassExpressions_;
 	}
 
@@ -331,8 +358,8 @@ public class DifferentialIndex extends DirectIndex {
 	 * @return the {@link IndexedClassExpression}s removed during the last
 	 *         incremental session
 	 */
-	public Collection<IndexedClassExpression> getRemovedClassExpressions() {
-		return todoDeletions_.indexedClassExpressionLookup;
+	public Iterable<? extends IndexedClassExpression> getRemovedClassExpressions() {
+		return Operations.filter(todoDeletions_, IndexedClassExpression.class);
 	}
 
 	/**
@@ -341,7 +368,10 @@ public class DifferentialIndex extends DirectIndex {
 	 * registration
 	 */
 	public void clearDeletedRules() {
-		objectCache.subtract(todoDeletions_);
+		for (CachedIndexedObject<?> deletion : todoDeletions_) {
+			LOGGER_.trace("{}: comitting removal", deletion);
+			super.remove(deletion);
+		}
 		initDeletions();
 	}
 
@@ -364,7 +394,7 @@ public class DifferentialIndex extends DirectIndex {
 		// commit changes in rules for IndexedClassExpression
 		ChainableSubsumerRule nextClassExpressionRule;
 		Chain<ChainableSubsumerRule> classExpressionRuleChain;
-		for (IndexedClassExpression target : addedContextRuleHeadByClassExpressions_
+		for (ModifiableIndexedClassExpression target : addedContextRuleHeadByClassExpressions_
 				.keySet()) {
 			LOGGER_.trace("Committing context rule additions for {}", target);
 
@@ -408,8 +438,8 @@ public class DifferentialIndex extends DirectIndex {
 		if (!mode) {
 			clearDeletedRules();
 			commitAddedRules();
-			initClassSignatureChanges();
-			initIndividualSignatureChanges();
+			initClassChanges();
+			initIndividualChanges();
 		}
 	}
 
@@ -470,7 +500,7 @@ public class DifferentialIndex extends DirectIndex {
 	 *         (addition or deletions) of rules
 	 */
 	private Chain<ChainableSubsumerRule> getAddedContextRuleChain(
-			final IndexedClassExpression target) {
+			final ModifiableIndexedClassExpression target) {
 		return AbstractChain.getMapBackedChain(
 				addedContextRuleHeadByClassExpressions_, target);
 	}
@@ -485,7 +515,7 @@ public class DifferentialIndex extends DirectIndex {
 	 *         (addition or deletions) of rules
 	 */
 	private Chain<ChainableSubsumerRule> getRemovedContextRuleChain(
-			final IndexedClassExpression target) {
+			final ModifiableIndexedClassExpression target) {
 		return AbstractChain.getMapBackedChain(
 				removedContextRuleHeadByClassExpressions_, target);
 	}

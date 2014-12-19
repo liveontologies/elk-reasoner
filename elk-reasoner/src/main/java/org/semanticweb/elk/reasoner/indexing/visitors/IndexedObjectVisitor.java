@@ -24,8 +24,8 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
 
 public interface IndexedObjectVisitor<O> extends
 		IndexedClassExpressionVisitor<O>, IndexedPropertyChainVisitor<O>,
-		IndexedAxiomVisitor<O> {
+		IndexedAxiomVisitor<O>, IndexedEntityVisitor<O> {
 
-	// nothing else
+	// combined visitor
 
 }

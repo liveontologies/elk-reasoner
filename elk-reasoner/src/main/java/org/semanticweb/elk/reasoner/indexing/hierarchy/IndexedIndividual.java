@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitor;
 
 /**
@@ -34,69 +33,11 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitor;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class IndexedIndividual extends IndexedClassEntity {
-	/**
-	 * The ElkNamedIndividual that is the sole instance of this nominal
-	 */
-	private final ElkNamedIndividual elkNamedIndividual_;
-
-	private int occurrenceNo_ = 0;
-
-	IndexedIndividual(ElkNamedIndividual elkNamedIndividual) {
-		this.elkNamedIndividual_ = elkNamedIndividual;
-	}
-
-	/**
-	 * @return The represented ElkNamedIndividual.
-	 */
-	public ElkNamedIndividual getElkNamedIndividual() {
-		return elkNamedIndividual_;
-	}
-
-	public <O> O accept(IndexedIndividualVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
+public interface IndexedIndividual extends IndexedClassEntity {
 
 	@Override
-	public <O> O accept(IndexedClassEntityVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
+	public ElkNamedIndividual getElkEntity();
 
-	@Override
-	protected boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index, int increment,
-			int positiveIncrement, int negativeIncrement) {
-
-		if (occurrenceNo_ == 0 && increment > 0) {
-			if (!index.addNamedIndividual(elkNamedIndividual_))
-				return false;
-		}
-
-		occurrenceNo_ += increment;
-		positiveOccurrenceNo += positiveIncrement;
-		negativeOccurrenceNo += negativeIncrement;
-
-		if (occurrenceNo_ == 0 && increment < 0) {
-			if (!index.removeNamedIndividual(elkNamedIndividual_)) {
-				// revert all changes
-				occurrenceNo_ -= increment;
-				positiveOccurrenceNo -= positiveIncrement;
-				negativeOccurrenceNo -= negativeIncrement;
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public boolean occurs() {
-		return occurrenceNo_ > 0;
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "ObjectOneOf(<"
-				+ elkNamedIndividual_.getIri().getFullIriAsString() + ">)";
-	}
+	public <O> O accept(IndexedIndividualVisitor<O> visitor);
 
 }

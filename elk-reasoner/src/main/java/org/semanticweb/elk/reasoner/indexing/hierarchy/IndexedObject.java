@@ -25,30 +25,18 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 
 /**
- * Top level class for all indexed objects
+ * Top level interface for all indexed objects
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class IndexedObject {
-
-	/**
-	 * @return {@code true} if this {@link IndexedObject} occur in the ontology
-	 *         index
-	 */
-	public abstract boolean occurs();
+public interface IndexedObject {
 
 	/**
 	 * @return a structural string representation of the object
 	 */
-	abstract String toStringStructural();
+	String toStringStructural();
 
-	@Override
-	public String toString() {
-		// use in debugging to identify the object uniquely (more or less)
-		return toStringStructural() + "#" + hashCode();
-	}
-
-	public abstract <O> O accept(IndexedObjectVisitor<O> visitor);
+	public <O> O accept(IndexedObjectVisitor<O> visitor);
 
 }

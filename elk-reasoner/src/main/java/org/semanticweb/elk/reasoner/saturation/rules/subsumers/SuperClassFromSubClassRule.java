@@ -28,7 +28,8 @@ import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -76,17 +77,16 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 		super(null);
 		this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
 				1);
-
-		toldSuperClassExpressions_.add(ice);
+		this.toldSuperClassExpressions_.add(ice);
 	}
 
-	public static boolean addRuleFor(IndexedSubClassOfAxiom axiom,
+	public static boolean addRuleFor(ModifiableIndexedSubClassOfAxiom axiom,
 			ModifiableOntologyIndex index) {
 		return index.add(axiom.getSubClass(), new SuperClassFromSubClassRule(
 				axiom.getSuperClass()));
 	}
 
-	public static boolean removeRuleFor(IndexedSubClassOfAxiom axiom,
+	public static boolean removeRuleFor(ModifiableIndexedSubClassOfAxiom axiom,
 			ModifiableOntologyIndex index) {
 		return index.remove(axiom.getSubClass(),
 				new SuperClassFromSubClassRule(axiom.getSuperClass()));

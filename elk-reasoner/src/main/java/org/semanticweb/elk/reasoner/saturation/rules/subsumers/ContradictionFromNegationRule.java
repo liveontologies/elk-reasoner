@@ -24,7 +24,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -60,13 +61,15 @@ public class ContradictionFromNegationRule extends
 		this.negation_ = negation;
 	}
 
-	public static boolean addRulesFor(IndexedObjectComplementOf negation,
+	public static boolean addRulesFor(
+			ModifiableIndexedObjectComplementOf negation,
 			ModifiableOntologyIndex index) {
 		return index.add(negation.getNegated(),
 				new ContradictionFromNegationRule(negation));
 	}
 
-	public static boolean removeRulesFor(IndexedObjectComplementOf negation,
+	public static boolean removeRulesFor(
+			ModifiableIndexedObjectComplementOf negation,
 			ModifiableOntologyIndex index) {
 		return index.remove(negation.getNegated(),
 				new ContradictionFromNegationRule(negation));

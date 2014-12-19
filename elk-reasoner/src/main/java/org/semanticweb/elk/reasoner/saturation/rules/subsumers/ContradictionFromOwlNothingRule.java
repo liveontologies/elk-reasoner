@@ -25,7 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -56,18 +57,18 @@ public class ContradictionFromOwlNothingRule extends
 	}
 
 	private static void checkOwlNothing(IndexedClass candidate) {
-		if (candidate.getElkClass() != PredefinedElkClass.OWL_NOTHING)
+		if (candidate.getElkEntity() != PredefinedElkClass.OWL_NOTHING)
 			throw new IllegalArgumentException(
 					"The rule can be registered only for owl:Nothing");
 	}
 
-	public static boolean addRuleFor(IndexedClass owlNothing,
+	public static boolean addRuleFor(ModifiableIndexedClass owlNothing,
 			ModifiableOntologyIndex index) {
 		checkOwlNothing(owlNothing);
 		return index.add(owlNothing, new ContradictionFromOwlNothingRule());
 	}
 
-	public static boolean removeRuleFor(IndexedClass owlNothing,
+	public static boolean removeRuleFor(ModifiableIndexedClass owlNothing,
 			ModifiableOntologyIndex index) {
 		checkOwlNothing(owlNothing);
 		return index.remove(owlNothing, new ContradictionFromOwlNothingRule());

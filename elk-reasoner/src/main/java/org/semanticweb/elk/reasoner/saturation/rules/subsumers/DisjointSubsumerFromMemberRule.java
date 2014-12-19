@@ -26,7 +26,9 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -69,11 +71,11 @@ public class DisjointSubsumerFromMemberRule extends
 		disjointnessAxioms_.add(axiom);
 	}
 
-	public static boolean addRulesFor(IndexedDisjointnessAxiom axiom,
+	public static boolean addRulesFor(ModifiableIndexedDisjointnessAxiom axiom,
 			ModifiableOntologyIndex index) {
 		boolean success = true;
 		int added = 0;
-		for (IndexedClassExpression ice : axiom.getDisjointMembers()) {
+		for (ModifiableIndexedClassExpression ice : axiom.getDisjointMembers()) {
 			if (index.add(ice, new DisjointSubsumerFromMemberRule(axiom))) {
 				added++;
 			} else {
@@ -84,7 +86,7 @@ public class DisjointSubsumerFromMemberRule extends
 		if (success)
 			return true;
 		// else revert the changes made
-		for (IndexedClassExpression ice : axiom.getDisjointMembers()) {
+		for (ModifiableIndexedClassExpression ice : axiom.getDisjointMembers()) {
 			if (added == 0)
 				break;
 			// else
@@ -94,11 +96,12 @@ public class DisjointSubsumerFromMemberRule extends
 		return false;
 	}
 
-	public static boolean removeRulesFor(IndexedDisjointnessAxiom axiom,
+	public static boolean removeRulesFor(
+			ModifiableIndexedDisjointnessAxiom axiom,
 			ModifiableOntologyIndex index) {
 		boolean success = true;
 		int removed = 0;
-		for (IndexedClassExpression ice : axiom.getDisjointMembers()) {
+		for (ModifiableIndexedClassExpression ice : axiom.getDisjointMembers()) {
 			if (index.remove(ice, new DisjointSubsumerFromMemberRule(axiom))) {
 				removed++;
 			} else {
@@ -109,7 +112,7 @@ public class DisjointSubsumerFromMemberRule extends
 		if (success)
 			return true;
 		// else revert the changes made
-		for (IndexedClassExpression ice : axiom.getDisjointMembers()) {
+		for (ModifiableIndexedClassExpression ice : axiom.getDisjointMembers()) {
 			if (removed == 0)
 				break;
 			// else

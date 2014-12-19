@@ -50,11 +50,11 @@ public class EnumerateContextsStage extends BasePostProcessingStage {
 	@Override
 	public void execute() throws ElkException {
 		int cnt = 0;
-		
+
 		for (Context context : reasoner_.saturationState.getContexts()) {
 			cnt += context.getSubsumers().size();
 		}
-		
+
 		cnt = 2 * cnt - cnt;
 	}
 

@@ -49,7 +49,7 @@ public class TransitiveReductionOutputEquivalentDirect<R extends IndexedClassExp
 		extends TransitiveReductionOutputEquivalent<R> {
 
 	final Map<IndexedClass, TransitiveReductionOutputEquivalent<IndexedClass>> directSubsumers;
-	
+
 	/**
 	 * the union of the subsumers of the current direct subsumers
 	 */
@@ -58,7 +58,7 @@ public class TransitiveReductionOutputEquivalentDirect<R extends IndexedClassExp
 	public TransitiveReductionOutputEquivalentDirect(R root) {
 		super(root);
 		directSubsumers = new HashMap<IndexedClass, TransitiveReductionOutputEquivalent<IndexedClass>>();
-		
+
 	}
 
 	/**
@@ -72,39 +72,40 @@ public class TransitiveReductionOutputEquivalentDirect<R extends IndexedClassExp
 	public Collection<TransitiveReductionOutputEquivalent<IndexedClass>> getDirectSubsumers() {
 		return directSubsumers.values();
 	}
-	
+
 	public void addDirectSubsumer(IndexedClass subsumer) {
 		TransitiveReductionOutputEquivalent<IndexedClass> output = new TransitiveReductionOutputEquivalent<IndexedClass>(
 				subsumer);
-		output.equivalent.add(subsumer.getElkClass());
-		
+		output.equivalent.add(subsumer.getElkEntity());
 		directSubsumers.put(subsumer, output);
 	}
-	
+
 	public void addToAllSubsumers(IndexedClass subsumer) {
 		if (allSubsumers == null) {
 			allSubsumers = new HashSet<IndexedClass>();
 		}
-		
+
 		allSubsumers.add(subsumer);
 	}
-	
+
 	public Set<IndexedClass> getAllSubsumers() {
-		return allSubsumers == null ? Collections.<IndexedClass>emptySet() : allSubsumers;
+		return allSubsumers == null ? Collections.<IndexedClass> emptySet()
+				: allSubsumers;
 	}
-	
+
 	public void clearAllSubsumers() {
 		allSubsumers = null;
 	}
-	
+
 	public void removeDirectSubsumer(IndexedClass subsumer) {
 		directSubsumers.remove(subsumer);
 	}
-	
-	public TransitiveReductionOutputEquivalent<IndexedClass> getTransitiveReductionOutputForDirectSubsumer(IndexedClass subsumer) {
+
+	public TransitiveReductionOutputEquivalent<IndexedClass> getTransitiveReductionOutputForDirectSubsumer(
+			IndexedClass subsumer) {
 		return directSubsumers.get(subsumer);
 	}
-	
+
 	@Override
 	public void accept(TransitiveReductionOutputVisitor<R> visitor) {
 		visitor.visit(this);

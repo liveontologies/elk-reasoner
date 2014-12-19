@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Forwar
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -85,8 +86,11 @@ public class ReflexiveBackwardLinkCompositionRule extends
 	public void apply(ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		/* compose the link with all reflexive backward links */
-		final Multimap<IndexedObjectProperty, IndexedBinaryPropertyChain> comps = this.forwardLink_
-				.getRelation().getSaturated()
+		SaturatedPropertyChain linkSaturation = this.forwardLink_.getRelation()
+				.getSaturated();
+		if (linkSaturation == null)
+			return;
+		final Multimap<IndexedObjectProperty, IndexedBinaryPropertyChain> comps = linkSaturation
 				.getCompositionsByLeftSubProperty();
 		final Set<IndexedObjectProperty> reflexiveBackwardRelations = premises
 				.getLocalReflexiveObjectProperties();

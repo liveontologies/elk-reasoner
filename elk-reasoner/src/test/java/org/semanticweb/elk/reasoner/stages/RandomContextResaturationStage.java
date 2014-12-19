@@ -118,8 +118,8 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 	private List<IndexedClassExpression> pickRandomContexts(long seed) {
 		Random rnd = new Random(seed);
 		List<IndexedClassExpression> contexts = new ArrayList<IndexedClassExpression>();
-		Collection<IndexedClassExpression> ices = reasoner.ontologyIndex
-				.getIndexedClassExpressions();
+		Collection<? extends IndexedClassExpression> ices = reasoner.ontologyIndex
+				.getClassExpressions();
 		int number = Math.max(1, (int) (ices.size() * RATIO_));
 		Set<Integer> indexes = new ArrayHashSet<Integer>(number);
 

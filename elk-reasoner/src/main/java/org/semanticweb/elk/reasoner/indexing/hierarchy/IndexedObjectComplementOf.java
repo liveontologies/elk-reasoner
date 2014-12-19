@@ -23,13 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectComplementOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
-import org.semanticweb.elk.util.logging.LogLevel;
-import org.semanticweb.elk.util.logging.LoggerWrap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkObjectComplementOf} in an
@@ -37,71 +31,10 @@ import org.slf4j.LoggerFactory;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class IndexedObjectComplementOf extends IndexedClassExpression {
+public interface IndexedObjectComplementOf extends IndexedClassExpression {
 
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedObjectComplementOf.class);
+	public IndexedClassExpression getNegated();
 
-	private final IndexedClassExpression negated_;
-
-	IndexedObjectComplementOf(IndexedClassExpression negated) {
-		this.negated_ = negated;
-	}
-
-	public IndexedClassExpression getNegated() {
-		return negated_;
-	}
-
-	public <O> O accept(IndexedObjectComplementOfVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedObjectComplementOfVisitor<O>) visitor);
-	}
-
-	@Override
-	boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
-		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
-			// first positive occurrence of this expression
-			if (!ContradictionFromNegationRule.addRulesFor(this, index))
-				return false;
-		}
-
-		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
-			// first negative occurrence of this expression
-			if (LOGGER_.isWarnEnabled()) {
-				LoggerWrap
-						.log(LOGGER_,
-								LogLevel.WARN,
-								"reasoner.indexing.IndexedObjectComplementOf",
-								"ELK does not support negative occurrences of ObjectComplementOf. Reasoning might be incomplete!");
-			}
-		}
-
-		positiveOccurrenceNo += positiveIncrement;
-		negativeOccurrenceNo += negativeIncrement;
-
-		checkOccurrenceNumbers();
-
-		if (positiveOccurrenceNo == 0 && positiveIncrement < 0) {
-			// no positive occurrences of this expression left
-			if (!ContradictionFromNegationRule.removeRulesFor(this, index)) {
-				// revert all changes
-				positiveOccurrenceNo -= positiveIncrement;
-				negativeOccurrenceNo -= negativeIncrement;
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "ObjectComplementOf(" + this.negated_ + ')';
-	}
+	public <O> O accept(IndexedObjectComplementOfVisitor<O> visitor);
 
 }

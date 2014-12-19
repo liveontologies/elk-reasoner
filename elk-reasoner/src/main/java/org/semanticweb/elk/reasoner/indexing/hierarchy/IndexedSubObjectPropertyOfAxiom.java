@@ -22,73 +22,10 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public interface IndexedSubObjectPropertyOfAxiom extends IndexedAxiom {
 
-public class IndexedSubObjectPropertyOfAxiom extends IndexedAxiom {
+	public IndexedPropertyChain getSubPropertyChain();
 
-	static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedSubObjectPropertyOfAxiom.class);
+	public IndexedObjectProperty getSuperProperty();
 
-	private final IndexedPropertyChain subPropertyChain_;
-	private final IndexedObjectProperty superProperty_;
-
-	IndexedSubObjectPropertyOfAxiom(IndexedPropertyChain subPropertyChain,
-			IndexedObjectProperty superProperty) {
-		this.subPropertyChain_ = subPropertyChain;
-		this.superProperty_ = superProperty;
-	}
-
-	public IndexedPropertyChain getSubPropertyChain() {
-		return this.subPropertyChain_;
-	}
-
-	public IndexedObjectProperty getSuperProperty() {
-		return this.superProperty_;
-	}
-
-	@Override
-	public boolean occurs() {
-		// not cached
-		return false;
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "SubObjectPropertyOf(" + this.subPropertyChain_ + ' '
-				+ this.superProperty_ + ')';
-	}
-
-	@Override
-	public <O> O accept(IndexedAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			final int increment) {
-		if (increment > 0) {
-			if (!subPropertyChain_.addToldSuperObjectProperty(superProperty_))
-				return false;
-			if (!superProperty_.addToldSubPropertyChain(subPropertyChain_)) {
-				// revert the changes
-				subPropertyChain_.removeToldSuperObjectProperty(superProperty_);
-				return false;
-			}
-		}
-
-		if (increment < 0) {
-			if (!subPropertyChain_
-					.removeToldSuperObjectProperty(superProperty_))
-				return false;
-			if (!superProperty_.removeToldSubPropertyChain(subPropertyChain_)) {
-				// revert the changes
-				subPropertyChain_.addToldSuperObjectProperty(superProperty_);
-				return false;
-			}
-		}
-		// success!
-		return true;
-	}
 }

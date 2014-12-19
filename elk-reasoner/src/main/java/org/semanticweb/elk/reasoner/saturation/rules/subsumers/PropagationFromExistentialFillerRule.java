@@ -31,13 +31,15 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
@@ -87,14 +89,15 @@ public class PropagationFromExistentialFillerRule extends
 		return negExistentials_;
 	}
 
-	public static boolean addRuleFor(IndexedObjectSomeValuesFrom existential,
+	public static boolean addRuleFor(
+			ModifiableIndexedObjectSomeValuesFrom existential,
 			ModifiableOntologyIndex index) {
 		return index.add(existential.getFiller(),
 				new PropagationFromExistentialFillerRule(existential));
 	}
 
 	public static boolean removeRuleFor(
-			IndexedObjectSomeValuesFrom existential,
+			ModifiableIndexedObjectSomeValuesFrom existential,
 			ModifiableOntologyIndex index) {
 		return index.remove(existential.getFiller(),
 				new PropagationFromExistentialFillerRule(existential));
@@ -123,13 +126,16 @@ public class PropagationFromExistentialFillerRule extends
 		// }
 
 		for (IndexedObjectSomeValuesFrom e : negExistentials_) {
-			IndexedObjectProperty relation = e.getRelation();
+			IndexedObjectProperty relation = e.getProperty();
 			/*
 			 * creating propagations for relevant sub-properties of the relation
 			 */
+			SaturatedPropertyChain saturation = relation.getSaturated();
+			if (saturation == null)
+				continue;
 			for (IndexedObjectProperty property : new LazySetIntersection<IndexedObjectProperty>(
-					candidatePropagationProperties, relation.getSaturated()
-							.getSubProperties())) {
+					candidatePropagationProperties,
+					saturation.getSubProperties())) {
 				// producer.produce(premises.getRoot(), new
 				// Propagation(property, e));
 				if (subContextMap.get(property).isInitialized()) {
@@ -142,7 +148,7 @@ public class PropagationFromExistentialFillerRule extends
 
 			// TODO: create a composition rule to deal with reflexivity
 			// propagating to the this context if relation is reflexive
-			if (relation.getSaturated().isDerivedReflexive()) {
+			if (saturation.isDerivedReflexive()) {
 				// producer.produce(premises.getRoot(), new
 				// ComposedSubsumer(e));
 				producer.produce(premises.getRoot(),
@@ -220,8 +226,10 @@ public class PropagationFromExistentialFillerRule extends
 			ContextPremises premises, ConclusionProducer producer) {
 
 		for (IndexedObjectSomeValuesFrom e : negExistentials_) {
-			if (e.getRelation().getSaturated().getSubPropertyChains()
-					.contains(property)) {
+			SaturatedPropertyChain saturation = e.getProperty().getSaturated();
+			if (saturation == null)
+				continue;
+			if (saturation.getSubPropertyChains().contains(property)) {
 				// producer.produce(premises.getRoot(), new
 				// Propagation(property, e));
 				producer.produce(premises.getRoot(), new TracedPropagation(
@@ -231,19 +239,24 @@ public class PropagationFromExistentialFillerRule extends
 
 	}
 
-	public static void applyForProperty(Chain<ChainableSubsumerRule> ruleChain,
+	public static void applyForProperty(LinkedSubsumerRule rule,
 			IndexedObjectProperty property, ContextPremises premises,
 			ConclusionProducer producer) {
-		PropagationFromExistentialFillerRule rule = ruleChain.find(MATCHER_);
-
-		if (rule == null)
-			return;
-
-		rule.applyForProperty(property, premises, producer);
-
+		for (;;) {
+			if (rule == null)
+				return;
+			PropagationFromExistentialFillerRule matchedRule = MATCHER_
+					.match(rule);
+			if (matchedRule != null) {
+				matchedRule.applyForProperty(property, premises, producer);
+				return;
+			}
+			// else
+			rule = rule.next();
+		}
 	}
 
-	private static final Matcher<ChainableSubsumerRule, PropagationFromExistentialFillerRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableSubsumerRule, PropagationFromExistentialFillerRule>(
+	private static final Matcher<LinkedSubsumerRule, PropagationFromExistentialFillerRule> MATCHER_ = new SimpleTypeBasedMatcher<LinkedSubsumerRule, PropagationFromExistentialFillerRule>(
 			PropagationFromExistentialFillerRule.class);
 
 	private static final ReferenceFactory<ChainableSubsumerRule, PropagationFromExistentialFillerRule> FACTORY_ = new ReferenceFactory<ChainableSubsumerRule, PropagationFromExistentialFillerRule>() {

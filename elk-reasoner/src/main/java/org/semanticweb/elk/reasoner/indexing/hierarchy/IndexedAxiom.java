@@ -1,7 +1,6 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 
 /*
  * #%L
@@ -25,25 +24,8 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
  * #L%
  */
 
-public abstract class IndexedAxiom extends IndexedObject {
+public interface IndexedAxiom extends IndexedObject {
 
-	/**
-	 * Updates occurrence numbers of this {@link IndexedAxiom}, updating the
-	 * {@link ModifiableOntologyIndex} if necessary. Occurrence numbers of
-	 * sub-expressions is not affected.
-	 * 
-	 * @return {@code true} if this operation was successful and {@code false}
-	 *         otherwise; if {@code false} is returned, the
-	 *         {@link ModifiableOntologyIndex} should not change
-	 */
-	abstract boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index, final int increment);
-
-	public abstract <O> O accept(IndexedAxiomVisitor<O> visitor);
-
-	@Override
-	public <O> O accept(IndexedObjectVisitor<O> visitor) {
-		return accept((IndexedAxiomVisitor<O>) visitor);
-	}
+	public <O> O accept(IndexedAxiomVisitor<O> visitor);
 
 }

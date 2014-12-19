@@ -57,7 +57,7 @@ public class SaturatedPropertyChainCheckingStage extends
 	@Override
 	public void execute() throws ElkException {
 
-		for (IndexedPropertyChain ipc : index_.getIndexedPropertyChains()) {
+		for (IndexedPropertyChain ipc : index_.getPropertyChains()) {
 			AsymmetricCompositionHook hook = new VerifySymmetricPropertySaturation.AsymmetricCompositionHook() {
 
 				@Override

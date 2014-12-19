@@ -27,17 +27,11 @@ package org.semanticweb.elk.reasoner.indexing;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.caching.IndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 
@@ -47,66 +41,14 @@ import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextIn
  * rules: the global rules stored for the ontology that can be obtained using {
  * {@link #getContextInitRuleHead()}, and the local rules associated with
  * specific {@link IndexedObject}s, such as {@link IndexedClassExpression}s and
- * {@link IndexedPropertyChain}s. The methods of this class provide access to
- * such objects.
+ * {@link IndexedPropertyChain}s. The methods of this class provide access
+ * to such objects.
  * 
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik
  * 
  */
-public interface OntologyIndex {
-
-	/**
-	 * Return the indexed representation of {@code owl:Thing}
-	 * 
-	 * @return the {@link IndexedClass} corresponding to {@code owl:Thing}. It
-	 *         is assumed that {@code owl:Thing} occurs (i.e., is declared) in
-	 *         every ontology.
-	 */
-	IndexedClass getIndexedOwlThing();
-
-	/**
-	 * Return the indexed representation of {@code owl:Nothing}
-	 * 
-	 * @return the {@link IndexedClass} corresponding to {@code owl:Nothing}. It
-	 *         is assumed that {@code owl:Nothing} contains (i.e., is declared)
-	 *         in every ontology.
-	 */
-	IndexedClass getIndexedOwlNothing();
-
-	/**
-	 * @return the {@link IndexedClassExpression}s for all
-	 *         {@link ElkClassExpression}s occurring in the ontology (including
-	 *         {@code owl:Thing} and {@code owl:Nothing}) or added/removed from
-	 *         the ontology since the last commit of the differential index
-	 */
-	Collection<IndexedClassExpression> getIndexedClassExpressions();
-
-	/**
-	 * @return the {@link IndexedClass}es for all {@link ElkClass}es occurring
-	 *         in the ontology (including {@code owl:Thing} and
-	 *         {@code owl:Nothing})
-	 */
-	Collection<IndexedClass> getIndexedClasses();
-
-	/**
-	 * @return the {@link IndexedIndividual}s for all {@link ElkIndividual}s
-	 *         occurring in the ontology.
-	 */
-	Collection<IndexedIndividual> getIndexedIndividuals();
-
-	/**
-	 * @return the {@link IndexedPropertyChain}s for all
-	 *         {@link ElkSubObjectPropertyExpression}s occurring in the
-	 *         ontology.
-	 */
-	Collection<IndexedPropertyChain> getIndexedPropertyChains();
-
-	/**
-	 * @return the {@link IndexedObjectProperty}s for all
-	 *         {@link ElkObjectProperty}s occurring in the ontology.
-	 */
-	Collection<IndexedObjectProperty> getIndexedObjectProperties();
+public interface OntologyIndex extends IndexedObjectCache {
 
 	/**
 	 * @return the {@link IndexedObjectProperty}s for all
@@ -122,5 +64,9 @@ public interface OntologyIndex {
 	 *         {@link LinkRule#next()}
 	 */
 	LinkedContextInitRule getContextInitRuleHead();
+
+	boolean hasNegativeOwlThing();
+
+	boolean hasPositivelyOwlNothing();
 
 }

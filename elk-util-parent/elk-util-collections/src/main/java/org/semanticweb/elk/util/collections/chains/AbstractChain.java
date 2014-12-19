@@ -38,7 +38,7 @@ public abstract class AbstractChain<T extends ModifiableLink<T>> implements
 		Chain<T> {
 
 	@Override
-	public <S extends T> S find(Matcher<T, S> matcher) {
+	public <S extends T> S find(Matcher<? super T, S> matcher) {
 		T candidate = next();
 		for (;;) {
 			if (candidate == null)
@@ -51,7 +51,7 @@ public abstract class AbstractChain<T extends ModifiableLink<T>> implements
 	}
 
 	@Override
-	public <S extends T> S getCreate(Matcher<T, S> matcher,
+	public <S extends T> S getCreate(Matcher<? super T, S> matcher,
 			ReferenceFactory<T, S> factory) {
 		T candidate = next();
 		for (;;) {
@@ -68,7 +68,7 @@ public abstract class AbstractChain<T extends ModifiableLink<T>> implements
 	}
 
 	@Override
-	public <S extends T> S remove(Matcher<T, S> matcher) {
+	public <S extends T> S remove(Matcher<? super T, S> matcher) {
 		ModifiableLink<T> point = this;
 		for (;;) {
 			T next = point.next();

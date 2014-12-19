@@ -48,7 +48,7 @@ public class InstanceTaxonomyComputation
 		ReasonerComputationWithInputs<IndexedIndividual, InstanceTaxonomyComputationFactory> {
 
 	public InstanceTaxonomyComputation(
-			Collection<IndexedIndividual> inputs,
+			Collection<? extends IndexedIndividual> inputs,
 			ComputationExecutor executor,
 			int maxWorkers,
 			ProgressMonitor progressMonitor,

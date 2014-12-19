@@ -22,11 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitor;
 
 /**
@@ -36,48 +34,12 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitor
  * @author "Yevgeny Kazakov"
  * 
  */
-public class IndexedDataHasValue extends IndexedClassExpression {
+public interface IndexedDataHasValue extends IndexedClassExpression {
 
-	protected final ElkDataProperty property;
-	protected final ElkLiteral filler;
+	public ElkDataProperty getRelation();
 
-	IndexedDataHasValue(ElkDataHasValue elkDataHasValue) {
-		this.property = (ElkDataProperty) elkDataHasValue.getProperty();
-		this.filler = elkDataHasValue.getFiller();
-	}
+	public ElkLiteral getFiller();
 
-	public ElkDataProperty getRelation() {
-		return property;
-	}
-
-	public ElkLiteral getFiller() {
-		return filler;
-	}
-
-	@Override
-	boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
-		positiveOccurrenceNo += positiveIncrement;
-		negativeOccurrenceNo += negativeIncrement;
-		return true;
-	}
-
-	public <O> O accept(IndexedDataHasValueVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedDataHasValueVisitor<O>) visitor);
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "DataHasValue(" + '<'
-				+ this.property.getIri().getFullIriAsString() + "> \""
-				+ this.filler.getLexicalForm() + "\"^^<"
-				+ this.filler.getDatatype().getIri().getFullIriAsString()
-				+ ">)";
-	}
+	public <O> O accept(IndexedDataHasValueVisitor<O> visitor);
 
 }

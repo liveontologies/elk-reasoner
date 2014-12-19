@@ -23,19 +23,13 @@
 
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
-import org.semanticweb.elk.util.hashing.HashGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkSubObjectPropertyExpression} in an
@@ -52,177 +46,25 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class IndexedPropertyChain extends IndexedObject implements
-		Comparable<IndexedPropertyChain> {
-
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedPropertyChain.class);
-
-	/**
-	 * This counts how often this object occurred in the ontology.
-	 */
-	int occurrenceNo = 0;
-
-	/** Hash code for this object. */
-	private final int hashCode_ = HashGenerator.generateNextHashCode();
-
-	/**
-	 * The {@link SaturatedPropertyChain} object assigned to this
-	 * {@link IndexedPropertyChain}
-	 */
-	private volatile SaturatedPropertyChain saturated_ = null;
-
-	/**
-	 * All told super object properties of this
-	 * {@link IndexedBinaryPropertyChain}. Should be a List for correctness of
-	 * axioms deletions (duplicates matter).
-	 */
-	private List<IndexedObjectProperty> toldSuperProperties_;
-
-	/**
-	 * Collections of all binary role chains in which this
-	 * {@link IndexedBinaryPropertyChain} occurs on the right.
-	 */
-	private Collection<IndexedBinaryPropertyChain> rightChains_;
+public interface IndexedPropertyChain extends IndexedObject {
 
 	/**
 	 * @return All told super object properties of this
 	 *         {@link IndexedBinaryPropertyChain}
 	 */
-	public List<IndexedObjectProperty> getToldSuperProperties() {
-		return toldSuperProperties_ == null ? Collections
-				.<IndexedObjectProperty> emptyList() : Collections
-				.unmodifiableList(toldSuperProperties_);
-	}
+	public List<IndexedObjectProperty> getToldSuperProperties();
 
 	/**
 	 * @return All {@link IndexedBinaryPropertyChain}s in which this
 	 *         {@link IndexedPropertyChain} occurs on right
 	 */
-	public Collection<IndexedBinaryPropertyChain> getRightChains() {
-		return rightChains_ == null ? Collections
-				.<IndexedBinaryPropertyChain> emptySet() : Collections
-				.unmodifiableCollection(rightChains_);
-	}
-
-	/**
-	 * Adds the given {@link IndexedObjectProperty} as a super-role of this
-	 * {@link IndexedPropertyChain}
-	 * 
-	 * @param superObjectProperty
-	 *            the {@link IndexedObjectProperty} to be added
-	 * @return {@code true} if the operation is successful or {@code false}
-	 *         otherwise; if {@code false} is returned, this
-	 *         {@link IndexedPropertyChain} does not change
-	 */
-	boolean addToldSuperObjectProperty(IndexedObjectProperty superObjectProperty) {
-		if (toldSuperProperties_ == null)
-			toldSuperProperties_ = new ArrayList<IndexedObjectProperty>(1);
-		return toldSuperProperties_.add(superObjectProperty);
-	}
-
-	/**
-	 * Removes the given {@link IndexedObjectProperty} from super-roles of this
-	 * {@link IndexedPropertyChain}
-	 * 
-	 * @param superObjectProperty
-	 *            the {@link IndexedObjectProperty} to be removed
-	 * @return {@code true} if the operation is successful or {@code false}
-	 *         otherwise; if {@code false} is returned, this
-	 *         {@link IndexedPropertyChain} does not change
-	 */
-	boolean removeToldSuperObjectProperty(
-			IndexedObjectProperty superObjectProperty) {
-		boolean success = false;
-		if (toldSuperProperties_ != null) {
-			success = toldSuperProperties_.remove(superObjectProperty);
-			if (toldSuperProperties_.isEmpty())
-				toldSuperProperties_ = null;
-		}
-		return success;
-	}
-
-	/**
-	 * Adds the given {@link IndexedBinaryPropertyChain} to the list of
-	 * {@link IndexedBinaryPropertyChain} that contains this
-	 * {@link IndexedPropertyChain} in the right-hand-side
-	 * 
-	 * @param chain
-	 *            the {@link IndexedBinaryPropertyChain} to be added
-	 * @return {@code true} if the operation is successful or {@code false}
-	 *         otherwise; if {@code false} is returned, this
-	 *         {@link IndexedPropertyChain} does not change
-	 */
-	boolean addRightChain(IndexedBinaryPropertyChain chain) {
-		if (rightChains_ == null)
-			rightChains_ = new ArrayList<IndexedBinaryPropertyChain>(1);
-		return rightChains_.add(chain);
-	}
-
-	/**
-	 * Adds the given {@link IndexedBinaryPropertyChain} from the list of
-	 * {@link IndexedBinaryPropertyChain} that contain this
-	 * {@link IndexedPropertyChain} in the right-hand-side
-	 * 
-	 * @param chain
-	 *            the {@link IndexedBinaryPropertyChain} to be removed
-	 * @return {@code true} if the operation is successful or {@code false}
-	 *         otherwise; if {@code false} is returned, this
-	 *         {@link IndexedPropertyChain} does not change
-	 */
-	boolean removeRightChain(IndexedBinaryPropertyChain chain) {
-		boolean success = false;
-		if (rightChains_ != null) {
-			success = rightChains_.remove(chain);
-			if (rightChains_.isEmpty())
-				rightChains_ = null;
-		}
-		return success;
-	}
-
-	/**
-	 * Non-recursively. The recursion is implemented in indexing visitors.
-	 */
-	abstract boolean updateOccurrenceNumber(int increment);
-
-	@Override
-	public boolean occurs() {
-		return occurrenceNo > 0;
-	}
-
-	/**
-	 * @return the string representation for the occurrence numbers of this
-	 *         {@link IndexedClassExpression}
-	 */
-	public String printOccurrenceNumbers() {
-		return "[all=" + occurrenceNo + "]";
-	}
-
-	/**
-	 * verifies that occurrence numbers are not negative
-	 */
-	public void checkOccurrenceNumbers() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(this + " occurences: " + printOccurrenceNumbers());
-		if (occurrenceNo < 0)
-			throw new ElkUnexpectedIndexingException(this
-					+ " has a negative occurrence: " + printOccurrenceNumbers());
-	}
-
-	public boolean updateAndCheckOccurrenceNumbers(int increment) {
-		if (!updateOccurrenceNumber(increment))
-			return false;
-		checkOccurrenceNumbers();
-		return true;
-	}
+	public Collection<IndexedBinaryPropertyChain> getRightChains();
 
 	/**
 	 * @return The corresponding {@code SaturatedObjecProperty} assigned to this
 	 *         {@link IndexedPropertyChain} or {@code null} if none is assigned
 	 */
-	public SaturatedPropertyChain getSaturated() {
-		return saturated_;
-	}
+	public SaturatedPropertyChain getSaturated();
 
 	/**
 	 * Sets the corresponding {@code SaturatedObjecProperty} of this
@@ -236,60 +78,17 @@ public abstract class IndexedPropertyChain extends IndexedObject implements
 	 *         {@link IndexedPropertyChain} or {@code null} if none was
 	 *         assigned.
 	 */
-	public synchronized SaturatedPropertyChain setSaturated(
-			SaturatedPropertyChain saturatedObjectProperty) {
-		if (saturated_ != null)
-			return saturated_;
-		if (saturatedObjectProperty == null)
-			throw new ElkUnexpectedIndexingException(this
-					+ ": cannot assign null saturation");
-		saturated_ = saturatedObjectProperty;
-		LOGGER_.trace("{}: saturation assinged", this);
-
-		return null;
-	}
+	public SaturatedPropertyChain setSaturated(
+			SaturatedPropertyChain saturatedObjectProperty);
 
 	/**
 	 * Resets the corresponding {@code SaturatedObjecProperty} to {@code null}.
 	 */
-	public synchronized void resetSaturated() {
-		saturated_ = null;
-		LOGGER_.trace("{}: saturation removed", this);
-	}
+	public void resetSaturated();
 
-	/**
-	 * Get an integer hash code to be used for this object.
-	 * 
-	 * @return Hash code.
-	 */
-	@Override
-	public final int hashCode() {
-		return hashCode_;
-	}
+	public <O> O accept(IndexedPropertyChainVisitor<O> visitor);
 
-	@Override
-	public int compareTo(IndexedPropertyChain o) {
-		if (this == o)
-			return 0;
-		else if (this.hashCode_ == o.hashCode_) {
-			/*
-			 * hash code collision for different elements should happen very
-			 * rarely; in this case we rely on the unique string representation
-			 * of indexed objects to compare them
-			 */
-			return this.toString().compareTo(o.toString());
-		} else
-			return (this.hashCode_ < o.hashCode_ ? -1 : 1);
-	}
-
-	public abstract <O> O accept(IndexedPropertyChainVisitor<O> visitor);
-
-	@Override
-	public <O> O accept(IndexedObjectVisitor<O> visitor) {
-		return accept((IndexedPropertyChainVisitor<O>) visitor);
-	}
-
-	public abstract <O, P> O accept(
-			IndexedPropertyChainVisitorEx<O, P> visitor, P parameter);
+	public <O, P> O accept(IndexedPropertyChainVisitorEx<O, P> visitor,
+			P parameter);
 
 }

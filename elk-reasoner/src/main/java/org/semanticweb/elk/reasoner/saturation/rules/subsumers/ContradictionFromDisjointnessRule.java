@@ -24,7 +24,9 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -63,11 +65,12 @@ public class ContradictionFromDisjointnessRule extends
 		this.contradictionCounter_++;
 	}
 
-	public static boolean addRulesFor(IndexedDisjointnessAxiom axiom,
+	public static boolean addRulesFor(ModifiableIndexedDisjointnessAxiom axiom,
 			ModifiableOntologyIndex index) {
 		boolean success = true;
 		int added = 0;
-		for (IndexedClassExpression ice : axiom.getInconsistentMembers()) {
+		for (ModifiableIndexedClassExpression ice : axiom
+				.getInconsistentMembers()) {
 			if (index.add(ice, new ContradictionFromDisjointnessRule())) {
 				added++;
 			} else {
@@ -78,7 +81,8 @@ public class ContradictionFromDisjointnessRule extends
 		if (success)
 			return true;
 		// else revert the changes
-		for (IndexedClassExpression ice : axiom.getInconsistentMembers()) {
+		for (ModifiableIndexedClassExpression ice : axiom
+				.getInconsistentMembers()) {
 			if (added == 0)
 				break;
 			// else
@@ -88,11 +92,13 @@ public class ContradictionFromDisjointnessRule extends
 		return false;
 	}
 
-	public static boolean removeRulesFor(IndexedDisjointnessAxiom axiom,
+	public static boolean removeRulesFor(
+			ModifiableIndexedDisjointnessAxiom axiom,
 			ModifiableOntologyIndex index) {
 		boolean success = true;
 		int removed = 0;
-		for (IndexedClassExpression ice : axiom.getInconsistentMembers()) {
+		for (ModifiableIndexedClassExpression ice : axiom
+				.getInconsistentMembers()) {
 			if (index.remove(ice, new ContradictionFromDisjointnessRule())) {
 				removed++;
 			} else {
@@ -103,7 +109,8 @@ public class ContradictionFromDisjointnessRule extends
 		if (success)
 			return true;
 		// else revert the changes
-		for (IndexedClassExpression ice : axiom.getInconsistentMembers()) {
+		for (ModifiableIndexedClassExpression ice : axiom
+				.getInconsistentMembers()) {
 			if (removed == 0)
 				break;
 			// else

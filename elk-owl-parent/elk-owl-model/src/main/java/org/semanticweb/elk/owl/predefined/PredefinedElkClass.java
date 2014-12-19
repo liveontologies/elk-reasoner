@@ -30,9 +30,9 @@ import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * Corresponds to <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Classes">predefined classes<a> in the OWL
- * 2 specification, such as {@code owl:Thing} and {@code owl:Nothing}.
+ * Corresponds to <a href= "http://www.w3.org/TR/owl2-syntax/#Classes">built-in
+ * classes<a> in the OWL 2 specification, such as {@code owl:Thing} and
+ * {@code owl:Nothing}.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -44,15 +44,15 @@ public enum PredefinedElkClass implements ElkClass {
 	OWL_NOTHING(PredefinedElkIri.OWL_NOTHING.get())//
 	;
 
-	private final ElkIri iri;
+	private final ElkIri iri_;
 
 	private PredefinedElkClass(ElkIri iri) {
-		this.iri = iri;
+		this.iri_ = iri;
 	}
 
 	@Override
 	public ElkIri getIri() {
-		return iri;
+		return iri_;
 	}
 
 	@Override

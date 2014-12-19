@@ -26,7 +26,9 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -65,11 +67,13 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 		this.disjunctions_.add(disjunction);
 	}
 
-	public static boolean addRulesFor(IndexedObjectUnionOf disjunction,
+	public static boolean addRulesFor(
+			ModifiableIndexedObjectUnionOf disjunction,
 			ModifiableOntologyIndex index) {
 		boolean success = true;
 		int added = 0;
-		for (IndexedClassExpression disjunct : disjunction.getDisjuncts()) {
+		for (ModifiableIndexedClassExpression disjunct : disjunction
+				.getDisjuncts()) {
 			if (index.add(disjunct,
 					new ObjectUnionFromDisjunctRule(disjunction))) {
 				added++;
@@ -81,7 +85,8 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 		if (success)
 			return true;
 		// else revert the changes made
-		for (IndexedClassExpression disjunct : disjunction.getDisjuncts()) {
+		for (ModifiableIndexedClassExpression disjunct : disjunction
+				.getDisjuncts()) {
 			if (added == 0)
 				break;
 			// else
@@ -91,11 +96,13 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 		return false;
 	}
 
-	public static boolean removeRulesFor(IndexedObjectUnionOf disjunction,
+	public static boolean removeRulesFor(
+			ModifiableIndexedObjectUnionOf disjunction,
 			ModifiableOntologyIndex index) {
 		boolean success = true;
 		int removed = 0;
-		for (IndexedClassExpression disjunct : disjunction.getDisjuncts()) {
+		for (ModifiableIndexedClassExpression disjunct : disjunction
+				.getDisjuncts()) {
 			if (index.remove(disjunct, new ObjectUnionFromDisjunctRule(
 					disjunction))) {
 				removed++;
@@ -107,7 +114,8 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 		if (success)
 			return true;
 		// else revert the changes made
-		for (IndexedClassExpression disjunct : disjunction.getDisjuncts()) {
+		for (ModifiableIndexedClassExpression disjunct : disjunction
+				.getDisjuncts()) {
 			if (removed == 0)
 				break;
 			// else

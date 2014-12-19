@@ -115,7 +115,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 	@Override
 	public void execute() {
 		// starting from indexed class expressions
-		for (IndexedClassExpression ice : index_.getIndexedClassExpressions()) {
+		for (IndexedClassExpression ice : index_.getClassExpressions()) {
 			iceValidator_.add(ice);
 		}
 		for (;;) {

@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -56,7 +57,7 @@ class ContextInitializationFactory
 			.getLogger(ContextInitializationFactory.class);
 
 	private final SaturationState<?> saturationState_;
-	private final Map<IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges_;
+	private final Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges_;
 	private final IndexedClassExpression[] indexChangesKeys_;
 	private final LinkedContextInitRule changedGlobalRuleHead_;
 	private AtomicInteger ruleHits = new AtomicInteger(0);
@@ -64,7 +65,7 @@ class ContextInitializationFactory
 
 	public ContextInitializationFactory(
 			SaturationState<?> state,
-			Map<IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges,
+			Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges,
 			LinkedContextInitRule changedGlobalRuleHead,
 			SaturationStatistics stageStats) {
 

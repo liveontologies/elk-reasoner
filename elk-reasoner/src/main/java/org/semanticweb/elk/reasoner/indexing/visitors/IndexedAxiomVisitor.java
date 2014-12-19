@@ -23,10 +23,10 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  */
 
 public interface IndexedAxiomVisitor<O> extends
-		IndexedSubClassOfAxiomVisitor<O>,
+		IndexedDisjointnessAxiomVisitor<O>, IndexedSubClassOfAxiomVisitor<O>,
 		IndexedSubObjectPropertyOfAxiomVisitor<O>,
-		IndexedReflexiveObectPropertyAxiomVisitor<O>,
-		IndexedDisjointnessAxiomVisitor<O> {
+		IndexedReflexiveObjectPropertyAxiomVisitor<O>,
+		IndexedDeclarationAxiomVisitor<O> {
 
-	// nothing else
+	// combined visitor
 }

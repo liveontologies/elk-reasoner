@@ -26,7 +26,9 @@ import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -79,16 +81,19 @@ public class ObjectIntersectionFromConjunctRule extends
 
 	/**
 	 * Add {@link ObjectIntersectionFromConjunctRule}s for the given
-	 * {@link IndexedObjectIntersectionOf} in the given
+	 * {@link ModifiableIndexedObjectIntersectionOf} in the given
 	 * {@link ModifiableOntologyIndex}
 	 * 
 	 * @param conjunction
 	 * @param index
 	 */
-	public static boolean addRulesFor(IndexedObjectIntersectionOf conjunction,
+	public static boolean addRulesFor(
+			ModifiableIndexedObjectIntersectionOf conjunction,
 			ModifiableOntologyIndex index) {
-		IndexedClassExpression firstConjunct = conjunction.getFirstConjunct();
-		IndexedClassExpression secondConjunct = conjunction.getSecondConjunct();
+		ModifiableIndexedClassExpression firstConjunct = conjunction
+				.getFirstConjunct();
+		ModifiableIndexedClassExpression secondConjunct = conjunction
+				.getSecondConjunct();
 		if (!index.add(firstConjunct, new ObjectIntersectionFromConjunctRule(
 				secondConjunct, conjunction)))
 			return false;
@@ -107,17 +112,19 @@ public class ObjectIntersectionFromConjunctRule extends
 
 	/**
 	 * Removes {@link ObjectIntersectionFromConjunctRule}s for the given
-	 * {@link IndexedObjectIntersectionOf} in the given
+	 * {@link ModifiableIndexedObjectIntersectionOf} in the given
 	 * {@link ModifiableOntologyIndex}
 	 * 
 	 * @param conjunction
 	 * @param index
 	 */
 	public static boolean removeRulesFor(
-			IndexedObjectIntersectionOf conjunction,
+			ModifiableIndexedObjectIntersectionOf conjunction,
 			ModifiableOntologyIndex index) {
-		IndexedClassExpression firstConjunct = conjunction.getFirstConjunct();
-		IndexedClassExpression secondConjunct = conjunction.getSecondConjunct();
+		ModifiableIndexedClassExpression firstConjunct = conjunction
+				.getFirstConjunct();
+		ModifiableIndexedClassExpression secondConjunct = conjunction
+				.getSecondConjunct();
 		if (!index.remove(firstConjunct,
 				new ObjectIntersectionFromConjunctRule(secondConjunct,
 						conjunction)))

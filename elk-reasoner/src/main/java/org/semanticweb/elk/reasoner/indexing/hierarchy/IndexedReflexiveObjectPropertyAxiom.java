@@ -22,62 +22,8 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public interface IndexedReflexiveObjectPropertyAxiom extends IndexedAxiom {
 
-public class IndexedReflexiveObjectPropertyAxiom extends IndexedAxiom {
+	public IndexedObjectProperty getProperty();
 
-	static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedReflexiveObjectPropertyAxiom.class);
-
-	private final IndexedObjectProperty property_;
-
-	IndexedReflexiveObjectPropertyAxiom(IndexedObjectProperty property) {
-		this.property_ = property;
-	}
-
-	public IndexedPropertyChain getProperty() {
-		return this.property_;
-	}
-
-	@Override
-	public boolean occurs() {
-		// not cached
-		return false;
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "ReflexiveObjectProperty(" + this.property_ + ')';
-	}
-
-	@Override
-	public <O> O accept(IndexedAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			final int increment) {
-
-		if (property_.reflexiveAxiomOccurrenceNo == 0 && increment > 0) {
-			// first occurrence of reflexivity property
-			if (!index.addReflexiveProperty(property_))
-				return false;
-		}
-
-		property_.reflexiveAxiomOccurrenceNo += increment;
-
-		if (property_.reflexiveAxiomOccurrenceNo == 0 && increment < 0) {
-			// no occurrence of reflexivity axiom
-			if (!index.removeReflexiveProperty(property_)) {
-				// revert the changes
-				property_.reflexiveAxiomOccurrenceNo -= increment;
-				return false;
-			}
-		}
-		// success!
-		return true;
-	}
 }

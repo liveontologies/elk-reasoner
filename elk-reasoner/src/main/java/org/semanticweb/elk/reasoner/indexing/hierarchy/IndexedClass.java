@@ -23,13 +23,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromOwlNothingRule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkClass} in an ontology.
@@ -38,138 +32,11 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class IndexedClass extends IndexedClassEntity {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedClass.class);
-
-	/**
-	 * The indexed ElkClass
-	 */
-	protected final ElkClass elkClass;
-
-	/**
-	 * This counts how many times this object occurred in the ontology. Because
-	 * of declaration axioms, this number might differ from the sum of the
-	 * negative and the positive occurrences counts
-	 */
-	protected int occurrenceNo = 0;
-
-	/**
-	 * Creates an object representing the given ElkClass.
-	 */
-	IndexedClass(ElkClass clazz) {
-		elkClass = clazz;
-	}
-
-	/**
-	 * @return The represented ElkClass.
-	 */
-	public ElkClass getElkClass() {
-		return elkClass;
-	}
-
-	public <O> O accept(IndexedClassVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
+public interface IndexedClass extends IndexedClassEntity {
 
 	@Override
-	public <O> O accept(IndexedClassEntityVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
+	public ElkClass getElkEntity();
 
-	boolean updateOccurrenceNo(final ModifiableOntologyIndex index,
-			int increment) {
+	public <O> O accept(IndexedClassVisitor<O> visitor);
 
-		if (occurrenceNo == 0 && increment > 0) {
-			if (!index.addClass(elkClass))
-				return false;
-			if (elkClass == PredefinedElkClass.OWL_NOTHING
-					&& !ContradictionFromOwlNothingRule.addRuleFor(this, index)) {
-				// revert the changes
-				index.removeClass(elkClass);
-				return false;
-			}
-		}
-		occurrenceNo += increment;
-		if (occurrenceNo == 0 && increment < 0) {
-			if (!index.removeClass(elkClass)) {
-				occurrenceNo -= increment;
-				return false;
-			}
-			if (elkClass == PredefinedElkClass.OWL_NOTHING
-					&& !ContradictionFromOwlNothingRule.removeRuleFor(this,
-							index)) {
-				// revert the changes
-				index.addClass(elkClass);
-				occurrenceNo -= increment;
-				return false;
-			}
-		}
-		return true;
-	}
-
-	boolean updateNegativeOccurrenceNo(final ModifiableOntologyIndex index,
-			int negativeIncrement) {
-		if (negativeOccurrenceNo == 0 && negativeIncrement > 0
-				&& elkClass == PredefinedElkClass.OWL_THING) {
-			if (!OwlThingContextInitRule.addRuleFor(this, index)) {
-				return false;
-			}
-		}
-		negativeOccurrenceNo += negativeIncrement;
-		if (negativeOccurrenceNo == 0 && negativeIncrement < 0
-				&& elkClass == PredefinedElkClass.OWL_THING) {
-			if (!OwlThingContextInitRule.removeRuleFor(this, index)) {
-				// revert the changes
-				negativeOccurrenceNo -= negativeIncrement;
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
-
-		if (!updateOccurrenceNo(index, increment)) {
-			return false;
-		}
-		if (!updateNegativeOccurrenceNo(index, negativeIncrement)) {
-			// revert the changes
-			updateOccurrenceNo(index, -increment);
-			return false;
-		}
-		positiveOccurrenceNo += positiveIncrement;
-		return true;
-	}
-
-	@Override
-	public String printOccurrenceNumbers() {
-		return "[all=" + occurrenceNo + "; pos=" + positiveOccurrenceNo
-				+ "; neg=" + +negativeOccurrenceNo + "]";
-	}
-
-	@Override
-	public void checkOccurrenceNumbers() {
-		if (LOGGER_.isTraceEnabled())
-			LOGGER_.trace(toString() + " occurences: "
-					+ printOccurrenceNumbers());
-		if (occurrenceNo < 0 || positiveOccurrenceNo < 0
-				|| negativeOccurrenceNo < 0)
-			throw new ElkUnexpectedIndexingException(toString()
-					+ " has a negative occurrence: " + printOccurrenceNumbers());
-	}
-
-	@Override
-	public boolean occurs() {
-		return occurrenceNo > 0;
-	}
-
-	@Override
-	public String toStringStructural() {
-		return '<' + getElkClass().getIri().getFullIriAsString() + '>';
-	}
 }

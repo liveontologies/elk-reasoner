@@ -58,7 +58,7 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 		reasoner.initClassTaxonomy();
 
 		this.computation_ = new ClassTaxonomyComputation(Operations.split(
-				reasoner.ontologyIndex.getIndexedClasses(), 64),
+				reasoner.ontologyIndex.getClasses(), 64),
 				reasoner.getProcessExecutor(), workerNo, progressMonitor,
 				reasoner.saturationState,
 				reasoner.classTaxonomyState.getTaxonomy());

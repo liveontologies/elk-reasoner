@@ -1,0 +1,90 @@
+package org.semanticweb.elk.reasoner.indexing.impl;
+
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedComplexClassExpression;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Implements {@link CachedIndexedComplexClassExpression}.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <T>
+ *            the type of objects this object can be structurally equal to
+ */
+abstract class CachedIndexedComplexClassExpressionImpl<T extends CachedIndexedComplexClassExpression<T>>
+		extends
+		CachedIndexedClassExpressionImpl<T, CachedIndexedComplexClassExpression<?>>
+		implements CachedIndexedComplexClassExpression<T> {
+
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(CachedIndexedComplexClassExpressionImpl.class);
+
+	/**
+	 * This counts how often this object occurred positively. Some indexing
+	 * operations are only needed when encountering objects positively for the
+	 * first time.
+	 */
+	int positiveOccurrenceNo = 0;
+
+	/**
+	 * This counts how often this object occurred negatively. Some indexing
+	 * operations are only needed when encountering objects negatively for the
+	 * first time.
+	 */
+	int negativeOccurrenceNo = 0;
+
+	CachedIndexedComplexClassExpressionImpl(int structuralHash) {
+		super(structuralHash);
+	}
+
+	/**
+	 * This method should always return true apart from intermediate steps
+	 * during the indexing.
+	 * 
+	 * @return true if the represented class expression occurs in the ontology
+	 */
+	@Override
+	public final boolean occurs() {
+		return positiveOccurrenceNo > 0 || negativeOccurrenceNo > 0;
+	}
+
+	/**
+	 * @return the string representation for the occurrence numbers of this
+	 *         {@link IndexedClassExpression}
+	 */
+	@Override
+	public final String printOccurrenceNumbers() {
+		return "[pos=" + positiveOccurrenceNo + "; neg="
+				+ +negativeOccurrenceNo + "]";
+	}
+
+	/**
+	 * verifies that occurrence numbers are not negative
+	 */
+	public final void checkOccurrenceNumbers() {
+		if (LOGGER_.isTraceEnabled())
+			LOGGER_.trace(toString() + " occurences: "
+					+ printOccurrenceNumbers());
+		if (positiveOccurrenceNo < 0 || negativeOccurrenceNo < 0)
+			throw new ElkUnexpectedIndexingException(toString()
+					+ " has a negative occurrence: " + printOccurrenceNumbers());
+	}
+
+	final boolean updateAndCheckOccurrenceNumbers(
+			ModifiableOntologyIndex index, int increment,
+			int positiveIncrement, int negativeIncrement) {
+		if (!updateOccurrenceNumbers(index, increment, positiveIncrement,
+				negativeIncrement)) {
+			LOGGER_.trace("{}: cannot index!", this);
+			return false;
+		}
+		checkOccurrenceNumbers();
+		return true;
+	}
+
+}

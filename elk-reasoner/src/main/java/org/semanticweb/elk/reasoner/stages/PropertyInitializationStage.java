@@ -24,10 +24,10 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Iterator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //TODO: add progress monitor, make concurrent if possible
 
@@ -60,7 +60,7 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	/**
 	 * The state of the iterator of the input to be processed
 	 */
-	private Iterator<IndexedPropertyChain> todo_ = null;
+	private Iterator<? extends IndexedPropertyChain> todo_ = null;
 
 	public PropertyInitializationStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -76,10 +76,8 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		todo_ = reasoner.ontologyIndex.getIndexedPropertyChains()
-				.iterator();
-		maxProgress_ = reasoner.ontologyIndex.getIndexedPropertyChains()
-				.size();
+		todo_ = reasoner.ontologyIndex.getPropertyChains().iterator();
+		maxProgress_ = reasoner.ontologyIndex.getPropertyChains().size();
 		progress_ = 0;
 		clearedSaturations_ = 0;
 		return true;

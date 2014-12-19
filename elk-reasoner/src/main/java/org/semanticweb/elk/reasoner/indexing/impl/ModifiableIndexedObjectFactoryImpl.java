@@ -1,0 +1,130 @@
+package org.semanticweb.elk.reasoner.indexing.impl;
+
+import java.util.List;
+
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClass;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDataHasValue;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDeclarationAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubObjectPropertyOfAxiom;
+
+/**
+ * Implements {@link ModifiableIndexedObjectFactory} and
+ * {@link CachedIndexedObjectFactory}
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
+public class ModifiableIndexedObjectFactoryImpl implements
+		ModifiableIndexedObjectFactory, CachedIndexedObjectFactory {
+
+	@Override
+	public CachedIndexedBinaryPropertyChain getIndexedBinaryPropertyChain(
+			ModifiableIndexedObjectProperty leftProperty,
+			ModifiableIndexedPropertyChain rightProperty) {
+		return new CachedIndexedBinaryPropertyChainImpl(leftProperty,
+				rightProperty);
+	}
+
+	@Override
+	public CachedIndexedClass getIndexedClass(ElkClass elkClass) {
+		return new CachedIndexedClassImpl(elkClass);
+	}
+
+	@Override
+	public CachedIndexedDataHasValue getIndexedDataHasValue(
+			ElkDataHasValue elkDataHasValue) {
+		return new CachedIndexedDataHasValueImpl(elkDataHasValue);
+	}
+
+	@Override
+	public ModifiableIndexedDeclarationAxiom getIndexedDeclarationAxiom(
+			ModifiableIndexedEntity entity) {
+		return new ModifiableIndexedDeclarationAxiomImpl(entity);
+	}
+
+	@Override
+	public CachedIndexedDisjointnessAxiom getIndexedDisjointnessAxiom(
+			List<? extends ModifiableIndexedClassExpression> members) {
+		return new CachedIndexedDisjointnessAxiomImpl(members);
+	}
+
+	@Override
+	public CachedIndexedIndividual getIndexedIndividual(
+			ElkNamedIndividual elkNamedIndividual) {
+		return new CachedIndexedIndividualImpl(elkNamedIndividual);
+	}
+
+	@Override
+	public CachedIndexedObjectComplementOf getIndexedObjectComplementOf(
+			ModifiableIndexedClassExpression negated) {
+		return new CachedIndexedObjectComplementOfImpl(negated);
+	}
+
+	@Override
+	public CachedIndexedObjectIntersectionOf getIndexedObjectIntersectionOf(
+			ModifiableIndexedClassExpression conjunctA,
+			ModifiableIndexedClassExpression conjunctB) {
+		return new CachedIndexedObjectIntersectionOfImpl(conjunctA, conjunctB);
+	}
+
+	@Override
+	public CachedIndexedObjectProperty getIndexedObjectProperty(
+			ElkObjectProperty elkObjectProperty) {
+		return new CachedIndexedObjectPropertyImpl(elkObjectProperty);
+	}
+
+	@Override
+	public CachedIndexedObjectSomeValuesFrom getIndexedObjectSomeValuesFrom(
+			ModifiableIndexedObjectProperty property,
+			ModifiableIndexedClassExpression filler) {
+		return new CachedIndexedObjectSomeValuesFromImpl(property, filler);
+	}
+
+	@Override
+	public CachedIndexedObjectUnionOf getIndexedObjectUnionOf(
+			List<? extends ModifiableIndexedClassExpression> disjuncts) {
+		return new CachedIndexedObjectUnionOfImpl(disjuncts);
+	}
+
+	@Override
+	public ModifiableIndexedReflexiveObjectPropertyAxiom getIndexedReflexiveObjectPropertyAxiom(
+			ModifiableIndexedObjectProperty property) {
+		return new ModifiableIndexedReflexiveObjectPropertyAxiomImpl(property);
+	}
+
+	@Override
+	public ModifiableIndexedSubClassOfAxiom getIndexedSubClassOfAxiom(
+			ModifiableIndexedClassExpression subClass,
+			ModifiableIndexedClassExpression superClass) {
+		return new ModifiableIndexedSubClassOfAxiomImpl(subClass, superClass);
+	}
+
+	@Override
+	public ModifiableIndexedSubObjectPropertyOfAxiom getIndexedSubObjectPropertyOfAxiom(
+			ModifiableIndexedPropertyChain subPropertyChain,
+			ModifiableIndexedObjectProperty superProperty) {
+		return new ModifiableIndexedSubObjectPropertyOfAxiomImpl(
+				subPropertyChain, superProperty);
+	}
+
+}

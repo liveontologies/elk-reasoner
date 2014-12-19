@@ -139,7 +139,7 @@ public class ConsistencyChecking
 	 */
 	public static Collection<IndexedClassEntity> getTestEntities(
 			final OntologyIndex ontologyIndex) {
-		if (!ontologyIndex.getIndexedOwlNothing().occursPositively()) {
+		if (!ontologyIndex.hasPositivelyOwlNothing()) {
 			LOGGER_.trace("owl:Nothing does not occur positively; ontology is consistent");
 			/*
 			 * if the ontology does not have any positive occurrence of bottom,
@@ -155,18 +155,17 @@ public class ConsistencyChecking
 		 */
 		return new AbstractCollection<IndexedClassEntity>() {
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public Iterator<IndexedClassEntity> iterator() {
-				return Operations
-						.concat(Operations.singleton(ontologyIndex
-								.getIndexedOwlThing()),
-								ontologyIndex.getIndexedIndividuals())
-						.iterator();
+				return Operations.concat(
+						Operations.singleton(ontologyIndex.getOwlThing()),
+						ontologyIndex.getIndividuals()).iterator();
 			}
 
 			@Override
 			public int size() {
-				return ontologyIndex.getIndexedIndividuals().size() + 1;
+				return ontologyIndex.getIndividuals().size() + 1;
 			}
 		};
 	}

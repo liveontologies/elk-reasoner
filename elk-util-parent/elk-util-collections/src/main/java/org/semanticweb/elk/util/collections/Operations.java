@@ -91,10 +91,8 @@ public class Operations {
 		return (Multimap<S, T>) EMPTY_MULTIMAP;
 	}
 
-	@SuppressWarnings("unchecked")
-	public static <T> Iterable<T> concat(final Iterable<? extends T> a,
-			final Iterable<? extends T> b) {
-		return concat(Arrays.asList(a, b));
+	public static <T> Iterable<T> concat(final Iterable<? extends T>... inputs) {
+		return concat(Arrays.asList(inputs));
 	}
 
 	public static <T> Iterable<T> singleton(final T element) {
@@ -127,14 +125,14 @@ public class Operations {
 	/**
 	 * Concatenates several {@link Iterable}s into one
 	 * 
-	 * @param input
+	 * @param inputs
 	 *            the {@link Iterable} of {@link Iterable}s to be concatenated
 	 * @return {@link Iterable} consisting of all elements found in input
 	 *         {@link Iterable}s
 	 */
 	public static <T> Iterable<T> concat(
-			final Iterable<? extends Iterable<? extends T>> input) {
-		assert input != null;
+			final Iterable<? extends Iterable<? extends T>> inputs) {
+		assert inputs != null;
 
 		return new Iterable<T>() {
 
@@ -142,7 +140,7 @@ public class Operations {
 			public Iterator<T> iterator() {
 
 				return new Iterator<T>() {
-					Iterator<? extends Iterable<? extends T>> outer = input
+					Iterator<? extends Iterable<? extends T>> outer = inputs
 							.iterator();
 
 					Iterator<? extends T> inner;
@@ -214,7 +212,8 @@ public class Operations {
 
 					@Override
 					public ArrayList<T> next() {
-						final ArrayList<T> nextBatch = new ArrayList<T>(batchSize);
+						final ArrayList<T> nextBatch = new ArrayList<T>(
+								batchSize);
 						int count = 0;
 						while (count++ < batchSize
 								&& elementsIterator.hasNext()) {
@@ -501,7 +500,7 @@ public class Operations {
 	}
 
 	// TODO: get rid of Conditions in favour of transformations
-	
+
 	/**
 	 * Transforms elements using a given {@link Transformation} the output
 	 * elements consist of the result of the transformation in the same order;
@@ -613,37 +612,37 @@ public class Operations {
 
 		public O apply(I element);
 	}
-	
+
 	/**
 	 * An extension of {@link Functor} which can do the reverse transformation
 	 * 
 	 * @author Pavel Klinov
 	 *
-	 * pavel.klinov@uni-ulm.de
+	 *         pavel.klinov@uni-ulm.de
 	 */
 	public interface FunctorEx<I, O> extends Functor<I, O> {
-		
+
 		/**
-		 * The reason this method takes Objects rather than instances of O is because
-		 * it's primarily used for an efficient implementation of
+		 * The reason this method takes Objects rather than instances of O is
+		 * because it's primarily used for an efficient implementation of
 		 * {@link Set#contains(Object)}, which takes an Object
 		 * 
 		 * @return Can return null if the transformation is not possible
 		 */
 		public I deapply(Object element);
 	}
-	
+
 	/**
 	 * 
 	 * @author Pavel Klinov
 	 *
-	 * pavel.klinov@uni-ulm.de
+	 *         pavel.klinov@uni-ulm.de
 	 */
 	private static class MapIterator<I, O> implements Iterator<O> {
-		
+
 		private final Iterator<? extends I> iter_;
 		private final Functor<I, O> functor_;
-		
+
 		MapIterator(Iterator<? extends I> iter, Functor<I, O> functor) {
 			iter_ = iter;
 			functor_ = functor;
@@ -663,19 +662,20 @@ public class Operations {
 		public void remove() {
 			iter_.remove();
 		}
-		
-		
+
 	}
-	
+
 	/**
 	 * A simple second-order map function
 	 * 
 	 * @param input
 	 * @param functor
-	 * @return a set which contains the results of applying the functor to the elements in the input set
+	 * @return a set which contains the results of applying the functor to the
+	 *         elements in the input set
 	 */
-	public static <I,O> Set<O> map(final Set<? extends I> input, final FunctorEx<I,O> functor) {
-		return new AbstractSet<O>() { 
+	public static <I, O> Set<O> map(final Set<? extends I> input,
+			final FunctorEx<I, O> functor) {
+		return new AbstractSet<O>() {
 
 			@Override
 			public Iterator<O> iterator() {
@@ -685,7 +685,7 @@ public class Operations {
 			@Override
 			public boolean contains(Object o) {
 				I element = functor.deapply(o);
-				
+
 				return element == null ? false : input.contains(element);
 			}
 
@@ -693,7 +693,7 @@ public class Operations {
 			public int size() {
 				return input.size();
 			}
-			
+
 		};
 	}
 }

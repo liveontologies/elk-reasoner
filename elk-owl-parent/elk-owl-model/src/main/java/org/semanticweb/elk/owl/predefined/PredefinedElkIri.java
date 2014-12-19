@@ -32,20 +32,21 @@ public enum PredefinedElkIri {
 	OWL_NOTHING(new ElkFullIri(PredefinedElkPrefix.OWL.get(), "Nothing")), //
 
 	OWL_TOP_OBJECT_PROPERTY(new ElkFullIri(PredefinedElkPrefix.OWL.get(),
-			"TopObjectProperty")), //
+			"topObjectProperty")), //
 
 	OWL_BOTTOM_OBJECT_PROPERTY(new ElkFullIri(PredefinedElkPrefix.OWL.get(),
-			"BottomObjectProperty")), //
+			"bottomObjectProperty")), //
 
 	OWL_TOP_DATA_PROPERTY(new ElkFullIri(PredefinedElkPrefix.OWL.get(),
-			"TopDataProperty")), //
+			"topDataProperty")), //
 
 	OWL_BOTTOM_DATA_PROPERTY(new ElkFullIri(PredefinedElkPrefix.OWL.get(),
-			"BottomDataProperty")), //
+			"bottomDataProperty")), //
+
+	RDFS_LITERAL(new ElkFullIri(PredefinedElkPrefix.RDFS.get(), "Literal")),
 
 	RDF_PLAIN_LITERAL(new ElkFullIri(PredefinedElkPrefix.RDF.get(),
-			"PlainLiteral"))//
-	;
+			"PlainLiteral"));
 
 	private final ElkIri iri;
 

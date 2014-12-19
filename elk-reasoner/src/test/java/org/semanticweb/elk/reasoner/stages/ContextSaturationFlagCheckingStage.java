@@ -50,12 +50,12 @@ public class ContextSaturationFlagCheckingStage extends BasePostProcessingStage 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContextSaturationFlagCheckingStage.class);
 
-	private final Collection<IndexedClassExpression> classes_;
+	private final Collection<? extends IndexedClassExpression> classes_;
 	private final Set<Context> nonSaturated_;
 	private final SaturationState<?> saturationState_;
 
 	public ContextSaturationFlagCheckingStage(AbstractReasonerState reasoner) {
-		classes_ = reasoner.ontologyIndex.getIndexedClassExpressions();
+		classes_ = reasoner.ontologyIndex.getClassExpressions();
 		nonSaturated_ = new ArrayHashSet<Context>(reasoner.saturationState
 				.getNotSaturatedContexts().size());
 		nonSaturated_

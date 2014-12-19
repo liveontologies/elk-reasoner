@@ -22,9 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
 
 /**
  * A {@link ReasonerStage} during which the instance taxonomy of the current
@@ -58,20 +58,21 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		
+
 		if (reasoner.doneTaxonomy()) {
 			reasoner.initInstanceTaxonomy();
 
 			computation_ = new InstanceTaxonomyComputation(
-					reasoner.ontologyIndex.getIndexedIndividuals(),
+					reasoner.ontologyIndex.getIndividuals(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.saturationState, reasoner.instanceTaxonomyState.getTaxonomy());
+					reasoner.saturationState,
+					reasoner.instanceTaxonomyState.getTaxonomy());
 		}
 
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		}
-		
+
 		return true;
 	}
 
@@ -90,7 +91,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 			return false;
 
 		this.computation_ = null;
-		
+
 		return true;
 	}
 

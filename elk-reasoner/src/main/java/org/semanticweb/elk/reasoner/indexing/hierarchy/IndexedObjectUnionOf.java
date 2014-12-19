@@ -22,93 +22,20 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectUnionOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.logging.LogLevel;
-import org.semanticweb.elk.util.logging.LoggerWrap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents all occurrences of an {@link ElkObjectUnionOf} in an ontology.
  * 
  * @author "Yevgeny Kazakov"
  */
-public class IndexedObjectUnionOf extends IndexedClassExpression {
+public interface IndexedObjectUnionOf extends IndexedClassExpression {
 
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedObjectUnionOf.class);
+	public Set<? extends IndexedClassExpression> getDisjuncts();
 
-	private final Set<IndexedClassExpression> disjuncts_;
-
-	IndexedObjectUnionOf(List<IndexedClassExpression> disjuncts) {
-		this.disjuncts_ = new ArrayHashSet<IndexedClassExpression>(2);
-		for (IndexedClassExpression disjunct : disjuncts) {
-			disjuncts_.add(disjunct);
-		}
-	}
-
-	public Set<IndexedClassExpression> getDisjuncts() {
-		return disjuncts_;
-	}
-
-	public <O> O accept(IndexedObjectUnionOfVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedObjectUnionOfVisitor<O>) visitor);
-	}
-
-	@Override
-	boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
-
-		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
-			// first negative occurrence of this expression
-			if (!ObjectUnionFromDisjunctRule.addRulesFor(this, index))
-				return false;
-		}
-
-		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
-			// first positive occurrence of this expression
-			if (LOGGER_.isWarnEnabled()) {
-				LoggerWrap
-						.log(LOGGER_,
-								LogLevel.WARN,
-								"reasoner.indexing.IndexedObjectUnionOf",
-								"ELK does not support positive occurrences of ObjectUnionOf. Reasoning might be incomplete!");
-			}
-		}
-
-		positiveOccurrenceNo += positiveIncrement;
-		negativeOccurrenceNo += negativeIncrement;
-
-		checkOccurrenceNumbers();
-
-		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
-			// no negative occurrences of this expression left
-			if (!ObjectUnionFromDisjunctRule.removeRulesFor(this, index)) {
-				// revert all changes
-				positiveOccurrenceNo -= positiveIncrement;
-				negativeOccurrenceNo -= negativeIncrement;
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "ObjectUnionOf(" + disjuncts_ + ')';
-	}
+	public <O> O accept(IndexedObjectUnionOfVisitor<O> visitor);
 
 }
