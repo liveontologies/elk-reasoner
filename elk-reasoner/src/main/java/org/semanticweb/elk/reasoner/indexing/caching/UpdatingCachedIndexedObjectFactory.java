@@ -23,15 +23,9 @@ package org.semanticweb.elk.reasoner.indexing.caching;
  */
 
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class UpdatingCachedIndexedObjectFactory extends
 		DelegatingCachedIndexedObjectFactory {
-
-	// logger for events
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(UpdatingCachedIndexedObjectFactory.class);
 
 	private final ModifiableOntologyIndex index_;
 

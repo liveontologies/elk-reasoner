@@ -42,6 +42,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.caching.ModifiableIndexedObjectCache;
+import org.semanticweb.elk.reasoner.indexing.caching.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.caching.UpdatingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedAxiomFactory;
 import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
@@ -98,6 +100,10 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
 	public ElkAxiomConverterImpl(ModifiableIndexedObjectFactory factory) {
 		this(factory, factory, factory, factory);
+	}
+
+	public ElkAxiomConverterImpl(ModifiableIndexedObjectCache cache) {
+		this(new ResolvingModifiableIndexedObjectFactory(cache));
 	}
 
 	<F extends CachedIndexedObjectFactory & ModifiableIndexedObjectFactory> ElkAxiomConverterImpl(

@@ -43,6 +43,8 @@ import org.semanticweb.elk.reasoner.incremental.NonIncrementalChangeListener;
 import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ChangeIndexingProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
@@ -182,6 +184,8 @@ public abstract class AbstractReasonerState {
 	 */
 	TraceState traceState;
 
+	private final ElkPolarityExpressionConverter expressionConverter_;
+
 	protected AbstractReasonerState() {
 		this.ontologyIndex = new DifferentialIndex();
 		this.axiomInserter_ = new ElkAxiomConverterImpl(ontologyIndex, 1);
@@ -190,6 +194,8 @@ public abstract class AbstractReasonerState {
 				.createSaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
+		this.expressionConverter_ = new ElkPolarityExpressionConverterImpl(
+				ontologyIndex);
 	}
 
 	protected AbstractReasonerState(AxiomLoader axiomLoader) {
@@ -602,10 +608,8 @@ public abstract class AbstractReasonerState {
 			resetTraceState();
 		}
 
-		IndexedClassExpression subsumee = sub.accept(ontologyIndex
-				.getExpressionConverter());
-		IndexedClassExpression subsumer = sup.accept(ontologyIndex
-				.getExpressionConverter());
+		IndexedClassExpression subsumee = sub.accept(expressionConverter_);
+		IndexedClassExpression subsumer = sup.accept(expressionConverter_);
 
 		TraceStore.Reader onDemandTracer = new OnDemandTracingReader(
 				traceState.getSaturationState(), traceState.getTraceStore()
@@ -640,7 +644,7 @@ public abstract class AbstractReasonerState {
 	}
 
 	IndexedClassExpression transform(ElkClassExpression ce) {
-		return ce.accept(ontologyIndex.getExpressionConverter());
+		return ce.accept(expressionConverter_);
 	}
 
 	public void resetTraceState() {

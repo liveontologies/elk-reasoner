@@ -38,6 +38,7 @@ import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
@@ -86,6 +87,7 @@ public class IncrementalAdditionInitializationStage extends
 	 * @see
 	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
 	 */
+
 	@Override
 	public boolean preExecute() {
 		if (!super.preExecute())
@@ -105,8 +107,8 @@ public class IncrementalAdditionInitializationStage extends
 						stageStatistics_.getContextStatistics());
 
 		// first, create and init contexts for new classes
-		final ElkPolarityExpressionConverter converter = reasoner.ontologyIndex
-				.getExpressionConverter();
+		final ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
+				reasoner.ontologyIndex);
 		final SaturationStateWriter<?> writer =
 
 		SaturationUtils.getStatsAwareWriter(reasoner.saturationState

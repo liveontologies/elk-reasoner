@@ -27,17 +27,11 @@ import java.util.Collection;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
-import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.implementation.ModifiableIndexedObjectFactoryImpl;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.collections.entryset.Entry;
 import org.semanticweb.elk.util.collections.entryset.EntryCollection;
@@ -68,10 +62,6 @@ public class ModifiableIndexedObjectCacheImpl implements
 	private final Entry<CachedIndexedClass, ?> owlThingResolver_,
 			owlNothingResolver_;
 
-	private final ElkPolarityExpressionConverter expressionConverter_;
-
-	private final ElkAxiomConverter axiomConverter_;
-
 	public ModifiableIndexedObjectCacheImpl(int initialSize) {
 		this.cachedComplexClassExpressions_ = new EntryCollection<CachedIndexedComplexClassExpression<?>>(
 				initialSize);
@@ -91,14 +81,6 @@ public class ModifiableIndexedObjectCacheImpl implements
 		this.owlThingResolver_ = new ClassResolver(PredefinedElkClass.OWL_THING);
 		this.owlNothingResolver_ = new ClassResolver(
 				PredefinedElkClass.OWL_NOTHING);
-
-		ModifiableIndexedObjectFactory resolvingFactory = new ResolvingModifiableIndexedObjectFactory(
-				new ModifiableIndexedObjectFactoryImpl(), this);
-
-		this.expressionConverter_ = new ElkPolarityExpressionConverterImpl(
-				resolvingFactory);
-		this.axiomConverter_ = new ElkAxiomConverterImpl(resolvingFactory);
-
 	}
 
 	public ModifiableIndexedObjectCacheImpl() {
@@ -165,16 +147,6 @@ public class ModifiableIndexedObjectCacheImpl implements
 	public void remove(CachedIndexedObject<?> input) {
 		LOGGER_.trace(input + ": removing from cache");
 		input.accept(deleter_);
-	}
-
-	@Override
-	public ElkPolarityExpressionConverter getExpressionConverter() {
-		return this.expressionConverter_;
-	}
-
-	@Override
-	public ElkAxiomConverter getAxiomConverter() {
-		return this.axiomConverter_;
 	}
 
 	private class Resolver_ implements CachedIndexedObjectFilter {

@@ -30,6 +30,7 @@ import java.util.Collection;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
@@ -72,8 +73,8 @@ public class IncrementalClassTaxonomyComputationStage extends
 		 */
 		Operations.Transformation<ElkClass, IndexedClass> transformation = new Operations.Transformation<ElkClass, IndexedClass>() {
 
-			private final ElkPolarityExpressionConverter converter = reasoner.ontologyIndex
-					.getExpressionConverter();
+			private final ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
+					reasoner.ontologyIndex);
 
 			@Override
 			public IndexedClass transform(ElkClass element) {

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
@@ -78,8 +79,8 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 		// let's convert to indexed objects and filter out removed individuals
 		Operations.Transformation<ElkNamedIndividual, IndexedIndividual> transformation = new Operations.Transformation<ElkNamedIndividual, IndexedIndividual>() {
 
-			private final ElkPolarityExpressionConverter converter = reasoner.ontologyIndex
-					.getExpressionConverter();
+			private final ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
+					reasoner.ontologyIndex);
 
 			@Override
 			public IndexedIndividual transform(ElkNamedIndividual element) {

@@ -35,6 +35,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.caching.ModifiableIndexedObjectCache;
+import org.semanticweb.elk.reasoner.indexing.caching.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedIndividual;
@@ -74,6 +76,10 @@ public class ElkPolarityExpressionConverterImpl extends
 			ModifiableIndexedObjectFactory dualFactory) {
 		this.factory_ = dualFactory;
 		this.complementaryConverter_ = this;
+	}
+
+	public ElkPolarityExpressionConverterImpl(ModifiableIndexedObjectCache cache) {
+		this(new ResolvingModifiableIndexedObjectFactory(cache));
 	}
 
 	@Override

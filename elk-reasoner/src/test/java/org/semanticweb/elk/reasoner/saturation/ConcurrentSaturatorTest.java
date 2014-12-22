@@ -35,6 +35,7 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ChangeIndexingProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -82,8 +83,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 				objectFactory.getObjectSomeValuesFrom(r, c), d));
 		inserter.visit(objectFactory.getSubObjectPropertyOfAxiom(r, s));
 
-		ElkPolarityExpressionConverter converter = index
-				.getExpressionConverter();
+		ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
+				index);
 
 		IndexedClassExpression A = a.accept(converter);
 		IndexedClassExpression D = d.accept(converter);
@@ -130,8 +131,8 @@ public class ConcurrentSaturatorTest extends TestCase {
 		inserter.visit(objectFactory.getSubClassOfAxiom(
 				objectFactory.getObjectIntersectionOf(b, c), d));
 
-		ElkPolarityExpressionConverter converter = index
-				.getExpressionConverter();
+		ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
+				index);
 
 		IndexedClassExpression A = a.accept(converter);
 		IndexedClassExpression B = b.accept(converter);
