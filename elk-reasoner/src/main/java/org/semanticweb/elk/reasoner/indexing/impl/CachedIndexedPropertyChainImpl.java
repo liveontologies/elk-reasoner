@@ -76,7 +76,7 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 	 * The {@link SaturatedPropertyChain} object assigned to this
 	 * {@link IndexedPropertyChain}
 	 */
-	private volatile SaturatedPropertyChain saturated_ = null;
+	private final SaturatedPropertyChain saturated_;
 
 	/**
 	 * All told super object properties of this
@@ -93,6 +93,7 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 
 	CachedIndexedPropertyChainImpl(int structuralHash) {
 		super(structuralHash);
+		this.saturated_ = new SaturatedPropertyChain(this);
 	}
 
 	@Override
@@ -117,26 +118,6 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 	@Override
 	public final SaturatedPropertyChain getSaturated() {
 		return saturated_;
-	}
-
-	@Override
-	public synchronized SaturatedPropertyChain setSaturated(
-			SaturatedPropertyChain saturatedObjectProperty) {
-		if (saturated_ != null)
-			return saturated_;
-		if (saturatedObjectProperty == null)
-			throw new ElkUnexpectedIndexingException(this
-					+ ": cannot assign null saturation");
-		saturated_ = saturatedObjectProperty;
-		LOGGER_.trace("{}: saturation assinged", this);
-
-		return null;
-	}
-
-	@Override
-	public synchronized void resetSaturated() {
-		saturated_ = null;
-		LOGGER_.trace("{}: saturation removed", this);
 	}
 
 	@Override

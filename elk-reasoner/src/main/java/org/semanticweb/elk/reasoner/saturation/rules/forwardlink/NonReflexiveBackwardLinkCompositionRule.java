@@ -87,8 +87,6 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 		/* compose the link with all non-reflexive backward links */
 		SaturatedPropertyChain linkSaturation = this.forwardLink_.getRelation()
 				.getSaturated();
-		if (linkSaturation == null)
-			return;
 		final Multimap<IndexedObjectProperty, IndexedBinaryPropertyChain> comps = linkSaturation
 				.getCompositionsByLeftSubProperty();
 		final Map<IndexedObjectProperty, ? extends SubContextPremises> subContextMap = premises

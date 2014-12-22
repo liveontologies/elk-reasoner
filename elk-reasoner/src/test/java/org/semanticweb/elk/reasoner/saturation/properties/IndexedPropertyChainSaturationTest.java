@@ -324,14 +324,12 @@ public class IndexedPropertyChainSaturationTest {
 			@Override
 			public Boolean visit(IndexedObjectProperty prop) {
 				return prop.isToldReflexive()
-						|| (prop.getSaturated() != null && prop.getSaturated()
-								.isDerivedReflexive());
+						|| (prop.getSaturated().isDerivedReflexive());
 			}
 
 			@Override
 			public Boolean visit(IndexedBinaryPropertyChain binaryChain) {
-				return binaryChain.getSaturated() != null
-						&& binaryChain.getSaturated().isDerivedReflexive();
+				return binaryChain.getSaturated().isDerivedReflexive();
 			}
 		});
 	}

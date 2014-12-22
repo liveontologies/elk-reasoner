@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFr
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
-import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
@@ -93,11 +92,8 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	public static void produceDecomposedExistentialLink(
 			ConclusionProducer producer, IndexedClassExpression source,
 			IndexedObjectSomeValuesFrom existential) {
-		SaturatedPropertyChain relationSaturation = existential.getProperty()
-				.getSaturated();
-		if (relationSaturation == null
-				|| relationSaturation.getCompositionsByLeftSubProperty()
-						.isEmpty()) {
+		if (existential.getProperty().getSaturated()
+				.getCompositionsByLeftSubProperty().isEmpty()) {
 			producer.produce(existential.getFiller(),
 					new DecomposedExistentialBackwardLink(source, existential));
 		} else {
@@ -114,11 +110,8 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 			IndexedClassExpression target,
 			IndexedBinaryPropertyChain composition) {
 
-		SaturatedPropertyChain compositionSaturation = composition
-				.getSaturated();
-		if (compositionSaturation == null
-				|| compositionSaturation.getCompositionsByLeftSubProperty()
-						.isEmpty()) {
+		if (composition.getSaturated().getCompositionsByLeftSubProperty()
+				.isEmpty()) {
 			for (IndexedObjectProperty toldSuper : composition
 					.getToldSuperProperties()) {
 				producer.produce(target, new ComposedBackwardLink(source,

@@ -46,8 +46,6 @@ public class VerifySymmetricPropertySaturation {
 	public static void testLeftCompositions(IndexedPropertyChain ipc,
 			AsymmetricCompositionHook hook) {
 		SaturatedPropertyChain saturation = ipc.getSaturated();
-		if (saturation == null)
-			return;
 		Multimap<IndexedObjectProperty, IndexedBinaryPropertyChain> compositionsByLeft = saturation
 				.getCompositionsByLeftSubProperty();
 		for (IndexedObjectProperty left : compositionsByLeft.keySet()) {
@@ -72,8 +70,6 @@ public class VerifySymmetricPropertySaturation {
 	public static void testRightCompositions(IndexedObjectProperty ip,
 			AsymmetricCompositionHook hook) {
 		SaturatedPropertyChain saturation = ip.getSaturated();
-		if (saturation == null)
-			return;
 		Multimap<IndexedPropertyChain, IndexedBinaryPropertyChain> compositionsByRight = saturation
 				.getCompositionsByRightSubProperty();
 		for (IndexedPropertyChain right : compositionsByRight.keySet()) {

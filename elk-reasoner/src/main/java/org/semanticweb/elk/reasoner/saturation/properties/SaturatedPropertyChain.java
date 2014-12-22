@@ -195,24 +195,6 @@ public class SaturatedPropertyChain {
 	}
 
 	/**
-	 * @param ipc
-	 *            the {@link IndexedPropertyChain} for which to retrieve the
-	 *            assigned {@link SaturatedPropertyChain}
-	 * @return the {@link SaturatedPropertyChain} assigned to the given
-	 *         {@link IndexedPropertyChain} creating new assignment if necessary
-	 */
-	public static SaturatedPropertyChain getCreate(IndexedPropertyChain ipc) {
-		SaturatedPropertyChain saturated = ipc.getSaturated();
-		if (saturated == null) {
-			saturated = new SaturatedPropertyChain(ipc);
-			SaturatedPropertyChain previous = ipc.setSaturated(saturated);
-			if (previous != null)
-				return previous;
-		}
-		return saturated;
-	}
-
-	/**
 	 * Prints differences with other {@link SaturatedPropertyChain}
 	 * 
 	 * @param other

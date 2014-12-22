@@ -88,8 +88,6 @@ public class ReflexiveBackwardLinkCompositionRule extends
 		/* compose the link with all reflexive backward links */
 		SaturatedPropertyChain linkSaturation = this.forwardLink_.getRelation()
 				.getSaturated();
-		if (linkSaturation == null)
-			return;
 		final Multimap<IndexedObjectProperty, IndexedBinaryPropertyChain> comps = linkSaturation
 				.getCompositionsByLeftSubProperty();
 		final Set<IndexedObjectProperty> reflexiveBackwardRelations = premises

@@ -140,8 +140,6 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 		/* compose the link with all forward links */
 		SaturatedPropertyChain linkSaturation = link.getRelation()
 				.getSaturated();
-		if (linkSaturation == null)
-			return;
 		final Multimap<IndexedPropertyChain, IndexedBinaryPropertyChain> comps = linkSaturation
 				.getCompositionsByRightSubProperty();
 		if (comps == null)

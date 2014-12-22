@@ -62,29 +62,9 @@ public interface IndexedPropertyChain extends IndexedObject {
 
 	/**
 	 * @return The corresponding {@code SaturatedObjecProperty} assigned to this
-	 *         {@link IndexedPropertyChain} or {@code null} if none is assigned
+	 *         {@link IndexedPropertyChain}; should not be {@code null}
 	 */
 	public SaturatedPropertyChain getSaturated();
-
-	/**
-	 * Sets the corresponding {@code SaturatedObjecProperty} of this
-	 * {@link IndexedPropertyChain} if none was yet assigned.
-	 * 
-	 * @param saturatedObjectProperty
-	 *            assign the given {@link SaturatedPropertyChain} to this
-	 *            {@link IndexedPropertyChain}
-	 * 
-	 * @return the previous {@link SaturatedPropertyChain} assigned to this
-	 *         {@link IndexedPropertyChain} or {@code null} if none was
-	 *         assigned.
-	 */
-	public SaturatedPropertyChain setSaturated(
-			SaturatedPropertyChain saturatedObjectProperty);
-
-	/**
-	 * Resets the corresponding {@code SaturatedObjecProperty} to {@code null}.
-	 */
-	public void resetSaturated();
 
 	public <O> O accept(IndexedPropertyChainVisitor<O> visitor);
 

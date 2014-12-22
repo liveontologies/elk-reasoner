@@ -131,8 +131,6 @@ public class PropagationFromExistentialFillerRule extends
 			 * creating propagations for relevant sub-properties of the relation
 			 */
 			SaturatedPropertyChain saturation = relation.getSaturated();
-			if (saturation == null)
-				continue;
 			for (IndexedObjectProperty property : new LazySetIntersection<IndexedObjectProperty>(
 					candidatePropagationProperties,
 					saturation.getSubProperties())) {
@@ -227,8 +225,6 @@ public class PropagationFromExistentialFillerRule extends
 
 		for (IndexedObjectSomeValuesFrom e : negExistentials_) {
 			SaturatedPropertyChain saturation = e.getProperty().getSaturated();
-			if (saturation == null)
-				continue;
 			if (saturation.getSubPropertyChains().contains(property)) {
 				// producer.produce(premises.getRoot(), new
 				// Propagation(property, e));

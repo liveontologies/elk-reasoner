@@ -124,8 +124,8 @@ public class PropertyHierarchyCompositionComputationFactory
 
 			for (IndexedPropertyChain rightSubPropertyChain : rightSubProperties) {
 
-				SaturatedPropertyChain rightSaturation = SaturatedPropertyChain
-						.getCreate(rightSubPropertyChain);
+				SaturatedPropertyChain rightSaturation = rightSubPropertyChain
+						.getSaturated();
 				synchronized (rightSaturation) {
 					if (rightSaturation.compositionsByLeftSubProperty == null)
 						rightSaturation.compositionsByLeftSubProperty = new CompositionMultimap<IndexedObjectProperty>();
@@ -178,8 +178,8 @@ public class PropertyHierarchyCompositionComputationFactory
 					}
 
 					if (newRecord) {
-						SaturatedPropertyChain leftSaturation = SaturatedPropertyChain
-								.getCreate(leftSubProperty);
+						SaturatedPropertyChain leftSaturation = leftSubProperty
+								.getSaturated();
 						synchronized (leftSaturation) {
 							if (leftSaturation.compositionsByRightSubProperty == null)
 								leftSaturation.compositionsByRightSubProperty = new CompositionMultimap<IndexedPropertyChain>();

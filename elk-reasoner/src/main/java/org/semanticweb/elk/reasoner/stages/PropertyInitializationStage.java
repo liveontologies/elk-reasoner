@@ -45,10 +45,6 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 			.getLogger(PropertyInitializationStage.class);
 
 	/**
-	 * The counter for deleted saturations
-	 */
-	private int clearedSaturations_;
-	/**
 	 * The progress counter
 	 */
 	private int progress_;
@@ -79,7 +75,6 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 		todo_ = reasoner.ontologyIndex.getPropertyChains().iterator();
 		maxProgress_ = reasoner.ontologyIndex.getPropertyChains().size();
 		progress_ = 0;
-		clearedSaturations_ = 0;
 		return true;
 	}
 
@@ -90,10 +85,7 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 				break;
 			IndexedPropertyChain ipc = todo_.next();
 			SaturatedPropertyChain saturation = ipc.getSaturated();
-			if (saturation != null) {
-				saturation.clear();
-				clearedSaturations_++;
-			}
+			saturation.clear();
 			progressMonitor.report(++progress_, maxProgress_);
 			if (spuriousInterrupt())
 				continue;
@@ -110,8 +102,7 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
-		if (clearedSaturations_ > 0 && LOGGER_.isDebugEnabled())
-			LOGGER_.debug("Saturations cleared: " + clearedSaturations_);
+		// nothing interesting to print
 	}
 
 }

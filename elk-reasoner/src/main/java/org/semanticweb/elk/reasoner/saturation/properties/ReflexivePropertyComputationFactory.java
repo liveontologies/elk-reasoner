@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,14 +25,14 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The factory of engines that compute implied reflexivity of object property
@@ -67,9 +68,7 @@ public class ReflexivePropertyComputationFactory
 	}
 
 	private void toDo(IndexedPropertyChain ipc) {
-		SaturatedPropertyChain saturation = SaturatedPropertyChain
-				.getCreate(ipc);
-		if (saturation.setReflexive()) {
+		if (ipc.getSaturated().setReflexive()) {
 			LOGGER_.trace("{}: set reflexive", ipc);
 
 			toDo_.add(ipc);
@@ -84,9 +83,7 @@ public class ReflexivePropertyComputationFactory
 
 	private void toDoLeftChains(IndexedObjectProperty iop) {
 		for (IndexedBinaryPropertyChain chain : iop.getLeftChains()) {
-			SaturatedPropertyChain rightSaturation = chain.getRightProperty()
-					.getSaturated();
-			if (rightSaturation == null || !rightSaturation.isDerivedReflexive())
+			if (!chain.getRightProperty().getSaturated().isDerivedReflexive())
 				continue;
 			toDo(chain);
 		}
@@ -94,9 +91,7 @@ public class ReflexivePropertyComputationFactory
 
 	private void toDoRightChains(IndexedPropertyChain ipc) {
 		for (IndexedBinaryPropertyChain chain : ipc.getRightChains()) {
-			SaturatedPropertyChain leftSaturation = chain.getLeftProperty()
-					.getSaturated();
-			if (leftSaturation == null || !leftSaturation.isDerivedReflexive())
+			if (!chain.getLeftProperty().getSaturated().isDerivedReflexive())
 				continue;
 			toDo(chain);
 		}

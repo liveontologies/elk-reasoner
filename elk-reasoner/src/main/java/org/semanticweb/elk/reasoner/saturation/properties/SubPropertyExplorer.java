@@ -84,11 +84,9 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	public Void visit(IndexedBinaryPropertyChain element) {
 		IndexedPropertyChain left = element.getLeftProperty();
 		IndexedPropertyChain right = element.getRightProperty();
-		SaturatedPropertyChain leftSaturation = left.getSaturated();
-		SaturatedPropertyChain rightSaturation = right.getSaturated();
-		if (leftSaturation != null && leftSaturation.isDerivedReflexive())
+		if (left.getSaturated().isDerivedReflexive())
 			toDo(right);
-		if (rightSaturation != null && rightSaturation.isDerivedReflexive())
+		if (right.getSaturated().isDerivedReflexive())
 			toDo(left);
 		return null;
 	}
@@ -122,8 +120,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 
 	private static SaturatedPropertyChain computeSubProperties(
 			IndexedPropertyChain element) {
-		SaturatedPropertyChain saturation = SaturatedPropertyChain
-				.getCreate(element);
+		SaturatedPropertyChain saturation = element.getSaturated();
 		if (saturation.derivedSubPropertiesComputed)
 			return saturation;
 		// else
@@ -176,8 +173,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	 */
 	static Multimap<IndexedObjectProperty, IndexedObjectProperty> getLeftSubComposableSubPropertiesByRightProperties(
 			IndexedObjectProperty element) {
-		SaturatedPropertyChain saturation = SaturatedPropertyChain
-				.getCreate(element);
+		SaturatedPropertyChain saturation = element.getSaturated();
 		if (saturation.leftSubComposableSubPropertiesByRightPropertiesComputed)
 			return saturation.leftSubComposableSubPropertiesByRightProperties;
 		// else
