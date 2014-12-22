@@ -45,7 +45,7 @@ import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.impl.IndexedObjectsCreator;
+import org.semanticweb.elk.reasoner.indexing.implementation.IndexedObjectsCreator;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;

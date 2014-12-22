@@ -20,7 +20,7 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.indexing.impl;
+package org.semanticweb.elk.reasoner.indexing.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
@@ -111,7 +111,7 @@ final class CachedIndexedClassImpl extends
 	boolean updatePositiveOccurrenceNo(final ModifiableOntologyIndex index,
 			int positiveIncrement) {
 		if (elkClass_ != PredefinedElkClass.OWL_NOTHING)
-			return false;
+			return true;
 
 		index.updatePositiveOwlNothingOccurrenceNo(positiveIncrement);
 
@@ -126,11 +126,18 @@ final class CachedIndexedClassImpl extends
 		if (!updateOccurrenceNo(index, increment)) {
 			return false;
 		}
-		if (!updateNegativeOccurrenceNo(index, negativeIncrement)) {
+		if (!updatePositiveOccurrenceNo(index, positiveIncrement)) {
 			// revert the changes
 			updateOccurrenceNo(index, -increment);
 			return false;
 		}
+		if (!updateNegativeOccurrenceNo(index, negativeIncrement)) {
+			// revert the changes
+			updateOccurrenceNo(index, -increment);
+			updatePositiveOccurrenceNo(index, -positiveIncrement);
+			return false;
+		}
+
 		return true;
 	}
 

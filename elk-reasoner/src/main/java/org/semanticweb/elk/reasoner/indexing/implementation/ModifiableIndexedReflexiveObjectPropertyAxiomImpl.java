@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.impl;
+package org.semanticweb.elk.reasoner.indexing.implementation;
 
 /*
  * #%L

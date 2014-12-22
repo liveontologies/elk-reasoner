@@ -156,7 +156,8 @@ public class InstanceTaxonomyComputationFactory implements
 				TransitiveReductionOutputUnsatisfiable<IndexedIndividual> output) {
 			// the ontology is inconsistent, this should have been checked
 			// earlier
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("individual " + output.getRoot()
+					+ " cannot be inconsistent!");
 		}
 
 		@Override

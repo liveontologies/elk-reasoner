@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.reasoner.indexing.impl;
+package org.semanticweb.elk.reasoner.indexing.implementation;
 
 /*
  * #%L
@@ -26,6 +26,8 @@ package org.semanticweb.elk.reasoner.indexing.impl;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.implementation.CachedIndexedBinaryPropertyChainImpl;
+import org.semanticweb.elk.reasoner.indexing.implementation.CachedIndexedObjectPropertyImpl;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
