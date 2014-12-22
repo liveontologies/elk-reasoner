@@ -127,12 +127,10 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		if (saturation.derivedSubPropertiesComputed)
 			return saturation;
 		// else
-		if (saturation.derivedSubProperyChains == null) {
-			synchronized (saturation) {
-				if (saturation.derivedSubProperyChains == null)
-					saturation.derivedSubProperyChains = new ArrayHashSet<IndexedPropertyChain>(
-							8);
-			}
+		synchronized (saturation) {
+			if (saturation.derivedSubProperyChains == null)
+				saturation.derivedSubProperyChains = new ArrayHashSet<IndexedPropertyChain>(
+						8);
 		}
 		synchronized (saturation.derivedSubProperyChains) {
 			if (saturation.derivedSubPropertiesComputed)
@@ -181,11 +179,9 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		if (saturation.leftSubComposableSubPropertiesByRightPropertiesComputed)
 			return saturation.leftSubComposableSubPropertiesByRightProperties;
 		// else
-		if (saturation.leftSubComposableSubPropertiesByRightProperties == null) {
-			synchronized (saturation) {
-				if (saturation.leftSubComposableSubPropertiesByRightProperties == null)
-					saturation.leftSubComposableSubPropertiesByRightProperties = new HashSetMultimap<IndexedObjectProperty, IndexedObjectProperty>();
-			}
+		synchronized (saturation) {
+			if (saturation.leftSubComposableSubPropertiesByRightProperties == null)
+				saturation.leftSubComposableSubPropertiesByRightProperties = new HashSetMultimap<IndexedObjectProperty, IndexedObjectProperty>();
 		}
 		synchronized (saturation.leftSubComposableSubPropertiesByRightProperties) {
 			if (saturation.leftSubComposableSubPropertiesByRightPropertiesComputed)
