@@ -22,8 +22,17 @@ package org.semanticweb.elk.reasoner.indexing.conversion;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedAxiom;
 
+/**
+ * A {@link ElkAxiomVisitor} that can be used for converting {@link ElkAxiom}s
+ * to the corresponding {@link ModifiableIndexedAxiom}s. One {@link ElkAxiom}
+ * might be converted into several {@link ModifiableIndexedAxiom}s.
+ * 
+ * @author "Yevgeny Kazakov"
+ */
 public interface ElkAxiomConverter extends ElkAxiomVisitor<Void> {
 
 	// combined interface

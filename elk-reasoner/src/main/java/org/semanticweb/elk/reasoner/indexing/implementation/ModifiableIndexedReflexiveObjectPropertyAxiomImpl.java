@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
@@ -70,7 +71,8 @@ class ModifiableIndexedReflexiveObjectPropertyAxiomImpl extends
 			// no occurrence of reflexivity axiom
 			if (!index.removeReflexiveProperty(property_)) {
 				// revert the changes
-				property_.updateReflexiveOccurrenceNumber(-increment);
+				if (!property_.updateReflexiveOccurrenceNumber(-increment))
+					throw new ElkUnexpectedIndexingException(this);
 				return false;
 			}
 		}

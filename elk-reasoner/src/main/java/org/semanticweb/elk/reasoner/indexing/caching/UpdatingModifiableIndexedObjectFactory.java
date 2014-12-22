@@ -55,9 +55,9 @@ public class UpdatingModifiableIndexedObjectFactory extends
 				negativeIncrement);
 		this.baseFactory_ = baseFactory;
 		this.index_ = index;
+		this.increment_ = increment;
 		this.positiveIncrement_ = positiveIncerement;
 		this.negativeIncrement_ = negativeIncrement;
-		this.increment_ = increment;
 	}
 
 	<T extends ModifiableIndexedAxiom> T filter(T input) {

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
@@ -47,13 +48,28 @@ import org.semanticweb.elk.reasoner.indexing.caching.ResolvingModifiableIndexedO
 import org.semanticweb.elk.reasoner.indexing.caching.UpdatingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedAxiomFactory;
 import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.implementation.ModifiableIndexedObjectFactoryImpl;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 
+/**
+ * An implementation of {@link ElkAxiomConverter} that converts {@link ElkAxiom}
+ * s to {@link ModifiableIndexedAxiom}s using a
+ * {@link ModifiableIndexedAxiomFactory} in addition to converters and factories
+ * for other types of {@link IndexedObject}s.
+ * 
+ * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
 	private final ModifiableIndexedAxiomFactory axiomFactory_;
@@ -82,6 +98,37 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		this.entityConverter_ = entityConverter;
 	}
 
+	/**
+	 * Creates an {@link ElkAxiomConverter} that uses four
+	 * {@link ModifiableIndexedObjectFactory}s to create all
+	 * {@link ModifiableIndexedObject} sub-expression of the resulting
+	 * {@link ModifiableIndexedAxiom}s depending on (logical) polarity of their
+	 * occurrence.
+	 * 
+	 * @param neutralFactory
+	 *            this {@link ModifiableIndexedObjectFactory} is used to create
+	 *            {@link IndexedAxiom}s as well as
+	 *            {@link ModifiableIndexedObject}s that do not occur (logically)
+	 *            positively or negatively in the ontology, such as entities in
+	 *            declaration axioms
+	 * @param positiveFactory
+	 *            this {@link ModifiableIndexedObjectFactory} is used to create
+	 *            positive occurrences of {@link ModifiableIndexedObject}s, such
+	 *            as {@link IndexedClassExpression}s on the right-hand-side of
+	 *            {@code SubClassOf} axioms.
+	 * 
+	 * @param negativeFactory
+	 *            this {@link ModifiableIndexedObjectFactory} is used to create
+	 *            negative occurrences of {@link ModifiableIndexedObject}s, such
+	 *            as {@link IndexedClassExpression}s on the right-hand-side of
+	 *            {@code SubClassOf} axioms.
+	 * @param dualFactory
+	 *            this {@link ModifiableIndexedObjectFactory} is used to create
+	 *            simultaneously positive and negative occurrences of
+	 *            {@link ModifiableIndexedObject}s, such as
+	 *            {@link IndexedClassExpression}s in {@code EquivalentClasses}
+	 *            axioms.
+	 */
 	public ElkAxiomConverterImpl(ModifiableIndexedObjectFactory neutralFactory,
 			ModifiableIndexedObjectFactory positiveFactory,
 			ModifiableIndexedObjectFactory negativeFactory,
@@ -98,10 +145,36 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		this.entityConverter_ = new ElkEntityConverterImpl(neutralFactory);
 	}
 
+	/**
+	 * Creates an {@link ElkAxiomConverter} that uses the given
+	 * {@link ModifiableIndexedObjectFactory}s to create all
+	 * {@link ModifiableIndexedObject} sub-expression of the resulting
+	 * {@link ModifiableIndexedAxiom}s.
+	 * 
+	 * @param faactory
+	 *            the {@link ModifiableIndexedObjectFactory} that is used to
+	 *            create all {@link ModifiableIndexedObject}s necessary for
+	 *            conversion of {@link ElkAxiom}s.
+	 */
 	public ElkAxiomConverterImpl(ModifiableIndexedObjectFactory factory) {
 		this(factory, factory, factory, factory);
 	}
 
+	/**
+	 * Creates an {@link ElkAxiomConverter} for converting {@link ElkAxiom}s
+	 * that have already been indexed in the given
+	 * {@link ModifiableIndexedObjectCache}. All {@link ModifiableIndexedObject}
+	 * s subexpression of the converted {@link ModifiabledIndexedAxiom}s are
+	 * taken from this {@link ModifiableIndexedObjectCache} as well. The
+	 * provided {@link ModifiableIndexedObjectCache} will not change. The
+	 * converter may not work properly if used with {@link ElkAxiom}s that have
+	 * not been indexed in the given {@link ModifiableIndexedObjectCache} (e.g.,
+	 * {@link NullPointerException}s may occur).
+	 * 
+	 * @param cache
+	 *            the {@link ModifiableIndexedObjectCache} from which all
+	 *            {@link ModifiableIndexedObject}s are used.
+	 */
 	public ElkAxiomConverterImpl(ModifiableIndexedObjectCache cache) {
 		this(new ResolvingModifiableIndexedObjectFactory(cache));
 	}
@@ -119,6 +192,28 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		);
 	}
 
+	/**
+	 * Creates an {@link ElkAxiomConverter} that converts {@link ElkAxiom}s and
+	 * adds them to the provided {@link ModifiableOntologyIndex} with the given
+	 * multiplicity. The converter will also insert all intermediate
+	 * {@link ModifiableIndexedObject} subexpressions of the created
+	 * {@link ModifiableIndexedAxiom}s with the same multiplicity for polarity
+	 * of their occurrences. Some {@link ModifiableIndexedObject}s will be
+	 * reused and only their multiplicity will be updated.
+	 * 
+	 * @param index
+	 *            the {@link ModifiableOntologyIndex} representing the ontology
+	 *            to which the resulting {@link ModifiableIndexedObject}s will
+	 *            be added and processed (compiled to rules).
+	 * @param increment
+	 *            the multiplicity with which the created
+	 *            {@link ModifiableIndexedAxiom}s should be inserted to the
+	 *            {@link ModifiableOntologyIndex} (e.g., 2 means 2 copies of
+	 *            each create axiom should be added); it can be negative, which
+	 *            means that the {@link ModifiableIndexedAxiom}s should be
+	 *            removed the corresponding number of times.
+	 * 
+	 */
 	public ElkAxiomConverterImpl(ModifiableOntologyIndex index, int increment) {
 		this(new ModifiableIndexedObjectFactoryImpl(), index, increment);
 	}

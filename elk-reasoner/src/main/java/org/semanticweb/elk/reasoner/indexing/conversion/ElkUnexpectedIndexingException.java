@@ -1,4 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.conversion;
+
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
+
 /*
  * #%L
  * ELK Reasoner
@@ -36,6 +39,10 @@ public class ElkUnexpectedIndexingException extends ElkIndexingException {
 
 	public ElkUnexpectedIndexingException(String message) {
 		super(message);
+	}
+
+	public ElkUnexpectedIndexingException(IndexedObject object) {
+		super("Error indexing " + object);
 	}
 
 	public ElkUnexpectedIndexingException(String message, Throwable cause) {

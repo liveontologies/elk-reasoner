@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubObjectPropertyOfAxiom;
@@ -68,27 +69,72 @@ class ModifiableIndexedSubObjectPropertyOfAxiomImpl extends
 	@Override
 	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
 			int increment) {
+		boolean success = true;
 		if (increment > 0) {
-			if (!subPropertyChain_.addToldSuperObjectProperty(superProperty_))
-				return false;
-			if (!superProperty_.addToldSubPropertyChain(subPropertyChain_)) {
+			int added = 0;
+			for (int i = 0; i < increment; i++) {
+				if (addOnce())
+					added++;
+				else {
+					success = false;
+					break;
+				}
+			}
+			if (!success) {
 				// revert the changes
-				subPropertyChain_.removeToldSuperObjectProperty(superProperty_);
-				return false;
+				for (; added > 0; added--) {
+					if (!removeOnce()) {
+						throw new ElkUnexpectedIndexingException(this);
+					}
+				}
+			}
+		} else {
+			// increment <= 0
+			int removed = 0;
+			for (int i = 0; i < -increment; i++) {
+				if (removeOnce())
+					removed++;
+				else {
+					success = false;
+					break;
+				}
+			}
+			if (!success) {
+				// revert the changes
+				for (; removed > 0; removed--) {
+					if (!addOnce()) {
+						throw new ElkUnexpectedIndexingException(this);
+					}
+				}
 			}
 		}
+		return success;
+	}
 
-		if (increment < 0) {
+	boolean addOnce() {
+		if (!subPropertyChain_.addToldSuperObjectProperty(superProperty_))
+			return false;
+		if (!superProperty_.addToldSubPropertyChain(subPropertyChain_)) {
+			// revert the changes
 			if (!subPropertyChain_
 					.removeToldSuperObjectProperty(superProperty_))
-				return false;
-			if (!superProperty_.removeToldSubPropertyChain(subPropertyChain_)) {
-				// revert the changes
-				subPropertyChain_.addToldSuperObjectProperty(superProperty_);
-				return false;
-			}
+				throw new ElkUnexpectedIndexingException(this);
+			return false;
 		}
-		// success!
+		// success
+		return true;
+	}
+
+	boolean removeOnce() {
+		if (!subPropertyChain_.removeToldSuperObjectProperty(superProperty_))
+			return false;
+		if (!superProperty_.removeToldSubPropertyChain(subPropertyChain_)) {
+			// revert the changes
+			if (!subPropertyChain_.addToldSuperObjectProperty(superProperty_))
+				throw new ElkUnexpectedIndexingException(this);
+			return false;
+		}
+		// success
 		return true;
 	}
 

@@ -23,15 +23,12 @@
 /**
  * @author Yevgeny Kazakov, May 13, 2011
  */
-package org.semanticweb.elk.reasoner.indexing;
+package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.caching.IndexedObjectCache;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 
@@ -41,8 +38,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextIn
  * rules: the global rules stored for the ontology that can be obtained using {
  * {@link #getContextInitRuleHead()}, and the local rules associated with
  * specific {@link IndexedObject}s, such as {@link IndexedClassExpression}s and
- * {@link IndexedPropertyChain}s. The methods of this class provide access
- * to such objects.
+ * {@link IndexedPropertyChain}s. The methods of this class provide access to
+ * such objects. Just like {@link IndexedObject}s {@link OntologyIndex} has
+ * other helper method that can be used to execute these rules.
  * 
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik
@@ -65,8 +63,16 @@ public interface OntologyIndex extends IndexedObjectCache {
 	 */
 	LinkedContextInitRule getContextInitRuleHead();
 
+	/**
+	 * @return {@code true} if {@code owl:Thing} occurs negatively in the
+	 *         ontology represented by this {@link OntologyIndex}
+	 */
 	boolean hasNegativeOwlThing();
 
+	/**
+	 * @return {@code true} if {@code owl:Nothing} occurs positively in the
+	 *         ontology represented by this {@link OntologyIndex}
+	 */
 	boolean hasPositivelyOwlNothing();
 
 }

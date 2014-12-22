@@ -56,8 +56,9 @@ class ModifiableIndexedDeclarationAxiomImpl extends ModifiableIndexedAxiomImpl
 	@Override
 	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
 			int increment) {
-		// declarations do not have any semantic meaning, just make sure that
-		// the entity occurs in the ontology
+		// declarations do not have any semantic meaning, they just make sure
+		// that the entity occurs in the ontology (corresponding number of
+		// times)
 		return true;
 	}
 
