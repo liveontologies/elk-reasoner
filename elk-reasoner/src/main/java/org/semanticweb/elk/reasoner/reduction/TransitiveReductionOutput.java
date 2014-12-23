@@ -54,6 +54,11 @@ public abstract class TransitiveReductionOutput<R extends IndexedClassExpression
 		return root_;
 	}
 
+	@Override
+	public int hashCode() {
+		return this.root_.hashCode();
+	}
+
 	public abstract void accept(TransitiveReductionOutputVisitor<R> visitor);
 
 }
