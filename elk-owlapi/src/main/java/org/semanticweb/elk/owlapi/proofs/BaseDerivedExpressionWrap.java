@@ -33,11 +33,16 @@ import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
+import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionWrap;
 
 /**
+ * The base wrapper around {@link DerivedExpression} which implements the
+ * generic {@link OWLExpression}. The inferences are lazily translated to
+ * {@link OWLInference}s when requested.
+ * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
 public abstract class BaseDerivedExpressionWrap<E extends DerivedExpression> implements OWLExpression {
 
@@ -73,7 +78,13 @@ public abstract class BaseDerivedExpressionWrap<E extends DerivedExpression> imp
 			return false;
 		}
 		
+		if (obj instanceof OWLExpressionWrap) {
+			// unwrapping the OWL API wrappers
+			return equals(((OWLExpressionWrap) obj).getExpression());
+		}
+		
 		if (obj instanceof BaseDerivedExpressionWrap) {
+			// now unwrapping the ELK wrappers
 			BaseDerivedExpressionWrap<?> expr = (BaseDerivedExpressionWrap<?>) obj;
 			
 			return expression.accept(new StructuralEquivalenceChecker(), expr.expression);

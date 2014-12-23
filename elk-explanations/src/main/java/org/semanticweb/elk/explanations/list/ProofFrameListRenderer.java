@@ -22,41 +22,117 @@ package org.semanticweb.elk.explanations.list;
  */
 
 import java.awt.Component;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.swing.JComponent;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 
 import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.ui.framelist.OWLFrameListRenderer;
-import org.semanticweb.owlapi.model.OWLObject;
+import org.protege.editor.owl.ui.frame.OWLFrameSection;
+import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
+import org.semanticweb.owlapi.model.OWLEntity;
 
 /**
- * Author: Matthew Horridge<br>
- * Stanford University<br>
- * Bio-Medical Informatics Research Group<br>
- * Date: 19/03/2012
+ * 
+ * @author	Pavel Klinov
+ * 			pavel.klinov@uni-ulm.de
+ *
  */
-public class ProofFrameListRenderer extends OWLFrameListRenderer {
+public class ProofFrameListRenderer implements ListCellRenderer<Object> {
+
+    private OWLCellRenderer owlCellRenderer;
+
+    private ListCellRenderer<Object> separatorRenderer;
+
+    private boolean highlightKeywords;
+
+    private boolean highlightUnsatisfiableClasses;
+
+    private boolean highlightUnsatisfiableProperties;
+
+    private Set<OWLEntity> crossedOutEntities;
 
     public ProofFrameListRenderer(OWLEditorKit owlEditorKit) {
-        super(owlEditorKit);
-        //setHighlightUnsatisfiableClasses(false);
-        //setHighlightUnsatisfiableProperties(false);
+        owlCellRenderer = new OWLCellRenderer(owlEditorKit);
+        separatorRenderer = new DefaultListCellRenderer();
+        highlightKeywords = true;
+        highlightUnsatisfiableClasses = true;
+        highlightUnsatisfiableProperties = true;
+        crossedOutEntities = new HashSet<OWLEntity>();
     }
 
-    @Override
-    protected OWLObject getIconObject(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        return null;
+    public void setHighlightKeywords(boolean highlightKeywords) {
+        this.highlightKeywords = highlightKeywords;
     }
 
-	@Override
-	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-		JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-		
-		//c.setBorder(BorderFactory.createLineBorder(Color.red));
-		
-		return c;
-	}
-    
-    
+    public OWLCellRenderer getOWLCellRenderer() {
+        return owlCellRenderer;
+    }
+
+    public void setHighlightUnsatisfiableClasses(boolean b) {
+        highlightUnsatisfiableClasses = b;
+    }
+
+
+    public boolean isHighlightUnsatisfiableClasses() {
+        return highlightUnsatisfiableClasses;
+    }
+
+
+    public boolean isHighlightUnsatisfiableProperties() {
+        return highlightUnsatisfiableProperties;
+    }
+
+
+    public void setHighlightUnsatisfiableProperties(boolean h) {
+        highlightUnsatisfiableProperties = h;
+    }
+
+
+    public void setCrossedOutEntities(Set<OWLEntity> entities) {
+        crossedOutEntities.clear();
+        crossedOutEntities.addAll(entities);
+    }
+
+    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+                                                  boolean cellHasFocus) {
+
+
+        if (value instanceof OWLFrameSection) {
+            JLabel label = (JLabel) separatorRenderer.getListCellRendererComponent(list,
+                                                                                   " ",
+                                                                                   index,
+                                                                                   isSelected,
+                                                                                   cellHasFocus);
+            label.setVerticalAlignment(JLabel.TOP);
+            return label;
+        }
+        else {
+            Object valueToRender = getValueToRender(list, (ProofFrameSectionRow) value, index, isSelected, cellHasFocus);
+            
+            owlCellRenderer.setCommentedOut(false);
+            owlCellRenderer.setOntology(((ProofFrameSectionRow) value).getOntology());
+            owlCellRenderer.setInferred(((ProofFrameSectionRow) value).isInferred());
+            owlCellRenderer.setHighlightKeywords(highlightKeywords);
+            owlCellRenderer.setHighlightUnsatisfiableClasses(highlightUnsatisfiableClasses);
+            owlCellRenderer.setCrossedOutEntities(crossedOutEntities);
+            
+            return owlCellRenderer.getListCellRendererComponent(list,
+                                                                valueToRender,
+                                                                index,
+                                                                isSelected,
+                                                                cellHasFocus);
+        }
+    }
+
+    public void setWrap(boolean b) {
+        owlCellRenderer.setWrap(b);
+    }
+
+    protected Object getValueToRender(JList<?> list, ProofFrameSectionRow value, int index, boolean isSelected, boolean cellHasFocus) {
+        return value.getRendering();
+    }
 }

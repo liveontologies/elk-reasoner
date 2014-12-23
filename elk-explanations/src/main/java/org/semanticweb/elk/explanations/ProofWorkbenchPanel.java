@@ -45,7 +45,7 @@ import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.semanticweb.owl.explanation.api.ExplanationException;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
+import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
 /*
  * Copyright (C) 2008, University of Manchester
  *
@@ -299,7 +299,7 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelM
         refill();
     }
 
-    protected ExplanationDisplay createProofExplanationDisplay(OWLExpression proofRoot, boolean allProofs) {
+    protected ExplanationDisplay createProofExplanationDisplay(CycleBlockingExpression proofRoot, boolean allProofs) {
     	return new ProofFrameExplanationDisplay(editorKit, this, workbenchManager, proofRoot);    	
     }
 

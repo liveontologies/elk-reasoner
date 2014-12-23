@@ -34,7 +34,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface OWLAxiomExpression {
+public interface OWLAxiomExpression extends OWLExpression {
 
 	public OWLAxiom getAxiom();
 

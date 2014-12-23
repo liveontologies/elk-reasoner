@@ -145,7 +145,7 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
         }
     }
     
-    public OWLExpression getProofRoot(OWLAxiom entailment)  throws ExplanationException {
+    public CycleBlockingExpression getProofRoot(OWLAxiom entailment)  throws ExplanationException {
     	// TODO caching
         OWLReasonerManager reasonerManager = modelManager.getOWLReasonerManager();
         OWLReasoner reasoner = reasonerManager.getCurrentReasoner();

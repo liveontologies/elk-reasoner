@@ -60,29 +60,32 @@
 			<artifactId>org.protege.common</artifactId>
 			<version>4.3.0</version>
         </dependency>
-
         <dependency>
 			<groupId>edu.stanford.protege</groupId>
 			<artifactId>org.protege.editor.core.application</artifactId>
 			<version>4.3.0</version>
         </dependency>
-        
         <dependency>
 			<groupId>edu.stanford.protege</groupId>
 			<artifactId>org.protege.editor.owl</artifactId>
 			<version>4.3.0</version>
         </dependency>
-        
 		<dependency>
 			<groupId>org.semanticweb.owl</groupId>
 			<artifactId>explanation</artifactId>
 			<version>3.3.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>owlapi-proofs</artifactId>
 			<version>${project.version}</version>
+		</dependency>	
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>owlapi-proofs</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
 		</dependency>	
 		<dependency>
 			<groupId>log4j</groupId>

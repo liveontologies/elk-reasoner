@@ -25,9 +25,11 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
@@ -39,14 +41,17 @@ import javax.swing.border.Border;
 import org.protege.editor.core.ui.list.MListButton;
 import org.protege.editor.core.ui.list.MListDeleteButton;
 import org.protege.editor.core.ui.list.MListEditButton;
+import org.protege.editor.core.ui.list.MListItem;
 import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRow;
 import org.protege.editor.owl.ui.framelist.ExplainButton;
 import org.protege.editor.owl.ui.framelist.OWLFrameList;
 import org.protege.editor.owl.ui.framelist.OWLFrameListInferredSectionRowBorder;
 import org.semanticweb.elk.explanations.AxiomSelectionModel;
 import org.semanticweb.elk.explanations.WorkbenchManager;
-import org.semanticweb.owlapi.model.OWLClassAxiom;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
+import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
 
 /**
  * 
@@ -55,9 +60,11 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
  *
  */
 @SuppressWarnings("serial")
-public class ProofFrameList extends OWLFrameList<OWLExpression> {
+public class ProofFrameList extends OWLFrameList<CycleBlockingExpression> {
 	
 	private static final Border INFERRED_BORDER = new OWLFrameListInferredSectionRowBorder();
+	
+	private static final Set<AxiomType<?>> EDITABLE_AXIOM_TYPES = new HashSet<AxiomType<?>>(Arrays.<AxiomType<?>>asList(AxiomType.SUBCLASS_OF, AxiomType.OBJECT_PROPERTY_DOMAIN, AxiomType.OBJECT_PROPERTY_RANGE, AxiomType.EQUIVALENT_CLASSES));
 
     public ProofFrameList(OWLEditorKit editorKit, AxiomSelectionModel axiomSelectionModel, WorkbenchManager workbenchManager, ProofFrame proofFrame) {
         super(editorKit, proofFrame);
@@ -66,6 +73,11 @@ public class ProofFrameList extends OWLFrameList<OWLExpression> {
     }
     
     @Override
+	public ProofFrame getFrame() {
+		return (ProofFrame) super.getFrame();
+	}
+
+	@Override
     protected List<MListButton> getButtons(final Object value) {
         if (value instanceof ProofFrameSectionRow) {
         	ProofFrameSectionRow row = (ProofFrameSectionRow) value;
@@ -91,7 +103,7 @@ public class ProofFrameList extends OWLFrameList<OWLExpression> {
 							}));
 				}
 			}
-			else if (row.getAxiom() instanceof OWLClassAxiom) {
+			else if (row.getAxiom().isOfType(EDITABLE_AXIOM_TYPES)) {
 				// asserted axiom, can edit or delete it
 				return Arrays.<MListButton> asList(
 						new MListEditButton(new AbstractAction() {
@@ -116,10 +128,17 @@ public class ProofFrameList extends OWLFrameList<OWLExpression> {
     
 	protected void editRow(ProofFrameSectionRow expressionRow) {
     	//TODO show editor
+		//blockInferencesForPremise(expressionRow.getRootObject());
     }
     
     protected void deleteRow(ProofFrameSectionRow expressionRow) {
     	//TODO
+    	blockInferencesForPremise(expressionRow.getRoot());
+    }
+    
+    private void blockInferencesForPremise(OWLExpression premise) {
+    	getFrame().blockInferencesForPremise(premise);
+    	refreshComponent();
     }
     
     protected void collapseRow(ProofFrameSectionRow expressionRow) {
@@ -128,63 +147,6 @@ public class ProofFrameList extends OWLFrameList<OWLExpression> {
     }
 
 	protected void explainRow(ProofFrameSectionRow expressionRow) {
-		/*OWLExpression conclusion = expressionRow.getRootObject();
-		ProofFrame frame = (ProofFrame) getFrame();
-		ProofFrameSection expressionSection = (ProofFrameSection) expressionRow.getFrameSection();
-		int rowDepth = expressionRow.getDepth() + 1;
-		int sectionIndex = frame.indexOf(expressionSection);
-		// removing the current section since it's going to be split on two
-		frame.removeSection(sectionIndex);
-		
-		List<OWLFrameSectionRow<OWLExpression, OWLAxiom, OWLAxiom>> rows = expressionSection.getRows();
-		// first part consists of all rows before (and including) the explained expression
-		List<OWLExpression> firstExpressions = new ArrayList<OWLExpression>();
-		int i = 0;
-		
-		for (; i < rows.size();) {
-			OWLFrameSectionRow<OWLExpression, OWLAxiom, OWLAxiom> row = rows.get(i++);
-			
-			firstExpressions.add(row.getRoot());
-			
-			if (row == expressionRow) {
-				break;
-			}
-		}
-		
-		// second part consists of all rows after the explained expression
-		List<OWLExpression> secondExpressions = new ArrayList<OWLExpression>();
-
-		for (; i < rows.size(); i++) {
-			secondExpressions.add(rows.get(i).getRoot());
-		}
-		
-		ProofFrameSection firstSection = new ProofFrameSection(editorKit, frame, firstExpressions, expressionSection.getLabel(), expressionRow.getDepth());
-		
-		firstSection.refill(null);
-		frame.addSection(firstSection, sectionIndex);
-		// add sections corresponding to inferences
-		int offset = 1;
-		
-		try {
-			for (OWLInference inference : conclusion.getInferences()) {
-				ProofFrameSection inferenceSection = new ProofFrameSection(editorKit, frame, inference.getPremises(), inference.getName(), rowDepth);
-				
-				inferenceSection.refill(null);
-				frame.addSection(inferenceSection, sectionIndex + (offset++));
-			}
-		} catch (ProofGenerationException e) {
-			ProtegeApplication.getErrorLog().logError(e);
-		}
-		
-		if (!secondExpressions.isEmpty()) {
-			ProofFrameSection secondSection = new ProofFrameSection(editorKit, frame, secondExpressions, "", expressionRow.getDepth());
-			
-			secondSection.refill(null);
-			frame.addSection(secondSection, sectionIndex + offset);
-		}
-		
-		refreshComponent();*/
-		
 		expressionRow.setExpanded(true);
 		
 		if (!expressionRow.isFilled()) {
@@ -195,12 +157,12 @@ public class ProofFrameList extends OWLFrameList<OWLExpression> {
 	}
 
 	@Override
-	protected Border createPaddingBorder(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+	protected Border createPaddingBorder(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         return BorderFactory.createMatteBorder(0, 0, 1, 0, Color.WHITE);
     }
 	
 	@Override
-    protected Border createListItemBorder(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+    protected Border createListItemBorder(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 		// creating indents to reflect the proof's structure
 		if (value instanceof ProofFrameSectionRow) {
 			ProofFrameSectionRow row = (ProofFrameSectionRow) value;
@@ -222,6 +184,17 @@ public class ProofFrameList extends OWLFrameList<OWLExpression> {
 		return new FlattenedListModel((ProofFrameSection) this.getFrame().getFrameSections().get(0));
 	}
 
+	@Override
+	protected Color getItemBackgroundColor(MListItem item) {
+        if (item instanceof ProofFrameSectionRow) {
+            if (((ProofFrameSectionRow) item).isInferred()) {
+                return INFERRED_BG_COLOR;
+            }
+        }
+        
+        return super.getItemBackgroundColor(item);
+    }
+	
 	// TODO cache the list of items for better performance, e.g., constant time lookup by index
 	private static class FlattenedListModel extends AbstractListModel<Object> {
 

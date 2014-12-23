@@ -1,10 +1,10 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.utils;
+package org.semanticweb.elk.explanations.list;
 /*
  * #%L
- * ELK Proofs Package
+ * Explanation Workbench
  * $Id:$
  * $HeadURL:$
  * %%
@@ -24,19 +24,18 @@ package org.semanticweb.elk.proofs.utils;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.explanations.OWLRenderer;
+import org.semanticweb.owlapi.model.OWLObject;
 
 /**
- * Prints inferences
- * 
- * @author Pavel Klinov
+ * @author	Pavel Klinov
+ * 			pavel.klinov@uni-ulm.de
  *
- * pavel.klinov@uni-ulm.de
  */
-public class InferencePrinter {
+public class TestOWLRenderer implements OWLRenderer {
 
-	public static String print(Inference inference) {
-		return String.format("%s( %s ) |- %s", inference.getRule().toString(), Operations.toString(inference.getPremises()), inference.getConclusion());
+	public String render(OWLObject obj) {
+		return obj.toString();
 	}
+
 }

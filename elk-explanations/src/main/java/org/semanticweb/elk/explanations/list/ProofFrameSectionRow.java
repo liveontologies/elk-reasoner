@@ -24,16 +24,20 @@ package org.semanticweb.elk.explanations.list;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.protege.editor.core.ProtegeApplication;
-import org.protege.editor.core.ui.list.MListButton;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.editor.OWLObjectEditor;
-import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRow;
-import org.protege.editor.owl.ui.frame.OWLFrameSection;
+import org.protege.editor.owl.ui.frame.OWLFrameSectionRow;
+import org.semanticweb.elk.explanations.OWLRenderer;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
@@ -46,18 +50,25 @@ import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class ProofFrameSectionRow extends AbstractOWLFrameSectionRow<OWLExpression, OWLAxiom, OWLAxiom>{
+public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, OWLAxiom, OWLAxiom>{
 
     private final int depth_;
     
     private boolean expanded_ = false;
     
     private List<ProofFrameSection> inferenceSections_ = new ArrayList<ProofFrameSection>(2);
+    
+    private OWLExpression expression_;
+    
+    private final ProofFrameSection section_;
+    
+    private final OWLRenderer renderer_;
 
-    public ProofFrameSectionRow(OWLEditorKit owlEditorKit, OWLFrameSection<OWLExpression, OWLAxiom, OWLAxiom> section, OWLExpression rootObject, OWLAxiom axiom, int depth) {
-        super(owlEditorKit, section, /*owlEditorKit.getOWLModelManager().getActiveOntology()*/null, rootObject, axiom);
-        
-        this.depth_ = depth;
+    public ProofFrameSectionRow(ProofFrameSection section, OWLExpression rootObject, OWLAxiom axiom, int depth, OWLRenderer r) {
+    	section_ = section;
+    	expression_ = rootObject;
+        depth_ = depth;
+        renderer_ = r;
     }
 
     public int getDepth() {
@@ -84,8 +95,8 @@ public class ProofFrameSectionRow extends AbstractOWLFrameSectionRow<OWLExpressi
     	inferenceSections_.clear();
     	
     	try {
-			for (OWLInference inf : getRootObject().getInferences()) {
-				ProofFrameSection inferenceSection = new ProofFrameSection(getOWLEditorKit(), getFrameSection().getFrame(), inf.getPremises(), inf.getName(), depth_ + 1);
+			for (OWLInference inf : expression_.getInferences()) {
+				ProofFrameSection inferenceSection = new ProofFrameSection(getFrameSection().getFrame(), inf.getPremises(), inf.getName(), depth_ + 1, renderer_);
 				// filling up rows with premises
 				inferenceSection.refill(getOntology());
 				inferenceSections_.add(inferenceSection);
@@ -95,26 +106,16 @@ public class ProofFrameSectionRow extends AbstractOWLFrameSectionRow<OWLExpressi
 		}
     }
 
-    @Override
-    public List<MListButton> getAdditionalButtons() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    protected OWLObjectEditor<OWLAxiom> getObjectEditor() {
-        return null;
-    }
-
-    @Override
-    protected OWLAxiom createAxiom(OWLAxiom editedObject) {
-        return null;
-    }
-
     public List<? extends OWLObject> getManipulatableObjects() {
         return Arrays.asList(getAxiom());
     }
-
+    
     @Override
+	public ProofFrameSection getFrameSection() {
+		return section_;
+	}
+
+	@Override
     public boolean isEditable() {
         return !isInferred();
     }
@@ -135,5 +136,139 @@ public class ProofFrameSectionRow extends AbstractOWLFrameSectionRow<OWLExpressi
 		}
 	}
 
-    
+	public void update(OWLExpression expression) {
+		//FIXME
+		System.err.println("Updating row " + toString());
+		
+		expression_ = expression;
+		
+		try {
+			Iterable<? extends OWLInference> inferences = expression.getInferences();
+			// remove obsolete sections first
+			Set<ProofFrameSection> sectionsCopy = new HashSet<ProofFrameSection>(inferenceSections_);
+			List<ProofFrameSection> newSections = new ArrayList<ProofFrameSection>();
+			
+			// update existing sections and add new ones
+			for (OWLInference inf : inferences) {
+				ProofFrameSection section = findSection(inf);
+				
+				if (section == null) {
+					ProofFrameSection inferenceSection = new ProofFrameSection(getFrameSection().getFrame(), inf.getPremises(), inf.getName(), depth_ + 1, renderer_);
+					// filling up rows with premises
+					inferenceSection.refill(getOntology());
+					newSections.add(inferenceSection);
+					
+					//FIXME
+					System.err.println("Adding section:" + inferenceSection);
+				}
+				else {
+					// update the section
+					sectionsCopy.remove(section);
+					section.update(inf.getPremises());
+				}
+			}
+			
+			//removing sections for which there are no more inferences
+			//FIXME
+			System.err.println("Removing sections:\n" + sectionsCopy);
+			
+			inferenceSections_.removeAll(sectionsCopy);
+			
+		} catch (ProofGenerationException e) {
+			ProtegeApplication.getErrorLog().logError(e);
+		}
+		
+	}
+
+	private ProofFrameSection findSection(OWLInference inference) {
+		// TODO slow, index sections by inferences?
+		for (ProofFrameSection section : inferenceSections_) {
+			if (section.match(inference)) {
+				return section;
+			};
+		}
+		
+		return null;
+	}
+
+	@Override
+	public OWLObjectEditor<OWLAxiom> getEditor() {
+		return null;
+	}
+
+	@Override
+	public boolean checkEditorResults(OWLObjectEditor<OWLAxiom> editor) {
+		return true;
+	}
+
+	@Override
+	public boolean canAcceptDrop(List<OWLObject> objects) {
+		return false;
+	}
+
+	@Override
+	public boolean dropObjects(List<OWLObject> objects) {
+		return false;
+	}
+
+	@Override
+	public String getTooltip() {
+		return isInferred() ? "Inferred" : "Asserted";
+	}
+
+    public void handleEdit() {
+    }
+
+
+    public boolean handleDelete() {
+        return false;
+    }
+
+	@Override
+	public OWLExpression getRoot() {
+		return expression_;
+	}
+
+	@Override
+	public OWLAxiom getAxiom() {
+		return OWLProofUtils.getAxiom(expression_);
+	}
+
+	@Override
+	public Object getUserObject() {
+		return null;
+	}
+
+	@Override
+	public void setUserObject(Object object) {
+		// no-op
+	}
+
+	@Override
+	public OWLOntology getOntology() {
+		return null;
+	}
+
+	@Override
+	public OWLOntologyManager getOWLOntologyManager() {
+		return null;
+	}
+
+	@Override
+	public List<? extends OWLOntologyChange> getDeletionChanges() {
+		return Collections.emptyList();
+	}
+
+    public String getRendering() {
+        return renderer_.render(getAxiom());
+    }
+	
+    public String toString() {
+        return getRendering();
+    }
+
+	public boolean match(OWLExpression expr) {
+		return expression_.equals(expr);
+	}
+
 }

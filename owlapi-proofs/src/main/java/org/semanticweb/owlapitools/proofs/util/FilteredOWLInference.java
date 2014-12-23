@@ -47,7 +47,7 @@ public class FilteredOWLInference<C extends Condition<OWLInference>> implements 
 	
 	@Override
 	public OWLExpression getConclusion() {
-		return propagateCondition(inference.getConclusion());
+		return inference.getConclusion();
 	}
 
 	protected FilteredOWLExpression<C> propagateCondition(OWLExpression expr) {
@@ -71,4 +71,9 @@ public class FilteredOWLInference<C extends Condition<OWLInference>> implements 
 		return inference.getName();
 	}
 
+	@Override
+	public String toString() {
+		return inference.toString();
+	}
+	
 }

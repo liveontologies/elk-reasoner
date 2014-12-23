@@ -1,10 +1,11 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.utils;
+package org.semanticweb.owlapitools.proofs.expressions;
+
 /*
  * #%L
- * ELK Proofs Package
+ * OWL API Proofs Model
  * $Id:$
  * $HeadURL:$
  * %%
@@ -24,19 +25,18 @@ package org.semanticweb.elk.proofs.utils;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.util.collections.Operations;
-
 /**
- * Prints inferences
+ * This interface should be implemented by various wrappers around
+ * {@link OWLExpression} if they require that equals is based on equality of
+ * wrapped objects. In turn, every implementation of {@link OWLExpression}, if
+ * it provides custom equals logic, must first check if the passed object is a
+ * wrapper and unwrap the underlying expression using the {@link #getExpression}
+ * method.
  * 
- * @author Pavel Klinov
+ * @author Pavel Klinov pavel.klinov@uni-ulm.de
  *
- * pavel.klinov@uni-ulm.de
  */
-public class InferencePrinter {
+public interface OWLExpressionWrap {
 
-	public static String print(Inference inference) {
-		return String.format("%s( %s ) |- %s", inference.getRule().toString(), Operations.toString(inference.getPremises()), inference.getConclusion());
-	}
+	public OWLExpression getExpression();
 }

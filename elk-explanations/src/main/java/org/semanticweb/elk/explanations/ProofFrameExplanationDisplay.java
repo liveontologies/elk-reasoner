@@ -33,7 +33,8 @@ import org.semanticweb.elk.explanations.list.ProofFrame;
 import org.semanticweb.elk.explanations.list.ProofFrameList;
 import org.semanticweb.owl.explanation.api.Explanation;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
 
 /**
  * 
@@ -42,36 +43,6 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
  */
 @SuppressWarnings("serial")
 public class ProofFrameExplanationDisplay extends JPanel implements ExplanationDisplay, AxiomSelectionListener {
-
-    /*private Explanation<OWLAxiom> explanation;
-    
-     public ProofFrameExplanationDisplay(OWLEditorKit editorKit, AxiomSelectionModel selectionModel, WorkbenchManager workbenchManager, OWLExpression proofRoot) {
-    	ProofTree tree = new ProofTree(editorKit, proofRoot);
-    	
-    	setLayout(new BorderLayout());
-        
-    	tree.setUI(new ProofTreeUI());
-        add(new JScrollPane(tree), BorderLayout.CENTER);
-        tree.setVisible(true);
-    	add(new ProofTreeFrame(editorKit, proofRoot));
-    }
-
-    public Explanation<OWLAxiom> getExplanation() {
-        return explanation;
-    }
-
-    public void dispose() {
-    }
-
-    public void axiomAdded(AxiomSelectionModel source, OWLAxiom axiom) {
-    }
-
-    public void axiomRemoved(AxiomSelectionModel source, OWLAxiom axiom) {
-    }*/
-	
-	
-
-    //private Explanation<OWLAxiom> explanation;
     
     private ProofFrame frame;
 
@@ -81,16 +52,21 @@ public class ProofFrameExplanationDisplay extends JPanel implements ExplanationD
     
     private boolean transmittingSelectionToModel = false;
 
-    public ProofFrameExplanationDisplay(OWLEditorKit editorKit, AxiomSelectionModel selectionModel, WorkbenchManager workbenchManager, OWLExpression root) {
+    public ProofFrameExplanationDisplay(final OWLEditorKit editorKit, AxiomSelectionModel selectionModel, WorkbenchManager workbenchManager, CycleBlockingExpression root) {
         this.axiomSelectionModel = selectionModel;
         
-        frame = new ProofFrame(editorKit, root);
+        frame = new ProofFrame(root, new OWLRenderer() {
+			
+			@Override
+			public String render(OWLObject obj) {
+				return editorKit.getOWLModelManager().getRendering(obj);
+			}
+		}, editorKit.getOWLModelManager().getActiveOntology());
         setLayout(new BorderLayout());
         frameList =  new ProofFrameList(editorKit, selectionModel, workbenchManager, frame);
         
         add(frameList, BorderLayout.NORTH);
         
-        frame.setRootObject(root);
         frameList.setBorder(BorderFactory.createEmptyBorder(7, 10, 7, 10));
 
         frameList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {

@@ -105,4 +105,64 @@ public class OWLProofUtils {
 		
 		return graph;
 	}
+	
+	public static String printProofTree(OWLExpression root) throws ProofGenerationException {
+		/*OWLInferenceGraph iGraph = computeInferenceGraph(root);
+		CycleBlockingExpression newRoot = new CycleBlockingExpression(root, iGraph);*/
+		Set<OWLExpression> done = new HashSet<OWLExpression>();
+		StringBuilder builder = new StringBuilder();
+		
+		print(root, builder, 0, done);
+		
+		return builder.toString();
+	}
+
+	private static void print(OWLExpression expr, StringBuilder builder, int depth, Set<OWLExpression> visited) throws ProofGenerationException {
+		for (int i = 0; i < depth; i++) {
+			builder.append("   ");
+		}
+		
+		builder.append(expr).append('\n');
+		
+		if (!visited.add(expr)) {
+			return;
+		}
+		
+		for (OWLInference inf : expr.getInferences()) {
+			for (int i = 0; i < depth + 1; i++) {
+				builder.append("   ");
+			}
+			
+			builder.append(inf.getName()).append('\n');
+			
+			for (OWLExpression premise : inf.getPremises()) {
+				print(premise, builder, depth + 2, visited);	
+			}
+		}
+	}
+	
+	public static void visitExpressionsInProofGraph(OWLExpression root, OWLExpressionVisitor<?> exprVisitor) throws ProofGenerationException {
+		Queue<OWLExpression> toDo = new LinkedList<OWLExpression>();
+		Set<OWLExpression> done = new HashSet<OWLExpression>();
+		
+		toDo.add(root);
+		
+		for (;;) {
+			OWLExpression next = toDo.poll();
+			
+			if (next == null) {
+				break;
+			}
+			
+			if (done.add(next)) {
+				next.accept(exprVisitor);
+				
+				for (OWLInference inf : next.getInferences()) {
+					for (OWLExpression premise : inf.getPremises()) {
+						toDo.add(premise);
+					}
+				}
+			}
+		}
+	}
 }

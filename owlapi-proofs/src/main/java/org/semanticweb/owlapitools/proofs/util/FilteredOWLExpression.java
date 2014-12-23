@@ -28,13 +28,14 @@ import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
+import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionWrap;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class FilteredOWLExpression<C extends Condition<OWLInference>> implements OWLExpression {
+public class FilteredOWLExpression<C extends Condition<OWLInference>> implements OWLExpression, OWLExpressionWrap {
 
 	protected final OWLExpression expression;
 	
@@ -79,6 +80,7 @@ public class FilteredOWLExpression<C extends Condition<OWLInference>> implements
 		return expression.toString();
 	}
 	
+	@Override
 	public OWLExpression getExpression() {
 		return expression;
 	}

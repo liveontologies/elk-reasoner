@@ -24,74 +24,47 @@ package org.semanticweb.owlapitools.proofs.util;
  * #L%
  */
 
-import java.util.ArrayDeque;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.owlapitools.proofs.OWLInference;
+import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 
 /**
- * Recursively blocks expressions which were used to derive this or parent
- * expression.
+ * Blocks cyclic proofs
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class CycleBlockingExpression extends FilteredOWLExpression<BlockingCondition> {
-
-	private final OWLInferenceGraph infGraph_;
+public class CycleBlockingExpression extends RecursivelyBlockingExpression {
 	
-	public CycleBlockingExpression(OWLExpression expr, OWLInferenceGraph ig) {
+	public CycleBlockingExpression(OWLExpression expr, OWLInferenceGraph ig) throws ProofGenerationException {
 		// root constructor
-		super(expr, new BlockingCondition(saturateBlockedExpressions(expr, Collections.<OWLExpression>emptySet(), ig)));
-		infGraph_ = ig;
+		super(expr, expr, Collections.<OWLExpression>emptySet(), ig);
 	}
 	
 	CycleBlockingExpression(OWLExpression expr, CycleBlockingExpression parentExpression, OWLInferenceGraph infGraph) {
 		// child constructor
-		super(expr, new BlockingCondition(saturateBlockedExpressions(expr, parentExpression.getFilterCondition().getBlockedExpressions(), infGraph)));
-		infGraph_ = infGraph;
+		super(expr, expr, parentExpression.getFilterCondition().getBlockedExpressions(), infGraph);
+	}
+	
+	CycleBlockingExpression(OWLExpression expr, OWLExpression toBeBlocked, Set<OWLExpression> currentlyBlocked, OWLInferenceGraph iG) {
+		// internal constructor
+		super(expr, toBeBlocked, currentlyBlocked, iG);
 	}
 	
 	@Override
-	protected FilteredOWLInference<BlockingCondition> propagateCondition(OWLInference inf) {
-		return new CycleBlockingInference(inf, this, infGraph_);
-	}
-
-	// recursively blocks all expressions which are derived using the given expression or any expression blocked by the parent expression.
-	private static Set<OWLExpression> saturateBlockedExpressions(OWLExpression newExpr, Set<OWLExpression> parentBlocked, OWLInferenceGraph infGraph) {
-		// TODO avoid copying, use something like Lisp-style lists or lazy set unions
-		Set<OWLExpression> newSet = new HashSet<OWLExpression>(parentBlocked);
-		Queue<OWLExpression> toDo = new ArrayDeque<OWLExpression>();
-		
-		toDo.add(newExpr);
-		
-		//System.err.println("Blocking for: " + newExpr);
-		//System.err.println("Parent blocked: " + parentBlocked);
-		
-		for (;;) {
-			OWLExpression next = toDo.poll();
-			
-			if (next == null) {
-				break;
-			}
-			
-			if (newSet.add(next)) {
-				//System.err.println("Blocked: " + next);
-				
-				for (OWLInference inf : infGraph.getInferencesForPremise(next)) {
-					toDo.add(inf.getConclusion());
-				}
-			}
-		}
-		
-		return newSet;
+	protected CycleBlockingInference propagateCondition(OWLInference inf) {
+		return new CycleBlockingInference(inf, this, infGraph);
 	}
 	
+	@Override
+	public CycleBlockingExpression blockExpression(OWLExpression toBeBlocked) {
+		return new CycleBlockingExpression(getExpression(), toBeBlocked, getFilterCondition().getBlockedExpressions(), infGraph);
+	}
+
 	private static class CycleBlockingInference extends FilteredOWLInference<BlockingCondition> {
 
 		private final OWLInferenceGraph infGraph_;
@@ -100,12 +73,13 @@ public class CycleBlockingExpression extends FilteredOWLExpression<BlockingCondi
 		
 		public CycleBlockingInference(OWLInference inf, CycleBlockingExpression parent, OWLInferenceGraph ig) {
 			super(inf, parent.getFilterCondition());
+			
 			parent_ = parent;
 			infGraph_ = ig;
 		}
 
 		@Override
-		protected FilteredOWLExpression<BlockingCondition> propagateCondition(	OWLExpression premise) {
+		protected CycleBlockingExpression propagateCondition(OWLExpression premise) {
 			return new CycleBlockingExpression(premise, parent_, infGraph_);
 		}
 		

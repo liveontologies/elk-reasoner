@@ -24,12 +24,20 @@ package org.semanticweb.elk.explanations.list;
  * #L%
  */
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
-import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
+import org.protege.editor.core.ProtegeApplication;
+import org.protege.editor.owl.ui.frame.OWLFrame;
+import org.protege.editor.owl.ui.frame.OWLFrameListener;
 import org.protege.editor.owl.ui.frame.OWLFrameSection;
+import org.semanticweb.elk.explanations.OWLRenderer;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
+import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
+import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
 
 /**
  * 
@@ -37,43 +45,95 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class ProofFrame extends AbstractOWLFrame<OWLExpression> {
+public class ProofFrame implements OWLFrame<CycleBlockingExpression> {
 	
-	//private static final Set<AxiomType<?>> EDITABLE_AXIOM_TYPES = new HashSet<AxiomType<?>>(Arrays.<AxiomType<?>>asList(AxiomType.SUBCLASS_OF, AxiomType.OBJECT_PROPERTY_DOMAIN, AxiomType.OBJECT_PROPERTY_RANGE));
+	private ProofFrameSection rootSection_;
 	
-    public ProofFrame(OWLEditorKit owlEditorKit, OWLExpression proofRoot) {
-    	super(owlEditorKit.getOWLModelManager().getOWLOntologyManager());
-    	
-        addSection(new ProofFrameSection(owlEditorKit, this, Collections.singleton(proofRoot), "Proof tree", 0));
+    private final List<OWLFrameListener> listeners_ = new ArrayList<OWLFrameListener>(2);
+    
+    private CycleBlockingExpression rootExpression_;
+
+    private final OWLRenderer renderer_;
+	
+    public ProofFrame(CycleBlockingExpression proofRoot, OWLRenderer renderer, OWLOntology active) {
+    	renderer_ = renderer;
+    	rootExpression_ = proofRoot;
+    	rootSection_ = new ProofFrameSection(this, Collections.singletonList(proofRoot), "Proof tree", 0, renderer);
+    	rootSection_.refill(active);
     }
 
+	public void blockInferencesForPremise(OWLExpression premise) {
+		CycleBlockingExpression root = getRootObject();
+		CycleBlockingExpression updatedRoot = root.blockExpression(premise);
+		// this will update the hierarchical model (sections and rows)
+		
+		//FIXME
+		System.err.println("Blocked " + premise + ", root replaced");
+		
+		setRootObject(updatedRoot);
+	}
+
+	public ProofFrameSection getRootSection() {
+		return rootSection_;
+	}
+	
 	@Override
-	protected void addSection(OWLFrameSection<? extends Object, ? extends Object, ? extends Object> section, int index) {
-		super.addSection(section, index);
+	public void dispose() {
+		rootSection_.dispose();
 	}
-	
-	int indexOf(OWLFrameSection<? extends Object, ? extends Object, ? extends Object> section) {
-		int index = 0;
-		
-		for (OWLFrameSection<?, ?, ?> sec : getFrameSections()) {
-			if (sec == section) {
-				return index;
+
+	@Override
+	public void setRootObject(CycleBlockingExpression expr) {
+		rootExpression_ = expr;
+
+		try {
+			if (!expr.getInferences().iterator().hasNext()) {
+				String rendering = renderer_.render(OWLProofUtils.getAxiom(expr));
+				
+				rootSection_.dispose();
+				rootSection_ = new ProofFrameSection(this, Collections.<OWLExpression>emptyList(), String.format("%s is no longer entailed by the ontology", rendering), 0, renderer_);
 			}
-			
-			index++;
+			else {
+				// now run down the model and update it
+				rootSection_.update(Collections.singletonList(expr));
+			}
+		} catch (ProofGenerationException e) {
+			ProtegeApplication.getErrorLog().logError(e);
 		}
-		
-		return -1;
 	}
+
+	@Override
+	public CycleBlockingExpression getRootObject() {
+		return rootExpression_;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public List<OWLFrameSection> getFrameSections() {
+		return Collections.<OWLFrameSection>singletonList(rootSection_);
+	}
+
+    public void addFrameListener(OWLFrameListener listener) {
+        listeners_.add(listener);
+    }
+
+
+    public void removeFrameListener(OWLFrameListener listener) {
+        listeners_.remove(listener);
+    }
+
+    public void fireContentChanged() {
+        for (OWLFrameListener listener : listeners_) {
+            try {
+                listener.frameContentChanged();
+            }
+            catch (Exception e) {
+            	ProtegeApplication.getErrorLog().logError(e);
+            }
+        }
+    }
 	
-	void removeSection(int index) {
-		// this works only as long as the returned list isn't a copy of the real
-		// data structure. unfortunately the superclass doesn't provide access
-		// to the underlying list so maybe it's better to not use the superclass
-		// at all.
-		getFrameSections().remove(index);
-	}
-    
+
     /*private void showAxiomEditor(final OWLAxiom axiom) {
     	final AxiomExpressionEditor editor = new AxiomExpressionEditor(kit_);
         final JComponent editorComponent = editor.getEditorComponent();
