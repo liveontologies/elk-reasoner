@@ -219,8 +219,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 */
 			IndexedClass candidate = saturationJob.getInput();
 			TransitiveReductionState<R, J> state = saturationJob.state;
-			updateTransitiveReductionOutput(state.output, candidate,
-					saturationState_.getContext(candidate));
+			updateTransitiveReductionOutput(state.output, candidate);
 			processTransitiveReductionState(state);
 		}
 
@@ -315,8 +314,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				 * Otherwise update the output of the transitive reduction using
 				 * the saturation
 				 */
-				updateTransitiveReductionOutput(state.output, candidate,
-						candidateSaturation);
+				updateTransitiveReductionOutput(state.output, candidate);
 			}
 
 			/* When all candidates are processed, the output is computed */
@@ -357,97 +355,83 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 
 		/**
 		 * Updates the output of the transitive reduction using a new candidate
-		 * indexed super class and its saturation. Special checks are needed if
-		 * the candidate is owl:Thing since it may not be derived if owl:Thing
-		 * doesn't occur negatively in the ontology.
+		 * indexed super class and its saturation.
 		 * 
 		 * @param output
 		 *            the partially computed transitive reduction output
 		 * @param candidate
 		 *            the super class of the root
-		 * @param candidateSaturation
-		 *            the saturation of the candidate
 		 */
 		private void updateTransitiveReductionOutput(
 				TransitiveReductionOutputEquivalentDirect<R> output,
-				IndexedClass candidate, Context candidateSaturation) {
+				IndexedClass candidate) {
 
-			R root = output.getRoot();
+			Set<IndexedClassExpression> candidateSubsumers = saturationState_
+					.getContext(candidate).getSubsumers();
 
-			if (candidate == root) {
+			/*
+			 * Check if subsumer is equivalent to the root, and if so, add it to
+			 * the equivalent classes of the output
+			 */
+			Set<IndexedClassExpression> rootSubsumers = saturationState_
+					.getContext(output.getRoot()).getSubsumers();
+			int candidateSubsumersSize = candidateSubsumers.size();
+
+			if (candidateSubsumersSize == rootSubsumers.size()) {
 				output.equivalent.add(candidate.getElkClass());
 				return;
 			}
 
-			Set<IndexedClassExpression> candidateSupers = candidateSaturation
-					.getSubsumers();
-			/*
-			 * If the saturation for the candidate contains the root, the
-			 * candidate is equivalent to the root
-			 */
-			if (candidateSupers.contains(root)) {
-				output.equivalent.add(candidate.getElkClass());
+			if (candidate.getElkClass().getIri() == PredefinedElkIri.OWL_THING
+					.get() && candidateSubsumersSize == 1) {
+				/*
+				 * if subsumer is top and has no other subsumers (which means,
+				 * in particular, it does not occur negatively), then it can be
+				 * safely ignored; top will be automatically introduced if no
+				 * direct subsumers are found
+				 */
 				return;
 			}
 
 			/*
-			 * To check if the candidate should be added to the list of direct
-			 * super-classes, we iterate over the direct super classes computed
-			 * so far.
+			 * Update the list of current direct subsumers using the new
+			 * candidate
 			 */
-			boolean isCandidateTop = isTop(candidate);
-			Iterator<IndexedClass> iteratorDirectSuperClasses = output.directSubsumers
+			Iterator<IndexedClass> iteratorDirectSubsumers = output.directSubsumers
 					.keySet().iterator();
 
-			while (iteratorDirectSuperClasses.hasNext()) {
-				IndexedClass directSuperClass = iteratorDirectSuperClasses
-						.next();
-				boolean isDirectSuperClassTop = isTop(directSuperClass);
+			while (iteratorDirectSubsumers.hasNext()) {
+				IndexedClass directSubsumer = iteratorDirectSubsumers.next();
 
-				/*
-				 * If the (already computed) saturation for the direct
-				 * super-class contains the candidate, it cannot be direct.
-				 */
-				if (isCandidateTop
-						|| saturationState_.getContext(directSuperClass)
-								.getSubsumers().contains(candidate)) {
-					/*
-					 * If, in addition, the saturation for the candidate
-					 * contains the direct super class, they are equivalent, so
-					 * the candidate is added to the equivalence class of the
-					 * direct super class.
-					 */
-					if (candidateSupers.contains(directSuperClass)
-							|| isDirectSuperClassTop) {
-						output.directSubsumers.get(directSuperClass).add(
-								candidate.getElkClass());
+				Set<IndexedClassExpression> directSubsumerSubsumers = saturationState_
+						.getContext(directSubsumer).getSubsumers();
+
+				if (candidateSubsumersSize > directSubsumerSubsumers.size()) {
+					if (candidateSubsumers.contains(directSubsumer)) {
+						/*
+						 * directSubsumer strictly subsumes candidate, so it is
+						 * not a direct subsumer anymore
+						 */
+						iteratorDirectSubsumers.remove();
 					}
+				} else if (directSubsumerSubsumers.contains(candidate)) {
+					/* candidate is subsumed by the direct subsumer */
+					if (candidateSubsumersSize == directSubsumerSubsumers
+							.size())
+						/* candidate is equivalent to the directSubsumer */
+						output.directSubsumers.get(directSubsumer).add(
+								candidate.getElkClass());
 					return;
-				}
-				/*
-				 * At this point we know that the candidate is not contained in
-				 * the saturation of the direct super-class. We check, if
-				 * conversely, the saturation of the candidate contains the
-				 * direct super-class. In this case the direct super-class is
-				 * not direct anymore and should be removed from the list.
-				 */
-				if (candidateSupers.contains(directSuperClass)
-						|| isDirectSuperClassTop) {
-					iteratorDirectSuperClasses.remove();
 				}
 			}
 			/*
 			 * if the candidate has survived all the tests, then it is a direct
-			 * super-class
+			 * subsumer
 			 */
 			Set<ElkClass> candidateEquivalent = new ArrayHashSet<ElkClass>(1);
 			candidateEquivalent.add(candidate.getElkClass());
 			output.directSubsumers.put(candidate, candidateEquivalent);
 		}
-	}
-
-	private boolean isTop(IndexedClass clazz) {
-		return clazz.getElkClass().getIri() == PredefinedElkIri.OWL_THING.get();
 	}
 
 	public class Engine implements InputProcessor<J> {
