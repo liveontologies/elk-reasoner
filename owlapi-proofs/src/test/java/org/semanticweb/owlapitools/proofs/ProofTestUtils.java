@@ -56,11 +56,10 @@ public class ProofTestUtils {
 	private static final OWLDataFactory FACTORY = OWLManager.getOWLDataFactory();
 	private static final String PREFIX = "http://example.com/";
 
-	public static MockOWLAxiomExpression generateRandomProofGraph(long seed, int maxInferencesForExpression, int maxPremisesForInference, int totalExpressionLimit) {
+	public static MockOWLAxiomExpression generateRandomProofGraph(Random rnd, int maxInferencesForExpression, int maxPremisesForInference, int totalExpressionLimit) {
 		int exprCount = 0;
 		Queue<MockOWLAxiomExpression> toDo = new ArrayDeque<MockOWLAxiomExpression>();
 		MockOWLAxiomExpression root = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(clazz("sub"), clazz("sup")), false);
-		Random rnd = new Random(seed);
 		
 		toDo.add(root);
 		
@@ -105,10 +104,15 @@ public class ProofTestUtils {
 		return FACTORY.getOWLClass(IRI.create(PREFIX + suffix));
 	}
 	
-	public static OWLExpression pickRandomExpression(OWLExpression root, long seed) throws ProofGenerationException {
+	public static OWLExpression pickRandomExpression(OWLExpression root, Random rnd) throws ProofGenerationException {
 		// traverses the tree twice, probably slow but should be OK for testing
-		Random rnd = new Random(seed);
 		int size = getProofGraphSize(root);
+		
+		if (size <= 1) {
+			// can't pick the root so exit
+			return null;
+		}
+		
 		// pick the i_th according to some fixed order, doesn't pick the root
 		final int index = 1 + rnd.nextInt(size - 1);
 		final AtomicInteger counter = new AtomicInteger(0);

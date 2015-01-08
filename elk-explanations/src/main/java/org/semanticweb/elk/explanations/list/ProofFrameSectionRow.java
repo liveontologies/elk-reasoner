@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.protege.editor.core.ProtegeApplication;
-import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.editor.OWLObjectEditor;
 import org.protege.editor.owl.ui.frame.OWLFrameSectionRow;
 import org.semanticweb.elk.explanations.OWLRenderer;
@@ -153,19 +152,20 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
 				ProofFrameSection section = findSection(inf);
 				
 				if (section == null) {
-					ProofFrameSection inferenceSection = new ProofFrameSection(getFrameSection().getFrame(), inf.getPremises(), inf.getName(), depth_ + 1, renderer_);
+					section = new ProofFrameSection(getFrameSection().getFrame(), inf.getPremises(), inf.getName(), depth_ + 1, renderer_);
 					// filling up rows with premises
-					inferenceSection.refill(getOntology());
-					newSections.add(inferenceSection);
+					section.refill(getOntology());
+					newSections.add(section);
 					
 					//FIXME
-					System.err.println("Adding section:" + inferenceSection);
+					System.err.println("Adding section:" + section);
 				}
 				else {
 					// update the section
 					sectionsCopy.remove(section);
-					section.update(inf.getPremises());
 				}
+				
+				section.update(inf.getPremises());
 			}
 			
 			//removing sections for which there are no more inferences
@@ -174,13 +174,18 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
 			
 			inferenceSections_.removeAll(sectionsCopy);
 			
+			if (expanded_) {
+				// don't expand expressions which are currently unexpanded
+				inferenceSections_.addAll(newSections);
+			}
+			
 		} catch (ProofGenerationException e) {
 			ProtegeApplication.getErrorLog().logError(e);
 		}
 		
 	}
 
-	private ProofFrameSection findSection(OWLInference inference) {
+	ProofFrameSection findSection(OWLInference inference) {
 		// TODO slow, index sections by inferences?
 		for (ProofFrameSection section : inferenceSections_) {
 			if (section.match(inference)) {

@@ -35,13 +35,19 @@ import static org.semanticweb.owlapitools.proofs.TestVocabulary.D;
 import static org.semanticweb.owlapitools.proofs.TestVocabulary.FACTORY;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Queue;
+import java.util.Random;
+import java.util.UUID;
 
 import org.junit.Test;
 import org.protege.editor.owl.ui.frame.OWLFrameSectionRow;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapitools.proofs.MockOWLAxiomExpression;
 import org.semanticweb.owlapitools.proofs.MockOWLInference;
 import org.semanticweb.owlapitools.proofs.OWLInference;
@@ -131,8 +137,9 @@ public class UpdateProofModelTest {
 	@Test
 	public void randomDeletions() throws Exception {
 		long seed = System.currentTimeMillis();//123;
+		Random rnd = new Random(seed);
 		// first generate some random proofs (return the root)
-		OWLExpression root = ProofTestUtils.generateRandomProofGraph(seed, 3, 3, 100);
+		OWLExpression root = ProofTestUtils.generateRandomProofGraph(rnd, 3, 3, 100);
 		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
 		
 		System.err.println(OWLProofUtils.printProofTree(root));
@@ -143,7 +150,12 @@ public class UpdateProofModelTest {
 
 		// randomly pick and delete expressions and check that the proof model and the GUI model remain in sync 
 		for (;;) {
-			OWLExpression toDelete = ProofTestUtils.pickRandomExpression(root, seed);
+			OWLExpression toDelete = ProofTestUtils.pickRandomExpression(root, rnd);
+			
+			if (toDelete == null) {
+				// the proof model is empty
+				return;
+			}
 			
 			System.err.println("Deleting " + toDelete);
 			// blocking the expression in the proof model
@@ -164,7 +176,70 @@ public class UpdateProofModelTest {
 		}
 	}
 	
+	@Test
+	public void randomChanges() throws Exception {
+		final int ADDITION_NO = 10;
+		long seed = 123;
+		Random rnd = new Random(seed);
+		// first generate some random proofs (return the root)
+		OWLExpression root = ProofTestUtils.generateRandomProofGraph(rnd, 3, 3, 10);
+		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
+		
+		System.err.println(OWLProofUtils.printProofTree(root));
+		
+		ProofFrame frame = createProofModel(root);
+		
+		System.err.println(printProofModel(frame.getRootSection()));
 
+		for (int i = 0; i < ADDITION_NO; i++) {
+			MockOWLAxiomExpression derived = (MockOWLAxiomExpression) ProofTestUtils.pickRandomExpression(root, rnd);
+			
+			if (derived == null) {
+				// the proof model is empty
+				return;
+			}
+			
+			// add a new inference for this one
+			int numOfPremises = 1 + rnd.nextInt(3);
+			List<OWLExpression> premises = new ArrayList<OWLExpression>(numOfPremises);
+			
+			for (int j = 0; j < numOfPremises; j++) {
+				OWLExpression premise = null;
+				
+				if (rnd.nextBoolean()) {
+					// new expression as a premise
+					OWLClass sub = FACTORY.getOWLClass(IRI.create("http://random.org/" + UUID.randomUUID().toString().substring(0, 4)));
+					OWLClass sup = FACTORY.getOWLClass(IRI.create("http://random.org/" + UUID.randomUUID().toString().substring(0, 4)));
+				
+					premise = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(sub, sup), false);
+				}
+				else {
+					// use an existing expression as a premise
+					premise = ProofTestUtils.pickRandomExpression(root, rnd);
+				}
+				
+				premises.add(premise);
+			}
+			
+			MockOWLInference inf = new MockOWLInference("inference_" + derived.getInferences().size(), derived, premises);
+			
+			derived.addInference(inf);
+			
+			System.err.println("Adding inference " + inf);
+			
+			iGraph = OWLProofUtils.computeInferenceGraph(root);
+			
+			CycleBlockingExpression newRoot = new CycleBlockingExpression(root, iGraph);
+			
+			System.err.println(OWLProofUtils.printProofTree(newRoot));
+			// refreshing the GUI's model. The root object is the same but the proof model has changed
+			frame.setRootObject(newRoot);
+			
+			System.err.println(printProofModel(frame.getRootSection()));
+			
+			assertMatch(newRoot, (ProofFrameSectionRow) frame.getRootSection().getRows().get(0));
+		}
+	}
 	
 	ProofFrame createProofModel(OWLExpression root) throws ProofGenerationException {
 		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
@@ -234,7 +309,6 @@ public class UpdateProofModelTest {
 			return;
 		}
 		
-		// TODO tighten the check to make sure there's 1-1 correspondence
 		for (ProofFrameSection section : rootRow.getInferenceSections()) {
 			OWLInference inf = findMatchingInference(section, rootExpression);
 			
@@ -253,6 +327,17 @@ public class UpdateProofModelTest {
 				
 				assertMatch(premise, row);
 			}
+		}
+		
+		for (OWLInference inf : rootExpression.getInferences()) {
+			ProofFrameSection section = rootRow.findSection(inf);
+			
+			//FIXME
+			if (section == null) {
+				rootRow.findSection(inf);
+			}
+			
+			assertNotNull("No matching section for " + inf, section);
 		}
 	}
 

@@ -82,7 +82,7 @@ public class MockOWLAxiomExpression implements OWLAxiomExpression {
 	}
 
 	@Override
-	public Iterable<MockOWLInference> getInferences() throws ProofGenerationException {
+	public List<MockOWLInference> getInferences() throws ProofGenerationException {
 		return inferences_;
 	}
 

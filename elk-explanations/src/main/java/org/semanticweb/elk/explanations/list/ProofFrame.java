@@ -85,17 +85,22 @@ public class ProofFrame implements OWLFrame<CycleBlockingExpression> {
 	@Override
 	public void setRootObject(CycleBlockingExpression expr) {
 		rootExpression_ = expr;
-
+		refresh();
+	}
+	
+	// called after the root has been updated
+	void refresh() {
 		try {
-			if (!expr.getInferences().iterator().hasNext()) {
-				String rendering = renderer_.render(OWLProofUtils.getAxiom(expr));
+			if (!rootExpression_.getInferences().iterator().hasNext()) {
+				// the root expression is no longer entailed
+				String rendering = renderer_.render(OWLProofUtils.getAxiom(rootExpression_));
 				
 				rootSection_.dispose();
 				rootSection_ = new ProofFrameSection(this, Collections.<OWLExpression>emptyList(), String.format("%s is no longer entailed by the ontology", rendering), 0, renderer_);
 			}
 			else {
-				// now run down the model and update it
-				rootSection_.update(Collections.singletonList(expr));
+				// run down the model and refresh it
+				rootSection_.update(Collections.singletonList(rootExpression_));
 			}
 		} catch (ProofGenerationException e) {
 			ProtegeApplication.getErrorLog().logError(e);

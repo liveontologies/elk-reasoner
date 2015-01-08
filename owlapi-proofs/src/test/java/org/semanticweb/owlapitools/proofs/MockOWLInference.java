@@ -62,5 +62,10 @@ public class MockOWLInference implements OWLInference {
 		return name_;
 	}
 
+	@Override
+	public String toString() {
+		return name_ + premises_ + " |- " + conclusion_;
+	}
+
 	
 }
