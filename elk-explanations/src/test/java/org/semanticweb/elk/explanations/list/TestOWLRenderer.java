@@ -34,6 +34,7 @@ import org.semanticweb.owlapi.model.OWLObject;
  */
 public class TestOWLRenderer implements OWLRenderer {
 
+	@Override
 	public String render(OWLObject obj) {
 		return obj.toString();
 	}

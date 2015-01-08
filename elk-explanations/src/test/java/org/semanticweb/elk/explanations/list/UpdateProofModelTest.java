@@ -129,9 +129,10 @@ public class UpdateProofModelTest {
 	}
 	
 	@Test
-	public void randomChanges() throws Exception {
-		long seed = 123;
-		MockOWLAxiomExpression root = ProofTestUtils.generateRandomProofGraph(seed, 3, 3, 10);
+	public void randomDeletions() throws Exception {
+		long seed = System.currentTimeMillis();//123;
+		// first generate some random proofs (return the root)
+		OWLExpression root = ProofTestUtils.generateRandomProofGraph(seed, 3, 3, 100);
 		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
 		
 		System.err.println(OWLProofUtils.printProofTree(root));
@@ -139,21 +140,28 @@ public class UpdateProofModelTest {
 		ProofFrame frame = createProofModel(root);
 		
 		System.err.println(printProofModel(frame.getRootSection()));
-		
-		//assertMatch(root, (ProofFrameSectionRow) header.getRows().get(0));
-		MockOWLAxiomExpression toDelete = ProofTestUtils.pickRandomExpression(root, seed);
-		
-		System.err.println("Deleting " + toDelete);
-		
-		OWLExpression newRoot = new CycleBlockingExpression(root, iGraph).blockExpression(toDelete);
-		
-		System.err.println(OWLProofUtils.printProofTree(newRoot));
-		
-		frame.blockInferencesForPremise(toDelete);
-		
-		System.err.println(printProofModel(frame.getRootSection()));
-		
-		assertMatch(newRoot, (ProofFrameSectionRow) frame.getRootSection().getRows().get(0));
+
+		// randomly pick and delete expressions and check that the proof model and the GUI model remain in sync 
+		for (;;) {
+			OWLExpression toDelete = ProofTestUtils.pickRandomExpression(root, seed);
+			
+			System.err.println("Deleting " + toDelete);
+			// blocking the expression in the proof model
+			root = new CycleBlockingExpression(root, iGraph).blockExpression(toDelete);
+			
+			System.err.println(OWLProofUtils.printProofTree(root));
+			// now blocking it in the GUI model
+			frame.blockInferencesForPremise(toDelete);
+			
+			System.err.println(printProofModel(frame.getRootSection()));
+			
+			if (!root.getInferences().iterator().hasNext()) {
+				// finishing when the root is no longer entailed
+				break;
+			}
+			
+			assertMatch(root, (ProofFrameSectionRow) frame.getRootSection().getRows().get(0));
+		}
 	}
 	
 
@@ -220,9 +228,12 @@ public class UpdateProofModelTest {
 	}
 	
 	void assertMatch(OWLExpression rootExpression, ProofFrameSectionRow rootRow) throws ProofGenerationException {
-		//System.err.println("Checking " + rootExpression + " and " + rootRow);
-		
 		assertTrue("row for " + rootRow + " does not match the expression " + rootExpression, rootRow.match(rootExpression));
+		
+		if (!rootRow.isExpanded()) {
+			return;
+		}
+		
 		// TODO tighten the check to make sure there's 1-1 correspondence
 		for (ProofFrameSection section : rootRow.getInferenceSections()) {
 			OWLInference inf = findMatchingInference(section, rootExpression);

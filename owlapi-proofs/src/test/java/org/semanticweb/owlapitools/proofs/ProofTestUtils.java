@@ -56,7 +56,7 @@ public class ProofTestUtils {
 	private static final OWLDataFactory FACTORY = OWLManager.getOWLDataFactory();
 	private static final String PREFIX = "http://example.com/";
 
-	public static MockOWLAxiomExpression generateRandomProofGraph(long seed, int maxInferences, int maxPremises, int totalExpressionLimit) {
+	public static MockOWLAxiomExpression generateRandomProofGraph(long seed, int maxInferencesForExpression, int maxPremisesForInference, int totalExpressionLimit) {
 		int exprCount = 0;
 		Queue<MockOWLAxiomExpression> toDo = new ArrayDeque<MockOWLAxiomExpression>();
 		MockOWLAxiomExpression root = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(clazz("sub"), clazz("sup")), false);
@@ -71,11 +71,11 @@ public class ProofTestUtils {
 				break;
 			}
 			// 0 inferences is allowed
-			int numOfInf = rnd.nextInt(maxInferences + 1);
+			int numOfInf = rnd.nextInt(maxInferencesForExpression + 1);
 			
 			for (int i = 0; i < numOfInf; i++) {
 				// generate new "inference"
-				int numOfPremises = 1 + rnd.nextInt(maxPremises);
+				int numOfPremises = 1 + rnd.nextInt(maxPremisesForInference);
 				List<MockOWLAxiomExpression> premises = new ArrayList<MockOWLAxiomExpression>(numOfPremises);
 				
 				for (int j = 0; j < numOfPremises; j++) {
@@ -105,21 +105,21 @@ public class ProofTestUtils {
 		return FACTORY.getOWLClass(IRI.create(PREFIX + suffix));
 	}
 	
-	public static MockOWLAxiomExpression pickRandomExpression(MockOWLAxiomExpression root, long seed) throws ProofGenerationException {
+	public static OWLExpression pickRandomExpression(OWLExpression root, long seed) throws ProofGenerationException {
 		// traverses the tree twice, probably slow but should be OK for testing
 		Random rnd = new Random(seed);
 		int size = getProofGraphSize(root);
-		// pick the i_th according to some fixed order
-		final int index = rnd.nextInt(size);
+		// pick the i_th according to some fixed order, doesn't pick the root
+		final int index = 1 + rnd.nextInt(size - 1);
 		final AtomicInteger counter = new AtomicInteger(0);
-		final AtomicReference<MockOWLAxiomExpression> ref = new AtomicReference<MockOWLAxiomExpression>();
+		final AtomicReference<OWLExpression> ref = new AtomicReference<OWLExpression>();
 		
 		OWLProofUtils.visitExpressionsInProofGraph(root, new OWLExpressionVisitor<Void>() {
 
 			@Override
 			public Void visit(OWLAxiomExpression expression) {
 				if (counter.get() == index) {
-					ref.set((MockOWLAxiomExpression) expression); 
+					ref.set((OWLExpression) expression); 
 				}
 				
 				counter.incrementAndGet();

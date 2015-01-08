@@ -113,16 +113,19 @@ public class ProofFrame implements OWLFrame<CycleBlockingExpression> {
 		return Collections.<OWLFrameSection>singletonList(rootSection_);
 	}
 
-    public void addFrameListener(OWLFrameListener listener) {
+    @Override
+	public void addFrameListener(OWLFrameListener listener) {
         listeners_.add(listener);
     }
 
 
-    public void removeFrameListener(OWLFrameListener listener) {
+    @Override
+	public void removeFrameListener(OWLFrameListener listener) {
         listeners_.remove(listener);
     }
 
-    public void fireContentChanged() {
+    @Override
+	public void fireContentChanged() {
         for (OWLFrameListener listener : listeners_) {
             try {
                 listener.frameContentChanged();
