@@ -332,11 +332,6 @@ public class UpdateProofModelTest {
 		for (OWLInference inf : rootExpression.getInferences()) {
 			ProofFrameSection section = rootRow.findSection(inf);
 			
-			//FIXME
-			if (section == null) {
-				rootRow.findSection(inf);
-			}
-			
 			assertNotNull("No matching section for " + inf, section);
 		}
 	}

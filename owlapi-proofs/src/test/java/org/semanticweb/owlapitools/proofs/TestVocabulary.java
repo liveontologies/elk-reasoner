@@ -28,6 +28,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 
 /**
  * @author Pavel Klinov
@@ -43,4 +44,15 @@ public class TestVocabulary {
 	public static final OWLClass C = FACTORY.getOWLClass(IRI.create(PREFIX + "C"));
 	public static final OWLClass D = FACTORY.getOWLClass(IRI.create(PREFIX + "D"));
 	public static final OWLClass E = FACTORY.getOWLClass(IRI.create(PREFIX + "E"));
+	public static final OWLClass F = FACTORY.getOWLClass(IRI.create(PREFIX + "F"));
+	public static final OWLClass G = FACTORY.getOWLClass(IRI.create(PREFIX + "G"));
+	public static final OWLObjectProperty R = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "R"));
+	public static final OWLObjectProperty S = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "S"));
+	public static final OWLObjectProperty H = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "H"));
+	public static final OWLObjectProperty T = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "T"));
+	public static final OWLObjectProperty R1 = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "R1"));
+	public static final OWLObjectProperty R2 = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "R2"));
+	public static final OWLObjectProperty R3 = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "R3"));
+	public static final OWLObjectProperty R4 = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "R4"));
+	public static final OWLObjectProperty R5 = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "R5"));
 }

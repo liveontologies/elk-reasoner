@@ -151,6 +151,9 @@ public class OWLProofUtils {
 				next.accept(exprVisitor);
 				
 				for (OWLInference inf : next.getInferences()) {
+					//FIXME
+					System.err.println(inf);
+					
 					for (OWLExpression premise : inf.getPremises()) {
 						toDo.add(premise);
 					}
