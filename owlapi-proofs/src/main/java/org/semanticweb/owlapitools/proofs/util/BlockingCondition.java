@@ -24,11 +24,12 @@ package org.semanticweb.owlapitools.proofs.util;
  * #L%
  */
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
+import org.semanticweb.owlapitools.proofs.util.Operations.Transformation;
 
 /**
  * Blocks inferences which use blocked expressions as premises.
@@ -37,7 +38,7 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class BlockingCondition implements Condition<OWLInference> {
+public class BlockingCondition implements Transformation<OWLInference, Iterable<OWLInference>> {//Condition<OWLInference> {
 
 	private final Set<OWLExpression> blocked_;
 	
@@ -45,11 +46,7 @@ public class BlockingCondition implements Condition<OWLInference> {
 		blocked_ = blocked;
 	}
 	
-	public BlockingCondition() {
-		this(new HashSet<OWLExpression>());
-	}
-	
-	@Override
+	/*@Override
 	public boolean holds(OWLInference inf) {
 		boolean result = true;
 		
@@ -65,9 +62,25 @@ public class BlockingCondition implements Condition<OWLInference> {
 		}
 		
 		return result;
-	}
+	}*/
 
 	public Set<OWLExpression> getBlockedExpressions() {
 		return blocked_;
+	}
+
+	@Override
+	public Iterable<OWLInference> transform(OWLInference inf) {
+		for (OWLExpression premise : inf.getPremises()) {
+			if (inf.getConclusion().equals(premise)) {
+				// filtering single cycles
+				return Collections.emptyList();
+			}
+			
+			if (blocked_.contains(premise)) {
+				return Collections.emptyList();
+			}
+		}
+		
+		return Collections.singletonList(inf);
 	}
 }

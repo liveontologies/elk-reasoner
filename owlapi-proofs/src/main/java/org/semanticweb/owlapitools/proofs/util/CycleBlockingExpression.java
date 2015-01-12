@@ -56,7 +56,7 @@ public class CycleBlockingExpression extends RecursivelyBlockingExpression {
 	}
 	
 	@Override
-	protected CycleBlockingInference propagateCondition(OWLInference inf) {
+	protected CycleBlockingInference propagateTransformation(OWLInference inf) {
 		return new CycleBlockingInference(inf, this, infGraph);
 	}
 	
@@ -65,7 +65,7 @@ public class CycleBlockingExpression extends RecursivelyBlockingExpression {
 		return new CycleBlockingExpression(getExpression(), toBeBlocked, getFilterCondition().getBlockedExpressions(), infGraph);
 	}
 
-	private static class CycleBlockingInference extends FilteredOWLInference<BlockingCondition> {
+	private static class CycleBlockingInference extends TransformedOWLInference<BlockingCondition> {
 
 		private final OWLInferenceGraph infGraph_;
 		
@@ -79,7 +79,7 @@ public class CycleBlockingExpression extends RecursivelyBlockingExpression {
 		}
 
 		@Override
-		protected CycleBlockingExpression propagateCondition(OWLExpression premise) {
+		protected CycleBlockingExpression propagateTransformation(OWLExpression premise) {
 			return new CycleBlockingExpression(premise, parent_, infGraph_);
 		}
 		

@@ -168,7 +168,7 @@ public class OWLExpressionTests {
 
 			@Override
 			public Void visit(OWLAxiomExpression expression) {
-				System.err.println(expression);
+				//System.err.println(expression);
 				return null;
 			}
 

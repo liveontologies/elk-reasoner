@@ -31,9 +31,16 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionWrap;
 
 /**
+ * Generic base class for {@link OWLExpression}s which transform their
+ * {@link OWLInference}s before returning them from the method
+ * {@link #getInferences()}. The transformation is done using the provided
+ * instance of {@link Operations.Transformation}. A special case of
+ * transformation is filtering, i.e., eliminating some inferences from the
+ * output.
+ * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
 public class TransformedOWLExpression<T extends Operations.Transformation<OWLInference, Iterable<OWLInference>>> implements OWLExpression, OWLExpressionWrap {
 
@@ -99,7 +106,5 @@ public class TransformedOWLExpression<T extends Operations.Transformation<OWLInf
 	public int hashCode() {
 		return expression.hashCode();
 	}
-	
-	
 	
 }

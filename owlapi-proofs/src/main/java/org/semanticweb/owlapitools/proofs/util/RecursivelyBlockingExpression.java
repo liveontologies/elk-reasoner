@@ -42,7 +42,7 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class RecursivelyBlockingExpression extends FilteredOWLExpression<BlockingCondition> {
+public class RecursivelyBlockingExpression extends TransformedOWLExpression<BlockingCondition> {
 
 	protected final OWLInferenceGraph infGraph;
 	

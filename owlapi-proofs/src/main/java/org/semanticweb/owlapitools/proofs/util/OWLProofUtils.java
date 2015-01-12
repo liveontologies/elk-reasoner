@@ -152,7 +152,7 @@ public class OWLProofUtils {
 				
 				for (OWLInference inf : next.getInferences()) {
 					//FIXME
-					System.err.println(inf);
+					//System.err.println(inf);
 					
 					for (OWLExpression premise : inf.getPremises()) {
 						toDo.add(premise);
