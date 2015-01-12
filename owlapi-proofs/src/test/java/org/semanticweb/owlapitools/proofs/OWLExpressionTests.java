@@ -44,6 +44,8 @@ import static org.semanticweb.owlapitools.proofs.TestVocabulary.S;
 import java.util.Arrays;
 
 import org.junit.Test;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
@@ -121,6 +123,58 @@ public class OWLExpressionTests {
 			@Override
 			public Void visit(OWLLemmaExpression expression) {
 				fail("all lemmas should have been eliminated but got this: " + expression);
+				return null;
+			}
+			
+		});
+	}
+	
+	@Test
+	public void lemmaEliminationMultipleInferences() throws Exception {
+		// auxiliary classes
+		OWLClass B1 = FACTORY.getOWLClass(IRI.create(TestVocabulary.PREFIX + "B1"));
+		OWLClass B2 = FACTORY.getOWLClass(IRI.create(TestVocabulary.PREFIX + "B2"));
+		OWLClass D1 = FACTORY.getOWLClass(IRI.create(TestVocabulary.PREFIX + "D1"));
+		OWLClass D2 = FACTORY.getOWLClass(IRI.create(TestVocabulary.PREFIX + "D2"));
+		// lemmas
+		MockOWLLemmaExpression aSubR1R2B = new MockOWLLemmaExpression("A SubClassOf R1 o R2 some B");
+		MockOWLLemmaExpression cSubR4R5D = new MockOWLLemmaExpression("C SubClassOf R4 o R5 some D");
+		// axioms
+		MockOWLAxiomExpression aSubSE = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(A, FACTORY.getOWLObjectSomeValuesFrom(S, B)));
+		MockOWLAxiomExpression bSubR3C = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(B, FACTORY.getOWLObjectSomeValuesFrom(R3, C)));
+		// two pairs of premises for A => R1 o R2 some B
+		MockOWLAxiomExpression aSubR1B1 = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(A, FACTORY.getOWLObjectSomeValuesFrom(R1, B1)));
+		MockOWLAxiomExpression b1SubR2B = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(B1, FACTORY.getOWLObjectSomeValuesFrom(R2, B)));
+		MockOWLAxiomExpression aSubR1B2 = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(A, FACTORY.getOWLObjectSomeValuesFrom(R1, B2)));
+		MockOWLAxiomExpression b2SubR2B = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(B2, FACTORY.getOWLObjectSomeValuesFrom(R2, B)));
+		// two pairs of premises for C => R4 o R5 some D
+		MockOWLAxiomExpression cSubR4D1 = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(C, FACTORY.getOWLObjectSomeValuesFrom(R4, D1)));
+		MockOWLAxiomExpression d1SubR5D = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(D1, FACTORY.getOWLObjectSomeValuesFrom(R5, D)));
+		MockOWLAxiomExpression cSubR4D2 = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(C, FACTORY.getOWLObjectSomeValuesFrom(R4, D2)));
+		MockOWLAxiomExpression d2SubR5D = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(D2, FACTORY.getOWLObjectSomeValuesFrom(R5, D)));
+		// premises = two lemmas and one axiom
+		aSubSE.addInference(new MockOWLInference(INF_PREFIX, aSubSE, Arrays.<OWLExpression>asList(aSubR1R2B, bSubR3C, cSubR4R5D)));
+		// now the inferences for the lemmas
+		aSubR1R2B
+			.addInference(new MockOWLInference(INF_PREFIX, aSubR1R2B, Arrays.<OWLExpression>asList(aSubR1B1, b1SubR2B)))
+			.addInference(new MockOWLInference(INF_PREFIX, aSubR1R2B, Arrays.<OWLExpression>asList(aSubR1B2, b2SubR2B)));
+		cSubR4R5D
+			.addInference(new MockOWLInference(INF_PREFIX, cSubR4R5D, Arrays.<OWLExpression>asList(cSubR4D1, d1SubR5D)))
+			.addInference(new MockOWLInference(INF_PREFIX, cSubR4R5D, Arrays.<OWLExpression>asList(cSubR4D2, d2SubR5D)));
+		
+		TransformedOWLExpression<?> root = new TransformedOWLExpression<LazyLemmaElimination>(aSubSE, new LazyLemmaElimination());
+		
+		OWLProofUtils.visitExpressionsInProofGraph(root, new OWLExpressionVisitor<Void>() {
+
+			@Override
+			public Void visit(OWLAxiomExpression expression) {
+				System.err.println(expression);
+				return null;
+			}
+
+			@Override
+			public Void visit(OWLLemmaExpression lemma) {
+				fail("all lemmas should have been eliminated but got this: " + lemma);
 				return null;
 			}
 			

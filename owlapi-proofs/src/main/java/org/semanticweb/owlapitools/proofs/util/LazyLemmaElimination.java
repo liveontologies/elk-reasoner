@@ -84,12 +84,14 @@ public class LazyLemmaElimination implements Transformation<OWLInference, Iterab
 									List<OWLExpression> premises = new ArrayList<OWLExpression>(otherPremises);
 									
 									premises.addAll(premiseInf.getPremises());
-									
 									toDo.add(new MacroOWLInference("macro inference", candidate.getConclusion(), premises));
 								}
 							} catch (ProofGenerationException e) {
 								// TODO log the failed transformation
 							}
+							// breaking at the first lemma to avoid duplicate
+							// inferences if there are multiple lemma premises
+							break;
 						}
 					}
 					
@@ -109,7 +111,7 @@ public class LazyLemmaElimination implements Transformation<OWLInference, Iterab
 				}
 				
 				OWLInference result = next;
-				
+
 				next = null;
 				
 				return result;
