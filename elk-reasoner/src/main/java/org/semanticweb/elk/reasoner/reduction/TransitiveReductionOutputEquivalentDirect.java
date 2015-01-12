@@ -23,8 +23,8 @@
 package org.semanticweb.elk.reasoner.reduction;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
@@ -47,11 +47,12 @@ import org.semanticweb.elk.util.collections.ArrayHashMap;
 public class TransitiveReductionOutputEquivalentDirect<R extends IndexedClassExpression>
 		extends TransitiveReductionOutputEquivalent<R> {
 
-	final Map<IndexedClass, Set<ElkClass>> directSubsumers;
+	final Map<IndexedClass, List<ElkClass>> directSubsumers;
 
-	public TransitiveReductionOutputEquivalentDirect(R root) {
-		super(root);
-		this.directSubsumers = new ArrayHashMap<IndexedClass, Set<ElkClass>>();
+	public TransitiveReductionOutputEquivalentDirect(R root,
+			List<ElkClass> equivalent) {
+		super(root, equivalent);
+		this.directSubsumers = new ArrayHashMap<IndexedClass, List<ElkClass>>();
 	}
 
 	/**
@@ -62,7 +63,7 @@ public class TransitiveReductionOutputEquivalentDirect<R extends IndexedClassExp
 	 * @return the list consisting of partial output of transitive reduction for
 	 *         direct subsumers of the root
 	 */
-	public Collection<? extends Set<ElkClass>> getDirectSubsumers() {
+	public Collection<? extends List<ElkClass>> getDirectSubsumers() {
 		return directSubsumers.values();
 	}
 

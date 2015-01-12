@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
@@ -151,7 +151,7 @@ public class ClassTaxonomyComputationFactory implements
 			UpdateableTaxonomyNode<ElkClass> node = taxonomy_
 					.getCreateNode(output.getEquivalent());
 
-			for (Set<ElkClass> directSuperEquivalent : output
+			for (List<ElkClass> directSuperEquivalent : output
 					.getDirectSubsumers()) {
 
 				UpdateableTaxonomyNode<ElkClass> superNode = taxonomy_

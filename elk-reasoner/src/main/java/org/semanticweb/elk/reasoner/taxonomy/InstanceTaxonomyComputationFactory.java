@@ -23,7 +23,7 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
@@ -140,7 +140,7 @@ public class InstanceTaxonomyComputationFactory implements
 					.getCreateInstanceNode(Collections.singleton(output
 							.getRoot().getElkNamedIndividual()));
 
-			for (Set<ElkClass> directSuperEquivalent : output
+			for (List<ElkClass> directSuperEquivalent : output
 					.getDirectSubsumers()) {
 				UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode = taxonomy_
 						.getCreateTypeNode(directSuperEquivalent);

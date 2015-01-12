@@ -22,7 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -39,7 +41,6 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.slf4j.Logger;
@@ -122,7 +123,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	 * The default equivalence classes for owl:Thing to be used when there are
 	 * no (direct) subsumers
 	 */
-	private final Set<ElkClass> defaultTopOutput_;
+	private final List<ElkClass> defaultTopOutput_;
 
 	/**
 	 * Creating a new transitive reduction engine for the input ontology index
@@ -147,7 +148,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				maxWorkers, new ThisClassExpressionSaturationListener());
 		this.owlThing_ = saturationState.getOntologyIndex()
 				.getIndexedOwlThing();
-		this.defaultTopOutput_ = new ArrayHashSet<ElkClass>(1);
+		this.defaultTopOutput_ = new ArrayList<ElkClass>(1);
 		defaultTopOutput_.add(PredefinedElkClass.OWL_THING);
 	}
 
@@ -219,7 +220,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			 */
 			IndexedClass candidate = saturationJob.getInput();
 			TransitiveReductionState<R, J> state = saturationJob.state;
-			updateTransitiveReductionOutput(state.output, candidate);
+			updateTransitiveReductionState(state, candidate);
 			processTransitiveReductionState(state);
 		}
 
@@ -311,24 +312,14 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 					return;
 				}
 				/*
-				 * Otherwise update the output of the transitive reduction using
-				 * the saturation
+				 * Otherwise update the transitive state using the saturation
 				 */
-				updateTransitiveReductionOutput(state.output, candidate);
+				updateTransitiveReductionState(state, candidate);
 			}
 
 			/* When all candidates are processed, the output is computed */
-			TransitiveReductionOutputEquivalentDirect<R> output = state.output;
-			/*
-			 * if there are no direct subsumers found, then use the default
-			 * direct subsumer for owl:Thing unless it is the output for
-			 * owl:Thing itself
-			 */
-			if (output.directSubsumers.isEmpty()
-					&& !output.getEquivalent().contains(
-							PredefinedElkClass.OWL_THING)) {
-				output.directSubsumers.put(owlThing_, defaultTopOutput_);
-			}
+			TransitiveReductionOutputEquivalentDirect<R> output = computeOutput(state);
+
 			// if (output.equivalent.isEmpty()) {
 			// LOGGER_.error("{}: empty equivalent class!", output.getRoot());
 			// }
@@ -339,7 +330,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			if (LOGGER_.isTraceEnabled()) {
 				R root = output.getRoot();
 				LOGGER_.trace(root + ": transitive reduction finished");
-				for (ElkClass equivalent : output.equivalent) {
+				for (ElkClass equivalent : output.getEquivalent()) {
 					LOGGER_.trace(root + ": equivalent " + equivalent.getIri());
 				}
 				for (IndexedClass direct : output.directSubsumers.keySet()) {
@@ -354,31 +345,29 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		}
 
 		/**
-		 * Updates the output of the transitive reduction using a new candidate
-		 * indexed super class and its saturation.
+		 * Updates the transitive reduction state using a new candidate indexed
+		 * super class and its saturation. During this update, all pruned
+		 * subsumers that are strictly subsumed by the candidate will be
+		 * removed.
 		 * 
-		 * @param output
-		 *            the partially computed transitive reduction output
+		 * @param state
+		 *            the transitive reduction state in progress for the root
 		 * @param candidate
 		 *            the super class of the root
 		 */
-		private void updateTransitiveReductionOutput(
-				TransitiveReductionOutputEquivalentDirect<R> output,
-				IndexedClass candidate) {
+		private void updateTransitiveReductionState(
+				TransitiveReductionState<R, J> state, IndexedClass candidate) {
 
 			Set<IndexedClassExpression> candidateSubsumers = saturationState_
 					.getContext(candidate).getSubsumers();
 
 			/*
-			 * Check if subsumer is equivalent to the root, and if so, add it to
-			 * the equivalent classes of the output
+			 * Check if subsumer is equivalent to the root
 			 */
-			Set<IndexedClassExpression> rootSubsumers = saturationState_
-					.getContext(output.getRoot()).getSubsumers();
 			int candidateSubsumersSize = candidateSubsumers.size();
 
-			if (candidateSubsumersSize == rootSubsumers.size()) {
-				output.equivalent.add(candidate.getElkClass());
+			if (candidateSubsumersSize == state.subsumerCount) {
+				state.rootEquivalent.add(candidate.getElkClass());
 				return;
 			}
 
@@ -393,44 +382,166 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				return;
 			}
 
-			/*
-			 * Update the list of current direct subsumers using the new
-			 * candidate
-			 */
-			Iterator<IndexedClass> iteratorDirectSubsumers = output.directSubsumers
-					.keySet().iterator();
-
-			while (iteratorDirectSubsumers.hasNext()) {
-				IndexedClass directSubsumer = iteratorDirectSubsumers.next();
-
-				Set<IndexedClassExpression> directSubsumerSubsumers = saturationState_
-						.getContext(directSubsumer).getSubsumers();
-
-				if (candidateSubsumersSize > directSubsumerSubsumers.size()) {
-					if (candidateSubsumers.contains(directSubsumer)) {
-						/*
-						 * directSubsumer strictly subsumes candidate, so it is
-						 * not a direct subsumer anymore
-						 */
-						iteratorDirectSubsumers.remove();
+			/* removing all pruned subsumers strictly subsumed by the candidate */
+			if (candidateSubsumersSize > state.prunedSubsumers.size()) {
+				/* iterating over pruned subsumers checking candidate subsumers */
+				Iterator<IndexedClass> iteratorPrunedSubsumers = state.prunedSubsumers
+						.iterator();
+				while (iteratorPrunedSubsumers.hasNext()) {
+					IndexedClass prunedSubsumer = iteratorPrunedSubsumers
+							.next();
+					Set<IndexedClassExpression> prunedSubsumerSubsumers = saturationState_
+							.getContext(prunedSubsumer).getSubsumers();
+					if (candidateSubsumersSize > prunedSubsumerSubsumers.size()) {
+						if (candidateSubsumers.contains(prunedSubsumer)) {
+							/* candidate strictly subsumes the pruned subsumer */
+							iteratorPrunedSubsumers.remove();
+						}
+					} else if (prunedSubsumerSubsumers.contains(candidate)
+							&& candidateSubsumersSize != prunedSubsumerSubsumers
+									.size()) {
+						/* pruned subsumer strictly subsumes the candidate */
+						return;
 					}
-				} else if (directSubsumerSubsumers.contains(candidate)) {
-					/* candidate is subsumed by the direct subsumer */
-					if (candidateSubsumersSize == directSubsumerSubsumers
-							.size())
-						/* candidate is equivalent to the directSubsumer */
-						output.directSubsumers.get(directSubsumer).add(
-								candidate.getElkClass());
-					return;
+				}
+			} else {
+				/* iterating over candidate subsumers checking pruned subsumers */
+				for (IndexedClassExpression candidateSubsumer : candidateSubsumers) {
+					if (!(candidateSubsumer instanceof IndexedClass)
+							|| !state.prunedSubsumers
+									.contains(candidateSubsumer))
+						continue;
+					IndexedClass prunedSubsumer = (IndexedClass) candidateSubsumer;
+					Set<IndexedClassExpression> prunedSubsumerSubsumers = saturationState_
+							.getContext(prunedSubsumer).getSubsumers();
+					if (candidateSubsumersSize > prunedSubsumerSubsumers.size()) {
+						/* candidate strictly subsumes the pruned subsumer */
+						state.prunedSubsumers.remove(prunedSubsumer);
+					}
 				}
 			}
 			/*
-			 * if the candidate has survived all the tests, then it is a direct
-			 * subsumer
+			 * if the candidate has survived all the tests, then it is pruned
 			 */
-			Set<ElkClass> candidateEquivalent = new ArrayHashSet<ElkClass>(1);
-			candidateEquivalent.add(candidate.getElkClass());
-			output.directSubsumers.put(candidate, candidateEquivalent);
+			state.prunedSubsumers.add(candidate);
+		}
+
+		/**
+		 * Computes the result of the transitive reduction from the transitive
+		 * reduction state. During this process, direct subsumers and its
+		 * equivalent classes will be computed from the pruned subsumers.
+		 * 
+		 * @param state
+		 * @return
+		 */
+		private TransitiveReductionOutputEquivalentDirect<R> computeOutput(
+				TransitiveReductionState<R, J> state) {
+
+			R root = state.initiatorJob.getInput();
+
+			TransitiveReductionOutputEquivalentDirect<R> output = new TransitiveReductionOutputEquivalentDirect<R>(
+					root, state.rootEquivalent);
+
+			/*
+			 * if there are no direct subsumers found, then use the default
+			 * direct subsumer for owl:Thing unless it is the output for
+			 * owl:Thing itself
+			 */
+			if (state.prunedSubsumers.isEmpty()
+					&& !output.getEquivalent().contains(
+							PredefinedElkClass.OWL_THING)) {
+				output.directSubsumers.put(owlThing_, defaultTopOutput_);
+				return output;
+			}
+
+			/*
+			 * Second pruning stage: it is important that we process subsumers
+			 * again in the same order. In the first stage we removed subsumers
+			 * that are strictly subsumed by some following subsumers in this
+			 * order. Now we removed subsumers that are strictly subsumed by
+			 * previous subsumers in this order.
+			 */
+			for (IndexedClassExpression subsumer : saturationState_.getContext(
+					root).getSubsumers()) {
+				if (!(subsumer instanceof IndexedClass)
+						|| !state.prunedSubsumers.contains(subsumer))
+					continue;
+				IndexedClass candidate = (IndexedClass) subsumer;
+				/*
+				 * Otherwise the candidate subsumer must be direct as it
+				 * strictly subsumed by neither previous (due to second stage)
+				 * nor following (due to first stage) subsumers. We further
+				 * remove subsumers that it subsumes (including itself) from the
+				 * pruned subsumers and find those that are equivalent to it.
+				 */
+				Set<IndexedClassExpression> candidateSubsumers = saturationState_
+						.getContext(candidate).getSubsumers();
+				int candidateSubsumersSize = candidateSubsumers.size();
+				List<ElkClass> candidateEquivalent = new ArrayList<ElkClass>(1);
+				/* pruning other pruned subsumers */
+				if (candidateSubsumersSize > state.prunedSubsumers.size()) {
+					/*
+					 * iterating over pruned subsumers checking candidate
+					 * subsumers
+					 */
+					Iterator<IndexedClass> iteratorPrunedSubsumers = state.prunedSubsumers
+							.iterator();
+					while (iteratorPrunedSubsumers.hasNext()) {
+						IndexedClass prunedSubsumer = iteratorPrunedSubsumers
+								.next();
+						Set<IndexedClassExpression> prunedSubsumerSubsumers = saturationState_
+								.getContext(prunedSubsumer).getSubsumers();
+						if (candidateSubsumersSize >= prunedSubsumerSubsumers
+								.size()
+								&& candidateSubsumers.contains(prunedSubsumer)) {
+							/* candidate subsumes the pruned subsumer */
+							iteratorPrunedSubsumers.remove();
+							if (candidateSubsumersSize == prunedSubsumerSubsumers
+									.size()) {
+								/* candidate equivalent to pruned subsumer */
+								candidateEquivalent.add(prunedSubsumer
+										.getElkClass());
+							}
+						}
+					}
+				} else {
+					/*
+					 * iterating over candidate subsumers checking pruned
+					 * subsumers
+					 */
+					for (IndexedClassExpression candidateSubsumer : candidateSubsumers) {
+						if (!(candidateSubsumer instanceof IndexedClass)
+								|| !state.prunedSubsumers
+										.contains(candidateSubsumer))
+							continue;
+						IndexedClass prunedSubsumer = (IndexedClass) candidateSubsumer;
+						/*
+						 * otherwise saturation for the candidate subsumer
+						 * computed
+						 */
+						Set<IndexedClassExpression> prunedSubsumerSubsumers = saturationState_
+								.getContext(prunedSubsumer).getSubsumers();
+						if (candidateSubsumersSize >= prunedSubsumerSubsumers
+								.size()) {
+							/* candidate subsumes the pruned subsumer */
+							state.prunedSubsumers.remove(candidateSubsumer);
+							if (candidateSubsumersSize == prunedSubsumerSubsumers
+									.size()) {
+								/* candidate equivalent to pruned subsumer */
+								candidateEquivalent.add(prunedSubsumer
+										.getElkClass());
+							}
+						}
+					}
+				}
+				output.directSubsumers.put(candidate, candidateEquivalent);
+				LOGGER_.trace("{}: new direct subsumer {} [{}]", root,
+						candidate, candidateEquivalent);
+			}
+			if (!state.prunedSubsumers.isEmpty())
+				LOGGER_.error("{}: pruned subsumers not removed: {}", root,
+						state.prunedSubsumers);
+			return output;
 		}
 	}
 

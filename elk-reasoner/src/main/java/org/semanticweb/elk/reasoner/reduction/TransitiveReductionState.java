@@ -22,10 +22,16 @@
  */
 package org.semanticweb.elk.reasoner.reduction;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
+import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
  * The intermediate state of the transitive reduction computation.
@@ -43,14 +49,27 @@ class TransitiveReductionState<R extends IndexedClassExpression, J extends Trans
 	 * The transitive reduction job for which this state was created
 	 */
 	final J initiatorJob;
-	/**
-	 * The partially computed transitive reduction output for the job
-	 */
-	final TransitiveReductionOutputEquivalentDirect<R> output;
+
 	/**
 	 * The (current state of the) iterator over derived subsumers of the root
 	 */
 	final Iterator<IndexedClassExpression> subsumerIterator;
+
+	/**
+	 * The total number of subsumers of the root
+	 */
+	final int subsumerCount;
+
+	/**
+	 * We collect subsumers equivalent to the root here
+	 */
+	final List<ElkClass> rootEquivalent;
+
+	/**
+	 * A temporary subset of subsumers used to compute direct subsumers and
+	 * their equivalent classes.
+	 */
+	final Set<IndexedClass> prunedSubsumers;
 
 	/**
 	 * Constructing the state for the initiator job. It is required that the
@@ -61,12 +80,12 @@ class TransitiveReductionState<R extends IndexedClassExpression, J extends Trans
 	 */
 	TransitiveReductionState(J initiatorJob, SaturationState<?> saturationState) {
 		this.initiatorJob = initiatorJob;
-		R root = initiatorJob.getInput();
-		this.output = new TransitiveReductionOutputEquivalentDirect<R>(root);
-		// TODO it makes sense to iterate over subsumer is some order, e.g.,
-		// first check those which are more likely to be direct (like have more
-		// subsumers)
-		this.subsumerIterator = saturationState.getContext(root).getSubsumers()
-				.iterator();
+		this.rootEquivalent = new ArrayList<ElkClass>(1);
+		this.prunedSubsumers = new ArrayHashSet<IndexedClass>(8);
+		Set<IndexedClassExpression> subsumers = saturationState.getContext(
+				initiatorJob.getInput()).getSubsumers();
+		this.subsumerIterator = subsumers.iterator();
+		this.subsumerCount = subsumers.size();
 	}
+
 }
