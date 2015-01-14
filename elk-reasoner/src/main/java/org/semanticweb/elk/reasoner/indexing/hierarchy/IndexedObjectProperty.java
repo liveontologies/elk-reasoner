@@ -27,9 +27,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 
 /**
- * Represents all occurrences of an ElkObjectProperty in an ontology.
+ * Represents occurrences of an {@link ElkObjectProperty} in an ontology.
  * 
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
@@ -46,19 +48,29 @@ public interface IndexedObjectProperty extends IndexedPropertyChain,
 	public ElkObjectProperty getElkEntity();
 
 	/**
-	 * @return All told sub object properties of this object property
+	 * @return The representations of all {@link ElkSubObjectPropertyExpression}
+	 *         s occurring in {@link ElkSubObjectPropertyOfAxiom}, where the
+	 *         super property {@link ElkObjectProperty} is represented by this
+	 *         {@link IndexedObjectProperty}
+	 * 
+	 * @see {@link ElkSubObjectPropertyOfAxiom#getSubObjectPropertyExpression()}
+	 * @see {@link ElkSubObjectPropertyOfAxiom#getSuperObjectPropertyExpression()}
 	 */
 	public List<IndexedPropertyChain> getToldSubProperties();
 
 	/**
 	 * @return All {@link IndexedBinaryPropertyChain}s in which this
-	 *         {@link IndexedPropertyChain} occurs on the left
+	 *         {@link IndexedObjectProperty} is a left property
+	 * 
+	 * @see {@link IndexedBinaryPropertyChain#getLeftProperty()}
 	 */
 	public Collection<IndexedBinaryPropertyChain> getLeftChains();
 
 	/**
-	 * @return {@code true} if this object property occurs in a reflexivity
-	 *         axiom.
+	 * @return {@code true} if this object property occurs in a
+	 *         {@link IndexedReflexiveObjectPropertyAxiom}.
+	 * 
+	 * @see {@link IndexedReflexiveObjectPropertyAxiom#getProperty()}
 	 */
 	public boolean isToldReflexive();
 

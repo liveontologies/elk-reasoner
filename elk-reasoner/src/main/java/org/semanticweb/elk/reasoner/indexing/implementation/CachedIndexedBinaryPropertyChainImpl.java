@@ -69,7 +69,7 @@ final class CachedIndexedBinaryPropertyChainImpl
 	}
 
 	@Override
-	public final ModifiableIndexedPropertyChain getRightProperty() {
+	public final ModifiableIndexedPropertyChain getRightPropertyChain() {
 		return rightProperty_;
 	}
 

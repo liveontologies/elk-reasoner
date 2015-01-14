@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.conversion;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedAxiom;
 
 /**
- * A {@link ElkAxiomVisitor} that can be used for converting {@link ElkAxiom}s
+ * An {@link ElkAxiomVisitor} that can be used for converting {@link ElkAxiom}s
  * to the corresponding {@link ModifiableIndexedAxiom}s. One {@link ElkAxiom}
  * might be converted into several {@link ModifiableIndexedAxiom}s.
  * 

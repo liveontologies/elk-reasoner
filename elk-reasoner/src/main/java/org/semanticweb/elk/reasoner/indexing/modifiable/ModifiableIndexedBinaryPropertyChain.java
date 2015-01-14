@@ -31,6 +31,6 @@ public interface ModifiableIndexedBinaryPropertyChain extends
 	public ModifiableIndexedObjectProperty getLeftProperty();
 
 	@Override
-	public ModifiableIndexedPropertyChain getRightProperty();
+	public ModifiableIndexedPropertyChain getRightPropertyChain();
 
 }

@@ -83,7 +83,7 @@ public class ReflexivePropertyComputationFactory
 
 	private void toDoLeftChains(IndexedObjectProperty iop) {
 		for (IndexedBinaryPropertyChain chain : iop.getLeftChains()) {
-			if (!chain.getRightProperty().getSaturated().isDerivedReflexive())
+			if (!chain.getRightPropertyChain().getSaturated().isDerivedReflexive())
 				continue;
 			toDo(chain);
 		}

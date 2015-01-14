@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
@@ -30,8 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 
 /**
- * Represents all occurrences of an {@link ElkObjectSomeValuesFrom} in an
- * ontology.
+ * Represents occurrences of an {@link ElkObjectSomeValuesFrom} in an ontology.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
@@ -40,13 +41,20 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromEx
 public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	/**
-	 * @return The indexed object property comprising this ObjectSomeValuesFrom.
+	 * @return The representation of the {@link ElkObjectPropertyExpression}
+	 *         that is a property of the {@link ElkObjectSomeValuesFrom}
+	 *         represented by this {@link IndexedObjectSomeValuesFrom}.
+	 * 
+	 * @see {@link ElkObjectSomeValuesFrom#getProperty()}
 	 */
 	public IndexedObjectProperty getProperty();
 
 	/**
-	 * @return The indexed class expression comprising this
-	 *         ObjectSomeValuesFrom.
+	 * @return The representation of the {@link ElkClassExpression} that is a
+	 *         filler of the {@link ElkObjectSomeValuesFrom} represented by this
+	 *         {@link IndexedObjectSomeValuesFrom}.
+	 * 
+	 * @see {@link ElkObjectSomeValuesFrom#getFiller()}
 	 */
 	public IndexedClassExpression getFiller();
 

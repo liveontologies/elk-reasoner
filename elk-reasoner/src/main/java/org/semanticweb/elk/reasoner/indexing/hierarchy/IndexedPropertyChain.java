@@ -26,20 +26,16 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import java.util.Collection;
 import java.util.List;
 
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 
 /**
- * Represents all occurrences of an {@link ElkSubObjectPropertyExpression} in an
- * ontology. To this end, objects of this class keeps a list of sub and super
- * property expressions. The data structures are optimized for quickly
- * retrieving the relevant relationships during inferencing.
- * 
- * This class is mainly a data container that provides direct public access to
- * its content. The task of updating index structures consistently in a global
- * sense is left to callers.
+ * Represents occurrences of an {@link ElkSubObjectPropertyExpression} in an
+ * ontology.
  * 
  * @author Frantisek Simancik
  * @author Markus Kroetzsch
@@ -49,20 +45,28 @@ import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain
 public interface IndexedPropertyChain extends IndexedObject {
 
 	/**
-	 * @return All told super object properties of this
-	 *         {@link IndexedBinaryPropertyChain}
+	 * @return The representations of all {@link ElkObjectProperty}s occurring
+	 *         in {@link ElkSubObjectPropertyOfAxiom}s, where the sub property
+	 *         {@link ElkSubObjectPropertyExpression} is represented by this
+	 *         {@link IndexedPropertyChain}
+	 * 
+	 * @see {@link ElkSubObjectPropertyOfAxiom#getSubObjectPropertyExpression()}
+	 * @see {@link ElkSubObjectPropertyOfAxiom#getSuperObjectPropertyExpression()}
+	 * @see {@link IndexedObjectProperty#getToldSubProperties()}
 	 */
 	public List<IndexedObjectProperty> getToldSuperProperties();
 
 	/**
 	 * @return All {@link IndexedBinaryPropertyChain}s in which this
-	 *         {@link IndexedPropertyChain} occurs on right
+	 *         {@link IndexedPropertyChain} is a right property
+	 * 
+	 * @see {@link IndexedBinaryPropertyChain#getRightPropertyChain()}
 	 */
 	public Collection<IndexedBinaryPropertyChain> getRightChains();
 
 	/**
 	 * @return The corresponding {@code SaturatedObjecProperty} assigned to this
-	 *         {@link IndexedPropertyChain}; should not be {@code null}
+	 *         {@link IndexedPropertyChain}; should never be {@code null}
 	 */
 	public SaturatedPropertyChain getSaturated();
 

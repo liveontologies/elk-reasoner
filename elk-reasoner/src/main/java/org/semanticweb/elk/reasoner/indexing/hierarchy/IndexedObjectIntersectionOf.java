@@ -26,8 +26,10 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
 
 /**
- * Represents all occurrences of an {@link ElkObjectIntersectionOf} in an
- * ontology.
+ * Represents occurrences of an {@link ElkObjectIntersectionOf} in an ontology.
+ * An {@link IndexedObjectIntersectionOf} is binary (has exactly two conjuncts).
+ * In order to convert an (n-ary) {@link ElkObjectIntersectionOf} to an
+ * {@link IndexedObjectIntersectionOf}, conjunctions must be binarized.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
@@ -35,8 +37,15 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionO
  */
 public interface IndexedObjectIntersectionOf extends IndexedClassExpression {
 
+	/**
+	 * @return the first conjunction of this {@link IndexedObjectIntersectionOf}
+	 */
 	public IndexedClassExpression getFirstConjunct();
 
+	/**
+	 * @return the second conjunction of this
+	 *         {@link IndexedObjectIntersectionOf}
+	 */
 	public IndexedClassExpression getSecondConjunct();
 
 	public <O> O accept(IndexedObjectIntersectionOfVisitor<O> visitor);

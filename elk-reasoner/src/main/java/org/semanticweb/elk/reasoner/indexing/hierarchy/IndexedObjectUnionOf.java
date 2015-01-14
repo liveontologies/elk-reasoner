@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,19 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectUnionOfVisitor;
 
 /**
- * Represents all occurrences of an {@link ElkObjectUnionOf} in an ontology.
+ * Represents occurrences of an {@link ElkObjectUnionOf} in an ontology.
  * 
  * @author "Yevgeny Kazakov"
  */
 public interface IndexedObjectUnionOf extends IndexedClassExpression {
 
+	/**
+	 * @return the {@link IndexedClassExpression}s representing the disjuncts of
+	 *         the {@link ElkObjectUnionOf} represented by this
+	 *         {@link IndexedObjectUnionOf}.
+	 * 
+	 * @see {@link IndexedObjectUnionOf#getDisjuncts()}
+	 */
 	public Set<? extends IndexedClassExpression> getDisjuncts();
 
 	public <O> O accept(IndexedObjectUnionOfVisitor<O> visitor);

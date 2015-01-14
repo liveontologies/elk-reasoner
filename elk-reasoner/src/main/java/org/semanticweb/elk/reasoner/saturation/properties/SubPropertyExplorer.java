@@ -83,7 +83,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	@Override
 	public Void visit(IndexedBinaryPropertyChain element) {
 		IndexedPropertyChain left = element.getLeftProperty();
-		IndexedPropertyChain right = element.getRightProperty();
+		IndexedPropertyChain right = element.getRightPropertyChain();
 		if (left.getSaturated().isDerivedReflexive())
 			toDo(right);
 		if (right.getSaturated().isDerivedReflexive())
@@ -194,7 +194,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 					if (commonSubProperties.isEmpty())
 						continue;
 					for (IndexedObjectProperty rightSubProperty : getSubProperties(composition
-							.getRightProperty()))
+							.getRightPropertyChain()))
 						for (IndexedObjectProperty commonLeft : commonSubProperties)
 							saturation.leftSubComposableSubPropertiesByRightProperties
 									.add(rightSubProperty, commonLeft);

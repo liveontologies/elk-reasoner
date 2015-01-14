@@ -112,7 +112,7 @@ public class PropertyHierarchyCompositionComputationFactory
 			LOGGER_.trace("{}: computing compositions", element);
 
 			IndexedObjectProperty left = element.getLeftProperty();
-			IndexedPropertyChain right = element.getRightProperty();
+			IndexedPropertyChain right = element.getRightPropertyChain();
 			Set<IndexedObjectProperty> leftSubProperties = SubPropertyExplorer
 					.getSubProperties(left);
 			if (leftSubProperties.isEmpty())
@@ -141,7 +141,7 @@ public class PropertyHierarchyCompositionComputationFactory
 				if (rightSubPropertyChain instanceof IndexedBinaryPropertyChain) {
 					IndexedBinaryPropertyChain composition = (IndexedBinaryPropertyChain) rightSubPropertyChain;
 					IndexedPropertyChain rightRightSubProperty = composition
-							.getRightProperty();
+							.getRightPropertyChain();
 					if (rightSubProperties.contains(rightRightSubProperty)) {
 						IndexedObjectProperty rightLeftSubProperty = composition
 								.getLeftProperty();

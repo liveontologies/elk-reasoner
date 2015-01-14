@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,16 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectComplementOfVisitor;
 
 /**
- * Represents all occurrences of an {@link ElkObjectComplementOf} in an
- * ontology.
+ * Represents occurrences of an {@link ElkObjectComplementOf} in an ontology.
  * 
  * @author "Yevgeny Kazakov"
  */
 public interface IndexedObjectComplementOf extends IndexedClassExpression {
 
+	/**
+	 * @return the {@link IndexedClassExpression}, negation of which is
+	 *         represented by this {@link IndexedObjectComplementOf}
+	 */
 	public IndexedClassExpression getNegated();
 
 	public <O> O accept(IndexedObjectComplementOfVisitor<O> visitor);

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 /*

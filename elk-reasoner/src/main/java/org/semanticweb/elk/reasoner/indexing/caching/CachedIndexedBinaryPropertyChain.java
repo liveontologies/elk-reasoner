@@ -47,8 +47,8 @@ public interface CachedIndexedBinaryPropertyChain extends
 				CachedIndexedBinaryPropertyChain secondEntry = (CachedIndexedBinaryPropertyChain) second;
 				if (first.getLeftProperty().equals(
 						secondEntry.getLeftProperty())
-						&& first.getRightProperty().equals(
-								secondEntry.getRightProperty()))
+						&& first.getRightPropertyChain().equals(
+								secondEntry.getRightPropertyChain()))
 					return secondEntry;
 			}
 			// else

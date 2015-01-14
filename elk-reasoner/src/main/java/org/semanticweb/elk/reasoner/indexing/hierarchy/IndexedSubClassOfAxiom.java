@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,32 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+
+/**
+ * Represents occurrences of an {@link ElkSubClassOfAxiom} in an ontology.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public interface IndexedSubClassOfAxiom extends IndexedAxiom {
 
+	/**
+	 * @return the {@link IndexedClassExpression} representing the sub class of
+	 *         the {@link ElkSubClassOfAxiom} represented by this
+	 *         {@link IndexedSubClassOfAxiom}
+	 * 
+	 * @see {@link IndexedSubClassOfAxiom#getSubClass()}
+	 */
 	public IndexedClassExpression getSubClass();
 
+	/**
+	 * @return the {@link IndexedClassExpression} representing the super class
+	 *         of the {@link ElkSubClassOfAxiom} represented by this
+	 *         {@link IndexedSubClassOfAxiom}
+	 * 
+	 * @see {@link IndexedSubClassOfAxiom#getSuperClass()}
+	 */
 	public IndexedClassExpression getSuperClass();
 
 }

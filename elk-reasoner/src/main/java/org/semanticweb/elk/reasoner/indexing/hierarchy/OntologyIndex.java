@@ -41,6 +41,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextIn
  * {@link IndexedPropertyChain}s. The methods of this class provide access to
  * such objects.
  * 
+ * @see {@link IndexedObject}
+ * 
  * @author Yevgeny Kazakov
  * @author Frantisek Simancik
  * 

@@ -49,6 +49,6 @@ public interface IndexedBinaryPropertyChain extends IndexedPropertyChain {
 	 * @return The right component of this (binary) complex property inclusion
 	 *         axiom.
 	 */
-	public IndexedPropertyChain getRightProperty();
+	public IndexedPropertyChain getRightPropertyChain();
 
 }

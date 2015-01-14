@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.indexing.hierarchy;
-
 /*
  * #%L
  * ELK Reasoner
@@ -22,8 +20,26 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
+package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
+import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
+
+/**
+ * Represents occurrences of an {@link ElkReflexiveObjectPropertyAxiom} in an
+ * ontology.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public interface IndexedReflexiveObjectPropertyAxiom extends IndexedAxiom {
 
+	/**
+	 * @return the {@link IndexedObjectProperty} representing the property of
+	 *         the {@link ElkReflexiveObjectPropertyAxiom} represented by this
+	 *         {@link IndexedReflexiveObjectPropertyAxiom}
+	 * 
+	 * @see {@link IndexedReflexiveObjectPropertyAxiom#getProperty()}
+	 */
 	public IndexedObjectProperty getProperty();
 
 }
