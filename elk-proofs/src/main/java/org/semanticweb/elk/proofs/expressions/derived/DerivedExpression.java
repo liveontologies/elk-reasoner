@@ -45,5 +45,5 @@ public interface DerivedExpression extends Expression {
 	 * @return
 	 * @throws ElkException
 	 */
-	public Iterable<Inference> getInferences() throws ElkException;
+	public Iterable<? extends Inference> getInferences() throws ElkException;
 }

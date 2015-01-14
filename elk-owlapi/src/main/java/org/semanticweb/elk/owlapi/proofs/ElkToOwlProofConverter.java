@@ -44,9 +44,9 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.owlapi.wrapper.ElkAxiomWrap;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -74,7 +74,7 @@ public class ElkToOwlProofConverter {
 			}
 
 			@Override
-			public OWLExpression visit(DerivedLemmaExpression expr, Void input) {
+			public OWLExpression visit(LemmaExpression expr, Void input) {
 				return new LemmaExpressionWrap(expr);
 			}
 		}, null);

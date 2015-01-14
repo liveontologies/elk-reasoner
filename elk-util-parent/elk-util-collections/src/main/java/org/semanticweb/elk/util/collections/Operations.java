@@ -542,6 +542,125 @@ public class Operations {
 			}
 		};
 	}
+	
+	public static <I, O> Iterable<O> mapConcat(final Iterable<I> input,
+			final Transformation<? super I, Iterable<O>> transformation) {
+		assert input != null;
+
+		return new Iterable<O>() {
+
+			@Override
+			public Iterator<O> iterator() {
+				return mapConcat(input.iterator(), transformation);
+			}
+		};
+	}
+	
+	public static <I, O> Collection<O> map(final Collection<I> input,
+			final Transformation<? super I, O> transformation) {
+		assert input != null;
+
+		return new AbstractCollection<O>() {
+
+			@Override
+			public Iterator<O> iterator() {
+				return map(input.iterator(), transformation);
+			}
+
+			@Override
+			public int size() {
+				// this is an upper bound
+				return input.size();
+			}
+			
+		};
+	}
+	
+	public static <I, O> Iterator<O> map(final Iterator<I> input, final Transformation<? super I, O> transformation) {
+		return new Iterator<O>() {
+			O next;
+			boolean hasNext = advance();
+
+			@Override
+			public boolean hasNext() {
+				return hasNext;
+			}
+
+			@Override
+			public O next() {
+				if (hasNext) {
+					O result = next;
+					hasNext = advance();
+					return result;
+				}
+				throw new NoSuchElementException();
+			}
+
+			@Override
+			public void remove() {
+				input.remove();
+			}
+
+			boolean advance() {
+				while (input.hasNext()) {
+					next = transformation.transform(input.next());
+					if (next != null)
+						return true;
+				}
+				return false;
+			}
+		};
+	}
+	
+	
+	public static <I, O> Iterator<O> mapConcat(final Iterator<I> input, final Transformation<? super I, Iterable<O>> transformation) {
+		return new Iterator<O>() {
+			Iterator<O> nextIter = Collections.<O>emptyList().iterator();
+			
+			O next;
+			
+			@Override
+			public boolean hasNext() {
+				for (;;) {
+					if (next != null) {
+						return true;
+					}
+					
+					if (nextIter.hasNext()) {
+						next = nextIter.next();
+						return true;
+					}
+					
+					if (input.hasNext()) {
+						nextIter = transformation.transform(input.next()).iterator();
+					}
+					else {
+						return false;
+					}
+				}
+			}
+
+			@Override
+			public O next() {
+				if (!hasNext()) {
+					throw new NoSuchElementException();
+				}
+				
+				O result = next;
+				
+				next = null;
+				
+				return result;
+			}
+
+			@Override
+			public void remove() {
+				input.remove();
+			}
+
+		};
+	}
+	
 
 	/**
 	 * Prints key-value entries present in the first {@link Multimap} but not in

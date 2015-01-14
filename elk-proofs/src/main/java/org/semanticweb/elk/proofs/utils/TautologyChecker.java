@@ -27,8 +27,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceChecker;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaVisitor;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkReflexivePropertyChainLemma;
@@ -69,14 +69,12 @@ public class TautologyChecker extends
 	}
 
 	@Override
-	public Boolean visit(DerivedAxiomExpression<?> expr,
-			Void input) {
+	public Boolean visit(DerivedAxiomExpression<?> expr, Void input) {
 		return expr.getAxiom().accept(this);
 	}
 
 	@Override
-	public Boolean visit(DerivedLemmaExpression expr,
-			Void input) {
+	public Boolean visit(LemmaExpression expr, Void input) {
 		return expr.getLemma().accept(this, input);
 	}
 

@@ -24,7 +24,7 @@ package org.semanticweb.elk.owlapi.proofs;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
 import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
 
@@ -33,9 +33,9 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class LemmaExpressionWrap extends BaseDerivedExpressionWrap<DerivedLemmaExpression> implements OWLLemmaExpression { 
+public class LemmaExpressionWrap extends BaseDerivedExpressionWrap<LemmaExpression> implements OWLLemmaExpression { 
 
-	LemmaExpressionWrap(DerivedLemmaExpression expr) {
+	LemmaExpressionWrap(LemmaExpression expr) {
 		super(expr);
 	}
 

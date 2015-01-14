@@ -35,11 +35,11 @@ import org.semanticweb.elk.proofs.utils.ElkLemmaPrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DerivedLemmaExpression extends AbstractDerivedExpression implements LemmaExpression {
+public class LemmaExpressionImpl extends AbstractDerivedExpression implements LemmaExpression {
 
 	private final ElkLemma lemma_;
 	
-	public DerivedLemmaExpression(ElkLemma lemma, InferenceReader r) {
+	public LemmaExpressionImpl(ElkLemma lemma, InferenceReader r) {
 		super(r);
 		lemma_ = lemma;
 	}

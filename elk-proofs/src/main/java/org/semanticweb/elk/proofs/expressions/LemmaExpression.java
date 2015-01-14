@@ -24,6 +24,7 @@ package org.semanticweb.elk.proofs.expressions;
  * #L%
  */
 
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
 
 /**
@@ -31,7 +32,7 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface LemmaExpression extends Expression {
+public interface LemmaExpression extends DerivedExpression {
 
 	public ElkLemma getLemma();
 }

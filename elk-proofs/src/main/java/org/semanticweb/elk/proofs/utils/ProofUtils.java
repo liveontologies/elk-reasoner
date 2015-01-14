@@ -29,9 +29,9 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
 
 /**
  * @author Pavel Klinov
@@ -65,7 +65,7 @@ public class ProofUtils {
 			}
 
 			@Override
-			public Boolean visit(DerivedLemmaExpression expr, Void input) {
+			public Boolean visit(LemmaExpression expr, Void input) {
 				// lemmas can not be asserted
 				return false;
 			}

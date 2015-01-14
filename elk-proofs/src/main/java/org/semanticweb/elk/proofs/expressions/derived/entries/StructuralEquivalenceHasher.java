@@ -51,8 +51,8 @@ import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.AbstractElkObjectVisitor;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedLemmaExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkClassExpressionWrap;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpressionVisitor;
@@ -97,7 +97,7 @@ public class StructuralEquivalenceHasher implements ExpressionHasher {
 			}
 
 			@Override
-			public Integer visit(DerivedLemmaExpression expr, Void input) {
+			public Integer visit(LemmaExpression expr, Void input) {
 				return LemmaHasher.hashCode(expr.getLemma());
 			}
 			

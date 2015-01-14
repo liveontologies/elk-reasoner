@@ -25,57 +25,15 @@ package org.semanticweb.elk.proofs.expressions.derived;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
-import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
-import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DerivedAxiomExpression<E extends ElkAxiom> extends AbstractDerivedExpression implements AxiomExpression<E> {
+public interface DerivedAxiomExpression<E extends ElkAxiom> extends AxiomExpression<E>, DerivedExpression {
 
-	private E axiom_;
-	
-	private boolean asserted_;
-	
-	public DerivedAxiomExpression(E ax, InferenceReader r) {
-		this(ax, r, false);
-	}
-	
-	public DerivedAxiomExpression(E ax, InferenceReader r, boolean asserted) {
-		super(r);
-		axiom_ = ax;
-		asserted_ = asserted;
-		
-		assert ax != null : "cannot create axiom expressions without an axiom";
-	}
-	
-	@Override
-	public E getAxiom() {
-		return axiom_;
-	}
-	
-	void setAsserted(E axiom) {
-		axiom_ = axiom;
-		asserted_ = true;
-	}
-	
-	@Override
-	public boolean isAsserted() {
-		return asserted_;
-	}
-	
-	@Override
-	public String toString() {
-		return OwlFunctionalStylePrinter.toString(axiom_) + (asserted_ ? "*" : "");
-	}
 
-	@Override
-	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
-	}
 	
 }

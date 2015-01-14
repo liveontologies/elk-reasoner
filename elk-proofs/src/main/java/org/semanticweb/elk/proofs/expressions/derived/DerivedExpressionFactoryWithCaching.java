@@ -39,36 +39,36 @@ import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
  */
 public class DerivedExpressionFactoryWithCaching implements DerivedExpressionFactory {
 
-	private final KeyEntryHashSet<DerivedAxiomExpression<ElkAxiom>> axiomLookup_;
+	private final KeyEntryHashSet<DerivedAxiomExpressionImpl<ElkAxiom>> axiomLookup_;
 	
-	private final KeyEntryHashSet<DerivedLemmaExpression> lemmaLookup_;
+	private final KeyEntryHashSet<LemmaExpressionImpl> lemmaLookup_;
 	
 	private final InferenceReader reader_;
 
 	public DerivedExpressionFactoryWithCaching(InferenceReader reader) {
-		axiomLookup_ = new KeyEntryHashSet<DerivedAxiomExpression<ElkAxiom>>(new ExpressionEntryFactory<DerivedAxiomExpression<ElkAxiom>>(), 128);
-		lemmaLookup_ = new KeyEntryHashSet<DerivedLemmaExpression>(new ExpressionEntryFactory<DerivedLemmaExpression>(), 32);
+		axiomLookup_ = new KeyEntryHashSet<DerivedAxiomExpressionImpl<ElkAxiom>>(new ExpressionEntryFactory<DerivedAxiomExpressionImpl<ElkAxiom>>(), 128);
+		lemmaLookup_ = new KeyEntryHashSet<LemmaExpressionImpl>(new ExpressionEntryFactory<LemmaExpressionImpl>(), 32);
 		reader_ = reader;
 	}
 	
 	@Override
-	public DerivedAxiomExpression<?> create(ElkAxiom axiom) {
-		DerivedAxiomExpression<ElkAxiom> newExpr = new DerivedAxiomExpression<ElkAxiom>(axiom, reader_);
+	public DerivedAxiomExpressionImpl<?> create(ElkAxiom axiom) {
+		DerivedAxiomExpressionImpl<ElkAxiom> newExpr = new DerivedAxiomExpressionImpl<ElkAxiom>(axiom, reader_);
 		
 		return axiomLookup_.merge(newExpr);
 	}
 
 	@Override
-	public DerivedLemmaExpression create(ElkLemma lemma) {
-		DerivedLemmaExpression newExpr = new DerivedLemmaExpression(lemma, reader_);
+	public LemmaExpressionImpl create(ElkLemma lemma) {
+		LemmaExpressionImpl newExpr = new LemmaExpressionImpl(lemma, reader_);
 		
 		return lemmaLookup_.merge(newExpr);
 	}
 
 	@Override
-	public DerivedAxiomExpression<?> createAsserted(ElkAxiom axiom) {
-		DerivedAxiomExpression<ElkAxiom> newExpr = new DerivedAxiomExpression<ElkAxiom>(axiom, reader_, true);
-		DerivedAxiomExpression<ElkAxiom> oldExpr = axiomLookup_.merge(newExpr);
+	public DerivedAxiomExpressionImpl<?> createAsserted(ElkAxiom axiom) {
+		DerivedAxiomExpressionImpl<ElkAxiom> newExpr = new DerivedAxiomExpressionImpl<ElkAxiom>(axiom, reader_, true);
+		DerivedAxiomExpressionImpl<ElkAxiom> oldExpr = axiomLookup_.merge(newExpr);
 		
 		if (!oldExpr.isAsserted()) {
 			oldExpr.setAsserted(axiom);

@@ -25,7 +25,8 @@ package org.semanticweb.elk.proofs.expressions.derived;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
 
 /**
@@ -33,21 +34,47 @@ import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DummyExpressionFactory implements DerivedExpressionFactory {
+public class DerivedAxiomExpressionImpl<E extends ElkAxiom> extends AbstractDerivedExpression implements DerivedAxiomExpression<E> {
 
+	private E axiom_;
+	
+	private boolean asserted_;
+	
+	public DerivedAxiomExpressionImpl(E ax, InferenceReader r) {
+		this(ax, r, false);
+	}
+	
+	public DerivedAxiomExpressionImpl(E ax, InferenceReader r, boolean asserted) {
+		super(r);
+		axiom_ = ax;
+		asserted_ = asserted;
+		
+		assert ax != null : "cannot create axiom expressions without an axiom";
+	}
+	
 	@Override
-	public DerivedAxiomExpressionImpl<?> create(ElkAxiom axiom) {
-		return new DerivedAxiomExpressionImpl<ElkAxiom>(axiom, InferenceReader.DUMMY);
+	public E getAxiom() {
+		return axiom_;
+	}
+	
+	void setAsserted(E axiom) {
+		axiom_ = axiom;
+		asserted_ = true;
+	}
+	
+	@Override
+	public boolean isAsserted() {
+		return asserted_;
+	}
+	
+	@Override
+	public String toString() {
+		return OwlFunctionalStylePrinter.toString(axiom_) + (asserted_ ? "*" : "");
 	}
 
 	@Override
-	public LemmaExpressionImpl create(ElkLemma lemma) {
-		return new LemmaExpressionImpl(lemma, InferenceReader.DUMMY);
+	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
-
-	@Override
-	public DerivedAxiomExpressionImpl<?> createAsserted(ElkAxiom axiom) {
-		return new DerivedAxiomExpressionImpl<ElkAxiom>(axiom, InferenceReader.DUMMY, true);
-	}
-
+	
 }
