@@ -29,6 +29,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPro
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
 
+/**
+ * An {@link IndexedAxiomVisitor} that always returns {@code null}.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <O>
+ */
 public class NoOpIndexedAxiomVisitor<O> implements IndexedAxiomVisitor<O> {
 
 	@SuppressWarnings("unused")

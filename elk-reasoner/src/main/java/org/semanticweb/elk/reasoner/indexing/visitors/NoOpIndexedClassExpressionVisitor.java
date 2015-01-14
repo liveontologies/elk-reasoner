@@ -31,6 +31,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersection
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 
+/**
+ * An {@link IndexedClassExpressionVisitor} that always returns {@code null}.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <O>
+ */
 public class NoOpIndexedClassExpressionVisitor<O> implements
 		IndexedClassExpressionVisitor<O> {
 

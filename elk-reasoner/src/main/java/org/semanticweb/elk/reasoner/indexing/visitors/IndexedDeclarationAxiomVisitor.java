@@ -24,6 +24,14 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDeclarationAxiom;
 
+/**
+ * Visitor pattern interface for instances of {@link IndexedDeclarationAxiom}.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
+ */
 public interface IndexedDeclarationAxiomVisitor<O> {
 
 	O visit(IndexedDeclarationAxiom axiom);

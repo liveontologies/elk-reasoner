@@ -37,6 +37,16 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPro
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
 
+/**
+ * An {@link IndexedObjectVisitor} that delegates its visit methods to the
+ * either {@link IndexedClassExpressionVisitor},
+ * {@link IndexedPropertyChainVisitor}, or {@link IndexedAxiomVisitor} according
+ * to the type of the argument.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <O>
+ */
 public class DelegatingIndexedObjectVisitor<O> implements
 		IndexedObjectVisitor<O> {
 

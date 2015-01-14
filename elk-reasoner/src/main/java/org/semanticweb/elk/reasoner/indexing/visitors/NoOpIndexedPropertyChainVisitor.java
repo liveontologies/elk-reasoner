@@ -26,6 +26,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChai
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
+/**
+ * An {@link IndexedPropertyChainVisitor} that always returns {@code null}.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <O>
+ */
 public class NoOpIndexedPropertyChainVisitor<O> implements
 		IndexedPropertyChainVisitor<O> {
 

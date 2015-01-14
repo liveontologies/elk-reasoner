@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,6 +24,15 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
 
+/**
+ * Visitor pattern interface for instances of
+ * {@link IndexedReflexiveObjectPropertyAxiom}.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
+ */
 public interface IndexedReflexiveObjectPropertyAxiomVisitor<O> {
 
 	O visit(IndexedReflexiveObjectPropertyAxiom axiom);
