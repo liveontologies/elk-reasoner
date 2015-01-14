@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * TODO
@@ -52,6 +53,20 @@ public class RightReflexiveSubPropertyChainInference extends ReflexiveSubPropert
 		return visitor.visit(this, input);
 	}
 	
-	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof RightReflexiveSubPropertyChainInference)) {
+			return false;
+		}
+		
+		RightReflexiveSubPropertyChainInference inf = (RightReflexiveSubPropertyChainInference) obj;
+		
+		return getSubPropertyChain().equals(inf.getSubPropertyChain()) && getSuperPropertyChain().equals(inf.getSuperPropertyChain());
+	}
+
+	@Override
+	public int hashCode() {
+		return HashGenerator.combineListHash(getSubPropertyChain().hashCode(), getSuperPropertyChain().hashCode());
+	}
 
 }

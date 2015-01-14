@@ -56,5 +56,20 @@ public class PropertyChainInitialization implements ObjectPropertyInference {
 		return visitor.visit(this, input);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof PropertyChainInitialization)) {
+			return false;
+		}
+		
+		PropertyChainInitialization inf = (PropertyChainInitialization) obj;
+		
+		return chain_.equals(inf.chain_);
+	}
+
+	@Override
+	public int hashCode() {
+		return chain_.hashCode();
+	}
 
 }

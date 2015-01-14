@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * R <= S if R <= H and H <= S. This class stores H as the premise.
@@ -65,4 +66,21 @@ public class BottomUpPropertySubsumptionInference extends SubPropertyChain<Index
 		return "Told sub-chain: " + getSubPropertyChain() + " => " + getSuperPropertyChain() + ", premise: " + getSubPropertyChain() + " => " + premise_;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof BottomUpPropertySubsumptionInference)) {
+			return false;
+		}
+		
+		BottomUpPropertySubsumptionInference inf = (BottomUpPropertySubsumptionInference) obj;
+		
+		return premise_.equals(inf.premise_) && getSubPropertyChain().equals(inf.getSubPropertyChain()) && getSuperPropertyChain().equals(inf.getSuperPropertyChain());
+	}
+
+	@Override
+	public int hashCode() {
+		return HashGenerator.combineListHash(premise_.hashCode(), getSubPropertyChain().hashCode(), getSuperPropertyChain().hashCode());
+	}
+
+	
 }

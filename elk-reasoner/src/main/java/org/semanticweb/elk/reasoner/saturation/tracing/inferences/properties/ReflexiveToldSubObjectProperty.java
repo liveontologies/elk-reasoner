@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.InferencePrinter;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * Represents an inference that the property is reflexive if one of its told sub-chains is reflexive.
@@ -58,5 +59,21 @@ public class ReflexiveToldSubObjectProperty extends ReflexivePropertyChain<Index
 	@Override
 	public String toString() {
 		return new InferencePrinter().visit(this, null);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof ReflexiveToldSubObjectProperty)) {
+			return false;
+		}
+		
+		ReflexiveToldSubObjectProperty inf = (ReflexiveToldSubObjectProperty) obj;
+		
+		return subChain_.equals(inf.subChain_) && getPropertyChain().equals(inf.getPropertyChain());
+	}
+
+	@Override
+	public int hashCode() {
+		return HashGenerator.combineListHash(subChain_.hashCode(), getPropertyChain().hashCode());
 	}
 }

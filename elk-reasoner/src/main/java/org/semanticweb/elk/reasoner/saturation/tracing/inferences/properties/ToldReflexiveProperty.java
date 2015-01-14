@@ -55,4 +55,20 @@ public class ToldReflexiveProperty extends ReflexivePropertyChain<IndexedObjectP
 	public String toString() {
 		return new InferencePrinter().visit(this, null);
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof ToldReflexiveProperty)) {
+			return false;
+		}
+		
+		ToldReflexiveProperty inf = (ToldReflexiveProperty) obj;
+		
+		return getPropertyChain().equals(inf.getPropertyChain());
+	}
+
+	@Override
+	public int hashCode() {
+		return getPropertyChain().hashCode();
+	}
 }

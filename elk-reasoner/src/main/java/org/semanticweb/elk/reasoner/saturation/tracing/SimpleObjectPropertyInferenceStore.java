@@ -24,13 +24,13 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.BottomUpPropertySubsumptionInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
@@ -43,7 +43,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Sub
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.TopDownPropertySubsumptionInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.util.collections.HashListMultimap;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
+import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 
 /**
@@ -213,11 +214,16 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 	}
 	
 	/**
-	 * Interface for objects storing property or property chain inferences
+	 * Interface for objects storing property or property chain inferences.
+	 * 
+	 * {@link ObjectPropertyInference}s can be produced multiple times (in
+	 * contrast to {@link ClassInference}s) so we use sets and set multimaps to
+	 * store unique inferences. We also require that implementations properly
+	 * override equals() and hashCode().
 	 * 
 	 * @author Pavel Klinov
 	 *
-	 * pavel.klinov@uni-ulm.de
+	 *         pavel.klinov@uni-ulm.de
 	 */
 	private static interface PropertyInferences {
 		
@@ -225,8 +231,8 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 
 	private static class BasePropertyInferences implements PropertyInferences {
 		
-		final List<ObjectPropertyInference> reflexivityInferences = new ArrayList<ObjectPropertyInference>(1);
-		final Multimap<IndexedPropertyChain, ObjectPropertyInference> subPropertyInfences = new HashListMultimap<IndexedPropertyChain, ObjectPropertyInference>(2);
+		final Set<ObjectPropertyInference> reflexivityInferences = new ArrayHashSet<ObjectPropertyInference>(1);
+		final Multimap<IndexedPropertyChain, ObjectPropertyInference> subPropertyInfences = new HashSetMultimap<IndexedPropertyChain, ObjectPropertyInference>(2);
 	}
 
 }

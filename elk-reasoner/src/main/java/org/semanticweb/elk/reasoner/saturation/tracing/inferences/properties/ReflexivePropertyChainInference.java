@@ -66,4 +66,19 @@ public class ReflexivePropertyChainInference extends ReflexivePropertyChain<Inde
 		return new InferencePrinter().visit(this, null);
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof ReflexivePropertyChainInference)) {
+			return false;
+		}
+		
+		ReflexivePropertyChainInference inf = (ReflexivePropertyChainInference) obj;
+		
+		return getPropertyChain().equals(inf.getPropertyChain());
+	}
+
+	@Override
+	public int hashCode() {
+		return getPropertyChain().hashCode();
+	}
 }
