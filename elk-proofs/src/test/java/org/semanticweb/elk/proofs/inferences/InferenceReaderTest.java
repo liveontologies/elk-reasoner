@@ -3,9 +3,6 @@
  */
 package org.semanticweb.elk.proofs.inferences;
 
-import java.io.File;
-
-import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;

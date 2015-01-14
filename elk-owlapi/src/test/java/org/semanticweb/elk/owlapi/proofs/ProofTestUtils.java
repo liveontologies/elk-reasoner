@@ -27,7 +27,6 @@ package org.semanticweb.elk.owlapi.proofs;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,23 +39,16 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.util.InferredAxiomGenerator;
-import org.semanticweb.owlapi.util.InferredEquivalentClassAxiomGenerator;
-import org.semanticweb.owlapi.util.InferredOntologyGenerator;
-import org.semanticweb.owlapi.util.InferredSubClassAxiomGenerator;
 import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
-import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
-import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
+import org.semanticweb.owlapitools.proofs.util.OWLInferenceGraph;
+import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
 
 /**
  * TODO this is adapted from {@link TestUtils}, see if we can get rid of copy-paste.
@@ -67,65 +59,42 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
  */
 public class ProofTestUtils {
 
-	// tests that each derived expression is provable. an expression is provable
-	// if either it doesn't require a proof (i.e. is a tautology or asserted) or
-	// returns at least one inference such that each of the premises is
-	// provable.
-	public static boolean provabilityTest(ExplainingOWLReasoner reasoner, OWLSubClassOfAxiom axiom) throws ProofGenerationException {
-		OWLExpression next = reasoner.getDerivedExpression(axiom);
-
-		return proved(next, new HashSet<OWLExpression>(Arrays.asList(next)));
-	}
-
-	private static boolean proved(OWLExpression expr, HashSet<OWLExpression> seen) throws ProofGenerationException {
-		// check if the expression doesn't require a proof
-		if (isAsserted(expr)) {
-			return true;
+	// tests that each derived expression is provable
+	public static void provabilityTest(ExplainingOWLReasoner reasoner, OWLSubClassOfAxiom axiom) throws ProofGenerationException {
+		OWLExpression root = reasoner.getDerivedExpression(axiom);
+		OWLInferenceGraph graph = OWLProofUtils.computeInferenceGraph(root);
+		
+		if (graph.getExpressions().isEmpty()) {
+			throw new AssertionError(String.format("There is no proof of %s", axiom));
 		}
-
-		for (OWLInference inf : expr.getInferences()) {
-			// see if this inference proves the expression
-			boolean proves = true;
-			boolean newPremise = false;
+		
+		Set<OWLExpression> proved = new HashSet<OWLExpression>(graph.getExpressions().size());
+		Queue<OWLExpression> toDo = new LinkedList<OWLExpression>(graph.getRootExpressions()); 
+		
+		for (;;) {
+			OWLExpression next = toDo.poll();
 			
-			if (inf.getConclusion().equals(expr) && isAsserted(inf.getConclusion())) {
-				// it is technically possible to have inferences which derive expressions from themselves
-				// TODO avoid it?
-				return true;
+			if (next == null) {
+				break;
 			}
-
-			for (OWLExpression premise : inf.getPremises()) {
-				if (seen.add(premise)) {
-					newPremise = true;
-					proves &= proved(premise, seen);
+			
+			if (proved.add(next)) {
+				for (OWLInference inf : graph.getInferencesForPremise(next)) {
+					if (proved.containsAll(inf.getPremises())) {
+						toDo.add(inf.getConclusion());
+					}
 				}
 			}
-
-			if (proves && newPremise) {
-				return true;
+		}
+		
+		for (OWLExpression expr : graph.getExpressions()) {
+			if (!proved.contains(expr)) {
+				throw new AssertionError(String.format("There is no acyclic proof of %s", expr));
 			}
 		}
-
-		return false;
 	}
 
-	private static boolean isAsserted(OWLExpression expr) {
-		return expr.accept(new OWLExpressionVisitor<Boolean>() {
-
-			@Override
-			public Boolean visit(OWLAxiomExpression expr) {
-				return expr.isAsserted();
-			}
-
-			@Override
-			public Boolean visit(OWLLemmaExpression arg0) {
-				return false;
-			}
-			
-		});
-	}
-	
-	public static OWLOntology getInferredTaxonomy(OWLReasoner reasoner) throws OWLOntologyCreationException {
+/*	public static OWLOntology getInferredTaxonomy(OWLReasoner reasoner) throws OWLOntologyCreationException {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		
 		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
@@ -140,7 +109,7 @@ public class ProofTestUtils {
         iog.fillOntology(manager, infOnt);
 
         return infOnt;
-	}
+	}*/
 
 	// checks that each axiom premise is in fact an axiom in the source ontology
 	// raises an assertion error if it's not the case

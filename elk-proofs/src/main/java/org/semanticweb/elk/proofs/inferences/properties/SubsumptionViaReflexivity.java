@@ -37,6 +37,8 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
+ * TODO
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de

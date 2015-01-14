@@ -34,7 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Objec
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface ObjectPropertyInference/* extends ObjectPropertyConclusion*/ {
+public interface ObjectPropertyInference {
 
 	public <I, O> O acceptTraced(ObjectPropertyInferenceVisitor<I, O> visitor, I input);
 }

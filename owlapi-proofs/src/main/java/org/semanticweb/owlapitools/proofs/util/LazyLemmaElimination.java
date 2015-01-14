@@ -2,6 +2,27 @@
  * 
  */
 package org.semanticweb.owlapitools.proofs.util;
+/*
+ * #%L
+ * OWL API Proofs Model
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -18,7 +39,10 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
 import org.semanticweb.owlapitools.proofs.util.Operations.Transformation;
 
 /**
- * TODO
+ * The transformation which replaces inferences having {@link OWLLemmaExpression}s as premises by collections of inferences, one per the inference which derives each lemma premise.
+ * The process is done recursively until there are no lemma premises.
+ * 
+ * There is a possibility of combinatorial explosion here if there are multiple lemma premises and they are derived by multiple inferences.
  * 
  * @author	Pavel Klinov
  * 			pavel.klinov@uni-ulm.de
@@ -84,7 +108,7 @@ public class LazyLemmaElimination implements Transformation<OWLInference, Iterab
 									List<OWLExpression> premises = new ArrayList<OWLExpression>(otherPremises);
 									
 									premises.addAll(premiseInf.getPremises());
-									toDo.add(new MacroOWLInference("macro inference", candidate.getConclusion(), premises));
+									toDo.add(new MacroOWLInference("Macro inference", candidate.getConclusion(), premises));
 								}
 							} catch (ProofGenerationException e) {
 								// TODO log the failed transformation

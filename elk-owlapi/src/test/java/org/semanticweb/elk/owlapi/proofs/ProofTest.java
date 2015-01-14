@@ -1,130 +1,53 @@
-/**
- * 
- */
 package org.semanticweb.elk.owlapi.proofs;
-
-/*
- * #%L
- * ELK Reasoner
- * $Id:$
- * $HeadURL:$
- * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
-import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionTracingTests;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestManifest;
-import org.semanticweb.elk.reasoner.saturation.tracing.TracingTests;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
-import org.semanticweb.elk.testing.ConfigurationUtils;
-import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
-import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.PolySuite.Config;
-import org.semanticweb.elk.testing.PolySuite.Configuration;
-import org.semanticweb.elk.testing.TestInput;
-import org.semanticweb.elk.testing.TestManifest;
-import org.semanticweb.elk.testing.VoidTestOutput;
-import org.semanticweb.elk.testing.io.URLTestIO;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
-import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
-import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.semanticweb.owlapitools.proofs.OWLInference;
 
 /**
- * Tracing tests over the OWL API interfaces
  * 
- * @author Pavel Klinov
- * 
+ * @author	Pavel Klinov
+ * 			pavel.klinov@uni-ulm.de
+ *
  */
-@RunWith(PolySuite.class)
 public class ProofTest {
 
-	final static String INPUT_DATA_LOCATION = "classification_test_input";
-	private static final Logger LOGGER_ = LoggerFactory.getLogger(ProofTest.class);
-
-	protected final TracingTestManifest manifest;
-
-	public ProofTest(TracingTestManifest testManifest) {
-		manifest = testManifest;
-	}
-
-	@Before
-	public void before() throws IOException, Owl2ParseException {
-		assumeTrue(!ignore(manifest.getInput()));
-	}
-
-	protected boolean ignore(@SuppressWarnings("unused") TestInput input) {
-		return false;
-	}
-
 	@Test
-	public void proofTest() throws Exception {
+	public void reflexiveRoles() throws Exception {
 		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		// loading and classifying via the OWL API
-		final OWLOntology ontology = loadOntology(manifest.getInput().getInputStream());
+		final OWLOntology ontology = loadOntology(ProofTest.class.getClassLoader().getResourceAsStream("classification_test_input/ReflexiveRole.owl"));
 		final ExplainingOWLReasoner reasoner = OWLAPITestUtils.createReasoner(ontology);
-
-		try {
-			// now do testing
-			// this visitor checks binding of premises to axioms in the source ontology
-	        final OWLInferenceVisitor bindingChecker = ProofTestUtils.getAxiomBindingChecker(ontology);
-	        
-	        ProofTestUtils.visitAllSubsumptionsForProofTests(reasoner, new ProofTestVisitor<Exception>() {
-	        //ProofTestUtils.visitAllSubsumptionsForProofTests(infOnt, new ProofTestVisitor<Exception>() {
-				
-				@Override
-				public void visit(OWLClassExpression subsumee, OWLClassExpression subsumer) {
-					LOGGER_.info("Requesting proofs for {} <= {}", subsumee, subsumer);
-					
-					try {
-						ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(subsumee, subsumer));
-						RecursiveInferenceVisitor.visitInferences(reasoner, factory.getOWLSubClassOfAxiom(subsumee, subsumer), bindingChecker, true);
-					} catch (ProofGenerationException e) {
-						fail(e.getMessage());
-					}
-				}
-			});
+		
+		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+		
+		OWLClass sub = factory.getOWLClass(IRI.create("http://example.org/K"));
+		OWLClass sup = factory.getOWLClass(IRI.create("http://example.org/L"));
+		
+		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
+		RecursiveInferenceVisitor.visitInferences(reasoner, factory.getOWLSubClassOfAxiom(sub, sup), new OWLInferenceVisitor() {
 			
-		} catch (Exception e) {
-			//swallow..
-			LOGGER_.error("", e);
-		} finally {
-			reasoner.dispose();
-		}
+			@Override
+			public void visit(OWLInference inference) {
+				System.err.println(inference);
+				System.err.print("");
+			}
+			
+		}, true);
 	}
 	
 	private OWLOntology loadOntology(InputStream stream) throws IOException, Owl2ParseException {
@@ -140,27 +63,5 @@ public class ProofTest {
 		}
 		
 		return ontology;
-	}
-
-	protected TracingTests getProvabilityTests(Taxonomy<ElkClass> taxonomy) {
-		return new ComprehensiveSubsumptionTracingTests(taxonomy);
-	}
-
-	@Config
-	public static Configuration getConfig() throws URISyntaxException,
-			IOException {
-		return ConfigurationUtils
-				.loadFileBasedTestConfiguration(
-						INPUT_DATA_LOCATION,
-						ProofTest.class,
-						"owl",
-						new TestManifestCreator<URLTestIO, VoidTestOutput, VoidTestOutput>() {
-							@Override
-							public TestManifest<URLTestIO, VoidTestOutput, VoidTestOutput> create(
-									URL input, URL output) throws IOException {
-								// don't need an expected output for these tests
-								return new TracingTestManifest(input);
-							}
-						});
 	}
 }

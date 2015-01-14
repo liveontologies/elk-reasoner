@@ -240,12 +240,10 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 		}
 	}	
 
-	@SuppressWarnings("unused")
 	protected void handleUntraced(Conclusion untraced, IndexedClassExpression root) {
 		//no-op
 	}
 	
-	@SuppressWarnings("unused")
 	protected void handleUntraced(ObjectPropertyConclusion untraced) {
 		//no-op
 	}

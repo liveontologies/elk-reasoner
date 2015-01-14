@@ -51,8 +51,9 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
 import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
 import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
-import org.semanticweb.owlapitools.proofs.util.OWLInferenceGraph;
+import org.semanticweb.owlapitools.proofs.util.LazyLemmaElimination;
 import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
+import org.semanticweb.owlapitools.proofs.util.TransformedOWLExpression;
 
 
 
@@ -155,9 +156,10 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
         	
         	try {
         		OWLExpression root = explainingReasoner.getDerivedExpression(entailment);
-        		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
-        		
-        		return new CycleBlockingExpression(root, iGraph);
+        		// first eliminate possible lemmas since we can't render them in Protege
+        		root = new TransformedOWLExpression<LazyLemmaElimination>(root, new LazyLemmaElimination());
+        		// second block loopy proofs
+        		return new CycleBlockingExpression(root, OWLProofUtils.computeInferenceGraph(root));
 			} catch (Exception e) {
 				throw new ExplanationException(e);
 			}
