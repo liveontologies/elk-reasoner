@@ -23,10 +23,10 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionFactory;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
@@ -140,11 +140,10 @@ public class InstanceTaxonomyComputationFactory implements
 					.getCreateInstanceNode(Collections.singleton(output
 							.getRoot().getElkEntity()));
 
-			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
+			for (List<ElkClass> directSuperEquivalent : output
 					.getDirectSubsumers()) {
 				UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode = taxonomy_
-						.getCreateTypeNode(directSuperEquivalent
-								.getEquivalent());
+						.getCreateTypeNode(directSuperEquivalent);
 				assignDirectTypeNode(node, superNode);
 			}
 
