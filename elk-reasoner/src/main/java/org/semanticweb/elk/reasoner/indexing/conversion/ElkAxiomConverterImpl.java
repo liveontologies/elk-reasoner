@@ -41,6 +41,7 @@ import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.predefined.ElkPolarity;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.caching.ModifiableIndexedObjectCache;
@@ -72,8 +73,15 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
  */
 public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
+	/**
+	 * The factory to create axioms
+	 */
 	private final ModifiableIndexedAxiomFactory axiomFactory_;
 
+	/**
+	 * The factories to create objects of respectively positive and negative
+	 * polarities of occurrences.
+	 */
 	private final ModifiableIndexedObjectFactory positiveFactory_,
 			negativeFactory_;
 
@@ -137,7 +145,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		this.positiveFactory_ = positiveFactory;
 		this.negativeFactory_ = negativeFactory;
 		this.positiveConverter_ = new ElkPolarityExpressionConverterImpl(
-				positiveFactory, negativeFactory);
+				ElkPolarity.POSITIVE, positiveFactory, negativeFactory);
 		this.negativeConverter_ = positiveConverter_
 				.getComplementaryConverter();
 		this.dualConverter_ = new ElkPolarityExpressionConverterImpl(

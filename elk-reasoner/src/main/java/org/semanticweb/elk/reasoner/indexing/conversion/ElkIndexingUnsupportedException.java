@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.conversion;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,8 +27,7 @@ import org.semanticweb.elk.owl.util.OwlObjectNameVisitor;
 
 /**
  * This exception should be used to indicate that some {@link ElkObject} cannot
- * be represented within the index datastructure, that is, it is not supported
- * by the reasoner.
+ * be converted by ELK, that is, it is not supported by the reasoner.
  * 
  * @author "Yevgeny Kazakov"
  * 

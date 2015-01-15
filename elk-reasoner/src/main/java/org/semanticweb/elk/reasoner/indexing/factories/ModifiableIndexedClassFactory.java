@@ -23,11 +23,10 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 
 /**
- * A factory for producing objects of {@link IndexedClass}.
+ * A factory for creating instances of {@link ModifiableIndexedClass}
  * 
  * @author "Yevgeny Kazakov"
  * 

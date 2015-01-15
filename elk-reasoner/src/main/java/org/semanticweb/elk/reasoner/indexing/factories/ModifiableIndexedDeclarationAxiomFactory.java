@@ -25,6 +25,12 @@ package org.semanticweb.elk.reasoner.indexing.factories;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 
+/**
+ * A factory for creating instances of {@link ModifiableIndexedDeclarationAxiom}
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public interface ModifiableIndexedDeclarationAxiomFactory {
 
 	public ModifiableIndexedDeclarationAxiom getIndexedDeclarationAxiom(

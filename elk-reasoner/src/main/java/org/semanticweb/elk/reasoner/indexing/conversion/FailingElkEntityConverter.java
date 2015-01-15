@@ -31,6 +31,13 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 
+/**
+ * An {@link ElkEntityConverter} that always throws
+ * {@link ElkIndexingUnsupportedException}.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public class FailingElkEntityConverter implements ElkEntityConverter {
 
 	private static <O> O fail(ElkEntity expression) {

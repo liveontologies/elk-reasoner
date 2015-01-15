@@ -51,12 +51,26 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
+import org.semanticweb.elk.owl.predefined.ElkPolarity;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 
+/**
+ * An {@link ElkPolarityExpressionConverter} that always throws
+ * {@link ElkIndexingUnsupportedException}.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public class FailingElkPolarityExpressionConverter implements
 		ElkPolarityExpressionConverter {
+
+	private final ElkPolarity polarity_;
+
+	public FailingElkPolarityExpressionConverter(ElkPolarity polarity) {
+		this.polarity_ = polarity;
+	}
 
 	private static <O> O fail(ElkObject expression) {
 		throw new ElkIndexingUnsupportedException(expression);
@@ -223,6 +237,11 @@ public class FailingElkPolarityExpressionConverter implements
 	@Override
 	public ElkPolarityExpressionConverter getComplementaryConverter() {
 		return this;
+	}
+
+	@Override
+	public ElkPolarity getPolarity() {
+		return this.polarity_;
 	}
 
 }

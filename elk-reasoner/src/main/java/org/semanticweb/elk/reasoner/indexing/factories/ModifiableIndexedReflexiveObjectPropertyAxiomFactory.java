@@ -22,13 +22,12 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedReflexiveObjectPropertyAxiom;
 
 /**
- * A filter producing objects in {@link IndexedReflexiveObjectPropertyAxiom}
- * from objects of this type.
+ * A factory for creating instances of
+ * {@link ModifiableIndexedReflexiveObjectPropertyAxiom}
  * 
  * @author "Yevgeny Kazakov"
  * 

@@ -27,9 +27,9 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedAxiom;
 
 /**
- * An {@link ElkAxiomVisitor} that can be used for converting {@link ElkAxiom}s
- * to the corresponding {@link ModifiableIndexedAxiom}s. One {@link ElkAxiom}
- * might be converted into several {@link ModifiableIndexedAxiom}s.
+ * Converts {@link ElkAxiom}s to (one or several) corresponding
+ * {@link ModifiableIndexedAxiom}s. The converted axioms are not returned but
+ * internally processed by this {@link ElkAxiomConverter}.
  * 
  * @author "Yevgeny Kazakov"
  */

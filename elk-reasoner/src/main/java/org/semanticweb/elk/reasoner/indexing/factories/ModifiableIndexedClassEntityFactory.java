@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.factories;
 
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassEntity;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,8 +24,14 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  * #L%
  */
 
-public interface ModifiableIndexedClassEntityFactory extends ModifiableIndexedClassFactory,
-		ModifiableIndexedIndividualFactory {
+/**
+ * A factory for creating instances of {@link ModifiableIndexedClassEntity}
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+public interface ModifiableIndexedClassEntityFactory extends
+		ModifiableIndexedClassFactory, ModifiableIndexedIndividualFactory {
 
 	// combined interface
 

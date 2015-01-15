@@ -23,12 +23,10 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDataHasValue;
 
 /**
- * A filter producing objects in {@link IndexedDataHasValue} from objects of
- * this type.
+ * A factory for creating instances of {@link ModifiableIndexedDataHasValue}
  * 
  * @author "Yevgeny Kazakov"
  * 

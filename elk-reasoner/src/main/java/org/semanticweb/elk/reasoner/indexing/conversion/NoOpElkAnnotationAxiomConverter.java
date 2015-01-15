@@ -28,6 +28,13 @@ import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubAnnotationPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAnnotationAxiomVisitor;
 
+/**
+ * An {@link ElkAnnotationAxiomVisitor} that does nothing.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <O>
+ */
 public class NoOpElkAnnotationAxiomConverter<O> implements
 		ElkAnnotationAxiomVisitor<O> {
 

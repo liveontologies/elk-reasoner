@@ -22,14 +22,13 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 
 /**
- * A filter producing objects in {@link IndexedBinaryPropertyChain} from objects
- * of this type.
+ * A factory for creating instances of
+ * {@link ModifiableIndexedBinaryPropertyChain}
  * 
  * @author "Yevgeny Kazakov"
  * 

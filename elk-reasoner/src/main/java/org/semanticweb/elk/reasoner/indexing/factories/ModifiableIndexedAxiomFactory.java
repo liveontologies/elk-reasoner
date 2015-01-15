@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.factories;
 
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedAxiom;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,6 +24,12 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  * #L%
  */
 
+/**
+ * A factory for creating instances of {@link ModifiableIndexedAxiom}
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public interface ModifiableIndexedAxiomFactory extends
 		ModifiableIndexedSubClassOfAxiomFactory,
 		ModifiableIndexedSubObjectPropertyOfAxiomFactory,

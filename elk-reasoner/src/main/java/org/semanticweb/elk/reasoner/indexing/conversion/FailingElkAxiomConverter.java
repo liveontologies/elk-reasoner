@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.indexing.conversion;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
@@ -63,6 +64,13 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 
+/**
+ * A {@link ElkAxiomConverter} that does nothing for {@link ElkAnnotationAxiom}s
+ * and throws {@link ElkIndexingUnsupportedException} for other types of axioms.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public class FailingElkAxiomConverter extends
 		NoOpElkAnnotationAxiomConverter<Void> implements ElkAxiomConverter,
 		ElkSubObjectPropertyExpressionVisitor<ModifiableIndexedPropertyChain> {

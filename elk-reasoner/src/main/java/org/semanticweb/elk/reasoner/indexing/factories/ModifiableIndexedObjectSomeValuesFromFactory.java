@@ -22,14 +22,13 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectSomeValuesFrom;
 
 /**
- * A filter producing objects in {@link IndexedObjectSomeValuesFrom} from
- * objects of this type.
+ * A factory for creating instances of
+ * {@link ModifiableIndexedObjectSomeValuesFrom}
  * 
  * @author "Yevgeny Kazakov"
  * 

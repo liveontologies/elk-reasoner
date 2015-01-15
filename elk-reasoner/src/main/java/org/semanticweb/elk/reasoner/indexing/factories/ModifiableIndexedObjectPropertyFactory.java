@@ -23,12 +23,10 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 
 /**
- * A filter producing objects in {@link IndexedObjectProperty} from objects of
- * this type.
+ * A factory for creating instances of {@link ModifiableIndexedObjectProperty}
  * 
  * @author "Yevgeny Kazakov"
  * 

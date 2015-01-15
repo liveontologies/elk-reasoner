@@ -22,13 +22,11 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubClassOfAxiom;
 
 /**
- * A filter producing objects in {@link IndexedSubClassOfAxiom} from objects of
- * this type.
+ * A factory for creating instances of {@link ModifiableIndexedSubClassOfAxiom}
  * 
  * @author "Yevgeny Kazakov"
  * 

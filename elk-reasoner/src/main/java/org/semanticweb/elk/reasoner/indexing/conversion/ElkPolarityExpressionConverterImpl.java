@@ -35,6 +35,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
+import org.semanticweb.elk.owl.predefined.ElkPolarity;
 import org.semanticweb.elk.reasoner.indexing.caching.ModifiableIndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.caching.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
@@ -57,23 +58,26 @@ public class ElkPolarityExpressionConverterImpl extends
 
 	private final ElkPolarityExpressionConverter complementaryConverter_;
 
-	public ElkPolarityExpressionConverterImpl(
+	public ElkPolarityExpressionConverterImpl(ElkPolarity polarity,
 			ModifiableIndexedObjectFactory factory,
 			ElkPolarityExpressionConverter complementaryConverter) {
+		super(polarity);
 		this.factory_ = factory;
 		this.complementaryConverter_ = complementaryConverter;
 	}
 
-	public ElkPolarityExpressionConverterImpl(
+	public ElkPolarityExpressionConverterImpl(ElkPolarity polarity,
 			ModifiableIndexedObjectFactory factory,
 			ModifiableIndexedObjectFactory complementaryFactory) {
+		super(polarity);
 		this.factory_ = factory;
 		this.complementaryConverter_ = new ElkPolarityExpressionConverterImpl(
-				complementaryFactory, this);
+				polarity.getComplementary(), complementaryFactory, this);
 	}
 
 	public ElkPolarityExpressionConverterImpl(
 			ModifiableIndexedObjectFactory dualFactory) {
+		super(ElkPolarity.DUAL);
 		this.factory_ = dualFactory;
 		this.complementaryConverter_ = this;
 	}

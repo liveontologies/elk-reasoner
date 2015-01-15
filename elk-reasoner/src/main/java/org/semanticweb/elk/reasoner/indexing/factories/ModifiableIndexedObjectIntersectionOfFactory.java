@@ -22,13 +22,12 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectIntersectionOf;
 
 /**
- * A filter producing objects in {@link IndexedObjectIntersectionOf} from
- * objects of this type.
+ * A factory for creating instances of
+ * {@link ModifiableIndexedObjectIntersectionOf}
  * 
  * @author "Yevgeny Kazakov"
  * 

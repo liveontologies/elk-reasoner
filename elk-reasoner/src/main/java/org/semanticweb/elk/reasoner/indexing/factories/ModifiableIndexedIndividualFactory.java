@@ -23,12 +23,10 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedIndividual;
 
 /**
- * A filter producing objects in {@link IndexedIndividual} from objects of this
- * type.
+ * A factory for creating instances of {@link ModifiableIndexedIndividual}
  * 
  * @author "Yevgeny Kazakov"
  * 

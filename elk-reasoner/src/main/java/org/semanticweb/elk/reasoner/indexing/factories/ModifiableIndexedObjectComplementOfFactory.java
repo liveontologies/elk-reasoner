@@ -22,13 +22,12 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectComplementOf;
 
 /**
- * A filter producing objects in {@link IndexedObjectComplementOf} from objects
- * of this type.
+ * A factory for creating instances of
+ * {@link ModifiableIndexedObjectComplementOf}
  * 
  * @author "Yevgeny Kazakov"
  * 

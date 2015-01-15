@@ -24,13 +24,11 @@ package org.semanticweb.elk.reasoner.indexing.factories;
 
 import java.util.List;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectUnionOf;
 
 /**
- * A filter producing objects in {@link IndexedObjectUnionOf} from objects of
- * this type.
+ * A factory for creating instances of {@link ModifiableIndexedObjectUnionOf}
  * 
  * @author "Yevgeny Kazakov"
  * 

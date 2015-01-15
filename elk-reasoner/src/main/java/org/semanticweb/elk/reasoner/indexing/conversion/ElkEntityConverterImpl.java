@@ -28,6 +28,14 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedEntityFactory;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 
+/**
+ * An implementation of {@link ElkEntityConverter} that uses a given
+ * {@link ModifiableIndexedEntityFactory} for creating instances of
+ * {@link ModifiableIndexedEntity}
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 class ElkEntityConverterImpl extends FailingElkEntityConverter {
 
 	private final ModifiableIndexedEntityFactory factory_;
