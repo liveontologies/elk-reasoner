@@ -77,11 +77,6 @@ class CachedIndexedIndividualImpl extends
 	}
 
 	@Override
-	public String getEntityType() {
-		return "Individual";
-	}
-
-	@Override
 	public final <O> O accept(IndexedIndividualVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

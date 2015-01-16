@@ -33,9 +33,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 
 /**
- * An object representing the compiled logical information about the ontology
- * that enables execution of reasoning inference rules. There are two type of
- * rules: the global rules stored for the ontology that can be obtained using
+ * An object representing the logical structure of the ontology that enables
+ * execution of reasoning inference rules. There are two type of rules: the
+ * global rules stored for the ontology that can be obtained using
  * {@link #getContextInitRuleHead()}, and the local rules associated with
  * specific {@link IndexedObject}s, such as {@link IndexedClassExpression}s and
  * {@link IndexedPropertyChain}s. The methods of this class provide access to

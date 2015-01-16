@@ -36,7 +36,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
  * @author "Yevgeny Kazakov"
  * 
  */
-
 public interface IndexedBinaryPropertyChain extends IndexedPropertyChain {
 
 	/**

@@ -37,4 +37,5 @@ public interface CachedIndexedAxiom<T extends CachedIndexedAxiom<T>> extends
 		ModifiableIndexedAxiom, CachedIndexedObject<T>,
 		Entry<T, CachedIndexedAxiom<?>> {
 
+	// no further specific methods
 }

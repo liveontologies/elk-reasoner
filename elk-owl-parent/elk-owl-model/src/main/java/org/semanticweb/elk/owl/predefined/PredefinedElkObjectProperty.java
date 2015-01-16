@@ -41,10 +41,9 @@ import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
  */
 public enum PredefinedElkObjectProperty implements ElkObjectProperty {
 
-	OWL_TOP_OBJECT_PROPERTY(PredefinedElkIri.OWL_TOP_OBJECT_PROPERTY.get()),
+	OWL_TOP_OBJECT_PROPERTY(PredefinedElkIris.OWL_TOP_OBJECT_PROPERTY),
 
-	OWL_BOTTOM_OBJECT_PROPERTY(PredefinedElkIri.OWL_BOTTOM_OBJECT_PROPERTY
-			.get())//
+	OWL_BOTTOM_OBJECT_PROPERTY(PredefinedElkIris.OWL_BOTTOM_OBJECT_PROPERTY)//
 	;
 
 	private final ElkIri iri_;
@@ -56,6 +55,11 @@ public enum PredefinedElkObjectProperty implements ElkObjectProperty {
 	@Override
 	public ElkIri getIri() {
 		return iri_;
+	}
+
+	@Override
+	public ElkEntityType getEntityType() {
+		return ElkEntityType.OBJECT_PROPERTY;
 	}
 
 	@Override

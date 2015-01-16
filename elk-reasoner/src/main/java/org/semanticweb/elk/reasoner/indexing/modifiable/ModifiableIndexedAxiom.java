@@ -1,7 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.modifiable;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
-
 /*
  * #%L
  * ELK Reasoner
@@ -24,8 +22,17 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
  * #L%
  */
 
-public interface ModifiableIndexedAxiom extends IndexedAxiom,
-		ModifiableIndexedObject {
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
+
+/**
+ * An {@link IndexedAxiom} that can be modified as a result of updating the
+ * {@link ModifiableOntologyIndex} where this object is stored.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
+public interface ModifiableIndexedAxiom extends ModifiableIndexedObject,
+		IndexedAxiom {
 
 	// nothing specific to modify
 

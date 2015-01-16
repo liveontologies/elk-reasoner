@@ -26,6 +26,13 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 
+/**
+ * An {@link IndexedObjectUnionOf} that can be modified as a result of updating
+ * the {@link ModifiableOntologyIndex} where this object is stored.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public interface ModifiableIndexedObjectUnionOf extends
 		ModifiableIndexedClassExpression, IndexedObjectUnionOf {
 

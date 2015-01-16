@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedReflexiveObjectPropertyAxiom;
@@ -43,7 +44,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @see {@link ModifiableIndexedObject#updateOccurrenceNumbers}
+ * @see ModifiableIndexedObject#updateOccurrenceNumbers
  *
  */
 public class UpdatingModifiableIndexedObjectFactory extends

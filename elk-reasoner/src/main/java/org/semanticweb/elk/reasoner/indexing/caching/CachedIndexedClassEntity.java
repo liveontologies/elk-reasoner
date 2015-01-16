@@ -37,4 +37,5 @@ public interface CachedIndexedClassEntity<T extends CachedIndexedClassEntity<T>>
 		extends ModifiableIndexedClassEntity, CachedIndexedClassExpression<T>,
 		CachedIndexedEntity<T> {
 
+	// no further specific methods
 }

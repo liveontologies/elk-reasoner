@@ -147,11 +147,6 @@ final class CachedIndexedClassImpl extends
 	}
 
 	@Override
-	public final String getEntityType() {
-		return "Class";
-	}
-
-	@Override
 	public final <O> O accept(IndexedClassVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

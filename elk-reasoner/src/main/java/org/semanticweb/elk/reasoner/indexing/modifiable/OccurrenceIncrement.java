@@ -32,8 +32,8 @@ import org.semanticweb.elk.owl.predefined.ElkPolarity;
  * occurrences of an object have been added / removed. If the value is positive,
  * the respective number of occurrences have been added, otherwise removed.
  *
- * @see {@link ElkPolarity}
- * @see {@link ModifiableIndexedObject#updateOccurrenceNumbers}
+ * @see ElkPolarity
+ * @see ModifiableIndexedObject#updateOccurrenceNumbers
  * 
  * @author "Yevgeny Kazakov"
  *

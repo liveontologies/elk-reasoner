@@ -1,12 +1,11 @@
-package org.semanticweb.elk.reasoner.indexing.modifiable;
-
 /*
  * #%L
- * ELK Reasoner
- * $Id:$
- * $HeadURL:$
+ * ELK OWL Model Implementation
+ * 
+ * $Id$
+ * $HeadURL$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +20,31 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  * limitations under the License.
  * #L%
  */
-
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
+package org.semanticweb.elk.owl.iris;
 
 /**
- * An {@link IndexedObjectComplementOf} that can be modified as a result of
- * updating the {@link ModifiableOntologyIndex} where this object is stored.
+ * An implementation of {@link ElkPrefix}
  * 
+ * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
- *
  */
-public interface ModifiableIndexedObjectComplementOf extends
-		ModifiableIndexedClassExpression, IndexedObjectComplementOf {
+public class ElkPrefixImpl implements ElkPrefix {
+
+	private final String name_;
+	private final ElkFullIri iri_;
+
+	public ElkPrefixImpl(String prefixName, ElkFullIri iri) {
+		this.name_ = prefixName;
+		this.iri_ = iri;
+	}
 
 	@Override
-	public ModifiableIndexedClassExpression getNegated();
+	public String getName() {
+		return name_;
+	}
 
+	@Override
+	public ElkFullIri getIri() {
+		return iri_;
+	}
 }

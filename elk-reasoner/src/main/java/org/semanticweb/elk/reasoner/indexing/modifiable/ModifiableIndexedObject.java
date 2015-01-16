@@ -24,8 +24,35 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 
+/**
+ * An {@link IndexedObject} than be modified as a result of updating the
+ * {@link ModifiableOntologyIndex} where this object is stored.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public interface ModifiableIndexedObject extends IndexedObject {
 
+	/**
+	 * Tries to change the number of occurrences of this
+	 * {@link ModifiableIndexedObject} in the given
+	 * {@link ModifiableOntologyIndex} according to the given
+	 * {@link OccurrenceIncrement}
+	 * 
+	 * @param index
+	 *            the {@link ModifiableOntologyIndex} representing the logical
+	 *            structure of the ontology
+	 * 
+	 * @param increment
+	 *            describes how occurrences of this
+	 *            {@link ModifiableIndexedObject} should changed
+	 * 
+	 * @return {@code true} if the operation has been successful or
+	 *         {@code false} otherwise. If {@code false} is return, the provided
+	 *         {@link ModifiableOntologyIndex} should not logically change,
+	 *         i.e., it should correspond to the same logical representation of
+	 *         the ontology as before the operation
+	 */
 	boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
 			OccurrenceIncrement increment);
 

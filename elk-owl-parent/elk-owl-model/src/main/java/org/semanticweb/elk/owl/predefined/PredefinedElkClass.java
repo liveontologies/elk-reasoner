@@ -39,9 +39,9 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  */
 public enum PredefinedElkClass implements ElkClass {
 
-	OWL_THING(PredefinedElkIri.OWL_THING.get()), //
+	OWL_THING(PredefinedElkIris.OWL_THING), //
 
-	OWL_NOTHING(PredefinedElkIri.OWL_NOTHING.get())//
+	OWL_NOTHING(PredefinedElkIris.OWL_NOTHING)//
 	;
 
 	private final ElkIri iri_;
@@ -53,6 +53,11 @@ public enum PredefinedElkClass implements ElkClass {
 	@Override
 	public ElkIri getIri() {
 		return iri_;
+	}
+
+	@Override
+	public ElkEntityType getEntityType() {
+		return ElkEntityType.CLASS;
 	}
 
 	@Override

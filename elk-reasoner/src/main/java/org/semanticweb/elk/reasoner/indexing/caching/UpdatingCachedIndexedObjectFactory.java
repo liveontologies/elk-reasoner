@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.indexing.caching;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 
@@ -32,7 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @see {@link ModifiableIndexedObject#updateOccurrenceNumbers}
+ * @see ModifiableIndexedObject#updateOccurrenceNumbers
  */
 public class UpdatingCachedIndexedObjectFactory extends
 		DelegatingCachedIndexedObjectFactory {

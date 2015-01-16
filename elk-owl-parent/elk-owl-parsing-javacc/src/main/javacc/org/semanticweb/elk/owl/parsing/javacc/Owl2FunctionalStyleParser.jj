@@ -141,6 +141,7 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
+import org.semanticweb.elk.owl.iris.ElkPrefixImpl;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
@@ -570,7 +571,7 @@ void prefixDeclaration(Owl2ParserAxiomProcessor axiomProcessor) throws Owl2Parse
 		<EQUALS>
 		iri = fullIri()
 	<CLOSE_BRACKET> {
-		ElkPrefix prefix = new ElkPrefix(name, iri);
+		ElkPrefix prefix = new ElkPrefixImpl(name, iri);
 	
 		if ( !getElkPrefixDeclarations().addPrefix( prefix ) ) {
 			throw new ParseException("Duplicate declaration of prefix " + name + ".");

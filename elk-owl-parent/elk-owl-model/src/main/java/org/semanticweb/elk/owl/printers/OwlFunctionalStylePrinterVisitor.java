@@ -114,7 +114,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
@@ -500,8 +500,8 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	private static boolean isPlain(ElkLiteral elkLiteral) {
 
 		return elkLiteral.getDatatype() == null
-				|| PredefinedElkIri.RDF_PLAIN_LITERAL.get().equals(
-						elkLiteral.getDatatype().getIri());
+				|| PredefinedElkIris.RDF_PLAIN_LITERAL.equals(elkLiteral
+						.getDatatype().getIri());
 	}
 
 	@Override
@@ -545,7 +545,8 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	}
 
 	@Override
-	public Void visit(ElkObjectExactCardinalityUnqualified elkObjectExactCardinality) {
+	public Void visit(
+			ElkObjectExactCardinalityUnqualified elkObjectExactCardinality) {
 		write("ObjectExactCardinality(");
 		write(elkObjectExactCardinality);
 		write(')');

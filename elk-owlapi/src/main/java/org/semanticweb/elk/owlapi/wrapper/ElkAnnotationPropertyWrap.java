@@ -23,6 +23,7 @@
 package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
+import org.semanticweb.elk.owl.predefined.ElkEntityType;
 import org.semanticweb.elk.owl.visitors.ElkAnnotationPropertyVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
@@ -41,6 +42,11 @@ public class ElkAnnotationPropertyWrap<T extends OWLAnnotationProperty> extends
 
 	public ElkAnnotationPropertyWrap(T owlAnnotationProperty) {
 		super(owlAnnotationProperty);
+	}
+
+	@Override
+	public ElkEntityType getEntityType() {
+		return ElkEntityType.ANNOTATION_PROPERTY;
 	}
 
 	@Override

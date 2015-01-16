@@ -23,6 +23,7 @@
 package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.owl.predefined.ElkEntityType;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkIndividualVisitor;
 import org.semanticweb.elk.owl.visitors.ElkNamedIndividualVisitor;
@@ -42,6 +43,11 @@ public class ElkNamedIndividualWrap<T extends OWLNamedIndividual> extends
 
 	public ElkNamedIndividualWrap(T owlNamedIndividual) {
 		super(owlNamedIndividual);
+	}
+
+	@Override
+	public ElkEntityType getEntityType() {
+		return ElkEntityType.NAMED_INDIVIDUAL;
 	}
 
 	@Override

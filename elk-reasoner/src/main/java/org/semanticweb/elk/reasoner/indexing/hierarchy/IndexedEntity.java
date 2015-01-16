@@ -32,10 +32,6 @@ public interface IndexedEntity extends IndexedObject {
 	 */
 	public ElkEntity getElkEntity();
 
-	// TODO: add enum for entity types
-
-	String getEntityType();
-
 	public <O> O accept(IndexedEntityVisitor<O> visitor);
 
 }

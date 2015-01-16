@@ -23,6 +23,7 @@
 package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.predefined.ElkEntityType;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkClassVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
@@ -42,6 +43,11 @@ public class ElkClassWrap<T extends OWLClass> extends ElkEntityWrap<T>
 
 	public ElkClassWrap(T owlClass) {
 		super(owlClass);
+	}
+
+	@Override
+	public ElkEntityType getEntityType() {
+		return ElkEntityType.CLASS;
 	}
 
 	@Override

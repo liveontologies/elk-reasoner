@@ -35,4 +35,6 @@ public interface CachedIndexedComplexClassExpression<T extends CachedIndexedComp
 		extends CachedIndexedClassExpression<T>,
 		Entry<T, CachedIndexedComplexClassExpression<?>> {
 
+	// no further specific methods
+
 }

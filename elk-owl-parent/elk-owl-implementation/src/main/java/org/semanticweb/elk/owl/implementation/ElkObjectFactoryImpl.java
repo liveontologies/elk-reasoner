@@ -118,7 +118,7 @@ import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.managers.DummyElkObjectRecycler;
 import org.semanticweb.elk.owl.managers.ElkObjectRecycler;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 
 /**
  * A factory for creating {@link ElkObject}s based on the implementations in the
@@ -129,19 +129,19 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	protected static final ElkObjectProperty ELK_OWL_TOP_OBJECT_PROPERTY = new ElkObjectPropertyImpl(
-			PredefinedElkIri.OWL_TOP_OBJECT_PROPERTY.get());
+			PredefinedElkIris.OWL_TOP_OBJECT_PROPERTY);
 
 	protected static final ElkObjectProperty ELK_OWL_BOTTOM_OBJECT_PROPERTY = new ElkObjectPropertyImpl(
-			PredefinedElkIri.OWL_BOTTOM_OBJECT_PROPERTY.get());
+			PredefinedElkIris.OWL_BOTTOM_OBJECT_PROPERTY);
 
 	protected static final ElkDataProperty ELK_OWL_TOP_DATA_PROPERTY = new ElkDataPropertyImpl(
-			PredefinedElkIri.OWL_TOP_DATA_PROPERTY.get());
+			PredefinedElkIris.OWL_TOP_DATA_PROPERTY);
 
 	protected static final ElkDataProperty ELK_OWL_BOTTOM_DATA_PROPERTY = new ElkDataPropertyImpl(
-			PredefinedElkIri.OWL_BOTTOM_DATA_PROPERTY.get());
+			PredefinedElkIris.OWL_BOTTOM_DATA_PROPERTY);
 
 	protected static final ElkDatatype ELK_RDF_PLAIN_LITERAL = new ElkDatatypeImpl(
-			PredefinedElkIri.RDF_PLAIN_LITERAL.get());
+			PredefinedElkIris.RDF_PLAIN_LITERAL);
 
 	protected final ElkObjectRecycler objectRecycler_;
 

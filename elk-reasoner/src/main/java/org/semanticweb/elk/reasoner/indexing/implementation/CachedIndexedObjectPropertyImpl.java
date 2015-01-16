@@ -165,11 +165,6 @@ final class CachedIndexedObjectPropertyImpl
 		return '<' + getElkEntity().getIri().getFullIriAsString() + '>';
 	}
 
-	@Override
-	public final String getEntityType() {
-		return "ObjectProperty";
-	}
-
 	public final <O> O accept(IndexedObjectPropertyVisitor<O> visitor) {
 		return visitor.visit(this);
 	}

@@ -26,6 +26,7 @@
 package org.semanticweb.elk.owl.interfaces;
 
 import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.predefined.ElkEntityType;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 
 /**
@@ -41,6 +42,11 @@ public interface ElkEntity extends ElkObject {
 	 * @return The IRI of this entity.
 	 */
 	public ElkIri getIri();
+
+	/**
+	 * @return the type of this entity
+	 */
+	public ElkEntityType getEntityType();
 
 	/**
 	 * Accept an {@link ElkEntityVisitor}.

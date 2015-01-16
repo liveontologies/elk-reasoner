@@ -33,4 +33,6 @@ public interface CachedIndexedObjectFilter extends
 		CachedIndexedClassExpressionFilter, CachedIndexedPropertyChainFilter,
 		CachedIndexedAxiomFilter {
 
+	// no further specific methods
+
 }

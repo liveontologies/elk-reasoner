@@ -26,6 +26,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChai
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
+/**
+ * An {@link IndexedPropertyChain} that can be modified as a result of updating
+ * the {@link ModifiableOntologyIndex} where this object is stored.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public interface ModifiableIndexedPropertyChain extends
 		ModifiableIndexedObject, IndexedPropertyChain,
 		Comparable<ModifiableIndexedPropertyChain> {

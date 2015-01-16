@@ -24,6 +24,13 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 
+/**
+ * An {@link IndexedObjectSomeValuesFrom} that can be modified as a result of
+ * updating the {@link ModifiableOntologyIndex} where this object is stored.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public interface ModifiableIndexedObjectSomeValuesFrom extends
 		ModifiableIndexedClassExpression, IndexedObjectSomeValuesFrom {
 

@@ -26,8 +26,15 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 
+/**
+ * An {@link IndexedDisjointnessAxiom} that can be modified as a result of
+ * updating the {@link ModifiableOntologyIndex} where this object is stored.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public interface ModifiableIndexedDisjointnessAxiom extends
-		ModifiableIndexedCachedAxiom, IndexedDisjointnessAxiom {
+		IndexedDisjointnessAxiom {
 
 	@Override
 	public Set<? extends ModifiableIndexedClassExpression> getInconsistentMembers();

@@ -26,6 +26,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
+/**
+ * An {@link IndexedClassExpression} that can be modified as a result of
+ * updating the {@link ModifiableOntologyIndex} where this object is stored.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public interface ModifiableIndexedClassExpression extends
 		ModifiableIndexedObject, IndexedClassExpression,
 		Comparable<ModifiableIndexedClassExpression> {

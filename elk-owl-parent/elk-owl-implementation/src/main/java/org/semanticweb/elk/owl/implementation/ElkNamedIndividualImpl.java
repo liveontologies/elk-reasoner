@@ -25,6 +25,7 @@ package org.semanticweb.elk.owl.implementation;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.predefined.ElkEntityType;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkIndividualVisitor;
 import org.semanticweb.elk.owl.visitors.ElkNamedIndividualVisitor;
@@ -42,6 +43,11 @@ public class ElkNamedIndividualImpl extends ElkIriObject implements ElkEntity,
 
 	ElkNamedIndividualImpl(ElkIri iri) {
 		super(iri);
+	}
+
+	@Override
+	public ElkEntityType getEntityType() {
+		return ElkEntityType.NAMED_INDIVIDUAL;
 	}
 
 	@Override

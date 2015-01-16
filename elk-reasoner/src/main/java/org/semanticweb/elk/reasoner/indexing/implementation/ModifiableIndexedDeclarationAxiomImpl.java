@@ -49,8 +49,8 @@ class ModifiableIndexedDeclarationAxiomImpl extends ModifiableIndexedAxiomImpl
 
 	@Override
 	public final String toStringStructural() {
-		return "Declaration(" + entity_.getEntityType() + "(" + this.entity_
-				+ "))";
+		return "Declaration(" + entity_.getElkEntity().getEntityType() + "("
+				+ this.entity_ + "))";
 	}
 
 	@Override

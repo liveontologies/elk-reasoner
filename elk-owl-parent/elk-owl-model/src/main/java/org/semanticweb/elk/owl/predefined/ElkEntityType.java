@@ -1,12 +1,12 @@
-package org.semanticweb.elk.reasoner.indexing.modifiable;
+package org.semanticweb.elk.owl.predefined;
 
 /*
  * #%L
- * ELK Reasoner
+ * ELK OWL Object Interfaces
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,22 +22,29 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
-
 /**
- * An {@link IndexedSubObjectPropertyOfAxiom} that can be modified as a result
- * of updating the {@link ModifiableOntologyIndex} where this object is stored.
+ * Corresponds to the types <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Entity_Declarations_and_Typing" >Entity
+ * Declaration Axioms<a> in the OWL 2 specification.
  * 
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedSubObjectPropertyOfAxiom extends
-		ModifiableIndexedAxiom, IndexedSubObjectPropertyOfAxiom {
+public enum ElkEntityType {
+
+	CLASS("Class"), DATATYPE("Datatype"), OBJECT_PROPERTY("ObjectProperty"), DATA_PROPERTY(
+			"DataProperty"), ANNOTATION_PROPERTY("AnnotationProperty"), NAMED_INDIVIDUAL(
+			"NamedIndividual");
+
+	private String name_;
+
+	ElkEntityType(String name) {
+		this.name_ = name;
+	}
 
 	@Override
-	public ModifiableIndexedPropertyChain getSubPropertyChain();
-
-	@Override
-	public ModifiableIndexedObjectProperty getSuperProperty();
+	public String toString() {
+		return this.name_;
+	}
 
 }

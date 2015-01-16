@@ -119,7 +119,7 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 
 	protected static void setDefaultPrefixes(Owl2Parser parser) {
 		for (PredefinedElkPrefix prefix : PredefinedElkPrefix.values())
-			parser.declarePrefix(prefix.get());
+			parser.declarePrefix(prefix);
 	}
 
 	/**
@@ -260,7 +260,7 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 		expectedCountMap.put(ElkDifferentIndividualsAxiom.class, 1);
 
 		expectedCountMap.put(ElkDeclarationAxiom.class, 43);
-		
+
 		expectedCountMap.put(ElkSWRLRule.class, 3);
 
 		checkAxiomTypeCounts(counter, expectedCountMap, false);
@@ -370,7 +370,7 @@ public abstract class AbstractOwl2FunctionalSyntaxParseTest {
 
 		parseOntology(testString);
 	}
-	
+
 	@Test
 	public void testSWRL() throws Owl2ParseException {
 		String testString = "Prefix(:=<www.example.org>) "

@@ -28,6 +28,7 @@ package org.semanticweb.elk.owl.implementation;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.predefined.ElkEntityType;
 import org.semanticweb.elk.owl.visitors.ElkDataPropertyExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkDataPropertyVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
@@ -43,6 +44,11 @@ public class ElkDataPropertyImpl extends ElkIriObject implements ElkEntity,
 
 	ElkDataPropertyImpl(ElkIri iri) {
 		super(iri);
+	}
+
+	@Override
+	public ElkEntityType getEntityType() {
+		return ElkEntityType.DATA_PROPERTY;
 	}
 
 	@Override

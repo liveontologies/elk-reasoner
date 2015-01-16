@@ -31,7 +31,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
@@ -370,8 +369,8 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 				return;
 			}
 
-			if (candidate.getElkEntity().getIri() == PredefinedElkIri.OWL_THING
-					.get() && candidateSubsumersSize == 1) {
+			if (candidate.getElkEntity() == PredefinedElkClass.OWL_THING
+					&& candidateSubsumersSize == 1) {
 				/*
 				 * if subsumer is top and has no other subsumers (which means,
 				 * in particular, it does not occur negatively), then it can be
