@@ -82,7 +82,7 @@ public class RecursiveInferenceVisitor {
 			}
 			
 			if (!derived && !ProofUtils.isAsserted(next) ) {
-				LOGGER_.debug("Inferences not found for {}", next);
+				LOGGER_.warn("Inferences not found for {}", next);
 			}
 		}
 	}

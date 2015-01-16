@@ -37,19 +37,19 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class TopDownPropertySubsumptionInference extends SubPropertyChain<IndexedPropertyChain, IndexedObjectProperty>
+public class TopDownPropertySubsumptionInference extends SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>
 		implements ObjectPropertyInference {
 
 	private final IndexedObjectProperty premise_;
 	
 	public TopDownPropertySubsumptionInference(IndexedPropertyChain chain,
-			IndexedObjectProperty sup, IndexedObjectProperty premise) {
+			IndexedPropertyChain sup, IndexedObjectProperty premise) {
 		super(chain, sup);
 		premise_ = premise;
 	}
 
-	public SubPropertyChain<IndexedObjectProperty, IndexedObjectProperty> getPremise() {
-		return new SubPropertyChain<IndexedObjectProperty, IndexedObjectProperty>(premise_, getSuperPropertyChain());
+	public SubPropertyChain<IndexedObjectProperty, IndexedPropertyChain> getPremise() {
+		return new SubPropertyChain<IndexedObjectProperty, IndexedPropertyChain>(premise_, getSuperPropertyChain());
 	}
 	
 	@Override
@@ -60,7 +60,7 @@ public class TopDownPropertySubsumptionInference extends SubPropertyChain<Indexe
 	
 	@Override
 	public String toString() {
-		return "Told sub-chain: " + getSubPropertyChain() + " => " + getSuperPropertyChain() + ", premise: " + premise_ + " => " + getSuperPropertyChain();
+		return "Sub-chain: " + getSubPropertyChain() + " => " + getSuperPropertyChain() + ", premise: " + premise_ + " => " + getSuperPropertyChain();
 	}
 
 	@Override

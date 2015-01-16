@@ -57,7 +57,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(SubPropertyExplorer.class);
 
-	final private IndexedObjectProperty superProperty_;
+	final private IndexedPropertyChain superProperty_;
 
 	/**
 	 * the set that will be closed under sub-properties
@@ -82,8 +82,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 			Set<IndexedPropertyChain> subPropertyChains,
 			Set<IndexedObjectProperty> subProperties,
 			TraceStore.Writer traceWriter) {
-		this.superProperty_ = element instanceof IndexedObjectProperty ? (IndexedObjectProperty) element
-				: null;
+		this.superProperty_ = element;
 		this.subPropertyChains_ = subPropertyChains;
 		this.subProperties_ = subProperties;
 		this.traceWriter_ = traceWriter;
@@ -93,14 +92,10 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 
 	@Override
 	public Void visit(IndexedObjectProperty element) {
-		for (IndexedPropertyChain sub : element.getToldSubProperties())
-			if (superProperty_ != null) {
-				// with tracing
-				toDoWithTracing(sub, new TopDownPropertySubsumptionInference(sub, superProperty_, element));	
-			} else {
-				// without tracing
-				toDo(sub);
-			}
+		for (IndexedPropertyChain sub : element.getToldSubProperties()) {
+			toDoWithTracing(sub, new TopDownPropertySubsumptionInference(sub, superProperty_, element));
+		}
+		
 		return null;
 	}
 
@@ -126,11 +121,11 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		
 		traceWriter_.addObjectPropertyInference(inference);
 		
-		if (superProperty_ != null) {
+		if (superProperty_ != inference.getSuperPropertyChain()) {
 			// with tracing
 			toDoWithTracing(other, new BottomUpPropertySubsumptionInference(other, superProperty_, chain));	
 		} else {
-			// without tracing
+			// we have already written this inference, avoiding it here
 			toDo(other);
 		}	
 	}
@@ -145,15 +140,8 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		}
 	}
 	
-	private void toDoWithTracing(IndexedPropertyChain subProperty,
-			ObjectPropertyInference subPropertyInference) {
-		if (subPropertyChains_.add(subProperty)) {
-			toDoSubProperties_.add(subProperty);
-
-			if (subProperty instanceof IndexedObjectProperty) {
-				subProperties_.add((IndexedObjectProperty) subProperty);
-			}
-		}
+	private void toDoWithTracing(IndexedPropertyChain subProperty, ObjectPropertyInference subPropertyInference) {
+		toDo(subProperty);
 		
 		LOGGER_.trace("{}: new sub-property inference {}, inference {}", superProperty_, subProperty, subPropertyInference);
 		// record the inference

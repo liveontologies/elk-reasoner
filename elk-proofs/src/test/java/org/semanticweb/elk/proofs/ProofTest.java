@@ -88,7 +88,7 @@ public class ProofTest {
 		assumeTrue(!ignore(manifest.getInput()));
 	}
 
-	protected boolean ignore(@SuppressWarnings("unused") TestInput input) {
+	protected boolean ignore(TestInput input) {
 		return false;
 	}
 

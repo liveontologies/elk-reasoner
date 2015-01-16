@@ -38,6 +38,8 @@ import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.reasoner.Reasoner;
 
 /**
+ * Utilities for testing proofs
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de

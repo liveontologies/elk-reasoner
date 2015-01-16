@@ -27,9 +27,7 @@ package org.semanticweb.elk.proofs.inferences.properties;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -51,13 +49,12 @@ public class ChainSubsumption extends AbstractInference {
 	private final DerivedExpression conclusion_;
 
 	public ChainSubsumption(
-			ElkSubObjectPropertyOfAxiom conclusion,
+			DerivedExpression conclusion,
 			DerivedExpression first, 
-			ElkSubObjectPropertyOfAxiom second,
-			DerivedExpressionFactory exprFactory) {
+			DerivedExpression second) {
 		firstPremise_ = first;
-		secondPremise_ = exprFactory.create(second);
-		conclusion_ = exprFactory.create(conclusion);
+		secondPremise_ = second;
+		conclusion_ = conclusion;
 	}
 
 	@Override

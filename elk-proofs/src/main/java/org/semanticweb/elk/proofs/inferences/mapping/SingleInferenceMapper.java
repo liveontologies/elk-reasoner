@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
@@ -41,6 +42,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
+import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
@@ -70,6 +72,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChai
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.SideConditionLookup;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
@@ -464,36 +467,50 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(TopDownPropertySubsumptionInference inference,
-				Void input) {
-			final ElkObjectProperty sup = inference.getSuperPropertyChain().getElkObjectProperty();
-			ElkSubObjectPropertyOfAxiom sideCondition = (ElkSubObjectPropertyOfAxiom) sideConditionLookup_.lookup(inference);
+		public Inference visit(TopDownPropertySubsumptionInference inference, Void input) {
 			ElkObjectProperty h = inference.getPremise().getSubPropertyChain().getElkObjectProperty();
-			ElkSubObjectPropertyOfAxiom conclusion = inference.getSubPropertyChain().accept(new IndexedPropertyChainVisitor<ElkSubObjectPropertyOfAxiom>() {
-
-				@Override
-				public ElkSubObjectPropertyOfAxiom visit(IndexedObjectProperty property) {
-					ElkObjectProperty sub = Deindexer.deindex(property);
-					
-					return factory_.getSubObjectPropertyOfAxiom(sub, sup);
-				}
-
-				@Override
-				public ElkSubObjectPropertyOfAxiom visit(IndexedBinaryPropertyChain chain) {
-					ElkObjectPropertyChain sub = Deindexer.deindex(chain);
-					
-					return factory_.getSubObjectPropertyOfAxiom(sub, sup);
-				}
-			});
+			ElkSubObjectPropertyExpression ss = deindex(inference.getSuperPropertyChain());
+			ElkSubObjectPropertyOfAxiom sideCondition = (ElkSubObjectPropertyOfAxiom) sideConditionLookup_.lookup(inference);
+			DerivedExpression rrSS = createChainExpression(sideCondition.getSubObjectPropertyExpression(), ss);
+			DerivedExpression hSS = createChainExpression(h, ss);
 			
-			return new ChainSubsumption(conclusion, exprFactory_.createAsserted(sideCondition), factory_.getSubObjectPropertyOfAxiom(h, sup), exprFactory_);
+			return new ChainSubsumption(rrSS, hSS, exprFactory_.createAsserted(sideCondition));
 		}
 
 		@Override
-		public Inference visit(final BottomUpPropertySubsumptionInference inference,
-				Void input) {
-			final ElkObjectProperty s = inference.getSuperPropertyChain().getElkObjectProperty();
-			final ElkSubObjectPropertyExpression sub = inference.getSubPropertyChain().accept(new IndexedPropertyChainVisitor<ElkSubObjectPropertyExpression>() {
+		public Inference visit(final BottomUpPropertySubsumptionInference inference, Void input) {
+			final ElkSubObjectPropertyExpression ss = deindex(inference.getSuperPropertyChain());
+			final ElkSubObjectPropertyExpression rr = deindex(inference.getSubPropertyChain());
+			final ElkSubObjectPropertyExpression hh = deindex(inference.getFirstPremise().getSuperPropertyChain());
+			final DerivedExpression rrSubHH = createChainExpression(rr, hh);
+			final DerivedExpression hhSubSS = createChainExpression(hh, ss);
+			final DerivedExpression rrSubSS = createChainExpression(rr, ss);
+			
+			return new ChainSubsumption(rrSubSS, rrSubHH, hhSubSS);
+		}
+		
+		private DerivedExpression createChainExpression(final ElkSubObjectPropertyExpression sub, ElkSubObjectPropertyExpression sup) {
+			return sup.accept(new ElkSubObjectPropertyExpressionVisitor<DerivedExpression>() {
+
+				@Override
+				public DerivedExpression visit(ElkObjectInverseOf elkObjectInverseOf) {
+					throw new IllegalArgumentException("Unexpected inverse property in EL " + elkObjectInverseOf);
+				}
+
+				@Override
+				public DerivedExpression visit(ElkObjectProperty expr) {
+					return exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(sub, expr));
+				}
+
+				@Override
+				public DerivedExpression visit(ElkObjectPropertyChain expr) {
+					return exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(sub, expr));
+				}
+			});
+		}
+		
+		private ElkSubObjectPropertyExpression deindex(IndexedPropertyChain ipc) {
+			return ipc.accept(new IndexedPropertyChainVisitor<ElkSubObjectPropertyExpression>() {
 
 				@Override
 				public ElkSubObjectPropertyExpression visit(IndexedObjectProperty property) {
@@ -503,28 +520,6 @@ public class SingleInferenceMapper {
 				@Override
 				public ElkSubObjectPropertyExpression visit(IndexedBinaryPropertyChain chain) {
 					return Deindexer.deindex(chain);
-				}
-			});
-			
-			return inference.getFirstPremise().getSuperPropertyChain().accept(new IndexedPropertyChainVisitor<ChainSubsumption>() {
-
-				@Override
-				public ChainSubsumption visit(IndexedObjectProperty hh) {
-					// first premise is an axiom
-					DerivedExpression firstPremise = exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(sub, hh.getElkObjectProperty()));
-					ElkSubObjectPropertyOfAxiom secondPremise = factory_.getSubObjectPropertyOfAxiom(hh.getElkObjectProperty(), s);
-					
-					return new ChainSubsumption(factory_.getSubObjectPropertyOfAxiom(sub, s), firstPremise, secondPremise, exprFactory_);
-				}
-
-				@Override
-				public ChainSubsumption visit(IndexedBinaryPropertyChain hh) {
-					// first premise is not an axiom
-					ElkObjectPropertyChain chain = Deindexer.deindex(hh);
-					DerivedExpression firstPremise = exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(sub, chain));
-					ElkSubObjectPropertyOfAxiom secondPremise = factory_.getSubObjectPropertyOfAxiom(chain, s);
-					
-					return new ChainSubsumption(factory_.getSubObjectPropertyOfAxiom(sub, s), firstPremise, secondPremise, exprFactory_);
 				}
 			});
 		}

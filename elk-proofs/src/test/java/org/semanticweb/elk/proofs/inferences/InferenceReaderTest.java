@@ -72,12 +72,23 @@ public class InferenceReaderTest {
 	}
 	
 	@Test
+	public void compositionsWithReflexivity() throws Exception {
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositionsWithReflexivity.owl");
+		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
+		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/E"));
+		
+		TestUtils.provabilityTest(reasoner, sub, sup);
+		
+		reasoner.shutdown();
+	}
+	
+	@Test
 	//@Ignore("not a real test, more for manual debugging")
 	public void basicTest() throws Exception {
 		//Reasoner reasoner = TestReasonerUtils.loadAndClassify(new File("/home/pavel/ulm/data/galens/EL-GALEN.owl"));
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/AcyclicUnwinding.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositionsWithReflexivity.owl");
 		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
-		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/B"));
+		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/E"));
 		// print inferences 
 		RecursiveInferenceVisitor.visitInferences(reasoner, sub, sup, new AbstractInferenceVisitor<Void, Void>() {
 

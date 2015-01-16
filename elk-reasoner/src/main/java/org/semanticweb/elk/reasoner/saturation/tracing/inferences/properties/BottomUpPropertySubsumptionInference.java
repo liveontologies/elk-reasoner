@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.util.hashing.HashGenerator;
@@ -36,13 +35,13 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class BottomUpPropertySubsumptionInference extends SubPropertyChain<IndexedPropertyChain, IndexedObjectProperty>
+public class BottomUpPropertySubsumptionInference extends SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>
 		implements ObjectPropertyInference {
 
 	private final IndexedPropertyChain premise_;
 	
 	public BottomUpPropertySubsumptionInference(IndexedPropertyChain chain,
-			IndexedObjectProperty sup, IndexedPropertyChain premise) {
+			IndexedPropertyChain sup, IndexedPropertyChain premise) {
 		super(chain, sup);
 		premise_ = premise;
 	}
@@ -51,8 +50,8 @@ public class BottomUpPropertySubsumptionInference extends SubPropertyChain<Index
 		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(getSubPropertyChain(), premise_);
 	}
 	
-	public SubPropertyChain<?, IndexedObjectProperty> getSecondPremise() {
-		return new SubPropertyChain<IndexedPropertyChain, IndexedObjectProperty>(premise_, getSuperPropertyChain());
+	public SubPropertyChain<?, IndexedPropertyChain> getSecondPremise() {
+		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(premise_, getSuperPropertyChain());
 	}
 	
 	@Override
@@ -63,7 +62,7 @@ public class BottomUpPropertySubsumptionInference extends SubPropertyChain<Index
 	
 	@Override
 	public String toString() {
-		return "Told sub-chain: " + getSubPropertyChain() + " => " + getSuperPropertyChain() + ", premise: " + getSubPropertyChain() + " => " + premise_;
+		return "Sub-chain: " + getSubPropertyChain() + " => " + getSuperPropertyChain() + ", premise: " + getSubPropertyChain() + " => " + premise_;
 	}
 
 	@Override

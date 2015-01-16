@@ -200,6 +200,8 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 	
 	@Override
 	public synchronized boolean addInference(ObjectPropertyInference inference) {
+		//FIXME
+		//System.err.println(inference);
 		return inference.acceptTraced(inferenceWriter_, null);
 	}
 
