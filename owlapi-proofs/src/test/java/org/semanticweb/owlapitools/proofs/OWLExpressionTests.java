@@ -52,7 +52,7 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
 import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
 import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
-import org.semanticweb.owlapitools.proofs.util.LazyLemmaElimination;
+import org.semanticweb.owlapitools.proofs.util.GenericLemmaElimination;
 import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
 import org.semanticweb.owlapitools.proofs.util.TransformedOWLExpression;
 
@@ -110,7 +110,7 @@ public class OWLExpressionTests {
 		cSubR3R4R5F.addInference(new MockOWLInference(INF_PREFIX, cSubR3R4R5F, Arrays.<OWLExpression>asList(cSubR3D, dSubR4R5F)));
 		dSubR4R5F.addInference(new MockOWLInference(INF_PREFIX, dSubR4R5F, Arrays.<OWLExpression>asList(dSubR4E, eSubR5F)));
 		
-		TransformedOWLExpression<?> root = new TransformedOWLExpression<LazyLemmaElimination>(aSubG, new LazyLemmaElimination());
+		TransformedOWLExpression<?> root = new TransformedOWLExpression<GenericLemmaElimination>(aSubG, new GenericLemmaElimination());
 		
 		OWLProofUtils.visitExpressionsInProofGraph(root, new OWLExpressionVisitor<Void>() {
 
@@ -162,7 +162,7 @@ public class OWLExpressionTests {
 			.addInference(new MockOWLInference(INF_PREFIX, cSubR4R5D, Arrays.<OWLExpression>asList(cSubR4D1, d1SubR5D)))
 			.addInference(new MockOWLInference(INF_PREFIX, cSubR4R5D, Arrays.<OWLExpression>asList(cSubR4D2, d2SubR5D)));
 		
-		TransformedOWLExpression<?> root = new TransformedOWLExpression<LazyLemmaElimination>(aSubSE, new LazyLemmaElimination());
+		TransformedOWLExpression<?> root = new TransformedOWLExpression<GenericLemmaElimination>(aSubSE, new GenericLemmaElimination());
 		
 		OWLProofUtils.visitExpressionsInProofGraph(root, new OWLExpressionVisitor<Void>() {
 

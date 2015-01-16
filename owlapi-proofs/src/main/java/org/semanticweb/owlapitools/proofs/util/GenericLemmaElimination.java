@@ -48,7 +48,7 @@ import org.semanticweb.owlapitools.proofs.util.Operations.Transformation;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class LazyLemmaElimination implements Transformation<OWLInference, Iterable<OWLInference>> {
+public class GenericLemmaElimination implements Transformation<OWLInference, Iterable<OWLInference>> {
 
 	@Override
 	public Iterable<OWLInference> transform(final OWLInference inf) {
@@ -100,6 +100,7 @@ public class LazyLemmaElimination implements Transformation<OWLInference, Iterab
 							// inferences in which this lemma is sub'd by one of
 							// its inference's premises
 							try {
+								// TODO take care of premise ordering here
 								List<OWLExpression> otherPremises = new ArrayList<OWLExpression>(candidate.getPremises());
 								
 								otherPremises.remove(premise);
