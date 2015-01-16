@@ -25,6 +25,15 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedIndividual;
 
+/**
+ * A {@link ModifiableIndexedIndividual} that can be used for memoization
+ * (caching).
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <T>
+ *            the type of the {@link CachedIndexedIndividual}
+ */
 public interface CachedIndexedIndividual extends ModifiableIndexedIndividual,
 		CachedIndexedClassExpression<CachedIndexedIndividual>,
 		CachedIndexedClassEntity<CachedIndexedIndividual> {

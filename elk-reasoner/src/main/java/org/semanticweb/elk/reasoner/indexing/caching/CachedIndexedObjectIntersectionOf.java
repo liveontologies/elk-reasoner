@@ -25,13 +25,23 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectIntersectionOf;
 
+/**
+ * A {@link ModifiableIndexedObjectIntersectionOf} that can be used for
+ * memoization (caching).
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <T>
+ *            the type of the {@link CachedIndexedObjectIntersectionOf}
+ */
 public interface CachedIndexedObjectIntersectionOf extends
 		ModifiableIndexedObjectIntersectionOf,
 		CachedIndexedComplexClassExpression<CachedIndexedObjectIntersectionOf> {
 
 	static class Helper extends CachedIndexedObject.Helper {
 
-		public static int structuralHashCode(IndexedClassExpression firstConjunct,
+		public static int structuralHashCode(
+				IndexedClassExpression firstConjunct,
 				IndexedClassExpression secondConjunct) {
 			return combinedHashCode(CachedIndexedObjectIntersectionOf.class,
 					firstConjunct, secondConjunct);

@@ -23,23 +23,30 @@ package org.semanticweb.elk.reasoner.indexing.caching;
  */
 
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 
+/**
+ * A {@link CachedIndexedObjectFactory} that constructs objects using another
+ * {@link CachedIndexedObjectFactory} and updates the occurrence counts for the
+ * constructed objects using the provided {@link OccurrenceIncrement}.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @see {@link ModifiableIndexedObject#updateOccurrenceNumbers}
+ */
 public class UpdatingCachedIndexedObjectFactory extends
 		DelegatingCachedIndexedObjectFactory {
 
 	private final ModifiableOntologyIndex index_;
 
-	private final int increment_, positiveIncrement_, negativeIncrement_;
+	private final OccurrenceIncrement increment_;
 
 	public UpdatingCachedIndexedObjectFactory(
 			CachedIndexedObjectFactory baseFactory,
-			ModifiableOntologyIndex index, int increment,
-			int positiveIncerement, int negativeIncrement) {
+			ModifiableOntologyIndex index, OccurrenceIncrement increment) {
 		super(baseFactory);
 		this.index_ = index;
 		this.increment_ = increment;
-		this.positiveIncrement_ = positiveIncerement;
-		this.negativeIncrement_ = negativeIncrement;
 	}
 
 	@Override
@@ -51,8 +58,7 @@ public class UpdatingCachedIndexedObjectFactory extends
 		if (!result.occurs()) {
 			index_.add(result);
 		}
-		result.updateOccurrenceNumbers(index_, increment_, positiveIncrement_,
-				negativeIncrement_);
+		result.updateOccurrenceNumbers(index_, increment_);
 		if (!result.occurs()) {
 			index_.remove(result);
 		}

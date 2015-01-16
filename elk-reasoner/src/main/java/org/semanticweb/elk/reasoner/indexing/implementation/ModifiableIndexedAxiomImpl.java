@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 
@@ -43,9 +44,9 @@ abstract class ModifiableIndexedAxiomImpl extends ModifiableIndexedObjectImpl
 
 	@Override
 	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
+			OccurrenceIncrement increment) {
 		// positive and negative occurrences do not make sense for axioms
-		return updateOccurrenceNumbers(index, increment);
+		return updateOccurrenceNumbers(index, increment.totalIncrement);
 	}
 
 	abstract boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,

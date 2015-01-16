@@ -38,6 +38,11 @@ import org.semanticweb.elk.util.collections.entryset.EntryCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * An implementation of {@link ModifiableIndexedObjectCache}
+ * 
+ * @author "Yevgeny Kazakov"
+ */
 public class ModifiableIndexedObjectCacheImpl implements
 		ModifiableIndexedObjectCache {
 
@@ -47,7 +52,7 @@ public class ModifiableIndexedObjectCacheImpl implements
 
 	private final EntryCollection<CachedIndexedComplexClassExpression<?>> cachedComplexClassExpressions_;
 
-	private final EntryCollection<CachedIndexedComplexPropertyChain<?>> cachedComplexPropertyChains_;
+	private final EntryCollection<CachedIndexedBinaryPropertyChain> cachedBinaryPropertyChains_;
 
 	private final EntryCollection<CachedIndexedAxiom<?>> cachedAxioms_;
 
@@ -65,7 +70,7 @@ public class ModifiableIndexedObjectCacheImpl implements
 	public ModifiableIndexedObjectCacheImpl(int initialSize) {
 		this.cachedComplexClassExpressions_ = new EntryCollection<CachedIndexedComplexClassExpression<?>>(
 				initialSize);
-		this.cachedComplexPropertyChains_ = new EntryCollection<CachedIndexedComplexPropertyChain<?>>(
+		this.cachedBinaryPropertyChains_ = new EntryCollection<CachedIndexedBinaryPropertyChain>(
 				initialSize);
 		this.cachedAxioms_ = new EntryCollection<CachedIndexedAxiom<?>>(
 				initialSize);
@@ -116,9 +121,9 @@ public class ModifiableIndexedObjectCacheImpl implements
 	public Collection<? extends IndexedPropertyChain> getPropertyChains() {
 		return Operations.getCollection(
 				Operations.concat(cachedObjectProperties_,
-						cachedComplexPropertyChains_),
+						cachedBinaryPropertyChains_),
 				cachedObjectProperties_.size()
-						+ cachedComplexPropertyChains_.size());
+						+ cachedBinaryPropertyChains_.size());
 	}
 
 	@Override
@@ -200,7 +205,7 @@ public class ModifiableIndexedObjectCacheImpl implements
 		@Override
 		public CachedIndexedBinaryPropertyChain filter(
 				CachedIndexedBinaryPropertyChain element) {
-			return cachedComplexPropertyChains_.findStructural(element);
+			return cachedBinaryPropertyChains_.findStructural(element);
 		}
 
 		@Override
@@ -270,7 +275,7 @@ public class ModifiableIndexedObjectCacheImpl implements
 		@Override
 		public CachedIndexedBinaryPropertyChain filter(
 				CachedIndexedBinaryPropertyChain element) {
-			cachedComplexPropertyChains_.addStructural(element);
+			cachedBinaryPropertyChains_.addStructural(element);
 			return null;
 		}
 
@@ -334,7 +339,7 @@ public class ModifiableIndexedObjectCacheImpl implements
 		@Override
 		public CachedIndexedBinaryPropertyChain filter(
 				CachedIndexedBinaryPropertyChain element) {
-			return cachedComplexPropertyChains_.removeStructural(element);
+			return cachedBinaryPropertyChains_.removeStructural(element);
 		}
 
 		@Override

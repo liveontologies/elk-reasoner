@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressio
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectUnionOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectUnionFromDisjunctRule;
@@ -90,15 +91,15 @@ class CachedIndexedObjectUnionOfImpl extends
 
 	@Override
 	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
+			OccurrenceIncrement increment) {
 
-		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
+		if (negativeOccurrenceNo == 0 && increment.negativeIncrement > 0) {
 			// first negative occurrence of this expression
 			if (!ObjectUnionFromDisjunctRule.addRulesFor(this, index))
 				return false;
 		}
 
-		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
+		if (positiveOccurrenceNo == 0 && increment.positiveIncrement > 0) {
 			// first positive occurrence of this expression
 			if (LOGGER_.isWarnEnabled()) {
 				LoggerWrap
@@ -109,17 +110,17 @@ class CachedIndexedObjectUnionOfImpl extends
 			}
 		}
 
-		positiveOccurrenceNo += positiveIncrement;
-		negativeOccurrenceNo += negativeIncrement;
+		positiveOccurrenceNo += increment.positiveIncrement;
+		negativeOccurrenceNo += increment.negativeIncrement;
 
 		checkOccurrenceNumbers();
 
-		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
+		if (negativeOccurrenceNo == 0 && increment.negativeIncrement < 0) {
 			// no negative occurrences of this expression left
 			if (!ObjectUnionFromDisjunctRule.removeRulesFor(this, index)) {
 				// revert all changes
-				positiveOccurrenceNo -= positiveIncrement;
-				negativeOccurrenceNo -= negativeIncrement;
+				positiveOccurrenceNo -= increment.positiveIncrement;
+				negativeOccurrenceNo -= increment.negativeIncrement;
 				return false;
 			}
 		}

@@ -26,6 +26,7 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionFilter;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedEntityVisitor;
@@ -63,9 +64,9 @@ class CachedIndexedIndividualImpl extends
 
 	@Override
 	public boolean updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
+			OccurrenceIncrement increment) {
 
-		occurrenceNo += increment;
+		totalOccurrenceNo += increment.totalIncrement;
 		return true;
 	}
 

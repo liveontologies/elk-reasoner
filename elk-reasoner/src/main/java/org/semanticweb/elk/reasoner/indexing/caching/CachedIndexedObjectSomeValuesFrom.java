@@ -26,6 +26,15 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectSomeValuesFrom;
 
+/**
+ * A {@link ModifiableIndexedObjectSomeValuesFrom} that can be used for
+ * memoization (caching).
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <T>
+ *            the type of the {@link CachedIndexedObjectSomeValuesFrom}
+ */
 public interface CachedIndexedObjectSomeValuesFrom extends
 		ModifiableIndexedObjectSomeValuesFrom,
 		CachedIndexedComplexClassExpression<CachedIndexedObjectSomeValuesFrom> {

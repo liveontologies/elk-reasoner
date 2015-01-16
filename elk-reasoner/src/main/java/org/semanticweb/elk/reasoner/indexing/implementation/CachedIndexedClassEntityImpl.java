@@ -46,7 +46,7 @@ abstract class CachedIndexedClassEntityImpl<T extends CachedIndexedClassEntity<T
 	/**
 	 * This counts how many times this object occurred in the ontology.
 	 */
-	protected int occurrenceNo = 0;
+	protected int totalOccurrenceNo = 0;
 
 	CachedIndexedClassEntityImpl(int structuralHash) {
 		super(structuralHash);
@@ -54,19 +54,19 @@ abstract class CachedIndexedClassEntityImpl<T extends CachedIndexedClassEntity<T
 
 	@Override
 	public final boolean occurs() {
-		return occurrenceNo > 0;
+		return totalOccurrenceNo > 0;
 	}
 
 	@Override
 	public String printOccurrenceNumbers() {
-		return "[all=" + occurrenceNo + "]";
+		return "[all=" + totalOccurrenceNo + "]";
 	}
 
 	public void checkOccurrenceNumbers() {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(toString() + " occurences: "
 					+ printOccurrenceNumbers());
-		if (occurrenceNo < 0)
+		if (totalOccurrenceNo < 0)
 			throw new ElkUnexpectedIndexingException(toString()
 					+ " has a negative occurrence: " + printOccurrenceNumbers());
 	}

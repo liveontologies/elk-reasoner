@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedPropertyChainF
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectPropertyVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
@@ -143,8 +144,8 @@ final class CachedIndexedObjectPropertyImpl
 
 	@Override
 	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
-		occurrenceNo += increment;
+			OccurrenceIncrement increment) {
+		totalOccurrenceNo += increment.totalIncrement;
 		return true;
 	}
 

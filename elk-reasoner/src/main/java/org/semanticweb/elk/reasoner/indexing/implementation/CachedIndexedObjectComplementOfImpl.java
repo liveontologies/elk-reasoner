@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressio
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectComplementOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
@@ -52,7 +53,8 @@ class CachedIndexedObjectComplementOfImpl
 	private final ModifiableIndexedClassExpression negated_;
 
 	CachedIndexedObjectComplementOfImpl(ModifiableIndexedClassExpression negated) {
-		super(CachedIndexedObjectComplementOf.Helper.structuralHashCode(negated));
+		super(CachedIndexedObjectComplementOf.Helper
+				.structuralHashCode(negated));
 		this.negated_ = negated;
 	}
 
@@ -69,14 +71,14 @@ class CachedIndexedObjectComplementOfImpl
 
 	@Override
 	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
-		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
+			OccurrenceIncrement increment) {
+		if (positiveOccurrenceNo == 0 && increment.positiveIncrement > 0) {
 			// first positive occurrence of this expression
 			if (!ContradictionFromNegationRule.addRulesFor(this, index))
 				return false;
 		}
 
-		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
+		if (negativeOccurrenceNo == 0 && increment.negativeIncrement > 0) {
 			// first negative occurrence of this expression
 			if (LOGGER_.isWarnEnabled()) {
 				LoggerWrap
@@ -87,17 +89,17 @@ class CachedIndexedObjectComplementOfImpl
 			}
 		}
 
-		positiveOccurrenceNo += positiveIncrement;
-		negativeOccurrenceNo += negativeIncrement;
+		positiveOccurrenceNo += increment.positiveIncrement;
+		negativeOccurrenceNo += increment.negativeIncrement;
 
 		checkOccurrenceNumbers();
 
-		if (positiveOccurrenceNo == 0 && positiveIncrement < 0) {
+		if (positiveOccurrenceNo == 0 && increment.positiveIncrement < 0) {
 			// no positive occurrences of this expression left
 			if (!ContradictionFromNegationRule.removeRulesFor(this, index)) {
 				// revert all changes
-				positiveOccurrenceNo -= positiveIncrement;
-				negativeOccurrenceNo -= negativeIncrement;
+				positiveOccurrenceNo -= increment.positiveIncrement;
+				negativeOccurrenceNo -= increment.negativeIncrement;
 				return false;
 			}
 		}

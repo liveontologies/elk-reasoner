@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromDisjointnessRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerFromMemberRule;
@@ -62,7 +63,7 @@ class CachedIndexedDisjointnessAxiomImpl extends
 	 * This counts how often this {@link IndexedDisjointnessAxiom} occurs in the
 	 * ontology.
 	 */
-	int occurrenceNo_ = 0;
+	int totalOccurrenceNo_ = 0;
 
 	CachedIndexedDisjointnessAxiomImpl(
 			List<? extends ModifiableIndexedClassExpression> members) {
@@ -98,7 +99,7 @@ class CachedIndexedDisjointnessAxiomImpl extends
 
 	@Override
 	public final boolean occurs() {
-		return occurrenceNo_ > 0;
+		return totalOccurrenceNo_ > 0;
 	}
 
 	@Override
@@ -119,9 +120,9 @@ class CachedIndexedDisjointnessAxiomImpl extends
 
 	@Override
 	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
+			OccurrenceIncrement increment) {
 
-		if (occurrenceNo_ == 0 && increment > 0) {
+		if (totalOccurrenceNo_ == 0 && increment.totalIncrement > 0) {
 			// first occurrence of this axiom
 			if (!ContradictionFromDisjointnessRule.addRulesFor(this, index))
 				return false;
@@ -132,19 +133,19 @@ class CachedIndexedDisjointnessAxiomImpl extends
 			}
 		}
 
-		occurrenceNo_ += increment;
-		index.updatePositiveOwlNothingOccurrenceNo(increment);
+		totalOccurrenceNo_ += increment.totalIncrement;
+		index.updatePositiveOwlNothingOccurrenceNo(increment.totalIncrement);
 
-		if (occurrenceNo_ == 0 && increment < 0) {
+		if (totalOccurrenceNo_ == 0 && increment.totalIncrement < 0) {
 			// last occurrence of this axiom
 			if (!ContradictionFromDisjointnessRule.removeRulesFor(this, index)) {
 				// revert the changes
-				occurrenceNo_ -= increment;
+				totalOccurrenceNo_ -= increment.totalIncrement;
 				return false;
 			}
 			if (!DisjointSubsumerFromMemberRule.removeRulesFor(this, index)) {
 				// revert the changes
-				occurrenceNo_ -= increment;
+				totalOccurrenceNo_ -= increment.totalIncrement;
 				ContradictionFromDisjointnessRule.addRulesFor(this, index);
 				return false;
 			}

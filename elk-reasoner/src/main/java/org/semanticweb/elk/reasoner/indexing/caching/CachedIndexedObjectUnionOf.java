@@ -27,6 +27,15 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectUnionOf;
 
+/**
+ * A {@link ModifiableIndexedObjectUnionOf} that can be used for memoization
+ * (caching).
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <T>
+ *            the type of the {@link CachedIndexedObjectUnionOf}
+ */
 public interface CachedIndexedObjectUnionOf extends
 		ModifiableIndexedObjectUnionOf,
 		CachedIndexedComplexClassExpression<CachedIndexedObjectUnionOf> {

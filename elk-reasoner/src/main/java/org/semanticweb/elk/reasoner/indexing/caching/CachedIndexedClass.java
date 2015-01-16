@@ -25,6 +25,14 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 
+/**
+ * A {@link ModifiableIndexedClass} that can be used for memoization (caching).
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <T>
+ *            the type of the {@link CachedIndexedClass}
+ */
 public interface CachedIndexedClass extends ModifiableIndexedClass,
 		CachedIndexedClassEntity<CachedIndexedClass> {
 

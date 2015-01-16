@@ -25,6 +25,14 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedAxiom;
 import org.semanticweb.elk.util.collections.entryset.Entry;
 
+/**
+ * A {@link ModifiableIndexedAxiom} that can be used for memoization (caching).
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <T>
+ *            the type of the {@link CachedIndexedAxiom}
+ */
 public interface CachedIndexedAxiom<T extends CachedIndexedAxiom<T>> extends
 		ModifiableIndexedAxiom, CachedIndexedObject<T>,
 		Entry<T, CachedIndexedAxiom<?>> {

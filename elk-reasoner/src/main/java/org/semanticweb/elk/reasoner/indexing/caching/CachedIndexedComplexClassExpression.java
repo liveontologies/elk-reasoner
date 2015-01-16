@@ -24,6 +24,13 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 
 import org.semanticweb.elk.util.collections.entryset.Entry;
 
+/**
+ * A non-atomic {@link CachedIndexedClassExpression}, that is, not an
+ * {@link CachedIndexedClassEntity}
+ *
+ * @param <T>
+ *            the type of the {@link CachedIndexedComplexClassExpression}
+ */
 public interface CachedIndexedComplexClassExpression<T extends CachedIndexedComplexClassExpression<T>>
 		extends CachedIndexedClassExpression<T>,
 		Entry<T, CachedIndexedComplexClassExpression<?>> {

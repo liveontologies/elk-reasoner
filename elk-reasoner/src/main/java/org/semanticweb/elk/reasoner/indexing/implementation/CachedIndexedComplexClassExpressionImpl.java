@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedComplexClassEx
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,10 +99,8 @@ abstract class CachedIndexedComplexClassExpressionImpl<T extends CachedIndexedCo
 	}
 
 	final boolean updateAndCheckOccurrenceNumbers(
-			ModifiableOntologyIndex index, int increment,
-			int positiveIncrement, int negativeIncrement) {
-		if (!updateOccurrenceNumbers(index, increment, positiveIncrement,
-				negativeIncrement)) {
+			ModifiableOntologyIndex index, OccurrenceIncrement increment) {
+		if (!updateOccurrenceNumbers(index, increment)) {
 			LOGGER_.trace("{}: cannot index!", this);
 			return false;
 		}

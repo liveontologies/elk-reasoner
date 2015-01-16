@@ -37,6 +37,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
@@ -70,7 +71,7 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 	/**
 	 * This counts how often this object occurred in the ontology.
 	 */
-	int occurrenceNo = 0;
+	int totalOccurrenceNo = 0;
 
 	/**
 	 * The {@link SaturatedPropertyChain} object assigned to this
@@ -98,7 +99,7 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 
 	@Override
 	public final boolean occurs() {
-		return occurrenceNo > 0;
+		return totalOccurrenceNo > 0;
 	}
 
 	@Override
@@ -182,7 +183,7 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 	 *         {@link IndexedClassExpression}
 	 */
 	public final String printOccurrenceNumbers() {
-		return "[all=" + occurrenceNo + "]";
+		return "[all=" + totalOccurrenceNo + "]";
 	}
 
 	/**
@@ -191,16 +192,14 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 	public final void checkOccurrenceNumbers() {
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(this + " occurences: " + printOccurrenceNumbers());
-		if (occurrenceNo < 0)
+		if (totalOccurrenceNo < 0)
 			throw new ElkUnexpectedIndexingException(this
 					+ " has a negative occurrence: " + printOccurrenceNumbers());
 	}
 
 	public final boolean updateAndCheckOccurrenceNumbers(
-			ModifiableOntologyIndex index, int positiveIncrement,
-			int negativeIncrement, int increment) {
-		if (!updateOccurrenceNumbers(index, positiveIncrement,
-				negativeIncrement, increment))
+			ModifiableOntologyIndex index, OccurrenceIncrement increment) {
+		if (!updateOccurrenceNumbers(index, increment))
 			return false;
 		checkOccurrenceNumbers();
 		return true;

@@ -34,6 +34,16 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedReflexi
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubObjectPropertyOfAxiom;
 
+/**
+ * A {@link ModifiableIndexedObjectFactory} which uses a given
+ * {@link ModifiableIndexedObjectCache} to reuse the objects previously created
+ * by this factory. An object in the {@link ModifiableIndexedObjectCache} is
+ * reused (returned by the factory) if it is structurally equivalent to the one
+ * being constructed.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public class ResolvingModifiableIndexedObjectFactory extends
 		ResolvingCachedIndexedObjectFactory implements
 		ModifiableIndexedObjectFactory {

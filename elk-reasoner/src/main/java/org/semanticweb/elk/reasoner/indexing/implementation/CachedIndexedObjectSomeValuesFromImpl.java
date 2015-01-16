@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectSomeValu
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
@@ -71,28 +72,27 @@ class CachedIndexedObjectSomeValuesFromImpl
 	}
 
 	@Override
-	public final boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index, final int increment,
-			final int positiveIncrement, final int negativeIncrement) {
+	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
+			OccurrenceIncrement increment) {
 
-		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
+		if (negativeOccurrenceNo == 0 && increment.negativeIncrement > 0) {
 			// first negative occurrence of this expression
 			if (!PropagationFromExistentialFillerRule.addRuleFor(this, index))
 				return false;
 		}
 
-		negativeOccurrenceNo += negativeIncrement;
+		negativeOccurrenceNo += increment.negativeIncrement;
 
-		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
+		if (negativeOccurrenceNo == 0 && increment.negativeIncrement < 0) {
 			// no negative occurrences of this expression left
 			if (!PropagationFromExistentialFillerRule
 					.removeRuleFor(this, index)) {
 				// revert the changes
-				negativeOccurrenceNo -= negativeIncrement;
+				negativeOccurrenceNo -= increment.negativeIncrement;
 				return false;
 			}
 		}
-		positiveOccurrenceNo += positiveIncrement;
+		positiveOccurrenceNo += increment.positiveIncrement;
 		return true;
 
 	}

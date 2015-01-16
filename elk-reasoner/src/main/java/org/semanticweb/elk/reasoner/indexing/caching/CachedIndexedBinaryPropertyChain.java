@@ -25,14 +25,27 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedBinaryPropertyChain;
+import org.semanticweb.elk.util.collections.entryset.Entry;
 
-public interface CachedIndexedBinaryPropertyChain extends
+/**
+ * A {@link ModifiableIndexedBinaryPropertyChain} that can be used for
+ * memoization (caching).
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <T>
+ *            the type of the {@link CachedIndexedBinaryPropertyChain}
+ */
+public interface CachedIndexedBinaryPropertyChain
+		extends
 		ModifiableIndexedBinaryPropertyChain,
-		CachedIndexedComplexPropertyChain<CachedIndexedBinaryPropertyChain> {
+		CachedIndexedPropertyChain<CachedIndexedBinaryPropertyChain>,
+		Entry<CachedIndexedBinaryPropertyChain, CachedIndexedBinaryPropertyChain> {
 
 	static class Helper extends CachedIndexedObject.Helper {
 
-		public static int structuralHashCode(IndexedObjectProperty leftProperty,
+		public static int structuralHashCode(
+				IndexedObjectProperty leftProperty,
 				IndexedPropertyChain rightProperty) {
 			return combinedHashCode(CachedIndexedBinaryPropertyChain.class,
 					leftProperty, rightProperty);

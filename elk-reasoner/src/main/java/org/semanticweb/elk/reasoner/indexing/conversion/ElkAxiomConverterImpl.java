@@ -60,6 +60,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 
 /**
  * An implementation of {@link ElkAxiomConverter} that converts {@link ElkAxiom}
@@ -190,14 +191,13 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	<F extends CachedIndexedObjectFactory & ModifiableIndexedObjectFactory> ElkAxiomConverterImpl(
 			F baseFactory, ModifiableOntologyIndex index, int increment) {
 		this(new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
-				increment, 0, 0),// neutralFactory
+				OccurrenceIncrement.getNeutralIncrement(increment)),
 				new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
-						increment, increment, 0),// positiveFactory
+						OccurrenceIncrement.getPositiveIncrement(increment)),
 				new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
-						increment, 0, increment),// negative Factory
+						OccurrenceIncrement.getNegativeIncrement(increment)),
 				new UpdatingModifiableIndexedObjectFactory(baseFactory, index,
-						increment, increment, increment)// dualFactory
-		);
+						OccurrenceIncrement.getDualIncrement(increment)));
 	}
 
 	/**

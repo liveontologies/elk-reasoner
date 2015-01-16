@@ -25,6 +25,15 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectComplementOf;
 
+/**
+ * A {@link ModifiableIndexedObjectComplementOf} that can be used for
+ * memoization (caching).
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <T>
+ *            the type of the {@link CachedIndexedObjectComplementOf}
+ */
 public interface CachedIndexedObjectComplementOf extends
 		ModifiableIndexedObjectComplementOf,
 		CachedIndexedComplexClassExpression<CachedIndexedObjectComplementOf> {

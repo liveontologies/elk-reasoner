@@ -27,11 +27,33 @@ import java.util.List;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
+/**
+ * A {@link ModifiableIndexedObject} that can be used for memoization (caching),
+ * that is, reusing previously constructed structurally equal objects instead of
+ * creating new ones. To implement memoization, the objects require structural
+ * comparizon (equality and hash functions). These methods are provided for
+ * every type of {@link ModifiableIndexedObject} based on its fields using
+ * helper methods.
+ * 
+ * @see IndexedObjectCache
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <T>
+ *            the type of the {@link ModifiableIndexedObject}
+ */
 public interface CachedIndexedObject<T extends CachedIndexedObject<T>> extends
 		ModifiableIndexedObject {
 
+	/**
+	 * @return {@code true} if this object is memoized (occurs in the cache)
+	 */
 	boolean occurs();
 
+	/**
+	 * @param filter
+	 * @return the result of applying the filter to this object
+	 */
 	T accept(CachedIndexedObjectFilter filter);
 
 	static class Helper {

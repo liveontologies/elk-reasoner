@@ -22,6 +22,13 @@ package org.semanticweb.elk.reasoner.indexing.caching;
  * #L%
  */
 
+/**
+ * A filter method for types of {@link CachedIndexedObject} that produces
+ * elements of the same type.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public interface CachedIndexedObjectFilter extends
 		CachedIndexedClassExpressionFilter, CachedIndexedPropertyChainFilter,
 		CachedIndexedAxiomFilter {

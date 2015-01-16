@@ -28,6 +28,7 @@ import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionFilter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
@@ -64,18 +65,18 @@ final class CachedIndexedClassImpl extends
 		return CachedIndexedClass.Helper.structuralEquals(this, other);
 	}
 
-	boolean updateOccurrenceNo(final ModifiableOntologyIndex index,
-			int increment) {
+	boolean updateTotalOccurrenceNo(final ModifiableOntologyIndex index,
+			int totalIncrement) {
 
-		if (occurrenceNo == 0 && increment > 0) {
+		if (totalOccurrenceNo == 0 && totalIncrement > 0) {
 			if (elkClass_ == PredefinedElkClass.OWL_NOTHING
 					&& !ContradictionFromOwlNothingRule.addRuleFor(this, index)) {
 				return false;
 			}
 		}
-		occurrenceNo += increment;
+		totalOccurrenceNo += totalIncrement;
 
-		if (occurrenceNo == 0 && increment < 0) {
+		if (totalOccurrenceNo == 0 && totalIncrement < 0) {
 			if (elkClass_ == PredefinedElkClass.OWL_NOTHING
 					&& !ContradictionFromOwlNothingRule.removeRuleFor(this,
 							index)) {
@@ -120,21 +121,20 @@ final class CachedIndexedClassImpl extends
 
 	@Override
 	public final boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index, int increment,
-			int positiveIncrement, int negativeIncrement) {
+			final ModifiableOntologyIndex index, OccurrenceIncrement increment) {
 
-		if (!updateOccurrenceNo(index, increment)) {
+		if (!updateTotalOccurrenceNo(index, increment.totalIncrement)) {
 			return false;
 		}
-		if (!updatePositiveOccurrenceNo(index, positiveIncrement)) {
+		if (!updatePositiveOccurrenceNo(index, increment.positiveIncrement)) {
 			// revert the changes
-			updateOccurrenceNo(index, -increment);
+			updateTotalOccurrenceNo(index, -increment.positiveIncrement);
 			return false;
 		}
-		if (!updateNegativeOccurrenceNo(index, negativeIncrement)) {
+		if (!updateNegativeOccurrenceNo(index, increment.negativeIncrement)) {
 			// revert the changes
-			updateOccurrenceNo(index, -increment);
-			updatePositiveOccurrenceNo(index, -positiveIncrement);
+			updateTotalOccurrenceNo(index, -increment.negativeIncrement);
+			updatePositiveOccurrenceNo(index, -increment.positiveIncrement);
 			return false;
 		}
 

@@ -32,6 +32,14 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassEx
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 
+/**
+ * Delegates construction of {@link CachedIndexedObject} to a given
+ * {@link CachedIndexedObjectFactory}. Subclasses can redefine the the method
+ * {@link #filter(CachedIndexedObject)} which can additionally post-process the
+ * created object.
+ * 
+ * @author "Yevgeny Kazakov"
+ */
 public class DelegatingCachedIndexedObjectFactory implements
 		CachedIndexedObjectFactory {
 
@@ -42,7 +50,7 @@ public class DelegatingCachedIndexedObjectFactory implements
 	}
 
 	/**
-	 * Filters the objects created by the factory; can be overriden in
+	 * Filters the objects created by the factory; can be overridden in
 	 * subclasses
 	 * 
 	 * @param input

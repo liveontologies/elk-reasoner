@@ -33,7 +33,19 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedReflexi
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 
+/**
+ * A {@link ModifiableIndexedObjectFactory} that constructs objects using
+ * another {@link ModifiableIndexedObjectFactory} and updates the occurrence
+ * counts for the constructed objects using the provided
+ * {@link OccurrenceIncrement}.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @see {@link ModifiableIndexedObject#updateOccurrenceNumbers}
+ *
+ */
 public class UpdatingModifiableIndexedObjectFactory extends
 		UpdatingCachedIndexedObjectFactory implements
 		ModifiableIndexedObjectFactory {
@@ -42,27 +54,19 @@ public class UpdatingModifiableIndexedObjectFactory extends
 
 	private final ModifiableOntologyIndex index_;
 
-	private final int increment_;
-
-	private final int positiveIncrement_;
-
-	private final int negativeIncrement_;
+	private final OccurrenceIncrement increment_;
 
 	public <F extends CachedIndexedObjectFactory & ModifiableIndexedObjectFactory> UpdatingModifiableIndexedObjectFactory(
-			F baseFactory, ModifiableOntologyIndex index, int increment,
-			int positiveIncerement, int negativeIncrement) {
-		super(baseFactory, index, increment, positiveIncerement,
-				negativeIncrement);
+			F baseFactory, ModifiableOntologyIndex index,
+			OccurrenceIncrement increment) {
+		super(baseFactory, index, increment);
 		this.baseFactory_ = baseFactory;
 		this.index_ = index;
 		this.increment_ = increment;
-		this.positiveIncrement_ = positiveIncerement;
-		this.negativeIncrement_ = negativeIncrement;
 	}
 
 	<T extends ModifiableIndexedAxiom> T filter(T input) {
-		input.updateOccurrenceNumbers(index_, increment_, positiveIncrement_,
-				negativeIncrement_);
+		input.updateOccurrenceNumbers(index_, increment_);
 		return input;
 	}
 

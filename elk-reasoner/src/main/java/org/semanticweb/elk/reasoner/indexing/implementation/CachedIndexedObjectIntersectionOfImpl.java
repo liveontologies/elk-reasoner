@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectIntersec
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectIntersectionOfVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ObjectIntersectionFromConjunctRule;
@@ -99,24 +100,24 @@ class CachedIndexedObjectIntersectionOfImpl
 
 	@Override
 	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
+			OccurrenceIncrement increment) {
 
-		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
+		if (negativeOccurrenceNo == 0 && increment.negativeIncrement > 0) {
 			if (!ObjectIntersectionFromConjunctRule.addRulesFor(this, index)) {
 				return false;
 			}
 		}
 
-		positiveOccurrenceNo += positiveIncrement;
-		negativeOccurrenceNo += negativeIncrement;
+		positiveOccurrenceNo += increment.positiveIncrement;
+		negativeOccurrenceNo += increment.negativeIncrement;
 
 		checkOccurrenceNumbers();
 
-		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
+		if (negativeOccurrenceNo == 0 && increment.negativeIncrement < 0) {
 			if (!ObjectIntersectionFromConjunctRule.removeRulesFor(this, index)) {
 				// revert all changes
-				positiveOccurrenceNo -= positiveIncrement;
-				negativeOccurrenceNo -= negativeIncrement;
+				positiveOccurrenceNo -= increment.positiveIncrement;
+				negativeOccurrenceNo -= increment.negativeIncrement;
 				return false;
 			}
 		}

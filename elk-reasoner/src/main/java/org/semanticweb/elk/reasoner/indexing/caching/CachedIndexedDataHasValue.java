@@ -26,6 +26,15 @@ import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDataHasValue;
 
+/**
+ * A {@link ModifiableIndexedDataHasValue} that can be used for memoization
+ * (caching).
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <T>
+ *            the type of the {@link CachedIndexedDataHasValue}
+ */
 public interface CachedIndexedDataHasValue extends
 		ModifiableIndexedDataHasValue,
 		CachedIndexedComplexClassExpression<CachedIndexedDataHasValue> {

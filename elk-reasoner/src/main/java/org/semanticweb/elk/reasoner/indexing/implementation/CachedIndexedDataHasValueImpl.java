@@ -28,6 +28,7 @@ import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionFilter;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedDataHasValueVisitor;
 
@@ -47,8 +48,8 @@ class CachedIndexedDataHasValueImpl extends
 
 	private CachedIndexedDataHasValueImpl(ElkDataProperty property,
 			ElkLiteral filler) {
-		super(CachedIndexedDataHasValue.Helper
-				.structuralHashCode(property, filler));
+		super(CachedIndexedDataHasValue.Helper.structuralHashCode(property,
+				filler));
 		this.property_ = property;
 		this.filler_ = filler;
 	}
@@ -75,10 +76,9 @@ class CachedIndexedDataHasValueImpl extends
 
 	@Override
 	public final boolean updateOccurrenceNumbers(
-			final ModifiableOntologyIndex index, int increment,
-			int positiveIncrement, int negativeIncrement) {
-		positiveOccurrenceNo += positiveIncrement;
-		negativeOccurrenceNo += negativeIncrement;
+			final ModifiableOntologyIndex index, OccurrenceIncrement increment) {
+		positiveOccurrenceNo += increment.positiveIncrement;
+		negativeOccurrenceNo += increment.negativeIncrement;
 		return true;
 	}
 

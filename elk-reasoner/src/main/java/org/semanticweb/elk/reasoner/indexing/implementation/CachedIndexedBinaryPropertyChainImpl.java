@@ -23,12 +23,12 @@
 package org.semanticweb.elk.reasoner.indexing.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedBinaryPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedPropertyChainFilter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedBinaryPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisito
  */
 final class CachedIndexedBinaryPropertyChainImpl
 		extends
-		CachedIndexedPropertyChainImpl<CachedIndexedBinaryPropertyChain, CachedIndexedComplexPropertyChain<?>>
+		CachedIndexedPropertyChainImpl<CachedIndexedBinaryPropertyChain, CachedIndexedBinaryPropertyChain>
 		implements CachedIndexedBinaryPropertyChain {
 
 	private final ModifiableIndexedObjectProperty leftProperty_;
@@ -81,9 +81,9 @@ final class CachedIndexedBinaryPropertyChainImpl
 
 	@Override
 	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
+			OccurrenceIncrement increment) {
 
-		if (occurrenceNo == 0 && increment > 0) {
+		if (totalOccurrenceNo == 0 && increment.totalIncrement > 0) {
 			// first occurrence of this expression
 			if (!rightProperty_.addRightChain(this))
 				return false;
@@ -94,19 +94,19 @@ final class CachedIndexedBinaryPropertyChainImpl
 			}
 		}
 
-		occurrenceNo += increment;
+		totalOccurrenceNo += increment.totalIncrement;
 
-		if (occurrenceNo == 0 && increment < 0) {
+		if (totalOccurrenceNo == 0 && increment.totalIncrement < 0) {
 			// no occurrences of this conjunction left
 			if (!rightProperty_.removeRightChain(this)) {
 				// revert all changes
-				occurrenceNo -= increment;
+				totalOccurrenceNo -= increment.totalIncrement;
 				return false;
 			}
 			if (!leftProperty_.removeLeftChain(this)) {
 				// revert all changes
 				rightProperty_.addRightChain(this);
-				occurrenceNo -= increment;
+				totalOccurrenceNo -= increment.totalIncrement;
 				return false;
 			}
 		}
