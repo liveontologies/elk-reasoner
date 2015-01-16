@@ -31,9 +31,9 @@ import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
-import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.PropertyInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
@@ -43,20 +43,20 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class SubsumptionViaReflexivity extends AbstractInference  {
+public class SubsumptionViaReflexivity extends AbstractPropertyInference  {
 	
 	private final DerivedExpression premise_;
 	
-	private final DerivedExpression conclusion_;
-	
 	public SubsumptionViaReflexivity(ElkSubPropertyChainOfLemma conclusion, ElkReflexiveObjectPropertyAxiom premise, DerivedExpressionFactory exprFactory) {
+		super(exprFactory.create(conclusion));
+		
 		premise_ = exprFactory.create(premise);
-		conclusion_ = exprFactory.create(conclusion);
 	}
 	
 	public SubsumptionViaReflexivity(ElkSubPropertyChainOfLemma conclusion, DerivedExpression premise, DerivedExpressionFactory exprFactory) {
+		super(exprFactory.create(conclusion));
+		
 		premise_ = premise;
-		conclusion_ = exprFactory.create(conclusion);
 	}
 	
 	@Override
@@ -70,11 +70,6 @@ public class SubsumptionViaReflexivity extends AbstractInference  {
 	}
 
 	@Override
-	public DerivedExpression getConclusion() {
-		return conclusion_;
-	}
-
-	@Override
 	public String toString() {
 		return InferencePrinter.print(this);
 	}
@@ -82,5 +77,10 @@ public class SubsumptionViaReflexivity extends AbstractInference  {
 	@Override
 	public InferenceRule getRule() {
 		return InferenceRule.R_SUBSUMPTION_VIA_REFLEXIVITY;
+	}
+	
+	@Override
+	public <I, O> O accept(PropertyInferenceVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 }

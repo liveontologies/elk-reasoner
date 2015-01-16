@@ -52,10 +52,10 @@ public class DerivedExpressionFactoryWithCaching implements DerivedExpressionFac
 	}
 	
 	@Override
-	public DerivedAxiomExpressionImpl<?> create(ElkAxiom axiom) {
+	public <E extends ElkAxiom> DerivedAxiomExpressionImpl<E> create(E axiom) {
 		DerivedAxiomExpressionImpl<ElkAxiom> newExpr = new DerivedAxiomExpressionImpl<ElkAxiom>(axiom, reader_);
 		
-		return axiomLookup_.merge(newExpr);
+		return (DerivedAxiomExpressionImpl<E>) axiomLookup_.merge(newExpr);
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class DerivedExpressionFactoryWithCaching implements DerivedExpressionFac
 	}
 
 	@Override
-	public DerivedAxiomExpressionImpl<?> createAsserted(ElkAxiom axiom) {
+	public <E extends ElkAxiom> DerivedAxiomExpressionImpl<E> createAsserted(E axiom) {
 		DerivedAxiomExpressionImpl<ElkAxiom> newExpr = new DerivedAxiomExpressionImpl<ElkAxiom>(axiom, reader_, true);
 		DerivedAxiomExpressionImpl<ElkAxiom> oldExpr = axiomLookup_.merge(newExpr);
 		
@@ -74,7 +74,7 @@ public class DerivedExpressionFactoryWithCaching implements DerivedExpressionFac
 			oldExpr.setAsserted(axiom);
 		}
 		
-		return oldExpr;
+		return (DerivedAxiomExpressionImpl<E>) oldExpr;
 	}
 
 }

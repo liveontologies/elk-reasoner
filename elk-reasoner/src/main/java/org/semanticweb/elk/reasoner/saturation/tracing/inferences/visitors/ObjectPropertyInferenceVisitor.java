@@ -26,11 +26,11 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors;
 
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.BottomUpPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.GeneralSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.TopDownPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
 
 /**
@@ -40,9 +40,9 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Tol
  */
 public interface ObjectPropertyInferenceVisitor<I, O> {
 
-	public O visit(TopDownPropertySubsumptionInference inference, I input);
+	public O visit(ToldSubPropertyInference inference, I input);
 	
-	public O visit(BottomUpPropertySubsumptionInference inference, I input);
+	public O visit(GeneralSubPropertyInference inference, I input);
 	
 	public O visit(PropertyChainInitialization inference, I input);
 	
@@ -97,13 +97,13 @@ public interface ObjectPropertyInferenceVisitor<I, O> {
 		}
 
 		@Override
-		public Void visit(TopDownPropertySubsumptionInference inference, Void input) {
+		public Void visit(ToldSubPropertyInference inference, Void input) {
 			// no-op
 			return null;
 		}
 
 		@Override
-		public Void visit(BottomUpPropertySubsumptionInference inference, Void input) {
+		public Void visit(GeneralSubPropertyInference inference, Void input) {
 			// no-op
 			return null;
 		}

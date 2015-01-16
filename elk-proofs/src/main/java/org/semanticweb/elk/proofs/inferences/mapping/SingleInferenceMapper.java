@@ -43,6 +43,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
@@ -94,7 +95,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsu
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.BottomUpPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.GeneralSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
@@ -104,7 +105,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Rig
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.TopDownPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -280,10 +281,9 @@ public class SingleInferenceMapper {
 					exprFactory_);
 		}
 		
-		// Creates existential composition inferences by analyzing the chain premise. Depending on whether
-		// its LHS and RHS are object properties or chains, it creates the corresponding premise expressions (out of lemmas or axioms).
-		private ExistentialCompositionViaChain createExistentialCompositionInference(
-				DerivedExpression conclusion,
+		// creates two complex premises (which can be lemmas or axioms) of the existential inference via composition
+		// the premise of the form D <= SS some E is returned first, the premise of the form SS <= SS' second
+		private DerivedExpression[] createExistentialPremises(
 				ElkClassExpression d,
 				ElkClassExpression e,
 				SubPropertyChain<?,?> chainPremise,
@@ -294,7 +294,8 @@ public class SingleInferenceMapper {
 			DerivedExpression rightExistentialPremise = null;
 			DerivedExpression rightChainSubsumptionPremise = null;
 			ElkSubObjectPropertyExpression ss = null;
-			// create the right property chain premise
+			
+			// now create the right existential premise
 			if (chainPremise.getSubPropertyChain() instanceof IndexedBinaryPropertyChain) {
 				ss = Deindexer.deindex(chainPremise.getSubPropertyChain());
 				// a lemma
@@ -305,7 +306,7 @@ public class SingleInferenceMapper {
 				// an axiom
 				rightExistentialPremise = exprFactory_.create(factory_.getSubClassOfAxiom(d, factory_.getObjectSomeValuesFrom((ElkObjectProperty) ss, e)));
 			}
-			// now create the right existential premise
+			// create the property chain premise
 			if (chainPremise.getSuperPropertyChain() instanceof IndexedBinaryPropertyChain) {
 				// a lemma
 				ElkSubObjectPropertyExpression ssPrime = Deindexer.deindex(chainPremise.getSuperPropertyChain());				
@@ -319,15 +320,9 @@ public class SingleInferenceMapper {
 				rightChainSubsumptionPremise = exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(ss, ssPrime));
 			}
 			
-			return new ExistentialCompositionViaChain(
-					conclusion, 
-					exprFactory_.create(leftExistentialPremise), 
-					rightExistentialPremise, 
-					exprFactory_.create(leftChainPremise), 
-					rightChainSubsumptionPremise, 
-					chainAxiom == null ? null : exprFactory_.createAsserted(chainAxiom));
+			return new DerivedExpression[]{rightExistentialPremise, rightChainSubsumptionPremise};
 		}
-
+		
 		@Override
 		public Inference visit(ComposedBackwardLink inference, 	IndexedClassExpression whereStored) {
 			SubObjectProperty leftPropertyPremise = inference.getLeftSubObjectProperty();
@@ -346,7 +341,15 @@ public class SingleInferenceMapper {
 			// TODO will get rid of this cast later
 			ElkObjectPropertyAxiom chainAxiom = (ElkObjectPropertyAxiom) sideConditionLookup_.lookup(inference);		
 			
-			return createExistentialCompositionInference(exprFactory_.create(conclusion), d, e, rightChainPremise, firstExPremise, propSubsumption, chainAxiom);
+			DerivedExpression[] existentialPremises = createExistentialPremises(d, e, rightChainPremise, firstExPremise, propSubsumption, chainAxiom);
+			
+			return new ExistentialCompositionViaChain(
+					exprFactory_.create(conclusion), 
+					exprFactory_.create(firstExPremise), 
+					existentialPremises[0], 
+					exprFactory_.create(propSubsumption), 
+					existentialPremises[1], 
+					chainAxiom == null ? null : exprFactory_.createAsserted(chainAxiom));
 		}
 
 		@Override
@@ -364,7 +367,15 @@ public class SingleInferenceMapper {
 			ElkSubObjectPropertyExpression conclusionChain = Deindexer.deindex(inference.getRelation()); 
 			ElkSubClassOfLemma conclusion = lemmaObjectFactory_.getSubClassOfLemma(c, lemmaObjectFactory_.getComplexObjectSomeValuesFrom(conclusionChain, e));
 			
-			return createExistentialCompositionInference(exprFactory_.create(conclusion), d, e, rightChainPremise, firstExPremise, propSubsumption, null);
+			DerivedExpression[] existentialPremises = createExistentialPremises(d, e, rightChainPremise, firstExPremise, propSubsumption, null);
+			
+			return new ExistentialCompositionViaChain(
+					exprFactory_.create(conclusion), 
+					exprFactory_.create(firstExPremise), 
+					existentialPremises[0], 
+					exprFactory_.create(propSubsumption), 
+					existentialPremises[1], 
+					null);
 		}
 
 		@Override
@@ -467,35 +478,52 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(TopDownPropertySubsumptionInference inference, Void input) {
+		public Inference visit(ToldSubPropertyInference inference, Void input) {
 			ElkObjectProperty h = inference.getPremise().getSubPropertyChain().getElkObjectProperty();
 			ElkSubObjectPropertyExpression ss = deindex(inference.getSuperPropertyChain());
 			ElkSubObjectPropertyOfAxiom sideCondition = (ElkSubObjectPropertyOfAxiom) sideConditionLookup_.lookup(inference);
-			DerivedExpression rrSS = createChainExpression(sideCondition.getSubObjectPropertyExpression(), ss);
-			DerivedExpression hSS = createChainExpression(h, ss);
+			final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> rrH = exprFactory_.createAsserted(sideCondition);
+			final ElkSubObjectPropertyExpression rr = sideCondition.getSubObjectPropertyExpression();
+			final DerivedExpression hSS = createChainExpression(h, ss);
 			
-			return new ChainSubsumption(rrSS, hSS, exprFactory_.createAsserted(sideCondition));
+			return ss.accept(new BaseElkSubObjectPropertyExpressionVisitor<Inference>() {
+
+				@Override
+				public Inference visit(ElkObjectProperty expr) {
+					return new ChainSubsumption(exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(rr, expr)), hSS, rrH);
+				}
+
+				@Override
+				public Inference visit(ElkObjectPropertyChain expr) {
+					return new ChainSubsumption(exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(rr, expr)), hSS, rrH);
+				}
+			});
 		}
 
 		@Override
-		public Inference visit(final BottomUpPropertySubsumptionInference inference, Void input) {
+		public Inference visit(final GeneralSubPropertyInference inference, Void input) {
 			final ElkSubObjectPropertyExpression ss = deindex(inference.getSuperPropertyChain());
 			final ElkSubObjectPropertyExpression rr = deindex(inference.getSubPropertyChain());
 			final ElkSubObjectPropertyExpression hh = deindex(inference.getFirstPremise().getSuperPropertyChain());
-			final DerivedExpression rrSubHH = createChainExpression(rr, hh);
-			final DerivedExpression hhSubSS = createChainExpression(hh, ss);
-			final DerivedExpression rrSubSS = createChainExpression(rr, ss);
+			final DerivedExpression rrHH = createChainExpression(rr, hh);
+			final DerivedExpression hhSS = createChainExpression(hh, ss);
 			
-			return new ChainSubsumption(rrSubSS, rrSubHH, hhSubSS);
+			return ss.accept(new BaseElkSubObjectPropertyExpressionVisitor<Inference>() {
+
+				@Override
+				public Inference visit(ElkObjectProperty expr) {
+					return new ChainSubsumption(exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(rr, expr)), rrHH, hhSS);
+				}
+
+				@Override
+				public Inference visit(ElkObjectPropertyChain expr) {
+					return new ChainSubsumption(exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(rr, expr)), rrHH, hhSS);
+				}
+			});
 		}
 		
 		private DerivedExpression createChainExpression(final ElkSubObjectPropertyExpression sub, ElkSubObjectPropertyExpression sup) {
-			return sup.accept(new ElkSubObjectPropertyExpressionVisitor<DerivedExpression>() {
-
-				@Override
-				public DerivedExpression visit(ElkObjectInverseOf elkObjectInverseOf) {
-					throw new IllegalArgumentException("Unexpected inverse property in EL " + elkObjectInverseOf);
-				}
+			return sup.accept(new BaseElkSubObjectPropertyExpressionVisitor<DerivedExpression>() {
 
 				@Override
 				public DerivedExpression visit(ElkObjectProperty expr) {
@@ -595,5 +623,14 @@ public class SingleInferenceMapper {
 				
 			};
 		}
+	}
+	
+	private static abstract class BaseElkSubObjectPropertyExpressionVisitor<O> implements ElkSubObjectPropertyExpressionVisitor<O> {
+
+		@Override
+		public O visit(ElkObjectInverseOf elkObjectInverseOf) {
+			throw new IllegalArgumentException("Illegal use of inverse property in EL: " + elkObjectInverseOf);
+		}
+		
 	}
 }

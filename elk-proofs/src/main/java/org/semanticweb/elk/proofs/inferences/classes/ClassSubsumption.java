@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.inferences.ClassInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
@@ -51,7 +52,7 @@ public class ClassSubsumption extends AbstractClassInference {
 	public ClassSubsumption(ElkAxiom sideCondition,
 			ElkClassExpression sub, ElkClassExpression sup,
 			ElkClassExpression premise, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
-		super(factory.getSubClassOfAxiom(sub, sup), exprFactory);
+		super(exprFactory.create(factory.getSubClassOfAxiom(sub, sup)));
 
 		premise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, premise));
 		axiom_ = exprFactory.createAsserted(sideCondition);
@@ -75,5 +76,10 @@ public class ClassSubsumption extends AbstractClassInference {
 	@Override
 	public InferenceRule getRule() {
 		return InferenceRule.R_SUB;
+	}
+
+	@Override
+	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 }

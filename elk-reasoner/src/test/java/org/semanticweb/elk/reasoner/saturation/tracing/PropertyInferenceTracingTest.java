@@ -52,7 +52,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Ref
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.TopDownPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
@@ -105,7 +105,7 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(TopDownPropertySubsumptionInference inference,
+					public Boolean visit(ToldSubPropertyInference inference,
 							Void input) {
 						// checking that S -> HH is in the trace (i.e. is used)
 						return inference.getSubPropertyChain().equals(s) && 
@@ -190,7 +190,7 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(TopDownPropertySubsumptionInference inference,
+					public Boolean visit(ToldSubPropertyInference inference,
 							Void input) {
 						return inference.getSubPropertyChain().equals(sIndexed) &&
 								inference.getSuperPropertyChain().equals(ssIndexed);
@@ -232,7 +232,7 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(TopDownPropertySubsumptionInference inference,
+					public Boolean visit(ToldSubPropertyInference inference,
 							Void input) {
 						return inference.getSubPropertyChain().equals(rIndexed) &&
 								inference.getSuperPropertyChain().equals(rrIndexed);

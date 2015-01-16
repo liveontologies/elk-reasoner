@@ -57,7 +57,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubs
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.TopDownPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
@@ -238,7 +238,7 @@ public class TracingTest {
 
 						@Override
 						public Boolean visit(
-								TopDownPropertySubsumptionInference inference,
+								ToldSubPropertyInference inference,
 								Void input) {
 							ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 							

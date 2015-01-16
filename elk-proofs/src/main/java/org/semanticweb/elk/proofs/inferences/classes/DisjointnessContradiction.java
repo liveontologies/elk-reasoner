@@ -33,6 +33,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.inferences.ClassInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
@@ -52,7 +53,7 @@ public class DisjointnessContradiction extends
 	private final DerivedExpression axiom_;
 	
 	public DisjointnessContradiction(ElkClassExpression sub, ElkClassExpression firstSup, ElkClassExpression secondSup, ElkDisjointClassesAxiom sideCondition, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
-		super(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING), exprFactory);
+		super(exprFactory.create(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING)));
 
 		firstPremise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, firstSup));
 		secondPremise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, secondSup));
@@ -77,5 +78,10 @@ public class DisjointnessContradiction extends
 	@Override
 	public InferenceRule getRule() {
 		return InferenceRule.R_CONTRADITION_FROM_DISJOINTNESS;
+	}
+	
+	@Override
+	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 }

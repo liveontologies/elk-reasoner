@@ -26,9 +26,11 @@ package org.semanticweb.elk.proofs.inferences.properties;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
+import org.semanticweb.elk.proofs.inferences.PropertyInferenceVisitor;
 
 /**
  * The base class for class inferences whose conclusions are always object
@@ -42,8 +44,12 @@ abstract class AbstractPropertyInference extends AbstractInference {
 
 	final DerivedExpression conclusion;
 
-	AbstractPropertyInference(ElkObjectPropertyAxiom c, DerivedExpressionFactory factory) {
-		conclusion = factory.create(c);
+	AbstractPropertyInference(DerivedAxiomExpression<? extends ElkObjectPropertyAxiom> c) {
+		conclusion = c;
+	}
+	
+	AbstractPropertyInference(LemmaExpression c) {
+		conclusion = c;
 	}
 
 	@Override
@@ -51,4 +57,5 @@ abstract class AbstractPropertyInference extends AbstractInference {
 		return conclusion;
 	}
 	
+	public abstract <I, O> O accept(PropertyInferenceVisitor<I, O> visitor, I input);
 }

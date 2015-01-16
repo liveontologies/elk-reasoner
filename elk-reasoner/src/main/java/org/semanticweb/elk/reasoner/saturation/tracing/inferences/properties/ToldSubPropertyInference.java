@@ -24,34 +24,32 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
- * R <= S if R <= H and H <= S. This class stores H as the premise.
+ * Property hierarchy inference based on a told sub-property subsumption.
+ * RR <= SS if H <= SS and RR is a told sub-chain of H. This class stores H as the premise. RR <= H is a side condition.
  * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class BottomUpPropertySubsumptionInference extends SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>
+public class ToldSubPropertyInference extends SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>
 		implements ObjectPropertyInference {
 
-	private final IndexedPropertyChain premise_;
+	private final IndexedObjectProperty premise_;
 	
-	public BottomUpPropertySubsumptionInference(IndexedPropertyChain chain,
-			IndexedPropertyChain sup, IndexedPropertyChain premise) {
+	public ToldSubPropertyInference(IndexedPropertyChain chain,
+			IndexedPropertyChain sup, IndexedObjectProperty premise) {
 		super(chain, sup);
 		premise_ = premise;
 	}
 
-	public SubPropertyChain<?, ?> getFirstPremise() {
-		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(getSubPropertyChain(), premise_);
-	}
-	
-	public SubPropertyChain<?, IndexedPropertyChain> getSecondPremise() {
-		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(premise_, getSuperPropertyChain());
+	public SubPropertyChain<IndexedObjectProperty, IndexedPropertyChain> getPremise() {
+		return new SubPropertyChain<IndexedObjectProperty, IndexedPropertyChain>(premise_, getSuperPropertyChain());
 	}
 	
 	@Override
@@ -62,16 +60,16 @@ public class BottomUpPropertySubsumptionInference extends SubPropertyChain<Index
 	
 	@Override
 	public String toString() {
-		return "Sub-chain: " + getSubPropertyChain() + " => " + getSuperPropertyChain() + ", premise: " + getSubPropertyChain() + " => " + premise_;
+		return "Told sub-chain: " + getSubPropertyChain() + " => " + getSuperPropertyChain() + ", premise: " + premise_ + " => " + getSuperPropertyChain();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof BottomUpPropertySubsumptionInference)) {
+		if (obj == null || !(obj instanceof ToldSubPropertyInference)) {
 			return false;
 		}
 		
-		BottomUpPropertySubsumptionInference inf = (BottomUpPropertySubsumptionInference) obj;
+		ToldSubPropertyInference inf = (ToldSubPropertyInference) obj;
 		
 		return premise_.equals(inf.premise_) && getSubPropertyChain().equals(inf.getSubPropertyChain()) && getSuperPropertyChain().equals(inf.getSuperPropertyChain());
 	}
@@ -80,6 +78,4 @@ public class BottomUpPropertySubsumptionInference extends SubPropertyChain<Index
 	public int hashCode() {
 		return HashGenerator.combineListHash(premise_.hashCode(), getSubPropertyChain().hashCode(), getSuperPropertyChain().hashCode());
 	}
-
-	
 }

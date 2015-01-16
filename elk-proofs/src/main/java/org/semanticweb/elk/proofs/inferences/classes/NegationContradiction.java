@@ -32,6 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.inferences.ClassInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
@@ -49,7 +50,7 @@ public class NegationContradiction extends
 	private final DerivedExpression negativeSubsumer_;
 	
 	public NegationContradiction(ElkClassExpression sub, ElkClassExpression sup, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
-		super(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING), exprFactory);
+		super(exprFactory.create(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING)));
 
 		subsumer_ = exprFactory.create(factory.getSubClassOfAxiom(sub, sup));
 		negativeSubsumer_ = exprFactory.create(factory.getSubClassOfAxiom(sub, factory.getObjectComplementOf(sup)));
@@ -73,5 +74,10 @@ public class NegationContradiction extends
 	@Override
 	public InferenceRule getRule() {
 		return InferenceRule.R_CONTRADITION_FROM_NEGATION;
+	}
+	
+	@Override
+	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 }

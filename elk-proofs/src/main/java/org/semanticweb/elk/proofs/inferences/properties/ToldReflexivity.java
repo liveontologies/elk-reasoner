@@ -33,6 +33,7 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.PropertyInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
@@ -47,7 +48,7 @@ public class ToldReflexivity extends AbstractPropertyInference {
 	private final DerivedExpression premise_;
 	
 	public ToldReflexivity(ElkReflexiveObjectPropertyAxiom axiom, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
-		super(axiom, exprFactory);
+		super(exprFactory.create(axiom));
 		
 		axiom_ = exprFactory.createAsserted(axiom);
 		premise_ = exprFactory.create(factory.getSubObjectPropertyOfAxiom(axiom.getProperty(), axiom.getProperty()));
@@ -71,5 +72,10 @@ public class ToldReflexivity extends AbstractPropertyInference {
 	@Override
 	public InferenceRule getRule() {
 		return InferenceRule.R_TOLD_REFLEXIVITY;
+	}
+	
+	@Override
+	public <I, O> O accept(PropertyInferenceVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 }

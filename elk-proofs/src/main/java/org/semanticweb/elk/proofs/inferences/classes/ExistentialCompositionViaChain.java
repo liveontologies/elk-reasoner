@@ -27,8 +27,11 @@ package org.semanticweb.elk.proofs.inferences.classes;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.inferences.AbstractInference;
+import org.semanticweb.elk.proofs.inferences.ClassInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
@@ -40,7 +43,7 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ExistentialCompositionViaChain extends AbstractInference {
+public class ExistentialCompositionViaChain extends AbstractClassInference {
 
 	private final DerivedExpression firstExistentialPremise_;
 
@@ -51,23 +54,36 @@ public class ExistentialCompositionViaChain extends AbstractInference {
 	private final DerivedExpression secondPropertySubsumptionPremise_;
 
 	private final DerivedExpression chainPremise_;
-	
-	private final DerivedExpression conclusion_;
-
+	// conclusion is an axiom
 	public ExistentialCompositionViaChain(
-			DerivedExpression conclusion,
+			DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion,
 			DerivedExpression firstExPremise,
 			DerivedExpression secondExPremise,
 			DerivedExpression propSubsumption,
 			DerivedExpression chainSubsumption,
 			DerivedExpression chainAxiom) {
-		conclusion_ = conclusion;
+		super(conclusion);
 		firstExistentialPremise_ = firstExPremise;
 		secondExistentialPremise_ = secondExPremise;
 		firstPropertySubsumptionPremise_ = propSubsumption;
 		secondPropertySubsumptionPremise_ = chainSubsumption;
 		chainPremise_ = chainAxiom;
 	}	
+	// conclusion is a lemma
+	public ExistentialCompositionViaChain(
+			LemmaExpression conclusion,
+			DerivedExpression firstExPremise,
+			DerivedExpression secondExPremise,
+			DerivedExpression propSubsumption,
+			DerivedExpression chainSubsumption,
+			DerivedExpression chainAxiom) {
+		super(conclusion);
+		firstExistentialPremise_ = firstExPremise;
+		secondExistentialPremise_ = secondExPremise;
+		firstPropertySubsumptionPremise_ = propSubsumption;
+		secondPropertySubsumptionPremise_ = chainSubsumption;
+		chainPremise_ = chainAxiom;
+	}
 	
 	@Override
 	public Collection<DerivedExpression> getRawPremises() {
@@ -85,11 +101,6 @@ public class ExistentialCompositionViaChain extends AbstractInference {
 	}
 
 	@Override
-	public DerivedExpression getConclusion() {
-		return conclusion_;
-	}
-
-	@Override
 	public String toString() {
 		return InferencePrinter.print(this);
 	}
@@ -97,5 +108,10 @@ public class ExistentialCompositionViaChain extends AbstractInference {
 	@Override
 	public InferenceRule getRule() {
 		return InferenceRule.R_EXIST_CHAIN_COMPOSITION;
+	}
+	
+	@Override
+	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 }

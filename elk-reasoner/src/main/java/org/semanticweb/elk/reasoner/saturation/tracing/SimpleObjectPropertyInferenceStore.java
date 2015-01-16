@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.BottomUpPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.GeneralSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Ref
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.TopDownPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
@@ -120,12 +120,12 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 		}
 
 		@Override
-		public Boolean visit(TopDownPropertySubsumptionInference inference, Void input) {
+		public Boolean visit(ToldSubPropertyInference inference, Void input) {
 			return writeSubPropertyChainInference(inference.getSubPropertyChain(), inference.getSuperPropertyChain(), inference);
 		}
 		
 		@Override
-		public Boolean visit(BottomUpPropertySubsumptionInference inference, Void input) {
+		public Boolean visit(GeneralSubPropertyInference inference, Void input) {
 			return writeSubPropertyChainInference(inference.getSubPropertyChain(), inference.getSuperPropertyChain(), inference);
 		}
 		

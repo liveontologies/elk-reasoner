@@ -27,10 +27,13 @@ package org.semanticweb.elk.proofs.inferences.properties;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.PropertyInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
@@ -40,31 +43,35 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ChainSubsumption extends AbstractInference {
+public class ChainSubsumption extends AbstractPropertyInference {
 
 	private final DerivedExpression firstPremise_;
 
 	private final DerivedExpression secondPremise_;
-
-	private final DerivedExpression conclusion_;
-
+	// conclusion is representable in OWL
 	public ChainSubsumption(
-			DerivedExpression conclusion,
+			DerivedAxiomExpression<? extends ElkObjectPropertyAxiom> conclusion,
 			DerivedExpression first, 
 			DerivedExpression second) {
+		super(conclusion);
+		
 		firstPremise_ = first;
 		secondPremise_ = second;
-		conclusion_ = conclusion;
+	}
+	// conclusion is not representable in OWL, i.e. is a lemma
+	public ChainSubsumption(
+			LemmaExpression conclusion,
+			DerivedExpression first, 
+			DerivedExpression second) {
+		super(conclusion);
+		
+		firstPremise_ = first;
+		secondPremise_ = second;
 	}
 
 	@Override
 	public Collection<DerivedExpression> getRawPremises() {
 		return Arrays.asList(firstPremise_, secondPremise_);
-	}
-
-	@Override
-	public DerivedExpression getConclusion() {
-		return conclusion_;
 	}
 
 	@Override
@@ -80,5 +87,10 @@ public class ChainSubsumption extends AbstractInference {
 	@Override
 	public InferenceRule getRule() {
 		return InferenceRule.R_CHAIN_SUBSUMPTION;
+	}
+	
+	@Override
+	public <I, O> O accept(PropertyInferenceVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 }

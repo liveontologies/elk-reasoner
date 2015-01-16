@@ -44,7 +44,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagat
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.TopDownPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
@@ -207,7 +207,7 @@ public class SideConditionLookup {
 
 		@Override
 		public ElkObjectPropertyAxiom visit(
-				TopDownPropertySubsumptionInference inference, Void input) {
+				ToldSubPropertyInference inference, Void input) {
 			IndexedObjectPropertyWithBinding property = withBinding(inference.getPremise().getSubPropertyChain());
 			
 			if (property != null) {

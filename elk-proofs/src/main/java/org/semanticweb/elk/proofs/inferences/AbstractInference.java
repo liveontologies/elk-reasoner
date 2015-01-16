@@ -49,7 +49,7 @@ public abstract class AbstractInference implements Inference {
 		if (premises_ != null) {
 			return premises_;
 		}
-		
+		// TODO move this to a transformation
 		premises_ = new LinkedList<DerivedExpression>();
 		// filtering out tautologies
 		final TautologyChecker checker = new TautologyChecker();

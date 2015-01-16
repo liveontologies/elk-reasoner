@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.inferences.ClassInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
@@ -52,8 +53,7 @@ public class InconsistentDisjointness extends AbstractClassInference {
 	public InconsistentDisjointness(ElkClassExpression sub,
 			ElkClassExpression sup, ElkDisjointClassesAxiom sideCondition,
 			ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
-		super(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING),
-				exprFactory);
+		super(exprFactory.create(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING)));
 
 		premise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, sup));
 		axiom_ = exprFactory.createAsserted(sideCondition);
@@ -77,5 +77,10 @@ public class InconsistentDisjointness extends AbstractClassInference {
 	@Override
 	public InferenceRule getRule() {
 		return InferenceRule.R_INCONSISTENT_DISJOINTNESS;
+	}
+	
+	@Override
+	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 }

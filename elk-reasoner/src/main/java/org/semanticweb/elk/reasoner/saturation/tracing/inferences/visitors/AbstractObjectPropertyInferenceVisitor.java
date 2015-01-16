@@ -28,11 +28,11 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.BottomUpPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.GeneralSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.TopDownPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
 
 /**
@@ -78,13 +78,13 @@ public abstract class AbstractObjectPropertyInferenceVisitor<I, O> implements
 	}
 	
 	@Override
-	public O visit(TopDownPropertySubsumptionInference inference, I input) {
+	public O visit(ToldSubPropertyInference inference, I input) {
 		return defaultTracedVisit(inference, input);
 
 	}
 	
 	@Override
-	public O visit(BottomUpPropertySubsumptionInference inference, I input) {
+	public O visit(GeneralSubPropertyInference inference, I input) {
 		return defaultTracedVisit(inference, input);
 
 	}

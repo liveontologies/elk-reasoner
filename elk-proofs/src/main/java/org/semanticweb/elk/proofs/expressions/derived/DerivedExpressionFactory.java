@@ -44,9 +44,9 @@ public interface DerivedExpressionFactory {
 	 * @param axiom
 	 * @return
 	 */
-	public DerivedAxiomExpressionImpl<?> createAsserted(ElkAxiom axiom);
+	public <E extends ElkAxiom> DerivedAxiomExpressionImpl<E> createAsserted(E axiom);
 	
-	public DerivedAxiomExpressionImpl<?> create(ElkAxiom axiom);
+	public <E extends ElkAxiom> DerivedAxiomExpressionImpl<E> create(E axiom);
 	
 	public LemmaExpressionImpl create(ElkLemma lemma);
 }

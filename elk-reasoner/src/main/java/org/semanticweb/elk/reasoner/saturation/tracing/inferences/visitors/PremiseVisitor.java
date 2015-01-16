@@ -52,7 +52,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsu
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.BottomUpPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.GeneralSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
@@ -60,7 +60,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Ref
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.TopDownPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 
 /**
  * Visits all premises for the given {@link ClassInference} or {@link ObjectPropertyInference}. Each premise implements
@@ -255,13 +255,13 @@ public class PremiseVisitor<I, O> implements ClassInferenceVisitor<I, O>, Object
 	}
 
 	@Override
-	public O visit(TopDownPropertySubsumptionInference inference, I input) {
+	public O visit(ToldSubPropertyInference inference, I input) {
 		inference.getPremise().accept(propertyConclusionVisitor_, input);
 		return null;
 	}
 	
 	@Override
-	public O visit(BottomUpPropertySubsumptionInference inference, I input) {
+	public O visit(GeneralSubPropertyInference inference, I input) {
 		inference.getFirstPremise().accept(propertyConclusionVisitor_, input);
 		inference.getSecondPremise().accept(propertyConclusionVisitor_, input);
 		return null;

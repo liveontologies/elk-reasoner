@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.inferences.ClassInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
@@ -59,7 +60,7 @@ public class ExistentialComposition extends AbstractClassInference {
 			ElkSubObjectPropertyOfAxiom propPremise,
 			ElkObjectFactory factory, 
 			DerivedExpressionFactory exprFactory) {
-		super(factory.getSubClassOfAxiom(sub, sup), exprFactory);
+		super(exprFactory.create(factory.getSubClassOfAxiom(sub, sup)));
 
 		existentialPremise_ = exprFactory.create(exPremise);
 		subsumerPremise_ = exprFactory.create(subPremise);
@@ -85,5 +86,10 @@ public class ExistentialComposition extends AbstractClassInference {
 	@Override
 	public InferenceRule getRule() {
 		return InferenceRule.R_EXIST_COMPOSITION;
+	}
+	
+	@Override
+	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 }

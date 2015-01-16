@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.inferences.ClassInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
@@ -47,7 +48,7 @@ public class ConjunctionDecomposition extends
 	
 	// the first conjunct is the super class 
 	public ConjunctionDecomposition(ElkClassExpression sub, ElkClassExpression sup, ElkClassExpression otherConjunct, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
-		super(factory.getSubClassOfAxiom(sub, sup), exprFactory);
+		super(exprFactory.create(factory.getSubClassOfAxiom(sub, sup)));
 
 		premise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(sup, otherConjunct)));
 	}
@@ -70,5 +71,10 @@ public class ConjunctionDecomposition extends
 	@Override
 	public InferenceRule getRule() {
 		return InferenceRule.R_AND_DECOMPOSITION;
+	}
+	
+	@Override
+	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 }

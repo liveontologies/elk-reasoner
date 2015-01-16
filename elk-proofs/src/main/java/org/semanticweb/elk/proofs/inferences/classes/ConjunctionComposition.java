@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.inferences.ClassInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
@@ -48,7 +49,7 @@ public class ConjunctionComposition extends
 	private final DerivedExpression secondPremise_;
 	
 	public ConjunctionComposition(ElkClassExpression sub, ElkClassExpression firstConjunct, ElkClassExpression secondConjunct, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
-		super(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(firstConjunct, secondConjunct)), exprFactory);
+		super(exprFactory.create(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(firstConjunct, secondConjunct))));
 
 		firstPremise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, firstConjunct));
 		secondPremise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, secondConjunct));
@@ -72,5 +73,10 @@ public class ConjunctionComposition extends
 	@Override
 	public InferenceRule getRule() {
 		return InferenceRule.R_AND_COMPOSITION;
+	}
+	
+	@Override
+	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 }

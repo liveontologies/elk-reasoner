@@ -31,9 +31,9 @@ import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkReflexivePropertyChainLemma;
-import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.PropertyInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
@@ -41,18 +41,17 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReflexiveComposition extends AbstractInference {
+public class ReflexiveComposition extends AbstractPropertyInference {
 
 	private final DerivedExpression firstReflexive_;
 	
 	private final DerivedExpression secondReflexive_;
 	
-	private final DerivedExpression conclusion_;
-	
 	public ReflexiveComposition(ElkReflexivePropertyChainLemma conclusion, ElkReflexiveObjectPropertyAxiom firstRefl, DerivedExpression secondRefl, DerivedExpressionFactory exprFactory) {
+		super(exprFactory.create(conclusion));
+		
 		firstReflexive_ = exprFactory.create(firstRefl);
 		secondReflexive_ = secondRefl;
-		conclusion_ = exprFactory.create(conclusion);
 	}
 	
 	@Override
@@ -66,11 +65,6 @@ public class ReflexiveComposition extends AbstractInference {
 	}
 
 	@Override
-	public DerivedExpression getConclusion() {
-		return conclusion_;
-	}
-
-	@Override
 	public String toString() {
 		return InferencePrinter.print(this);
 	}
@@ -78,5 +72,10 @@ public class ReflexiveComposition extends AbstractInference {
 	@Override
 	public InferenceRule getRule() {
 		return InferenceRule.R_REFLEXIVE_COMPOSITION;
+	}
+	
+	@Override
+	public <I, O> O accept(PropertyInferenceVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 }

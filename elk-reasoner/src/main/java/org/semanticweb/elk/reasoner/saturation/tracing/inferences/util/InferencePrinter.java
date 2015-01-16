@@ -49,11 +49,11 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubs
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.BottomUpPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.GeneralSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.TopDownPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
@@ -211,12 +211,12 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>, Ob
 	}
 
 	@Override
-	public String visit(TopDownPropertySubsumptionInference inference, Void input) {
+	public String visit(ToldSubPropertyInference inference, Void input) {
 		return "Told sub-chain: " + inference.getSubPropertyChain() + " => " + inference.getSuperPropertyChain() + ", premise: " + inference.getPremise();
 	}
 	
 	@Override
-	public String visit(BottomUpPropertySubsumptionInference inference, Void input) {
+	public String visit(GeneralSubPropertyInference inference, Void input) {
 		return "Told sub-chain: " + inference.getSubPropertyChain() + " => " + inference.getSuperPropertyChain() + ", premise: " + inference.getFirstPremise();
 	}
 

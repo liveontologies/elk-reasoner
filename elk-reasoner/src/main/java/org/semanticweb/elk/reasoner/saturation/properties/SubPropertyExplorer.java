@@ -33,10 +33,10 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisito
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.BottomUpPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.GeneralSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.TopDownPropertySubsumptionInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -93,7 +93,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	@Override
 	public Void visit(IndexedObjectProperty element) {
 		for (IndexedPropertyChain sub : element.getToldSubProperties()) {
-			toDoWithTracing(sub, new TopDownPropertySubsumptionInference(sub, superProperty_, element));
+			toDoWithTracing(sub, new ToldSubPropertyInference(sub, superProperty_, element));
 		}
 		
 		return null;
@@ -123,7 +123,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		
 		if (superProperty_ != inference.getSuperPropertyChain()) {
 			// with tracing
-			toDoWithTracing(other, new BottomUpPropertySubsumptionInference(other, superProperty_, chain));	
+			toDoWithTracing(other, new GeneralSubPropertyInference(other, superProperty_, chain));	
 		} else {
 			// we have already written this inference, avoiding it here
 			toDo(other);
