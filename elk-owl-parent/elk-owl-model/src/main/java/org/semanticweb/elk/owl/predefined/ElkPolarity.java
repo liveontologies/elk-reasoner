@@ -56,7 +56,13 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  */
 public enum ElkPolarity {
 
-	POSITIVE(), NEGATIVE(POSITIVE), DUAL(), NEUTRAL();
+	POSITIVE(),
+
+	NEGATIVE(POSITIVE),
+
+	DUAL(),
+
+	NEUTRAL();
 
 	private ElkPolarity complementary_;
 

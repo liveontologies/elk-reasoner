@@ -34,10 +34,14 @@ import org.semanticweb.elk.owl.iris.ElkPrefix;
  */
 public enum PredefinedElkPrefix implements ElkPrefix {
 
-	RDF("rdf:", new ElkFullIri("http://www.w3.org/1999/02/22-rdf-syntax-ns#")), //
-	RDFS("rdfs:", new ElkFullIri("http://www.w3.org/2000/01/rdf-schema#")), //
-	XSD("xsd:", new ElkFullIri("http://www.w3.org/2001/XMLSchema#")), //
-	OWL("owl:", new ElkFullIri("http://www.w3.org/2002/07/owl#"))//
+	RDF("rdf:", new ElkFullIri("http://www.w3.org/1999/02/22-rdf-syntax-ns#")),
+
+	RDFS("rdfs:", new ElkFullIri("http://www.w3.org/2000/01/rdf-schema#")),
+
+	XSD("xsd:", new ElkFullIri("http://www.w3.org/2001/XMLSchema#")),
+
+	OWL("owl:", new ElkFullIri("http://www.w3.org/2002/07/owl#")),
+
 	;
 
 	private final String name_;

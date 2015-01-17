@@ -1,11 +1,12 @@
+package org.semanticweb.elk.owl.predefined;
+
 /*
  * #%L
  * ELK OWL Object Interfaces
- * 
- * $Id$
- * $HeadURL$
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,34 +21,34 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.predefined;
 
-import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
-import org.semanticweb.elk.owl.visitors.ElkClassVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataPropertyExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataPropertyVisitor;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * Corresponds to <a href= "http://www.w3.org/TR/owl2-syntax/#Classes">built-in
- * classes<a> in the OWL 2 specification, such as {@code owl:Thing} and
- * {@code owl:Nothing}.
+ * Corresponds to <a href=
+ * "http://www.w3.org/TR/owl2-syntax/#Data_Properties">built-in data
+ * properties<a> in the OWL 2 specification, such as {@code owl:topDataProperty}
+ * and {@code owl:bottomDataProperty} .
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public enum PredefinedElkClass implements ElkClass {
+public enum PredefinedElkDataProperty implements ElkDataProperty {
 
-	OWL_THING(PredefinedElkIris.OWL_THING),
+	OWL_TOP_DATA_PROPERTY(PredefinedElkIris.OWL_TOP_DATA_PROPERTY),
 
-	OWL_NOTHING(PredefinedElkIris.OWL_NOTHING),
+	OWL_BOTTOM_DATA_PROPERTY(PredefinedElkIris.OWL_BOTTOM_DATA_PROPERTY),
 
 	;
 
 	private final ElkIri iri_;
 
-	private PredefinedElkClass(ElkIri iri) {
+	private PredefinedElkDataProperty(ElkIri iri) {
 		this.iri_ = iri;
 	}
 
@@ -58,26 +59,26 @@ public enum PredefinedElkClass implements ElkClass {
 
 	@Override
 	public ElkEntityType getEntityType() {
-		return ElkEntityType.CLASS;
+		return ElkEntityType.DATA_PROPERTY;
 	}
 
 	@Override
-	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		return accept((ElkClassVisitor<O>) visitor);
+	public <O> O accept(ElkDataPropertyExpressionVisitor<O> visitor) {
+		return accept((ElkDataPropertyVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return accept((ElkClassVisitor<O>) visitor);
+		return accept((ElkDataPropertyVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkEntityVisitor<O> visitor) {
-		return accept((ElkClassVisitor<O>) visitor);
+		return accept((ElkDataPropertyVisitor<O>) visitor);
 	}
 
 	@Override
-	public <O> O accept(ElkClassVisitor<O> visitor) {
+	public <O> O accept(ElkDataPropertyVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

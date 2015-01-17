@@ -49,6 +49,12 @@ public enum PredefinedElkDeclaration implements ElkDeclarationAxiom {
 	OWL_BOTTOM_OBJECT_PROPERTY_DECLARATION(
 			PredefinedElkObjectProperty.OWL_BOTTOM_OBJECT_PROPERTY),
 
+//	OWL_TOP_DATA_PROPERTY_DECLARATION(
+//			PredefinedElkDataProperty.OWL_TOP_DATA_PROPERTY),
+//
+//	OWL_BOTTOM_DATA_PROPERTY_DECLARATION(
+//			PredefinedElkDataProperty.OWL_BOTTOM_DATA_PROPERTY),
+
 	;
 
 	private final ElkEntity entity_;

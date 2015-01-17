@@ -32,9 +32,17 @@ package org.semanticweb.elk.owl.predefined;
  */
 public enum ElkEntityType {
 
-	CLASS("Class"), DATATYPE("Datatype"), OBJECT_PROPERTY("ObjectProperty"), DATA_PROPERTY(
-			"DataProperty"), ANNOTATION_PROPERTY("AnnotationProperty"), NAMED_INDIVIDUAL(
-			"NamedIndividual");
+	CLASS("Class"),
+
+	DATATYPE("Datatype"),
+
+	OBJECT_PROPERTY("ObjectProperty"),
+
+	DATA_PROPERTY("DataProperty"),
+
+	ANNOTATION_PROPERTY("AnnotationProperty"),
+
+	NAMED_INDIVIDUAL("NamedIndividual");
 
 	private String name_;
 
