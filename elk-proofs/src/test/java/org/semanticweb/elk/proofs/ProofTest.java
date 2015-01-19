@@ -120,7 +120,7 @@ public class ProofTest {
 					
 					LOGGER_.trace("Proof test: {} => {}", subsumee, subsumer);
 					
-					TestUtils.provabilityTest(reasoner, subsumee, subsumer);
+					TestUtils.provabilityTest(new ProofReader(reasoner), subsumee, subsumer);
 				} catch (ElkException e) {
 					throw new RuntimeException(e);
 				}

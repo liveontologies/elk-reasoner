@@ -30,8 +30,10 @@ import org.semanticweb.elk.proofs.inferences.classes.ConjunctionDecomposition;
 import org.semanticweb.elk.proofs.inferences.classes.DisjointnessContradiction;
 import org.semanticweb.elk.proofs.inferences.classes.DisjunctionComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialComposition;
-import org.semanticweb.elk.proofs.inferences.classes.ExistentialCompositionViaChain;
+import org.semanticweb.elk.proofs.inferences.classes.ExistentialChainAxiomComposition;
+import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainComposition;
 import org.semanticweb.elk.proofs.inferences.classes.InconsistentDisjointness;
+import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialComposition;
 import org.semanticweb.elk.proofs.inferences.classes.NegationContradiction;
 import org.semanticweb.elk.proofs.inferences.classes.ReflexiveExistentialComposition;
 
@@ -55,11 +57,15 @@ public interface ClassInferenceVisitor<I, O> {
 	
 	public O visit(ExistentialComposition inf, I input);
 	
-	public O visit(ExistentialCompositionViaChain inf, I input);
+	public O visit(ExistentialChainAxiomComposition inf, I input);
+	
+	public O visit(ExistentialLemmaChainComposition inf, I input);
 	
 	public O visit(InconsistentDisjointness inf, I input);
 	
 	public O visit(NegationContradiction inf, I input);
 	
 	public O visit(ReflexiveExistentialComposition inf, I input);
+	
+	public O visit(NaryExistentialComposition inf, I input);
 }

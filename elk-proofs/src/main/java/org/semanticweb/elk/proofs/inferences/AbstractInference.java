@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 import org.semanticweb.elk.proofs.utils.TautologyChecker;
 import org.semanticweb.elk.util.collections.Condition;
 import org.semanticweb.elk.util.collections.Operations;
@@ -66,6 +67,11 @@ public abstract class AbstractInference implements Inference {
 		}
 		
 		return premises_;
+	}
+	
+	@Override
+	public String toString() {
+		return InferencePrinter.print(this);
 	}
 
 	protected abstract Iterable<DerivedExpression> getRawPremises();

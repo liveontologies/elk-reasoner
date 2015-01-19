@@ -27,72 +27,48 @@ package org.semanticweb.elk.proofs.inferences.classes;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.inferences.ClassInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
- * The existential inference based on role composition. 
+ * The existential inference based on role composition which derives a lemma expression. 
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ExistentialCompositionViaChain extends AbstractClassInference {
+public class ExistentialLemmaChainComposition extends AbstractClassInference<LemmaExpression> {
 
-	private final DerivedExpression firstExistentialPremise_;
+	private final DerivedAxiomExpression<ElkSubClassOfAxiom> firstExistentialPremise_;
 
 	private final DerivedExpression secondExistentialPremise_;
 
-	private final DerivedExpression firstPropertySubsumptionPremise_;
+	private final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> firstPropertySubsumptionPremise_;
 
 	private final DerivedExpression secondPropertySubsumptionPremise_;
-
-	private final DerivedExpression chainPremise_;
-	// conclusion is an axiom
-	public ExistentialCompositionViaChain(
-			DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion,
-			DerivedExpression firstExPremise,
-			DerivedExpression secondExPremise,
-			DerivedExpression propSubsumption,
-			DerivedExpression chainSubsumption,
-			DerivedExpression chainAxiom) {
-		super(conclusion);
-		firstExistentialPremise_ = firstExPremise;
-		secondExistentialPremise_ = secondExPremise;
-		firstPropertySubsumptionPremise_ = propSubsumption;
-		secondPropertySubsumptionPremise_ = chainSubsumption;
-		chainPremise_ = chainAxiom;
-	}	
-	// conclusion is a lemma
-	public ExistentialCompositionViaChain(
+	
+	public ExistentialLemmaChainComposition(
 			LemmaExpression conclusion,
-			DerivedExpression firstExPremise,
+			DerivedAxiomExpression<ElkSubClassOfAxiom> firstExPremise,
 			DerivedExpression secondExPremise,
-			DerivedExpression propSubsumption,
-			DerivedExpression chainSubsumption,
-			DerivedExpression chainAxiom) {
+			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propSubsumption,
+			DerivedExpression chainSubsumption) {
 		super(conclusion);
 		firstExistentialPremise_ = firstExPremise;
 		secondExistentialPremise_ = secondExPremise;
 		firstPropertySubsumptionPremise_ = propSubsumption;
 		secondPropertySubsumptionPremise_ = chainSubsumption;
-		chainPremise_ = chainAxiom;
 	}
 	
 	@Override
 	public Collection<DerivedExpression> getRawPremises() {
-		if (chainPremise_ != null) {
-			return Arrays.asList(firstExistentialPremise_, secondExistentialPremise_, firstPropertySubsumptionPremise_, secondPropertySubsumptionPremise_, chainPremise_);
-		}
-		else {
-			return Arrays.asList(firstExistentialPremise_, secondExistentialPremise_, firstPropertySubsumptionPremise_, secondPropertySubsumptionPremise_);
-		}
+		return Arrays.asList(firstExistentialPremise_, secondExistentialPremise_, firstPropertySubsumptionPremise_, secondPropertySubsumptionPremise_);
 	}
 	
 	@Override
@@ -101,17 +77,23 @@ public class ExistentialCompositionViaChain extends AbstractClassInference {
 	}
 
 	@Override
-	public String toString() {
-		return InferencePrinter.print(this);
-	}
-	
-	@Override
 	public InferenceRule getRule() {
 		return InferenceRule.R_EXIST_CHAIN_COMPOSITION;
 	}
 	
-	@Override
-	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public DerivedAxiomExpression<? extends ElkClassAxiom> getFirstExistentialPremise() {
+		return firstExistentialPremise_;
+	}
+	
+	public DerivedExpression getSecondExistentialPremise() {
+		return secondExistentialPremise_;
+	}
+	
+	public DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> getFirstPropertyPremise() {
+		return firstPropertySubsumptionPremise_;
+	}
+	
+	public DerivedExpression getSecondPropertyPremise() {
+		return secondPropertySubsumptionPremise_;
 	}
 }

@@ -35,7 +35,6 @@ import org.semanticweb.elk.proofs.InferenceGraph;
 import org.semanticweb.elk.proofs.ProofReader;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.reasoner.Reasoner;
 
 /**
  * Utilities for testing proofs
@@ -50,8 +49,8 @@ public class TestUtils {
 	// if either it doesn't require a proof (i.e. is a tautology or asserted) or
 	// returns at least one inference such that each of the premises is
 	// provable.
-	public static void provabilityTest(Reasoner reasoner, ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
-		InferenceGraph graph = ProofReader.readInferenceGraph(reasoner, sub, sup);
+	public static void provabilityTest(ProofReader reader, ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
+		InferenceGraph graph = ProofReader.readInferenceGraph(reader, sub, sup);
 		//FIXME
 		//System.out.println(graph);
 		

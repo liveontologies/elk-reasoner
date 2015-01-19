@@ -32,6 +32,4 @@ package org.semanticweb.elk.proofs.expressions.lemmas;
 public interface ElkComplexClassExpressionVisitor<I, O> {
 
 	public O visit(ElkComplexObjectSomeValuesFrom ce, I input);
-	
-	public O visit(ElkClassExpressionWrap ce, I input);
 }

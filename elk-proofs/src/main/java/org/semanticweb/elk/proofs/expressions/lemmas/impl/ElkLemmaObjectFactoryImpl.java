@@ -25,14 +25,14 @@ package org.semanticweb.elk.proofs.expressions.lemmas.impl;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkClassExpressionWrap;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexObjectSomeValuesFrom;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkReflexivePropertyChainLemma;
+import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
+import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 
 /**
  * @author Pavel Klinov
@@ -63,14 +63,8 @@ public class ElkLemmaObjectFactoryImpl implements ElkLemmaObjectFactory {
 
 	@Override
 	public ElkComplexObjectSomeValuesFrom getComplexObjectSomeValuesFrom(
-			ElkSubObjectPropertyExpression chain, ElkClassExpression filler) {
+			ElkObjectPropertyChain chain, ElkClassExpression filler) {
 		return new ElkComplexObjectSomeValuesFromImpl(chain, filler);
-	}
-
-	@Override
-	public ElkClassExpressionWrap wrapElkClassExpression(
-			ElkClassExpression ce) {
-		return new ElkClassExpressionWrapImpl(ce);
 	}
 
 }

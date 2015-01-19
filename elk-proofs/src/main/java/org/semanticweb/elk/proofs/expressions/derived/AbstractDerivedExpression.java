@@ -25,10 +25,15 @@ package org.semanticweb.elk.proofs.expressions.derived;
  */
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceChecker;
+import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceHasher;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
 
 /**
+ * The abstract base class of all {@link DerivedExpression}s.
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
@@ -44,6 +49,23 @@ abstract class AbstractDerivedExpression implements DerivedExpression {
 	@Override
 	public Iterable<Inference> getInferences() throws ElkException {
 		return reader_.getInferences(this);
+	}
+	
+	// overriding equals and hashCode to allow expression wrappers which could break the pointer-equality which is otherwise guaranteed by our expression factory.
+	// TODO it's bad that we explicitly use structural checker/hasher here, makes it hard to use another checker/hasher in the factory, if needed
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj != null && obj instanceof Expression) {
+			return new StructuralEquivalenceChecker().equal(this, (Expression) obj);
+		}
+		
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return new StructuralEquivalenceHasher().hashCode(this);
 	}
 
 }

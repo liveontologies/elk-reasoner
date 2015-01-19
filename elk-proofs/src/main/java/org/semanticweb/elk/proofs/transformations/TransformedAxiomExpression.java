@@ -39,7 +39,7 @@ import org.semanticweb.elk.util.collections.Operations;
 public class TransformedAxiomExpression<T extends Operations.Transformation<Inference, Iterable<Inference>>> 
 				extends TransformedExpression<DerivedAxiomExpression<?>, T> implements DerivedAxiomExpression<ElkAxiom> {
 
-	protected TransformedAxiomExpression(DerivedAxiomExpression<?> expr, T f) {
+	public TransformedAxiomExpression(DerivedAxiomExpression<?> expr, T f) {
 		super(expr, f);
 	}
 

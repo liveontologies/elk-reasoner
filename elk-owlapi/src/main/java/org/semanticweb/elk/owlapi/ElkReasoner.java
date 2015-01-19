@@ -946,7 +946,7 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 			ElkSubClassOfAxiom elkAxiom = (ElkSubClassOfAxiom) scAxiom.accept(OwlClassAxiomConverterVisitor.getInstance());
 			
 			try {
-				DerivedExpression expr = ProofReader.start(reasoner_, elkAxiom.getSubClassExpression(), elkAxiom.getSuperClassExpression());
+				DerivedExpression expr = new ProofReader(reasoner_).getProofRoot(elkAxiom.getSubClassExpression(), elkAxiom.getSuperClassExpression());
 				
 				return ElkToOwlProofConverter.convert(expr);
 				

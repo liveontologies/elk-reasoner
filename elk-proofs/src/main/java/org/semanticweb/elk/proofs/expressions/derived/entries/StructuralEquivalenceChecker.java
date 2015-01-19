@@ -58,7 +58,6 @@ import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.LemmaExpressionImpl;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkClassExpressionWrap;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexObjectSomeValuesFrom;
@@ -319,10 +318,10 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 			return Boolean.FALSE;
 		}
 
-		@Override
+		/*@Override
 		public Boolean visit(ElkClassExpressionWrap ce, ElkObject input) {
 			return Boolean.FALSE;
-		}
+		}*/
 		
 	}
 	
@@ -480,18 +479,6 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 					}, null);
 				}
 
-				@Override
-				public Boolean visit(final ElkClassExpressionWrap first, ElkObject input) {
-					return second.accept(new EntityChecker() {
-
-						@Override
-						public Boolean visit(ElkClassExpressionWrap second,
-								ElkObject input) {
-							return equal(first.getClassExpression(), second.getClassExpression());
-						}
-						
-					}, null);
-				}
 			}, null);
 		}
 		

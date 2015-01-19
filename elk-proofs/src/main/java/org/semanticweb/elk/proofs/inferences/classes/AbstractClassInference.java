@@ -24,38 +24,27 @@ package org.semanticweb.elk.proofs.inferences.classes;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
-import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
-import org.semanticweb.elk.proofs.inferences.ClassInferenceVisitor;
 
 /**
- * The base class for class inferences whose conclusions are always subsumption
- * axioms.
+ * The base class for class inferences.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-abstract class AbstractClassInference extends AbstractInference {
+public abstract class AbstractClassInference<D extends DerivedExpression> extends AbstractInference {
 
-	final DerivedExpression conclusion;
+	final D conclusion;
 
-	AbstractClassInference(DerivedAxiomExpression<? extends ElkClassAxiom> c) {//(ElkSubClassOfAxiom c, DerivedExpressionFactory factory) {
-		//conclusion = factory.create(c);
+	AbstractClassInference(D c) {
 		conclusion = c;
 	}
 	
-	AbstractClassInference(LemmaExpression c) {
-		conclusion = c;
-	}
-
 	@Override
-	public DerivedExpression getConclusion() {
+	public D getConclusion() {
 		return conclusion;
 	}
 
-	public abstract <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I input);
 }

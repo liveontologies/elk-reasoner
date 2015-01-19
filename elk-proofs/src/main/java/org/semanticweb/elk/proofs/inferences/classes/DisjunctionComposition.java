@@ -27,12 +27,13 @@ package org.semanticweb.elk.proofs.inferences.classes;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
-import org.semanticweb.elk.proofs.inferences.ClassInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
@@ -42,8 +43,7 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DisjunctionComposition extends
-		AbstractClassInference {
+public class DisjunctionComposition extends AbstractClassInference<DerivedAxiomExpression<? extends ElkClassAxiom>> {
 
 	private final DerivedExpression premise_;
 	
@@ -71,10 +71,5 @@ public class DisjunctionComposition extends
 	@Override
 	public InferenceRule getRule() {
 		return InferenceRule.R_OR_COMPOSITION;
-	}
-	
-	@Override
-	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
 	}
 }

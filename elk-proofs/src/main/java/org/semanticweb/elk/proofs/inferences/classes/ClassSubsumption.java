@@ -27,11 +27,12 @@ package org.semanticweb.elk.proofs.inferences.classes;
 import java.util.Arrays;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
-import org.semanticweb.elk.proofs.inferences.ClassInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
@@ -41,7 +42,7 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ClassSubsumption extends AbstractClassInference {
+public class ClassSubsumption extends AbstractClassInference<DerivedAxiomExpression<? extends ElkClassAxiom>> {
 
 	private final DerivedExpression premise_;
 
@@ -78,8 +79,4 @@ public class ClassSubsumption extends AbstractClassInference {
 		return InferenceRule.R_SUB;
 	}
 
-	@Override
-	public <I, O> O accept(ClassInferenceVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
-	}
 }

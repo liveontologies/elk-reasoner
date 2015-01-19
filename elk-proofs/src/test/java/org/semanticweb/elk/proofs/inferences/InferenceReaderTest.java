@@ -3,11 +3,13 @@
  */
 package org.semanticweb.elk.proofs.inferences;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.proofs.ProofReader;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.TestUtils;
@@ -52,7 +54,7 @@ public class InferenceReaderTest {
 		ElkClass a = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass g = factory_.getClass(new ElkFullIri("http://example.org/G"));
 		
-		TestUtils.provabilityTest(reasoner, a, g);
+		TestUtils.provabilityTest(new ProofReader(reasoner), a, g);
 		
 		reasoner.shutdown();
 	}
@@ -64,7 +66,7 @@ public class InferenceReaderTest {
 		ElkClass notDerived = factory_.getClass(new ElkFullIri("http://example.org/Invalid"));
 		
 		try {
-			TestUtils.provabilityTest(reasoner, a, notDerived);
+			TestUtils.provabilityTest(new ProofReader(reasoner), a, notDerived);
 		}
 		finally {
 			reasoner.shutdown();
@@ -77,7 +79,7 @@ public class InferenceReaderTest {
 		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/E"));
 		
-		TestUtils.provabilityTest(reasoner, sub, sup);
+		TestUtils.provabilityTest(new ProofReader(reasoner), sub, sup);
 		
 		reasoner.shutdown();
 	}
@@ -86,11 +88,13 @@ public class InferenceReaderTest {
 	//@Ignore("not a real test, more for manual debugging")
 	public void basicTest() throws Exception {
 		//Reasoner reasoner = TestReasonerUtils.loadAndClassify(new File("/home/pavel/ulm/data/galens/EL-GALEN.owl"));
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositionsWithReflexivity.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositionsWithHierarchyAndReflexivity.owl");
 		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
-		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/E"));
+		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/G"));
+		ProofReader reader = new ProofReader(reasoner).eliminateLemmas();
+		
 		// print inferences 
-		RecursiveInferenceVisitor.visitInferences(reasoner, sub, sup, new AbstractInferenceVisitor<Void, Void>() {
+		RecursiveInferenceVisitor.visitInferences(reader, sub, sup, new AbstractInferenceVisitor<Void, Void>() {
 
 			@Override
 			protected Void defaultVisit(Inference inference, Void input) {
@@ -100,7 +104,7 @@ public class InferenceReaderTest {
 			
 		});
 		
-		TestUtils.provabilityTest(reasoner, sub, sup);
+		TestUtils.provabilityTest(reader, sub, sup);
 		
 		reasoner.shutdown();
 	}

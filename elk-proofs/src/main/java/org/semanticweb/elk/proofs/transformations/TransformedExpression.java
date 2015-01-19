@@ -92,7 +92,7 @@ abstract class TransformedExpression<D extends DerivedExpression, T extends Oper
 	public String toString() {
 		return expression.toString();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		return expression.equals(obj);
@@ -102,5 +102,4 @@ abstract class TransformedExpression<D extends DerivedExpression, T extends Oper
 	public int hashCode() {
 		return expression.hashCode();
 	}
-	
 }

@@ -36,7 +36,6 @@ import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkClassExpressionWrap;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexObjectSomeValuesFrom;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaVisitor;
@@ -118,13 +117,6 @@ public class ExpressionMapper {
 									.accept(converter_);
 
 							return new ForwardLinkImpl(chain, filler);
-						}
-
-						@Override
-						public Conclusion visit(ElkClassExpressionWrap ce,
-								Void input) {
-							return new DecomposedSubsumerImpl<IndexedClassExpression>(
-									ce.getClassExpression().accept(converter_));
 						}
 
 					}, input);

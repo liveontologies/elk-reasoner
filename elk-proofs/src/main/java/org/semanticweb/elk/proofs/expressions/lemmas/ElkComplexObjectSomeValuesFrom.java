@@ -25,7 +25,7 @@ package org.semanticweb.elk.proofs.expressions.lemmas;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 
 /**
  * @author Pavel Klinov
@@ -36,5 +36,5 @@ public interface ElkComplexObjectSomeValuesFrom extends ElkComplexClassExpressio
 
 	public ElkClassExpression getFiller();
 	
-	public ElkSubObjectPropertyExpression getPropertyChain();
+	public ElkObjectPropertyChain getPropertyChain();
 }

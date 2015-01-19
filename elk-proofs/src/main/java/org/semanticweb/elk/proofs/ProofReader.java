@@ -25,13 +25,18 @@ package org.semanticweb.elk.proofs;
  */
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.transformations.LemmaElimination;
+import org.semanticweb.elk.proofs.transformations.TransformedAxiomExpression;
 import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
+import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.Operations.Transformation;
 
 /**
  * The main entrance point for accessing proofs.
@@ -42,6 +47,21 @@ import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
  */
 public class ProofReader {
 
+	// TODO support more than one (i.e. nested) transformation, it's easy
+	private Operations.Transformation<Inference, Iterable<Inference>> inferenceTransformation_;
+	
+	private final ReasonerInferenceReader reader_;
+	
+	public ProofReader(Reasoner r) {
+		reader_ = new ReasonerInferenceReader(r);
+	}
+	
+	public ProofReader eliminateLemmas() {
+		inferenceTransformation_ = new LemmaElimination(reader_.getExpressionFactory(), new ElkObjectFactoryImpl());
+		
+		return this;
+	}
+	
 	/**
 	 * Starts reading proofs by retrieving the {@link DerivedExpression} which
 	 * corresponds to the subsumption entailment between the give classes. The
@@ -49,17 +69,19 @@ public class ProofReader {
 	 * {@code DerivedExpression#getInferences()} for each expression used as a
 	 * premise.
 	 * 
-	 * @param reasoner
 	 * @param subsumee
 	 * @param subsumer
 	 * @return
 	 * @throws ElkException
 	 */
-	public static DerivedExpression start(Reasoner reasoner, ElkClassExpression subsumee,
-			ElkClassExpression subsumer) throws ElkException {
-		ReasonerInferenceReader reader = new ReasonerInferenceReader(reasoner);
-
-		return reader.initialize(subsumee, subsumer);
+	public DerivedAxiomExpression<?> getProofRoot(ElkClassExpression subsumee, ElkClassExpression subsumer) throws ElkException {
+		DerivedAxiomExpression<?> root = reader_.initialize(subsumee, subsumer);
+		
+		if (inferenceTransformation_ != null) {
+			root = new TransformedAxiomExpression<Transformation<Inference, Iterable<Inference>>>(root, inferenceTransformation_);
+		}
+		
+		return root;
 	}
 	
 	/**
@@ -71,11 +93,10 @@ public class ProofReader {
 	 * @return
 	 * @throws ElkException
 	 */
-	public static InferenceGraph readInferenceGraph(Reasoner reasoner, ElkClassExpression subsumee,
-			ElkClassExpression subsumer) throws ElkException {
+	public static InferenceGraph readInferenceGraph(ProofReader reader, ElkClassExpression subsumee, ElkClassExpression subsumer) throws ElkException {
 		final InferenceGraphImpl graph = new InferenceGraphImpl();
 		
-		RecursiveInferenceVisitor.visitInferences(reasoner, subsumee, subsumer, new AbstractInferenceVisitor<Void, Void>() {
+		RecursiveInferenceVisitor.visitInferences(reader, subsumee, subsumer, new AbstractInferenceVisitor<Void, Void>() {
 
 			@Override
 			protected Void defaultVisit(Inference inference, Void input) {

@@ -31,10 +31,9 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactoryWithCaching;
-import org.semanticweb.elk.proofs.expressions.derived.DummyExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -61,24 +60,28 @@ public class ReasonerInferenceReader implements InferenceReader {
 
 	final AbstractReasonerState reasoner;
 	
-	private DerivedExpressionFactory expressionFactory_ = new DummyExpressionFactory();
+	private final DerivedExpressionFactory expressionFactory_;
 	
 	public ReasonerInferenceReader(AbstractReasonerState r) {
 		reasoner = r;
+		// this expression factory will guarantee pointer equality for structurally equivalent expressions
+		expressionFactory_ = new DerivedExpressionFactoryWithCaching(this);
 	}
 	
-	public DerivedExpression initialize(ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
+	public DerivedAxiomExpression<?> initialize(ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
 		// trace it
 		reasoner.explainSubsumption(sub, sup);
-		// this expression factory will guarantee pointer equality for structurally equivalent expressions 
-		expressionFactory_ = new DerivedExpressionFactoryWithCaching(this);
 		// create and return the first derived expression which corresponds to the initial subsumption
 		return expressionFactory_.create(new ElkObjectFactoryImpl().getSubClassOfAxiom(sub, sup));
 	}
 	
+	public DerivedExpressionFactory getExpressionFactory() {
+		return expressionFactory_;
+	}
+	
 	@Override
 	public Iterable<Inference> getInferences(Expression expression) throws ElkException {
-		// first transform the expression into inputs for the trace reader
+		// first, transform the expression into inputs for the trace reader
 		Iterable<TracingInput> inputs = ExpressionMapper.convertExpressionToTracingInputs(expression, reasoner.getIndexObjectConverter(), new SatisfiabilityChecker() {
 
 			@Override
@@ -88,7 +91,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 		});
 		
 		TraceStore.Reader traceReader = reasoner.getTraceState().getTraceStore().getReader();
-		final InferenceMapper mapper = new InferenceMapper(new RecursiveTraceUnwinder(traceReader), expressionFactory_);
+		InferenceMapper mapper = new InferenceMapper(new RecursiveTraceUnwinder(traceReader), expressionFactory_);
 		final List<Inference> userInferences = new LinkedList<Inference>();
 		InferenceVisitor<Void, Void> collector = new AbstractInferenceVisitor<Void, Void>() {
 

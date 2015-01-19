@@ -25,6 +25,7 @@ package org.semanticweb.elk.proofs.expressions.lemmas;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 /**
@@ -40,7 +41,5 @@ public interface ElkLemmaObjectFactory {
 	
 	public ElkSubClassOfLemma getSubClassOfLemma(ElkClassExpression subclass, ElkComplexClassExpression superclass);
 	
-	public ElkComplexObjectSomeValuesFrom getComplexObjectSomeValuesFrom(ElkSubObjectPropertyExpression chain, ElkClassExpression filler);
-
-	public ElkClassExpressionWrap wrapElkClassExpression(ElkClassExpression ce);
+	public ElkComplexObjectSomeValuesFrom getComplexObjectSomeValuesFrom(ElkObjectPropertyChain chain, ElkClassExpression filler);
 }

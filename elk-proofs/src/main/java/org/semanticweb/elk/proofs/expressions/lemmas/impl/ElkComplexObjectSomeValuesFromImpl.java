@@ -25,7 +25,7 @@ package org.semanticweb.elk.proofs.expressions.lemmas.impl;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexObjectSomeValuesFrom;
 
@@ -37,11 +37,11 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexObjectSomeValuesF
 public class ElkComplexObjectSomeValuesFromImpl implements
 		ElkComplexObjectSomeValuesFrom {
 
-	private final ElkSubObjectPropertyExpression chain_;
+	private final ElkObjectPropertyChain chain_;
 	
 	private final ElkClassExpression filler_;
 	
-	ElkComplexObjectSomeValuesFromImpl(ElkSubObjectPropertyExpression chain, ElkClassExpression filler) {
+	ElkComplexObjectSomeValuesFromImpl(ElkObjectPropertyChain chain, ElkClassExpression filler) {
 		chain_ = chain;
 		filler_ = filler;
 	}
@@ -52,7 +52,7 @@ public class ElkComplexObjectSomeValuesFromImpl implements
 	}
 
 	@Override
-	public ElkSubObjectPropertyExpression getPropertyChain() {
+	public ElkObjectPropertyChain getPropertyChain() {
 		return chain_;
 	}
 

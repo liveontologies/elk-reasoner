@@ -35,7 +35,6 @@ import org.semanticweb.elk.proofs.ProofReader;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.reasoner.Reasoner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +49,8 @@ public class RecursiveInferenceVisitor {
 	
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveInferenceVisitor.class);
 
-	public static void visitInferences(Reasoner reasoner, ElkClassExpression subsumee, ElkClassExpression subsumer, InferenceVisitor<?, ?> visitor) throws ElkException {
-		DerivedExpression next = ProofReader.start(reasoner, subsumee, subsumer);
+	public static void visitInferences(ProofReader reader, ElkClassExpression subsumee, ElkClassExpression subsumer, InferenceVisitor<?, ?> visitor) throws ElkException {
+		DerivedExpression next = reader.getProofRoot(subsumee, subsumer);
 		// start recursive unwinding
 		Queue<DerivedExpression> toDo = new LinkedList<DerivedExpression>();
 		Set<DerivedExpression> done = new HashSet<DerivedExpression>();

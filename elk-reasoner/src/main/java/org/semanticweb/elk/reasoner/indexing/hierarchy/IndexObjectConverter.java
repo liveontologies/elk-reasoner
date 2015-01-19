@@ -231,7 +231,6 @@ public class IndexObjectConverter extends AbstractIndexObjectConverter {
 	@Override
 	public IndexedPropertyChain visit(ElkObjectProperty elkObjectProperty) {
 		return indexedPropertyFilter_.visit(objectFactory_.createdIndexedObjectProperty(elkObjectProperty));
-		//return indexedPropertyFilter_.visit(new IndexedObjectProperty(	elkObjectProperty));
 	}
 
 	/*

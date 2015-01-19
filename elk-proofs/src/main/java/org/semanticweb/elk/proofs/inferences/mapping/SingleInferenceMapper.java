@@ -59,8 +59,9 @@ import org.semanticweb.elk.proofs.inferences.classes.ConjunctionComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ConjunctionDecomposition;
 import org.semanticweb.elk.proofs.inferences.classes.DisjointnessContradiction;
 import org.semanticweb.elk.proofs.inferences.classes.DisjunctionComposition;
+import org.semanticweb.elk.proofs.inferences.classes.ExistentialChainAxiomComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialComposition;
-import org.semanticweb.elk.proofs.inferences.classes.ExistentialCompositionViaChain;
+import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainComposition;
 import org.semanticweb.elk.proofs.inferences.classes.InconsistentDisjointness;
 import org.semanticweb.elk.proofs.inferences.classes.NegationContradiction;
 import org.semanticweb.elk.proofs.inferences.classes.ReflexiveExistentialComposition;
@@ -299,7 +300,7 @@ public class SingleInferenceMapper {
 			if (chainPremise.getSubPropertyChain() instanceof IndexedBinaryPropertyChain) {
 				ss = Deindexer.deindex(chainPremise.getSubPropertyChain());
 				// a lemma
-				rightExistentialPremise = exprFactory_.create(lemmaObjectFactory_.getSubClassOfLemma(d, lemmaObjectFactory_.getComplexObjectSomeValuesFrom(ss, e)));
+				rightExistentialPremise = exprFactory_.create(lemmaObjectFactory_.getSubClassOfLemma(d, lemmaObjectFactory_.getComplexObjectSomeValuesFrom((ElkObjectPropertyChain) ss, e)));
 			}
 			else {
 				ss = Deindexer.deindex(chainPremise.getSubPropertyChain());
@@ -343,7 +344,7 @@ public class SingleInferenceMapper {
 			
 			DerivedExpression[] existentialPremises = createExistentialPremises(d, e, rightChainPremise, firstExPremise, propSubsumption, chainAxiom);
 			
-			return new ExistentialCompositionViaChain(
+			return new ExistentialChainAxiomComposition(
 					exprFactory_.create(conclusion), 
 					exprFactory_.create(firstExPremise), 
 					existentialPremises[0], 
@@ -365,17 +366,16 @@ public class SingleInferenceMapper {
 			ElkObjectProperty rPrime = Deindexer.deindex(leftPropertyPremise.getSuperPropertyChain());
 			ElkSubObjectPropertyOfAxiom propSubsumption = factory_.getSubObjectPropertyOfAxiom(r, rPrime);
 			ElkSubObjectPropertyExpression conclusionChain = Deindexer.deindex(inference.getRelation()); 
-			ElkSubClassOfLemma conclusion = lemmaObjectFactory_.getSubClassOfLemma(c, lemmaObjectFactory_.getComplexObjectSomeValuesFrom(conclusionChain, e));
+			ElkSubClassOfLemma conclusion = lemmaObjectFactory_.getSubClassOfLemma(c, lemmaObjectFactory_.getComplexObjectSomeValuesFrom((ElkObjectPropertyChain) conclusionChain, e));
 			
 			DerivedExpression[] existentialPremises = createExistentialPremises(d, e, rightChainPremise, firstExPremise, propSubsumption, null);
 			
-			return new ExistentialCompositionViaChain(
+			return new ExistentialLemmaChainComposition(
 					exprFactory_.create(conclusion), 
 					exprFactory_.create(firstExPremise), 
 					existentialPremises[0], 
 					exprFactory_.create(propSubsumption), 
-					existentialPremises[1], 
-					null);
+					existentialPremises[1]);
 		}
 
 		@Override
