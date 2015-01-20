@@ -210,7 +210,7 @@
 		<protege.version>4.3.0</protege.version>
 		<java.required.version>1.6</java.required.version>
 		<!-- TODO: get current year automatically -->
-		<currentYear>2014</currentYear>
+		<currentYear>2015</currentYear>
 	</properties>
 
 	<build>
