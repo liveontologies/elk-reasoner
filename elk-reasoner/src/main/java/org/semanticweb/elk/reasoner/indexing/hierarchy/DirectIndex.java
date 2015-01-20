@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkDeclaration;
 import org.semanticweb.elk.reasoner.indexing.caching.ModifiableIndexedObjectCacheImpl;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
@@ -66,7 +67,12 @@ public class DirectIndex extends ModifiableIndexedObjectCacheImpl implements
 		ElkAxiomConverter tmpConverter = new ElkAxiomConverterImpl(this, 1);
 		for (ElkDeclarationAxiom declaration : PredefinedElkDeclaration
 				.values()) {
-			declaration.accept(tmpConverter);
+			try {
+				declaration.accept(tmpConverter);
+			} catch (ElkIndexingUnsupportedException e) {
+				// ignore unsupported declarations
+				continue;
+			}
 		}
 	}
 

@@ -101,6 +101,12 @@ public enum PredefinedElkDatatype implements ElkDatatype {
 
 	RDF_XML_LITERAL(PredefinedElkIris.RDF_XML_LITERAL),
 
+	/*
+	 * not listed in Section 4 of OWL specs but listed in Table 5
+	 */
+
+	RDFS_LITERAL(PredefinedElkIris.RDFS_LITERAL),
+
 	;
 
 	private final ElkIri iri_;
