@@ -25,10 +25,16 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedEntityVisitor;
 
+/**
+ * Represents all occurrences of an {@link ElkEntity} in an ontology.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public interface IndexedEntity extends IndexedObject {
 
 	/**
-	 * @return The represented {@link ElkEntity}
+	 * @return The {@link ElkEntity} represented by this {@link IndexedEntity}
 	 */
 	public ElkEntity getElkEntity();
 

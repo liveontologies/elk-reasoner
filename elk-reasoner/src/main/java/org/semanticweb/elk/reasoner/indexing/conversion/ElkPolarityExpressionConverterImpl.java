@@ -41,12 +41,22 @@ import org.semanticweb.elk.reasoner.indexing.caching.ResolvingModifiableIndexedO
 import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObject;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 
+ * An implementation of {@link ElkPolarityExpressionConverter} that converts
+ * that creates {@link ModifiableIndexedObject}s using a provided
+ * {@link ModifiableIndexedObjectFactory}.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public class ElkPolarityExpressionConverterImpl extends
 		FailingElkPolarityExpressionConverter {
 
@@ -58,7 +68,7 @@ public class ElkPolarityExpressionConverterImpl extends
 
 	private final ElkPolarityExpressionConverter complementaryConverter_;
 
-	public ElkPolarityExpressionConverterImpl(ElkPolarity polarity,
+	ElkPolarityExpressionConverterImpl(ElkPolarity polarity,
 			ModifiableIndexedObjectFactory factory,
 			ElkPolarityExpressionConverter complementaryConverter) {
 		super(polarity);
@@ -66,6 +76,23 @@ public class ElkPolarityExpressionConverterImpl extends
 		this.complementaryConverter_ = complementaryConverter;
 	}
 
+	/**
+	 * Creates an {@link ElkPolarityExpressionConverter} of the given
+	 * {@link ElkPolarity} using two {@link ModifiableIndexedObjectFactory}s for
+	 * creating {@link ModifiableIndexedObject}s of the given polarity and
+	 * complementary polarity respectively.
+	 * 
+	 * @param polarity
+	 *            the {@link ElkPolarity} associated with this
+	 *            {@link ElkPolarityExpressionConverter}
+	 * @param factory
+	 *            the {@link ModifiableIndexedObjectFactory} for creating
+	 *            {@link ModifiableIndexedObject}s of the given polarity
+	 * @param complementaryConverter
+	 *            the {@link ModifiableIndexedObjectFactory} used by the
+	 *            complementary converter for creating
+	 *            {@link ModifiableIndexedObject}s of the complementary polarity
+	 */
 	public ElkPolarityExpressionConverterImpl(ElkPolarity polarity,
 			ModifiableIndexedObjectFactory factory,
 			ModifiableIndexedObjectFactory complementaryFactory) {
@@ -75,6 +102,18 @@ public class ElkPolarityExpressionConverterImpl extends
 				polarity.getComplementary(), complementaryFactory, this);
 	}
 
+	/**
+	 * Creates an {@link ElkPolarityExpressionConverter} of polarity
+	 * {@link ElkPolarity#DUAL}, which uses the given
+	 * {@link ModifiableIndexedObjectFactory} for creating the
+	 * {@link ModifiableIndexedObjectFactory}s (of the dual polarity). This
+	 * converter returns itself as the complementary converter.
+	 * 
+	 * @param dualFactory
+	 *            {@link ModifiableIndexedObjectFactory} used for creating the
+	 *            {@link ModifiableIndexedObjectFactory}s of this converter
+	 * 
+	 */
 	public ElkPolarityExpressionConverterImpl(
 			ModifiableIndexedObjectFactory dualFactory) {
 		super(ElkPolarity.DUAL);

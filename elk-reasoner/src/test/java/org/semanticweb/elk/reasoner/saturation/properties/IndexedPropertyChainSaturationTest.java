@@ -42,7 +42,7 @@ import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.implementation.IndexedObjectsCreator;
@@ -328,7 +328,7 @@ public class IndexedPropertyChainSaturationTest {
 			}
 
 			@Override
-			public Boolean visit(IndexedBinaryPropertyChain binaryChain) {
+			public Boolean visit(IndexedComplexPropertyChain binaryChain) {
 				return binaryChain.getSaturated().isDerivedReflexive();
 			}
 		});

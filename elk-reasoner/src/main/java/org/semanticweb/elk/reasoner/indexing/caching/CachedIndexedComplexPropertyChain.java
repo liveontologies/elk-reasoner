@@ -24,44 +24,44 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedComplexPropertyChain;
 import org.semanticweb.elk.util.collections.entryset.Entry;
 
 /**
- * A {@link ModifiableIndexedBinaryPropertyChain} that can be used for
+ * A {@link ModifiableIndexedComplexPropertyChain} that can be used for
  * memoization (caching).
  * 
  * @author "Yevgeny Kazakov"
  *
  * @param <T>
- *            the type of the {@link CachedIndexedBinaryPropertyChain}
+ *            the type of the {@link CachedIndexedComplexPropertyChain}
  */
-public interface CachedIndexedBinaryPropertyChain
+public interface CachedIndexedComplexPropertyChain
 		extends
-		ModifiableIndexedBinaryPropertyChain,
-		CachedIndexedPropertyChain<CachedIndexedBinaryPropertyChain>,
-		Entry<CachedIndexedBinaryPropertyChain, CachedIndexedBinaryPropertyChain> {
+		ModifiableIndexedComplexPropertyChain,
+		CachedIndexedPropertyChain<CachedIndexedComplexPropertyChain>,
+		Entry<CachedIndexedComplexPropertyChain, CachedIndexedComplexPropertyChain> {
 
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(
 				IndexedObjectProperty leftProperty,
 				IndexedPropertyChain rightProperty) {
-			return combinedHashCode(CachedIndexedBinaryPropertyChain.class,
+			return combinedHashCode(CachedIndexedComplexPropertyChain.class,
 					leftProperty, rightProperty);
 		}
 
-		public static CachedIndexedBinaryPropertyChain structuralEquals(
-				CachedIndexedBinaryPropertyChain first, Object second) {
+		public static CachedIndexedComplexPropertyChain structuralEquals(
+				CachedIndexedComplexPropertyChain first, Object second) {
 			if (first == second) {
 				return first;
 			}
-			if (second instanceof CachedIndexedBinaryPropertyChain) {
-				CachedIndexedBinaryPropertyChain secondEntry = (CachedIndexedBinaryPropertyChain) second;
-				if (first.getLeftProperty().equals(
-						secondEntry.getLeftProperty())
-						&& first.getRightPropertyChain().equals(
-								secondEntry.getRightPropertyChain()))
+			if (second instanceof CachedIndexedComplexPropertyChain) {
+				CachedIndexedComplexPropertyChain secondEntry = (CachedIndexedComplexPropertyChain) second;
+				if (first.getFirstProperty().equals(
+						secondEntry.getFirstProperty())
+						&& first.getSuffixChain().equals(
+								secondEntry.getSuffixChain()))
 					return secondEntry;
 			}
 			// else

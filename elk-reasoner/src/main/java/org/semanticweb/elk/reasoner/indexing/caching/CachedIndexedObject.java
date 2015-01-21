@@ -31,7 +31,7 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * A {@link ModifiableIndexedObject} that can be used for memoization (caching),
  * that is, reusing previously constructed structurally equal objects instead of
  * creating new ones. To implement memoization, the objects require structural
- * comparizon (equality and hash functions). These methods are provided for
+ * comparison (equality and hash functions). These methods are provided for
  * every type of {@link ModifiableIndexedObject} based on its fields using
  * helper methods.
  * 

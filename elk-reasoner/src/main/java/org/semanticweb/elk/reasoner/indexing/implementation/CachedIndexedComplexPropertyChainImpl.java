@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.indexing.implementation;
 
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedPropertyChainFilter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
@@ -34,15 +34,15 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisito
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitorEx;
 
 /**
- * Implements {@link CachedIndexedBinaryPropertyChain}
+ * Implements {@link CachedIndexedComplexPropertyChain}
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-final class CachedIndexedBinaryPropertyChainImpl
+final class CachedIndexedComplexPropertyChainImpl
 		extends
-		CachedIndexedPropertyChainImpl<CachedIndexedBinaryPropertyChain, CachedIndexedBinaryPropertyChain>
-		implements CachedIndexedBinaryPropertyChain {
+		CachedIndexedPropertyChainImpl<CachedIndexedComplexPropertyChain, CachedIndexedComplexPropertyChain>
+		implements CachedIndexedComplexPropertyChain {
 
 	private final ModifiableIndexedObjectProperty leftProperty_;
 
@@ -54,28 +54,28 @@ final class CachedIndexedBinaryPropertyChainImpl
 	 * @param leftProperty
 	 * @param rightProperty
 	 */
-	public CachedIndexedBinaryPropertyChainImpl(
+	public CachedIndexedComplexPropertyChainImpl(
 			ModifiableIndexedObjectProperty leftProperty,
 			ModifiableIndexedPropertyChain rightProperty) {
-		super(CachedIndexedBinaryPropertyChain.Helper.structuralHashCode(
+		super(CachedIndexedComplexPropertyChain.Helper.structuralHashCode(
 				leftProperty, rightProperty));
 		this.leftProperty_ = leftProperty;
 		this.rightProperty_ = rightProperty;
 	}
 
 	@Override
-	public final ModifiableIndexedObjectProperty getLeftProperty() {
+	public final ModifiableIndexedObjectProperty getFirstProperty() {
 		return leftProperty_;
 	}
 
 	@Override
-	public final ModifiableIndexedPropertyChain getRightPropertyChain() {
+	public final ModifiableIndexedPropertyChain getSuffixChain() {
 		return rightProperty_;
 	}
 
 	@Override
-	public final CachedIndexedBinaryPropertyChain structuralEquals(Object other) {
-		return CachedIndexedBinaryPropertyChain.Helper.structuralEquals(this,
+	public final CachedIndexedComplexPropertyChain structuralEquals(Object other) {
+		return CachedIndexedComplexPropertyChain.Helper.structuralEquals(this,
 				other);
 	}
 
@@ -146,7 +146,7 @@ final class CachedIndexedBinaryPropertyChainImpl
 	}
 
 	@Override
-	public CachedIndexedBinaryPropertyChain accept(
+	public CachedIndexedComplexPropertyChain accept(
 			CachedIndexedPropertyChainFilter filter) {
 		return filter.filter(this);
 	}

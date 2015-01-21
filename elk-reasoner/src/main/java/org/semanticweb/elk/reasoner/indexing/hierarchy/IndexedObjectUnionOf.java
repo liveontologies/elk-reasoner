@@ -39,7 +39,7 @@ public interface IndexedObjectUnionOf extends IndexedClassExpression {
 	 *         the {@link ElkObjectUnionOf} represented by this
 	 *         {@link IndexedObjectUnionOf}.
 	 * 
-	 * @see {@link IndexedObjectUnionOf#getDisjuncts()}
+	 * @see IndexedObjectUnionOf#getDisjuncts()
 	 */
 	public Set<? extends IndexedClassExpression> getDisjuncts();
 

@@ -26,7 +26,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassVisitor;
 
 /**
- * Represents all occurrences of an {@link ElkClass} in an ontology.
+ * Represents occurrences of an {@link ElkClass} in an ontology.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"

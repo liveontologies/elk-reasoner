@@ -24,17 +24,17 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
 
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 
 /**
- * An {@link IndexedDisjointnessAxiom} that can be modified as a result of
+ * An {@link IndexedDisjointClassesAxiom} that can be modified as a result of
  * updating the {@link ModifiableOntologyIndex} where this object is stored.
  * 
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedDisjointnessAxiom extends
-		IndexedDisjointnessAxiom {
+public interface ModifiableIndexedDisjointClassesAxiom extends
+		IndexedDisjointClassesAxiom {
 
 	@Override
 	public Set<? extends ModifiableIndexedClassExpression> getInconsistentMembers();

@@ -22,22 +22,22 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 
 /**
- * An {@link IndexedBinaryPropertyChain} that can be modified as a result of
+ * An {@link IndexedComplexPropertyChain} that can be modified as a result of
  * updating the {@link ModifiableOntologyIndex} where this object is stored.
  * 
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedBinaryPropertyChain extends
-		ModifiableIndexedPropertyChain, IndexedBinaryPropertyChain {
+public interface ModifiableIndexedComplexPropertyChain extends
+		ModifiableIndexedPropertyChain, IndexedComplexPropertyChain {
 
 	@Override
-	public ModifiableIndexedObjectProperty getLeftProperty();
+	public ModifiableIndexedObjectProperty getFirstProperty();
 
 	@Override
-	public ModifiableIndexedPropertyChain getRightPropertyChain();
+	public ModifiableIndexedPropertyChain getSuffixChain();
 
 }

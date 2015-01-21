@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
@@ -81,9 +81,9 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	}
 
 	@Override
-	public Void visit(IndexedBinaryPropertyChain element) {
-		IndexedPropertyChain left = element.getLeftProperty();
-		IndexedPropertyChain right = element.getRightPropertyChain();
+	public Void visit(IndexedComplexPropertyChain element) {
+		IndexedPropertyChain left = element.getFirstProperty();
+		IndexedPropertyChain right = element.getSuffixChain();
 		if (left.getSaturated().isDerivedReflexive())
 			toDo(right);
 		if (right.getSaturated().isDerivedReflexive())
@@ -185,16 +185,16 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 			// else compute it
 			Set<IndexedObjectProperty> subProperties = getSubProperties(element);
 			for (IndexedPropertyChain subPropertyChain : getSubPropertyChains(element)) {
-				if (subPropertyChain instanceof IndexedBinaryPropertyChain) {
-					IndexedBinaryPropertyChain composition = (IndexedBinaryPropertyChain) subPropertyChain;
+				if (subPropertyChain instanceof IndexedComplexPropertyChain) {
+					IndexedComplexPropertyChain composition = (IndexedComplexPropertyChain) subPropertyChain;
 					Set<IndexedObjectProperty> leftSubProperties = getSubProperties(composition
-							.getLeftProperty());
+							.getFirstProperty());
 					Set<IndexedObjectProperty> commonSubProperties = new LazySetIntersection<IndexedObjectProperty>(
 							subProperties, leftSubProperties);
 					if (commonSubProperties.isEmpty())
 						continue;
 					for (IndexedObjectProperty rightSubProperty : getSubProperties(composition
-							.getRightPropertyChain()))
+							.getSuffixChain()))
 						for (IndexedObjectProperty commonLeft : commonSubProperties)
 							saturation.leftSubComposableSubPropertiesByRightProperties
 									.add(rightSubProperty, commonLeft);

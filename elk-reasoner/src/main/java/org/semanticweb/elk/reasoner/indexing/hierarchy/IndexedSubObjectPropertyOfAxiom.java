@@ -38,7 +38,7 @@ public interface IndexedSubObjectPropertyOfAxiom extends IndexedAxiom {
 	 *         expression of the {@link ElkSubObjectPropertyOfAxiom} represented
 	 *         by this {@link IndexedSubObjectPropertyOfAxiom}
 	 * 
-	 * @see {@link ElkSubObjectPropertyOfAxiom#getSubObjectPropertyExpression()}
+	 * @see ElkSubObjectPropertyOfAxiom#getSubObjectPropertyExpression()
 	 */
 	public IndexedPropertyChain getSubPropertyChain();
 
@@ -47,7 +47,7 @@ public interface IndexedSubObjectPropertyOfAxiom extends IndexedAxiom {
 	 *         of the {@link ElkSubObjectPropertyOfAxiom} represented by this
 	 *         {@link IndexedSubObjectPropertyOfAxiom}
 	 * 
-	 * @see {@link ElkSubObjectPropertyOfAxiom#getSuperObjectPropertyExpression()}
+	 * @see ElkSubObjectPropertyOfAxiom#getSuperObjectPropertyExpression()
 	 */
 	public IndexedObjectProperty getSuperProperty();
 

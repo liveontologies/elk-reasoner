@@ -23,9 +23,9 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -39,7 +39,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 /**
  * A {@link ChainableSubsumerRule} producing {@link Contradiction} when
  * processing an {@link IndexedClassExpression} that is present in an
- * {@link IndexedDisjointnessAxiom} at least twice.
+ * {@link IndexedDisjointClassesAxiom} at least twice.
  * 
  * @author "Yevgeny Kazakov"
  */
@@ -49,7 +49,7 @@ public class ContradictionFromDisjointnessRule extends
 	public static final String NAME = "DisjointClasses Contradiction Introduction";
 
 	/**
-	 * The number of {@link IndexedDisjointnessAxiom}s in which the
+	 * The number of {@link IndexedDisjointClassesAxiom}s in which the
 	 * {@link IndexedClassExpression}, for which this rule is registered, occurs
 	 * more than once.
 	 */
@@ -65,7 +65,7 @@ public class ContradictionFromDisjointnessRule extends
 		this.contradictionCounter_++;
 	}
 
-	public static boolean addRulesFor(ModifiableIndexedDisjointnessAxiom axiom,
+	public static boolean addRulesFor(ModifiableIndexedDisjointClassesAxiom axiom,
 			ModifiableOntologyIndex index) {
 		boolean success = true;
 		int added = 0;
@@ -93,7 +93,7 @@ public class ContradictionFromDisjointnessRule extends
 	}
 
 	public static boolean removeRulesFor(
-			ModifiableIndexedDisjointnessAxiom axiom,
+			ModifiableIndexedDisjointClassesAxiom axiom,
 			ModifiableOntologyIndex index) {
 		boolean success = true;
 		int removed = 0;

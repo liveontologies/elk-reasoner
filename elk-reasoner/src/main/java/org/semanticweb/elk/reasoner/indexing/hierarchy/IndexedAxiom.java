@@ -1,5 +1,6 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
 
 /*
@@ -24,6 +25,13 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
  * #L%
  */
 
+/**
+ * Represents occurrences of an {@link ElkAxiom} in an ontology.
+ * 
+ * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public interface IndexedAxiom extends IndexedObject {
 
 	public <O> O accept(IndexedAxiomVisitor<O> visitor);

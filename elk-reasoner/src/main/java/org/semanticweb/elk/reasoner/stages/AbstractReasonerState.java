@@ -49,7 +49,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalChangeCheckingVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalElkAxiomVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
@@ -277,11 +277,11 @@ public abstract class AbstractReasonerState {
 		// if some axiom change can't be incorporated incrementally
 
 		ElkAxiomProcessor axiomInserter = new ChangeIndexingProcessor(
-				new NonIncrementalChangeCheckingVisitor(axiomInserter_,
+				new NonIncrementalElkAxiomVisitor(axiomInserter_,
 						nonIncrementalChangeListener_),
 				ChangeIndexingProcessor.ADDITION);
 		ElkAxiomProcessor axiomDeleter = new ChangeIndexingProcessor(
-				new NonIncrementalChangeCheckingVisitor(axiomDeleter_,
+				new NonIncrementalElkAxiomVisitor(axiomDeleter_,
 						nonIncrementalChangeListener_),
 				ChangeIndexingProcessor.REMOVAL);
 

@@ -35,6 +35,8 @@ public interface IndexedObjectComplementOf extends IndexedClassExpression {
 	/**
 	 * @return the {@link IndexedClassExpression}, negation of which is
 	 *         represented by this {@link IndexedObjectComplementOf}
+	 * 
+	 * @see ElkObjectComplementOf#getClassExpression()
 	 */
 	public IndexedClassExpression getNegated();
 

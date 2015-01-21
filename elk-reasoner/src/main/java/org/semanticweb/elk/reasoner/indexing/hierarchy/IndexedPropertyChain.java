@@ -50,19 +50,19 @@ public interface IndexedPropertyChain extends IndexedObject {
 	 *         {@link ElkSubObjectPropertyExpression} is represented by this
 	 *         {@link IndexedPropertyChain}
 	 * 
-	 * @see {@link ElkSubObjectPropertyOfAxiom#getSubObjectPropertyExpression()}
-	 * @see {@link ElkSubObjectPropertyOfAxiom#getSuperObjectPropertyExpression()}
-	 * @see {@link IndexedObjectProperty#getToldSubProperties()}
+	 * @see ElkSubObjectPropertyOfAxiom#getSubObjectPropertyExpression()
+	 * @see ElkSubObjectPropertyOfAxiom#getSuperObjectPropertyExpression()
+	 * @see IndexedObjectProperty#getToldSubProperties()
 	 */
 	public List<IndexedObjectProperty> getToldSuperProperties();
 
 	/**
-	 * @return All {@link IndexedBinaryPropertyChain}s in which this
+	 * @return All {@link IndexedComplexPropertyChain}s in which this
 	 *         {@link IndexedPropertyChain} is a right property
 	 * 
-	 * @see {@link IndexedBinaryPropertyChain#getRightPropertyChain()}
+	 * @see IndexedComplexPropertyChain#getSuffixChain()
 	 */
-	public Collection<IndexedBinaryPropertyChain> getRightChains();
+	public Collection<IndexedComplexPropertyChain> getRightChains();
 
 	/**
 	 * @return The corresponding {@code SaturatedObjecProperty} assigned to this

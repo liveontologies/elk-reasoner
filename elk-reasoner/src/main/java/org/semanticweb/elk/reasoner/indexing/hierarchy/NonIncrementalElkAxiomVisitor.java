@@ -34,35 +34,29 @@ import org.semanticweb.elk.reasoner.incremental.NonIncrementalChangeListener;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
 
 /**
- * A delegating visitor which notifies the
- * {@link NonIncrementalChangeCheckingVisitor} that some axiom represents a
- * change which cannot be processed incrementally by the reasoner
+ * A delegating visitor which notifies the provided
+ * {@link NonIncrementalChangeListener} that some axiom represents a change
+ * which cannot be processed incrementally by the reasoner
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class NonIncrementalChangeCheckingVisitor extends
-		DelegatingElkAxiomVisitor implements ElkAxiomConverter {
+public class NonIncrementalElkAxiomVisitor extends DelegatingElkAxiomVisitor
+		implements ElkAxiomConverter {
 
 	private final NonIncrementalChangeListener<ElkAxiom> listener_;
 
-	public NonIncrementalChangeCheckingVisitor(ElkAxiomConverter visitor,
+	public NonIncrementalElkAxiomVisitor(ElkAxiomConverter visitor,
 			NonIncrementalChangeListener<ElkAxiom> listener) {
 		super(visitor);
-
 		listener_ = listener;
-	}
-
-	public ElkAxiomIndexingVisitor getIndexingVisitor() {
-		return (ElkAxiomIndexingVisitor) getVisitor();
 	}
 
 	@Override
 	public Void visit(
 			ElkEquivalentObjectPropertiesAxiom elkEquivalentObjectProperties) {
 		listener_.notify(elkEquivalentObjectProperties);
-
 		return super.visit(elkEquivalentObjectProperties);
 	}
 
@@ -70,14 +64,12 @@ public class NonIncrementalChangeCheckingVisitor extends
 	public Void visit(
 			ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
 		listener_.notify(elkReflexiveObjectPropertyAxiom);
-
 		return super.visit(elkReflexiveObjectPropertyAxiom);
 	}
 
 	@Override
 	public Void visit(ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom) {
 		listener_.notify(elkSubObjectPropertyOfAxiom);
-
 		return super.visit(elkSubObjectPropertyOfAxiom);
 	}
 
@@ -85,7 +77,6 @@ public class NonIncrementalChangeCheckingVisitor extends
 	public Void visit(
 			ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom) {
 		listener_.notify(elkTransitiveObjectPropertyAxiom);
-
 		return super.visit(elkTransitiveObjectPropertyAxiom);
 	}
 

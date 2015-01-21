@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
@@ -44,5 +44,5 @@ public interface IndexedPropertyChainVisitorEx<O, P> {
 
 	public O visit(IndexedObjectProperty property, P parameter);
 
-	public O visit(IndexedBinaryPropertyChain chain, P parameter);
+	public O visit(IndexedComplexPropertyChain chain, P parameter);
 }

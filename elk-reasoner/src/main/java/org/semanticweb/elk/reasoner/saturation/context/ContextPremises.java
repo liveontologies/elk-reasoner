@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -96,17 +96,17 @@ public interface ContextPremises {
 
 	/**
 	 * @param axiom
-	 *            the {@link IndexedDisjointnessAxiom} to be checked for causing
+	 *            the {@link IndexedDisjointClassesAxiom} to be checked for causing
 	 *            inconsistency in this {@link ContextPremises}
 	 * 
-	 * @return {@code true} if the given {@link IndexedDisjointnessAxiom} makes
+	 * @return {@code true} if the given {@link IndexedDisjointClassesAxiom} makes
 	 *         this {@link ContextPremises} inconsistent, that is, this context
 	 *         contains at least two different {@link DisjointSubsumer}s for
-	 *         this {@link IndexedDisjointnessAxiom}
+	 *         this {@link IndexedDisjointClassesAxiom}
 	 */
 	/*public boolean isInconsistForDisjointnessAxiom(
 			IndexedDisjointnessAxiom axiom);*/
-	public IndexedClassExpression[] getDisjointSubsumers(IndexedDisjointnessAxiom axiom);
+	public IndexedClassExpression[] getDisjointSubsumers(IndexedDisjointClassesAxiom axiom);
 
 	public Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(IndexedPropertyChain subRoot);
 }

@@ -22,10 +22,11 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 
 /**
- * Top level interface for all indexed objects
+ * Represents occurrences of an {@link ElkObject} in an ontology.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -33,8 +34,9 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 public interface IndexedObject {
 
 	/**
-	 * @return a structural string representation of the object; if two indexed
-	 *         object have the same string representation, they must be equal
+	 * @return a string representation of the object; if two indexed objects
+	 *         have the same string representation, they must be equal according
+	 *         to {@link Object#equals(Object)}
 	 */
 	String toStringStructural();
 

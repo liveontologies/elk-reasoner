@@ -24,8 +24,17 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 
+/**
+ * A {@link ModifiableIndexedPropertyChain} that can be used for memoization
+ * (caching).
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <T>
+ *            the type of the {@link CachedIndexedPropertyChain}
+ */
 public interface CachedIndexedPropertyChain<T extends CachedIndexedPropertyChain<T>>
-		extends CachedIndexedObject<T>, ModifiableIndexedPropertyChain {
+		extends ModifiableIndexedPropertyChain, CachedIndexedObject<T> {
 
 	T accept(CachedIndexedPropertyChainFilter filter);
 

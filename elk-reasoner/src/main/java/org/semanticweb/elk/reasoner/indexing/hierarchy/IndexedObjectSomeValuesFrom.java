@@ -45,7 +45,7 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	 *         that is a property of the {@link ElkObjectSomeValuesFrom}
 	 *         represented by this {@link IndexedObjectSomeValuesFrom}.
 	 * 
-	 * @see {@link ElkObjectSomeValuesFrom#getProperty()}
+	 * @see ElkObjectSomeValuesFrom#getProperty()
 	 */
 	public IndexedObjectProperty getProperty();
 
@@ -54,7 +54,7 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	 *         filler of the {@link ElkObjectSomeValuesFrom} represented by this
 	 *         {@link IndexedObjectSomeValuesFrom}.
 	 * 
-	 * @see {@link ElkObjectSomeValuesFrom#getFiller()}
+	 * @see ElkObjectSomeValuesFrom#getFiller()
 	 */
 	public IndexedClassExpression getFiller();
 

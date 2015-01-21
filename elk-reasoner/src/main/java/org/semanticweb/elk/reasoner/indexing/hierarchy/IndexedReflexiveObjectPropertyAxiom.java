@@ -38,7 +38,7 @@ public interface IndexedReflexiveObjectPropertyAxiom extends IndexedAxiom {
 	 *         the {@link ElkReflexiveObjectPropertyAxiom} represented by this
 	 *         {@link IndexedReflexiveObjectPropertyAxiom}
 	 * 
-	 * @see {@link IndexedReflexiveObjectPropertyAxiom#getProperty()}
+	 * @see IndexedReflexiveObjectPropertyAxiom#getProperty()
 	 */
 	public IndexedObjectProperty getProperty();
 

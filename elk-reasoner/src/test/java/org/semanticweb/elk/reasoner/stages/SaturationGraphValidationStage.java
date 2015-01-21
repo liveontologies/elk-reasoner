@@ -31,7 +31,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
@@ -258,7 +258,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		public void visit(DisjointSubsumerFromMemberRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
-			for (IndexedDisjointnessAxiom axiom : rule.getDisjointnessAxioms()) {
+			for (IndexedDisjointClassesAxiom axiom : rule.getDisjointnessAxioms()) {
 				if (!axiom.occurs()) {
 					LOGGER_.error("Dead disjointness axiom: " + axiom);
 				}

@@ -44,8 +44,8 @@ public interface ModifiableIndexedObject extends IndexedObject {
 	 *            structure of the ontology
 	 * 
 	 * @param increment
-	 *            describes how occurrences of this
-	 *            {@link ModifiableIndexedObject} should changed
+	 *            how many occurrences should be added (if positive) or removed
+	 *            (if negative)
 	 * 
 	 * @return {@code true} if the operation has been successful or
 	 *         {@code false} otherwise. If {@code false} is return, the provided

@@ -27,7 +27,7 @@ import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 
 /**
- * Represents all occurrences of an {@link ElkClass} or {@link ElkIndividual} in
+ * Represents occurrences of an {@link ElkClass} or an {@link ElkIndividual} in
  * an ontology.
  * 
  * @author "Yevgeny Kazakov"
@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
  */
 public interface IndexedClassEntity extends IndexedClassExpression,
 		IndexedEntity {
-	
+
 	public <O> O accept(IndexedClassEntityVisitor<O> visitor);
 
 }

@@ -37,7 +37,7 @@ public interface IndexedSubClassOfAxiom extends IndexedAxiom {
 	 *         the {@link ElkSubClassOfAxiom} represented by this
 	 *         {@link IndexedSubClassOfAxiom}
 	 * 
-	 * @see {@link IndexedSubClassOfAxiom#getSubClass()}
+	 * @see IndexedSubClassOfAxiom#getSubClass()
 	 */
 	public IndexedClassExpression getSubClass();
 
@@ -46,7 +46,7 @@ public interface IndexedSubClassOfAxiom extends IndexedAxiom {
 	 *         of the {@link ElkSubClassOfAxiom} represented by this
 	 *         {@link IndexedSubClassOfAxiom}
 	 * 
-	 * @see {@link IndexedSubClassOfAxiom#getSuperClass()}
+	 * @see IndexedSubClassOfAxiom#getSuperClass()
 	 */
 	public IndexedClassExpression getSuperClass();
 

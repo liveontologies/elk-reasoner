@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
@@ -63,29 +63,29 @@ public interface ModifiableIndexedPropertyChain extends
 			IndexedObjectProperty superObjectProperty);
 
 	/**
-	 * Adds the given {@link IndexedBinaryPropertyChain} to the list of
-	 * {@link IndexedBinaryPropertyChain} that contains this
+	 * Adds the given {@link IndexedComplexPropertyChain} to the list of
+	 * {@link IndexedComplexPropertyChain} that contains this
 	 * {@link IndexedPropertyChain} in the right-hand-side
 	 * 
 	 * @param chain
-	 *            the {@link IndexedBinaryPropertyChain} to be added
+	 *            the {@link IndexedComplexPropertyChain} to be added
 	 * @return {@code true} if the operation is successful or {@code false}
 	 *         otherwise; if {@code false} is returned, this
 	 *         {@link IndexedPropertyChain} does not change
 	 */
-	boolean addRightChain(IndexedBinaryPropertyChain chain);
+	boolean addRightChain(IndexedComplexPropertyChain chain);
 
 	/**
-	 * Adds the given {@link IndexedBinaryPropertyChain} from the list of
-	 * {@link IndexedBinaryPropertyChain} that contain this
+	 * Adds the given {@link IndexedComplexPropertyChain} from the list of
+	 * {@link IndexedComplexPropertyChain} that contain this
 	 * {@link IndexedPropertyChain} in the right-hand-side
 	 * 
 	 * @param chain
-	 *            the {@link IndexedBinaryPropertyChain} to be removed
+	 *            the {@link IndexedComplexPropertyChain} to be removed
 	 * @return {@code true} if the operation is successful or {@code false}
 	 *         otherwise; if {@code false} is returned, this
 	 *         {@link IndexedPropertyChain} does not change
 	 */
-	boolean removeRightChain(IndexedBinaryPropertyChain chain);
+	boolean removeRightChain(IndexedComplexPropertyChain chain);
 
 }

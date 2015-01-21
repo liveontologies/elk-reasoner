@@ -62,7 +62,7 @@ public class DelegatingCachedIndexedObjectFactory implements
 	}
 
 	@Override
-	public final CachedIndexedBinaryPropertyChain getIndexedBinaryPropertyChain(
+	public final CachedIndexedComplexPropertyChain getIndexedBinaryPropertyChain(
 			ModifiableIndexedObjectProperty leftProperty,
 			ModifiableIndexedPropertyChain rightProperty) {
 		return filter(baseFactory_.getIndexedBinaryPropertyChain(leftProperty,

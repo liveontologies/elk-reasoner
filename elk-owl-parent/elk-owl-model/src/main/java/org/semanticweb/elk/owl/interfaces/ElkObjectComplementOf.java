@@ -34,7 +34,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectComplementOfVisitor;
 public interface ElkObjectComplementOf extends ElkClassExpression {
 
 	/**
-	 * Get the class expression that this expression refers to.
+	 * Get the class expression that this expression negation of.
 	 * 
 	 * @return class expression
 	 */

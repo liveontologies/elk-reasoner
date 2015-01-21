@@ -30,7 +30,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedPropertyChainFilter;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
@@ -54,9 +54,9 @@ final class CachedIndexedObjectPropertyImpl
 
 	/**
 	 * Collections of all binary role chains in which this
-	 * {@link IndexedBinaryPropertyChain} occurs on the left.
+	 * {@link IndexedComplexPropertyChain} occurs on the left.
 	 */
-	private Collection<IndexedBinaryPropertyChain> leftChains_;
+	private Collection<IndexedComplexPropertyChain> leftChains_;
 
 	/**
 	 * Correctness of axioms deletions requires that toldSubProperties is a
@@ -87,9 +87,9 @@ final class CachedIndexedObjectPropertyImpl
 	}
 
 	@Override
-	public final Collection<IndexedBinaryPropertyChain> getLeftChains() {
+	public final Collection<IndexedComplexPropertyChain> getLeftChains() {
 		return leftChains_ == null ? Collections
-				.<IndexedBinaryPropertyChain> emptySet() : Collections
+				.<IndexedComplexPropertyChain> emptySet() : Collections
 				.unmodifiableCollection(leftChains_);
 	}
 
@@ -104,14 +104,14 @@ final class CachedIndexedObjectPropertyImpl
 	}
 
 	@Override
-	public final boolean addLeftChain(IndexedBinaryPropertyChain chain) {
+	public final boolean addLeftChain(IndexedComplexPropertyChain chain) {
 		if (leftChains_ == null)
-			leftChains_ = new ArrayList<IndexedBinaryPropertyChain>(1);
+			leftChains_ = new ArrayList<IndexedComplexPropertyChain>(1);
 		return leftChains_.add(chain);
 	}
 
 	@Override
-	public final boolean removeLeftChain(IndexedBinaryPropertyChain chain) {
+	public final boolean removeLeftChain(IndexedComplexPropertyChain chain) {
 		boolean success = false;
 		if (leftChains_ != null) {
 			success = leftChains_.remove(chain);

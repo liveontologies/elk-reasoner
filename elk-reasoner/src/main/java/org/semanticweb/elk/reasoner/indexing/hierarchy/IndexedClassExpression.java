@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 
 /**
- * Represents all occurrences of an {@link ElkClassExpression} in an ontology.
+ * Represents occurrences of an {@link ElkClassExpression} in an ontology.
  * 
  * @author "Frantisek Simancik"
  * @author "Markus Kroetzsch"
@@ -42,8 +42,7 @@ public interface IndexedClassExpression extends IndexedObjectWithContext {
 	 * @return the first composition rule assigned to this
 	 *         {@link IndexedClassExpression}, or {@code null} if there no such
 	 *         rules; all other rules can be obtained by traversing over
-	 *         {@link LinkRule#next()}; this method should be used to access the
-	 *         rules without modifying them.
+	 *         {@link LinkRule#next()}
 	 */
 	public LinkedSubsumerRule getCompositionRuleHead();
 

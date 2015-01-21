@@ -26,9 +26,9 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.implementation.CachedIndexedBinaryPropertyChainImpl;
+import org.semanticweb.elk.reasoner.indexing.implementation.CachedIndexedComplexPropertyChainImpl;
 import org.semanticweb.elk.reasoner.indexing.implementation.CachedIndexedObjectPropertyImpl;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 
@@ -70,7 +70,7 @@ public class IndexedObjectsCreator {
 			ModifiableIndexedPropertyChain right,
 			ModifiableIndexedObjectProperty[] toldSupers) {
 
-		ModifiableIndexedBinaryPropertyChain chain = new CachedIndexedBinaryPropertyChainImpl(
+		ModifiableIndexedComplexPropertyChain chain = new CachedIndexedComplexPropertyChainImpl(
 				left, right);
 
 		for (ModifiableIndexedObjectProperty sup : toldSupers) {

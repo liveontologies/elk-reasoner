@@ -33,7 +33,7 @@ public interface CachedIndexedPropertyChainFilter {
 
 	CachedIndexedObjectProperty filter(CachedIndexedObjectProperty element);
 
-	CachedIndexedBinaryPropertyChain filter(
-			CachedIndexedBinaryPropertyChain element);
+	CachedIndexedComplexPropertyChain filter(
+			CachedIndexedComplexPropertyChain element);
 
 }

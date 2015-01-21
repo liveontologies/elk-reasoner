@@ -52,7 +52,7 @@ public class ModifiableIndexedObjectCacheImpl implements
 
 	private final EntryCollection<CachedIndexedComplexClassExpression<?>> cachedComplexClassExpressions_;
 
-	private final EntryCollection<CachedIndexedBinaryPropertyChain> cachedBinaryPropertyChains_;
+	private final EntryCollection<CachedIndexedComplexPropertyChain> cachedBinaryPropertyChains_;
 
 	private final EntryCollection<CachedIndexedAxiom<?>> cachedAxioms_;
 
@@ -70,7 +70,7 @@ public class ModifiableIndexedObjectCacheImpl implements
 	public ModifiableIndexedObjectCacheImpl(int initialSize) {
 		this.cachedComplexClassExpressions_ = new EntryCollection<CachedIndexedComplexClassExpression<?>>(
 				initialSize);
-		this.cachedBinaryPropertyChains_ = new EntryCollection<CachedIndexedBinaryPropertyChain>(
+		this.cachedBinaryPropertyChains_ = new EntryCollection<CachedIndexedComplexPropertyChain>(
 				initialSize);
 		this.cachedAxioms_ = new EntryCollection<CachedIndexedAxiom<?>>(
 				initialSize);
@@ -203,8 +203,8 @@ public class ModifiableIndexedObjectCacheImpl implements
 		}
 
 		@Override
-		public CachedIndexedBinaryPropertyChain filter(
-				CachedIndexedBinaryPropertyChain element) {
+		public CachedIndexedComplexPropertyChain filter(
+				CachedIndexedComplexPropertyChain element) {
 			return cachedBinaryPropertyChains_.findStructural(element);
 		}
 
@@ -273,8 +273,8 @@ public class ModifiableIndexedObjectCacheImpl implements
 		}
 
 		@Override
-		public CachedIndexedBinaryPropertyChain filter(
-				CachedIndexedBinaryPropertyChain element) {
+		public CachedIndexedComplexPropertyChain filter(
+				CachedIndexedComplexPropertyChain element) {
 			cachedBinaryPropertyChains_.addStructural(element);
 			return null;
 		}
@@ -337,8 +337,8 @@ public class ModifiableIndexedObjectCacheImpl implements
 		}
 
 		@Override
-		public CachedIndexedBinaryPropertyChain filter(
-				CachedIndexedBinaryPropertyChain element) {
+		public CachedIndexedComplexPropertyChain filter(
+				CachedIndexedComplexPropertyChain element) {
 			return cachedBinaryPropertyChains_.removeStructural(element);
 		}
 

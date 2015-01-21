@@ -41,7 +41,7 @@ public interface ElkObjectPropertyChain extends ElkSubObjectPropertyExpression {
 	/**
 	 * Get the list of object property expressions that this expression refers
 	 * to. The order of object property expressions is important for the syntax
-	 * and semantics of OWL.
+	 * and semantics of OWL. The list should have at east two members.
 	 * 
 	 * @return list of object property expressions
 	 */

@@ -32,6 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
@@ -41,6 +42,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
  * (indexed) representation.
  * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @see IndexedObject
  *
  */
 public interface IndexedObjectCache {

@@ -22,11 +22,11 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
@@ -104,7 +104,7 @@ public class DelegatingIndexedObjectVisitor<O> implements
 	}
 
 	@Override
-	public O visit(IndexedBinaryPropertyChain element) {
+	public O visit(IndexedComplexPropertyChain element) {
 		return propertyChainVisitor_.visit(element);
 	}
 
@@ -124,7 +124,7 @@ public class DelegatingIndexedObjectVisitor<O> implements
 	}
 
 	@Override
-	public O visit(IndexedDisjointnessAxiom axiom) {
+	public O visit(IndexedDisjointClassesAxiom axiom) {
 		return axiomVisitor_.visit(axiom);
 	}
 

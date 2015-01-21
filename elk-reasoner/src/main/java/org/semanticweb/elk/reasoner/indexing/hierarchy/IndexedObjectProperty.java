@@ -53,24 +53,24 @@ public interface IndexedObjectProperty extends IndexedPropertyChain,
 	 *         super property {@link ElkObjectProperty} is represented by this
 	 *         {@link IndexedObjectProperty}
 	 * 
-	 * @see {@link ElkSubObjectPropertyOfAxiom#getSubObjectPropertyExpression()}
-	 * @see {@link ElkSubObjectPropertyOfAxiom#getSuperObjectPropertyExpression()}
+	 * @see ElkSubObjectPropertyOfAxiom#getSubObjectPropertyExpression()
+	 * @see ElkSubObjectPropertyOfAxiom#getSuperObjectPropertyExpression()
 	 */
 	public List<IndexedPropertyChain> getToldSubProperties();
 
 	/**
-	 * @return All {@link IndexedBinaryPropertyChain}s in which this
+	 * @return All {@link IndexedComplexPropertyChain}s in which this
 	 *         {@link IndexedObjectProperty} is a left property
 	 * 
-	 * @see {@link IndexedBinaryPropertyChain#getLeftProperty()}
+	 * @see {@link IndexedComplexPropertyChain#getFirstProperty()}
 	 */
-	public Collection<IndexedBinaryPropertyChain> getLeftChains();
+	public Collection<IndexedComplexPropertyChain> getLeftChains();
 
 	/**
 	 * @return {@code true} if this object property occurs in a
 	 *         {@link IndexedReflexiveObjectPropertyAxiom}.
 	 * 
-	 * @see {@link IndexedReflexiveObjectPropertyAxiom#getProperty()}
+	 * @see IndexedReflexiveObjectPropertyAxiom#getProperty()
 	 */
 	public boolean isToldReflexive();
 

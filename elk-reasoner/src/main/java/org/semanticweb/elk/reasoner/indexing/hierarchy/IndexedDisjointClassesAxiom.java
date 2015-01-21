@@ -24,32 +24,40 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import java.util.Set;
 
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
+
 /**
- * Defines the disjointness inference rule for indexed class expressions
+ * Represents occurrences of an {@link ElkDisjointClassesAxiom} in an ontology.
  * 
  * @author Frantisek Simancik
  * @author Pavel Klinov
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface IndexedDisjointnessAxiom extends IndexedAxiom {
+public interface IndexedDisjointClassesAxiom extends IndexedAxiom {
 
 	/**
-	 * @return {@link IndexedClassExpression}s that have at least two equal
-	 *         occurrences (according to the {@link Object#equals(Object)}
-	 *         method) in this {@link IndexedDisjointnessAxiom}
+	 * @return {@link IndexedClassExpression}s corresponding to
+	 *         {@link ElkClassExpression}s that occur at least twice in this
+	 *         {@link IndexedDisjointClassesAxiom}
+	 * 
+	 * @see ElkDisjointClassesAxiom#getClassExpressions()
 	 */
 	public Set<? extends IndexedClassExpression> getInconsistentMembers();
 
 	/**
-	 * {@link IndexedClassExpression}s that occur exactly once in this
-	 * {@link IndexedDisjointnessAxiom}
+	 * @return {@link IndexedClassExpression}s corresponding to
+	 *         {@link ElkClassExpression}s that occur exactly once in this
+	 *         {@link IndexedDisjointClassesAxiom}
+	 * 
+	 * @see ElkDisjointClassesAxiom#getClassExpressions()
 	 */
 	public Set<? extends IndexedClassExpression> getDisjointMembers();
 
 	/**
-	 * @return {@code true} if this {@link IndexedDisjointnessAxiom} occurs in
-	 *         the ontology
+	 * @return {@code true} if this {@link IndexedDisjointClassesAxiom} occurs
+	 *         in the ontology
 	 */
 	public boolean occurs();
 

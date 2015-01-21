@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
@@ -82,16 +82,16 @@ public class ReflexivePropertyComputationFactory
 	}
 
 	private void toDoLeftChains(IndexedObjectProperty iop) {
-		for (IndexedBinaryPropertyChain chain : iop.getLeftChains()) {
-			if (!chain.getRightPropertyChain().getSaturated().isDerivedReflexive())
+		for (IndexedComplexPropertyChain chain : iop.getLeftChains()) {
+			if (!chain.getSuffixChain().getSaturated().isDerivedReflexive())
 				continue;
 			toDo(chain);
 		}
 	}
 
 	private void toDoRightChains(IndexedPropertyChain ipc) {
-		for (IndexedBinaryPropertyChain chain : ipc.getRightChains()) {
-			if (!chain.getLeftProperty().getSaturated().isDerivedReflexive())
+		for (IndexedComplexPropertyChain chain : ipc.getRightChains()) {
+			if (!chain.getFirstProperty().getSaturated().isDerivedReflexive())
 				continue;
 			toDo(chain);
 		}
@@ -110,7 +110,7 @@ public class ReflexivePropertyComputationFactory
 		}
 
 		@Override
-		public Void visit(IndexedBinaryPropertyChain element) {
+		public Void visit(IndexedComplexPropertyChain element) {
 			commonVisit(element);
 			return null;
 		}

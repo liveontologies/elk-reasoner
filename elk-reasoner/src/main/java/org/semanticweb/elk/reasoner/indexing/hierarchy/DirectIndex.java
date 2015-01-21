@@ -43,8 +43,10 @@ import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
+ * An implementation of {@link ModifiableOntologyIndex}
  * 
- * 
+ * @author "Yevgeny Kazakov"
+ *
  */
 public class DirectIndex extends ModifiableIndexedObjectCacheImpl implements
 		ModifiableOntologyIndex {

@@ -25,10 +25,10 @@ package org.semanticweb.elk.reasoner.indexing.caching;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointClassesAxiom;
 
 /**
- * A {@link ModifiableIndexedDisjointnessAxiom} that can be used for memoization
+ * A {@link ModifiableIndexedDisjointClassesAxiom} that can be used for memoization
  * (caching).
  * 
  * @author "Yevgeny Kazakov"
@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjoin
  *            the type of the {@link CachedIndexedDisjointnessAxiom}
  */
 public interface CachedIndexedDisjointnessAxiom extends
-		ModifiableIndexedDisjointnessAxiom,
+		ModifiableIndexedDisjointClassesAxiom,
 		CachedIndexedAxiom<CachedIndexedDisjointnessAxiom> {
 
 	static class Helper extends CachedIndexedObject.Helper {

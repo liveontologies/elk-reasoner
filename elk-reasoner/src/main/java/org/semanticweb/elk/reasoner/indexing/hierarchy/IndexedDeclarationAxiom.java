@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,8 +24,21 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
+/**
+ * Represents occurrences of an {@link ElkDeclarationAxiom} in an ontology.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ */
 public interface IndexedDeclarationAxiom extends IndexedAxiom {
 
+	/**
+	 * @return the {@link IndexedEntity} that represents the entity of the
+	 *         {@link ElkDeclarationAxiom} represented by this
+	 *         {@link IndexedDeclarationAxiom}
+	 * 
+	 * @see ElkDeclarationAxiom#getEntity()
+	 */
 	public IndexedEntity getEntity();
 
 }

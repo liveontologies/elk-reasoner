@@ -32,9 +32,16 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassEx
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 
+/**
+ * A factory for creating instances of {@link CachedIndexedObject}s from the
+ * respective parameters of the fields.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
 public interface CachedIndexedObjectFactory {
 
-	public CachedIndexedBinaryPropertyChain getIndexedBinaryPropertyChain(
+	public CachedIndexedComplexPropertyChain getIndexedBinaryPropertyChain(
 			ModifiableIndexedObjectProperty leftProperty,
 			ModifiableIndexedPropertyChain rightProperty);
 

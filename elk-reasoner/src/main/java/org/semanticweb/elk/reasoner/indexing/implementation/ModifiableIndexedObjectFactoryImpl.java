@@ -28,7 +28,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDisjointnessAxiom;
@@ -60,10 +60,10 @@ public class ModifiableIndexedObjectFactoryImpl implements
 		ModifiableIndexedObjectFactory, CachedIndexedObjectFactory {
 
 	@Override
-	public CachedIndexedBinaryPropertyChain getIndexedBinaryPropertyChain(
+	public CachedIndexedComplexPropertyChain getIndexedBinaryPropertyChain(
 			ModifiableIndexedObjectProperty leftProperty,
 			ModifiableIndexedPropertyChain rightProperty) {
-		return new CachedIndexedBinaryPropertyChainImpl(leftProperty,
+		return new CachedIndexedComplexPropertyChainImpl(leftProperty,
 				rightProperty);
 	}
 

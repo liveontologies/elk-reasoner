@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.AbstractConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
 
 /**
  * Represents a {@link Contradiction} as the result of processing a
- * {@link Subsumer} which occurs in the same {@link IndexedDisjointnessAxiom} as
+ * {@link Subsumer} which occurs in the same {@link IndexedDisjointClassesAxiom} as
  * some previously derived subsumer.
  * 
  * @author Pavel Klinov
@@ -54,7 +54,7 @@ public class ContradictionFromDisjointSubsumers extends AbstractConclusion imple
 	 */
 	private final IndexedClassExpression[] disjointSubsumers_;
 	
-	private final IndexedDisjointnessAxiom axiom_;
+	private final IndexedDisjointClassesAxiom axiom_;
 	
 	public ContradictionFromDisjointSubsumers(DisjointSubsumer ds, IndexedClassExpression[] disjointSubsumers) {
 		premise_ = ds.getMember();
@@ -85,7 +85,7 @@ public class ContradictionFromDisjointSubsumers extends AbstractConclusion imple
 		//return new DisjointSubsumerImpl(axiom_, premise_);
 	}
 	
-	public IndexedDisjointnessAxiom getAxiom() {
+	public IndexedDisjointClassesAxiom getAxiom() {
 		return axiom_;
 	}
 	

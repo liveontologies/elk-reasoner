@@ -22,20 +22,20 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 
 /**
  * A factory for creating instances of
- * {@link ModifiableIndexedBinaryPropertyChain}
+ * {@link ModifiableIndexedComplexPropertyChain}
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
 public interface ModifiableIndexedBinaryPropertyChainFactory {
 
-	public ModifiableIndexedBinaryPropertyChain getIndexedBinaryPropertyChain(
+	public ModifiableIndexedComplexPropertyChain getIndexedBinaryPropertyChain(
 			ModifiableIndexedObjectProperty leftProperty,
 			ModifiableIndexedPropertyChain rightProperty);
 

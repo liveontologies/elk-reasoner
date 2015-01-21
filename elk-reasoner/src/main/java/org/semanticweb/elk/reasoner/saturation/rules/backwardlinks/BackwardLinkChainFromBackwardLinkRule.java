@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
@@ -140,7 +140,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 		/* compose the link with all forward links */
 		SaturatedPropertyChain linkSaturation = link.getRelation()
 				.getSaturated();
-		final Multimap<IndexedPropertyChain, IndexedBinaryPropertyChain> comps = linkSaturation
+		final Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> comps = linkSaturation
 				.getCompositionsByRightSubProperty();
 		if (comps == null)
 			return;
@@ -148,12 +148,12 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 		for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
 				comps.keySet(), forwardLinksByObjectProperty_.keySet())) {
 
-			Collection<IndexedBinaryPropertyChain> compositions = comps
+			Collection<IndexedComplexPropertyChain> compositions = comps
 					.get(forwardRelation);
 			Collection<IndexedClassExpression> forwardTargets = forwardLinksByObjectProperty_
 					.get(forwardRelation);
 
-			for (IndexedBinaryPropertyChain composition : compositions)
+			for (IndexedComplexPropertyChain composition : compositions)
 				for (IndexedClassExpression forwardTarget : forwardTargets)
 					ForwardLinkImpl.produceComposedLink(producer,
 							link.getSource(), link.getRelation(),

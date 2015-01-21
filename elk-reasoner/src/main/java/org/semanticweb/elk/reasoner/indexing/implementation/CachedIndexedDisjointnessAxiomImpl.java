@@ -29,7 +29,7 @@ import java.util.Set;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFilter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
@@ -50,17 +50,17 @@ class CachedIndexedDisjointnessAxiomImpl extends
 	/**
 	 * {@link IndexedClassExpression}s that have at least two equal occurrences
 	 * (according to the {@link Object#equals(Object)} method) in this
-	 * {@link IndexedDisjointnessAxiom}
+	 * {@link IndexedDisjointClassesAxiom}
 	 */
 	private final Set<ModifiableIndexedClassExpression> inconsistentMembers_;
 	/**
 	 * {@link IndexedClassExpression}s that occur exactly once in this
-	 * {@link IndexedDisjointnessAxiom}
+	 * {@link IndexedDisjointClassesAxiom}
 	 */
 	private final Set<ModifiableIndexedClassExpression> disjointMembers_;
 
 	/**
-	 * This counts how often this {@link IndexedDisjointnessAxiom} occurs in the
+	 * This counts how often this {@link IndexedDisjointClassesAxiom} occurs in the
 	 * ontology.
 	 */
 	int totalOccurrenceNo_ = 0;

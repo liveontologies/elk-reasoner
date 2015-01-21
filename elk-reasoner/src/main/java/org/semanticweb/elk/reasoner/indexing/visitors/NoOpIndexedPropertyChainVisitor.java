@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
@@ -47,7 +47,7 @@ public class NoOpIndexedPropertyChainVisitor<O> implements
 	}
 
 	@Override
-	public O visit(IndexedBinaryPropertyChain element) {
+	public O visit(IndexedComplexPropertyChain element) {
 		return defaultVisit(element);
 	}
 

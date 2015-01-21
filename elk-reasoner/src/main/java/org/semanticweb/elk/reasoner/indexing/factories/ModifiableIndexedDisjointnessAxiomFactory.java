@@ -25,18 +25,18 @@ package org.semanticweb.elk.reasoner.indexing.factories;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointClassesAxiom;
 
 /**
  * A factory for creating instances of
- * {@link ModifiableIndexedDisjointnessAxiom}
+ * {@link ModifiableIndexedDisjointClassesAxiom}
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
 public interface ModifiableIndexedDisjointnessAxiomFactory {
 
-	public ModifiableIndexedDisjointnessAxiom getIndexedDisjointnessAxiom(
+	public ModifiableIndexedDisjointClassesAxiom getIndexedDisjointnessAxiom(
 			List<? extends ModifiableIndexedClassExpression> members);
 
 }

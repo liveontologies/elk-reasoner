@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDeclarationAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
@@ -59,7 +59,7 @@ public class NoOpIndexedAxiomVisitor<O> implements IndexedAxiomVisitor<O> {
 	}
 
 	@Override
-	public O visit(IndexedDisjointnessAxiom axiom) {
+	public O visit(IndexedDisjointClassesAxiom axiom) {
 		return defaultVisit(axiom);
 	}
 

@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFilter;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedPropertyChainFilter;
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -81,16 +81,16 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 
 	/**
 	 * All told super object properties of this
-	 * {@link IndexedBinaryPropertyChain}. Should be a List for correctness of
+	 * {@link IndexedComplexPropertyChain}. Should be a List for correctness of
 	 * axioms deletions (duplicates matter).
 	 */
 	private List<IndexedObjectProperty> toldSuperProperties_;
 
 	/**
 	 * Collections of all binary role chains in which this
-	 * {@link IndexedBinaryPropertyChain} occurs on the right.
+	 * {@link IndexedComplexPropertyChain} occurs on the right.
 	 */
-	private Collection<IndexedBinaryPropertyChain> rightChains_;
+	private Collection<IndexedComplexPropertyChain> rightChains_;
 
 	CachedIndexedPropertyChainImpl(int structuralHash) {
 		super(structuralHash);
@@ -110,9 +110,9 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 	}
 
 	@Override
-	public final Collection<IndexedBinaryPropertyChain> getRightChains() {
+	public final Collection<IndexedComplexPropertyChain> getRightChains() {
 		return rightChains_ == null ? Collections
-				.<IndexedBinaryPropertyChain> emptySet() : Collections
+				.<IndexedComplexPropertyChain> emptySet() : Collections
 				.unmodifiableCollection(rightChains_);
 	}
 
@@ -161,14 +161,14 @@ abstract class CachedIndexedPropertyChainImpl<T extends CachedIndexedPropertyCha
 	}
 
 	@Override
-	public final boolean addRightChain(IndexedBinaryPropertyChain chain) {
+	public final boolean addRightChain(IndexedComplexPropertyChain chain) {
 		if (rightChains_ == null)
-			rightChains_ = new ArrayList<IndexedBinaryPropertyChain>(1);
+			rightChains_ = new ArrayList<IndexedComplexPropertyChain>(1);
 		return rightChains_.add(chain);
 	}
 
 	@Override
-	public final boolean removeRightChain(IndexedBinaryPropertyChain chain) {
+	public final boolean removeRightChain(IndexedComplexPropertyChain chain) {
 		boolean success = false;
 		if (rightChains_ != null) {
 			success = rightChains_.remove(chain);
