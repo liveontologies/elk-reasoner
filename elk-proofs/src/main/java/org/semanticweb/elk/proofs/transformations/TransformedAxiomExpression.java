@@ -36,15 +36,15 @@ import org.semanticweb.elk.util.collections.Operations;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class TransformedAxiomExpression<T extends Operations.Transformation<Inference, Iterable<Inference>>> 
-				extends TransformedExpression<DerivedAxiomExpression<?>, T> implements DerivedAxiomExpression<ElkAxiom> {
+public class TransformedAxiomExpression<T extends Operations.Transformation<Inference, Iterable<Inference>>, E extends ElkAxiom> 
+				extends TransformedExpression<DerivedAxiomExpression<E>, T> implements DerivedAxiomExpression<E> {
 
-	public TransformedAxiomExpression(DerivedAxiomExpression<?> expr, T f) {
+	public TransformedAxiomExpression(DerivedAxiomExpression<E> expr, T f) {
 		super(expr, f);
 	}
 
 	@Override
-	public ElkAxiom getAxiom() {
+	public E getAxiom() {
 		return expression.getAxiom();
 	}
 

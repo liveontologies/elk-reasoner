@@ -30,6 +30,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
@@ -69,7 +70,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 		expressionFactory_ = new DerivedExpressionFactoryWithCaching(this);
 	}
 	
-	public DerivedAxiomExpression<?> initialize(ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
+	public DerivedAxiomExpression<ElkSubClassOfAxiom> initialize(ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
 		// trace it
 		reasoner.explainSubsumption(sub, sup);
 		// create and return the first derived expression which corresponds to the initial subsumption

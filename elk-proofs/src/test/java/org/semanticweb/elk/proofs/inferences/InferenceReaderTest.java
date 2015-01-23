@@ -106,10 +106,21 @@ public class InferenceReaderTest {
 	}
 	
 	@Test
+	public void redundantCompositions() throws Exception {
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/RedundantCompositions.owl");
+		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
+		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/G"));
+		
+		TestUtils.provabilityTest(new ProofReader(reasoner), sub, sup);
+		
+		reasoner.shutdown();
+	}
+	
+	@Test
 	//@Ignore("not a real test, more for manual debugging")
 	public void basicTest() throws Exception {
 		//Reasoner reasoner = TestReasonerUtils.loadAndClassify(new File("/home/pavel/ulm/data/galens/EL-GALEN.owl"));
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositionsWithReflexivity.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/RedundantCompositions.owl");
 		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/G"));
 		ProofReader reader = new ProofReader(reasoner).eliminateLemmas();

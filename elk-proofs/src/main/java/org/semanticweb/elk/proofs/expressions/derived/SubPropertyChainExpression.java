@@ -135,10 +135,9 @@ public class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSub
 
 	private Iterable<? extends Inference> rewrite(List<IndexedObjectProperty> indexedChain, List<IndexedObjectProperty> indexedTargetChain) {
 		// try to rewrite substrings starting from the back and going to the left
-		int index = indexedChain.size() - 2;
 		List<Inference> inferences = new ArrayList<Inference>();
 		
-		for (;;) {
+		for (int index = indexedChain.size() - 2; index >=0; index--) {
 			IndexedBinaryPropertyChain subChain = (IndexedBinaryPropertyChain) binarize(indexedChain.subList(index,  indexedChain.size()));
 			Multimap<IndexedPropertyChain, ObjectPropertyInference> leftSuperChainToInferences = getSuperChainToInferencesMultimap(subChain.getLeftProperty());
 			Multimap<IndexedPropertyChain, ObjectPropertyInference> rightSuperChainToInferences = getSuperChainToInferencesMultimap(subChain.getRightProperty());
@@ -172,13 +171,9 @@ public class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSub
 					inferences.add(inf);
 				}	
 			}
-			
-			if (!inferences.isEmpty() || index <= 0) {
-				return inferences;
-			}
-				
-			index--;
 		}
+		
+		return inferences;
 	}
 
 	private boolean composable(IndexedObjectProperty left, IndexedPropertyChain right) {
@@ -242,11 +237,6 @@ public class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSub
 										int subChainIndex,
 										Iterable<ObjectPropertyInference> superChainInferences) {
 		List<IndexedObjectProperty> premiseChain = replace(indexedChainList_, flatten(subChain), flatten(superChain), subChainIndex);
-		
-		if (premiseChain == null) {
-			return null;
-		}
-		
 		DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> premise = null;
 		DerivedExpressionFactory exprFactory = getExpressionFactory();
 		
@@ -292,7 +282,6 @@ public class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSub
 
 				@Override
 				public Inference visit(ToldSubPropertyInference inference, DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
-					// using only told role hierarchy
 					if (inference.getSuperPropertyChain() instanceof IndexedObjectProperty) {
 						return createSubChainInference(inference.getSubPropertyChain(), (IndexedObjectProperty) inference.getSuperPropertyChain(), premise);	
 					}
@@ -313,9 +302,9 @@ public class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSub
 	private Inference createSubChainInference(	IndexedPropertyChain subChain, 
 												IndexedObjectProperty superChain, 
 												DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> firstPremise) {
-			// rewriting
 		return new ChainSubsumption(expr_, firstPremise, 
-					getExpressionFactory().create(elkFactory_.getSubObjectPropertyOfAxiom(deindex(subChain), ((IndexedObjectProperty) superChain).getElkObjectProperty())));
+					getExpressionFactory().create(elkFactory_.getSubObjectPropertyOfAxiom(deindex(subChain), 
+					((IndexedObjectProperty) superChain).getElkObjectProperty())));
 	}
 	
 	private List<IndexedObjectProperty> flatten(IndexedPropertyChain ipc) {

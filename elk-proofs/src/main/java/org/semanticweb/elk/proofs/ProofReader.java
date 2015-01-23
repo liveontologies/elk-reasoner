@@ -26,6 +26,7 @@ package org.semanticweb.elk.proofs;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
@@ -74,11 +75,11 @@ public class ProofReader {
 	 * @return
 	 * @throws ElkException
 	 */
-	public DerivedAxiomExpression<?> getProofRoot(ElkClassExpression subsumee, ElkClassExpression subsumer) throws ElkException {
-		DerivedAxiomExpression<?> root = reader_.initialize(subsumee, subsumer);
+	public DerivedAxiomExpression<ElkSubClassOfAxiom> getProofRoot(ElkClassExpression subsumee, ElkClassExpression subsumer) throws ElkException {
+		DerivedAxiomExpression<ElkSubClassOfAxiom> root = reader_.initialize(subsumee, subsumer);
 		
 		if (inferenceTransformation_ != null) {
-			root = new TransformedAxiomExpression<Transformation<Inference, Iterable<Inference>>>(root, inferenceTransformation_);
+			root = new TransformedAxiomExpression<Transformation<Inference, Iterable<Inference>>, ElkSubClassOfAxiom>(root, inferenceTransformation_);
 		}
 		
 		return root;
