@@ -147,7 +147,7 @@ public class ExpressionMapper {
 		}
 
 		@Override
-		public Iterable<TracingInput> visit(LemmaExpression expr, Void input) {
+		public Iterable<TracingInput> visit(LemmaExpression<?> expr, Void input) {
 			return expr.getLemma().accept(this, input);
 		}
 

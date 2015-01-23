@@ -42,6 +42,7 @@ import org.semanticweb.elk.proofs.inferences.mapping.InferenceMapper;
 import org.semanticweb.elk.proofs.inferences.mapping.SatisfiabilityChecker;
 import org.semanticweb.elk.proofs.inferences.mapping.TracingInput;
 import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
@@ -79,6 +80,14 @@ public class ReasonerInferenceReader implements InferenceReader {
 		return expressionFactory_;
 	}
 	
+	public IndexObjectConverter getIndexer() {
+		return reasoner.getIndexObjectConverter();
+	}
+	
+	public TraceStore.Reader getTraceReader() {
+		return reasoner.getTraceState().getTraceStore().getReader();
+	}
+	
 	@Override
 	public Iterable<Inference> getInferences(Expression expression) throws ElkException {
 		// first, transform the expression into inputs for the trace reader
@@ -90,8 +99,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 			}
 		});
 		
-		TraceStore.Reader traceReader = reasoner.getTraceState().getTraceStore().getReader();
-		InferenceMapper mapper = new InferenceMapper(new RecursiveTraceUnwinder(traceReader), expressionFactory_);
+		InferenceMapper mapper = new InferenceMapper(new RecursiveTraceUnwinder(getTraceReader()), expressionFactory_);
 		final List<Inference> userInferences = new LinkedList<Inference>();
 		InferenceVisitor<Void, Void> collector = new AbstractInferenceVisitor<Void, Void>() {
 
@@ -108,5 +116,5 @@ public class ReasonerInferenceReader implements InferenceReader {
 		
 		return userInferences;
 	}
-
+	
 }

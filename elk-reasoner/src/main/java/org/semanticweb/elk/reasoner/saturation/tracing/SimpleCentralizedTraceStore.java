@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
@@ -96,6 +97,11 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 		public void accept(ObjectPropertyConclusion conclusion,
 				ObjectPropertyInferenceVisitor<?, ?> visitor) {
 			propertyInferenceStore_.visitInferences(conclusion, visitor);
+		}
+
+		@Override
+		public void visitInferences(IndexedPropertyChain ipc, ObjectPropertyInferenceVisitor<?, ?> visitor) {
+			propertyInferenceStore_.visitInferences(ipc, visitor);
 		}
 		
 	}

@@ -38,7 +38,7 @@ public abstract class AbstractClassInference<D extends DerivedExpression> extend
 
 	final D conclusion;
 
-	AbstractClassInference(D c) {
+	protected AbstractClassInference(D c) {
 		conclusion = c;
 	}
 	

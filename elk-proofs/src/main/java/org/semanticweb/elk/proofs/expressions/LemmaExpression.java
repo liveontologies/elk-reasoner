@@ -28,11 +28,13 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
 
 /**
+ * TODO
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface LemmaExpression extends DerivedExpression {
+public interface LemmaExpression<L extends ElkLemma> extends DerivedExpression {
 
-	public ElkLemma getLemma();
+	public L getLemma();
 }

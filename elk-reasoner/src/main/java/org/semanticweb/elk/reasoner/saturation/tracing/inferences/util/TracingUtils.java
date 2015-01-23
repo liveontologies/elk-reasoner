@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
@@ -36,9 +37,15 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectProp
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.GeneralSubPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.util.collections.HashListMultimap;
+import org.semanticweb.elk.util.collections.Multimap;
 
 /**
  * @author Pavel Klinov
@@ -77,6 +84,44 @@ public class TracingUtils {
 		});
 		
 		return inferences;
+	}
+	
+	public static Multimap<IndexedPropertyChain, ObjectPropertyInference> getSuperPropertyInferenceMultimap(TraceStore.Reader reader, IndexedPropertyChain ipc) {
+		final Multimap<IndexedPropertyChain, ObjectPropertyInference> result = new HashListMultimap<IndexedPropertyChain, ObjectPropertyInference>();
+		
+		reader.visitInferences(ipc, new AbstractObjectPropertyInferenceVisitor<Void, Void>() {
+
+			@Override
+			public Void visit(ToldSubPropertyInference inference, Void input) {
+				result.add(inference.getSuperPropertyChain(), inference);
+				return null;
+			}
+
+			@Override
+			public Void visit(GeneralSubPropertyInference inference, Void input) {
+				result.add(inference.getSuperPropertyChain(), inference);
+				return null;
+			}
+
+			@Override
+			public Void visit(LeftReflexiveSubPropertyChainInference inference, Void input) {
+				result.add(inference.getSuperPropertyChain(), inference);
+				return null;
+			}
+
+			@Override
+			public Void visit(RightReflexiveSubPropertyChainInference inference, Void input) {
+				result.add(inference.getSuperPropertyChain(), inference);
+				return null;
+			}
+
+			@Override
+			protected Void defaultTracedVisit(ObjectPropertyInference inference, Void input) {
+				return null;
+			}
+		});
+		
+		return result;
 	}
 	
 	public static Conclusion getConclusionToTrace(Context context, IndexedClassExpression subsumer) {

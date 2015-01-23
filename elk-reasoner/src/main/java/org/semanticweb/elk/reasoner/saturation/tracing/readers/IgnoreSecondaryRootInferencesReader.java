@@ -27,10 +27,11 @@ package org.semanticweb.elk.reasoner.saturation.tracing.readers;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.tracing.DelegatingTraceReader;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedConjunction;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;

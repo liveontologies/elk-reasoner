@@ -57,7 +57,6 @@ import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.LemmaExpressionImpl;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexObjectSomeValuesFrom;
@@ -104,8 +103,8 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 	}
 
 	@Override
-	public Boolean visit(LemmaExpression expr, Expression second) {
-		return second instanceof LemmaExpression ? LemmaEquivalenceChecker.equal(expr.getLemma(), ((LemmaExpressionImpl)second).getLemma()) : Boolean.FALSE;
+	public Boolean visit(LemmaExpression<?> expr, Expression second) {
+		return second instanceof LemmaExpression ? LemmaEquivalenceChecker.equal(expr.getLemma(), ((LemmaExpression<?>)second).getLemma()) : Boolean.FALSE;
 	}
 
 	private static class DefaultLemmaChecker  implements ElkLemmaVisitor<ElkLemma, Boolean> {

@@ -107,8 +107,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Sub
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Maps one or more lower-level inferences to a single {@link Inference}. If the given low-level
@@ -124,8 +122,6 @@ import org.slf4j.LoggerFactory;
  *         pavel.klinov@uni-ulm.de
  */
 public class SingleInferenceMapper {
-	
-	private static final Logger LOGGER_ = LoggerFactory.getLogger(SingleInferenceMapper.class);
 	
 	static final Inference STOP = new Unmappable();
 	
@@ -148,19 +144,11 @@ public class SingleInferenceMapper {
 	
 	public Inference map(ClassInference inference,
 			IndexedClassExpression whereStored) {
-		Inference userInf = inference.acceptTraced(new MappingVisitor(), whereStored);
-		
-		LOGGER_.trace("Mapped {} in {} => {}", inference, whereStored, userInf);
-		
-		return userInf;
+		return inference.acceptTraced(new MappingVisitor(), whereStored);
 	}
 
 	public Inference map(ObjectPropertyInference inference) {
-		Inference userInf = inference.acceptTraced(new MappingVisitor(), null);
-		
-		LOGGER_.trace("Mapped {} => {}", inference, userInf);
-		
-		return userInf;
+		return inference.acceptTraced(new MappingVisitor(), null);
 	}
 	
 	/**

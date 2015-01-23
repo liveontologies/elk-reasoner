@@ -33,6 +33,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
@@ -43,7 +44,7 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ExistentialLemmaChainComposition extends AbstractClassInference<LemmaExpression> {
+public class ExistentialLemmaChainComposition extends AbstractClassInference<LemmaExpression<ElkSubClassOfLemma>> {
 
 	private final DerivedAxiomExpression<ElkSubClassOfAxiom> firstExistentialPremise_;
 
@@ -54,7 +55,7 @@ public class ExistentialLemmaChainComposition extends AbstractClassInference<Lem
 	private final DerivedExpression secondPropertySubsumptionPremise_;
 	
 	public ExistentialLemmaChainComposition(
-			LemmaExpression conclusion,
+			LemmaExpression<ElkSubClassOfLemma> conclusion,
 			DerivedAxiomExpression<ElkSubClassOfAxiom> firstExPremise,
 			DerivedExpression secondExPremise,
 			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propSubsumption,

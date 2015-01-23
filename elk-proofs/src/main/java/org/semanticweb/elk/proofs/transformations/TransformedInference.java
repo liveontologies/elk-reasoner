@@ -26,7 +26,6 @@ package org.semanticweb.elk.proofs.transformations;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
@@ -63,12 +62,12 @@ public class TransformedInference<T extends Operations.Transformation<Inference,
 		return expr.accept(new ExpressionVisitor<Void, TransformedExpression<?, T>>() {
 
 			@Override
-			public TransformedExpression<?, T> visit(DerivedAxiomExpression<? extends ElkAxiom> axiom, Void input) {
+			public TransformedExpression<?, T> visit(DerivedAxiomExpression<?> axiom, Void input) {
 				return new TransformedAxiomExpression<T>(axiom, transformation);
 			}
 
 			@Override
-			public TransformedExpression<?, T> visit(LemmaExpression lemma, Void input) {
+			public TransformedExpression<?, T> visit(LemmaExpression<?> lemma, Void input) {
 				return new TransformedLemmaExpression<T>(lemma, transformation);
 			}
 			

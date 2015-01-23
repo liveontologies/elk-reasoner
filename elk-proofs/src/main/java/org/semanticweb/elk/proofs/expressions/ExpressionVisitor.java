@@ -36,5 +36,5 @@ public interface ExpressionVisitor<I, O> {
 
 	public O visit(DerivedAxiomExpression<? extends ElkAxiom> expr, I input);
 	
-	public O visit(LemmaExpression expr, I input);
+	public O visit(LemmaExpression<?> expr, I input);
 }

@@ -25,13 +25,13 @@ package org.semanticweb.elk.proofs;
  */
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.proofs.transformations.LemmaElimination;
 import org.semanticweb.elk.proofs.transformations.TransformedAxiomExpression;
+import org.semanticweb.elk.proofs.transformations.lemmas.LemmaElimination;
 import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
@@ -57,7 +57,7 @@ public class ProofReader {
 	}
 	
 	public ProofReader eliminateLemmas() {
-		inferenceTransformation_ = new LemmaElimination(reader_.getExpressionFactory(), new ElkObjectFactoryImpl());
+		inferenceTransformation_ = new LemmaElimination(reader_);
 		
 		return this;
 	}

@@ -62,9 +62,68 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 	private final ConcurrentHashMap<IndexedPropertyChain, BasePropertyInferences> propertyToInferencesMap_ = new ConcurrentHashMap<IndexedPropertyChain, BasePropertyInferences>();
 
 	/**
-	 * records object property inferences
+	 * Records object property inferences
 	 */
-	private final ObjectPropertyInferenceVisitor<Void, Boolean> inferenceWriter_ = new ObjectPropertyInferenceVisitor<Void, Boolean>() {
+	private final WritingVisitor inferenceWriter_ = new WritingVisitor();
+	
+	/**
+	 * Retrieves object property inferences
+	 */
+	private final ReadingVisitor inferenceReader_ = new ReadingVisitor();
+	
+	@Override
+	public synchronized boolean addInference(ObjectPropertyInference inference) {
+		//FIXME
+		//System.err.println(inference);
+		return inference.acceptTraced(inferenceWriter_, null);
+	}
+
+	@Override
+	public void visitInferences(ObjectPropertyConclusion conclusion, ObjectPropertyInferenceVisitor<?, ?> visitor) {
+		conclusion.accept(inferenceReader_, visitor);
+	}
+	
+	@Override
+	public void visitInferences(IndexedPropertyChain ipc, ObjectPropertyInferenceVisitor<?, ?> visitor) {
+		inferenceReader_.visitReflexivityInferences(ipc, visitor);
+		inferenceReader_.visitSuperPropertyInferences(ipc, visitor);
+	}
+
+	@Override
+	public void clear() {
+		propertyToInferencesMap_.clear();
+	}
+	
+	/**
+	 * Interface for objects storing property or property chain inferences.
+	 * 
+	 * {@link ObjectPropertyInference}s can be produced multiple times (in
+	 * contrast to {@link ClassInference}s) so we use sets and set multimaps to
+	 * store unique inferences. We also require that implementations properly
+	 * override equals() and hashCode().
+	 * 
+	 * @author Pavel Klinov
+	 *
+	 *         pavel.klinov@uni-ulm.de
+	 */
+	private static interface PropertyInferences {
+		
+	}
+
+	private static class BasePropertyInferences implements PropertyInferences {
+		
+		final Set<ObjectPropertyInference> reflexivityInferences = new ArrayHashSet<ObjectPropertyInference>(1);
+		final Multimap<IndexedPropertyChain, ObjectPropertyInference> superPropertyInfences = new HashSetMultimap<IndexedPropertyChain, ObjectPropertyInference>(2);
+	}
+	
+	/**
+	 * Writes inferences.
+	 * 
+	 * @author	Pavel Klinov
+	 * 			pavel.klinov@uni-ulm.de
+	 *
+	 */
+	private class WritingVisitor implements ObjectPropertyInferenceVisitor<Void, Boolean> {
 
 		@Override
 		public Boolean visit(PropertyChainInitialization conclusion, Void input) {
@@ -78,14 +137,12 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 		}
 
 		@Override
-		public Boolean visit(ReflexiveToldSubObjectProperty inference,
-				Void input) {
+		public Boolean visit(ReflexiveToldSubObjectProperty inference, Void input) {
 			return writeReflexivityInference(inference.getPropertyChain(), inference);
 		}
 
 		@Override
-		public Boolean visit(ReflexivePropertyChainInference inference,
-				Void input) {
+		public Boolean visit(ReflexivePropertyChainInference inference, Void input) {
 			return writeReflexivityInference(inference.getPropertyChain(), inference);
 		}
 		
@@ -134,10 +191,10 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 				IndexedPropertyChain superPropertyChain,
 				ObjectPropertyInference inference) {
 			
-			BasePropertyInferences inferences = getInferences(superPropertyChain);			
-			boolean modified = inferences.subPropertyInfences.add(subPropertyChain, inference);
+			BasePropertyInferences inferences = getInferences(subPropertyChain);			
+			boolean modified = inferences.superPropertyInfences.add(superPropertyChain, inference);
 			
-			setInferences(superPropertyChain, inferences);
+			setInferences(subPropertyChain, inferences);
 			
 			//LOGGER_.trace("writing sub-chain inference: {} -> {}, inference: {}, store: {}", subPropertyChain, superPropertyChain, inference, hashCode());
 			
@@ -147,9 +204,14 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 	};
 	
 	/**
-	 * retrieves object property inferences
+	 * Reads inferences
+	 * 
+	 * 
+	 * @author	Pavel Klinov
+	 * 			pavel.klinov@uni-ulm.de
+	 *
 	 */
-	private final ObjectPropertyConclusionVisitor<ObjectPropertyInferenceVisitor<?,?>, Void> inferenceReader_ = new ObjectPropertyConclusionVisitor<ObjectPropertyInferenceVisitor<?,?>, Void>() {
+	private class ReadingVisitor implements ObjectPropertyConclusionVisitor<ObjectPropertyInferenceVisitor<?,?>, Void> {
 
 		@Override
 		public Void visit(SubPropertyChain<?, ?> conclusion, ObjectPropertyInferenceVisitor<?, ?> visitor) {
@@ -157,19 +219,21 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 				visitInitializationInference(conclusion.getSubPropertyChain(), visitor);
 			}
 			else {
-				visitSuperPropertyInferences(conclusion.getSuperPropertyChain(), conclusion.getSubPropertyChain(), visitor);
+				visitSuperPropertyInferences(conclusion.getSubPropertyChain(), conclusion.getSuperPropertyChain(), visitor);
 			}
 			return null;
 		}
 
 		@Override
 		public Void visit(ReflexivePropertyChain<?> conclusion, final ObjectPropertyInferenceVisitor<?,?> visitor) {
-			visitReflexivityInferences(propertyToInferencesMap_.get(conclusion.getPropertyChain()), visitor);
+			visitReflexivityInferences(conclusion.getPropertyChain(), visitor);
 			
 			return null;
 		}
 
-		private void visitReflexivityInferences(BasePropertyInferences inferences, ObjectPropertyInferenceVisitor<?,?> visitor) {
+		private void visitReflexivityInferences(IndexedPropertyChain chain, ObjectPropertyInferenceVisitor<?,?> visitor) {
+			BasePropertyInferences inferences = propertyToInferencesMap_.get(chain);
+			
 			if (inferences != null) {
 				for (ObjectPropertyInference inf : inferences.reflexivityInferences) {
 					inf.acceptTraced(visitor, null);
@@ -178,63 +242,37 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 			
 		}		
 
-		private void visitInitializationInference(	IndexedPropertyChain subChain, ObjectPropertyInferenceVisitor<?, ?> visitor) {
+		private void visitInitializationInference(IndexedPropertyChain subChain, ObjectPropertyInferenceVisitor<?, ?> visitor) {
 			// assume that this inference is always there and generate it on the fly
 			new PropertyChainInitialization(subChain).acceptTraced(visitor, null);	
 		}
 		
-		private void visitSuperPropertyInferences(IndexedPropertyChain superChain, IndexedPropertyChain subChain, ObjectPropertyInferenceVisitor<?,?> visitor) {
-			BasePropertyInferences inferences = propertyToInferencesMap_.get(superChain);
+		private void visitSuperPropertyInferences(IndexedPropertyChain subChain, IndexedPropertyChain superChain, ObjectPropertyInferenceVisitor<?,?> visitor) {
+			BasePropertyInferences inferences = propertyToInferencesMap_.get(subChain);
 
 			if (inferences == null) {
 				//LOGGER_.trace("not found sub-chain inferences: {} -> {}, store: {}", subChain, superChain, hashCode());
 				return;
 			}
 
-			for (ObjectPropertyInference inference : inferences.subPropertyInfences.get(subChain)) {
+			for (ObjectPropertyInference inference : inferences.superPropertyInfences.get(superChain)) {
 				inference.acceptTraced(visitor, null);
 			}
 		}
 		
+		private void visitSuperPropertyInferences(IndexedPropertyChain subChain, ObjectPropertyInferenceVisitor<?,?> visitor) {
+			BasePropertyInferences inferences = propertyToInferencesMap_.get(subChain);
+
+			if (inferences == null) {
+				return;
+			}
+			
+			for (IndexedPropertyChain superChain : inferences.superPropertyInfences.keySet()) {
+				for (ObjectPropertyInference inference : inferences.superPropertyInfences.get(superChain)) {
+					inference.acceptTraced(visitor, null);
+				}
+			}
+		}
+		
 	};
-	
-	@Override
-	public synchronized boolean addInference(ObjectPropertyInference inference) {
-		//FIXME
-		//System.err.println(inference);
-		return inference.acceptTraced(inferenceWriter_, null);
-	}
-
-	@Override
-	public void visitInferences(ObjectPropertyConclusion conclusion, ObjectPropertyInferenceVisitor<?, ?> visitor) {
-		conclusion.accept(inferenceReader_, visitor);
-	}
-	
-	@Override
-	public void clear() {
-		propertyToInferencesMap_.clear();
-	}
-	
-	/**
-	 * Interface for objects storing property or property chain inferences.
-	 * 
-	 * {@link ObjectPropertyInference}s can be produced multiple times (in
-	 * contrast to {@link ClassInference}s) so we use sets and set multimaps to
-	 * store unique inferences. We also require that implementations properly
-	 * override equals() and hashCode().
-	 * 
-	 * @author Pavel Klinov
-	 *
-	 *         pavel.klinov@uni-ulm.de
-	 */
-	private static interface PropertyInferences {
-		
-	}
-
-	private static class BasePropertyInferences implements PropertyInferences {
-		
-		final Set<ObjectPropertyInference> reflexivityInferences = new ArrayHashSet<ObjectPropertyInference>(1);
-		final Multimap<IndexedPropertyChain, ObjectPropertyInference> subPropertyInfences = new HashSetMultimap<IndexedPropertyChain, ObjectPropertyInference>(2);
-	}
-
 }

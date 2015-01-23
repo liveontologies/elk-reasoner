@@ -3,7 +3,6 @@
  */
 package org.semanticweb.elk.proofs.inferences;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -77,7 +76,29 @@ public class InferenceReaderTest {
 	public void compositionsWithReflexivity() throws Exception {
 		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositionsWithReflexivity.owl");
 		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
-		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/E"));
+		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/G"));
+		
+		TestUtils.provabilityTest(new ProofReader(reasoner), sub, sup);
+		
+		reasoner.shutdown();
+	}
+	
+	@Test
+	public void compositionsWithHierarchy() throws Exception {
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositionsWithHierarchy.owl");
+		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
+		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/G"));
+		
+		TestUtils.provabilityTest(new ProofReader(reasoner), sub, sup);
+		
+		reasoner.shutdown();
+	}
+	
+	@Test
+	public void compositionsWithHierarchyAndReflexivity() throws Exception {
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositionsWithReflexivity.owl");
+		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
+		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/G"));
 		
 		TestUtils.provabilityTest(new ProofReader(reasoner), sub, sup);
 		
@@ -88,7 +109,7 @@ public class InferenceReaderTest {
 	//@Ignore("not a real test, more for manual debugging")
 	public void basicTest() throws Exception {
 		//Reasoner reasoner = TestReasonerUtils.loadAndClassify(new File("/home/pavel/ulm/data/galens/EL-GALEN.owl"));
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositionsWithHierarchyAndReflexivity.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositionsWithReflexivity.owl");
 		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/G"));
 		ProofReader reader = new ProofReader(reasoner).eliminateLemmas();

@@ -43,8 +43,8 @@ public class DummyExpressionFactory implements DerivedExpressionFactory {
 	}
 
 	@Override
-	public LemmaExpressionImpl create(ElkLemma lemma) {
-		return new LemmaExpressionImpl(lemma, InferenceReader.DUMMY);
+	public <L extends ElkLemma> LemmaExpressionImpl<L> create(L lemma) {
+		return new LemmaExpressionImpl<L>(lemma, InferenceReader.DUMMY);
 	}
 
 	@Override

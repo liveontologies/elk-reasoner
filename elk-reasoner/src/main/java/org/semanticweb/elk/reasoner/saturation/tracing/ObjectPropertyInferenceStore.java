@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
@@ -40,6 +41,13 @@ public interface ObjectPropertyInferenceStore {
 	public boolean addInference(ObjectPropertyInference inference);
 	
 	public void visitInferences(ObjectPropertyConclusion conclusion, ObjectPropertyInferenceVisitor<?, ?> visitor);
+	/**
+	 * TODO
+	 * 
+	 * @param ipc
+	 * @param visitor
+	 */
+	public void visitInferences(IndexedPropertyChain ipc, ObjectPropertyInferenceVisitor<?, ?> visitor);
 	
 	public void clear();
 }

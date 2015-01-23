@@ -29,6 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.PropertyInferenceVisitor;
 
@@ -48,7 +49,7 @@ abstract class AbstractPropertyInference extends AbstractInference {
 		conclusion = c;
 	}
 	
-	AbstractPropertyInference(LemmaExpression c) {
+	AbstractPropertyInference(LemmaExpression<? extends ElkLemma> c) {
 		conclusion = c;
 	}
 

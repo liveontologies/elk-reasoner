@@ -37,7 +37,7 @@ import org.semanticweb.elk.proofs.inferences.PropertyInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
- * TODO
+ * TODO split on two
  * 
  * @author Pavel Klinov
  *
@@ -57,6 +57,10 @@ public class SubsumptionViaReflexivity extends AbstractPropertyInference  {
 		super(exprFactory.create(conclusion));
 		
 		premise_ = premise;
+	}
+	
+	public DerivedExpression getReflexivityPremise() {
+		return premise_;
 	}
 	
 	@Override

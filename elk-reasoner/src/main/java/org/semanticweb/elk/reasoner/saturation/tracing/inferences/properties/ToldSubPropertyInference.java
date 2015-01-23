@@ -52,6 +52,10 @@ public class ToldSubPropertyInference extends SubPropertyChain<IndexedPropertyCh
 		return new SubPropertyChain<IndexedObjectProperty, IndexedPropertyChain>(premise_, getSuperPropertyChain());
 	}
 	
+	public SubPropertyChain<IndexedPropertyChain, IndexedObjectProperty> getSideCondition() {
+		return new SubPropertyChain<IndexedPropertyChain, IndexedObjectProperty>(getSubPropertyChain(), premise_);
+	}
+	
 	@Override
 	public <I, O> O acceptTraced(ObjectPropertyInferenceVisitor<I, O> visitor,
 			I input) {

@@ -35,6 +35,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Visits all used low level {@link ClassInference}s and
@@ -47,6 +49,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Abstr
  */
 public class InferenceMapper {
 
+	private static final Logger LOGGER_ = LoggerFactory.getLogger(InferenceMapper.class);
+	
 	private final RecursiveTraceUnwinder unwinder_;
 	
 	private final DerivedExpressionFactory exprFactory_;
@@ -92,6 +96,8 @@ public class InferenceMapper {
 							return true;
 						}
 						else if (mapped != SingleInferenceMapper.STOP) {
+							LOGGER_.trace("Mapped {} in {} => {}", inference, whereStored, mapped);
+							
 							mapped.accept(visitor, null);
 						}
 						// stop because either an inference was mapped or it can be ignored
@@ -109,6 +115,8 @@ public class InferenceMapper {
 							return true;
 						}
 						else if (mapped != SingleInferenceMapper.STOP) {
+							LOGGER_.trace("Mapped {} => {}", inference, mapped);
+							
 							mapped.accept(visitor, null);
 						}
 						
@@ -131,6 +139,8 @@ public class InferenceMapper {
 						Inference mapped = singleMapper.map(inference);
 						
 						if (mapped != null) {
+							LOGGER_.trace("Mapped {} => {}", inference, mapped);
+							
 							mapped.accept(visitor, null);
 							return false;
 						}

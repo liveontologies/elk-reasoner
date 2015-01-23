@@ -46,7 +46,8 @@ public enum InferenceRule {
 	R_REFLEXIVE_COMPOSITION("Composition of reflexive properties"),
 	R_REFLEXIVITY_VIA_SUBSUMPTION("Reflexivity inference from subsumption"),
 	R_SUBSUMPTION_VIA_REFLEXIVITY("Property subsumption inference from reflexivity"),
-	R_TOLD_REFLEXIVITY("Reflexivity inference");
+	R_TOLD_REFLEXIVITY("Reflexivity inference"),
+	R_REFLEXIVITY_ELIMINATION("Reflexivity elimination");
 	
 	private final String text_;
 	

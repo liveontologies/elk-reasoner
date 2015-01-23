@@ -29,6 +29,7 @@ import org.semanticweb.elk.proofs.inferences.properties.ReflexiveComposition;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexivityViaSubsumption;
 import org.semanticweb.elk.proofs.inferences.properties.SubsumptionViaReflexivity;
 import org.semanticweb.elk.proofs.inferences.properties.ToldReflexivity;
+import org.semanticweb.elk.proofs.transformations.lemmas.ReflexivityElimination;
 
 /**
  * @author Pavel Klinov
@@ -46,4 +47,6 @@ public interface PropertyInferenceVisitor<I, O> {
 	public O visit(SubsumptionViaReflexivity inf, I input);
 	
 	public O visit(ToldReflexivity inf, I input);
+	
+	public O visit(ReflexivityElimination inf, I input);
 }

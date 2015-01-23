@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.transformations;
+package org.semanticweb.elk.proofs.transformations.lemmas;
 /*
  * #%L
  * ELK Proofs Package
@@ -35,6 +35,7 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
@@ -45,11 +46,13 @@ import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.expressions.derived.SubPropertyChainExpression;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialChainAxiomComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainComposition;
 import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialComposition;
+import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -62,13 +65,17 @@ import org.semanticweb.elk.util.collections.Operations;
  */
 public class LemmaElimination implements Operations.Transformation<Inference, Iterable<Inference>> {
 
-	private final DerivedExpressionFactory exprFactory_;
-	
 	private final ElkObjectFactory elkFactory_;
 	
-	public LemmaElimination(DerivedExpressionFactory exprFactory, ElkObjectFactory elkFactory) {
-		exprFactory_ = exprFactory;
-		elkFactory_ = elkFactory;
+	private ReasonerInferenceReader reader_;
+	
+	public LemmaElimination(ReasonerInferenceReader reader) {
+		elkFactory_ = new ElkObjectFactoryImpl();
+		reader_ = reader;
+	}
+	
+	private DerivedExpressionFactory getExpressionFactory() {
+		return reader_.getExpressionFactory();
 	}
 	
 	@Override
@@ -142,7 +149,7 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 						break;
 					}
 					//FIXME
-					System.err.println("Rewriting " + candidate);
+					//System.err.println("Rewriting " + candidate);
 					
 					// rewriting happens here
 					nextTransformed = candidate.accept(new ClassInferenceRewriter(), null).iterator();
@@ -245,9 +252,12 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 									NaryExistentialComposition rewritten = null;
 									
 									if (!moreLemmas) {
-										rewritten = recreateChainAxiom(inf.getConclusion(), premises, (ElkObjectProperty) inf.getChainPremise().getAxiom().getSuperObjectPropertyExpression());
+										rewritten = recreateChainAxiom(
+												inf.getConclusion(), 
+												premises,
+												inf.getChainPremise().getAxiom());
 										//FIXME
-										System.err.println("Lemma-free n-ary inference: " + rewritten);
+										//System.err.println("Lemma-free n-ary inference: " + rewritten);
 									}
 									else {
 										rewritten = new NaryExistentialComposition(inf.getConclusion(), premises, inf.getChainPremise());	
@@ -277,7 +287,7 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 		private NaryExistentialComposition recreateChainAxiom(
 				DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion, 
 				List<? extends DerivedExpression> existentialPremises,
-				ElkObjectProperty superProperty) {
+				ElkSubObjectPropertyOfAxiom chainPremise) {
 			List<ElkObjectPropertyExpression> chainList = new ArrayList<ElkObjectPropertyExpression>(existentialPremises.size());
 			
 			for (DerivedExpression premise : existentialPremises) {
@@ -290,8 +300,11 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 			return new NaryExistentialComposition(
 					conclusion,
 					existentialPremises,
-					// TODO may need a special wrapper around this chain expression since we may not have recorded inferences for it
-					exprFactory_.create(elkFactory_.getSubObjectPropertyOfAxiom(elkFactory_.getObjectPropertyChain(chainList), superProperty)));
+					
+					new SubPropertyChainExpression(
+							getExpressionFactory().create(elkFactory_.getSubObjectPropertyOfAxiom(elkFactory_.getObjectPropertyChain(chainList), (ElkObjectProperty) chainPremise.getSuperObjectPropertyExpression())),
+							chainPremise,
+							reader_));
 		}
 		
 	}

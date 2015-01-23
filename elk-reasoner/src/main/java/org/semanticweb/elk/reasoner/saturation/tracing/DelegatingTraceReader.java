@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
@@ -37,11 +38,11 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Objec
  *
  * pavel.klinov@uni-ulm.de
  */
-abstract class DelegatingTraceReader implements TraceStore.Reader {
+public abstract class DelegatingTraceReader implements TraceStore.Reader {
 
 	protected final TraceStore.Reader reader;
 	
-	DelegatingTraceReader(TraceStore.Reader r) {
+	protected DelegatingTraceReader(TraceStore.Reader r) {
 		reader = r;
 	}
 	
@@ -59,6 +60,11 @@ abstract class DelegatingTraceReader implements TraceStore.Reader {
 	@Override
 	public void visitInferences(IndexedClassExpression root, ClassInferenceVisitor<IndexedClassExpression, ?> visitor) {
 		reader.visitInferences(root, visitor);
+	}
+	
+	@Override
+	public void visitInferences(IndexedPropertyChain ipc, ObjectPropertyInferenceVisitor<?, ?> visitor) {
+		reader.visitInferences(ipc, visitor);
 	}
 
 	@Override

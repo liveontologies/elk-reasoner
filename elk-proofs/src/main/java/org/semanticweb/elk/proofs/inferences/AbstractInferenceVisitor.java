@@ -41,6 +41,7 @@ import org.semanticweb.elk.proofs.inferences.properties.ReflexiveComposition;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexivityViaSubsumption;
 import org.semanticweb.elk.proofs.inferences.properties.SubsumptionViaReflexivity;
 import org.semanticweb.elk.proofs.inferences.properties.ToldReflexivity;
+import org.semanticweb.elk.proofs.transformations.lemmas.ReflexivityElimination;
 
 /**
  * A skeleton implementation.
@@ -80,6 +81,11 @@ public abstract class AbstractInferenceVisitor<I ,O> implements InferenceVisitor
 	@Override
 	public O visit(ToldReflexivity inf, I input) {
 		
+		return defaultVisit(inf, input);
+	}
+	
+	@Override
+	public O visit(ReflexivityElimination inf, I input) {
 		return defaultVisit(inf, input);
 	}
 

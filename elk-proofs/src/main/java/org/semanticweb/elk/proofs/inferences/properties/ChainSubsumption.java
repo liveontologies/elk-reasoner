@@ -31,13 +31,14 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.PropertyInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
- * TODO
+ * TODO split on two
  * 
  * @author Pavel Klinov
  * 
@@ -60,7 +61,7 @@ public class ChainSubsumption extends AbstractPropertyInference {
 	}
 	// conclusion is not representable in OWL, i.e. is a lemma
 	public ChainSubsumption(
-			LemmaExpression conclusion,
+			LemmaExpression<ElkSubPropertyChainOfLemma> conclusion,
 			DerivedExpression first, 
 			DerivedExpression second) {
 		super(conclusion);

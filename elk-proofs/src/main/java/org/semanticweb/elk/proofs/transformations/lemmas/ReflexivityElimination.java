@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences.classes;
+package org.semanticweb.elk.proofs.transformations.lemmas;
 /*
  * #%L
  * ELK Proofs Package
@@ -25,14 +25,14 @@ package org.semanticweb.elk.proofs.inferences.classes;
  */
 
 import java.util.Collections;
-import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.inferences.classes.AbstractClassInference;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -42,24 +42,29 @@ import org.semanticweb.elk.util.collections.Operations;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class NaryExistentialComposition extends AbstractClassInference<DerivedAxiomExpression<ElkSubClassOfAxiom>> {
+public class ReflexivityElimination extends AbstractClassInference<DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>> {
 
-	private final List<? extends DerivedExpression> existentialPremises_;
+	private final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> firstPremise_;
 	
-	private final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> chainAxiom_;
+	private final Iterable<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> reflexivePremises_;
 	
-	public NaryExistentialComposition(DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion,
-			List<? extends DerivedExpression> premises,
-			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> chainAxiom) {
-		super(conclusion);
+	public ReflexivityElimination(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> c, DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> first, Iterable<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> reflexivePremises) {
+		super(c);
 		
-		existentialPremises_ = premises;
-		chainAxiom_ = chainAxiom;
+		firstPremise_ = first;
+		reflexivePremises_ = reflexivePremises;
+	}
+	
+	public ReflexivityElimination(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> c, DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> first, DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom> reflexivePremise) {
+		super(c);
+		
+		firstPremise_ = first;
+		reflexivePremises_ = Collections.singletonList(reflexivePremise);
 	}
 
 	@Override
 	public InferenceRule getRule() {
-		return InferenceRule.R_EXIST_CHAIN_COMPOSITION;
+		return InferenceRule.R_REFLEXIVITY_ELIMINATION;
 	}
 
 	@Override
@@ -69,14 +74,7 @@ public class NaryExistentialComposition extends AbstractClassInference<DerivedAx
 
 	@Override
 	protected Iterable<DerivedExpression> getRawPremises() {
-		return Operations.concat(existentialPremises_, Collections.singletonList(chainAxiom_));
+		return Operations.concat(Collections.<DerivedExpression>singletonList(firstPremise_), reflexivePremises_);
 	}
-	
-	public List<? extends DerivedExpression> getExistentialPremises() {
-		return existentialPremises_;
-	}
-	
-	public DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> getChainPremise() {
-		return chainAxiom_;
-	}
+
 }

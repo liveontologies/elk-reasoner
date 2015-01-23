@@ -96,7 +96,7 @@ public class StructuralEquivalenceHasher implements ExpressionHasher {
 			}
 
 			@Override
-			public Integer visit(LemmaExpression expr, Void input) {
+			public Integer visit(LemmaExpression<?> expr, Void input) {
 				return LemmaHasher.hashCode(expr.getLemma());
 			}
 			

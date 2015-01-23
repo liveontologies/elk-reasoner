@@ -37,9 +37,9 @@ import org.semanticweb.elk.util.collections.Operations;
  *
  */
 public class TransformedLemmaExpression<T extends Operations.Transformation<Inference, Iterable<Inference>>> 
-				extends TransformedExpression<LemmaExpression, T> implements LemmaExpression {
+				extends TransformedExpression<LemmaExpression<?>, T> implements LemmaExpression<ElkLemma> {
 
-	protected TransformedLemmaExpression(LemmaExpression expr, T f) {
+	protected TransformedLemmaExpression(LemmaExpression<?> expr, T f) {
 		super(expr, f);
 	}
 
