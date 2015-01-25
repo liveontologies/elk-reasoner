@@ -28,12 +28,13 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
+import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.PropertyInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
@@ -43,7 +44,7 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class SubsumptionViaReflexivity extends AbstractPropertyInference  {
+public class SubsumptionViaReflexivity extends AbstractInference<LemmaExpression<ElkSubPropertyChainOfLemma>>  {
 	
 	private final DerivedExpression premise_;
 	
@@ -83,8 +84,4 @@ public class SubsumptionViaReflexivity extends AbstractPropertyInference  {
 		return InferenceRule.R_SUBSUMPTION_VIA_REFLEXIVITY;
 	}
 	
-	@Override
-	public <I, O> O accept(PropertyInferenceVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
-	}
 }

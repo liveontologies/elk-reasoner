@@ -25,6 +25,7 @@ package org.semanticweb.elk.proofs.transformations;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.util.collections.Operations;
@@ -51,6 +52,11 @@ public class TransformedAxiomExpression<T extends Operations.Transformation<Infe
 	@Override
 	public boolean isAsserted() {
 		return expression.isAsserted();
+	}
+	
+	@Override
+	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 
 }

@@ -41,9 +41,20 @@ import org.semanticweb.elk.util.collections.Operations;
  *
  * pavel.klinov@uni-ulm.de
  */
-public abstract class AbstractInference implements Inference {
+public abstract class AbstractInference<D extends DerivedExpression> implements Inference {
 
 	private List<DerivedExpression> premises_; 
+	
+	final D conclusion;
+	
+	protected AbstractInference(D conclusion) {
+		this.conclusion = conclusion;
+	};
+	
+	@Override
+	public D getConclusion() {
+		return conclusion;
+	}
 	
 	@Override
 	public final Collection<? extends DerivedExpression> getPremises() {

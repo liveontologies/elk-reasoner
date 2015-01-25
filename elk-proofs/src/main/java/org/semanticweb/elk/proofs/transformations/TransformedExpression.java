@@ -25,7 +25,6 @@ package org.semanticweb.elk.proofs.transformations;
  */
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.util.collections.Operations;
@@ -60,12 +59,6 @@ abstract class TransformedExpression<D extends DerivedExpression, T extends Oper
 		transformation = f;
 	}
 	
-	@Override
-	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input) {
-		return expression.accept(visitor, input);
-	}
-
-
 	@Override
 	public Iterable<TransformedInference<T>> getInferences() throws ElkException {
 		return Operations.mapConcat(expression.getInferences(), new Operations.Transformation<Inference, Iterable<TransformedInference<T>>>() {

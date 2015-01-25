@@ -69,12 +69,12 @@ public class ElkToOwlProofConverter {
 		return expression.accept(new ExpressionVisitor<Void, OWLExpression>() {
 
 			@Override
-			public OWLExpression visit(	DerivedAxiomExpression<? extends ElkAxiom> expr, Void input) {
+			public OWLExpression visit(	DerivedAxiomExpression<?> expr, Void input) {
 				return new AxiomExpressionWrap(expr);
 			}
 
 			@Override
-			public OWLExpression visit(LemmaExpression expr, Void input) {
+			public OWLExpression visit(LemmaExpression<?> expr, Void input) {
 				return new LemmaExpressionWrap(expr);
 			}
 		}, null);

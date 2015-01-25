@@ -34,17 +34,11 @@ import org.semanticweb.elk.proofs.inferences.AbstractInference;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public abstract class AbstractClassInference<D extends DerivedExpression> extends AbstractInference {
-
-	final D conclusion;
+public abstract class AbstractClassInference<D extends DerivedExpression> extends AbstractInference<D> {
 
 	protected AbstractClassInference(D c) {
-		conclusion = c;
+		super(c);
 	}
 	
-	@Override
-	public D getConclusion() {
-		return conclusion;
-	}
 
 }

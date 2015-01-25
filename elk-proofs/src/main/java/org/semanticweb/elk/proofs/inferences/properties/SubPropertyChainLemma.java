@@ -27,39 +27,49 @@ package org.semanticweb.elk.proofs.inferences.properties;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
+ * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class ToldReflexivity extends AbstractInference<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> {
+public class SubPropertyChainLemma extends AbstractInference<LemmaExpression<ElkSubPropertyChainOfLemma>> {
 
-	private final DerivedExpression axiom_;
-	
-	private final DerivedExpression premise_;
-	
-	public ToldReflexivity(ElkReflexiveObjectPropertyAxiom axiom, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
-		super(exprFactory.create(axiom));
+	private final DerivedExpression firstPremise_;
+
+	private final DerivedExpression secondPremise_;
+
+	public SubPropertyChainLemma(
+			LemmaExpression<ElkSubPropertyChainOfLemma> conclusion,
+			DerivedExpression first, 
+			DerivedExpression second) {
+		super(conclusion);
 		
-		axiom_ = exprFactory.createAsserted(axiom);
-		premise_ = exprFactory.create(factory.getSubObjectPropertyOfAxiom(axiom.getProperty(), axiom.getProperty()));
+		firstPremise_ = first;
+		secondPremise_ = second;
 	}
 	
+	public DerivedExpression getFirstPremise() {
+		return firstPremise_;
+	}
+	
+	public DerivedExpression getSecondPremise() {
+		return secondPremise_;
+	}
+
 	@Override
 	public Collection<DerivedExpression> getRawPremises() {
-		return Arrays.asList(premise_, axiom_);
+		return Arrays.asList(firstPremise_, secondPremise_);
 	}
-	
+
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
@@ -72,7 +82,7 @@ public class ToldReflexivity extends AbstractInference<DerivedAxiomExpression<El
 	
 	@Override
 	public InferenceRule getRule() {
-		return InferenceRule.R_TOLD_REFLEXIVITY;
+		return InferenceRule.R_CHAIN_SUBSUMPTION;
 	}
-	
+
 }

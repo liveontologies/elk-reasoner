@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions.derived;
+package org.semanticweb.elk.proofs.transformations.lemmas;
 /*
  * #%L
  * ELK Proofs Package
@@ -33,26 +33,19 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
-import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.proofs.inferences.mapping.Deindexer;
-import org.semanticweb.elk.proofs.inferences.properties.ChainSubsumption;
-import org.semanticweb.elk.proofs.transformations.lemmas.ReflexivityElimination;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.TracingUtils;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -65,7 +58,7 @@ import org.semanticweb.elk.util.collections.Multimap;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> {
+class ChainRewritingExpression implements DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> {
 
 	private final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr_;
 
@@ -75,9 +68,9 @@ public class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSub
 	
 	private final ElkObjectFactory elkFactory_ = new ElkObjectFactoryImpl();
 	
-	private ReasonerInferenceReader reader_;
+	private final ReasonerInferenceReader reader_;
 	
-	public SubPropertyChainExpression(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr, 
+	ChainRewritingExpression(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr, 
 			ElkSubObjectPropertyOfAxiom targetAxiom, ReasonerInferenceReader reader) {
 		expr_ = expr;
 		indexedChainList_ = index(((ElkObjectPropertyChain) expr.getAxiom().getSubObjectPropertyExpression()).getObjectPropertyExpressions(), reader.getIndexer());
@@ -85,7 +78,7 @@ public class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSub
 		reader_ = reader;
 	}
 	
-	SubPropertyChainExpression(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr, 
+	ChainRewritingExpression(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr, 
 			List<IndexedObjectProperty> indexedChainList,
 			List<IndexedObjectProperty> indexedTargetChainList,
 			ReasonerInferenceReader reader) {
@@ -126,10 +119,6 @@ public class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSub
 
 	@Override
 	public Iterable<? extends Inference> getInferences() throws ElkException {
-		if (expr_.getInferences().iterator().hasNext()) {
-			return expr_.getInferences();
-		}
-		
 		return rewrite(indexedChainList_, indexedTargetChainList_);
 	}
 
@@ -160,6 +149,7 @@ public class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSub
 			}
 			
 			for (IndexedPropertyChain rightSuperChain : rightSuperChainToInferences.keySet()) {
+				// now subChain.getLeft() o rightSuperChain is a superchain of subChain
 				if (!composable(subChain.getLeftProperty(), rightSuperChain)) {
 					continue;
 				}
@@ -246,50 +236,15 @@ public class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSub
 		}
 		else {
 			// still on the way to the target
-			premise = new SubPropertyChainExpression(
+			premise = new ChainRewritingExpression(
 					exprFactory.create(elkFactory_.getSubObjectPropertyOfAxiom(deindex(premiseChain), getSuperProperty())),
 					premiseChain, indexedTargetChainList_, reader_);
 		}
 		
+		LemmaFreePropertyInferenceFactory roleInfFactory = new LemmaFreePropertyInferenceFactory(expr_, reader_.getExpressionFactory());
+		
 		for (ObjectPropertyInference inf : superChainInferences) {
-			Inference result = inf.acceptTraced(new AbstractObjectPropertyInferenceVisitor<DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>, Inference>() {
-
-				@Override
-				protected Inference defaultTracedVisit(ObjectPropertyInference inference, DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> input) {
-					return null;
-				}
-
-				@Override
-				public Inference visit(LeftReflexiveSubPropertyChainInference inference, DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
-					return new ReflexivityElimination(expr_, premise, createReflexivityPremise(inference.getReflexivePremise().getPropertyChain()));
-				}
-
-				@Override
-				public Inference visit(final RightReflexiveSubPropertyChainInference inference, final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
-					return inference.getReflexivePremise().getPropertyChain().accept(new IndexedPropertyChainVisitor<Inference>() {
-
-						@Override
-						public Inference visit(IndexedObjectProperty iop) {
-							return new ReflexivityElimination(expr_, premise, createReflexivityPremise(iop));
-						}
-
-						@Override
-						public Inference visit(IndexedBinaryPropertyChain ipc) {
-							return new ReflexivityElimination(expr_, premise, createReflexivityPremises(ipc));
-						}
-					});
-				}
-
-				@Override
-				public Inference visit(ToldSubPropertyInference inference, DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
-					if (inference.getSuperPropertyChain() instanceof IndexedObjectProperty) {
-						return createSubChainInference(inference.getSubPropertyChain(), (IndexedObjectProperty) inference.getSuperPropertyChain(), premise);	
-					}
-					
-					return null;
-				}
-				
-			}, premise);
+			Inference result = inf.acceptTraced(roleInfFactory, premise);
 			
 			if (result != null) {
 				return result;
@@ -297,14 +252,6 @@ public class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSub
 		}
 		
 		return null;
-	}
-	
-	private Inference createSubChainInference(	IndexedPropertyChain subChain, 
-												IndexedObjectProperty superChain, 
-												DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> firstPremise) {
-		return new ChainSubsumption(expr_, firstPremise, 
-					getExpressionFactory().create(elkFactory_.getSubObjectPropertyOfAxiom(deindex(subChain), 
-					((IndexedObjectProperty) superChain).getElkObjectProperty())));
 	}
 	
 	private List<IndexedObjectProperty> flatten(IndexedPropertyChain ipc) {
@@ -335,26 +282,8 @@ public class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSub
 		return index(elkFactory_.getObjectPropertyChain(elkProps), getIndexer());
 	}
 	
-	private DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom> createReflexivityPremise(IndexedObjectProperty ipc) {
-		return getExpressionFactory().create(elkFactory_.getReflexiveObjectPropertyAxiom(((IndexedObjectProperty) ipc).getElkObjectProperty()));
-	}
-	
-	private Iterable<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> createReflexivityPremises(IndexedBinaryPropertyChain ipc) {
-		List<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> premises = new ArrayList<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>>();
-		
-		for (IndexedObjectProperty iop : flatten(ipc)) {
-			premises.add(createReflexivityPremise(iop));
-		}
-		
-		return premises;
-	}
-
 	private ElkObjectProperty getSuperProperty() {
 		return (ElkObjectProperty) expr_.getAxiom().getSuperObjectPropertyExpression();
-	}
-	
-	private ElkSubObjectPropertyExpression deindex(IndexedPropertyChain chain) {
-		return Deindexer.deindex(chain);
 	}
 	
 	private ElkSubObjectPropertyExpression deindex(List<IndexedObjectProperty> chainList) {

@@ -65,9 +65,10 @@ import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainCompos
 import org.semanticweb.elk.proofs.inferences.classes.InconsistentDisjointness;
 import org.semanticweb.elk.proofs.inferences.classes.NegationContradiction;
 import org.semanticweb.elk.proofs.inferences.classes.ReflexiveExistentialComposition;
-import org.semanticweb.elk.proofs.inferences.properties.ChainSubsumption;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexiveComposition;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexivityViaSubsumption;
+import org.semanticweb.elk.proofs.inferences.properties.SubPropertyChainAxiom;
+import org.semanticweb.elk.proofs.inferences.properties.SubPropertyChainLemma;
 import org.semanticweb.elk.proofs.inferences.properties.SubsumptionViaReflexivity;
 import org.semanticweb.elk.proofs.inferences.properties.ToldReflexivity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
@@ -478,12 +479,12 @@ public class SingleInferenceMapper {
 
 				@Override
 				public Inference visit(ElkObjectProperty expr) {
-					return new ChainSubsumption(exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(rr, expr)), hSS, rrH);
+					return new SubPropertyChainAxiom(exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(rr, expr)), hSS, rrH);
 				}
 
 				@Override
 				public Inference visit(ElkObjectPropertyChain expr) {
-					return new ChainSubsumption(exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(rr, expr)), hSS, rrH);
+					return new SubPropertyChainLemma(exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(rr, expr)), hSS, rrH);
 				}
 			});
 		}
@@ -500,12 +501,12 @@ public class SingleInferenceMapper {
 
 				@Override
 				public Inference visit(ElkObjectProperty expr) {
-					return new ChainSubsumption(exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(rr, expr)), rrHH, hhSS);
+					return new SubPropertyChainAxiom(exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(rr, expr)), rrHH, hhSS);
 				}
 
 				@Override
 				public Inference visit(ElkObjectPropertyChain expr) {
-					return new ChainSubsumption(exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(rr, expr)), rrHH, hhSS);
+					return new SubPropertyChainLemma(exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(rr, expr)), rrHH, hhSS);
 				}
 			});
 		}

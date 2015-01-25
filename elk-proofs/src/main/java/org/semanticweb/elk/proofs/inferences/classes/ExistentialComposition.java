@@ -28,7 +28,6 @@ package org.semanticweb.elk.proofs.inferences.classes;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
@@ -45,13 +44,13 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ExistentialComposition extends AbstractClassInference<DerivedAxiomExpression<? extends ElkClassAxiom>> {
+public class ExistentialComposition extends AbstractClassInference<DerivedAxiomExpression<ElkSubClassOfAxiom>> {
 
-	private final DerivedExpression existentialPremise_;
+	private final DerivedAxiomExpression<ElkSubClassOfAxiom> existentialPremise_;
 
-	private final DerivedExpression subsumerPremise_;
+	private final DerivedAxiomExpression<ElkSubClassOfAxiom> subsumerPremise_;
 
-	private final DerivedExpression propertyPremise_;
+	private final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propertyPremise_;
 
 	public ExistentialComposition(
 			ElkClassExpression sub, 
@@ -68,6 +67,18 @@ public class ExistentialComposition extends AbstractClassInference<DerivedAxiomE
 		propertyPremise_ = exprFactory.create(propPremise);
 	}
 	
+	public ExistentialComposition(
+			DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion, 
+			DerivedAxiomExpression<ElkSubClassOfAxiom> subsumerPremise,
+			DerivedAxiomExpression<ElkSubClassOfAxiom> existentialPremise,
+			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propPremise) {
+		super(conclusion);
+
+		existentialPremise_ = existentialPremise;
+		subsumerPremise_ = subsumerPremise;
+		propertyPremise_ = propPremise;
+	}
+	
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
@@ -75,10 +86,21 @@ public class ExistentialComposition extends AbstractClassInference<DerivedAxiomE
 
 	@Override
 	public Collection<DerivedExpression> getRawPremises() {
-		return Arrays.asList(existentialPremise_, subsumerPremise_,
-				propertyPremise_);
+		return Arrays.<DerivedExpression>asList(existentialPremise_, subsumerPremise_, propertyPremise_);
+	}
+	
+	public DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> getSubPropertyPremise() {
+		return propertyPremise_;
+	}
+	
+	public DerivedAxiomExpression<ElkSubClassOfAxiom> getExistentialPremise() {
+		return existentialPremise_;
 	}
 
+	public DerivedAxiomExpression<ElkSubClassOfAxiom> getSubsumerPremise() {
+		return subsumerPremise_;
+	}
+	
 	@Override
 	public String toString() {
 		return InferencePrinter.print(this);

@@ -46,12 +46,15 @@ import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
-import org.semanticweb.elk.proofs.expressions.derived.SubPropertyChainExpression;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialChainAxiomComposition;
+import org.semanticweb.elk.proofs.inferences.classes.ExistentialComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainComposition;
 import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialComposition;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
 import org.semanticweb.elk.util.collections.Operations;
 
@@ -80,104 +83,9 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 	
 	@Override
 	public Iterable<Inference> transform(final Inference inference) {
-		return new Iterable<Inference>() {
-
-			@Override
-			public Iterator<Inference> iterator() {
-				return lazyElimination(inference);
-			}
-			
-		};
+		return inference.accept(new InferenceRewriter(), null);
 	}
 	
-	private boolean lemmasPresent(Inference inf) {
-		for (DerivedExpression premise : inf.getPremises()) {
-			if (premise instanceof LemmaExpression) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	Iterator<Inference> lazyElimination(final Inference inf) {
-		if (!lemmasPresent(inf)) {
-			// a shortcut to avoid creating a queue, etc.
-			return Collections.singletonList(inf).iterator();
-		}
-		
-		final Queue<Inference> toDo = new ArrayDeque<Inference>();
-		
-		toDo.add(inf);
-		// returning the lazy iterator which will recursively replace inferences
-		// with lemmas by inferences without a single lemma premise 
-		return new Iterator<Inference>() {
-
-			Inference next = null;
-			
-			Iterator<Inference> nextTransformed = null;
-			
-			@Override
-			public boolean hasNext() {
-				for (;;) {
-					if (next != null) {
-						return true;
-					}
-					
-					if (nextTransformed != null) {
-						while (nextTransformed.hasNext()) {
-							Inference candidate = nextTransformed.next();
-							
-							if (lemmasPresent(candidate)) {
-								toDo.add(candidate);
-							}
-							else {
-								// found the next lemma-free inference
-								next = candidate;
-								break;
-							}
-						}
-						
-						if (next != null) {
-							return true;
-						}
-					}
-					
-					Inference candidate = toDo.poll();
-					
-					if (candidate == null) {
-						break;
-					}
-					//FIXME
-					//System.err.println("Rewriting " + candidate);
-					
-					// rewriting happens here
-					nextTransformed = candidate.accept(new ClassInferenceRewriter(), null).iterator();
-				}
-				
-				return false;
-			}
-
-			@Override
-			public Inference next() {
-				if (!hasNext()) {
-					throw new NoSuchElementException();
-				}
-				
-				Inference result = next;
-
-				next = null;
-				
-				return result;
-			}
-
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-			
-		};
-	}
 
 	/**
 	 * Visitor which rewrites inferences
@@ -186,16 +94,138 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 	 * 			pavel.klinov@uni-ulm.de
 	 *
 	 */
-	private class ClassInferenceRewriter extends AbstractInferenceVisitor<Void, Iterable<Inference>> {
+	private class InferenceRewriter extends AbstractInferenceVisitor<Void, Iterable<Inference>> {
+		
+		private boolean lemmasPresent(Inference inf) {
+			for (DerivedExpression premise : inf.getPremises()) {
+				if (premise instanceof LemmaExpression) {
+					return true;
+				}
+			}
+			
+			return false;
+		}
 		
 		@Override
 		protected Iterable<Inference> defaultVisit(Inference inf, Void input) {
 			// by default output the same inference, rewrite just some specific owns which may have lemmas
 			return Collections.singletonList(inf);
 		}
+		
+		Iterator<Inference> lazyEliminationIterator(final NaryExistentialComposition inf) {
+			final Queue<NaryExistentialComposition> toDo = new ArrayDeque<NaryExistentialComposition>();
+			
+			toDo.add(inf);
+			// returning the lazy iterator which will recursively replace inferences
+			// with lemmas by inferences without a single lemma premise 
+			return new Iterator<Inference>() {
+
+				Inference next = null;
+				
+				Iterator<NaryExistentialComposition> nextTransformed = null;
+				
+				@Override
+				public boolean hasNext() {
+					for (;;) {
+						if (next != null) {
+							return true;
+						}
+						
+						if (nextTransformed != null) {
+							while (nextTransformed.hasNext()) {
+								NaryExistentialComposition candidate = nextTransformed.next();
+								
+								if (lemmasPresent(candidate)) {
+									toDo.add(candidate);
+								}
+								else {
+									// found the next lemma-free inference
+									next = candidate;
+									break;
+								}
+							}
+							
+							if (next != null) {
+								return true;
+							}
+						}
+						
+						NaryExistentialComposition candidate = toDo.poll();
+						
+						if (candidate == null) {
+							break;
+						}
+						//FIXME
+						System.err.println("Rewriting " + candidate);
+						
+						// rewriting happens here
+						nextTransformed = rewrite(candidate).iterator();
+					}
+					
+					return false;
+				}
+
+				@Override
+				public Inference next() {
+					if (!hasNext()) {
+						throw new NoSuchElementException();
+					}
+					
+					Inference result = next;
+
+					next = null;
+					
+					return result;
+				}
+
+				@Override
+				public void remove() {
+					throw new UnsupportedOperationException();
+				}
+				
+			};
+		}
+		
+		// the property subsumption premise can have a derivation with lemmas. this method wraps with a special kind of expression
+		// which produces lemma-free derivations.
+		private DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> wrapSubPropertyExpression(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr) {
+			ElkSubObjectPropertyOfAxiom axiom = expr.getAxiom();
+			IndexObjectConverter indexer = reader_.getIndexer();
+			
+			if (!axiom.getSubObjectPropertyExpression().accept(indexer).equals(axiom.getSuperObjectPropertyExpression().accept(indexer))) {
+				return createSubPropertyExpression(expr);
+			}
+			
+			return expr;
+		}
+		
+		private SubPropertyChainExpression createSubPropertyExpression(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr) {
+			IndexObjectConverter indexer = reader_.getIndexer();
+			IndexedObjectProperty superProperty = (IndexedObjectProperty) expr.getAxiom().getSuperObjectPropertyExpression().accept(indexer);
+			IndexedPropertyChain subChain = expr.getAxiom().getSubObjectPropertyExpression().accept(indexer);
+			
+			return new SubPropertyChainExpression(expr, superProperty, subChain, reader_);
+		}
 
 		@Override
-		public Iterable<Inference> visit(final ExistentialChainAxiomComposition inf, Void input) {
+		public Iterable<Inference> visit(ExistentialComposition inf, Void input) {
+			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propPremise = wrapSubPropertyExpression(inf.getSubPropertyPremise());
+			
+			if (propPremise == inf.getSubPropertyPremise()) {
+				// the property premise is trivial, no need to wrap it
+				return defaultVisit(inf, input);
+			}
+			
+			return Collections.<Inference>singletonList(
+					new ExistentialComposition(
+							inf.getConclusion(), 
+							inf.getSubsumerPremise(), 
+							inf.getExistentialPremise(), 
+							propPremise));
+		}
+
+		@Override
+		public Iterable<Inference> visit(ExistentialChainAxiomComposition inf, Void input) {
 			// check if there are premises not representable in OWL and transform to the n-ary inference if that's the case
 			if (inf.getSecondExistentialPremise() instanceof LemmaExpression) {
 				Inference transformed = new NaryExistentialComposition(
@@ -206,12 +236,42 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 				
 				return Collections.singletonList(transformed);
 			}
-			
-			return super.visit(inf, input);
+			else {
+				// wrapping the property subsumption premise, if needed
+				DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propPremise = wrapSubPropertyExpression(inf.getFirstPropertyPremise());
+				
+				if (propPremise == inf.getFirstPropertyPremise()) {
+					return defaultVisit(inf, input);
+				}
+				
+				return Collections.<Inference>singletonList(
+						new ExistentialChainAxiomComposition(
+								inf.getConclusion(), 
+								inf.getFirstExistentialPremise(), 
+								inf.getSecondExistentialPremise(), 
+								propPremise,
+								inf.getSecondPropertyPremise(),
+								inf.getChainPremise()));
+			}
 		}
-
+		
 		@Override
 		public Iterable<Inference> visit(final NaryExistentialComposition inf, Void input) {
+			if (lemmasPresent(inf)) {
+				return Collections.<Inference>singletonList(inf);
+			}
+			
+			return new Iterable<Inference>() {
+
+				@Override
+				public Iterator<Inference> iterator() {
+					return lazyEliminationIterator(inf);
+				}
+				
+			};
+		}
+
+		public Iterable<NaryExistentialComposition> rewrite(final NaryExistentialComposition inf) {
 			final List<DerivedExpression> commonPremises = new ArrayList<DerivedExpression>();
 			
 			for (int i = 0; i < inf.getExistentialPremises().size(); i++) {
@@ -220,20 +280,20 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 				
 				if (premise instanceof LemmaExpression) {
 					// replacing the current inference by a collection of inferences, one for each inference which derives the lemma premise
-					List<Inference> transformed = new LinkedList<Inference>();
+					List<NaryExistentialComposition> transformed = new LinkedList<NaryExistentialComposition>();
 					
 					try {
 						for (Inference lemmaInf : premise.getInferences()) {
-							transformed.add(lemmaInf.accept(new AbstractInferenceVisitor<Void, Inference>() {
+							transformed.add(lemmaInf.accept(new AbstractInferenceVisitor<Void, NaryExistentialComposition>() {
 
 								@Override
-								protected Inference defaultVisit(Inference inference, Void input) {
+								protected NaryExistentialComposition defaultVisit(Inference inference, Void input) {
 									// shouldn't get here, check?
 									return null;
 								}
 
 								@Override
-								public Inference visit(ExistentialLemmaChainComposition lemmaInf, Void input) {
+								public NaryExistentialComposition visit(ExistentialLemmaChainComposition lemmaInf, Void input) {
 									// only this inference can derive existential lemma premises
 									List<DerivedExpression> premises = new ArrayList<DerivedExpression>(commonPremises);
 									
@@ -257,7 +317,7 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 												premises,
 												inf.getChainPremise().getAxiom());
 										//FIXME
-										//System.err.println("Lemma-free n-ary inference: " + rewritten);
+										System.err.println("Lemma-free n-ary inference: " + rewritten);
 									}
 									else {
 										rewritten = new NaryExistentialComposition(inf.getConclusion(), premises, inf.getChainPremise());	
@@ -281,7 +341,7 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 				}
 			}
 			// shouldn't get here
-			return defaultVisit(inf, input);
+			return Collections.emptyList();
 		}
 
 		private NaryExistentialComposition recreateChainAxiom(
@@ -300,8 +360,8 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 			return new NaryExistentialComposition(
 					conclusion,
 					existentialPremises,
-					
-					new SubPropertyChainExpression(
+					// special expression for the chain premise
+					new ChainRewritingExpression(
 							getExpressionFactory().create(elkFactory_.getSubObjectPropertyOfAxiom(elkFactory_.getObjectPropertyChain(chainList), (ElkObjectProperty) chainPremise.getSuperObjectPropertyExpression())),
 							chainPremise,
 							reader_));

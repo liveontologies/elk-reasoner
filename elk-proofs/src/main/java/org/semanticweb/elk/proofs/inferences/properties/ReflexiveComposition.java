@@ -28,12 +28,13 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkReflexivePropertyChainLemma;
+import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.PropertyInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
@@ -41,7 +42,7 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReflexiveComposition extends AbstractPropertyInference {
+public class ReflexiveComposition extends AbstractInference<LemmaExpression<ElkReflexivePropertyChainLemma>> {
 
 	private final DerivedExpression firstReflexive_;
 	
@@ -74,8 +75,4 @@ public class ReflexiveComposition extends AbstractPropertyInference {
 		return InferenceRule.R_REFLEXIVE_COMPOSITION;
 	}
 	
-	@Override
-	public <I, O> O accept(PropertyInferenceVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
-	}
 }

@@ -59,7 +59,6 @@ public class ProofTest {
 		OWLClass sub = factory.getOWLClass(IRI.create("http://example.org/K"));
 		OWLClass sup = factory.getOWLClass(IRI.create("http://example.org/L"));
 		
-		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
 		RecursiveInferenceVisitor.visitInferences(reasoner, factory.getOWLSubClassOfAxiom(sub, sup), new OWLInferenceVisitor() {
 			
 			@Override
@@ -69,6 +68,8 @@ public class ProofTest {
 			}
 			
 		}, true);
+		
+		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
 	}
 	
 	private OWLOntology loadOntology(InputStream stream) throws IOException, Owl2ParseException {

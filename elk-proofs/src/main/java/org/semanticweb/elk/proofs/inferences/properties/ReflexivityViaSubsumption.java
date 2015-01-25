@@ -28,12 +28,14 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
+import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.PropertyInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
@@ -41,14 +43,13 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReflexivityViaSubsumption extends AbstractPropertyInference {
+public class ReflexivityViaSubsumption extends AbstractInference<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> {
 
 	private final DerivedExpression axiom_;
 	
 	private final DerivedExpression premise_;
 	
 	public ReflexivityViaSubsumption(ElkSubObjectPropertyOfAxiom axiom, DerivedExpression premise, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
-		//super(factory.getReflexiveObjectPropertyAxiom(axiom.getSuperObjectPropertyExpression()), exprFactory);
 		super(exprFactory.create(factory.getReflexiveObjectPropertyAxiom(axiom.getSuperObjectPropertyExpression())));
 		
 		axiom_ = exprFactory.createAsserted(axiom);
@@ -75,8 +76,4 @@ public class ReflexivityViaSubsumption extends AbstractPropertyInference {
 		return InferenceRule.R_REFLEXIVITY_VIA_SUBSUMPTION;
 	}
 	
-	@Override
-	public <I, O> O accept(PropertyInferenceVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
-	}
 }

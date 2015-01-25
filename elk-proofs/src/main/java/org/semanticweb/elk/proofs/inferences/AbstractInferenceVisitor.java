@@ -29,16 +29,17 @@ import org.semanticweb.elk.proofs.inferences.classes.ConjunctionComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ConjunctionDecomposition;
 import org.semanticweb.elk.proofs.inferences.classes.DisjointnessContradiction;
 import org.semanticweb.elk.proofs.inferences.classes.DisjunctionComposition;
-import org.semanticweb.elk.proofs.inferences.classes.ExistentialComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialChainAxiomComposition;
+import org.semanticweb.elk.proofs.inferences.classes.ExistentialComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainComposition;
 import org.semanticweb.elk.proofs.inferences.classes.InconsistentDisjointness;
 import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialComposition;
 import org.semanticweb.elk.proofs.inferences.classes.NegationContradiction;
 import org.semanticweb.elk.proofs.inferences.classes.ReflexiveExistentialComposition;
-import org.semanticweb.elk.proofs.inferences.properties.ChainSubsumption;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexiveComposition;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexivityViaSubsumption;
+import org.semanticweb.elk.proofs.inferences.properties.SubPropertyChainAxiom;
+import org.semanticweb.elk.proofs.inferences.properties.SubPropertyChainLemma;
 import org.semanticweb.elk.proofs.inferences.properties.SubsumptionViaReflexivity;
 import org.semanticweb.elk.proofs.inferences.properties.ToldReflexivity;
 import org.semanticweb.elk.proofs.transformations.lemmas.ReflexivityElimination;
@@ -55,7 +56,13 @@ public abstract class AbstractInferenceVisitor<I ,O> implements InferenceVisitor
 	protected abstract O defaultVisit(Inference inference, I input);
 
 	@Override
-	public O visit(ChainSubsumption inf, I input) {
+	public O visit(SubPropertyChainAxiom inf, I input) {
+		
+		return defaultVisit(inf, input);
+	}
+	
+	@Override
+	public O visit(SubPropertyChainLemma inf, I input) {
 		
 		return defaultVisit(inf, input);
 	}

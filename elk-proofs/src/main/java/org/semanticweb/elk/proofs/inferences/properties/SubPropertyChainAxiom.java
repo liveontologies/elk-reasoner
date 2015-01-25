@@ -27,31 +27,28 @@ package org.semanticweb.elk.proofs.inferences.properties;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
-import org.semanticweb.elk.proofs.expressions.LemmaExpression;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
+import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.PropertyInferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
- * TODO split on two
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ChainSubsumption extends AbstractPropertyInference {
+public class SubPropertyChainAxiom extends AbstractInference<DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>> {
 
 	private final DerivedExpression firstPremise_;
 
 	private final DerivedExpression secondPremise_;
-	// conclusion is representable in OWL
-	public ChainSubsumption(
-			DerivedAxiomExpression<? extends ElkObjectPropertyAxiom> conclusion,
+
+	public SubPropertyChainAxiom(
+			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> conclusion,
 			DerivedExpression first, 
 			DerivedExpression second) {
 		super(conclusion);
@@ -59,15 +56,13 @@ public class ChainSubsumption extends AbstractPropertyInference {
 		firstPremise_ = first;
 		secondPremise_ = second;
 	}
-	// conclusion is not representable in OWL, i.e. is a lemma
-	public ChainSubsumption(
-			LemmaExpression<ElkSubPropertyChainOfLemma> conclusion,
-			DerivedExpression first, 
-			DerivedExpression second) {
-		super(conclusion);
-		
-		firstPremise_ = first;
-		secondPremise_ = second;
+	
+	public DerivedExpression getFirstPremise() {
+		return firstPremise_;
+	}
+	
+	public DerivedExpression getSecondPremise() {
+		return secondPremise_;
 	}
 
 	@Override
@@ -90,8 +85,4 @@ public class ChainSubsumption extends AbstractPropertyInference {
 		return InferenceRule.R_CHAIN_SUBSUMPTION;
 	}
 	
-	@Override
-	public <I, O> O accept(PropertyInferenceVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
-	}
 }

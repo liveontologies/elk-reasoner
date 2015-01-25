@@ -946,7 +946,10 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 			ElkSubClassOfAxiom elkAxiom = (ElkSubClassOfAxiom) scAxiom.accept(OwlClassAxiomConverterVisitor.getInstance());
 			
 			try {
-				DerivedExpression expr = new ProofReader(reasoner_).getProofRoot(elkAxiom.getSubClassExpression(), elkAxiom.getSuperClassExpression());
+				// TODO introduce a config option for preserving or eliminating lemmas
+				DerivedExpression expr = new ProofReader(reasoner_)
+											.eliminateLemmas()
+											.getProofRoot(elkAxiom.getSubClassExpression(), elkAxiom.getSuperClassExpression());
 				
 				return ElkToOwlProofConverter.convert(expr);
 				
@@ -959,8 +962,6 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 		
 		throw new UnsupportedEntailmentTypeException(axiom);
 	}
-
-
 
 	protected class OntologyChangeListener implements OWLOntologyChangeListener {
 		@Override

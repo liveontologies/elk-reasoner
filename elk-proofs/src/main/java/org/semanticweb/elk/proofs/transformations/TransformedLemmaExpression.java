@@ -24,6 +24,7 @@ package org.semanticweb.elk.proofs.transformations;
  * #L%
  */
 
+import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
 import org.semanticweb.elk.proofs.inferences.Inference;
@@ -46,6 +47,11 @@ public class TransformedLemmaExpression<T extends Operations.Transformation<Infe
 	@Override
 	public ElkLemma getLemma() {
 		return expression.getLemma();
+	}
+	
+	@Override
+	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 
 }
