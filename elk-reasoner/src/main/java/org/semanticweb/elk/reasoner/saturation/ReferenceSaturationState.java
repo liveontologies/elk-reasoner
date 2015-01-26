@@ -31,8 +31,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
@@ -67,8 +67,8 @@ class ReferenceSaturationState extends AbstractSaturationState<ExtendedContext> 
 			public Iterator<ExtendedContext> iterator() {
 				return new Iterator<ExtendedContext>() {
 
-					Iterator<? extends IndexedObjectWithContext> ices = ontologyIndex
-							.getIndexedClassExpressions().iterator();
+					Iterator<? extends IndexedClassExpression> ices = ontologyIndex
+							.getClassExpressions().iterator();
 
 					ExtendedContext next;
 
@@ -124,7 +124,7 @@ class ReferenceSaturationState extends AbstractSaturationState<ExtendedContext> 
 
 	@Override
 	public ExtendedContext getContext(IndexedClassExpression ice) {
-		return ((IndexedObjectWithContext) ice).getContext();
+		return ice.getContext();
 	}
 
 	@Override
@@ -133,14 +133,13 @@ class ReferenceSaturationState extends AbstractSaturationState<ExtendedContext> 
 			// everything is already done
 			return;
 		for (Context context : getContexts()) {
-			((IndexedObjectWithContext) context.getRoot()).resetContext();
+			context.getRoot().resetContext();
 		}
 	}
 
 	@Override
 	ExtendedContext setIfAbsent(ExtendedContext context) {
-		ExtendedContext result = ((IndexedObjectWithContext) context.getRoot())
-				.setContextIfAbsent(context);
+		ExtendedContext result = context.getRoot().setContextIfAbsent(context);
 		if (result == null)
 			contextCount.incrementAndGet();
 		return result;

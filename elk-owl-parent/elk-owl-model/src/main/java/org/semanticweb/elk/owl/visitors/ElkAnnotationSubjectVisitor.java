@@ -26,22 +26,20 @@
 package org.semanticweb.elk.owl.visitors;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
-import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
-import org.semanticweb.elk.owl.iris.ElkIri;
 
 /**
- * Visitor interface for {@link ElkAnnotationSubject}.
+ * Visitor pattern interface for instances of {@link ElkAnnotationSubject}.
  * 
  * @author Frantisek Simancik
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <O>
- *            the output type of the visitor
+ *            the type of the output of this visitor
  */
-public interface ElkAnnotationSubjectVisitor<O> {
+public interface ElkAnnotationSubjectVisitor<O> extends ElkIriVisitor<O>,
+		ElkAnonymousIndividualVisitor<O> {
 
-	O visit(ElkIri iri);
+	// combined visitor
 
-	O visit(ElkAnonymousIndividual anon);
 }

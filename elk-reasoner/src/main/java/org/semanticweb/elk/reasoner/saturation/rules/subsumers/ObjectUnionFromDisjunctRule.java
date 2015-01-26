@@ -26,7 +26,9 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectUnionOf;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -65,16 +67,62 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 		this.disjunctions_.add(disjunction);
 	}
 
-	public static void addRulesFor(IndexedObjectUnionOf disjunction,
+	public static boolean addRulesFor(
+			ModifiableIndexedObjectUnionOf disjunction,
 			ModifiableOntologyIndex index) {
-		for (IndexedClassExpression disjunct : disjunction.getDisjuncts())
-			index.add(disjunct, new ObjectUnionFromDisjunctRule(disjunction));
+		boolean success = true;
+		int added = 0;
+		for (ModifiableIndexedClassExpression disjunct : disjunction
+				.getDisjuncts()) {
+			if (index.add(disjunct,
+					new ObjectUnionFromDisjunctRule(disjunction))) {
+				added++;
+			} else {
+				success = false;
+				break;
+			}
+		}
+		if (success)
+			return true;
+		// else revert the changes made
+		for (ModifiableIndexedClassExpression disjunct : disjunction
+				.getDisjuncts()) {
+			if (added == 0)
+				break;
+			// else
+			added--;
+			index.remove(disjunct, new ObjectUnionFromDisjunctRule(disjunction));
+		}
+		return false;
 	}
 
-	public static void removeRulesFor(IndexedObjectUnionOf disjunction,
+	public static boolean removeRulesFor(
+			ModifiableIndexedObjectUnionOf disjunction,
 			ModifiableOntologyIndex index) {
-		for (IndexedClassExpression disjunct : disjunction.getDisjuncts())
-			index.remove(disjunct, new ObjectUnionFromDisjunctRule(disjunction));
+		boolean success = true;
+		int removed = 0;
+		for (ModifiableIndexedClassExpression disjunct : disjunction
+				.getDisjuncts()) {
+			if (index.remove(disjunct, new ObjectUnionFromDisjunctRule(
+					disjunction))) {
+				removed++;
+			} else {
+				success = false;
+				break;
+			}
+		}
+		if (success)
+			return true;
+		// else revert the changes made
+		for (ModifiableIndexedClassExpression disjunct : disjunction
+				.getDisjuncts()) {
+			if (removed == 0)
+				break;
+			// else
+			removed--;
+			index.add(disjunct, new ObjectUnionFromDisjunctRule(disjunction));
+		}
+		return false;
 	}
 
 	@Override
@@ -98,31 +146,56 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		for (IndexedObjectUnionOf disjunction : disjunctions_) {
-			/*producer.produce(premises.getRoot(),
-					new ComposedSubsumerImpl<IndexedClassExpression>(
-							disjunction));*/
-			producer.produce(premises.getRoot(),
-					new DisjunctionComposition(premise, disjunction));
+			/*
+			 * producer.produce(premises.getRoot(), new
+			 * ComposedSubsumerImpl<IndexedClassExpression>( disjunction));
+			 */
+			producer.produce(premises.getRoot(), new DisjunctionComposition(
+					premise, disjunction));
 		}
 	}
 
 	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		ObjectUnionFromDisjunctRule rule = ruleChain.getCreate(MATCHER_,
 				FACTORY_);
-		return rule.disjunctions_.addAll(this.disjunctions_);
+		rule.disjunctions_.addAll(this.disjunctions_);
+		return true;
 	}
 
 	@Override
 	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		ObjectUnionFromDisjunctRule rule = ruleChain.find(MATCHER_);
-		boolean changed = false;
-		if (rule != null) {
-			changed = rule.disjunctions_.removeAll(this.disjunctions_);
+		if (rule == null)
+			return false;
+		// else
+		boolean success = true;
+		int removed = 0;
+		for (IndexedObjectUnionOf disjunction : this.disjunctions_) {
+			if (rule.disjunctions_.remove(disjunction))
+				removed++;
+			else {
+				success = false;
+				break;
+			}
+		}
+		if (success) {
 			if (rule.isEmpty())
 				ruleChain.remove(MATCHER_);
+			return true;
 		}
-		return changed;
+		// else revert all changes
+		for (IndexedObjectUnionOf disjunction : this.disjunctions_) {
+			if (removed == 0)
+				break;
+			removed--;
+			rule.disjunctions_.add(disjunction);
+		}
+		return false;
 	}
 
 	/**

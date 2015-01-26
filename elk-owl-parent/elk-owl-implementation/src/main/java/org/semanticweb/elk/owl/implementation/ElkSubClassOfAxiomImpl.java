@@ -30,6 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
+import org.semanticweb.elk.owl.visitors.ElkSubClassOfAxiomVisitor;
 
 /**
  * Corresponds to a <a href=
@@ -42,38 +43,43 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkSubClassOfAxiomImpl extends ElkObjectImpl implements
 		ElkSubClassOfAxiom {
 
-	protected final ElkClassExpression subClassExpression,
-			superClassExpression;
+	private final ElkClassExpression subClassExpression_,
+			superClassExpression_;
 
-	ElkSubClassOfAxiomImpl(
-			ElkClassExpression subClassExpression,
+	ElkSubClassOfAxiomImpl(ElkClassExpression subClassExpression,
 			ElkClassExpression superClassExpression) {
-		this.subClassExpression = subClassExpression;
-		this.superClassExpression = superClassExpression;
+		this.subClassExpression_ = subClassExpression;
+		this.superClassExpression_ = superClassExpression;
 	}
 
 	@Override
 	public ElkClassExpression getSubClassExpression() {
-		return subClassExpression;
+		return subClassExpression_;
 	}
 
 	@Override
 	public ElkClassExpression getSuperClassExpression() {
-		return superClassExpression;
+		return superClassExpression_;
 	}
 
 	@Override
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkSubClassOfAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkSubClassOfAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkSubClassOfAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkSubClassOfAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
+
 }

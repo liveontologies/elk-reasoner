@@ -1,11 +1,12 @@
+package org.semanticweb.elk.owl.iris;
+
 /*
  * #%L
- * ELK OWL Model Implementation
- * 
- * $Id$
- * $HeadURL$
+ * ELK OWL Object Interfaces
+ * $Id:$
+ * $HeadURL:$
  * %%
- * Copyright (C) 2011 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,30 +21,17 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.owl.iris;
-
 
 /**
- * This class represents a prefix declaration. It holds both the prefix
- * name and the corresponding full IRI. 
+ * An object representing a prefix declaration. It holds both the prefix name
+ * and the corresponding full IRI.
  * 
  * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
  */
-public class ElkPrefix {
-	
-	protected final String name;
-	protected final ElkFullIri iri;
+public interface ElkPrefix {
 
-	public ElkPrefix(String prefixName, ElkFullIri iri) {
-		this.name = prefixName;
-		this.iri = iri;
-	}
+	public String getName();
 
-	public String getName() {
-		return name;
-	}
-	
-	public ElkFullIri getIri() {
-		return iri;
-	}
+	public ElkFullIri getIri();
 }

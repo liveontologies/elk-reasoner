@@ -23,6 +23,9 @@
 package org.semanticweb.elk.owl.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
+import org.semanticweb.elk.owl.visitors.ElkAnnotationSubjectVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAnnotationValueVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAnonymousIndividualVisitor;
 import org.semanticweb.elk.owl.visitors.ElkIndividualVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
@@ -36,20 +39,20 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkAnonymousIndividualImpl extends ElkObjectImpl implements
 		ElkAnonymousIndividual {
 
-	protected final String nodeId;
+	private final String nodeId_;
 
-	/* package-private */ElkAnonymousIndividualImpl(String nodeId) {
-		this.nodeId = nodeId;
+	ElkAnonymousIndividualImpl(String nodeId) {
+		this.nodeId_ = nodeId;
 	}
 
 	@Override
 	public String getNodeId() {
-		return nodeId;
+		return nodeId_;
 	}
 
 	@Override
 	public String toString() {
-		return nodeId;
+		return nodeId_;
 	}
 
 	@Override
@@ -59,6 +62,21 @@ public class ElkAnonymousIndividualImpl extends ElkObjectImpl implements
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(ElkAnnotationValueVisitor<O> visitor) {
+		return accept((ElkAnonymousIndividualVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkAnnotationSubjectVisitor<O> visitor) {
+		return accept((ElkAnonymousIndividualVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkAnonymousIndividualVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

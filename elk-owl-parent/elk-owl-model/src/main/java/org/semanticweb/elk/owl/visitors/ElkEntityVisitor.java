@@ -25,13 +25,7 @@
  */
 package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
-import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 
 /**
  * Visitor pattern interface for instances of {@link ElkEntity}.
@@ -39,20 +33,12 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
  * @author "Yevgeny Kazakov"
  * 
  * @param <O>
- *            the output type of the visitor
+ *            the type of the output of this visitor
  */
-public interface ElkEntityVisitor<O> {
+public interface ElkEntityVisitor<O> extends ElkAnnotationPropertyVisitor<O>,
+		ElkClassVisitor<O>, ElkDataPropertyVisitor<O>, ElkDatatypeVisitor<O>,
+		ElkNamedIndividualVisitor<O>, ElkObjectPropertyVisitor<O> {
 
-	O visit(ElkAnnotationProperty elkAnnotationProperty);
-
-	O visit(ElkClass elkClass);
-
-	O visit(ElkDataProperty elkDataProperty);
-
-	O visit(ElkDatatype elkDatatype);
-
-	O visit(ElkNamedIndividual elkNamedIndividual);
-
-	O visit(ElkObjectProperty elkObjectProperty);
+	// combined visitor
 
 }

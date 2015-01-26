@@ -30,6 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubAnnotationPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAnnotationAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
+import org.semanticweb.elk.owl.visitors.ElkSubAnnotationPropertyOfAxiomVisitor;
 
 /**
  * ELK implementation of {@link ElkSubAnnotationPropertyOfAxiom}.
@@ -38,51 +39,45 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  * @author Markus Kroetzsch
  * 
  */
-public class ElkSubAnnotationPropertyOfAxiomImpl extends ElkObjectImpl implements
-		ElkSubAnnotationPropertyOfAxiom {
+public class ElkSubAnnotationPropertyOfAxiomImpl extends ElkObjectImpl
+		implements ElkSubAnnotationPropertyOfAxiom {
 
-	protected final ElkAnnotationProperty subAnnotationProperty;
-	protected final ElkAnnotationProperty superAnnotationProperty;
+	private final ElkAnnotationProperty subProperty_;
+	private final ElkAnnotationProperty superProperty_;
 
-	ElkSubAnnotationPropertyOfAxiomImpl(
-			ElkAnnotationProperty subAnnotationProperty,
-			ElkAnnotationProperty superAnnotationProperty) {
-		this.subAnnotationProperty = subAnnotationProperty;
-		this.superAnnotationProperty = superAnnotationProperty;
+	ElkSubAnnotationPropertyOfAxiomImpl(ElkAnnotationProperty subProperty,
+			ElkAnnotationProperty superProperty) {
+		this.subProperty_ = subProperty;
+		this.superProperty_ = superProperty;
 	}
 
 	@Override
 	public ElkAnnotationProperty getSubAnnotationProperty() {
-		return subAnnotationProperty;
+		return subProperty_;
 	}
 
 	@Override
 	public ElkAnnotationProperty getSuperAnnotationProperty() {
-		return superAnnotationProperty;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder("SubObjectPropertyOf(");
-		result.append(subAnnotationProperty.toString());
-		result.append(" ");
-		result.append(superAnnotationProperty.toString());
-		result.append(")");
-		return result.toString();
-	}
-
-	@Override
-	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return superProperty_;
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkSubAnnotationPropertyOfAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkAxiomVisitor<O> visitor) {
+		return accept((ElkSubAnnotationPropertyOfAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor) {
+		return accept((ElkSubAnnotationPropertyOfAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkSubAnnotationPropertyOfAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

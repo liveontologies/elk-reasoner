@@ -141,6 +141,7 @@ import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 import org.semanticweb.elk.owl.iris.ElkPrefixDeclarations;
+import org.semanticweb.elk.owl.iris.ElkPrefixImpl;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
@@ -570,7 +571,7 @@ void prefixDeclaration(Owl2ParserAxiomProcessor axiomProcessor) throws Owl2Parse
 		<EQUALS>
 		iri = fullIri()
 	<CLOSE_BRACKET> {
-		ElkPrefix prefix = new ElkPrefix(name, iri);
+		ElkPrefix prefix = new ElkPrefixImpl(name, iri);
 	
 		if ( !getElkPrefixDeclarations().addPrefix( prefix ) ) {
 			throw new ParseException("Duplicate declaration of prefix " + name + ".");
@@ -1154,7 +1155,7 @@ ElkObjectMinCardinality objectMinCardinality():
 		( y = classExpression() )?
 	<CLOSE_BRACKET> {
 		if (y == null)
-			return getElkObjectFactory().getObjectMinCardinality(x, Integer.parseInt( n.image ));
+			return getElkObjectFactory().getObjectMinCardinalityUnqualified(x, Integer.parseInt( n.image ));
 		else
 			return getElkObjectFactory().getObjectMinCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
@@ -1173,7 +1174,7 @@ ElkObjectMaxCardinality objectMaxCardinality():
 		( y = classExpression() )?
 	<CLOSE_BRACKET> {
 		if (y == null)
-			return getElkObjectFactory().getObjectMaxCardinality(x, Integer.parseInt( n.image ));
+			return getElkObjectFactory().getObjectMaxCardinalityUnqualified(x, Integer.parseInt( n.image ));
 		else
 			return getElkObjectFactory().getObjectMaxCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
@@ -1192,7 +1193,7 @@ ElkObjectExactCardinality objectExactCardinality():
 		( y = classExpression() )?
 	<CLOSE_BRACKET> {
 		if (y == null)
-			return getElkObjectFactory().getObjectExactCardinality(x, Integer.parseInt( n.image ));
+			return getElkObjectFactory().getObjectExactCardinalityUnqualified(x, Integer.parseInt( n.image ));
 		else
 			return getElkObjectFactory().getObjectExactCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
@@ -1295,7 +1296,7 @@ ElkDataMinCardinality dataMinCardinality():
 		( y = dataRange() )?
 	<CLOSE_BRACKET> {
 		if (y == null)
-			return getElkObjectFactory().getDataMinCardinality(x, Integer.parseInt( n.image ));
+			return getElkObjectFactory().getDataMinCardinalityUnqualified(x, Integer.parseInt( n.image ));
 		else
 			return getElkObjectFactory().getDataMinCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
@@ -1314,7 +1315,7 @@ ElkDataMaxCardinality dataMaxCardinality():
 		( y = dataRange() )?
 	<CLOSE_BRACKET> {
 		if (y == null)
-			return getElkObjectFactory().getDataMaxCardinality(x, Integer.parseInt( n.image ));
+			return getElkObjectFactory().getDataMaxCardinalityUnqualified(x, Integer.parseInt( n.image ));
 		else
 			return getElkObjectFactory().getDataMaxCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}
@@ -1333,7 +1334,7 @@ ElkDataExactCardinality dataExactCardinality():
 		( y = dataRange() )?
 	<CLOSE_BRACKET> {
 		if (y == null)
-			return getElkObjectFactory().getDataExactCardinality(x, Integer.parseInt( n.image ));
+			return getElkObjectFactory().getDataExactCardinalityUnqualified(x, Integer.parseInt( n.image ));
 		else
 			return getElkObjectFactory().getDataExactCardinalityQualified(x, Integer.parseInt( n.image ), y);
 	}

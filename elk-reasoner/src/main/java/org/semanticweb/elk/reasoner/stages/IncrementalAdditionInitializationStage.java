@@ -37,8 +37,9 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
@@ -49,7 +50,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Contex
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -69,24 +70,6 @@ public class IncrementalAdditionInitializationStage extends
 		return IncrementalStages.ADDITIONS_INIT;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
-	 */
 	@Override
 	public boolean preExecute() {
 		if (!super.preExecute())
@@ -94,8 +77,8 @@ public class IncrementalAdditionInitializationStage extends
 
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		LinkedContextInitRule changedInitRules = null;
-		Map<IndexedClassExpression, ChainableSubsumerRule> changedRulesByCE = null;
-		Map<IndexedClass, IndexedClassExpression> changedDefinitions = null;
+		Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedRulesByCE = null;
+		Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 		ContextCreationListener contextCreationListener = SaturationUtils
 				.addStatsToContextCreationListener(
@@ -107,8 +90,8 @@ public class IncrementalAdditionInitializationStage extends
 						stageStatistics_.getContextStatistics());
 
 		// first, create and init contexts for new classes
-		final IndexObjectConverter converter = reasoner.objectCache_
-				.getIndexObjectConverter();
+		final ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
+				reasoner.ontologyIndex);
 		final SaturationStateWriter<?> writer =
 
 		SaturationUtils.getStatsAwareWriter(reasoner.saturationState
@@ -189,8 +172,8 @@ public class IncrementalAdditionInitializationStage extends
 			return false;
 		this.initialization_ = null;
 		reasoner.ontologyIndex.commitAddedRules();
-		reasoner.ontologyIndex.initClassSignatureChanges();
-		reasoner.ontologyIndex.initIndividualSignatureChanges();
+		reasoner.ontologyIndex.initClassChanges();
+		reasoner.ontologyIndex.initIndividualChanges();
 		return true;
 	}
 

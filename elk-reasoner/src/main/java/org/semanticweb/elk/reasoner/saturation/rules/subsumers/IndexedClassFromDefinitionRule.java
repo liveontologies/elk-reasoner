@@ -28,8 +28,8 @@ import java.util.List;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -69,16 +69,16 @@ public class IndexedClassFromDefinitionRule extends
 		this.definedClasses_.add(defined);
 	}
 
-	public static void addRuleFor(IndexedDefinitionAxiom axiom,
+	public static boolean addRuleFor(ModifiableIndexedDefinitionAxiom axiom,
 			ModifiableOntologyIndex index) {
-		index.add(axiom.getDefinition(), new IndexedClassFromDefinitionRule(
-				axiom.getDefinedClass()));
+		return index.add(axiom.getDefinition(),
+				new IndexedClassFromDefinitionRule(axiom.getDefinedClass()));
 	}
 
-	public static void removeRuleFor(IndexedDefinitionAxiom axiom,
+	public static boolean removeRuleFor(ModifiableIndexedDefinitionAxiom axiom,
 			ModifiableOntologyIndex index) {
-		index.remove(axiom.getDefinition(), new IndexedClassFromDefinitionRule(
-				axiom.getDefinedClass()));
+		return index.remove(axiom.getDefinition(),
+				new IndexedClassFromDefinitionRule(axiom.getDefinedClass()));
 	}
 
 	@Override

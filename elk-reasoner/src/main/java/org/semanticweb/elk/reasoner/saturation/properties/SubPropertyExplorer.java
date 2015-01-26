@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
@@ -81,14 +81,12 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	}
 
 	@Override
-	public Void visit(IndexedBinaryPropertyChain element) {
-		IndexedPropertyChain left = element.getLeftProperty();
-		IndexedPropertyChain right = element.getRightProperty();
-		SaturatedPropertyChain leftSaturation = left.getSaturated();
-		SaturatedPropertyChain rightSaturation = right.getSaturated();
-		if (leftSaturation != null && leftSaturation.isDerivedReflexive())
+	public Void visit(IndexedComplexPropertyChain element) {
+		IndexedPropertyChain left = element.getFirstProperty();
+		IndexedPropertyChain right = element.getSuffixChain();
+		if (left.getSaturated().isDerivedReflexive())
 			toDo(right);
-		if (rightSaturation != null && rightSaturation.isDerivedReflexive())
+		if (right.getSaturated().isDerivedReflexive())
 			toDo(left);
 		return null;
 	}
@@ -122,17 +120,14 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 
 	private static SaturatedPropertyChain computeSubProperties(
 			IndexedPropertyChain element) {
-		SaturatedPropertyChain saturation = SaturatedPropertyChain
-				.getCreate(element);
+		SaturatedPropertyChain saturation = element.getSaturated();
 		if (saturation.derivedSubPropertiesComputed)
 			return saturation;
 		// else
-		if (saturation.derivedSubProperyChains == null) {
-			synchronized (saturation) {
-				if (saturation.derivedSubProperyChains == null)
-					saturation.derivedSubProperyChains = new ArrayHashSet<IndexedPropertyChain>(
-							8);
-			}
+		synchronized (saturation) {
+			if (saturation.derivedSubProperyChains == null)
+				saturation.derivedSubProperyChains = new ArrayHashSet<IndexedPropertyChain>(
+						8);
 		}
 		synchronized (saturation.derivedSubProperyChains) {
 			if (saturation.derivedSubPropertiesComputed)
@@ -176,16 +171,13 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	 */
 	static Multimap<IndexedObjectProperty, IndexedObjectProperty> getLeftSubComposableSubPropertiesByRightProperties(
 			IndexedObjectProperty element) {
-		SaturatedPropertyChain saturation = SaturatedPropertyChain
-				.getCreate(element);
+		SaturatedPropertyChain saturation = element.getSaturated();
 		if (saturation.leftSubComposableSubPropertiesByRightPropertiesComputed)
 			return saturation.leftSubComposableSubPropertiesByRightProperties;
 		// else
-		if (saturation.leftSubComposableSubPropertiesByRightProperties == null) {
-			synchronized (saturation) {
-				if (saturation.leftSubComposableSubPropertiesByRightProperties == null)
-					saturation.leftSubComposableSubPropertiesByRightProperties = new HashSetMultimap<IndexedObjectProperty, IndexedObjectProperty>();
-			}
+		synchronized (saturation) {
+			if (saturation.leftSubComposableSubPropertiesByRightProperties == null)
+				saturation.leftSubComposableSubPropertiesByRightProperties = new HashSetMultimap<IndexedObjectProperty, IndexedObjectProperty>();
 		}
 		synchronized (saturation.leftSubComposableSubPropertiesByRightProperties) {
 			if (saturation.leftSubComposableSubPropertiesByRightPropertiesComputed)
@@ -193,16 +185,16 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 			// else compute it
 			Set<IndexedObjectProperty> subProperties = getSubProperties(element);
 			for (IndexedPropertyChain subPropertyChain : getSubPropertyChains(element)) {
-				if (subPropertyChain instanceof IndexedBinaryPropertyChain) {
-					IndexedBinaryPropertyChain composition = (IndexedBinaryPropertyChain) subPropertyChain;
+				if (subPropertyChain instanceof IndexedComplexPropertyChain) {
+					IndexedComplexPropertyChain composition = (IndexedComplexPropertyChain) subPropertyChain;
 					Set<IndexedObjectProperty> leftSubProperties = getSubProperties(composition
-							.getLeftProperty());
+							.getFirstProperty());
 					Set<IndexedObjectProperty> commonSubProperties = new LazySetIntersection<IndexedObjectProperty>(
 							subProperties, leftSubProperties);
 					if (commonSubProperties.isEmpty())
 						continue;
 					for (IndexedObjectProperty rightSubProperty : getSubProperties(composition
-							.getRightProperty()))
+							.getSuffixChain()))
 						for (IndexedObjectProperty commonLeft : commonSubProperties)
 							saturation.leftSubComposableSubPropertiesByRightProperties
 									.add(rightSubProperty, commonLeft);

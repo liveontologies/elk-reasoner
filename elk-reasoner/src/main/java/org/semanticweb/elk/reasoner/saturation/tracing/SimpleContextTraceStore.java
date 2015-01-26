@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
@@ -87,7 +87,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 
 	private final List<Inference> contradictionInferences_;
 	
-	private final Map<IndexedClassExpression, Multimap<IndexedDisjointnessAxiom, Inference>> disjointSubsumerInferenceMap_;
+	private final Map<IndexedClassExpression, Multimap<IndexedDisjointClassesAxiom, Inference>> disjointSubsumerInferenceMap_;
 	
 	private final Multimap<IndexedClassExpression, Inference> subsumerInferenceMap_;
 
@@ -314,7 +314,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 	 */
 	public SimpleContextTraceStore() {
 		contradictionInferences_ = new ArrayList<Inference>(2);
-		disjointSubsumerInferenceMap_ = new ArrayHashMap<IndexedClassExpression, Multimap<IndexedDisjointnessAxiom, Inference>>();
+		disjointSubsumerInferenceMap_ = new ArrayHashMap<IndexedClassExpression, Multimap<IndexedDisjointClassesAxiom, Inference>>();
 		subsumerInferenceMap_ = new HashListMultimap<IndexedClassExpression, Inference>();
 		backwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedClassExpression, Inference>>();
 		forwardLinkInferenceMap_ = new ArrayHashMap<IndexedPropertyChain, Multimap<IndexedClassExpression, Inference>>();

@@ -24,6 +24,9 @@ package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
+import org.semanticweb.elk.owl.visitors.ElkCardinalityRestrictionQualifiedVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataMinCardinalityQualifiedVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionQualifiedVisitor;
 import org.semanticweb.owlapi.model.OWLDataMinCardinality;
 
 /**
@@ -46,6 +49,21 @@ public class ElkDataMinCardinalityQualifiedWrap<T extends OWLDataMinCardinality>
 	@Override
 	public ElkDataRange getFiller() {
 		return converter.convert(this.owlObject.getFiller());
+	}
+
+	@Override
+	public <O> O accept(ElkCardinalityRestrictionQualifiedVisitor<O> visitor) {
+		return accept((ElkDataMinCardinalityQualifiedVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyRestrictionQualifiedVisitor<O> visitor) {
+		return accept((ElkDataMinCardinalityQualifiedVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDataMinCardinalityQualifiedVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

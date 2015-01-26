@@ -187,98 +187,101 @@ public class OwlAxiomConverterVisitor extends
 	public ElkAxiom visit(
 			OWLInverseObjectPropertiesAxiom owlInverseObjectPropertiesAxiom) {
 		return CONVERTER.convert(owlInverseObjectPropertiesAxiom);
-	};
+	}
 
 	@Override
 	public ElkAxiom visit(
 			OWLIrreflexiveObjectPropertyAxiom owlIrreflexiveObjectPropertyAxiom) {
 		return CONVERTER.convert(owlIrreflexiveObjectPropertyAxiom);
-	};
+	}
 
 	@Override
 	public ElkAxiom visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
 		return CONVERTER.convert(axiom);
-	};
+	}
 
 	@Override
 	public ElkAxiom visit(OWLObjectPropertyAssertionAxiom axiom) {
 		return CONVERTER.convert(axiom);
-	};
+	}
 
 	@Override
 	public ElkAxiom visit(
 			OWLObjectPropertyDomainAxiom owlObjectPropertyDomainAxiom) {
 		return CONVERTER.convert(owlObjectPropertyDomainAxiom);
-	};
+	}
 
 	@Override
 	public ElkAxiom visit(
 			OWLObjectPropertyRangeAxiom owlObjectPropertyRangeAxiom) {
 		return CONVERTER.convert(owlObjectPropertyRangeAxiom);
-	};
+	}
 
 	@Override
 	public ElkAxiom visit(
 			OWLReflexiveObjectPropertyAxiom owlReflexiveObjectPropertyAxiom) {
 		return CONVERTER.convert(owlReflexiveObjectPropertyAxiom);
-	};
+	}
 
 	@Override
 	public ElkAxiom visit(OWLSameIndividualAxiom axiom) {
 		return CONVERTER.convert(axiom);
-	};
+	}
 
 	@Override
 	public ElkAxiom visit(OWLSubClassOfAxiom owlSubClassOfAxiom) {
 		return CONVERTER.convert(owlSubClassOfAxiom);
-	};
+	}
 
 	@Override
 	public ElkAxiom visit(OWLSubDataPropertyOfAxiom owlSubDataPropertyOfAxiom) {
 		return CONVERTER.convert(owlSubDataPropertyOfAxiom);
-	};
+	}
 
 	@Override
 	public ElkAxiom visit(
 			OWLSubObjectPropertyOfAxiom owlSubObjectPropertyOfAxiom) {
 		return CONVERTER.convert(owlSubObjectPropertyOfAxiom);
-	};
+	}
 
 	@Override
 	public ElkAxiom visit(OWLSubPropertyChainOfAxiom owlSubPropertyChainOfAxiom) {
 		return new ElkSubObjectPropertyChainOfAxiomWrap<OWLSubPropertyChainOfAxiom>(
 				owlSubPropertyChainOfAxiom);
-	};
+	}
 
 	@Override
 	public ElkAxiom visit(
 			OWLSymmetricObjectPropertyAxiom owlSymmetricObjectPropertyAxiom) {
 		return CONVERTER.convert(owlSymmetricObjectPropertyAxiom);
-	};
+	}
 
 	@Override
 	public ElkAxiom visit(
 			OWLTransitiveObjectPropertyAxiom owlTransitiveObjectPropertyAxiom) {
 		return CONVERTER.convert(owlTransitiveObjectPropertyAxiom);
-	};
-	
+	}
+
 	@Override
 	public ElkAxiom visit(OWLAnnotationAssertionAxiom owlAnnotationAssertion) {
 		return CONVERTER.convert(owlAnnotationAssertion);
 	}
 
 	@Override
-	public ElkAxiom visit(OWLAnnotationPropertyDomainAxiom owlAnnotationPropertyDomain) {
+	public ElkAxiom visit(
+			OWLAnnotationPropertyDomainAxiom owlAnnotationPropertyDomain) {
 		return CONVERTER.convert(owlAnnotationPropertyDomain);
 	}
 
 	@Override
-	public ElkAxiom visit(OWLAnnotationPropertyRangeAxiom owlAnnotationPropertyRange) {
+	public ElkAxiom visit(
+			OWLAnnotationPropertyRangeAxiom owlAnnotationPropertyRange) {
 		return CONVERTER.convert(owlAnnotationPropertyRange);
 	}
 
 	@Override
-	public ElkAxiom visit(OWLSubAnnotationPropertyOfAxiom owlSubAnnotationPropertyOfAxiom) {
+	public ElkAxiom visit(
+			OWLSubAnnotationPropertyOfAxiom owlSubAnnotationPropertyOfAxiom) {
 		return CONVERTER.convert(owlSubAnnotationPropertyOfAxiom);
 	}
 
@@ -301,5 +304,5 @@ public class OwlAxiomConverterVisitor extends
 	public ElkAxiom visit(SWRLRule rule) {
 		return CONVERTER.convert(rule);
 	}
-	
+
 }

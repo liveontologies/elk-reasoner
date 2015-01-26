@@ -135,7 +135,7 @@ class TaxonomyCleaningFactory
 			}
 
 			private void submitClass(IndexedClass indexedClass) {
-				ElkClass elkClass = indexedClass.getElkClass();
+				ElkClass elkClass = indexedClass.getElkEntity();
 				UpdateableTaxonomy<ElkClass> classTaxonomy = classTaxonomyState_
 						.getTaxonomy();
 				UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = instanceTaxonomyState_
@@ -233,7 +233,7 @@ class TaxonomyCleaningFactory
 					UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = instanceTaxonomyState_
 							.getTaxonomy();
 					ElkNamedIndividual individual = indexedIndividual
-							.getElkNamedIndividual();
+							.getElkEntity();
 					UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy
 							.getInstanceNode(individual);
 

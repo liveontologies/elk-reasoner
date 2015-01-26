@@ -22,7 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
@@ -92,9 +92,8 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	public static void produceDecomposedExistentialLink(
 			ConclusionProducer producer, IndexedClassExpression source,
 			IndexedObjectSomeValuesFrom existential) {
-		IndexedObjectProperty relation = existential.getRelation();
-		if (relation.getSaturated().getCompositionsByLeftSubProperty()
-				.isEmpty()) {
+		if (existential.getProperty().getSaturated()
+				.getCompositionsByLeftSubProperty().isEmpty()) {
 			producer.produce(existential.getFiller(),
 					new DecomposedExistentialBackwardLink(source, existential));
 		} else {
@@ -109,7 +108,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 			IndexedClassExpression inferenceRoot,
 			IndexedPropertyChain forwardRelation,
 			IndexedClassExpression target,
-			IndexedBinaryPropertyChain composition) {
+			IndexedComplexPropertyChain composition) {
 
 		if (composition.getSaturated().getCompositionsByLeftSubProperty()
 				.isEmpty()) {
@@ -125,5 +124,4 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 					composition));
 		}
 	}
-
 }

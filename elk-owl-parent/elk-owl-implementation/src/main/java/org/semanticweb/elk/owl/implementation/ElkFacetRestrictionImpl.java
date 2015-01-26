@@ -28,6 +28,7 @@ package org.semanticweb.elk.owl.implementation;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.visitors.ElkFacetRestrictionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -35,31 +36,36 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  *
  */
 public class ElkFacetRestrictionImpl implements ElkFacetRestriction {
 
-	private final ElkIri facetURI;
-	private final ElkLiteral literal;
-	
+	private final ElkIri facetURI_;
+	private final ElkLiteral literal_;
+
 	ElkFacetRestrictionImpl(ElkIri facetURI, ElkLiteral literal) {
-		this.facetURI = facetURI;
-		this.literal = literal;
-	}
-	
-	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return visitor.visit(this);
+		this.facetURI_ = facetURI;
+		this.literal_ = literal;
 	}
 
 	@Override
 	public ElkIri getConstrainingFacet() {
-		return facetURI;
+		return facetURI_;
 	}
 
 	@Override
 	public ElkLiteral getRestrictionValue() {
-		return literal;
+		return literal_;
+	}
+
+	@Override
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkFacetRestrictionVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkFacetRestrictionVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }

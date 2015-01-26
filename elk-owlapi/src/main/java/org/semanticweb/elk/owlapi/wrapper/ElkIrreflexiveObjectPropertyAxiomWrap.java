@@ -24,7 +24,9 @@ package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkIrreflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.visitors.ElkIrreflexiveObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLIrreflexiveObjectPropertyAxiom;
 
 /**
@@ -52,6 +54,16 @@ public class ElkIrreflexiveObjectPropertyAxiomWrap<T extends OWLIrreflexiveObjec
 
 	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyAxiomVisitor<O> visitor) {
+		return accept((ElkIrreflexiveObjectPropertyAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkIrreflexiveObjectPropertyAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

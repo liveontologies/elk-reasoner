@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
+import org.semanticweb.elk.owl.visitors.ElkDataIntersectionOfVisitor;
 import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
@@ -47,11 +48,16 @@ public class ElkDataIntersectionOfImpl extends ElkDataRangeListObject implements
 
 	@Override
 	public <O> O accept(ElkDataRangeVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkDataIntersectionOfVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkDataIntersectionOfVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDataIntersectionOfVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

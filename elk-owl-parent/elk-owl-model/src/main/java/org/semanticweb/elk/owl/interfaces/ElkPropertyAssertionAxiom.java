@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkPropertyAssertionAxiomVisitor;
+
 /**
  * /** A generic interface for object and data property assertion axioms.
  * 
@@ -50,5 +52,14 @@ public interface ElkPropertyAssertionAxiom<P, S, O> extends
 	 * @return the object of this restriction
 	 */
 	O getObject();
+
+	/**
+	 * Accept an {@link ElkPropertyAssertionAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public <T> T accept(ElkPropertyAssertionAxiomVisitor<T> visitor);
 
 }

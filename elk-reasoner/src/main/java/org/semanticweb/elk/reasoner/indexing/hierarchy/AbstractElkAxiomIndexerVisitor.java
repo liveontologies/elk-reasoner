@@ -50,6 +50,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 
 /**
  * An abstract class for indexing axioms. Its purpose is to reduce many
@@ -162,9 +163,9 @@ public abstract class AbstractElkAxiomIndexerVisitor extends
 			if (first == null)
 				first = c;
 			else {
-				 indexEquivalentClasses(first, c);
-//				indexSubClassOfAxiom(first, c);
-//				indexSubClassOfAxiom(c, first);
+				indexEquivalentClasses(first, c);
+				// indexSubClassOfAxiom(first, c);
+				// indexSubClassOfAxiom(c, first);
 			}
 		}
 		return null;

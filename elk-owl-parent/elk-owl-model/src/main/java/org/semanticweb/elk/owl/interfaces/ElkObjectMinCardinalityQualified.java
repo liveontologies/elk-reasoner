@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkObjectMinCardinalityQualifiedVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Minimum_Cardinality">minimum cardinality
@@ -37,4 +39,13 @@ public interface ElkObjectMinCardinalityQualified
 		extends
 		ElkObjectMinCardinality,
 		ElkCardinalityRestrictionQualified<ElkObjectPropertyExpression, ElkClassExpression> {
+
+	/**
+	 * Accept an {@link ElkObjectMinCardinalityQualifiedVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkObjectMinCardinalityQualifiedVisitor<O> visitor);
 }

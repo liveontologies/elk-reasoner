@@ -26,6 +26,9 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectSomeValuesFromVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionQualifiedVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionVisitor;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 
 /**
@@ -57,6 +60,21 @@ public class ElkObjectSomeValuesFromWrap<T extends OWLObjectSomeValuesFrom>
 
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+		return accept((ElkObjectSomeValuesFromVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyRestrictionQualifiedVisitor<O> visitor) {
+		return accept((ElkObjectSomeValuesFromVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyRestrictionVisitor<O> visitor) {
+		return accept((ElkObjectSomeValuesFromVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectSomeValuesFromVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

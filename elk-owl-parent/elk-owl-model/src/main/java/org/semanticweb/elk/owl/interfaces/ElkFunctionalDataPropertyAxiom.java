@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkFunctionalDataPropertyAxiomVisitor;
+
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Functional_Data_Properties">Functional
@@ -35,5 +37,15 @@ package org.semanticweb.elk.owl.interfaces;
  */
 public interface ElkFunctionalDataPropertyAxiom extends ElkDataPropertyAxiom,
 		ElkPropertyAxiom<ElkDataPropertyExpression> {
+
+	/**
+	 * Accept an {@link ElkFunctionalDataPropertyAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(
+			ElkFunctionalDataPropertyAxiomVisitor<O> visitor);
 
 }

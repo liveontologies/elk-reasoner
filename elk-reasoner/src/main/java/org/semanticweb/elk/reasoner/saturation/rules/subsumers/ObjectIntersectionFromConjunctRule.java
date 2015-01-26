@@ -24,10 +24,11 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import java.util.Map;
 
-import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -80,45 +81,66 @@ public class ObjectIntersectionFromConjunctRule extends
 
 	/**
 	 * Add {@link ObjectIntersectionFromConjunctRule}s for the given
-	 * {@link IndexedObjectIntersectionOf} in the given
+	 * {@link ModifiableIndexedObjectIntersectionOf} in the given
 	 * {@link ModifiableOntologyIndex}
 	 * 
-	 * @param conjunct
+	 * @param conjunction
 	 * @param index
 	 */
-	public static void addRulesFor(IndexedObjectIntersectionOf conjunct,
+	public static boolean addRulesFor(
+			ModifiableIndexedObjectIntersectionOf conjunction,
 			ModifiableOntologyIndex index) {
-		IndexedClassExpression firstConjunct = conjunct.getFirstConjunct();
-		IndexedClassExpression secondConjunct = conjunct.getSecondConjunct();
-		// first negative occurrence of this expression
-		index.add(firstConjunct, new ObjectIntersectionFromConjunctRule(
-				secondConjunct, conjunct));
-		// if both conjuncts are the same, do not index the second time
-		if (!secondConjunct.equals(firstConjunct))
-			index.add(secondConjunct, new ObjectIntersectionFromConjunctRule(
-					firstConjunct, conjunct));
+		ModifiableIndexedClassExpression firstConjunct = conjunction
+				.getFirstConjunct();
+		ModifiableIndexedClassExpression secondConjunct = conjunction
+				.getSecondConjunct();
+		if (!index.add(firstConjunct, new ObjectIntersectionFromConjunctRule(
+				secondConjunct, conjunction)))
+			return false;
+		// if both conjuncts are the same, we are done
+		if (secondConjunct.equals(firstConjunct))
+			return true;
+		// else index the second conjunct
+		if (index.add(secondConjunct, new ObjectIntersectionFromConjunctRule(
+				firstConjunct, conjunction)))
+			return true;
+		// else revert the changes made
+		index.remove(firstConjunct, new ObjectIntersectionFromConjunctRule(
+				secondConjunct, conjunction));
+		return false;
 	}
 
 	/**
 	 * Removes {@link ObjectIntersectionFromConjunctRule}s for the given
-	 * {@link IndexedObjectIntersectionOf} in the given
+	 * {@link ModifiableIndexedObjectIntersectionOf} in the given
 	 * {@link ModifiableOntologyIndex}
 	 * 
-	 * @param conjunct
+	 * @param conjunction
 	 * @param index
 	 */
-	public static void removeRulesFor(IndexedObjectIntersectionOf conjunct,
+	public static boolean removeRulesFor(
+			ModifiableIndexedObjectIntersectionOf conjunction,
 			ModifiableOntologyIndex index) {
-		IndexedClassExpression firstConjunct = conjunct.getFirstConjunct();
-		IndexedClassExpression secondConjunct = conjunct.getSecondConjunct();
-		// first negative occurrence of this expression
-		index.remove(firstConjunct, new ObjectIntersectionFromConjunctRule(
-				secondConjunct, conjunct));
-		// if both conjuncts are the same, do not index the second time
-		if (!secondConjunct.equals(firstConjunct))
-			index.remove(secondConjunct,
-					new ObjectIntersectionFromConjunctRule(firstConjunct,
-							conjunct));
+		ModifiableIndexedClassExpression firstConjunct = conjunction
+				.getFirstConjunct();
+		ModifiableIndexedClassExpression secondConjunct = conjunction
+				.getSecondConjunct();
+		if (!index.remove(firstConjunct,
+				new ObjectIntersectionFromConjunctRule(secondConjunct,
+						conjunction)))
+			return false;
+		// if both conjuncts are the same, we are done
+		if (secondConjunct.equals(firstConjunct))
+			return true;
+		// else index the second conjunct
+		if (index.remove(secondConjunct,
+				new ObjectIntersectionFromConjunctRule(firstConjunct,
+						conjunction)))
+			return true;
+		// else revert the changes made
+		index.add(firstConjunct, new ObjectIntersectionFromConjunctRule(
+				secondConjunct, conjunction));
+		return false;
 	}
 
 	// TODO: hide this method
@@ -141,38 +163,69 @@ public class ObjectIntersectionFromConjunctRule extends
 
 	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		ObjectIntersectionFromConjunctRule rule = ruleChain.getCreate(MATCHER_,
 				FACTORY_);
-		boolean changed = false;
-
-		for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : conjunctionsByConjunct_
+		boolean success = true;
+		int added = 0;
+		for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : this.conjunctionsByConjunct_
 				.entrySet()) {
-			changed |= rule.addConjunctionByConjunct(entry.getValue(),
-					entry.getKey());
+			if (rule.addConjunctionByConjunct(entry.getValue(), entry.getKey()))
+				added++;
+			else {
+				success = false;
+				break;
+			}
 		}
-
-		return changed;
-
+		if (success)
+			return true;
+		// else revert all changes
+		for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : this.conjunctionsByConjunct_
+				.entrySet()) {
+			if (added == 0)
+				break;
+			added--;
+			rule.removeConjunctionByConjunct(entry.getValue(), entry.getKey());
+		}
+		return false;
 	}
 
 	@Override
 	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		ObjectIntersectionFromConjunctRule rule = ruleChain.find(MATCHER_);
-		boolean changed = false;
-
-		if (rule != null) {
-			for (IndexedClassExpression conjunct : conjunctionsByConjunct_
-					.keySet()) {
-				changed |= rule.removeConjunctionByConjunct(conjunct);
+		if (rule == null)
+			return false;
+		// else
+		boolean success = true;
+		int removed = 0;
+		for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : this.conjunctionsByConjunct_
+				.entrySet()) {
+			if (rule.removeConjunctionByConjunct(entry.getValue(),
+					entry.getKey()))
+				removed++;
+			else {
+				success = false;
+				break;
 			}
-
+		}
+		if (success) {
 			if (rule.isEmpty()) {
 				ruleChain.remove(MATCHER_);
 			}
+			return true;
 		}
-
-		return changed;
-
+		// else revert all changes
+		for (Map.Entry<IndexedClassExpression, IndexedObjectIntersectionOf> entry : this.conjunctionsByConjunct_
+				.entrySet()) {
+			if (removed == 0)
+				break;
+			removed--;
+			rule.addConjunctionByConjunct(entry.getValue(), entry.getKey());
+		}
+		return false;
 	}
 
 	@Override
@@ -185,17 +238,26 @@ public class ObjectIntersectionFromConjunctRule extends
 	private boolean addConjunctionByConjunct(
 			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression conjunct) {
-		Object previous = conjunctionsByConjunct_.put(conjunct, conjunction);
-
+		IndexedObjectIntersectionOf previous = conjunctionsByConjunct_.put(
+				conjunct, conjunction);
 		if (previous == null)
 			return true;
-
-		throw new ElkRuntimeException("Conjunction " + conjunction
-				+ "is already indexed: " + previous);
+		// else revert the change;
+		conjunctionsByConjunct_.put(conjunct, previous);
+		return false;
 	}
 
-	private boolean removeConjunctionByConjunct(IndexedClassExpression conjunct) {
-		return conjunctionsByConjunct_.remove(conjunct) != null;
+	private boolean removeConjunctionByConjunct(
+			IndexedObjectIntersectionOf conjunction,
+			IndexedClassExpression conjunct) {
+		IndexedObjectIntersectionOf previous = conjunctionsByConjunct_
+				.remove(conjunct);
+		if (previous == conjunction)
+			return true;
+		// else revert the change
+		if (previous != null)
+			conjunctionsByConjunct_.put(conjunct, previous);
+		return false;
 	}
 
 	/**

@@ -27,6 +27,8 @@ package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.visitors.ElkDataOneOfVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Enumeration_of_Literals">Enumeration of
@@ -38,11 +40,20 @@ public interface ElkDataOneOf extends ElkDataRange {
 
 	/**
 	 * Get the list of literals that this expression refers to. The order of
-	 * literals does not affect the semantics but it is relevant to the
-	 * syntax of OWL.
+	 * literals does not affect the semantics but it is relevant to the syntax
+	 * of OWL.
 	 * 
 	 * @return list of literals
 	 */
 	public List<? extends ElkLiteral> getLiterals();
+
+	/**
+	 * Accept an {@link ElkDataOneOfVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkDataOneOfVisitor<O> visitor);
 
 }

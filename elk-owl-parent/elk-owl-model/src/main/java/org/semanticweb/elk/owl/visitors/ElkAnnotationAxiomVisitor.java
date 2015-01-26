@@ -25,12 +25,12 @@
  */
 package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyDomainAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyRangeAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSubAnnotationPropertyOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkAnnotationAxiom;
 
 /**
+ * Visitor pattern interface for instances of {@link ElkAnnotationAxiom}.
+ * 
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
@@ -41,14 +41,12 @@ import org.semanticweb.elk.owl.interfaces.ElkSubAnnotationPropertyOfAxiom;
  * @param <O>
  *            the output type of the visitor
  */
-public interface ElkAnnotationAxiomVisitor<O> {
+public interface ElkAnnotationAxiomVisitor<O> extends
+		ElkAnnotationAssertionAxiomVisitor<O>,
+		ElkAnnotationPropertyDomainAxiomVisitor<O>,
+		ElkAnnotationPropertyRangeAxiomVisitor<O>,
+		ElkSubAnnotationPropertyOfAxiomVisitor<O> {
 
-	O visit(ElkSubAnnotationPropertyOfAxiom subAnnotationPropertyOfAxiom);
-
-	O visit(ElkAnnotationPropertyDomainAxiom annotationPropertyDomainAxiom);
-
-	O visit(ElkAnnotationPropertyRangeAxiom annotationPropertyRangeAxiom);
-
-	O visit(ElkAnnotationAssertionAxiom annotationAssertionAxiom);
+	// combined visitor
 
 }

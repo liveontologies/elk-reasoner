@@ -23,8 +23,10 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -37,7 +39,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 /**
  * A {@link ChainableSubsumerRule} producing {@link Contradiction} when
  * processing an {@link IndexedClassExpression} that is present in an
- * {@link IndexedDisjointnessAxiom} at least twice.
+ * {@link IndexedDisjointClassesAxiom} at least twice.
  * 
  * @author "Yevgeny Kazakov"
  */
@@ -47,7 +49,7 @@ public class ContradictionFromDisjointnessRule extends
 	public static final String NAME = "DisjointClasses Contradiction Introduction";
 
 	/**
-	 * The number of {@link IndexedDisjointnessAxiom}s in which the
+	 * The number of {@link IndexedDisjointClassesAxiom}s in which the
 	 * {@link IndexedClassExpression}, for which this rule is registered, occurs
 	 * more than once.
 	 */
@@ -63,16 +65,59 @@ public class ContradictionFromDisjointnessRule extends
 		this.contradictionCounter_++;
 	}
 
-	public static void addRulesFor(IndexedDisjointnessAxiom axiom,
+	public static boolean addRulesFor(ModifiableIndexedDisjointClassesAxiom axiom,
 			ModifiableOntologyIndex index) {
-		for (IndexedClassExpression ice : axiom.getInconsistentMembers())
-			index.add(ice, new ContradictionFromDisjointnessRule());
+		boolean success = true;
+		int added = 0;
+		for (ModifiableIndexedClassExpression ice : axiom
+				.getInconsistentMembers()) {
+			if (index.add(ice, new ContradictionFromDisjointnessRule())) {
+				added++;
+			} else {
+				success = false;
+				break;
+			}
+		}
+		if (success)
+			return true;
+		// else revert the changes
+		for (ModifiableIndexedClassExpression ice : axiom
+				.getInconsistentMembers()) {
+			if (added == 0)
+				break;
+			// else
+			added--;
+			index.remove(ice, new ContradictionFromDisjointnessRule());
+		}
+		return false;
 	}
 
-	public static void removeRulesFor(IndexedDisjointnessAxiom axiom,
+	public static boolean removeRulesFor(
+			ModifiableIndexedDisjointClassesAxiom axiom,
 			ModifiableOntologyIndex index) {
-		for (IndexedClassExpression ice : axiom.getInconsistentMembers())
-			index.remove(ice, new ContradictionFromDisjointnessRule());
+		boolean success = true;
+		int removed = 0;
+		for (ModifiableIndexedClassExpression ice : axiom
+				.getInconsistentMembers()) {
+			if (index.remove(ice, new ContradictionFromDisjointnessRule())) {
+				removed++;
+			} else {
+				success = false;
+				break;
+			}
+		}
+		if (success)
+			return true;
+		// else revert the changes
+		for (ModifiableIndexedClassExpression ice : axiom
+				.getInconsistentMembers()) {
+			if (removed == 0)
+				break;
+			// else
+			removed--;
+			index.add(ice, new ContradictionFromDisjointnessRule());
+		}
+		return false;
 	}
 
 	@Override
@@ -83,28 +128,38 @@ public class ContradictionFromDisjointnessRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		//producer.produce(premises.getRoot(), ContradictionImpl.getInstance());
-		producer.produce(premises.getRoot(), new ContradictionFromInconsistentDisjointnessAxiom(premise));
+		// producer.produce(premises.getRoot(),
+		// ContradictionImpl.getInstance());
+		producer.produce(premises.getRoot(),
+				new ContradictionFromInconsistentDisjointnessAxiom(premise));
 	}
 
 	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		ContradictionFromDisjointnessRule rule = ruleChain.getCreate(MATCHER_,
 				FACTORY_);
 		rule.contradictionCounter_ += this.contradictionCounter_;
-		return this.contradictionCounter_ != 0;
+		return true;
 	}
 
 	@Override
 	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		ContradictionFromDisjointnessRule rule = ruleChain.find(MATCHER_);
 		if (rule == null) {
 			return false;
 		}
+		if (rule.contradictionCounter_ < this.contradictionCounter_) {
+			return false;
+		}
+		// else
 		rule.contradictionCounter_ -= this.contradictionCounter_;
 		if (rule.isEmpty())
 			ruleChain.remove(MATCHER_);
-		return this.contradictionCounter_ != 0;
+		return true;
 	}
 
 	@Override
@@ -114,7 +169,7 @@ public class ContradictionFromDisjointnessRule extends
 		visitor.visit(this, premise, premises, producer);
 	}
 
-	protected boolean isEmpty() {
+	private boolean isEmpty() {
 		return this.contradictionCounter_ == 0;
 	}
 

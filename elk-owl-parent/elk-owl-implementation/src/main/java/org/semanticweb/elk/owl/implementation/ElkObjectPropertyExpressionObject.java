@@ -31,14 +31,13 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
  */
 public abstract class ElkObjectPropertyExpressionObject extends ElkObjectImpl {
 
-	protected final ElkObjectPropertyExpression objectPropertyExpression;
+	private final ElkObjectPropertyExpression property_;
 
-	ElkObjectPropertyExpressionObject(
-			ElkObjectPropertyExpression objectPropertyExpression) {
-		this.objectPropertyExpression = objectPropertyExpression;
+	ElkObjectPropertyExpressionObject(ElkObjectPropertyExpression property) {
+		this.property_ = property;
 	}
 
 	public ElkObjectPropertyExpression getProperty() {
-		return objectPropertyExpression;
+		return property_;
 	}
 }

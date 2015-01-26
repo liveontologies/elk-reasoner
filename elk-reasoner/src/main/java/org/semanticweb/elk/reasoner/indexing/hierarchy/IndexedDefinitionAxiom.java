@@ -22,68 +22,10 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassDecomposition;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.IndexedClassFromDefinitionRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public interface IndexedDefinitionAxiom extends IndexedAxiom {
 
-public class IndexedDefinitionAxiom extends IndexedAxiom {
+	public IndexedClass getDefinedClass();
 
-	static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedDefinitionAxiom.class);
-
-	private final IndexedClass definedClass_;
-	private final IndexedClassExpression definition_;
-
-	protected IndexedDefinitionAxiom(IndexedClass definedClass,
-			IndexedClassExpression definition) {
-		this.definedClass_ = definedClass;
-		this.definition_ = definition;
-	}
-
-	public IndexedClass getDefinedClass() {
-		return this.definedClass_;
-	}
-
-	public IndexedClassExpression getDefinition() {
-		return this.definition_;
-	}
-
-	@Override
-	public boolean occurs() {
-		// we do not cache definition axioms
-		// TODO: introduce a method for testing if we cache an object in the
-		// index
-		return false;
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "EquivalentClasses(" + this.definedClass_ + ' '
-				+ this.definition_ + ')';
-	}
-
-	@Override
-	public <O> O accept(IndexedAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			final int increment) {
-		if (increment > 0) {
-			if (IndexedClassDecomposition.tryAddRuleFor(this, index))
-				IndexedClassFromDefinitionRule.addRuleFor(this, index);
-			else
-				SuperClassFromSubClassRule.addRulesFor(this, index);
-		} else {
-			if (IndexedClassDecomposition.tryRemoveRuleFor(this, index))
-				IndexedClassFromDefinitionRule.removeRuleFor(this, index);
-			else
-				SuperClassFromSubClassRule.removeRulesFor(this, index);
-		}
-	}
+	public IndexedClassExpression getDefinition();
 
 }

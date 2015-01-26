@@ -23,12 +23,6 @@
 package org.semanticweb.elk.owl.visitors;
 
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDataPropertyDomainAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDataPropertyRangeAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDisjointDataPropertiesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkEquivalentDataPropertiesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 
 /**
  * Visitor pattern interface for instances of {@link ElkDataPropertyAxiom}.
@@ -37,20 +31,16 @@ import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
  * @author "Yevgeny Kazakov"
  * 
  * @param <O>
- *            the output type of the visitor
+ *            the type of the output of this visitor
  */
-public interface ElkDataPropertyAxiomVisitor<O> {
+public interface ElkDataPropertyAxiomVisitor<O> extends
+		ElkDataPropertyDomainAxiomVisitor<O>,
+		ElkDataPropertyRangeAxiomVisitor<O>,
+		ElkDisjointDataPropertiesAxiomVisitor<O>,
+		ElkEquivalentDataPropertiesAxiomVisitor<O>,
+		ElkFunctionalDataPropertyAxiomVisitor<O>,
+		ElkSubDataPropertyOfAxiomVisitor<O> {
 
-	O visit(ElkDataPropertyDomainAxiom elkDataPropertyDomainAxiom);
-
-	O visit(ElkDataPropertyRangeAxiom elkDataPropertyRangeAxiom);
-
-	O visit(ElkDisjointDataPropertiesAxiom elkDisjointDataPropertiesAxiom);
-
-	O visit(ElkEquivalentDataPropertiesAxiom elkEquivalentDataProperties);
-
-	O visit(ElkFunctionalDataPropertyAxiom elkFunctionalDataPropertyAxiom);
-
-	O visit(ElkSubDataPropertyOfAxiom elkSubDataPropertyOfAxiom);
+	// combined visitor
 
 }

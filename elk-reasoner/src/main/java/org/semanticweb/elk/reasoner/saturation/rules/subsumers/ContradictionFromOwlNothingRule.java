@@ -25,7 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -56,21 +57,21 @@ public class ContradictionFromOwlNothingRule extends
 	}
 
 	private static void checkOwlNothing(IndexedClass candidate) {
-		if (candidate.getElkClass() != PredefinedElkClass.OWL_NOTHING)
+		if (candidate.getElkEntity() != PredefinedElkClass.OWL_NOTHING)
 			throw new IllegalArgumentException(
 					"The rule can be registered only for owl:Nothing");
 	}
 
-	public static void addRuleFor(IndexedClass owlNothing,
+	public static boolean addRuleFor(ModifiableIndexedClass owlNothing,
 			ModifiableOntologyIndex index) {
 		checkOwlNothing(owlNothing);
-		index.add(owlNothing, new ContradictionFromOwlNothingRule());
+		return index.add(owlNothing, new ContradictionFromOwlNothingRule());
 	}
 
-	public static void removeRuleFor(IndexedClass owlNothing,
+	public static boolean removeRuleFor(ModifiableIndexedClass owlNothing,
 			ModifiableOntologyIndex index) {
 		checkOwlNothing(owlNothing);
-		index.remove(owlNothing, new ContradictionFromOwlNothingRule());
+		return index.remove(owlNothing, new ContradictionFromOwlNothingRule());
 	}
 
 	@Override
@@ -81,16 +82,19 @@ public class ContradictionFromOwlNothingRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		//producer.produce(premises.getRoot(), ContradictionImpl.getInstance());
-		producer.produce(premises.getRoot(), new ContradictionFromOwlNothing((IndexedClass)premise));
+		// producer.produce(premises.getRoot(),
+		// ContradictionImpl.getInstance());
+		producer.produce(premises.getRoot(), new ContradictionFromOwlNothing(
+				(IndexedClass) premise));
 	}
 
 	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
 		ContradictionFromOwlNothingRule rule = ruleChain.find(MATCHER_);
-		if (rule != null)
+		if (rule != null) {
 			// the rule is already registered
 			return false;
+		}
 		// else will create and add to the chain
 		ruleChain.getCreate(MATCHER_, FACTORY_);
 		return true;
@@ -98,13 +102,12 @@ public class ContradictionFromOwlNothingRule extends
 
 	@Override
 	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
-		ContradictionFromOwlNothingRule rule = ruleChain.find(MATCHER_);
-		if (rule == null) {
+		ContradictionFromOwlNothingRule previous = ruleChain.remove(MATCHER_);
+		if (previous == null) {
 			// the rule was not registered
 			return false;
 		}
-		// else remove it
-		ruleChain.remove(MATCHER_);
+		// else
 		return true;
 	}
 

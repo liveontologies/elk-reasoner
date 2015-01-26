@@ -27,10 +27,11 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkClassAssertionAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * ELK implementation of ElkClassAssertionAxiom.
+ * Implementation of {@link ElkClassAssertionAxiom}.
  * 
  * @author Markus Kroetzsch
  * 
@@ -38,38 +39,42 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkClassAssertionAxiomImpl extends ElkObjectImpl implements
 		ElkClassAssertionAxiom {
 
-	protected final ElkIndividual individual;
-	protected final ElkClassExpression classExpression;
+	private final ElkIndividual individual_;
+	private final ElkClassExpression classExpression_;
 
 	ElkClassAssertionAxiomImpl(ElkClassExpression classExpression,
 			ElkIndividual individual) {
-
-		this.individual = individual;
-		this.classExpression = classExpression;
+		this.individual_ = individual;
+		this.classExpression_ = classExpression;
 	}
 
 	@Override
 	public ElkClassExpression getClassExpression() {
-		return classExpression;
+		return classExpression_;
 	}
 
 	@Override
 	public ElkIndividual getIndividual() {
-		return individual;
+		return individual_;
 	}
 
 	@Override
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkClassAssertionAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkClassAssertionAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkClassAssertionAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkClassAssertionAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

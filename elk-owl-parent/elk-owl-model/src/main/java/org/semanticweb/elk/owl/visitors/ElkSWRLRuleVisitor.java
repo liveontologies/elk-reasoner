@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.owl.visitors;
+
 /*
  * #%L
  * ELK OWL Object Interfaces
@@ -29,9 +30,9 @@ import org.semanticweb.elk.owl.interfaces.ElkSWRLRule;
 /**
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
 public interface ElkSWRLRuleVisitor<O> {
 
-	O visit(ElkSWRLRule rule);
+	O visit(ElkSWRLRule axiom);
 }

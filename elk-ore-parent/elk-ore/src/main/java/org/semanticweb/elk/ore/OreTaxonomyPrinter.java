@@ -44,7 +44,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceNode;
@@ -73,7 +73,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 
 			writer.append("Ontology(\n");
 
-			new OreTaxonomyPrinter().processTaxomomy(taxonomy, writer);
+			processTaxomomy(taxonomy, writer);
 
 			writer.append(")\n");
 			writer.flush();
@@ -96,7 +96,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 
 			writer.append("Ontology(\n");
 
-			new OreTaxonomyPrinter().processInstanceTaxomomy(taxonomy, writer);
+			processInstanceTaxomomy(taxonomy, writer);
 
 			writer.append(")\n");
 			writer.flush();
@@ -107,8 +107,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 		}
 	}
 
-	@Override
-	protected void processTaxomomy(Taxonomy<ElkClass> classTaxonomy,
+	protected static void processTaxomomy(Taxonomy<ElkClass> classTaxonomy,
 			Appendable writer) throws IOException {
 		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
 
@@ -143,8 +142,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 		}
 	}
 
-	@Override
-	protected void processInstanceTaxomomy(
+	protected static void processInstanceTaxomomy(
 			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy,
 			Writer writer) throws IOException {
 		ElkObjectFactory objectFactory = new ElkObjectFactoryImpl();
@@ -152,7 +150,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 		printIndividualDeclarations(taxonomy.getInstanceNodes(), objectFactory,
 				writer);
 		// TBox printed here
-		//processTaxomomy(taxonomy, writer);
+		// processTaxomomy(taxonomy, writer);
 		// print the ABox
 		TreeSet<ElkNamedIndividual> canonicalIndividuals = new TreeSet<ElkNamedIndividual>(
 				INDIVIDUAL_COMPARATOR);
@@ -184,8 +182,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 		}
 	}
 
-	@Override
-	protected void printClassAxioms(ElkClass elkClass,
+	protected static void printClassAxioms(ElkClass elkClass,
 			ArrayList<ElkClass> orderedEquivalentClasses,
 			TreeSet<ElkClass> orderedSubClasses, Appendable writer)
 			throws IOException {
@@ -201,8 +198,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 		}
 
 		for (ElkClass elkSubClass : orderedSubClasses)
-			if (!elkSubClass.getIri()
-					.equals(PredefinedElkIri.OWL_NOTHING.get())) {
+			if (!elkSubClass.getIri().equals(PredefinedElkIris.OWL_NOTHING)) {
 				ElkSubClassOfAxiom elkSubClassAxiom = objectFactory
 						.getSubClassOfAxiom(elkSubClass, elkClass);
 				OwlFunctionalStylePrinter
@@ -211,8 +207,7 @@ public class OreTaxonomyPrinter extends TaxonomyPrinter {
 			}
 	}
 
-	@Override
-	protected void printIndividualAxioms(ElkNamedIndividual individual,
+	protected static void printIndividualAxioms(ElkNamedIndividual individual,
 			ArrayList<ElkNamedIndividual> orderedSameIndividuals,
 			TreeSet<ElkClass> orderedDirectClasses,
 			ElkObjectFactory objectFactory, Writer writer) throws IOException {

@@ -26,10 +26,6 @@
 package org.semanticweb.elk.owl.visitors;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 
 /**
  * Visitor pattern interface for instances of {@link ElkClassAxiom}.
@@ -38,16 +34,12 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
  * @author Markus Kroetzsch
  * 
  * @param <O>
- *            the output type of the visitor
+ *            the type of the output of this visitor
  */
-public interface ElkClassAxiomVisitor<O> {
+public interface ElkClassAxiomVisitor<O> extends
+		ElkDisjointClassesAxiomVisitor<O>, ElkDisjointUnionAxiomVisitor<O>,
+		ElkEquivalentClassesAxiomVisitor<O>, ElkSubClassOfAxiomVisitor<O> {
 
-	O visit(ElkDisjointClassesAxiom elkDisjointClasses);
-
-	O visit(ElkDisjointUnionAxiom elkDisjointUnionAxiom);
-
-	O visit(ElkEquivalentClassesAxiom elkEquivalentClassesAxiom);
-
-	O visit(ElkSubClassOfAxiom elkSubClassOfAxiom);
+	// combined visitor
 
 }

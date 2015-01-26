@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  */
 public class DisjointSubsumerFromSubsumer extends DisjointSubsumerImpl implements Inference {
 
-	public DisjointSubsumerFromSubsumer(IndexedDisjointnessAxiom axiom,
+	public DisjointSubsumerFromSubsumer(IndexedDisjointClassesAxiom axiom,
 			IndexedClassExpression member) {
 		super(axiom, member);
 	}

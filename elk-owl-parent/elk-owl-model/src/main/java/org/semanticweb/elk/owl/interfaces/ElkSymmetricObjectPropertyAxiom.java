@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkSymmetricObjectPropertyAxiomVisitor;
+
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Symmetric_Object_Properties">Symmetric
@@ -35,4 +37,14 @@ package org.semanticweb.elk.owl.interfaces;
  */
 public interface ElkSymmetricObjectPropertyAxiom extends
 		ElkObjectPropertyAxiom, ElkPropertyAxiom<ElkObjectPropertyExpression> {
+
+	/**
+	 * Accept an {@link ElkSymmetricObjectPropertyAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(
+			ElkSymmetricObjectPropertyAxiomVisitor<O> visitor);
 }

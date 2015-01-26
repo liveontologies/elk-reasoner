@@ -45,7 +45,7 @@ public interface Chain<T extends ModifiableLink<T>> extends ModifiableLink<T> {
 	 * @return the object contained in the chain that satisfies the provided
 	 *         {@link Matcher} or {@code null} if no such element is found
 	 */
-	public <S extends T> S find(Matcher<T, S> matcher);
+	public <S extends T> S find(Matcher<? super T, S> matcher);
 
 	/**
 	 * Finds an element in the chain satisfies the provided {@link Matcher}, or
@@ -61,7 +61,7 @@ public interface Chain<T extends ModifiableLink<T>> extends ModifiableLink<T> {
 	 *         in the chain, or the newly created and inserted element object
 	 *         otherwise
 	 */
-	public <S extends T> S getCreate(Matcher<T, S> matcher,
+	public <S extends T> S getCreate(Matcher<? super T, S> matcher,
 			ReferenceFactory<T, S> factory);
 
 	/**
@@ -72,6 +72,6 @@ public interface Chain<T extends ModifiableLink<T>> extends ModifiableLink<T> {
 	 *            the object describing the element to search for
 	 * @return the removed element, if found, or {@code null} if not found
 	 */
-	public <S extends T> S remove(Matcher<T, S> descriptor);
+	public <S extends T> S remove(Matcher<? super T, S> descriptor);
 
 }

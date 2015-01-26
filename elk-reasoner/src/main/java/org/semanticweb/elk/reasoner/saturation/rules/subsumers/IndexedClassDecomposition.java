@@ -24,8 +24,10 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -37,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * A {@link SubsumerDecompositionRule} that processes an {@link IndexedClass}
  * and produces {@link Subsumer}s for its definition
  * 
- * @see IndexedClass#getDefinedClassExpression()
+ * @see IndexedClass#getDefinition()
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -56,20 +58,21 @@ public class IndexedClassDecomposition extends
 		return NAME;
 	}
 
-	public static boolean tryAddRuleFor(IndexedDefinitionAxiom axiom,
+	public static boolean tryAddRuleFor(ModifiableIndexedDefinitionAxiom axiom,
 			ModifiableOntologyIndex index) {
-		IndexedClass definedClass = axiom.getDefinedClass();
-		IndexedClassExpression definition = axiom.getDefinition();
+		ModifiableIndexedClass definedClass = axiom.getDefinedClass();
+		ModifiableIndexedClassExpression definition = axiom.getDefinition();
 		boolean success = index.tryAddDefinition(definedClass, definition);
 		if (success)
 			LOGGER_.trace("{}: added definition {}", definedClass, definition);
 		return success;
 	}
 
-	public static boolean tryRemoveRuleFor(IndexedDefinitionAxiom axiom,
+	public static boolean tryRemoveRuleFor(
+			ModifiableIndexedDefinitionAxiom axiom,
 			ModifiableOntologyIndex index) {
-		IndexedClass definedClass = axiom.getDefinedClass();
-		IndexedClassExpression definition = axiom.getDefinition();
+		ModifiableIndexedClass definedClass = axiom.getDefinedClass();
+		ModifiableIndexedClassExpression definition = axiom.getDefinition();
 		boolean success = index.tryRemoveDefinition(definedClass, definition);
 		if (success)
 			LOGGER_.trace("{}: removed definition {}", definedClass, definition);
@@ -101,7 +104,7 @@ public class IndexedClassDecomposition extends
 			IndexedClass premise) {
 		// by default take from the premise, but it may be overridden, e.g., for
 		// incremental reasoning
-		return premise.getDefinedClassExpression();
+		return premise.getDefinition();
 	}
 
 }

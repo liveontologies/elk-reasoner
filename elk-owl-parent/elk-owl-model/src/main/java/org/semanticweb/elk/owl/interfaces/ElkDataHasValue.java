@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkDataHasValueVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Literal_Value_Restriction">Literal Value
@@ -34,5 +36,14 @@ package org.semanticweb.elk.owl.interfaces;
  */
 public interface ElkDataHasValue extends
 		ElkPropertyRestrictionQualified<ElkDataPropertyExpression, ElkLiteral> {
+
+	/**
+	 * Accept an {@link ElkDataHasValueVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkDataHasValueVisitor<O> visitor);
 
 }

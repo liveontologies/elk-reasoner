@@ -30,14 +30,14 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
@@ -119,7 +119,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 	@Override
 	public void execute() {
 		// starting from indexed class expressions
-		for (IndexedClassExpression ice : index_.getIndexedClassExpressions()) {
+		for (IndexedClassExpression ice : index_.getClassExpressions()) {
 			iceValidator_.add(ice);
 		}
 		for (;;) {
@@ -262,7 +262,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		public void visit(DisjointSubsumerFromMemberRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
-			for (IndexedDisjointnessAxiom axiom : rule.getDisjointnessAxioms()) {
+			for (IndexedDisjointClassesAxiom axiom : rule
+					.getDisjointnessAxioms()) {
 				if (!axiom.occurs()) {
 					LOGGER_.error("Dead disjointness axiom: " + axiom);
 				}

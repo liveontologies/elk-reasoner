@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkObjectMaxCardinalityQualifiedVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Maximum_Cardinality">maximum cardinality
@@ -37,4 +39,13 @@ public interface ElkObjectMaxCardinalityQualified
 		extends
 		ElkObjectMaxCardinality,
 		ElkCardinalityRestrictionQualified<ElkObjectPropertyExpression, ElkClassExpression> {
+
+	/**
+	 * Accept an {@link ElkObjectMaxCardinalityQualifiedVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkObjectMaxCardinalityQualifiedVisitor<O> visitor);
 }

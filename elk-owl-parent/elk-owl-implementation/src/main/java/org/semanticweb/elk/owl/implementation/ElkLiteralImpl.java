@@ -24,6 +24,7 @@ package org.semanticweb.elk.owl.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
+import org.semanticweb.elk.owl.visitors.ElkAnnotationValueVisitor;
 import org.semanticweb.elk.owl.visitors.ElkLiteralVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
@@ -59,7 +60,12 @@ public class ElkLiteralImpl extends ElkObjectImpl implements ElkLiteral {
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkLiteralVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkAnnotationValueVisitor<O> visitor) {
+		return accept((ElkLiteralVisitor<O>) visitor);
 	}
 
 }

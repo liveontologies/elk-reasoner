@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkAnnotationVisitor;
+
 /**
  * The basic interface for annotation objects in OWL 2 as defined in <a
  * href="http://www.w3.org/TR/owl2-syntax/#Annotations">Section 10</a> of the
@@ -47,4 +49,13 @@ public interface ElkAnnotation extends ElkObject {
 	public ElkAnnotationProperty getProperty();
 
 	public ElkAnnotationValue getValue();
+
+	/**
+	 * Accept an {@link ElkAnnotationVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkAnnotationVisitor<O> visitor);
 }

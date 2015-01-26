@@ -22,9 +22,7 @@
  */
 package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 
 /**
  * Visitor interface for {@link ElkIndividual}.
@@ -34,11 +32,11 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
  * @author "Yevgeny Kazakov"
  * 
  * @param <O>
- *            the output type of the visitor
+ *            the type of the output of this visitor
  */
-public interface ElkIndividualVisitor<O> {
+public interface ElkIndividualVisitor<O> extends
+		ElkAnonymousIndividualVisitor<O>, ElkNamedIndividualVisitor<O> {
 
-	O visit(ElkAnonymousIndividual elkAnonymousIndividual);
+	// combined visitor
 
-	O visit(ElkNamedIndividual elkNamedIndividual);
 }

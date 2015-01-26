@@ -23,8 +23,10 @@
 package org.semanticweb.elk.owl.implementation;
 
 import org.semanticweb.elk.owl.interfaces.ElkPropertyRestrictionQualified;
+import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionQualifiedVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionVisitor;
 
-/** 
+/**
  * Implementation of {@link ElkPropertyRestrictionQualified}
  * 
  * @author "Yevgeny Kazakov"
@@ -38,16 +40,21 @@ public abstract class ElkPropertyRestrictionQualifiedImpl<P, F> extends
 		ElkPropertyRestrictionImpl<P> implements
 		ElkPropertyRestrictionQualified<P, F> {
 
-	protected final F filler;
+	private final F filler_;
 
 	ElkPropertyRestrictionQualifiedImpl(P property, F filler) {
 		super(property);
-		this.filler = filler;
+		this.filler_ = filler;
 	}
 
 	@Override
 	public F getFiller() {
-		return this.filler;
+		return this.filler_;
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyRestrictionVisitor<O> visitor) {
+		return accept((ElkPropertyRestrictionQualifiedVisitor<O>) visitor);
 	}
 
 }

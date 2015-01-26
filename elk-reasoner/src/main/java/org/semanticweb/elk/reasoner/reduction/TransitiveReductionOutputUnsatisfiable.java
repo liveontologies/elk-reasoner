@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.reduction;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
- * The result of the transitive reduction for satisfiable
+ * The result of the transitive reduction for unsatisfiable
  * {@link IndexedClassExpression}s. No further information is computed here.
  * 
  * @author "Yevgeny Kazakov"

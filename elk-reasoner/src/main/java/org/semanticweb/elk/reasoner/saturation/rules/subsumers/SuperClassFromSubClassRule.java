@@ -26,10 +26,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDefinitionAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDefinitionAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubClassOfAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -77,36 +80,54 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 		super(null);
 		this.toldSuperClassExpressions_ = new ArrayList<IndexedClassExpression>(
 				1);
-
-		toldSuperClassExpressions_.add(ice);
+		this.toldSuperClassExpressions_.add(ice);
 	}
 
-	public static void addRuleFor(IndexedSubClassOfAxiom axiom,
+	public static boolean addRuleFor(ModifiableIndexedSubClassOfAxiom axiom,
 			ModifiableOntologyIndex index) {
-		index.add(axiom.getSubClass(),
+		return index.add(axiom.getSubClass(), new SuperClassFromSubClassRule(
+				axiom.getSuperClass()));
+	}
+
+	public static boolean removeRuleFor(ModifiableIndexedSubClassOfAxiom axiom,
+			ModifiableOntologyIndex index) {
+		return index.remove(axiom.getSubClass(),
 				new SuperClassFromSubClassRule(axiom.getSuperClass()));
 	}
 
-	public static void removeRuleFor(IndexedSubClassOfAxiom axiom,
+	public static boolean addRulesFor(ModifiableIndexedDefinitionAxiom axiom,
 			ModifiableOntologyIndex index) {
-		index.remove(axiom.getSubClass(),
-				new SuperClassFromSubClassRule(axiom.getSuperClass()));
+		ModifiableIndexedClass definedClass = axiom.getDefinedClass();
+		ChainableSubsumerRule firstRule = new SuperClassFromSubClassRule(
+				axiom.getDefinition());
+		if (!index.add(definedClass, firstRule))
+			return false;
+		if (!index.add(axiom.getDefinition(), new SuperClassFromSubClassRule(
+				axiom.getDefinedClass()))) {
+			// revert all changes
+			if (!index.remove(definedClass, firstRule))
+				throw new ElkUnexpectedIndexingException(axiom);
+			return false;
+		}
+		return true;
 	}
 
-	public static void addRulesFor(IndexedDefinitionAxiom axiom,
+	public static boolean removeRulesFor(
+			ModifiableIndexedDefinitionAxiom axiom,
 			ModifiableOntologyIndex index) {
-		index.add(axiom.getDefinedClass(),
-				new SuperClassFromSubClassRule(axiom.getDefinition()));
-		index.add(axiom.getDefinition(),
-				new SuperClassFromSubClassRule(axiom.getDefinedClass()));
-	}
-
-	public static void removeRulesFor(IndexedDefinitionAxiom axiom,
-			ModifiableOntologyIndex index) {
-		index.remove(axiom.getDefinedClass(), new SuperClassFromSubClassRule(
-				axiom.getDefinition()));
-		index.remove(axiom.getDefinition(), new SuperClassFromSubClassRule(
-				axiom.getDefinedClass()));
+		ModifiableIndexedClass definedClass = axiom.getDefinedClass();
+		ChainableSubsumerRule firstRule = new SuperClassFromSubClassRule(
+				axiom.getDefinition());
+		if (!index.remove(definedClass, firstRule))
+			return false;
+		if (!index.remove(axiom.getDefinition(),
+				new SuperClassFromSubClassRule(axiom.getDefinedClass()))) {
+			// revert all changes
+			if (!index.add(definedClass, firstRule))
+				throw new ElkUnexpectedIndexingException(axiom);
+			return false;
+		}
+		return true;
 	}
 
 	// TODO: hide this method
@@ -133,45 +154,72 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 
 	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		SuperClassFromSubClassRule rule = ruleChain.getCreate(
 				SuperClassFromSubClassRule.MATCHER_,
 				SuperClassFromSubClassRule.FACTORY_);
-		boolean changed = false;
-
+		boolean success = true;
+		int added = 0;
 		for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-			LOGGER_.trace("Adding {} to {}", ice, NAME);
-
-			changed |= rule.addToldSuperClassExpression(ice);
+			LOGGER_.trace("{}: adding to {}", ice, NAME);
+			if (rule.toldSuperClassExpressions_.add(ice)) {
+				added++;
+			} else {
+				success = false;
+				break;
+			}
 		}
-
-		return changed;
-
+		if (success) {
+			return true;
+		}
+		// else revert all changes
+		for (IndexedClassExpression ice : toldSuperClassExpressions_) {
+			if (added == 0)
+				break;
+			added--;
+			LOGGER_.trace("{}: removing from {} [revert]", ice, NAME);
+			rule.toldSuperClassExpressions_.remove(ice);
+		}
+		return false;
 	}
 
 	@Override
 	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		SuperClassFromSubClassRule rule = ruleChain
 				.find(SuperClassFromSubClassRule.MATCHER_);
-		boolean changed = false;
-
-		if (rule != null) {
-			for (IndexedClassExpression ice : toldSuperClassExpressions_) {
-				LOGGER_.trace("Removing {} from {}", ice, NAME);
-
-				changed |= rule.removeToldSuperClassExpression(ice);
-			}
-
-			if (rule.isEmpty()) {
-				ruleChain.remove(SuperClassFromSubClassRule.MATCHER_);
-
-				LOGGER_.trace("{}: removed ", NAME);
-
-				return true;
+		if (rule == null)
+			return false;
+		// else
+		boolean success = true;
+		int removed = 0;
+		for (IndexedClassExpression ice : toldSuperClassExpressions_) {
+			LOGGER_.trace("{}: removing from {}", ice, NAME);
+			if (rule.toldSuperClassExpressions_.remove(ice)) {
+				removed++;
+			} else {
+				success = false;
+				break;
 			}
 		}
-
-		return changed;
-
+		if (success) {
+			if (rule.isEmpty()) {
+				ruleChain.remove(SuperClassFromSubClassRule.MATCHER_);
+				LOGGER_.trace("{}: removed ", NAME);
+			}
+			return true;
+		}
+		// else revert all changes
+		for (IndexedClassExpression ice : toldSuperClassExpressions_) {
+			if (removed == 0)
+				break;
+			removed--;
+			LOGGER_.trace("{}: adding to {} [revert]", ice, NAME);
+			rule.toldSuperClassExpressions_.add(ice);
+		}
+		return false;
 	}
 
 	@Override
@@ -179,20 +227,6 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 			IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		visitor.visit(this, premise, premises, producer);
-	}
-
-	protected boolean addToldSuperClassExpression(
-			IndexedClassExpression superClassExpression) {
-		return toldSuperClassExpressions_.add(superClassExpression);
-	}
-
-	/**
-	 * @param superClassExpression
-	 * @return true if successfully removed
-	 */
-	protected boolean removeToldSuperClassExpression(
-			IndexedClassExpression superClassExpression) {
-		return toldSuperClassExpressions_.remove(superClassExpression);
 	}
 
 	/**

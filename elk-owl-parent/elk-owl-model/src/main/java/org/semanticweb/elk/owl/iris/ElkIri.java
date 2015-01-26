@@ -24,6 +24,9 @@ package org.semanticweb.elk.owl.iris;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
+import org.semanticweb.elk.owl.visitors.ElkAnnotationSubjectVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAnnotationValueVisitor;
+import org.semanticweb.elk.owl.visitors.ElkIriVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -78,8 +81,28 @@ public abstract class ElkIri implements Comparable<ElkIri>,
 		return this.getFullIriAsString().compareTo(arg.getFullIriAsString());
 	}
 
+	/**
+	 * Accept an {@link ElkIriVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(ElkIriVisitor<O> visitor);
+
+	@Override
+	public <O> O accept(ElkAnnotationSubjectVisitor<O> visitor) {
+		return accept((ElkIriVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkAnnotationValueVisitor<O> visitor) {
+		return accept((ElkIriVisitor<O>) visitor);
+	}
+
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkIriVisitor<O>) visitor);
 	}
+
 }

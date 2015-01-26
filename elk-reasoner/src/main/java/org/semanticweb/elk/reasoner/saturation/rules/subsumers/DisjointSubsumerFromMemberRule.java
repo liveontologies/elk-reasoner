@@ -25,8 +25,10 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -40,7 +42,7 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 /**
  * A {@link ChainableSubsumerRule} producing {@link DisjointSubsumer} when
  * processing an {@link IndexedClassExpression} that is present in an
- * {@link IndexedDisjointnessAxiom} of this {@link DisjointSubsumer} exactly
+ * {@link IndexedDisjointClassesAxiom} of this {@link DisjointSubsumer} exactly
  * once.
  * 
  * @author Pavel Klinov
@@ -54,35 +56,74 @@ public class DisjointSubsumerFromMemberRule extends
 	public static final String NAME = "DisjointClasses Introduction";
 
 	/**
-	 * Set of relevant {@link IndexedDisjointnessAxiom}s in which the member,
+	 * Set of relevant {@link IndexedDisjointClassesAxiom}s in which the member,
 	 * for which this rule is registered, appears.
 	 */
-	private final Set<IndexedDisjointnessAxiom> disjointnessAxioms_;
+	private final Set<IndexedDisjointClassesAxiom> disjointnessAxioms_;
 
 	private DisjointSubsumerFromMemberRule(ChainableSubsumerRule tail) {
 		super(tail);
-		disjointnessAxioms_ = new ArrayHashSet<IndexedDisjointnessAxiom>();
+		disjointnessAxioms_ = new ArrayHashSet<IndexedDisjointClassesAxiom>();
 	}
 
-	private DisjointSubsumerFromMemberRule(IndexedDisjointnessAxiom axiom) {
+	private DisjointSubsumerFromMemberRule(IndexedDisjointClassesAxiom axiom) {
 		this((ChainableSubsumerRule) null);
 		disjointnessAxioms_.add(axiom);
 	}
 
-	public static void addRulesFor(IndexedDisjointnessAxiom axiom,
+	public static boolean addRulesFor(ModifiableIndexedDisjointClassesAxiom axiom,
 			ModifiableOntologyIndex index) {
-		for (IndexedClassExpression ice : axiom.getDisjointMembers())
-			index.add(ice, new DisjointSubsumerFromMemberRule(axiom));
+		boolean success = true;
+		int added = 0;
+		for (ModifiableIndexedClassExpression ice : axiom.getDisjointMembers()) {
+			if (index.add(ice, new DisjointSubsumerFromMemberRule(axiom))) {
+				added++;
+			} else {
+				success = false;
+				break;
+			}
+		}
+		if (success)
+			return true;
+		// else revert the changes made
+		for (ModifiableIndexedClassExpression ice : axiom.getDisjointMembers()) {
+			if (added == 0)
+				break;
+			// else
+			added--;
+			index.remove(ice, new DisjointSubsumerFromMemberRule(axiom));
+		}
+		return false;
 	}
 
-	public static void removeRulesFor(IndexedDisjointnessAxiom axiom,
+	public static boolean removeRulesFor(
+			ModifiableIndexedDisjointClassesAxiom axiom,
 			ModifiableOntologyIndex index) {
-		for (IndexedClassExpression ice : axiom.getDisjointMembers())
-			index.remove(ice, new DisjointSubsumerFromMemberRule(axiom));
+		boolean success = true;
+		int removed = 0;
+		for (ModifiableIndexedClassExpression ice : axiom.getDisjointMembers()) {
+			if (index.remove(ice, new DisjointSubsumerFromMemberRule(axiom))) {
+				removed++;
+			} else {
+				success = false;
+				break;
+			}
+		}
+		if (success)
+			return true;
+		// else revert the changes made
+		for (ModifiableIndexedClassExpression ice : axiom.getDisjointMembers()) {
+			if (removed == 0)
+				break;
+			// else
+			removed--;
+			index.add(ice, new DisjointSubsumerFromMemberRule(axiom));
+		}
+		return false;
 	}
 
 	// TODO: hide this method
-	public Set<IndexedDisjointnessAxiom> getDisjointnessAxioms() {
+	public Set<IndexedDisjointClassesAxiom> getDisjointnessAxioms() {
 		return disjointnessAxioms_;
 	}
 
@@ -101,34 +142,60 @@ public class DisjointSubsumerFromMemberRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		for (IndexedDisjointnessAxiom disAxiom : disjointnessAxioms_)
-			/*producer.produce(premises.getRoot(), new DisjointSubsumerImpl(
-					disAxiom, premise));*/
-			producer.produce(premises.getRoot(), new DisjointSubsumerFromSubsumer(disAxiom, premise));
-	}
-
-	protected boolean isEmpty() {
-		return disjointnessAxioms_.isEmpty();
+		for (IndexedDisjointClassesAxiom disAxiom : disjointnessAxioms_)
+			/*
+			 * producer.produce(premises.getRoot(), new DisjointSubsumerImpl(
+			 * disAxiom, premise));
+			 */
+			producer.produce(premises.getRoot(),
+					new DisjointSubsumerFromSubsumer(disAxiom, premise));
 	}
 
 	@Override
 	public boolean addTo(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		DisjointSubsumerFromMemberRule rule = ruleChain.getCreate(MATCHER_,
 				FACTORY_);
-		return rule.disjointnessAxioms_.addAll(this.disjointnessAxioms_);
+		rule.disjointnessAxioms_.addAll(this.disjointnessAxioms_);
+		return true;
 	}
 
 	@Override
 	public boolean removeFrom(Chain<ChainableSubsumerRule> ruleChain) {
+		if (isEmpty())
+			return true;
 		DisjointSubsumerFromMemberRule rule = ruleChain.find(MATCHER_);
-		boolean changed = false;
-		if (rule != null) {
-			changed = rule.disjointnessAxioms_
-					.removeAll(this.disjointnessAxioms_);
+		if (rule == null)
+			return false;
+		// else trying to remove the axioms
+		int removed = 0;
+		boolean success = true;
+		for (IndexedDisjointClassesAxiom axiom : this.disjointnessAxioms_) {
+			if (rule.disjointnessAxioms_.remove(axiom))
+				removed++;
+			else {
+				success = false;
+				break;
+			}
+		}
+		if (success) {
 			if (rule.isEmpty())
 				ruleChain.remove(MATCHER_);
+			return true;
 		}
-		return changed;
+		// else revert all changes
+		for (IndexedDisjointClassesAxiom axiom : this.disjointnessAxioms_) {
+			if (removed == 0)
+				break;
+			removed--;
+			rule.disjointnessAxioms_.add(axiom);
+		}
+		return false;
+	}
+
+	private boolean isEmpty() {
+		return disjointnessAxioms_.isEmpty();
 	}
 
 	private static Matcher<ChainableSubsumerRule, DisjointSubsumerFromMemberRule> MATCHER_ = new SimpleTypeBasedMatcher<ChainableSubsumerRule, DisjointSubsumerFromMemberRule>(

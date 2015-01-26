@@ -32,9 +32,9 @@ import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
  * @author "Yevgeny Kazakov"
  * 
  * @param <O>
- *            the output type of the visitor
+ *            the type of the output of this visitor
  */
 public interface ElkDeclarationAxiomVisitor<O> {
 
-	O visit(ElkDeclarationAxiom elkDeclarationAxiom);
+	O visit(ElkDeclarationAxiom axiom);
 }

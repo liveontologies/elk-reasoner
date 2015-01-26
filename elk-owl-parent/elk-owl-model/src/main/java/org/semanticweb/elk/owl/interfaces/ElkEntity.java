@@ -26,6 +26,7 @@
 package org.semanticweb.elk.owl.interfaces;
 
 import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.predefined.ElkEntityType;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 
 /**
@@ -43,10 +44,15 @@ public interface ElkEntity extends ElkObject {
 	public ElkIri getIri();
 
 	/**
+	 * @return the type of this entity
+	 */
+	public ElkEntityType getEntityType();
+
+	/**
 	 * Accept an {@link ElkEntityVisitor}.
 	 * 
 	 * @param visitor
-	 *            the visitor that can work with this axiom type
+	 *            the visitor that can work with this object type
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkEntityVisitor<O> visitor);

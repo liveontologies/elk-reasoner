@@ -28,7 +28,7 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
@@ -88,13 +88,13 @@ public class SaturatedPropertyChain {
 	 * A {@link Multimap} from R to S such that ObjectPropertyChain(R, root)
 	 * implies S
 	 */
-	AbstractHashMultimap<IndexedObjectProperty, IndexedBinaryPropertyChain> compositionsByLeftSubProperty;
+	AbstractHashMultimap<IndexedObjectProperty, IndexedComplexPropertyChain> compositionsByLeftSubProperty;
 
 	/**
 	 * A {@link Multimap} from R to S such that ObjectPropertyChain(root, R)
 	 * implies S
 	 */
-	AbstractHashMultimap<IndexedPropertyChain, IndexedBinaryPropertyChain> compositionsByRightSubProperty;
+	AbstractHashMultimap<IndexedPropertyChain, IndexedComplexPropertyChain> compositionsByRightSubProperty;
 
 	public SaturatedPropertyChain(IndexedPropertyChain ipc) {
 		this.root = ipc;
@@ -163,9 +163,9 @@ public class SaturatedPropertyChain {
 	 * @return A {@link Multimap} from R to S such that ObjectPropertyChain(R,
 	 *         root) implies S
 	 */
-	public Multimap<IndexedObjectProperty, IndexedBinaryPropertyChain> getCompositionsByLeftSubProperty() {
+	public Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> getCompositionsByLeftSubProperty() {
 		return compositionsByLeftSubProperty == null ? Operations
-				.<IndexedObjectProperty, IndexedBinaryPropertyChain> emptyMultimap()
+				.<IndexedObjectProperty, IndexedComplexPropertyChain> emptyMultimap()
 				: compositionsByLeftSubProperty;
 	}
 
@@ -173,9 +173,9 @@ public class SaturatedPropertyChain {
 	 * @return A {@link Multimap} from R to S such that
 	 *         ObjectPropertyChain(root, R) implies S
 	 */
-	public Multimap<IndexedPropertyChain, IndexedBinaryPropertyChain> getCompositionsByRightSubProperty() {
+	public Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> getCompositionsByRightSubProperty() {
 		return compositionsByRightSubProperty == null ? Operations
-				.<IndexedPropertyChain, IndexedBinaryPropertyChain> emptyMultimap()
+				.<IndexedPropertyChain, IndexedComplexPropertyChain> emptyMultimap()
 				: compositionsByRightSubProperty;
 	}
 
@@ -192,24 +192,6 @@ public class SaturatedPropertyChain {
 			return false;
 		isDerivedReflexive_ = true;
 		return true;
-	}
-
-	/**
-	 * @param ipc
-	 *            the {@link IndexedPropertyChain} for which to retrieve the
-	 *            assigned {@link SaturatedPropertyChain}
-	 * @return the {@link SaturatedPropertyChain} assigned to the given
-	 *         {@link IndexedPropertyChain} creating new assignment if necessary
-	 */
-	public static SaturatedPropertyChain getCreate(IndexedPropertyChain ipc) {
-		SaturatedPropertyChain saturated = ipc.getSaturated();
-		if (saturated == null) {
-			saturated = new SaturatedPropertyChain(ipc);
-			SaturatedPropertyChain previous = ipc.setSaturated(saturated);
-			if (previous != null)
-				return previous;
-		}
-		return saturated;
 	}
 
 	/**

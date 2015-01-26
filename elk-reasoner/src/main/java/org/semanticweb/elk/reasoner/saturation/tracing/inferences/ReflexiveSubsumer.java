@@ -50,7 +50,7 @@ public class ReflexiveSubsumer<S extends IndexedObjectSomeValuesFrom> extends
 	}
 
 	public IndexedPropertyChain getRelation() {
-		return getExpression().getRelation();
+		return getExpression().getProperty();
 	}
 
 	@Override

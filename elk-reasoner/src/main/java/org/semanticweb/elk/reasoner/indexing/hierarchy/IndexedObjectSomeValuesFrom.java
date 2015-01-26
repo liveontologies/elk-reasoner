@@ -22,8 +22,9 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -31,90 +32,53 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 
 /**
- * Represents all occurrences of an {@link ElkObjectSomeValuesFrom} in an
- * ontology.
+ * Represents occurrences of an {@link ElkObjectSomeValuesFrom} in an ontology.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
  */
-public class IndexedObjectSomeValuesFrom extends IndexedClassExpression {
-
-	protected final IndexedObjectProperty property;
-
-	protected final IndexedClassExpression filler;
-
-	IndexedObjectSomeValuesFrom(IndexedObjectProperty indexedObjectProperty,
-			IndexedClassExpression filler) {
-		this.property = indexedObjectProperty;
-		this.filler = filler;
-	}
+public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	/**
-	 * @return The indexed object property comprising this ObjectSomeValuesFrom.
-	 */
-	public IndexedObjectProperty getRelation() {
-		return property;
-	}
-
-	/**
-	 * @return The indexed class expression comprising this
-	 *         ObjectSomeValuesFrom.
-	 */
-	public IndexedClassExpression getFiller() {
-		return filler;
-	}
-
-	public <O> O accept(IndexedObjectSomeValuesFromVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedObjectSomeValuesFromVisitor<O>) visitor);
-	}
-
-	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			final int increment, final int positiveIncrement,
-			final int negativeIncrement) {
-
-		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
-			// first negative occurrence of this expression
-			PropagationFromExistentialFillerRule.addRuleFor(this, index);
-		}
-
-		positiveOccurrenceNo += positiveIncrement;
-		negativeOccurrenceNo += negativeIncrement;
-
-		if (negativeOccurrenceNo == 0 && negativeIncrement < 0) {
-			// no negative occurrences of this expression left
-			PropagationFromExistentialFillerRule.removeRuleFor(this, index);
-		}
-
-	}
-
-	/**
-	 * Generates {@link PropagationImpl}s for the {@link ContextPremises} that apply
-	 * for the given {@link IndexedObjectProperty}
+	 * @return The representation of the {@link ElkObjectPropertyExpression}
+	 *         that is a property of the {@link ElkObjectSomeValuesFrom}
+	 *         represented by this {@link IndexedObjectSomeValuesFrom}.
 	 * 
-	 * @param property
-	 * @param premises
-	 * @param producer
+	 * @see ElkObjectSomeValuesFrom#getProperty()
 	 */
-	public static void generatePropagations(IndexedObjectProperty property,
-			ContextPremises premises, ConclusionProducer producer) {
-		for (IndexedClassExpression ice : premises.getComposedSubsumers()) {
-			PropagationFromExistentialFillerRule
-					.applyForProperty(ice.getCompositionRuleChain(), property,
-							premises, producer);
-		}
-	}
+	public IndexedObjectProperty getProperty();
 
-	@Override
-	public String toStringStructural() {
-		return "ObjectSomeValuesFrom(" + this.property + ' ' + this.filler
-				+ ')';
+	/**
+	 * @return The representation of the {@link ElkClassExpression} that is a
+	 *         filler of the {@link ElkObjectSomeValuesFrom} represented by this
+	 *         {@link IndexedObjectSomeValuesFrom}.
+	 * 
+	 * @see ElkObjectSomeValuesFrom#getFiller()
+	 */
+	public IndexedClassExpression getFiller();
+
+	public <O> O accept(IndexedObjectSomeValuesFromVisitor<O> visitor);
+
+	class Helper {
+
+		/**
+		 * Generates {@link PropagationImpl}s for the {@link ContextPremises}
+		 * that apply for the given {@link IndexedObjectProperty}
+		 * 
+		 * @param property
+		 * @param premises
+		 * @param producer
+		 */
+		public static void generatePropagations(IndexedObjectProperty property,
+				ContextPremises premises, ConclusionProducer producer) {
+			for (IndexedClassExpression ice : premises.getComposedSubsumers()) {
+				PropagationFromExistentialFillerRule.applyForProperty(
+						ice.getCompositionRuleHead(), property, premises,
+						producer);
+			}
+		}
+
 	}
 
 }

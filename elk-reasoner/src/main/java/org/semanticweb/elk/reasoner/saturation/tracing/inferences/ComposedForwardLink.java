@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -56,7 +56,7 @@ public class ComposedForwardLink extends ForwardLinkImpl implements Inference {
 			IndexedClassExpression inferenceContext,
 			IndexedPropertyChain forwardLinkChain,
 			IndexedClassExpression linkTarget,
-			IndexedBinaryPropertyChain composition) {
+			IndexedComplexPropertyChain composition) {
 		super(composition, linkTarget);
 		this.backwardLinkSource_ = linkSource;
 		this.backwardLinkRelation_ = backwardLinkRelation;

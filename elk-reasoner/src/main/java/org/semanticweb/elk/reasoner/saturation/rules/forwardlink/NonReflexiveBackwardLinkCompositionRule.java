@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
 import java.util.Collection;
 import java.util.Map;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
@@ -33,6 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLi
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -84,8 +85,9 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 	public void apply(ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		/* compose the link with all non-reflexive backward links */
-		final Multimap<IndexedObjectProperty, IndexedBinaryPropertyChain> comps = this.forwardLink_
-				.getRelation().getSaturated()
+		SaturatedPropertyChain linkSaturation = this.forwardLink_.getRelation()
+				.getSaturated();
+		final Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> comps = linkSaturation
 				.getCompositionsByLeftSubProperty();
 		final Map<IndexedObjectProperty, ? extends SubContextPremises> subContextMap = premises
 				.getSubContextPremisesByObjectProperty();
@@ -93,12 +95,12 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 		for (IndexedObjectProperty backwardRelation : new LazySetIntersection<IndexedObjectProperty>(
 				comps.keySet(), subContextMap.keySet())) {
 
-			Collection<IndexedBinaryPropertyChain> compositions = comps
+			Collection<IndexedComplexPropertyChain> compositions = comps
 					.get(backwardRelation);
 			SubContextPremises subPremises = subContextMap
 					.get(backwardRelation);
 
-			for (IndexedBinaryPropertyChain composition : compositions)
+			for (IndexedComplexPropertyChain composition : compositions)
 				for (IndexedClassExpression source : subPremises
 						.getLinkedRoots()) {
 					ForwardLinkImpl.produceComposedLink(producer, source,

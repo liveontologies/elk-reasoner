@@ -27,6 +27,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkEquivalentObjectPropertiesAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
@@ -48,16 +49,21 @@ public class ElkEquivalentObjectPropertiesAxiomImpl extends
 
 	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkEquivalentObjectPropertiesAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkEquivalentObjectPropertiesAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkEquivalentObjectPropertiesAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkEquivalentObjectPropertiesAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

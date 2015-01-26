@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -67,11 +67,14 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 	 * 
 	 * @param owlThing
 	 * @param index
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is returned, the index remains
+	 *         unchanged
 	 */
-	public static void addRuleFor(IndexedClass owlThing,
+	public static boolean addRuleFor(IndexedClass owlThing,
 			ModifiableOntologyIndex index) {
-		LOGGER_.trace("Adding {} to {}", owlThing, NAME);
-		index.addContextInitRule(new OwlThingContextInitRule(owlThing));
+		LOGGER_.trace("{}: adding {}", owlThing, NAME);
+		return index.addContextInitRule(new OwlThingContextInitRule(owlThing));
 	}
 
 	/**
@@ -80,10 +83,15 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 	 * 
 	 * @param owlThing
 	 * @param index
+	 * @return {@code true} if the operation was successful and {@code false}
+	 *         otherwise; if {@code false} is returned, the index remains
+	 *         unchanged
 	 */
-	public static void removeRuleFor(IndexedClass owlThing,
+	public static boolean removeRuleFor(IndexedClass owlThing,
 			ModifiableOntologyIndex index) {
-		index.removeContextInitRule(new OwlThingContextInitRule(owlThing));
+		LOGGER_.trace("{}: removing {}", owlThing, NAME);
+		return index
+				.removeContextInitRule(new OwlThingContextInitRule(owlThing));
 	}
 
 	@Override
@@ -106,10 +114,9 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 		if (rule.owlThing_ == null) {
 			// new rule created
 			rule.owlThing_ = owlThing_;
-			return true;
 		}
 		// owl:Thing was already registered
-		return false;
+		return true;
 	}
 
 	@Override

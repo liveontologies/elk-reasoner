@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkAnonymousIndividualVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Anonymous_Individuals">Anonymous
@@ -32,7 +34,8 @@ package org.semanticweb.elk.owl.interfaces;
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkAnonymousIndividual extends ElkIndividual, ElkAnnotationValue, ElkAnnotationSubject {
+public interface ElkAnonymousIndividual extends ElkIndividual,
+		ElkAnnotationValue, ElkAnnotationSubject {
 
 	/**
 	 * Get the nodeID of this anonymous individual.
@@ -40,4 +43,14 @@ public interface ElkAnonymousIndividual extends ElkIndividual, ElkAnnotationValu
 	 * @return The nodeID of anonymous individual.
 	 */
 	public abstract String getNodeId();
+
+	/**
+	 * Accept an {@link ElkAnonymousIndividualVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkAnonymousIndividualVisitor<O> visitor);
+
 }

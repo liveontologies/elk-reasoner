@@ -25,7 +25,8 @@ package org.semanticweb.elk.owl.implementation;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
-import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataHasValueVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionQualifiedVisitor;
 
 /**
  * ELK implementation of {@link ElkDataHasValue}.
@@ -39,13 +40,18 @@ public class ElkDataHasValueImpl
 		ElkPropertyRestrictionQualifiedImpl<ElkDataPropertyExpression, ElkLiteral>
 		implements ElkDataHasValue {
 
-	ElkDataHasValueImpl(
-			ElkDataPropertyExpression dataPropertyExpression, ElkLiteral literal) {
+	ElkDataHasValueImpl(ElkDataPropertyExpression dataPropertyExpression,
+			ElkLiteral literal) {
 		super(dataPropertyExpression, literal);
 	}
 
 	@Override
-	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+	public <O> O accept(ElkPropertyRestrictionQualifiedVisitor<O> visitor) {
+		return accept((ElkDataHasValueVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDataHasValueVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

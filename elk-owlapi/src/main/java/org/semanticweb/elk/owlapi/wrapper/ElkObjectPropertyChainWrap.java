@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.visitors.ElkObjectPropertyChainVisitor;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
@@ -61,6 +62,11 @@ public class ElkObjectPropertyChainWrap<T extends OWLSubPropertyChainOfAxiom>
 
 	@Override
 	public <O> O accept(ElkSubObjectPropertyExpressionVisitor<O> visitor) {
+		return accept((ElkObjectPropertyChainVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectPropertyChainVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

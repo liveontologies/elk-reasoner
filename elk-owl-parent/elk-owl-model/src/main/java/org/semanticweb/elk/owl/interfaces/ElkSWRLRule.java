@@ -2,6 +2,9 @@
  * 
  */
 package org.semanticweb.elk.owl.interfaces;
+
+import org.semanticweb.elk.owl.visitors.ElkSWRLRuleVisitor;
+
 /*
  * #%L
  * ELK OWL Object Interfaces
@@ -35,5 +38,14 @@ package org.semanticweb.elk.owl.interfaces;
  *         pavel.klinov@uni-ulm.de
  */
 public interface ElkSWRLRule extends ElkAxiom {
+
+	/**
+	 * Accept an {@link ElkSWRLRuleVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkSWRLRuleVisitor<O> visitor);
 
 }

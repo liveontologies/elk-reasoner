@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.owlapi.wrapper;
+
 /*
  * #%L
  * ELK OWL API Binding
@@ -27,24 +28,36 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkSWRLRule;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
+import org.semanticweb.elk.owl.visitors.ElkSWRLRuleVisitor;
+import org.semanticweb.owlapi.model.SWRLRule;
 
 /**
  * Just as dummy as {@link ElkSWRLRule}
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
-public class ElkSWRLRuleWrap implements ElkSWRLRule {
+public class ElkSWRLRuleWrap<T extends SWRLRule> extends ElkObjectWrap<T>
+		implements ElkSWRLRule {
+
+	public ElkSWRLRuleWrap(T rule) {
+		super(rule);
+	}
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return null;
+		return accept((ElkSWRLRuleVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return null;
+		return accept((ElkSWRLRuleVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkSWRLRuleVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

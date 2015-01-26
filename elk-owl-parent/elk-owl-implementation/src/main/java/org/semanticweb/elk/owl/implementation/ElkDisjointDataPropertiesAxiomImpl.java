@@ -28,6 +28,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointDataPropertiesAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkDataPropertyAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDisjointDataPropertiesAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -48,16 +49,21 @@ public class ElkDisjointDataPropertiesAxiomImpl extends
 
 	@Override
 	public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkDisjointDataPropertiesAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkDisjointDataPropertiesAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkDisjointDataPropertiesAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDisjointDataPropertiesAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

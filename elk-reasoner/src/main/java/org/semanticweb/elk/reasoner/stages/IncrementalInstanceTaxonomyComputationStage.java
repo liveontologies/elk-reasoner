@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
@@ -76,11 +78,15 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 				.getIndividualsWithModifiedNodes();
 		// let's convert to indexed objects and filter out removed individuals
 		Operations.Transformation<ElkNamedIndividual, IndexedIndividual> transformation = new Operations.Transformation<ElkNamedIndividual, IndexedIndividual>() {
+
+			private final ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
+					reasoner.ontologyIndex);
+
 			@Override
 			public IndexedIndividual transform(ElkNamedIndividual element) {
-				IndexedIndividual indexedindividual = element
-						.accept(reasoner.objectCache_.getIndexObjectConverter());
-
+				IndexedIndividual indexedindividual = element.accept(converter);
+				if (indexedindividual == null)
+					return null;
 				return indexedindividual.occurs() ? indexedindividual : null;
 			}
 		};
@@ -108,7 +114,7 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 		}
 
 		reasoner.instanceTaxonomyState.getWriter().clearModifiedNodeObjects();
-		reasoner.ontologyIndex.initIndividualSignatureChanges();
+		reasoner.ontologyIndex.initIndividualChanges();
 		// reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
 		this.computation_ = null;
 

@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkDataPropertyDomainAxiomVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Data_Property_Domain">Data Property
@@ -35,4 +37,13 @@ package org.semanticweb.elk.owl.interfaces;
  */
 public interface ElkDataPropertyDomainAxiom extends ElkDataPropertyAxiom,
 		ElkPropertyDomainAxiom<ElkDataPropertyExpression, ElkClassExpression> {
+
+	/**
+	 * Accept an {@link ElkDataPropertyDomainAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(ElkDataPropertyDomainAxiomVisitor<O> visitor);
 }

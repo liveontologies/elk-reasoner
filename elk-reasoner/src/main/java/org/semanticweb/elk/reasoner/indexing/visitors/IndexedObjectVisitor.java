@@ -1,5 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.visitors;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,10 +24,18 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  * #L%
  */
 
+/**
+ * Visitor pattern interface for instances of {@link IndexedObject}.
+ * 
+ * @author Yevgeny Kazakov
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
+ */
 public interface IndexedObjectVisitor<O> extends
 		IndexedClassExpressionVisitor<O>, IndexedPropertyChainVisitor<O>,
-		IndexedAxiomVisitor<O> {
+		IndexedAxiomVisitor<O>, IndexedEntityVisitor<O> {
 
-	// nothing else
+	// combined visitor
 
 }

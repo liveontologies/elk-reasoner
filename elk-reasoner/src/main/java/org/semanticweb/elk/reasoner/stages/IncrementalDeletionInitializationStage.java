@@ -33,15 +33,15 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.visitors.AbstractIndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.NoOpIndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
+import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -68,8 +68,8 @@ public class IncrementalDeletionInitializationStage extends
 
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		LinkedContextInitRule changedInitRules = null;
-		Map<IndexedClassExpression, ChainableSubsumerRule> changedRulesByCE = null;
-		Map<IndexedClass, IndexedClassExpression> changedDefinitions = null;
+		Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedRulesByCE = null;
+		Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 
 		changedInitRules = diffIndex.getRemovedContextInitRules();
@@ -107,7 +107,7 @@ public class IncrementalDeletionInitializationStage extends
 				.getWriter();
 		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState
 				.getWriter();
-		final IndexedClassExpressionVisitor<Object> entityRemovalVisitor = new AbstractIndexedClassEntityVisitor<Object>() {
+		final IndexedClassExpressionVisitor<Object> entityRemovalVisitor = new NoOpIndexedClassExpressionVisitor<Object>() {
 
 			@Override
 			public Object visit(IndexedClass element) {

@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 
 /**
@@ -32,10 +31,11 @@ import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
  * @author "Yevgeny Kazakov"
  * 
  * @param <O>
- *            the output type of the visitor
+ *            the type of the output of this visitor
  */
-public interface ElkDataPropertyExpressionVisitor<O> {
+public interface ElkDataPropertyExpressionVisitor<O> extends
+		ElkDataPropertyVisitor<O> {
 
-	O visit(ElkDataProperty elkDataProperty);
+	// combined visitor
 
 }

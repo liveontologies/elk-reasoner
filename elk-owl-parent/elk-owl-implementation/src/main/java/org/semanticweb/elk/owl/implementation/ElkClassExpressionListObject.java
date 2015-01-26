@@ -40,7 +40,7 @@ public abstract class ElkClassExpressionListObject extends
 	}
 
 	public List<? extends ElkClassExpression> getClassExpressions() {
-		return elkObjects;
+		return getObjects();
 	}
 
 }

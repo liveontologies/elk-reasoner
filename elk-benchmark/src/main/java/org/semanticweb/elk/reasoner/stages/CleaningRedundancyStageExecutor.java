@@ -68,7 +68,7 @@ public class CleaningRedundancyStageExecutor extends SimpleStageExecutor {
 			// toClean_ =
 			// ((AbstractReasonerStage)stage).reasoner.getContextMap();
 			for (IndexedClassExpression ice : reasonerStage.reasoner.ontologyIndex
-					.getIndexedClassExpressions()) {
+					.getClassExpressions()) {
 				Context context = reasonerStage.reasoner.saturationState
 						.getContext(ice);
 

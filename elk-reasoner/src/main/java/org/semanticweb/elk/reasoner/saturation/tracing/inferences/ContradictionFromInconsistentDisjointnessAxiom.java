@@ -25,14 +25,14 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
 
 /**
  * Represents a {@link Contradiction} as the result of a class occurrsing
- * multiple times in one {@link IndexedDisjointnessAxiom}.
+ * multiple times in one {@link IndexedDisjointClassesAxiom}.
  * 
  * TODO store the inconsistent disjointness axiom explicitly as the side
  * condition or get it from the rule registered for the premise?

@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkInverseFunctionalObjectPropertyAxiomVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Inverse-Functional_Object_Properties"
@@ -35,4 +37,14 @@ package org.semanticweb.elk.owl.interfaces;
  */
 public interface ElkInverseFunctionalObjectPropertyAxiom extends
 		ElkObjectPropertyAxiom, ElkPropertyAxiom<ElkObjectPropertyExpression> {
+
+	/**
+	 * Accept an {@link ElkInverseFunctionalObjectPropertyAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(
+			ElkInverseFunctionalObjectPropertyAxiomVisitor<O> visitor);
 }

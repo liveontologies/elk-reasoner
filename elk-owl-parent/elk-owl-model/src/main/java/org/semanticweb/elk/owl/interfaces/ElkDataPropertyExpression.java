@@ -40,7 +40,7 @@ public interface ElkDataPropertyExpression extends ElkObject {
 	 * Accept an {@link ElkDataPropertyExpressionVisitor}.
 	 * 
 	 * @param visitor
-	 *            the visitor that can work with this axiom type
+	 *            the visitor that can work with this object type
 	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkDataPropertyExpressionVisitor<O> visitor);

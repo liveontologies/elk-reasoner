@@ -27,6 +27,8 @@ package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.visitors.ElkDifferentIndividualsAxiomVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Individual_Inequality">individual
@@ -44,5 +46,14 @@ public interface ElkDifferentIndividualsAxiom extends ElkAssertionAxiom {
 	 * @return list of individuals
 	 */
 	public List<? extends ElkIndividual> getIndividuals();
+
+	/**
+	 * Accept an {@link ElkDifferentIndividualsAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkDifferentIndividualsAxiomVisitor<O> visitor);
 
 }

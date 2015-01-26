@@ -39,7 +39,7 @@ public abstract class ElkIndividualListObject extends
 	}
 
 	public List<? extends ElkIndividual> getIndividuals() {
-		return elkObjects;
+		return getObjects();
 	}
 
 }

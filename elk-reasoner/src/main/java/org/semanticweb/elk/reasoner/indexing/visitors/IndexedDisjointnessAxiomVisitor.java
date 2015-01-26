@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,10 +22,18 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 
+/**
+ * Visitor pattern interface for instances of {@link IndexedDisjointClassesAxiom}.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
+ */
 public interface IndexedDisjointnessAxiomVisitor<O> {
 
-	O visit(IndexedDisjointnessAxiom axiom);
+	O visit(IndexedDisjointClassesAxiom axiom);
 
 }

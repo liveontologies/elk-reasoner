@@ -23,28 +23,18 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
-/**
- * An {@link IndexedObject} to which a {@link Context} can be assigned. In some
- * situations this is more efficient than using a map.
- * 
- * @author "Yevgeny Kazakov"
- * 
- */
-public abstract class IndexedObjectWithContext extends IndexedObject {
+public interface IndexedObjectWithContext extends IndexedObject {
 
 	/**
-	 * the reference to a {@link Context} assigned to this {@link IndexedObject}
+	 * @return The corresponding context or {@code null} if none was assigned.
 	 */
-	private volatile ExtendedContext context_ = null;
+	ExtendedContext getContext();
 
 	/**
-	 * @return The corresponding context, null if none was assigned.
+	 * Resets the corresponding context to {@code null}.
 	 */
-	ExtendedContext getContext() {
-		return context_;
-	}
+	void resetContext();
 
 	/**
 	 * Assign the given {@link ExtendedContext} to this {@link IndexedObject} if
@@ -58,19 +48,6 @@ public abstract class IndexedObjectWithContext extends IndexedObject {
 	 *         if none was assigned (in which case the new
 	 *         {@link ExtendedContext} will be assigned)
 	 */
-	synchronized ExtendedContext setContextIfAbsent(ExtendedContext context) {
-		if (context_ != null)
-			return context_;
-		// else
-		context_ = context;
-		return null;
-	}
-
-	/**
-	 * Resets the corresponding context to {@code null}.
-	 */
-	synchronized void resetContext() {
-		context_ = null;
-	}
+	ExtendedContext setContextIfAbsent(ExtendedContext context);
 
 }

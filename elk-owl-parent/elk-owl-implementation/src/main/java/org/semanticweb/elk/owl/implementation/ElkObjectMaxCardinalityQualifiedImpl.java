@@ -25,7 +25,9 @@ package org.semanticweb.elk.owl.implementation;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
-import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkCardinalityRestrictionQualifiedVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectMaxCardinalityQualifiedVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectMaxCardinalityVisitor;
 
 /**
  * Implementation of {@link ElkObjectMaxCardinalityQualified}.
@@ -46,7 +48,18 @@ public class ElkObjectMaxCardinalityQualifiedImpl
 	}
 
 	@Override
-	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+	public <O> O accept(ElkCardinalityRestrictionQualifiedVisitor<O> visitor) {
+		return accept((ElkObjectMaxCardinalityQualifiedVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectMaxCardinalityVisitor<O> visitor) {
+		return accept((ElkObjectMaxCardinalityQualifiedVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectMaxCardinalityQualifiedVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
+
 }

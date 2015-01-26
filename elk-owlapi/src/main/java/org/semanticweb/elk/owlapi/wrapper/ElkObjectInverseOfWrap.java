@@ -25,6 +25,7 @@ package org.semanticweb.elk.owlapi.wrapper;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.visitors.ElkObjectInverseOfVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
 import org.semanticweb.owlapi.model.OWLObjectInverseOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
@@ -56,6 +57,11 @@ public class ElkObjectInverseOfWrap<T extends OWLObjectProperty> extends
 
 	@Override
 	public <O> O accept(ElkObjectPropertyExpressionVisitor<O> visitor) {
+		return accept((ElkObjectInverseOfVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectInverseOfVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

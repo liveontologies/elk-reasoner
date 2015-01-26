@@ -24,6 +24,8 @@ package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.visitors.ElkDatatypeRestrictionVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Datatype_Restrictions">Datatype
@@ -39,12 +41,21 @@ public interface ElkDatatypeRestriction extends ElkDataRange {
 	 * @return The datatype of this datatype restriction.
 	 */
 	public ElkDatatype getDatatype();
-	
+
 	/**
 	 * Get the facet restrictions of this datatype restriction.
 	 * 
 	 * @return The facet restrictions of this datatype restriction.
 	 */
 	public List<? extends ElkFacetRestriction> getFacetRestrictions();
+
+	/**
+	 * Accept an {@link ElkDatatypeRestrictionVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkDatatypeRestrictionVisitor<O> visitor);
 
 }

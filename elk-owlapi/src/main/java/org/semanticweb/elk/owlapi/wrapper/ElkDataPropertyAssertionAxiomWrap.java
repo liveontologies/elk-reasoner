@@ -27,6 +27,9 @@ import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataPropertyAssertionAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyAssertionAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
 
 /**
@@ -62,7 +65,22 @@ public class ElkDataPropertyAssertionAxiomWrap<T extends OWLDataPropertyAssertio
 	}
 
 	@Override
-	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {
+	public <O> O accept(ElkDataPropertyAssertionAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyAssertionAxiomVisitor<O> visitor) {
+		return accept((ElkDataPropertyAssertionAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyAxiomVisitor<O> visitor) {
+		return accept((ElkDataPropertyAssertionAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {
+		return accept((ElkDataPropertyAssertionAxiomVisitor<O>) visitor);
 	}
 }

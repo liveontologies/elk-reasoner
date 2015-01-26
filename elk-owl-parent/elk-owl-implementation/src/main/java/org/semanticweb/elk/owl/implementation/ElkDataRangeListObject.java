@@ -39,7 +39,7 @@ public abstract class ElkDataRangeListObject extends
 	}
 
 	public List<? extends ElkDataRange> getDataRanges() {
-		return elkObjects;
+		return getObjects();
 	}
 
 }

@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2013 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,72 +23,23 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectComplementOfVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ContradictionFromNegationRule;
-import org.semanticweb.elk.util.logging.LogLevel;
-import org.semanticweb.elk.util.logging.LoggerWrap;
 
 /**
- * Represents all occurrences of an {@link ElkObjectComplementOf} in an
- * ontology.
+ * Represents occurrences of an {@link ElkObjectComplementOf} in an ontology.
  * 
  * @author "Yevgeny Kazakov"
  */
-public class IndexedObjectComplementOf extends IndexedClassExpression {
+public interface IndexedObjectComplementOf extends IndexedClassExpression {
 
-	private final IndexedClassExpression negated_;
+	/**
+	 * @return the {@link IndexedClassExpression}, negation of which is
+	 *         represented by this {@link IndexedObjectComplementOf}
+	 * 
+	 * @see ElkObjectComplementOf#getClassExpression()
+	 */
+	public IndexedClassExpression getNegated();
 
-	protected IndexedObjectComplementOf(IndexedClassExpression negated) {
-		this.negated_ = negated;
-	}
-
-	public IndexedClassExpression getNegated() {
-		return negated_;
-	}
-
-	public <O> O accept(IndexedObjectComplementOfVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(IndexedClassExpressionVisitor<O> visitor) {
-		return accept((IndexedObjectComplementOfVisitor<O>) visitor);
-	}
-
-	@Override
-	void updateOccurrenceNumbers(ModifiableOntologyIndex index, int increment,
-			int positiveIncrement, int negativeIncrement) {
-		if (positiveOccurrenceNo == 0 && positiveIncrement > 0) {
-			// first positive occurrence of this expression
-			ContradictionFromNegationRule.addRulesFor(this, index);
-		}
-
-		if (negativeOccurrenceNo == 0 && negativeIncrement > 0) {
-			// first negative occurrence of this expression
-			if (LOGGER_.isWarnEnabled()) {
-				LoggerWrap
-						.log(LOGGER_,
-								LogLevel.WARN,
-								"reasoner.indexing.IndexedObjectComplementOf",
-								"ELK does not support negative occurrences of ObjectComplementOf. Reasoning might be incomplete!");
-			}
-		}
-
-		positiveOccurrenceNo += positiveIncrement;
-		negativeOccurrenceNo += negativeIncrement;
-
-		checkOccurrenceNumbers();
-
-		if (positiveOccurrenceNo == 0 && positiveIncrement < 0) {
-			// no positive occurrences of this expression left
-			ContradictionFromNegationRule.removeRulesFor(this, index);
-		}
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "ObjectComplementOf(" + this.negated_ + ')';
-	}
+	public <O> O accept(IndexedObjectComplementOfVisitor<O> visitor);
 
 }

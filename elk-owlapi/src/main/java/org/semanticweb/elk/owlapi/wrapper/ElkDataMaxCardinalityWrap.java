@@ -22,10 +22,14 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
-import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
+import org.semanticweb.elk.owl.visitors.ElkCardinalityRestrictionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataMaxCardinalityUnqualifiedVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataMaxCardinalityVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionVisitor;
 import org.semanticweb.owlapi.model.OWLDataMaxCardinality;
 
 /**
@@ -38,7 +42,7 @@ import org.semanticweb.owlapi.model.OWLDataMaxCardinality;
  *            the type of the wrapped object
  */
 public class ElkDataMaxCardinalityWrap<T extends OWLDataMaxCardinality> extends
-		ElkClassExpressionWrap<T> implements ElkDataMaxCardinality {
+		ElkClassExpressionWrap<T> implements ElkDataMaxCardinalityUnqualified {
 
 	public ElkDataMaxCardinalityWrap(T owlDataMaxCardinality) {
 		super(owlDataMaxCardinality);
@@ -56,6 +60,26 @@ public class ElkDataMaxCardinalityWrap<T extends OWLDataMaxCardinality> extends
 
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+		return accept((ElkDataMaxCardinalityUnqualifiedVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDataMaxCardinalityVisitor<O> visitor) {
+		return accept((ElkDataMaxCardinalityUnqualifiedVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkCardinalityRestrictionVisitor<O> visitor) {
+		return accept((ElkDataMaxCardinalityUnqualifiedVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyRestrictionVisitor<O> visitor) {
+		return accept((ElkDataMaxCardinalityUnqualifiedVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDataMaxCardinalityUnqualifiedVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 }

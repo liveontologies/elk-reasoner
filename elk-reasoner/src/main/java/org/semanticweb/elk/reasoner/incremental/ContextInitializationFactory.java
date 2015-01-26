@@ -63,7 +63,7 @@ class ContextInitializationFactory
 	private final IndexedClassExpression[] changedComposedSubsumers_;
 	private final IndexedClass[] changedDecomposedSubsumers_;
 	private final LinkedContextInitRule changedGlobalRuleHead_;
-	private final Map<IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules_;
+	private final Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules_;
 	private AtomicInteger compositionRuleHits_ = new AtomicInteger(0);
 	private AtomicInteger decompositionRuleHits_ = new AtomicInteger(0);
 	private final SaturationStatistics stageStatistics_;
@@ -73,8 +73,8 @@ class ContextInitializationFactory
 	public ContextInitializationFactory(
 			SaturationState<?> state,
 			LinkedContextInitRule changedGlobalRuleHead,
-			Map<IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules,
-			final Map<IndexedClass, IndexedClassExpression> changedDefinitions,
+			Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> changedCompositionRules,
+			final Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions,
 			SaturationStatistics stageStats) {
 
 		saturationState_ = state;
@@ -89,7 +89,7 @@ class ContextInitializationFactory
 		stageStatistics_ = stageStats;
 
 		classDecomposition_ = new IndexedClassDecomposition() {
-			private final Map<IndexedClass, IndexedClassExpression> changedDefinitions_ = changedDefinitions;
+			private final Map<? extends IndexedClass, ? extends IndexedClassExpression> changedDefinitions_ = changedDefinitions;
 
 			@Override
 			protected IndexedClassExpression getDefinedClassExpression(

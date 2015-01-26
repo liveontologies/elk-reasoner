@@ -24,6 +24,7 @@ package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.visitors.ElkInverseObjectPropertiesAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLInverseObjectPropertiesAxiom;
 
@@ -56,6 +57,11 @@ public class ElkInverseObjectPropertiesAxiomWrap<T extends OWLInverseObjectPrope
 
 	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
+		return accept((ElkInverseObjectPropertiesAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkInverseObjectPropertiesAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -24,6 +24,7 @@ package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
+import org.semanticweb.elk.owl.visitors.ElkDataComplementOfVisitor;
 import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
 import org.semanticweb.owlapi.model.OWLDataComplementOf;
 
@@ -50,6 +51,11 @@ public class ElkDataComplementOfWrap<T extends OWLDataComplementOf> extends
 
 	@Override
 	public <O> O accept(ElkDataRangeVisitor<O> visitor) {
+		return accept((ElkDataComplementOfVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDataComplementOfVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 }

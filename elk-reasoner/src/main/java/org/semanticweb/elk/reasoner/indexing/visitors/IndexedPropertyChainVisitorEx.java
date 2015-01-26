@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.indexing.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,17 +25,24 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 
 /**
+ * Visitor pattern interface for instances of {@link IndexedPropertyChain} the
+ * visit methods of which can take an additional parameter.
+ * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
 public interface IndexedPropertyChainVisitorEx<O, P> {
 
 	public O visit(IndexedObjectProperty property, P parameter);
-	
-	public O visit(IndexedBinaryPropertyChain chain, P parameter);
+
+	public O visit(IndexedComplexPropertyChain chain, P parameter);
 }
