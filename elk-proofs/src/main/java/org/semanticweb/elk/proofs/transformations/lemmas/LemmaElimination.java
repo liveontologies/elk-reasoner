@@ -52,11 +52,11 @@ import org.semanticweb.elk.proofs.inferences.classes.ExistentialChainAxiomCompos
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainComposition;
 import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialComposition;
+import org.semanticweb.elk.proofs.transformations.InferenceTransformation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
-import org.semanticweb.elk.util.collections.Operations;
 
 /**
  * Transforms EL+ inferences containing lemma premises, that is, {@link ExistentialLemmaChainComposition} and {@link ExistentialChainAxiomComposition} into
@@ -66,7 +66,7 @@ import org.semanticweb.elk.util.collections.Operations;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class LemmaElimination implements Operations.Transformation<Inference, Iterable<Inference>> {
+public class LemmaElimination implements InferenceTransformation {
 
 	private final ElkObjectFactory elkFactory_;
 	
@@ -288,9 +288,6 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 					
 					try {
 						for (Inference lemmaInf : premise.getInferences()) {
-							
-							lemmaInf = lemmaInf == null ? lemmaInf : lemmaInf;
-							
 							transformed.add(lemmaInf.accept(new AbstractInferenceVisitor<Void, NaryExistentialComposition>() {
 
 								@Override
@@ -374,5 +371,13 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 							reader_));
 		}
 		
+	}
+
+
+	@Override
+	public boolean mayIntroduceDuplicates() {
+		// rewriting existential binary composition inferences may produce
+		// duplicate n-ary composition inferences
+		return true;
 	}
 }

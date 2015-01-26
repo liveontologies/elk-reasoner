@@ -31,13 +31,12 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.transformations.InferenceTransformation;
 import org.semanticweb.elk.proofs.transformations.TransformedAxiomExpression;
 import org.semanticweb.elk.proofs.transformations.lemmas.LemmaElimination;
 import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
-import org.semanticweb.elk.util.collections.Operations;
-import org.semanticweb.elk.util.collections.Operations.Transformation;
 
 /**
  * The main entrance point for accessing proofs.
@@ -49,7 +48,7 @@ import org.semanticweb.elk.util.collections.Operations.Transformation;
 public class ProofReader {
 
 	// TODO support more than one (i.e. nested) transformation, it's easy
-	private Operations.Transformation<Inference, Iterable<Inference>> inferenceTransformation_;
+	private InferenceTransformation inferenceTransformation_;
 	
 	private final ReasonerInferenceReader reader_;
 	
@@ -79,7 +78,7 @@ public class ProofReader {
 		DerivedAxiomExpression<ElkSubClassOfAxiom> root = reader_.initialize(subsumee, subsumer);
 		
 		if (inferenceTransformation_ != null) {
-			root = new TransformedAxiomExpression<Transformation<Inference, Iterable<Inference>>, ElkSubClassOfAxiom>(root, inferenceTransformation_);
+			root = new TransformedAxiomExpression<InferenceTransformation, ElkSubClassOfAxiom>(root, inferenceTransformation_);
 		}
 		
 		return root;

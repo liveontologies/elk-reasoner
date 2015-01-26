@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.semanticweb.elk.proofs.transformations;
 /*
  * #%L
@@ -24,31 +21,16 @@ package org.semanticweb.elk.proofs.transformations;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
-import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
+import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
- * TODO
  * 
  * @author	Pavel Klinov
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class TransformedLemmaExpression<T extends InferenceTransformation> extends TransformedExpression<LemmaExpression<?>, T> implements LemmaExpression<ElkLemma> {
+public interface InferenceTransformation extends Operations.Transformation<Inference, Iterable<Inference>> {
 
-	protected TransformedLemmaExpression(LemmaExpression<?> expr, T f) {
-		super(expr, f);
-	}
-
-	@Override
-	public ElkLemma getLemma() {
-		return expression.getLemma();
-	}
-	
-	@Override
-	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
-	}
-
+	public boolean mayIntroduceDuplicates();
 }

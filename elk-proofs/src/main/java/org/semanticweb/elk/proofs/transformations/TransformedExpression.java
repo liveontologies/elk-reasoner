@@ -24,9 +24,14 @@ package org.semanticweb.elk.proofs.transformations;
  * #L%
  */
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.inferences.InferenceEntry;
+import org.semanticweb.elk.util.collections.Condition;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -41,7 +46,7 @@ import org.semanticweb.elk.util.collections.Operations;
  *
  *         pavel.klinov@uni-ulm.de
  */
-abstract class TransformedExpression<D extends DerivedExpression, T extends Operations.Transformation<Inference, Iterable<Inference>>> implements DerivedExpression {
+abstract class TransformedExpression<D extends DerivedExpression, T extends InferenceTransformation> implements DerivedExpression {
 
 	protected final D expression;
 	
@@ -60,8 +65,8 @@ abstract class TransformedExpression<D extends DerivedExpression, T extends Oper
 	}
 	
 	@Override
-	public Iterable<TransformedInference<T>> getInferences() throws ElkException {
-		return Operations.mapConcat(expression.getInferences(), new Operations.Transformation<Inference, Iterable<TransformedInference<T>>>() {
+	public Iterable<? extends Inference> getInferences() throws ElkException {
+		Iterable<TransformedInference<T>> transformed = Operations.mapConcat(expression.getInferences(), new Operations.Transformation<Inference, Iterable<TransformedInference<T>>>() {
 
 			@Override
 			public Iterable<TransformedInference<T>> transform(Inference inf) {
@@ -71,6 +76,25 @@ abstract class TransformedExpression<D extends DerivedExpression, T extends Oper
 			}
 			
 		});
+		
+		if (!transformation.mayIntroduceDuplicates()) {
+			return transformed;
+		}
+		
+		return eliminateDuplicates(transformed);
+	}
+
+	private Iterable<? extends Inference> eliminateDuplicates(final Iterable<? extends Inference> inferences) {
+		final Set<InferenceEntry> unique = new HashSet<InferenceEntry>();
+		
+		return Operations.filter(inferences, new Condition<Inference>() {
+
+			@Override
+			public boolean holds(Inference inf) {
+				return unique.add(new InferenceEntry(inf));
+			}
+			
+		});		
 	}
 
 	protected TransformedInference<T> propagateTransformation(Inference inf) {

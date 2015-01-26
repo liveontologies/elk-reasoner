@@ -43,7 +43,7 @@ import org.semanticweb.elk.util.collections.Operations;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class TransformedInference<T extends Operations.Transformation<Inference, Iterable<Inference>>> implements Inference {
+public class TransformedInference<T extends InferenceTransformation> implements Inference {
 
 	protected final Inference inference;
 	
