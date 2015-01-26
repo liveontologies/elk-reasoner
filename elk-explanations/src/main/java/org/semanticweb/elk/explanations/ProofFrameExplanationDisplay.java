@@ -34,7 +34,7 @@ import org.semanticweb.elk.explanations.list.ProofFrameList;
 import org.semanticweb.owl.explanation.api.Explanation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLObject;
-import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
+import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
 
 /**
  * 
@@ -52,7 +52,7 @@ public class ProofFrameExplanationDisplay extends JPanel implements ExplanationD
     
     private boolean transmittingSelectionToModel = false;
 
-    public ProofFrameExplanationDisplay(final OWLEditorKit editorKit, AxiomSelectionModel selectionModel, WorkbenchManager workbenchManager, CycleBlockingExpression root) {
+    public ProofFrameExplanationDisplay(final OWLEditorKit editorKit, AxiomSelectionModel selectionModel, WorkbenchManager workbenchManager, CycleFreeProofRoot root) {
         this.axiomSelectionModel = selectionModel;
         
         frame = new ProofFrame(root, new OWLRenderer() {

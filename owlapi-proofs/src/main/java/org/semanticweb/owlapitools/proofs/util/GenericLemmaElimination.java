@@ -36,7 +36,6 @@ import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
-import org.semanticweb.owlapitools.proofs.util.Operations.Transformation;
 
 /**
  * The transformation which replaces inferences having {@link OWLLemmaExpression}s as premises by collections of inferences, one per the inference which derives each lemma premise.
@@ -48,7 +47,7 @@ import org.semanticweb.owlapitools.proofs.util.Operations.Transformation;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class GenericLemmaElimination implements Transformation<OWLInference, Iterable<OWLInference>> {
+public class GenericLemmaElimination implements OWLInferenceTransformation {
 
 	@Override
 	public Iterable<OWLInference> transform(final OWLInference inf) {
@@ -158,6 +157,12 @@ public class GenericLemmaElimination implements Transformation<OWLInference, Ite
 		}
 		
 		return false;
+	}
+
+	@Override
+	public OWLInferenceTransformation update(OWLInference inf,
+			OWLExpression premise) {
+		return this;
 	}
 
 }

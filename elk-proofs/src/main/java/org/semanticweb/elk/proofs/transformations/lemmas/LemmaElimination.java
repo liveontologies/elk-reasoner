@@ -228,13 +228,13 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 		public Iterable<Inference> visit(ExistentialChainAxiomComposition inf, Void input) {
 			// check if there are premises not representable in OWL and transform to the n-ary inference if that's the case
 			if (inf.getSecondExistentialPremise() instanceof LemmaExpression) {
-				Inference transformed = new NaryExistentialComposition(
-											inf.getConclusion(), 
-											Arrays.asList(inf.getFirstExistentialPremise(), inf.getSecondExistentialPremise()),
-											// can have only chain axioms here. can't have transitivity, for example, that doesn't involve lemmas
-											(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>) inf.getChainPremise());
+				NaryExistentialComposition transformed = new NaryExistentialComposition(
+															inf.getConclusion(), 
+															Arrays.asList(inf.getFirstExistentialPremise(), inf.getSecondExistentialPremise()),
+															// can have only chain axioms here. can't have transitivity, for example, that doesn't involve lemmas
+															(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>) inf.getChainPremise());
 				
-				return Collections.singletonList(transformed);
+				return lazyLemmaElimination(transformed);
 			}
 			else {
 				// wrapping the property subsumption premise, if needed
@@ -257,10 +257,14 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 		
 		@Override
 		public Iterable<Inference> visit(final NaryExistentialComposition inf, Void input) {
-			if (lemmasPresent(inf)) {
+			if (!lemmasPresent(inf)) {
 				return Collections.<Inference>singletonList(inf);
 			}
 			
+			return lazyLemmaElimination(inf);
+		}
+		
+		private Iterable<Inference> lazyLemmaElimination(final NaryExistentialComposition inf) {
 			return new Iterable<Inference>() {
 
 				@Override
@@ -284,6 +288,9 @@ public class LemmaElimination implements Operations.Transformation<Inference, It
 					
 					try {
 						for (Inference lemmaInf : premise.getInferences()) {
+							
+							lemmaInf = lemmaInf == null ? lemmaInf : lemmaInf;
+							
 							transformed.add(lemmaInf.accept(new AbstractInferenceVisitor<Void, NaryExistentialComposition>() {
 
 								@Override

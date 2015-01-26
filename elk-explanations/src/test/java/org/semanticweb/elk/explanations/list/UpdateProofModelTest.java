@@ -53,8 +53,9 @@ import org.semanticweb.owlapitools.proofs.MockOWLInference;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.ProofTestUtils;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
+import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
-import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
+import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
 import org.semanticweb.owlapitools.proofs.util.OWLInferenceGraph;
 import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
 
@@ -82,7 +83,7 @@ public class UpdateProofModelTest {
 
 		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
 		
-		ProofFrame frame = new ProofFrame(new CycleBlockingExpression(root, iGraph), new TestOWLRenderer(), null);
+		ProofFrame frame = new ProofFrame(new CycleFreeProofRoot(root, iGraph), new TestOWLRenderer(), null);
 		ProofFrameSection header = (ProofFrameSection) frame.getFrameSections().get(0);
 		// A <= C is entailed
 		assertEquals(1, header.getRows().size());
@@ -110,7 +111,7 @@ public class UpdateProofModelTest {
 		
 		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
 		
-		ProofFrame frame = new ProofFrame(new CycleBlockingExpression(root, iGraph), new TestOWLRenderer(), null);
+		ProofFrame frame = new ProofFrame(new CycleFreeProofRoot(root, iGraph), new TestOWLRenderer(), null);
 		ProofFrameSection header = (ProofFrameSection) frame.getFrameSections().get(0);
 		// A <= C is entailed
 		assertEquals(1, header.getRows().size());
@@ -139,7 +140,7 @@ public class UpdateProofModelTest {
 		long seed = System.currentTimeMillis();//123;
 		Random rnd = new Random(seed);
 		// first generate some random proofs (return the root)
-		OWLExpression root = ProofTestUtils.generateRandomProofGraph(rnd, 3, 3, 100);
+		OWLAxiomExpression root = ProofTestUtils.generateRandomProofGraph(rnd, 3, 3, 100);
 		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
 		
 		System.err.println(OWLProofUtils.printProofTree(root));
@@ -159,7 +160,7 @@ public class UpdateProofModelTest {
 			
 			System.err.println("Deleting " + toDelete);
 			// blocking the expression in the proof model
-			root = new CycleBlockingExpression(root, iGraph).blockExpression(toDelete);
+			root = new CycleFreeProofRoot(root, iGraph).blockExpression(toDelete);
 			
 			System.err.println(OWLProofUtils.printProofTree(root));
 			// now blocking it in the GUI model
@@ -182,7 +183,7 @@ public class UpdateProofModelTest {
 		long seed = 123;
 		Random rnd = new Random(seed);
 		// first generate some random proofs (return the root)
-		OWLExpression root = ProofTestUtils.generateRandomProofGraph(rnd, 3, 3, 10);
+		OWLAxiomExpression root = ProofTestUtils.generateRandomProofGraph(rnd, 3, 3, 10);
 		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
 		
 		System.err.println(OWLProofUtils.printProofTree(root));
@@ -229,7 +230,7 @@ public class UpdateProofModelTest {
 			
 			iGraph = OWLProofUtils.computeInferenceGraph(root);
 			
-			CycleBlockingExpression newRoot = new CycleBlockingExpression(root, iGraph);
+			CycleFreeProofRoot newRoot = new CycleFreeProofRoot(root, iGraph);
 			
 			System.err.println(OWLProofUtils.printProofTree(newRoot));
 			// refreshing the GUI's model. The root object is the same but the proof model has changed
@@ -241,9 +242,9 @@ public class UpdateProofModelTest {
 		}
 	}
 	
-	ProofFrame createProofModel(OWLExpression root) throws ProofGenerationException {
+	ProofFrame createProofModel(OWLAxiomExpression root) throws ProofGenerationException {
 		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
-		ProofFrame frame = new ProofFrame(new CycleBlockingExpression(root, iGraph), new TestOWLRenderer(), null);
+		ProofFrame frame = new ProofFrame(new CycleFreeProofRoot(root, iGraph), new TestOWLRenderer(), null);
 		ProofFrameSection header = (ProofFrameSection) frame.getFrameSections().get(0);
 		Queue<ProofFrameSection> toDo = new ArrayDeque<ProofFrameSection>();
 		

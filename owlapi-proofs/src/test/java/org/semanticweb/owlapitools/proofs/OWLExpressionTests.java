@@ -51,10 +51,10 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
 import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
-import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
+import org.semanticweb.owlapitools.proofs.util.CycleBlocking;
 import org.semanticweb.owlapitools.proofs.util.GenericLemmaElimination;
 import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
-import org.semanticweb.owlapitools.proofs.util.TransformedOWLExpression;
+import org.semanticweb.owlapitools.proofs.util.TransformedOWLAxiomExpression;
 
 /**
  * @author Pavel Klinov
@@ -82,10 +82,10 @@ public class OWLExpressionTests {
 		aSubC.addInference(new MockOWLInference(INF_PREFIX, aSubC, Arrays.<OWLExpression>asList(aSubD, dSubC)));
 		aSubD.addInference(new MockOWLInference(INF_PREFIX, aSubD, Arrays.<OWLExpression>asList(aSubB, bSubD)));		
 		
-		CycleBlockingExpression root = new CycleBlockingExpression(aSubB, OWLProofUtils.computeInferenceGraph(aSubB));
-		
+		OWLExpression root = new TransformedOWLAxiomExpression<CycleBlocking>(aSubB, new CycleBlocking(aSubB, OWLProofUtils.computeInferenceGraph(aSubB))); 
+				
 		assertEquals(2, getNumberOfInferences(aSubB));
-		// only one inference remains since the other is loopy
+		// only one inference remains since the other is cyclic
 		assertEquals(1, getNumberOfInferences(root));
 	}
 	
@@ -110,7 +110,7 @@ public class OWLExpressionTests {
 		cSubR3R4R5F.addInference(new MockOWLInference(INF_PREFIX, cSubR3R4R5F, Arrays.<OWLExpression>asList(cSubR3D, dSubR4R5F)));
 		dSubR4R5F.addInference(new MockOWLInference(INF_PREFIX, dSubR4R5F, Arrays.<OWLExpression>asList(dSubR4E, eSubR5F)));
 		
-		TransformedOWLExpression<?> root = new TransformedOWLExpression<GenericLemmaElimination>(aSubG, new GenericLemmaElimination());
+		OWLExpression root = new TransformedOWLAxiomExpression<GenericLemmaElimination>(aSubG, new GenericLemmaElimination());
 		
 		OWLProofUtils.visitExpressionsInProofGraph(root, new OWLExpressionVisitor<Void>() {
 
@@ -162,7 +162,7 @@ public class OWLExpressionTests {
 			.addInference(new MockOWLInference(INF_PREFIX, cSubR4R5D, Arrays.<OWLExpression>asList(cSubR4D1, d1SubR5D)))
 			.addInference(new MockOWLInference(INF_PREFIX, cSubR4R5D, Arrays.<OWLExpression>asList(cSubR4D2, d2SubR5D)));
 		
-		TransformedOWLExpression<?> root = new TransformedOWLExpression<GenericLemmaElimination>(aSubSE, new GenericLemmaElimination());
+		OWLExpression root = new TransformedOWLAxiomExpression<GenericLemmaElimination>(aSubSE, new GenericLemmaElimination());
 		
 		OWLProofUtils.visitExpressionsInProofGraph(root, new OWLExpressionVisitor<Void>() {
 

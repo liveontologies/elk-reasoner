@@ -50,7 +50,7 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
 import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
-import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
+import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
 import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
 
 
@@ -144,7 +144,7 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
         }
     }
     
-    public CycleBlockingExpression getProofRoot(OWLAxiom entailment)  throws ExplanationException {
+    public CycleFreeProofRoot getProofRoot(OWLAxiom entailment)  throws ExplanationException {
     	// TODO caching
         OWLReasonerManager reasonerManager = modelManager.getOWLReasonerManager();
         OWLReasoner reasoner = reasonerManager.getCurrentReasoner();
@@ -153,11 +153,12 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
         	ExplainingOWLReasoner explainingReasoner = (ExplainingOWLReasoner) reasoner;
         	
         	try {
-        		OWLExpression root = explainingReasoner.getDerivedExpression(entailment);
+        		OWLAxiomExpression root = explainingReasoner.getDerivedExpression(entailment);
         		// first eliminate possible lemmas since we can't render them in Protege
         		//root = new TransformedOWLExpression<GenericLemmaElimination>(root, new GenericLemmaElimination());
         		// second block loopy proofs
-        		return new CycleBlockingExpression(root, OWLProofUtils.computeInferenceGraph(root));
+        		//return new CycleBlockingExpression(root, OWLProofUtils.computeInferenceGraph(root));
+        		return new CycleFreeProofRoot(root, OWLProofUtils.computeInferenceGraph(root));
 			} catch (Exception e) {
 				throw new ExplanationException(e);
 			}

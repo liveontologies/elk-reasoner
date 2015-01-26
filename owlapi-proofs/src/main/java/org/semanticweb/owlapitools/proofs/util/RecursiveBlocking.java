@@ -25,7 +25,6 @@ package org.semanticweb.owlapitools.proofs.util;
  */
 
 import java.util.ArrayDeque;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
@@ -42,31 +41,20 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class RecursivelyBlockingExpression extends TransformedOWLExpression<BlockingCondition> {
+public class RecursiveBlocking extends BlockingCondition {
 
 	protected final OWLInferenceGraph infGraph;
 	
-	public RecursivelyBlockingExpression(OWLExpression expr, OWLInferenceGraph iG) throws ProofGenerationException {
-		// root constructor
-		super(expr, new BlockingCondition(blockRecursively(expr, Collections.<OWLExpression>emptySet(), iG)));
+	public RecursiveBlocking(OWLExpression expr, Set<OWLExpression> blocked, OWLInferenceGraph iGraph) {
+		super(blockRecursively(expr, blocked, iGraph));
 		
-		infGraph = iG;
+		infGraph = iGraph;
 	}
 	
-	protected RecursivelyBlockingExpression(OWLExpression expr, OWLExpression toBeBlocked, Set<OWLExpression> currentlyBlocked, OWLInferenceGraph iG) {
-		// internal constructor
-		super(expr, new BlockingCondition(blockRecursively(toBeBlocked, currentlyBlocked, iG)));
-		
-		infGraph = iG;
+	OWLInferenceGraph getOWLInferenceGraph() {
+		return infGraph;
 	}
 	
-	// return a new expression which blocks all expressions blocked by the
-	// current expression plus all those which use the expression passed as the
-	// argument.
-	public RecursivelyBlockingExpression blockExpression(OWLExpression toBeBlocked) {
-		return new RecursivelyBlockingExpression(getExpression(), toBeBlocked, getFilterCondition().getBlockedExpressions(), infGraph);
-	}
-
 	// recursively blocks all expressions which are derived using the given expression or any expression blocked by the parent expression.
 	static Set<OWLExpression> blockRecursively(OWLExpression newExpr, Set<OWLExpression> blocked, OWLInferenceGraph infGraph) {
 		// TODO avoid copying, use something like Lisp-style lists or lazy set unions

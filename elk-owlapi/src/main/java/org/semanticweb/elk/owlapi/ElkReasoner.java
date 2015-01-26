@@ -41,7 +41,7 @@ import org.semanticweb.elk.owlapi.proofs.ElkToOwlProofConverter;
 import org.semanticweb.elk.owlapi.wrapper.OwlClassAxiomConverterVisitor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.proofs.ProofReader;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ElkUnsupportedReasoningTaskException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
@@ -87,7 +87,7 @@ import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNode;
 import org.semanticweb.owlapi.util.Version;
 import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
-import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
+import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -939,7 +939,7 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 	}
 	
 	@Override
-	public OWLExpression getDerivedExpression(OWLAxiom axiom) {
+	public OWLAxiomExpression getDerivedExpression(OWLAxiom axiom) {
 		// support only class subsumptions for the moment
 		if (axiom instanceof OWLSubClassOfAxiom) {
 			OWLSubClassOfAxiom scAxiom = (OWLSubClassOfAxiom) axiom;
@@ -947,9 +947,9 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 			
 			try {
 				// TODO introduce a config option for preserving or eliminating lemmas
-				DerivedExpression expr = new ProofReader(reasoner_)
-											.eliminateLemmas()
-											.getProofRoot(elkAxiom.getSubClassExpression(), elkAxiom.getSuperClassExpression());
+				DerivedAxiomExpression<ElkSubClassOfAxiom> expr = new ProofReader(reasoner_)
+																	.eliminateLemmas()
+																	.getProofRoot(elkAxiom.getSubClassExpression(), elkAxiom.getSuperClassExpression());
 				
 				return ElkToOwlProofConverter.convert(expr);
 				

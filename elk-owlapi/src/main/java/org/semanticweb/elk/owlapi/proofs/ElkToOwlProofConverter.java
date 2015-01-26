@@ -54,6 +54,7 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapitools.proofs.OWLInference;
+import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 
 /**
@@ -70,7 +71,7 @@ public class ElkToOwlProofConverter {
 
 			@Override
 			public OWLExpression visit(	DerivedAxiomExpression<?> expr, Void input) {
-				return new AxiomExpressionWrap(expr);
+				return convert(expr);
 			}
 
 			@Override
@@ -78,6 +79,10 @@ public class ElkToOwlProofConverter {
 				return new LemmaExpressionWrap(expr);
 			}
 		}, null);
+	}
+	
+	public static OWLAxiomExpression convert(DerivedAxiomExpression<?> expression) {
+		return new AxiomExpressionWrap(expression);
 	}
 
 	public static OWLInference convert(Inference inference) {

@@ -45,7 +45,7 @@ import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.semanticweb.owl.explanation.api.ExplanationException;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
+import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
 /*
  * Copyright (C) 2008, University of Manchester
  *
@@ -139,87 +139,8 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelM
     }
 
     private JComponent createHeaderPanel() {
-
         GridBagLayout layout = new GridBagLayout();
-
         JComponent headerPanel = new JPanel(layout);
-
- /*       final WorkbenchSettings workbenchSettings = workbenchManager.getWorkbenchSettings();
-        JRadioButton regularButton = new JRadioButton(new AbstractAction("Show regular justifications") {
-            public void actionPerformed(ActionEvent e) {
-                workbenchSettings.setJustificationType(JustificationType.REGULAR);
-                refill();
-            }
-        });
-        regularButton.setSelected(true);
-        headerPanel.add(regularButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 2, 30), 0, 0));
-
-        JRadioButton laconicButton = new JRadioButton(new AbstractAction("Show laconic justifications") {
-            public void actionPerformed(ActionEvent e) {
-                workbenchSettings.setJustificationType(JustificationType.LACONIC);
-                refill();
-            }
-        });
-        headerPanel.add(laconicButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 30), 0, 0));
-
-
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(regularButton);
-        bg.add(laconicButton);
-
-
-        SpinnerModel spinnerModel = new SpinnerNumberModel(workbenchSettings.getLimit(), 1, 900, 1);
-        maxExplanationsSelector.setModel(spinnerModel);
-        maxExplanationsSelector.setEnabled(!workbenchSettings.isFindAllExplanations());
-
-        final JRadioButton computeAllExplanationsRadioButton = new JRadioButton();
-        computeAllExplanationsRadioButton.setAction(new AbstractAction("All justifications") {
-            public void actionPerformed(ActionEvent e) {
-                workbenchSettings.setFindAllExplanations(computeAllExplanationsRadioButton.isSelected());
-                maxExplanationsSelector.setEnabled(!workbenchSettings.isFindAllExplanations());
-                refill();
-            }
-        });
-        final JRadioButton computeMaxExplanationsRadioButton = new JRadioButton();
-        computeMaxExplanationsRadioButton.setAction(new AbstractAction("Limit justifications to") {
-            public void actionPerformed(ActionEvent e) {
-                workbenchSettings.setFindAllExplanations(false);
-                maxExplanationsSelector.setEnabled(!workbenchSettings.isFindAllExplanations());
-                refill();
-            }
-        });
-        ButtonGroup limitButtonGroup = new ButtonGroup();
-        limitButtonGroup.add(computeAllExplanationsRadioButton);
-        limitButtonGroup.add(computeMaxExplanationsRadioButton);
-
-        if (workbenchSettings.isFindAllExplanations()) {
-            computeAllExplanationsRadioButton.setSelected(true);
-        }
-        else {
-            computeMaxExplanationsRadioButton.setSelected(true);
-        }
-
-        headerPanel.add(computeAllExplanationsRadioButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
-        headerPanel.add(computeMaxExplanationsRadioButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
-
-
-        final Timer spinnerUpdateTimer = new Timer(800, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                workbenchSettings.setLimit((Integer) maxExplanationsSelector.getValue());
-                refill();
-            }
-        });
-
-        spinnerUpdateTimer.setRepeats(false);
-
-        headerPanel.add(maxExplanationsSelector, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
-        maxExplanationsSelector.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 0));
-        maxExplanationsSelector.addChangeListener(new ChangeListener() {
-
-            public void stateChanged(ChangeEvent e) {
-                spinnerUpdateTimer.restart();
-            }
-        });*/
 
         return headerPanel;
     }
@@ -299,7 +220,7 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelM
         refill();
     }
 
-    protected ExplanationDisplay createProofExplanationDisplay(CycleBlockingExpression proofRoot, boolean allProofs) {
+    protected ExplanationDisplay createProofExplanationDisplay(CycleFreeProofRoot proofRoot, boolean allProofs) {
     	return new ProofFrameExplanationDisplay(editorKit, this, workbenchManager, proofRoot);    	
     }
 

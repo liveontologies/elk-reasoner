@@ -27,7 +27,10 @@ package org.semanticweb.owlapitools.proofs.util;
 import java.util.Collection;
 
 import org.semanticweb.owlapitools.proofs.OWLInference;
+import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
+import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
+import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
 
 /**
  * TODO
@@ -36,7 +39,7 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class TransformedOWLInference<T extends Operations.Transformation<OWLInference, Iterable<OWLInference>>> implements OWLInference {
+public class TransformedOWLInference<T extends OWLInferenceTransformation> implements OWLInference {
 
 	protected final OWLInference inference;
 	
@@ -52,16 +55,31 @@ public class TransformedOWLInference<T extends Operations.Transformation<OWLInfe
 		return inference.getConclusion();
 	}
 
-	protected TransformedOWLExpression<T> propagateTransformation(OWLExpression expr) {
-		return new TransformedOWLExpression<T>(expr, transformation);
+	protected TransformedOWLExpression<?, T> propagateTransformation(OWLExpression expr) {
+		// FIXME get rid of the cast later
+		T updated = (T) transformation.update(inference, expr);
+		
+		return expr.accept(new OWLExpressionVisitor<TransformedOWLExpression<?, T>>() {
+
+			@Override
+			public TransformedOWLExpression<?, T> visit(OWLAxiomExpression expression) {
+				return new TransformedOWLAxiomExpression<T>(expression, transformation);
+			}
+
+			@Override
+			public TransformedOWLExpression<?, T> visit(OWLLemmaExpression expression) {
+				return new TransformedOWLLemmaExpression<T>(expression, transformation);
+			}
+			
+		});
 	}
 
 	@Override
-	public Collection<? extends TransformedOWLExpression<T>> getPremises() {
-		return Operations.map(inference.getPremises(), new Operations.Transformation<OWLExpression, TransformedOWLExpression<T>>() {
+	public Collection<? extends TransformedOWLExpression<?, T>> getPremises() {
+		return Operations.map(inference.getPremises(), new Operations.Transformation<OWLExpression, TransformedOWLExpression<?, T>>() {
 
 			@Override
-			public TransformedOWLExpression<T> transform(OWLExpression premise) {
+			public TransformedOWLExpression<?, T> transform(OWLExpression premise) {
 				return propagateTransformation(premise);
 			}
 			

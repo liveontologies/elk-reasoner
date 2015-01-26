@@ -36,7 +36,7 @@ import org.semanticweb.elk.explanations.OWLRenderer;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
-import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
+import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
 import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
 
 /**
@@ -45,17 +45,17 @@ import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class ProofFrame implements OWLFrame<CycleBlockingExpression> {
+public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 	
 	private ProofFrameSection rootSection_;
 	
     private final List<OWLFrameListener> listeners_ = new ArrayList<OWLFrameListener>(2);
     
-    private CycleBlockingExpression rootExpression_;
+    private CycleFreeProofRoot rootExpression_;
 
     private final OWLRenderer renderer_;
 	
-    public ProofFrame(CycleBlockingExpression proofRoot, OWLRenderer renderer, OWLOntology active) {
+    public ProofFrame(CycleFreeProofRoot proofRoot, OWLRenderer renderer, OWLOntology active) {
     	renderer_ = renderer;
     	rootExpression_ = proofRoot;
     	rootSection_ = new ProofFrameSection(this, Collections.singletonList(proofRoot), "Proof tree", 0, renderer);
@@ -63,8 +63,8 @@ public class ProofFrame implements OWLFrame<CycleBlockingExpression> {
     }
 
 	public void blockInferencesForPremise(OWLExpression premise) {
-		CycleBlockingExpression root = getRootObject();
-		CycleBlockingExpression updatedRoot = root.blockExpression(premise);
+		CycleFreeProofRoot root = getRootObject();
+		CycleFreeProofRoot updatedRoot = root.blockExpression(premise);
 		// this will update the hierarchical model (sections and rows)
 		
 		//FIXME
@@ -83,7 +83,7 @@ public class ProofFrame implements OWLFrame<CycleBlockingExpression> {
 	}
 
 	@Override
-	public void setRootObject(CycleBlockingExpression expr) {
+	public void setRootObject(CycleFreeProofRoot expr) {
 		rootExpression_ = expr;
 		refresh();
 	}
@@ -108,7 +108,7 @@ public class ProofFrame implements OWLFrame<CycleBlockingExpression> {
 	}
 
 	@Override
-	public CycleBlockingExpression getRootObject() {
+	public CycleFreeProofRoot getRootObject() {
 		return rootExpression_;
 	}
 

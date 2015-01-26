@@ -27,7 +27,6 @@ package org.semanticweb.owlapitools.proofs.util;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
-import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionWrap;
 
 /**
@@ -42,9 +41,9 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionWrap;
  *
  *         pavel.klinov@uni-ulm.de
  */
-public class TransformedOWLExpression<T extends Operations.Transformation<OWLInference, Iterable<OWLInference>>> implements OWLExpression, OWLExpressionWrap {
+public abstract class TransformedOWLExpression<E extends OWLExpression, T extends OWLInferenceTransformation> implements OWLExpression, OWLExpressionWrap {
 
-	protected final OWLExpression expression;
+	protected final E expression;
 	
 	protected final T transformation; 
 	
@@ -55,16 +54,11 @@ public class TransformedOWLExpression<T extends Operations.Transformation<OWLInf
 			return propagateTransformation(inf);
 		}}; 
 	
-	public TransformedOWLExpression(OWLExpression expr, T f) {
+	public TransformedOWLExpression(E expr, T f) {
 		expression = expr;
 		transformation = f;
 	}
 	
-	@Override
-	public <O> O accept(OWLExpressionVisitor<O> visitor) {
-		return expression.accept(visitor);
-	}
-
 	@Override
 	public Iterable<TransformedOWLInference<T>> getInferences() throws ProofGenerationException {
 		return Operations.mapConcat(expression.getInferences(), new Operations.Transformation<OWLInference, Iterable<TransformedOWLInference<T>>>() {
@@ -93,7 +87,7 @@ public class TransformedOWLExpression<T extends Operations.Transformation<OWLInf
 	}
 	
 	@Override
-	public OWLExpression getExpression() {
+	public E getExpression() {
 		return expression;
 	}
 

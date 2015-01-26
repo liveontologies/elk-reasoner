@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.owlapitools.proofs;
+package org.semanticweb.owlapitools.proofs.util;
 /*
  * #%L
  * OWL API Proofs Model
@@ -24,31 +24,36 @@ package org.semanticweb.owlapitools.proofs;
  * #L%
  */
 
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
+import java.util.Collections;
+import java.util.Set;
+
+import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
-import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 
 /**
- * An extension of the OWL API's {@link OWLReasoner} for reasoners which can
- * reconstruct proofs for entailments.
+ * Blocks cyclic proofs
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public interface ExplainingOWLReasoner extends OWLReasoner {
+public class CycleBlocking extends RecursiveBlocking {
+	
+	public CycleBlocking(OWLExpression expr, OWLInferenceGraph ig) throws ProofGenerationException {
+		// root constructor
+		super(expr, Collections.<OWLExpression>emptySet(), ig);
+	}
+	
+	public CycleBlocking(OWLExpression expr, Set<OWLExpression> blockedExpressions, OWLInferenceGraph infGraph) {
+		// child constructor
+		super(expr, blockedExpressions, infGraph);
+	}
 
-	/**
-	 * Returns an {@link OWLExpression} object which represents the entailed
-	 * axiom, or {@code null} if the entailment does not hold. All proofs can be
-	 * unwound recursively by calling {@link OWLExpression#getInferences()} on
-	 * each premise.
-	 * 
-	 * @param entailment
-	 * @return
-	 */
-	public OWLAxiomExpression getDerivedExpression(OWLAxiom entailment) throws ProofGenerationException, UnsupportedEntailmentTypeException;
+	@Override
+	public CycleBlocking update(OWLInference inf, OWLExpression expr) {
+		// return a new transformation which blocks all expressions blocked by the
+		// current transformation plus all those which use the passed expression
+		return new CycleBlocking(expr, getBlockedExpressions(), infGraph);
+	}
 }

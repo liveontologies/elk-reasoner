@@ -29,7 +29,6 @@ import java.util.Set;
 
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
-import org.semanticweb.owlapitools.proofs.util.Operations.Transformation;
 
 /**
  * Blocks inferences which use blocked expressions as premises.
@@ -38,7 +37,7 @@ import org.semanticweb.owlapitools.proofs.util.Operations.Transformation;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class BlockingCondition implements Transformation<OWLInference, Iterable<OWLInference>> {//Condition<OWLInference> {
+public class BlockingCondition implements OWLInferenceTransformation {
 
 	private final Set<OWLExpression> blocked_;
 	
@@ -46,24 +45,6 @@ public class BlockingCondition implements Transformation<OWLInference, Iterable<
 		blocked_ = blocked;
 	}
 	
-	/*@Override
-	public boolean holds(OWLInference inf) {
-		boolean result = true;
-		
-		for (OWLExpression premise : inf.getPremises()) {
-			if (inf.getConclusion().equals(premise)) {
-				// filtering single cycles
-				return false;
-			}
-			
-			if (blocked_.contains(premise)) {
-				return false;
-			}
-		}
-		
-		return result;
-	}*/
-
 	public Set<OWLExpression> getBlockedExpressions() {
 		return blocked_;
 	}
@@ -82,5 +63,10 @@ public class BlockingCondition implements Transformation<OWLInference, Iterable<
 		}
 		
 		return Collections.singletonList(inf);
+	}
+
+	@Override
+	public OWLInferenceTransformation update(OWLInference inf, OWLExpression premise) {
+		return this;
 	}
 }

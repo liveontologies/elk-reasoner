@@ -43,7 +43,6 @@ import org.protege.editor.core.ui.list.MListDeleteButton;
 import org.protege.editor.core.ui.list.MListEditButton;
 import org.protege.editor.core.ui.list.MListItem;
 import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRow;
 import org.protege.editor.owl.ui.framelist.ExplainButton;
 import org.protege.editor.owl.ui.framelist.OWLFrameList;
 import org.protege.editor.owl.ui.framelist.OWLFrameListInferredSectionRowBorder;
@@ -51,7 +50,7 @@ import org.semanticweb.elk.explanations.AxiomSelectionModel;
 import org.semanticweb.elk.explanations.WorkbenchManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
-import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
+import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
 
 /**
  * 
@@ -60,7 +59,7 @@ import org.semanticweb.owlapitools.proofs.util.CycleBlockingExpression;
  *
  */
 @SuppressWarnings("serial")
-public class ProofFrameList extends OWLFrameList<CycleBlockingExpression> {
+public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 	
 	private static final Border INFERRED_BORDER = new OWLFrameListInferredSectionRowBorder();
 	
