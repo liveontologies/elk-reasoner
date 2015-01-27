@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.factories;
+package org.semanticweb.elk.reasoner.indexing.visitors;
 
 /*
  * #%L
@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,21 +22,19 @@ package org.semanticweb.elk.reasoner.indexing.factories;
  * #L%
  */
 
-import java.util.List;
-
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 
 /**
- * A factory for creating instances of
- * {@link ModifiableIndexedDisjointClassesAxiom}
+ * Visitor pattern interface for instances of
+ * {@link IndexedDisjointClassesAxiom}.
  * 
  * @author "Yevgeny Kazakov"
  * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
-public interface ModifiableIndexedDisjointnessAxiomFactory {
+public interface IndexedDisjointClassesAxiomVisitor<O> {
 
-	public ModifiableIndexedDisjointClassesAxiom getIndexedDisjointnessAxiom(
-			List<? extends ModifiableIndexedClassExpression> members);
+	O visit(IndexedDisjointClassesAxiom axiom);
 
 }

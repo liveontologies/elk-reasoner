@@ -50,7 +50,7 @@ public interface CachedIndexedObjectFactory {
 	public CachedIndexedDataHasValue getIndexedDataHasValue(
 			ElkDataHasValue elkDataHasValue);
 
-	public CachedIndexedDisjointnessAxiom getIndexedDisjointnessAxiom(
+	public CachedIndexedDisjointClassesAxiom getIndexedDisjointnessAxiom(
 			List<? extends ModifiableIndexedClassExpression> members);
 
 	public CachedIndexedIndividual getIndexedIndividual(

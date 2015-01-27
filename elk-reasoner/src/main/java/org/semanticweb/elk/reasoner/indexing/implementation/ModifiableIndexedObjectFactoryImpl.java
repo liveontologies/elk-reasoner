@@ -31,7 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDataHasValue;
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFactory;
@@ -85,9 +85,9 @@ public class ModifiableIndexedObjectFactoryImpl implements
 	}
 
 	@Override
-	public CachedIndexedDisjointnessAxiom getIndexedDisjointnessAxiom(
+	public CachedIndexedDisjointClassesAxiom getIndexedDisjointnessAxiom(
 			List<? extends ModifiableIndexedClassExpression> members) {
-		return new CachedIndexedDisjointnessAxiomImpl(members);
+		return new CachedIndexedDisjointClassesAxiomImpl(members);
 	}
 
 	@Override
