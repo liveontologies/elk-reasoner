@@ -22,7 +22,6 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClass;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDefinitionAxiom;
@@ -35,7 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ModifiableIndexedDefinitionAxiomImpl extends
-		ModifiableIndexedAxiomImpl implements ModifiableIndexedDefinitionAxiom {
+		ModifiableIndexedNonStructuralAxiom implements
+		ModifiableIndexedDefinitionAxiom {
 
 	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ModifiableIndexedDefinitionAxiomImpl.class);
@@ -67,48 +67,6 @@ public class ModifiableIndexedDefinitionAxiomImpl extends
 	}
 
 	@Override
-	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
-			int increment) {
-		boolean success = true;
-		if (increment > 0) {
-			int added = 0;
-			for (int i = 0; i < increment; i++) {
-				if (addOnce(index))
-					added++;
-				else {
-					success = false;
-					break;
-				}
-			}
-			if (!success) {
-				// revert the changes
-				for (; added > 0; added--) {
-					if (!removeOnce(index))
-						throw new ElkUnexpectedIndexingException(this);
-				}
-			}
-		} else {
-			// increment <= 0
-			int removed = 0;
-			for (int i = 0; i < -increment; i++) {
-				if (removeOnce(index))
-					removed++;
-				else {
-					success = false;
-					break;
-				}
-			}
-			if (!success) {
-				// revert the changes
-				for (; removed > 0; removed--) {
-					if (!addOnce(index))
-						throw new ElkUnexpectedIndexingException(this);
-				}
-			}
-		}
-		return success;
-	}
-
 	boolean addOnce(ModifiableOntologyIndex index) {
 		if (IndexedClassDecomposition.tryAddRuleFor(this, index))
 			return IndexedClassFromDefinitionRule.addRuleFor(this, index);
@@ -116,6 +74,7 @@ public class ModifiableIndexedDefinitionAxiomImpl extends
 		return SuperClassFromSubClassRule.addRulesFor(this, index);
 	}
 
+	@Override
 	boolean removeOnce(ModifiableOntologyIndex index) {
 		if (IndexedClassDecomposition.tryRemoveRuleFor(this, index))
 			return IndexedClassFromDefinitionRule.removeRuleFor(this, index);

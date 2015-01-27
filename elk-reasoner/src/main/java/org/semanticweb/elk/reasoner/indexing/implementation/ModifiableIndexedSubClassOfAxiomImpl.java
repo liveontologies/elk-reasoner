@@ -61,7 +61,6 @@ class ModifiableIndexedSubClassOfAxiomImpl extends
 		return "SubClassOf(" + this.subClass_ + ' ' + this.superClass_ + ')';
 	}
 
-	// TODO: Move to a common super-class to avoid code duplicate
 	@Override
 	boolean addOnce(ModifiableOntologyIndex index) {
 		return SuperClassFromSubClassRule.addRuleFor(this, index);
