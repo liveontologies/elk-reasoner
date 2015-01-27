@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
  * 
  */
 class ModifiableIndexedSubObjectPropertyOfAxiomImpl extends
-		ModifiableIndexedAxiomImpl implements
+		ModifiableIndexedNonStructuralAxiom implements
 		ModifiableIndexedSubObjectPropertyOfAxiom {
 
 	private final ModifiableIndexedPropertyChain subPropertyChain_;
@@ -67,51 +67,7 @@ class ModifiableIndexedSubObjectPropertyOfAxiomImpl extends
 	}
 
 	@Override
-	public final boolean updateOccurrenceNumbers(ModifiableOntologyIndex index,
-			int increment) {
-		boolean success = true;
-		if (increment > 0) {
-			int added = 0;
-			for (int i = 0; i < increment; i++) {
-				if (addOnce())
-					added++;
-				else {
-					success = false;
-					break;
-				}
-			}
-			if (!success) {
-				// revert the changes
-				for (; added > 0; added--) {
-					if (!removeOnce()) {
-						throw new ElkUnexpectedIndexingException(this);
-					}
-				}
-			}
-		} else {
-			// increment <= 0
-			int removed = 0;
-			for (int i = 0; i < -increment; i++) {
-				if (removeOnce())
-					removed++;
-				else {
-					success = false;
-					break;
-				}
-			}
-			if (!success) {
-				// revert the changes
-				for (; removed > 0; removed--) {
-					if (!addOnce()) {
-						throw new ElkUnexpectedIndexingException(this);
-					}
-				}
-			}
-		}
-		return success;
-	}
-
-	boolean addOnce() {
+	boolean addOnce(ModifiableOntologyIndex index) {
 		if (!subPropertyChain_.addToldSuperObjectProperty(superProperty_))
 			return false;
 		if (!superProperty_.addToldSubPropertyChain(subPropertyChain_)) {
@@ -125,7 +81,8 @@ class ModifiableIndexedSubObjectPropertyOfAxiomImpl extends
 		return true;
 	}
 
-	boolean removeOnce() {
+	@Override
+	boolean removeOnce(ModifiableOntologyIndex index) {
 		if (!subPropertyChain_.removeToldSuperObjectProperty(superProperty_))
 			return false;
 		if (!superProperty_.removeToldSubPropertyChain(subPropertyChain_)) {
