@@ -28,35 +28,35 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassEx
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDisjointClassesAxiom;
 
 /**
- * A {@link ModifiableIndexedDisjointClassesAxiom} that can be used for memoization
- * (caching).
+ * A {@link ModifiableIndexedDisjointClassesAxiom} that can be used for
+ * memoization (caching).
  * 
  * @author "Yevgeny Kazakov"
  *
  * @param <T>
- *            the type of the {@link CachedIndexedDisjointnessAxiom}
+ *            the type of the {@link CachedIndexedDisjointClassesAxiom}
  */
-public interface CachedIndexedDisjointnessAxiom extends
+public interface CachedIndexedDisjointClassesAxiom extends
 		ModifiableIndexedDisjointClassesAxiom,
-		CachedIndexedAxiom<CachedIndexedDisjointnessAxiom> {
+		CachedIndexedAxiom<CachedIndexedDisjointClassesAxiom> {
 
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(
 				Set<? extends ModifiableIndexedClassExpression> inconsistentMembers,
 				Set<? extends ModifiableIndexedClassExpression> disjointMembers) {
-			return combinedHashCode(CachedIndexedDisjointnessAxiom.class,
+			return combinedHashCode(CachedIndexedDisjointClassesAxiom.class,
 					combinedHashCode(inconsistentMembers),
 					combinedHashCode(disjointMembers));
 		}
 
-		public static CachedIndexedDisjointnessAxiom structuralEquals(
-				CachedIndexedDisjointnessAxiom first, Object second) {
+		public static CachedIndexedDisjointClassesAxiom structuralEquals(
+				CachedIndexedDisjointClassesAxiom first, Object second) {
 			if (first == second) {
 				return first;
 			}
-			if (second instanceof CachedIndexedDisjointnessAxiom) {
-				CachedIndexedDisjointnessAxiom secondEntry = (CachedIndexedDisjointnessAxiom) second;
+			if (second instanceof CachedIndexedDisjointClassesAxiom) {
+				CachedIndexedDisjointClassesAxiom secondEntry = (CachedIndexedDisjointClassesAxiom) second;
 				if (first.getDisjointMembers().equals(
 						secondEntry.getDisjointMembers())
 						&& first.getInconsistentMembers().equals(

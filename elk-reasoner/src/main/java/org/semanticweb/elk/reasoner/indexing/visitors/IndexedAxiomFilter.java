@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 public interface IndexedAxiomFilter extends
 		IndexedSubClassOfAxiomVisitor<IndexedSubClassOfAxiom>,
 		IndexedDefinitionAxiomVisitor<IndexedDefinitionAxiom>,
-		IndexedDisjointnessAxiomVisitor<IndexedDisjointClassesAxiom> {
+		IndexedDisjointClassesAxiomVisitor<IndexedDisjointClassesAxiom> {
 
 	// nothing else
 

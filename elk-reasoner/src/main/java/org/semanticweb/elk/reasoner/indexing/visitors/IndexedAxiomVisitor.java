@@ -33,8 +33,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
  *            the type of the output of this visitor
  */
 public interface IndexedAxiomVisitor<O> extends
-		IndexedDisjointnessAxiomVisitor<O>, IndexedSubClassOfAxiomVisitor<O>,
-		IndexedDefinitionAxiomVisitor<O>,
+		IndexedDisjointClassesAxiomVisitor<O>,
+		IndexedSubClassOfAxiomVisitor<O>, IndexedDefinitionAxiomVisitor<O>,
 		IndexedSubObjectPropertyOfAxiomVisitor<O>,
 		IndexedReflexiveObjectPropertyAxiomVisitor<O>,
 		IndexedDeclarationAxiomVisitor<O> {

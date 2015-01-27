@@ -32,6 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
@@ -250,6 +251,24 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		axiomFactory_.getIndexedSubObjectPropertyOfAxiom(axiom
 				.getSubObjectPropertyExpression().accept(this), axiom
 				.getSuperObjectPropertyExpression().accept(positiveConverter_));
+		return null;
+	}
+
+	@Override
+	public Void visit(ElkEquivalentObjectPropertiesAxiom axiom) {
+		// reduces equivalence to sub-property axioms
+		ModifiableIndexedObjectProperty first = null;
+		for (ElkObjectPropertyExpression pe : axiom
+				.getObjectPropertyExpressions()) {
+			if (first == null)
+				first = pe.accept(dualConverter_);
+			else {
+				ModifiableIndexedObjectProperty other = pe
+						.accept(dualConverter_);
+				axiomFactory_.getIndexedSubObjectPropertyOfAxiom(first, other);
+				axiomFactory_.getIndexedSubObjectPropertyOfAxiom(other, first);
+			}
+		}
 		return null;
 	}
 

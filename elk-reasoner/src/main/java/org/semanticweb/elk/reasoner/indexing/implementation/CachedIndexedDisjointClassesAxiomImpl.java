@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectFilter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
@@ -39,13 +39,13 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.DisjointSubsumerF
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
- * Implements {@link CachedIndexedDisjointnessAxiom}
+ * Implements {@link CachedIndexedDisjointClassesAxiom}
  * 
  * @author "Yevgeny Kazakov"
  */
-class CachedIndexedDisjointnessAxiomImpl extends
-		CachedIndexedAxiomImpl<CachedIndexedDisjointnessAxiom> implements
-		CachedIndexedDisjointnessAxiom {
+class CachedIndexedDisjointClassesAxiomImpl extends
+		CachedIndexedAxiomImpl<CachedIndexedDisjointClassesAxiom> implements
+		CachedIndexedDisjointClassesAxiom {
 
 	/**
 	 * {@link IndexedClassExpression}s that have at least two equal occurrences
@@ -60,18 +60,18 @@ class CachedIndexedDisjointnessAxiomImpl extends
 	private final Set<ModifiableIndexedClassExpression> disjointMembers_;
 
 	/**
-	 * This counts how often this {@link IndexedDisjointClassesAxiom} occurs in the
-	 * ontology.
+	 * This counts how often this {@link IndexedDisjointClassesAxiom} occurs in
+	 * the ontology.
 	 */
 	int totalOccurrenceNo_ = 0;
 
-	CachedIndexedDisjointnessAxiomImpl(
+	CachedIndexedDisjointClassesAxiomImpl(
 			List<? extends ModifiableIndexedClassExpression> members) {
 		this(new Initializer(members));
 	}
 
-	private CachedIndexedDisjointnessAxiomImpl(Initializer init) {
-		super(CachedIndexedDisjointnessAxiom.Helper.structuralHashCode(
+	private CachedIndexedDisjointClassesAxiomImpl(Initializer init) {
+		super(CachedIndexedDisjointClassesAxiom.Helper.structuralHashCode(
 				init.inconsistentMembers_, init.disjointMembers_));
 		this.inconsistentMembers_ = init.inconsistentMembers_;
 		this.disjointMembers_ = init.disjointMembers_;
@@ -113,8 +113,8 @@ class CachedIndexedDisjointnessAxiomImpl extends
 	}
 
 	@Override
-	public final CachedIndexedDisjointnessAxiom structuralEquals(Object other) {
-		return CachedIndexedDisjointnessAxiom.Helper.structuralEquals(this,
+	public final CachedIndexedDisjointClassesAxiom structuralEquals(Object other) {
+		return CachedIndexedDisjointClassesAxiom.Helper.structuralEquals(this,
 				other);
 	}
 
@@ -172,7 +172,7 @@ class CachedIndexedDisjointnessAxiomImpl extends
 	}
 
 	@Override
-	public CachedIndexedDisjointnessAxiom accept(
+	public CachedIndexedDisjointClassesAxiom accept(
 			CachedIndexedObjectFilter filter) {
 		return filter.filter(this);
 	}

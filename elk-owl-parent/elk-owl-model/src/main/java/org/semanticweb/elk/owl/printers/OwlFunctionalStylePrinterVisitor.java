@@ -420,7 +420,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	@Override
 	public Void visit(
 			ElkEquivalentObjectPropertiesAxiom elkEquivalentObjectProperties) {
-		write("DisjointObjectProperties(");
+		write("EquivalentObjectProperties(");
 		write(elkEquivalentObjectProperties.getObjectPropertyExpressions());
 		write(')');
 		return null;

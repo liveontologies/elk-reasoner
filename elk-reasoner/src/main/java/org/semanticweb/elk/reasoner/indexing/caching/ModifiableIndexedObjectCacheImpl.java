@@ -144,13 +144,13 @@ public class ModifiableIndexedObjectCacheImpl implements
 
 	@Override
 	public void add(CachedIndexedObject<?> input) {
-		LOGGER_.trace(input + ": adding to cache");
+		LOGGER_.trace("{}: adding to cache", input);
 		input.accept(inserter_);
 	}
 
 	@Override
 	public void remove(CachedIndexedObject<?> input) {
-		LOGGER_.trace(input + ": removing from cache");
+		LOGGER_.trace("{}: removing from cache", input);
 		input.accept(deleter_);
 	}
 
@@ -209,8 +209,8 @@ public class ModifiableIndexedObjectCacheImpl implements
 		}
 
 		@Override
-		public CachedIndexedDisjointnessAxiom filter(
-				CachedIndexedDisjointnessAxiom element) {
+		public CachedIndexedDisjointClassesAxiom filter(
+				CachedIndexedDisjointClassesAxiom element) {
 			return cachedAxioms_.findStructural(element);
 		}
 
@@ -280,8 +280,8 @@ public class ModifiableIndexedObjectCacheImpl implements
 		}
 
 		@Override
-		public CachedIndexedDisjointnessAxiom filter(
-				CachedIndexedDisjointnessAxiom element) {
+		public CachedIndexedDisjointClassesAxiom filter(
+				CachedIndexedDisjointClassesAxiom element) {
 			cachedAxioms_.addStructural(element);
 			return null;
 		}
@@ -343,8 +343,8 @@ public class ModifiableIndexedObjectCacheImpl implements
 		}
 
 		@Override
-		public CachedIndexedDisjointnessAxiom filter(
-				CachedIndexedDisjointnessAxiom element) {
+		public CachedIndexedDisjointClassesAxiom filter(
+				CachedIndexedDisjointClassesAxiom element) {
 			return cachedAxioms_.removeStructural(element);
 		}
 
