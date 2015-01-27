@@ -81,9 +81,9 @@ public class DelegatingCachedIndexedObjectFactory implements
 	}
 
 	@Override
-	public final CachedIndexedDisjointnessAxiom getIndexedDisjointnessAxiom(
+	public final CachedIndexedDisjointClassesAxiom getIndexedDisjointClassesAxiom(
 			List<? extends ModifiableIndexedClassExpression> members) {
-		return filter(baseFactory_.getIndexedDisjointnessAxiom(members));
+		return filter(baseFactory_.getIndexedDisjointClassesAxiom(members));
 	}
 
 	@Override

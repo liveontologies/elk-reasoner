@@ -209,8 +209,8 @@ public class ModifiableIndexedObjectCacheImpl implements
 		}
 
 		@Override
-		public CachedIndexedDisjointnessAxiom filter(
-				CachedIndexedDisjointnessAxiom element) {
+		public CachedIndexedDisjointClassesAxiom filter(
+				CachedIndexedDisjointClassesAxiom element) {
 			return cachedAxioms_.findStructural(element);
 		}
 
@@ -280,8 +280,8 @@ public class ModifiableIndexedObjectCacheImpl implements
 		}
 
 		@Override
-		public CachedIndexedDisjointnessAxiom filter(
-				CachedIndexedDisjointnessAxiom element) {
+		public CachedIndexedDisjointClassesAxiom filter(
+				CachedIndexedDisjointClassesAxiom element) {
 			cachedAxioms_.addStructural(element);
 			return null;
 		}
@@ -343,8 +343,8 @@ public class ModifiableIndexedObjectCacheImpl implements
 		}
 
 		@Override
-		public CachedIndexedDisjointnessAxiom filter(
-				CachedIndexedDisjointnessAxiom element) {
+		public CachedIndexedDisjointClassesAxiom filter(
+				CachedIndexedDisjointClassesAxiom element) {
 			return cachedAxioms_.removeStructural(element);
 		}
 

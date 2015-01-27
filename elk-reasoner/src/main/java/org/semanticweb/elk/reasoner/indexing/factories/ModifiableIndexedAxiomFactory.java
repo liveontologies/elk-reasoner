@@ -34,7 +34,7 @@ public interface ModifiableIndexedAxiomFactory extends
 		ModifiableIndexedSubClassOfAxiomFactory,
 		ModifiableIndexedSubObjectPropertyOfAxiomFactory,
 		ModifiableIndexedReflexiveObjectPropertyAxiomFactory,
-		ModifiableIndexedDisjointnessAxiomFactory,
+		ModifiableIndexedDisjointClassesAxiomFactory,
 		ModifiableIndexedDeclarationAxiomFactory {
 
 	// combined interface

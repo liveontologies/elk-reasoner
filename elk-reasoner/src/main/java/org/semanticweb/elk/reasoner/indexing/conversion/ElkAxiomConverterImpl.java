@@ -325,7 +325,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 					members.size());
 			for (ElkClassExpression member : members)
 				indexedMembers.add(member.accept(negativeConverter_));
-			axiomFactory_.getIndexedDisjointnessAxiom(indexedMembers);
+			axiomFactory_.getIndexedDisjointClassesAxiom(indexedMembers);
 			return null;
 		}
 		/*
