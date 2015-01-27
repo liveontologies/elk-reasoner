@@ -28,6 +28,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
+ * FIXME delete it, the queue is not supposed to be local to the worker
+ * 
  * Implements basic job queueing and lets subclasses focus
  * on processing single jobs
  * 

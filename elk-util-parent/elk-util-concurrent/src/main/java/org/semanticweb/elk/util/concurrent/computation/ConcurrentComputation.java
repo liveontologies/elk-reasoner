@@ -62,6 +62,10 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	 * the internal buffer for queuing input
 	 */
 	protected final BlockingQueue<I> buffer;
+
+	// we are never going to call any method on this object
+	@SuppressWarnings("unchecked")
+	private I POISION_PILL = (I) new Object();
 	/**
 	 * {@code true} if the finish of computation was requested using the
 	 * function {@link #finish()}
@@ -180,8 +184,9 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	public void finish() throws InterruptedException {
 		if (!finishRequested) {
 			finishRequested = true;
-			executor.interrupt();
+			buffer.put(POISION_PILL);
 		}
+
 		executor.waitDone();
 		inputProcessorFactory.finish();
 	}
@@ -195,7 +200,7 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	private class Worker implements Runnable {
 		@Override
 		public final void run() {
-			I nextInput;
+			I nextInput = null;
 			// we use one engine per worker run
 			InputProcessor<I> inputProcessor = inputProcessorFactory
 					.getEngine();
@@ -214,7 +219,11 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 						}
 						if (finishRequested) {
 							nextInput = buffer.poll();
-							if (nextInput == null) {
+
+							if (nextInput == POISION_PILL || nextInput == null) {
+								// let's poison other workers blocked by the
+								// empty buffer
+								buffer.put(POISION_PILL);
 								// make sure nothing is left unprocessed
 								inputProcessor.process(); // can be interrupted
 								if (!interrupted && Thread.interrupted())
@@ -223,6 +232,10 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 							}
 						} else {
 							nextInput = buffer.take();
+
+							if (nextInput == POISION_PILL) {
+								continue;
+							}
 						}
 						inputProcessor.submit(nextInput); // should never fail
 						inputProcessor.process(); // can be interrupted

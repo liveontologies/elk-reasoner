@@ -84,7 +84,7 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 						 * when JVM exits.
 						 */
 						result.setDaemon(true);
-						
+
 						return result;
 					}
 				});
@@ -184,10 +184,10 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 		public void run() {
 			try {
 				job.run();
+
+				return;
 			} catch (Throwable e) {
-				exception = new ComputationRuntimeException(
-						"Uncaught exception in a worker thread:", e);
-				executorThread.interrupt();
+				handleUnexpectedException(e);
 			} finally {
 				done.countDown();
 				/*
@@ -196,6 +196,12 @@ public class ComputationExecutor extends ThreadPoolExecutor {
 				 */
 				Thread.interrupted();
 			}
+		}
+
+		private void handleUnexpectedException(Throwable e) {
+			exception = new ComputationRuntimeException(
+					"Uncaught exception in a worker thread:", e);
+			executorThread.interrupt();
 		}
 	}
 
