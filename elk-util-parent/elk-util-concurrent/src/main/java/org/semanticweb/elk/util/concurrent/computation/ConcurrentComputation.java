@@ -78,7 +78,7 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	/**
 	 * {@code true} if the computation has been interrupted
 	 */
-	private boolean interrupted_;
+	private boolean isInterrupted_;
 	/**
 	 * the worker instance used to process the jobs
 	 */
@@ -103,7 +103,7 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 		this.inputProcessorFactory_ = inputProcessorFactory;
 		this.buffer_ = new ArrayBlockingQueue<I>(bufferCapacity);
 		this.finishRequested_ = false;
-		this.interrupted_ = false;
+		this.isInterrupted_ = false;
 		this.worker_ = new Worker();
 		this.executor_ = executor;
 		this.maxWorkers_ = maxWorkers;
@@ -139,7 +139,7 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	 */
 	public synchronized boolean start() {
 		finishRequested_ = false;
-		interrupted_ = false;
+		isInterrupted_ = false;
 		return executor_.start(worker_, maxWorkers_);
 	}
 
@@ -173,9 +173,9 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	 * @throws InterruptedException
 	 */
 	public synchronized Iterable<I> interrupt() throws InterruptedException {
-		if (!interrupted_) {
-			interrupted_ = true;
-			executor_.interrupt();
+		if (!isInterrupted_) {
+			isInterrupted_ = true;
+			inputProcessorFactory_.interrupt();
 		}
 		executor_.waitDone();
 		return buffer_;
@@ -198,7 +198,6 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 			buffer_.put(poison_pill_);
 			finishRequested_ = true;
 		}
-
 		executor_.waitDone();
 		inputProcessorFactory_.finish();
 	}
@@ -220,7 +219,7 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 			try {
 				boolean doneProcess = false;
 				for (;;) {
-					if (interrupted_)
+					if (isInterrupted_)
 						break;
 					try {
 						// make sure that all previously submitted inputs are
@@ -235,18 +234,19 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 							buffer_.put(poison_pill_);
 							// make sure nothing is left unprocessed
 							inputProcessor.process(); // can be interrupted
-							if (!interrupted_ && Thread.interrupted())
-								continue;
 							break;
 						}
 						inputProcessor.submit(nextInput); // should never fail
 						inputProcessor.process(); // can be interrupted
 					} catch (InterruptedException e) {
-						if (interrupted_) {
-							// restore the interrupt status and exit
-							Thread.currentThread().interrupt();
-							break;
-						}
+						/*
+						 * we don't know what is causing this but we need to
+						 * obey; consistency of the computation for such
+						 * interrupt is not guaranteed; restore the interrupt
+						 * status and exit
+						 */
+						Thread.currentThread().interrupt();
+						break;
 					}
 				}
 			} finally {

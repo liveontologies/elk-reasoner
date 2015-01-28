@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -46,6 +47,12 @@ public class PropertyHierarchyCompositionComputationFactory
 	@Override
 	public Engine getEngine() {
 		return new Engine();
+	}
+
+	@Override
+	public void interrupt() {
+		// nothing to interrupt as everything is processed immediately upon
+		// submission
 	}
 
 	@Override

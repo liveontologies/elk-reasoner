@@ -114,6 +114,12 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	private final TransitiveReductionOutputEquivalent<IndexedClass> defaultTopOutput_;
 
 	/**
+	 * {@code true} if computation has been interrupted and all running workers
+	 * should stop immediately
+	 */
+	private volatile boolean isInterrupted_ = false;
+
+	/**
 	 * Creating a new transitive reduction engine for the input ontology index
 	 * and a listener for executing callback functions.
 	 * 
@@ -144,7 +150,14 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	}
 
 	@Override
+	public void interrupt() {
+		isInterrupted_ = true;
+		saturationFactory_.interrupt();
+	}
+
+	@Override
 	public void finish() {
+		isInterrupted_ = false;
 		saturationFactory_.finish();
 	}
 
@@ -464,7 +477,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		@Override
 		public final void process() throws InterruptedException {
 			for (;;) {
-				if (Thread.currentThread().isInterrupted())
+				if (isInterrupted_)
 					return;
 				J processedJob = jobsWithSaturatedRoot_.poll();
 				if (processedJob != null) {

@@ -191,9 +191,10 @@ public class ConsistencyChecking
 
 	@Override
 	public void process() {
-		consistencyMonitor_.registerCurrentThreadToInterrupt();
+		consistencyMonitor_
+				.registerComputationToInterrupt(ConsistencyChecking.this);
 		super.process();
-		consistencyMonitor_.clearThreadToInterrupt();
+		consistencyMonitor_.clearComputationToInterrupt();
 	}
 
 	/**
@@ -250,18 +251,15 @@ public class ConsistencyChecking
 	 */
 	static class ConsistencyMonitor {
 		private volatile boolean inconsistent_ = false;
-		private volatile Thread controlThread;
+		private volatile ConsistencyChecking computation_;
 
-		public void registerThreadToInterrupt(Thread controlThread) {
-			this.controlThread = controlThread;
+		public void registerComputationToInterrupt(
+				ConsistencyChecking computation) {
+			this.computation_ = computation;
 		}
 
-		public void registerCurrentThreadToInterrupt() {
-			registerThreadToInterrupt(Thread.currentThread());
-		}
-
-		public void clearThreadToInterrupt() {
-			this.controlThread = null;
+		public void clearComputationToInterrupt() {
+			this.computation_ = null;
 		}
 
 		public boolean isInconsistent() {
@@ -270,9 +268,10 @@ public class ConsistencyChecking
 
 		public void setInconsistent() {
 			inconsistent_ = true;
-			// interrupt the reasoner
-			if (controlThread != null)
-				controlThread.interrupt();
+			// interrupt all workers
+			if (computation_ != null)
+				computation_.getInputProcessorFactory().interrupt();
+
 		}
 
 	}

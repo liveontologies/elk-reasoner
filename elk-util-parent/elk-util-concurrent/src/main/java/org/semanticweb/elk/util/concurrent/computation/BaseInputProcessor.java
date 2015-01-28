@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.util.concurrent.computation;
+
 /*
  * #%L
  * ELK Utilities for Concurrency
@@ -30,32 +31,33 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * FIXME delete it, the queue is not supposed to be local to the worker
  * 
- * Implements basic job queueing and lets subclasses focus
- * on processing single jobs
+ * Implements basic job queueing and lets subclasses focus on processing single
+ * jobs
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
 public abstract class BaseInputProcessor<J> implements InputProcessor<J> {
 
 	/**
 	 * The buffer for jobs that need to be processed, i.e., those for which the
-	 * method {@link submit(J)} was executed but processing
-	 * of jobs has not been started yet.
+	 * method {@link submit(J)} was executed but processing of jobs has not been
+	 * started yet.
 	 */
 	private final Queue<J> jobsToDo_ = new ConcurrentLinkedQueue<J>();
-	
+
 	private final InputProcessorListenerNotifyFinishedJob<J> listener_;
-	
+
 	public BaseInputProcessor() {
 		this(null);
 	}
-	
-	public BaseInputProcessor(final InputProcessorListenerNotifyFinishedJob<J> listener) {
+
+	public BaseInputProcessor(
+			final InputProcessorListenerNotifyFinishedJob<J> listener) {
 		listener_ = listener;
 	}
-	
+
 	@Override
 	public void submit(J job) {
 		jobsToDo_.add(job);
@@ -64,18 +66,18 @@ public abstract class BaseInputProcessor<J> implements InputProcessor<J> {
 	@Override
 	public void process() throws InterruptedException {
 		for (;;) {
-			if (Thread.currentThread().isInterrupted()) {
+			if (isInterrupted()) {
 				break;
 			}
-			
+
 			J nextJob = jobsToDo_.poll();
-			
+
 			if (nextJob == null) {
 				break;
 			}
-			
+
 			process(nextJob);
-			
+
 			if (listener_ != null) {
 				listener_.notifyFinished(nextJob);
 			}
@@ -83,7 +85,10 @@ public abstract class BaseInputProcessor<J> implements InputProcessor<J> {
 	}
 
 	@Override
-	public void finish() {}
+	public void finish() {
+	}
+
+	protected abstract boolean isInterrupted();
 
 	protected abstract void process(J job);
 }

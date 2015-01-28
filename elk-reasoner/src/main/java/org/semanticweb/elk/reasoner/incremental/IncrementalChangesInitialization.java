@@ -96,6 +96,11 @@ class ContextInitializationFactory
 	private final LinkRule<Context> changedGlobalRuleHead_;
 	private AtomicInteger ruleHits = new AtomicInteger(0);
 	private final SaturationStatistics stageStatistics_;
+	/**
+	 * {@code true} if computation has been interrupted and all running workers
+	 * should stop immediately
+	 */
+	private volatile boolean isInterrupted_ = false;
 
 	public ContextInitializationFactory(
 			SaturationState state,
@@ -115,6 +120,18 @@ class ContextInitializationFactory
 	@Override
 	public InputProcessor<ArrayList<Context>> getEngine() {
 		return getEngine(getBaseContextProcessor());
+	}
+
+	@Override
+	public void interrupt() {
+		isInterrupted_ = true;
+	}
+
+	@Override
+	public void finish() {
+		isInterrupted_ = false;
+		if (LOGGER_.isDebugEnabled())
+			LOGGER_.debug("Rule hits: " + ruleHits.get());
 	}
 
 	private ContextProcessor getBaseContextProcessor() {
@@ -194,16 +211,10 @@ class ContextInitializationFactory
 		if (SaturationUtils.COLLECT_PROCESSING_TIMES) {
 			return new TimedContextCollectionProcessor(baseProcessor,
 					stageStatistics_.getIncrementalProcessingStatistics());
-		} else {
-			return new ContextCollectionProcessor(baseProcessor);
 		}
+		// else
+		return new ContextCollectionProcessor(baseProcessor);
 
-	}
-
-	@Override
-	public void finish() {
-		if (LOGGER_.isDebugEnabled())
-			LOGGER_.debug("Rule hits: " + ruleHits.get());
 	}
 
 	/**
@@ -212,7 +223,7 @@ class ContextInitializationFactory
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private static class TimedContextCollectionProcessor extends
+	private class TimedContextCollectionProcessor extends
 			BaseInputProcessor<ArrayList<Context>> {
 
 		private final ContextProcessor contextProcessor_;
@@ -265,6 +276,12 @@ class ContextInitializationFactory
 
 			stageStats_.add(localStats_);
 		}
+
+		@Override
+		protected boolean isInterrupted() {
+			return isInterrupted_;
+		}
+
 	}
 
 	/**
@@ -273,7 +290,7 @@ class ContextInitializationFactory
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private static class ContextCollectionProcessor extends
+	private class ContextCollectionProcessor extends
 			BaseInputProcessor<ArrayList<Context>> {
 
 		private final ContextProcessor contextProcessor_;
@@ -293,6 +310,11 @@ class ContextInitializationFactory
 		public void finish() {
 			super.finish();
 			contextProcessor_.finish();
+		}
+
+		@Override
+		protected boolean isInterrupted() {
+			return isInterrupted_;
 		}
 
 	}

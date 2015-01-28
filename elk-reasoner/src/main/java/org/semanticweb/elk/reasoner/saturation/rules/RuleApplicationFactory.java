@@ -73,6 +73,8 @@ public class RuleApplicationFactory {
 	 */
 	private final boolean trackModifiedContexts_;
 
+	private volatile boolean interrupted_ = false;
+
 	public RuleApplicationFactory(final SaturationState saturationState) {
 		this(saturationState, false);
 	}
@@ -92,7 +94,12 @@ public class RuleApplicationFactory {
 		return new DefaultEngine(listener, modListener);
 	}
 
+	public void interrupt() {
+		interrupted_ = true;
+	}
+
 	public void finish() {
+		interrupted_ = false;
 		// aggregatedStats_.check(LOGGER_);
 	}
 
@@ -138,7 +145,7 @@ public class RuleApplicationFactory {
 			}
 
 			for (;;) {
-				if (Thread.currentThread().isInterrupted())
+				if (interrupted_)
 					break;
 
 				Context nextContext = writer.pollForActiveContext();

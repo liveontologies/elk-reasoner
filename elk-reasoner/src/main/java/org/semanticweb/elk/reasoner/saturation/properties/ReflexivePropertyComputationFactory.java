@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -54,6 +55,11 @@ public class ReflexivePropertyComputationFactory
 	 * chains they are part of.
 	 */
 	private final Queue<IndexedPropertyChain> toDo_ = new ConcurrentLinkedQueue<IndexedPropertyChain>();
+	/**
+	 * {@code true} if computation has been interrupted and all running workers
+	 * should stop immediately
+	 */
+	private volatile boolean isInterrupted_ = false;
 
 	@Override
 	public Engine getEngine() {
@@ -61,8 +67,13 @@ public class ReflexivePropertyComputationFactory
 	}
 
 	@Override
+	public void interrupt() {
+		isInterrupted_ = true;
+	}
+
+	@Override
 	public void finish() {
-		// nothing to do
+		isInterrupted_ = false;
 	}
 
 	private void toDo(IndexedPropertyChain ipc) {
@@ -85,7 +96,8 @@ public class ReflexivePropertyComputationFactory
 		for (IndexedBinaryPropertyChain chain : iop.getLeftChains()) {
 			SaturatedPropertyChain rightSaturation = chain.getRightProperty()
 					.getSaturated();
-			if (rightSaturation == null || !rightSaturation.isDerivedReflexive())
+			if (rightSaturation == null
+					|| !rightSaturation.isDerivedReflexive())
 				continue;
 			toDo(chain);
 		}
@@ -133,8 +145,10 @@ public class ReflexivePropertyComputationFactory
 		}
 
 		@Override
-		public void process() throws InterruptedException {
+		public void process() {
 			for (;;) {
+				if (isInterrupted_)
+					return;
 				IndexedPropertyChain next = toDo_.poll();
 				if (next == null)
 					return;

@@ -208,6 +208,11 @@ public class InstanceTaxonomyComputationFactory implements
 	}
 
 	@Override
+	public void interrupt() {
+		transitiveReductionShared_.interrupt();
+	}
+
+	@Override
 	public void finish() {
 		transitiveReductionShared_.finish();
 	}

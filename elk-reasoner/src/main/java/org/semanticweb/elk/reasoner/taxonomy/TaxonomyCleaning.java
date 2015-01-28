@@ -83,11 +83,18 @@ class TaxonomyCleaningFactory
 		implements
 		InputProcessorFactory<IndexedClassEntity, InputProcessor<IndexedClassEntity>> {
 
-	/*private static final Logger LOGGER_ = Logger
-			.getLogger(TaxonomyCleaningFactory.class);*/
+	/*
+	 * private static final Logger LOGGER_ = Logger
+	 * .getLogger(TaxonomyCleaningFactory.class);
+	 */
 
 	private final ClassTaxonomyState classTaxonomyState_;
 	private final InstanceTaxonomyState instanceTaxonomyState_;
+	/**
+	 * {@code true} if computation has been interrupted and all running workers
+	 * should stop immediately
+	 */
+	private volatile boolean isInterrupted_ = false;
 
 	TaxonomyCleaningFactory(final ClassTaxonomyState classTaxonomyState,
 			final InstanceTaxonomyState instanceTaxonomyState) {
@@ -255,8 +262,11 @@ class TaxonomyCleaningFactory
 			}
 
 			@Override
-			public void process() throws InterruptedException {
+			public void process() {
 				for (;;) {
+					if (isInterrupted_)
+						return;
+
 					UpdateableTaxonomyNode<ElkClass> node = toRemove_.poll();
 
 					if (node == null) {
@@ -291,6 +301,13 @@ class TaxonomyCleaningFactory
 	}
 
 	@Override
-	public void finish() {
+	public void interrupt() {
+		isInterrupted_ = true;
 	}
+
+	@Override
+	public void finish() {
+		isInterrupted_ = false;
+	}
+
 }

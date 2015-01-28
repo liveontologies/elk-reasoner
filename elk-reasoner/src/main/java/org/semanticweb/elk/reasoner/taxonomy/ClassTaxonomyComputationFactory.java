@@ -143,14 +143,15 @@ public class ClassTaxonomyComputationFactory implements
 		public void visit(
 				TransitiveReductionOutputEquivalentDirect<IndexedClass> output) {
 
-			//LOGGER_.trace("+++ creating node for equivalent classes: " + output.getEquivalent());
-			
+			// LOGGER_.trace("+++ creating node for equivalent classes: " +
+			// output.getEquivalent());
+
 			UpdateableTaxonomyNode<ElkClass> node = taxonomy_
 					.getCreateNode(output.getEquivalent());
 
 			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
 					.getDirectSubsumers()) {
-							
+
 				UpdateableTaxonomyNode<ElkClass> superNode = taxonomy_
 						.getCreateNode(directSuperEquivalent.getEquivalent());
 				assignDirectSuperClassNode(node, superNode);
@@ -215,6 +216,11 @@ public class ClassTaxonomyComputationFactory implements
 	public Engine getEngine() {
 		return new Engine();
 
+	}
+
+	@Override
+	public void interrupt() {
+		transitiveReductionShared_.interrupt();
 	}
 
 	@Override

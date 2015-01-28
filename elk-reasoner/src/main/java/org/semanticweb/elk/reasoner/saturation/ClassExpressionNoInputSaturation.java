@@ -96,7 +96,13 @@ class ClassExpressionNoInputSaturationFactory
 	}
 
 	@Override
+	public void interrupt() {
+		ruleAppFactory_.interrupt();
+	}
+
+	@Override
 	public void finish() {
+		// nothing to do
 	}
 
 	public SaturationStatistics getRuleAndConclusionStatistics() {
@@ -120,7 +126,7 @@ class ClassExpressionNoInputSaturationFactory
 		}
 
 		@Override
-		public void process() throws InterruptedException {
+		public void process() {
 			BaseEngine engine = ruleAppFactory_
 					.getDefaultEngine(ContextCreationListener.DUMMY,
 							contextModificationListener_);
@@ -139,4 +145,5 @@ class ClassExpressionNoInputSaturationFactory
 		}
 
 	}
+
 }
