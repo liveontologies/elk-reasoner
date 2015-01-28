@@ -61,18 +61,18 @@ public class ClassTaxonomyComputation
 	 *         {@link #process()} should be called first to compute the taxonomy
 	 */
 	public UpdateableTaxonomy<ElkClass> getTaxonomy() {
-		return inputProcessorFactory.getTaxonomy();
+		return getInputProcessorFactory().getTaxonomy();
 	}
 
 	/**
 	 * Print statistics about taxonomy computation
 	 */
 	public void printStatistics() {
-		inputProcessorFactory.printStatistics();
+		getInputProcessorFactory().printStatistics();
 	}
 
 	public SaturationStatistics getRuleAndConclusionStatistics() {
-		return inputProcessorFactory.getRuleAndConclusionStatistics();
+		return getInputProcessorFactory().getRuleAndConclusionStatistics();
 	}
 
 }

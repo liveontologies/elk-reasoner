@@ -92,11 +92,11 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 	 * Print statistics about the saturation computation
 	 */
 	public void printStatistics() {
-		inputProcessorFactory.printStatistics();
+		getInputProcessorFactory().printStatistics();
 	}
 
 	public SaturationStatistics getRuleAndConclusionStatistics() {
-		return inputProcessorFactory.getRuleAndConclusionStatistics();
+		return getInputProcessorFactory().getRuleAndConclusionStatistics();
 	}
 
 	/**

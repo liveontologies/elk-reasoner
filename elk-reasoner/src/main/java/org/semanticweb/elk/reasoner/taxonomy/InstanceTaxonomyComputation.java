@@ -58,20 +58,20 @@ public class InstanceTaxonomyComputation
 				maxWorkers, partialTaxonomy), executor, maxWorkers,
 				progressMonitor);
 	}
-	
+
 	/**
 	 * @return the taxonomy computed by this computation; the method
 	 *         {@link #process()} should be called first to compute the taxonomy
 	 */
 	public UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
-		return inputProcessorFactory.getTaxonomy();
+		return getInputProcessorFactory().getTaxonomy();
 	}
 
 	/**
 	 * Print statistics about taxonomy computation
 	 */
 	public void printStatistics() {
-		inputProcessorFactory.printStatistics();
+		getInputProcessorFactory().printStatistics();
 	}
 
 }

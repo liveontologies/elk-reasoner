@@ -47,14 +47,14 @@ public class ClassExpressionNoInputSaturation
 		ReasonerComputation<IndexedClassExpression, ClassExpressionNoInputSaturationFactory> {
 
 	public ClassExpressionNoInputSaturation(final ComputationExecutor executor,
-			final int maxWorkers,
-			final ProgressMonitor progressMonitor,
+			final int maxWorkers, final ProgressMonitor progressMonitor,
 			final RuleApplicationFactory ruleAppFactory,
 			final ContextModificationListener contextModificationListener) {
 
 		super(Collections.<IndexedClassExpression> emptyList(),
-				new ClassExpressionNoInputSaturationFactory(ruleAppFactory, contextModificationListener),
-				executor, maxWorkers, progressMonitor);
+				new ClassExpressionNoInputSaturationFactory(ruleAppFactory,
+						contextModificationListener), executor, maxWorkers,
+				progressMonitor);
 	}
 
 	/**
@@ -62,11 +62,11 @@ public class ClassExpressionNoInputSaturation
 	 */
 
 	public void printStatistics() {
-		inputProcessorFactory.printStatistics();
+		getInputProcessorFactory().printStatistics();
 	}
 
 	public SaturationStatistics getRuleAndConclusionStatistics() {
-		return inputProcessorFactory.getRuleAndConclusionStatistics();
+		return getInputProcessorFactory().getRuleAndConclusionStatistics();
 	}
 
 }
@@ -74,12 +74,12 @@ public class ClassExpressionNoInputSaturation
 class ClassExpressionNoInputSaturationFactory
 		implements
 		InputProcessorFactory<IndexedClassExpression, ClassExpressionNoInputSaturationFactory.Engine> {
-	
+
 	private static final Logger LOGGER_ = Logger
-			.getLogger(ClassExpressionNoInputSaturationFactory.class);	
+			.getLogger(ClassExpressionNoInputSaturationFactory.class);
 
 	private final RuleApplicationFactory ruleAppFactory_;
-	
+
 	private final ContextModificationListener contextModificationListener_;
 
 	public ClassExpressionNoInputSaturationFactory(
@@ -121,12 +121,13 @@ class ClassExpressionNoInputSaturationFactory
 
 		@Override
 		public void process() throws InterruptedException {
-			BaseEngine engine = ruleAppFactory_.getDefaultEngine(ContextCreationListener.DUMMY, contextModificationListener_);
-			
+			BaseEngine engine = ruleAppFactory_
+					.getDefaultEngine(ContextCreationListener.DUMMY,
+							contextModificationListener_);
+
 			try {
 				engine.process();
-			}
-			finally {
+			} finally {
 				engine.finish();
 			}
 		}
@@ -134,7 +135,7 @@ class ClassExpressionNoInputSaturationFactory
 		@Override
 		public void finish() {
 			ruleAppFactory_.finish();
-			//System.err.println(ruleAppFactory_.getStatistics().getRuleStatistics().getTotalRuleAppCount());
+			// System.err.println(ruleAppFactory_.getStatistics().getRuleStatistics().getTotalRuleAppCount());
 		}
 
 	}

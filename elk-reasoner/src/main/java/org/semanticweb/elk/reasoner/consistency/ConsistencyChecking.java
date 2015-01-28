@@ -124,7 +124,7 @@ public class ConsistencyChecking
 	}
 
 	public SaturationStatistics getRuleAndConclusionStatistics() {
-		return inputProcessorFactory.getRuleAndConclusionStatistics();
+		return getInputProcessorFactory().getRuleAndConclusionStatistics();
 	}
 
 	/**
@@ -209,7 +209,7 @@ public class ConsistencyChecking
 	 * Print statistics about consistency checking
 	 */
 	public void printStatistics() {
-		inputProcessorFactory.printStatistics();
+		getInputProcessorFactory().printStatistics();
 	}
 
 	/**
