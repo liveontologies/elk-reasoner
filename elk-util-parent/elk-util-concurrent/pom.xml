@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>elk-util-parent</artifactId>
 		<groupId>org.semanticweb.elk</groupId>
-		<version>0.4.1</version>
+		<version>0.4.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>elk-util-concurrent</artifactId>
