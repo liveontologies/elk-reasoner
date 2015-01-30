@@ -74,7 +74,7 @@ public class TautologyChecker extends
 	}
 
 	@Override
-	public Boolean visit(LemmaExpression expr, Void input) {
+	public Boolean visit(LemmaExpression<?> expr, Void input) {
 		return expr.getLemma().accept(this, input);
 	}
 

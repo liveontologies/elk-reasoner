@@ -4,11 +4,11 @@
 package org.semanticweb.elk.proofs.inferences.classes;
 /*
  * #%L
- * ELK Reasoner
+ * ELK Proofs Package
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,34 +24,33 @@ package org.semanticweb.elk.proofs.inferences.classes;
  * #L%
  */
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
-import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
-import org.semanticweb.elk.proofs.inferences.AbstractInference;
-import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.util.collections.Operations;
 
 /**
- * @author Pavel Klinov
+ * TODO
+ * 
+ * @author	Pavel Klinov
+ * 			pavel.klinov@uni-ulm.de
  *
- * pavel.klinov@uni-ulm.de
  */
-public class ReflexiveExistentialComposition extends AbstractInference<DerivedAxiomExpression<ElkSubClassOfAxiom>> {
+public class NaryExistentialAxiomComposition extends NaryExistentialComposition<DerivedAxiomExpression<ElkSubClassOfAxiom>> {
 
-	private final DerivedExpression reflexPremise_;
+	private final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> chainAxiom_;
 	
-	public ReflexiveExistentialComposition(
-			ElkSubClassOfAxiom subClassOfAxiom,
-			ElkReflexiveObjectPropertyAxiom reflPremise,
-			DerivedExpressionFactory exprFactory) {
-		super(exprFactory.create(subClassOfAxiom));
+	public NaryExistentialAxiomComposition(DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion,
+			List<? extends DerivedExpression> premises,
+			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> chainAxiom) {
+		super(conclusion, premises);
 		
-		reflexPremise_ = exprFactory.create(reflPremise);
+		chainAxiom_ = chainAxiom;
 	}
 
 	@Override
@@ -60,12 +59,11 @@ public class ReflexiveExistentialComposition extends AbstractInference<DerivedAx
 	}
 
 	@Override
-	public Collection<DerivedExpression> getRawPremises() {
-		return Collections.singleton(reflexPremise_);
+	protected Iterable<DerivedExpression> getRawPremises() {
+		return Operations.concat(getExistentialPremises(), Collections.singletonList(chainAxiom_));
 	}
-
-	@Override
-	public InferenceRule getRule() {
-		return InferenceRule.R_REFLEXIVE_EXISTENTIAL;
+	
+	public DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> getChainPremise() {
+		return chainAxiom_;
 	}
 }

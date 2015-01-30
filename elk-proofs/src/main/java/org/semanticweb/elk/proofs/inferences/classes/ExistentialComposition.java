@@ -28,49 +28,34 @@ package org.semanticweb.elk.proofs.inferences.classes;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
+ * TODO
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ExistentialComposition extends AbstractClassInference<DerivedAxiomExpression<ElkSubClassOfAxiom>> {
+public class ExistentialComposition extends AbstractInference<DerivedAxiomExpression<ElkSubClassOfAxiom>> {
 
-	private final DerivedAxiomExpression<ElkSubClassOfAxiom> existentialPremise_;
+	private final DerivedExpression existentialPremise_;
 
 	private final DerivedAxiomExpression<ElkSubClassOfAxiom> subsumerPremise_;
 
 	private final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propertyPremise_;
 
 	public ExistentialComposition(
-			ElkClassExpression sub, 
-			ElkClassExpression sup,
-			ElkSubClassOfAxiom exPremise, 
-			ElkSubClassOfAxiom subPremise,
-			ElkSubObjectPropertyOfAxiom propPremise,
-			ElkObjectFactory factory, 
-			DerivedExpressionFactory exprFactory) {
-		super(exprFactory.create(factory.getSubClassOfAxiom(sub, sup)));
-
-		existentialPremise_ = exprFactory.create(exPremise);
-		subsumerPremise_ = exprFactory.create(subPremise);
-		propertyPremise_ = exprFactory.create(propPremise);
-	}
-	
-	public ExistentialComposition(
 			DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion, 
 			DerivedAxiomExpression<ElkSubClassOfAxiom> subsumerPremise,
-			DerivedAxiomExpression<ElkSubClassOfAxiom> existentialPremise,
+			DerivedExpression existentialPremise,
 			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propPremise) {
 		super(conclusion);
 
@@ -93,7 +78,7 @@ public class ExistentialComposition extends AbstractClassInference<DerivedAxiomE
 		return propertyPremise_;
 	}
 	
-	public DerivedAxiomExpression<ElkSubClassOfAxiom> getExistentialPremise() {
+	public DerivedExpression getExistentialPremise() {
 		return existentialPremise_;
 	}
 

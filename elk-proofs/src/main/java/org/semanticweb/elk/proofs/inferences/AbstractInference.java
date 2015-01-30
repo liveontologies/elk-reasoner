@@ -85,5 +85,5 @@ public abstract class AbstractInference<D extends DerivedExpression> implements 
 		return InferencePrinter.print(this);
 	}
 
-	protected abstract Iterable<DerivedExpression> getRawPremises();
+	protected abstract Iterable<? extends DerivedExpression> getRawPremises();
 }

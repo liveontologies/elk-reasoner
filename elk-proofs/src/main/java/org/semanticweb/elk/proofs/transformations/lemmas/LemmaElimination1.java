@@ -51,7 +51,7 @@ import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialChainAxiomComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainComposition;
-import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialComposition;
+import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialAxiomComposition;
 import org.semanticweb.elk.proofs.transformations.InferenceTransformation;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
@@ -59,20 +59,22 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
 
 /**
- * Transforms EL+ inferences containing lemma premises, that is, {@link ExistentialLemmaChainComposition} and {@link ExistentialChainAxiomComposition} into
- * {@link NaryExistentialComposition} inferences without lemma premises. 
+ *
+ * TODO
+ * 
+ * This transformation produces derived sub-property chain axioms which are then explained.
  * 
  * @author	Pavel Klinov
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class LemmaElimination implements InferenceTransformation {
+public class LemmaElimination1 implements InferenceTransformation {
 
 	private final ElkObjectFactory elkFactory_;
 	
 	private ReasonerInferenceReader reader_;
 	
-	public LemmaElimination(ReasonerInferenceReader reader) {
+	public LemmaElimination1(ReasonerInferenceReader reader) {
 		elkFactory_ = new ElkObjectFactoryImpl();
 		reader_ = reader;
 	}
@@ -112,8 +114,8 @@ public class LemmaElimination implements InferenceTransformation {
 			return Collections.singletonList(inf);
 		}
 		
-		Iterator<Inference> lazyEliminationIterator(final NaryExistentialComposition inf) {
-			final Queue<NaryExistentialComposition> toDo = new ArrayDeque<NaryExistentialComposition>();
+		Iterator<Inference> lazyEliminationIterator(final NaryExistentialAxiomComposition inf) {
+			final Queue<NaryExistentialAxiomComposition> toDo = new ArrayDeque<NaryExistentialAxiomComposition>();
 			
 			toDo.add(inf);
 			// returning the lazy iterator which will recursively replace inferences
@@ -122,7 +124,7 @@ public class LemmaElimination implements InferenceTransformation {
 
 				Inference next = null;
 				
-				Iterator<NaryExistentialComposition> nextTransformed = null;
+				Iterator<NaryExistentialAxiomComposition> nextTransformed = null;
 				
 				@Override
 				public boolean hasNext() {
@@ -133,7 +135,7 @@ public class LemmaElimination implements InferenceTransformation {
 						
 						if (nextTransformed != null) {
 							while (nextTransformed.hasNext()) {
-								NaryExistentialComposition candidate = nextTransformed.next();
+								NaryExistentialAxiomComposition candidate = nextTransformed.next();
 								
 								if (lemmasPresent(candidate)) {
 									toDo.add(candidate);
@@ -150,7 +152,7 @@ public class LemmaElimination implements InferenceTransformation {
 							}
 						}
 						
-						NaryExistentialComposition candidate = toDo.poll();
+						NaryExistentialAxiomComposition candidate = toDo.poll();
 						
 						if (candidate == null) {
 							break;
@@ -228,7 +230,7 @@ public class LemmaElimination implements InferenceTransformation {
 		public Iterable<Inference> visit(ExistentialChainAxiomComposition inf, Void input) {
 			// check if there are premises not representable in OWL and transform to the n-ary inference if that's the case
 			if (inf.getSecondExistentialPremise() instanceof LemmaExpression) {
-				NaryExistentialComposition transformed = new NaryExistentialComposition(
+				NaryExistentialAxiomComposition transformed = new NaryExistentialAxiomComposition(
 															inf.getConclusion(), 
 															Arrays.asList(inf.getFirstExistentialPremise(), inf.getSecondExistentialPremise()),
 															// can have only chain axioms here. can't have transitivity, for example, that doesn't involve lemmas
@@ -256,7 +258,7 @@ public class LemmaElimination implements InferenceTransformation {
 		}
 		
 		@Override
-		public Iterable<Inference> visit(final NaryExistentialComposition inf, Void input) {
+		public Iterable<Inference> visit(final NaryExistentialAxiomComposition inf, Void input) {
 			if (!lemmasPresent(inf)) {
 				return Collections.<Inference>singletonList(inf);
 			}
@@ -264,7 +266,7 @@ public class LemmaElimination implements InferenceTransformation {
 			return lazyLemmaElimination(inf);
 		}
 		
-		private Iterable<Inference> lazyLemmaElimination(final NaryExistentialComposition inf) {
+		private Iterable<Inference> lazyLemmaElimination(final NaryExistentialAxiomComposition inf) {
 			return new Iterable<Inference>() {
 
 				@Override
@@ -275,7 +277,7 @@ public class LemmaElimination implements InferenceTransformation {
 			};
 		}
 
-		public Iterable<NaryExistentialComposition> rewrite(final NaryExistentialComposition inf) {
+		public Iterable<NaryExistentialAxiomComposition> rewrite(final NaryExistentialAxiomComposition inf) {
 			final List<DerivedExpression> commonPremises = new ArrayList<DerivedExpression>();
 			
 			for (int i = 0; i < inf.getExistentialPremises().size(); i++) {
@@ -284,20 +286,20 @@ public class LemmaElimination implements InferenceTransformation {
 				
 				if (premise instanceof LemmaExpression) {
 					// replacing the current inference by a collection of inferences, one for each inference which derives the lemma premise
-					List<NaryExistentialComposition> transformed = new LinkedList<NaryExistentialComposition>();
+					List<NaryExistentialAxiomComposition> transformed = new LinkedList<NaryExistentialAxiomComposition>();
 					
 					try {
 						for (Inference lemmaInf : premise.getInferences()) {
-							transformed.add(lemmaInf.accept(new AbstractInferenceVisitor<Void, NaryExistentialComposition>() {
+							transformed.add(lemmaInf.accept(new AbstractInferenceVisitor<Void, NaryExistentialAxiomComposition>() {
 
 								@Override
-								protected NaryExistentialComposition defaultVisit(Inference inference, Void input) {
+								protected NaryExistentialAxiomComposition defaultVisit(Inference inference, Void input) {
 									// shouldn't get here, check?
 									return null;
 								}
 
 								@Override
-								public NaryExistentialComposition visit(ExistentialLemmaChainComposition lemmaInf, Void input) {
+								public NaryExistentialAxiomComposition visit(ExistentialLemmaChainComposition lemmaInf, Void input) {
 									// only this inference can derive existential lemma premises
 									List<DerivedExpression> premises = new ArrayList<DerivedExpression>(commonPremises);
 									
@@ -313,7 +315,7 @@ public class LemmaElimination implements InferenceTransformation {
 										premises.add(nextPremise);
 									}
 									
-									NaryExistentialComposition rewritten = null;
+									NaryExistentialAxiomComposition rewritten = null;
 									
 									if (!moreLemmas) {
 										rewritten = recreateChainAxiom(
@@ -324,7 +326,7 @@ public class LemmaElimination implements InferenceTransformation {
 										System.err.println("Lemma-free n-ary inference: " + rewritten);
 									}
 									else {
-										rewritten = new NaryExistentialComposition(inf.getConclusion(), premises, inf.getChainPremise());	
+										rewritten = new NaryExistentialAxiomComposition(inf.getConclusion(), premises, inf.getChainPremise());	
 									}
 									
 									return rewritten;
@@ -348,7 +350,7 @@ public class LemmaElimination implements InferenceTransformation {
 			return Collections.emptyList();
 		}
 
-		private NaryExistentialComposition recreateChainAxiom(
+		private NaryExistentialAxiomComposition recreateChainAxiom(
 				DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion, 
 				List<? extends DerivedExpression> existentialPremises,
 				ElkSubObjectPropertyOfAxiom chainPremise) {
@@ -361,7 +363,7 @@ public class LemmaElimination implements InferenceTransformation {
 				chainList.add(exSuper.getProperty());
 			}
 			
-			return new NaryExistentialComposition(
+			return new NaryExistentialAxiomComposition(
 					conclusion,
 					existentialPremises,
 					// special expression for the chain premise

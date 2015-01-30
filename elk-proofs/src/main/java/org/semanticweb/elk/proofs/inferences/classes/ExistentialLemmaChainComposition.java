@@ -27,13 +27,13 @@ package org.semanticweb.elk.proofs.inferences.classes;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
+import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
@@ -44,7 +44,7 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ExistentialLemmaChainComposition extends AbstractClassInference<LemmaExpression<ElkSubClassOfLemma>> {
+public class ExistentialLemmaChainComposition extends AbstractInference<LemmaExpression<ElkSubClassOfLemma>> {
 
 	private final DerivedAxiomExpression<ElkSubClassOfAxiom> firstExistentialPremise_;
 
@@ -82,7 +82,7 @@ public class ExistentialLemmaChainComposition extends AbstractClassInference<Lem
 		return InferenceRule.R_EXIST_CHAIN_COMPOSITION;
 	}
 	
-	public DerivedAxiomExpression<? extends ElkClassAxiom> getFirstExistentialPremise() {
+	public DerivedAxiomExpression<ElkSubClassOfAxiom> getFirstExistentialPremise() {
 		return firstExistentialPremise_;
 	}
 	

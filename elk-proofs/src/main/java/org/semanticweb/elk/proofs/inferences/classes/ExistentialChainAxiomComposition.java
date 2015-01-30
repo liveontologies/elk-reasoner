@@ -32,6 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
@@ -42,7 +43,7 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ExistentialChainAxiomComposition extends AbstractClassInference<DerivedAxiomExpression<ElkSubClassOfAxiom>> {
+public class ExistentialChainAxiomComposition extends AbstractInference<DerivedAxiomExpression<ElkSubClassOfAxiom>> {
 
 	private final DerivedAxiomExpression<ElkSubClassOfAxiom> firstExistentialPremise_;
 

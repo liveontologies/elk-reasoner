@@ -87,8 +87,7 @@ public class InferenceMapper {
 				new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
 
 					@Override
-					protected Boolean defaultTracedVisit(ClassInference inference,
-							IndexedClassExpression whereStored) {
+					protected Boolean defaultTracedVisit(ClassInference inference, IndexedClassExpression whereStored) {
 						Inference mapped = singleMapper.map(inference, whereStored);
 						
 						if (mapped == SingleInferenceMapper.CONTINUE) {
@@ -107,8 +106,7 @@ public class InferenceMapper {
 				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 					@Override
-					protected Boolean defaultTracedVisit(
-							ObjectPropertyInference inference, Void input) {
+					protected Boolean defaultTracedVisit(ObjectPropertyInference inference, Void input) {
 						Inference mapped = singleMapper.map(inference);
 						
 						if (mapped == SingleInferenceMapper.CONTINUE) {

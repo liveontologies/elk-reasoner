@@ -33,7 +33,7 @@ import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.transformations.InferenceTransformation;
 import org.semanticweb.elk.proofs.transformations.TransformedAxiomExpression;
-import org.semanticweb.elk.proofs.transformations.lemmas.LemmaElimination;
+import org.semanticweb.elk.proofs.transformations.lemmas.LemmaElimination2;
 import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
@@ -57,7 +57,7 @@ public class ProofReader {
 	}
 	
 	public ProofReader eliminateLemmas() {
-		inferenceTransformation_ = new LemmaElimination(reader_);
+		inferenceTransformation_ = new LemmaElimination2(reader_);
 		
 		return this;
 	}

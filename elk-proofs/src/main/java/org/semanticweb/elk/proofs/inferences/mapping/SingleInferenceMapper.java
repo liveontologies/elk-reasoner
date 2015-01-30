@@ -77,6 +77,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersection
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.SideConditionLookup;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
@@ -240,8 +241,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(PropagatedSubsumer inference,
-				IndexedClassExpression whereStored) {
+		public Inference visit(PropagatedSubsumer inference, IndexedClassExpression whereStored) {
 			// the left premise is an axiom with a simple existential on the right
 			ElkClassExpression c = Deindexer.deindex(whereStored);
 			ElkObjectProperty r = Deindexer.deindex(inference.getBackwardLink().getRelation());
@@ -251,15 +251,15 @@ public class SingleInferenceMapper {
 			ElkObjectSomeValuesFrom rSomeD = factory_.getObjectSomeValuesFrom(r, d);
 			ElkObjectSomeValuesFrom sSomeE = factory_.getObjectSomeValuesFrom(s, e);
 			
-			return new ExistentialComposition(c, sSomeE,
-					factory_.getSubClassOfAxiom(c, rSomeD),
-					factory_.getSubClassOfAxiom(d, e),
-					factory_.getSubObjectPropertyOfAxiom(r, s), factory_, exprFactory_);
+			return new ExistentialComposition(
+					exprFactory_.create(factory_.getSubClassOfAxiom(c, sSomeE)),
+					exprFactory_.create(factory_.getSubClassOfAxiom(d, e)),
+					exprFactory_.create(factory_.getSubClassOfAxiom(c, rSomeD)),
+					exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(r, s)));
 		}
 
 		@Override
-		public Inference visit(ReflexiveSubsumer<?> inference,
-				IndexedClassExpression input) {
+		public Inference visit(ReflexiveSubsumer<?> inference, IndexedClassExpression input) {
 			ElkClassExpression sub = Deindexer.deindex(input);
 			ElkClassExpression sup = Deindexer.deindex(inference.getExpression());
 			ElkSubClassOfAxiom conclusion = factory_.getSubClassOfAxiom(sub, sup);
@@ -368,37 +368,67 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ReversedForwardLink inference,
-				IndexedClassExpression input) {
+		public Inference visit(ReversedForwardLink inference, IndexedClassExpression whereStored) {
+			// skipping tautology
+			//return SingleInferenceMapper.STOP;
+			
+			ForwardLink premise = inference.getSourceLink();
+			
+			if (premise.getRelation().equals(inference.getRelation())) {
+				// skipping tautology
+				return SingleInferenceMapper.STOP;
+			}
+			
+			// existential composition with sub-property chain
+			IndexedPropertyChain subChain = premise.getRelation();
+
+			final ElkClassExpression c = Deindexer.deindex(inference.getSource());
+			final ElkClassExpression d = Deindexer.deindex(whereStored);
+			final ElkSubObjectPropertyExpression ss = Deindexer.deindex(premise.getRelation());
+			ElkObjectProperty h = Deindexer.deindex(inference.getRelation());
+			ElkObjectSomeValuesFrom hSomeD = factory_.getObjectSomeValuesFrom(h, d);
+			DerivedExpression cSubssSomeC = subChain.accept(new IndexedPropertyChainVisitor<DerivedExpression>() {
+
+				@Override
+				public DerivedExpression visit(IndexedObjectProperty subProp) {
+					return exprFactory_.create(factory_.getSubClassOfAxiom(c, factory_.getObjectSomeValuesFrom(subProp.getElkObjectProperty(), d)));
+				}
+
+				@Override
+				public DerivedExpression visit(IndexedBinaryPropertyChain subChain) {
+					return exprFactory_.create(lemmaObjectFactory_.getSubClassOfLemma(c, lemmaObjectFactory_.getComplexObjectSomeValuesFrom(Deindexer.deindex(subChain), d)));
+				}
+				
+			});
+
+			return new ExistentialComposition(
+					exprFactory_.create(factory_.getSubClassOfAxiom(c, hSomeD)),
+					exprFactory_.create(factory_.getSubClassOfAxiom(d, d)),
+					cSubssSomeC,
+					exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(ss, h)));
+		}
+
+		@Override
+		public Inference visit(DecomposedExistentialBackwardLink inference, IndexedClassExpression input) {
 			// not a self-contained user inference
 			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
-		public Inference visit(DecomposedExistentialBackwardLink inference,
-				IndexedClassExpression input) {
+		public Inference visit(DecomposedExistentialForwardLink inference, IndexedClassExpression input) {
 			// not a self-contained user inference
 			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
-		public Inference visit(DecomposedExistentialForwardLink inference,
-				IndexedClassExpression input) {
-			// not a self-contained user inference
-			return SingleInferenceMapper.STOP;
-		}
-
-		@Override
-		public Inference visit(TracedPropagation inference,
-				IndexedClassExpression input) {
+		public Inference visit(TracedPropagation inference, IndexedClassExpression input) {
 			// not a self-contained user inference
 			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
 		public Inference visit(
-				ContradictionFromInconsistentDisjointnessAxiom inference,
-				IndexedClassExpression input) {
+				ContradictionFromInconsistentDisjointnessAxiom inference, IndexedClassExpression input) {
 			ElkDisjointClassesAxiom sideCondition = (ElkDisjointClassesAxiom) sideConditionLookup_.lookup(inference);
 			ElkClassExpression c = Deindexer.deindex(input);
 			ElkClassExpression d = Deindexer.deindex(inference.getPremise().getExpression());
@@ -407,8 +437,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ContradictionFromDisjointSubsumers inference,
-				IndexedClassExpression input) {
+		public Inference visit(ContradictionFromDisjointSubsumers inference, IndexedClassExpression input) {
 			ElkDisjointClassesAxiom sideCondition = (ElkDisjointClassesAxiom) sideConditionLookup_.lookup(inference);
 			ElkClassExpression c = Deindexer.deindex(input);
 			ElkClassExpression d = Deindexer.deindex(inference.getPremises()[0].getMember());
@@ -418,8 +447,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ContradictionFromNegation inference,
-				IndexedClassExpression input) {
+		public Inference visit(ContradictionFromNegation inference, IndexedClassExpression input) {
 			ElkClassExpression c = Deindexer.deindex(input);
 			ElkClassExpression d = Deindexer.deindex(inference.getPositivePremise().getExpression());
 			
@@ -427,30 +455,28 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ContradictionFromOwlNothing inference,
-				IndexedClassExpression input) {
+		public Inference visit(ContradictionFromOwlNothing inference, IndexedClassExpression input) {
 			// not a self-contained user inference but we need to see inferences for owl:Nothing and map those.
 			return SingleInferenceMapper.CONTINUE;
 		}
 
 		@Override
-		public Inference visit(PropagatedContradiction inference,
-				IndexedClassExpression whereStored) {
+		public Inference visit(PropagatedContradiction inference, IndexedClassExpression whereStored) {
 			// the left premise is an axiom with a simple existential on the right
 			ElkClassExpression c = Deindexer.deindex(whereStored);
 			ElkObjectProperty r = Deindexer.deindex(inference.getLinkPremise().getRelation());
 			ElkClassExpression d = Deindexer.deindex(inference.getInferenceContextRoot(whereStored));
 			ElkObjectSomeValuesFrom rSomeD = factory_.getObjectSomeValuesFrom(r, d);
 
-			return new ExistentialComposition(c, PredefinedElkClass.OWL_NOTHING,
-					factory_.getSubClassOfAxiom(c, rSomeD),
-					factory_.getSubClassOfAxiom(d, PredefinedElkClass.OWL_NOTHING),
-					factory_.getSubObjectPropertyOfAxiom(r, r), factory_, exprFactory_);
+			return new ExistentialComposition(
+					exprFactory_.create(factory_.getSubClassOfAxiom(c, PredefinedElkClass.OWL_NOTHING)),
+					exprFactory_.create(factory_.getSubClassOfAxiom(d, PredefinedElkClass.OWL_NOTHING)),
+					exprFactory_.create(factory_.getSubClassOfAxiom(c, rSomeD)),
+					exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(r, r)));
 		}
 
 		@Override
-		public Inference visit(DisjointSubsumerFromSubsumer inference,
-				IndexedClassExpression input) {
+		public Inference visit(DisjointSubsumerFromSubsumer inference, IndexedClassExpression input) {
 			// not a self-contained user inference
 			return SingleInferenceMapper.STOP;
 		}
@@ -584,8 +610,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(
-				RightReflexiveSubPropertyChainInference inference, Void input) {
+		public Inference visit(RightReflexiveSubPropertyChainInference inference, Void input) {
 			DerivedExpression premise = inference.getReflexivePremise().getPropertyChain().accept(reflexiveChainExpressionCreator());
 			ElkSubPropertyChainOfLemma conclusion = lemmaObjectFactory_
 					.getSubPropertyChainOfLemma(

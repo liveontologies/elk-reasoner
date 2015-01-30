@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
@@ -43,7 +44,7 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DisjunctionComposition extends AbstractClassInference<DerivedAxiomExpression<? extends ElkClassAxiom>> {
+public class DisjunctionComposition extends AbstractInference<DerivedAxiomExpression<? extends ElkClassAxiom>> {
 
 	private final DerivedExpression premise_;
 	

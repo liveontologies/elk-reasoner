@@ -31,12 +31,11 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.proofs.inferences.mapping.Deindexer;
-import org.semanticweb.elk.proofs.inferences.properties.SubPropertyChainAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.saturation.tracing.SideConditionLookup;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
@@ -51,16 +50,13 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Abstr
  * 			pavel.klinov@uni-ulm.de
  *
  */
-class LemmaFreePropertyInferenceFactory extends AbstractObjectPropertyInferenceVisitor<DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>, Inference> {
-	
-	private final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr_;
+abstract class PropertyInferenceVisitor extends AbstractObjectPropertyInferenceVisitor<DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>, Inference> {
 	
 	private final ElkObjectFactory elkFactory_ = new ElkObjectFactoryImpl();
 	
 	private final DerivedExpressionFactory exprFactory_;
 	
-	LemmaFreePropertyInferenceFactory(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> conclusion, DerivedExpressionFactory exprFactory) {
-		expr_ = conclusion;
+	PropertyInferenceVisitor(DerivedExpressionFactory exprFactory) {
 		exprFactory_ = exprFactory;
 	}
 
@@ -71,7 +67,7 @@ class LemmaFreePropertyInferenceFactory extends AbstractObjectPropertyInferenceV
 
 	@Override
 	public Inference visit(LeftReflexiveSubPropertyChainInference inference, DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
-		return new ReflexivityElimination(expr_, premise, createReflexivityPremise(inference.getReflexivePremise().getPropertyChain()));
+		return createReflexivityEliminationInference(createReflexivityPremise(inference.getReflexivePremise().getPropertyChain()));
 	}
 
 	@Override
@@ -80,12 +76,12 @@ class LemmaFreePropertyInferenceFactory extends AbstractObjectPropertyInferenceV
 
 			@Override
 			public Inference visit(IndexedObjectProperty iop) {
-				return new ReflexivityElimination(expr_, premise, createReflexivityPremise(iop));
+				return createReflexivityEliminationInference(createReflexivityPremise(iop));
 			}
 
 			@Override
 			public Inference visit(IndexedBinaryPropertyChain ipc) {
-				return new ReflexivityElimination(expr_, premise, createReflexivityPremises(ipc));
+				return createReflexivityEliminationInference(createReflexivityPremises(ipc));
 			}
 		});
 	}
@@ -93,8 +89,11 @@ class LemmaFreePropertyInferenceFactory extends AbstractObjectPropertyInferenceV
 	@Override
 	public Inference visit(ToldSubPropertyInference inference, DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
 		// using only told hierarchy here
-		if (inference.getSuperPropertyChain() instanceof IndexedObjectProperty && inference.getSubPropertyChain().getToldSuperProperties().contains(inference.getSuperPropertyChain())) {
-			return createSubChainInference(inference.getSubPropertyChain(), (IndexedObjectProperty) inference.getSuperPropertyChain(), premise);	
+		if (inference.getSuperPropertyChain() instanceof IndexedObjectProperty && 
+				inference.getSubPropertyChain().getToldSuperProperties().contains(inference.getSuperPropertyChain())) {
+			ElkSubObjectPropertyOfAxiom axiom = (ElkSubObjectPropertyOfAxiom) new SideConditionLookup().lookup(inference);
+			
+			return createSubChainInference(exprFactory_.createAsserted(axiom));
 		}
 
 		return null;
@@ -122,12 +121,10 @@ class LemmaFreePropertyInferenceFactory extends AbstractObjectPropertyInferenceV
 		return premises;
 	}
 	
-	private Inference createSubChainInference(	IndexedPropertyChain subChain, 
-												IndexedObjectProperty superChain, 
-												DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> firstPremise) {
-		ElkSubObjectPropertyOfAxiom subChainAxiom = elkFactory_.getSubObjectPropertyOfAxiom(Deindexer.deindex(subChain), superChain.getElkObjectProperty());
-		
-		return new SubPropertyChainAxiom(expr_, firstPremise, exprFactory_.create(subChainAxiom));
-	}
+	protected abstract Inference createReflexivityEliminationInference(DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom> premise);
+	
+	protected abstract Inference createReflexivityEliminationInference(Iterable<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> premises);
+	
+	protected abstract Inference createSubChainInference(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> premise);
 
 }

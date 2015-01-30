@@ -30,9 +30,9 @@ import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.proofs.inferences.classes.AbstractClassInference;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
@@ -42,7 +42,7 @@ import org.semanticweb.elk.util.collections.Operations;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class ReflexivityElimination extends AbstractClassInference<DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>> {
+public class ReflexivityElimination extends AbstractInference<DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>> {
 
 	private final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> firstPremise_;
 	
