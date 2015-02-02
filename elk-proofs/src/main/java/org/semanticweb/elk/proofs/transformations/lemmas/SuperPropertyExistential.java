@@ -4,6 +4,7 @@
 package org.semanticweb.elk.proofs.transformations.lemmas;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
@@ -15,10 +16,12 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
+import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
 import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryImpl;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialComposition;
@@ -82,57 +85,69 @@ class SuperPropertyExistential implements DerivedAxiomExpression<ElkSubClassOfAx
 		for (IndexedPropertyChain toldSubChain : superProperty_.getToldSubProperties()) {
 			if (toldSubChain.equals(subChain_)) {
 				// finishing
-				ElkSubObjectPropertyOfAxiom toldPropAxiom = lookup(toldSubChain, superProperty_, elkFactory);
-				DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propPremise = exprFactory.create(toldPropAxiom);
-				DerivedAxiomExpression<ElkSubClassOfAxiom> subsumerPremise = exprFactory.create(elkFactory.getSubClassOfAxiom(existential.getFiller(), existential.getFiller()));
-				DerivedExpression exPremise = toldSubChain.accept(new IndexedPropertyChainVisitor<DerivedExpression>() {
+				final ElkSubObjectPropertyOfAxiom toldPropAxiom = createSubPropertyChainAxiom(toldSubChain, superProperty_, elkFactory);
+				final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> chainAxiom = exprFactory.create(toldPropAxiom);
+				final DerivedAxiomExpression<ElkSubClassOfAxiom> subsumerPremise = exprFactory.create(elkFactory.getSubClassOfAxiom(existential.getFiller(), existential.getFiller()));
+				Inference inf = toldSubChain.accept(new IndexedPropertyChainVisitor<Inference>() {
 
 					@Override
-					public DerivedExpression visit(IndexedObjectProperty prop) {
-						return exprFactory.create(
-								elkFactory.getSubClassOfAxiom(
-										getAxiom().getSubClassExpression(), 
-										elkFactory.getObjectSomeValuesFrom(prop.getElkObjectProperty(), existential.getFiller())));
+					public Inference visit(IndexedObjectProperty prop) {
+						DerivedAxiomExpression<ElkSubClassOfAxiom> exPremise = exprFactory.create(
+																					elkFactory.getSubClassOfAxiom(
+																							getAxiom().getSubClassExpression(), 
+																							elkFactory.getObjectSomeValuesFrom(prop.getElkObjectProperty(), existential.getFiller())));
+						
+						return new ExistentialComposition(expr_, subsumerPremise, exPremise, chainAxiom);
 					}
 
 					@Override
-					public DerivedExpression visit(IndexedBinaryPropertyChain chain) {
+					public Inference visit(IndexedBinaryPropertyChain chain) {
 						ElkLemmaObjectFactory lemmaFactory = new ElkLemmaObjectFactoryImpl();
+						LemmaExpression<ElkSubClassOfLemma> exPremise = exprFactory.create(
+																			lemmaFactory.getSubClassOfLemma(
+																					getAxiom().getSubClassExpression(), 
+																					lemmaFactory.getComplexObjectSomeValuesFrom(Deindexer.deindex(chain), existential.getFiller())));
 						
-						return exprFactory.create(
-								lemmaFactory.getSubClassOfLemma(
-										getAxiom().getSubClassExpression(), 
-										lemmaFactory.getComplexObjectSomeValuesFrom(Deindexer.deindex(chain), existential.getFiller())));
+						return new NaryExistentialAxiomComposition(expr_, Collections.singletonList(exPremise), chainAxiom);
 					}
 					
 				});
 				
-				inferences.add(new ExistentialComposition(expr_, subsumerPremise, exPremise, propPremise));
+				inferences.add(inf);
+				
+				continue;
 			}
 			
-			if (toldSubChain.getSaturated().getSubProperties().contains(subChain_)) {
-				toldSubChain.accept(new IndexedPropertyChainVisitor<Void>() {
+			if (toldSubChain.getSaturated().getSubPropertyChains().contains(subChain_)) {
+				Inference inf = toldSubChain.accept(new IndexedPropertyChainVisitor<Inference>() {
 
 					@Override
-					public Void visit(IndexedObjectProperty subProp) {
+					public Inference visit(final IndexedObjectProperty toldSubProperty) {
 						// this is a trivial premise
 						DerivedAxiomExpression<ElkSubClassOfAxiom> subsumerPremise = exprFactory.create(elkFactory.getSubClassOfAxiom(existential.getFiller(), existential.getFiller()));
-						ElkSubObjectPropertyOfAxiom toldPropAxiom = lookup(subProp, superProperty_, elkFactory);
+						ElkSubObjectPropertyOfAxiom toldPropAxiom = createSubPropertyChainAxiom(toldSubProperty, superProperty_, elkFactory);
 						DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propPremise = exprFactory.create(toldPropAxiom);
-						ElkSubClassOfAxiom exPremiseAxiom = elkFactory.getSubClassOfAxiom(subClass, elkFactory.getObjectSomeValuesFrom(Deindexer.deindex(subProp), existential.getFiller()));
-						DerivedAxiomExpression<ElkSubClassOfAxiom> exPremise = exprFactory.create(exPremiseAxiom);
+						final DerivedAxiomExpression<ElkSubClassOfAxiom> premise = createExistentialPremise(subClass, toldSubProperty.getElkObjectProperty(), existential.getFiller(), elkFactory);
 						
-						if (!subProp.equals(subChain_)) {
-							exPremise = new SuperPropertyExistential(exPremise, subChain_, subProp, reader_);
-						}
+						DerivedExpression exPremise = subChain_.accept(new IndexedPropertyChainVisitor<DerivedAxiomExpression<ElkSubClassOfAxiom>>() {
+
+							@Override
+							public DerivedAxiomExpression<ElkSubClassOfAxiom> visit(IndexedObjectProperty subProp) {
+								return SuperChainExistential.createExistentialPremise(premise, subProp, reader_);
+							}
+
+							@Override
+							public DerivedAxiomExpression<ElkSubClassOfAxiom> visit(IndexedBinaryPropertyChain subChain) {
+								return new SuperPropertyExistential(premise, subChain, toldSubProperty, reader_);
+							}
+							
+						});
 						
-						inferences.add(new ExistentialComposition(expr_, subsumerPremise, exPremise, propPremise));
-						
-						return null;
+						return new ExistentialComposition(expr_, subsumerPremise, exPremise, propPremise);
 					}
 
 					@Override
-					public Void visit(IndexedBinaryPropertyChain subChain) {
+					public Inference visit(IndexedBinaryPropertyChain subChain) {
 						// eliminating reflexivity in a loop
 						IndexedPropertyChain top = subChain;
 						List<DerivedAxiomExpression<ElkSubClassOfAxiom>> existentialPremises = new ArrayList<DerivedAxiomExpression<ElkSubClassOfAxiom>>();
@@ -147,17 +162,14 @@ class SuperPropertyExistential implements DerivedAxiomExpression<ElkSubClassOfAx
 							IndexedPropertyChain right = ibc.getRightProperty();
 							
 							if (left.getSaturated().isDerivedReflexive()) {
-								existentialPremises.add(createExistentialPremise(subClass, left.getElkObjectProperty(), subClass, elkFactory));
+								existentialPremises.add(SuperChainExistential.createReflexiveExistential(subClass, left.getElkObjectProperty(), reader_));
 							}
 							else if (right.getSaturated().isDerivedReflexive()) {
 								// ok, the left is a sub-property
 								DerivedAxiomExpression<ElkSubClassOfAxiom> premise = createExistentialPremise(subClass, left.getElkObjectProperty(), existential.getFiller(), elkFactory);
+								DerivedAxiomExpression<ElkSubClassOfAxiom> exPremise = SuperChainExistential.createExistentialPremise(premise, left, reader_);
 								
-								if (!left.equals(subChain_)) {
-									premise = new SuperPropertyExistential(premise, subChain_, left, reader_);
-								}
-								
-								existentialPremises.add(premise);
+								existentialPremises.add(exPremise);
 							}
 							else {
 								// shouldn't get here, chains can only be super-properties if there's some reflexivity involved
@@ -167,26 +179,26 @@ class SuperPropertyExistential implements DerivedAxiomExpression<ElkSubClassOfAx
 							top = right;
 						}
 						
-						ElkSubObjectPropertyOfAxiom toldChain = lookup(subChain, superProperty_, elkFactory);
+						ElkSubObjectPropertyOfAxiom toldChain = createSubPropertyChainAxiom(subChain, superProperty_, elkFactory);
 						DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propPremise = exprFactory.createAsserted(toldChain);
 						
-						inferences.add(new NaryExistentialAxiomComposition(expr_, existentialPremises, propPremise));
-						
-						return null;
+						return new NaryExistentialAxiomComposition(expr_, existentialPremises, propPremise);
 					}
 					
 				});
+				
+				inferences.add(inf);
 			}
 		}
 
 		return inferences;
 	}
 
-	protected DerivedAxiomExpression<ElkSubClassOfAxiom> createExistentialPremise(ElkClassExpression subClass, ElkObjectProperty property, ElkClassExpression filler, ElkObjectFactory elkFactory) {
+	private DerivedAxiomExpression<ElkSubClassOfAxiom> createExistentialPremise(ElkClassExpression subClass, ElkObjectProperty property, ElkClassExpression filler, ElkObjectFactory elkFactory) {
 		return reader_.getExpressionFactory().create(elkFactory.getSubClassOfAxiom(subClass, elkFactory.getObjectSomeValuesFrom(property, filler)));
 	}
 
-	protected ElkSubObjectPropertyOfAxiom lookup(IndexedPropertyChain sub, IndexedObjectProperty sup, ElkObjectFactory elkFactory) {
+	private ElkSubObjectPropertyOfAxiom createSubPropertyChainAxiom(IndexedPropertyChain sub, IndexedObjectProperty sup, ElkObjectFactory elkFactory) {
 		return elkFactory.getSubObjectPropertyOfAxiom(Deindexer.deindex(sub), sup.getElkObjectProperty());
 	}
 

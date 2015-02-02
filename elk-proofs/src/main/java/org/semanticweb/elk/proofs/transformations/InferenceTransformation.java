@@ -30,7 +30,7 @@ import org.semanticweb.elk.util.collections.Operations;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public interface InferenceTransformation extends Operations.Transformation<Inference, Iterable<Inference>> {
+public interface InferenceTransformation extends Operations.Transformation<Inference, Iterable<? extends Inference>> {
 
 	public boolean mayIntroduceDuplicates();
 }

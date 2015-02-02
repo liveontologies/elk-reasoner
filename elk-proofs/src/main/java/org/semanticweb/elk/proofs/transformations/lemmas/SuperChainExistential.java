@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
@@ -25,12 +26,11 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryImpl;
-import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainComposition;
 import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialLemmaComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ReflexiveExistentialComposition;
 import org.semanticweb.elk.proofs.inferences.mapping.Deindexer;
+import org.semanticweb.elk.proofs.utils.TautologyChecker;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
@@ -64,41 +64,61 @@ class SuperChainExistential implements LemmaExpression<ElkSubClassOfLemma> {
 	
 	@Override
 	public Iterable<? extends Inference> getInferences() throws ElkException {
-		final ElkObjectFactory elkFactory = new ElkObjectFactoryImpl();
-		final List<Inference> inferences = new ArrayList<Inference>();
+		Inference refElimination = getReflexivityEliminationInference();
 		
-		for (Inference inf : lemma_.getInferences()) {
-			Inference transformed = inf.accept(new AbstractInferenceVisitor<Void, Inference>() {
-
-				@Override
-				protected Inference defaultVisit(Inference inference, Void input) {
-					// shouldn't get here
-					return null;
-				}
-
-				@Override
-				public Inference visit(ExistentialLemmaChainComposition lemmaInf, Void input) {
-					ElkSubObjectPropertyOfAxiom firstPropAxiom = lemmaInf.getFirstPropertyPremise().getAxiom();
-					ElkSubClassOfAxiom firstPremiseAxiom = lemmaInf.getFirstExistentialPremise().getAxiom();
-					DerivedAxiomExpression<ElkSubClassOfAxiom> firstExPremise = createExistentialPremise(
-							getSubClass(), 
-							(ElkObjectProperty) firstPropAxiom.getSubObjectPropertyExpression(), 
-							((ElkObjectSomeValuesFrom) firstPremiseAxiom.getSuperClassExpression()).getFiller(), 
-							elkFactory);
-					List<DerivedExpression> premises = new ArrayList<DerivedExpression>();
-					List<DerivedExpression> otherExPremises = createExistentialPremise(lemmaInf.getSecondExistentialPremise(), lemmaInf.getSecondPropertyPremise(), reader_);
-					
-					premises.add(firstExPremise);
-					premises.addAll(otherExPremises);
-					// continue producing inferences with lemmas
-					return new NaryExistentialLemmaComposition(lemma_, premises);
-				}
-			}, null);
-			
-			inferences.add(transformed);
+		if (refElimination != null) {
+			//return Operations.concat(Collections.singletonList(refElimination), lemma_.getInferences());
+			// if there's derivation subChain <= superChain which starts at this reflexivity elimination inference, we ignore other inferences
+			// of the lemma. If they exist, they're handled elsewhere.
+			return Collections.singletonList(refElimination);
 		}
 		
-		return inferences;
+		return lemma_.getInferences();
+	}
+
+	// TODO use recorded inferences
+	private Inference getReflexivityEliminationInference() {
+		if (superChain_ instanceof IndexedObjectProperty) {
+			return null;
+		}
+		
+		IndexedBinaryPropertyChain superChain = (IndexedBinaryPropertyChain) superChain_;
+		IndexedObjectProperty left = superChain.getLeftProperty();
+		IndexedPropertyChain right = superChain.getRightProperty();
+		
+		if (left.getSaturated().isDerivedReflexive() && right.getSaturated().getSubPropertyChains().contains(subChain_)) {
+			DerivedAxiomExpression<?> reflExistential = createReflexiveExistential(getSubClass(), left.getElkObjectProperty(), reader_);
+			DerivedExpression exPremise = updateSuperChain(getLemma(), subChain_, right, reader_);
+			
+			return new NaryExistentialLemmaComposition(lemma_, Arrays.asList(reflExistential, exPremise));
+		}
+		else if (right.getSaturated().isDerivedReflexive() && left.getSaturated().getSubPropertyChains().contains(subChain_)) {
+			// all properties comprising the right chain are derived reflexive so we add all reflexive existentials in one go
+			List<DerivedExpression> existentials = new ArrayList<DerivedExpression>();
+			IndexedPropertyChain top = right;
+			DerivedExpression exPremise = updateSuperChain(getLemma(), subChain_, left, reader_); 
+			
+			existentials.add(exPremise);
+			
+			for (;;) {
+				if (top instanceof IndexedObjectProperty) {
+					IndexedObjectProperty prop = (IndexedObjectProperty) top;
+					
+					existentials.add(createReflexiveExistential(getSuperClassFiller(), prop.getElkObjectProperty(), reader_));
+					break;
+				}
+				else {
+					IndexedObjectProperty prop = ((IndexedBinaryPropertyChain) top).getLeftProperty();
+
+					existentials.add(createReflexiveExistential(getSuperClassFiller(), prop.getElkObjectProperty(), reader_));
+					top = ((IndexedBinaryPropertyChain) top).getRightProperty();
+				}
+			}
+			
+			return new NaryExistentialLemmaComposition(lemma_, existentials);
+		}
+		
+		return null;
 	}
 
 	@Override
@@ -122,50 +142,7 @@ class SuperChainExistential implements LemmaExpression<ElkSubClassOfLemma> {
 	static ElkClassExpression getSuperClassFiller(ElkSubClassOfLemma lemma) {
 		return ((ElkComplexObjectSomeValuesFrom) lemma.getSuperClass()).getFiller();
 	}
-	
-	//TODO
-	List<DerivedExpression> eliminateReflexivity() {
-		if (superChain_ instanceof IndexedObjectProperty) {
-			return Collections.<DerivedExpression>singletonList(this);
-		}
 		
-		IndexedBinaryPropertyChain superChain = (IndexedBinaryPropertyChain) superChain_;
-		IndexedObjectProperty left = superChain.getLeftProperty();
-		IndexedPropertyChain right = superChain.getRightProperty();
-		
-		if (left.getSaturated().isDerivedReflexive()) {
-			DerivedAxiomExpression<?> reflExistential = createReflexiveExistential(getSubClass(), left.getElkObjectProperty(), reader_);
-						
-			return Arrays.asList(reflExistential, updateSuperChain(getLemma(), subChain_, right, reader_));
-		}
-		else if (right.getSaturated().isDerivedReflexive()) {
-			// all properties comprising the right chain are derived reflexive so we add all reflexive existentials in one go
-			List<DerivedExpression> existentials = new ArrayList<DerivedExpression>();
-			IndexedPropertyChain top = right;
-			
-			existentials.add(updateSuperChain(getLemma(), subChain_, left, reader_));
-			
-			for (;;) {
-				if (top instanceof IndexedObjectProperty) {
-					IndexedObjectProperty prop = (IndexedObjectProperty) top;
-					
-					existentials.add(createReflexiveExistential(getSuperClassFiller(), prop.getElkObjectProperty(), reader_));
-					break;
-				}
-				else {
-					IndexedObjectProperty prop = ((IndexedBinaryPropertyChain) top).getLeftProperty();
-
-					existentials.add(createReflexiveExistential(getSuperClassFiller(), prop.getElkObjectProperty(), reader_));
-					top = ((IndexedBinaryPropertyChain) top).getRightProperty();
-				}
-			}
-			
-			return existentials;
-		}
-		
-		return Collections.<DerivedExpression>singletonList(this);
-	}
-	
 	static DerivedExpression updateSuperChain(final ElkSubClassOfLemma lemma, final IndexedPropertyChain subChain, final IndexedPropertyChain superChain, final ReasonerInferenceReader reader) {
 		final ElkObjectFactory elkFactory = new ElkObjectFactoryImpl(); 
 		final ElkLemmaObjectFactory lemmaFactory = new ElkLemmaObjectFactoryImpl();
@@ -178,8 +155,7 @@ class SuperChainExistential implements LemmaExpression<ElkSubClassOfLemma> {
 						lemma.getSubClass(), 
 						elkFactory.getObjectSomeValuesFrom(iop.getElkObjectProperty(), getSuperClassFiller(lemma)));
 				
-				return new SuperPropertyExistential(
-						reader.getExpressionFactory().create(conclusionAxiom), subChain, iop, reader);
+				return new SuperPropertyExistential(reader.getExpressionFactory().create(conclusionAxiom), subChain, iop, reader);
 			}
 
 			@Override
@@ -193,6 +169,21 @@ class SuperChainExistential implements LemmaExpression<ElkSubClassOfLemma> {
 			
 		});
 	}
+	
+	static DerivedAxiomExpression<ElkSubClassOfAxiom> updateSuperProperty(
+														ElkSubClassOfAxiom premise, 
+														IndexedPropertyChain sub, 
+														IndexedObjectProperty sup,
+														ReasonerInferenceReader reader) {
+		final ElkObjectFactory elkFactory = new ElkObjectFactoryImpl();
+		
+		ElkSubClassOfAxiom conclusionAxiom = elkFactory.getSubClassOfAxiom(
+												premise.getSubClassExpression(), 
+												elkFactory.getObjectSomeValuesFrom(sup.getElkObjectProperty(), 
+														((ElkObjectSomeValuesFrom) premise.getSuperClassExpression()).getFiller()));
+		
+		return new SuperPropertyExistential(reader.getExpressionFactory().create(conclusionAxiom), sub, sup, reader);
+	}
 
 	static DerivedAxiomExpression<ElkSubClassOfAxiom> createReflexiveExistential(ElkClassExpression ce, ElkObjectProperty prop, ReasonerInferenceReader reader) {
 		ElkObjectFactory elkFactory = new ElkObjectFactoryImpl();
@@ -205,51 +196,68 @@ class SuperChainExistential implements LemmaExpression<ElkSubClassOfLemma> {
 		return wrap;
 	}
 
-	static List<DerivedExpression> createExistentialPremise(DerivedExpression classPremise, DerivedExpression chainPremise, ReasonerInferenceReader reader) {
+	static DerivedExpression createExistentialPremise(final DerivedExpression classPremise, final DerivedExpression chainPremise, final ReasonerInferenceReader reader) {
+		if (isTautology(chainPremise)) {
+			return classPremise;
+		}
+		
 		if (classPremise instanceof DerivedAxiomExpression) {
-			DerivedAxiomExpression<ElkSubClassOfAxiom> exPremise = (DerivedAxiomExpression<ElkSubClassOfAxiom>) classPremise;
-			
-			return Collections.<DerivedExpression>singletonList(
-					createExistentialPremise(
+			return createExistentialPremise(
 							(DerivedAxiomExpression<ElkSubClassOfAxiom>) classPremise, 
 							(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>) chainPremise,
-							reader));
+							reader);
 		}
 		// continue to unwind lemmas
-		ElkSubClassOfLemma lemmaPremise = ((LemmaExpression<ElkSubClassOfLemma>) classPremise).getLemma();
-		IndexObjectConverter indexer = reader.getIndexer();
-		LemmaExpression<ElkSubPropertyChainOfLemma> chainLemma = (LemmaExpression<ElkSubPropertyChainOfLemma>) chainPremise;
-		IndexedPropertyChain sub = chainLemma.getLemma().getSubPropertyChain().accept(indexer);
-		IndexedPropertyChain sup = chainLemma.getLemma().getSuperPropertyChain().accept(indexer);
-		
-		DerivedExpression premise = updateSuperChain(lemmaPremise, sub, sup, reader);
-		
-		return premise instanceof SuperChainExistential ? ((SuperChainExistential) premise).eliminateReflexivity() : Collections.singletonList(premise);
-		
+		final ElkSubClassOfLemma lemmaPremise = ((LemmaExpression<ElkSubClassOfLemma>) classPremise).getLemma();
+		final IndexObjectConverter indexer = reader.getIndexer();
+		// even though the subsumer premise is a lemma, the sub-chain premise can still be a sub-property chain axiom
+		return chainPremise.accept(new ExpressionVisitor<Void, DerivedExpression>() {
+
+			@Override
+			public DerivedExpression visit(DerivedAxiomExpression<? extends ElkAxiom> expr, Void input) {
+				DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> chainAxiom = (DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>) expr;
+				IndexedPropertyChain sub = chainAxiom.getAxiom().getSubObjectPropertyExpression().accept(indexer);
+				IndexedPropertyChain sup = chainAxiom.getAxiom().getSuperObjectPropertyExpression().accept(indexer);
+				
+				return updateSuperChain(lemmaPremise, sub, sup, reader);
+			}
+
+			@Override
+			public DerivedExpression visit(LemmaExpression<?> chainExpr, Void input) {
+				LemmaExpression<ElkSubPropertyChainOfLemma> chainLemma = (LemmaExpression<ElkSubPropertyChainOfLemma>) chainExpr;
+				IndexedPropertyChain sub = chainLemma.getLemma().getSubPropertyChain().accept(indexer);
+				IndexedPropertyChain sup = chainLemma.getLemma().getSuperPropertyChain().accept(indexer);
+				
+				return updateSuperChain(lemmaPremise, sub, sup, reader);
+			}
+		}, null);
 	}
 	
 	static DerivedAxiomExpression<ElkSubClassOfAxiom> createExistentialPremise(
 			DerivedAxiomExpression<ElkSubClassOfAxiom> exPremise, DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propPremise, ReasonerInferenceReader reader) {
-		ElkSubObjectPropertyOfAxiom propPremiseAxiom = propPremise.getAxiom();
-		IndexObjectConverter indexer = reader.getIndexer();
-		IndexedPropertyChain sub = propPremiseAxiom.getSubObjectPropertyExpression().accept(indexer);
-		IndexedPropertyChain sup = propPremiseAxiom.getSuperObjectPropertyExpression().accept(indexer);
-		
-		if (sub.equals(sup)) {
+		if (isTautology(propPremise)) {
 			return exPremise;
 		}
 		
-		return new SuperPropertyExistential(exPremise, (IndexedObjectProperty) sub, (IndexedObjectProperty) sup, reader);
+		ElkSubObjectPropertyOfAxiom propPremiseAxiom = propPremise.getAxiom();
+		IndexObjectConverter indexer = reader.getIndexer();
+		IndexedPropertyChain sup = propPremiseAxiom.getSuperObjectPropertyExpression().accept(indexer);
+		
+		return createExistentialPremise(exPremise, (IndexedObjectProperty) sup, reader);
 	}
 	
-	protected DerivedAxiomExpression<ElkSubClassOfAxiom> createExistentialPremise(ElkClassExpression subClass, ElkObjectProperty property, ElkClassExpression filler, ElkObjectFactory elkFactory) {
-		return reader_.getExpressionFactory().create(elkFactory.getSubClassOfAxiom(subClass, elkFactory.getObjectSomeValuesFrom(property, filler)));
-	}
-	
-	protected ElkSubObjectPropertyOfAxiom lookup(IndexedPropertyChain sub, IndexedObjectProperty sup, ElkObjectFactory elkFactory) {
-		return elkFactory.getSubObjectPropertyOfAxiom(Deindexer.deindex(sub), sup.getElkObjectProperty());
-	}
+	static DerivedAxiomExpression<ElkSubClassOfAxiom> createExistentialPremise(DerivedAxiomExpression<ElkSubClassOfAxiom> exPremise, IndexedObjectProperty sup, ReasonerInferenceReader reader) {
+		ElkObjectSomeValuesFrom existential = (ElkObjectSomeValuesFrom) exPremise.getAxiom().getSuperClassExpression();
+		IndexObjectConverter indexer = reader.getIndexer();
+		IndexedPropertyChain sub = existential.getProperty().accept(indexer);
 
+		return updateSuperProperty(exPremise.getAxiom(), (IndexedObjectProperty) sub, (IndexedObjectProperty) sup, reader);
+	}
+	
+	private static boolean isTautology(DerivedExpression premise) {
+		return premise.accept(new TautologyChecker(), null);
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		return lemma_.equals(obj);
@@ -264,6 +272,5 @@ class SuperChainExistential implements LemmaExpression<ElkSubClassOfLemma> {
 	public String toString() {
 		return lemma_.toString();
 	}
-	
 	
 }

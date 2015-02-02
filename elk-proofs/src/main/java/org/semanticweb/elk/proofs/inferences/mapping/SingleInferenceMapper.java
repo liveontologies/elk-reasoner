@@ -505,12 +505,12 @@ public class SingleInferenceMapper {
 
 				@Override
 				public Inference visit(ElkObjectProperty expr) {
-					return new SubPropertyChainAxiom(exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(rr, expr)), hSS, rrH);
+					return new SubPropertyChainAxiom(exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(rr, expr)), rrH, hSS);
 				}
 
 				@Override
 				public Inference visit(ElkObjectPropertyChain expr) {
-					return new SubPropertyChainLemma(exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(rr, expr)), hSS, rrH);
+					return new SubPropertyChainLemma(exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(rr, expr)), rrH, hSS);
 				}
 			});
 		}

@@ -52,8 +52,7 @@ public class TautologyChecker extends
 	}
 
 	@Override
-	public Boolean visit(
-			ElkReflexivePropertyChainLemma lemma, Void input) {
+	public Boolean visit(ElkReflexivePropertyChainLemma lemma, Void input) {
 		return false;
 	}
 
@@ -63,8 +62,7 @@ public class TautologyChecker extends
 	}
 
 	@Override
-	public Boolean visit(ElkSubPropertyChainOfLemma lemma,
-			Void input) {
+	public Boolean visit(ElkSubPropertyChainOfLemma lemma, Void input) {
 		return StructuralEquivalenceChecker.equal(lemma.getSubPropertyChain(), lemma.getSuperPropertyChain());
 	}
 

@@ -50,13 +50,12 @@ import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialChainAxiomComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialComposition;
+import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainComposition;
 import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialAxiomComposition;
 import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialLemmaComposition;
+import org.semanticweb.elk.proofs.inferences.properties.SubPropertyChainAxiom;
 import org.semanticweb.elk.proofs.transformations.InferenceTransformation;
 import org.semanticweb.elk.proofs.utils.TautologyChecker;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
 
 /**
@@ -84,7 +83,7 @@ public class LemmaElimination2 implements InferenceTransformation {
 	}
 	
 	@Override
-	public Iterable<Inference> transform(final Inference inference) {
+	public Iterable<? extends Inference> transform(final Inference inference) {
 		return inference.accept(new InferenceRewriter(), null);
 	}
 	
@@ -96,7 +95,7 @@ public class LemmaElimination2 implements InferenceTransformation {
 	 * 			pavel.klinov@uni-ulm.de
 	 *
 	 */
-	private class InferenceRewriter extends AbstractInferenceVisitor<Void, Iterable<Inference>> {
+	private class InferenceRewriter extends AbstractInferenceVisitor<Void, Iterable<? extends Inference>> {
 		
 		private boolean lemmasPresent(Inference inf) {
 			for (DerivedExpression premise : inf.getPremises()) {
@@ -157,8 +156,6 @@ public class LemmaElimination2 implements InferenceTransformation {
 						if (candidate == null) {
 							break;
 						}
-						//FIXME
-						System.err.println("Rewriting " + candidate);
 						
 						// rewriting happens here
 						nextTransformed = rewrite(candidate).iterator();
@@ -189,46 +186,86 @@ public class LemmaElimination2 implements InferenceTransformation {
 		}
 		
 		@Override
-		public Iterable<Inference> visit(final ExistentialComposition inf, Void input) {
-			ElkSubObjectPropertyOfAxiom propPremise = inf.getSubPropertyPremise().getAxiom();
+		public Iterable<? extends Inference> visit(final ExistentialComposition inf, Void input) {
+			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> subPropertyPremise = inf.getSubPropertyPremise();
 			
-			if (propPremise.accept(new TautologyChecker())) {
+			if (isToldOrTautology(subPropertyPremise)) {
 				return Collections.<Inference>singletonList(inf);
 			}
 			
-			DerivedExpression exPremise = inf.getExistentialPremise().accept(new ExpressionVisitor<Void, DerivedExpression>() {
+			return inf.getExistentialPremise().accept(new ExpressionVisitor<Void, Iterable<? extends Inference>>() {
 
 				@Override
-				public DerivedExpression visit(DerivedAxiomExpression<? extends ElkAxiom> expr, Void input) {
-					return createExistentialPremise((DerivedAxiomExpression<ElkSubClassOfAxiom>) expr, inf.getSubPropertyPremise());
+				public Iterable<? extends Inference> visit(DerivedAxiomExpression<? extends ElkAxiom> expr, Void input) {
+					DerivedExpression exPremise = SuperChainExistential.createExistentialPremise((DerivedAxiomExpression<ElkSubClassOfAxiom>) expr, inf.getSubPropertyPremise(), reader_);
+					
+					if (exPremise.equals(inf.getConclusion())) {
+						return getInferenceSafe(exPremise);
+					}
+					
+					NaryExistentialAxiomComposition transformed = new NaryExistentialAxiomComposition(inf.getConclusion(), Collections.singletonList(exPremise), inf.getSubPropertyPremise());
+					
+					return lazyLemmaElimination(transformed);
 				}
 
 				@Override
-				public DerivedExpression visit(LemmaExpression<?> expr, Void input) {
-					return createExistentialPremise((LemmaExpression<ElkSubClassOfLemma>) expr, inf.getSubPropertyPremise());
+				public Iterable<Inference> visit(LemmaExpression<?> expr, Void input) {
+					DerivedExpression exPremise = SuperChainExistential.createExistentialPremise((LemmaExpression<ElkSubClassOfLemma>) expr, inf.getSubPropertyPremise(), reader_);
+					NaryExistentialAxiomComposition transformed = new NaryExistentialAxiomComposition(inf.getConclusion(), Collections.singletonList(exPremise), inf.getSubPropertyPremise());
+
+					return lazyLemmaElimination(transformed);
 				}
 				
 			}, null); 
-			
-			NaryExistentialAxiomComposition transformed = new NaryExistentialAxiomComposition(
-					inf.getConclusion(), 
-					Collections.singletonList(exPremise),
-					inf.getSubPropertyPremise());
+		}
+	
+		private Iterable<? extends Inference> getInferenceSafe(DerivedExpression expr) {
+			try {
+				return expr.getInferences();
+			} catch (ElkException e) {
+				// TODO log it
+				return Collections.emptyList();
+			}
+		}
 
-			return lazyLemmaElimination(transformed);
+		private boolean isToldOrTautology(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> subPropertyAxiom) {
+			if (subPropertyAxiom.getAxiom().accept(new TautologyChecker())) {
+				return true;
+			}
+			
+			for (Inference inf : getInferenceSafe(subPropertyAxiom)) {
+				boolean result = inf.accept(new AbstractInferenceVisitor<Void, Boolean>() {
+
+					@Override
+					protected Boolean defaultVisit(Inference inference, Void input) {
+						return false;
+					}
+
+					@Override
+					public Boolean visit(SubPropertyChainAxiom inf, Void input) {
+						return inf.getPremises().size() == 1;
+					}
+				}, null);
+				
+				if (result) {
+					return true;
+				}
+			}
+			
+			return false;
 		}
 
 		@Override
-		public Iterable<Inference> visit(ExistentialChainAxiomComposition inf, Void input) {
+		public Iterable<? extends Inference> visit(ExistentialChainAxiomComposition inf, Void input) {
 			// first, replacing wrapping up the premises to unwind the chain hierarchy properly
-			DerivedAxiomExpression<ElkSubClassOfAxiom> firstExPremise = createExistentialPremise(inf.getFirstExistentialPremise(), inf.getFirstPropertyPremise());
-			List<DerivedExpression> otherExPremises = SuperChainExistential.createExistentialPremise(inf.getSecondExistentialPremise(), inf.getSecondPropertyPremise(), reader_);
+			DerivedAxiomExpression<ElkSubClassOfAxiom> firstExPremise = SuperChainExistential.createExistentialPremise(inf.getFirstExistentialPremise(), inf.getFirstPropertyPremise(), reader_);
+			DerivedExpression secondExPremise = SuperChainExistential.createExistentialPremise(inf.getSecondExistentialPremise(), inf.getSecondPropertyPremise(), reader_);
 			// second, check if there are premises not representable in OWL and transform to the n-ary inference if that's the case
 			if (inf.getSecondExistentialPremise() instanceof LemmaExpression) {
 				List<DerivedExpression> premises = new ArrayList<DerivedExpression>();
 				
 				premises.add(firstExPremise);
-				premises.addAll(otherExPremises);
+				premises.add(secondExPremise);
 				
 				NaryExistentialAxiomComposition transformed = new NaryExistentialAxiomComposition(
 															inf.getConclusion(), 
@@ -240,7 +277,6 @@ public class LemmaElimination2 implements InferenceTransformation {
 			}
 			else {
 				DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> secondPropertyPremise = (DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>) inf.getSecondPropertyPremise();
-				DerivedAxiomExpression<ElkSubClassOfAxiom> secondExPremise = createExistentialPremise((DerivedAxiomExpression<ElkSubClassOfAxiom>) inf.getSecondExistentialPremise(), secondPropertyPremise);
 				
 				return Collections.<Inference>singletonList(
 						new ExistentialChainAxiomComposition(
@@ -257,34 +293,8 @@ public class LemmaElimination2 implements InferenceTransformation {
 			return getExpressionFactory().create(elkFactory_.getSubObjectPropertyOfAxiom(prop, prop));
 		}
 
-		private DerivedAxiomExpression<ElkSubClassOfAxiom> createExistentialPremise(DerivedAxiomExpression<ElkSubClassOfAxiom> exPremise, DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propPremise) {
-			ElkSubObjectPropertyOfAxiom propPremiseAxiom = propPremise.getAxiom();
-			IndexObjectConverter indexer = reader_.getIndexer();
-			IndexedPropertyChain sub = propPremiseAxiom.getSubObjectPropertyExpression().accept(indexer);
-			IndexedPropertyChain sup = propPremiseAxiom.getSuperObjectPropertyExpression().accept(indexer);
-			
-			if (sub.equals(sup)) {
-				return exPremise;
-			}
-			
-			return new SuperPropertyExistential(exPremise, (IndexedObjectProperty) sub, (IndexedObjectProperty) sup, reader_);
-		}
-		
-		private LemmaExpression<ElkSubClassOfLemma> createExistentialPremise(LemmaExpression<ElkSubClassOfLemma> exPremise, DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propPremise) {
-			ElkSubObjectPropertyOfAxiom propPremiseAxiom = propPremise.getAxiom();
-			IndexObjectConverter indexer = reader_.getIndexer();
-			IndexedPropertyChain sub = propPremiseAxiom.getSubObjectPropertyExpression().accept(indexer);
-			IndexedPropertyChain sup = propPremiseAxiom.getSuperObjectPropertyExpression().accept(indexer);
-			
-			if (sub.equals(sup)) {
-				return exPremise;
-			}
-			
-			return new SuperChainExistential(exPremise, sub, sup, reader_);
-		}
-
 		@Override
-		public Iterable<Inference> visit(final NaryExistentialAxiomComposition inf, Void input) {
+		public Iterable<? extends Inference> visit(final NaryExistentialAxiomComposition inf, Void input) {
 			if (!lemmasPresent(inf)) {
 				return Collections.<Inference>singletonList(inf);
 			}
@@ -304,6 +314,9 @@ public class LemmaElimination2 implements InferenceTransformation {
 		}
 
 		public Iterable<NaryExistentialAxiomComposition> rewrite(final NaryExistentialAxiomComposition inf) {
+			//FIXME
+			//System.err.println("From: " + inf);
+			
 			final List<DerivedExpression> commonPremises = new ArrayList<DerivedExpression>();
 			
 			for (int i = 0; i < inf.getExistentialPremises().size(); i++) {
@@ -320,15 +333,18 @@ public class LemmaElimination2 implements InferenceTransformation {
 
 								@Override
 								protected NaryExistentialAxiomComposition defaultVisit(Inference inference, Void input) {
-									// shouldn't get here, check?
+									// shouldn't get here
 									return null;
 								}
 								
 								@Override
-								public NaryExistentialAxiomComposition visit(NaryExistentialAxiomComposition lemmaInf, Void input) {
+								public NaryExistentialAxiomComposition visit(ExistentialLemmaChainComposition lemmaInf, Void input) {
 									List<DerivedExpression> premises = new ArrayList<DerivedExpression>(commonPremises);
+									DerivedAxiomExpression<ElkSubClassOfAxiom> firstExPremise = SuperChainExistential.createExistentialPremise(lemmaInf.getFirstExistentialPremise(), lemmaInf.getFirstPropertyPremise(), reader_);
+									DerivedExpression secondExPremise = SuperChainExistential.createExistentialPremise(lemmaInf.getSecondExistentialPremise(), lemmaInf.getSecondPropertyPremise(), reader_);
 									
-									premises.add(lemmaInf.getConclusion());
+									premises.add(firstExPremise);
+									premises.add(secondExPremise);
 									
 									// copying the remaining inferences
 									for (int j = premiseIndex + 1; j < inf.getExistentialPremises().size(); j++) {
@@ -339,7 +355,7 @@ public class LemmaElimination2 implements InferenceTransformation {
 									
 									return new NaryExistentialAxiomComposition(inf.getConclusion(), premises, inf.getChainPremise());
 								}
-								
+
 								@Override
 								public NaryExistentialAxiomComposition visit(NaryExistentialLemmaComposition lemmaInf, Void input) {
 									List<DerivedExpression> premises = new ArrayList<DerivedExpression>(commonPremises);
@@ -363,6 +379,9 @@ public class LemmaElimination2 implements InferenceTransformation {
 						
 					}
 					
+					//FIXME
+					//System.err.println("To: " + transformed);
+					
 					return transformed;
 				}
 				else {
@@ -377,6 +396,7 @@ public class LemmaElimination2 implements InferenceTransformation {
 
 	@Override
 	public boolean mayIntroduceDuplicates() {
+		// see the test RedundantCompositions.owl
 		return false;
 	}
 }

@@ -12,8 +12,5 @@ ReflexiveObjectProperty(:S3)
 SubObjectPropertyOf(:S :S4)
 SubObjectPropertyOf(ObjectPropertyChain(:R3 :R4) :S)
 
-#SubObjectPropertyOf(:R3 :S3)
-#SubObjectPropertyOf(:R4 :S4)
-
 SubClassOf(ObjectSomeValuesFrom(:R :E) :G)
 )

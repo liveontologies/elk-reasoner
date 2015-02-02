@@ -38,7 +38,7 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
- * TODO
+ * Represents the existential composition inference: (A <= R some B, B <= C, R <= S) |- A <= S some C   
  * 
  * @author Pavel Klinov
  * 

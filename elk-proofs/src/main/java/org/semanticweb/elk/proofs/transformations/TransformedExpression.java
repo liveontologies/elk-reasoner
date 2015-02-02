@@ -70,7 +70,7 @@ abstract class TransformedExpression<D extends DerivedExpression, T extends Infe
 
 			@Override
 			public Iterable<TransformedInference<T>> transform(Inference inf) {
-				Iterable<Inference> transformed = transformation.transform(inf); 
+				Iterable<? extends Inference> transformed = transformation.transform(inf); 
 				
 				return Operations.map(transformed, propagation);
 			}
