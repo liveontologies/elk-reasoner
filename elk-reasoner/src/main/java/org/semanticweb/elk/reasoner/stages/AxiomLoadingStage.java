@@ -22,7 +22,18 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
+import org.apache.log4j.Logger;
+import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.reasoner.incremental.NonIncrementalChangeListener;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ChangeIndexingProcessor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexingVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalChangeCheckingVisitor;
 
 /**
  * A {@link ReasonerStage} during which the input ontology is loaded into the
@@ -32,6 +43,14 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
  * 
  */
 public class AxiomLoadingStage extends AbstractReasonerStage {
+
+	// logger for this class
+	private static final Logger LOGGER_ = Logger
+			.getLogger(AxiomLoadingStage.class);
+
+	private volatile AxiomLoader loader_;
+	private ElkAxiomProcessor axiomInsertionProcessor_,
+			axiomDeletionProcessor_;
 
 	public AxiomLoadingStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -47,16 +66,59 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
+		loader_ = reasoner.getAxiomLoader();
+		if (loader_ == null || loader_.isLoadingFinished()) {
+			return true;
+		}
+
+		ModifiableOntologyIndex ontologyIndex = reasoner
+				.getModifiableOntologyIndex();
+
+		ElkAxiomIndexingVisitor axiomInserter = new MainAxiomIndexerVisitor(
+				ontologyIndex, true);
+		ElkAxiomIndexingVisitor axiomDeleter = new MainAxiomIndexerVisitor(
+				ontologyIndex, false);
+
+		/*
+		 * wrapping both the inserter and the deleter to receive notifications
+		 * if some axiom change can't be incorporated incrementally
+		 */
+		/**
+		 * The listener used to detect if the axiom has an impact on the role
+		 * hierarchy
+		 */
+		NonIncrementalChangeListener<ElkAxiom> listener = new NonIncrementalChangeListener<ElkAxiom>() {
+
+			boolean resetDone = false;
+
+			@Override
+			public void notify(ElkAxiom axiom) {
+				if (resetDone)
+					return;
+				if (LOGGER_.isDebugEnabled()) {
+					LOGGER_.debug("Disallowing incremental mode due to "
+							+ OwlFunctionalStylePrinter.toString(axiom));
+				}
+				reasoner.resetPropertySaturation();
+				reasoner.setNonIncrementalMode();
+				resetDone = true;
+			}
+		};
+
+		axiomInserter = new NonIncrementalChangeCheckingVisitor(axiomInserter,
+				listener);
+		axiomDeleter = new NonIncrementalChangeCheckingVisitor(axiomDeleter,
+				listener);
+
+		this.axiomInsertionProcessor_ = new ChangeIndexingProcessor(
+				axiomInserter);
+		this.axiomDeletionProcessor_ = new ChangeIndexingProcessor(axiomDeleter);
 		return true;
 	}
 
 	@Override
 	public void executeStage() throws ElkException {
-		for (;;) {
-			reasoner.forceLoading();
-			if (!spuriousInterrupt())
-				break;
-		}
+		loader_.load(axiomInsertionProcessor_, axiomDeletionProcessor_);
 	}
 
 	@Override
@@ -68,6 +130,12 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(loader_, flag);
 	}
 
 }

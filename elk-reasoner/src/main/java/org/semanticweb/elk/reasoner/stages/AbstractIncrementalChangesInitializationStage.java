@@ -54,25 +54,30 @@ abstract class AbstractIncrementalChangesInitializationStage extends
 
 	@Override
 	public void executeStage() throws ElkInterruptedException {
-		for (;;) {
-			initialization_.process();
-			if (!spuriousInterrupt())
-				break;
-		}
+		if (isInterrupted())
+			return;
+		initialization_.process();
 	}
 
 	@Override
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		
+
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);
 		stageStatistics_.reset();
-		
+
 		return true;
 	}
 
 	@Override
 	public void printInfo() {
 	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(initialization_, flag);
+	}
+
 }

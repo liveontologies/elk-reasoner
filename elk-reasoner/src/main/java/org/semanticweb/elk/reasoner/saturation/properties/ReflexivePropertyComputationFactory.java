@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 
 /**
  * The factory of engines that compute implied reflexivity of object property
@@ -41,7 +42,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ReflexivePropertyComputationFactory
+public class ReflexivePropertyComputationFactory extends SimpleInterrupter
 		implements
 		InputProcessorFactory<IndexedObjectProperty, ReflexivePropertyComputationFactory.Engine> {
 
@@ -55,11 +56,6 @@ public class ReflexivePropertyComputationFactory
 	 * chains they are part of.
 	 */
 	private final Queue<IndexedPropertyChain> toDo_ = new ConcurrentLinkedQueue<IndexedPropertyChain>();
-	/**
-	 * {@code true} if computation has been interrupted and all running workers
-	 * should stop immediately
-	 */
-	private volatile boolean isInterrupted_ = false;
 
 	@Override
 	public Engine getEngine() {
@@ -67,13 +63,8 @@ public class ReflexivePropertyComputationFactory
 	}
 
 	@Override
-	public void interrupt() {
-		isInterrupted_ = true;
-	}
-
-	@Override
 	public void finish() {
-		isInterrupted_ = false;
+		// nothing to do
 	}
 
 	private void toDo(IndexedPropertyChain ipc) {
@@ -147,7 +138,7 @@ public class ReflexivePropertyComputationFactory
 		@Override
 		public void process() {
 			for (;;) {
-				if (isInterrupted_)
+				if (isInterrupted())
 					return;
 				IndexedPropertyChain next = toDo_.poll();
 				if (next == null)

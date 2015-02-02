@@ -23,6 +23,7 @@
 package org.semanticweb.elk.loading;
 
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * An object through which axioms can be add or removed to the ontology
@@ -30,7 +31,7 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  * @author "Yevgeny Kazakov"
  * 
  */
-public interface AxiomLoader {
+public interface AxiomLoader extends Interrupter {
 
 	/**
 	 * Loads pending axioms using the provided {@code  axiomInserter} for

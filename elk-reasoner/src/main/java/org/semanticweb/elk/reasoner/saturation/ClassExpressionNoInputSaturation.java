@@ -96,13 +96,18 @@ class ClassExpressionNoInputSaturationFactory
 	}
 
 	@Override
-	public void interrupt() {
-		ruleAppFactory_.interrupt();
+	public void setInterrupt(boolean flag) {
+		ruleAppFactory_.setInterrupt(flag);
+	}
+
+	@Override
+	public boolean isInterrupted() {
+		return ruleAppFactory_.isInterrupted();
 	}
 
 	@Override
 	public void finish() {
-		// nothing to do
+		ruleAppFactory_.finish();
 	}
 
 	public SaturationStatistics getRuleAndConclusionStatistics() {
@@ -118,7 +123,12 @@ class ClassExpressionNoInputSaturationFactory
 
 	class Engine implements InputProcessor<IndexedClassExpression> {
 
+		private final BaseEngine engine_;
+
 		private Engine() {
+			this.engine_ = ruleAppFactory_
+					.getDefaultEngine(ContextCreationListener.DUMMY,
+							contextModificationListener_);
 		}
 
 		@Override
@@ -127,20 +137,12 @@ class ClassExpressionNoInputSaturationFactory
 
 		@Override
 		public void process() {
-			BaseEngine engine = ruleAppFactory_
-					.getDefaultEngine(ContextCreationListener.DUMMY,
-							contextModificationListener_);
-
-			try {
-				engine.process();
-			} finally {
-				engine.finish();
-			}
+			engine_.process();
 		}
 
 		@Override
 		public void finish() {
-			ruleAppFactory_.finish();
+			engine_.finish();
 			// System.err.println(ruleAppFactory_.getStatistics().getRuleStatistics().getTotalRuleAppCount());
 		}
 

@@ -67,6 +67,8 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 
 	@Override
 	public void executeStage() throws ElkException {
+		// TODO: it seems like this stage cannot be currently interrupted
+
 		// first, pick random class expressions
 		List<IndexedClassExpression> contexts = pickRandomContexts(RandomSeedProvider.VALUE);
 		// init them for deletions

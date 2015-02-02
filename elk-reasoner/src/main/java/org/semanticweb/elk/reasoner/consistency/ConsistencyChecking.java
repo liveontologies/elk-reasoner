@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * A {@link ReasonerComputation} for checking consistency of the ontology. This
@@ -191,8 +192,7 @@ public class ConsistencyChecking
 
 	@Override
 	public void process() {
-		consistencyMonitor_
-				.registerComputationToInterrupt(ConsistencyChecking.this);
+		consistencyMonitor_.registerInterrupt(ConsistencyChecking.this);
 		super.process();
 		consistencyMonitor_.clearComputationToInterrupt();
 	}
@@ -251,15 +251,14 @@ public class ConsistencyChecking
 	 */
 	static class ConsistencyMonitor {
 		private volatile boolean inconsistent_ = false;
-		private volatile ConsistencyChecking computation_;
+		private volatile Interrupter interrupter_;
 
-		public void registerComputationToInterrupt(
-				ConsistencyChecking computation) {
-			this.computation_ = computation;
+		public void registerInterrupt(Interrupter computation) {
+			this.interrupter_ = computation;
 		}
 
 		public void clearComputationToInterrupt() {
-			this.computation_ = null;
+			this.interrupter_ = null;
 		}
 
 		public boolean isInconsistent() {
@@ -269,8 +268,10 @@ public class ConsistencyChecking
 		public void setInconsistent() {
 			inconsistent_ = true;
 			// interrupt all workers
-			if (computation_ != null)
-				computation_.getInputProcessorFactory().interrupt();
+			if (interrupter_ != null)
+				interrupter_.setInterrupt(true);
+			else
+				LOGGER_.error("no interrupter registered!");
 
 		}
 
@@ -313,22 +314,21 @@ public class ConsistencyChecking
 				public boolean hasNext() {
 					if (consistencyMonitor.isInconsistent())
 						return false;
-					else
-						return inputsIterator.hasNext();
+					// else
+					return inputsIterator.hasNext();
 				}
 
 				@Override
 				public SaturationJob<IndexedClassEntity> next() {
 					if (consistencyMonitor.isInconsistent())
 						throw new NoSuchElementException();
-					else {
-						SaturationJob<IndexedClassEntity> job = new SaturationJob<IndexedClassEntity>(
-								inputsIterator.next());
-						if (LOGGER_.isTraceEnabled())
-							LOGGER_.trace(job.getInput()
-									+ ": consistency checking submitted");
-						return job;
-					}
+					// else
+					SaturationJob<IndexedClassEntity> job = new SaturationJob<IndexedClassEntity>(
+							inputsIterator.next());
+					if (LOGGER_.isTraceEnabled())
+						LOGGER_.trace(job.getInput()
+								+ ": consistency checking submitted");
+					return job;
 				}
 
 				@Override

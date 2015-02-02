@@ -75,10 +75,8 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		todo_ = reasoner.ontologyIndex.getIndexedPropertyChains()
-				.iterator();
-		maxProgress_ = reasoner.ontologyIndex.getIndexedPropertyChains()
-				.size();
+		todo_ = reasoner.ontologyIndex.getIndexedPropertyChains().iterator();
+		maxProgress_ = reasoner.ontologyIndex.getIndexedPropertyChains().size();
 		progress_ = 0;
 		clearedSaturations_ = 0;
 		return true;
@@ -87,6 +85,7 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	@Override
 	public void executeStage() throws ElkInterruptedException {
 		for (;;) {
+			checkInterrupt();
 			if (!todo_.hasNext())
 				break;
 			IndexedPropertyChain ipc = todo_.next();
@@ -96,8 +95,6 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 				clearedSaturations_++;
 			}
 			progressMonitor.report(++progress_, maxProgress_);
-			if (spuriousInterrupt())
-				continue;
 		}
 	}
 

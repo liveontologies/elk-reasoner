@@ -45,7 +45,8 @@ import java.util.concurrent.BlockingQueue;
  * @param <F>
  *            the type of the factory for the input processors
  */
-public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
+public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>>
+		extends SimpleInterrupter {
 	/**
 	 * the factory for the input processor engines
 	 */
@@ -64,21 +65,17 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	private final BlockingQueue<I> buffer_;
 
 	/**
-	 * a special object to signal the end of input; all workers should terminate
-	 * when consuming this object
+	 * a special object to "wake up" worker threads waiting for the input
 	 */
 	@SuppressWarnings("unchecked")
 	private final I poison_pill_ = (I) new Object();
 
 	/**
-	 * {@code true} if the finish of computation was requested using the
-	 * function {@link #finish()}
+	 * {@code true} the workers should stop either as soon as possible (if the
+	 * computation has been terminated) or after there is no further input
+	 * available in the buffer
 	 */
-	private boolean finishRequested_;
-	/**
-	 * {@code true} if the computation has been interrupted
-	 */
-	private boolean isInterrupted_;
+	private volatile boolean termination_;
 	/**
 	 * the worker instance used to process the jobs
 	 */
@@ -102,8 +99,7 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 			ComputationExecutor executor, int maxWorkers, int bufferCapacity) {
 		this.inputProcessorFactory_ = inputProcessorFactory;
 		this.buffer_ = new ArrayBlockingQueue<I>(bufferCapacity);
-		this.finishRequested_ = false;
-		this.isInterrupted_ = false;
+		this.termination_ = false;
 		this.worker_ = new Worker();
 		this.executor_ = executor;
 		this.maxWorkers_ = maxWorkers;
@@ -138,8 +134,6 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	 * @return {@code true} if the operation was successful
 	 */
 	public synchronized boolean start() {
-		finishRequested_ = false;
-		isInterrupted_ = false;
 		return executor_.start(worker_, maxWorkers_);
 	}
 
@@ -151,34 +145,42 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	 * @param input
 	 *            the input to be processed
 	 * @return {@code true} if the input has been successfully submitted for
-	 *         computation; the input cannot be submitted, e.g., if
-	 *         {@link #finish()} has been called
+	 *         computation; the input cannot be submitted if {@link #finish()}
+	 *         was called or the computation has been terminated
 	 * @throws InterruptedException
 	 *             thrown if interrupted during waiting for space to be
 	 *             available
 	 */
 	public synchronized boolean submit(I input) throws InterruptedException {
-		if (finishRequested_)
+		if (termination_)
 			return false;
 		buffer_.put(input);
 		return true;
 	}
 
+	@Override
+	public final void setInterrupt(boolean flag) {
+		this.termination_ = flag;
+		super.setInterrupt(flag);
+		inputProcessorFactory_.setInterrupt(flag);
+	}
+
 	/**
-	 * Request all currently running workers to stop; no input can be submitted
+	 * Wait until all currently running workers stop; no input can be submitted
 	 * after calling this method. When this method returns, no worker should be
 	 * running.
 	 * 
-	 * @return the submitted inputs that were not processed by the workers
 	 * @throws InterruptedException
 	 */
-	public synchronized Iterable<I> interrupt() throws InterruptedException {
-		if (!isInterrupted_) {
-			isInterrupted_ = true;
-			inputProcessorFactory_.interrupt();
-		}
+	protected synchronized void waitWorkers() throws InterruptedException {
+		if (buffer_.isEmpty())
+			// wake up blocked workers
+			buffer_.put(poison_pill_);
 		executor_.waitDone();
-		return buffer_;
+		// remove all poison pills
+		while (buffer_.peek() == poison_pill_) {
+			buffer_.remove();
+		}
 	}
 
 	/**
@@ -193,13 +195,13 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 	 * @throws InterruptedException
 	 *             if interrupted during waiting for finish request
 	 */
-	public void finish() throws InterruptedException {
-		if (!finishRequested_) {
-			buffer_.put(poison_pill_);
-			finishRequested_ = true;
+	public synchronized void finish() throws InterruptedException {
+		termination_ = true;
+		waitWorkers();
+		if (!isInterrupted()) {
+			termination_ = false;
+			inputProcessorFactory_.finish();
 		}
-		executor_.waitDone();
-		inputProcessorFactory_.finish();
 	}
 
 	/**
@@ -217,38 +219,37 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>> {
 					.getEngine();
 
 			try {
-				boolean doneProcess = false;
+				boolean previousProcessed = false;
 				for (;;) {
-					if (isInterrupted_)
-						break;
-					try {
-						// make sure that all previously submitted inputs are
-						// processed
-						if (!doneProcess) {
-							inputProcessor.process(); // can be interrupted
-							doneProcess = true;
-						}
-						nextInput = buffer_.take();
-						if (nextInput == poison_pill_) {
-							// other workers should also die
+					// make sure that all previously submitted inputs are
+					// processed
+					if (!previousProcessed) {
+						inputProcessor.process(); // can be interrupted
+						if (!isInterrupted())
+							previousProcessed = true;
+					}
+					nextInput = buffer_.take();
+					if (nextInput != poison_pill_) {
+						inputProcessor.submit(nextInput); // should not fail
+						inputProcessor.process(); // can be interrupted
+					}
+					if (termination_) {
+						if (buffer_.isEmpty()) {
 							buffer_.put(poison_pill_);
-							// make sure nothing is left unprocessed
-							inputProcessor.process(); // can be interrupted
 							break;
 						}
-						inputProcessor.submit(nextInput); // should never fail
-						inputProcessor.process(); // can be interrupted
-					} catch (InterruptedException e) {
-						/*
-						 * we don't know what is causing this but we need to
-						 * obey; consistency of the computation for such
-						 * interrupt is not guaranteed; restore the interrupt
-						 * status and exit
-						 */
-						Thread.currentThread().interrupt();
-						break;
+						if (isInterrupted()) {
+							break;
+						}
 					}
 				}
+			} catch (InterruptedException e) {
+				/*
+				 * we don't know what is causing this but we need to obey;
+				 * consistency of the computation for such interrupt is not
+				 * guaranteed; restore the interrupt status and exit
+				 */
+				Thread.currentThread().interrupt();
 			} finally {
 				inputProcessor.finish();
 			}

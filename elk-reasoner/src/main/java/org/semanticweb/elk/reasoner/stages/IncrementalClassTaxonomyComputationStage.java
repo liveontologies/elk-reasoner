@@ -118,4 +118,9 @@ public class IncrementalClassTaxonomyComputationStage extends
 			computation_.printStatistics();
 	}
 
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(computation_, flag);
+	}
 }

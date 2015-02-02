@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
@@ -204,7 +203,7 @@ public class ElkReasoner implements OWLReasoner {
 		if (isBufferingMode_) {
 			try {
 				reasoner_.forceLoading();
-			} catch (ElkLoadingException e) {
+			} catch (ElkException e) {
 				throw elkConverter_.convert(e);
 			}
 		}

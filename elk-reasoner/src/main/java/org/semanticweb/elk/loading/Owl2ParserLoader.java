@@ -132,7 +132,7 @@ public class Owl2ParserLoader extends AbstractAxiomLoader implements
 
 		try {
 			for (;;) {
-				if (Thread.currentThread().isInterrupted())
+				if (isInterrupted())
 					break;
 				try {
 					nextBatch = axiomExchanger_.take();

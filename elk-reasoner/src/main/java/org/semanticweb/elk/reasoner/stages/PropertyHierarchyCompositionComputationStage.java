@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.properties.PropertyHierarchyCompositionComputation;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 public class PropertyHierarchyCompositionComputationStage extends
 		AbstractReasonerStage {
@@ -55,11 +56,7 @@ public class PropertyHierarchyCompositionComputationStage extends
 
 	@Override
 	public void executeStage() throws ElkException {
-		for (;;) {
-			computation_.process();
-			if (!spuriousInterrupt())
-				break;
-		}
+		computation_.process();
 	}
 
 	@Override
@@ -67,7 +64,6 @@ public class PropertyHierarchyCompositionComputationStage extends
 		if (!super.postExecute())
 			return false;
 		computation_ = null;
-		reasoner.propertyHierarchyUpToDate_ = true;
 		return true;
 	}
 
@@ -75,6 +71,12 @@ public class PropertyHierarchyCompositionComputationStage extends
 	public void printInfo() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(computation_, flag);
 	}
 
 }

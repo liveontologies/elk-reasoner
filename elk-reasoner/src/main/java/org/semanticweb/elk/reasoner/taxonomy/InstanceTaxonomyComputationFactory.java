@@ -208,8 +208,13 @@ public class InstanceTaxonomyComputationFactory implements
 	}
 
 	@Override
-	public void interrupt() {
-		transitiveReductionShared_.interrupt();
+	public void setInterrupt(boolean flag) {
+		transitiveReductionShared_.setInterrupt(flag);
+	}
+
+	@Override
+	public boolean isInterrupted() {
+		return transitiveReductionShared_.isInterrupted();
 	}
 
 	@Override

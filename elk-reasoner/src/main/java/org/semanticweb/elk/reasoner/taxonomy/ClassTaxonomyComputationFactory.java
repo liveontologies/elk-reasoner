@@ -43,6 +43,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 
 /**
  * The factory for engines that concurrently construct a {@link Taxonomy}. The
@@ -53,8 +54,8 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class ClassTaxonomyComputationFactory implements
-		InputProcessorFactory<Collection<IndexedClass>, Engine> {
+public class ClassTaxonomyComputationFactory extends SimpleInterrupter
+		implements InputProcessorFactory<Collection<IndexedClass>, Engine> {
 
 	// logger for this class
 	private static final Logger LOGGER_ = Logger
@@ -219,8 +220,9 @@ public class ClassTaxonomyComputationFactory implements
 	}
 
 	@Override
-	public void interrupt() {
-		transitiveReductionShared_.interrupt();
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		transitiveReductionShared_.setInterrupt(flag);
 	}
 
 	@Override

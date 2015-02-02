@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
@@ -53,7 +54,7 @@ import org.semanticweb.elk.util.logging.CachedTimeThread;
  * @author Pavel Klinov
  * 
  */
-public class RuleApplicationFactory {
+public class RuleApplicationFactory extends SimpleInterrupter {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = Logger
@@ -72,8 +73,6 @@ public class RuleApplicationFactory {
 	 * correspond to modified contexts (during de-saturation and re-saturation)
 	 */
 	private final boolean trackModifiedContexts_;
-
-	private volatile boolean interrupted_ = false;
 
 	public RuleApplicationFactory(final SaturationState saturationState) {
 		this(saturationState, false);
@@ -94,12 +93,7 @@ public class RuleApplicationFactory {
 		return new DefaultEngine(listener, modListener);
 	}
 
-	public void interrupt() {
-		interrupted_ = true;
-	}
-
 	public void finish() {
-		interrupted_ = false;
 		// aggregatedStats_.check(LOGGER_);
 	}
 
@@ -145,7 +139,7 @@ public class RuleApplicationFactory {
 			}
 
 			for (;;) {
-				if (interrupted_)
+				if (isInterrupted())
 					break;
 
 				Context nextContext = writer.pollForActiveContext();

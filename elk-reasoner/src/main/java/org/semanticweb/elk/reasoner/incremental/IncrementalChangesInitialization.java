@@ -49,6 +49,7 @@ import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
@@ -83,7 +84,7 @@ public class IncrementalChangesInitialization extends
  * 
  *         pavel.klinov@uni-ulm.de
  */
-class ContextInitializationFactory
+class ContextInitializationFactory extends SimpleInterrupter
 		implements
 		InputProcessorFactory<ArrayList<Context>, InputProcessor<ArrayList<Context>>> {
 
@@ -96,11 +97,6 @@ class ContextInitializationFactory
 	private final LinkRule<Context> changedGlobalRuleHead_;
 	private AtomicInteger ruleHits = new AtomicInteger(0);
 	private final SaturationStatistics stageStatistics_;
-	/**
-	 * {@code true} if computation has been interrupted and all running workers
-	 * should stop immediately
-	 */
-	private volatile boolean isInterrupted_ = false;
 
 	public ContextInitializationFactory(
 			SaturationState state,
@@ -123,13 +119,7 @@ class ContextInitializationFactory
 	}
 
 	@Override
-	public void interrupt() {
-		isInterrupted_ = true;
-	}
-
-	@Override
 	public void finish() {
-		isInterrupted_ = false;
 		if (LOGGER_.isDebugEnabled())
 			LOGGER_.debug("Rule hits: " + ruleHits.get());
 	}
@@ -279,7 +269,7 @@ class ContextInitializationFactory
 
 		@Override
 		protected boolean isInterrupted() {
-			return isInterrupted_;
+			return ContextInitializationFactory.this.isInterrupted();
 		}
 
 	}
@@ -314,7 +304,7 @@ class ContextInitializationFactory
 
 		@Override
 		protected boolean isInterrupted() {
-			return isInterrupted_;
+			return ContextInitializationFactory.this.isInterrupted();
 		}
 
 	}

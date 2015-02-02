@@ -34,17 +34,13 @@ import static org.junit.Assert.fail;
 public class FailingInterrupter implements Interrupter {
 
 	@Override
-	public void interrupt() {
+	public void setInterrupt(boolean flag) {
 		fail();
 	}
 
 	@Override
 	public boolean isInterrupted() {
 		return false;
-	}
-
-	@Override
-	public void clearInterrupt() {
 	}
 
 }

@@ -51,6 +51,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 
 /**
  * Cleans both class and instance taxonomies concurrently
@@ -79,7 +80,7 @@ public class TaxonomyCleaning extends
  * 
  *         pavel.klinov@uni-ulm.de
  */
-class TaxonomyCleaningFactory
+class TaxonomyCleaningFactory extends SimpleInterrupter
 		implements
 		InputProcessorFactory<IndexedClassEntity, InputProcessor<IndexedClassEntity>> {
 
@@ -90,11 +91,6 @@ class TaxonomyCleaningFactory
 
 	private final ClassTaxonomyState classTaxonomyState_;
 	private final InstanceTaxonomyState instanceTaxonomyState_;
-	/**
-	 * {@code true} if computation has been interrupted and all running workers
-	 * should stop immediately
-	 */
-	private volatile boolean isInterrupted_ = false;
 
 	TaxonomyCleaningFactory(final ClassTaxonomyState classTaxonomyState,
 			final InstanceTaxonomyState instanceTaxonomyState) {
@@ -264,7 +260,7 @@ class TaxonomyCleaningFactory
 			@Override
 			public void process() {
 				for (;;) {
-					if (isInterrupted_)
+					if (isInterrupted())
 						return;
 
 					UpdateableTaxonomyNode<ElkClass> node = toRemove_.poll();
@@ -301,13 +297,8 @@ class TaxonomyCleaningFactory
 	}
 
 	@Override
-	public void interrupt() {
-		isInterrupted_ = true;
-	}
-
-	@Override
 	public void finish() {
-		isInterrupted_ = false;
+		// nothing to do
 	}
 
 }

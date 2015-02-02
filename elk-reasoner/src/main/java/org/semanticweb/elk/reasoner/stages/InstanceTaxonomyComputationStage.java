@@ -24,6 +24,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * A {@link ReasonerStage} during which the instance taxonomy of the current
@@ -57,30 +58,27 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		
+
 		if (reasoner.doneTaxonomy()) {
 			reasoner.initInstanceTaxonomy();
 
 			computation_ = new InstanceTaxonomyComputation(
 					reasoner.ontologyIndex.getIndexedIndividuals(),
 					reasoner.getProcessExecutor(), workerNo, progressMonitor,
-					reasoner.saturationState, reasoner.instanceTaxonomyState.getTaxonomy());
+					reasoner.saturationState,
+					reasoner.instanceTaxonomyState.getTaxonomy());
 		}
 
 		if (LOGGER_.isInfoEnabled()) {
 			LOGGER_.info(getName() + " using " + workerNo + " workers");
 		}
-		
+
 		return true;
 	}
 
 	@Override
 	public void executeStage() throws ElkInterruptedException {
-		for (;;) {
-			computation_.process();
-			if (!spuriousInterrupt())
-				break;
-		}
+		computation_.process();
 	}
 
 	@Override
@@ -89,7 +87,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 			return false;
 
 		this.computation_ = null;
-		
+
 		return true;
 	}
 
@@ -97,6 +95,12 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	public void printInfo() {
 		if (computation_ != null)
 			computation_.printStatistics();
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(computation_, flag);
 	}
 
 }

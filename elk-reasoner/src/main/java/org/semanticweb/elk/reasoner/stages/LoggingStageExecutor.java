@@ -47,22 +47,23 @@ public class LoggingStageExecutor extends AbstractStageExecutor {
 		}
 
 		Statistics.logOperationStart(stage.getName(), LOGGER_);
-		
+
 		try {
 			stage.preExecute();
 			stage.execute();
+			stage.printInfo();
+			stage.postExecute();
 		} catch (ElkInterruptedException e) {
 			LOGGER_.debug(stage.getName() + " was interrupted.");
+			stage.printInfo();
 			throw e;
 		} finally {
 			Statistics.logOperationFinish(stage.getName(), LOGGER_);
 			Statistics.logMemoryUsage(LOGGER_);
-			stage.printInfo();
-			stage.postExecute();
 		}
 
 		if (LOGGER_.isDebugEnabled()) {
-			LOGGER_.debug(stage.getName() + " done.");
+			LOGGER_.debug(stage.getName() + ": done.");
 		}
 	}
 }

@@ -35,8 +35,10 @@ import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 
-public class PropertyHierarchyCompositionComputationFactory
+public class PropertyHierarchyCompositionComputationFactory extends
+		SimpleInterrupter
 		implements
 		InputProcessorFactory<IndexedPropertyChain, PropertyHierarchyCompositionComputationFactory.Engine> {
 
@@ -47,12 +49,6 @@ public class PropertyHierarchyCompositionComputationFactory
 	@Override
 	public Engine getEngine() {
 		return new Engine();
-	}
-
-	@Override
-	public void interrupt() {
-		// nothing to interrupt as everything is processed immediately upon
-		// submission
 	}
 
 	@Override

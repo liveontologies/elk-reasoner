@@ -130,11 +130,6 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 */
 	private final int threshold_;
 	/**
-	 * {@code true} if computation has been interrupted and all running workers
-	 * should stop immediately
-	 */
-	private volatile boolean isInterrupted_ = false;
-	/**
 	 * {@code true} if some worker could be blocked from submitting the jobs
 	 * because threshold is exceeded.
 	 */
@@ -238,9 +233,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	}
 
 	@Override
-	public void interrupt() {
-		this.isInterrupted_ = true;
-		ruleApplicationFactory_.interrupt();
+	public void setInterrupt(boolean flag) {
+		ruleApplicationFactory_.setInterrupt(flag);
 		/*
 		 * waking up all waiting workers
 		 */
@@ -253,8 +247,12 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	}
 
 	@Override
+	public boolean isInterrupted() {
+		return ruleApplicationFactory_.isInterrupted();
+	}
+
+	@Override
 	public void finish() {
-		this.isInterrupted_ = false;
 		checkStatistics();
 	}
 
@@ -450,13 +448,13 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			 */
 			countStartedWorkers_.incrementAndGet();
 			ruleApplicationEngine_.process();
-			if (isInterrupted_)
+			if (isInterrupted())
 				updateIfSmaller(lastInterruptStartedWorkersSnapshot_,
 						countStartedWorkers_.get());
 			updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
 			processFinishedCounters(stats_); // can throw InterruptedException
 			for (;;) {
-				if (isInterrupted_) {
+				if (isInterrupted()) {
 					return;
 				}
 				int snapshotCountContextsProcessed = countContextsProcessed_
@@ -513,7 +511,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				ruleApplicationEngine_.submit(root);
 				ruleApplicationEngine_.process();
 
-				if (isInterrupted_) {
+				if (isInterrupted()) {
 					updateIfSmaller(lastInterruptStartedWorkersSnapshot_,
 							countStartedWorkers_.get());
 				}

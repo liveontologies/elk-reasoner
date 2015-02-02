@@ -37,7 +37,8 @@ package org.semanticweb.elk.util.concurrent.computation;
  * @param <P>
  *            the type of the input processors produced by this factory
  */
-public interface InputProcessorFactory<I, P extends InputProcessor<I>> {
+public interface InputProcessorFactory<I, P extends InputProcessor<I>> extends
+		Interrupter {
 
 	/**
 	 * @return a new input processor of the given type
@@ -45,14 +46,7 @@ public interface InputProcessorFactory<I, P extends InputProcessor<I>> {
 	public P getEngine();
 
 	/**
-	 * interrupt processing of inputs: all worker threads should stop as soon as
-	 * possible. After interrupt, the workers can be resume using the engine to
-	 * continue processing of inputs.
-	 */
-	public void interrupt();
-
-	/**
-	 * a hook function to be called when all jobs are processed
+	 * a hook function to be called when all jobs are successfully processed
 	 */
 	void finish();
 

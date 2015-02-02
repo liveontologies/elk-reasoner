@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 
 /**
  * The factory for engines that concurrently perform the transitive reduction of
@@ -72,7 +73,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  * @see TransitiveReductionListener
  */
 public class TransitiveReductionFactory<R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
-		implements
+		extends SimpleInterrupter implements
 		InputProcessorFactory<J, TransitiveReductionFactory<R, J>.Engine> {
 
 	// logger for this class
@@ -114,12 +115,6 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	private final TransitiveReductionOutputEquivalent<IndexedClass> defaultTopOutput_;
 
 	/**
-	 * {@code true} if computation has been interrupted and all running workers
-	 * should stop immediately
-	 */
-	private volatile boolean isInterrupted_ = false;
-
-	/**
 	 * Creating a new transitive reduction engine for the input ontology index
 	 * and a listener for executing callback functions.
 	 * 
@@ -150,14 +145,13 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	}
 
 	@Override
-	public void interrupt() {
-		isInterrupted_ = true;
-		saturationFactory_.interrupt();
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		saturationFactory_.setInterrupt(flag);
 	}
 
 	@Override
 	public void finish() {
-		isInterrupted_ = false;
 		saturationFactory_.finish();
 	}
 
@@ -477,8 +471,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		@Override
 		public final void process() throws InterruptedException {
 			for (;;) {
-				if (isInterrupted_)
+				if (isInterrupted()) {
 					return;
+				}
 				J processedJob = jobsWithSaturatedRoot_.poll();
 				if (processedJob != null) {
 					saturationOutputProcessor_

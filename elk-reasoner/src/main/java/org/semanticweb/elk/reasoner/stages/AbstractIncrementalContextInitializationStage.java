@@ -99,6 +99,8 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	@Override
 	public void executeStage() throws ElkInterruptedException {
 		for (;;) {
+			if (isInterrupted())
+				return;
 			if (!todo.hasNext())
 				break;
 			IndexedClassExpression ice = todo.next();
@@ -110,9 +112,6 @@ abstract class AbstractIncrementalContextInitializationStage extends
 			initContexts++;
 			progressMonitor.report(initContexts, maxContexts);
 
-			if (spuriousInterrupt()) {
-				continue;
-			}
 		}
 	}
 

@@ -68,7 +68,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		if (!super.preExecute()) {
 			return false;
 		}
-		
+
 		final Collection<IndexedClassEntity> modified = new ContextRootCollection(
 				reasoner.saturationState.getNotSaturatedContexts());
 		final Collection<IndexedClassEntity> removedClasses = new ContextRootCollection(
@@ -76,8 +76,10 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		final Collection<IndexedClassEntity> removedIndividuals = new ContextRootCollection(
 				reasoner.instanceTaxonomyState.getRemovedIndividuals());
 		Collection<IndexedClassEntity> inputs = Operations.getCollection(
-				Operations.concat(Operations.concat(removedClasses, modified), removedIndividuals),
-				removedClasses.size() + modified.size() + removedIndividuals.size());
+				Operations.concat(Operations.concat(removedClasses, modified),
+						removedIndividuals),
+				removedClasses.size() + modified.size()
+						+ removedIndividuals.size());
 
 		if (LOGGER_.isTraceEnabled()) {
 			LOGGER_.trace("Taxonomy nodes to be cleaned for modified contexts: "
@@ -87,27 +89,20 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			LOGGER_.trace("Instance taxonomy nodes to be cleaned for removed individuals: "
 					+ removedIndividuals);
 		}
-		
-		cleaning_ = new TaxonomyCleaning(inputs,
-				reasoner.classTaxonomyState, reasoner.instanceTaxonomyState,
-				reasoner.getProcessExecutor(), workerNo, progressMonitor);
-		
+
+		cleaning_ = new TaxonomyCleaning(inputs, reasoner.classTaxonomyState,
+				reasoner.instanceTaxonomyState, reasoner.getProcessExecutor(),
+				workerNo, progressMonitor);
 
 		return true;
 	}
 
 	@Override
 	public void executeStage() throws ElkException {
-
-		if (reasoner.classTaxonomyState.getTaxonomy() == null) {
+		if (reasoner.classTaxonomyState.getTaxonomy() == null)
 			// nothing to do
 			return;
-		}
-		for (;;) {
-			cleaning_.process();
-			if (!spuriousInterrupt())
-				break;
-		}
+		cleaning_.process();
 	}
 
 	@Override
@@ -121,12 +116,18 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
 		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
 		this.cleaning_ = null;
-		
+
 		return true;
 	}
 
 	@Override
 	public void printInfo() {
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(cleaning_, flag);
 	}
 
 	/*
