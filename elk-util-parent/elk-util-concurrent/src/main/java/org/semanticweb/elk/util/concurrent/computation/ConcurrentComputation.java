@@ -174,8 +174,8 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>>
 	 */
 	protected synchronized void waitWorkers() throws InterruptedException {
 		if (buffer_.isEmpty())
-			// wake up blocked workers
-			buffer_.put(poison_pill_);
+			// wake up blocked workers if not done already
+			buffer_.offer(poison_pill_);
 		executor_.waitDone();
 		// remove all poison pills
 		while (buffer_.peek() == poison_pill_) {
@@ -235,7 +235,8 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>>
 					}
 					if (termination_) {
 						if (buffer_.isEmpty()) {
-							buffer_.put(poison_pill_);
+							// wake up blocked workers if not done already
+							buffer_.offer(poison_pill_);
 							break;
 						}
 						if (isInterrupted()) {
