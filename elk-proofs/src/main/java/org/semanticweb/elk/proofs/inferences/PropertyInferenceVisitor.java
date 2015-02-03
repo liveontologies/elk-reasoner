@@ -28,7 +28,8 @@ import org.semanticweb.elk.proofs.inferences.properties.ReflexiveComposition;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexivityViaSubsumption;
 import org.semanticweb.elk.proofs.inferences.properties.SubPropertyChainAxiom;
 import org.semanticweb.elk.proofs.inferences.properties.SubPropertyChainLemma;
-import org.semanticweb.elk.proofs.inferences.properties.SubsumptionViaReflexivity;
+import org.semanticweb.elk.proofs.inferences.properties.SubsumptionViaLeftReflexivity;
+import org.semanticweb.elk.proofs.inferences.properties.SubsumptionViaRightReflexivity;
 import org.semanticweb.elk.proofs.inferences.properties.ToldReflexivity;
 import org.semanticweb.elk.proofs.transformations.lemmas.ReflexivityElimination;
 
@@ -47,7 +48,9 @@ public interface PropertyInferenceVisitor<I, O> {
 	
 	public O visit(ReflexivityViaSubsumption inf, I input);
 	
-	public O visit(SubsumptionViaReflexivity inf, I input);
+	public O visit(SubsumptionViaRightReflexivity inf, I input);
+	
+	public O visit(SubsumptionViaLeftReflexivity inf, I input);
 	
 	public O visit(ToldReflexivity inf, I input);
 	

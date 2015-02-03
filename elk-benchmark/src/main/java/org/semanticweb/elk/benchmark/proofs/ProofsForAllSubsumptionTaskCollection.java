@@ -39,6 +39,7 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
+import org.semanticweb.elk.proofs.ProofReader;
 import org.semanticweb.elk.proofs.utils.TestUtils;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
@@ -183,7 +184,7 @@ public class ProofsForAllSubsumptionTaskCollection implements VisitorTaskCollect
 				//reasoner.resetTraceState();
 				ReasonerStateAccessor.cleanClassTraces(reasoner);
 				
-				TestUtils.provabilityTest(reasoner, subsumee, subsumer);
+				TestUtils.provabilityTest(new ProofReader(reasoner), subsumee, subsumer);
 			} catch (ElkException e) {
 				throw new TaskException(e);
 			}

@@ -1,0 +1,15 @@
+Prefix( : = <http://example.org/> )
+Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
+Prefix( rdfs: = <http://www.w3.org/2000/01/rdf-schema#> )
+Ontology(
+
+Annotation( rdfs:label 
+ "Tests that :R is properly eliminated from the chains to still entail V1 -> V3 and, thus, A -> G." )
+
+ReflexiveObjectProperty(:R)
+
+SubObjectPropertyOf(ObjectPropertyChain(:R :V1) :V2)
+SubObjectPropertyOf(ObjectPropertyChain(:V2 :R) :V3)
+EquivalentClasses(:A ObjectSomeValuesFrom(:V1 :K1))
+EquivalentClasses(:G ObjectSomeValuesFrom(:V3 :K1))
+)

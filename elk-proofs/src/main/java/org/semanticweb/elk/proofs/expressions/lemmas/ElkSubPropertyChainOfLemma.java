@@ -24,6 +24,7 @@ package org.semanticweb.elk.proofs.expressions.lemmas;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 
 /**
@@ -35,5 +36,5 @@ public interface ElkSubPropertyChainOfLemma extends ElkLemma {
 
 	public ElkSubObjectPropertyExpression getSubPropertyChain();
 	
-	public ElkSubObjectPropertyExpression getSuperPropertyChain();
+	public ElkObjectPropertyChain getSuperPropertyChain();
 }

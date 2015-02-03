@@ -38,9 +38,9 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class InferenceEntry extends StrongKeyEntry<Inference, Inference> {
+public class InferenceEntry<I extends Inference> extends StrongKeyEntry<I, I> {
 
-	public InferenceEntry(Inference inf) {
+	public InferenceEntry(I inf) {
 		super(inf);
 	}
 
@@ -59,7 +59,7 @@ public class InferenceEntry extends StrongKeyEntry<Inference, Inference> {
 			return false;
 		}
 		
-		Inference otherInf = ((InferenceEntry) object).key;
+		Inference otherInf = ((InferenceEntry<?>) object).key;
 		
 		return key.getRule().equals(otherInf.getRule()) && key.getConclusion().equals(otherInf.getConclusion()) && equal(key.getPremises(), otherInf.getPremises());
 	}

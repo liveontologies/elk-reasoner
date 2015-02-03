@@ -27,51 +27,36 @@ package org.semanticweb.elk.proofs.inferences.properties;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
-import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
- * TODO split on two
  * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class SubsumptionViaReflexivity extends AbstractInference<LemmaExpression<ElkSubPropertyChainOfLemma>>  {
+public abstract class AbstractSubsumptionViaReflexivityInference<D extends DerivedExpression> extends AbstractInference<LemmaExpression<ElkSubPropertyChainOfLemma>>  {
 	
-	private final DerivedExpression premise_;
+	private final D premise_;
 	
-	public SubsumptionViaReflexivity(ElkSubPropertyChainOfLemma conclusion, ElkReflexiveObjectPropertyAxiom premise, DerivedExpressionFactory exprFactory) {
-		super(exprFactory.create(conclusion));
-		
-		premise_ = exprFactory.create(premise);
-	}
-	
-	public SubsumptionViaReflexivity(ElkSubPropertyChainOfLemma conclusion, DerivedExpression premise, DerivedExpressionFactory exprFactory) {
-		super(exprFactory.create(conclusion));
+	public AbstractSubsumptionViaReflexivityInference(LemmaExpression<ElkSubPropertyChainOfLemma> conclusion, D premise) {
+		super(conclusion);
 		
 		premise_ = premise;
 	}
 	
-	public DerivedExpression getReflexivityPremise() {
+	public D getReflexivityPremise() {
 		return premise_;
 	}
 	
 	@Override
 	public Collection<DerivedExpression> getRawPremises() {
-		return Collections.singletonList(premise_);
-	}
-
-	@Override
-	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+		return Collections.<DerivedExpression>singletonList(premise_);
 	}
 
 	@Override

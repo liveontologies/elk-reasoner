@@ -53,7 +53,7 @@ public class InferenceReaderTest {
 		ElkClass a = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass g = factory_.getClass(new ElkFullIri("http://example.org/G"));
 		
-		TestUtils.provabilityTest(new ProofReader(reasoner), a, g);
+		TestUtils.provabilityTest(new ProofReader(reasoner).eliminateLemmas(), a, g);
 		
 		reasoner.shutdown();
 	}
@@ -65,7 +65,7 @@ public class InferenceReaderTest {
 		ElkClass notDerived = factory_.getClass(new ElkFullIri("http://example.org/Invalid"));
 		
 		try {
-			TestUtils.provabilityTest(new ProofReader(reasoner), a, notDerived);
+			TestUtils.provabilityTest(new ProofReader(reasoner).eliminateLemmas(), a, notDerived);
 		}
 		finally {
 			reasoner.shutdown();
@@ -78,7 +78,7 @@ public class InferenceReaderTest {
 		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/G"));
 		
-		TestUtils.provabilityTest(new ProofReader(reasoner), sub, sup);
+		TestUtils.provabilityTest(new ProofReader(reasoner).eliminateLemmas(), sub, sup);
 		
 		reasoner.shutdown();
 	}
@@ -89,7 +89,7 @@ public class InferenceReaderTest {
 		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/G"));
 		
-		TestUtils.provabilityTest(new ProofReader(reasoner), sub, sup);
+		TestUtils.provabilityTest(new ProofReader(reasoner).eliminateLemmas(), sub, sup);
 		
 		reasoner.shutdown();
 	}
@@ -100,7 +100,7 @@ public class InferenceReaderTest {
 		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/G"));
 		
-		TestUtils.provabilityTest(new ProofReader(reasoner), sub, sup);
+		TestUtils.provabilityTest(new ProofReader(reasoner).eliminateLemmas(), sub, sup);
 		
 		reasoner.shutdown();
 	}
@@ -111,7 +111,7 @@ public class InferenceReaderTest {
 		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/G"));
 		
-		TestUtils.provabilityTest(new ProofReader(reasoner), sub, sup);
+		TestUtils.provabilityTest(new ProofReader(reasoner).eliminateLemmas(), sub, sup);
 		
 		reasoner.shutdown();
 	}
@@ -120,7 +120,7 @@ public class InferenceReaderTest {
 	//@Ignore("not a real test, more for manual debugging")
 	public void basicTest() throws Exception {
 		//Reasoner reasoner = TestReasonerUtils.loadAndClassify(new File("/home/pavel/ulm/data/galens/EL-GALEN.owl"));
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/RedundantCompositions.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositionsWithReflexivity.owl");
 		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/G"));
 		ProofReader reader = new ProofReader(reasoner).eliminateLemmas();

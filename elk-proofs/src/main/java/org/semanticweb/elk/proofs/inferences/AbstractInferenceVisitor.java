@@ -37,11 +37,14 @@ import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialAxiomComposi
 import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialLemmaComposition;
 import org.semanticweb.elk.proofs.inferences.classes.NegationContradiction;
 import org.semanticweb.elk.proofs.inferences.classes.ReflexiveExistentialComposition;
+import org.semanticweb.elk.proofs.inferences.properties.AbstractSubPropertyChainInference;
+import org.semanticweb.elk.proofs.inferences.properties.AbstractSubsumptionViaReflexivityInference;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexiveComposition;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexivityViaSubsumption;
 import org.semanticweb.elk.proofs.inferences.properties.SubPropertyChainAxiom;
 import org.semanticweb.elk.proofs.inferences.properties.SubPropertyChainLemma;
-import org.semanticweb.elk.proofs.inferences.properties.SubsumptionViaReflexivity;
+import org.semanticweb.elk.proofs.inferences.properties.SubsumptionViaLeftReflexivity;
+import org.semanticweb.elk.proofs.inferences.properties.SubsumptionViaRightReflexivity;
 import org.semanticweb.elk.proofs.inferences.properties.ToldReflexivity;
 import org.semanticweb.elk.proofs.transformations.lemmas.ReflexivityElimination;
 
@@ -56,16 +59,22 @@ public abstract class AbstractInferenceVisitor<I ,O> implements InferenceVisitor
 
 	protected abstract O defaultVisit(Inference inference, I input);
 
-	@Override
-	public O visit(SubPropertyChainAxiom inf, I input) {
-		
+	protected O visitSubChainInference(AbstractSubPropertyChainInference<?> inf, I input) {
+		return defaultVisit(inf, input);
+	}
+	
+	protected O visitSubsumptionViaReflexivityInference(AbstractSubsumptionViaReflexivityInference<?> inf, I input) {
 		return defaultVisit(inf, input);
 	}
 	
 	@Override
+	public O visit(SubPropertyChainAxiom inf, I input) {
+		return visitSubChainInference(inf, input);
+	}
+	
+	@Override
 	public O visit(SubPropertyChainLemma inf, I input) {
-		
-		return defaultVisit(inf, input);
+		return visitSubChainInference(inf, input);
 	}
 
 	@Override
@@ -81,9 +90,12 @@ public abstract class AbstractInferenceVisitor<I ,O> implements InferenceVisitor
 	}
 
 	@Override
-	public O visit(SubsumptionViaReflexivity inf, I input) {
-		
-		return defaultVisit(inf, input);
+	public O visit(SubsumptionViaRightReflexivity inf, I input) {
+		return visitSubsumptionViaReflexivityInference(inf, input);
+	}
+	
+	public O visit(SubsumptionViaLeftReflexivity inf, I input) {
+		return visitSubsumptionViaReflexivityInference(inf, input);
 	}
 
 	@Override

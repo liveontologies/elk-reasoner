@@ -85,13 +85,13 @@ abstract class TransformedExpression<D extends DerivedExpression, T extends Infe
 	}
 
 	private Iterable<? extends Inference> eliminateDuplicates(final Iterable<? extends Inference> inferences) {
-		final Set<InferenceEntry> unique = new HashSet<InferenceEntry>();
+		final Set<InferenceEntry<Inference>> unique = new HashSet<InferenceEntry<Inference>>();
 		
 		return Operations.filter(inferences, new Condition<Inference>() {
 
 			@Override
 			public boolean holds(Inference inf) {
-				return unique.add(new InferenceEntry(inf));
+				return unique.add(new InferenceEntry<Inference>(inf));
 			}
 			
 		});		

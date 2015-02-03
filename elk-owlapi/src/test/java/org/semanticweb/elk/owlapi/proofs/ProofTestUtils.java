@@ -123,7 +123,7 @@ public class ProofTestUtils {
 					if (premise instanceof OWLAxiomExpression) {
 						OWLAxiomExpression expr = (OWLAxiomExpression) premise;
 						
-						assertTrue("Asserted premise is not found in the ontology", !expr.isAsserted() || isAsserted(ontology, expr.getAxiom()));
+						assertTrue("Asserted premise is not found in the ontology: " + expr.getAxiom(), !expr.isAsserted() || isAsserted(ontology, expr.getAxiom()));
 					}
 				}
 				

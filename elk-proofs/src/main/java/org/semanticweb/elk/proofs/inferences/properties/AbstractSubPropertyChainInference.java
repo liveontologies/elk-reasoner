@@ -1,10 +1,10 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences.classes;
+package org.semanticweb.elk.proofs.inferences.properties;
 /*
  * #%L
- * ELK Reasoner
+ * ELK Proofs Package
  * $Id:$
  * $HeadURL:$
  * %%
@@ -24,46 +24,54 @@ package org.semanticweb.elk.proofs.inferences.classes;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
-import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
-import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
+import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
+ * 
  * @author Pavel Klinov
- *
- * pavel.klinov@uni-ulm.de
+ * 
+ *         pavel.klinov@uni-ulm.de
  */
-public class ReflexiveExistentialComposition extends AbstractInference<DerivedAxiomExpression<ElkSubClassOfAxiom>> {
+public abstract class AbstractSubPropertyChainInference<D extends DerivedExpression> extends AbstractInference<D> {
 
-	private final DerivedExpression reflexPremise_;
-	
-	public ReflexiveExistentialComposition(
-			DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion,
-			DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom> reflPremise) {
+	private final DerivedExpression firstPremise_;
+
+	private final D secondPremise_;
+
+	public AbstractSubPropertyChainInference(D conclusion, DerivedExpression first, D second) {
 		super(conclusion);
 		
-		reflexPremise_ = reflPremise;
+		firstPremise_ = first;
+		secondPremise_ = second;
 	}
-
-	@Override
-	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	
+	public DerivedExpression getFirstPremise() {
+		return firstPremise_;
+	}
+	
+	public D getSecondPremise() {
+		return secondPremise_;
 	}
 
 	@Override
 	public Collection<DerivedExpression> getRawPremises() {
-		return Collections.singleton(reflexPremise_);
+		return Arrays.asList(firstPremise_, secondPremise_);
 	}
 
 	@Override
-	public InferenceRule getRule() {
-		return InferenceRule.R_REFLEXIVE_EXISTENTIAL;
+	public String toString() {
+		return InferencePrinter.print(this);
 	}
+	
+	@Override
+	public InferenceRule getRule() {
+		return InferenceRule.R_CHAIN_SUBSUMPTION;
+	}
+	
 }

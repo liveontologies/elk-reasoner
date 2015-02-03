@@ -31,6 +31,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -38,6 +39,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
 import org.semanticweb.owlapitools.proofs.OWLInference;
+import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 
 /**
  * 
@@ -59,6 +61,31 @@ public class ProofTest {
 		OWLClass sub = factory.getOWLClass(IRI.create("http://example.org/K"));
 		OWLClass sup = factory.getOWLClass(IRI.create("http://example.org/L"));
 		
+		//printInferences(reasoner, sub, sup);
+		
+		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
+	}
+	
+	@Test
+	public void compositionReflexivity() throws Exception {
+		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
+		// loading and classifying via the OWL API
+		final OWLOntology ontology = loadOntology(ProofTest.class.getClassLoader().getResourceAsStream("classification_test_input/CompositionReflexivity.owl"));
+		final ExplainingOWLReasoner reasoner = OWLAPITestUtils.createReasoner(ontology);
+		
+		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+		
+		OWLClass sub = factory.getOWLClass(IRI.create("http://example.org/A"));
+		OWLClass sup = factory.getOWLClass(IRI.create("http://example.org/B"));
+		
+		//printInferences(reasoner, sub, sup);
+		
+		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
+	}
+	
+	void printInferences(ExplainingOWLReasoner reasoner, OWLClassExpression sub, OWLClassExpression sup) throws ProofGenerationException {
+		OWLDataFactory factory = OWLManager.getOWLDataFactory();
+		
 		RecursiveInferenceVisitor.visitInferences(reasoner, factory.getOWLSubClassOfAxiom(sub, sup), new OWLInferenceVisitor() {
 			
 			@Override
@@ -68,8 +95,6 @@ public class ProofTest {
 			}
 			
 		}, true);
-		
-		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
 	}
 	
 	private OWLOntology loadOntology(InputStream stream) throws IOException, Owl2ParseException {

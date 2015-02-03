@@ -24,6 +24,7 @@ package org.semanticweb.elk.proofs.utils;
  * #L%
  */
 
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
@@ -32,6 +33,7 @@ import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.inferences.Inference;
 
 /**
  * @author Pavel Klinov
@@ -65,7 +67,7 @@ public class ProofUtils {
 			}
 
 			@Override
-			public Boolean visit(LemmaExpression expr, Void input) {
+			public Boolean visit(LemmaExpression<?> expr, Void input) {
 				// lemmas can not be asserted
 				return false;
 			}
@@ -73,4 +75,28 @@ public class ProofUtils {
 		}, null);
 	}
 
+	public static boolean checkAsserted(DerivedExpression expr) throws ElkException {
+		if (isAsserted(expr)) {
+			return true;
+		}
+		
+		// asserted expressions are either marked as asserted or have inferences which derive them from themselves
+		for (Inference inf : expr.getInferences()) {
+			for (DerivedExpression premise : inf.getPremises()) {
+				if (premise.equals(expr) && isAsserted(premise)) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	public static Iterable<? extends Inference> getInferences(DerivedExpression expr) {
+		try {
+			return expr.getInferences();
+		} catch (ElkException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

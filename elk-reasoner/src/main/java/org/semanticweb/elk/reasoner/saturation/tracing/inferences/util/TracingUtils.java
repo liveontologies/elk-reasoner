@@ -24,9 +24,12 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.util;
  * #L%
  */
 
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -44,6 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Rig
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -122,6 +126,30 @@ public class TracingUtils {
 		});
 		
 		return result;
+	}
+	
+	public static Set<IndexedPropertyChain> getDerivedSuperChains(IndexedPropertyChain ipc, TraceStore.Reader reader) {
+		Set<IndexedPropertyChain> superChains = new ArrayHashSet<IndexedPropertyChain>();
+		Queue<IndexedPropertyChain> toDo = new ArrayDeque<IndexedPropertyChain>();
+		
+		toDo.add(ipc);
+		
+		for (;;) {
+			IndexedPropertyChain next = toDo.poll();
+			
+			if (next == null) {
+				break;
+			}
+			
+			// TODO just visit all super-chain inferences without creating a multimap here
+			for (IndexedPropertyChain superChain : getSuperPropertyInferenceMultimap(reader, next).keySet()) {
+				if (superChains.add(superChain)) {
+					toDo.add(superChain);
+				}
+			}
+		}
+		
+		return superChains;
 	}
 	
 	public static Conclusion getConclusionToTrace(Context context, IndexedClassExpression subsumer) {

@@ -50,7 +50,7 @@ public class ElkLemmaObjectFactoryImpl implements ElkLemmaObjectFactory {
 	@Override
 	public ElkSubPropertyChainOfLemma getSubPropertyChainOfLemma(
 			ElkSubObjectPropertyExpression subchain,
-			ElkSubObjectPropertyExpression superchain) {
+			ElkObjectPropertyChain superchain) {
 		return new ElkSubPropertyChainOfLemmaImpl(subchain, superchain);
 	}
 

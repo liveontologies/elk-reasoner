@@ -37,7 +37,7 @@ public interface ElkLemmaObjectFactory {
 
 	public ElkReflexivePropertyChainLemma getReflexivePropertyChainLemma(ElkSubObjectPropertyExpression chain);
 	
-	public ElkSubPropertyChainOfLemma getSubPropertyChainOfLemma(ElkSubObjectPropertyExpression subchain, ElkSubObjectPropertyExpression superchain);
+	public ElkSubPropertyChainOfLemma getSubPropertyChainOfLemma(ElkSubObjectPropertyExpression subchain, ElkObjectPropertyChain superchain);
 	
 	public ElkSubClassOfLemma getSubClassOfLemma(ElkClassExpression subclass, ElkComplexClassExpression superclass);
 	

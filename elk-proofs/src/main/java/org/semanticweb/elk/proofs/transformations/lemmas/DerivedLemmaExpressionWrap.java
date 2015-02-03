@@ -24,9 +24,9 @@ package org.semanticweb.elk.proofs.transformations.lemmas;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
+import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
 
 
 /**
@@ -36,20 +36,15 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class DerivedAxiomExpressionWrap<E extends ElkAxiom> extends DerivedExpressionWrap<DerivedAxiomExpression<E>> implements DerivedAxiomExpression<E> {
+public class DerivedLemmaExpressionWrap<E extends ElkLemma> extends DerivedExpressionWrap<LemmaExpression<E>> implements LemmaExpression<E> {
 
-	public DerivedAxiomExpressionWrap(DerivedAxiomExpression<E> expr) {
+	public DerivedLemmaExpressionWrap(LemmaExpression<E> expr) {
 		super(expr);
 	}
 	
 	@Override
-	public E getAxiom() {
-		return expr.getAxiom();
-	}
-
-	@Override
-	public boolean isAsserted() {
-		return expr.isAsserted();
+	public E getLemma() {
+		return expr.getLemma();
 	}
 
 	@Override

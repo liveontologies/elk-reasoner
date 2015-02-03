@@ -1,10 +1,10 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences.classes;
+package org.semanticweb.elk.proofs.inferences.properties;
 /*
  * #%L
- * ELK Reasoner
+ * ELK Proofs Package
  * $Id:$
  * $HeadURL:$
  * %%
@@ -24,46 +24,26 @@ package org.semanticweb.elk.proofs.inferences.classes;
  * #L%
  */
 
-import java.util.Collection;
-import java.util.Collections;
-
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
+import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.inferences.AbstractInference;
-import org.semanticweb.elk.proofs.inferences.InferenceRule;
+import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
 /**
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReflexiveExistentialComposition extends AbstractInference<DerivedAxiomExpression<ElkSubClassOfAxiom>> {
-
-	private final DerivedExpression reflexPremise_;
+public class SubsumptionViaLeftReflexivity extends AbstractSubsumptionViaReflexivityInference<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>>  {
 	
-	public ReflexiveExistentialComposition(
-			DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion,
-			DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom> reflPremise) {
-		super(conclusion);
-		
-		reflexPremise_ = reflPremise;
+	public SubsumptionViaLeftReflexivity(LemmaExpression<ElkSubPropertyChainOfLemma> conclusion, DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom> premise) {
+		super(conclusion, premise);
 	}
 
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
-	}
-
-	@Override
-	public Collection<DerivedExpression> getRawPremises() {
-		return Collections.singleton(reflexPremise_);
-	}
-
-	@Override
-	public InferenceRule getRule() {
-		return InferenceRule.R_REFLEXIVE_EXISTENTIAL;
 	}
 }

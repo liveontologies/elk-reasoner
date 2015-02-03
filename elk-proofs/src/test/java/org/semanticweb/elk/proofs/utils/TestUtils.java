@@ -69,12 +69,12 @@ public class TestUtils {
 			}
 			
 			if (proved.add(next)) {
-				//FIXME
-				System.err.println("Proved: " + next);
-				
 				for (Inference inf : graph.getInferencesForPremise(next)) {
 					if (proved.containsAll(inf.getPremises())) {
 						toDo.add(inf.getConclusion());
+						
+						//FIXME
+						//System.err.println("Proved: " + inf.getConclusion() + " by " + inf);
 					}
 				}
 			}
