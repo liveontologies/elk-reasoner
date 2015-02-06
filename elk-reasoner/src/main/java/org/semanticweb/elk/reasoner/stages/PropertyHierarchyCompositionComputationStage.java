@@ -63,6 +63,13 @@ public class PropertyHierarchyCompositionComputationStage extends
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		return true;
+	}
+
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
 		computation_ = null;
 		return true;
 	}

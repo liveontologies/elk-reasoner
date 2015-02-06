@@ -71,15 +71,20 @@ public interface ReasonerStage extends Interrupter {
 	public void execute() throws ElkException;
 
 	/**
-	 * Invoked after {@link #execute()} to perform any necessary clean-up. Could
-	 * be invoked before {@link #execute()} if {@link #preExecute} threw an
-	 * exception.
-	 * 
-	 * FIXME: can {@link #preExecute} throw an exception? If so, document.
+	 * Invoked after a successful {@link #execute()} to perform any necessary
+	 * finalization, e.g., computation of statistics.
 	 * 
 	 * @return {@code true} if the operation is successful
 	 */
 	public boolean postExecute();
+
+	/**
+	 * Free resources occupied by the reasoning stage. After this, in order to
+	 * execute the stage one has to call {@link #preExecute()}
+	 * 
+	 * @return {@code true} if the operation is successful
+	 */
+	public boolean dispose();
 
 	/**
 	 * Prints detailed information about the (progress) of this stage. This

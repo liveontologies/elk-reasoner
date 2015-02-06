@@ -100,6 +100,13 @@ class ContextInitializationStage extends AbstractReasonerStage {
 		// reasoner.saturationState.resetFirstContext();
 		reasoner.saturationState.getWriter(ConclusionVisitor.DUMMY)
 				.resetContexts();
+		return true;
+	}
+
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
 		todo_ = null;
 		return true;
 	}

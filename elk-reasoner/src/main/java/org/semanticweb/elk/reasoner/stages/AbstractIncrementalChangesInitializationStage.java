@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 abstract class AbstractIncrementalChangesInitializationStage extends
 		AbstractReasonerStage {
 
-	protected IncrementalChangesInitialization initialization_ = null;
+	protected IncrementalChangesInitialization initialization = null;
 
 	protected final SaturationStatistics stageStatistics_ = new SaturationStatistics();
 
@@ -56,17 +56,23 @@ abstract class AbstractIncrementalChangesInitializationStage extends
 	public void executeStage() throws ElkInterruptedException {
 		if (isInterrupted())
 			return;
-		initialization_.process();
+		initialization.process();
 	}
 
 	@Override
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);
 		stageStatistics_.reset();
+		return true;
+	}
 
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
+		initialization = null;
 		return true;
 	}
 
@@ -77,7 +83,7 @@ abstract class AbstractIncrementalChangesInitializationStage extends
 	@Override
 	public void setInterrupt(boolean flag) {
 		super.setInterrupt(flag);
-		setInterrupt(initialization_, flag);
+		setInterrupt(initialization, flag);
 	}
 
 }

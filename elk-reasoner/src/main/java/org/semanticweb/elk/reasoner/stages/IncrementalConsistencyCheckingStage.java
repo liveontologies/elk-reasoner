@@ -59,6 +59,13 @@ class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		return true;
+	}
+
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
 		this.computation_ = null;
 		return true;
 	}

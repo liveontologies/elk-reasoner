@@ -95,8 +95,14 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 				.clearNotSaturatedContexts();
 		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
 		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
-		completion_ = null;
+		return true;
+	}
 
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
+		completion_ = null;
 		return true;
 	}
 

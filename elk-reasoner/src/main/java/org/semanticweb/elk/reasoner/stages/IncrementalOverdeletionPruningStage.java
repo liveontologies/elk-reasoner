@@ -92,11 +92,16 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 		if (!super.postExecute()) {
 			return false;
 		}
-
 		reasoner.ruleAndConclusionStats.add(completion_
 				.getRuleAndConclusionStatistics());
-		completion_ = null;
+		return true;
+	}
 
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
+		completion_ = null;
 		return true;
 	}
 

@@ -75,9 +75,16 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		this.computation_ = null;
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
+		return true;
+	}
+
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
+		computation_ = null;
 		return true;
 	}
 

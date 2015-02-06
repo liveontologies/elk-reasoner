@@ -115,8 +115,14 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 				.clearNotSaturatedContexts();
 		reasoner.classTaxonomyState.getWriter().clearRemovedClasses();
 		reasoner.instanceTaxonomyState.getWriter().clearRemovedIndividuals();
-		this.cleaning_ = null;
+		return true;
+	}
 
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
+		this.cleaning_ = null;
 		return true;
 	}
 

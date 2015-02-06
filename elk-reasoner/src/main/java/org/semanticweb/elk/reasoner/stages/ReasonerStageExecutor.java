@@ -47,4 +47,10 @@ public interface ReasonerStageExecutor extends Interrupter {
 	 */
 	public void complete(ReasonerStage stage) throws ElkException;
 
+	/**
+	 * Performs the necessary cleanup to free any resources taken by this
+	 * executor
+	 */
+	public void dispose();
+
 }

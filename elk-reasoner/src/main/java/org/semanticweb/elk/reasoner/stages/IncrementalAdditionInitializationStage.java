@@ -154,7 +154,7 @@ public class IncrementalAdditionInitializationStage extends
 					8 * workerNo);
 		}
 
-		this.initialization_ = new IncrementalChangesInitialization(inputs,
+		this.initialization = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
 				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
 				reasoner.getProgressMonitor());
@@ -166,7 +166,6 @@ public class IncrementalAdditionInitializationStage extends
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		this.initialization_ = null;
 		reasoner.ontologyIndex.commitAddedRules();
 		reasoner.ontologyIndex.initClassSignatureChanges();
 		reasoner.ontologyIndex.initIndividualSignatureChanges();

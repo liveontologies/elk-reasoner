@@ -120,7 +120,8 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 		LOGGER_.trace(getName() + ": initialized");
 		this.workerNo = reasoner.getNumberOfWorkers();
 		this.progressMonitor = reasoner.getProgressMonitor();
-		return initialized = true;
+		initialized = true;
+		return true;
 	}
 
 	/**
@@ -134,6 +135,13 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 		if (!initialized)
 			return false;
 		LOGGER_.trace(getName() + ": done");
+		return true;
+	}
+
+	@Override
+	public boolean dispose() {
+		if (!initialized)
+			return false;
 		this.workerNo = 0;
 		this.progressMonitor = null;
 		this.initialized = false;

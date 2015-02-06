@@ -122,9 +122,11 @@ public class AxiomLoadingStage extends AbstractReasonerStage {
 	}
 
 	@Override
-	public boolean postExecute() {
-		if (!super.postExecute())
+	public boolean dispose() {
+		if (!super.dispose())
 			return false;
+		loader_.dispose();
+		loader_ = null;
 		return true;
 	}
 

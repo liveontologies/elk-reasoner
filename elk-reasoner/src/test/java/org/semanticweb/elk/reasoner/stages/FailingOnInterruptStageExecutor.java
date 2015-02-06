@@ -22,8 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.stages;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.util.concurrent.computation.FailingInterrupter;
+import static org.junit.Assert.fail;
 
 /**
  * A simple {@link ReasonerStageExecutor} for unit tests. If a stage has not
@@ -33,20 +32,11 @@ import org.semanticweb.elk.util.concurrent.computation.FailingInterrupter;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class FailingOnInterruptStageExecutor extends FailingInterrupter implements
-		ReasonerStageExecutor {
+public class FailingOnInterruptStageExecutor extends SimpleStageExecutor {
 
 	@Override
-	public void complete(ReasonerStage stage) throws ElkException {
-		if (!stage.isCompleted()) {
-			for (ReasonerStage dependentStage : stage.getPreStages()) {
-				complete(dependentStage);
-			}
-			
-			stage.preExecute();
-			stage.execute();
-			stage.postExecute();
-		}
+	public void setInterrupt(boolean flag) {
+		fail();
 	}
 
 }

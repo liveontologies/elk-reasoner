@@ -107,8 +107,14 @@ public class IncrementalClassTaxonomyComputationStage extends
 		reasoner.ontologyIndex.initClassSignatureChanges();
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
-		this.computation_ = null;
+		return true;
+	}
 
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
+		this.computation_ = null;
 		return true;
 	}
 

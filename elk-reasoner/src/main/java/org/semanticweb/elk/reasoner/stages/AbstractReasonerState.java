@@ -209,7 +209,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	public synchronized void registerAxiomLoader(AxiomLoader newAxiomLoader) {
 		LOGGER_.trace("Registering new axiom loader");
 		resetAxiomLoading();
-
 		if (axiomLoader_ == null || axiomLoader_.isLoadingFinished())
 			axiomLoader_ = newAxiomLoader;
 		else

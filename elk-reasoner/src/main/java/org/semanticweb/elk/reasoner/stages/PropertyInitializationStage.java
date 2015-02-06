@@ -102,6 +102,13 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
+		return true;
+	}
+
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
 		todo_ = null;
 		return true;
 	}

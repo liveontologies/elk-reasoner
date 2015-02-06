@@ -80,6 +80,13 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 				.getRuleAndConclusionStatistics());
 
 		markAllContextsAsSaturated();
+		return true;
+	}
+
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
 		saturation_ = null;
 		return true;
 	}

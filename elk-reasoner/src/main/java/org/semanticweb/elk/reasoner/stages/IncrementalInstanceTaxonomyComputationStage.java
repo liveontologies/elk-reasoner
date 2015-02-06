@@ -106,14 +106,18 @@ public class IncrementalInstanceTaxonomyComputationStage extends
 		if (!super.postExecute()) {
 			return false;
 		}
-
 		reasoner.instanceTaxonomyState.getWriter().clearModifiedIndividuals();
 		reasoner.ontologyIndex.initIndividualSignatureChanges();
 		// reasoner.ruleAndConclusionStats.add(computation_.getRuleAndConclusionStatistics());
-		this.computation_ = null;
-
 		return true;
+	}
 
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
+		computation_ = null;
+		return true;
 	}
 
 	@Override

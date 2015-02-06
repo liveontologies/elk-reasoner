@@ -77,7 +77,13 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 			reasoner.classTaxonomyState.getWriter().clearTaxonomy();
 			reasoner.instanceTaxonomyState.getWriter().clearTaxonomy();
 		}
+		return true;
+	}
 
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
 		this.computation_ = null;
 		return true;
 	}

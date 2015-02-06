@@ -79,6 +79,13 @@ public class IncrementalDeletionStage extends AbstractReasonerStage {
 			LOGGER_.trace("Number of modified contexts "
 					+ reasoner.saturationState.getNotSaturatedContexts().size());
 		}
+		return true;
+	}
+
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
 		desaturation_ = null;
 		return true;
 	}

@@ -38,5 +38,6 @@ public class SimpleStageExecutor extends AbstractStageExecutor {
 		stage.preExecute();
 		stage.execute();
 		stage.postExecute();
+		stage.dispose();
 	}
 }

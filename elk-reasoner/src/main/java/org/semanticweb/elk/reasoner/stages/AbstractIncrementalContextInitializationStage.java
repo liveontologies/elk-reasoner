@@ -120,6 +120,13 @@ abstract class AbstractIncrementalContextInitializationStage extends
 		if (!super.postExecute())
 			return false;
 		reasoner.ruleAndConclusionStats.add(stageStatistics_);
+		return true;
+	}
+
+	@Override
+	public boolean dispose() {
+		if (!super.dispose())
+			return false;
 		this.writer_ = null;
 		return true;
 	}

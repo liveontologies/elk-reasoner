@@ -53,6 +53,7 @@ public class LoggingStageExecutor extends AbstractStageExecutor {
 			stage.execute();
 			stage.printInfo();
 			stage.postExecute();
+			stage.dispose();
 		} catch (ElkInterruptedException e) {
 			LOGGER_.debug(stage.getName() + " was interrupted.");
 			stage.printInfo();

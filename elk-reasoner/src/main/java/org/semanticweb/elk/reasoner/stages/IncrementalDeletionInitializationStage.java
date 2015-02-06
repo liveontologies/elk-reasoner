@@ -77,14 +77,14 @@ public class IncrementalDeletionInitializationStage extends
 			inputs = Operations.split(reasoner.saturationState.getContexts(),
 					8 * workerNo);
 		}
-		
-		//System.err.println(changedRulesByCE.keySet().size());
 
-		this.initialization_ = new IncrementalChangesInitialization(inputs,
+		// System.err.println(changedRulesByCE.keySet().size());
+
+		this.initialization = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
 				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
 				reasoner.getProgressMonitor());
-		
+
 		return true;
 	}
 
@@ -92,7 +92,6 @@ public class IncrementalDeletionInitializationStage extends
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		this.initialization_ = null;
 		// initializing contexts which will be removed
 		final ConclusionVisitor<?> conclusionVisitor = SaturationUtils
 				.addStatsToConclusionVisitor(stageStatistics_

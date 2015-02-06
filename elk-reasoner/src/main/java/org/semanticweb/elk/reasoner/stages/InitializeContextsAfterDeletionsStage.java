@@ -62,8 +62,8 @@ class InitializeContextsAfterDeletionsStage extends
 	}
 
 	@Override
-	public boolean postExecute() {
-		if (!super.postExecute())
+	public boolean dispose() {
+		if (!super.dispose())
 			return false;
 		this.todo = null;
 		return true;
