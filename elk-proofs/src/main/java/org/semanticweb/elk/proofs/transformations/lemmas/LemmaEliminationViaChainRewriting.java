@@ -68,13 +68,13 @@ import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class LemmaElimination1 implements InferenceTransformation {
+public class LemmaEliminationViaChainRewriting implements InferenceTransformation {
 
 	private final ElkObjectFactory elkFactory_;
 	
 	private ReasonerInferenceReader reader_;
 	
-	public LemmaElimination1(ReasonerInferenceReader reader) {
+	public LemmaEliminationViaChainRewriting(ReasonerInferenceReader reader) {
 		elkFactory_ = new ElkObjectFactoryImpl();
 		reader_ = reader;
 	}

@@ -26,6 +26,10 @@ public class Pair<First, Second> {
 	protected final First first;
 	protected final Second second;
 	
+	public static <First, Second> Pair<First, Second> create(First f, Second s) {
+		return new Pair<First, Second>(f, s);
+	}
+	
 	public Pair(First first, Second second) {
 		assert first != null;
 		assert second != null;

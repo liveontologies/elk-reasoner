@@ -181,10 +181,9 @@ public class ProofsForAllSubsumptionTaskCollection implements VisitorTaskCollect
 		@Override
 		public void run() throws TaskException {
 			try {
-				//reasoner.resetTraceState();
 				ReasonerStateAccessor.cleanClassTraces(reasoner);
 				
-				TestUtils.provabilityTest(new ProofReader(reasoner), subsumee, subsumer);
+				TestUtils.provabilityTest(new ProofReader(reasoner).eliminateLemmas(), subsumee, subsumer);
 			} catch (ElkException e) {
 				throw new TaskException(e);
 			}

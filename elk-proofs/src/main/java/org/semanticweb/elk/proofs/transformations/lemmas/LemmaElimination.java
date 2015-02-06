@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
-import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
@@ -47,6 +46,7 @@ import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainCompos
 import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialAxiomComposition;
 import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialLemmaComposition;
 import org.semanticweb.elk.proofs.transformations.InferenceTransformation;
+import org.semanticweb.elk.proofs.utils.ProofUtils;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
 
 /**
@@ -58,11 +58,11 @@ import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class LemmaElimination2 implements InferenceTransformation {
+public class LemmaElimination implements InferenceTransformation {
 
 	private final DerivedChainSubsumptionElimination rewritingUnderChainHierarchy_;
 	
-	public LemmaElimination2(ReasonerInferenceReader reader) {
+	public LemmaElimination(ReasonerInferenceReader reader) {
 		rewritingUnderChainHierarchy_ = new DerivedChainSubsumptionElimination(reader);
 	}
 	
@@ -174,58 +174,52 @@ public class LemmaElimination2 implements InferenceTransformation {
 			DerivedExpression premise = inf.getExistentialPremises().get(i);
 			
 			if (premise instanceof LemmaExpression) {
-				
 				List<NaryExistentialAxiomComposition> transformed = new LinkedList<NaryExistentialAxiomComposition>();
 				
-				try {
-					for (Inference lemmaInf : premise.getInferences()) {
-						transformed.add(lemmaInf.accept(new AbstractInferenceVisitor<Void, NaryExistentialAxiomComposition>() {
+				for (Inference lemmaInf : ProofUtils.getInferences(premise)) {
+					transformed.add(lemmaInf.accept(new AbstractInferenceVisitor<Void, NaryExistentialAxiomComposition>() {
 
-							@Override
-							protected NaryExistentialAxiomComposition defaultVisit(Inference inference, Void input) {
-								// shouldn't get here
-								return null;
-							}
-							
-							@Override
-							public NaryExistentialAxiomComposition visit(ExistentialLemmaChainComposition lemmaInf, Void input) {
-								List<DerivedExpression> premises = new ArrayList<DerivedExpression>(commonPremises);
-								ExistentialLemmaChainComposition expandedUnderHierarchy = rewritingUnderChainHierarchy_.transform(lemmaInf);
-								
-								premises.add(expandedUnderHierarchy.getFirstExistentialPremise());
-								premises.add(expandedUnderHierarchy.getSecondExistentialPremise());
-								
-								// copying the remaining inferences
-								for (int j = premiseIndex + 1; j < inf.getExistentialPremises().size(); j++) {
-									DerivedExpression nextPremise = inf.getExistentialPremises().get(j);
-									
-									premises.add(nextPremise);
-								}
-								
-								return new NaryExistentialAxiomComposition(inf.getConclusion(), premises, inf.getChainPremise());
+						@Override
+						protected NaryExistentialAxiomComposition defaultVisit(Inference inference, Void input) {
+							// shouldn't get here
+							return null;
+						}
+
+						@Override
+						public NaryExistentialAxiomComposition visit(ExistentialLemmaChainComposition lemmaInf, Void input) {
+							List<DerivedExpression> premises = new ArrayList<DerivedExpression>(commonPremises);
+							ExistentialLemmaChainComposition expandedUnderHierarchy = rewritingUnderChainHierarchy_.transform(lemmaInf);
+
+							premises.add(expandedUnderHierarchy.getFirstExistentialPremise());
+							premises.add(expandedUnderHierarchy.getSecondExistentialPremise());
+
+							// copying the remaining inferences
+							for (int j = premiseIndex + 1; j < inf.getExistentialPremises().size(); j++) {
+								DerivedExpression nextPremise = inf.getExistentialPremises().get(j);
+
+								premises.add(nextPremise);
 							}
 
-							@Override
-							public NaryExistentialAxiomComposition visit(NaryExistentialLemmaComposition lemmaInf, Void input) {
-								List<DerivedExpression> premises = new ArrayList<DerivedExpression>(commonPremises);
-								
-								premises.addAll(lemmaInf.getExistentialPremises());
-								
-								// copying the remaining inferences
-								for (int j = premiseIndex + 1; j < inf.getExistentialPremises().size(); j++) {
-									DerivedExpression nextPremise = inf.getExistentialPremises().get(j);
-									
-									premises.add(nextPremise);
-								}
-								
-								return new NaryExistentialAxiomComposition(inf.getConclusion(), premises, inf.getChainPremise());
+							return new NaryExistentialAxiomComposition(inf.getConclusion(), premises, inf.getChainPremise());
+						}
+
+						@Override
+						public NaryExistentialAxiomComposition visit(NaryExistentialLemmaComposition lemmaInf, Void input) {
+							List<DerivedExpression> premises = new ArrayList<DerivedExpression>(commonPremises);
+
+							premises.addAll(lemmaInf.getExistentialPremises());
+
+							// copying the remaining inferences
+							for (int j = premiseIndex + 1; j < inf.getExistentialPremises().size(); j++) {
+								DerivedExpression nextPremise = inf.getExistentialPremises().get(j);
+
+								premises.add(nextPremise);
 							}
-							
-						}, null));
-					}
-				} catch (ElkException e) {
-					// TODO log it
-					
+
+							return new NaryExistentialAxiomComposition(inf.getConclusion(), premises, inf.getChainPremise());
+						}
+
+					}, null));
 				}
 				
 				//FIXME

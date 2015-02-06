@@ -57,7 +57,9 @@ import org.semanticweb.elk.proofs.transformations.lemmas.ReflexivityElimination;
  */
 public abstract class AbstractInferenceVisitor<I ,O> implements InferenceVisitor<I, O> {
 
-	protected abstract O defaultVisit(Inference inference, I input);
+	protected O defaultVisit(Inference inference, I input)  {
+		return null;
+	}
 
 	protected O visitSubChainInference(AbstractSubPropertyChainInference<?> inf, I input) {
 		return defaultVisit(inf, input);
