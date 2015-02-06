@@ -67,10 +67,6 @@ public class Owl2ParserLoader extends AbstractAxiomLoader implements
 	 */
 	private final Thread parserThread_;
 	/**
-	 * the thread from which axioms are taken
-	 */
-	private volatile Thread controlThread_;
-	/**
 	 * {@code true} if the parser thread has started
 	 */
 	private boolean started_;
@@ -121,8 +117,6 @@ public class Owl2ParserLoader extends AbstractAxiomLoader implements
 		if (finished_)
 			return;
 
-		controlThread_ = Thread.currentThread();
-
 		if (!started_) {
 			parserThread_.start();
 			started_ = true;
@@ -130,35 +124,31 @@ public class Owl2ParserLoader extends AbstractAxiomLoader implements
 
 		ArrayList<ElkAxiom> nextBatch;
 
-		try {
-			for (;;) {
-				if (isInterrupted())
-					break;
-				try {
-					nextBatch = axiomExchanger_.take();
-				} catch (InterruptedException e) {
-					/*
-					 * we don't know for sure why the thread was interrupted, so
-					 * we need to obey; if interrupt was not relevant, the
-					 * process will restart; we need to restore the interrupt
-					 * status so that the called methods know that there was an
-					 * interrupt
-					 */
-					Thread.currentThread().interrupt();
-					break;
-				}
-				if (nextBatch == POISON_BATCH_) {
-					return;
-				}
-				for (int i = 0; i < nextBatch.size(); i++) {
-					ElkAxiom axiom = nextBatch.get(i);
-					axiomInserter.visit(axiom);
-				}
+		for (;;) {
+			if (isInterrupted())
+				break;
+			try {
+				nextBatch = axiomExchanger_.take();
+			} catch (InterruptedException e) {
+				/*
+				 * we don't know for sure why the thread was interrupted, so we
+				 * need to obey; if interrupt was not relevant, the process will
+				 * restart; we need to restore the interrupt status so that the
+				 * called methods know that there was an interrupt
+				 */
+				Thread.currentThread().interrupt();
+				break;
 			}
-		} finally {
-			if (exception != null) {
-				throw exception;
+			if (nextBatch == POISON_BATCH_) {
+				break;
 			}
+			for (int i = 0; i < nextBatch.size(); i++) {
+				ElkAxiom axiom = nextBatch.get(i);
+				axiomInserter.visit(axiom);
+			}
+		}
+		if (exception != null) {
+			throw exception;
 		}
 	}
 
@@ -183,12 +173,17 @@ public class Owl2ParserLoader extends AbstractAxiomLoader implements
 				exception = new ElkLoadingException(
 						"Cannot load the ontology!", e);
 			} finally {
+				finished_ = true;
 				try {
 					axiomExchanger_.put(POISON_BATCH_);
 				} catch (InterruptedException e) {
-					controlThread_.interrupt();
+					/*
+					 * we don't know what is causing this but we need to obey;
+					 * consistency of the computation for such interrupt is not
+					 * guaranteed; restore the interrupt status and exit
+					 */
+					Thread.currentThread().interrupt();
 				}
-				finished_ = true;
 				disposeParserResources();
 			}
 		}
