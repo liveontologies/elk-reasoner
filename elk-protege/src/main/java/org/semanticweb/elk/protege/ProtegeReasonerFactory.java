@@ -46,11 +46,12 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 
 	protected final OWLReasonerFactory factory = new ElkReasonerFactory();
 
-	protected final ReasonerConfiguration elkConfig = ElkProtegeConfigurationUtils.loadConfiguration();
+	protected final ReasonerConfiguration elkConfig = ElkProtegeConfigurationUtils
+			.loadConfiguration();
 
 	@Override
 	public BufferingMode getRecommendedBuffering() {
-		return BufferingMode.BUFFERING;
+		return BufferingMode.NON_BUFFERING;
 	}
 
 	@Override
