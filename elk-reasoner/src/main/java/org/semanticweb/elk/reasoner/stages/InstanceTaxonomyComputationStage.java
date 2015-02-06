@@ -24,7 +24,6 @@ package org.semanticweb.elk.reasoner.stages;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.reasoner.taxonomy.InstanceTaxonomyComputation;
-import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * A {@link ReasonerStage} during which the instance taxonomy of the current
@@ -68,11 +67,6 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 					reasoner.saturationState,
 					reasoner.instanceTaxonomyState.getTaxonomy());
 		}
-
-		if (LOGGER_.isInfoEnabled()) {
-			LOGGER_.info(getName() + " using " + workerNo + " workers");
-		}
-
 		return true;
 	}
 

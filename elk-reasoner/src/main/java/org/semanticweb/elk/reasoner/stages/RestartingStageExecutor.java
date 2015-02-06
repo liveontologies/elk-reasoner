@@ -45,7 +45,7 @@ public class RestartingStageExecutor extends SimpleStageExecutor {
 			try {
 				super.complete(stage);
 			} catch (ElkInterruptedException e) {
-				LOGGER_.info(stage.getName() + ": restarting");
+				LOGGER_.info(stage.getName() + " restarted");
 				stage.setInterrupt(false);
 				continue;
 			}

@@ -29,7 +29,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.semanticweb.elk.loading.AbstractAxiomLoader;
 import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
@@ -104,12 +103,12 @@ public class OwlOntologyLoader extends AbstractAxiomLoader implements
 
 	@Override
 	public void load(ElkAxiomProcessor axiomInserter,
-			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
+			ElkAxiomProcessor axiomDeleter) {
 		progressMonitor_.start(status);
 		if (LOGGER_.isTraceEnabled())
 			LOGGER_.trace(status);
 		for (;;) {
-			if (Thread.currentThread().isInterrupted())
+			if (isInterrupted())
 				break;
 			if (!axiomsIterator_.hasNext()) {
 				importsClosureProcessed_++;

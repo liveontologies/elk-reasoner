@@ -218,6 +218,8 @@ abstract class AbstractReasonerStage extends SimpleInterrupter implements
 
 	void checkInterrupt() throws ElkInterruptedException {
 		if (isInterrupted()) {
+			if (LOGGER_.isInfoEnabled())
+				LOGGER_.info(getName() + " interrupted");
 			throw new ElkInterruptedException(getName() + " interrupted");
 		}
 	}

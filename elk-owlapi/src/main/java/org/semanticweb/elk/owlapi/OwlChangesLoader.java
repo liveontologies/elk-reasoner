@@ -74,7 +74,7 @@ public class OwlChangesLoader extends AbstractAxiomLoader implements
 				LOGGER_.trace(status + ": " + changesCount);
 			int currentAxiom = 0;
 			for (;;) {
-				if (Thread.currentThread().isInterrupted())
+				if (isInterrupted())
 					break;
 				OWLOntologyChange change = pendingChanges_.poll();
 				if (change == null)
