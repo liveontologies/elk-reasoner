@@ -261,6 +261,9 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * not
 	 */
 	private void checkStatistics() {
+		if (isInterrupted())
+			return;
+		// else
 		if (aggregatedStats_.jobsSubmittedNo != aggregatedStats_.jobsAlreadyDoneNo
 				+ +aggregatedStats_.jobsProcessedNo)
 			LOGGER_.error("Some submitted saturation jobs were not processed!");
