@@ -36,13 +36,13 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
+import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionTracingTests;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestManifest;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTests;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
@@ -103,7 +103,7 @@ public class AllOntologiesProofTest {
 		try {
 			reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
 		} catch (InconsistentOntologyException e) {
-			return;
+			// we will explain it, too
 		}
 
 		try {
@@ -124,11 +124,16 @@ public class AllOntologiesProofTest {
 						fail(e.getMessage());
 					}
 				}
+
+				@Override
+				public void inconsistencyTest() throws Exception {
+					ProofTestUtils.provabilityOfInconsistencyTest(reasoner);
+					RecursiveInferenceVisitor.visitInferencesOfInconsistency(reasoner, bindingChecker, true);
+				}
 			});
 			
 		} catch (Exception e) {
-			//swallow..
-			LOGGER_.error("", e);
+			LOGGER_.error("Unexpected exception", e);
 		} finally {
 			reasoner.dispose();
 		}
@@ -149,8 +154,8 @@ public class AllOntologiesProofTest {
 		return ontology;
 	}
 
-	protected TracingTests getProvabilityTests(Taxonomy<ElkClass> taxonomy) {
-		return new ComprehensiveSubsumptionTracingTests(taxonomy);
+	protected TracingTests getProvabilityTests(Reasoner reasoner) throws ElkException {
+		return new ComprehensiveSubsumptionTracingTests(reasoner);
 	}
 
 	@Config

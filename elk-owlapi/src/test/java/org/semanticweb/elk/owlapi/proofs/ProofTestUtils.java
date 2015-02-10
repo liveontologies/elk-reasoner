@@ -59,25 +59,36 @@ import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
  */
 public class ProofTestUtils {
 
-	// tests that each derived expression is provable
 	public static void provabilityTest(ExplainingOWLReasoner reasoner, OWLSubClassOfAxiom axiom) throws ProofGenerationException {
 		OWLExpression root = reasoner.getDerivedExpression(axiom);
+		
+		provabilityTest(root);
+	}
+	
+	public static void provabilityOfInconsistencyTest(ExplainingOWLReasoner reasoner) throws ProofGenerationException {
+		OWLExpression root = reasoner.getDerivedExpressionForInconsistency();
+		
+		provabilityTest(root);
+	}
+	
+	// tests that each derived expression is provable
+	static void provabilityTest(OWLExpression root) throws ProofGenerationException {
 		OWLInferenceGraph graph = OWLProofUtils.computeInferenceGraph(root);
-		
+
 		if (graph.getExpressions().isEmpty()) {
-			throw new AssertionError(String.format("There is no proof of %s", axiom));
+			throw new AssertionError(String.format("There is no proof of %s", root));
 		}
-		
+
 		Set<OWLExpression> proved = new HashSet<OWLExpression>(graph.getExpressions().size());
 		Queue<OWLExpression> toDo = new LinkedList<OWLExpression>(graph.getRootExpressions()); 
-		
+
 		for (;;) {
 			OWLExpression next = toDo.poll();
-			
+
 			if (next == null) {
 				break;
 			}
-			
+
 			if (proved.add(next)) {
 				for (OWLInference inf : graph.getInferencesForPremise(next)) {
 					if (proved.containsAll(inf.getPremises())) {
@@ -86,30 +97,13 @@ public class ProofTestUtils {
 				}
 			}
 		}
-		
+
 		for (OWLExpression expr : graph.getExpressions()) {
 			if (!proved.contains(expr)) {
 				throw new AssertionError(String.format("There is no acyclic proof of %s", expr));
 			}
 		}
 	}
-
-/*	public static OWLOntology getInferredTaxonomy(OWLReasoner reasoner) throws OWLOntologyCreationException {
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		
-		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-		
-		List<InferredAxiomGenerator<? extends OWLAxiom>> gens = new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
-        gens.add(new InferredSubClassAxiomGenerator());
-        gens.add(new InferredEquivalentClassAxiomGenerator());
-        // put the inferred axioms into a fresh empty ontology.
-        OWLOntology infOnt = manager.createOntology();
-        InferredOntologyGenerator iog = new InferredOntologyGenerator(reasoner, gens);
-        
-        iog.fillOntology(manager, infOnt);
-
-        return infOnt;
-	}*/
 
 	// checks that each axiom premise is in fact an axiom in the source ontology
 	// raises an assertion error if it's not the case

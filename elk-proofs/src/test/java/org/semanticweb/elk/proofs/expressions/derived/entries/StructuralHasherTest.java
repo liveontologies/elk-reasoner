@@ -35,8 +35,11 @@ import java.util.Arrays;
 
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceHasher;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryImpl;
@@ -69,6 +72,11 @@ public class StructuralHasherTest {
 		// disjointness
 		assertEquals(StructuralEquivalenceHasher.hashCode(objFactory_.getDisjointClassesAxiom(Arrays.asList(a, b, c))), 
 				StructuralEquivalenceHasher.hashCode(objFactory_.getDisjointClassesAxiom(Arrays.asList(a, b, c))));
+		// canonicalization of class assertions
+		ElkNamedIndividual aInd = objFactory_.getNamedIndividual(getIri("a"));
+		
+		assertEquals(StructuralEquivalenceHasher.hashCode(objFactory_.getClassAssertionAxiom(b, aInd)), 
+				StructuralEquivalenceHasher.hashCode(objFactory_.getSubClassOfAxiom(objFactory_.getObjectOneOf(aInd), b)));
 	}
 	
 	@Test
@@ -79,4 +87,7 @@ public class StructuralHasherTest {
 				StructuralEquivalenceHasher.hashCode(lemmaFactory_.getSubClassOfLemma(a, lemmaFactory_.getComplexObjectSomeValuesFrom(rs, b))));
 	}
 	
+	private ElkIri getIri(String fragment) {
+		return new ElkFullIri(TestEntities.prefix_.getIri().getFullIriAsString() + fragment);
+	}
 }

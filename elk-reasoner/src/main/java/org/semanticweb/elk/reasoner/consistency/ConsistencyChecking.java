@@ -206,6 +206,14 @@ public class ConsistencyChecking
 	public boolean isInconsistent() {
 		return consistencyMonitor_.isInconsistent();
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public IndexedClassEntity getInconsistentEntity() {
+		return consistencyMonitor_.getInconsistentEntity();
+	}
 
 	/**
 	 * Print statistics about consistency checking
@@ -232,15 +240,15 @@ public class ConsistencyChecking
 
 		@Override
 		public void notifyFinished(SaturationJob<IndexedClassEntity> job) {
-			if (job.getOutput().containsConclusion(
-					ContradictionImpl.getInstance()))
-				consistenceMonitor.setInconsistent();
+			boolean inconsistent = job.getOutput().containsConclusion(
+					ContradictionImpl.getInstance());
+			
+			if (inconsistent)
+				consistenceMonitor.setInconsistent(job.getInput());
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace(job.getInput()
 						+ ": consistency checking finished: "
-						+ (job.getOutput().containsConclusion(
-								ContradictionImpl.getInstance()) ? "inconsistent"
-								: "satisfiable"));
+						+ (inconsistent ? "inconsistent" : "consistent"));
 		}
 
 	}
@@ -253,7 +261,7 @@ public class ConsistencyChecking
 	 * 
 	 */
 	static class ConsistencyMonitor {
-		private volatile boolean inconsistent_ = false;
+		private volatile IndexedClassEntity inconsistentEntity_ = null;
 		private volatile Thread controlThread_;
 
 		public void registerThreadToInterrupt(Thread controlThread) {
@@ -269,11 +277,15 @@ public class ConsistencyChecking
 		}
 
 		public boolean isInconsistent() {
-			return inconsistent_;
+			return inconsistentEntity_ != null;
+		}
+		
+		public IndexedClassEntity getInconsistentEntity() {
+			return inconsistentEntity_;
 		}
 
-		public void setInconsistent() {
-			inconsistent_ = true;
+		public void setInconsistent(IndexedClassEntity entity) {
+			inconsistentEntity_ = entity;
 			// interrupt the reasoner
 			if (controlThread_ != null)
 				controlThread_.interrupt();

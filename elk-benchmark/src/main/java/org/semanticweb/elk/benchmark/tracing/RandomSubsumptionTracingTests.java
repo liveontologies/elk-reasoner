@@ -92,7 +92,7 @@ public class RandomSubsumptionTracingTests implements TracingTests {
 				}
 				
 				if (sub != sup) {
-					visitor.visit(sub, sup);
+					visitor.subsumptionTest(sub, sup);
 					count++;
 				}
 			}

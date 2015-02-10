@@ -56,7 +56,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.reasoner.stages.RuleAndConclusionCountMeasuringExecutor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
  * A task to trace all atomic subsumptions
@@ -81,18 +80,19 @@ public class AllSubsumptionTracingTaskCollection implements VisitorTaskCollectio
 	
 	@Override
 	public void visitTasks(final TaskVisitor visitor) throws TaskException {
-		// classify the ontology and instantiate tracing tasks
-		Taxonomy<ElkClass> taxonomy = loadAndClassify(ontologyFile_);
+		Reasoner reasoner = load(ontologyFile_);
 		
 		try {
-			new ComprehensiveSubsumptionTracingTests(taxonomy).accept(new TracingTestVisitor() {
+			new ComprehensiveSubsumptionTracingTests(reasoner).accept(new TracingTestVisitor() {
 				
 				@Override
-				public boolean visit(ElkClass subsumee, ElkClass subsumer) throws Exception {
-					
+				public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) throws Exception {
 					visitor.visit(createSpecificTask(subsumee, subsumer));
-					
-					return true;
+				}
+
+				@Override
+				public void inconsistencyTest() throws Exception {
+					// ignoring inconsistency in benchmark tests
 				}
 			});
 			
@@ -136,7 +136,7 @@ public class AllSubsumptionTracingTaskCollection implements VisitorTaskCollectio
 		return createSpecificTask(factory.getClass(new ElkFullIri(sub)), factory.getClass(new ElkFullIri(sup)));
 	}
 
-	Taxonomy<ElkClass> loadAndClassify(String ontologyFile) throws TaskException {
+	Reasoner load(String ontologyFile) throws TaskException {
 		try {
 			File ontFile = BenchmarkUtils.getFile(ontologyFile);
 
@@ -148,9 +148,7 @@ public class AllSubsumptionTracingTaskCollection implements VisitorTaskCollectio
 					new RuleAndConclusionCountMeasuringExecutor(new SimpleStageExecutor(), metrics_),
 					reasonerConfig_);
 			
-			Taxonomy<ElkClass> taxonomy = reasoner_.getTaxonomy();
-			
-			return taxonomy;
+			return reasoner_;
 			
 		} catch (Exception e) {
 			throw new TaskException(e);
@@ -243,9 +241,7 @@ public class AllSubsumptionTracingTaskCollection implements VisitorTaskCollectio
 					//ignoring the results
 				}
 				
-				if (TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner) <= 0) {
-					throw new TaskException("The subsumption " + subsumee + " => " + subsumer + " wasn't properly traced");
-				}
+				TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner);
 				
 				TracingTestUtils.checkTracingMinimality(subsumee, subsumer, reasoner);
 				TracingTestUtils.checkInferenceAcyclicity(reasoner);

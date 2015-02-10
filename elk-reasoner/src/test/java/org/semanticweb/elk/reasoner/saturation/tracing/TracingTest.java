@@ -44,7 +44,6 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
-import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -64,7 +63,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
@@ -113,13 +111,11 @@ public class TracingTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(fileLoader, new PostProcessingStageExecutor());
 
 		try {
-			TracingTests tests = getTracingTests(reasoner.getTaxonomy());
+			TracingTests tests = getTracingTests(reasoner);
 			
 			tests.accept(getTracingTestVisitor(reasoner));
-		} catch (ElkInconsistentOntologyException e) {
-			//swallow..
-			LOGGER_.trace("The test ontology is inconsistent so tracing tests do not make sense");
-		} finally {
+		} 
+		finally {
 			reasoner.shutdown();
 		}
 	}
@@ -134,127 +130,150 @@ public class TracingTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(fileLoader, new PostProcessingStageExecutor());
 
 		try {
-			TracingTests tests = getTracingTests(reasoner.getTaxonomy());
+			TracingTests tests = getTracingTests(reasoner);
 			
 			tests.accept(getAxiomBindingTestVisitor(reasoner));
-		} catch (ElkInconsistentOntologyException e) {
-			//swallow..
-			LOGGER_.trace("The test ontology is inconsistent so tracing tests do not make sense");
-		} finally {
+		} 
+		finally {
 			reasoner.shutdown();
 		}
 	}	
+	
+	private ClassInferenceVisitor<IndexedClassExpression, Boolean> getClassInferenceCheckerForAxiomBinding() {
+		return new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
+
+			@Override
+			protected Boolean defaultTracedVisit(ClassInference inference, IndexedClassExpression root) {
+				return true;
+			}
+			
+			// axioms used as side conditions of this rule, should be able to look them up
+			@Override
+			public Boolean visit(SubClassOfSubsumer<?> inference, IndexedClassExpression root) {
+				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
+				
+				assertNotNull("Failed to look up the ontology axiom for the subsumption inference " + inference, axiom);
+				return true;
+			}
+			
+			@Override
+			public Boolean visit(DisjointSubsumerFromSubsumer inference, IndexedClassExpression root) {
+				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
+				
+				assertNotNull("Failed to look up the ontology axiom for the disjoint subsumer inference " + inference, axiom);
+				return true;
+			}
+			
+			@Override
+			public Boolean visit(ComposedBackwardLink inference, IndexedClassExpression root) {
+				IndexedPropertyChain subChain = inference.getSubPropertyChain().getSubPropertyChain();
+				
+				if (subChain != inference.getRelation()) {
+					ElkAxiom axiom = new SideConditionLookup().lookup(inference);
+					
+					assertNotNull("Failed to look up the property axiom for the composition infrence " + inference, axiom);
+					return true;
+				}
+				
+				return true;
+			}
+
+			@Override
+			public Boolean visit(ReversedForwardLink inference, IndexedClassExpression root) {
+				IndexedPropertyChain subChain = inference.getSubPropertyChain().getSubPropertyChain();
+				
+				if (subChain != inference.getRelation()) {
+					ElkAxiom axiom = new SideConditionLookup().lookup(inference);
+					
+					assertNotNull("Failed to look up the property axiom for the composition infrence " + inference, axiom);
+					return true;
+				}
+				
+				return true;
+			}
+			
+		};
+	}
+	
+	private ObjectPropertyInferenceVisitor<?, Boolean> getPropertyInferenceCheckerForAxiomBinding() {
+		return new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
+
+			@Override
+			protected Boolean defaultTracedVisit(
+					ObjectPropertyInference inference, Void input) {
+				return true;
+			}
+
+			@Override
+			public Boolean visit(ToldReflexiveProperty inference,
+					Void input) {
+				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
+				
+				assertNotNull("Failed to look up the axiom for the reflexivity inference " + inference, axiom);
+				return true;
+			}
+
+			@Override
+			public Boolean visit(
+					ReflexiveToldSubObjectProperty inference,
+					Void input) {
+				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
+				
+				assertNotNull("Failed to look up the subsumption axiom for the reflexivity inference " + inference, axiom);
+				return true;
+			}
+
+			@Override
+			public Boolean visit(
+					ToldSubPropertyInference inference,
+					Void input) {
+				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
+				
+				assertNotNull("Failed to look up the axiom for the property subsumption inference " + inference, axiom);
+				return true;
+			}
+
+		};
+	}
 
 	private TracingTestVisitor getAxiomBindingTestVisitor(final Reasoner reasoner) {
 		return new TracingTestVisitor() {
 			
 			@Override
-			public boolean visit(ElkClass subsumee, ElkClass subsumer) {
+			public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) {
 				ReasonerStateAccessor.cleanClassTraces(reasoner);
 				
 				try {
-					LOGGER_.trace("Axiom binding test: {} => {}", subsumee, subsumer);
+					LOGGER_.trace("Axiom binding test for {} => {}", subsumee, subsumer);
 					
-					ClassInferenceVisitor<IndexedClassExpression, Boolean> classInferenceChecker = new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
-
-						@Override
-						protected Boolean defaultTracedVisit(ClassInference inference, IndexedClassExpression root) {
-							return true;
-						}
-						
-						// axioms used as side conditions of this rule, should be able to look them up
-						@Override
-						public Boolean visit(SubClassOfSubsumer<?> inference, IndexedClassExpression root) {
-							ElkAxiom axiom = new SideConditionLookup().lookup(inference);
-							
-							assertNotNull("Failed to look up the ontology axiom for the subsumption inference " + inference, axiom);
-							return true;
-						}
-						
-						@Override
-						public Boolean visit(DisjointSubsumerFromSubsumer inference, IndexedClassExpression root) {
-							ElkAxiom axiom = new SideConditionLookup().lookup(inference);
-							
-							assertNotNull("Failed to look up the ontology axiom for the disjoint subsumer inference " + inference, axiom);
-							return true;
-						}
-						
-						@Override
-						public Boolean visit(ComposedBackwardLink inference, IndexedClassExpression root) {
-							IndexedPropertyChain subChain = inference.getSubPropertyChain().getSubPropertyChain();
-							
-							if (subChain != inference.getRelation()) {
-								ElkAxiom axiom = new SideConditionLookup().lookup(inference);
-								
-								assertNotNull("Failed to look up the property axiom for the composition infrence " + inference, axiom);
-								return true;
-							}
-							
-							return true;
-						}
-
-						@Override
-						public Boolean visit(ReversedForwardLink inference, IndexedClassExpression root) {
-							IndexedPropertyChain subChain = inference.getSubPropertyChain().getSubPropertyChain();
-							
-							if (subChain != inference.getRelation()) {
-								ElkAxiom axiom = new SideConditionLookup().lookup(inference);
-								
-								assertNotNull("Failed to look up the property axiom for the composition infrence " + inference, axiom);
-								return true;
-							}
-							
-							return true;
-						}
-						
-					};
-					
-					ObjectPropertyInferenceVisitor<?, Boolean> propertyInferenceChecker = new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
-
-						@Override
-						protected Boolean defaultTracedVisit(
-								ObjectPropertyInference inference, Void input) {
-							return true;
-						}
-
-						@Override
-						public Boolean visit(ToldReflexiveProperty inference,
-								Void input) {
-							ElkAxiom axiom = new SideConditionLookup().lookup(inference);
-							
-							assertNotNull("Failed to look up the axiom for the reflexivity inference " + inference, axiom);
-							return true;
-						}
-
-						@Override
-						public Boolean visit(
-								ReflexiveToldSubObjectProperty inference,
-								Void input) {
-							ElkAxiom axiom = new SideConditionLookup().lookup(inference);
-							
-							assertNotNull("Failed to look up the subsumption axiom for the reflexivity inference " + inference, axiom);
-							return true;
-						}
-
-						@Override
-						public Boolean visit(
-								ToldSubPropertyInference inference,
-								Void input) {
-							ElkAxiom axiom = new SideConditionLookup().lookup(inference);
-							
-							assertNotNull("Failed to look up the axiom for the property subsumption inference " + inference, axiom);
-							return true;
-						}
-
-					};
-					
-					TracingTestUtils.visitInferences(subsumee, subsumer, reasoner, classInferenceChecker, propertyInferenceChecker);
+					TracingTestUtils.visitInferences(
+							subsumee, 
+							subsumer, 
+							reasoner, 
+							getClassInferenceCheckerForAxiomBinding(), 
+							getPropertyInferenceCheckerForAxiomBinding());
 				} catch (ElkException e) {
 					throw new RuntimeException(e);
 				}
-				
-				return true;
 			}
+
+			@Override
+			public void inconsistencyTest() throws Exception {
+				ReasonerStateAccessor.cleanClassTraces(reasoner);
+				
+				try {
+					LOGGER_.trace("Axiom binding test for inconsistency");
+					
+					TracingTestUtils.visitInferencesForInconsistency(
+							reasoner, 
+							getClassInferenceCheckerForAxiomBinding(), 
+							getPropertyInferenceCheckerForAxiomBinding());
+				} catch (ElkException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			
+			
 		};
 	}
 
@@ -262,11 +281,10 @@ public class TracingTest {
 		return new TracingTestVisitor() {
 			
 			@Override
-			public boolean visit(ElkClass subsumee, ElkClass subsumer) {
+			public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) {
 				ReasonerStateAccessor.cleanClassTraces(reasoner);
 				
 				try {
-					
 					LOGGER_.trace("Tracing test: {} => {}", subsumee, subsumer);
 					
 					reasoner.explainSubsumption(subsumee, subsumer);
@@ -276,16 +294,29 @@ public class TracingTest {
 				} catch (ElkException e) {
 					throw new RuntimeException(e);
 				}
+			}
+
+			@Override
+			public void inconsistencyTest() throws Exception {
+				ReasonerStateAccessor.cleanClassTraces(reasoner);
 				
-				return true;
+				try {
+					LOGGER_.trace("Tracing test: inconsistency");
+					
+					reasoner.explainInconsistency();
+						
+					TracingTestUtils.checkTracingOfInconsistencyCompleteness(reasoner);
+				} catch (ElkException e) {
+					throw new RuntimeException(e);
+				}
 			}
 		};
 	}
 
-	protected TracingTests getTracingTests(Taxonomy<ElkClass> taxonomy) {
-		return new ComprehensiveSubsumptionTracingTests(taxonomy);
+	protected TracingTests getTracingTests(Reasoner reasoner) throws ElkException {
+		return new ComprehensiveSubsumptionTracingTests(reasoner);
 	}
-
+	
 	@Config
 	public static Configuration getConfig() throws URISyntaxException,
 			IOException {

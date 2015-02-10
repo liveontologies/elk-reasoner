@@ -36,6 +36,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.slf4j.Logger;
@@ -65,7 +66,6 @@ public class TracingSaturationTest {
 	
 	@Test
 	public void testBasicTracing() throws Exception {
-		
 		Reasoner reasoner = TestReasonerUtils.loadAndClassify("tracing/DuplicateExistential.owl");
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkClass a = factory.getClass(new ElkFullIri("http://example.org/A"));
@@ -74,6 +74,15 @@ public class TracingSaturationTest {
 		reasoner.explainSubsumption(a, d);
 		TracingTestUtils.checkTracingCompleteness(a, d, reasoner);
 		TracingTestUtils.checkTracingMinimality(a, d, reasoner);
+	}
+	
+	@Test
+	public void testInconsistency() throws Exception {
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("classification_test_input/Inconsistent.owl");
+
+		reasoner.explainInconsistency();
+		TracingTestUtils.checkTracingCompleteness(PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING, reasoner);
+		TracingTestUtils.checkTracingMinimality(PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING, reasoner);
 	}
 	
 	@Test

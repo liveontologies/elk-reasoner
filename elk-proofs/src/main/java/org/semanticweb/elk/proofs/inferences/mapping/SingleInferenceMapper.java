@@ -444,7 +444,7 @@ public class SingleInferenceMapper {
 			ElkClassExpression c = Deindexer.deindex(input);
 			ElkClassExpression d = Deindexer.deindex(inference.getPremises()[0].getMember());
 			ElkClassExpression e = Deindexer.deindex(inference.getPremises()[1].getMember());
-			// TODO check this
+			
 			return new DisjointnessContradiction(c, d, e, sideCondition, factory_, exprFactory_);
 		}
 

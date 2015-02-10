@@ -130,7 +130,7 @@ public class StructuralEquivalenceHasher implements ExpressionHasher {
 	private static class AxiomHasher extends AbstractElkAxiomVisitor<Integer> {
 
 		static int hashCode(ElkAxiom ax) {
-			return ax.accept(new AxiomHasher());
+			return AxiomCanonicalizer.canonicalize(ax).accept(new AxiomHasher());
 		}
 		
 		@Override
@@ -164,26 +164,22 @@ public class StructuralEquivalenceHasher implements ExpressionHasher {
 		}
 
 		@Override
-		public Integer visit(
-				ElkObjectPropertyDomainAxiom ax) {
+		public Integer visit(ElkObjectPropertyDomainAxiom ax) {
 			return HashGenerator.combineListHash(ElkObjectPropertyDomainAxiom.class.hashCode(), EntityHasher.hashCode(ax.getProperty()), EntityHasher.hashCode(ax.getDomain()));
 		}
 
 		@Override
-		public Integer visit(
-				ElkReflexiveObjectPropertyAxiom ax) {
+		public Integer visit(ElkReflexiveObjectPropertyAxiom ax) {
 			return HashGenerator.combineListHash(ElkReflexiveObjectPropertyAxiom.class.hashCode(), EntityHasher.hashCode(ax.getProperty()));
 		}
 
 		@Override
-		public Integer visit(
-				ElkSubObjectPropertyOfAxiom ax) {
+		public Integer visit(ElkSubObjectPropertyOfAxiom ax) {
 			return HashGenerator.combineListHash(ElkSubObjectPropertyOfAxiom.class.hashCode(), EntityHasher.hashCode(ax.getSubObjectPropertyExpression()),EntityHasher.hashCode(ax.getSuperObjectPropertyExpression()));
 		}
 
 		@Override
-		public Integer visit(
-				ElkTransitiveObjectPropertyAxiom ax) {
+		public Integer visit(ElkTransitiveObjectPropertyAxiom ax) {
 			return HashGenerator.combineListHash(ElkReflexiveObjectPropertyAxiom.class.hashCode(), EntityHasher.hashCode(ax.getProperty()));
 		}
 		

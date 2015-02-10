@@ -29,8 +29,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
+import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
 
@@ -45,12 +48,26 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 	
 	private final Taxonomy<ElkClass> classTaxonomy_;
 	
-	public ComprehensiveSubsumptionTracingTests(Taxonomy<ElkClass> tax) {
-		classTaxonomy_ = tax;
+	public ComprehensiveSubsumptionTracingTests(Reasoner reasoner) throws ElkException {
+		classTaxonomy_ = initTaxonomy(reasoner);
+	}
+	
+	private static Taxonomy<ElkClass> initTaxonomy(Reasoner reasoner) throws ElkException {
+		try {
+			return reasoner.getTaxonomy();
+		} catch (ElkInconsistentOntologyException e) {
+			// no worries
+			return null;
+		} 
 	}
 	
 	@Override
 	public void accept(TracingTestVisitor visitor) throws Exception {
+		if (classTaxonomy_ == null) {
+			visitor.inconsistencyTest();
+			return;
+		}
+		
 		Set<TaxonomyNode<ElkClass>> visited = new HashSet<TaxonomyNode<ElkClass>>();
 		Deque<TaxonomyNode<ElkClass>> toDo = new LinkedList<TaxonomyNode<ElkClass>>();
 		
@@ -92,7 +109,7 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 				}
 				
 				if (sub != sup) {
-					visitor.visit(sub, sup);
+					visitor.subsumptionTest(sub, sup);
 				}
 			}
 		}

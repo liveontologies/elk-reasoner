@@ -39,6 +39,7 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.proofs.ProofReader;
 import org.semanticweb.elk.proofs.utils.TestUtils;
 import org.semanticweb.elk.reasoner.Reasoner;
@@ -48,7 +49,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionT
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 
 /**
  * A task collection to reconstruct proofs for all atomic subsumptions in the classified ontology.
@@ -78,8 +78,7 @@ public class ProofsForAllSubsumptionTaskCollection implements VisitorTaskCollect
 	
 	@Override
 	public void visitTasks(final TaskVisitor visitor) throws TaskException {
-		// classify the ontology and instantiate tracing tasks
-		Taxonomy<ElkClass> taxonomy = loadAndClassify(ontologyFile_);
+		Reasoner reasoner = loadAndClassify(ontologyFile_);
 		
 		// classify the ontology and instantiate proof reconstruction tasks
 		//final OWLDataFactory factory = OWLManager.getOWLDataFactory();
@@ -99,14 +98,16 @@ public class ProofsForAllSubsumptionTaskCollection implements VisitorTaskCollect
 					visitor.visit(new ProofTask(factory.getOWLSubClassOfAxiom(subsumee, subsumer), bindingChecker));
 				}
 			});*/
-			new ComprehensiveSubsumptionTracingTests(taxonomy).accept(new TracingTestVisitor() {
+			new ComprehensiveSubsumptionTracingTests(reasoner).accept(new TracingTestVisitor() {
 				
 				@Override
-				public boolean visit(ElkClass subsumee, ElkClass subsumer) throws Exception {
-					
+				public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) throws Exception {
 					visitor.visit(new ProofTask(reasoner_, subsumee, subsumer));
-					
-					return true;
+				}
+
+				@Override
+				public void inconsistencyTest() throws Exception {
+					visitor.visit(new ProofTask(reasoner_, PredefinedElkClass.OWL_THING, PredefinedElkClass.OWL_NOTHING));
 				}
 			});
 			
@@ -115,19 +116,6 @@ public class ProofsForAllSubsumptionTaskCollection implements VisitorTaskCollect
 		}
 	}
 	
-	/*private OWLOntology loadOntology() throws TaskException {
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLOntology ontology = null;
-
-		try {
-			ontology = manager.loadOntologyFromOntologyDocument(new File(ontologyFile_));
-		} catch (Exception e) {
-			throw new TaskException(e);
-		}
-		
-		return ontology;
-	}*/
-
 	@Override
 	public Metrics getMetrics() {
 		return metrics_;
@@ -144,7 +132,7 @@ public class ProofsForAllSubsumptionTaskCollection implements VisitorTaskCollect
 		}
 	}
 	
-	Taxonomy<ElkClass> loadAndClassify(String ontologyFile) throws TaskException {
+	Reasoner loadAndClassify(String ontologyFile) throws TaskException {
 		try {
 			File ontFile = BenchmarkUtils.getFile(ontologyFile);
 
@@ -155,9 +143,9 @@ public class ProofsForAllSubsumptionTaskCollection implements VisitorTaskCollect
 					new SimpleStageExecutor(),
 					reasonerConfig_);
 			
-			Taxonomy<ElkClass> taxonomy = reasoner_.getTaxonomy();
+			//Taxonomy<ElkClass> taxonomy = reasoner_.getTaxonomy();
 			
-			return taxonomy;
+			return reasoner_;
 			
 		} catch (Exception e) {
 			throw new TaskException(e);
@@ -183,7 +171,7 @@ public class ProofsForAllSubsumptionTaskCollection implements VisitorTaskCollect
 			try {
 				ReasonerStateAccessor.cleanClassTraces(reasoner);
 				
-				TestUtils.provabilityTest(new ProofReader(reasoner).eliminateLemmas(), subsumee, subsumer);
+				TestUtils.provabilityOfSubsumptionTest(new ProofReader(reasoner).eliminateLemmas(), subsumee, subsumer);
 			} catch (ElkException e) {
 				throw new TaskException(e);
 			}

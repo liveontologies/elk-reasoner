@@ -27,11 +27,15 @@ package org.semanticweb.elk.proofs.inferences.mapping;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
+ * TODO rename
+ * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface SatisfiabilityChecker {
+public interface EntailmentChecker {
 
 	public boolean isSatisfiable(IndexedClassExpression ice);
+	
+	public boolean isDerivedSubsumer(IndexedClassExpression subsumee, IndexedClassExpression subsumer);
 }

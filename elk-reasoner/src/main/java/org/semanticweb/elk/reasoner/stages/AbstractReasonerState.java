@@ -33,6 +33,7 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
+import org.semanticweb.elk.owl.interfaces.ElkEntity;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
@@ -47,20 +48,23 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.ChangeIndexingProcessor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexingVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiomFactoryWithBinding;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalChangeCheckingVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.PlainIndexedAxiomFactory;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
@@ -150,7 +154,7 @@ public abstract class AbstractReasonerState {
 	/**
 	 * {@code true} if the current ontology is inconsistent
 	 */
-	boolean inconsistentOntology = false;
+	IndexedClassEntity inconsistentEntity = null;
 	/**
 	 * Taxonomy state that stores (partial) classification
 	 */
@@ -380,7 +384,7 @@ public abstract class AbstractReasonerState {
 			stageManager.incrementalConsistencyCheckingStage.setCompleted();
 		}
 
-		return inconsistentOntology;
+		return inconsistentEntity != null;
 	}
 
 	/**
@@ -613,15 +617,9 @@ public abstract class AbstractReasonerState {
 
 	/*---------------------------------------------------
 	 * TRACING METHODS
-	 * TODO; clients should not have to work with contexts and conclusions. we
-	 * need to represent the trace graphs in a way that is completely detached
-	 * from the index or saturation data structures (like the taxonomies).
-	 * 
-	 * TODO#2: check if FULL_TRACING is on 
 	 *---------------------------------------------------*/
 
-	public TraceStore.Reader explainSubsumption(ElkClassExpression sub,
-			ElkClassExpression sup) throws ElkException {
+	public TraceStore.Reader explainSubsumption(ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
 		if (traceState == null) {
 			resetTraceState();
 		}
@@ -635,6 +633,37 @@ public abstract class AbstractReasonerState {
 
 		return traceState.getTraceStore().getReader();
 	}
+	
+	/**
+	 * @return either owl:Thing, if it was derived to be a subclass of
+	 *         owl:Nothing or the individual which was inferred to be an
+	 *         instance of owl:Nothing.
+	 * @throws ElkException
+	 */
+	public ElkEntity explainInconsistency() throws ElkException {
+		if (!isInconsistent()) {
+			throw new IllegalStateException("The ontology is consistent");
+		}
+		
+		traceState.clearTracingMap();
+		traceState.addConclusionToTrace(inconsistentEntity, ContradictionImpl.getInstance());
+		trace();
+		traceState.clearTracingMap();
+
+		return inconsistentEntity.accept(new IndexedClassEntityVisitor<ElkEntity>() {
+
+			@Override
+			public ElkEntity visit(IndexedClass element) {
+				return element.getElkClass();
+			}
+
+			@Override
+			public ElkEntity visit(IndexedIndividual element) {
+				return element.getElkNamedIndividual();
+			}
+		});
+	}
+	
 	// TODO hide this?
 	public void submitForTracing(ElkClassExpression sub, ElkClassExpression sup) {
 		IndexedClassExpression subsumee = sub.accept(objectCache_
@@ -652,7 +681,14 @@ public abstract class AbstractReasonerState {
 	}
 	
 	void stageBasedTrace(IndexedClassExpression subsumee, IndexedClassExpression subsumer) throws ElkException {
-		traceState.addConclusionToTrace(subsumee, convertTraceTarget(subsumee, subsumer));
+		if (isInconsistent()) {
+			throw new ElkInconsistentOntologyException("The ontology is inconsistent. Use explainInconsistency() method instead");
+		}
+		else {
+			// explain subsumption or sub-class unsatisfiability
+			traceState.addConclusionToTrace(subsumee, convertTraceTarget(subsumee, subsumer));
+		}
+		
 		trace();
 		traceState.clearTracingMap();
 	}
@@ -663,13 +699,25 @@ public abstract class AbstractReasonerState {
 		if (subsumeeContext != null) {
 			return !subsumeeContext.containsConclusion(ContradictionImpl.getInstance());
 		}
-		
+		// shouldn't happen if we suppport only named classes or abbreviate
+		// class expressions and saturate them prior to tracing
 		return true;
+	}
+	
+	boolean isSubsumerDerived(IndexedClassExpression subsumee, IndexedClassExpression subsumer) {
+		Context subsumeeContext = saturationState.getContext(subsumee);
+		
+		if (subsumeeContext != null) {
+			return subsumeeContext.containsConclusion(new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer))
+					|| subsumeeContext.containsConclusion(new ComposedSubsumerImpl<IndexedClassExpression>(subsumer));
+		}
+		
+		return false;
 	}
 	
 	private Conclusion convertTraceTarget(IndexedClassExpression subsumee, IndexedClassExpression subsumer) {
 		if (!isSatisfiable(subsumee)) {
-				// the subsumee is unsatisfiable so we explain the unsatisfiability
+			// the subsumee is unsatisfiable so we explain the unsatisfiability
 			return ContradictionImpl.getInstance();
 		}
 		else {

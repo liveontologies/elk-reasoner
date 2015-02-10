@@ -24,6 +24,7 @@ package org.semanticweb.elk.proofs.utils;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -35,6 +36,7 @@ import org.semanticweb.elk.proofs.InferenceGraph;
 import org.semanticweb.elk.proofs.ProofReader;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * Utilities for testing proofs
@@ -49,13 +51,25 @@ public class TestUtils {
 	// if either it doesn't require a proof (i.e. is a tautology or asserted) or
 	// returns at least one inference such that each of the premises is
 	// provable.
-	public static void provabilityTest(ProofReader reader, ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
+	public static void provabilityOfSubsumptionTest(ProofReader reader, ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
 		InferenceGraph graph = ProofReader.readInferenceGraph(reader, sub, sup);
+		
+		provabilityTest(graph, graph.getExpressions());
+	}
+	
+	public static void provabilityOfInconsistencyTest(ProofReader reader) throws ElkException {
+		Pair<InferenceGraph, DerivedExpression> graphAndInconsistencyExpr = ProofReader.readInferenceGraphForInconsistency(reader);
+		// only the expression which corresponds to inconsistency has to be explained
+		provabilityTest(graphAndInconsistencyExpr.getFirst(), 
+				Collections.singleton(graphAndInconsistencyExpr.getSecond()));
+	}
+	
+	public static void provabilityTest(InferenceGraph graph, Iterable<? extends DerivedExpression> toCheck) throws ElkException {
 		//FIXME
 		//System.out.println(graph);
 		
 		if (graph.getExpressions().isEmpty()) {
-			throw new AssertionError(String.format("There is no proof of %s <= %s", sub, sup));
+			throw new AssertionError(String.format("The inference graph is empty"));
 		}
 		
 		Set<DerivedExpression> proved = new HashSet<DerivedExpression>(graph.getExpressions().size());
@@ -74,13 +88,13 @@ public class TestUtils {
 						toDo.add(inf.getConclusion());
 						
 						//FIXME
-						//System.err.println("Proved: " + inf.getConclusion() + " by " + inf);
+						System.err.println("Proved: " + inf.getConclusion() + " by " + inf);
 					}
 				}
 			}
 		}
 		
-		for (DerivedExpression expr : graph.getExpressions()) {
+		for (DerivedExpression expr : toCheck) {
 			if (!proved.contains(expr)) {
 				throw new AssertionError(String.format("There is no acyclic proof of %s", expr));
 			}

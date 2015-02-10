@@ -33,5 +33,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
  */
 public interface TracingTestVisitor {
 
-	public boolean visit(ElkClass subsumee, ElkClass subsumer) throws Exception;
+	public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) throws Exception;
+	
+	public void inconsistencyTest() throws Exception;
 }

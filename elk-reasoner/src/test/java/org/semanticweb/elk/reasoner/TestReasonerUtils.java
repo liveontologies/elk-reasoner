@@ -99,7 +99,11 @@ public class TestReasonerUtils {
 				initialLoader.add(axiom);
 			}
 
-			reasoner.getTaxonomy();
+			try {
+				reasoner.getTaxonomy();
+			} catch (ElkInconsistentOntologyException e) {
+				// shit happens
+			}
 		} finally {
 			IOUtils.closeQuietly(stream);
 		}

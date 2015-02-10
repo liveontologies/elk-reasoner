@@ -53,7 +53,13 @@ public class DisjointnessContradiction extends AbstractInference<DerivedAxiomExp
 	
 	private final DerivedExpression axiom_;
 	
-	public DisjointnessContradiction(ElkClassExpression sub, ElkClassExpression firstSup, ElkClassExpression secondSup, ElkDisjointClassesAxiom sideCondition, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
+	public DisjointnessContradiction(
+			ElkClassExpression sub, 
+			ElkClassExpression firstSup, 
+			ElkClassExpression secondSup, 
+			ElkDisjointClassesAxiom sideCondition, 
+			ElkObjectFactory factory, 
+			DerivedExpressionFactory exprFactory) {
 		super(exprFactory.create(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING)));
 
 		firstPremise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, firstSup));

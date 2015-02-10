@@ -25,8 +25,8 @@ package org.semanticweb.elk.proofs;
  */
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
@@ -37,6 +37,7 @@ import org.semanticweb.elk.proofs.transformations.lemmas.LemmaElimination;
 import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
+import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * The main entrance point for accessing proofs.
@@ -74,11 +75,21 @@ public class ProofReader {
 	 * @return
 	 * @throws ElkException
 	 */
-	public DerivedAxiomExpression<ElkSubClassOfAxiom> getProofRoot(ElkClassExpression subsumee, ElkClassExpression subsumer) throws ElkException {
-		DerivedAxiomExpression<ElkSubClassOfAxiom> root = reader_.initialize(subsumee, subsumer);
+	public DerivedAxiomExpression<?> getProofRoot(ElkClassExpression subsumee, ElkClassExpression subsumer) throws ElkException {
+		DerivedAxiomExpression<?> root = reader_.initialize(subsumee, subsumer);
 		
+		return applyTransformation(root);
+	}
+	
+	public DerivedAxiomExpression<?> getProofRootForInconsistency() throws ElkException {
+		DerivedAxiomExpression<?> root = reader_.initializeForInconsistency();
+		
+		return applyTransformation(root);
+	}
+	
+	private <E extends ElkAxiom> DerivedAxiomExpression<E> applyTransformation(DerivedAxiomExpression<E> root) {
 		if (inferenceTransformation_ != null) {
-			root = new TransformedAxiomExpression<InferenceTransformation, ElkSubClassOfAxiom>(root, inferenceTransformation_);
+			root = new TransformedAxiomExpression<InferenceTransformation, E>(root, inferenceTransformation_);
 		}
 		
 		return root;
@@ -106,6 +117,22 @@ public class ProofReader {
 		});
 		
 		return graph;
+	}
+	
+	public static Pair<InferenceGraph, DerivedExpression> readInferenceGraphForInconsistency(ProofReader reader) throws ElkException {
+		final InferenceGraphImpl graph = new InferenceGraphImpl();
+		DerivedExpression root = reader.getProofRootForInconsistency();
+		
+		RecursiveInferenceVisitor.visitInferences(root, new AbstractInferenceVisitor<Void, Void>() {
+
+			@Override
+			protected Void defaultVisit(Inference inference, Void input) {
+				graph.addInference(inference);
+				return null;
+			}
+		});
+		
+		return Pair.<InferenceGraph, DerivedExpression>create(graph, root);
 	}
 	
 }

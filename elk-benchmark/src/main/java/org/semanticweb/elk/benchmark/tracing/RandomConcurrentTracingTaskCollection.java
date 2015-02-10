@@ -53,7 +53,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestUtils;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.reasoner.stages.SimpleStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -85,7 +84,7 @@ public class RandomConcurrentTracingTaskCollection implements VisitorTaskCollect
 	@Override
 	public void visitTasks(final TaskVisitor visitor) throws TaskException {
 		// classify the ontology and instantiate tracing tasks
-		final Taxonomy<ElkClass> taxonomy = loadAndClassify(ontologyFile_);
+		final Reasoner taxonomy = load(ontologyFile_);
 		final Multimap<ElkClassExpression, ElkClassExpression> tracingBatch = new HashListMultimap<ElkClassExpression, ElkClassExpression>();
 		final MutableInteger batchSize = new MutableInteger(0);
 		
@@ -93,8 +92,7 @@ public class RandomConcurrentTracingTaskCollection implements VisitorTaskCollect
 			new ComprehensiveSubsumptionTracingTests(taxonomy).accept(new TracingTestVisitor() {
 				
 				@Override
-				public boolean visit(ElkClass subsumee, ElkClass subsumer) throws Exception {
-					
+				public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) throws Exception {
 					tracingBatch.add(subsumee, subsumer);
 					
 					if (batchSize.increment() >= BATCH_SIZE) {
@@ -102,8 +100,11 @@ public class RandomConcurrentTracingTaskCollection implements VisitorTaskCollect
 						tracingBatch.clear();
 						batchSize.set(0);
 					}
-					
-					return true;
+				}
+
+				@Override
+				public void inconsistencyTest() throws Exception {
+					// ignoring inconsistency in benchmark tests
 				}
 			});
 			
@@ -128,13 +129,7 @@ public class RandomConcurrentTracingTaskCollection implements VisitorTaskCollect
 		return new BatchTracingTask(reasoner_, batchCopy);
 	}
 
-/*	TracingTask createSpecificTask(String sub, String sup) {
-		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		
-		return createSpecificTask(factory.getClass(new ElkFullIri(sub)), factory.getClass(new ElkFullIri(sup)));
-	}*/
-
-	Taxonomy<ElkClass> loadAndClassify(String ontologyFile) throws TaskException {
+	Reasoner load(String ontologyFile) throws TaskException {
 		try {
 			File ontFile = BenchmarkUtils.getFile(ontologyFile);
 
@@ -146,11 +141,9 @@ public class RandomConcurrentTracingTaskCollection implements VisitorTaskCollect
 					//new RuleAndConclusionCountMeasuringExecutor(new SimpleStageExecutor(), metrics_),
 					reasonerConfig_);
 			
-			Taxonomy<ElkClass> taxonomy = reasoner_.getTaxonomy();
+			//Taxonomy<ElkClass> taxonomy = reasoner_.getTaxonomy();
 			
-			//TaxonomyPrinter.dumpClassTaxomomyToFile(taxonomy, "/home/pavel/tmp/galen.taxonomy", false);
-			
-			return taxonomy;
+			return reasoner_;
 			
 		} catch (Exception e) {
 			throw new TaskException(e);
@@ -254,11 +247,7 @@ public class RandomConcurrentTracingTaskCollection implements VisitorTaskCollect
 				//ignoring the results
 			}
 			
-			if (TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner) <= 0) {
-				throw new TaskException("The subsumption " + subsumee + " => " + subsumer + " wasn't properly traced");
-			}
-			
-			//TracingTestUtils.checkInferenceAcyclicity(reasoner);
+			TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner);
 		}
 
 		@Override

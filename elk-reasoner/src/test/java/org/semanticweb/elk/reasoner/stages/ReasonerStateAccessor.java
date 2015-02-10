@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.stages;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -76,5 +77,9 @@ public class ReasonerStateAccessor {
 	
 	public static Context getContext(AbstractReasonerState reasoner, IndexedClassExpression ice) {
 		return reasoner.saturationState.getContext(ice);
+	}
+	
+	public static IndexedClassEntity getInconsistentEntity(AbstractReasonerState reasoner) {
+		return reasoner.inconsistentEntity;
 	}
 }

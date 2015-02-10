@@ -51,4 +51,15 @@ public interface ExplainingOWLReasoner extends OWLReasoner {
 	 * @return
 	 */
 	public OWLAxiomExpression getDerivedExpression(OWLAxiom entailment) throws ProofGenerationException, UnsupportedEntailmentTypeException;
+	
+	/**
+	 * Returns an {@link OWLExpression} object which represents the entailed
+	 * inconsistency, or {@code null} if the ontology is consistent. All proofs can be
+	 * unwound recursively by calling {@link OWLExpression#getInferences()} on
+	 * each premise.
+	 * 
+	 * @return
+	 * @throws ProofGenerationException
+	 */
+	public OWLAxiomExpression getDerivedExpressionForInconsistency() throws ProofGenerationException;
 }

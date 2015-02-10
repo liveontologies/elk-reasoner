@@ -66,7 +66,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLRuntimeException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.AxiomNotInProfileException;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
@@ -87,6 +86,7 @@ import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 import org.semanticweb.owlapi.reasoner.impl.OWLNamedIndividualNode;
 import org.semanticweb.owlapi.util.Version;
 import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
+import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -939,28 +939,42 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 	}
 	
 	@Override
-	public OWLAxiomExpression getDerivedExpression(OWLAxiom axiom) {
+	public OWLAxiomExpression getDerivedExpression(OWLAxiom axiom) throws ProofGenerationException {
 		// support only class subsumptions for the moment
 		if (axiom instanceof OWLSubClassOfAxiom) {
 			OWLSubClassOfAxiom scAxiom = (OWLSubClassOfAxiom) axiom;
 			ElkSubClassOfAxiom elkAxiom = (ElkSubClassOfAxiom) scAxiom.accept(OwlClassAxiomConverterVisitor.getInstance());
 			
 			try {
-				// TODO introduce a config option for preserving or eliminating lemmas
-				DerivedAxiomExpression<ElkSubClassOfAxiom> expr = new ProofReader(reasoner_)
-																	.eliminateLemmas()
-																	.getProofRoot(elkAxiom.getSubClassExpression(), elkAxiom.getSuperClassExpression());
+				DerivedAxiomExpression<?> expr = new ProofReader(reasoner_)
+						.eliminateLemmas().getProofRoot(
+								elkAxiom.getSubClassExpression(),
+								elkAxiom.getSuperClassExpression());
 				
 				return ElkToOwlProofConverter.convert(expr);
 				
 			} catch (ElkException e) {
 				LOGGER_.error("Error during proof reconstruction", e);
 				
-				throw new OWLRuntimeException(e);
+				throw new ProofGenerationException(e);
 			} 
 		}
 		
 		throw new UnsupportedEntailmentTypeException(axiom);
+	}
+	
+	public OWLAxiomExpression getDerivedExpressionForInconsistency() throws ProofGenerationException {
+		try {
+			DerivedAxiomExpression<?> expr = new ProofReader(reasoner_)
+					.eliminateLemmas().getProofRootForInconsistency();
+			
+			return ElkToOwlProofConverter.convert(expr);
+			
+		} catch (ElkException e) {
+			LOGGER_.error("Error during proof reconstruction", e);
+			
+			throw new ProofGenerationException(e);
+		} 
 	}
 
 	protected class OntologyChangeListener implements OWLOntologyChangeListener {

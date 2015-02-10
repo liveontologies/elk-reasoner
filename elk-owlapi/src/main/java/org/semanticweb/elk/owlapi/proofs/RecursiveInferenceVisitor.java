@@ -44,10 +44,22 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 public class RecursiveInferenceVisitor {
 
 	public static void visitInferences(ExplainingOWLReasoner reasoner, OWLAxiom axiom, OWLInferenceVisitor visitor, boolean allProofs) throws ProofGenerationException {
-		OWLExpression next = reasoner.getDerivedExpression(axiom);
+		OWLExpression root = reasoner.getDerivedExpression(axiom);
+		
+		visitInferences(reasoner, root, visitor, allProofs);
+	}
+	
+	public static void visitInferencesOfInconsistency(ExplainingOWLReasoner reasoner, OWLInferenceVisitor visitor, boolean allProofs) throws ProofGenerationException {
+		OWLExpression root = reasoner.getDerivedExpressionForInconsistency();
+		
+		visitInferences(reasoner, root, visitor, allProofs);
+	}
+	
+	static void visitInferences(ExplainingOWLReasoner reasoner, OWLExpression root, OWLInferenceVisitor visitor, boolean allProofs) throws ProofGenerationException {
 		// start recursive unwinding
 		Queue<OWLExpression> toDo = new LinkedList<OWLExpression>();
 		Set<OWLExpression> done = new HashSet<OWLExpression>();
+		OWLExpression next = root;
 		
 		toDo.add(next);
 		done.add(next);

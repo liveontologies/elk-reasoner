@@ -31,6 +31,7 @@ import java.util.Set;
 import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
@@ -81,7 +82,7 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 	}
 	
 	public static boolean equal(ElkAxiom first, ElkAxiom second) {
-		return AxiomEquivalenceChecker.equal(first, second);
+		return AxiomEquivalenceChecker.equal(canonicalize(first), canonicalize(second));
 	}
 	
 	public static boolean equal(ElkLemma first, ElkLemma second) {
@@ -99,12 +100,16 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 
 	@Override
 	public Boolean visit(DerivedAxiomExpression<?> expr, Expression second) {
-		return second instanceof DerivedAxiomExpression ? AxiomEquivalenceChecker.equal(expr.getAxiom(), ((DerivedAxiomExpression<?>) second).getAxiom()) : Boolean.FALSE;
+		return second instanceof DerivedAxiomExpression ? equal(expr.getAxiom(), ((DerivedAxiomExpression<?>) second).getAxiom()) : Boolean.FALSE;
 	}
 
 	@Override
 	public Boolean visit(LemmaExpression<?> expr, Expression second) {
 		return second instanceof LemmaExpression ? LemmaEquivalenceChecker.equal(expr.getLemma(), ((LemmaExpression<?>)second).getLemma()) : Boolean.FALSE;
+	}
+	
+	private static ElkAxiom canonicalize(ElkAxiom axiom) {
+		return AxiomCanonicalizer.canonicalize(axiom);
 	}
 
 	private static class DefaultLemmaChecker  implements ElkLemmaVisitor<ElkLemma, Boolean> {
@@ -228,8 +233,7 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 					return second.accept(new DefaultAxiomChecker() {
 
 						@Override
-						public Boolean visit(
-								ElkSubClassOfAxiom second) {
+						public Boolean visit(ElkSubClassOfAxiom second) {
 							return EntityEquivalenceChecker.equal(first.getSubClassExpression(), second.getSubClassExpression())
 									&& EntityEquivalenceChecker.equal(first.getSuperClassExpression(), second.getSuperClassExpression());
 						}
@@ -242,8 +246,7 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 					return second.accept(new DefaultAxiomChecker() {
 
 						@Override
-						public Boolean visit(
-								ElkEquivalentObjectPropertiesAxiom second) {
+						public Boolean visit(ElkEquivalentObjectPropertiesAxiom second) {
 							return equalAsSets(first.getObjectPropertyExpressions(), second.getObjectPropertyExpressions());
 						}
 						
@@ -254,8 +257,7 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 				public Boolean visit(final ElkObjectPropertyDomainAxiom first) {
 					return second.accept(new DefaultAxiomChecker() {
 						@Override
-						public Boolean visit(
-								ElkObjectPropertyDomainAxiom second) {
+						public Boolean visit(ElkObjectPropertyDomainAxiom second) {
 							return EntityEquivalenceChecker.equal(first.getDomain(), second.getDomain()) 
 									&& EntityEquivalenceChecker.equal(first.getProperty(), second.getProperty());
 						}
@@ -300,6 +302,18 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 					});
 				}
 				
+				@Override
+				public Boolean visit(final ElkClassAssertionAxiom first) {
+					return second.accept(new DefaultAxiomChecker() {
+						@Override
+						public Boolean visit(ElkClassAssertionAxiom second) {
+							return EntityEquivalenceChecker.equal(first.getClassExpression(), second.getClassExpression())
+									&& EntityEquivalenceChecker.equal(first.getIndividual(), second.getIndividual());
+						}
+						
+					});
+				}
+				
 			});
 		}
 		
@@ -316,11 +330,6 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 		public Boolean visit(ElkComplexObjectSomeValuesFrom ce, ElkObject input) {
 			return Boolean.FALSE;
 		}
-
-		/*@Override
-		public Boolean visit(ElkClassExpressionWrap ce, ElkObject input) {
-			return Boolean.FALSE;
-		}*/
 		
 	}
 	
@@ -388,6 +397,15 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 							return equalAsSets(first.getIndividuals(), second.getIndividuals());
 						}
 						
+						@Override
+						public Boolean visit(ElkNamedIndividual second) {
+							if (first.getIndividuals().size() != 1) {
+								return false;
+							}
+							
+							return equal(first.getIndividuals().get(0), second);
+						}
+						
 					});
 				}
 
@@ -443,8 +461,18 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 							return first.getIri().equals(second.getIri());
 						}
 						
+						@Override
+						public Boolean visit(ElkObjectOneOf second) {
+							if (second.getIndividuals().size() != 1) {
+								return false;
+							}
+							
+							return equal(first, second.getIndividuals().get(0));
+						}
+						
 					});
 				}
+				
 
 				@Override
 				public Boolean visit(final ElkIri first) {

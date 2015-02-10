@@ -68,12 +68,12 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.inconsistentOntology = computation_.isInconsistent();
+		reasoner.inconsistentEntity = computation_.getInconsistentEntity();
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
 
 		// FIXME Obviously needed a better clean-up after inconsistency
-		if (reasoner.inconsistentOntology) {
+		if (reasoner.inconsistentEntity != null) {
 			reasoner.classTaxonomyState.getWriter().clearTaxonomy();
 			reasoner.instanceTaxonomyState.getWriter().clearTaxonomy();
 		}

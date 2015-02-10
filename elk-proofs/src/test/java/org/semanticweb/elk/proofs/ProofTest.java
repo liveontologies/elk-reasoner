@@ -43,7 +43,6 @@ import org.semanticweb.elk.owl.managers.ElkEntityRecycler;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.proofs.utils.TestUtils;
-import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.saturation.tracing.ComprehensiveSubsumptionTracingTests;
@@ -51,7 +50,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestManifest;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTestVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.TracingTests;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
-import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.ConfigurationUtils;
 import org.semanticweb.elk.testing.ConfigurationUtils.TestManifestCreator;
 import org.semanticweb.elk.testing.PolySuite;
@@ -100,12 +98,9 @@ public class ProofTest {
 		Reasoner reasoner = TestReasonerUtils.createTestReasoner(fileLoader, new PostProcessingStageExecutor());
 
 		try {
-			TracingTests tests = getProvabilityTests(reasoner.getTaxonomy());
+			TracingTests tests = getProvabilityTests(reasoner);
 			
 			tests.accept(getTestingVisitor(reasoner));
-		} catch (ElkInconsistentOntologyException e) {
-			//swallow..
-			LOGGER_.trace("The test ontology is inconsistent so proof tests do not make sense");
 		} finally {
 			reasoner.shutdown();
 		}
@@ -115,23 +110,32 @@ public class ProofTest {
 		return new TracingTestVisitor() {
 			
 			@Override
-			public boolean visit(ElkClass subsumee, ElkClass subsumer) {
+			public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) {
 				try {
-					
 					LOGGER_.trace("Proof test: {} => {}", subsumee, subsumer);
 					
-					TestUtils.provabilityTest(new ProofReader(reasoner), subsumee, subsumer);
+					TestUtils.provabilityOfSubsumptionTest(new ProofReader(reasoner), subsumee, subsumer);
 				} catch (ElkException e) {
 					throw new RuntimeException(e);
 				}
-				
-				return true;
 			}
+
+			@Override
+			public void inconsistencyTest() throws Exception {
+				try {
+					LOGGER_.trace("Proof test for inconsistency");
+					
+					TestUtils.provabilityOfInconsistencyTest(new ProofReader(reasoner));
+				} catch (ElkException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			
 		};
 	}
 
-	protected TracingTests getProvabilityTests(Taxonomy<ElkClass> taxonomy) {
-		return new ComprehensiveSubsumptionTracingTests(taxonomy);
+	protected TracingTests getProvabilityTests(Reasoner reasoner) throws ElkException {
+		return new ComprehensiveSubsumptionTracingTests(reasoner);
 	}
 
 	@Config

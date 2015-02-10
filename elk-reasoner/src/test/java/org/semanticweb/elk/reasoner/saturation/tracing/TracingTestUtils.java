@@ -40,7 +40,9 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.Reasoner;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
@@ -106,7 +108,7 @@ public class TracingTestUtils {
 		throw new IllegalArgumentException("Context may not be null");
 	}
 
-	public static int checkTracingCompleteness(ElkClassExpression sub, ElkClassExpression sup, Reasoner reasoner) {
+	public static void checkTracingCompleteness(ElkClassExpression sub, ElkClassExpression sup, Reasoner reasoner) {
 		IndexedClassExpression subsumee = ReasonerStateAccessor.transform(reasoner, sub);
 		Conclusion subsumer = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
@@ -123,8 +125,29 @@ public class TracingTestUtils {
 		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState.getTraceStore().getReader(), UNTRACED_LISTENER);
 
 		explorer.accept(subsumee, subsumer, counter);
+	}
+	
+	public static void checkTracingOfInconsistencyCompleteness(Reasoner reasoner) {
+		IndexedClassEntity entity = ReasonerStateAccessor.getInconsistentEntity(reasoner);
+		
+		if (entity == null) {
+			throw new IllegalStateException("The ontology is consistent");
+		}
+		
+		final AtomicInteger conclusionCount = new AtomicInteger(0);
+		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
+		ClassInferenceVisitor<IndexedClassExpression, Boolean> counter = new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
 
-		return conclusionCount.get();
+			@Override
+			protected Boolean defaultTracedVisit(ClassInference conclusion, IndexedClassExpression input) {
+				conclusionCount.incrementAndGet();
+				return true;
+			}
+		};
+
+		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState.getTraceStore().getReader(), UNTRACED_LISTENER);
+
+		explorer.accept(entity, ContradictionImpl.getInstance(), counter);
 	}
 
 	public static void checkTracingMinimality(ElkClassExpression sub,
@@ -297,6 +320,23 @@ public class TracingTestUtils {
 
 		reasoner.explainSubsumption(sub, sup);
 		traceUnwinder.accept(subsumee, conclusion, classInferenceVisitor,
+				propertyInferenceVisitor);		
+	}
+	
+	public static void visitInferencesForInconsistency(Reasoner reasoner, 
+			final ClassInferenceVisitor<IndexedClassExpression, Boolean> classInferenceVisitor,
+			final ObjectPropertyInferenceVisitor<?, Boolean> propertyInferenceVisitor) throws ElkException {
+		IndexedClassEntity entity = ReasonerStateAccessor.getInconsistentEntity(reasoner);
+		
+		if (entity == null) {
+			throw new IllegalStateException("The ontology is consistent");
+		}
+		
+		TraceStore.Reader inferenceReader = ReasonerStateAccessor.getTraceState(reasoner).getTraceStore().getReader();
+		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader, UNTRACED_LISTENER);
+
+		reasoner.explainInconsistency();
+		traceUnwinder.accept(entity, ContradictionImpl.getInstance(), classInferenceVisitor,
 				propertyInferenceVisitor);		
 	}
 	

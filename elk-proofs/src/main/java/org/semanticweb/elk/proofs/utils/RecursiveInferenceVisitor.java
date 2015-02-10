@@ -51,6 +51,12 @@ public class RecursiveInferenceVisitor {
 
 	public static void visitInferences(ProofReader reader, ElkClassExpression subsumee, ElkClassExpression subsumer, InferenceVisitor<?, ?> visitor) throws ElkException {
 		DerivedExpression next = reader.getProofRoot(subsumee, subsumer);
+		
+		visitInferences(next, visitor);
+	}
+	
+	public static void visitInferences(DerivedExpression root, InferenceVisitor<?, ?> visitor) throws ElkException {
+		DerivedExpression next = root;
 		// start recursive unwinding
 		Queue<DerivedExpression> toDo = new LinkedList<DerivedExpression>();
 		Set<DerivedExpression> done = new HashSet<DerivedExpression>();

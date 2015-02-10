@@ -32,6 +32,7 @@ import java.util.Arrays;
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
+import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
@@ -86,6 +87,7 @@ public class StructuralEquivalenceTest {
 		ElkClass a = factory.getClass(getIri("A"));
 		ElkClass b = factory.getClass(getIri("B"));
 		ElkClass c = factory.getClass(getIri("C"));
+		ElkNamedIndividual aInd = factory.getNamedIndividual(getIri("a"));
 		ElkObjectProperty r = factory.getObjectProperty(getIri("R"));
 		// disjointness
 		assertTrue(StructuralEquivalenceChecker.equal(factory.getDisjointClassesAxiom(Arrays.asList(a, b, c)), factory.getDisjointClassesAxiom(Arrays.asList(a, b, c))));
@@ -98,6 +100,9 @@ public class StructuralEquivalenceTest {
 		assertTrue(StructuralEquivalenceChecker.equal(factory.getEquivalentClassesAxiom(Arrays.asList(a, b, c, a)), factory.getEquivalentClassesAxiom(Arrays.asList(c, b, a, b, c))));
 		// subsumption
 		assertTrue(StructuralEquivalenceChecker.equal(factory.getSubClassOfAxiom(a, b), factory.getSubClassOfAxiom(a, b)));
+		// canonicalization of class assertions
+		assertTrue(StructuralEquivalenceChecker.equal(factory.getSubClassOfAxiom(factory.getObjectOneOf(aInd), b), factory.getClassAssertionAxiom(b, aInd)));
+		assertTrue(StructuralEquivalenceChecker.equal(factory.getClassAssertionAxiom(b, aInd), factory.getSubClassOfAxiom(factory.getObjectOneOf(aInd), b)));
 		// property domain
 		assertTrue(StructuralEquivalenceChecker.equal(factory.getObjectPropertyDomainAxiom(r, a), factory.getObjectPropertyDomainAxiom(r, a)));
 		// property axioms
