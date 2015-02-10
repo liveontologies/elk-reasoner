@@ -77,7 +77,7 @@ import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
  *
  */
 @SuppressWarnings("serial")
-public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelManagerListener, EntailmentSelectionListener, AxiomSelectionModel, ExplanationManagerListener {
+public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelManagerListener, EntailmentSelectionListener, ExplanationManagerListener {
 
     private OWLEditorKit editorKit;
 
@@ -91,18 +91,22 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelM
 
     private AxiomSelectionModelImpl selectionModel;
 
-
     private WorkbenchManager workbenchManager;
 
-
-//    private JCheckBox showAllExplanationsCheckBox = new JCheckBox();
-
-
+    // proof workbench panel for subsumption
     public ProofWorkbenchPanel(OWLEditorKit ek, OWLAxiom entailment) {
+    	this(ek, new WorkbenchManager(ProofManager.getExplanationManager(ek.getOWLModelManager()), entailment));
+    }
+    
+    // proof workbench panel for inconsistency
+    public ProofWorkbenchPanel(OWLEditorKit ek) {
+    	this(ek, new WorkbenchManager(ProofManager.getExplanationManager(ek.getOWLModelManager())));
+    }
+    
+    private ProofWorkbenchPanel(OWLEditorKit ek, WorkbenchManager wbManager) {
         this.editorKit = ek;
-        ProofManager proofManager = ProofManager.getExplanationManager(ek.getOWLModelManager());
+        this.workbenchManager = wbManager;
         
-        this.workbenchManager = new WorkbenchManager(proofManager, entailment);
         setLayout(new BorderLayout());
 
         selectionModel = new AxiomSelectionModelImpl();
@@ -155,7 +159,6 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelM
 
     public void explanationLimitChanged(ProofManager explanationManager) {
         maxExplanationsSelector.setEnabled(!workbenchManager.getWorkbenchSettings().isFindAllExplanations());
-//        showAllExplanationsCheckBox.setSelected(expMan.isFindAllExplanations());
         selectionChanged();
     }
 
@@ -201,27 +204,15 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelM
     }
 
 
-    public void removeSelectedAxioms() {
-//        RepairPanel.showDialog(editorKit.getWorkspace(), editorKit);
-//        repMan.applyPlan();
-//        editorKit.getModelManager().getOWLReasonerManager().classifyAsynchronously(Collections.emptySet());
-        repaint();
-    }
-
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
     public void selectionChanged() {
         refill();
     }
 
-    protected ExplanationDisplay createProofExplanationDisplay(CycleFreeProofRoot proofRoot, boolean allProofs) {
-    	return new ProofFrameExplanationDisplay(editorKit, this, workbenchManager, proofRoot);    	
+    protected ExplanationDisplay createProofExplanationDisplay(CycleFreeProofRoot proofRoot, boolean allProofs, String displayTitle) {
+    	return new ProofFrameExplanationDisplay(editorKit, workbenchManager, proofRoot, displayTitle);    	
     }
 
 
@@ -235,7 +226,9 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelM
 
             OWLAxiom entailment = workbenchManager.getEntailment();
             ProofManager proofManager = workbenchManager.getProofManager();       
-            ExplanationDisplay explanationDisplayPanel = createProofExplanationDisplay(proofManager.getProofRoot(entailment), true);
+            ExplanationDisplay explanationDisplayPanel = entailment == null 
+            				? createProofExplanationDisplay(proofManager.getProofRootForInconsistency(), true, "Proof tree for ontology inconsistency")
+            				: createProofExplanationDisplay(proofManager.getProofRoot(entailment), true, "Proof tree for class susbumption");
             //GUI
             ExplanationDisplayList list = new ExplanationDisplayList(editorKit, workbenchManager, explanationDisplayPanel, 1);
             

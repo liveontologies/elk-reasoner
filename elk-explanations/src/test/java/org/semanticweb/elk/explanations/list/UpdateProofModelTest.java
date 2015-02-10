@@ -83,7 +83,7 @@ public class UpdateProofModelTest {
 
 		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
 		
-		ProofFrame frame = new ProofFrame(new CycleFreeProofRoot(root, iGraph), new TestOWLRenderer(), null);
+		ProofFrame frame = new ProofFrame(new CycleFreeProofRoot(root, iGraph), new TestOWLRenderer(), null, "test");
 		ProofFrameSection header = (ProofFrameSection) frame.getFrameSections().get(0);
 		// A <= C is entailed
 		assertEquals(1, header.getRows().size());
@@ -111,7 +111,7 @@ public class UpdateProofModelTest {
 		
 		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
 		
-		ProofFrame frame = new ProofFrame(new CycleFreeProofRoot(root, iGraph), new TestOWLRenderer(), null);
+		ProofFrame frame = new ProofFrame(new CycleFreeProofRoot(root, iGraph), new TestOWLRenderer(), null, "test");
 		ProofFrameSection header = (ProofFrameSection) frame.getFrameSections().get(0);
 		// A <= C is entailed
 		assertEquals(1, header.getRows().size());
@@ -244,7 +244,7 @@ public class UpdateProofModelTest {
 	
 	ProofFrame createProofModel(OWLAxiomExpression root) throws ProofGenerationException {
 		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
-		ProofFrame frame = new ProofFrame(new CycleFreeProofRoot(root, iGraph), new TestOWLRenderer(), null);
+		ProofFrame frame = new ProofFrame(new CycleFreeProofRoot(root, iGraph), new TestOWLRenderer(), null, "test");
 		ProofFrameSection header = (ProofFrameSection) frame.getFrameSections().get(0);
 		Queue<ProofFrameSection> toDo = new ArrayDeque<ProofFrameSection>();
 		

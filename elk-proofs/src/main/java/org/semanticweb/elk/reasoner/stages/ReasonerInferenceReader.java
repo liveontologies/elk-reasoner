@@ -114,8 +114,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 
 			@Override
 			public ElkAxiom visit(ElkNamedIndividual elkNamedIndividual) {
-				// representing class assertion using a nominal
-				return factory.getSubClassOfAxiom(factory.getObjectOneOf(elkNamedIndividual), PredefinedElkClass.OWL_NOTHING);
+				return factory.getClassAssertionAxiom(PredefinedElkClass.OWL_NOTHING, elkNamedIndividual);
 			}
 			
 		});

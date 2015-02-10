@@ -24,11 +24,8 @@ package org.semanticweb.elk.explanations;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.FlowLayout;
 
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
@@ -76,11 +73,6 @@ public class ExplanationDisplayList extends JPanel implements Disposable {
 
     private void createUI() {
         setLayout(new BorderLayout(2, 2));
-        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        //JLabel label = new JLabel("Proof tree");
-        
-        //headerPanel.add(label);
-        //add(headerPanel, BorderLayout.NORTH);
 
         JPanel displayHolder = new JPanel(new BorderLayout());
         Border marginBorder = BorderFactory.createEmptyBorder(0, 20, 0, 0);

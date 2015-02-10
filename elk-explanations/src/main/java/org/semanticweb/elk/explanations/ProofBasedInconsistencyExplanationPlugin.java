@@ -40,7 +40,7 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
  * Bio-Medical Informatics Research Group<br>
  * Date: 18/03/2012
  */
-public class InconsistentOntologyExplanationPluginImpl implements InconsistentOntologyPluginInstance {
+public class ProofBasedInconsistencyExplanationPlugin implements InconsistentOntologyPluginInstance {
 
     private OWLEditorKit editorKit;
     
@@ -49,14 +49,13 @@ public class InconsistentOntologyExplanationPluginImpl implements InconsistentOn
     }
 
     public void explain(OWLOntology ontology) {
-
         OWLModelManager owlModelManager = editorKit.getOWLModelManager();
         OWLDataFactory df = owlModelManager.getOWLDataFactory();
-        OWLSubClassOfAxiom entailment = df.getOWLSubClassOfAxiom(df.getOWLThing(), df.getOWLNothing());
-        final ProofWorkbenchPanel panel = new ProofWorkbenchPanel(editorKit, entailment);
+        final ProofWorkbenchPanel panel = new ProofWorkbenchPanel(editorKit);
 
         JOptionPane op = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION);
         JDialog dlg =op.createDialog("Inconsistent ontology explanation");
+        
         dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dlg.addComponentListener(new ComponentAdapter() {
             @Override
@@ -64,11 +63,10 @@ public class InconsistentOntologyExplanationPluginImpl implements InconsistentOn
                 panel.dispose();
             }
         });
+        
         dlg.setModal(false);
         dlg.setResizable(true);
         dlg.setVisible(true);
-
-
     }
 
     public void initialise() throws Exception {

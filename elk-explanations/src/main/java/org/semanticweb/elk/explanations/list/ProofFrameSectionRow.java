@@ -265,7 +265,13 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
 	}
 
     public String getRendering() {
-        return renderer_.render(getAxiom());
+    	OWLObject ax = getAxiom();
+    	//FIXME
+    	if (ax == null) {
+    		System.err.println(expression_);
+    	}
+    	
+        return renderer_.render(ax);
     }
 	
     public String toString() {

@@ -144,28 +144,43 @@ public class ProofManager implements Disposable, OWLReasonerProvider {
         }
     }
     
-    public CycleFreeProofRoot getProofRoot(OWLAxiom entailment)  throws ExplanationException {
-    	// TODO caching
-        OWLReasonerManager reasonerManager = modelManager.getOWLReasonerManager();
+    private ExplainingOWLReasoner getExplainingReasoner() {
+    	OWLReasonerManager reasonerManager = modelManager.getOWLReasonerManager();
         OWLReasoner reasoner = reasonerManager.getCurrentReasoner();
         
         if (reasoner instanceof ExplainingOWLReasoner) {
-        	ExplainingOWLReasoner explainingReasoner = (ExplainingOWLReasoner) reasoner;
-        	
-        	try {
-        		OWLAxiomExpression root = explainingReasoner.getDerivedExpression(entailment);
-        		// first eliminate possible lemmas since we can't render them in Protege
-        		//root = new TransformedOWLExpression<GenericLemmaElimination>(root, new GenericLemmaElimination());
-        		// second block loopy proofs
-        		//return new CycleBlockingExpression(root, OWLProofUtils.computeInferenceGraph(root));
-        		return new CycleFreeProofRoot(root, OWLProofUtils.computeInferenceGraph(root));
-			} catch (Exception e) {
-				throw new ExplanationException(e);
-			}
+        	return (ExplainingOWLReasoner) reasoner;
         }
         else {
         	throw new ExplanationException("The current reasoner (" + reasoner.getClass().getName() + ") does not support proof-based explanations");
-        }    	
+        } 
+    }
+    
+    private CycleFreeProofRoot blockCycles(OWLAxiomExpression root) throws ProofGenerationException {
+    	return new CycleFreeProofRoot(root, OWLProofUtils.computeInferenceGraph(root));
+    }
+    
+    public CycleFreeProofRoot getProofRootForInconsistency()  throws ExplanationException {
+    	try {
+			ExplainingOWLReasoner reasoner = getExplainingReasoner();
+			OWLAxiomExpression root = reasoner.getDerivedExpressionForInconsistency();
+			
+			return blockCycles(root);
+		} catch (ProofGenerationException e) {
+			throw new ExplanationException(e);
+		}
+    }
+    
+    public CycleFreeProofRoot getProofRoot(OWLAxiom entailment)  throws ExplanationException {
+    	// TODO caching
+    	try {
+			ExplainingOWLReasoner reasoner = getExplainingReasoner();
+			OWLAxiomExpression root = reasoner.getDerivedExpression(entailment);
+			
+			return blockCycles(root);
+		} catch (ProofGenerationException e) {
+			throw new ExplanationException(e);
+		}
     }
 
     public Set<Explanation<OWLAxiom>> getJustifications(OWLAxiom entailment, JustificationType type) throws ExplanationException {

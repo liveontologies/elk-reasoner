@@ -29,14 +29,17 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
@@ -52,6 +55,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.expressions.OWLAxiomExpression;
@@ -94,6 +98,17 @@ public class ElkToOwlProofConverter {
 
 		return axiom.accept(new AbstractElkAxiomVisitor<OWLAxiom>() {
 
+			@Override
+			protected OWLAxiom defaultLogicalVisit(ElkAxiom axiom) {
+				// shouldn't get here
+				throw new IllegalStateException("Conversion of " + axiom.getClass().getSimpleName() + " not implemented");
+			}
+
+			@Override
+			protected OWLAxiom defaultNonLogicalVisit(ElkAxiom axiom) {
+				throw new IllegalStateException("Conversion of " + axiom.getClass().getSimpleName() + " not implemented");
+			}
+
 			@SuppressWarnings("unchecked")
 			private OWLAxiom asOWLAxiom(ElkAxiom axiom) {
 				// check if the ELK axiom is a wrapper around the original OWL API axiom which comes from the source ontology
@@ -132,6 +147,30 @@ public class ElkToOwlProofConverter {
 				}
 
 				return factory.getOWLSubClassOfAxiom(convert(axiom.getSubClassExpression(), factory), convert(axiom.getSuperClassExpression(), factory));
+			}
+			
+			
+
+			@Override
+			public OWLAxiom visit(ElkObjectPropertyRangeAxiom axiom) {
+				OWLAxiom ax = asOWLAxiom(axiom);
+				
+				if (ax != null) {
+					return ax;
+				}
+
+				return factory.getOWLObjectPropertyDomainAxiom(convert(axiom.getProperty(), factory), convert(axiom.getRange(), factory));
+			}
+
+			@Override
+			public OWLAxiom visit(ElkClassAssertionAxiom axiom) {
+				OWLAxiom ax = asOWLAxiom(axiom);
+				
+				if (ax != null) {
+					return ax;
+				}
+
+				return factory.getOWLClassAssertionAxiom(convert(axiom.getClassExpression(), factory), convert(axiom.getIndividual(), factory));
 			}
 
 			@Override
@@ -212,8 +251,12 @@ public class ElkToOwlProofConverter {
 		return ce.accept(new ClassExpressionConverter(factory));
 	}
 	
+	static OWLIndividual convert(final ElkIndividual ind, final OWLDataFactory factory) {
+		return ind.accept(new IndividualConverter(factory));
+	}
+	
 	static OWLObjectPropertyExpression convert(final ElkObjectPropertyExpression ce, final OWLDataFactory factory) {
 		return ce.accept(new ObjectPropertyExpressionConverter(factory));
 	}
-
+	
 }

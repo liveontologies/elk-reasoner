@@ -46,7 +46,6 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.framelist.ExplainButton;
 import org.protege.editor.owl.ui.framelist.OWLFrameList;
 import org.protege.editor.owl.ui.framelist.OWLFrameListInferredSectionRowBorder;
-import org.semanticweb.elk.explanations.AxiomSelectionModel;
 import org.semanticweb.elk.explanations.WorkbenchManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
@@ -65,7 +64,7 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 	
 	private static final Set<AxiomType<?>> EDITABLE_AXIOM_TYPES = new HashSet<AxiomType<?>>(Arrays.<AxiomType<?>>asList(AxiomType.SUBCLASS_OF, AxiomType.OBJECT_PROPERTY_DOMAIN, AxiomType.OBJECT_PROPERTY_RANGE, AxiomType.EQUIVALENT_CLASSES));
 
-    public ProofFrameList(OWLEditorKit editorKit, AxiomSelectionModel axiomSelectionModel, WorkbenchManager workbenchManager, ProofFrame proofFrame) {
+    public ProofFrameList(OWLEditorKit editorKit, WorkbenchManager workbenchManager, ProofFrame proofFrame) {
         super(editorKit, proofFrame);
         
         setCellRenderer(new ProofFrameListRenderer(editorKit));

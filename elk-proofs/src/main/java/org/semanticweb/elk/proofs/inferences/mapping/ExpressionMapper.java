@@ -199,8 +199,8 @@ public class ExpressionMapper {
 			IndexedClassExpression subsumer = ax.getClassExpression().accept(indexer_);
 			
 			TracingInput input = !entailmentChecker_.isDerivedSubsumer(subsumee, subsumer) && !entailmentChecker_.isSatisfiable(subsumee) 
-					? new ClassTracingInput(subsumee, new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer))
-					: new ClassTracingInput(subsumee, ContradictionImpl.getInstance());
+					? new ClassTracingInput(subsumee, ContradictionImpl.getInstance())
+					: new ClassTracingInput(subsumee, new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer));
 			
 			return Collections.singleton(input);
 		}

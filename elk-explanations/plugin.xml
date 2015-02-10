@@ -9,15 +9,13 @@
     <extension id="ProofBasedExplanation"
                point="org.protege.editor.owl.explanation">
         <name value="Proof Based Explanation"/>
-        <!--class value="uk.ac.manchester.cs.owl.explanation.JustificationBasedExplanationServiceImpl"/-->
         <class value="org.semanticweb.elk.explanations.ProofBasedExplanationService"/>
     </extension>
 
-
-    <!--extension id="BlackBoxInconsistentOntologyExplanationGenerator"
+    <extension id="ProofBasedInconsistencyExplanation"
                point="org.protege.editor.owl.inconsistentOntologyExplanation">
-        <class value="org.semanticweb.elk.explanations.InconsistentOntologyExplanationPluginImpl"/>
-        <name value="Inconsistent Ontology Explanation"/>
-    </extension-->
+        <class value="org.semanticweb.elk.explanations.ProofBasedInconsistencyExplanationPlugin"/>
+        <name value="Proof Based Inconsistent Ontology Explanation"/>
+    </extension>
 
 </plugin>

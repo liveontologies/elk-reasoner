@@ -21,9 +21,6 @@ package org.semanticweb.elk.explanations;
  * #L%
  */
 
-import java.util.Set;
-
-import org.semanticweb.owl.explanation.api.Explanation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 /**
@@ -40,9 +37,14 @@ public class WorkbenchManager {
 
     private OWLAxiom entailment;
     
-    public WorkbenchManager(ProofManager justificationManager, OWLAxiom entailment) {
-        this.proofManager = justificationManager;
+    public WorkbenchManager(ProofManager proofManager, OWLAxiom entailment) {
+        this.proofManager = proofManager;
         this.entailment = entailment;
+    }
+    
+    public WorkbenchManager(ProofManager proofManager) {
+        this.proofManager = proofManager;
+        this.entailment = null;
     }
 
     public WorkbenchSettings getWorkbenchSettings() {
@@ -53,30 +55,8 @@ public class WorkbenchManager {
         return entailment;
     }
 
-/*    public Set<Explanation<OWLAxiom>> getJustifications(OWLAxiom entailment) {
-        JustificationType justificationType = workbenchSettings.getJustificationType();
-        return proofManager.getJustifications(entailment, justificationType);
-    }
-
-    public int getJustificationCount(OWLAxiom entailment) {
-        JustificationType justificationType = workbenchSettings.getJustificationType();
-        return proofManager.getComputedExplanationCount(entailment, justificationType);
-    }
-
-
-*/    public ProofManager getProofManager() {
+    public ProofManager getProofManager() {
         return proofManager;
     }
-    
-/*    public int getPopularity(OWLAxiom axiom) {
-        int count = 0;
-        Set<Explanation<OWLAxiom>> justifications = proofManager.getJustifications(entailment, workbenchSettings.getJustificationType());
-        for(Explanation<OWLAxiom> justification : justifications) {
-            if(justification.contains(axiom)) {
-                count++;
-            }
-        }
-        return count;
-    }*/
     
 }

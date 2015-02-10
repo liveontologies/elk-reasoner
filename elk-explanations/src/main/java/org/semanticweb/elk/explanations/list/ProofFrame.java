@@ -55,10 +55,10 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 
     private final OWLRenderer renderer_;
 	
-    public ProofFrame(CycleFreeProofRoot proofRoot, OWLRenderer renderer, OWLOntology active) {
+    public ProofFrame(CycleFreeProofRoot proofRoot, OWLRenderer renderer, OWLOntology active, String title) {
     	renderer_ = renderer;
     	rootExpression_ = proofRoot;
-    	rootSection_ = new ProofFrameSection(this, Collections.singletonList(proofRoot), "Proof tree", 0, renderer);
+    	rootSection_ = new ProofFrameSection(this, Collections.singletonList(proofRoot), title, 0, renderer);
     	rootSection_.refill(active);
     }
 
