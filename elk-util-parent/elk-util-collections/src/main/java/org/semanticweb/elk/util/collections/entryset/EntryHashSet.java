@@ -156,7 +156,7 @@ public class EntryHashSet<E extends Entry<E>> extends AbstractCollection<E> {
 		while (capacity < initialCapacity)
 			capacity <<= 1;
 
-		this.underloadFactor = overloadFactor;
+		this.underloadFactor = underloadFactor;
 		this.overloadFactor = overloadFactor;
 		this.minsize = initialCapacity;
 		undersize = (int) (capacity * underloadFactor);
