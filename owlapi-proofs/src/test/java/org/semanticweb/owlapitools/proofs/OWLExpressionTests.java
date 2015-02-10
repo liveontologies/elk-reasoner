@@ -53,6 +53,7 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
 import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
 import org.semanticweb.owlapitools.proofs.util.CycleBlocking;
 import org.semanticweb.owlapitools.proofs.util.GenericLemmaElimination;
+import org.semanticweb.owlapitools.proofs.util.OWLInferenceGraph;
 import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
 import org.semanticweb.owlapitools.proofs.util.TransformedOWLAxiomExpression;
 
@@ -90,6 +91,31 @@ public class OWLExpressionTests {
 	}
 	
 	@Test
+	public void blockCyclicProof2() throws Exception {
+		MockOWLAxiomExpression root = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(A, B), false);		
+		MockOWLAxiomExpression inf1P1 = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(B, C));
+		MockOWLAxiomExpression inf1P2 = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(C, D), false);
+		MockOWLAxiomExpression inf2P1 = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(D, E));
+		MockOWLAxiomExpression inf2P2 = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(C, E));
+		
+		root
+			.addInference(new MockOWLInference(INF_PREFIX, root, Arrays.<OWLExpression>asList(inf1P1, inf1P2)))
+			.addInference(new MockOWLInference(INF_PREFIX, root, Arrays.<OWLExpression>asList(inf2P1, inf2P2)));
+
+		inf1P2.addInference(new MockOWLInference(INF_PREFIX, inf1P2, Arrays.<OWLExpression>asList(root, root)));
+		
+		OWLInferenceGraph graph = OWLProofUtils.computeInferenceGraph(root);
+		
+		//System.err.println(graph);
+		
+		OWLExpression blocked = new TransformedOWLAxiomExpression<CycleBlocking>(root, new CycleBlocking(root, graph)); 
+				
+		assertEquals(2, getNumberOfInferences(root));
+		// only one inference remains since the other is cyclic
+		assertEquals(1, getNumberOfInferences(blocked));
+	}
+	
+	@Test
 	public void lemmaEliminationRoleChain() throws Exception {
 		MockOWLAxiomExpression aSubG = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(A, G));
 		MockOWLAxiomExpression aSubR1B = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(A, FACTORY.getOWLObjectSomeValuesFrom(R1, B)));
@@ -116,7 +142,7 @@ public class OWLExpressionTests {
 
 			@Override
 			public Void visit(OWLAxiomExpression expression) {
-				System.err.println(expression);
+				//System.err.println(expression);
 				return null;
 			}
 

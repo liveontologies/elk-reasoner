@@ -44,71 +44,75 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 public class RecursiveBlocking extends BlockingCondition {
 
 	protected final OWLInferenceGraph infGraph;
-	
+
 	public RecursiveBlocking(OWLExpression expr, Set<OWLExpression> blocked, OWLInferenceGraph iGraph) {
 		super(blockRecursively(expr, blocked, iGraph));
-		
+
 		infGraph = iGraph;
 	}
-	
+
 	OWLInferenceGraph getOWLInferenceGraph() {
 		return infGraph;
 	}
-	
+
 	// recursively blocks all expressions which are derived using the given expression or any expression blocked by the parent expression.
 	static Set<OWLExpression> blockRecursively(OWLExpression newExpr, Set<OWLExpression> blocked, OWLInferenceGraph infGraph) {
 		// TODO avoid copying, use something like Lisp-style lists or lazy set unions
 		Set<OWLExpression> newSet = new HashSet<OWLExpression>(blocked);
-		Set<OWLInference> blockedInferences = new HashSet<OWLInference>();
+		//Set<OWLInference> blockedInferences = new HashSet<OWLInference>();
 		Queue<OWLExpression> toDo = new ArrayDeque<OWLExpression>();
-		
+
 		toDo.add(newExpr);
 		//FIXME
 		//System.err.println("Blocking: " + newExpr);
 		//System.err.println("Parent blocks: " + blocked);
-		
+
 		for (;;) {
 			OWLExpression next = toDo.poll();
-			
+
 			if (next == null) {
 				break;
 			}
-			
+
 			if (newSet.add(next)) {
 				//FIXME
 				//System.err.println("Blocked: " + next);
-				
-				for (OWLInference inf : infGraph.getInferencesForPremise(next)) {
-					// blocking the inference which has at least one blocked premise
-					if (blockedInferences.add(inf)) {
-						boolean nonBlockedInferenceExists = false;
 
-						try {
-							for (OWLInference altInf : inf.getConclusion().getInferences()) {
-								if (!blockedInferences.contains(altInf)) {
-									nonBlockedInferenceExists = true;
+				for (OWLInference inf : infGraph.getInferencesForPremise(next)) {
+					boolean nonBlockedInferenceExists = false;
+
+					try {
+						for (OWLInference altInf : inf.getConclusion().getInferences()) {
+							boolean nonBlockedInference = true;
+
+							for (OWLExpression premise : altInf.getPremises()) {
+								if (newSet.contains(premise)) {
+									nonBlockedInference = false;
 									break;
 								}
 							}
-							// blocking the conclusion of the blocked inference
-							// if it doesn't have alternative inferences
-							if (!nonBlockedInferenceExists) {
-								toDo.add(inf.getConclusion());
+
+							if (nonBlockedInference) {
+								nonBlockedInferenceExists = true;
+								break;
 							}
-						} catch (ProofGenerationException e) {
-							// we don't handle it here because if proof
-							// generation failed
-							// for whatever reason, we wouldn't even start cycle
-							// blocking because we couldn't have generated the
-							// inference graph
-							throw new RuntimeException("Unexpected proof generation error", e);
 						}
+						// blocking the conclusion of the blocked inference
+						// if it doesn't have alternative inferences
+						if (!nonBlockedInferenceExists) {
+							toDo.add(inf.getConclusion());
+						}
+					} catch (ProofGenerationException e) {
+						// we don't handle it here because if proof
+						// generation failed for whatever reason, we wouldn't even start cycle
+						// blocking because we couldn't have generated the inference graph
+						throw new RuntimeException("Unexpected proof generation error", e);
 					}
 				}
 			}
 		}
-		
+
 		return newSet;
 	}
-	
+
 }

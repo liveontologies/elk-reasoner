@@ -57,18 +57,18 @@ public class TransformedOWLInference<T extends OWLInferenceTransformation> imple
 
 	protected TransformedOWLExpression<?, T> propagateTransformation(OWLExpression expr) {
 		// FIXME get rid of the cast later
-		T updated = (T) transformation.update(inference, expr);
+		final T updated = (T) transformation.update(inference, expr);
 		
 		return expr.accept(new OWLExpressionVisitor<TransformedOWLExpression<?, T>>() {
 
 			@Override
 			public TransformedOWLExpression<?, T> visit(OWLAxiomExpression expression) {
-				return new TransformedOWLAxiomExpression<T>(expression, transformation);
+				return new TransformedOWLAxiomExpression<T>(expression, updated);
 			}
 
 			@Override
 			public TransformedOWLExpression<?, T> visit(OWLLemmaExpression expression) {
-				return new TransformedOWLLemmaExpression<T>(expression, transformation);
+				return new TransformedOWLLemmaExpression<T>(expression, updated);
 			}
 			
 		});

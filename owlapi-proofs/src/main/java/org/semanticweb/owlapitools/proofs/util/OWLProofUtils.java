@@ -94,6 +94,8 @@ public class OWLProofUtils {
 			for (OWLInference inf : next.getInferences()) {
 				graph.addInference(inf);
 				// Recursively unwind premise inferences
+				//Set<OWLExpression> uniquePremises = new HashSet<OWLExpression>(inf.getPremises()); 
+				
 				for (OWLExpression premise : inf.getPremises()) {
 					
 					if (done.add(premise)) {

@@ -45,7 +45,7 @@ public class CycleBlocking extends RecursiveBlocking {
 		super(expr, Collections.<OWLExpression>emptySet(), ig);
 	}
 	
-	public CycleBlocking(OWLExpression expr, Set<OWLExpression> blockedExpressions, OWLInferenceGraph infGraph) {
+	CycleBlocking(OWLExpression expr, Set<OWLExpression> blockedExpressions, OWLInferenceGraph infGraph) {
 		// child constructor
 		super(expr, blockedExpressions, infGraph);
 	}
