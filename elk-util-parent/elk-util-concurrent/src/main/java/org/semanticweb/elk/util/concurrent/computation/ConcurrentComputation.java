@@ -63,6 +63,10 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>>
 	 * the internal buffer for queuing input
 	 */
 	private final BlockingQueue<I> buffer_;
+	/**
+	 * the capacity of the buffer
+	 */
+	private final int bufferCapacity_;
 
 	/**
 	 * a special object to "wake up" worker threads waiting for the input
@@ -99,6 +103,7 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>>
 			ComputationExecutor executor, int maxWorkers, int bufferCapacity) {
 		this.inputProcessorFactory_ = inputProcessorFactory;
 		this.buffer_ = new ArrayBlockingQueue<I>(bufferCapacity);
+		this.bufferCapacity_ = bufferCapacity;
 		this.termination_ = false;
 		this.worker_ = new Worker();
 		this.executor_ = executor;
@@ -213,7 +218,6 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>>
 	private class Worker implements Runnable {
 		@Override
 		public final void run() {
-			I nextInput = null;
 			// we use one engine per worker run
 			InputProcessor<I> inputProcessor = inputProcessorFactory_
 					.getEngine();
@@ -228,7 +232,7 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>>
 						if (!isInterrupted())
 							previousProcessed = true;
 					}
-					nextInput = buffer_.take();
+					I nextInput = buffer_.take();
 					if (nextInput != poison_pill_) {
 						inputProcessor.submit(nextInput); // should not fail
 						inputProcessor.process(); // can be interrupted
@@ -240,6 +244,12 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>>
 							break;
 						}
 						if (isInterrupted()) {
+							if (buffer_.size() == bufferCapacity_) {
+								// buffer is full, producer may be blocked,
+								// need to consume one more input
+								continue;
+							}
+							// else
 							break;
 						}
 					}
