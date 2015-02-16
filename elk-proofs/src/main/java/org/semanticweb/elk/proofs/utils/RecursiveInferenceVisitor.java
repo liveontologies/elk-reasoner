@@ -30,7 +30,6 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.proofs.ProofReader;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
@@ -49,12 +48,6 @@ public class RecursiveInferenceVisitor {
 	
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveInferenceVisitor.class);
 
-	public static void visitInferences(ProofReader reader, ElkClassExpression subsumee, ElkClassExpression subsumer, InferenceVisitor<?, ?> visitor) throws ElkException {
-		DerivedExpression next = reader.getProofRoot(subsumee, subsumer);
-		
-		visitInferences(next, visitor);
-	}
-	
 	public static void visitInferences(DerivedExpression root, InferenceVisitor<?, ?> visitor) throws ElkException {
 		DerivedExpression next = root;
 		// start recursive unwinding

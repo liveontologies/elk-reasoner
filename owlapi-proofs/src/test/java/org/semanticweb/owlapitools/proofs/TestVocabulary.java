@@ -55,4 +55,9 @@ public class TestVocabulary {
 	public static final OWLObjectProperty R3 = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "R3"));
 	public static final OWLObjectProperty R4 = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "R4"));
 	public static final OWLObjectProperty R5 = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "R5"));
+	public static final OWLObjectProperty S1 = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "S1"));
+	public static final OWLObjectProperty S2 = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "S2"));
+	public static final OWLObjectProperty S3 = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "S3"));
+	public static final OWLObjectProperty S4 = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "S4"));
+	public static final OWLObjectProperty S5 = FACTORY.getOWLObjectProperty(IRI.create(PREFIX + "S5"));
 }

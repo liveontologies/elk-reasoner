@@ -64,7 +64,6 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
@@ -647,7 +646,7 @@ public abstract class AbstractReasonerState {
 		
 		traceState.clearTracingMap();
 		traceState.addConclusionToTrace(inconsistentEntity, ContradictionImpl.getInstance());
-		trace();
+		trace(false);
 		traceState.clearTracingMap();
 
 		return inconsistentEntity.accept(new IndexedClassEntityVisitor<ElkEntity>() {
@@ -673,8 +672,11 @@ public abstract class AbstractReasonerState {
 		traceState.addConclusionToTrace(subsumee, convertTraceTarget(subsumee, subsumer));
 	}
 	
-	public TraceStore.Reader trace() throws ElkException {
-		stageManager.inferenceTracingStage.invalidate();
+	public TraceStore.Reader trace(boolean forceTrace) throws ElkException {
+		if (forceTrace) {
+			stageManager.inferenceTracingStage.invalidate();
+		}
+		
 		getStageExecutor().complete(stageManager.inferenceTracingStage);
 		
 		return traceState.getTraceStore().getReader();
@@ -689,7 +691,7 @@ public abstract class AbstractReasonerState {
 			traceState.addConclusionToTrace(subsumee, convertTraceTarget(subsumee, subsumer));
 		}
 		
-		trace();
+		trace(true);
 		traceState.clearTracingMap();
 	}
 	
@@ -702,17 +704,6 @@ public abstract class AbstractReasonerState {
 		// shouldn't happen if we suppport only named classes or abbreviate
 		// class expressions and saturate them prior to tracing
 		return true;
-	}
-	
-	boolean isSubsumerDerived(IndexedClassExpression subsumee, IndexedClassExpression subsumer) {
-		Context subsumeeContext = saturationState.getContext(subsumee);
-		
-		if (subsumeeContext != null) {
-			return subsumeeContext.containsConclusion(new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer))
-					|| subsumeeContext.containsConclusion(new ComposedSubsumerImpl<IndexedClassExpression>(subsumer));
-		}
-		
-		return false;
 	}
 	
 	private Conclusion convertTraceTarget(IndexedClassExpression subsumee, IndexedClassExpression subsumer) {

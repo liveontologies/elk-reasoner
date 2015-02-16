@@ -206,7 +206,7 @@ public class RandomConcurrentTracingTaskCollection implements VisitorTaskCollect
 		@Override
 		public void run() throws TaskException {
 			try {
-				reasoner.trace();
+				reasoner.trace(true);
 				
 			} catch (ElkException e) {
 				throw new TaskException(e);

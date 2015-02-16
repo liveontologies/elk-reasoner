@@ -33,9 +33,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface EntailmentChecker {
+public interface SatisfiabilityChecker {
 
 	public boolean isSatisfiable(IndexedClassExpression ice);
 	
-	public boolean isDerivedSubsumer(IndexedClassExpression subsumee, IndexedClassExpression subsumer);
+	//public boolean isDerivedSubsumer(IndexedClassExpression subsumee, IndexedClassExpression subsumer);
 }

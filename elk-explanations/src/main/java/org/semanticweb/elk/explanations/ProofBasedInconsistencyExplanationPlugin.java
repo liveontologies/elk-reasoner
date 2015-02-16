@@ -28,11 +28,8 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.explanation.io.InconsistentOntologyPluginInstance;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 /**
  * Author: Matthew Horridge<br>
@@ -49,12 +46,9 @@ public class ProofBasedInconsistencyExplanationPlugin implements InconsistentOnt
     }
 
     public void explain(OWLOntology ontology) {
-        OWLModelManager owlModelManager = editorKit.getOWLModelManager();
-        OWLDataFactory df = owlModelManager.getOWLDataFactory();
         final ProofWorkbenchPanel panel = new ProofWorkbenchPanel(editorKit);
-
         JOptionPane op = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION);
-        JDialog dlg =op.createDialog("Inconsistent ontology explanation");
+        JDialog dlg = op.createDialog("Inconsistent ontology explanation");
         
         dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dlg.addComponentListener(new ComponentAdapter() {

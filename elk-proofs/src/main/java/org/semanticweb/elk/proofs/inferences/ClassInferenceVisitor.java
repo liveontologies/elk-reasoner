@@ -37,6 +37,7 @@ import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialAxiomComposi
 import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialLemmaComposition;
 import org.semanticweb.elk.proofs.inferences.classes.NegationContradiction;
 import org.semanticweb.elk.proofs.inferences.classes.ReflexiveExistentialComposition;
+import org.semanticweb.elk.proofs.inferences.classes.UnsatisfiabilityInference;
 
 /**
  * 
@@ -71,5 +72,7 @@ public interface ClassInferenceVisitor<I, O> {
 	public O visit(NaryExistentialAxiomComposition inf, I input);
 	
 	public O visit(NaryExistentialLemmaComposition inf, I input);
+	
+	public O visit(UnsatisfiabilityInference inf, I input);
 
 }

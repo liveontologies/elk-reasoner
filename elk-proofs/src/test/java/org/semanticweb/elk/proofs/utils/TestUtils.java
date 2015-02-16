@@ -34,9 +34,9 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.proofs.InferenceGraph;
 import org.semanticweb.elk.proofs.ProofReader;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * Utilities for testing proofs
@@ -49,29 +49,34 @@ public class TestUtils {
 
 	// tests that each derived expression is provable. an expression is provable
 	// if either it doesn't require a proof (i.e. is a tautology or asserted) or
-	// returns at least one inference such that each of the premises is
-	// provable.
+	// returns at least one inference such that each of the premises is provable.
 	public static void provabilityOfSubsumptionTest(ProofReader reader, ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
-		InferenceGraph graph = ProofReader.readInferenceGraph(reader, sub, sup);
+		DerivedAxiomExpression<?> root = reader.getProofRoot(sub, sup);
+		InferenceGraph graph = ProofReader.readInferenceGraph(root);
+		
+		//FIXME
+		//System.out.println("Inference graph for " + root);
+		//System.out.println(graph);
+		
+		if (!graph.getExpressions().contains(root) && !root.isAsserted()) {
+			throw new AssertionError(root + " isn't derived!");
+		}
 		
 		provabilityTest(graph, graph.getExpressions());
+		
+		
 	}
 	
 	public static void provabilityOfInconsistencyTest(ProofReader reader) throws ElkException {
-		Pair<InferenceGraph, DerivedExpression> graphAndInconsistencyExpr = ProofReader.readInferenceGraphForInconsistency(reader);
-		// only the expression which corresponds to inconsistency has to be explained
-		provabilityTest(graphAndInconsistencyExpr.getFirst(), 
-				Collections.singleton(graphAndInconsistencyExpr.getSecond()));
+		DerivedExpression root = reader.getProofRootForInconsistency();
+		InferenceGraph graph = ProofReader.readInferenceGraph(root);
+		// only the expression which corresponds to inconsistency has to be
+		// explained, others aren't guaranteed to be derived since inconsistency
+		// aborts reasoning
+		provabilityTest(graph, Collections.singleton(root));
 	}
 	
 	public static void provabilityTest(InferenceGraph graph, Iterable<? extends DerivedExpression> toCheck) throws ElkException {
-		//FIXME
-		//System.out.println(graph);
-		
-		if (graph.getExpressions().isEmpty()) {
-			throw new AssertionError(String.format("The inference graph is empty"));
-		}
-		
 		Set<DerivedExpression> proved = new HashSet<DerivedExpression>(graph.getExpressions().size());
 		Queue<DerivedExpression> toDo = new LinkedList<DerivedExpression>(graph.getRootExpressions()); 
 		
@@ -88,14 +93,14 @@ public class TestUtils {
 						toDo.add(inf.getConclusion());
 						
 						//FIXME
-						System.err.println("Proved: " + inf.getConclusion() + " by " + inf);
+						//System.err.println("Proved: " + inf.getConclusion() + " by " + inf);
 					}
 				}
 			}
 		}
 		
 		for (DerivedExpression expr : toCheck) {
-			if (!proved.contains(expr)) {
+			if (!proved.contains(expr) && !ProofUtils.isAsserted(expr)) {
 				throw new AssertionError(String.format("There is no acyclic proof of %s", expr));
 			}
 		}

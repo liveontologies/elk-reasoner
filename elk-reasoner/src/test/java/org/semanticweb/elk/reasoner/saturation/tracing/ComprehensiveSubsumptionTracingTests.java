@@ -83,9 +83,7 @@ public class ComprehensiveSubsumptionTracingTests implements TracingTests {
 			visitEquivalentClassesTracingTasks(next, visitor);
 	
 			for (TaxonomyNode<ElkClass> subNode : next.getDirectSubNodes()) {
-				if (subNode != classTaxonomy_.getBottomNode() && next != classTaxonomy_.getTopNode()) {
-					visitTracingTasksForDirectSubClasses(subNode, next, visitor);
-				}
+				visitTracingTasksForDirectSubClasses(subNode, next, visitor);
 				
 				if (visited.add(subNode)) {
 					toDo.push(subNode);

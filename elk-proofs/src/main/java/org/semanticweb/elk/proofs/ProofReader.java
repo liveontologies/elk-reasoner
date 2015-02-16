@@ -24,6 +24,9 @@ package org.semanticweb.elk.proofs;
  * #L%
  */
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
@@ -32,12 +35,12 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.transformations.InferenceTransformation;
+import org.semanticweb.elk.proofs.transformations.OneStepCyclicInferenceFilter;
 import org.semanticweb.elk.proofs.transformations.TransformedAxiomExpression;
 import org.semanticweb.elk.proofs.transformations.lemmas.LemmaElimination;
 import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
-import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * The main entrance point for accessing proofs.
@@ -48,17 +51,23 @@ import org.semanticweb.elk.util.collections.Pair;
  */
 public class ProofReader {
 
-	// TODO support more than one (i.e. nested) transformation, it's easy
-	private InferenceTransformation inferenceTransformation_;
+	private LemmaElimination lemmaElimination_;
+	// mandatory transformations which should be applied after lemma elimination
+	// (after because lemma elimination can introduce new expressions whose
+	// inferences must then be transformed)
+	private final List<InferenceTransformation> transformations_;
 	
 	private final ReasonerInferenceReader reader_;
 	
+	
 	public ProofReader(Reasoner r) {
 		reader_ = new ReasonerInferenceReader(r);
+		transformations_ = new LinkedList<InferenceTransformation>();
+		transformations_.add(new OneStepCyclicInferenceFilter());
 	}
 	
 	public ProofReader eliminateLemmas() {
-		inferenceTransformation_ = new LemmaElimination(reader_);
+		lemmaElimination_ = new LemmaElimination(reader_);
 		
 		return this;
 	}
@@ -88,11 +97,17 @@ public class ProofReader {
 	}
 	
 	private <E extends ElkAxiom> DerivedAxiomExpression<E> applyTransformation(DerivedAxiomExpression<E> root) {
-		if (inferenceTransformation_ != null) {
-			root = new TransformedAxiomExpression<InferenceTransformation, E>(root, inferenceTransformation_);
+		DerivedAxiomExpression<E> top = root;
+		
+		if (lemmaElimination_ != null) {
+			top = new TransformedAxiomExpression<InferenceTransformation, E>(top, lemmaElimination_);
 		}
 		
-		return root;
+		for (InferenceTransformation t : transformations_) {
+			top = new TransformedAxiomExpression<InferenceTransformation, E>(top, t);
+		}
+		
+		return top;
 	}
 	
 	/**
@@ -104,24 +119,8 @@ public class ProofReader {
 	 * @return
 	 * @throws ElkException
 	 */
-	public static InferenceGraph readInferenceGraph(ProofReader reader, ElkClassExpression subsumee, ElkClassExpression subsumer) throws ElkException {
+	public static InferenceGraph readInferenceGraph(DerivedExpression root) throws ElkException {
 		final InferenceGraphImpl graph = new InferenceGraphImpl();
-		
-		RecursiveInferenceVisitor.visitInferences(reader, subsumee, subsumer, new AbstractInferenceVisitor<Void, Void>() {
-
-			@Override
-			protected Void defaultVisit(Inference inference, Void input) {
-				graph.addInference(inference);
-				return null;
-			}
-		});
-		
-		return graph;
-	}
-	
-	public static Pair<InferenceGraph, DerivedExpression> readInferenceGraphForInconsistency(ProofReader reader) throws ElkException {
-		final InferenceGraphImpl graph = new InferenceGraphImpl();
-		DerivedExpression root = reader.getProofRootForInconsistency();
 		
 		RecursiveInferenceVisitor.visitInferences(root, new AbstractInferenceVisitor<Void, Void>() {
 
@@ -132,7 +131,7 @@ public class ProofReader {
 			}
 		});
 		
-		return Pair.<InferenceGraph, DerivedExpression>create(graph, root);
+		return graph;
 	}
 	
 }

@@ -58,8 +58,7 @@ public class RecursiveBlocking extends BlockingCondition {
 	// recursively blocks all expressions which are derived using the given expression or any expression blocked by the parent expression.
 	static Set<OWLExpression> blockRecursively(OWLExpression newExpr, Set<OWLExpression> blocked, OWLInferenceGraph infGraph) {
 		// TODO avoid copying, use something like Lisp-style lists or lazy set unions
-		Set<OWLExpression> newSet = new HashSet<OWLExpression>(blocked);
-		//Set<OWLInference> blockedInferences = new HashSet<OWLInference>();
+		Set<OWLExpression> nowBlocked = new HashSet<OWLExpression>(blocked);
 		Queue<OWLExpression> toDo = new ArrayDeque<OWLExpression>();
 
 		toDo.add(newExpr);
@@ -74,19 +73,25 @@ public class RecursiveBlocking extends BlockingCondition {
 				break;
 			}
 
-			if (newSet.add(next)) {
+			if (nowBlocked.add(next)) {
 				//FIXME
 				//System.err.println("Blocked: " + next);
 
 				for (OWLInference inf : infGraph.getInferencesForPremise(next)) {
 					boolean nonBlockedInferenceExists = false;
+					OWLExpression conclusion = inf.getConclusion();
+					
+					if (OWLProofUtils.isAsserted(conclusion)) {
+						// never block asserted expressions
+						continue;
+					}
 
 					try {
-						for (OWLInference altInf : inf.getConclusion().getInferences()) {
+						for (OWLInference altInf : conclusion.getInferences()) {
 							boolean nonBlockedInference = true;
 
 							for (OWLExpression premise : altInf.getPremises()) {
-								if (newSet.contains(premise)) {
+								if (nowBlocked.contains(premise)) {
 									nonBlockedInference = false;
 									break;
 								}
@@ -100,7 +105,9 @@ public class RecursiveBlocking extends BlockingCondition {
 						// blocking the conclusion of the blocked inference
 						// if it doesn't have alternative inferences
 						if (!nonBlockedInferenceExists) {
-							toDo.add(inf.getConclusion());
+							if (!nowBlocked.contains(conclusion)) {
+								toDo.add(conclusion);
+							}
 						}
 					} catch (ProofGenerationException e) {
 						// we don't handle it here because if proof
@@ -112,7 +119,7 @@ public class RecursiveBlocking extends BlockingCondition {
 			}
 		}
 
-		return newSet;
+		return nowBlocked;
 	}
 
 }

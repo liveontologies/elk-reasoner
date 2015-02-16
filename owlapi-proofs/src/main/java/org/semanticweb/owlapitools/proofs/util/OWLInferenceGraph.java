@@ -49,6 +49,8 @@ public class OWLInferenceGraph {
 
 	private final Set<OWLExpression> roots_;
 	
+	private boolean rootsUpdated = false;
+	
 	private final Map<OWLExpression, List<OWLInference>> nodes_;
 	
 	public OWLInferenceGraph() {
@@ -57,7 +59,21 @@ public class OWLInferenceGraph {
 	}
 	
 	public Collection<OWLExpression> getRootExpressions() {
+		if (!rootsUpdated) {
+			updateRoots();
+		}
+		
 		return Collections.unmodifiableCollection(roots_);
+	}
+	
+	private void updateRoots() {
+		for (OWLExpression expr : nodes_.keySet()) {
+			if (OWLProofUtils.isAsserted(expr)) {
+				roots_.add(expr);
+			}
+		}
+		
+		rootsUpdated = true;
 	}
 
 	public Collection<OWLInference> getInferencesForPremise(OWLExpression expression) {
@@ -69,11 +85,6 @@ public class OWLInferenceGraph {
 	}
 	
 	boolean addExpression(OWLExpression expr) {
-		// asserted expressions are roots
-		if (OWLProofUtils.isAsserted(expr)) {
-			roots_.add(expr);
-		}
-		
 		if (nodes_.containsKey(expr)) {
 			return false;
 		}
@@ -84,6 +95,8 @@ public class OWLInferenceGraph {
 	}
 	
 	void addInference(OWLInference inf) {
+		rootsUpdated = false;
+		
 		for (OWLExpression premise : inf.getPremises()) {
 			addExpression(premise);
 			
@@ -91,12 +104,10 @@ public class OWLInferenceGraph {
 		}
 		
 		addExpression(inf.getConclusion());
-		// could get inferences whose premises were all filtered out for some reason (i.e. they are all tautologies), e.g. (A <= A, A <= A) |- A <= A and A 
-		if (inf.getPremises().isEmpty() || OWLProofUtils.isAsserted(inf.getConclusion())) {
+ 
+		if (inf.getPremises().isEmpty()) {
+			// some expressions are roots because they're produced by initialization inferences (or inferences whose premises are all tautologies, e.g. (A<=A, A<=A) |- A <= A and A)
 			roots_.add(inf.getConclusion());
-		}
-		else {
-			roots_.remove(inf.getConclusion());			
 		}
 	}
 
@@ -112,6 +123,5 @@ public class OWLInferenceGraph {
 		
 		return builder.toString();
 	}
-	
 	
 }

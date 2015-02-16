@@ -35,11 +35,13 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.AbstractElkClassExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceChecker;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexObjectSomeValuesFrom;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaVisitor;
@@ -69,12 +71,9 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Tol
  */
 public class ExpressionMapper {
 	
-	private final EntailmentChecker entailmentChecker_;
-	
 	private final IndexObjectConverter indexer_;
 	
-	public ExpressionMapper(IndexObjectConverter indexer, EntailmentChecker checker) {
-		entailmentChecker_ = checker;
+	public ExpressionMapper(IndexObjectConverter indexer) {
 		indexer_ = indexer;
 	}
 
@@ -111,8 +110,7 @@ public class ExpressionMapper {
 					new ElkComplexClassExpressionVisitor<Void, Conclusion>() {
 
 						@Override
-						public Conclusion visit(
-								ElkComplexObjectSomeValuesFrom ce, Void input) {
+						public Conclusion visit(ElkComplexObjectSomeValuesFrom ce, Void input) {
 							// a forward link
 							IndexedPropertyChain chain = ce.getPropertyChain()
 									.accept(indexer_);
@@ -124,12 +122,8 @@ public class ExpressionMapper {
 
 					}, input);
 
-			if (entailmentChecker_.isSatisfiable(subsumee)) {
-				return singleton(new ClassTracingInput(subsumee, subsumer));
-			}
-			else {
-				return Arrays.<TracingInput>asList(new ClassTracingInput(subsumee, subsumer), new ClassTracingInput(subsumee, ContradictionImpl.getInstance()));
-			}
+			return singleton(new ClassTracingInput(subsumee, subsumer));
+			
 		}
 
 		@Override
@@ -157,13 +151,10 @@ public class ExpressionMapper {
 		@Override
 		public Iterable<TracingInput> visit(ElkSubClassOfAxiom ax) {
 			IndexedClassExpression subsumee = getIndexedSubClassOf(ax.getSubClassExpression());
-			IndexedClassExpression subsumer = ax.getSuperClassExpression().accept(indexer_);
-			Conclusion subsumerConclusion = new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer);
+			ElkClassExpression sup = ax.getSuperClassExpression();
+			IndexedClassExpression subsumer = sup.accept(indexer_);
+			Conclusion subsumerConclusion = isNothing(sup) ? ContradictionImpl.getInstance() : new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer);
 			TracingInput subsumptionInput = new ClassTracingInput(subsumee, subsumerConclusion);
-			
-			subsumptionInput = !entailmentChecker_.isDerivedSubsumer(subsumee, subsumer) && !entailmentChecker_.isSatisfiable(subsumee)
-					? new ClassTracingInput(subsumee, ContradictionImpl.getInstance()) 
-					: subsumptionInput;
 			
 			if (subsumer instanceof IndexedObjectSomeValuesFrom) {
 				IndexedObjectSomeValuesFrom existential = (IndexedObjectSomeValuesFrom) subsumer;
@@ -198,9 +189,8 @@ public class ExpressionMapper {
 			IndexedClassExpression subsumee = ax.getIndividual().accept(indexer_);
 			IndexedClassExpression subsumer = ax.getClassExpression().accept(indexer_);
 			
-			TracingInput input = !entailmentChecker_.isDerivedSubsumer(subsumee, subsumer) && !entailmentChecker_.isSatisfiable(subsumee) 
-					? new ClassTracingInput(subsumee, ContradictionImpl.getInstance())
-					: new ClassTracingInput(subsumee, new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer));
+			Conclusion conclusion = isNothing(ax.getClassExpression()) ? ContradictionImpl.getInstance() : new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer);
+			TracingInput input = new ClassTracingInput(subsumee, conclusion);
 			
 			return Collections.singleton(input);
 		}
@@ -223,6 +213,10 @@ public class ExpressionMapper {
 
 		private Iterable<TracingInput> singleton(TracingInput input) {
 			return Collections.singletonList(input);
+		}
+		
+		private boolean isNothing(ElkClassExpression ce) {
+			return StructuralEquivalenceChecker.equal(ce, PredefinedElkClass.OWL_NOTHING);
 		}
 
 	}

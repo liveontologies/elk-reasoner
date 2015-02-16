@@ -27,6 +27,7 @@ package org.semanticweb.elk.owlapi.proofs;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,24 +62,20 @@ public class ProofTestUtils {
 
 	public static void provabilityTest(ExplainingOWLReasoner reasoner, OWLSubClassOfAxiom axiom) throws ProofGenerationException {
 		OWLExpression root = reasoner.getDerivedExpression(axiom);
+		OWLInferenceGraph graph = OWLProofUtils.computeInferenceGraph(root);
 		
-		provabilityTest(root);
+		provabilityTest(graph, graph.getExpressions());
 	}
 	
 	public static void provabilityOfInconsistencyTest(ExplainingOWLReasoner reasoner) throws ProofGenerationException {
 		OWLExpression root = reasoner.getDerivedExpressionForInconsistency();
+		OWLInferenceGraph graph = OWLProofUtils.computeInferenceGraph(root);
 		
-		provabilityTest(root);
+		provabilityTest(graph, Collections.singleton(root));
 	}
 	
 	// tests that each derived expression is provable
-	static void provabilityTest(OWLExpression root) throws ProofGenerationException {
-		OWLInferenceGraph graph = OWLProofUtils.computeInferenceGraph(root);
-
-		if (graph.getExpressions().isEmpty()) {
-			throw new AssertionError(String.format("There is no proof of %s", root));
-		}
-
+	static void provabilityTest(OWLInferenceGraph graph, Iterable<OWLExpression> expressions) throws ProofGenerationException {
 		Set<OWLExpression> proved = new HashSet<OWLExpression>(graph.getExpressions().size());
 		Queue<OWLExpression> toDo = new LinkedList<OWLExpression>(graph.getRootExpressions()); 
 
@@ -98,8 +95,8 @@ public class ProofTestUtils {
 			}
 		}
 
-		for (OWLExpression expr : graph.getExpressions()) {
-			if (!proved.contains(expr)) {
+		for (OWLExpression expr : expressions) {
+			if (!proved.contains(expr) && !OWLProofUtils.isAsserted(expr)) {
 				throw new AssertionError(String.format("There is no acyclic proof of %s", expr));
 			}
 		}

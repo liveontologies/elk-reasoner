@@ -34,6 +34,7 @@ import org.protege.editor.owl.ui.frame.OWLFrameListener;
 import org.protege.editor.owl.ui.frame.OWLFrameSection;
 import org.semanticweb.elk.explanations.OWLRenderer;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
@@ -64,11 +65,28 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 
 	public void blockInferencesForPremise(OWLExpression premise) {
 		CycleFreeProofRoot root = getRootObject();
+		
+		//FIXME
+		try {
+			System.err.println(OWLProofUtils.printProofTree(root));
+		} catch (ProofGenerationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		CycleFreeProofRoot updatedRoot = root.blockExpression(premise);
 		// this will update the hierarchical model (sections and rows)
 		
 		//FIXME
-		System.err.println("Blocked " + premise + ", root replaced");
+		System.err.println("Blocked " + premise + ", root replaced, remaining inferences:");
+		try {
+			for (OWLInference inf : updatedRoot.getInferences()) {
+				System.err.println(inf);
+			}
+		} catch (ProofGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		setRootObject(updatedRoot);
 	}

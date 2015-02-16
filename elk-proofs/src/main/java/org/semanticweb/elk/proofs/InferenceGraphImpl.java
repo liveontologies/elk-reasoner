@@ -27,7 +27,6 @@ package org.semanticweb.elk.proofs;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +35,7 @@ import java.util.Set;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.utils.ProofUtils;
+import org.semanticweb.elk.util.collections.ArrayHashSet;
 
 /**
  * A simple unoptimized implementation of the Inference Graph where each
@@ -48,17 +48,23 @@ import org.semanticweb.elk.proofs.utils.ProofUtils;
  */
 public class InferenceGraphImpl implements InferenceGraph {
 
-	private final Set<DerivedExpression> roots_;
+	private final Set<DerivedExpression> roots_ = new ArrayHashSet<DerivedExpression>();
+	
+	private boolean rootsUpdated = false;
 	
 	private final Map<DerivedExpression, List<Inference>> nodes_;
 	
 	public InferenceGraphImpl() {
-		roots_ = new HashSet<DerivedExpression>();
 		nodes_ = new HashMap<DerivedExpression, List<Inference>>();
 	}
 	
 	@Override
 	public Collection<DerivedExpression> getRootExpressions() {
+		if (!rootsUpdated) {
+			updateRoots();
+			rootsUpdated = true;
+		}
+		
 		return Collections.unmodifiableCollection(roots_);
 	}
 
@@ -73,11 +79,6 @@ public class InferenceGraphImpl implements InferenceGraph {
 	}
 	
 	public boolean addExpression(DerivedExpression expr) {
-		// asserted expressions are roots
-		if (ProofUtils.isAsserted(expr)) {
-			roots_.add(expr);
-		}
-		
 		if (nodes_.containsKey(expr)) {
 			return false;
 		}
@@ -88,6 +89,8 @@ public class InferenceGraphImpl implements InferenceGraph {
 	}
 	
 	public void addInference(Inference inf) {
+		rootsUpdated = false;
+		
 		for (DerivedExpression premise : inf.getPremises()) {
 			addExpression(premise);
 			
@@ -95,12 +98,10 @@ public class InferenceGraphImpl implements InferenceGraph {
 		}
 		
 		addExpression(inf.getConclusion());
-		// could get inferences whose premises were all filtered out for some reason (i.e. they are all tautologies), e.g. (A <= A, A <= A) |- A <= A and A 
-		if (inf.getPremises().isEmpty() || ProofUtils.isAsserted(inf.getConclusion())) {
+		
+		if (inf.getPremises().isEmpty()) {
+			// some expressions are roots because they're produced by initialization inferences (or inferences whose premises are all tautologies, e.g. (A<=A, A<=A) |- A <= A and A)
 			roots_.add(inf.getConclusion());
-		}
-		else {
-			roots_.remove(inf.getConclusion());			
 		}
 	}
 
@@ -108,7 +109,7 @@ public class InferenceGraphImpl implements InferenceGraph {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		
-		builder.append("Roots: " + roots_ + "\n");
+		builder.append("Roots: " + getRootExpressions() + "\n");
 		
 		for (DerivedExpression expr : nodes_.keySet()) {
 			builder.append(expr + " => " + nodes_.get(expr) + "\n");
@@ -116,6 +117,15 @@ public class InferenceGraphImpl implements InferenceGraph {
 		
 		return builder.toString();
 	}
-	
+
+	private void updateRoots() {
+		for (DerivedExpression expr : nodes_.keySet()) {
+			if (ProofUtils.isAsserted(expr)) {
+				roots_.add(expr);
+			}
+		}
+		
+		rootsUpdated = true;
+	}
 	
 }

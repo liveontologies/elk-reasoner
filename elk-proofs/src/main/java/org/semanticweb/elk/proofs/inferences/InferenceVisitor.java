@@ -33,5 +33,5 @@ package org.semanticweb.elk.proofs.inferences;
  */
 public interface InferenceVisitor<I, O> extends ClassInferenceVisitor<I, O>, PropertyInferenceVisitor<I, O> {
 
-	//nothing here
+	public O visit(InconsistencyInference inf, I input);
 }

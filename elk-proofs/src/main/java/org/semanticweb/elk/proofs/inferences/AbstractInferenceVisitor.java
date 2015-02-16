@@ -37,6 +37,7 @@ import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialAxiomComposi
 import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialLemmaComposition;
 import org.semanticweb.elk.proofs.inferences.classes.NegationContradiction;
 import org.semanticweb.elk.proofs.inferences.classes.ReflexiveExistentialComposition;
+import org.semanticweb.elk.proofs.inferences.classes.UnsatisfiabilityInference;
 import org.semanticweb.elk.proofs.inferences.properties.AbstractSubPropertyChainInference;
 import org.semanticweb.elk.proofs.inferences.properties.AbstractSubsumptionViaReflexivityInference;
 import org.semanticweb.elk.proofs.inferences.properties.ReflexiveComposition;
@@ -186,6 +187,14 @@ public abstract class AbstractInferenceVisitor<I ,O> implements InferenceVisitor
 	@Override
 	public O visit(NaryExistentialLemmaComposition inf, I input) {
 		
+		return defaultVisit(inf, input);
+	}
+	
+	public O visit(InconsistencyInference inf, I input) {
+		return defaultVisit(inf, input);
+	}
+	
+	public O visit(UnsatisfiabilityInference inf, I input) {
 		return defaultVisit(inf, input);
 	}
 }

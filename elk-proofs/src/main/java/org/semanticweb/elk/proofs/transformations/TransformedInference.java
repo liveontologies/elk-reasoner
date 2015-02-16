@@ -56,20 +56,24 @@ public class TransformedInference<T extends InferenceTransformation> implements 
 	
 	@Override
 	public DerivedExpression getConclusion() {
-		return inference.getConclusion();
+		return transform(inference.getConclusion(), transformation);
 	}
 
 	protected TransformedExpression<?, T> propagateTransformation(DerivedExpression expr) {
+		return transform(expr, transformation);
+	}
+	
+	private TransformedExpression<?, T> transform(DerivedExpression expr, final T transfrm) {
 		return expr.accept(new ExpressionVisitor<Void, TransformedExpression<?, T>>() {
 
 			@Override
-			public TransformedExpression<?, T> visit(DerivedAxiomExpression<?> axiom, Void input) {
-				return new TransformedAxiomExpression<T, ElkAxiom>((DerivedAxiomExpression<ElkAxiom>) axiom, transformation);
+			public TransformedExpression<?, T> visit(DerivedAxiomExpression<? extends ElkAxiom> axiom, Void input) {
+				return new TransformedAxiomExpression<T, ElkAxiom>((DerivedAxiomExpression<ElkAxiom>) axiom, transfrm);
 			}
 
 			@Override
 			public TransformedExpression<?, T> visit(LemmaExpression<?> lemma, Void input) {
-				return new TransformedLemmaExpression<T>(lemma, transformation);
+				return new TransformedLemmaExpression<T>(lemma, transfrm);
 			}
 			
 		}, null);

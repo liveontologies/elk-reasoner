@@ -120,23 +120,24 @@ public class InferenceReaderTest {
 	//@Ignore("not a real test, more for manual debugging")
 	public void basicTest() throws Exception {
 		//Reasoner reasoner = TestReasonerUtils.loadAndClassify(new File("/home/pavel/ulm/data/galens/EL-GALEN.owl"));
-		Reasoner reasoner = TestReasonerUtils.loadAndClassify("ontologies/PropertyCompositionsWithReflexivity.owl");
+		Reasoner reasoner = TestReasonerUtils.loadAndClassify("classification_test_input/AssertionDisjoint.owl");
 		ElkClass sub = factory_.getClass(new ElkFullIri("http://example.org/A"));
 		ElkClass sup = factory_.getClass(new ElkFullIri("http://example.org/G"));
 		ProofReader reader = new ProofReader(reasoner).eliminateLemmas();
 		
 		// print inferences 
-		RecursiveInferenceVisitor.visitInferences(reader, sub, sup, new AbstractInferenceVisitor<Void, Void>() {
+		RecursiveInferenceVisitor.visitInferences(reader.getProofRootForInconsistency(), new AbstractInferenceVisitor<Void, Void>() {
 
 			@Override
 			protected Void defaultVisit(Inference inference, Void input) {
-				System.out.println(InferencePrinter.print(inference));
+				System.err.println(InferencePrinter.print(inference));
 				return null;
 			}
 			
 		});
 		
-		TestUtils.provabilityOfSubsumptionTest(reader, sub, sup);
+		//TestUtils.provabilityOfSubsumptionTest(reader, sub, sup);
+		TestUtils.provabilityOfInconsistencyTest(reader);
 		
 		reasoner.shutdown();
 	}

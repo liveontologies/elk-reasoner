@@ -41,6 +41,9 @@ public enum InferenceRule {
 	R_INCONSISTENT_DISJOINTNESS("owl:Nothing inference from inconsistent disjointness axiom"),
 	R_CONTRADITION_FROM_NEGATION("owl:Nothing inference from negation"),
 	R_REFLEXIVE_EXISTENTIAL("Existential inference for reflexive property"),
+	R_UNSATISFIABILITY("Inference from class unsatisfiability"),
+	/*inconsistency*/
+	R_INCONSISTENCY("Inconsistency inference"),
 	/*role inference rules*/
 	R_CHAIN_SUBSUMPTION("Property subsumption inference"),
 	R_REFLEXIVE_COMPOSITION("Composition of reflexive properties"),

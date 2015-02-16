@@ -26,20 +26,7 @@ package org.semanticweb.owlapitools.proofs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.semanticweb.owlapitools.proofs.TestVocabulary.A;
-import static org.semanticweb.owlapitools.proofs.TestVocabulary.B;
-import static org.semanticweb.owlapitools.proofs.TestVocabulary.C;
-import static org.semanticweb.owlapitools.proofs.TestVocabulary.D;
-import static org.semanticweb.owlapitools.proofs.TestVocabulary.E;
-import static org.semanticweb.owlapitools.proofs.TestVocabulary.F;
-import static org.semanticweb.owlapitools.proofs.TestVocabulary.FACTORY;
-import static org.semanticweb.owlapitools.proofs.TestVocabulary.G;
-import static org.semanticweb.owlapitools.proofs.TestVocabulary.R1;
-import static org.semanticweb.owlapitools.proofs.TestVocabulary.R2;
-import static org.semanticweb.owlapitools.proofs.TestVocabulary.R3;
-import static org.semanticweb.owlapitools.proofs.TestVocabulary.R4;
-import static org.semanticweb.owlapitools.proofs.TestVocabulary.R5;
-import static org.semanticweb.owlapitools.proofs.TestVocabulary.S;
+import static org.semanticweb.owlapitools.proofs.TestVocabulary.*;
 
 import java.util.Arrays;
 
@@ -52,6 +39,7 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionVisitor;
 import org.semanticweb.owlapitools.proofs.expressions.OWLLemmaExpression;
 import org.semanticweb.owlapitools.proofs.util.CycleBlocking;
+import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
 import org.semanticweb.owlapitools.proofs.util.GenericLemmaElimination;
 import org.semanticweb.owlapitools.proofs.util.OWLInferenceGraph;
 import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
@@ -113,6 +101,35 @@ public class OWLExpressionTests {
 		assertEquals(2, getNumberOfInferences(root));
 		// only one inference remains since the other is cyclic
 		assertEquals(1, getNumberOfInferences(blocked));
+	}
+	
+	
+	@Test
+	public void recursiveBlocking() throws Exception {
+		MockOWLAxiomExpression aSubG = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(A, G), false);
+		MockOWLAxiomExpression aSubRSomeE = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(A, FACTORY.getOWLObjectSomeValuesFrom(R, E)), false);
+		MockOWLAxiomExpression rSomeESubG = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(FACTORY.getOWLObjectSomeValuesFrom(R, E), G));
+		MockOWLAxiomExpression aSubS1SomeB = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(A, FACTORY.getOWLObjectSomeValuesFrom(S1, B)), false);
+		MockOWLAxiomExpression aSubR1SomeB = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(A, FACTORY.getOWLObjectSomeValuesFrom(R1, B)));
+		MockOWLAxiomExpression bSubS2SomeE = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(B, FACTORY.getOWLObjectSomeValuesFrom(S2, E)), false);
+		MockOWLAxiomExpression bSubR2SomeE = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(B, FACTORY.getOWLObjectSomeValuesFrom(R2, E)));
+		MockOWLAxiomExpression s1s2SubR = new MockOWLAxiomExpression(FACTORY.getOWLSubPropertyChainOfAxiom(Arrays.asList(S1, S2), R));
+		MockOWLAxiomExpression r1SubS1 = new MockOWLAxiomExpression(FACTORY.getOWLSubObjectPropertyOfAxiom(R1, S1));
+		MockOWLAxiomExpression r2SubS2 = new MockOWLAxiomExpression(FACTORY.getOWLSubObjectPropertyOfAxiom(R2, S2));
+		
+		aSubG.addInference(new MockOWLInference(INF_PREFIX, aSubG, Arrays.<OWLExpression>asList(aSubRSomeE, rSomeESubG)));
+
+		aSubRSomeE.addInference(new MockOWLInference(INF_PREFIX, aSubRSomeE, Arrays.<OWLExpression>asList(aSubS1SomeB, bSubS2SomeE, s1s2SubR)));
+		aSubS1SomeB.addInference(new MockOWLInference(INF_PREFIX, aSubS1SomeB, Arrays.<OWLExpression>asList(aSubR1SomeB, r1SubS1)));		
+		bSubS2SomeE.addInference(new MockOWLInference(INF_PREFIX, bSubS2SomeE, Arrays.<OWLExpression>asList(bSubR2SomeE, r2SubS2)));
+		
+		CycleFreeProofRoot root = new CycleFreeProofRoot(aSubG, OWLProofUtils.computeInferenceGraph(aSubG)); 
+				
+		assertEquals(1, getNumberOfInferences(root));
+		
+		root = root.blockExpression(aSubR1SomeB);
+		
+		assertEquals(0, getNumberOfInferences(root));
 	}
 	
 	@Test
