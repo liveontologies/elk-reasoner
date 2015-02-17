@@ -472,7 +472,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 						 * checking processed contexts counters because it is
 						 * tested in the other order when waking up the workers
 						 */
-						if (countContextsProcessed_.get() > snapshotCountContextsProcessed) {
+						if (countContextsProcessed_.get() > snapshotCountContextsProcessed
+								|| isInterrupted()) {
 							/*
 							 * new contexts were processed meanwhile; all
 							 * workers should be notified
