@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 package org.semanticweb.elk.explanations.list;
 /*
  * #%L
@@ -5,7 +8,7 @@ package org.semanticweb.elk.explanations.list;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,29 +31,30 @@ import java.awt.event.ActionListener;
 import org.protege.editor.core.ui.list.MListButton;
 
 /**
- * Button for collapsing expressions, that is, hiding their inferences
- * 
  * @author	Pavel Klinov
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class CollapseButton extends MListButton {
+public class ExpandButton extends MListButton {
 
-    public CollapseButton(ActionListener actionListener) {
-        super("Hide inferences", new Color(100, 40, 140), actionListener);
+    public ExpandButton(ActionListener actionListener) {
+        super("Explain inference", new Color(100, 40, 140), actionListener);
     }
 
 
     public void paintButtonContent(Graphics2D gIn) {
     	Graphics2D g = (Graphics2D) gIn.create();
-    	int size = getBounds().height;
-    	int thickness = (Math.round(size / 8.0f) / 2) * 2;
+        int size = getBounds().height;
+        int thickness = (Math.round(size / 8.0f) / 2) * 2;
 
-    	int x = getBounds().x;
-    	int y = getBounds().y;
+        int x = getBounds().x;
+        int y = getBounds().y;
 
-    	int insetX = size / 4;
-    	int insetWidth = size / 2;
-    	g.fillRect(x + insetX, y + size / 2 - thickness / 2, insetWidth, thickness);
+        int insetX = size / 4;
+        int insetY = size / 4;
+        int insetHeight = size / 2;
+        int insetWidth = size / 2;
+        g.fillRect(x + size / 2  - thickness / 2, y + insetY, thickness, insetHeight);
+        g.fillRect(x + insetX, y + size / 2 - thickness / 2, insetWidth, thickness);
     }
 }

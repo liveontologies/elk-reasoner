@@ -23,6 +23,9 @@ package org.semanticweb.elk.explanations.list;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,7 +37,10 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.ListModel;
 import javax.swing.border.Border;
 
@@ -42,12 +48,20 @@ import org.protege.editor.core.ui.list.MListButton;
 import org.protege.editor.core.ui.list.MListDeleteButton;
 import org.protege.editor.core.ui.list.MListEditButton;
 import org.protege.editor.core.ui.list.MListItem;
+import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
+import org.protege.editor.core.ui.util.VerifyingOptionPane;
 import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.ui.framelist.ExplainButton;
 import org.protege.editor.owl.ui.framelist.OWLFrameList;
 import org.protege.editor.owl.ui.framelist.OWLFrameListInferredSectionRowBorder;
 import org.semanticweb.elk.explanations.WorkbenchManager;
+import org.semanticweb.elk.explanations.editing.AxiomExpressionEditor;
+import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AxiomType;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClassAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
 
@@ -60,13 +74,16 @@ import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
 @SuppressWarnings("serial")
 public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 	
+	private final OWLEditorKit kit_;
+	
 	private static final Border INFERRED_BORDER = new OWLFrameListInferredSectionRowBorder();
 	
 	private static final Set<AxiomType<?>> EDITABLE_AXIOM_TYPES = new HashSet<AxiomType<?>>(Arrays.<AxiomType<?>>asList(AxiomType.SUBCLASS_OF, AxiomType.OBJECT_PROPERTY_DOMAIN, AxiomType.OBJECT_PROPERTY_RANGE, AxiomType.EQUIVALENT_CLASSES));
-
+	
     public ProofFrameList(OWLEditorKit editorKit, WorkbenchManager workbenchManager, ProofFrame proofFrame) {
         super(editorKit, proofFrame);
         
+        kit_ = editorKit;
         setCellRenderer(new ProofFrameListRenderer(editorKit));
     }
     
@@ -83,7 +100,7 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 			if (row.isInferred()) {
 				if (!row.isExpanded()) {
 					// explain button for inferred expressions
-					return Arrays.<MListButton> asList(new ExplainButton(
+					return Arrays.<MListButton> asList(new ExpandButton(
 								new AbstractAction() {
 
 									public void actionPerformed(ActionEvent e) {
@@ -119,18 +136,29 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 								})
 						);
 			}
+			else {
+				// can only remove
+				return Arrays.<MListButton> asList(
+						new MListDeleteButton(
+								new AbstractAction() {
+
+									public void actionPerformed(ActionEvent e) {
+										deleteRow((ProofFrameSectionRow) value);
+									}
+								})
+						);
+			}
         }
 
         return Collections.emptyList();
     }
     
 	protected void editRow(ProofFrameSectionRow expressionRow) {
-    	//TODO show editor
-		//blockInferencesForPremise(expressionRow.getRootObject());
+		showAxiomEditor(expressionRow);
     }
     
     protected void deleteRow(ProofFrameSectionRow expressionRow) {
-    	//TODO
+    	handleDelete();
     	blockInferencesForPremise(expressionRow.getRoot());
     }
     
@@ -293,6 +321,73 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 			};
 		}
 		
+	}
+	
+    private void showAxiomEditor(final ProofFrameSectionRow expressionRow) {
+    	final OWLAxiom axiom = expressionRow.getAxiom();
+    	
+    	if (axiom == null) {
+    		return;
+    	}
+    	
+    	final AxiomExpressionEditor editor = new AxiomExpressionEditor(kit_);
+        final JComponent editorComponent = editor.getEditorComponent();
+        
+		final VerifyingOptionPane optionPane = new VerifyingOptionPane(editorComponent) {
+
+            public void selectInitialValue() {
+                // This is overriden so that the option pane dialog default
+                // button doesn't get the focus.
+            }
+        };
+        final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
+            public void verifiedStatusChanged(boolean verified) {
+                optionPane.setOKEnabled(verified);
+            }
+        };
+        // Protege's syntax checkers only cover the class axiom's syntax
+        editor.setEditedObject((OWLClassAxiom) axiom);
+        // prevent the OK button from being available until the expression is syntactically valid
+        editor.addStatusChangedListener(verificationListener);
+        
+        JDialog dlg = optionPane.createDialog(this, null);
+
+        dlg.setModal(false);
+        dlg.setResizable(true);
+        dlg.pack();
+        dlg.setLocationRelativeTo(this);
+        dlg.addComponentListener(new ComponentAdapter() {
+
+            public void componentHidden(ComponentEvent e) {
+                Object retVal = optionPane.getValue();
+                
+                editorComponent.setPreferredSize(editorComponent.getSize());
+                
+                if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
+                    handleEditFinished(editor.getEditedObject(), expressionRow);
+                }
+                
+                //setSelectedValue(frameObject, true);
+                
+                editor.removeStatusChangedListener(verificationListener);
+                editor.dispose();
+            }
+        });
+
+        dlg.setTitle("Class axiom editor");
+        dlg.setVisible(true);
+    }
+    
+	private void handleEditFinished(OWLAxiom newAxiom, ProofFrameSectionRow exprRow) {
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+		OWLOntology ontology = kit_.getOWLModelManager().getActiveOntology();
+		// remove the old axiom
+		changes.add(new RemoveAxiom(ontology, exprRow.getAxiom()));
+		changes.add(new AddAxiom(ontology, newAxiom));
+
+		kit_.getOWLModelManager().applyChanges(changes);
+		// only show proofs which do not use the old axiom
+		blockInferencesForPremise(exprRow.getRoot());
 	}
 
 }

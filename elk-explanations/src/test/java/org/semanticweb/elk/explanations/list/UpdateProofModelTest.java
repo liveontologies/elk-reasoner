@@ -257,7 +257,7 @@ public class UpdateProofModelTest {
 				break;
 			}
 			
-			next.refill(null);
+			next.refill();
 			
 			for (OWLFrameSectionRow<OWLExpression, OWLAxiom, OWLAxiom> row : next.getRows()) {
 				ProofFrameSectionRow premiseRow = (ProofFrameSectionRow) row;

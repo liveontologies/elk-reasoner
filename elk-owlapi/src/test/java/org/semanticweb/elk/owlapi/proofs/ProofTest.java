@@ -23,23 +23,30 @@ package org.semanticweb.elk.owlapi.proofs;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import org.junit.Test;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owlapi.OWLAPITestUtils;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
+import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
+import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
+import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
 
 /**
  * 
@@ -80,6 +87,43 @@ public class ProofTest {
 		
 		//printInferences(reasoner, sub, sup);
 		
+		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
+	}
+	
+	@Test
+	public void proofsUnderOntologyUpdate() throws Exception {
+		OWLDataFactory factory = OWLManager.getOWLDataFactory();
+		// loading and classifying via the OWL API
+		OWLOntology ontology = loadOntology(ProofTest.class.getClassLoader().getResourceAsStream("ontologies/PropertyCompositionsWithHierarchy.owl"));
+		ExplainingOWLReasoner reasoner = OWLAPITestUtils.createReasoner(ontology);
+		
+		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+		
+		OWLClass sub = factory.getOWLClass(IRI.create("http://example.org/A"));
+		OWLClass sup = factory.getOWLClass(IRI.create("http://example.org/G"));
+		
+		printInferences(reasoner, sub, sup);
+		OWLExpression root = reasoner.getDerivedExpression(factory.getOWLSubClassOfAxiom(sub, sup));
+		System.err.println(OWLProofUtils.printProofTree(root));
+		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
+		
+		// now convert C <= R3 some D to C < S3 some D
+		OWLClass c = factory.getOWLClass(IRI.create("http://example.org/C"));
+		OWLClass d = factory.getOWLClass(IRI.create("http://example.org/D"));
+		OWLObjectProperty r3 = factory.getOWLObjectProperty(IRI.create("http://example.org/R3"));
+		OWLObjectProperty s3 = factory.getOWLObjectProperty(IRI.create("http://example.org/S3"));
+		OWLAxiom oldAx = factory.getOWLSubClassOfAxiom(c, factory.getOWLObjectSomeValuesFrom(r3, d));
+		OWLAxiom newAx = factory.getOWLSubClassOfAxiom(c, factory.getOWLObjectSomeValuesFrom(s3, d));
+		
+		OWLOntologyManager manager = ontology.getOWLOntologyManager();
+		
+		manager.applyChanges(Arrays.asList(new RemoveAxiom(ontology, oldAx), new AddAxiom(ontology, newAx)));
+		
+		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+		
+		//printInferences(reasoner, sub, sup);
+		root = reasoner.getDerivedExpression(factory.getOWLSubClassOfAxiom(sub, sup));
+		System.err.println(OWLProofUtils.printProofTree(root));
 		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
 	}
 	

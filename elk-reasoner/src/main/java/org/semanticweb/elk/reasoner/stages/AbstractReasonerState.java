@@ -673,7 +673,13 @@ public abstract class AbstractReasonerState {
 	}
 	
 	public TraceStore.Reader trace(boolean forceTrace) throws ElkException {
-		if (forceTrace) {
+		if (!stageManager.inferenceTracingStage.isCompleted()) {
+			// to make sure we start with a clean trace store, esp. clear the
+			// previously stored class inferences which may no longer be valid
+			// if there were changed to the ontology 
+			traceState.clearClassTraces();
+		} 
+		else if (forceTrace) {
 			stageManager.inferenceTracingStage.invalidate();
 		}
 		

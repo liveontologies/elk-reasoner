@@ -63,7 +63,7 @@ public class ProofReader {
 	public ProofReader(Reasoner r) {
 		reader_ = new ReasonerInferenceReader(r);
 		transformations_ = new LinkedList<InferenceTransformation>();
-		transformations_.add(new OneStepCyclicInferenceFilter());
+		//transformations_.add(new OneStepCyclicInferenceFilter());
 	}
 	
 	public ProofReader eliminateLemmas() {

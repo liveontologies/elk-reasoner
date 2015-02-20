@@ -109,19 +109,72 @@ public class OWLProofUtils {
 	}
 	
 	public static String printProofTree(OWLExpression root) throws ProofGenerationException {
-		StringBuilder builder = new StringBuilder();
+		/*class ExprIndent {
+			private final OWLExpression expression;
+			private final int indent;
+			
+			ExprIndent(OWLExpression e, int i) {
+				expression = e;
+				indent = i;
+			}
+		}
 		
-		print(root, builder, 0);
+		StringBuilder builder = new StringBuilder();
+		Queue<ExprIndent> toDo = new ArrayDeque<ExprIndent>();
+		Set<OWLExpression> done = new HashSet<OWLExpression>();
+		
+		toDo.add(new ExprIndent(root, 0));
+		
+		for (;;) {
+			ExprIndent next = toDo.poll();
+			
+			if (next == null) {
+				break;
+			}
+			
+			for (int i = 0; i < next.indent; i++) {
+				builder.append("   ");
+			}
+			
+			builder.append(next.expression).append('\n');
+			
+			if (!done.add(next.expression)) {
+				continue;
+			}
+			
+			for (OWLInference inf : next.expression.getInferences()) {
+				for (int i = 0; i < next.indent + 1; i++) {
+					builder.append("   ");
+				}
+				
+				builder.append(inf.getName()).append('\n');
+				
+				for (OWLExpression premise : inf.getPremises()) {
+					toDo.add(new ExprIndent(premise, next.indent + 2));
+				}
+			}
+		}
+		
+		return builder.toString();*/
+		
+		StringBuilder builder = new StringBuilder();
+		Set<OWLExpression> done = new HashSet<OWLExpression>();
+		
+		print(root, builder, done, 0);
 		
 		return builder.toString();
 	}
 
-	private static void print(OWLExpression expr, StringBuilder builder, int depth) throws ProofGenerationException {
+	private static void print(OWLExpression expr, StringBuilder builder, Set<OWLExpression> done, int depth) throws ProofGenerationException {
 		for (int i = 0; i < depth; i++) {
 			builder.append("   ");
 		}
 		
 		builder.append(expr).append('\n');
+		
+		if (!done.add(expr)) {
+			return;
+		}
 		
 		for (OWLInference inf : expr.getInferences()) {
 			for (int i = 0; i < depth + 1; i++) {
@@ -131,7 +184,7 @@ public class OWLProofUtils {
 			builder.append(inf.getName()).append('\n');
 			
 			for (OWLExpression premise : inf.getPremises()) {
-				print(premise, builder, depth + 2);	
+				print(premise, builder, done, depth + 2);	
 			}
 		}
 	}

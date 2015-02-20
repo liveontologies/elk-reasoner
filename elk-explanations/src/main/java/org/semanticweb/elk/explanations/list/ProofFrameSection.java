@@ -33,7 +33,6 @@ import org.protege.editor.owl.ui.frame.OWLFrameSectionRow;
 import org.semanticweb.elk.explanations.OWLRenderer;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLObject;
-import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
@@ -231,7 +230,7 @@ public class ProofFrameSection implements OWLFrameSection<OWLExpression, OWLAxio
 		return null;
 	}
 
-    protected void refill(OWLOntology ontology) {
+    protected void refill() {
         if(filled) {
             return;
         }

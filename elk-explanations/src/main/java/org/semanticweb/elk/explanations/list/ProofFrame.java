@@ -34,7 +34,6 @@ import org.protege.editor.owl.ui.frame.OWLFrameListener;
 import org.protege.editor.owl.ui.frame.OWLFrameSection;
 import org.semanticweb.elk.explanations.OWLRenderer;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
@@ -55,30 +54,44 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
     private CycleFreeProofRoot rootExpression_;
 
     private final OWLRenderer renderer_;
+    
+    private final OWLOntology activeOntology_;
 	
     public ProofFrame(CycleFreeProofRoot proofRoot, OWLRenderer renderer, OWLOntology active, String title) {
     	renderer_ = renderer;
+    	activeOntology_ = active;
     	rootExpression_ = proofRoot;
     	rootSection_ = new ProofFrameSection(this, Collections.singletonList(proofRoot), title, 0, renderer);
-    	rootSection_.refill(active);
+    	rootSection_.refill();
+    	
+    	//FIXME
+		try {
+			System.err.println(OWLProofUtils.printProofTree(proofRoot));
+		} catch (ProofGenerationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
     }
 
+    OWLOntology getActiveOntology() {
+    	return activeOntology_;
+    }
+    
 	public void blockInferencesForPremise(OWLExpression premise) {
 		CycleFreeProofRoot root = getRootObject();
 		
-		//FIXME
+		CycleFreeProofRoot updatedRoot = root.blockExpression(premise);
+		
+		/*//FIXME
 		try {
 			System.err.println(OWLProofUtils.printProofTree(root));
 		} catch (ProofGenerationException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
-		
-		CycleFreeProofRoot updatedRoot = root.blockExpression(premise);
-		// this will update the hierarchical model (sections and rows)
+		}*/
 		
 		//FIXME
-		System.err.println("Blocked " + premise + ", root replaced, remaining inferences:");
+		/*System.err.println("Blocked " + premise + ", root replaced, remaining inferences:");
 		try {
 			for (OWLInference inf : updatedRoot.getInferences()) {
 				System.err.println(inf);
@@ -86,8 +99,8 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 		} catch (ProofGenerationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
+		}*/
+		// this will update the hierarchical model (sections and rows)		
 		setRootObject(updatedRoot);
 	}
 
@@ -114,7 +127,8 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 				String rendering = renderer_.render(OWLProofUtils.getAxiom(rootExpression_));
 				
 				rootSection_.dispose();
-				rootSection_ = new ProofFrameSection(this, Collections.<OWLExpression>emptyList(), String.format("%s is no longer entailed by the ontology", rendering), 0, renderer_);
+				rootSection_ = new ProofFrameSection(this, Collections.<OWLExpression>emptyList(), 
+						String.format("%s may no longer entailed by the ontology due to the performed changes. Please synchronize the reasoner.", rendering), 0, renderer_);
 			}
 			else {
 				// run down the model and refresh it

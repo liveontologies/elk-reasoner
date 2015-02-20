@@ -88,6 +88,5 @@ public class TraceState {
 		traceStore_.cleanClassInferences();
 		tracingSaturationState_ = new LocalTracingSaturationState(
 				tracingSaturationState_.getOntologyIndex());
-		clearTracingMap();
 	}
 }

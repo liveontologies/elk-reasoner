@@ -947,7 +947,8 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 			
 			try {
 				DerivedAxiomExpression<?> expr = new ProofReader(reasoner_)
-						.eliminateLemmas().getProofRoot(
+						.eliminateLemmas()
+						.getProofRoot(
 								elkAxiom.getSubClassExpression(),
 								elkAxiom.getSuperClassExpression());
 				

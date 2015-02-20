@@ -91,7 +91,8 @@ public class RecursiveBlocking extends BlockingCondition {
 							boolean nonBlockedInference = true;
 
 							for (OWLExpression premise : altInf.getPremises()) {
-								if (nowBlocked.contains(premise)) {
+								if (nowBlocked.contains(premise) || premise.equals(conclusion)) {
+									// this inference isn't alternative
 									nonBlockedInference = false;
 									break;
 								}

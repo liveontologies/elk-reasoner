@@ -37,6 +37,7 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
@@ -97,7 +98,7 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
 			for (OWLInference inf : expression_.getInferences()) {
 				ProofFrameSection inferenceSection = new ProofFrameSection(getFrameSection().getFrame(), inf.getPremises(), inf.getName(), depth_ + 1, renderer_);
 				// filling up rows with premises
-				inferenceSection.refill(getOntology());
+				inferenceSection.refill();
 				inferenceSections_.add(inferenceSection);
 			}
 		} catch (ProofGenerationException e) {
@@ -154,7 +155,7 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
 				if (section == null) {
 					section = new ProofFrameSection(getFrameSection().getFrame(), inf.getPremises(), inf.getName(), depth_ + 1, renderer_);
 					// filling up rows with premises
-					section.refill(getOntology());
+					section.refill();
 					newSections.add(section);
 					
 					//FIXME
@@ -251,7 +252,7 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
 
 	@Override
 	public OWLOntology getOntology() {
-		return null;
+		return getFrameSection().getFrame().getActiveOntology();
 	}
 
 	@Override
@@ -261,15 +262,11 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
 
 	@Override
 	public List<? extends OWLOntologyChange> getDeletionChanges() {
-		return Collections.emptyList();
+		return Collections.singletonList(new RemoveAxiom(getOntology(), getAxiom()));
 	}
 
     public String getRendering() {
     	OWLObject ax = getAxiom();
-    	//FIXME
-    	if (ax == null) {
-    		System.err.println(expression_);
-    	}
     	
         return renderer_.render(ax);
     }
