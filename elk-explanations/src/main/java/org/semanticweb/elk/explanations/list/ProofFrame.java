@@ -128,7 +128,7 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 				
 				rootSection_.dispose();
 				rootSection_ = new ProofFrameSection(this, Collections.<OWLExpression>emptyList(), 
-						String.format("%s may no longer entailed by the ontology due to the performed changes. Please synchronize the reasoner.", rendering), 0, renderer_);
+						String.format("%s may no longer be entailed by the ontology due to the performed changes. Please synchronize the reasoner.", rendering), 0, renderer_);
 			}
 			else {
 				// run down the model and refresh it

@@ -2,21 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	
-	<!--parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent-->
 	<parent>
 		<artifactId>elk-parent</artifactId>
 		<groupId>org.semanticweb.elk</groupId>
 		<version>0.5.0-SNAPSHOT</version>
 	</parent>
 	
-	<!--groupId>edu.stanford.protege</groupId>	
-	<artifactId>org.protege.explanation</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
-	<packaging>bundle</packaging-->
   <artifactId>elk-explanations</artifactId>
 	<packaging>bundle</packaging>
 
@@ -37,16 +28,6 @@
 		</developer>
 	</developers>
 	
-	<!--scm>
-		<connection>scm:git:git@github.com:protegeproject/explanation-workbench.git</connection>
-		<developerConnection>scm:git:git@github.com:protegeproject/explanation-workbench.git</developerConnection>
-		<url>https://github.com/protegeproject/explanation-workbench</url>
-	</scm>
-	<issueManagement>
-		<system>GitHub</system>
-		<url>https://github.com/protegeproject/explanation-workbench/issues</url>
-	</issueManagement-->	
-
     <repositories>
       <repository>
         <id>github</id>
@@ -134,7 +115,6 @@
 							org.semanticweb.owlapitools.*="0.4",
 							*
 						</Import-Package>
-						<!--Export-Package>org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui</Export-Package-->
 						<Private-Package>org.slf4j.*;-split-package:=merge-first</Private-Package>						
 						<Include-Resource>plugin.xml, {maven-resources}</Include-Resource>
 					</instructions>
@@ -149,6 +129,34 @@
                 </executions>
               </configuration>
             </plugin>
+
+
+			<!-- plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<version>2.10</version>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.semanticweb.elk</groupId>
+									<artifactId>elk-explanations</artifactId>
+									<version>0.5.0-SNAPSHOT</version>
+									<type>jar</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>/home/pavel/ulm/java/protege/protege-distribution/target/protege-distribution-5.0.0-beta-16-SNAPSHOT-bin/Protege_5.0_beta/plugins/</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin-->
+            
 		</plugins>
 	</build>
 </project>

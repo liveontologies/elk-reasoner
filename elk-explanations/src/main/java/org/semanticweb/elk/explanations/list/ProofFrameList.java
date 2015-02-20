@@ -78,6 +78,8 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 	
 	private static final Border INFERRED_BORDER = new OWLFrameListInferredSectionRowBorder();
 	
+	public static final Color EXPANDED_COLOR = new Color(232, 246, 219);
+	
 	private static final Set<AxiomType<?>> EDITABLE_AXIOM_TYPES = new HashSet<AxiomType<?>>(Arrays.<AxiomType<?>>asList(AxiomType.SUBCLASS_OF, AxiomType.OBJECT_PROPERTY_DOMAIN, AxiomType.OBJECT_PROPERTY_RANGE, AxiomType.EQUIVALENT_CLASSES));
 	
     public ProofFrameList(OWLEditorKit editorKit, WorkbenchManager workbenchManager, ProofFrame proofFrame) {
@@ -158,8 +160,14 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
     }
     
     protected void deleteRow(ProofFrameSectionRow expressionRow) {
-    	handleDelete();
-    	blockInferencesForPremise(expressionRow.getRoot());
+    	// we'll show a confirmation window to give a chance to abort it
+    	String rendering = expressionRow.getRendering();
+    	int dialogButton = JOptionPane.showConfirmDialog (this, String.format("Are you sure to remove the axiom \"%s\" from the ontology?", rendering), "Confirmation", JOptionPane.YES_NO_OPTION);
+
+        if(dialogButton == JOptionPane.YES_OPTION) { 
+        	handleDelete();
+        	blockInferencesForPremise(expressionRow.getRoot());
+        }
     }
     
     private void blockInferencesForPremise(OWLExpression premise) {
@@ -213,8 +221,10 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 	@Override
 	protected Color getItemBackgroundColor(MListItem item) {
         if (item instanceof ProofFrameSectionRow) {
-            if (((ProofFrameSectionRow) item).isInferred()) {
-                return INFERRED_BG_COLOR;
+        	ProofFrameSectionRow exprRow = (ProofFrameSectionRow) item;
+        	
+            if (exprRow.isInferred()) {
+                return exprRow.isExpanded() ? EXPANDED_COLOR : INFERRED_BG_COLOR;
             }
         }
         
