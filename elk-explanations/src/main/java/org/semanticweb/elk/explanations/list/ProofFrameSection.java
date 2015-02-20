@@ -51,7 +51,7 @@ public class ProofFrameSection implements OWLFrameSection<OWLExpression, OWLAxio
     
     private final int depth_;
     
-    private final String label_;
+    private String label_;
     
     private final ProofFrame frame_;
     
@@ -81,6 +81,10 @@ public class ProofFrameSection implements OWLFrameSection<OWLExpression, OWLAxio
 		
 		return rendering;
 	}
+    
+    void setLabel(String l) {
+    	label_ = l;
+    }
 
     void update(Iterable<? extends OWLExpression> newExpressions) {
     	//FIXME

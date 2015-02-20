@@ -31,9 +31,10 @@ import org.protege.editor.owl.ui.explanation.ExplanationResult;
  * Bio-Medical Informatics Research Group<br>
  * Date: 18/03/2012
  */
+@SuppressWarnings("serial")
 public class WorkbenchPanelExplanationResult extends ExplanationResult {
 
-    private ProofWorkbenchPanel workbenchPanel;
+	private ProofWorkbenchPanel workbenchPanel;
 
     public WorkbenchPanelExplanationResult(ProofWorkbenchPanel workbenchPanel) {
         this.workbenchPanel = workbenchPanel;

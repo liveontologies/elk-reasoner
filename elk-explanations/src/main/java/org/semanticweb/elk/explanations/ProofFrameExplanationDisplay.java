@@ -29,19 +29,21 @@ import javax.swing.JPanel;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.elk.explanations.list.ProofFrame;
 import org.semanticweb.elk.explanations.list.ProofFrameList;
-import org.semanticweb.owl.explanation.api.Explanation;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
 
 /**
  * 
- * @author pavel
+ * @author Pavel Klinov
  *
  */
 @SuppressWarnings("serial")
-public class ProofFrameExplanationDisplay extends JPanel implements ExplanationDisplay, AxiomSelectionListener {
+public class ProofFrameExplanationDisplay extends JPanel {
     
+	static final String SUBSUMPTION_TITLE = "Proof tree for class subsumption";
+	
+	static final String INCONSISTENCY_TITLE = "Proof tree for ontology inconsistency";
+	
     private ProofFrame frame;
 
     private final ProofFrameList frameList;
@@ -66,20 +68,14 @@ public class ProofFrameExplanationDisplay extends JPanel implements ExplanationD
         add(frameList, BorderLayout.NORTH);       
         frameList.setBorder(BorderFactory.createEmptyBorder(7, 10, 7, 10));
     }
-
-    public Explanation<OWLAxiom> getExplanation() {
-    	// TODO get all used axioms?
-        return null;
+    
+    void update(CycleFreeProofRoot newRoot) {
+    	frame.setRootObject(newRoot);
+    	frameList.refreshComponent();
     }
 
     public void dispose() {
         frame.dispose();
     }
-
-    public void axiomAdded(AxiomSelectionModel source, OWLAxiom axiom) {
-        System.out.println("SEL: " + axiom);
-    }
-
-    public void axiomRemoved(AxiomSelectionModel source, OWLAxiom axiom) {
-    }	
+	
 }

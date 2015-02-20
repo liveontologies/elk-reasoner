@@ -360,7 +360,7 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
         // prevent the OK button from being available until the expression is syntactically valid
         editor.addStatusChangedListener(verificationListener);
         
-        JDialog dlg = optionPane.createDialog(this, null);
+        JDialog dlg = optionPane.createDialog(this, "Class axiom editor");
 
         dlg.setModal(false);
         dlg.setResizable(true);
@@ -377,14 +377,12 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
                     handleEditFinished(editor.getEditedObject(), expressionRow);
                 }
                 
-                //setSelectedValue(frameObject, true);
-                
                 editor.removeStatusChangedListener(verificationListener);
                 editor.dispose();
             }
         });
 
-        dlg.setTitle("Class axiom editor");
+        //dlg.setTitle("Class axiom editor");
         dlg.setVisible(true);
     }
     

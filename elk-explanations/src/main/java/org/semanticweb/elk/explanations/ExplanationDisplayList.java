@@ -62,14 +62,13 @@ import org.protege.editor.owl.OWLEditorKit;
 @SuppressWarnings("serial")
 public class ExplanationDisplayList extends JPanel implements Disposable {
 
-    private ExplanationDisplay display;
+    private ProofFrameExplanationDisplay display;
 
-    public ExplanationDisplayList(OWLEditorKit editorKit, WorkbenchManager workbenchManager, ExplanationDisplay display, int explanationNumber) {
+    public ExplanationDisplayList(OWLEditorKit editorKit, WorkbenchManager workbenchManager, ProofFrameExplanationDisplay display, int explanationNumber) {
         this.display = display;
+        
         createUI();
-
     }
-
 
     private void createUI() {
         setLayout(new BorderLayout(2, 2));

@@ -35,7 +35,6 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.transformations.InferenceTransformation;
-import org.semanticweb.elk.proofs.transformations.OneStepCyclicInferenceFilter;
 import org.semanticweb.elk.proofs.transformations.TransformedAxiomExpression;
 import org.semanticweb.elk.proofs.transformations.lemmas.LemmaElimination;
 import org.semanticweb.elk.proofs.utils.RecursiveInferenceVisitor;

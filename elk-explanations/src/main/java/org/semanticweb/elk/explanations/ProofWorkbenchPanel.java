@@ -26,9 +26,6 @@ import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -36,10 +33,10 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.Scrollable;
 
 import org.protege.editor.core.Disposable;
+import org.protege.editor.core.ProtegeApplication;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
@@ -77,21 +74,17 @@ import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
  *
  */
 @SuppressWarnings("serial")
-public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelManagerListener, EntailmentSelectionListener, ExplanationManagerListener {
+public class ProofWorkbenchPanel extends JPanel implements Disposable, EntailmentSelectionListener, OWLModelManagerListener {
 
-    private OWLEditorKit editorKit;
+    private final OWLEditorKit editorKit;
 
-    private JComponent explanationDisplayHolder;
+    private final JComponent explanationDisplayHolder;
 
-    private JScrollPane scrollPane;
+    private final JScrollPane scrollPane;
 
-    private JSpinner maxExplanationsSelector = new JSpinner();
+    private ProofFrameExplanationDisplay proofDisplay = null; 
 
-    private Collection<ExplanationDisplay> panels;
-
-    private AxiomSelectionModelImpl selectionModel;
-
-    private WorkbenchManager workbenchManager;
+    private final WorkbenchManager workbenchManager;
 
     // proof workbench panel for subsumption
     public ProofWorkbenchPanel(OWLEditorKit ek, OWLAxiom entailment) {
@@ -108,11 +101,6 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelM
         this.workbenchManager = wbManager;
         
         setLayout(new BorderLayout());
-
-        selectionModel = new AxiomSelectionModelImpl();
-
-        panels = new ArrayList<ExplanationDisplay>();
-
         editorKit.getModelManager().addListener(this);
         explanationDisplayHolder = new Box(BoxLayout.Y_AXIS);
 
@@ -157,20 +145,7 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelM
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    public void explanationLimitChanged(ProofManager explanationManager) {
-        maxExplanationsSelector.setEnabled(!workbenchManager.getWorkbenchSettings().isFindAllExplanations());
-        selectionChanged();
-    }
-
-
-    public void explanationsComputed(OWLAxiom entailment) {
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
     private class HolderPanel extends JPanel implements Scrollable {
-
 
         public HolderPanel(LayoutManager layout) {
             super(layout);
@@ -211,77 +186,79 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelM
         refill();
     }
 
-    protected ExplanationDisplay createProofExplanationDisplay(CycleFreeProofRoot proofRoot, boolean allProofs, String displayTitle) {
+    protected ProofFrameExplanationDisplay createProofExplanationDisplay(CycleFreeProofRoot proofRoot, boolean allProofs, String displayTitle) {
     	return new ProofFrameExplanationDisplay(editorKit, workbenchManager, proofRoot, displayTitle);    	
     }
 
 
     private void refill() {
         try {
-            for (ExplanationDisplay panel : panels) {
-                panel.dispose();
-            }
+        	if (proofDisplay != null) {
+        		proofDisplay.dispose();
+        	}
+        	
             explanationDisplayHolder.removeAll();
             explanationDisplayHolder.validate();
 
             OWLAxiom entailment = workbenchManager.getEntailment();
-            ProofManager proofManager = workbenchManager.getProofManager();       
-            ExplanationDisplay explanationDisplayPanel = entailment == null 
-            				? createProofExplanationDisplay(proofManager.getProofRootForInconsistency(), true, "Proof tree for ontology inconsistency")
-            				: createProofExplanationDisplay(proofManager.getProofRoot(entailment), true, "Proof tree for class susbumption");
+            ProofManager proofManager = workbenchManager.getProofManager();
+            
+            proofDisplay = entailment == null 
+            				? createProofExplanationDisplay(proofManager.getProofRootForInconsistency(), true, ProofFrameExplanationDisplay.INCONSISTENCY_TITLE)
+            				: createProofExplanationDisplay(proofManager.getProofRoot(entailment), true, ProofFrameExplanationDisplay.SUBSUMPTION_TITLE);
             //GUI
-            ExplanationDisplayList list = new ExplanationDisplayList(editorKit, workbenchManager, explanationDisplayPanel, 1);
+            ExplanationDisplayList list = new ExplanationDisplayList(editorKit, workbenchManager, proofDisplay, 1);
             
             list.setBorder(BorderFactory.createEmptyBorder(2, 0, 10, 0));
             explanationDisplayHolder.add(list);
-            panels.add(explanationDisplayPanel);
-            
             scrollPane.validate();
         }
         catch (ExplanationException e) {
-            e.printStackTrace();
+            ProtegeApplication.getErrorLog().logError(e);
         }
     }
+    
+    private void updateProofRoot() {
+    	OWLAxiom entailment = workbenchManager.getEntailment();
+        ProofManager proofManager = workbenchManager.getProofManager();
+        CycleFreeProofRoot root = entailment == null ? proofManager.getProofRootForInconsistency() : proofManager.getProofRoot(entailment);
+        
+        proofDisplay.update(root);
+        scrollPane.validate();
+    }
 
+    @Override
     public void dispose() {
+		// nice, but Protege won't call this because OWLModelManager.dispose()
+		// doesn't call dispose on ExplanationManager which would let all loaded
+		// explanation plugins dispose of their resources
         editorKit.getModelManager().removeListener(this);
-        for (ExplanationDisplay panel : panels) {
-            panel.dispose();
-        }
+        
+    	if (proofDisplay != null) {
+    		proofDisplay.dispose();
+    	}
     }
 
 
     public void handleChange(OWLModelManagerChangeEvent event) {
-
+    	switch (event.getType()) {
+		case ONTOLOGY_CLASSIFIED:
+			// update the proof model
+			if (proofDisplay != null) {
+				updateProofRoot();
+			}
+			else {
+				refill();
+			}
+			
+			break;
+		// TODO handle also ontology change and reload events	
+		default:
+			break;
+		
+		}
     }
 
-
-    public void axiomSelectionChanged(ExplanationDisplay source) {
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Implementation of selection model
-
-
-    public void addAxiomSelectionListener(AxiomSelectionListener lsnr) {
-        selectionModel.addAxiomSelectionListener(lsnr);
-    }
-
-
-    public void removeAxiomSelectionListener(AxiomSelectionListener lsnr) {
-        selectionModel.removeAxiomSelectionListener(lsnr);
-    }
-
-
-    public void setAxiomSelected(OWLAxiom axiom, boolean b) {
-        selectionModel.setAxiomSelected(axiom, b);
-    }
-
-
-    public Set<OWLAxiom> getSelectedAxioms() {
-        return selectionModel.getSelectedAxioms();
-    }
 
     @Override
     public Dimension getPreferredSize() {

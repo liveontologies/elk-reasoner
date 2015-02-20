@@ -129,4 +129,6 @@ public class AxiomExpressionEditor extends AbstractOWLObjectEditor<OWLClassAxiom
     public void removeStatusChangedListener(InputVerificationStatusChangedListener listener) {
         editor.removeStatusChangedListener(listener);
     }
+    
+    
 }

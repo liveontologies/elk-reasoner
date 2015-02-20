@@ -47,6 +47,8 @@ import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
  */
 public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 	
+	static final String NO_LONGER_ENTAILED = "%s may no longer be entailed by the ontology due to the performed changes. Please synchronize the reasoner.";
+	
 	private ProofFrameSection rootSection_;
 	
     private final List<OWLFrameListener> listeners_ = new ArrayList<OWLFrameListener>(2);
@@ -56,21 +58,24 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
     private final OWLRenderer renderer_;
     
     private final OWLOntology activeOntology_;
+    
+    private final String originalTitle_;
 	
     public ProofFrame(CycleFreeProofRoot proofRoot, OWLRenderer renderer, OWLOntology active, String title) {
     	renderer_ = renderer;
     	activeOntology_ = active;
     	rootExpression_ = proofRoot;
     	rootSection_ = new ProofFrameSection(this, Collections.singletonList(proofRoot), title, 0, renderer);
+    	originalTitle_ = title;
     	rootSection_.refill();
     	
     	//FIXME
-		try {
+		/*try {
 			System.err.println(OWLProofUtils.printProofTree(proofRoot));
 		} catch (ProofGenerationException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
+		}*/
     }
 
     OWLOntology getActiveOntology() {
@@ -82,14 +87,6 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 		
 		CycleFreeProofRoot updatedRoot = root.blockExpression(premise);
 		
-		/*//FIXME
-		try {
-			System.err.println(OWLProofUtils.printProofTree(root));
-		} catch (ProofGenerationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}*/
-		
 		//FIXME
 		/*System.err.println("Blocked " + premise + ", root replaced, remaining inferences:");
 		try {
@@ -97,7 +94,6 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 				System.err.println(inf);
 			}
 		} catch (ProofGenerationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
 		// this will update the hierarchical model (sections and rows)		
@@ -127,11 +123,11 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 				String rendering = renderer_.render(OWLProofUtils.getAxiom(rootExpression_));
 				
 				rootSection_.dispose();
-				rootSection_ = new ProofFrameSection(this, Collections.<OWLExpression>emptyList(), 
-						String.format("%s may no longer be entailed by the ontology due to the performed changes. Please synchronize the reasoner.", rendering), 0, renderer_);
+				rootSection_ = new ProofFrameSection(this, Collections.<OWLExpression>emptyList(), String.format(NO_LONGER_ENTAILED, rendering), 0, renderer_);
 			}
 			else {
 				// run down the model and refresh it
+				rootSection_.setLabel(originalTitle_);
 				rootSection_.update(Collections.singletonList(rootExpression_));
 			}
 		} catch (ProofGenerationException e) {
@@ -173,64 +169,4 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
         }
     }
 	
-
-    /*private void showAxiomEditor(final OWLAxiom axiom) {
-    	final AxiomExpressionEditor editor = new AxiomExpressionEditor(kit_);
-        final JComponent editorComponent = editor.getEditorComponent();
-        @SuppressWarnings("serial")
-		final VerifyingOptionPane optionPane = new VerifyingOptionPane(editorComponent) {
-
-            public void selectInitialValue() {
-                // This is overriden so that the option pane dialog default
-                // button doesn't get the focus.
-            }
-        };
-        final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
-            public void verifiedStatusChanged(boolean verified) {
-                optionPane.setOKEnabled(verified);
-            }
-        };
-        // Protege's syntax checkers only cover the class axiom's syntax
-        editor.setEditedObject((OWLClassAxiom) axiom);
-        // prevent the OK button from being available until the expression is syntactically valid
-        editor.addStatusChangedListener(verificationListener);
-        
-        JDialog dlg = optionPane.createDialog(this, null);
-
-        dlg.setModal(false);
-        dlg.setResizable(true);
-        dlg.pack();
-        dlg.setLocationRelativeTo(this);
-        dlg.addComponentListener(new ComponentAdapter() {
-
-            public void componentHidden(ComponentEvent e) {
-                Object retVal = optionPane.getValue();
-                
-                editorComponent.setPreferredSize(editorComponent.getSize());
-                
-                if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
-                    handleEditFinished(axiom, editor.getEditedObject());
-                }
-                
-                //setSelectedValue(frameObject, true);
-                
-                editor.removeStatusChangedListener(verificationListener);
-                editor.dispose();
-            }
-        });
-
-        dlg.setTitle("Class axiom expression editor");
-        dlg.setVisible(true);
-    }
-    
-	private void handleEditFinished(OWLAxiom oldAxiom, OWLAxiom newAxiom) {
-		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
-		OWLOntology ontology = kit_.getOWLModelManager().getActiveOntology();
-		// remove the old axiom
-		changes.add(new RemoveAxiom(ontology, oldAxiom));
-		changes.add(new AddAxiom(ontology, newAxiom));
-
-		kit_.getOWLModelManager().applyChanges(changes);
-	}*/
-    
 }
