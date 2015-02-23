@@ -75,7 +75,7 @@ import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
  *
  */
 @SuppressWarnings("serial")
-public class ProofWorkbenchPanel extends JPanel implements Disposable, EntailmentSelectionListener, OWLModelManagerListener {
+public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelManagerListener {
 
     private final OWLEditorKit editorKit;
 

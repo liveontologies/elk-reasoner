@@ -31,8 +31,6 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  */
 public class WorkbenchManager {
 
-    private WorkbenchSettings workbenchSettings = new WorkbenchSettings();
-
     private ProofManager proofManager;
 
     private OWLAxiom entailment;
@@ -45,10 +43,6 @@ public class WorkbenchManager {
     public WorkbenchManager(ProofManager proofManager) {
         this.proofManager = proofManager;
         this.entailment = null;
-    }
-
-    public WorkbenchSettings getWorkbenchSettings() {
-        return workbenchSettings;
     }
 
     public OWLAxiom getEntailment() {
