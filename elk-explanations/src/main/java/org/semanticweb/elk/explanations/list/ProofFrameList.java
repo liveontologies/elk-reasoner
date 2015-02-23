@@ -49,12 +49,15 @@ import org.protege.editor.core.ui.list.MListDeleteButton;
 import org.protege.editor.core.ui.list.MListEditButton;
 import org.protege.editor.core.ui.list.MListItem;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
-import org.protege.editor.core.ui.util.VerifyingOptionPane;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.framelist.OWLFrameList;
 import org.protege.editor.owl.ui.framelist.OWLFrameListInferredSectionRowBorder;
+import org.protege.editor.owl.ui.inference.PrecomputeAction;
 import org.semanticweb.elk.explanations.WorkbenchManager;
 import org.semanticweb.elk.explanations.editing.AxiomExpressionEditor;
+import org.semanticweb.elk.explanations.editing.CollapseButton;
+import org.semanticweb.elk.explanations.editing.EditAxiomPane;
+import org.semanticweb.elk.explanations.editing.ExpandButton;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -74,18 +77,22 @@ import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
 @SuppressWarnings("serial")
 public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 	
-	private final OWLEditorKit kit_;
-	
 	private static final Border INFERRED_BORDER = new OWLFrameListInferredSectionRowBorder();
 	
 	public static final Color EXPANDED_COLOR = new Color(232, 246, 219);
 	
 	private static final Set<AxiomType<?>> EDITABLE_AXIOM_TYPES = new HashSet<AxiomType<?>>(Arrays.<AxiomType<?>>asList(AxiomType.SUBCLASS_OF, AxiomType.OBJECT_PROPERTY_DOMAIN, AxiomType.OBJECT_PROPERTY_RANGE, AxiomType.EQUIVALENT_CLASSES));
 	
+	private final OWLEditorKit kit_;
+	
+	private final PrecomputeAction reasonerSyncAction_;
+	
     public ProofFrameList(OWLEditorKit editorKit, WorkbenchManager workbenchManager, ProofFrame proofFrame) {
         super(editorKit, proofFrame);
         
         kit_ = editorKit;
+        reasonerSyncAction_ = new PrecomputeAction();
+        reasonerSyncAction_.setEditorKit(editorKit);
         setCellRenderer(new ProofFrameListRenderer(editorKit));
     }
     
@@ -342,14 +349,14 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
     	
     	final AxiomExpressionEditor editor = new AxiomExpressionEditor(kit_);
         final JComponent editorComponent = editor.getEditorComponent();
-        
-		final VerifyingOptionPane optionPane = new VerifyingOptionPane(editorComponent) {
+		final EditAxiomPane optionPane = new EditAxiomPane(editorComponent) {
 
             public void selectInitialValue() {
                 // This is overriden so that the option pane dialog default
                 // button doesn't get the focus.
             }
         };
+        
         final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
             public void verifiedStatusChanged(boolean verified) {
                 optionPane.setOKEnabled(verified);
@@ -373,8 +380,17 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
                 
                 editorComponent.setPreferredSize(editorComponent.getSize());
                 
-                if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
-                    handleEditFinished(editor.getEditedObject(), expressionRow);
+                if (retVal != null) { 
+                	if (retVal.equals(EditAxiomPane.OK)) {
+                		handleEditFinished(editor.getEditedObject(), expressionRow);
+                		// only show proofs which do not use the old axiom
+                		blockInferencesForPremise(expressionRow.getRoot());
+                	}
+                	else if (retVal.equals(EditAxiomPane.OK_SYNC)) {
+                		handleEditFinished(editor.getEditedObject(), expressionRow);
+                		// synchronize the reasoner
+                		reasonerSyncAction_.actionPerformed(new ActionEvent(optionPane.getSyncButton(), ActionEvent.ACTION_PERFORMED, EditAxiomPane.OK_SYNC));
+                	}
                 }
                 
                 editor.removeStatusChangedListener(verificationListener);
@@ -382,7 +398,6 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
             }
         });
 
-        //dlg.setTitle("Class axiom editor");
         dlg.setVisible(true);
     }
     
@@ -394,8 +409,7 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 		changes.add(new AddAxiom(ontology, newAxiom));
 
 		kit_.getOWLModelManager().applyChanges(changes);
-		// only show proofs which do not use the old axiom
-		blockInferencesForPremise(exprRow.getRoot());
+		
 	}
 
 }
