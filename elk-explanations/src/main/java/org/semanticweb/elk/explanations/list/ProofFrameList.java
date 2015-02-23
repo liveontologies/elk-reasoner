@@ -41,8 +41,10 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.protege.editor.core.ui.list.MListButton;
 import org.protege.editor.core.ui.list.MListDeleteButton;
@@ -81,6 +83,8 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 	
 	public static final Color EXPANDED_COLOR = new Color(232, 246, 219);
 	
+	public static final Color SELECTED_COLOR = new Color(230, 215, 246);
+	
 	private static final Set<AxiomType<?>> EDITABLE_AXIOM_TYPES = new HashSet<AxiomType<?>>(Arrays.<AxiomType<?>>asList(AxiomType.SUBCLASS_OF, AxiomType.OBJECT_PROPERTY_DOMAIN, AxiomType.OBJECT_PROPERTY_RANGE, AxiomType.EQUIVALENT_CLASSES));
 	
 	private final OWLEditorKit kit_;
@@ -94,13 +98,46 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
         reasonerSyncAction_ = new PrecomputeAction();
         reasonerSyncAction_.setEditorKit(editorKit);
         setCellRenderer(new ProofFrameListRenderer(editorKit));
+        getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent event) {
+				FlattenedListModel model = getModel();
+				
+				handleSelect(event.getFirstIndex(), event.getLastIndex(), model);
+			}
+        	
+        });
     }
     
-    @Override
+    protected void handleSelect(int first, int second, FlattenedListModel model) {
+		Iterator<?> rowIter = model.iterate();
+		int i = 0;
+		
+		while (rowIter.hasNext()) {
+			Object item = rowIter.next();
+			
+			if (i == first || i == second) {
+				if (item instanceof ProofFrameSection) {
+					ProofFrameSection section = (ProofFrameSection) item;
+					
+					//System.err.println("Updating " + i + ", " + (isSelectedIndex(i) ? "selecting" : "unselecting"));
+					section.setSelected(isSelectedIndex(i));
+				}
+			}
+			
+			i++;
+		}
+		
+		repaint();
+	}
+
+	@Override
 	public ProofFrame getFrame() {
 		return (ProofFrame) super.getFrame();
 	}
-
+    
 	@Override
     protected List<MListButton> getButtons(final Object value) {
         if (value instanceof ProofFrameSectionRow) {
@@ -169,11 +206,27 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
     protected void deleteRow(ProofFrameSectionRow expressionRow) {
     	// we'll show a confirmation window to give a chance to abort it
     	String rendering = expressionRow.getRendering();
-    	int dialogButton = JOptionPane.showConfirmDialog (this, String.format("Are you sure to remove the axiom \"%s\" from the ontology?", rendering), "Confirmation", JOptionPane.YES_NO_OPTION);
+    	String remove = "Remove";
+    	String removeSync = "Remove and synchronize reasoner";
+    	int result = JOptionPane.showOptionDialog (
+    			this, 
+    			String.format("Are you sure to remove the axiom \"%s\" from the ontology?", rendering), 
+    			"Confirmation", 
+    			JOptionPane.DEFAULT_OPTION,
+    			JOptionPane.QUESTION_MESSAGE,
+    			null,
+    			new Object[] {remove, removeSync, "Cancel"},
+    			removeSync);
 
-        if(dialogButton == JOptionPane.YES_OPTION) { 
+        if (result == 0) { 
         	handleDelete();
+        	getFrame().setReasonerSynchronized(false);
         	blockInferencesForPremise(expressionRow.getRoot());
+        }
+        else if (result == 1) {
+        	handleDelete();
+        	// the proof frame will refresh when synchronization finishes
+        	reasonerSyncAction_.actionPerformed(null);
         }
     }
     
@@ -221,7 +274,7 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 
 	
 	@Override
-	public ListModel<?> getModel() {
+	public FlattenedListModel getModel() {
 		return new FlattenedListModel((ProofFrameSection) this.getFrame().getFrameSections().get(0));
 	}
 
@@ -229,6 +282,10 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 	protected Color getItemBackgroundColor(MListItem item) {
         if (item instanceof ProofFrameSectionRow) {
         	ProofFrameSectionRow exprRow = (ProofFrameSectionRow) item;
+        	
+        	if (exprRow.isSelected()) {
+        		return SELECTED_COLOR;
+        	}
         	
             if (exprRow.isInferred()) {
                 return exprRow.isExpanded() ? EXPANDED_COLOR : INFERRED_BG_COLOR;
@@ -242,6 +299,8 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 	private static class FlattenedListModel extends AbstractListModel<Object> {
 
 		private final ProofFrameSection header_;
+		
+		//pri
 		
 		FlattenedListModel(ProofFrameSection header) {
 			header_ = header;
@@ -278,7 +337,7 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 			return i;
 		}
 		
-		private Iterator<?> iterate() {
+		Iterator<?> iterate() {
 			final LinkedList<Object> todo = new LinkedList<Object>();
 			
 			todo.add(header_);

@@ -47,7 +47,9 @@ import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
  */
 public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 	
-	static final String NO_LONGER_ENTAILED = "%s may no longer be entailed by the ontology due to the performed changes. Please synchronize the reasoner.";
+	static final String MAY_NOT_BE_ENTAILED = "%s may no longer be entailed by the ontology due to the performed changes. Please synchronize the reasoner.";
+	
+	static final String NOT_ENTAILED = "%s is no longer entailed by the ontology due to the performed changes.";
 	
 	private ProofFrameSection rootSection_;
 	
@@ -60,6 +62,8 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
     private final OWLOntology activeOntology_;
     
     private final String originalTitle_;
+    
+    private boolean reasonerInSync_ = true;
 	
     public ProofFrame(CycleFreeProofRoot proofRoot, OWLRenderer renderer, OWLOntology active, String title) {
     	renderer_ = renderer;
@@ -80,6 +84,10 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 
     OWLOntology getActiveOntology() {
     	return activeOntology_;
+    }
+    
+    public void setReasonerSynchronized(boolean v) {
+    	reasonerInSync_ = v;
     }
     
 	public void blockInferencesForPremise(OWLExpression premise) {
@@ -121,9 +129,10 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 			if (!rootExpression_.getInferences().iterator().hasNext()) {
 				// the root expression is no longer entailed
 				String rendering = renderer_.render(OWLProofUtils.getAxiom(rootExpression_));
+				String msg = reasonerInSync_ ? NOT_ENTAILED : MAY_NOT_BE_ENTAILED;
 				
 				rootSection_.dispose();
-				rootSection_ = new ProofFrameSection(this, Collections.<OWLExpression>emptyList(), String.format(NO_LONGER_ENTAILED, rendering), 0, renderer_);
+				rootSection_ = new ProofFrameSection(this, Collections.<OWLExpression>emptyList(), String.format(msg, rendering), 0, renderer_);
 			}
 			else {
 				// run down the model and refresh it

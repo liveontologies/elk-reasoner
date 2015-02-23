@@ -85,6 +85,12 @@ public class ProofFrameSection implements OWLFrameSection<OWLExpression, OWLAxio
     void setLabel(String l) {
     	label_ = l;
     }
+    
+    void setSelected(boolean sel) {
+    	for (ProofFrameSectionRow row : rows_) {
+    		row.setSelected(sel);
+    	}
+    }
 
     void update(Iterable<? extends OWLExpression> newExpressions) {
     	//FIXME

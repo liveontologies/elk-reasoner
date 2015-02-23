@@ -56,6 +56,8 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
     
     private boolean expanded_ = false;
     
+    private boolean selected_ = false;
+    
     private List<ProofFrameSection> inferenceSections_ = new ArrayList<ProofFrameSection>(2);
     
     private OWLExpression expression_;
@@ -81,6 +83,14 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
     
     void setExpanded(boolean v) {
     	expanded_ = v;
+    }
+    
+    boolean isSelected() {
+    	return selected_;
+    }
+    
+    void setSelected(boolean v) {
+    	selected_ = v;
     }
     
     boolean isFilled() {

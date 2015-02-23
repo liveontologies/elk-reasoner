@@ -40,6 +40,7 @@ import org.protege.editor.core.ProtegeApplication;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
+import org.protege.editor.owl.model.inference.ReasonerStatus;
 import org.semanticweb.owl.explanation.api.ExplanationException;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
@@ -238,9 +239,17 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable, Entailmen
     		proofDisplay.dispose();
     	}
     }
-
+    
+    boolean isReasonerSynchronized() {
+    	return editorKit.getOWLModelManager().getOWLReasonerManager().getReasonerStatus() != ReasonerStatus.OUT_OF_SYNC;
+    }
 
     public void handleChange(OWLModelManagerChangeEvent event) {
+    	//System.err.println("Event received: " + event.getType());
+    	if (proofDisplay != null) {
+    		proofDisplay.setReasonerSynchronized(isReasonerSynchronized());
+    	}
+    	
     	switch (event.getType()) {
 		case ONTOLOGY_CLASSIFIED:
 			// update the proof model

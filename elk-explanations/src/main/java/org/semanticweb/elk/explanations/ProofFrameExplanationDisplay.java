@@ -78,4 +78,7 @@ public class ProofFrameExplanationDisplay extends JPanel {
         frame.dispose();
     }
 	
+    public void setReasonerSynchronized(boolean v) {
+    	frame.setReasonerSynchronized(v);
+    }
 }
