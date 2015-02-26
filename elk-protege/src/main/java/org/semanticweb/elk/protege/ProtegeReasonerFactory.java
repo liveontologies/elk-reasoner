@@ -51,7 +51,7 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 
 	@Override
 	public BufferingMode getRecommendedBuffering() {
-		return BufferingMode.NON_BUFFERING;
+		return BufferingMode.BUFFERING;
 	}
 
 	@Override

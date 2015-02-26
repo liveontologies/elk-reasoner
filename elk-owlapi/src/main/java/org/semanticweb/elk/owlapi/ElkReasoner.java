@@ -59,6 +59,7 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
+import org.semanticweb.owlapi.model.OWLOntologyChangeProgressListener;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.AxiomNotInProfileException;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
@@ -109,6 +110,8 @@ public class ElkReasoner implements OWLReasoner {
 	private final boolean isBufferingMode_;
 	/** listener to implement addition and removal of axioms */
 	private final OntologyChangeListener ontologyChangeListener_;
+	/** listener to keep track of when changes are applied to the ontology */
+	private final OntologyChangeProgressListener ontologyChangeProgressListener_;
 	/** ELK object factory used to create any ElkObjects */
 	private final ElkObjectFactory objectFactory_;
 	/** Converter from OWL API to ELK OWL */
@@ -124,6 +127,11 @@ public class ElkReasoner implements OWLReasoner {
 	/** the ELK reasoner instance used for reasoning */
 	private Reasoner reasoner_;
 
+	/**
+	 * {@code true} if the ontology should be loaded before any changes are
+	 * applied to the ontology (used only for buffering mode)
+	 */
+	private boolean loadBeforeChanges_ = true;
 	/**
 	 * {@code true} if it is required to reload the whole ontology next time the
 	 * changes should be flushed
@@ -142,6 +150,9 @@ public class ElkReasoner implements OWLReasoner {
 		this.ontologyChangeListener_ = new OntologyChangeListener();
 		this.owlOntologymanager_
 				.addOntologyChangeListener(ontologyChangeListener_);
+		this.ontologyChangeProgressListener_ = new OntologyChangeProgressListener();
+		this.owlOntologymanager_
+				.addOntologyChangeProgessListener(ontologyChangeProgressListener_);
 		this.objectFactory_ = new ElkObjectFactoryImpl();
 		this.owlConverter_ = OwlConverter.getInstance();
 		this.elkConverter_ = ElkConverter.getInstance();
@@ -200,13 +211,6 @@ public class ElkReasoner implements OWLReasoner {
 		// switch to the primary progress monitor; this is to avoid bugs with
 		// progress monitors in Protege
 		this.reasoner_.setProgressMonitor(this.secondaryProgressMonitor_);
-		if (isBufferingMode_) {
-			try {
-				reasoner_.forceLoading();
-			} catch (ElkException e) {
-				throw elkConverter_.convert(e);
-			}
-		}
 	}
 
 	/**
@@ -287,8 +291,10 @@ public class ElkReasoner implements OWLReasoner {
 	public void dispose() {
 		if (LOGGER_.isDebugEnabled())
 			LOGGER_.debug("dispose()");
-		owlOntology_.getOWLOntologyManager().removeOntologyChangeListener(
-				ontologyChangeListener_);
+		owlOntologymanager_
+				.removeOntologyChangeListener(ontologyChangeListener_);
+		owlOntologymanager_
+				.removeOntologyChangeProgessListener(ontologyChangeProgressListener_);
 		try {
 			for (;;) {
 				try {
@@ -954,13 +960,20 @@ public class ElkReasoner implements OWLReasoner {
 		@Override
 		public void ontologiesChanged(List<? extends OWLOntologyChange> changes)
 				throws OWLException {
+			Set<OWLOntology> importClosure = null;
 			for (OWLOntologyChange change : changes) {
-				if (!relevantChange(change)) {
-					if (LOGGER_.isTraceEnabled()) {
-						LOGGER_.trace("Ignoring the change not applicable to the current ontology: "
-								+ change);
+				OWLOntology changedOntology = change.getOntology();
+				if (!changedOntology.equals(owlOntology_)) {
+					if (importClosure == null) {
+						importClosure = owlOntology_.getImportsClosure();
 					}
-					continue;
+					if (!importClosure.contains(changedOntology)) {						
+						if (LOGGER_.isTraceEnabled()) {
+							LOGGER_.trace("Ignoring the change not applicable to the current ontology: "
+									+ change);
+						}
+						continue;
+					}
 				}
 
 				if (!change.isAxiomChange()) {
@@ -978,14 +991,35 @@ public class ElkReasoner implements OWLReasoner {
 				flush();
 		}
 
-		/**
-		 */
-		private boolean relevantChange(OWLOntologyChange change) {
-			OWLOntology changedOntology = change.getOntology();
-			return changedOntology.equals(owlOntology_)
-					|| owlOntology_.getImportsClosure().contains(
-							change.getOntology());
+	}
+
+	private class OntologyChangeProgressListener implements
+			OWLOntologyChangeProgressListener {
+
+		@Override
+		public void begin(int size) {
+			if (isBufferingMode_ && loadBeforeChanges_) {
+				try {
+					LOGGER_.trace("force initial loading");
+					reasoner_.forceLoading();
+					loadBeforeChanges_ = false;
+				} catch (ElkException e) {
+					throw elkConverter_.convert(e);
+				}
+			}
 		}
+
+		@Override
+		public void appliedChange(OWLOntologyChange change) {
+			// nothing to do
+
+		}
+
+		@Override
+		public void end() {
+			// nothing to do
+		}
+
 	}
 
 }

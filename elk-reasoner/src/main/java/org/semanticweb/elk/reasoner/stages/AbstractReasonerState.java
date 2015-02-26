@@ -231,7 +231,6 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	public void forceLoading() throws ElkException {
-		resetAxiomLoading();
 		loadAxioms();
 	}
 
