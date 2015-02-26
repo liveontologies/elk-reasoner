@@ -25,9 +25,11 @@ package org.semanticweb.elk.explanations.editing;
  */
 
 import java.awt.Component;
+import java.awt.event.ComponentListener;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
@@ -47,40 +49,36 @@ public class EditAxiomPane extends JOptionPane {
     
     public static String OK = "Apply";
     
-    public static String OK_SYNC = "Apply and synchronize reasoner";
-    
     public static String CANCEL = "Cancel";
 
     private static final Logger logger = Logger.getLogger(VerifyingOptionPane.class);
 
     private JButton okButton;
     
-    private JButton okSyncButton;
-
+    private ComponentListener editorHandler_;
+    
     public EditAxiomPane(JComponent c) {
-        super(c, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, new Object[] {OK, OK_SYNC, CANCEL}, OK_SYNC);
-    }
-
-    public JButton getSyncButton() {
-    	return okSyncButton;
+        this(c, new Object[] {OK, CANCEL}, OK);
     }
     
+    protected EditAxiomPane(JComponent parent, Object[] options, Object defaultOption) {
+        super(parent, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, defaultOption);
+    }
+
     public void setOKEnabled(boolean enabled){
-        if (okButton == null || okSyncButton == null){
+        if (okButton == null){
             okButton = getButtonComponent(this, JButton.class, OK);
-            okSyncButton = getButtonComponent(this, JButton.class, OK_SYNC);
         }
         
-        if (okButton != null && okSyncButton != null){
+        if (okButton != null) {
             okButton.setEnabled(enabled);
-            okSyncButton.setEnabled(enabled);
         }
         else{
             logger.warn("Cannot find OK button for this system. Please report this with details of your OS and language.");
         }
     }
 
-    private <T extends JComponent> T getButtonComponent(JComponent parent, Class<T> type, String name) {
+    protected <T extends JComponent> T getButtonComponent(JComponent parent, Class<T> type, String name) {
         if (type.isAssignableFrom(parent.getClass())){
             if (parent instanceof JButton){
                 if (name.equals(((JButton)parent).getText())){
@@ -98,4 +96,25 @@ public class EditAxiomPane extends JOptionPane {
         }
         return null;
     }
+    
+    public void selectInitialValue() {
+        // This is overriden so that the option pane dialog default
+        // button doesn't immediately get the focus.
+    }
+
+	public void setEditorHandler(ComponentListener handler) {
+		editorHandler_ = handler;
+	}
+	
+	public JDialog createEditorDialog(JComponent parent) {
+		JDialog dlg = createDialog(parent, "Class axiom editor");
+		
+		dlg.setModal(false);
+        dlg.setResizable(true);
+        dlg.pack();
+        dlg.setLocationRelativeTo(parent);
+        dlg.addComponentListener(editorHandler_);
+        
+        return dlg;
+	}
 }

@@ -50,9 +50,9 @@ public class ProofFrameExplanationDisplay extends JPanel {
 
     public ProofFrameExplanationDisplay(
     		final OWLEditorKit editorKit, 
-    		WorkbenchManager workbenchManager, 
     		CycleFreeProofRoot root,
-    		String title) {
+    		String title, 
+    		ProofWorkbenchPanel proofWorkbenchPanel) {
         frame = new ProofFrame(root, new OWLRenderer() {
 			
 			@Override
@@ -64,12 +64,12 @@ public class ProofFrameExplanationDisplay extends JPanel {
         
         setLayout(new BorderLayout());
         
-        frameList =  new ProofFrameList(editorKit, workbenchManager, frame);
+        frameList =  new ProofFrameList(editorKit, frame, proofWorkbenchPanel);
         add(frameList, BorderLayout.NORTH);       
         frameList.setBorder(BorderFactory.createEmptyBorder(7, 10, 7, 10));
     }
     
-    void update(CycleFreeProofRoot newRoot) {
+    public void update(CycleFreeProofRoot newRoot) {
     	frame.setRootObject(newRoot);
     	frameList.refreshComponent();
     }

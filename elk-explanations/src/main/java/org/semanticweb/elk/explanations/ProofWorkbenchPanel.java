@@ -188,7 +188,7 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelM
     }
 
     protected ProofFrameExplanationDisplay createProofExplanationDisplay(CycleFreeProofRoot proofRoot, boolean allProofs, String displayTitle) {
-    	return new ProofFrameExplanationDisplay(editorKit, workbenchManager, proofRoot, displayTitle);    	
+    	return new ProofFrameExplanationDisplay(editorKit, proofRoot, displayTitle, this);    	
     }
 
 
@@ -219,7 +219,7 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelM
         }
     }
     
-    private void updateProofRoot() {
+    public void updateProofRoot() {
     	OWLAxiom entailment = workbenchManager.getEntailment();
         ProofManager proofManager = workbenchManager.getProofManager();
         CycleFreeProofRoot root = entailment == null ? proofManager.getProofRootForInconsistency() : proofManager.getProofRoot(entailment);

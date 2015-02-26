@@ -55,9 +55,10 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.framelist.OWLFrameList;
 import org.protege.editor.owl.ui.framelist.OWLFrameListInferredSectionRowBorder;
 import org.protege.editor.owl.ui.inference.PrecomputeAction;
-import org.semanticweb.elk.explanations.WorkbenchManager;
+import org.semanticweb.elk.explanations.ProofWorkbenchPanel;
 import org.semanticweb.elk.explanations.editing.AxiomExpressionEditor;
 import org.semanticweb.elk.explanations.editing.CollapseButton;
+import org.semanticweb.elk.explanations.editing.EditAndSyncAxiomPane;
 import org.semanticweb.elk.explanations.editing.EditAxiomPane;
 import org.semanticweb.elk.explanations.editing.ExpandButton;
 import org.semanticweb.owlapi.model.AddAxiom;
@@ -67,6 +68,7 @@ import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.RemoveAxiom;
+import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
 
@@ -91,10 +93,13 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 	
 	private final PrecomputeAction reasonerSyncAction_;
 	
-    public ProofFrameList(OWLEditorKit editorKit, WorkbenchManager workbenchManager, ProofFrame proofFrame) {
+	private final ProofWorkbenchPanel mainPanel_;
+	
+    public ProofFrameList(OWLEditorKit editorKit, ProofFrame proofFrame, ProofWorkbenchPanel proofWorkbenchPanel) {
         super(editorKit, proofFrame);
         
         kit_ = editorKit;
+        mainPanel_ = proofWorkbenchPanel;
         reasonerSyncAction_ = new PrecomputeAction();
         reasonerSyncAction_.setEditorKit(editorKit);
         setCellRenderer(new ProofFrameListRenderer(editorKit));
@@ -122,7 +127,6 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 				if (item instanceof ProofFrameSection) {
 					ProofFrameSection section = (ProofFrameSection) item;
 					
-					//System.err.println("Updating " + i + ", " + (isSelectedIndex(i) ? "selecting" : "unselecting"));
 					section.setSelected(isSelectedIndex(i));
 				}
 			}
@@ -300,8 +304,6 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 
 		private final ProofFrameSection header_;
 		
-		//pri
-		
 		FlattenedListModel(ProofFrameSection header) {
 			header_ = header;
 		}
@@ -399,26 +401,25 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 		
 	}
 	
+	private boolean isBufferingMode() {
+		return kit_.getOWLModelManager().getOWLReasonerManager().getCurrentReasoner().getBufferingMode() == BufferingMode.BUFFERING;
+	}
+	
     private void showAxiomEditor(final ProofFrameSectionRow expressionRow) {
     	final OWLAxiom axiom = expressionRow.getAxiom();
     	
     	if (axiom == null) {
+    		// lemma?? either way we can edit only axioms
     		return;
     	}
     	
-    	final AxiomExpressionEditor editor = new AxiomExpressionEditor(kit_);
-        final JComponent editorComponent = editor.getEditorComponent();
-		final EditAxiomPane optionPane = new EditAxiomPane(editorComponent) {
-
-            public void selectInitialValue() {
-                // This is overriden so that the option pane dialog default
-                // button doesn't get the focus.
-            }
-        };
+    	AxiomExpressionEditor editor = new AxiomExpressionEditor(kit_);
+        JComponent editorComponent = editor.getEditorComponent();
+		final EditAxiomPane editorPane = createEditAxiomPane(editorComponent, editor, expressionRow);
         
         final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
             public void verifiedStatusChanged(boolean verified) {
-                optionPane.setOKEnabled(verified);
+            	editorPane.setOKEnabled(verified);
             }
         };
         // Protege's syntax checkers only cover the class axiom's syntax
@@ -426,49 +427,129 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
         // prevent the OK button from being available until the expression is syntactically valid
         editor.addStatusChangedListener(verificationListener);
         
-        JDialog dlg = optionPane.createDialog(this, "Class axiom editor");
-
-        dlg.setModal(false);
-        dlg.setResizable(true);
-        dlg.pack();
-        dlg.setLocationRelativeTo(this);
-        dlg.addComponentListener(new ComponentAdapter() {
-
-            public void componentHidden(ComponentEvent e) {
-                Object retVal = optionPane.getValue();
-                
-                editorComponent.setPreferredSize(editorComponent.getSize());
-                
-                if (retVal != null) { 
-                	if (retVal.equals(EditAxiomPane.OK)) {
-                		handleEditFinished(editor.getEditedObject(), expressionRow);
-                		// only show proofs which do not use the old axiom
-                		blockInferencesForPremise(expressionRow.getRoot());
-                	}
-                	else if (retVal.equals(EditAxiomPane.OK_SYNC)) {
-                		handleEditFinished(editor.getEditedObject(), expressionRow);
-                		// synchronize the reasoner
-                		reasonerSyncAction_.actionPerformed(new ActionEvent(optionPane.getSyncButton(), ActionEvent.ACTION_PERFORMED, EditAxiomPane.OK_SYNC));
-                	}
-                }
-                
-                editor.removeStatusChangedListener(verificationListener);
-                editor.dispose();
-            }
-        });
+        JDialog dlg = editorPane.createEditorDialog(this);
 
         dlg.setVisible(true);
     }
     
-	private void handleEditFinished(OWLAxiom newAxiom, ProofFrameSectionRow exprRow) {
-		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
-		OWLOntology ontology = kit_.getOWLModelManager().getActiveOntology();
-		// remove the old axiom
-		changes.add(new RemoveAxiom(ontology, exprRow.getAxiom()));
-		changes.add(new AddAxiom(ontology, newAxiom));
-
-		kit_.getOWLModelManager().applyChanges(changes);
+    private EditAxiomPane createEditAxiomPane(JComponent component, AxiomExpressionEditor editor, ProofFrameSectionRow row) {
+    	if (isBufferingMode()) {
+			EditAndSyncAxiomPane optionPane = new EditAndSyncAxiomPane(component);
+			
+			optionPane.setEditorHandler(new BufferingEditHandler(component, optionPane, editor, row));
+			
+			return optionPane;
+		}
+		else {
+			EditAxiomPane optionPane = new EditAxiomPane(component);
+			
+			optionPane.setEditorHandler(new NonBufferingEditHandler(component, optionPane, editor, row));
+			
+			return optionPane;
+		}
+    }
+	
+	/**
+	 * 
+	 * @author	Pavel Klinov
+	 * 			pavel.klinov@uni-ulm.de
+	 *
+	 */
+	private abstract class EditHandler<C extends EditAxiomPane> extends ComponentAdapter {
 		
+		protected final JComponent editorComponent;
+		
+		protected final C editorPane;
+		
+		protected final AxiomExpressionEditor editor;
+		
+		protected final ProofFrameSectionRow expressionRow;
+		
+		public abstract void componentHidden(ComponentEvent e);
+		
+		EditHandler(JComponent component, C pane, AxiomExpressionEditor ed, ProofFrameSectionRow row) {
+			editorComponent = component;
+			editorPane = pane;
+			editor = ed;
+			expressionRow = row;
+		}
+		
+		void handleEditFinished(OWLAxiom newAxiom, ProofFrameSectionRow exprRow) {
+			List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+			OWLOntology ontology = kit_.getOWLModelManager().getActiveOntology();
+			// remove the old axiom
+			changes.add(new RemoveAxiom(ontology, exprRow.getAxiom()));
+			changes.add(new AddAxiom(ontology, newAxiom));
+
+			kit_.getOWLModelManager().applyChanges(changes);
+		}
+    
+	}
+	
+	/**
+	 * 
+	 * @author	Pavel Klinov
+	 * 			pavel.klinov@uni-ulm.de
+	 *
+	 */
+	private class NonBufferingEditHandler extends EditHandler<EditAxiomPane> {
+		
+		NonBufferingEditHandler(JComponent component, EditAxiomPane pane, AxiomExpressionEditor ed, ProofFrameSectionRow row) {
+			super(component, pane, ed, row);
+		}
+		
+		public void componentHidden(ComponentEvent e) {
+            Object retVal = editorPane.getValue();
+            
+            editorComponent.setPreferredSize(editorComponent.getSize());
+            
+            if (retVal != null) { 
+            	if (retVal.equals(EditAxiomPane.OK)) {
+            		handleEditFinished(editor.getEditedObject(), expressionRow);
+            		// immediately update the root, the reasoner should return up-to-date results
+            		mainPanel_.updateProofRoot();
+            	}
+            }
+            
+            //editor.removeStatusChangedListener(verificationListener);
+            editor.dispose();
+        }
+    
+	}
+	
+	/**
+	 * 
+	 * @author	Pavel Klinov
+	 * 			pavel.klinov@uni-ulm.de
+	 *
+	 */
+	private class BufferingEditHandler extends EditHandler<EditAndSyncAxiomPane> {
+		
+		BufferingEditHandler(JComponent component, EditAndSyncAxiomPane pane, AxiomExpressionEditor ed, ProofFrameSectionRow row) {
+			super(component, pane, ed, row);
+		}
+		
+		public void componentHidden(ComponentEvent e) {
+            Object retVal = editorPane.getValue();
+            
+            editorComponent.setPreferredSize(editorComponent.getSize());
+            
+            if (retVal != null) { 
+            	if (retVal.equals(EditAxiomPane.OK)) {
+            		handleEditFinished(editor.getEditedObject(), expressionRow);
+            		// only show proofs which do not use the old axiom
+            		blockInferencesForPremise(expressionRow.getRoot());
+            	}
+            	else if (retVal.equals(EditAndSyncAxiomPane.OK_SYNC)) {
+            		handleEditFinished(editor.getEditedObject(), expressionRow);
+            		// synchronize the reasoner
+            		reasonerSyncAction_.actionPerformed(new ActionEvent(editorPane.getSyncButton(), ActionEvent.ACTION_PERFORMED, EditAndSyncAxiomPane.OK_SYNC));
+            	}
+            }
+            
+            //editor.removeStatusChangedListener(verificationListener);
+            editor.dispose();
+        }
 	}
 
 }
