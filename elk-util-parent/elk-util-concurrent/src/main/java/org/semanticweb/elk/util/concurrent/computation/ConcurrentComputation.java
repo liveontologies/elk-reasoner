@@ -102,6 +102,10 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>>
 	public ConcurrentComputation(F inputProcessorFactory,
 			ComputationExecutor executor, int maxWorkers, int bufferCapacity) {
 		this.inputProcessorFactory_ = inputProcessorFactory;
+		if (bufferCapacity <= maxWorkers)
+			// we need poisons from the workers plus one input to fit in the
+			// buffer
+			bufferCapacity = maxWorkers + 1;
 		this.buffer_ = new ArrayBlockingQueue<I>(bufferCapacity);
 		this.bufferCapacity_ = bufferCapacity;
 		this.termination_ = false;
@@ -240,7 +244,7 @@ public class ConcurrentComputation<I, F extends InputProcessorFactory<I, ?>>
 					if (termination_) {
 						if (buffer_.isEmpty()) {
 							// wake up blocked workers if not done already
-							buffer_.offer(poison_pill_);
+							buffer_.put(poison_pill_);
 							break;
 						}
 						if (isInterrupted()) {

@@ -54,10 +54,10 @@ public interface InputProcessor<J> {
 	public void process() throws InterruptedException;
 
 	/**
-	 * Indicate that processing of the input is finished. This method should be
-	 * eventually called after every call of {@link #process()} (but it is not
-	 * necessary that every call of {@link #process()} should be followed by
-	 * {@link #finish()}).
+	 * Called when processing of the input is finished or interrupted. This
+	 * method is eventually called after every call of {@link #process()} (but
+	 * it is not guaranteed that every call of {@link #process()} is followed
+	 * with {@link #finish()}).
 	 */
 	public void finish();
 
