@@ -36,7 +36,7 @@
 		<connection>scm:git:https://code.google.com/p/elk-reasoner/</connection>
 		<developerConnection>scm:git:git@github.com:klinovp/elk.git</developerConnection>
 		<url>http://elk-reasoner.googlecode.com/git/</url>
-		<tag>v0.4.1</tag>
+		<tag>v0.4.2</tag>
 	</scm>
 
 	<licenses>
