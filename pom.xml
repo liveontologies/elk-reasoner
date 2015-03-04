@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.semanticweb.elk</groupId>
 	<artifactId>elk-parent</artifactId>
-	<version>0.4.2-SNAPSHOT</version>
+	<version>0.4.2</version>
 	<packaging>pom</packaging>
 
 	<parent>
