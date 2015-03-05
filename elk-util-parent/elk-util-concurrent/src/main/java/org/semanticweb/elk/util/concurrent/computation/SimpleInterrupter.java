@@ -23,8 +23,7 @@
 package org.semanticweb.elk.util.concurrent.computation;
 
 /**
- * A simple interrupter, which just stores the flag about the interrupt status
- * and interrupts the thread that is assigned to this interrupter
+ * A simple interrupter, which uses a flag about the interrupt status
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -32,59 +31,18 @@ package org.semanticweb.elk.util.concurrent.computation;
 public class SimpleInterrupter implements Interrupter {
 
 	/**
-	 * the thread which will be interrupted when {@link #interrupt()} is called
-	 */
-	private volatile Thread toInterrupt;
-
-	/**
 	 * the interrupt status of this interrupter
 	 */
-	volatile boolean interrupted = false;
-
-	/**
-	 * Make sure the given thread is interrupted when {@link #interrupt()} is
-	 * called
-	 * 
-	 * @param toInterrupt
-	 *            the thread which will be interrupted
-	 */
-	public void registerThreadToInterrupt(Thread toInterrupt) {
-		this.toInterrupt = toInterrupt;
-	}
-
-	/**
-	 * Assign the current thread is interrupted when {@link #interrupt()} is
-	 * called
-	 */
-	public void registerCurrentThreadToInterrupt() {
-		registerThreadToInterrupt(Thread.currentThread());
-	}
-
-	/**
-	 * De-registers a thread to be interrupted (so that no thread is interrupted
-	 * accidently)
-	 */
-	public synchronized void clearThreadToInterrupt() {
-		this.toInterrupt = null;
-	}
+	private volatile boolean isInterrupted_ = false;
 
 	@Override
-	// I've seen an NPE here, which can only happen
-	// if some thread managed to clear the to-be-interrupted thread
-	// before another one interrupts it
-	public synchronized void interrupt() {
-		interrupted = true;
-		if (toInterrupt != null)
-			toInterrupt.interrupt();
+	public void setInterrupt(boolean flag) {
+		this.isInterrupted_ = flag;
 	}
 
 	@Override
 	public boolean isInterrupted() {
-		return interrupted;
+		return isInterrupted_;
 	}
 
-	@Override
-	public void clearInterrupt() {
-		interrupted = false;
-	}
 }

@@ -31,6 +31,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * An {@link AbstractRuleEngine} which produces {@link Conclusion}s and
@@ -55,11 +56,12 @@ public class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
 
 	protected BasicRuleEngine(OntologyIndex index,
 			ConclusionVisitor<? super Context, Boolean> conclusionProcessor,
-			WorkerLocalTodo localTodo, SaturationStateWriter<?> writer,
+			WorkerLocalTodo localTodo, Interrupter interrupter,
+			SaturationStateWriter<?> writer,
 			SaturationStatistics aggregatedStatistics,
 			SaturationStatistics localStatistics) {
-		super(conclusionProcessor, localTodo, aggregatedStatistics,
-				localStatistics);
+		super(conclusionProcessor, localTodo, interrupter,
+				aggregatedStatistics, localStatistics);
 		this.writer_ = writer;
 		this.contextInitConclusion_ = new ContextInitializationImpl(index);
 	}

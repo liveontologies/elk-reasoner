@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,18 +59,24 @@ public abstract class AbstractRuleEngine implements
 	 */
 	private final WorkerLocalTodo workerLocalTodo_;
 
+	/**
+	 * The {@link Interrupter} that can interrupt processing
+	 */
+	private final Interrupter interrupter_;
+
 	public AbstractRuleEngine(
 			ConclusionVisitor<? super Context, ?> conclusionProcessor,
-			WorkerLocalTodo localizedProducer) {
+			WorkerLocalTodo localizedProducer, Interrupter interrupter) {
 		this.conclusionProcessor_ = conclusionProcessor;
 		this.workerLocalTodo_ = localizedProducer;
+		this.interrupter_ = interrupter;
 	}
 
 	@Override
 	public void process() throws InterruptedException {
 		try {
 			for (;;) {
-				if (Thread.currentThread().isInterrupted())
+				if (interrupter_.isInterrupted())
 					break;
 				Context nextContext = getNextActiveContext();
 				if (nextContext == null) {

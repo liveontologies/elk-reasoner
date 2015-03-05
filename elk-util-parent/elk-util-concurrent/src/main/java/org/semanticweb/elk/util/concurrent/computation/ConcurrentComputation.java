@@ -23,21 +23,22 @@
 package org.semanticweb.elk.util.concurrent.computation;
 
 /**
- * An class for concurrent processing using the supplied
- * {@link ProcessorFactory}. Processing is performed concurrently by several
- * workers, each using a {@link Processor} created by the
- * {@link ProcessorFactory}. Processing starts by calling {@link #start()},
- * which creates a specified number of working threads and starts concurrent
- * processing. All workers can be interrupted by calling {@link #interrupt()}.
- * When {@link #finish()} is called, the current thread blocks until everything
- * is processed by the workers or all workers have been interrupted.
+ * A class for concurrent processing using the supplied {@link ProcessorFactory}
+ * . Processing is performed concurrently by several workers, each using a
+ * {@link Processor} created by the {@link ProcessorFactory}. Processing starts
+ * by calling {@link #start()}, which creates a specified number of working
+ * threads and starts concurrent processing. All workers can be interrupted by
+ * calling {@link #interrupt()}. When {@link #finish()} is called, the current
+ * thread blocks until everything is processed by the workers or all workers
+ * have been interrupted.
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <F>
  *            the type of the factory for the input processors
  */
-public class ConcurrentComputation<F extends ProcessorFactory<?>> {
+public class ConcurrentComputation<F extends ProcessorFactory<?>> extends
+		SimpleInterrupter {
 	/**
 	 * the factory for the input processor engines
 	 */
@@ -51,14 +52,10 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> {
 	 */
 	protected final ComputationExecutor executor;
 	/**
-	 * {@code true} if the finish of computation was requested using the
-	 * function {@link #finish()}
+	 * {@code true} the workers should stop either as soon as possible (if the
+	 * computation has been terminated) or after {@link #finish()} is called
 	 */
-	protected volatile boolean finishRequested;
-	/**
-	 * {@code true} if the computation has been interrupted
-	 */
-	protected volatile boolean interrupted;
+	protected volatile boolean termination;
 	/**
 	 * the worker instance used to process the jobs
 	 */
@@ -73,34 +70,14 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> {
 	 *            the executor used internally to run the jobs
 	 * @param maxWorkers
 	 *            the maximal number of concurrent workers processing the jobs
-	 * @param bufferCapacity
-	 *            the size of the buffer for scheduled jobs; if the buffer is
-	 *            full, submitting new jobs will block until new space is
-	 *            available
-	 */
-	public ConcurrentComputation(F inputProcessorFactory,
-			ComputationExecutor executor, int maxWorkers, int bufferCapacity) {
-		this.processorFactory = inputProcessorFactory;
-		this.finishRequested = false;
-		this.interrupted = false;
-		this.worker = getWorker();
-		this.executor = executor;
-		this.maxWorkers = maxWorkers;
-	}
-
-	/**
-	 * Creating a {@link ConcurrentComputation} instance.
-	 * 
-	 * @param inputProcessorFactory
-	 *            the factory for input processors
-	 * @param executor
-	 *            the executor used internally to run the jobs
-	 * @param maxWorkers
-	 *            the maximal number of concurrent workers processing the jobs
 	 */
 	public ConcurrentComputation(F inputProcessorFactory,
 			ComputationExecutor executor, int maxWorkers) {
-		this(inputProcessorFactory, executor, maxWorkers, 512 + 32 * maxWorkers);
+		this.processorFactory = inputProcessorFactory;
+		this.termination = false;
+		this.worker = getWorker();
+		this.executor = executor;
+		this.maxWorkers = maxWorkers;
 	}
 
 	/**
@@ -109,25 +86,18 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> {
 	 * @return {@code true} if the operation was successful
 	 */
 	public synchronized boolean start() {
-		finishRequested = false;
-		interrupted = false;
 		return executor.start(worker, maxWorkers);
 	}
 
-	/**
-	 * Request all currently running workers to stop; no input can be submitted
-	 * after calling this method. When this method returns, no worker should be
-	 * running.
-	 * 
-	 * @throws InterruptedException
-	 */
-	public synchronized Object interrupt() throws InterruptedException {
-		if (!interrupted) {
-			interrupted = true;
-			executor.interrupt();
-		}
+	@Override
+	public final void setInterrupt(boolean flag) {
+		this.termination = flag;
+		super.setInterrupt(flag);
+		processorFactory.setInterrupt(flag);
+	}
+
+	protected synchronized void waitWorkers() throws InterruptedException {
 		executor.waitDone();
-		return null;
 	}
 
 	/**
@@ -142,13 +112,13 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> {
 	 * @throws InterruptedException
 	 *             if interrupted during waiting for finish request
 	 */
-	public void finish() throws InterruptedException {
-		if (!finishRequested) {
-			finishRequested = true;
-			executor.interrupt();
+	public synchronized void finish() throws InterruptedException {
+		termination = true;
+		waitWorkers();
+		if (!isInterrupted()) {
+			termination = false;
+			processorFactory.finish();
 		}
-		executor.waitDone();
-		processorFactory.finish();
 	}
 
 	Runnable getWorker() {
@@ -175,23 +145,19 @@ public class ConcurrentComputation<F extends ProcessorFactory<?>> {
 
 			try {
 				for (;;) {
-					if (interrupted) {
+					// FIXME: potential empty loop
+					inputProcessor.process(); // can be interrupted
+					if (termination) {
 						break;
-					}
-					try {
-						inputProcessor.process(); // can be interrupted
-						if (!interrupted && Thread.interrupted())
-							// spurious interrupt
-							continue;
-						break;
-					} catch (InterruptedException e) {
-						if (interrupted) {
-							// restore the interrupt status and exit
-							Thread.currentThread().interrupt();
-							break;
-						}
 					}
 				}
+			} catch (InterruptedException e) {
+				/*
+				 * we don't know what is causing this but we need to obey;
+				 * consistency of the computation for such interrupt is not
+				 * guaranteed; restore the interrupt status and exit
+				 */
+				Thread.currentThread().interrupt();
 			} catch (Throwable e) {
 				workerException_ = new RuntimeException(
 						"Exception in worker thread: ", e);

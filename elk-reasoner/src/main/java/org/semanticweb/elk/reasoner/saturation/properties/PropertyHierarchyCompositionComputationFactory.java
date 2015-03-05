@@ -35,6 +35,7 @@ import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +46,8 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class PropertyHierarchyCompositionComputationFactory
+public class PropertyHierarchyCompositionComputationFactory extends
+		SimpleInterrupter
 		implements
 		InputProcessorFactory<IndexedPropertyChain, PropertyHierarchyCompositionComputationFactory.Engine> {
 
@@ -91,22 +93,6 @@ public class PropertyHierarchyCompositionComputationFactory
 			return null;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.semanticweb.elk.reasoner.indexing.visitors.
-		 * IndexedBinaryPropertyChainVisitor
-		 * #visit(org.semanticweb.elk.reasoner.indexing
-		 * .hierarchy.IndexedBinaryPropertyChain)
-		 */
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.semanticweb.elk.reasoner.indexing.visitors.
-		 * IndexedBinaryPropertyChainVisitor
-		 * #visit(org.semanticweb.elk.reasoner.indexing
-		 * .hierarchy.IndexedBinaryPropertyChain)
-		 */
 		@Override
 		public Void visit(IndexedComplexPropertyChain element) {
 			LOGGER_.trace("{}: computing compositions", element);

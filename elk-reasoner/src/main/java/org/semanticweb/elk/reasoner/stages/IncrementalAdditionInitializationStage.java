@@ -69,25 +69,7 @@ public class IncrementalAdditionInitializationStage extends
 		return IncrementalStages.ADDITIONS_INIT;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
-	 */
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean preExecute() {
 		if (!super.preExecute())
@@ -173,7 +155,7 @@ public class IncrementalAdditionInitializationStage extends
 					8 * workerNo);
 		}
 
-		this.initialization_ = new IncrementalChangesInitialization(inputs,
+		this.initialization = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
 				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
 				reasoner.getProgressMonitor());
@@ -185,7 +167,6 @@ public class IncrementalAdditionInitializationStage extends
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		this.initialization_ = null;
 		reasoner.ontologyIndex.commitAddedRules();
 		reasoner.ontologyIndex.initClassChanges();
 		reasoner.ontologyIndex.initIndividualChanges();

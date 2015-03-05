@@ -80,7 +80,7 @@ public class Reasoner extends AbstractReasonerState {
 	/**
 	 * The executor for various stages of the reasoner
 	 */
-	protected final ReasonerStageExecutor stageExecutor;
+	private final ReasonerStageExecutor stageExecutor_;
 	/**
 	 * the executor used for concurrent tasks
 	 */
@@ -111,7 +111,7 @@ public class Reasoner extends AbstractReasonerState {
 			ReasonerStageExecutor stageExecutor) {
 		super(axiomLoader);
 
-		this.stageExecutor = stageExecutor;
+		this.stageExecutor_ = stageExecutor;
 		this.progressMonitor = new DummyProgressMonitor();
 		this.allowFreshEntities = true;
 
@@ -199,7 +199,7 @@ public class Reasoner extends AbstractReasonerState {
 
 	@Override
 	protected ReasonerStageExecutor getStageExecutor() {
-		return stageExecutor;
+		return stageExecutor_;
 	}
 
 	@Override

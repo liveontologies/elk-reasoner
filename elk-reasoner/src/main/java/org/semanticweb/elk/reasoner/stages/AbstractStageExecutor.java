@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -39,23 +40,33 @@ import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 public abstract class AbstractStageExecutor extends SimpleInterrupter implements
 		ReasonerStageExecutor {
 
+	private volatile ReasonerStage stageInProgress_;
+
 	@Override
 	public void complete(ReasonerStage stage) throws ElkException {
 		if (!stage.isCompleted()) {
 
+			// TODO: avoid recursive call, use accumulator
 			for (ReasonerStage dependentStage : stage.getPreStages()) {
 				complete(dependentStage);
 			}
-
-			registerCurrentThreadToInterrupt();
-
 			try {
+				stageInProgress_ = stage;
 				execute(stage);
 			} finally {
-				clearThreadToInterrupt();
+				stageInProgress_ = null;
 			}
 		}
 
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		ReasonerStage interrupter = stageInProgress_;
+		if (interrupter != null) {
+			interrupter.setInterrupt(flag);
+		}
 	}
 
 	protected abstract void execute(ReasonerStage stage) throws ElkException;

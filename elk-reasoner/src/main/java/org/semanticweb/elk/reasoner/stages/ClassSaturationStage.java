@@ -114,5 +114,11 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 		if (computation_ != null)
 			computation_.printStatistics();
 	}
+	
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(computation_, flag);
+	}
 
 }

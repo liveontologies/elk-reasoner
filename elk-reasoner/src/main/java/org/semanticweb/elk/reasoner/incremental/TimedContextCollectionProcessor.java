@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.incremental.ContextInitializationFactory.Con
 import org.semanticweb.elk.reasoner.incremental.ContextInitializationFactory.TimedContextProcessor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
@@ -44,14 +45,18 @@ class TimedContextCollectionProcessor extends
 
 	private final IncrementalProcessingStatistics localStats_ = new IncrementalProcessingStatistics();
 
+	private final Interrupter interrupter_;
+	
 	private int procNumber_ = 0;
+		
 
 	TimedContextCollectionProcessor(ContextProcessor baseProcessor,
-			IncrementalProcessingStatistics stageStats) {
+			IncrementalProcessingStatistics stageStats, Interrupter interrupter) {
 		contextProcessor_ = new TimedContextProcessor(baseProcessor,
 				localStats_);
 		stageStats_ = stageStats;
-		localStats_.startMeasurements();
+		interrupter_ = interrupter;
+		localStats_.startMeasurements();		
 	}
 
 	@Override
@@ -88,4 +93,11 @@ class TimedContextCollectionProcessor extends
 
 		stageStats_.add(localStats_);
 	}
+
+	@Override
+	protected boolean isInterrupted() {
+		return interrupter_.isInterrupted();
+	}
+	
+	
 }

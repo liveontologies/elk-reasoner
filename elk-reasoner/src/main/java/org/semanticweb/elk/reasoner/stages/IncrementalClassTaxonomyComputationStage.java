@@ -116,8 +116,6 @@ public class IncrementalClassTaxonomyComputationStage extends
 		reasoner.ontologyIndex.initClassChanges();
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
-		this.computation_ = null;
-
 		return true;
 	}
 
@@ -127,4 +125,9 @@ public class IncrementalClassTaxonomyComputationStage extends
 			computation_.printStatistics();
 	}
 
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(computation_, flag);
+	}
 }

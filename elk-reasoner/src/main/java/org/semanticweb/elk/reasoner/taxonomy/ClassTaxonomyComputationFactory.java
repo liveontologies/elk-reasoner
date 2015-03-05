@@ -43,6 +43,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,8 +56,8 @@ import org.slf4j.LoggerFactory;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class ClassTaxonomyComputationFactory implements
-		InputProcessorFactory<Collection<IndexedClass>, Engine> {
+public class ClassTaxonomyComputationFactory extends SimpleInterrupter
+		implements InputProcessorFactory<Collection<IndexedClass>, Engine> {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -218,6 +219,12 @@ public class ClassTaxonomyComputationFactory implements
 	public Engine getEngine() {
 		return new Engine();
 
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		transitiveReductionShared_.setInterrupt(flag);
 	}
 
 	@Override

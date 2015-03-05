@@ -78,11 +78,7 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public void executeStage() throws ElkInterruptedException {
-		for (;;) {
-			computation_.process();
-			if (!spuriousInterrupt())
-				break;
-		}
+		computation_.process();
 	}
 
 	@Override
@@ -99,6 +95,12 @@ class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 	public void printInfo() {
 		if (computation_ != null)
 			computation_.printStatistics();
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(computation_, flag);
 	}
 
 }

@@ -35,7 +35,7 @@ class ConcurrentJavaCCLexer extends
 	/**
 	 * how many tokens are in the batch
 	 */
-	private final static int DEFAULT_BATCH_LENGTH = 4096;
+	private final static int DEFAULT_BATCH_LENGTH_ = 4096;
 
 	/**
 	 * an object from which messages are received from the lexer thread
@@ -75,7 +75,7 @@ class ConcurrentJavaCCLexer extends
 		lastBatch_ = null;
 
 		Thread lexerThread = new Thread(new Lexer(nativeLexer, messagePipe_,
-				DEFAULT_BATCH_LENGTH), "elk-lexer-thread");
+				DEFAULT_BATCH_LENGTH_), "elk-lexer-thread");
 		lexerThread.setDaemon(true);
 		lexerThread.start();
 	}

@@ -42,6 +42,7 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +77,7 @@ import org.slf4j.LoggerFactory;
  * @see TransitiveReductionListener
  */
 public class TransitiveReductionFactory<R extends IndexedClassExpression, J extends TransitiveReductionJob<R>>
-		implements
+		extends SimpleInterrupter implements
 		InputProcessorFactory<J, TransitiveReductionFactory<R, J>.Engine> {
 
 	// logger for this class
@@ -153,6 +154,12 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 	@Override
 	public Engine getEngine() {
 		return new Engine();
+	}
+	
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		saturationFactory_.setInterrupt(flag);
 	}
 
 	@Override
@@ -573,8 +580,9 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		@Override
 		public final void process() throws InterruptedException {
 			for (;;) {
-				if (Thread.currentThread().isInterrupted())
+				if (isInterrupted()) {
 					return;
+				}
 				J processedJob = jobsWithSaturatedRoot_.poll();
 				if (processedJob != null) {
 					saturationOutputProcessor_

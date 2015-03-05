@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
-import org.semanticweb.elk.reasoner.stages.RestartingTestStageExecutor;
+import org.semanticweb.elk.reasoner.stages.RestartingStageExecutor;
 import org.semanticweb.elk.testing.HashTestOutput;
 
 /**
@@ -61,6 +61,6 @@ public class CLIHashRealizationCorrectnessTest extends
 		AxiomLoader loader = new Owl2StreamLoader(
 				new Owl2FunctionalStyleParserFactory(), input);
 		return new ReasonerFactory().createReasoner(loader,
-				new RestartingTestStageExecutor());
+				new RestartingStageExecutor());
 	}
 }

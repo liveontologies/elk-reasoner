@@ -68,11 +68,7 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 
 	@Override
 	public void executeStage() throws ElkInterruptedException {
-		for (;;) {
-			saturation_.process();
-			if (!spuriousInterrupt())
-				break;
-		}
+		saturation_.process();
 	}
 
 	@Override
@@ -89,6 +85,12 @@ public class IncrementalAdditionStage extends AbstractReasonerStage {
 	public void printInfo() {
 		if (saturation_ != null)
 			saturation_.printStatistics();
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(saturation_, flag);
 	}
 
 }

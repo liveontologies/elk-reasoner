@@ -23,8 +23,7 @@
 package org.semanticweb.elk.util.concurrent.computation;
 
 /**
- * An abstract interface for interrupting computations and monitoring if
- * computations have been interrupted.
+ * An abstract interface for interrupting computations.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -32,20 +31,30 @@ package org.semanticweb.elk.util.concurrent.computation;
 public interface Interrupter {
 
 	/**
-	 * Requests the computation to be interrupted
+	 * Set interrupt flag to the given value. After calling this method
+	 * {@link #isInterrupted()} should return this value
+	 * 
+	 * @param flag
+	 *            {@code true} if interrupt is requested {@code false} if not
 	 */
-	public void interrupt();
+	public void setInterrupt(boolean flag);
+
+//	/**
+//	 * Request interrupt of the computation. After calling this method,
+//	 * {@link #isInterrupted()} should return {@code true}
+//	 */
+//	public void setInterrupt();
+//
+//	/**
+//	 * Clears the interrupt status of the computation. After calling this
+//	 * method, {@link #isInterrupted()} should return {@code false}
+//	 */
+//	public void clearInterrupt();
 
 	/**
-	 * Checks if the computation was requested to be interrupted
-	 * 
-	 * @return {@code true} if the computation was requested to be interrupted
+	 * @return {@code true} if interrupt was requested and {@code false}
+	 *         otherwise
 	 */
 	public boolean isInterrupted();
-
-	/**
-	 * Clears the interrupt status: computation is no longer interrupted
-	 */
-	public void clearInterrupt();
 
 }

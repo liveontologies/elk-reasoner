@@ -26,8 +26,6 @@ import java.util.Iterator;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 //TODO: add progress monitor, make concurrent if possible
 
@@ -39,10 +37,6 @@ import org.slf4j.LoggerFactory;
  * 
  */
 class PropertyInitializationStage extends AbstractReasonerStage {
-
-	// logger for this class
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(PropertyInitializationStage.class);
 
 	/**
 	 * The progress counter
@@ -81,14 +75,13 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	@Override
 	public void executeStage() throws ElkInterruptedException {
 		for (;;) {
+			checkInterrupt();
 			if (!todo_.hasNext())
 				break;
 			IndexedPropertyChain ipc = todo_.next();
 			SaturatedPropertyChain saturation = ipc.getSaturated();
 			saturation.clear();
 			progressMonitor.report(++progress_, maxProgress_);
-			if (spuriousInterrupt())
-				continue;
 		}
 	}
 

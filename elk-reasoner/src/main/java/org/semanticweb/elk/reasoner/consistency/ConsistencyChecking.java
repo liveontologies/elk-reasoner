@@ -41,6 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Contra
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -192,9 +193,9 @@ public class ConsistencyChecking
 
 	@Override
 	public void process() {
-		consistencyMonitor_.registerCurrentThreadToInterrupt();
+		consistencyMonitor_.registerInterrupt(ConsistencyChecking.this);
 		super.process();
-		consistencyMonitor_.clearThreadToInterrupt();
+		consistencyMonitor_.clearComputationToInterrupt();
 	}
 
 	/**
@@ -253,18 +254,14 @@ public class ConsistencyChecking
 	 */
 	static class ConsistencyMonitor {
 		private volatile boolean inconsistent_ = false;
-		private volatile Thread controlThread_;
-
-		public void registerThreadToInterrupt(Thread controlThread) {
-			this.controlThread_ = controlThread;
+		private volatile Interrupter interrupter_;
+		
+		public void registerInterrupt(Interrupter computation) {
+			this.interrupter_ = computation;
 		}
 
-		public void registerCurrentThreadToInterrupt() {
-			registerThreadToInterrupt(Thread.currentThread());
-		}
-
-		public void clearThreadToInterrupt() {
-			this.controlThread_ = null;
+		public void clearComputationToInterrupt() {
+			this.interrupter_ = null;
 		}
 
 		public boolean isInconsistent() {
@@ -273,9 +270,12 @@ public class ConsistencyChecking
 
 		public void setInconsistent() {
 			inconsistent_ = true;
-			// interrupt the reasoner
-			if (controlThread_ != null)
-				controlThread_.interrupt();
+			// interrupt all workers
+			if (interrupter_ != null)
+				interrupter_.setInterrupt(true);
+			else
+				LOGGER_.error("no interrupter registered!");
+
 		}
 
 	}

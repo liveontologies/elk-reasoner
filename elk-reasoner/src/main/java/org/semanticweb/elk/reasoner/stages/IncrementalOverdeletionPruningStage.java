@@ -85,12 +85,7 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 
 	@Override
 	void executeStage() throws ElkException {
-		for (;;) {
-			completion_.process();
-
-			if (!spuriousInterrupt())
-				break;
-		}
+		completion_.process();
 	}
 
 	@Override
@@ -98,12 +93,15 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 		if (!super.postExecute()) {
 			return false;
 		}
-
 		reasoner.ruleAndConclusionStats.add(completion_
 				.getRuleAndConclusionStatistics());
-		completion_ = null;
-
 		return true;
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(completion_, flag);
 	}
 
 }

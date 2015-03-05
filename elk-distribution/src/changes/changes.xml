@@ -17,6 +17,20 @@ will appear in the produced result.
 	<body>
 	    <release version="${release.version}" date="${buildDate}" description="">
 	    </release>		
+		<release version="0.4.2" date="2015-02-04" description="Second maintenance relase after the fourth public release">
+			<action dev="yevgeny" type="update">
+				ELK can now be interrupted from the OWL API and Protege during the initial ontology loading stage.				
+			</action>
+			<action dev="yevgeny" type="update">
+				Updated the mechanism of interrupting reasoner computations due to removal of interrupt exceptions from the code.				
+			</action>
+			<action dev="pavel" type="fix" issue="27">
+				Fixed a problem causing runtime exception to be thrown with Protege 5 beta 15 due to the class loader of Apache Felix reacting on interrupt exceptions used for communication with elk worker threads.				
+			</action>
+			<action dev="pavel" type="fix" issue="24">
+				Fixed a bug reporting direct subclasses of owl:Thing when owl:Thing has (redundant) asserted subclasses.				
+			</action>
+	    </release>
 	    <release version="0.4.1" date="2013-08-15" description="First maintenance relase after the fourth public release">
 			<action dev="yevgeny" type="fix" issue="23">
 				Fixed a bug when querying equivalent classes of complex class expressions may include auxiliary classes.				

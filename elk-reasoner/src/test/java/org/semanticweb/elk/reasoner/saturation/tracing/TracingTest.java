@@ -83,6 +83,7 @@ public class TracingTest {
 		assumeTrue(!ignore(manifest.getInput()));
 	}
 
+	@SuppressWarnings("static-method")
 	protected boolean ignore(@SuppressWarnings("unused") TestInput input) {
 		return false;
 	}
@@ -127,6 +128,7 @@ public class TracingTest {
 		}
 	}
 
+	@SuppressWarnings("static-method")
 	protected TracingTests getTracingTests(Taxonomy<ElkClass> taxonomy) {
 		return new ComprehensiveSubsumptionTracingTests(taxonomy);
 	}

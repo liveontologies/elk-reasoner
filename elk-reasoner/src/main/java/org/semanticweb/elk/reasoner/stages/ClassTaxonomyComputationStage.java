@@ -74,12 +74,10 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-
 		reasoner.classTaxonomyState.getWriter().setTaxonomy(
 				computation_.getTaxonomy());
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
-		this.computation_ = null;
 		return true;
 	}
 
@@ -89,4 +87,9 @@ class ClassTaxonomyComputationStage extends AbstractReasonerStage {
 			computation_.printStatistics();
 	}
 
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(computation_, flag);
+	}
 }

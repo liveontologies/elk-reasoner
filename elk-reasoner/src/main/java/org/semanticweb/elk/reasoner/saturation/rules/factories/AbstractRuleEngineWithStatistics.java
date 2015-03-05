@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextStatistics;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 
 /**
@@ -60,9 +61,10 @@ public abstract class AbstractRuleEngineWithStatistics extends
 
 	public AbstractRuleEngineWithStatistics(
 			ConclusionVisitor<? super Context, ?> conclusionProcessor,
-			WorkerLocalTodo localTodo, SaturationStatistics aggregatedStats,
+			WorkerLocalTodo localTodo, Interrupter interrupter,
+			SaturationStatistics aggregatedStats,
 			SaturationStatistics localStatistics) {
-		super(conclusionProcessor, localTodo);
+		super(conclusionProcessor, localTodo, interrupter);
 		this.aggregatedStats_ = aggregatedStats;
 		this.localStatistics = localStatistics;
 		this.localContextStatistics = localStatistics.getContextStatistics();

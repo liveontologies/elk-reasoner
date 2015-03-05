@@ -66,11 +66,7 @@ public class IncrementalDeletionStage extends AbstractReasonerStage {
 
 	@Override
 	public void executeStage() throws ElkInterruptedException {
-		for (;;) {
-			desaturation_.process();
-			if (!spuriousInterrupt())
-				break;
-		}
+		desaturation_.process();
 	}
 
 	@Override
@@ -92,4 +88,11 @@ public class IncrementalDeletionStage extends AbstractReasonerStage {
 		if (desaturation_ != null)
 			desaturation_.printStatistics();
 	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(desaturation_, flag);
+	}
+
 }

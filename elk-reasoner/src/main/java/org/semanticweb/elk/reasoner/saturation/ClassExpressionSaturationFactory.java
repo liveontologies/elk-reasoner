@@ -244,6 +244,25 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	}
 
 	@Override
+	public void setInterrupt(boolean flag) {
+		ruleApplicationFactory_.setInterrupt(flag);
+		/*
+		 * waking up all waiting workers
+		 */
+		synchronized (countContextsSaturatedLower_) {
+			if (workersWaiting_) {
+				workersWaiting_ = false;
+				countContextsSaturatedLower_.notifyAll();
+			}
+		}
+	}
+
+	@Override
+	public boolean isInterrupted() {
+		return ruleApplicationFactory_.isInterrupted();
+	}
+
+	@Override
 	public void finish() {
 		checkStatistics();
 	}
@@ -253,6 +272,9 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * not
 	 */
 	private void checkStatistics() {
+		if (isInterrupted())
+			return;
+		// else
 		if (aggregatedStats_.jobsSubmittedNo != aggregatedStats_.jobsAlreadyDoneNo
 				+ +aggregatedStats_.jobsProcessedNo)
 			LOGGER_.error("Some submitted saturation jobs were not processed!");
@@ -507,30 +529,18 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			 * interrupted in between processing of contexts and updating these
 			 * counters.
 			 */
-			boolean interrupted = false;
 			countStartedWorkers_.incrementAndGet();
-			/*
-			 * process leftovers possibly from the previous interrupt
-			 */
-			try {
-				ruleApplicationEngine_.process();
-				if (Thread.currentThread().isInterrupted())
-					interrupted = true;
-			} catch (InterruptedException e) {
-				interrupted = true;
-				throw e;
-			} finally {
-				if (interrupted)
-					updateIfSmaller(lastInterruptCountStartedWorkers_,
-							countStartedWorkers_.get());
-				updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
-			}
-			// can throw InterruptedException
-			processFinishedCounters(stats_);
+			ruleApplicationEngine_.process();
+			if (isInterrupted())
+				updateIfSmaller(lastInterruptCountStartedWorkers_,
+						countStartedWorkers_.get());
+			updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
+			processFinishedCounters(stats_); // can throw InterruptedException
 
 			for (;;) {
-				if (Thread.currentThread().isInterrupted())
+				if (isInterrupted()) {
 					return;
+				}
 				int snapshotCountSaturated = countContextsSaturatedLower_.get();
 				if (saturationState_.getContextMarkNonSaturatedCount()
 						- snapshotCountSaturated > threshold_) {
@@ -542,7 +552,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 						 * checking processed contexts counters because it is
 						 * tested in the other order when waking up the workers
 						 */
-						if (countContextsSaturatedLower_.get() > snapshotCountSaturated) {
+						if (countContextsSaturatedLower_.get() > snapshotCountSaturated
+								|| isInterrupted()) {
 							/*
 							 * new contexts were processed meanwhile; all
 							 * workers should be notified
@@ -579,25 +590,15 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				 * submit the job to the rule engine and start processing it
 				 */
 				countStartedWorkers_.incrementAndGet();
-				interrupted = false;
-				try {
-					countJobsSubmittedUpper_.incrementAndGet();
-					jobsInProgress_.add(nextJob);
-					ruleApplicationEngine_.submit(root);
-					ruleApplicationEngine_.process();
-					if (Thread.currentThread().isInterrupted())
-						interrupted = true;
-				} catch (InterruptedException e) {
-					interrupted = true;
-					throw e;
-				} finally {
-					if (interrupted)
-						updateIfSmaller(lastInterruptCountStartedWorkers_,
-								countStartedWorkers_.get());
-					updateProcessedCounters(countFinishedWorkers_
-							.incrementAndGet());
-				}
-				// can throw InterruptedException
+				countJobsSubmittedUpper_.incrementAndGet();
+				jobsInProgress_.add(nextJob);
+				ruleApplicationEngine_.submit(root);
+				ruleApplicationEngine_.process();
+
+				if (isInterrupted())
+					updateIfSmaller(lastInterruptCountStartedWorkers_,
+							countStartedWorkers_.get());
+				updateProcessedCounters(countFinishedWorkers_.incrementAndGet());
 				processFinishedCounters(stats_);
 			}
 		}

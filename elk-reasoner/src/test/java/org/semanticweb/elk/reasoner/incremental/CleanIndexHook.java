@@ -49,6 +49,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(CleanIndexHook.class);
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void apply(Reasoner reasoner, OnOffVector<ElkAxiom> changingAxioms,
 			List<ElkAxiom> staticAxioms) throws ElkException {
