@@ -26,18 +26,43 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
- * S is a sub-chain of R o S if R is reflexive (same goes for R if S is reflexive)
+ * TODO
  * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public abstract class ReflexiveSubPropertyChainInference extends SubPropertyChain<IndexedPropertyChain, IndexedBinaryPropertyChain> implements ObjectPropertyInference {
+public abstract class ReflexiveSubPropertyChainInference<R extends IndexedPropertyChain> extends SubPropertyChain<R, IndexedPropertyChain> implements ObjectPropertyInference {
 
-	public ReflexiveSubPropertyChainInference(IndexedPropertyChain subChain, IndexedBinaryPropertyChain chain) {
-		super(subChain, chain);
+	final IndexedBinaryPropertyChain chain;
+	
+	protected ReflexiveSubPropertyChainInference(IndexedBinaryPropertyChain chain, R subChain, IndexedPropertyChain sup) {
+		super(subChain, sup);
+		
+		this.chain = chain;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj.getClass().equals(getClass()))) {
+			return false;
+		}
+		
+		ReflexiveSubPropertyChainInference<?> inf = (ReflexiveSubPropertyChainInference<?>) obj;
+		
+		return chain.equals(inf.chain) && getSuperPropertyChain().equals(inf.getSuperPropertyChain());
+	}
+
+	@Override
+	public int hashCode() {
+		return HashGenerator.combineListHash(chain.hashCode(), getSuperPropertyChain().hashCode());
+	}	
+	
+	public IndexedBinaryPropertyChain getPremiseChain() {
+		return chain;
 	}
 	
 	public abstract ReflexivePropertyChain<?> getReflexivePremise();

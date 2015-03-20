@@ -264,14 +264,12 @@ public class PropertyInferenceTracingTest {
 				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 					@Override
-					protected Boolean defaultTracedVisit(
-							ObjectPropertyInference inference, Void input) {
+					protected Boolean defaultTracedVisit(ObjectPropertyInference inference, Void input) {
 						return false;
 					}
 
 					@Override
-					public Boolean visit(
-							ReflexiveToldSubObjectProperty inference, Void input) {
+					public Boolean visit(ReflexiveToldSubObjectProperty inference, Void input) {
 						// H must be entailed as reflexive because S is reflexive
 						return inference.getPropertyChain().equals(hIndexed) &&
 								inference.getSubProperty().getPropertyChain().equals(sIndexed);
@@ -289,8 +287,7 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(
-							ReflexivePropertyChainInference inference, Void input) {
+					public Boolean visit(ReflexivePropertyChainInference inference, Void input) {
 						// S o RR must be entailed as reflexive because S and RR are reflexive
 						return inference.getPropertyChain().equals(srrIndexed) &&
 								inference.getLeftReflexiveProperty().getPropertyChain().equals(sIndexed) &&
@@ -307,29 +304,27 @@ public class PropertyInferenceTracingTest {
 		ElkClass d = factory.getClass(new ElkFullIri("http://example.org/D"));
 		ElkObjectProperty h = factory.getObjectProperty(new ElkFullIri("http://example.org/H"));
 		ElkObjectProperty s = factory.getObjectProperty(new ElkFullIri("http://example.org/S"));
-		ElkSubObjectPropertyExpression shChain = factory.getObjectPropertyChain(Arrays.asList(s, h));
+		ElkObjectProperty sh = factory.getObjectProperty(new ElkFullIri("http://example.org/SH"));
 		final IndexedObjectProperty hIndexed = ReasonerStateAccessor.transform(reasoner, h);
 		final IndexedObjectProperty sIndexed = ReasonerStateAccessor.transform(reasoner, s);
-		final IndexedPropertyChain shChainIndexed = ReasonerStateAccessor.transform(reasoner, shChain);
+		final IndexedPropertyChain shIndexed = ReasonerStateAccessor.transform(reasoner, sh);
 		
 		reasoner.explainSubsumption(a, d);
 		TracingTestUtils.checkTracingCompleteness(a, d, reasoner);
-		// looking for the inference that H is a sub-property of S o H (because S is entailed as reflexive)
+		// looking for the inference that H is a sub-property of SH (because S is entailed as reflexive)
 		TracingTestUtils.checkConditionOverUsedInferences(a, d, reasoner, 
 				TracingTestUtils.DUMMY_CLASS_INFERENCE_CHECKER, 
 				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 					@Override
-					protected Boolean defaultTracedVisit(
-							ObjectPropertyInference inference, Void input) {
+					protected Boolean defaultTracedVisit(ObjectPropertyInference inference, Void input) {
 						return false;
 					}
 
 					@Override
-					public Boolean visit(
-							LeftReflexiveSubPropertyChainInference inference, Void input) {
+					public Boolean visit(LeftReflexiveSubPropertyChainInference inference, Void input) {
 						return inference.getSubPropertyChain().equals(hIndexed) &&
-								inference.getSuperPropertyChain().equals(shChainIndexed) &&
+								inference.getSuperPropertyChain().equals(shIndexed) &&
 								inference.getReflexivePremise().getPropertyChain().equals(sIndexed);
 					}
 				});

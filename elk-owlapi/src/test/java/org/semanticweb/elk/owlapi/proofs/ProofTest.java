@@ -45,8 +45,6 @@ import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapitools.proofs.ExplainingOWLReasoner;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.exception.ProofGenerationException;
-import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
-import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
 
 /**
  * 
@@ -69,6 +67,20 @@ public class ProofTest {
 		OWLClass sup = factory.getOWLClass(IRI.create("http://example.org/L"));
 		
 		//printInferences(reasoner, sub, sup);
+		
+		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
+	}
+	
+	@Test
+	public void reflexiveRoles2() throws Exception {
+		final OWLDataFactory factory = OWLManager.getOWLDataFactory();
+		final OWLOntology ontology = loadOntology(ProofTest.class.getClassLoader().getResourceAsStream("classification_test_input/ReflexiveRole.owl"));
+		final ExplainingOWLReasoner reasoner = OWLAPITestUtils.createReasoner(ontology);
+		
+		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+		
+		OWLClass sub = factory.getOWLClass(IRI.create("http://example.org/C1"));
+		OWLClass sup = factory.getOWLClass(IRI.create("http://example.org/F"));
 		
 		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
 	}
@@ -102,9 +114,9 @@ public class ProofTest {
 		OWLClass sub = factory.getOWLClass(IRI.create("http://example.org/A"));
 		OWLClass sup = factory.getOWLClass(IRI.create("http://example.org/G"));
 		
-		printInferences(reasoner, sub, sup);
-		OWLExpression root = reasoner.getDerivedExpression(factory.getOWLSubClassOfAxiom(sub, sup));
-		System.err.println(OWLProofUtils.printProofTree(root));
+		//printInferences(reasoner, sub, sup);
+		//OWLExpression root = reasoner.getDerivedExpression(factory.getOWLSubClassOfAxiom(sub, sup));
+		//System.err.println(OWLProofUtils.printProofTree(root));
 		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
 		
 		// now convert C <= R3 some D to C < S3 some D
@@ -122,8 +134,8 @@ public class ProofTest {
 		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
 		
 		//printInferences(reasoner, sub, sup);
-		root = reasoner.getDerivedExpression(factory.getOWLSubClassOfAxiom(sub, sup));
-		System.err.println(OWLProofUtils.printProofTree(root));
+		//root = reasoner.getDerivedExpression(factory.getOWLSubClassOfAxiom(sub, sup));
+		//System.err.println(OWLProofUtils.printProofTree(root));
 		ProofTestUtils.provabilityTest(reasoner, factory.getOWLSubClassOfAxiom(sub, sup));
 	}
 	

@@ -25,9 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * TODO
@@ -36,15 +36,15 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class RightReflexiveSubPropertyChainInference extends ReflexiveSubPropertyChainInference {
+public class RightReflexiveSubPropertyChainInference extends ReflexiveSubPropertyChainInference<IndexedObjectProperty> {
 
-	public RightReflexiveSubPropertyChainInference(IndexedPropertyChain subChain, IndexedBinaryPropertyChain chain) {
-		super(subChain, chain);
+	public RightReflexiveSubPropertyChainInference(IndexedBinaryPropertyChain sub, IndexedPropertyChain sup) {
+		super(sub, sub.getLeftProperty(), sup);
 	}
 
 	@Override
 	public ReflexivePropertyChain<IndexedPropertyChain> getReflexivePremise() {
-		return new ReflexivePropertyChain<IndexedPropertyChain>(getSuperPropertyChain().getRightProperty());
+		return new ReflexivePropertyChain<IndexedPropertyChain>(chain.getRightProperty());
 	}
 
 	@Override
@@ -53,20 +53,4 @@ public class RightReflexiveSubPropertyChainInference extends ReflexiveSubPropert
 		return visitor.visit(this, input);
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof RightReflexiveSubPropertyChainInference)) {
-			return false;
-		}
-		
-		RightReflexiveSubPropertyChainInference inf = (RightReflexiveSubPropertyChainInference) obj;
-		
-		return getSubPropertyChain().equals(inf.getSubPropertyChain()) && getSuperPropertyChain().equals(inf.getSuperPropertyChain());
-	}
-
-	@Override
-	public int hashCode() {
-		return HashGenerator.combineListHash(getSubPropertyChain().hashCode(), getSuperPropertyChain().hashCode());
-	}
-
 }

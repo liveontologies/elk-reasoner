@@ -52,7 +52,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsu
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.GeneralSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
@@ -259,12 +258,4 @@ public class PremiseVisitor<I, O> implements ClassInferenceVisitor<I, O>, Object
 		inference.getPremise().accept(propertyConclusionVisitor_, input);
 		return null;
 	}
-	
-	@Override
-	public O visit(GeneralSubPropertyInference inference, I input) {
-		inference.getFirstPremise().accept(propertyConclusionVisitor_, input);
-		inference.getSecondPremise().accept(propertyConclusionVisitor_, input);
-		return null;
-	}
-
 }

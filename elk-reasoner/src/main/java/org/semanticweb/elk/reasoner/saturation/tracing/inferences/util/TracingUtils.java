@@ -40,7 +40,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectProp
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.GeneralSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
@@ -97,12 +96,6 @@ public class TracingUtils {
 
 			@Override
 			public Void visit(ToldSubPropertyInference inference, Void input) {
-				result.add(inference.getSuperPropertyChain(), inference);
-				return null;
-			}
-
-			@Override
-			public Void visit(GeneralSubPropertyInference inference, Void input) {
 				result.add(inference.getSuperPropertyChain(), inference);
 				return null;
 			}

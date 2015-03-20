@@ -425,7 +425,7 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
         // Protege's syntax checkers only cover the class axiom's syntax
         editor.setEditedObject((OWLClassAxiom) axiom);
         // prevent the OK button from being available until the expression is syntactically valid
-        editor.addStatusChangedListener(verificationListener);
+        //editor.addStatusChangedListener(verificationListener);
         
         JDialog dlg = editorPane.createEditorDialog(this);
 
@@ -507,7 +507,7 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
             	if (retVal.equals(EditAxiomPane.OK)) {
             		handleEditFinished(editor.getEditedObject(), expressionRow);
             		// immediately update the root, the reasoner should return up-to-date results
-            		mainPanel_.updateProofRoot();
+            		// mainPanel_.updateProofRoot();
             	}
             }
             

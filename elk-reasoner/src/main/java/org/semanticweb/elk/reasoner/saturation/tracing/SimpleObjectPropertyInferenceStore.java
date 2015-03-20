@@ -31,7 +31,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.GeneralSubPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
@@ -178,11 +177,6 @@ public class SimpleObjectPropertyInferenceStore implements ObjectPropertyInferen
 
 		@Override
 		public Boolean visit(ToldSubPropertyInference inference, Void input) {
-			return writeSubPropertyChainInference(inference.getSubPropertyChain(), inference.getSuperPropertyChain(), inference);
-		}
-		
-		@Override
-		public Boolean visit(GeneralSubPropertyInference inference, Void input) {
 			return writeSubPropertyChainInference(inference.getSubPropertyChain(), inference.getSuperPropertyChain(), inference);
 		}
 		

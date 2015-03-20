@@ -24,7 +24,9 @@ package org.semanticweb.elk.proofs.inferences.properties;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
@@ -41,24 +43,11 @@ public class SubPropertyChainLemma extends AbstractSubPropertyChainInference<Lem
 
 	public SubPropertyChainLemma(
 			LemmaExpression<ElkSubPropertyChainOfLemma> conclusion,
-			DerivedExpression first, 
-			LemmaExpression<ElkSubPropertyChainOfLemma> second) {
+			DerivedAxiomExpression<? extends ElkObjectPropertyAxiom> first, 
+			DerivedExpression second) {
 		super(conclusion, first, second);
 	}
 	
-/*	public DerivedExpression getFirstPremise() {
-		return firstPremise_;
-	}
-	
-	public DerivedExpression getSecondPremise() {
-		return secondPremise_;
-	}
-
-	@Override
-	public Collection<DerivedExpression> getRawPremises() {
-		return Arrays.asList(firstPremise_, secondPremise_);
-	}
-*/
 	@Override
 	public <I, O> O accept(InferenceVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);

@@ -250,6 +250,8 @@ public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelM
     		proofDisplay.setReasonerSynchronized(isReasonerSynchronized());
     	}
     	
+    	//System.err.println(event.getType());
+    	
     	switch (event.getType()) {
 		case ONTOLOGY_CLASSIFIED:
 			// update the proof model

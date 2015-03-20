@@ -33,8 +33,6 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisito
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.GeneralSubPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -107,16 +105,26 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		SaturatedPropertyChain rightSaturation = right.getSaturated();
 		// reflexivity-based inferences
 		if (leftSaturation != null && leftSaturation.isDerivedReflexive()) {
-			toDoReflexive(element, left, right, new LeftReflexiveSubPropertyChainInference(right, element));
+			LOGGER_.trace("{} is reflexive thus {} is a sub-property of {}", left, right, superProperty_);
+			
+			traceWriter_.addObjectPropertyInference(new LeftReflexiveSubPropertyChainInference(element, superProperty_));
+			
+			toDo(right);
+			//toDoReflexive(element, left, right, new LeftReflexiveSubPropertyChainInference(element, superProperty_));
 		}
 		if (rightSaturation != null && rightSaturation.isDerivedReflexive()) {
-			toDoReflexive(element, right, left, new RightReflexiveSubPropertyChainInference(left, element));
+			LOGGER_.trace("{} is reflexive thus {} is a sub-property of {}", right, left, superProperty_);
+			
+			traceWriter_.addObjectPropertyInference(new RightReflexiveSubPropertyChainInference(element, superProperty_));
+			
+			toDo(left);
+			//toDoReflexive(element, right, left, new RightReflexiveSubPropertyChainInference(element, superProperty_));
 		}
 		
 		return null;
 	}
 	
-	private void toDoReflexive(IndexedBinaryPropertyChain chain, IndexedPropertyChain reflexive, IndexedPropertyChain other, ReflexiveSubPropertyChainInference inference) {
+	/*private void toDoReflexive(IndexedBinaryPropertyChain chain, IndexedPropertyChain reflexive, IndexedPropertyChain other, ReflexiveSubPropertyChainInference<?> inference) {
 		LOGGER_.trace("{} is reflexive thus {} is a sub-property of {}", reflexive, other, chain);
 		
 		traceWriter_.addObjectPropertyInference(inference);
@@ -128,7 +136,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 			// we have already written this inference, avoiding it here
 			toDo(other);
 		}	
-	}
+	}*/
 
 	private void toDo(IndexedPropertyChain subProperty) {
 		if (subPropertyChains_.add(subProperty)) {

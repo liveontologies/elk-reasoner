@@ -73,10 +73,20 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.Pair;
 
 /**
- * TODO
+ * This class transforms existential and composition inferences, that is,
+ * {@link ExistentialComposition}, {@link ExistentialChainAxiomComposition}, and
+ * {@link ExistentialLemmaChainComposition}, by transforming class subsumptions
+ * with existentials on the right, e.g. C <= RR some D, given the derivation of
+ * RR <= SS.
  * 
- * @author	Pavel Klinov
- * 			pavel.klinov@uni-ulm.de
+ * It may return instances of {@link NaryExistentialLemmaComposition} which are
+ * then eliminated by {@link LemmaElimination} by replacing the conclusion by
+ * the premises.
+ * 
+ * This class guarantees that the transformed inferences do not have non-trivial
+ * property subsumption inferences.
+ * 
+ * @author Pavel Klinov pavel.klinov@uni-ulm.de
  *
  */
 public class DerivedChainSubsumptionElimination {
@@ -160,10 +170,15 @@ public class DerivedChainSubsumptionElimination {
 	}
 	
 	/**
+	 * Recursively transforms a pair of expressions C <= RR some D, RR <= SS
+	 * into C <= SS some D and creates inferences for it based on the derivation
+	 * of RR <= SS.
 	 * 
 	 * @param existentialPremise
+	 *            C <= RR some D
 	 * @param propertyPremise
-	 * @return
+	 *            RR <= SS
+	 * @return C <= SS some D with the corresponding inferences
 	 */
 	private DerivedExpression rewriteUnderPropertyChainHierarchy(final DerivedExpression existentialPremise, final DerivedExpression propertyPremise) {
 		if (isTautology(propertyPremise)) {
@@ -172,13 +187,13 @@ public class DerivedChainSubsumptionElimination {
 		}
 		
 		final Set<DerivedExpression> seen = new ArrayHashSet<DerivedExpression>();
-		final Queue<Pair<DerivedExpression, DerivedExpression>> todo = new ArrayDeque<Pair<DerivedExpression, DerivedExpression>>();
+		final Queue<Pair<DerivedExpression, ? extends DerivedExpression>> todo = new ArrayDeque<Pair<DerivedExpression, ? extends DerivedExpression>>();
 		final DerivedExpressionWrap<?> result = createConclusion(getSubClass(existentialPremise), getSuperPropertyExpression(propertyPremise), getFiller(existentialPremise));
 
 		todo.add(Pair.create(propertyPremise, existentialPremise));
 
 		for (;;) {
-			Pair<DerivedExpression, DerivedExpression> next = todo.poll();
+			Pair<DerivedExpression, ? extends DerivedExpression> next = todo.poll();
 
 			if (next == null) {
 				break;
@@ -209,7 +224,7 @@ public class DerivedChainSubsumptionElimination {
 						addInferenceForDirectSubsumption(nextConclusion, exPremise, inf.getFirstPremise());
 
 						if (seen.add(derivedPremise)) {
-							todo.add(Pair.create(derivedPremise, (DerivedExpression) nextConclusion));
+							todo.add(Pair.create(derivedPremise, nextConclusion));
 						}
 
 						return null;
@@ -217,15 +232,41 @@ public class DerivedChainSubsumptionElimination {
 
 					@Override
 					public Void visit(SubsumptionViaRightReflexivity inf, Void input) {
-						// the base case
-						addInferenceForDirectSubsumption(result, exPremise, inf.getConclusion());
+						if (isTautology(inf.getSubsumptionPremise())) {
+							// base case
+							result.addInference(getInferenceForRightReflexivity((LemmaExpression<ElkSubClassOfLemma>) result, exPremise, inf));
+							
+							return null;
+						}
+						
+						DerivedExpressionWrap<?> nextConclusion = createConclusion(getSubClass(existentialPremise), getSubPropertyExpression(inf.getSubsumptionPremise()), getFiller(exPremise));
+						
+						nextConclusion.addInference(getInferenceForRightReflexivity((LemmaExpression<ElkSubClassOfLemma>) nextConclusion, exPremise, inf));
+						// continue recursively
+						if (seen.add(inf.getSubsumptionPremise())) {
+							todo.add(Pair.create(inf.getSubsumptionPremise(), nextConclusion));
+						}
+						
 						return null;
 					}
 
 					@Override
 					public Void visit(SubsumptionViaLeftReflexivity inf, Void input) {
-						// the base case
-						addInferenceForDirectSubsumption(result, exPremise, inf.getConclusion());
+						if (isTautology(inf.getSubsumptionPremise())) {
+							// base case
+							result.addInference(getInferenceForLeftReflexivity((LemmaExpression<ElkSubClassOfLemma>) result, exPremise, inf));
+							
+							return null;
+						}
+						
+						DerivedExpressionWrap<?> nextConclusion = createConclusion(getSubClass(existentialPremise), getSubPropertyExpression(inf.getSubsumptionPremise()), getFiller(exPremise));
+						
+						nextConclusion.addInference(getInferenceForLeftReflexivity((LemmaExpression<ElkSubClassOfLemma>) nextConclusion, exPremise, inf));
+						// continue recursively
+						if (seen.add(inf.getSubsumptionPremise())) {
+							todo.add(Pair.create(inf.getSubsumptionPremise(), nextConclusion));
+						}
+						
 						return null;
 					}
 

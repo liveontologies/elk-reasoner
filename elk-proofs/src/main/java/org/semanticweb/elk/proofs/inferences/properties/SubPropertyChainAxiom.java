@@ -39,8 +39,8 @@ public class SubPropertyChainAxiom extends AbstractSubPropertyChainInference<Der
 
 	public SubPropertyChainAxiom(
 			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> conclusion,
-			DerivedExpression first, 
-			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> second) {
+			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> first, 
+			DerivedExpression second) {
 		super(conclusion, first, second);
 	}
 	

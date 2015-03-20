@@ -50,16 +50,18 @@ import org.semanticweb.elk.proofs.utils.ProofUtils;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
 
 /**
- * TODO
- * 
  * This transformation re-writes existential composition inferences into those which do not use derived sub-property chain axioms.
+ * It is based on {@link DerivedChainSubsumptionElimination} which does all the heavy lifting and
+ * returns a lazy iterator over the sequence of transformed lemma-free inferences.
  * 
  * @author	Pavel Klinov
  * 			pavel.klinov@uni-ulm.de
  *
  */
 public class LemmaElimination implements InferenceTransformation {
-
+	/**
+	 * The main transformation applied during the elimination.
+	 */
 	private final DerivedChainSubsumptionElimination rewritingUnderChainHierarchy_;
 	
 	public LemmaElimination(ReasonerInferenceReader reader) {
@@ -163,10 +165,13 @@ public class LemmaElimination implements InferenceTransformation {
 		return false;
 	}
 	
+	/**
+	 * The central rewriting method.
+	 * 
+	 * @param inf Inference for which some premises are lemmas.  
+	 * @return A sequence of lemma-free inferences.
+	 */
 	public Iterable<NaryExistentialAxiomComposition> rewrite(final NaryExistentialAxiomComposition inf) {
-		//FIXME
-		//System.err.println("From: " + inf);
-		
 		final List<DerivedExpression> commonPremises = new ArrayList<DerivedExpression>();
 		
 		for (int i = 0; i < inf.getExistentialPremises().size(); i++) {
@@ -178,12 +183,6 @@ public class LemmaElimination implements InferenceTransformation {
 				
 				for (Inference lemmaInf : ProofUtils.getInferences(premise)) {
 					transformed.add(lemmaInf.accept(new AbstractInferenceVisitor<Void, NaryExistentialAxiomComposition>() {
-
-						@Override
-						protected NaryExistentialAxiomComposition defaultVisit(Inference inference, Void input) {
-							// shouldn't get here
-							return null;
-						}
 
 						@Override
 						public NaryExistentialAxiomComposition visit(ExistentialLemmaChainComposition lemmaInf, Void input) {
@@ -222,9 +221,6 @@ public class LemmaElimination implements InferenceTransformation {
 					}, null));
 				}
 				
-				//FIXME
-				//System.err.println("To: " + transformed);
-				
 				return transformed;
 			}
 			else {
@@ -238,19 +234,14 @@ public class LemmaElimination implements InferenceTransformation {
 
 	/**
 	 * 
-	 * TODO
+	 * An auxiliary visitor which transforms inferences with lemmas to
+	 * {@link NaryExistentialAxiomComposition}s which are then rewritten to
+	 * eliminate lemmas.
 	 * 
-	 * @author	Pavel Klinov
-	 * 			pavel.klinov@uni-ulm.de
+	 * @author Pavel Klinov pavel.klinov@uni-ulm.de
 	 *
 	 */
 	private class TransformToNaryCompositions extends AbstractInferenceVisitor<Void, NaryExistentialAxiomComposition> {
-
-		@Override
-		protected NaryExistentialAxiomComposition defaultVisit(Inference inference, Void input) {
-			// no lemmas in other inferences, shouldn't get here
-			return null;
-		}
 
 		@Override
 		public NaryExistentialAxiomComposition visit(ExistentialComposition inf, Void input) {
@@ -281,7 +272,7 @@ public class LemmaElimination implements InferenceTransformation {
 	}
 	
 	/**
-	 * Visitor which rewrites inferences
+	 * Visitor which begins the lazy lemma elimination process for existential and composition inferences.
 	 * 
 	 * @author	Pavel Klinov
 	 * 			pavel.klinov@uni-ulm.de
@@ -291,7 +282,7 @@ public class LemmaElimination implements InferenceTransformation {
 		
 		@Override
 		protected Iterable<Inference> defaultVisit(Inference inf, Void input) {
-			// by default output the same inference, rewrite just some specific owns which may have lemmas
+			// by default output the same inference, rewrite just some specific ones which may have lemmas
 			return Collections.singletonList(inf);
 		}
 		

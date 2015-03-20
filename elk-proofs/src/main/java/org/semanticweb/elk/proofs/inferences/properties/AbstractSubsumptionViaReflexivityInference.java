@@ -24,12 +24,10 @@ package org.semanticweb.elk.proofs.inferences.properties;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
-import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
@@ -40,23 +38,30 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public abstract class AbstractSubsumptionViaReflexivityInference<D extends DerivedExpression> extends AbstractInference<LemmaExpression<ElkSubPropertyChainOfLemma>>  {
+public abstract class AbstractSubsumptionViaReflexivityInference<D extends DerivedExpression> extends AbstractInference<DerivedExpression>  {
 	
-	private final D premise_;
+	private final D reflexivityPremise_;
 	
-	public AbstractSubsumptionViaReflexivityInference(LemmaExpression<ElkSubPropertyChainOfLemma> conclusion, D premise) {
+	private final DerivedExpression subsumptionPremise_;
+	
+	public AbstractSubsumptionViaReflexivityInference(DerivedExpression conclusion, DerivedExpression subsumptionPremise, D reflexivityPremise) {
 		super(conclusion);
 		
-		premise_ = premise;
+		reflexivityPremise_ = reflexivityPremise;
+		subsumptionPremise_ = subsumptionPremise;
 	}
 	
 	public D getReflexivityPremise() {
-		return premise_;
+		return reflexivityPremise_;
+	}
+	
+	public DerivedExpression getSubsumptionPremise() {
+		return subsumptionPremise_;
 	}
 	
 	@Override
 	public Collection<DerivedExpression> getRawPremises() {
-		return Collections.<DerivedExpression>singletonList(premise_);
+		return Arrays.asList(subsumptionPremise_, reflexivityPremise_);
 	}
 
 	@Override

@@ -27,6 +27,8 @@ package org.semanticweb.elk.proofs.inferences.properties;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
+import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
@@ -34,28 +36,30 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
 
 /**
  * 
+ * TODO
+ * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
 public abstract class AbstractSubPropertyChainInference<D extends DerivedExpression> extends AbstractInference<D> {
+	// the first premise is always an asserted axiom
+	private final DerivedAxiomExpression<? extends ElkObjectPropertyAxiom> firstPremise_;
 
-	private final DerivedExpression firstPremise_;
+	private final DerivedExpression secondPremise_;
 
-	private final D secondPremise_;
-
-	public AbstractSubPropertyChainInference(D conclusion, DerivedExpression first, D second) {
+	public AbstractSubPropertyChainInference(D conclusion, DerivedAxiomExpression<? extends ElkObjectPropertyAxiom> first, DerivedExpression second) {
 		super(conclusion);
 		
 		firstPremise_ = first;
 		secondPremise_ = second;
 	}
 	
-	public DerivedExpression getFirstPremise() {
+	public DerivedAxiomExpression<? extends ElkObjectPropertyAxiom> getFirstPremise() {
 		return firstPremise_;
 	}
 	
-	public D getSecondPremise() {
+	public DerivedExpression getSecondPremise() {
 		return secondPremise_;
 	}
 

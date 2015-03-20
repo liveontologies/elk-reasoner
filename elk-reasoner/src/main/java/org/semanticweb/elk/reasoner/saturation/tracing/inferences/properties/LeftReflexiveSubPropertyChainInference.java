@@ -28,7 +28,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChai
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
  * TODO
@@ -37,15 +36,15 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class LeftReflexiveSubPropertyChainInference extends ReflexiveSubPropertyChainInference {
+public class LeftReflexiveSubPropertyChainInference extends ReflexiveSubPropertyChainInference<IndexedPropertyChain> {
 
-	public LeftReflexiveSubPropertyChainInference(IndexedPropertyChain sub, IndexedBinaryPropertyChain chain) {
-		super(sub, chain);
+	public LeftReflexiveSubPropertyChainInference(IndexedBinaryPropertyChain sub, IndexedPropertyChain sup) {
+		super(sub, sub.getRightProperty(), sup);
 	}
 
 	@Override
 	public ReflexivePropertyChain<IndexedObjectProperty> getReflexivePremise() {
-		return new ReflexivePropertyChain<IndexedObjectProperty>(getSuperPropertyChain().getLeftProperty());
+		return new ReflexivePropertyChain<IndexedObjectProperty>(chain.getLeftProperty());
 	}
 
 	@Override
@@ -54,20 +53,4 @@ public class LeftReflexiveSubPropertyChainInference extends ReflexiveSubProperty
 		return visitor.visit(this, input);
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof LeftReflexiveSubPropertyChainInference)) {
-			return false;
-		}
-		
-		LeftReflexiveSubPropertyChainInference inf = (LeftReflexiveSubPropertyChainInference) obj;
-		
-		return getSubPropertyChain().equals(inf.getSubPropertyChain()) && getSuperPropertyChain().equals(inf.getSuperPropertyChain());
-	}
-
-	@Override
-	public int hashCode() {
-		return HashGenerator.combineListHash(getSubPropertyChain().hashCode(), getSuperPropertyChain().hashCode());
-	}
-
 }
