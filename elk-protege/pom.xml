@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -18,43 +19,57 @@
 		<log4j.lower.version>1.2</log4j.lower.version>
 		<log4j.upper.version>2</log4j.upper.version>
 		<protege.lower.version>4.2</protege.lower.version>
-		<protege.upper.version>6</protege.upper.version>		
+		<protege.upper.version>6</protege.upper.version>
 	</properties>
 
 	<dependencies>
-		<!--dependency>
-			<groupId>org.protege</groupId>
-			<artifactId>protege-editor-core-application</artifactId>
-			<version>${protege.version}</version>
-		</dependency>
 		<dependency>
-			<groupId>org.protege</groupId>
-			<artifactId>protege-editor-owl</artifactId>
-			<version>${protege.version}</version>
-		</dependency-->
-    <dependency>
 			<groupId>edu.stanford.protege</groupId>
 			<artifactId>org.protege.common</artifactId>
 			<version>${protege.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
 			<artifactId>org.protege.editor.core.application</artifactId>
 			<version>${protege.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
 			<artifactId>org.protege.editor.owl</artifactId>
 			<version>${protege.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-api</artifactId>
 			<version>${owlapi.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-owl-implementation</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-owl-model</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-owlapi</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-reasoner</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-util-collections</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -64,7 +79,12 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>elk-util-logging</artifactId>
+			<artifactId>elk-util-concurrent</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-util-hashing</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -74,7 +94,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>elk-reasoner</artifactId>
+			<artifactId>elk-util-logging</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -85,18 +105,28 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
+			<scope>provided</scope>
 		</dependency>
-		<dependency> 
-        	<groupId>org.slf4j</groupId>
-        	<artifactId>slf4j-api</artifactId>
-      	</dependency>
-      	<dependency> 
-        	<groupId>org.slf4j</groupId>
-        	<artifactId>slf4j-log4j12</artifactId>
-      	</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>maven-bundle-plugin</artifactId>
+					<version>2.5.3</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<resources>
 			<resource>
 				<directory>${basedir}/src/main/resources</directory>
@@ -108,41 +138,74 @@
 		</resources>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<id>parse-version</id>
-						<goals>
-							<goal>parse-version</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.3.7</version>
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
+						<Bundle-SymbolicName>org.semanticweb.elk;singleton:=true</Bundle-SymbolicName>
 						<Implementation-Title>ELK Reasoner</Implementation-Title>
 						<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
 						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
-						<!--Export-Package>org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui</Export-Package-->
-						<Export-Package>org.semanticweb.owlapitools.proofs.*</Export-Package>
-						<Private-Package>org.slf4j.*;org.semanticweb.elk.*;org.semanticweb.owlapitools.*;-split-package:=merge-first</Private-Package>
-						<Bundle-SymbolicName>org.semanticweb.elk;singleton:=true</Bundle-SymbolicName>
+						<Export-Package>!org.semanticweb.elk.*,org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui;org.semanticweb.owlapitools.proofs.*</Export-Package>
+						<Import-Package>!org.semanticweb.elk.*,org.apache.log4j.*;version="[${log4j.lower.version},${log4j.upper.version})",
+							org.protege.*;version="[${protege.lower.version},${protege.upper.version})",*</Import-Package>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
-						<Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>
+						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
+						<Embed-Directory>target/dependency</Embed-Directory>
+						<Embed-StripGroup>true</Embed-StripGroup>
 						<Update-Url>http://elk.semanticweb.org/maven/latest/elk-distribution/resources/update.properties</Update-Url>
-						<Import-Package>org.apache.log4j.*;version="[${log4j.lower.version},${log4j.upper.version})",
-						org.protege.*;version="[${protege.lower.version},${protege.upper.version})",*</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<!-- with this profile put META-INF/MANIFEST.MF, plugin.xml, and embed 
+				dependencies so that Eclipse/PDE can find them; to use in Eclipse right click 
+				on the project > Configure > Convert to Plug-in Projects... -->
+			<id>eclipse</id>
+			<build>
+				<resources>
+					<resource>
+						<directory>${basedir}/src/main/resources</directory>
+						<includes>
+							<include>plugin.xml</include>
+						</includes>
+						<filtering>true</filtering>
+						<targetPath>${basedir}</targetPath>
+					</resource>
+				</resources>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.felix</groupId>
+						<artifactId>maven-bundle-plugin</artifactId>
+						<extensions>true</extensions>
+						<configuration>
+							<manifestLocation>META-INF</manifestLocation>
+						</configuration>
+					</plugin>
+					<plugin>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-dependencies</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<excludeScope>provided</excludeScope>
+							<excludeTransitive>true</excludeTransitive>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
