@@ -1,9 +1,9 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
 <plugin>
 
 <extension id="elk.reasoner.factory" point="org.protege.editor.owl.inference_reasonerfactory">
-    <name value="ELK ${project.version}"/>
-    <label value="ELK ${project.version}"/>
+	<name value="ELK ${project.version}"/>
 	<class value="org.semanticweb.elk.protege.ProtegeReasonerFactory"/>
 </extension>
 
