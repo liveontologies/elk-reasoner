@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.utils.ProofUtils;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
@@ -48,18 +48,18 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  */
 public class InferenceGraphImpl implements InferenceGraph {
 
-	private final Set<DerivedExpression> roots_ = new ArrayHashSet<DerivedExpression>();
+	private final Set<Expression> roots_ = new ArrayHashSet<Expression>();
 	
 	private boolean rootsUpdated = false;
 	
-	private final Map<DerivedExpression, List<Inference>> nodes_;
+	private final Map<Expression, List<Inference>> nodes_;
 	
 	public InferenceGraphImpl() {
-		nodes_ = new HashMap<DerivedExpression, List<Inference>>();
+		nodes_ = new HashMap<Expression, List<Inference>>();
 	}
 	
 	@Override
-	public Collection<DerivedExpression> getRootExpressions() {
+	public Collection<Expression> getRootExpressions() {
 		if (!rootsUpdated) {
 			updateRoots();
 			rootsUpdated = true;
@@ -69,16 +69,16 @@ public class InferenceGraphImpl implements InferenceGraph {
 	}
 
 	@Override
-	public Collection<Inference> getInferencesForPremise(DerivedExpression expression) {
+	public Collection<Inference> getInferencesForPremise(Expression expression) {
 		return nodes_.containsKey(expression) ? nodes_.get(expression) : Collections.<Inference>emptyList();
 	}
 	
 	@Override
-	public Collection<DerivedExpression> getExpressions() {
+	public Collection<Expression> getExpressions() {
 		return nodes_.keySet();
 	}
 	
-	public boolean addExpression(DerivedExpression expr) {
+	public boolean addExpression(Expression expr) {
 		if (nodes_.containsKey(expr)) {
 			return false;
 		}
@@ -91,7 +91,7 @@ public class InferenceGraphImpl implements InferenceGraph {
 	public void addInference(Inference inf) {
 		rootsUpdated = false;
 		
-		for (DerivedExpression premise : inf.getPremises()) {
+		for (Expression premise : inf.getPremises()) {
 			addExpression(premise);
 			
 			nodes_.get(premise).add(inf);
@@ -111,7 +111,7 @@ public class InferenceGraphImpl implements InferenceGraph {
 		
 		builder.append("Roots: " + getRootExpressions() + "\n");
 		
-		for (DerivedExpression expr : nodes_.keySet()) {
+		for (Expression expr : nodes_.keySet()) {
 			builder.append(expr + " => " + nodes_.get(expr) + "\n");
 		}
 		
@@ -119,7 +119,7 @@ public class InferenceGraphImpl implements InferenceGraph {
 	}
 
 	private void updateRoots() {
-		for (DerivedExpression expr : nodes_.keySet()) {
+		for (Expression expr : nodes_.keySet()) {
 			if (ProofUtils.isAsserted(expr)) {
 				roots_.add(expr);
 			}

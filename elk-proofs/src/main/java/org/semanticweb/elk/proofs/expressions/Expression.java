@@ -24,11 +24,12 @@ package org.semanticweb.elk.proofs.expressions;
  * #L%
  */
 
+import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.proofs.inferences.Inference;
 
 /**
- * An expression is either an axiom or a lemma. Axiom expressions are represented (syntactically) as OWL axioms.
- * Lemma expressions cannot be represented as OWL axioms. Depending on implementation they can be represented
- * using some extended axiom syntax or as inferences that derived them.
+ * The base interface for expressions derived by the reasoner. Expressions may
+ * or may not be representable in the OWL syntax.
  * 
  * @author Pavel Klinov
  * 
@@ -36,19 +37,12 @@ package org.semanticweb.elk.proofs.expressions;
  */
 public interface Expression {
 
-	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input);
+	/**
+	 * 
+	 * @return
+	 * @throws ElkException
+	 */
+	public Iterable<? extends Inference> getInferences() throws ElkException;
 	
-	public static Expression EMPTY = new Expression() {
-
-		@Override
-		public String toString() {
-			return "";
-		}
-
-		@Override
-		public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input) {
-			return null;
-		}
-		
-	};
+	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input);
 }

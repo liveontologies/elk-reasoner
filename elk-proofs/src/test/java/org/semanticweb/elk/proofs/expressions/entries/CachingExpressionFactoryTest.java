@@ -26,13 +26,13 @@ package org.semanticweb.elk.proofs.expressions.entries;
 
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
-import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.a;
-import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.b;
-import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.c;
-import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.d;
-import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.q;
-import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.r;
-import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.s;
+import static org.semanticweb.elk.proofs.expressions.entries.TestEntities.a;
+import static org.semanticweb.elk.proofs.expressions.entries.TestEntities.b;
+import static org.semanticweb.elk.proofs.expressions.entries.TestEntities.c;
+import static org.semanticweb.elk.proofs.expressions.entries.TestEntities.d;
+import static org.semanticweb.elk.proofs.expressions.entries.TestEntities.q;
+import static org.semanticweb.elk.proofs.expressions.entries.TestEntities.r;
+import static org.semanticweb.elk.proofs.expressions.entries.TestEntities.s;
 
 import java.util.Arrays;
 
@@ -40,26 +40,26 @@ import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.proofs.expressions.CachingExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactoryWithCaching;
+import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryImpl;
-import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
+import org.semanticweb.elk.proofs.inferences.InferenceReader;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ExpressionFactoryWithCachingTest {
+public class CachingExpressionFactoryTest {
 
 	private static final ElkObjectFactory objFactory_ = new ElkObjectFactoryImpl();
 	private static final ElkLemmaObjectFactory lemmaFactory_ = new ElkLemmaObjectFactoryImpl();
 	
 	@Test
 	public void axiomCaching() {
-		DerivedExpressionFactory factory = new DerivedExpressionFactoryWithCaching(InferenceReader.DUMMY);
+		ExpressionFactory factory = new CachingExpressionFactory(InferenceReader.DUMMY);
 		
 		Expression first = factory.create(objFactory_.getSubClassOfAxiom(a, b));
 		Expression second = factory.create(objFactory_.getSubClassOfAxiom(a, b));
@@ -84,7 +84,7 @@ public class ExpressionFactoryWithCachingTest {
 	
 	@Test
 	public void lemmaCaching() {
-		DerivedExpressionFactory factory = new DerivedExpressionFactoryWithCaching(InferenceReader.DUMMY);
+		ExpressionFactory factory = new CachingExpressionFactory(InferenceReader.DUMMY);
 		// complex existentials
 		ElkObjectPropertyChain rs = objFactory_.getObjectPropertyChain(Arrays.asList(r, s));
 		Expression first = factory.create(lemmaFactory_.getSubClassOfLemma(a, lemmaFactory_.getComplexObjectSomeValuesFrom(rs, b)));

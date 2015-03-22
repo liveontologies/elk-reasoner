@@ -30,9 +30,9 @@ import java.util.Collection;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -43,13 +43,13 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ConjunctionComposition extends AbstractInference<DerivedAxiomExpression<? extends ElkClassAxiom>> {
+public class ConjunctionComposition extends AbstractInference<AxiomExpression<? extends ElkClassAxiom>> {
 
-	private final DerivedExpression firstPremise_;
+	private final Expression firstPremise_;
 	
-	private final DerivedExpression secondPremise_;
+	private final Expression secondPremise_;
 	
-	public ConjunctionComposition(ElkClassExpression sub, ElkClassExpression firstConjunct, ElkClassExpression secondConjunct, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
+	public ConjunctionComposition(ElkClassExpression sub, ElkClassExpression firstConjunct, ElkClassExpression secondConjunct, ElkObjectFactory factory, ExpressionFactory exprFactory) {
 		super(exprFactory.create(factory.getSubClassOfAxiom(sub, factory.getObjectIntersectionOf(firstConjunct, secondConjunct))));
 
 		firstPremise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, firstConjunct));
@@ -57,7 +57,7 @@ public class ConjunctionComposition extends AbstractInference<DerivedAxiomExpres
 	}
 
 	@Override
-	public Collection<DerivedExpression> getRawPremises() {
+	public Collection<Expression> getRawPremises() {
 		return Arrays.asList(firstPremise_, secondPremise_);
 	}
 

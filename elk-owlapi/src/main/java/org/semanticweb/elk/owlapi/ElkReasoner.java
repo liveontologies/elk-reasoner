@@ -41,7 +41,7 @@ import org.semanticweb.elk.owlapi.proofs.ElkToOwlProofConverter;
 import org.semanticweb.elk.owlapi.wrapper.OwlClassAxiomConverterVisitor;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.proofs.ProofReader;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
 import org.semanticweb.elk.reasoner.ElkUnsupportedReasoningTaskException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
@@ -946,7 +946,7 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 			ElkSubClassOfAxiom elkAxiom = (ElkSubClassOfAxiom) scAxiom.accept(OwlClassAxiomConverterVisitor.getInstance());
 			
 			try {
-				DerivedAxiomExpression<?> expr = new ProofReader(reasoner_)
+				AxiomExpression<?> expr = new ProofReader(reasoner_)
 						.eliminateLemmas()
 						.getProofRoot(
 								elkAxiom.getSubClassExpression(),
@@ -966,7 +966,7 @@ public class ElkReasoner implements ExplainingOWLReasoner {
 	
 	public OWLAxiomExpression getDerivedExpressionForInconsistency() throws ProofGenerationException {
 		try {
-			DerivedAxiomExpression<?> expr = new ProofReader(reasoner_)
+			AxiomExpression<?> expr = new ProofReader(reasoner_)
 					.eliminateLemmas().getProofRootForInconsistency();
 			
 			return ElkToOwlProofConverter.convert(expr);

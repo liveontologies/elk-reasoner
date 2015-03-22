@@ -42,10 +42,10 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialChainAxiomComposition;
@@ -79,7 +79,7 @@ public class LemmaEliminationViaChainRewriting implements InferenceTransformatio
 		reader_ = reader;
 	}
 	
-	private DerivedExpressionFactory getExpressionFactory() {
+	private ExpressionFactory getExpressionFactory() {
 		return reader_.getExpressionFactory();
 	}
 	
@@ -99,7 +99,7 @@ public class LemmaEliminationViaChainRewriting implements InferenceTransformatio
 	private class InferenceRewriter extends AbstractInferenceVisitor<Void, Iterable<Inference>> {
 		
 		private boolean lemmasPresent(Inference inf) {
-			for (DerivedExpression premise : inf.getPremises()) {
+			for (Expression premise : inf.getPremises()) {
 				if (premise instanceof LemmaExpression) {
 					return true;
 				}
@@ -190,7 +190,7 @@ public class LemmaEliminationViaChainRewriting implements InferenceTransformatio
 		
 		// the property subsumption premise can have a derivation with lemmas. this method wraps with a special kind of expression
 		// which produces lemma-free derivations.
-		private DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> wrapSubPropertyExpression(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr) {
+		private AxiomExpression<ElkSubObjectPropertyOfAxiom> wrapSubPropertyExpression(AxiomExpression<ElkSubObjectPropertyOfAxiom> expr) {
 			ElkSubObjectPropertyOfAxiom axiom = expr.getAxiom();
 			IndexObjectConverter indexer = reader_.getIndexer();
 			
@@ -201,7 +201,7 @@ public class LemmaEliminationViaChainRewriting implements InferenceTransformatio
 			return expr;
 		}
 		
-		private SubPropertyChainExpression createSubPropertyExpression(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr) {
+		private SubPropertyChainExpression createSubPropertyExpression(AxiomExpression<ElkSubObjectPropertyOfAxiom> expr) {
 			IndexObjectConverter indexer = reader_.getIndexer();
 			IndexedObjectProperty superProperty = (IndexedObjectProperty) expr.getAxiom().getSuperObjectPropertyExpression().accept(indexer);
 			IndexedPropertyChain subChain = expr.getAxiom().getSubObjectPropertyExpression().accept(indexer);
@@ -211,7 +211,7 @@ public class LemmaEliminationViaChainRewriting implements InferenceTransformatio
 
 		@Override
 		public Iterable<Inference> visit(ExistentialComposition inf, Void input) {
-			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propPremise = wrapSubPropertyExpression(inf.getSubPropertyPremise());
+			AxiomExpression<ElkSubObjectPropertyOfAxiom> propPremise = wrapSubPropertyExpression(inf.getSubPropertyPremise());
 			
 			if (propPremise == inf.getSubPropertyPremise()) {
 				// the property premise is trivial, no need to wrap it
@@ -234,13 +234,13 @@ public class LemmaEliminationViaChainRewriting implements InferenceTransformatio
 															inf.getConclusion(), 
 															Arrays.asList(inf.getFirstExistentialPremise(), inf.getSecondExistentialPremise()),
 															// can have only chain axioms here. can't have transitivity, for example, that doesn't involve lemmas
-															(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>) inf.getChainPremise());
+															(AxiomExpression<ElkSubObjectPropertyOfAxiom>) inf.getChainPremise());
 				
 				return lazyLemmaElimination(transformed);
 			}
 			else {
 				// wrapping the property subsumption premise, if needed
-				DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propPremise = wrapSubPropertyExpression(inf.getFirstPropertyPremise());
+				AxiomExpression<ElkSubObjectPropertyOfAxiom> propPremise = wrapSubPropertyExpression(inf.getFirstPropertyPremise());
 				
 				if (propPremise == inf.getFirstPropertyPremise()) {
 					return defaultVisit(inf, input);
@@ -278,11 +278,11 @@ public class LemmaEliminationViaChainRewriting implements InferenceTransformatio
 		}
 
 		public Iterable<NaryExistentialAxiomComposition> rewrite(final NaryExistentialAxiomComposition inf) {
-			final List<DerivedExpression> commonPremises = new ArrayList<DerivedExpression>();
+			final List<Expression> commonPremises = new ArrayList<Expression>();
 			
 			for (int i = 0; i < inf.getExistentialPremises().size(); i++) {
 				final int premiseIndex = i;
-				DerivedExpression premise = inf.getExistentialPremises().get(i);
+				Expression premise = inf.getExistentialPremises().get(i);
 				
 				if (premise instanceof LemmaExpression) {
 					// replacing the current inference by a collection of inferences, one for each inference which derives the lemma premise
@@ -301,7 +301,7 @@ public class LemmaEliminationViaChainRewriting implements InferenceTransformatio
 								@Override
 								public NaryExistentialAxiomComposition visit(ExistentialLemmaChainComposition lemmaInf, Void input) {
 									// only this inference can derive existential lemma premises
-									List<DerivedExpression> premises = new ArrayList<DerivedExpression>(commonPremises);
+									List<Expression> premises = new ArrayList<Expression>(commonPremises);
 									
 									premises.add(lemmaInf.getFirstExistentialPremise());
 									premises.add(lemmaInf.getSecondExistentialPremise());
@@ -309,7 +309,7 @@ public class LemmaEliminationViaChainRewriting implements InferenceTransformatio
 									boolean moreLemmas = lemmaInf.getSecondExistentialPremise() instanceof LemmaExpression;
 									// copying the remaining inferences
 									for (int j = premiseIndex + 1; j < inf.getExistentialPremises().size(); j++) {
-										DerivedExpression nextPremise = inf.getExistentialPremises().get(j);
+										Expression nextPremise = inf.getExistentialPremises().get(j);
 										
 										moreLemmas |= (nextPremise instanceof LemmaExpression);
 										premises.add(nextPremise);
@@ -351,13 +351,13 @@ public class LemmaEliminationViaChainRewriting implements InferenceTransformatio
 		}
 
 		private NaryExistentialAxiomComposition recreateChainAxiom(
-				DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion, 
-				List<? extends DerivedExpression> existentialPremises,
+				AxiomExpression<ElkSubClassOfAxiom> conclusion, 
+				List<? extends Expression> existentialPremises,
 				ElkSubObjectPropertyOfAxiom chainPremise) {
 			List<ElkObjectPropertyExpression> chainList = new ArrayList<ElkObjectPropertyExpression>(existentialPremises.size());
 			
-			for (DerivedExpression premise : existentialPremises) {
-				ElkSubClassOfAxiom exPremise = (ElkSubClassOfAxiom) ((DerivedAxiomExpression<?>) premise).getAxiom();
+			for (Expression premise : existentialPremises) {
+				ElkSubClassOfAxiom exPremise = (ElkSubClassOfAxiom) ((AxiomExpression<?>) premise).getAxiom();
 				ElkObjectSomeValuesFrom exSuper = (ElkObjectSomeValuesFrom) exPremise.getSuperClassExpression();
 				
 				chainList.add(exSuper.getProperty());

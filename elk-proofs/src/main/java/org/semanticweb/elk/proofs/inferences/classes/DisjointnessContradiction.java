@@ -32,9 +32,9 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -45,13 +45,13 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DisjointnessContradiction extends AbstractInference<DerivedAxiomExpression<? extends ElkClassAxiom>> {
+public class DisjointnessContradiction extends AbstractInference<AxiomExpression<? extends ElkClassAxiom>> {
 
-	private final DerivedExpression firstPremise_;
+	private final Expression firstPremise_;
 	
-	private final DerivedExpression secondPremise_;
+	private final Expression secondPremise_;
 	
-	private final DerivedExpression axiom_;
+	private final Expression axiom_;
 	
 	public DisjointnessContradiction(
 			ElkClassExpression sub, 
@@ -59,7 +59,7 @@ public class DisjointnessContradiction extends AbstractInference<DerivedAxiomExp
 			ElkClassExpression secondSup, 
 			ElkDisjointClassesAxiom sideCondition, 
 			ElkObjectFactory factory, 
-			DerivedExpressionFactory exprFactory) {
+			ExpressionFactory exprFactory) {
 		super(exprFactory.create(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING)));
 
 		firstPremise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, firstSup));
@@ -68,7 +68,7 @@ public class DisjointnessContradiction extends AbstractInference<DerivedAxiomExp
 	}
 
 	@Override
-	public Collection<DerivedExpression> getRawPremises() {
+	public Collection<Expression> getRawPremises() {
 		return Arrays.asList(firstPremise_, secondPremise_, axiom_);
 	}
 	

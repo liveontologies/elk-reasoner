@@ -39,26 +39,23 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.AbstractElkEntityVisitor;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.CachingExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactoryWithCaching;
-import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceChecker;
+import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
+import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceChecker;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.InconsistencyInference;
 import org.semanticweb.elk.proofs.inferences.Inference;
+import org.semanticweb.elk.proofs.inferences.InferenceReader;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.classes.UnsatisfiabilityInference;
-import org.semanticweb.elk.proofs.inferences.mapping.SatisfiabilityChecker;
 import org.semanticweb.elk.proofs.inferences.mapping.ExpressionMapper;
 import org.semanticweb.elk.proofs.inferences.mapping.InferenceMapper;
+import org.semanticweb.elk.proofs.inferences.mapping.SatisfiabilityChecker;
 import org.semanticweb.elk.proofs.inferences.mapping.TracingInput;
-import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
-import org.semanticweb.elk.proofs.transformations.OneStepCyclicInferenceFilter;
-import org.semanticweb.elk.proofs.transformations.TransformedAxiomExpression;
 import org.semanticweb.elk.proofs.transformations.lemmas.BaseExpressionVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -80,18 +77,18 @@ public class ReasonerInferenceReader implements InferenceReader {
 
 	final AbstractReasonerState reasoner;
 	
-	private final DerivedExpressionFactory expressionFactory_;
+	private final ExpressionFactory expressionFactory_;
 	
 	private final ExpressionMapper expressionMapper_;
 	
 	public ReasonerInferenceReader(AbstractReasonerState r) {
 		reasoner = r;
 		// this expression factory will guarantee pointer equality for structurally equivalent expressions
-		expressionFactory_ = new DerivedExpressionFactoryWithCaching(this);
+		expressionFactory_ = new CachingExpressionFactory(this);
 		expressionMapper_ = new ExpressionMapper(reasoner.getIndexObjectConverter());
 	}
 	
-	public DerivedAxiomExpression<?> initialize(ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
+	public AxiomExpression<?> initialize(ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
 		// trace it
 		if (reasoner.isInconsistent()) {
 			return initializeForInconsistency();
@@ -99,14 +96,14 @@ public class ReasonerInferenceReader implements InferenceReader {
 		else {
 			reasoner.explainSubsumption(sub, sup);
 			// create and return the first derived expression which corresponds to the initial subsumption
-			DerivedAxiomExpression<ElkSubClassOfAxiom> expr = expressionFactory_.create(new ElkObjectFactoryImpl().getSubClassOfAxiom(sub, sup)); 
+			AxiomExpression<ElkSubClassOfAxiom> expr = expressionFactory_.create(new ElkObjectFactoryImpl().getSubClassOfAxiom(sub, sup)); 
 			
 			//return filterOutOneStepCycles(expr);
 			return expr;
 		}
 	}
 	
-	public DerivedAxiomExpression<?> initializeForInconsistency() throws ElkException {
+	public AxiomExpression<?> initializeForInconsistency() throws ElkException {
 		final ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		ElkEntity inconsistent = reasoner.explainInconsistency();
 		ElkAxiom axiom = inconsistent.accept(new AbstractElkEntityVisitor<ElkAxiom>() {
@@ -131,7 +128,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 		return new TransformedAxiomExpression<OneStepCyclicInferenceFilter, E>(root, new OneStepCyclicInferenceFilter());
 	}*/
 	
-	public DerivedExpressionFactory getExpressionFactory() {
+	public ExpressionFactory getExpressionFactory() {
 		return expressionFactory_;
 	}
 	
@@ -144,7 +141,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 	}
 	
 	@Override
-	public Iterable<Inference> getInferences(DerivedExpression expression) throws ElkException {
+	public Iterable<Inference> getInferences(Expression expression) throws ElkException {
 		Inference auxInf = createAuxiliaryInference(expression);
 		Iterable<Inference> exprInf = createExpressionInferences(expression); 
 		
@@ -152,9 +149,9 @@ public class ReasonerInferenceReader implements InferenceReader {
 	}
 	
 	// in case we're explaining expressions other than the submitted one, for example, if the ontology is inconsistent or the subclass is unsatisfiable
-	private Inference createAuxiliaryInference(DerivedExpression expression) throws ElkException {
+	private Inference createAuxiliaryInference(Expression expression) throws ElkException {
 		if (reasoner.isInconsistent()) {
-			DerivedAxiomExpression<?> inconsistencyConclusion = initializeForInconsistency();
+			AxiomExpression<?> inconsistencyConclusion = initializeForInconsistency();
 			// the ontology is inconsistent so everything follows
 			if (!expression.equals(inconsistencyConclusion)) {
 				return new InconsistencyInference(expression, inconsistencyConclusion);
@@ -217,7 +214,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 			
 			if (!entailmentChecker_.isSatisfiable(sub)) {
 				ElkObjectFactory factory = new ElkObjectFactoryImpl();
-				DerivedAxiomExpression<ElkSubClassOfAxiom> premise = expressionFactory_.create(factory.getSubClassOfAxiom(lemma.getSubClass(), PredefinedElkClass.OWL_NOTHING));
+				AxiomExpression<ElkSubClassOfAxiom> premise = expressionFactory_.create(factory.getSubClassOfAxiom(lemma.getSubClass(), PredefinedElkClass.OWL_NOTHING));
 				
 				return new UnsatisfiabilityInference(lemmaExpression, premise);
 			}
@@ -231,7 +228,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 			
 			if (!entailmentChecker_.isSatisfiable(sub) && !isNothing(axiom.getSuperClassExpression())) {
 				ElkObjectFactory factory = new ElkObjectFactoryImpl();
-				DerivedAxiomExpression<ElkSubClassOfAxiom> premise = expressionFactory_.create(factory.getSubClassOfAxiom(axiom.getSubClassExpression(), PredefinedElkClass.OWL_NOTHING));
+				AxiomExpression<ElkSubClassOfAxiom> premise = expressionFactory_.create(factory.getSubClassOfAxiom(axiom.getSubClassExpression(), PredefinedElkClass.OWL_NOTHING));
 				
 				return new UnsatisfiabilityInference(axiomExpression, premise);
 			}

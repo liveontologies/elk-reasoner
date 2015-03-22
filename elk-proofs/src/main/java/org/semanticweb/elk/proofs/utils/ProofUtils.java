@@ -29,10 +29,10 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyExpressionVisitor;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 
 /**
@@ -58,11 +58,11 @@ public class ProofUtils {
 		});
 	}
 	
-	public static boolean isAsserted(DerivedExpression expr) {
+	public static boolean isAsserted(Expression expr) {
 		return expr.accept(new ExpressionVisitor<Void, Boolean>() {
 
 			@Override
-			public Boolean visit(DerivedAxiomExpression<?> expr, Void input) {
+			public Boolean visit(AxiomExpression<?> expr, Void input) {
 				return expr.isAsserted();
 			}
 
@@ -75,14 +75,14 @@ public class ProofUtils {
 		}, null);
 	}
 
-	public static boolean checkAsserted(DerivedExpression expr) throws ElkException {
+	public static boolean checkAsserted(Expression expr) throws ElkException {
 		if (isAsserted(expr)) {
 			return true;
 		}
 		
 		// asserted expressions are either marked as asserted or have inferences which derive them from themselves
 		for (Inference inf : expr.getInferences()) {
-			for (DerivedExpression premise : inf.getPremises()) {
+			for (Expression premise : inf.getPremises()) {
 				if (premise.equals(expr) && isAsserted(premise)) {
 					return true;
 				}
@@ -92,7 +92,7 @@ public class ProofUtils {
 		return false;
 	}
 	
-	public static Iterable<? extends Inference> getInferences(DerivedExpression expr) {
+	public static Iterable<? extends Inference> getInferences(Expression expr) {
 		try {
 			return expr.getInferences();
 		} catch (ElkException e) {

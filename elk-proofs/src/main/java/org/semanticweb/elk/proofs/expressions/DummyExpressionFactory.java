@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions.derived;
+package org.semanticweb.elk.proofs.expressions;
 /*
  * #%L
  * ELK Proofs Package
@@ -26,7 +26,7 @@ package org.semanticweb.elk.proofs.expressions.derived;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
-import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
+import org.semanticweb.elk.proofs.inferences.InferenceReader;
 
 /**
  * Always creates new expression objects
@@ -35,11 +35,11 @@ import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class DummyExpressionFactory implements DerivedExpressionFactory {
+public class DummyExpressionFactory implements ExpressionFactory {
 
 	@Override
-	public <E extends ElkAxiom> DerivedAxiomExpressionImpl<E> create(E axiom) {
-		return new DerivedAxiomExpressionImpl<E>(axiom, InferenceReader.DUMMY);
+	public <E extends ElkAxiom> AxiomExpressionImpl<E> create(E axiom) {
+		return new AxiomExpressionImpl<E>(axiom, InferenceReader.DUMMY);
 	}
 
 	@Override
@@ -48,8 +48,8 @@ public class DummyExpressionFactory implements DerivedExpressionFactory {
 	}
 
 	@Override
-	public <E extends ElkAxiom> DerivedAxiomExpressionImpl<E> createAsserted(E axiom) {
-		return new DerivedAxiomExpressionImpl<E>(axiom, InferenceReader.DUMMY, true);
+	public <E extends ElkAxiom> AxiomExpressionImpl<E> createAsserted(E axiom) {
+		return new AxiomExpressionImpl<E>(axiom, InferenceReader.DUMMY, true);
 	}
 
 }

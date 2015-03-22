@@ -27,8 +27,8 @@ package org.semanticweb.elk.proofs.inferences.classes;
 import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -38,13 +38,13 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class UnsatisfiabilityInference extends AbstractInference<DerivedExpression> {
+public class UnsatisfiabilityInference extends AbstractInference<Expression> {
 
-	private final DerivedAxiomExpression<ElkSubClassOfAxiom> unsatisfiabilityPremise_;
+	private final AxiomExpression<ElkSubClassOfAxiom> unsatisfiabilityPremise_;
 	
 	public UnsatisfiabilityInference(
-			DerivedExpression conclusion,
-			DerivedAxiomExpression<ElkSubClassOfAxiom> inconsistencyPremise) {
+			Expression conclusion,
+			AxiomExpression<ElkSubClassOfAxiom> inconsistencyPremise) {
 		super(conclusion);
 		unsatisfiabilityPremise_ = inconsistencyPremise;
 	}
@@ -60,7 +60,7 @@ public class UnsatisfiabilityInference extends AbstractInference<DerivedExpressi
 	}
 
 	@Override
-	protected Iterable<? extends DerivedExpression> getRawPremises() {
+	protected Iterable<? extends Expression> getRawPremises() {
 		return Collections.singleton(unsatisfiabilityPremise_);
 	}
 

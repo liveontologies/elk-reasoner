@@ -28,8 +28,8 @@ import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -42,20 +42,20 @@ import org.semanticweb.elk.util.collections.Operations;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class ReflexivityElimination extends AbstractInference<DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>> {
+public class ReflexivityElimination extends AbstractInference<AxiomExpression<ElkSubObjectPropertyOfAxiom>> {
 
-	private final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> firstPremise_;
+	private final AxiomExpression<ElkSubObjectPropertyOfAxiom> firstPremise_;
 	
-	private final Iterable<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> reflexivePremises_;
+	private final Iterable<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> reflexivePremises_;
 	
-	public ReflexivityElimination(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> c, DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> first, Iterable<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> reflexivePremises) {
+	public ReflexivityElimination(AxiomExpression<ElkSubObjectPropertyOfAxiom> c, AxiomExpression<ElkSubObjectPropertyOfAxiom> first, Iterable<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> reflexivePremises) {
 		super(c);
 		
 		firstPremise_ = first;
 		reflexivePremises_ = reflexivePremises;
 	}
 	
-	public ReflexivityElimination(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> c, DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> first, DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom> reflexivePremise) {
+	public ReflexivityElimination(AxiomExpression<ElkSubObjectPropertyOfAxiom> c, AxiomExpression<ElkSubObjectPropertyOfAxiom> first, AxiomExpression<ElkReflexiveObjectPropertyAxiom> reflexivePremise) {
 		super(c);
 		
 		firstPremise_ = first;
@@ -73,8 +73,8 @@ public class ReflexivityElimination extends AbstractInference<DerivedAxiomExpres
 	}
 
 	@Override
-	protected Iterable<DerivedExpression> getRawPremises() {
-		return Operations.concat(Collections.<DerivedExpression>singletonList(firstPremise_), reflexivePremises_);
+	protected Iterable<Expression> getRawPremises() {
+		return Operations.concat(Collections.<Expression>singletonList(firstPremise_), reflexivePremises_);
 	}
 
 }

@@ -33,9 +33,9 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -46,15 +46,15 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class InconsistentDisjointness extends AbstractInference<DerivedAxiomExpression<? extends ElkClassAxiom>> {
+public class InconsistentDisjointness extends AbstractInference<AxiomExpression<? extends ElkClassAxiom>> {
 
-	private final DerivedExpression premise_;
+	private final Expression premise_;
 
-	private final DerivedExpression axiom_;
+	private final Expression axiom_;
 
 	public InconsistentDisjointness(ElkClassExpression sub,
 			ElkClassExpression sup, ElkDisjointClassesAxiom sideCondition,
-			ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
+			ElkObjectFactory factory, ExpressionFactory exprFactory) {
 		super(exprFactory.create(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING)));
 
 		premise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, sup));
@@ -62,7 +62,7 @@ public class InconsistentDisjointness extends AbstractInference<DerivedAxiomExpr
 	}
 
 	@Override
-	public Collection<DerivedExpression> getRawPremises() {
+	public Collection<Expression> getRawPremises() {
 		return Arrays.asList(premise_, axiom_);
 	}
 

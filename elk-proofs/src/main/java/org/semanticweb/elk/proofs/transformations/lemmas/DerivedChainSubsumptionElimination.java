@@ -45,10 +45,10 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexObjectSomeValuesFrom;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkReflexivePropertyChainLemma;
@@ -102,15 +102,15 @@ public class DerivedChainSubsumptionElimination {
 	}
 
 	Iterable<? extends Inference> transform(final ExistentialComposition inference) {
-		DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion = inference.getConclusion();
-		DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propertyPremise = inference.getSubPropertyPremise();
+		AxiomExpression<ElkSubClassOfAxiom> conclusion = inference.getConclusion();
+		AxiomExpression<ElkSubObjectPropertyOfAxiom> propertyPremise = inference.getSubPropertyPremise();
 		
 		if (isTautology(propertyPremise) || propertyPremise.isAsserted()) {
 			// told hierarchies are OK here
 			return Collections.singleton(inference);
 		}
 
-		DerivedExpression expandedExistential = rewriteUnderPropertyChainHierarchy(inference.getExistentialPremise(), propertyPremise);
+		Expression expandedExistential = rewriteUnderPropertyChainHierarchy(inference.getExistentialPremise(), propertyPremise);
 		
 		if (expandedExistential.equals(inference.getConclusion())) {
 			// this is what happens if the subsumer premise is trivial so the
@@ -129,13 +129,13 @@ public class DerivedChainSubsumptionElimination {
 	}
 	
 	ExistentialChainAxiomComposition transform(final ExistentialChainAxiomComposition original) {
-		DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion = original.getConclusion();
-		DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propertyPremise = original.getFirstPropertyPremise();
-		DerivedExpression secondPropertyPremise = original.getSecondPropertyPremise();
-		DerivedAxiomExpression<ElkSubClassOfAxiom> firstExPremise = original.getFirstExistentialPremise();
-		DerivedExpression secondExPremise = original.getSecondExistentialPremise();
+		AxiomExpression<ElkSubClassOfAxiom> conclusion = original.getConclusion();
+		AxiomExpression<ElkSubObjectPropertyOfAxiom> propertyPremise = original.getFirstPropertyPremise();
+		Expression secondPropertyPremise = original.getSecondPropertyPremise();
+		AxiomExpression<ElkSubClassOfAxiom> firstExPremise = original.getFirstExistentialPremise();
+		Expression secondExPremise = original.getSecondExistentialPremise();
 
-		firstExPremise = (DerivedAxiomExpression<ElkSubClassOfAxiom>) rewriteUnderPropertyChainHierarchy(firstExPremise, propertyPremise);
+		firstExPremise = (AxiomExpression<ElkSubClassOfAxiom>) rewriteUnderPropertyChainHierarchy(firstExPremise, propertyPremise);
 		secondExPremise = rewriteUnderPropertyChainHierarchy(secondExPremise, secondPropertyPremise);
 		
 		ExistentialChainAxiomComposition transformed = new ExistentialChainAxiomComposition(
@@ -151,12 +151,12 @@ public class DerivedChainSubsumptionElimination {
 	
 	ExistentialLemmaChainComposition transform(final ExistentialLemmaChainComposition original) {
 		LemmaExpression<ElkSubClassOfLemma> conclusion = original.getConclusion();
-		DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propertyPremise = original.getFirstPropertyPremise();
-		DerivedExpression secondPropertyPremise = original.getSecondPropertyPremise();
-		DerivedAxiomExpression<ElkSubClassOfAxiom> firstExPremise = original.getFirstExistentialPremise();
-		DerivedExpression secondExPremise = original.getSecondExistentialPremise();
+		AxiomExpression<ElkSubObjectPropertyOfAxiom> propertyPremise = original.getFirstPropertyPremise();
+		Expression secondPropertyPremise = original.getSecondPropertyPremise();
+		AxiomExpression<ElkSubClassOfAxiom> firstExPremise = original.getFirstExistentialPremise();
+		Expression secondExPremise = original.getSecondExistentialPremise();
 
-		firstExPremise = (DerivedAxiomExpression<ElkSubClassOfAxiom>) rewriteUnderPropertyChainHierarchy(firstExPremise, propertyPremise);
+		firstExPremise = (AxiomExpression<ElkSubClassOfAxiom>) rewriteUnderPropertyChainHierarchy(firstExPremise, propertyPremise);
 		secondExPremise = rewriteUnderPropertyChainHierarchy(secondExPremise, secondPropertyPremise);
 		
 		ExistentialLemmaChainComposition transformed = new ExistentialLemmaChainComposition(
@@ -180,27 +180,27 @@ public class DerivedChainSubsumptionElimination {
 	 *            RR <= SS
 	 * @return C <= SS some D with the corresponding inferences
 	 */
-	private DerivedExpression rewriteUnderPropertyChainHierarchy(final DerivedExpression existentialPremise, final DerivedExpression propertyPremise) {
+	private Expression rewriteUnderPropertyChainHierarchy(final Expression existentialPremise, final Expression propertyPremise) {
 		if (isTautology(propertyPremise)) {
 			// return as is
 			return existentialPremise;
 		}
 		
-		final Set<DerivedExpression> seen = new ArrayHashSet<DerivedExpression>();
-		final Queue<Pair<DerivedExpression, ? extends DerivedExpression>> todo = new ArrayDeque<Pair<DerivedExpression, ? extends DerivedExpression>>();
+		final Set<Expression> seen = new ArrayHashSet<Expression>();
+		final Queue<Pair<Expression, ? extends Expression>> todo = new ArrayDeque<Pair<Expression, ? extends Expression>>();
 		final DerivedExpressionWrap<?> result = createConclusion(getSubClass(existentialPremise), getSuperPropertyExpression(propertyPremise), getFiller(existentialPremise));
 
 		todo.add(Pair.create(propertyPremise, existentialPremise));
 
 		for (;;) {
-			Pair<DerivedExpression, ? extends DerivedExpression> next = todo.poll();
+			Pair<Expression, ? extends Expression> next = todo.poll();
 
 			if (next == null) {
 				break;
 			}
 
-			final DerivedExpression propertyExpr = next.getFirst();
-			final DerivedExpression exPremise = next.getSecond();
+			final Expression propertyExpr = next.getFirst();
+			final Expression exPremise = next.getSecond();
 			// going through all inferences which derive the current sub-property chain premise
 			for (Inference propertyExprInf : ProofUtils.getInferences(propertyExpr)) {
 				propertyExprInf.accept(new AbstractInferenceVisitor<Void, Void>() {
@@ -212,13 +212,13 @@ public class DerivedChainSubsumptionElimination {
 							result.addInference(getInferenceForToldSubsumption(
 									(DerivedAxiomExpressionWrap<ElkSubClassOfAxiom>) result, 
 									exPremise, 
-									(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>) inf.getFirstPremise()));
+									(AxiomExpression<ElkSubObjectPropertyOfAxiom>) inf.getFirstPremise()));
 							
 							return null;
 						}
 
 						// continue recursively
-						DerivedExpression derivedPremise = inf.getSecondPremise();
+						Expression derivedPremise = inf.getSecondPremise();
 						DerivedExpressionWrap<?> nextConclusion = createConclusion(getSubClass(exPremise), getSubPropertyExpression(derivedPremise), getFiller(exPremise));
 						// this inference will be saved for the conclusion so we can explain the latter even though we may not have recorded inferences for it 
 						addInferenceForDirectSubsumption(nextConclusion, exPremise, inf.getFirstPremise());
@@ -279,7 +279,7 @@ public class DerivedChainSubsumptionElimination {
 	}
 	
 	DerivedExpressionWrap<?> createConclusion(final ElkClassExpression subClass, final ElkSubObjectPropertyExpression subObjectPropertyExpression, final ElkClassExpression filler) {
-		final DerivedExpressionFactory exprFactory = reader_.getExpressionFactory();
+		final ExpressionFactory exprFactory = reader_.getExpressionFactory();
 		
 		return subObjectPropertyExpression.accept(new BaseElkSubObjectPropertyExpressionVisitor<DerivedExpressionWrap<?>>() {
 
@@ -297,13 +297,13 @@ public class DerivedChainSubsumptionElimination {
 		});
 	}
 	
-	void addInferenceForDirectSubsumption(final DerivedExpressionWrap<?> conclusion, final DerivedExpression exPremise, final DerivedExpression directPropertyPremise) {
+	void addInferenceForDirectSubsumption(final DerivedExpressionWrap<?> conclusion, final Expression exPremise, final Expression directPropertyPremise) {
 		for (Inference directPropInf : ProofUtils.getInferences(directPropertyPremise)) {
 			Inference inf = directPropInf.accept(new AbstractInferenceVisitor<Void, Inference>() {
 
 				@Override
 				public Inference visit(SubPropertyChainAxiom inf, Void input) {
-					return getInferenceForToldSubsumption((DerivedAxiomExpression<ElkSubClassOfAxiom>) conclusion, exPremise, inf.getConclusion());
+					return getInferenceForToldSubsumption((AxiomExpression<ElkSubClassOfAxiom>) conclusion, exPremise, inf.getConclusion());
 				}
 
 				@Override
@@ -323,41 +323,41 @@ public class DerivedChainSubsumptionElimination {
 	}
 
 	Inference getInferenceForToldSubsumption(
-			DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion, 
-			DerivedExpression exPremise, 
-			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> toldPropertyPremise) {
+			AxiomExpression<ElkSubClassOfAxiom> conclusion, 
+			Expression exPremise, 
+			AxiomExpression<ElkSubObjectPropertyOfAxiom> toldPropertyPremise) {
 		return new ExistentialComposition(conclusion, createTrivialSubsumerPremise(exPremise), exPremise, toldPropertyPremise);
 	}
 	
 	Inference getInferenceForLeftReflexivity(
 			LemmaExpression<ElkSubClassOfLemma> conclusion, 
-			DerivedExpression exPremise, 
+			Expression exPremise, 
 			SubsumptionViaLeftReflexivity inf) {
 		ElkObjectPropertyExpression property = inf.getReflexivityPremise().getAxiom().getProperty();
 		
-		return new NaryExistentialLemmaComposition(conclusion, Arrays.<DerivedExpression>asList(createReflexivePremise(getSubClass(exPremise), property), exPremise));
+		return new NaryExistentialLemmaComposition(conclusion, Arrays.<Expression>asList(createReflexivePremise(getSubClass(exPremise), property), exPremise));
 	}
 	
 	Inference getInferenceForRightReflexivity(
 			LemmaExpression<ElkSubClassOfLemma> conclusion, 
-			DerivedExpression exPremise, 
+			Expression exPremise, 
 			SubsumptionViaRightReflexivity inf) {
-		List<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> reflPremises = getReflexivityPremises(inf.getReflexivityPremise());
-		List<DerivedExpression> premises = new ArrayList<DerivedExpression>(reflPremises.size() + 1);
+		List<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> reflPremises = getReflexivityPremises(inf.getReflexivityPremise());
+		List<Expression> premises = new ArrayList<Expression>(reflPremises.size() + 1);
 		
 		premises.add(exPremise);
 		
-		for (DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom> reflPremise : reflPremises) {
+		for (AxiomExpression<ElkReflexiveObjectPropertyAxiom> reflPremise : reflPremises) {
 			premises.add(createReflexivePremise(getFiller(exPremise), reflPremise.getAxiom().getProperty()));
 		}
 		
 		return new NaryExistentialLemmaComposition((LemmaExpression<ElkSubClassOfLemma>) conclusion, premises);
 	}
 	
-	DerivedAxiomExpression<ElkSubClassOfAxiom> createReflexivePremise(ElkClassExpression ce, ElkObjectPropertyExpression prop) {
-		DerivedExpressionFactory exprFactory = reader_.getExpressionFactory();
+	AxiomExpression<ElkSubClassOfAxiom> createReflexivePremise(ElkClassExpression ce, ElkObjectPropertyExpression prop) {
+		ExpressionFactory exprFactory = reader_.getExpressionFactory();
 		ElkSubClassOfAxiom reflExistential = elkFactory_.getSubClassOfAxiom(ce, elkFactory_.getObjectSomeValuesFrom(prop, ce));
-		DerivedAxiomExpression<ElkSubClassOfAxiom> expr = exprFactory.create(reflExistential);
+		AxiomExpression<ElkSubClassOfAxiom> expr = exprFactory.create(reflExistential);
 		DerivedAxiomExpressionWrap<ElkSubClassOfAxiom> wrap = new DerivedAxiomExpressionWrap<ElkSubClassOfAxiom>(expr);
 		
 		wrap.addInference(new ReflexiveExistentialComposition(wrap, exprFactory.create(elkFactory_.getReflexiveObjectPropertyAxiom(prop))));
@@ -365,28 +365,28 @@ public class DerivedChainSubsumptionElimination {
 		return wrap;
 	}
 
-	DerivedAxiomExpression<ElkSubClassOfAxiom> createTrivialSubsumerPremise(DerivedExpression existentialPremise) {
+	AxiomExpression<ElkSubClassOfAxiom> createTrivialSubsumerPremise(Expression existentialPremise) {
 		ElkClassExpression filler = getFiller(existentialPremise);
 		
 		return reader_.getExpressionFactory().create(elkFactory_.getSubClassOfAxiom(filler, filler));
 	}
 	
-	DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> createTrivialPropertyPremise(ElkObjectPropertyExpression property) {
+	AxiomExpression<ElkSubObjectPropertyOfAxiom> createTrivialPropertyPremise(ElkObjectPropertyExpression property) {
 		return reader_.getExpressionFactory().create(elkFactory_.getSubObjectPropertyOfAxiom(property, property));
 	}
 	
-	DerivedExpression createTrivialChainPremise(DerivedExpression propertyExpression) {
-		return propertyExpression.accept(new BaseExpressionVisitor<Void, DerivedExpression>() {
+	Expression createTrivialChainPremise(Expression propertyExpression) {
+		return propertyExpression.accept(new BaseExpressionVisitor<Void, Expression>() {
 
 			@Override
-			public DerivedExpression visit(ElkSubPropertyChainOfLemma lemma, Void input) {
+			public Expression visit(ElkSubPropertyChainOfLemma lemma, Void input) {
 				ElkObjectPropertyChain chain = lemma.getSuperPropertyChain();
 				
 				return reader_.getExpressionFactory().create(lemmaFactory_.getSubPropertyChainOfLemma(chain, chain));
 			}
 
 			@Override
-			public DerivedExpression visit(ElkSubObjectPropertyOfAxiom axiom) {
+			public Expression visit(ElkSubObjectPropertyOfAxiom axiom) {
 				return createTrivialPropertyPremise(axiom.getSuperObjectPropertyExpression());
 			}
 			
@@ -394,25 +394,25 @@ public class DerivedChainSubsumptionElimination {
 	}
 	
 	// transforms the reflexive property chain into the corresponding list of reflexive properties
-	List<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> getReflexivityPremises(DerivedExpression reflexivityPremise) {
-		final DerivedExpressionFactory exprFactory = reader_.getExpressionFactory();
+	List<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> getReflexivityPremises(Expression reflexivityPremise) {
+		final ExpressionFactory exprFactory = reader_.getExpressionFactory();
 		
-		return reflexivityPremise.accept(new BaseExpressionVisitor<Void, List<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>>>() {
+		return reflexivityPremise.accept(new BaseExpressionVisitor<Void, List<AxiomExpression<ElkReflexiveObjectPropertyAxiom>>>() {
 
 			@Override
-			public List<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> visit(ElkReflexivePropertyChainLemma lemma, Void input) {
+			public List<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> visit(ElkReflexivePropertyChainLemma lemma, Void input) {
 				ElkSubObjectPropertyExpression chain = lemma.getPropertyChain();
 				
-				return chain.accept(new BaseElkSubObjectPropertyExpressionVisitor<List<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>>>() {
+				return chain.accept(new BaseElkSubObjectPropertyExpressionVisitor<List<AxiomExpression<ElkReflexiveObjectPropertyAxiom>>>() {
 
 					@Override
-					public List<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> visit(ElkObjectProperty property) {
+					public List<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> visit(ElkObjectProperty property) {
 						return Collections.singletonList(exprFactory.create(elkFactory_.getReflexiveObjectPropertyAxiom(property)));
 					}
 
 					@Override
-					public List<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> visit(ElkObjectPropertyChain chain) {
-						List<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> premises = new ArrayList<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>>(chain.getObjectPropertyExpressions().size());
+					public List<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> visit(ElkObjectPropertyChain chain) {
+						List<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> premises = new ArrayList<AxiomExpression<ElkReflexiveObjectPropertyAxiom>>(chain.getObjectPropertyExpressions().size());
 						
 						for (ElkObjectPropertyExpression property : chain.getObjectPropertyExpressions()) {
 							premises.add(exprFactory.create(elkFactory_.getReflexiveObjectPropertyAxiom(property)));
@@ -424,14 +424,14 @@ public class DerivedChainSubsumptionElimination {
 			}
 
 			@Override
-			public List<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> visit(ElkReflexiveObjectPropertyAxiom axiom) {
+			public List<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> visit(ElkReflexiveObjectPropertyAxiom axiom) {
 				return Collections.singletonList(exprFactory.create(axiom));
 			}
 			
 		}, null);
 	}
 	
-	private ElkClassExpression getSubClass(DerivedExpression expr) {
+	private ElkClassExpression getSubClass(Expression expr) {
 		return expr.accept(new BaseExpressionVisitor<Void, ElkClassExpression>() {
 
 			@Override
@@ -447,7 +447,7 @@ public class DerivedChainSubsumptionElimination {
 		}, null);
 	}
 	
-	private ElkClassExpression getFiller(DerivedExpression expr) {
+	private ElkClassExpression getFiller(Expression expr) {
 		return expr.accept(new BaseExpressionVisitor<Void, ElkClassExpression>() {
 
 			@Override
@@ -463,7 +463,7 @@ public class DerivedChainSubsumptionElimination {
 		}, null);
 	}
 	
-	private ElkSubObjectPropertyExpression getSuperPropertyExpression(DerivedExpression expr) {
+	private ElkSubObjectPropertyExpression getSuperPropertyExpression(Expression expr) {
 		return expr.accept(new BaseExpressionVisitor<Void, ElkSubObjectPropertyExpression>() {
 
 			@Override
@@ -479,7 +479,7 @@ public class DerivedChainSubsumptionElimination {
 		}, null);
 	}
 	
-	private ElkSubObjectPropertyExpression getSubPropertyExpression(DerivedExpression expr) {
+	private ElkSubObjectPropertyExpression getSubPropertyExpression(Expression expr) {
 		return expr.accept(new BaseExpressionVisitor<Void, ElkSubObjectPropertyExpression>() {
 
 			@Override
@@ -495,7 +495,7 @@ public class DerivedChainSubsumptionElimination {
 		}, null);
 	}
 
-	static boolean isTautology(DerivedExpression expr) {
+	static boolean isTautology(Expression expr) {
 		return expr.accept(new TautologyChecker(), null);
 	}
 

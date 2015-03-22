@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions.derived;
+package org.semanticweb.elk.proofs.expressions;
 /*
  * #%L
  * ELK Proofs Package
@@ -25,24 +25,23 @@ package org.semanticweb.elk.proofs.expressions.derived;
  */
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceChecker;
-import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceHasher;
+import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceChecker;
+import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceHasher;
 import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
+import org.semanticweb.elk.proofs.inferences.InferenceReader;
 
 /**
- * The abstract base class of all {@link DerivedExpression}s.
+ * The abstract base class of all {@link Expression}s.
  * 
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-abstract class AbstractDerivedExpression implements DerivedExpression {
+abstract class AbstractExpression implements Expression {
 
 	private final InferenceReader reader_;
 	
-	AbstractDerivedExpression(InferenceReader reader) {
+	AbstractExpression(InferenceReader reader) {
 		reader_ = reader;
 	}
 

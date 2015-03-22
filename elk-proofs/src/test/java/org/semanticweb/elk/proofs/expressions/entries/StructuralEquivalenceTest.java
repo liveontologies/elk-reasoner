@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions.derived.entries;
+package org.semanticweb.elk.proofs.expressions.entries;
 /*
  * #%L
  * ELK Proofs Package
@@ -38,7 +38,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceChecker;
+import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceChecker;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryImpl;
 

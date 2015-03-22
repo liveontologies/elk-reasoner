@@ -27,7 +27,7 @@ package org.semanticweb.elk.proofs.inferences;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.util.collections.entryset.StrongKeyEntry;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -64,17 +64,17 @@ public class InferenceEntry<I extends Inference> extends StrongKeyEntry<I, I> {
 		return key.getRule().equals(otherInf.getRule()) && key.getConclusion().equals(otherInf.getConclusion()) && equal(key.getPremises(), otherInf.getPremises());
 	}
 
-	private boolean equal(Collection<? extends DerivedExpression> premises, Collection<? extends DerivedExpression> other) {
-		Iterator<? extends DerivedExpression> premiseIter = premises.iterator();
-		Iterator<? extends DerivedExpression> otherIter = other.iterator();
+	private boolean equal(Collection<? extends Expression> premises, Collection<? extends Expression> other) {
+		Iterator<? extends Expression> premiseIter = premises.iterator();
+		Iterator<? extends Expression> otherIter = other.iterator();
 		
 		while (premiseIter.hasNext()) {
 			if (!otherIter.hasNext()) {
 				return false;
 			}
 			
-			DerivedExpression premise = premiseIter.next();
-			DerivedExpression otherPremise = otherIter.next();
+			Expression premise = premiseIter.next();
+			Expression otherPremise = otherIter.next();
 			
 			if (!premise.equals(otherPremise)) {
 				return false;

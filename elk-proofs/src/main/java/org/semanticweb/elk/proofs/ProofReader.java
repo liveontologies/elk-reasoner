@@ -30,8 +30,8 @@ import java.util.List;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.transformations.InferenceTransformation;
@@ -72,7 +72,7 @@ public class ProofReader {
 	}
 	
 	/**
-	 * Starts reading proofs by retrieving the {@link DerivedExpression} which
+	 * Starts reading proofs by retrieving the {@link Expression} which
 	 * corresponds to the subsumption entailment between the give classes. The
 	 * inferences can now be explored by calling
 	 * {@code DerivedExpression#getInferences()} for each expression used as a
@@ -83,20 +83,20 @@ public class ProofReader {
 	 * @return
 	 * @throws ElkException
 	 */
-	public DerivedAxiomExpression<?> getProofRoot(ElkClassExpression subsumee, ElkClassExpression subsumer) throws ElkException {
-		DerivedAxiomExpression<?> root = reader_.initialize(subsumee, subsumer);
+	public AxiomExpression<?> getProofRoot(ElkClassExpression subsumee, ElkClassExpression subsumer) throws ElkException {
+		AxiomExpression<?> root = reader_.initialize(subsumee, subsumer);
 		
 		return applyTransformation(root);
 	}
 	
-	public DerivedAxiomExpression<?> getProofRootForInconsistency() throws ElkException {
-		DerivedAxiomExpression<?> root = reader_.initializeForInconsistency();
+	public AxiomExpression<?> getProofRootForInconsistency() throws ElkException {
+		AxiomExpression<?> root = reader_.initializeForInconsistency();
 		
 		return applyTransformation(root);
 	}
 	
-	private <E extends ElkAxiom> DerivedAxiomExpression<E> applyTransformation(DerivedAxiomExpression<E> root) {
-		DerivedAxiomExpression<E> top = root;
+	private <E extends ElkAxiom> AxiomExpression<E> applyTransformation(AxiomExpression<E> root) {
+		AxiomExpression<E> top = root;
 		
 		if (lemmaElimination_ != null) {
 			top = new TransformedAxiomExpression<InferenceTransformation, E>(top, lemmaElimination_);
@@ -118,7 +118,7 @@ public class ProofReader {
 	 * @return
 	 * @throws ElkException
 	 */
-	public static InferenceGraph readInferenceGraph(DerivedExpression root) throws ElkException {
+	public static InferenceGraph readInferenceGraph(Expression root) throws ElkException {
 		final InferenceGraphImpl graph = new InferenceGraphImpl();
 		
 		RecursiveInferenceVisitor.visitInferences(root, new AbstractInferenceVisitor<Void, Void>() {

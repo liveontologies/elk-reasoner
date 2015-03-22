@@ -26,9 +26,9 @@ package org.semanticweb.elk.proofs.transformations.lemmas;
 
 import org.semanticweb.elk.owl.AbstractElkAxiomVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaVisitor;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkReflexivePropertyChainLemma;
@@ -42,12 +42,12 @@ import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
  */
 public class BaseExpressionVisitor<I, O> extends AbstractElkAxiomVisitor<O> implements ExpressionVisitor<I, O>, ElkLemmaVisitor<I, O> {
 
-	protected DerivedAxiomExpression<? extends ElkAxiom> axiomExpression;
+	protected AxiomExpression<? extends ElkAxiom> axiomExpression;
 	
 	protected LemmaExpression<? extends ElkLemma> lemmaExpression;
 	
 	@Override
-	public O visit(DerivedAxiomExpression<? extends ElkAxiom> expr, I input) {
+	public O visit(AxiomExpression<? extends ElkAxiom> expr, I input) {
 		axiomExpression = expr;
 		lemmaExpression = null;
 		

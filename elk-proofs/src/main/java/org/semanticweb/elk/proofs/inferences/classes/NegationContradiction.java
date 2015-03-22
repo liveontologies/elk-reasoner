@@ -31,9 +31,9 @@ import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -44,13 +44,13 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class NegationContradiction extends AbstractInference<DerivedAxiomExpression<? extends ElkClassAxiom>> {
+public class NegationContradiction extends AbstractInference<AxiomExpression<? extends ElkClassAxiom>> {
 
-	private final DerivedExpression subsumer_;
+	private final Expression subsumer_;
 	
-	private final DerivedExpression negativeSubsumer_;
+	private final Expression negativeSubsumer_;
 	
-	public NegationContradiction(ElkClassExpression sub, ElkClassExpression sup, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
+	public NegationContradiction(ElkClassExpression sub, ElkClassExpression sup, ElkObjectFactory factory, ExpressionFactory exprFactory) {
 		super(exprFactory.create(factory.getSubClassOfAxiom(sub, PredefinedElkClass.OWL_NOTHING)));
 
 		subsumer_ = exprFactory.create(factory.getSubClassOfAxiom(sub, sup));
@@ -58,7 +58,7 @@ public class NegationContradiction extends AbstractInference<DerivedAxiomExpress
 	}
 
 	@Override
-	public Collection<DerivedExpression> getRawPremises() {
+	public Collection<Expression> getRawPremises() {
 		return Arrays.asList(subsumer_, negativeSubsumer_);
 	}
 

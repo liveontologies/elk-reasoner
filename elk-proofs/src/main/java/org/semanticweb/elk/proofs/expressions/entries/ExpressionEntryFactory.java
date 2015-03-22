@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions.derived.entries;
+package org.semanticweb.elk.proofs.expressions.entries;
 /*
  * #%L
  * ELK Proofs Package
@@ -25,39 +25,18 @@ package org.semanticweb.elk.proofs.expressions.derived.entries;
  */
 
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.util.collections.entryset.StrongKeyEntry;
-
+import org.semanticweb.elk.util.collections.entryset.KeyEntryFactory;
 
 /**
- * A wrapper around an {@link Expression} object which is convenient to store
- * and find in collections.
- * 
  * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public class ExpressionEntry<K extends Expression> extends StrongKeyEntry<K, K> {
-
-	public ExpressionEntry(K key) {
-		super(key);
-	}
-	
-	@Override
-	public int computeHashCode() {
-		return new StructuralEquivalenceHasher().hashCode(key);
-	}
+public class ExpressionEntryFactory<K extends Expression> implements KeyEntryFactory<K> {
 
 	@Override
-	public boolean equals(Object object) {
-		if (this == object) {
-			return true;
-		}
-		
-		if (object == null || !(object instanceof ExpressionEntry<?>)) {
-			return false;
-		}
-		
-		return new StructuralEquivalenceChecker().equal(key, ((ExpressionEntry<?>) object).key);
+	public ExpressionEntry<K> createEntry(K key) {
+		return new ExpressionEntry<K>(key);
 	}
-	
+
 }

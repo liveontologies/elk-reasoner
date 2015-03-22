@@ -3,6 +3,7 @@
  */
 package org.semanticweb.elk.proofs.inferences;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -117,7 +118,7 @@ public class InferenceReaderTest {
 	}
 	
 	@Test
-	//@Ignore("not a real test, more for manual debugging")
+	@Ignore("not a real test, more for manual debugging")
 	public void basicTest() throws Exception {
 		//Reasoner reasoner = TestReasonerUtils.loadAndClassify(new File("/home/pavel/ulm/data/galens/EL-GALEN.owl"));
 		Reasoner reasoner = TestReasonerUtils.loadAndClassify("classification_test_input/AssertionDisjoint.owl");

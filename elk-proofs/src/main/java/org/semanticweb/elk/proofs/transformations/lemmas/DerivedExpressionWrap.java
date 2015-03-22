@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 
 
@@ -39,7 +39,7 @@ import org.semanticweb.elk.proofs.inferences.Inference;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public abstract class DerivedExpressionWrap<D extends DerivedExpression> implements DerivedExpression {
+public abstract class DerivedExpressionWrap<D extends Expression> implements Expression {
 
 	final D expr;
 	

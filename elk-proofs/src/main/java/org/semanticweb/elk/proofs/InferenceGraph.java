@@ -26,7 +26,7 @@ package org.semanticweb.elk.proofs;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 
 /**
@@ -44,14 +44,14 @@ public interface InferenceGraph {
 	 * 
 	 * @return
 	 */
-	public Collection<DerivedExpression> getRootExpressions();
+	public Collection<Expression> getRootExpressions();
 	
-	public Collection<DerivedExpression> getExpressions();
+	public Collection<Expression> getExpressions();
 	
 	/**
 	 * 
 	 * @param expression
 	 * @return
 	 */
-	public Collection<Inference> getInferencesForPremise(DerivedExpression expression);
+	public Collection<Inference> getInferencesForPremise(Expression expression);
 }

@@ -29,9 +29,9 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -42,13 +42,13 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ToldReflexivity extends AbstractInference<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> {
+public class ToldReflexivity extends AbstractInference<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> {
 
-	private final DerivedExpression axiom_;
+	private final Expression axiom_;
 	
-	private final DerivedExpression premise_;
+	private final Expression premise_;
 	
-	public ToldReflexivity(ElkReflexiveObjectPropertyAxiom axiom, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
+	public ToldReflexivity(ElkReflexiveObjectPropertyAxiom axiom, ElkObjectFactory factory, ExpressionFactory exprFactory) {
 		super(exprFactory.create(axiom));
 		
 		axiom_ = exprFactory.createAsserted(axiom);
@@ -56,7 +56,7 @@ public class ToldReflexivity extends AbstractInference<DerivedAxiomExpression<El
 	}
 	
 	@Override
-	public Collection<DerivedExpression> getRawPremises() {
+	public Collection<Expression> getRawPremises() {
 		return Arrays.asList(premise_, axiom_);
 	}
 	

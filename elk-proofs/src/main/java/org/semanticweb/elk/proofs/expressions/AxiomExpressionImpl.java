@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions.derived;
+package org.semanticweb.elk.proofs.expressions;
 /*
  * #%L
  * ELK Proofs Package
@@ -24,38 +24,56 @@ package org.semanticweb.elk.proofs.expressions.derived;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
-import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
-import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
-import org.semanticweb.elk.proofs.utils.ElkLemmaPrinter;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.proofs.inferences.InferenceReader;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class LemmaExpressionImpl<L extends ElkLemma> extends AbstractDerivedExpression implements LemmaExpression<L> {
+public class AxiomExpressionImpl<E extends ElkAxiom> extends AbstractExpression implements AxiomExpression<E> {
 
-	private final L lemma_;
+	private E axiom_;
 	
-	public LemmaExpressionImpl(L lemma, InferenceReader r) {
+	private boolean asserted_;
+	
+	public AxiomExpressionImpl(E ax, InferenceReader r) {
+		this(ax, r, false);
+	}
+	
+	public AxiomExpressionImpl(E ax, InferenceReader r, boolean asserted) {
 		super(r);
-		lemma_ = lemma;
+		axiom_ = ax;
+		asserted_ = asserted;
+		
+		assert ax != null : "cannot create axiom expressions without an axiom";
 	}
 	
 	@Override
-	public L getLemma() {
-		return lemma_;
+	public E getAxiom() {
+		return axiom_;
 	}
-
+	
+	void setAsserted(E axiom) {
+		axiom_ = axiom;
+		asserted_ = true;
+	}
+	
+	@Override
+	public boolean isAsserted() {
+		return asserted_;
+	}
+	
 	@Override
 	public String toString() {
-		return ElkLemmaPrinter.print(lemma_);
+		return OwlFunctionalStylePrinter.toString(axiom_) + (asserted_ ? "*" : "");
 	}
-	
+
 	@Override
 	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
-	}	
+	}
+	
 }

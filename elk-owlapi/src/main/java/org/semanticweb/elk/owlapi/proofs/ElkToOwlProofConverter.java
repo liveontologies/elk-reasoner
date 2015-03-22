@@ -46,10 +46,10 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.owlapi.wrapper.ElkAxiomWrap;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -70,11 +70,11 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
  */
 public class ElkToOwlProofConverter {
 
-	public static OWLExpression convert(DerivedExpression expression) {
+	public static OWLExpression convert(Expression expression) {
 		return expression.accept(new ExpressionVisitor<Void, OWLExpression>() {
 
 			@Override
-			public OWLExpression visit(	DerivedAxiomExpression<?> expr, Void input) {
+			public OWLExpression visit(	AxiomExpression<?> expr, Void input) {
 				return convert(expr);
 			}
 
@@ -85,7 +85,7 @@ public class ElkToOwlProofConverter {
 		}, null);
 	}
 	
-	public static OWLAxiomExpression convert(DerivedAxiomExpression<?> expression) {
+	public static OWLAxiomExpression convert(AxiomExpression<?> expression) {
 		return new AxiomExpressionWrap(expression);
 	}
 

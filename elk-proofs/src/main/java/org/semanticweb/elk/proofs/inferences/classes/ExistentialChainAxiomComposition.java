@@ -30,8 +30,8 @@ import java.util.Collection;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -43,26 +43,26 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ExistentialChainAxiomComposition extends AbstractInference<DerivedAxiomExpression<ElkSubClassOfAxiom>> {
+public class ExistentialChainAxiomComposition extends AbstractInference<AxiomExpression<ElkSubClassOfAxiom>> {
 
-	private final DerivedAxiomExpression<ElkSubClassOfAxiom> firstExistentialPremise_;
+	private final AxiomExpression<ElkSubClassOfAxiom> firstExistentialPremise_;
 
-	private final DerivedExpression secondExistentialPremise_;
+	private final Expression secondExistentialPremise_;
 
-	private final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> firstPropertySubsumptionPremise_;
+	private final AxiomExpression<ElkSubObjectPropertyOfAxiom> firstPropertySubsumptionPremise_;
 
-	private final DerivedExpression secondPropertySubsumptionPremise_;
+	private final Expression secondPropertySubsumptionPremise_;
 
-	private final DerivedAxiomExpression<? extends ElkObjectPropertyAxiom> chainPremise_;
+	private final AxiomExpression<? extends ElkObjectPropertyAxiom> chainPremise_;
 	
 	// conclusion is an axiom
 	public ExistentialChainAxiomComposition(
-			DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion,
-			DerivedAxiomExpression<ElkSubClassOfAxiom> firstExPremise,
-			DerivedExpression secondExPremise,
-			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> propSubsumption,
-			DerivedExpression chainSubsumption,
-			DerivedAxiomExpression<? extends ElkObjectPropertyAxiom> chainAxiom) {
+			AxiomExpression<ElkSubClassOfAxiom> conclusion,
+			AxiomExpression<ElkSubClassOfAxiom> firstExPremise,
+			Expression secondExPremise,
+			AxiomExpression<ElkSubObjectPropertyOfAxiom> propSubsumption,
+			Expression chainSubsumption,
+			AxiomExpression<? extends ElkObjectPropertyAxiom> chainAxiom) {
 		super(conclusion);
 		
 		firstExistentialPremise_ = firstExPremise;
@@ -73,7 +73,7 @@ public class ExistentialChainAxiomComposition extends AbstractInference<DerivedA
 	}
 	
 	@Override
-	public Collection<DerivedExpression> getRawPremises() {
+	public Collection<Expression> getRawPremises() {
 		return Arrays.asList(firstExistentialPremise_, secondExistentialPremise_, firstPropertySubsumptionPremise_, secondPropertySubsumptionPremise_, chainPremise_);
 	}
 	
@@ -87,23 +87,23 @@ public class ExistentialChainAxiomComposition extends AbstractInference<DerivedA
 		return InferenceRule.R_EXIST_CHAIN_COMPOSITION;
 	}
 	
-	public DerivedAxiomExpression<ElkSubClassOfAxiom> getFirstExistentialPremise() {
+	public AxiomExpression<ElkSubClassOfAxiom> getFirstExistentialPremise() {
 		return firstExistentialPremise_;
 	}
 	
-	public DerivedExpression getSecondExistentialPremise() {
+	public Expression getSecondExistentialPremise() {
 		return secondExistentialPremise_;
 	}
 	
-	public DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> getFirstPropertyPremise() {
+	public AxiomExpression<ElkSubObjectPropertyOfAxiom> getFirstPropertyPremise() {
 		return firstPropertySubsumptionPremise_;
 	}
 	
-	public DerivedExpression getSecondPropertyPremise() {
+	public Expression getSecondPropertyPremise() {
 		return secondPropertySubsumptionPremise_;
 	}
 	
-	public DerivedAxiomExpression<? extends ElkObjectPropertyAxiom> getChainPremise() {
+	public AxiomExpression<? extends ElkObjectPropertyAxiom> getChainPremise() {
 		return chainPremise_;
 	}
 }

@@ -35,9 +35,9 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.AbstractInferenceVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialChainAxiomComposition;
@@ -156,7 +156,7 @@ public class LemmaElimination implements InferenceTransformation {
 	}
 	
 	private boolean lemmasPresent(Inference inf) {
-		for (DerivedExpression premise : inf.getPremises()) {
+		for (Expression premise : inf.getPremises()) {
 			if (premise instanceof LemmaExpression) {
 				return true;
 			}
@@ -172,11 +172,11 @@ public class LemmaElimination implements InferenceTransformation {
 	 * @return A sequence of lemma-free inferences.
 	 */
 	public Iterable<NaryExistentialAxiomComposition> rewrite(final NaryExistentialAxiomComposition inf) {
-		final List<DerivedExpression> commonPremises = new ArrayList<DerivedExpression>();
+		final List<Expression> commonPremises = new ArrayList<Expression>();
 		
 		for (int i = 0; i < inf.getExistentialPremises().size(); i++) {
 			final int premiseIndex = i;
-			DerivedExpression premise = inf.getExistentialPremises().get(i);
+			Expression premise = inf.getExistentialPremises().get(i);
 			
 			if (premise instanceof LemmaExpression) {
 				List<NaryExistentialAxiomComposition> transformed = new LinkedList<NaryExistentialAxiomComposition>();
@@ -186,7 +186,7 @@ public class LemmaElimination implements InferenceTransformation {
 
 						@Override
 						public NaryExistentialAxiomComposition visit(ExistentialLemmaChainComposition lemmaInf, Void input) {
-							List<DerivedExpression> premises = new ArrayList<DerivedExpression>(commonPremises);
+							List<Expression> premises = new ArrayList<Expression>(commonPremises);
 							ExistentialLemmaChainComposition expandedUnderHierarchy = rewritingUnderChainHierarchy_.transform(lemmaInf);
 
 							premises.add(expandedUnderHierarchy.getFirstExistentialPremise());
@@ -194,7 +194,7 @@ public class LemmaElimination implements InferenceTransformation {
 
 							// copying the remaining inferences
 							for (int j = premiseIndex + 1; j < inf.getExistentialPremises().size(); j++) {
-								DerivedExpression nextPremise = inf.getExistentialPremises().get(j);
+								Expression nextPremise = inf.getExistentialPremises().get(j);
 
 								premises.add(nextPremise);
 							}
@@ -204,13 +204,13 @@ public class LemmaElimination implements InferenceTransformation {
 
 						@Override
 						public NaryExistentialAxiomComposition visit(NaryExistentialLemmaComposition lemmaInf, Void input) {
-							List<DerivedExpression> premises = new ArrayList<DerivedExpression>(commonPremises);
+							List<Expression> premises = new ArrayList<Expression>(commonPremises);
 
 							premises.addAll(lemmaInf.getExistentialPremises());
 
 							// copying the remaining inferences
 							for (int j = premiseIndex + 1; j < inf.getExistentialPremises().size(); j++) {
-								DerivedExpression nextPremise = inf.getExistentialPremises().get(j);
+								Expression nextPremise = inf.getExistentialPremises().get(j);
 
 								premises.add(nextPremise);
 							}
@@ -259,7 +259,7 @@ public class LemmaElimination implements InferenceTransformation {
 					inf.getConclusion(), 
 					Arrays.asList(inf.getFirstExistentialPremise(), inf.getSecondExistentialPremise()),
 					// can have only chain axioms here. can't have transitivity, for example, that doesn't involve lemmas
-					(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>) inf.getChainPremise());
+					(AxiomExpression<ElkSubObjectPropertyOfAxiom>) inf.getChainPremise());
 
 			return transformed;
 		}

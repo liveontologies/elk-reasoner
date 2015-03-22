@@ -31,7 +31,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.proofs.ProofReader;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.slf4j.Logger;
@@ -48,11 +48,11 @@ public class RecursiveInferenceVisitor {
 	
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveInferenceVisitor.class);
 
-	public static void visitInferences(DerivedExpression root, InferenceVisitor<?, ?> visitor) throws ElkException {
-		DerivedExpression next = root;
+	public static void visitInferences(Expression root, InferenceVisitor<?, ?> visitor) throws ElkException {
+		Expression next = root;
 		// start recursive unwinding
-		Queue<DerivedExpression> toDo = new LinkedList<DerivedExpression>();
-		Set<DerivedExpression> done = new HashSet<DerivedExpression>();
+		Queue<Expression> toDo = new LinkedList<Expression>();
+		Set<Expression> done = new HashSet<Expression>();
 		
 		toDo.add(next);
 		done.add(next);
@@ -71,7 +71,7 @@ public class RecursiveInferenceVisitor {
 				// pass to the client
 				inf.accept(visitor, null);
 				// recursively unwind premise inferences
-				for (DerivedExpression premise : inf.getPremises()) {
+				for (Expression premise : inf.getPremises()) {
 					// proof reader guarantees pointer equality for structurally equivalent expressions so we avoid infinite loops here
 					if (done.add(premise)) {
 						toDo.add(premise);

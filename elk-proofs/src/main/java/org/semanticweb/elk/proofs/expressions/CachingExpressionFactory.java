@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions.derived;
+package org.semanticweb.elk.proofs.expressions;
 /*
  * #%L
  * ELK Proofs Package
@@ -25,10 +25,9 @@ package org.semanticweb.elk.proofs.expressions.derived;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.derived.entries.ExpressionEntryFactory;
+import org.semanticweb.elk.proofs.expressions.entries.ExpressionEntryFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
-import org.semanticweb.elk.proofs.inferences.readers.InferenceReader;
+import org.semanticweb.elk.proofs.inferences.InferenceReader;
 import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
 
 /**
@@ -38,25 +37,25 @@ import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class DerivedExpressionFactoryWithCaching implements DerivedExpressionFactory {
+public class CachingExpressionFactory implements ExpressionFactory {
 
-	private final KeyEntryHashSet<DerivedAxiomExpressionImpl<?>> axiomLookup_;
+	private final KeyEntryHashSet<AxiomExpressionImpl<?>> axiomLookup_;
 	
 	private final KeyEntryHashSet<LemmaExpressionImpl<?>> lemmaLookup_;
 	
 	private final InferenceReader reader_;
 
-	public DerivedExpressionFactoryWithCaching(InferenceReader reader) {
-		axiomLookup_ = new KeyEntryHashSet<DerivedAxiomExpressionImpl<?>>(new ExpressionEntryFactory<DerivedAxiomExpressionImpl<?>>(), 128);
+	public CachingExpressionFactory(InferenceReader reader) {
+		axiomLookup_ = new KeyEntryHashSet<AxiomExpressionImpl<?>>(new ExpressionEntryFactory<AxiomExpressionImpl<?>>(), 128);
 		lemmaLookup_ = new KeyEntryHashSet<LemmaExpressionImpl<?>>(new ExpressionEntryFactory<LemmaExpressionImpl<?>>(), 32);
 		reader_ = reader;
 	}
 	
 	@Override
-	public <E extends ElkAxiom> DerivedAxiomExpression<E> create(E axiom) {
-		DerivedAxiomExpressionImpl<E> newExpr = new DerivedAxiomExpressionImpl<E>(axiom, reader_);
+	public <E extends ElkAxiom> AxiomExpression<E> create(E axiom) {
+		AxiomExpressionImpl<E> newExpr = new AxiomExpressionImpl<E>(axiom, reader_);
 		
-		return (DerivedAxiomExpression<E>) axiomLookup_.merge(newExpr);
+		return (AxiomExpression<E>) axiomLookup_.merge(newExpr);
 	}
 
 	@Override
@@ -67,9 +66,9 @@ public class DerivedExpressionFactoryWithCaching implements DerivedExpressionFac
 	}
 
 	@Override
-	public <E extends ElkAxiom> DerivedAxiomExpressionImpl<E> createAsserted(E axiom) {
-		DerivedAxiomExpressionImpl<E> newExpr = new DerivedAxiomExpressionImpl<E>(axiom, reader_, true);
-		DerivedAxiomExpressionImpl<E> oldExpr = (DerivedAxiomExpressionImpl<E>) axiomLookup_.merge(newExpr);
+	public <E extends ElkAxiom> AxiomExpressionImpl<E> createAsserted(E axiom) {
+		AxiomExpressionImpl<E> newExpr = new AxiomExpressionImpl<E>(axiom, reader_, true);
+		AxiomExpressionImpl<E> oldExpr = (AxiomExpressionImpl<E>) axiomLookup_.merge(newExpr);
 		
 		if (!oldExpr.isAsserted()) {
 			oldExpr.setAsserted(axiom);

@@ -30,9 +30,9 @@ import java.util.Collection;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -43,13 +43,13 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReflexivityViaSubsumption extends AbstractInference<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>> {
+public class ReflexivityViaSubsumption extends AbstractInference<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> {
 
-	private final DerivedExpression axiom_;
+	private final Expression axiom_;
 	
-	private final DerivedExpression premise_;
+	private final Expression premise_;
 	
-	public ReflexivityViaSubsumption(ElkSubObjectPropertyOfAxiom axiom, DerivedExpression premise, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
+	public ReflexivityViaSubsumption(ElkSubObjectPropertyOfAxiom axiom, Expression premise, ElkObjectFactory factory, ExpressionFactory exprFactory) {
 		super(exprFactory.create(factory.getReflexiveObjectPropertyAxiom(axiom.getSuperObjectPropertyExpression())));
 		
 		axiom_ = exprFactory.createAsserted(axiom);
@@ -57,7 +57,7 @@ public class ReflexivityViaSubsumption extends AbstractInference<DerivedAxiomExp
 	}
 	
 	@Override
-	public Collection<DerivedExpression> getRawPremises() {
+	public Collection<Expression> getRawPremises() {
 		return Arrays.asList(premise_, axiom_);
 	}
 	

@@ -25,9 +25,12 @@ package org.semanticweb.elk.proofs.inferences;
  */
 
 /**
+ * Enumeration of all supported/implemented rules with human-readable
+ * descriptions.
+ * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
 public enum InferenceRule {
 	/*class inference rules*/

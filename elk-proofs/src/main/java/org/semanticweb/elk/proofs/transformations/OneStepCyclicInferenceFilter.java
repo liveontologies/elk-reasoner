@@ -26,8 +26,8 @@ package org.semanticweb.elk.proofs.transformations;
 
 import java.util.Collections;
 
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceChecker;
+import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceChecker;
 import org.semanticweb.elk.proofs.inferences.Inference;
 
 /**
@@ -41,10 +41,10 @@ public class OneStepCyclicInferenceFilter implements InferenceTransformation {
 
 	@Override
 	public Iterable<? extends Inference> transform(Inference inf) {
-		DerivedExpression conclusion = inf.getConclusion();
+		Expression conclusion = inf.getConclusion();
 		StructuralEquivalenceChecker eqChecker = new StructuralEquivalenceChecker();
 		
-		for (DerivedExpression premise : inf.getPremises()) {
+		for (Expression premise : inf.getPremises()) {
 			if (eqChecker.equal(premise, conclusion)) {
 				return Collections.emptyList();
 			}

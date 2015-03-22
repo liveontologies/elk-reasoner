@@ -28,8 +28,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
@@ -42,29 +42,29 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public abstract class AbstractSubPropertyChainInference<D extends DerivedExpression> extends AbstractInference<D> {
+public abstract class AbstractSubPropertyChainInference<D extends Expression> extends AbstractInference<D> {
 	// the first premise is always an asserted axiom
-	private final DerivedAxiomExpression<? extends ElkObjectPropertyAxiom> firstPremise_;
+	private final AxiomExpression<? extends ElkObjectPropertyAxiom> firstPremise_;
 
-	private final DerivedExpression secondPremise_;
+	private final Expression secondPremise_;
 
-	public AbstractSubPropertyChainInference(D conclusion, DerivedAxiomExpression<? extends ElkObjectPropertyAxiom> first, DerivedExpression second) {
+	public AbstractSubPropertyChainInference(D conclusion, AxiomExpression<? extends ElkObjectPropertyAxiom> first, Expression second) {
 		super(conclusion);
 		
 		firstPremise_ = first;
 		secondPremise_ = second;
 	}
 	
-	public DerivedAxiomExpression<? extends ElkObjectPropertyAxiom> getFirstPremise() {
+	public AxiomExpression<? extends ElkObjectPropertyAxiom> getFirstPremise() {
 		return firstPremise_;
 	}
 	
-	public DerivedExpression getSecondPremise() {
+	public Expression getSecondPremise() {
 		return secondPremise_;
 	}
 
 	@Override
-	public Collection<DerivedExpression> getRawPremises() {
+	public Collection<Expression> getRawPremises() {
 		return Arrays.asList(firstPremise_, secondPremise_);
 	}
 

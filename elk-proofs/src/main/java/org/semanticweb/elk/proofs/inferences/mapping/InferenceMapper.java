@@ -24,7 +24,7 @@ package org.semanticweb.elk.proofs.inferences.mapping;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
@@ -53,9 +53,9 @@ public class InferenceMapper {
 	
 	private final RecursiveTraceUnwinder unwinder_;
 	
-	private final DerivedExpressionFactory exprFactory_;
+	private final ExpressionFactory exprFactory_;
 	
-	public InferenceMapper(RecursiveTraceUnwinder unwinder, DerivedExpressionFactory factory) {
+	public InferenceMapper(RecursiveTraceUnwinder unwinder, ExpressionFactory factory) {
 		unwinder_ = unwinder;
 		exprFactory_ = factory;
 	}

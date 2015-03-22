@@ -25,8 +25,8 @@ package org.semanticweb.elk.proofs.inferences.properties;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
 /**
@@ -35,9 +35,9 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class SubsumptionViaLeftReflexivity extends AbstractSubsumptionViaReflexivityInference<DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom>>  {
+public class SubsumptionViaLeftReflexivity extends AbstractSubsumptionViaReflexivityInference<AxiomExpression<ElkReflexiveObjectPropertyAxiom>>  {
 	
-	public SubsumptionViaLeftReflexivity(DerivedExpression conclusion, DerivedExpression subsumptionPremise, DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom> reflexivityPremise) {
+	public SubsumptionViaLeftReflexivity(Expression conclusion, Expression subsumptionPremise, AxiomExpression<ElkReflexiveObjectPropertyAxiom> reflexivityPremise) {
 		super(conclusion, subsumptionPremise, reflexivityPremise);
 	}
 

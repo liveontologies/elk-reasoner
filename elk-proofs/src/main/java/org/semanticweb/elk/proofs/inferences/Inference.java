@@ -28,7 +28,6 @@ package org.semanticweb.elk.proofs.inferences;
 import java.util.Collection;
 
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 
 /**
  * Represents an elementary component of proofs reported to the user. Each
@@ -41,9 +40,9 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
  */
 public interface Inference {
 
-	public Collection<? extends DerivedExpression> getPremises();
+	public Collection<? extends Expression> getPremises();
 
-	public DerivedExpression getConclusion();
+	public Expression getConclusion();
 	
 	public InferenceRule getRule();
 

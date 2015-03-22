@@ -25,8 +25,8 @@ package org.semanticweb.elk.proofs.transformations;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 
 /**
  * TODO
@@ -35,9 +35,9 @@ import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class TransformedAxiomExpression<T extends InferenceTransformation, E extends ElkAxiom> extends TransformedExpression<DerivedAxiomExpression<E>, T> implements DerivedAxiomExpression<E> {
+public class TransformedAxiomExpression<T extends InferenceTransformation, E extends ElkAxiom> extends TransformedExpression<AxiomExpression<E>, T> implements AxiomExpression<E> {
 
-	public TransformedAxiomExpression(DerivedAxiomExpression<E> expr, T f) {
+	public TransformedAxiomExpression(AxiomExpression<E> expr, T f) {
 		super(expr, f);
 	}
 

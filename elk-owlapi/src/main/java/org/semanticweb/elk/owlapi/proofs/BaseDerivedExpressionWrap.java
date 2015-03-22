@@ -25,9 +25,9 @@ package org.semanticweb.elk.owlapi.proofs;
  */
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceChecker;
-import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceHasher;
+import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceChecker;
+import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceHasher;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.owlapitools.proofs.OWLInference;
@@ -36,7 +36,7 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionWrap;
 
 /**
- * The base wrapper around {@link DerivedExpression} which implements the
+ * The base wrapper around {@link Expression} which implements the
  * generic {@link OWLExpression}. The inferences are lazily translated to
  * {@link OWLInference}s when requested.
  * 
@@ -44,7 +44,7 @@ import org.semanticweb.owlapitools.proofs.expressions.OWLExpressionWrap;
  *
  *         pavel.klinov@uni-ulm.de
  */
-public abstract class BaseDerivedExpressionWrap<E extends DerivedExpression> implements OWLExpression {
+public abstract class BaseDerivedExpressionWrap<E extends Expression> implements OWLExpression {
 
 	final E expression;
 	

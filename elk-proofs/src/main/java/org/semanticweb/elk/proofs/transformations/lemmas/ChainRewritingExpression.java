@@ -36,9 +36,9 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
@@ -58,9 +58,9 @@ import org.semanticweb.elk.util.collections.Multimap;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-class ChainRewritingExpression implements DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> {
+class ChainRewritingExpression implements AxiomExpression<ElkSubObjectPropertyOfAxiom> {
 
-	private final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr_;
+	private final AxiomExpression<ElkSubObjectPropertyOfAxiom> expr_;
 
 	private final List<IndexedObjectProperty> indexedChainList_;
 	
@@ -70,7 +70,7 @@ class ChainRewritingExpression implements DerivedAxiomExpression<ElkSubObjectPro
 	
 	private final ReasonerInferenceReader reader_;
 	
-	ChainRewritingExpression(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr, 
+	ChainRewritingExpression(AxiomExpression<ElkSubObjectPropertyOfAxiom> expr, 
 			ElkSubObjectPropertyOfAxiom targetAxiom, ReasonerInferenceReader reader) {
 		expr_ = expr;
 		indexedChainList_ = index(((ElkObjectPropertyChain) expr.getAxiom().getSubObjectPropertyExpression()).getObjectPropertyExpressions(), reader.getIndexer());
@@ -78,7 +78,7 @@ class ChainRewritingExpression implements DerivedAxiomExpression<ElkSubObjectPro
 		reader_ = reader;
 	}
 	
-	ChainRewritingExpression(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr, 
+	ChainRewritingExpression(AxiomExpression<ElkSubObjectPropertyOfAxiom> expr, 
 			List<IndexedObjectProperty> indexedChainList,
 			List<IndexedObjectProperty> indexedTargetChainList,
 			ReasonerInferenceReader reader) {
@@ -88,7 +88,7 @@ class ChainRewritingExpression implements DerivedAxiomExpression<ElkSubObjectPro
 		reader_ = reader;
 	}
 
-	private DerivedExpressionFactory getExpressionFactory() {
+	private ExpressionFactory getExpressionFactory() {
 		return reader_.getExpressionFactory();
 	}
 	
@@ -227,8 +227,8 @@ class ChainRewritingExpression implements DerivedAxiomExpression<ElkSubObjectPro
 										int subChainIndex,
 										Iterable<ObjectPropertyInference> superChainInferences) {
 		List<IndexedObjectProperty> premiseChain = replace(indexedChainList_, flatten(subChain), flatten(superChain), subChainIndex);
-		DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> premise = null;
-		DerivedExpressionFactory exprFactory = getExpressionFactory();
+		AxiomExpression<ElkSubObjectPropertyOfAxiom> premise = null;
+		ExpressionFactory exprFactory = getExpressionFactory();
 		
 		if (premiseChain.equals(indexedTargetChainList_)) {
 			// reached the target

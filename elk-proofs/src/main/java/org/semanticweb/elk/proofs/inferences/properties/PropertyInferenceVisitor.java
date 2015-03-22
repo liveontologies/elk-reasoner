@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions.derived.entries;
+package org.semanticweb.elk.proofs.inferences.properties;
 /*
  * #%L
  * ELK Proofs Package
@@ -24,19 +24,28 @@ package org.semanticweb.elk.proofs.expressions.derived.entries;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.util.collections.entryset.KeyEntryFactory;
+import org.semanticweb.elk.proofs.transformations.lemmas.ReflexivityElimination;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ExpressionEntryFactory<K extends Expression> implements KeyEntryFactory<K> {
+public interface PropertyInferenceVisitor<I, O> {
 
-	@Override
-	public ExpressionEntry<K> createEntry(K key) {
-		return new ExpressionEntry<K>(key);
-	}
-
+	public O visit(SubPropertyChainAxiom inf, I input);
+	
+	public O visit(SubPropertyChainLemma inf, I input);
+	
+	public O visit(ReflexiveComposition inf, I input);
+	
+	public O visit(ReflexivityViaSubsumption inf, I input);
+	
+	public O visit(SubsumptionViaRightReflexivity inf, I input);
+	
+	public O visit(SubsumptionViaLeftReflexivity inf, I input);
+	
+	public O visit(ToldReflexivity inf, I input);
+	
+	public O visit(ReflexivityElimination inf, I input);
 }

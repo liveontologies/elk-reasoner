@@ -29,8 +29,8 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.util.collections.Operations;
 
@@ -41,13 +41,13 @@ import org.semanticweb.elk.util.collections.Operations;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class NaryExistentialAxiomComposition extends NaryExistentialComposition<DerivedAxiomExpression<ElkSubClassOfAxiom>> {
+public class NaryExistentialAxiomComposition extends NaryExistentialComposition<AxiomExpression<ElkSubClassOfAxiom>> {
 
-	private final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> chainAxiom_;
+	private final AxiomExpression<ElkSubObjectPropertyOfAxiom> chainAxiom_;
 	
-	public NaryExistentialAxiomComposition(DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion,
-			List<? extends DerivedExpression> premises,
-			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> chainAxiom) {
+	public NaryExistentialAxiomComposition(AxiomExpression<ElkSubClassOfAxiom> conclusion,
+			List<? extends Expression> premises,
+			AxiomExpression<ElkSubObjectPropertyOfAxiom> chainAxiom) {
 		super(conclusion, premises);
 		
 		chainAxiom_ = chainAxiom;
@@ -59,11 +59,11 @@ public class NaryExistentialAxiomComposition extends NaryExistentialComposition<
 	}
 
 	@Override
-	protected Iterable<DerivedExpression> getRawPremises() {
+	protected Iterable<Expression> getRawPremises() {
 		return Operations.concat(getExistentialPremises(), Collections.singletonList(chainAxiom_));
 	}
 	
-	public DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> getChainPremise() {
+	public AxiomExpression<ElkSubObjectPropertyOfAxiom> getChainPremise() {
 		return chainAxiom_;
 	}
 }

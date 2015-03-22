@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions.derived;
+package org.semanticweb.elk.proofs.expressions;
 /*
  * #%L
  * ELK Proofs Package
@@ -24,30 +24,36 @@ package org.semanticweb.elk.proofs.expressions.derived;
  * #L%
  */
 
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.proofs.expressions.LemmaExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
+import org.semanticweb.elk.proofs.inferences.InferenceReader;
+import org.semanticweb.elk.proofs.utils.ElkLemmaPrinter;
 
 /**
- * Creates {@link DerivedExpression}s.
- * 
  * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ *
+ * pavel.klinov@uni-ulm.de
  */
-public interface DerivedExpressionFactory {
+public class LemmaExpressionImpl<L extends ElkLemma> extends AbstractExpression implements LemmaExpression<L> {
 
-	/**
-	 * If this expression doesn't yet exists, it will be created as an instance
-	 * of {@link AssertedAxiomExpression}, otherwise the old instance will be
-	 * returned as usual.
-	 * 
-	 * @param axiom
-	 * @return
-	 */
-	public <E extends ElkAxiom> DerivedAxiomExpression<E> createAsserted(E axiom);
+	private final L lemma_;
 	
-	public <E extends ElkAxiom> DerivedAxiomExpression<E> create(E axiom);
+	public LemmaExpressionImpl(L lemma, InferenceReader r) {
+		super(r);
+		lemma_ = lemma;
+	}
 	
-	public <L extends ElkLemma> LemmaExpression<L> create(L lemma);
+	@Override
+	public L getLemma() {
+		return lemma_;
+	}
+
+	@Override
+	public String toString() {
+		return ElkLemmaPrinter.print(lemma_);
+	}
+	
+	@Override
+	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
+	}	
 }

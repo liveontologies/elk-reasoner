@@ -25,8 +25,8 @@ package org.semanticweb.elk.proofs.inferences.properties;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
 /**
@@ -35,12 +35,12 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class SubPropertyChainAxiom extends AbstractSubPropertyChainInference<DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom>> {
+public class SubPropertyChainAxiom extends AbstractSubPropertyChainInference<AxiomExpression<ElkSubObjectPropertyOfAxiom>> {
 
 	public SubPropertyChainAxiom(
-			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> conclusion,
-			DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> first, 
-			DerivedExpression second) {
+			AxiomExpression<ElkSubObjectPropertyOfAxiom> conclusion,
+			AxiomExpression<ElkSubObjectPropertyOfAxiom> first, 
+			Expression second) {
 		super(conclusion, first, second);
 	}
 	

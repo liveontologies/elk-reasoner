@@ -28,9 +28,9 @@ import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.mapping.Deindexer;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
@@ -47,9 +47,9 @@ import org.semanticweb.elk.util.collections.Multimap;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> {
+class SubPropertyChainExpression implements AxiomExpression<ElkSubObjectPropertyOfAxiom> {
 
-	private final DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr_;
+	private final AxiomExpression<ElkSubObjectPropertyOfAxiom> expr_;
 	
 	private final IndexedObjectProperty superProperty_;
 	
@@ -59,7 +59,7 @@ class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSubObjectP
 	
 	private final ReasonerInferenceReader reader_;
 	
-	SubPropertyChainExpression(DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> expr, IndexedObjectProperty superProperty, IndexedPropertyChain subChain, ReasonerInferenceReader reader) {
+	SubPropertyChainExpression(AxiomExpression<ElkSubObjectPropertyOfAxiom> expr, IndexedObjectProperty superProperty, IndexedPropertyChain subChain, ReasonerInferenceReader reader) {
 		expr_ = expr;
 		superProperty_ = superProperty;
 		subChain_ = subChain;
@@ -85,13 +85,13 @@ class SubPropertyChainExpression implements DerivedAxiomExpression<ElkSubObjectP
 	public Iterable<? extends Inference> getInferences() throws ElkException {
 		Multimap<IndexedPropertyChain, ObjectPropertyInference> superChainToInferences = TracingUtils.getSuperPropertyInferenceMultimap(reader_.getTraceReader(), subChain_);
 		final List<Inference> inferences = new ArrayList<Inference>();
-		DerivedExpressionFactory exprFactory = reader_.getExpressionFactory();
+		ExpressionFactory exprFactory = reader_.getExpressionFactory();
 		LemmaFreePropertyInferenceFactory roleInfFactory = new LemmaFreePropertyInferenceFactory(expr_, reader_.getExpressionFactory());
 		
 		for (IndexedPropertyChain superChain : superChainToInferences.keySet()) {
 			if (superProperty_.getSaturated().getSubPropertyChains().contains(superChain)) {
 				for (ObjectPropertyInference inf : superChainToInferences.get(superChain)) {
-					DerivedAxiomExpression<ElkSubObjectPropertyOfAxiom> firstPremise = exprFactory.create(
+					AxiomExpression<ElkSubObjectPropertyOfAxiom> firstPremise = exprFactory.create(
 							elkFactory_.getSubObjectPropertyOfAxiom(Deindexer.deindex(superChain), superProperty_.getElkObjectProperty()));
 					Inference result = inf.acceptTraced(roleInfFactory, firstPremise); 
 					

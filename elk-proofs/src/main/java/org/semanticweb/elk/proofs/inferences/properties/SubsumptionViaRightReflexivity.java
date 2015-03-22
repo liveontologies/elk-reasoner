@@ -24,7 +24,7 @@ package org.semanticweb.elk.proofs.inferences.properties;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
 /**
@@ -33,9 +33,9 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class SubsumptionViaRightReflexivity extends AbstractSubsumptionViaReflexivityInference<DerivedExpression>  {
+public class SubsumptionViaRightReflexivity extends AbstractSubsumptionViaReflexivityInference<Expression>  {
 	
-	public SubsumptionViaRightReflexivity(DerivedExpression conclusion, DerivedExpression subsumptionPremise, DerivedExpression reflexivityPremise) {
+	public SubsumptionViaRightReflexivity(Expression conclusion, Expression subsumptionPremise, Expression reflexivityPremise) {
 		super(conclusion, subsumptionPremise, reflexivityPremise);
 	}
 	

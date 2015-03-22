@@ -28,14 +28,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceEntry;
 import org.semanticweb.elk.util.collections.Condition;
 import org.semanticweb.elk.util.collections.Operations;
 
 /**
- * Generic base class for {@link DerivedExpression}s which transform their
+ * Generic base class for {@link Expression}s which transform their
  * {@link Inference}s before returning them from the method
  * {@link #getInferences()}. The transformation is done using the provided
  * instance of {@link Operations.Transformation}. A special case of
@@ -46,7 +46,7 @@ import org.semanticweb.elk.util.collections.Operations;
  *
  *         pavel.klinov@uni-ulm.de
  */
-abstract class TransformedExpression<D extends DerivedExpression, T extends InferenceTransformation> implements DerivedExpression {
+abstract class TransformedExpression<D extends Expression, T extends InferenceTransformation> implements Expression {
 
 	protected final D expression;
 	

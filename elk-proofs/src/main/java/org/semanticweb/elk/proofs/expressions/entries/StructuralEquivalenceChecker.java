@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions.derived.entries;
+package org.semanticweb.elk.proofs.expressions.entries;
 /*
  * #%L
  * ELK Proofs Package
@@ -54,10 +54,10 @@ import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.AbstractElkObjectVisitor;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexObjectSomeValuesFrom;
@@ -99,8 +99,8 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 	}
 
 	@Override
-	public Boolean visit(DerivedAxiomExpression<?> expr, Expression second) {
-		return second instanceof DerivedAxiomExpression ? equal(expr.getAxiom(), ((DerivedAxiomExpression<?>) second).getAxiom()) : Boolean.FALSE;
+	public Boolean visit(AxiomExpression<?> expr, Expression second) {
+		return second instanceof AxiomExpression ? equal(expr.getAxiom(), ((AxiomExpression<?>) second).getAxiom()) : Boolean.FALSE;
 	}
 
 	@Override

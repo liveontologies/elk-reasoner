@@ -26,8 +26,8 @@ package org.semanticweb.elk.proofs.inferences.classes;
 
 import java.util.List;
 
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubClassOfLemma;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 
@@ -41,7 +41,7 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 public class NaryExistentialLemmaComposition extends NaryExistentialComposition<LemmaExpression<ElkSubClassOfLemma>> {
 
 	public NaryExistentialLemmaComposition(LemmaExpression<ElkSubClassOfLemma> conclusion,
-			List<? extends DerivedExpression> premises) {
+			List<? extends Expression> premises) {
 		super(conclusion, premises);
 	}
 
@@ -51,7 +51,7 @@ public class NaryExistentialLemmaComposition extends NaryExistentialComposition<
 	}
 
 	@Override
-	protected Iterable<? extends DerivedExpression> getRawPremises() {
+	protected Iterable<? extends Expression> getRawPremises() {
 		return getExistentialPremises();
 	}
 	

@@ -26,20 +26,20 @@ package org.semanticweb.elk.proofs.inferences;
 
 import java.util.Collections;
 
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 
 /**
  * @author	Pavel Klinov
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class InconsistencyInference extends AbstractInference<DerivedExpression> {
+public class InconsistencyInference extends AbstractInference<Expression> {
 
-	private final DerivedExpression inconsistencyPremise_;
+	private final Expression inconsistencyPremise_;
 	
 	public InconsistencyInference(
-			DerivedExpression conclusion,
-			DerivedExpression inconsistencyPremise) {
+			Expression conclusion,
+			Expression inconsistencyPremise) {
 		super(conclusion);
 		inconsistencyPremise_ = inconsistencyPremise;
 	}
@@ -55,7 +55,7 @@ public class InconsistencyInference extends AbstractInference<DerivedExpression>
 	}
 
 	@Override
-	protected Iterable<? extends DerivedExpression> getRawPremises() {
+	protected Iterable<? extends Expression> getRawPremises() {
 		return Collections.singleton(inconsistencyPremise_);
 	}
 

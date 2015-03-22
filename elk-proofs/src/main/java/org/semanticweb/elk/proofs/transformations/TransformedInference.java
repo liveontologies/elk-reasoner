@@ -27,10 +27,10 @@ package org.semanticweb.elk.proofs.transformations;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -55,20 +55,20 @@ public class TransformedInference<T extends InferenceTransformation> implements 
 	}
 	
 	@Override
-	public DerivedExpression getConclusion() {
+	public Expression getConclusion() {
 		return transform(inference.getConclusion(), transformation);
 	}
 
-	protected TransformedExpression<?, T> propagateTransformation(DerivedExpression expr) {
+	protected TransformedExpression<?, T> propagateTransformation(Expression expr) {
 		return transform(expr, transformation);
 	}
 	
-	private TransformedExpression<?, T> transform(DerivedExpression expr, final T transfrm) {
+	private TransformedExpression<?, T> transform(Expression expr, final T transfrm) {
 		return expr.accept(new ExpressionVisitor<Void, TransformedExpression<?, T>>() {
 
 			@Override
-			public TransformedExpression<?, T> visit(DerivedAxiomExpression<? extends ElkAxiom> axiom, Void input) {
-				return new TransformedAxiomExpression<T, ElkAxiom>((DerivedAxiomExpression<ElkAxiom>) axiom, transfrm);
+			public TransformedExpression<?, T> visit(AxiomExpression<? extends ElkAxiom> axiom, Void input) {
+				return new TransformedAxiomExpression<T, ElkAxiom>((AxiomExpression<ElkAxiom>) axiom, transfrm);
 			}
 
 			@Override
@@ -81,10 +81,10 @@ public class TransformedInference<T extends InferenceTransformation> implements 
 
 	@Override
 	public Collection<? extends TransformedExpression<?, T>> getPremises() {
-		return Operations.map(inference.getPremises(), new Operations.Transformation<DerivedExpression, TransformedExpression<?, T>>() {
+		return Operations.map(inference.getPremises(), new Operations.Transformation<Expression, TransformedExpression<?, T>>() {
 
 			@Override
-			public TransformedExpression<?, T> transform(DerivedExpression premise) {
+			public TransformedExpression<?, T> transform(Expression premise) {
 				return propagateTransformation(premise);
 			}
 			

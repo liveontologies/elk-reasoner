@@ -30,9 +30,9 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpressionFactory;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
+import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -43,17 +43,17 @@ import org.semanticweb.elk.proofs.utils.InferencePrinter;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ClassSubsumption extends AbstractInference<DerivedAxiomExpression<? extends ElkClassAxiom>> {
+public class ClassSubsumption extends AbstractInference<AxiomExpression<? extends ElkClassAxiom>> {
 
-	private final DerivedExpression premise_;
+	private final Expression premise_;
 
-	private final DerivedExpression axiom_;
+	private final Expression axiom_;
 
 	// we aren't yet checking correctness (or mutual consistency) of these
 	// parameters. Perhaps we could have an inference factory which would do it.
 	public ClassSubsumption(ElkAxiom sideCondition,
 			ElkClassExpression sub, ElkClassExpression sup,
-			ElkClassExpression premise, ElkObjectFactory factory, DerivedExpressionFactory exprFactory) {
+			ElkClassExpression premise, ElkObjectFactory factory, ExpressionFactory exprFactory) {
 		super(exprFactory.create(factory.getSubClassOfAxiom(sub, sup)));
 
 		premise_ = exprFactory.create(factory.getSubClassOfAxiom(sub, premise));
@@ -71,7 +71,7 @@ public class ClassSubsumption extends AbstractInference<DerivedAxiomExpression<?
 	}
 
 	@Override
-	protected Iterable<DerivedExpression> getRawPremises() {
+	protected Iterable<Expression> getRawPremises() {
 		return Arrays.asList(premise_, axiom_);
 	}
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.expressions.derived.entries;
+package org.semanticweb.elk.proofs.expressions.entries;
 /*
  * #%L
  * ELK Proofs Package
@@ -25,11 +25,11 @@ package org.semanticweb.elk.proofs.expressions.derived.entries;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.a;
-import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.b;
-import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.c;
-import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.r;
-import static org.semanticweb.elk.proofs.expressions.derived.entries.TestEntities.s;
+import static org.semanticweb.elk.proofs.expressions.entries.TestEntities.a;
+import static org.semanticweb.elk.proofs.expressions.entries.TestEntities.b;
+import static org.semanticweb.elk.proofs.expressions.entries.TestEntities.c;
+import static org.semanticweb.elk.proofs.expressions.entries.TestEntities.r;
+import static org.semanticweb.elk.proofs.expressions.entries.TestEntities.s;
 
 import java.util.Arrays;
 
@@ -40,7 +40,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceHasher;
+import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceHasher;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaObjectFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.impl.ElkLemmaObjectFactoryImpl;
 

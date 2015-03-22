@@ -26,7 +26,7 @@ package org.semanticweb.elk.proofs.inferences.classes;
 
 import java.util.List;
 
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 
@@ -35,17 +35,17 @@ import org.semanticweb.elk.proofs.inferences.InferenceRule;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public abstract class NaryExistentialComposition<D extends DerivedExpression> extends AbstractInference<D> {
+public abstract class NaryExistentialComposition<D extends Expression> extends AbstractInference<D> {
 
-	protected final List<? extends DerivedExpression> existentialPremises;
+	protected final List<? extends Expression> existentialPremises;
 	
-	protected NaryExistentialComposition(D conclusion, List<? extends DerivedExpression> exPremises) {
+	protected NaryExistentialComposition(D conclusion, List<? extends Expression> exPremises) {
 		super(conclusion);
 		
 		existentialPremises = exPremises;
 	}
 
-	public List<? extends DerivedExpression> getExistentialPremises() {
+	public List<? extends Expression> getExistentialPremises() {
 		return existentialPremises;
 	}
 	

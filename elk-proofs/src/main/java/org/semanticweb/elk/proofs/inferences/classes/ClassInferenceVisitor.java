@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.semanticweb.elk.proofs.inferences;
+package org.semanticweb.elk.proofs.inferences.classes;
 /*
  * #%L
  * ELK Proofs Package
@@ -24,20 +24,6 @@ package org.semanticweb.elk.proofs.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.inferences.classes.ClassSubsumption;
-import org.semanticweb.elk.proofs.inferences.classes.ConjunctionComposition;
-import org.semanticweb.elk.proofs.inferences.classes.ConjunctionDecomposition;
-import org.semanticweb.elk.proofs.inferences.classes.DisjointnessContradiction;
-import org.semanticweb.elk.proofs.inferences.classes.DisjunctionComposition;
-import org.semanticweb.elk.proofs.inferences.classes.ExistentialChainAxiomComposition;
-import org.semanticweb.elk.proofs.inferences.classes.ExistentialComposition;
-import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainComposition;
-import org.semanticweb.elk.proofs.inferences.classes.InconsistentDisjointness;
-import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialAxiomComposition;
-import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialLemmaComposition;
-import org.semanticweb.elk.proofs.inferences.classes.NegationContradiction;
-import org.semanticweb.elk.proofs.inferences.classes.ReflexiveExistentialComposition;
-import org.semanticweb.elk.proofs.inferences.classes.UnsatisfiabilityInference;
 
 /**
  * 

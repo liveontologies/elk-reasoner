@@ -29,8 +29,8 @@ import java.util.Collections;
 
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.AbstractInference;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -40,13 +40,13 @@ import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReflexiveExistentialComposition extends AbstractInference<DerivedAxiomExpression<ElkSubClassOfAxiom>> {
+public class ReflexiveExistentialComposition extends AbstractInference<AxiomExpression<ElkSubClassOfAxiom>> {
 
-	private final DerivedExpression reflexPremise_;
+	private final Expression reflexPremise_;
 	
 	public ReflexiveExistentialComposition(
-			DerivedAxiomExpression<ElkSubClassOfAxiom> conclusion,
-			DerivedAxiomExpression<ElkReflexiveObjectPropertyAxiom> reflPremise) {
+			AxiomExpression<ElkSubClassOfAxiom> conclusion,
+			AxiomExpression<ElkReflexiveObjectPropertyAxiom> reflPremise) {
 		super(conclusion);
 		
 		reflexPremise_ = reflPremise;
@@ -58,7 +58,7 @@ public class ReflexiveExistentialComposition extends AbstractInference<DerivedAx
 	}
 
 	@Override
-	public Collection<DerivedExpression> getRawPremises() {
+	public Collection<Expression> getRawPremises() {
 		return Collections.singleton(reflexPremise_);
 	}
 

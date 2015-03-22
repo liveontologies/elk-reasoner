@@ -28,7 +28,7 @@ import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.owlapitools.proofs.OWLInference;
 import org.semanticweb.owlapitools.proofs.expressions.OWLExpression;
@@ -56,7 +56,7 @@ public class InferenceWrap implements OWLInference {
 
 	@Override
 	public Collection<OWLExpression> getPremises() {
-		final Collection<? extends DerivedExpression> premises = inference_.getPremises();
+		final Collection<? extends Expression> premises = inference_.getPremises();
 		
 		return new AbstractCollection<OWLExpression>() {
 
@@ -64,7 +64,7 @@ public class InferenceWrap implements OWLInference {
 			public Iterator<OWLExpression> iterator() {
 				return new Iterator<OWLExpression>() {
 
-					private final Iterator<? extends DerivedExpression> iter_ = premises.iterator();
+					private final Iterator<? extends Expression> iter_ = premises.iterator();
 					
 					@Override
 					public boolean hasNext() {

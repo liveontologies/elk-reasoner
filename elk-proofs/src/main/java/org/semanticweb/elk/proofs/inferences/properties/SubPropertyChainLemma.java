@@ -25,9 +25,9 @@ package org.semanticweb.elk.proofs.inferences.properties;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkSubPropertyChainOfLemma;
 import org.semanticweb.elk.proofs.inferences.InferenceRule;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
@@ -43,8 +43,8 @@ public class SubPropertyChainLemma extends AbstractSubPropertyChainInference<Lem
 
 	public SubPropertyChainLemma(
 			LemmaExpression<ElkSubPropertyChainOfLemma> conclusion,
-			DerivedAxiomExpression<? extends ElkObjectPropertyAxiom> first, 
-			DerivedExpression second) {
+			AxiomExpression<? extends ElkObjectPropertyAxiom> first, 
+			Expression second) {
 		super(conclusion, first, second);
 	}
 	

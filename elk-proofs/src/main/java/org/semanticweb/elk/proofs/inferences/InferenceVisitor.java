@@ -2,6 +2,8 @@
  * 
  */
 package org.semanticweb.elk.proofs.inferences;
+
+import org.semanticweb.elk.proofs.inferences.classes.ClassInferenceVisitor;
 /*
  * #%L
  * ELK Reasoner
@@ -23,6 +25,7 @@ package org.semanticweb.elk.proofs.inferences;
  * limitations under the License.
  * #L%
  */
+import org.semanticweb.elk.proofs.inferences.properties.PropertyInferenceVisitor;
 
 /**
  * Visitor for the {@link Inference} hierarchy.

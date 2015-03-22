@@ -37,11 +37,11 @@ import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.AbstractElkClassExpressionVisitor;
+import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.LemmaExpression;
-import org.semanticweb.elk.proofs.expressions.derived.DerivedAxiomExpression;
-import org.semanticweb.elk.proofs.expressions.derived.entries.StructuralEquivalenceChecker;
+import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceChecker;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexClassExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkComplexObjectSomeValuesFrom;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemmaVisitor;
@@ -139,7 +139,7 @@ public class ExpressionMapper {
 		}
 
 		@Override
-		public Iterable<TracingInput> visit(DerivedAxiomExpression<?> expr, Void input) {
+		public Iterable<TracingInput> visit(AxiomExpression<?> expr, Void input) {
 			return expr.getAxiom().accept(this);
 		}
 

@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.semanticweb.elk.proofs.expressions.derived.DerivedExpression;
+import org.semanticweb.elk.proofs.expressions.Expression;
 import org.semanticweb.elk.proofs.utils.InferencePrinter;
 import org.semanticweb.elk.proofs.utils.TautologyChecker;
 import org.semanticweb.elk.util.collections.Condition;
@@ -41,9 +41,9 @@ import org.semanticweb.elk.util.collections.Operations;
  *
  * pavel.klinov@uni-ulm.de
  */
-public abstract class AbstractInference<D extends DerivedExpression> implements Inference {
+public abstract class AbstractInference<D extends Expression> implements Inference {
 
-	private List<DerivedExpression> premises_; 
+	private List<Expression> premises_; 
 	
 	final D conclusion;
 	
@@ -57,19 +57,19 @@ public abstract class AbstractInference<D extends DerivedExpression> implements 
 	}
 	
 	@Override
-	public final Collection<? extends DerivedExpression> getPremises() {
+	public final Collection<? extends Expression> getPremises() {
 		if (premises_ != null) {
 			return premises_;
 		}
 		// TODO move this to a transformation
-		premises_ = new LinkedList<DerivedExpression>();
+		premises_ = new LinkedList<Expression>();
 		// filtering out tautologies
 		final TautologyChecker checker = new TautologyChecker();
 		
-		for (DerivedExpression expr : Operations.filter(getRawPremises(), new Condition<DerivedExpression>() {
+		for (Expression expr : Operations.filter(getRawPremises(), new Condition<Expression>() {
 
 			@Override
-			public boolean holds(DerivedExpression premise) {
+			public boolean holds(Expression premise) {
 				return !premise.accept(checker, null);
 			}
 			
@@ -85,5 +85,5 @@ public abstract class AbstractInference<D extends DerivedExpression> implements 
 		return InferencePrinter.print(this);
 	}
 
-	protected abstract Iterable<? extends DerivedExpression> getRawPremises();
+	protected abstract Iterable<? extends Expression> getRawPremises();
 }
