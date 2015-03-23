@@ -49,16 +49,6 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>elk-owl-implementation</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>elk-owl-model</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-owlapi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -69,22 +59,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>elk-util-collections</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-util-common</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>elk-util-concurrent</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>elk-util-hashing</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -101,15 +76,6 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>owlapi-proofs</artifactId>
 			<version>${project.version}</version>
-		</dependency>	
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -148,10 +114,11 @@
 						<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
 						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
 						<Export-Package>!org.semanticweb.elk.*,org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui;org.semanticweb.owlapitools.proofs.*</Export-Package>
-						<Import-Package>!org.semanticweb.elk.*,org.apache.log4j.*;version="[${log4j.lower.version},${log4j.upper.version})",
+						<Import-Package>!com.sun.*,!javax.*,!org.semanticweb.elk.*,!org.slf4j.*,org.apache.log4j.*;version="[${log4j.lower.version},${log4j.upper.version})",
 							org.protege.*;version="[${protege.lower.version},${protege.upper.version})",*</Import-Package>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
-						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
+						<Embed-Dependency>*;scope=!provided;scope=compile|runtime;groupId=!net.sourceforge.owlapi|org.apache.felix|log4j;inline=false</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-Directory>target/dependency</Embed-Directory>
 						<Embed-StripGroup>true</Embed-StripGroup>
 						<Update-Url>http://elk.semanticweb.org/maven/latest/elk-distribution/resources/update.properties</Update-Url>
@@ -200,7 +167,7 @@
 						</executions>
 						<configuration>
 							<excludeScope>provided</excludeScope>
-							<excludeTransitive>true</excludeTransitive>
+							<excludeGroupIds>net.sourceforge.owlapi,org.apache.felix,log4j</excludeGroupIds>
 						</configuration>
 					</plugin>
 				</plugins>
