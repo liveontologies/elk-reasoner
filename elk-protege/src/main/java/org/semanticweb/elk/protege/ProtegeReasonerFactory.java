@@ -28,7 +28,6 @@ package org.semanticweb.elk.protege;
 import org.protege.editor.owl.model.inference.AbstractProtegeOWLReasonerInfo;
 import org.semanticweb.elk.owlapi.ElkReasonerConfiguration;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
-import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.BufferingMode;
 import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -44,19 +43,19 @@ import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
  */
 public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 
-	protected final OWLReasonerFactory factory = new ElkReasonerFactory();
+	private final OWLReasonerFactory factory_ = new ElkReasonerFactory();
 
-	protected final ReasonerConfiguration elkConfig = ElkProtegeConfigurationUtils
-			.loadConfiguration();
+	private final ElkProtegePreferences elkProtegePrefs_ = new ElkProtegePreferences();
 
 	@Override
 	public BufferingMode getRecommendedBuffering() {
-		return BufferingMode.BUFFERING;
+		return elkProtegePrefs_.load().bufferringMode ? BufferingMode.BUFFERING
+				: BufferingMode.NON_BUFFERING;
 	}
 
 	@Override
 	public OWLReasonerFactory getReasonerFactory() {
-		return factory;
+		return factory_;
 	}
 
 	@Override
@@ -64,7 +63,8 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 			ReasonerProgressMonitor monitor) {
 		OWLReasonerConfiguration defaultOwlConfig = ElkReasonerConfiguration
 				.getDefaultOwlReasonerConfiguration(monitor);
-		return new ElkReasonerConfiguration(defaultOwlConfig, elkConfig);
+		return new ElkReasonerConfiguration(defaultOwlConfig, elkProtegePrefs_
+				.load().getElkConfig());
 	}
 
 	@Override
@@ -75,7 +75,4 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 	public void dispose() throws Exception {
 	}
 
-	public ReasonerConfiguration getElkConfiguration() {
-		return elkConfig;
-	}
 }
