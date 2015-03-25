@@ -87,7 +87,7 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 
 		Box mainPanel = new Box(BoxLayout.PAGE_AXIS);
 		mainPanel.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Reasoner settings"),
+				BorderFactory.createTitledBorder("ELK reasoner settings"),
 				BorderFactory.createEmptyBorder(7, 7, 7, 7)));
 		mainPanel.add(numOfWorkersPanel);
 		mainPanel.setAlignmentX(LEFT_ALIGNMENT);
@@ -110,7 +110,11 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		c.insets = new Insets(0, 0, 0, 12);
 		c.anchor = GridBagConstraints.FIRST_LINE_START;
 		c.weightx = 0.0;
-		panel.add((new JLabel("Number of working threads:")), c);
+		JLabel name = new JLabel("Number of working threads:");
+		String description = "The number of threads that ELK can use for performing parallel computations.";
+		panel.add(name, c);
+		name.setToolTipText(description);
+		nwSpinner_.setToolTipText(description);
 
 		c.gridx = 1;
 		c.gridy = gridybase;
@@ -131,14 +135,19 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		c.insets = new Insets(0, 0, 0, 12);
 		c.anchor = GridBagConstraints.FIRST_LINE_START;
 		c.weightx = 0.0;
-		panel.add((new JLabel(
-				"<html>Incremental reasoning</html>")), c);
-		
+		JLabel name = new JLabel("Incremental reasoning");
+		String description = "ELK tries to recompute only the results caused by the changes in the ontology";
+		panel.add(name, c);
+		name.setToolTipText(description);
+		incCheckbox_.setToolTipText(description);
+
 		c.gridx = 1;
 		c.gridy = gridybase;
 		c.insets = new Insets(0, 0, 5, 0);
 		c.weightx = 1.0;
 		panel.add(incCheckbox_, c);
+		panel.add((new JLabel(
+				)), c);
 
 		return gridybase;
 	}
@@ -153,10 +162,11 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		c.insets = new Insets(0, 0, 0, 12);
 		c.anchor = GridBagConstraints.FIRST_LINE_START;
 		c.weightx = 0.0;
-		panel.add(
-				(new JLabel(
-						"<html>Auto-syncronization<br/>(requires reasoner restart)</html>")),
-				c);
+		JLabel name = new JLabel("<html>Auto-syncronization<br/>(requires reasoner restart)</html>");
+		String description = "ELK will be always in sync with the ontology";
+		panel.add(name, c);
+		name.setToolTipText(description);
+		syncCheckbox_.setToolTipText(description);
 
 		c.gridx = 1;
 		c.gridy = gridybase;
