@@ -22,6 +22,9 @@ package org.semanticweb.elk.protege;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.protege.editor.core.prefs.Preferences;
 import org.protege.editor.core.prefs.PreferencesManager;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
@@ -32,14 +35,16 @@ public class ElkProtegePreferences {
 
 	private static final String NUMBER_OF_WORKERS_KEY = "ELK_NUMBER_OF_WORKERS",
 			INCREMENTAL_MODE_KEY = "ELK_INCREMENTAL_MODE",
-			AUTO_SYNCRHONIZATION_KEY = "ELK_AUTO_SYNCHRONIZATION";
+			AUTO_SYNCRHONIZATION_KEY = "ELK_AUTO_SYNCHRONIZATION",
+			SUPPRESSED_WARNING_TYPES_KEY = "ELK_SUPPRESSED_WARNING_TYPES";
 
 	public int numberOfWorkers;
-
 	public boolean incrementalMode, autoSynchronization;
+	public List<String> suppressedWarningTypes;
 
 	private int defaultNumberOfWorkers_;
 	private boolean defaultIncrementalMode_, defaultAutoSynchronization_;
+	private List<String> defaultSuppressedWarningTypes_;
 
 	public ElkProtegePreferences() {
 		ReasonerConfiguration elkDefaults = ReasonerConfiguration
@@ -49,6 +54,7 @@ public class ElkProtegePreferences {
 		defaultIncrementalMode_ = elkDefaults
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED);
 		defaultAutoSynchronization_ = false;
+		defaultSuppressedWarningTypes_ = new ArrayList<String>();
 	}
 
 	private static Preferences getPreferences() {
@@ -59,14 +65,14 @@ public class ElkProtegePreferences {
 
 	public ElkProtegePreferences load() {
 		Preferences prefs = getPreferences();
-
 		numberOfWorkers = prefs.getInt(NUMBER_OF_WORKERS_KEY,
 				defaultNumberOfWorkers_);
 		incrementalMode = prefs.getBoolean(INCREMENTAL_MODE_KEY,
 				defaultIncrementalMode_);
 		autoSynchronization = prefs.getBoolean(AUTO_SYNCRHONIZATION_KEY,
 				defaultAutoSynchronization_);
-
+		suppressedWarningTypes = getStringList(prefs,
+				SUPPRESSED_WARNING_TYPES_KEY, defaultSuppressedWarningTypes_);
 		return this;
 	}
 
@@ -75,12 +81,53 @@ public class ElkProtegePreferences {
 		prefs.putInt(NUMBER_OF_WORKERS_KEY, numberOfWorkers);
 		prefs.putBoolean(INCREMENTAL_MODE_KEY, incrementalMode);
 		prefs.putBoolean(AUTO_SYNCRHONIZATION_KEY, autoSynchronization);
+		putStringList(prefs, SUPPRESSED_WARNING_TYPES_KEY,
+				suppressedWarningTypes);
 		return this;
 	}
 
 	public ElkProtegePreferences reset() {
 		getPreferences().clear();
 		return load();
+	}
+
+	/**
+	 * A replacement for {@link Preferences#getStringList(String, List)}, which
+	 * does not work in combination with {@link Preferences#clear()}
+	 * 
+	 * @param prefs
+	 * @param key
+	 * @param defaultList
+	 * @return
+	 */
+	private List<String> getStringList(Preferences prefs, String key,
+			List<String> defaultList) {
+		int size = prefs.getInt(key, -1);
+		if (size < 0)
+			return defaultList;
+		// else
+		List<String> result = new ArrayList<String>(size);
+		for (int i = 0; i < size; i++) {
+			result.add(prefs.getString(key + "#" + i, ""));
+		}
+		return result;
+	}
+
+	/**
+	 * A replacement for {@link Preferences#putStringList(String, List)}, which
+	 * does not work in combination with {@link Preferences#clear()}
+	 * 
+	 * @param prefs
+	 * @param key
+	 * @param list
+	 */
+	private void putStringList(Preferences prefs, String key, List<String> list) {
+		int size = list.size();
+		prefs.putInt(key, size);
+		int i = 0;
+		for (String value : list) {
+			prefs.putString(key + "#" + i++, value);
+		}
 	}
 
 	/**
