@@ -26,13 +26,18 @@
 package org.semanticweb.elk.protege.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -57,9 +62,7 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 
 	private JSpinner nwSpinner_;
 
-	private JCheckBox incCheckbox_;
-
-	private JCheckBox syncCheckbox_;
+	private JCheckBox incCheckbox_, syncCheckbox_;
 
 	@Override
 	public void initialise() throws Exception {
@@ -69,112 +72,113 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 
 		setLayout(new BorderLayout());
 
-		JPanel numOfWorkersPanel = new JPanel(new GridBagLayout());
+		JPanel elkPreferencesPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		int gridybase = 0;
 
+		JLabel label = new JLabel("Number of working threads:");
+		String description = "The number of threads that ELK can use for performing parallel computations.";
+		label.setToolTipText(description);
+
 		nwSpinner_ = new JSpinner(new SpinnerNumberModel(
-				elkProtegePrefs.numberOfWorkers, 1, 100, 1));
-		gridybase = buildNumOfWorkers(numOfWorkersPanel, c, gridybase);
+				elkProtegePrefs.numberOfWorkers, 1, 999, 1));
+		label.setLabelFor(nwSpinner_);
+		nwSpinner_.setToolTipText(description);
 
-		incCheckbox_ = new JCheckBox("", elkProtegePrefs.incrementalMode);
+		gridybase = buildFirstColumn(elkPreferencesPanel, label, nwSpinner_, c,
+				gridybase);
 
-		gridybase = buildIncrementalModeAllowed(numOfWorkersPanel, c, gridybase);
+		incCheckbox_ = new JCheckBox("Incremental reasoning",
+				elkProtegePrefs.incrementalMode);
+		incCheckbox_
+				.setToolTipText("If checked, ELK tries to recompute only the results caused by the changes in the ontology");
 
-		syncCheckbox_ = new JCheckBox("", !elkProtegePrefs.bufferringMode);
+		gridybase = buildFirstColumn(elkPreferencesPanel, incCheckbox_, c,
+				gridybase);
 
-		gridybase = buildBufferringMode(numOfWorkersPanel, c, gridybase);
+		syncCheckbox_ = new JCheckBox(
+				"Auto-syncronization (requires reasoner restart)",
+				elkProtegePrefs.autoSynchronization);
+		syncCheckbox_
+				.setToolTipText("If checked, ELK will always be in sync with the ontology");
+		syncCheckbox_.setEnabled(incCheckbox_.isSelected());
+		incCheckbox_.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				syncCheckbox_.setEnabled(incCheckbox_.isSelected());
+			}
+		});
 
-		Box mainPanel = new Box(BoxLayout.PAGE_AXIS);
-		mainPanel.setBorder(BorderFactory.createCompoundBorder(
+		gridybase = buildFirstColumn(elkPreferencesPanel, syncCheckbox_, c,
+				gridybase);
+
+		JButton resetButton = new JButton(new AbstractAction() {
+			private static final long serialVersionUID = 6257131701636338334L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				resetPreferences();
+			}
+		});
+		resetButton.setText("Reset");
+		resetButton
+				.setToolTipText("Resets all ELK preferences to default values");
+
+		gridybase = buildFirstColumn(elkPreferencesPanel, resetButton, c,
+				gridybase);
+
+		elkPreferencesPanel.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("ELK reasoner settings"),
 				BorderFactory.createEmptyBorder(7, 7, 7, 7)));
-		mainPanel.add(numOfWorkersPanel);
-		mainPanel.setAlignmentX(LEFT_ALIGNMENT);
 
 		Box holder = new Box(BoxLayout.PAGE_AXIS);
 
-		holder.add(mainPanel);
+		holder.add(elkPreferencesPanel);
 		add(holder, BorderLayout.NORTH);
 
-		applyChanges();
 	}
 
-	private int buildNumOfWorkers(JPanel panel, GridBagConstraints c,
-			int gridybase) {
+	private int buildFirstColumn(JPanel panel, Component first,
+			Component second, GridBagConstraints c, int gridybase) {
 		c.gridx = 0;
 		c.gridy = ++gridybase;
 		c.gridwidth = 1;
 		c.gridheight = 1;
-		c.fill = GridBagConstraints.NONE;
+		c.fill = GridBagConstraints.VERTICAL;
 		c.insets = new Insets(0, 0, 0, 12);
 		c.anchor = GridBagConstraints.FIRST_LINE_START;
 		c.weightx = 0.0;
-		JLabel name = new JLabel("Number of working threads:");
-		String description = "The number of threads that ELK can use for performing parallel computations.";
-		panel.add(name, c);
-		name.setToolTipText(description);
-		nwSpinner_.setToolTipText(description);
+		panel.add(first, c);
 
 		c.gridx = 1;
 		c.gridy = gridybase;
 		c.insets = new Insets(0, 0, 5, 0);
 		c.weightx = 1.0;
-		panel.add(nwSpinner_, c);
+		panel.add(second, c);
 
 		return gridybase;
 	}
 
-	private int buildIncrementalModeAllowed(JPanel panel, GridBagConstraints c,
-			int gridybase) {
+	private int buildFirstColumn(JPanel panel, Component comp,
+			GridBagConstraints c, int gridybase) {
 		c.gridx = 0;
 		c.gridy = ++gridybase;
-		c.gridwidth = 1;
+		c.gridwidth = 2;
 		c.gridheight = 1;
 		c.fill = GridBagConstraints.NONE;
-		c.insets = new Insets(0, 0, 0, 12);
+		c.insets = new Insets(0, 0, 5, 12);
 		c.anchor = GridBagConstraints.FIRST_LINE_START;
-		c.weightx = 0.0;
-		JLabel name = new JLabel("Incremental reasoning");
-		String description = "ELK tries to recompute only the results caused by the changes in the ontology";
-		panel.add(name, c);
-		name.setToolTipText(description);
-		incCheckbox_.setToolTipText(description);
-
-		c.gridx = 1;
-		c.gridy = gridybase;
-		c.insets = new Insets(0, 0, 5, 0);
 		c.weightx = 1.0;
-		panel.add(incCheckbox_, c);
-		panel.add((new JLabel(
-				)), c);
-
+		panel.add(comp, c);
 		return gridybase;
 	}
 
-	private int buildBufferringMode(JPanel panel, GridBagConstraints c,
-			int gridybase) {
-		c.gridx = 0;
-		c.gridy = ++gridybase;
-		c.gridwidth = 1;
-		c.gridheight = 1;
-		c.fill = GridBagConstraints.NONE;
-		c.insets = new Insets(0, 0, 0, 12);
-		c.anchor = GridBagConstraints.FIRST_LINE_START;
-		c.weightx = 0.0;
-		JLabel name = new JLabel("<html>Auto-syncronization<br/>(requires reasoner restart)</html>");
-		String description = "ELK will be always in sync with the ontology";
-		panel.add(name, c);
-		name.setToolTipText(description);
-		syncCheckbox_.setToolTipText(description);
-
-		c.gridx = 1;
-		c.gridy = gridybase;
-		c.insets = new Insets(0, 0, 5, 0);
-		c.weightx = 1.0;
-		panel.add(syncCheckbox_, c);
-
-		return gridybase;
+	private void resetPreferences() {
+		ElkProtegePreferences elkProtegePrefs = new ElkProtegePreferences()
+				.reset();
+		nwSpinner_.setValue(elkProtegePrefs.numberOfWorkers);
+		incCheckbox_.setSelected(elkProtegePrefs.incrementalMode);
+		syncCheckbox_.setSelected(elkProtegePrefs.autoSynchronization);
 	}
 
 	@Override
@@ -185,7 +189,7 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		elkProtegePrefs.numberOfWorkers = Integer.parseInt(nwSpinner_
 				.getValue().toString());
 		elkProtegePrefs.incrementalMode = incCheckbox_.isSelected();
-		elkProtegePrefs.bufferringMode = !syncCheckbox_.isSelected();
+		elkProtegePrefs.autoSynchronization = syncCheckbox_.isSelected();
 
 		elkProtegePrefs.save();
 

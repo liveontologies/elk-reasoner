@@ -32,14 +32,14 @@ public class ElkProtegePreferences {
 
 	private static final String NUMBER_OF_WORKERS_KEY = "ELK_NUMBER_OF_WORKERS",
 			INCREMENTAL_MODE_KEY = "ELK_INCREMENTAL_MODE",
-			BUFFERRING_MODE_KEY = "ELK_BUFFERRING_MODE";
+			AUTO_SYNCRHONIZATION_KEY = "ELK_AUTO_SYNCHRONIZATION";
 
 	public int numberOfWorkers;
 
-	public boolean incrementalMode, bufferringMode;
+	public boolean incrementalMode, autoSynchronization;
 
 	private int defaultNumberOfWorkers_;
-	private boolean defaultIncrementalMode_, defaultBufferingMode_;
+	private boolean defaultIncrementalMode_, defaultAutoSynchronization_;
 
 	public ElkProtegePreferences() {
 		ReasonerConfiguration elkDefaults = ReasonerConfiguration
@@ -48,7 +48,7 @@ public class ElkProtegePreferences {
 				.getParameterAsInt(ReasonerConfiguration.NUM_OF_WORKING_THREADS);
 		defaultIncrementalMode_ = elkDefaults
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED);
-		defaultBufferingMode_ = true;
+		defaultAutoSynchronization_ = false;
 	}
 
 	private static Preferences getPreferences() {
@@ -64,8 +64,8 @@ public class ElkProtegePreferences {
 				defaultNumberOfWorkers_);
 		incrementalMode = prefs.getBoolean(INCREMENTAL_MODE_KEY,
 				defaultIncrementalMode_);
-		bufferringMode = prefs.getBoolean(BUFFERRING_MODE_KEY,
-				defaultBufferingMode_);
+		autoSynchronization = prefs.getBoolean(AUTO_SYNCRHONIZATION_KEY,
+				defaultAutoSynchronization_);
 
 		return this;
 	}
@@ -74,7 +74,7 @@ public class ElkProtegePreferences {
 		Preferences prefs = getPreferences();
 		prefs.putInt(NUMBER_OF_WORKERS_KEY, numberOfWorkers);
 		prefs.putBoolean(INCREMENTAL_MODE_KEY, incrementalMode);
-		prefs.putBoolean(BUFFERRING_MODE_KEY, bufferringMode);
+		prefs.putBoolean(AUTO_SYNCRHONIZATION_KEY, autoSynchronization);
 		return this;
 	}
 
