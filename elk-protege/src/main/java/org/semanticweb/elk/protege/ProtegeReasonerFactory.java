@@ -49,8 +49,10 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 
 	@Override
 	public BufferingMode getRecommendedBuffering() {
-		return elkProtegePrefs_.load().bufferringMode ? BufferingMode.BUFFERING
-				: BufferingMode.NON_BUFFERING;
+		elkProtegePrefs_.load();
+		return elkProtegePrefs_.incrementalMode
+				&& elkProtegePrefs_.autoSynchronization ? BufferingMode.NON_BUFFERING
+				: BufferingMode.BUFFERING;
 	}
 
 	@Override
