@@ -27,26 +27,33 @@ package org.semanticweb.elk.protege.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.protege.ElkProtegePreferences;
+import org.semanticweb.elk.protege.ProtegeMessageAppender;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 /**
@@ -64,6 +71,8 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 
 	private JCheckBox incCheckbox_, syncCheckbox_;
 
+	private DefaultListModel warningTypes_;
+
 	@Override
 	public void initialise() throws Exception {
 		// Create a simple JPanel with the ELK's settings
@@ -79,7 +88,6 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		JLabel label = new JLabel("Number of working threads:");
 		String description = "The number of threads that ELK can use for performing parallel computations.";
 		label.setToolTipText(description);
-
 		nwSpinner_ = new JSpinner(new SpinnerNumberModel(
 				elkProtegePrefs.numberOfWorkers, 1, 999, 1));
 		label.setLabelFor(nwSpinner_);
@@ -87,6 +95,11 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 
 		gridybase = buildFirstColumn(elkPreferencesPanel, label, nwSpinner_, c,
 				gridybase);
+
+		gridybase = buildSecondColumn(
+				elkPreferencesPanel,
+				buildWarningTypesComponent(elkProtegePrefs.suppressedWarningTypes),
+				c, gridybase);
 
 		incCheckbox_ = new JCheckBox("Incremental reasoning",
 				elkProtegePrefs.incrementalMode);
@@ -138,6 +151,36 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 
 	}
 
+	private Component buildWarningTypesComponent(
+			List<String> suppressedWarningTypes) {
+		warningTypes_ = new DefaultListModel();
+		for (String warningType : suppressedWarningTypes) {
+			warningTypes_.addElement(warningType);
+		}
+		JList list = new JList(warningTypes_);
+		JScrollPane listScroller = new JScrollPane(list);
+		listScroller.setPreferredSize(new Dimension(300, 100));
+		JPanel listPane = new JPanel();
+		listPane.setLayout(new BoxLayout(listPane, BoxLayout.PAGE_AXIS));
+		listPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		JLabel label = new JLabel("Suppressed warnings types:");
+		listPane.add(label);
+		listPane.add(listScroller);
+
+		JPanel buttonPane = new JPanel();
+		buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
+		buttonPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+		JButton clearButton = new JButton("Clear");
+		JButton removeButton = new JButton("Remove");
+		buttonPane.add(clearButton);
+		buttonPane.add(Box.createHorizontalGlue());
+		buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
+		buttonPane.add(removeButton);
+		listPane.add(buttonPane);
+
+		return listPane;
+	}
+
 	private int buildFirstColumn(JPanel panel, Component first,
 			Component second, GridBagConstraints c, int gridybase) {
 		c.gridx = 0;
@@ -173,12 +216,30 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		return gridybase;
 	}
 
+	private int buildSecondColumn(JPanel panel, Component comp,
+			GridBagConstraints c, int gridybase) {
+		c.gridx = 3;
+		c.gridwidth = 1;
+		c.gridheight = 3;
+		c.fill = GridBagConstraints.NONE;
+		c.insets = new Insets(0, 0, 5, 12);
+		c.anchor = GridBagConstraints.FIRST_LINE_START;
+		c.weightx = 1.0;
+		panel.add(comp, c);
+		return gridybase;
+	}
+
 	private void resetPreferences() {
 		ElkProtegePreferences elkProtegePrefs = new ElkProtegePreferences()
 				.reset();
 		nwSpinner_.setValue(elkProtegePrefs.numberOfWorkers);
 		incCheckbox_.setSelected(elkProtegePrefs.incrementalMode);
 		syncCheckbox_.setSelected(elkProtegePrefs.autoSynchronization);
+		warningTypes_.clear();
+		ProtegeMessageAppender.getInstance().reloadIgnoredMessageTypes();
+		for (String warningType : elkProtegePrefs.suppressedWarningTypes) {
+			warningTypes_.addElement(warningType);
+		}
 	}
 
 	@Override
@@ -190,6 +251,12 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 				.getValue().toString());
 		elkProtegePrefs.incrementalMode = incCheckbox_.isSelected();
 		elkProtegePrefs.autoSynchronization = syncCheckbox_.isSelected();
+		elkProtegePrefs.suppressedWarningTypes = new ArrayList<String>(
+				warningTypes_.size());
+		for (int i = 0; i < warningTypes_.size(); i++) {
+			elkProtegePrefs.suppressedWarningTypes.add((String) warningTypes_
+					.getElementAt(i));
+		}
 
 		elkProtegePrefs.save();
 

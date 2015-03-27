@@ -39,6 +39,7 @@ import javax.swing.JTextArea;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
+import org.semanticweb.elk.protege.ElkProtegePreferences;
 import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
@@ -64,20 +65,17 @@ import org.semanticweb.elk.util.logging.ElkMessage;
  */
 public class MessageDialogAppender extends AppenderSkeleton implements Runnable {
 
-	protected final ConcurrentLinkedQueue<LoggingEvent> eventBuffer = new ConcurrentLinkedQueue<LoggingEvent>();
+	private final ConcurrentLinkedQueue<LoggingEvent> eventBuffer_ = new ConcurrentLinkedQueue<LoggingEvent>();
 
-	protected final AtomicReference<String> messengerThreadName = new AtomicReference<String>(
+	private final AtomicReference<String> messengerThreadName_ = new AtomicReference<String>(
 			"");
 
-	protected final Set<String> ignoredMessageTypes = new HashSet<String>();
+	private Set<String> ignoredMessageTypes_;
 
 	public MessageDialogAppender() {
 		super();
-		initConfiguration();
-	}
-
-	protected void initConfiguration() {
 		threshold = Level.WARN;
+		reloadIgnoredMessageTypes();
 	}
 
 	/**
@@ -86,8 +84,8 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 	 */
 	@Override
 	public void close() {
-		synchronized (eventBuffer) {
-			eventBuffer.clear(); // shoot the messenger
+		synchronized (eventBuffer_) {
+			eventBuffer_.clear(); // shoot the messenger
 		}
 	}
 
@@ -101,8 +99,9 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 	 */
 	@Override
 	protected void append(LoggingEvent event) {
-		if (!Thread.currentThread().getName().equals(messengerThreadName.get())) {
-			eventBuffer.add(event);
+		if (!Thread.currentThread().getName()
+				.equals(messengerThreadName_.get())) {
+			eventBuffer_.add(event);
 		}
 		// Else: drop event. Recursive message creation is thus blocked; even if
 		// displaying the message would create new events, they will not lead to
@@ -113,13 +112,20 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		ensureMessengerRuns();
 	}
 
+	public void reloadIgnoredMessageTypes() {
+		ElkProtegePreferences elkProtegePrefs = new ElkProtegePreferences()
+				.load();
+		ignoredMessageTypes_ = new HashSet<String>(
+				elkProtegePrefs.suppressedWarningTypes);
+	}
+
 	/**
 	 * Make sure that a messenger thread is run.
 	 */
 	protected void ensureMessengerRuns() {
-		if (messengerThreadName.compareAndSet("", "Initialising thread ...")) {
+		if (messengerThreadName_.compareAndSet("", "Initialising thread ...")) {
 			Thread messengerThread = new Thread(this);
-			messengerThreadName.set(messengerThread.getName());
+			messengerThreadName_.set(messengerThread.getName());
 			messengerThread.start();
 		}
 	}
@@ -157,13 +163,14 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 			messageLevel = JOptionPane.INFORMATION_MESSAGE;
 		}
 
-		ElkMessage elkMessage = ElkMessage.deserialize(event.getRenderedMessage());
+		ElkMessage elkMessage = ElkMessage.deserialize(event
+				.getRenderedMessage());
 		String messageType = null;
-		
+
 		if (elkMessage != null) {
 			messageType = elkMessage.getMessageType();
-			
-			if (ignoredMessageTypes.contains(messageType)) {
+
+			if (ignoredMessageTypes_.contains(messageType)) {
 				return false;
 			}
 		}
@@ -176,7 +183,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		if (messageText.length() > 520) {
 			messageText = messageText.substring(0, 500) + "...";
 		}
-		
+
 		WrappingLabel label = new WrappingLabel(messageText, 600);
 
 		label.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -202,7 +209,11 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		JOptionPane.showMessageDialog(null, panel, messageTitle, messageLevel);
 
 		if (ignoreMessageButton.isSelected()) {
-			ignoredMessageTypes.add(messageType);
+			ignoredMessageTypes_.add(messageType);
+			ElkProtegePreferences elkProtegePrefs = new ElkProtegePreferences()
+					.load();
+			elkProtegePrefs.suppressedWarningTypes.add(messageType);
+			elkProtegePrefs.save();
 		}
 
 		return true;
@@ -215,15 +226,15 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 	 */
 	@Override
 	public void run() {
-		while (!eventBuffer.isEmpty()) {
-			showMessage(eventBuffer.poll());
+		while (!eventBuffer_.isEmpty()) {
+			showMessage(eventBuffer_.poll());
 		}
-		messengerThreadName.set("");
+		messengerThreadName_.set("");
 		// If another thread has added new events just before the
 		// messengerThreadName was reset here, then it could happen that the
 		// messenger dies while there is still work to do. To avoid this, we
 		// check again one last time, and create a new messenger if needed:
-		if (!eventBuffer.isEmpty()) {
+		if (!eventBuffer_.isEmpty()) {
 			ensureMessengerRuns();
 		}
 	}
