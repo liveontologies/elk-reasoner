@@ -22,31 +22,24 @@ package org.semanticweb.elk.protege;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.protege.editor.core.prefs.Preferences;
 import org.protege.editor.core.prefs.PreferencesManager;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
 
-public class ElkProtegePreferences {
+public class ElkGeneralPreferences {
 
-	public static final String PREFERENCES_SET_KEY = "ELK_PREFS_SET";
-
-	private static final String NUMBER_OF_WORKERS_KEY = "ELK_NUMBER_OF_WORKERS",
+	private static final String ELK_GENERAL_PREFS_KEY = "ELK_GENERAL_PREFS",
+			NUMBER_OF_WORKERS_KEY = "ELK_NUMBER_OF_WORKERS",
 			INCREMENTAL_MODE_KEY = "ELK_INCREMENTAL_MODE",
-			AUTO_SYNCRHONIZATION_KEY = "ELK_AUTO_SYNCHRONIZATION",
-			SUPPRESSED_WARNING_TYPES_KEY = "ELK_SUPPRESSED_WARNING_TYPES";
+			AUTO_SYNCRHONIZATION_KEY = "ELK_AUTO_SYNCHRONIZATION";
 
 	public int numberOfWorkers;
 	public boolean incrementalMode, autoSynchronization;
-	public List<String> suppressedWarningTypes;
 
 	private int defaultNumberOfWorkers_;
 	private boolean defaultIncrementalMode_, defaultAutoSynchronization_;
-	private List<String> defaultSuppressedWarningTypes_;
 
-	public ElkProtegePreferences() {
+	public ElkGeneralPreferences() {
 		ReasonerConfiguration elkDefaults = ReasonerConfiguration
 				.getConfiguration();
 		defaultNumberOfWorkers_ = elkDefaults
@@ -54,85 +47,41 @@ public class ElkProtegePreferences {
 		defaultIncrementalMode_ = elkDefaults
 				.getParameterAsBoolean(ReasonerConfiguration.INCREMENTAL_MODE_ALLOWED);
 		defaultAutoSynchronization_ = false;
-		defaultSuppressedWarningTypes_ = new ArrayList<String>();
 	}
 
-	private static Preferences getPreferences() {
+	private static Preferences getPrefs() {
 		PreferencesManager prefMan = PreferencesManager.getInstance();
-		return prefMan.getPreferencesForSet(PREFERENCES_SET_KEY,
-				ElkProtegePreferences.class);
+		return prefMan.getPreferencesForSet(ELK_GENERAL_PREFS_KEY,
+				ElkGeneralPreferences.class);
 	}
 
-	public ElkProtegePreferences load() {
-		Preferences prefs = getPreferences();
+	public ElkGeneralPreferences load() {
+		Preferences prefs = getPrefs();
 		numberOfWorkers = prefs.getInt(NUMBER_OF_WORKERS_KEY,
 				defaultNumberOfWorkers_);
 		incrementalMode = prefs.getBoolean(INCREMENTAL_MODE_KEY,
 				defaultIncrementalMode_);
 		autoSynchronization = prefs.getBoolean(AUTO_SYNCRHONIZATION_KEY,
 				defaultAutoSynchronization_);
-		suppressedWarningTypes = getStringList(prefs,
-				SUPPRESSED_WARNING_TYPES_KEY, defaultSuppressedWarningTypes_);
 		return this;
 	}
 
-	public ElkProtegePreferences save() {
-		Preferences prefs = getPreferences();
+	public ElkGeneralPreferences save() {
+		Preferences prefs = getPrefs();
 		prefs.putInt(NUMBER_OF_WORKERS_KEY, numberOfWorkers);
 		prefs.putBoolean(INCREMENTAL_MODE_KEY, incrementalMode);
 		prefs.putBoolean(AUTO_SYNCRHONIZATION_KEY, autoSynchronization);
-		putStringList(prefs, SUPPRESSED_WARNING_TYPES_KEY,
-				suppressedWarningTypes);
 		return this;
 	}
 
-	public ElkProtegePreferences reset() {
-		getPreferences().clear();
-		return load();
-	}
-
-	/**
-	 * A replacement for {@link Preferences#getStringList(String, List)}, which
-	 * does not work in combination with {@link Preferences#clear()}
-	 * 
-	 * @param prefs
-	 * @param key
-	 * @param defaultList
-	 * @return
-	 */
-	private List<String> getStringList(Preferences prefs, String key,
-			List<String> defaultList) {
-		int size = prefs.getInt(key, -1);
-		if (size < 0)
-			return defaultList;
-		// else
-		List<String> result = new ArrayList<String>(size);
-		for (int i = 0; i < size; i++) {
-			result.add(prefs.getString(key + "#" + i, ""));
-		}
-		return result;
-	}
-
-	/**
-	 * A replacement for {@link Preferences#putStringList(String, List)}, which
-	 * does not work in combination with {@link Preferences#clear()}
-	 * 
-	 * @param prefs
-	 * @param key
-	 * @param list
-	 */
-	private void putStringList(Preferences prefs, String key, List<String> list) {
-		int size = list.size();
-		prefs.putInt(key, size);
-		int i = 0;
-		for (String value : list) {
-			prefs.putString(key + "#" + i++, value);
-		}
+	public ElkGeneralPreferences reset() {
+		getPrefs().clear();
+		return this;
 	}
 
 	/**
 	 * @return the {@link ReasonerConfiguration} with the settings from this
-	 *         {@link ElkProtegePreferences}
+	 *         {@link ElkGeneralPreferences}
 	 */
 	public ReasonerConfiguration getElkConfig() {
 		ReasonerConfiguration elkConfig = ReasonerConfiguration
