@@ -39,7 +39,8 @@ import javax.swing.JTextArea;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
-import org.semanticweb.elk.protege.ElkProtegePreferences;
+import org.semanticweb.elk.protege.ElkGeneralPreferences;
+import org.semanticweb.elk.protege.ElkWarningPreferences;
 import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
@@ -70,12 +71,12 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 	private final AtomicReference<String> messengerThreadName_ = new AtomicReference<String>(
 			"");
 
-	private Set<String> ignoredMessageTypes_;
+	private Set<String> suppressedMessageTypes_;
 
 	public MessageDialogAppender() {
 		super();
 		threshold = Level.WARN;
-		reloadIgnoredMessageTypes();
+		reloadSuppressedMessageTypes();
 	}
 
 	/**
@@ -112,11 +113,11 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		ensureMessengerRuns();
 	}
 
-	public void reloadIgnoredMessageTypes() {
-		ElkProtegePreferences elkProtegePrefs = new ElkProtegePreferences()
+	public void reloadSuppressedMessageTypes() {
+		ElkWarningPreferences elkWarningPrefs = new ElkWarningPreferences()
 				.load();
-		ignoredMessageTypes_ = new HashSet<String>(
-				elkProtegePrefs.suppressedWarningTypes);
+		suppressedMessageTypes_ = new HashSet<String>(
+				elkWarningPrefs.suppressedWarningTypes);
 	}
 
 	/**
@@ -170,7 +171,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		if (elkMessage != null) {
 			messageType = elkMessage.getMessageType();
 
-			if (ignoredMessageTypes_.contains(messageType)) {
+			if (suppressedMessageTypes_.contains(messageType)) {
 				return false;
 			}
 		}
@@ -209,11 +210,11 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		JOptionPane.showMessageDialog(null, panel, messageTitle, messageLevel);
 
 		if (ignoreMessageButton.isSelected()) {
-			ignoredMessageTypes_.add(messageType);
-			ElkProtegePreferences elkProtegePrefs = new ElkProtegePreferences()
+			suppressedMessageTypes_.add(messageType);
+			ElkWarningPreferences elkWarningPrefs = new ElkWarningPreferences()
 					.load();
-			elkProtegePrefs.suppressedWarningTypes.add(messageType);
-			elkProtegePrefs.save();
+			elkWarningPrefs.suppressedWarningTypes.add(messageType);
+			elkWarningPrefs.save();
 		}
 
 		return true;

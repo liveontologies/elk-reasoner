@@ -45,7 +45,7 @@ public class ProtegeReasonerFactory extends AbstractProtegeOWLReasonerInfo {
 
 	private final OWLReasonerFactory factory_ = new ElkReasonerFactory();
 
-	private final ElkProtegePreferences elkProtegePrefs_ = new ElkProtegePreferences();
+	private final ElkGeneralPreferences elkProtegePrefs_ = new ElkGeneralPreferences();
 
 	@Override
 	public BufferingMode getRecommendedBuffering() {
