@@ -39,8 +39,8 @@ import javax.swing.JTextArea;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
-import org.semanticweb.elk.protege.ElkGeneralPreferences;
-import org.semanticweb.elk.protege.ElkWarningPreferences;
+import org.semanticweb.elk.protege.preferences.ElkGeneralPreferences;
+import org.semanticweb.elk.protege.preferences.ElkWarningPreferences;
 import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
