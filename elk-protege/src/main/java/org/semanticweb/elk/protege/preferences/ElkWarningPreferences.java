@@ -1,4 +1,4 @@
-package org.semanticweb.elk.protege;
+package org.semanticweb.elk.protege.preferences;
 
 /*
  * #%L
@@ -30,7 +30,7 @@ import org.protege.editor.core.prefs.PreferencesManager;
 
 public class ElkWarningPreferences {
 
-	private static final String SUPPRESSED_WARNING_TYPES_KEY = "ELK_SUPPRESSED_WARNING_TYPES",
+	private static final String ELK_WARNING_PREFS_KEY = "ELK_WARNING_PREFS",
 			SIZE = "SIZE";
 
 	public List<String> suppressedWarningTypes;
@@ -43,7 +43,7 @@ public class ElkWarningPreferences {
 
 	private static Preferences getPrefs() {
 		PreferencesManager prefMan = PreferencesManager.getInstance();
-		return prefMan.getPreferencesForSet(SUPPRESSED_WARNING_TYPES_KEY,
+		return prefMan.getPreferencesForSet(ELK_WARNING_PREFS_KEY,
 				ElkWarningPreferences.class);
 	}
 

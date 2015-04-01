@@ -1,4 +1,4 @@
-package org.semanticweb.elk.protege;
+package org.semanticweb.elk.protege.preferences;
 
 /*
  * #%L
