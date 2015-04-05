@@ -97,6 +97,7 @@ public class ElkLogPreferencesPanel extends ElkPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				logTextArea_.setText(null);
+				ElkProtegeLogAppender.getInstance().clear();
 			}
 		});
 		clearButton.setText("Clear");
