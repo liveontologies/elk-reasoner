@@ -109,7 +109,7 @@
 						<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
 						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
 						<Export-Package>!org.semanticweb.elk.*,org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui</Export-Package>
-						<Import-Package>!com.sun.*,!javax.*,!org.semanticweb.elk.*,!org.slf4j.*,org.apache.log4j.*;version="[${log4j.lower.version},${log4j.upper.version})",
+						<Import-Package>!com.sun.*,!org.semanticweb.elk.*,!org.slf4j.*,org.apache.log4j.*;version="[${log4j.lower.version},${log4j.upper.version})",
 							org.protege.*;version="[${protege.lower.version},${protege.upper.version})",*</Import-Package>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
 						<Embed-Dependency>*;scope=!provided;scope=compile|runtime;groupId=!net.sourceforge.owlapi|org.apache.felix|log4j;inline=false</Embed-Dependency>
