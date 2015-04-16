@@ -133,7 +133,7 @@ public class ElkGeneralPreferencesPanel extends ElkPanel {
 
 	private void reset() {
 		ElkGeneralPreferences elkProtegePrefs = new ElkGeneralPreferences()
-				.reset().load();
+				.reset();
 		numberOfWorkersModel_.setValue(elkProtegePrefs.numberOfWorkers);
 		incrementalCheckbox_.setSelected(elkProtegePrefs.incrementalMode);
 		syncCheckbox_.setEnabled(incrementalCheckbox_.isSelected());

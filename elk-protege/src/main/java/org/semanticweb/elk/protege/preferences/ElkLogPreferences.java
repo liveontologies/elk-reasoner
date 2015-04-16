@@ -66,7 +66,7 @@ public class ElkLogPreferences {
 	}
 
 	public ElkLogPreferences reset() {
-		getPrefs().clear();
+		logLevel_ = defaultLogLevel_;
 		return this;
 	}
 

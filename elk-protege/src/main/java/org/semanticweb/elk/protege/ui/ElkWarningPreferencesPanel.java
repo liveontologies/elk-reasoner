@@ -36,8 +36,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 
+import org.semanticweb.elk.protege.ProtegeSuppressedMessages;
 import org.semanticweb.elk.protege.preferences.ElkWarningPreferences;
 
 public class ElkWarningPreferencesPanel extends ElkPanel {
@@ -45,6 +47,7 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 	private static final long serialVersionUID = -2161290012849409729L;
 
 	private WarningTableModel warningTypes_;
+	private ListSelectionModel warningSelection_;
 
 	@Override
 	public ElkWarningPreferencesPanel initialize() {
@@ -69,11 +72,15 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 
 	private Component buildWarningTypesComponent(
 			List<String> suppressedWarningTypes) {
+		ProtegeSuppressedMessages suppressedMessages = ProtegeSuppressedMessages
+				.getInstance().reload();
 		warningTypes_ = new WarningTableModel();
 		JTable table = new JTable(warningTypes_);
+		warningSelection_ = table.getSelectionModel();
 		table.getColumnModel().getColumn(1).setMaxWidth(50);
 		for (String warningType : suppressedWarningTypes) {
-			warningTypes_.addWarningType(warningType);
+			warningTypes_.addWarningType(warningType,
+					suppressedMessages.getCount(warningType));
 		}
 		JScrollPane tableScroller = new JScrollPane(table);
 		tableScroller.setPreferredSize(new Dimension(300, 100));
@@ -89,26 +96,25 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				clearSuppressedWarningTypes();
+				warningTypes_.clear();
 			}
 		});
 		clearButton.setText("Clear");
-		JButton removeButton = new JButton("Remove");
+		JButton removeButton = new JButton(new AbstractAction() {
+			private static final long serialVersionUID = 7125300829305229857L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				warningTypes_.removeSelectedRows(warningSelection_);
+			}
+		});
+		removeButton.setText("Remove");
 		buttonPane.add(clearButton);
 		buttonPane.add(Box.createHorizontalGlue());
 		buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
 		buttonPane.add(removeButton);
 
 		return buttonPane;
-	}
-
-	private void clearSuppressedWarningTypes() {
-		ElkWarningPreferences elkWarningPrefs = new ElkWarningPreferences()
-				.reset().load();
-		warningTypes_.clear();
-		for (String warningType : elkWarningPrefs.suppressedWarningTypes) {
-			warningTypes_.addWarningType(warningType);
-		}
 	}
 
 	private static class WarningTableModel extends AbstractTableModel {
@@ -122,11 +128,11 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 
 		private final List<Integer> warningCounts_ = new ArrayList<Integer>();
 
-		public void addWarningType(String warningType) {
+		public void addWarningType(String warningType, int warningCount) {
 			warningTypes_.add(warningType);
-			warningCounts_.add(0);
-			int newRow = warningType.length();
-			fireTableRowsInserted(newRow, newRow);
+			warningCounts_.add(warningCount);
+			int lastRow = warningTypes_.size();
+			fireTableRowsInserted(lastRow, lastRow);
 		}
 
 		public void clear() {
@@ -134,6 +140,20 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 			warningTypes_.clear();
 			warningCounts_.clear();
 			fireTableRowsDeleted(0, lastRow);
+		}
+
+		public void removeSelectedRows(ListSelectionModel selection) {
+			int first = selection.getMinSelectionIndex();
+			if (first < 0)
+				return;
+			int last = selection.getMaxSelectionIndex();
+			for (int i = last; i >= first; i--) {
+				if (!selection.isSelectedIndex(i))
+					continue;
+				warningTypes_.remove(i);
+				warningCounts_.remove(i);
+			}
+			fireTableRowsDeleted(first, last);
 		}
 
 		public String getWarningTypeAt(int row) {
@@ -147,6 +167,17 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 		@Override
 		public String getColumnName(int col) {
 			return COLUMN_NAMES_[col];
+		}
+
+		public Class<?> getColumnClass(int col) {
+			switch (col) {
+			case 0:
+				return String.class;
+			case 1:
+				return Integer.class;
+			default:
+				throw new IllegalArgumentException("Column value out of bounds");
+			}
 		}
 
 		@Override
