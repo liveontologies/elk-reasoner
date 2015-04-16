@@ -27,6 +27,7 @@ package org.semanticweb.elk.protege;
 
 import org.apache.log4j.Logger;
 import org.protege.editor.core.editorkit.plugin.EditorKitHook;
+import org.semanticweb.elk.protege.preferences.ElkLogPreferences;
 
 /**
  * Carries out some initialization, e.g. Log4j, which we don't want to put into
@@ -39,15 +40,21 @@ import org.protege.editor.core.editorkit.plugin.EditorKitHook;
  */
 public class ElkProtegePluginInstance extends EditorKitHook {
 
+	private static final String ELK_PACKAGE_ = "org.semanticweb.elk";
+
 	@Override
 	public void dispose() throws Exception {
 	}
 
 	@Override
 	public void initialise() throws Exception {
-		Logger.getLogger("org.semanticweb.elk").addAppender(
+		Logger.getLogger(ELK_PACKAGE_).addAppender(
 				ProtegeMessageAppender.getInstance());
-		Logger.getLogger("org.semanticweb.elk").addAppender(
-				ElkProtegeLogAppender.getInstance());
+		ElkProtegeLogAppender preferenceLogAppender = ElkProtegeLogAppender
+				.getInstance();
+		ElkLogPreferences elkLogPrefs = new ElkLogPreferences().load();
+		preferenceLogAppender.setLogLevel(elkLogPrefs.getLogLevel());
+		Logger.getLogger(ELK_PACKAGE_).addAppender(preferenceLogAppender);
+
 	}
 }

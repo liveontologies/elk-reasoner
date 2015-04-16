@@ -33,7 +33,7 @@ import javax.swing.JTabbedPane;
 import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.protege.ElkProtegeLogAppender;
-import org.semanticweb.elk.protege.ProtegeMessageAppender;
+import org.semanticweb.elk.protege.ProtegeSuppressedMessages;
 import org.semanticweb.elk.protege.preferences.ElkGeneralPreferences;
 import org.semanticweb.elk.protege.preferences.ElkLogPreferences;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -96,9 +96,11 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 				.load();
 		((ElkReasoner) reasoner).setConfigurationOptions(elkGeneralPrefs
 				.getElkConfig());
-		ProtegeMessageAppender.getInstance().reloadSuppressedMessageTypes();
+		ProtegeSuppressedMessages.getInstance().reload();
 
-		ElkProtegeLogAppender.getInstance().reloadLogLevel();
+		ElkLogPreferences elkLogPrefs = new ElkLogPreferences().load();
+		ElkProtegeLogAppender.getInstance().setLogLevel(
+				elkLogPrefs.getLogLevel());
 	}
 
 }

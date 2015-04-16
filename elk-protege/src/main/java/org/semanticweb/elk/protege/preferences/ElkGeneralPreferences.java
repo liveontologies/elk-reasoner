@@ -75,7 +75,9 @@ public class ElkGeneralPreferences {
 	}
 
 	public ElkGeneralPreferences reset() {
-		getPrefs().clear();
+		numberOfWorkers = defaultNumberOfWorkers_;
+		incrementalMode = defaultIncrementalMode_;
+		autoSynchronization = defaultAutoSynchronization_;
 		return this;
 	}
 

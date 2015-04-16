@@ -68,6 +68,9 @@ public class ElkLogPreferencesPanel extends ElkPanel {
 		ElkLogPreferences prefs = new ElkLogPreferences().load();
 		prefs.setLogLevel(LOG_LEVELS_[logLevelList_.getSelectedIndex()]);
 		prefs.save();
+		if (logTextArea_.getText().isEmpty()) {
+			ElkProtegeLogAppender.getInstance().clear();
+		}
 		return this;
 	}
 
@@ -91,21 +94,9 @@ public class ElkLogPreferencesPanel extends ElkPanel {
 		JScrollPane scrollPane = new JScrollPane(logTextArea_);
 		logTextArea_.setEditable(false);
 		ElkProtegeLogAppender elkLog = ElkProtegeLogAppender.getInstance();
-		int cursor = elkLog.getCursor();
-		LoggingEvent[] messages = elkLog.getEvents();
-		if (messages[cursor] == null) {
-			cursor = 0;
-		}
-		for (int i = 0; i < messages.length; i++) {
-			LoggingEvent event = messages[cursor];
-			cursor++;
-			if (cursor == messages.length)
-				cursor = 0;
-			if (event == null)
-				break;
+		for (LoggingEvent event : elkLog.getEvents()) {
 			logTextArea_.append(event.getRenderedMessage() + "\n");
 		}
-
 		return scrollPane;
 	}
 
@@ -119,7 +110,6 @@ public class ElkLogPreferencesPanel extends ElkPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				logTextArea_.setText(null);
-				ElkProtegeLogAppender.getInstance().clear();
 			}
 		});
 		clearButton.setText("Clear");

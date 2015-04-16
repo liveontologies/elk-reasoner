@@ -24,8 +24,6 @@ package org.semanticweb.elk.protege.ui;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -39,8 +37,7 @@ import javax.swing.JTextArea;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
-import org.semanticweb.elk.protege.preferences.ElkGeneralPreferences;
-import org.semanticweb.elk.protege.preferences.ElkWarningPreferences;
+import org.semanticweb.elk.protege.ProtegeSuppressedMessages;
 import org.semanticweb.elk.util.logging.ElkMessage;
 
 /**
@@ -71,12 +68,12 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 	private final AtomicReference<String> messengerThreadName_ = new AtomicReference<String>(
 			"");
 
-	private Set<String> suppressedMessageTypes_;
+	private final ProtegeSuppressedMessages supperssedMessages_;
 
 	public MessageDialogAppender() {
 		super();
 		threshold = Level.WARN;
-		reloadSuppressedMessageTypes();
+		supperssedMessages_ = ProtegeSuppressedMessages.getInstance().reload();
 	}
 
 	/**
@@ -111,13 +108,6 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		// Also note that get() above is needed.
 
 		ensureMessengerRuns();
-	}
-
-	public void reloadSuppressedMessageTypes() {
-		ElkWarningPreferences elkWarningPrefs = new ElkWarningPreferences()
-				.load();
-		suppressedMessageTypes_ = new HashSet<String>(
-				elkWarningPrefs.suppressedWarningTypes);
 	}
 
 	/**
@@ -170,10 +160,8 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 
 		if (elkMessage != null) {
 			messageType = elkMessage.getMessageType();
-
-			if (suppressedMessageTypes_.contains(messageType)) {
+			if (supperssedMessages_.checkSuppressed(messageType))
 				return false;
-			}
 		}
 
 		JPanel panel = new JPanel();
@@ -210,11 +198,7 @@ public class MessageDialogAppender extends AppenderSkeleton implements Runnable 
 		JOptionPane.showMessageDialog(null, panel, messageTitle, messageLevel);
 
 		if (ignoreMessageButton.isSelected()) {
-			suppressedMessageTypes_.add(messageType);
-			ElkWarningPreferences elkWarningPrefs = new ElkWarningPreferences()
-					.load();
-			elkWarningPrefs.suppressedWarningTypes.add(messageType);
-			elkWarningPrefs.save();
+			supperssedMessages_.addWarningType(messageType);
 		}
 
 		return true;

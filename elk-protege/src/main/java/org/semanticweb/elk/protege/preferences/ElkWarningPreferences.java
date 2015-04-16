@@ -61,7 +61,7 @@ public class ElkWarningPreferences {
 	}
 
 	public ElkWarningPreferences reset() {
-		getPrefs().clear();
+		suppressedWarningTypes = defaultSuppressedWarningTypes_;
 		return this;
 	}
 
