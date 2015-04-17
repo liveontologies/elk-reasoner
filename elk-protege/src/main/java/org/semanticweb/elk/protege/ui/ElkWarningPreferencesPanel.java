@@ -121,7 +121,7 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 				warningTypes_.resetCounts();
 			}
 		});
-		resetCountsButton.setText("Reset counts");
+		resetCountsButton.setText("Reset counters");
 		buttonPane.add(clearButton);
 		buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
 		buttonPane.add(removeButton);

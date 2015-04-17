@@ -99,8 +99,9 @@ public class ElkPreferencesPanel extends OWLPreferencesPanel {
 		ProtegeSuppressedMessages.getInstance().reload();
 
 		ElkLogPreferences elkLogPrefs = new ElkLogPreferences().load();
-		ElkProtegeLogAppender.getInstance().setLogLevel(
-				elkLogPrefs.getLogLevel());
+		ElkProtegeLogAppender.getInstance()
+				.setLogLevel(elkLogPrefs.getLogLevel())
+				.setBufferSize(elkLogPrefs.logBufferSize);
 	}
 
 }

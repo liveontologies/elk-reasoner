@@ -37,8 +37,8 @@ public class ElkWarningPreferences {
 	public List<String> suppressedWarningTypes;
 	public boolean suppressAllWarnings;
 
-	private List<String> defaultSuppressedWarningTypes_;
-	private boolean defaultIgnoreAllWarnings_;
+	private final List<String> defaultSuppressedWarningTypes_;
+	private final boolean defaultIgnoreAllWarnings_;
 
 	public ElkWarningPreferences() {
 		defaultSuppressedWarningTypes_ = new ArrayList<String>();

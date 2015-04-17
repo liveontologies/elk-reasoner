@@ -54,5 +54,6 @@ public class ElkProtegePluginInstance extends EditorKitHook {
 				.getInstance();
 		ElkLogPreferences elkLogPrefs = new ElkLogPreferences().load();
 		preferenceLogAppender.setLogLevel(elkLogPrefs.getLogLevel());
+		preferenceLogAppender.setBufferSize(elkLogPrefs.logBufferSize);
 	}
 }
