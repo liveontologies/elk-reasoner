@@ -33,6 +33,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -48,6 +49,7 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 
 	private WarningTableModel warningTypes_;
 	private ListSelectionModel warningSelection_;
+	private JCheckBox suppressAllWarningsCheckbox_;
 
 	@Override
 	public ElkWarningPreferencesPanel initialize() {
@@ -55,6 +57,7 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		add(buildWarningTypesComponent(prefs.suppressedWarningTypes));
 		add(buildButtonsComponent());
+		add(buildIgnoreAllWarningsComponent(prefs.suppressAllWarnings));
 		return this;
 	}
 
@@ -66,6 +69,7 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 		for (int i = 0; i < warningTypes_.getRowCount(); i++) {
 			prefs.suppressedWarningTypes.add(warningTypes_.getWarningTypeAt(i));
 		}
+		prefs.suppressAllWarnings = suppressAllWarningsCheckbox_.isSelected();
 		prefs.save();
 		return this;
 	}
@@ -108,13 +112,37 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 				warningTypes_.removeSelectedRows(warningSelection_);
 			}
 		});
-		removeButton.setText("Remove");
+		removeButton.setText("Remove selected");
+		JButton resetCountsButton = new JButton(new AbstractAction() {
+			private static final long serialVersionUID = 7918203938390550678L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				warningTypes_.resetCounts();
+			}
+		});
+		resetCountsButton.setText("Reset counts");
 		buttonPane.add(clearButton);
-		buttonPane.add(Box.createHorizontalGlue());
 		buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
 		buttonPane.add(removeButton);
+		buttonPane.add(Box.createHorizontalGlue());
+		buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
+		buttonPane.add(resetCountsButton);
 
 		return buttonPane;
+	}
+
+	private Component buildIgnoreAllWarningsComponent(boolean ignoreAllWarnings) {
+		JPanel pane = new JPanel();
+		pane.setLayout(new BoxLayout(pane, BoxLayout.LINE_AXIS));
+		pane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+		suppressAllWarningsCheckbox_ = new JCheckBox("Suppress all warnings",
+				ignoreAllWarnings);
+		suppressAllWarningsCheckbox_
+				.setToolTipText("If checked, all ELK warnings will be silently ignored; the counters will be included in the table above");
+		pane.add(suppressAllWarningsCheckbox_);
+		pane.add(Box.createHorizontalGlue());
+		return pane;
 	}
 
 	private static class WarningTableModel extends AbstractTableModel {
@@ -122,7 +150,7 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 		private static final long serialVersionUID = -384343581021434074L;
 
 		private static final String[] COLUMN_NAMES_ = {
-				"Supprssed warning type", "count" };
+				"Supprssed warning types", "counts" };
 
 		private final List<String> warningTypes_ = new ArrayList<String>();
 
@@ -140,6 +168,14 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 			warningTypes_.clear();
 			warningCounts_.clear();
 			fireTableRowsDeleted(0, lastRow);
+		}
+
+		public void resetCounts() {
+			int lastRow = warningTypes_.size();
+			for (int i = 0; i < lastRow; i++) {
+				warningCounts_.set(i, 0);
+			}
+			fireTableRowsUpdated(0, lastRow);
 		}
 
 		public void removeSelectedRows(ListSelectionModel selection) {
