@@ -22,6 +22,7 @@ package org.semanticweb.elk.protege;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -53,6 +54,9 @@ public class ElkProtegeLogAppender extends AppenderSkeleton {
 	}
 
 	public Iterable<LoggingEvent> getEvents() {
+		if (buffer_ == null)
+			return Collections.emptyList();
+		// else
 		return new Iterable<LoggingEvent>() {
 
 			@Override
