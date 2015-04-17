@@ -16,6 +16,7 @@ public class ProtegeSuppressedMessages {
 	private static final ProtegeSuppressedMessages INSTANCE_ = new ProtegeSuppressedMessages();
 
 	private final Map<String, Integer> suppressedWarningCounts_;
+	private boolean suppressAllWarnings_;
 
 	public ProtegeSuppressedMessages() {
 		suppressedWarningCounts_ = new HashMap<String, Integer>();
@@ -30,23 +31,22 @@ public class ProtegeSuppressedMessages {
 	 * counters if there were any
 	 */
 	public ProtegeSuppressedMessages reload() {
-		ElkWarningPreferences elkWarningPrefs = new ElkWarningPreferences()
-				.load();
+		ElkWarningPreferences prefs = new ElkWarningPreferences().load();
 		suppressedWarningCounts_.keySet().retainAll(
-				elkWarningPrefs.suppressedWarningTypes);
-		for (String warningType : elkWarningPrefs.suppressedWarningTypes) {
+				prefs.suppressedWarningTypes);
+		for (String warningType : prefs.suppressedWarningTypes) {
 			if (suppressedWarningCounts_.get(warningType) == null)
 				suppressedWarningCounts_.put(warningType, 0);
 		}
+		suppressAllWarnings_ = prefs.suppressAllWarnings;
 		return this;
 	}
 
 	public void addWarningType(String newWarningType) {
 		suppressedWarningCounts_.put(newWarningType, 0);
-		ElkWarningPreferences elkWarningPrefs = new ElkWarningPreferences()
-				.load();
-		elkWarningPrefs.suppressedWarningTypes.add(newWarningType);
-		elkWarningPrefs.save();
+		ElkWarningPreferences prefs = new ElkWarningPreferences().load();
+		prefs.suppressedWarningTypes.add(newWarningType);
+		prefs.save();
 	}
 
 	/**
@@ -57,9 +57,13 @@ public class ProtegeSuppressedMessages {
 	 */
 	public boolean checkSuppressed(String warningType) {
 		Integer count = suppressedWarningCounts_.get(warningType);
-		if (count == null)
-			return false;
-		// else
+		if (count == null) {
+			if (suppressAllWarnings_) {
+				count = 0;
+				addWarningType(warningType);
+			} else
+				return false;
+		}
 		suppressedWarningCounts_.put(warningType, count + 1);
 		return true;
 	}

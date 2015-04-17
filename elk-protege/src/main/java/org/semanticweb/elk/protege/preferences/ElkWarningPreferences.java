@@ -31,14 +31,18 @@ import org.protege.editor.core.prefs.PreferencesManager;
 public class ElkWarningPreferences {
 
 	private static final String ELK_WARNING_PREFS_KEY = "ELK_WARNING_PREFS",
-			SIZE = "SIZE";
+			SIZE = "SIZE",
+			SUPPRESS_ALL_WARNINGS_KEY = "ELK_SUPPRESS_ALL_WARNIGS";
 
 	public List<String> suppressedWarningTypes;
+	public boolean suppressAllWarnings;
 
 	private List<String> defaultSuppressedWarningTypes_;
+	private boolean defaultIgnoreAllWarnings_;
 
 	public ElkWarningPreferences() {
 		defaultSuppressedWarningTypes_ = new ArrayList<String>();
+		defaultIgnoreAllWarnings_ = false;
 	}
 
 	private static Preferences getPrefs() {
@@ -51,17 +55,21 @@ public class ElkWarningPreferences {
 		Preferences prefs = getPrefs();
 		suppressedWarningTypes = getStringList(prefs,
 				defaultSuppressedWarningTypes_);
+		suppressAllWarnings = prefs.getBoolean(SUPPRESS_ALL_WARNINGS_KEY,
+				defaultIgnoreAllWarnings_);
 		return this;
 	}
 
 	public ElkWarningPreferences save() {
 		Preferences prefs = getPrefs();
 		putStringList(prefs, suppressedWarningTypes);
+		prefs.putBoolean(SUPPRESS_ALL_WARNINGS_KEY, suppressAllWarnings);
 		return this;
 	}
 
 	public ElkWarningPreferences reset() {
 		suppressedWarningTypes = defaultSuppressedWarningTypes_;
+		suppressAllWarnings = defaultIgnoreAllWarnings_;
 		return this;
 	}
 
