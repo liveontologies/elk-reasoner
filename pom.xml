@@ -24,8 +24,8 @@
 		<module>elk-owl-parent</module>
 		<module>elk-util-parent</module>
 		<module>elk-reasoner</module>
-    <module>elk-proofs</module>
-    <module>owlapi-proofs</module>
+		<module>elk-proofs</module>
+		<module>owlapi-proofs</module>
 		<module>elk-owlapi</module>
 		<module>elk-protege</module>
 		<module>elk-explanations</module>
@@ -158,7 +158,16 @@
 				<version>2.8.1</version>
 				<configuration>
 					<show>public</show>
-					<aggregate>true</aggregate>
+					<!--aggregate>true</aggregate -->
+					<executions>
+						<execution>
+							<id>aggregate</id>
+							<goals>
+								<goal>aggregate</goal>
+							</goals>
+							<phase>site</phase>
+						</execution>
+					</executions>
 					<maxmemory>2g</maxmemory>
 					<minmemory>128m</minmemory>
 				</configuration>
@@ -200,7 +209,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<owlapi.version>3.4.5</owlapi.version>
-		<!--protege.version>5.0.0-beta-05-SNAPSHOT</protege.version-->
+		<!--protege.version>5.0.0-beta-05-SNAPSHOT</protege.version -->
 		<protege.version>4.3.0</protege.version>
 		<java.required.version>1.6</java.required.version>
 		<!-- TODO: get current year automatically -->
@@ -237,6 +246,18 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-changes-plugin</artifactId>
 					<version>2.7.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.18.1</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.maven.surefire</groupId>
+							<artifactId>surefire-junit47</artifactId>
+							<version>2.18.1</version>
+						</dependency>
+					</dependencies>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
