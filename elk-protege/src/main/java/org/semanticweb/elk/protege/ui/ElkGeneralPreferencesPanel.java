@@ -63,8 +63,7 @@ public class ElkGeneralPreferencesPanel extends ElkPanel {
 	@Override
 	public ElkGeneralPreferencesPanel applyChanges() {
 		ElkGeneralPreferences prefs = new ElkGeneralPreferences().load();
-		prefs.numberOfWorkers = Integer.parseInt(numberOfWorkersModel_
-				.getNumber().toString());
+		prefs.numberOfWorkers = numberOfWorkersModel_.getNumber().intValue();
 		prefs.incrementalMode = incrementalCheckbox_.isSelected();
 		prefs.autoSynchronization = syncCheckbox_.isSelected();
 		prefs.save();
@@ -132,12 +131,11 @@ public class ElkGeneralPreferencesPanel extends ElkPanel {
 	}
 
 	private void reset() {
-		ElkGeneralPreferences elkProtegePrefs = new ElkGeneralPreferences()
-				.reset();
-		numberOfWorkersModel_.setValue(elkProtegePrefs.numberOfWorkers);
-		incrementalCheckbox_.setSelected(elkProtegePrefs.incrementalMode);
+		ElkGeneralPreferences prefs = new ElkGeneralPreferences().reset();
+		numberOfWorkersModel_.setValue(prefs.numberOfWorkers);
+		incrementalCheckbox_.setSelected(prefs.incrementalMode);
 		syncCheckbox_.setEnabled(incrementalCheckbox_.isSelected());
-		syncCheckbox_.setSelected(elkProtegePrefs.autoSynchronization);
+		syncCheckbox_.setSelected(prefs.autoSynchronization);
 	}
 
 }

@@ -29,14 +29,18 @@ import org.protege.editor.core.prefs.PreferencesManager;
 public class ElkLogPreferences {
 
 	private static final String ELK_LOG_PREFS_KEY = "ELK_LOG_PREFS",
-			ELK_LOG_LEVEL_KEY = "ELK_LOG_LEVEL";
+			ELK_LOG_LEVEL_KEY = "ELK_LOG_LEVEL",
+			ELK_LOG_BUFFER_SIZE_KEY = "ELK_LOG_BUFFER_SIZE";
+
+	public int logBufferSize;
 
 	private int logLevel_;
 
-	private int defaultLogLevel_;
+	private final int defaultLogLevel_, defaultLogBufferSize_;
 
 	public ElkLogPreferences() {
 		defaultLogLevel_ = Level.DEBUG_INT;
+		defaultLogBufferSize_ = 256;
 	}
 
 	public Level getLogLevel() {
@@ -56,17 +60,21 @@ public class ElkLogPreferences {
 	public ElkLogPreferences load() {
 		Preferences prefs = getPrefs();
 		logLevel_ = prefs.getInt(ELK_LOG_LEVEL_KEY, defaultLogLevel_);
+		logBufferSize = prefs.getInt(ELK_LOG_BUFFER_SIZE_KEY,
+				defaultLogBufferSize_);
 		return this;
 	}
 
 	public ElkLogPreferences save() {
 		Preferences prefs = getPrefs();
 		prefs.putInt(ELK_LOG_LEVEL_KEY, logLevel_);
+		prefs.putInt(ELK_LOG_BUFFER_SIZE_KEY, logBufferSize);
 		return this;
 	}
 
 	public ElkLogPreferences reset() {
 		logLevel_ = defaultLogLevel_;
+		logBufferSize = defaultLogBufferSize_;
 		return this;
 	}
 

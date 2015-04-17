@@ -67,18 +67,19 @@ public class ElkProtegeLogAppender extends AppenderSkeleton {
 		};
 	}
 
-	public void setLogLevel(Level logLevel) {
+	public ElkProtegeLogAppender setLogLevel(Level logLevel) {
 		logger_.setLevel(logLevel);
+		return this;
 	}
 
-	public void setBufferSize(int bufferSize) {
+	public ElkProtegeLogAppender setBufferSize(int bufferSize) {
 		if (bufferSize <= 0)
 			throw new IllegalArgumentException(
 					"The buffer size should be positive!");
 		LoggingEvent[] newBuffer = new LoggingEvent[bufferSize];
 		if (buffer_ != null) {
 			if (bufferSize == buffer_.length)
-				return;
+				return this;
 			// else, copy the messages from the old buffer
 			int newCursor = 0;
 			for (LoggingEvent event : getEvents()) {
@@ -90,6 +91,7 @@ public class ElkProtegeLogAppender extends AppenderSkeleton {
 			this.cursor_ = newCursor;
 		}
 		this.buffer_ = newBuffer;
+		return this;
 	}
 
 	public void clear() {

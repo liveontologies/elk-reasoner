@@ -36,8 +36,8 @@ public class ElkGeneralPreferences {
 	public int numberOfWorkers;
 	public boolean incrementalMode, autoSynchronization;
 
-	private int defaultNumberOfWorkers_;
-	private boolean defaultIncrementalMode_, defaultAutoSynchronization_;
+	private final int defaultNumberOfWorkers_;
+	private final boolean defaultIncrementalMode_, defaultAutoSynchronization_;
 
 	public ElkGeneralPreferences() {
 		ReasonerConfiguration elkDefaults = ReasonerConfiguration
