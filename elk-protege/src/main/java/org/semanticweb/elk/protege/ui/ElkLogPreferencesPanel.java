@@ -24,6 +24,7 @@ package org.semanticweb.elk.protege.ui;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -66,7 +67,7 @@ public class ElkLogPreferencesPanel extends ElkPanel {
 		headPane.setLayout(new BoxLayout(headPane, BoxLayout.LINE_AXIS));
 		headPane.add(buildLogLevelComponent(prefs.getLogLevel()));
 		headPane.add(Box.createRigidArea(new Dimension(10, 0)));
-		headPane.add(buildBufferSizeComponent(prefs.logBufferSize));				
+		headPane.add(buildBufferSizeComponent(prefs.logBufferSize));
 		headPane.add(Box.createHorizontalGlue());
 		headPane.add(buildResetComponent());
 		add(headPane);
@@ -88,18 +89,21 @@ public class ElkLogPreferencesPanel extends ElkPanel {
 	}
 
 	private Component buildLogLevelComponent(Level logLevel) {
-		JPanel logLevelPane = new JPanel();
-		logLevelPane
-				.setLayout(new BoxLayout(logLevelPane, BoxLayout.LINE_AXIS));
+		JPanel pane = new JPanel();
+		pane.setLayout(new BoxLayout(pane, BoxLayout.LINE_AXIS));
 		JLabel label = new JLabel("Log level:");
 		logLevelList_ = new JComboBox(LOG_LEVELS_);
 		logLevelList_.setSelectedItem(logLevel);
 		logLevelList_.setMaximumSize(logLevelList_.getPreferredSize());
-		logLevelPane.add(label);
-		logLevelPane.add(Box.createRigidArea(new Dimension(10, 0)));
-		logLevelPane.add(logLevelList_);
+		String tooltip = "Only log messages with the chosen level or above will be printed.";
+		logLevelList_.setToolTipText(tooltip);
+		pane.setToolTipText(tooltip);
+		pane.add(label);
+		pane.add(Box.createRigidArea(new Dimension(10, 0)));
+		pane.add(logLevelList_);
+		pane.setToolTipText(tooltip);
 
-		return logLevelPane;
+		return pane;
 	}
 
 	private Component buildBufferSizeComponent(int bufferSize) {
@@ -113,7 +117,7 @@ public class ElkLogPreferencesPanel extends ElkPanel {
 		pane.add(Box.createRigidArea(new Dimension(10, 0)));
 		pane.add(spinner);
 		label.setLabelFor(spinner);
-		String tooltip = "The maximal number of last log messages saved.";
+		String tooltip = "The maximal number of log messages displayed.";
 		pane.setToolTipText(tooltip);
 		spinner.setToolTipText(tooltip);
 		pane.setAlignmentX(LEFT_ALIGNMENT);
@@ -138,6 +142,7 @@ public class ElkLogPreferencesPanel extends ElkPanel {
 
 	private Component buildLogComponent() {
 		logTextArea_ = new JTextArea(25, 50);
+		logTextArea_.setFont(new Font("monospaced", Font.PLAIN, 12));
 		JScrollPane scrollPane = new JScrollPane(logTextArea_);
 		logTextArea_.setEditable(false);
 		ElkProtegeLogAppender elkLog = ElkProtegeLogAppender.getInstance();

@@ -25,6 +25,7 @@ package org.semanticweb.elk.protege.ui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +40,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
 
 import org.semanticweb.elk.protege.ProtegeSuppressedMessages;
 import org.semanticweb.elk.protege.preferences.ElkWarningPreferences;
@@ -50,6 +52,12 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 	private WarningTableModel warningTypes_;
 	private ListSelectionModel warningSelection_;
 	private JCheckBox suppressAllWarningsCheckbox_;
+
+	private static final String[] COLUMN_NAMES_ = { "Suppressed warning types",
+			"counts" };
+	private static final String[] COLUMN_TOOLTIPS_ = {
+			"Messages for these warning types will not be displayed",
+			"The number of warning messages suppressed in this session" };
 
 	@Override
 	public ElkWarningPreferencesPanel initialize() {
@@ -79,7 +87,22 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 		ProtegeSuppressedMessages suppressedMessages = ProtegeSuppressedMessages
 				.getInstance().reload();
 		warningTypes_ = new WarningTableModel();
-		JTable table = new JTable(warningTypes_);
+		JTable table = new JTable(warningTypes_) {
+			// Implement table header tool tips.
+			@Override
+			protected JTableHeader createDefaultTableHeader() {
+				return new JTableHeader(columnModel) {
+					@Override
+					public String getToolTipText(MouseEvent e) {
+						java.awt.Point p = e.getPoint();
+						int index = columnModel.getColumnIndexAtX(p.x);
+						int realIndex = columnModel.getColumn(index)
+								.getModelIndex();
+						return COLUMN_TOOLTIPS_[realIndex];
+					}
+				};
+			}
+		};
 		warningSelection_ = table.getSelectionModel();
 		table.getColumnModel().getColumn(1).setMaxWidth(50);
 		for (String warningType : suppressedWarningTypes) {
@@ -104,6 +127,7 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 			}
 		});
 		clearButton.setText("Clear");
+		clearButton.setToolTipText("Remove all suppressed warning types");
 		JButton removeButton = new JButton(new AbstractAction() {
 			private static final long serialVersionUID = 7125300829305229857L;
 
@@ -113,6 +137,8 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 			}
 		});
 		removeButton.setText("Remove selected");
+		removeButton
+				.setToolTipText("Remove all selected suppressed warning types");
 		JButton resetCountsButton = new JButton(new AbstractAction() {
 			private static final long serialVersionUID = 7918203938390550678L;
 
@@ -122,6 +148,8 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 			}
 		});
 		resetCountsButton.setText("Reset counters");
+		resetCountsButton
+				.setToolTipText("Sets the values of all counters to 0");
 		buttonPane.add(clearButton);
 		buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
 		buttonPane.add(removeButton);
@@ -148,9 +176,6 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 	private static class WarningTableModel extends AbstractTableModel {
 
 		private static final long serialVersionUID = -384343581021434074L;
-
-		private static final String[] COLUMN_NAMES_ = {
-				"Supprssed warning types", "counts" };
 
 		private final List<String> warningTypes_ = new ArrayList<String>();
 
@@ -205,6 +230,7 @@ public class ElkWarningPreferencesPanel extends ElkPanel {
 			return COLUMN_NAMES_[col];
 		}
 
+		@Override
 		public Class<?> getColumnClass(int col) {
 			switch (col) {
 			case 0:
