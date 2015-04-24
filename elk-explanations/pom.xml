@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<parent>
 		<artifactId>elk-parent</artifactId>
 		<groupId>org.semanticweb.elk</groupId>
 		<version>0.5.0-SNAPSHOT</version>
 	</parent>
-	
-  <artifactId>elk-explanations</artifactId>
+
+	<artifactId>elk-explanations</artifactId>
 	<packaging>bundle</packaging>
 
 	<name>Explanation Workbench</name>
 	<description>A plug-in that adds explanation facilities to the Protege Desktop ontology editor</description>
 	<url>http://owl.cs.manchester.ac.uk/explanation</url>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<log4j.lower.version>1.2</log4j.lower.version>
 		<log4j.upper.version>2</log4j.upper.version>
+		<protege.lower.version>4.2</protege.lower.version>
+		<protege.upper.version>6</protege.upper.version>
 	</properties>
 
 	<developers>
@@ -27,30 +30,33 @@
 			<email>matthew.horridge@stanford.edu</email>
 		</developer>
 	</developers>
-	
-    <repositories>
-      <repository>
-        <id>github</id>
-        <url>https://github.com/protegeproject/mvn-repo/raw/master/releases</url>
-      </repository>
-    </repositories>
-    
+
+	<repositories>
+		<repository>
+			<id>github</id>
+			<url>https://github.com/protegeproject/mvn-repo/raw/master/releases</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
-        <dependency>
+		<dependency>
 			<groupId>edu.stanford.protege</groupId>
 			<artifactId>org.protege.common</artifactId>
-			<version>4.3.0</version>
-        </dependency>
-        <dependency>
+			<version>${protege.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>edu.stanford.protege</groupId>
 			<artifactId>org.protege.editor.core.application</artifactId>
-			<version>4.3.0</version>
-        </dependency>
-        <dependency>
+			<version>${protege.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>edu.stanford.protege</groupId>
 			<artifactId>org.protege.editor.owl</artifactId>
-			<version>4.3.0</version>
-        </dependency>
+			<version>${protege.version}</version>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.semanticweb.owl</groupId>
 			<artifactId>explanation</artifactId>
@@ -60,103 +66,145 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>owlapi-proofs</artifactId>
 			<version>${project.version}</version>
-		</dependency>	
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>owlapi-proofs</artifactId>
 			<version>${project.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
+			<scope>provided</scope>
 		</dependency>
-		<dependency> 
-     	<groupId>org.slf4j</groupId>
-     	<artifactId>slf4j-api</artifactId>
-   	</dependency>
-   		<dependency> 
-     		<groupId>org.slf4j</groupId>
-     		<artifactId>slf4j-log4j12</artifactId>
-   		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
-	
+
 	<build>
 		<plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <version>3.0</version>
-              <configuration>
-                <source>1.6</source>
-                <target>1.6</target>
-              </configuration>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
 
-            <plugin>
+			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.3.7</version>
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
-						<Bundle-ClassPath>., {maven-dependencies}</Bundle-ClassPath>
 						<Bundle-SymbolicName>org.semanticweb.owl.proofs;singleton:=true</Bundle-SymbolicName>
 						<Bundle-Vendor>University of Ulm</Bundle-Vendor>
 						<Embed-Dependency>explanation</Embed-Dependency>
 						<Import-Package>
-							org.eclipse.core.runtime;registry=split, 
-							org.protege.editor.core.*;version="4.3", <!-- equivalent to [4.3,infinity) -->
-							org.protege.editor.owl.*;version="4.3",
+							!org.slf4j.*,
+							org.eclipse.core.runtime;registry=split,
+							org.protege.editor.*;version="[${protege.lower.version},${protege.upper.version})",
 							org.apache.log4j.*;version="[${log4j.lower.version},${log4j.upper.version})",
 							org.semanticweb.owlapitools.*="0.4",
 							*
 						</Import-Package>
-						<Private-Package>org.slf4j.*;-split-package:=merge-first</Private-Package>						
-						<Include-Resource>plugin.xml, {maven-resources}</Include-Resource>
+						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
+						<Embed-Dependency>*;scope=!provided|test;scope=compile|runtime;groupId=!net.sourceforge.owlapi|org.apache.felix|log4j;inline=false</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Directory>target/dependency</Embed-Directory>
+						<Embed-StripGroup>true</Embed-StripGroup>
 					</instructions>
 					<executions>
 						<execution>
 							<id>bundle-manifest</id>
 							<phase>install</phase>
-							<goals>    
+							<goals>
 								<goal>manifest</goal>
-							</goals>   
-					</execution>
-                </executions>
-              </configuration>
-            </plugin>
-
-
-			<!-- plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<version>2.10</version>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.semanticweb.elk</groupId>
-									<artifactId>elk-explanations</artifactId>
-									<version>0.5.0-SNAPSHOT</version>
-									<type>jar</type>
-								</artifactItem>
-							</artifactItems>
-							<outputDirectory>/home/pavel/ulm/java/protege/protege-distribution/target/protege-distribution-5.0.0-beta-16-SNAPSHOT-bin/Protege_5.0_beta/plugins/</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin-->
-            
+							</goals>
+						</execution>
+					</executions>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<!-- with this profile put META-INF/MANIFEST.MF, plugin.xml, and embed 
+				dependencies so that Eclipse/PDE can find them; to use in Eclipse right click 
+				on the project > Configure > Convert to Plug-in Projects... -->
+			<id>eclipse</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>2.7</version>
+						<executions>
+							<execution>
+								<id>copy-resources</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${basedir}</outputDirectory>
+									<resources>
+										<resource>
+											<directory>src/main/resources</directory>
+											<includes>
+												<include>plugin.xml</include>
+											</includes>
+											<filtering>true</filtering>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.felix</groupId>
+						<artifactId>maven-bundle-plugin</artifactId>
+						<extensions>true</extensions>
+						<configuration>
+							<manifestLocation>META-INF</manifestLocation>
+						</configuration>
+					</plugin>
+					<plugin>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-dependencies</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<excludeScope>provided</excludeScope>
+							<excludeGroupIds>net.sourceforge.owlapi,org.apache.felix,log4j</excludeGroupIds>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 </project>

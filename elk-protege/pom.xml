@@ -108,9 +108,21 @@
 						<Implementation-Title>ELK Reasoner</Implementation-Title>
 						<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
 						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
-						<Export-Package>!org.semanticweb.elk.*,org.semanticweb.elk.protege;org.semanticweb.elk.protege.ui;org.semanticweb.owlapitools.proofs.*</Export-Package>
-						<Import-Package>!com.sun.*,!org.semanticweb.elk.*,!org.slf4j.*,org.apache.log4j.*;version="[${log4j.lower.version},${log4j.upper.version})",
-							org.protege.*;version="[${protege.lower.version},${protege.upper.version})",*</Import-Package>
+						<Export-Package>
+							!org.semanticweb.elk.*,
+							org.semanticweb.elk.protege,
+							org.semanticweb.elk.protege.ui</Export-Package>
+						<_exportcontents>
+							org.semanticweb.owlapitools.proofs.*
+						</_exportcontents>
+						<Import-Package>
+							!com.sun.*,
+							!org.semanticweb.elk.*,
+							!org.slf4j.*,
+							org.apache.log4j.*;version="[${log4j.lower.version},${log4j.upper.version})",
+							org.protege.*;version="[${protege.lower.version},${protege.upper.version})",
+							*
+						</Import-Package>
 						<Bundle-Activator>org.protege.editor.core.plugin.DefaultPluginActivator</Bundle-Activator>
 						<Embed-Dependency>*;scope=!provided;scope=compile|runtime;groupId=!net.sourceforge.owlapi|org.apache.felix|log4j;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
@@ -130,17 +142,32 @@
 				on the project > Configure > Convert to Plug-in Projects... -->
 			<id>eclipse</id>
 			<build>
-				<resources>
-					<resource>
-						<directory>${basedir}/src/main/resources</directory>
-						<includes>
-							<include>plugin.xml</include>
-						</includes>
-						<filtering>true</filtering>
-						<targetPath>${basedir}</targetPath>
-					</resource>
-				</resources>
 				<plugins>
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>2.7</version>
+						<executions>
+							<execution>
+								<id>copy-resources</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${basedir}</outputDirectory>
+									<resources>
+										<resource>
+											<directory>src/main/resources</directory>
+											<includes>
+												<include>plugin.xml</include>
+											</includes>
+											<filtering>true</filtering>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 					<plugin>
 						<groupId>org.apache.felix</groupId>
 						<artifactId>maven-bundle-plugin</artifactId>

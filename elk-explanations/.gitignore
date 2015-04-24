@@ -1,1 +1,3 @@
 target/
+/META-INF/
+/plugin.xml
