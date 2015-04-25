@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -78,8 +77,8 @@ public class ProofTestUtils {
 				List<MockOWLAxiomExpression> premises = new ArrayList<MockOWLAxiomExpression>(numOfPremises);
 				
 				for (int j = 0; j < numOfPremises; j++) {
-					OWLClass sub = FACTORY.getOWLClass(IRI.create("http://random.org/" + UUID.randomUUID().toString().substring(0, 4)));
-					OWLClass sup = FACTORY.getOWLClass(IRI.create("http://random.org/" + UUID.randomUUID().toString().substring(0, 4)));
+					OWLClass sub = FACTORY.getOWLClass(IRI.create("http://random.org/" + randomString(rnd, 4)));
+					OWLClass sup = FACTORY.getOWLClass(IRI.create("http://random.org/" + randomString(rnd, 4)));
 					MockOWLAxiomExpression premise = new MockOWLAxiomExpression(FACTORY.getOWLSubClassOfAxiom(sub, sup), false);
 					
 					premises.add(premise);
@@ -100,12 +99,23 @@ public class ProofTestUtils {
 		return root;
 	}
 	
+	private static String randomString(Random rnd, int len) {
+		StringBuilder builder = new StringBuilder(len);
+		String alphabet = "abc1de2fg3hi4jk5lmn6opq7rs8tuv9wx0yz";
+		
+		for (int i = 0; i < len; i++) {
+			builder.append(alphabet.charAt(rnd.nextInt(alphabet.length())));
+		}
+			
+		return builder.toString();
+	}
+
 	private static OWLClass clazz(String suffix) {
 		return FACTORY.getOWLClass(IRI.create(PREFIX + suffix));
 	}
 	
-	public static OWLExpression pickRandomExpression(OWLExpression root, Random rnd) throws ProofGenerationException {
-		// traverses the tree twice, probably slow but should be OK for testing
+	public static OWLExpression pickRandomExpression(final OWLExpression root, final Random rnd) throws ProofGenerationException {
+		/*// traverses the tree twice, probably slow but should be OK for testing
 		int size = getProofGraphSize(root);
 		
 		if (size <= 1) {
@@ -134,6 +144,43 @@ public class ProofTestUtils {
 			@Override
 			public Void visit(OWLLemmaExpression expression) {
 				counter.incrementAndGet();
+				return null;
+			}
+			
+		});
+		
+		return ref.get();*/
+		
+		if (!root.getInferences().iterator().hasNext()) {
+			// never pick the root
+			return null;
+		}
+		
+		final AtomicInteger counter = new AtomicInteger(0);
+		final AtomicReference<OWLExpression> ref = new AtomicReference<OWLExpression>();
+		
+		OWLProofUtils.visitExpressionsInProofGraph(root, new OWLExpressionVisitor<Void>() {
+
+			@Override
+			public Void visit(OWLAxiomExpression expression) {
+				int cnt = counter.incrementAndGet();
+				
+				if (ref.get() == null) {
+					ref.set(expression);
+				}
+				else {
+					double chance = 1d / cnt;
+					
+					if (chance > rnd.nextDouble()) {
+						ref.set(expression);
+					}
+				}
+				
+				return null;
+			}
+
+			@Override
+			public Void visit(OWLLemmaExpression expression) {
 				return null;
 			}
 			

@@ -68,7 +68,7 @@ import org.semanticweb.owlapitools.proofs.util.OWLProofUtils;
  *
  */
 public class UpdateProofModelTest {
-
+	
 	@Test
 	public void noLongerEntailed() throws ProofGenerationException {
 		OWLAxiom aSubC = FACTORY.getOWLSubClassOfAxiom(A, C);
@@ -111,7 +111,7 @@ public class UpdateProofModelTest {
 		
 		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
 		
-		ProofFrame frame = new ProofFrame(new CycleFreeProofRoot(root, iGraph), new TestOWLRenderer(), null, "test");
+		ProofFrame frame = new ProofFrame(new CycleFreeProofRoot(root, iGraph), new TestOWLRenderer(), null, "Proof frame");
 		ProofFrameSection header = (ProofFrameSection) frame.getFrameSections().get(0);
 		// A <= C is entailed
 		assertEquals(1, header.getRows().size());
@@ -137,17 +137,18 @@ public class UpdateProofModelTest {
 	
 	@Test
 	public void randomDeletions() throws Exception {
-		long seed = System.currentTimeMillis();//123;
+		long seed = System.currentTimeMillis();
 		Random rnd = new Random(seed);
 		// first generate some random proofs (return the root)
-		OWLAxiomExpression root = ProofTestUtils.generateRandomProofGraph(rnd, 3, 3, 100);
-		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
+		OWLAxiomExpression rootExpr = ProofTestUtils.generateRandomProofGraph(rnd, 3, 3, 100);
+		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(rootExpr);
+		CycleFreeProofRoot root = new CycleFreeProofRoot(rootExpr, iGraph);
 		
-		System.err.println(OWLProofUtils.printProofTree(root));
+		//System.err.println(OWLProofUtils.printProofTree(root));
 		
 		ProofFrame frame = createProofModel(root);
 		
-		System.err.println(printProofModel(frame.getRootSection()));
+		//System.err.println(printProofModel(frame.getRootSection()));
 
 		// randomly pick and delete expressions and check that the proof model and the GUI model remain in sync 
 		for (;;) {
@@ -158,27 +159,29 @@ public class UpdateProofModelTest {
 				return;
 			}
 			
-			System.err.println("Deleting " + toDelete);
-			// blocking the expression in the proof model
-			root = new CycleFreeProofRoot(root, iGraph).blockExpression(toDelete);
+			//System.err.println("Deleting " + toDelete);
 			
-			System.err.println(OWLProofUtils.printProofTree(root));
+			// blocking the expression in the proof model
+			root = root.blockExpression(toDelete);
+			
+			//System.err.println(OWLProofUtils.printProofTree(root));
 			// now blocking it in the GUI model
 			frame.blockInferencesForPremise(toDelete);
 			
-			System.err.println(printProofModel(frame.getRootSection()));
+			//System.err.println(printProofModel(frame.getRootSection()));
 			
 			if (!root.getInferences().iterator().hasNext()) {
 				// finishing when the root is no longer entailed
 				break;
 			}
 			
-			assertMatch(root, (ProofFrameSectionRow) frame.getRootSection().getRows().get(0));
+			assertTrue("Failure for seed " + seed, frame.getRootSection().getRows().size() > 0);
+			assertMatch("Failure for seed " + seed, root, (ProofFrameSectionRow) frame.getRootSection().getRows().get(0));
 		}
 	}
 	
 	@Test
-	public void randomChanges() throws Exception {
+	public void randomAdditions() throws Exception {
 		final int ADDITION_NO = 10;
 		long seed = 123;
 		Random rnd = new Random(seed);
@@ -186,11 +189,11 @@ public class UpdateProofModelTest {
 		OWLAxiomExpression root = ProofTestUtils.generateRandomProofGraph(rnd, 3, 3, 10);
 		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
 		
-		System.err.println(OWLProofUtils.printProofTree(root));
+		//System.err.println(OWLProofUtils.printProofTree(root));
 		
 		ProofFrame frame = createProofModel(root);
 		
-		System.err.println(printProofModel(frame.getRootSection()));
+		//System.err.println(printProofModel(frame.getRootSection()));
 
 		for (int i = 0; i < ADDITION_NO; i++) {
 			MockOWLAxiomExpression derived = (MockOWLAxiomExpression) ProofTestUtils.pickRandomExpression(root, rnd);
@@ -226,25 +229,25 @@ public class UpdateProofModelTest {
 			
 			derived.addInference(inf);
 			
-			System.err.println("Adding inference " + inf);
+			//System.err.println("Adding inference " + inf);
 			
 			iGraph = OWLProofUtils.computeInferenceGraph(root);
 			
 			CycleFreeProofRoot newRoot = new CycleFreeProofRoot(root, iGraph);
 			
-			System.err.println(OWLProofUtils.printProofTree(newRoot));
+			//System.err.println(OWLProofUtils.printProofTree(newRoot));
 			// refreshing the GUI's model. The root object is the same but the proof model has changed
 			frame.setRootObject(newRoot);
 			
-			System.err.println(printProofModel(frame.getRootSection()));
+			//System.err.println(printProofModel(frame.getRootSection()));
 			
-			assertMatch(newRoot, (ProofFrameSectionRow) frame.getRootSection().getRows().get(0));
+			assertMatch("failure for seed " + seed, newRoot, (ProofFrameSectionRow) frame.getRootSection().getRows().get(0));
 		}
 	}
 	
 	ProofFrame createProofModel(OWLAxiomExpression root) throws ProofGenerationException {
 		OWLInferenceGraph iGraph = OWLProofUtils.computeInferenceGraph(root);
-		ProofFrame frame = new ProofFrame(new CycleFreeProofRoot(root, iGraph), new TestOWLRenderer(), null, "test");
+		ProofFrame frame = new ProofFrame(new CycleFreeProofRoot(root, iGraph), new TestOWLRenderer(), null, "Proof frame");
 		ProofFrameSection header = (ProofFrameSection) frame.getFrameSections().get(0);
 		Queue<ProofFrameSection> toDo = new ArrayDeque<ProofFrameSection>();
 		
@@ -303,8 +306,8 @@ public class UpdateProofModelTest {
 		}
 	}
 	
-	void assertMatch(OWLExpression rootExpression, ProofFrameSectionRow rootRow) throws ProofGenerationException {
-		assertTrue("row for " + rootRow + " does not match the expression " + rootExpression, rootRow.match(rootExpression));
+	void assertMatch(String err, OWLExpression rootExpression, ProofFrameSectionRow rootRow) throws ProofGenerationException {
+		assertTrue("row for " + rootRow + " does not match the expression " + rootExpression + ", "+ err, rootRow.match(rootExpression));
 		
 		if (!rootRow.isExpanded()) {
 			return;
@@ -326,14 +329,14 @@ public class UpdateProofModelTest {
 				
 				OWLExpression premise = premiseIter.next();
 				
-				assertMatch(premise, row);
+				assertMatch(err, premise, row);
 			}
 		}
 		
 		for (OWLInference inf : rootExpression.getInferences()) {
 			ProofFrameSection section = rootRow.findSection(inf);
 			
-			assertNotNull("No matching section for " + inf, section);
+			assertNotNull("No matching section for " + inf + ", " + err, section);
 		}
 	}
 

@@ -148,7 +148,7 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
 
 	public void update(OWLExpression expression) {
 		//FIXME
-		System.err.println("Updating row " + toString());
+		//System.err.println("Updating row " + toString());
 		
 		expression_ = expression;
 		
@@ -169,7 +169,7 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
 					newSections.add(section);
 					
 					//FIXME
-					System.err.println("Adding section:" + section);
+					//System.err.println("Adding section:" + section);
 				}
 				else {
 					// update the section
@@ -181,7 +181,7 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
 			
 			//removing sections for which there are no more inferences
 			//FIXME
-			System.err.println("Removing sections:\n" + sectionsCopy);
+			//System.err.println("Removing sections:\n" + sectionsCopy);
 			
 			inferenceSections_.removeAll(sectionsCopy);
 			
