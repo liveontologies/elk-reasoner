@@ -92,18 +92,7 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
     
 	public void blockInferencesForPremise(OWLExpression premise) {
 		CycleFreeProofRoot root = getRootObject();
-		
 		CycleFreeProofRoot updatedRoot = root.blockExpression(premise);
-		
-		//FIXME
-		/*System.err.println("Blocked " + premise + ", root replaced, remaining inferences:");
-		try {
-			for (OWLInference inf : updatedRoot.getInferences()) {
-				System.err.println(inf);
-			}
-		} catch (ProofGenerationException e) {
-			e.printStackTrace();
-		}*/
 		// this will update the hierarchical model (sections and rows)		
 		setRootObject(updatedRoot);
 	}

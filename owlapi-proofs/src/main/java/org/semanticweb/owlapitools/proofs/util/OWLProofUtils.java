@@ -94,8 +94,6 @@ public class OWLProofUtils {
 			for (OWLInference inf : next.getInferences()) {
 				graph.addInference(inf);
 				// Recursively unwind premise inferences
-				//Set<OWLExpression> uniquePremises = new HashSet<OWLExpression>(inf.getPremises()); 
-				
 				for (OWLExpression premise : inf.getPremises()) {
 					
 					if (done.add(premise)) {
@@ -109,54 +107,6 @@ public class OWLProofUtils {
 	}
 	
 	public static String printProofTree(OWLExpression root) throws ProofGenerationException {
-		/*class ExprIndent {
-			private final OWLExpression expression;
-			private final int indent;
-			
-			ExprIndent(OWLExpression e, int i) {
-				expression = e;
-				indent = i;
-			}
-		}
-		
-		StringBuilder builder = new StringBuilder();
-		Queue<ExprIndent> toDo = new ArrayDeque<ExprIndent>();
-		Set<OWLExpression> done = new HashSet<OWLExpression>();
-		
-		toDo.add(new ExprIndent(root, 0));
-		
-		for (;;) {
-			ExprIndent next = toDo.poll();
-			
-			if (next == null) {
-				break;
-			}
-			
-			for (int i = 0; i < next.indent; i++) {
-				builder.append("   ");
-			}
-			
-			builder.append(next.expression).append('\n');
-			
-			if (!done.add(next.expression)) {
-				continue;
-			}
-			
-			for (OWLInference inf : next.expression.getInferences()) {
-				for (int i = 0; i < next.indent + 1; i++) {
-					builder.append("   ");
-				}
-				
-				builder.append(inf.getName()).append('\n');
-				
-				for (OWLExpression premise : inf.getPremises()) {
-					toDo.add(new ExprIndent(premise, next.indent + 2));
-				}
-			}
-		}
-		
-		return builder.toString();*/
-		
 		StringBuilder builder = new StringBuilder();
 		Set<OWLExpression> done = new HashSet<OWLExpression>();
 		

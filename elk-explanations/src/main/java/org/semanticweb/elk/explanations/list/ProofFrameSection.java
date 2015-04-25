@@ -94,7 +94,7 @@ public class ProofFrameSection implements OWLFrameSection<OWLExpression, OWLAxio
 
     void update(Iterable<? extends OWLExpression> newExpressions) {
     	//FIXME
-		System.err.println("Updating section " + toString());
+		//System.err.println("Updating section " + toString());
     	
     	expressions_ = newExpressions;
     	
@@ -107,7 +107,7 @@ public class ProofFrameSection implements OWLFrameSection<OWLExpression, OWLAxio
     			row = new ProofFrameSectionRow(this, expr, OWLProofUtils.getAxiom(expr), depth_, renderer_);
     			
     			//FIXME
-    			System.err.println("Row added " + row.getRoot());
+    			//System.err.println("Row added " + row.getRoot());
     			
                 rows_.add(row);
     		}
@@ -126,7 +126,7 @@ public class ProofFrameSection implements OWLFrameSection<OWLExpression, OWLAxio
     		if (findExpression(row.getRoot(), newExpressions) == null) {
     			
     			//FIXME
-    			System.err.println("Row removed " + row.getRoot());    			
+    			//System.err.println("Row removed " + row.getRoot());    			
     			
     			rowIter.remove();
     		}
