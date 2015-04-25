@@ -12,9 +12,8 @@
 	<artifactId>elk-explanations</artifactId>
 	<packaging>bundle</packaging>
 
-	<name>Explanation Workbench</name>
-	<description>A plug-in that adds explanation facilities to the Protege Desktop ontology editor</description>
-	<url>http://owl.cs.manchester.ac.uk/explanation</url>
+	<name>Proof-Based Explanations</name>
+	<description>A Protege plug-in for displaying proofs for entailed axioms</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,20 +22,6 @@
 		<protege.lower.version>4.2</protege.lower.version>
 		<protege.upper.version>6</protege.upper.version>
 	</properties>
-
-	<developers>
-		<developer>
-			<name>Matthew Horridge</name>
-			<email>matthew.horridge@stanford.edu</email>
-		</developer>
-	</developers>
-
-	<repositories>
-		<repository>
-			<id>github</id>
-			<url>https://github.com/protegeproject/mvn-repo/raw/master/releases</url>
-		</repository>
-	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -56,11 +41,6 @@
 			<artifactId>org.protege.editor.owl</artifactId>
 			<version>${protege.version}</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.semanticweb.owl</groupId>
-			<artifactId>explanation</artifactId>
-			<version>3.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

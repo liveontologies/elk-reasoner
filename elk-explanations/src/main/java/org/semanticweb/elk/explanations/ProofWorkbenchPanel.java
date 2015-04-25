@@ -1,4 +1,5 @@
 package org.semanticweb.elk.explanations;
+
 /*
  * #%L
  * Explanation Workbench
@@ -41,9 +42,9 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.protege.editor.owl.model.inference.ReasonerStatus;
-import org.semanticweb.owl.explanation.api.ExplanationException;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
+
 /*
  * Copyright (C) 2008, University of Manchester
  *
@@ -67,215 +68,213 @@ import org.semanticweb.owlapitools.proofs.util.CycleFreeProofRoot;
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
 /**
  * 
- * @author	Pavel Klinov
- * 			pavel.klinov@uni-ulm.de
+ * @author Pavel Klinov pavel.klinov@uni-ulm.de
  *
  */
 @SuppressWarnings("serial")
-public class ProofWorkbenchPanel extends JPanel implements Disposable, OWLModelManagerListener {
+public class ProofWorkbenchPanel extends JPanel implements Disposable,
+		OWLModelManagerListener {
 
-    private final OWLEditorKit editorKit;
+	private final OWLEditorKit editorKit;
 
-    private final JComponent explanationDisplayHolder;
+	private final JComponent explanationDisplayHolder;
 
-    private final JScrollPane scrollPane;
+	private final JScrollPane scrollPane;
 
-    private ProofFrameExplanationDisplay proofDisplay = null; 
+	private ProofFrameExplanationDisplay proofDisplay = null;
 
-    private final WorkbenchManager workbenchManager;
+	private final WorkbenchManager workbenchManager;
 
-    // proof workbench panel for subsumption
-    public ProofWorkbenchPanel(OWLEditorKit ek, OWLAxiom entailment) {
-    	this(ek, new WorkbenchManager(ProofManager.getExplanationManager(ek.getOWLModelManager()), entailment));
-    }
-    
-    // proof workbench panel for inconsistency
-    public ProofWorkbenchPanel(OWLEditorKit ek) {
-    	this(ek, new WorkbenchManager(ProofManager.getExplanationManager(ek.getOWLModelManager())));
-    }
-    
-    private ProofWorkbenchPanel(OWLEditorKit ek, WorkbenchManager wbManager) {
-        this.editorKit = ek;
-        this.workbenchManager = wbManager;
-        
-        setLayout(new BorderLayout());
-        editorKit.getModelManager().addListener(this);
-        explanationDisplayHolder = new Box(BoxLayout.Y_AXIS);
+	// proof workbench panel for subsumption
+	public ProofWorkbenchPanel(OWLEditorKit ek, OWLAxiom entailment) {
+		this(ek, new WorkbenchManager(ProofManager.getExplanationManager(ek
+				.getOWLModelManager()), entailment));
+	}
 
-        JPanel pan = new HolderPanel(new BorderLayout());
-        pan.add(explanationDisplayHolder, BorderLayout.NORTH);
-        scrollPane = new JScrollPane(pan);
-        scrollPane.setBorder(null);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.getViewport().setBackground(null);
-        scrollPane.setOpaque(false);
+	// proof workbench panel for inconsistency
+	public ProofWorkbenchPanel(OWLEditorKit ek) {
+		this(ek, new WorkbenchManager(ProofManager.getExplanationManager(ek
+				.getOWLModelManager())));
+	}
 
+	private ProofWorkbenchPanel(OWLEditorKit ek, WorkbenchManager wbManager) {
+		this.editorKit = ek;
+		this.workbenchManager = wbManager;
 
-        JPanel rhsPanel = new JPanel(new BorderLayout(7, 7));
-        JPanel explanationListPanel = new JPanel(new BorderLayout());
-        explanationListPanel.add(scrollPane);
-        explanationListPanel.setMinimumSize(new Dimension(10, 10));
+		setLayout(new BorderLayout());
+		editorKit.getModelManager().addListener(this);
+		explanationDisplayHolder = new Box(BoxLayout.Y_AXIS);
 
+		JPanel pan = new HolderPanel(new BorderLayout());
+		pan.add(explanationDisplayHolder, BorderLayout.NORTH);
+		scrollPane = new JScrollPane(pan);
+		scrollPane.setBorder(null);
+		scrollPane.getViewport().setOpaque(false);
+		scrollPane.getViewport().setBackground(null);
+		scrollPane.setOpaque(false);
 
-        JComponent headerPanel = createHeaderPanel();
-        JPanel headerPanelHolder = new JPanel(new BorderLayout());
-        headerPanelHolder.add(headerPanel, BorderLayout.WEST);
-        explanationListPanel.add(headerPanelHolder, BorderLayout.NORTH);
+		JPanel rhsPanel = new JPanel(new BorderLayout(7, 7));
+		JPanel explanationListPanel = new JPanel(new BorderLayout());
+		explanationListPanel.add(scrollPane);
+		explanationListPanel.setMinimumSize(new Dimension(10, 10));
 
-        rhsPanel.add(explanationListPanel);
-        add(rhsPanel);
+		JComponent headerPanel = createHeaderPanel();
+		JPanel headerPanelHolder = new JPanel(new BorderLayout());
+		headerPanelHolder.add(headerPanel, BorderLayout.WEST);
+		explanationListPanel.add(headerPanelHolder, BorderLayout.NORTH);
 
-        refill();
-    }
+		rhsPanel.add(explanationListPanel);
+		add(rhsPanel);
 
-    private JComponent createHeaderPanel() {
-        GridBagLayout layout = new GridBagLayout();
-        JComponent headerPanel = new JPanel(layout);
+		refill();
+	}
 
-        return headerPanel;
-    }
+	private JComponent createHeaderPanel() {
+		GridBagLayout layout = new GridBagLayout();
+		JComponent headerPanel = new JPanel(layout);
 
+		return headerPanel;
+	}
 
-    public Dimension getMinimumSize() {
-        return new Dimension(10, 10);
-    }
+	public Dimension getMinimumSize() {
+		return new Dimension(10, 10);
+	}
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	private class HolderPanel extends JPanel implements Scrollable {
 
-    private class HolderPanel extends JPanel implements Scrollable {
+		public HolderPanel(LayoutManager layout) {
+			super(layout);
+			setOpaque(false);
+		}
 
-        public HolderPanel(LayoutManager layout) {
-            super(layout);
-            setOpaque(false);
-        }
+		public Dimension getPreferredScrollableViewportSize() {
+			return super.getPreferredSize();
+		}
 
+		public int getScrollableUnitIncrement(Rectangle visibleRect,
+				int orientation, int direction) {
+			return 30;
+		}
 
-        public Dimension getPreferredScrollableViewportSize() {
-            return super.getPreferredSize();
-        }
+		public int getScrollableBlockIncrement(Rectangle visibleRect,
+				int orientation, int direction) {
+			return 30;
+		}
 
+		public boolean getScrollableTracksViewportWidth() {
+			return true;
+		}
 
-        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return 30;
-        }
+		public boolean getScrollableTracksViewportHeight() {
+			return false;
+		}
+	}
 
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return 30;
-        }
+	public void selectionChanged() {
+		refill();
+	}
 
+	protected ProofFrameExplanationDisplay createProofExplanationDisplay(
+			CycleFreeProofRoot proofRoot, boolean allProofs, String displayTitle) {
+		return new ProofFrameExplanationDisplay(editorKit, proofRoot,
+				displayTitle, this);
+	}
 
-        public boolean getScrollableTracksViewportWidth() {
-            return true;
-        }
+	private void refill() {
+		try {
+			if (proofDisplay != null) {
+				proofDisplay.dispose();
+			}
 
+			explanationDisplayHolder.removeAll();
+			explanationDisplayHolder.validate();
 
-        public boolean getScrollableTracksViewportHeight() {
-            return false;
-        }
-    }
+			OWLAxiom entailment = workbenchManager.getEntailment();
+			ProofManager proofManager = workbenchManager.getProofManager();
 
+			proofDisplay = entailment == null ? createProofExplanationDisplay(
+					proofManager.getProofRootForInconsistency(), true,
+					ProofFrameExplanationDisplay.INCONSISTENCY_TITLE)
+					: createProofExplanationDisplay(
+							proofManager.getProofRoot(entailment), true,
+							ProofFrameExplanationDisplay.SUBSUMPTION_TITLE);
+			// GUI
+			ExplanationDisplayList list = new ExplanationDisplayList(editorKit,
+					workbenchManager, proofDisplay, 1);
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			list.setBorder(BorderFactory.createEmptyBorder(2, 0, 10, 0));
+			explanationDisplayHolder.add(list);
+			scrollPane.validate();
+		} catch (ExplanationException e) {
+			ProtegeApplication.getErrorLog().logError(e);
+		}
+	}
 
-    public void selectionChanged() {
-        refill();
-    }
+	public void updateProofRoot() {
+		OWLAxiom entailment = workbenchManager.getEntailment();
+		ProofManager proofManager = workbenchManager.getProofManager();
+		CycleFreeProofRoot root = entailment == null ? proofManager
+				.getProofRootForInconsistency() : proofManager
+				.getProofRoot(entailment);
 
-    protected ProofFrameExplanationDisplay createProofExplanationDisplay(CycleFreeProofRoot proofRoot, boolean allProofs, String displayTitle) {
-    	return new ProofFrameExplanationDisplay(editorKit, proofRoot, displayTitle, this);    	
-    }
+		proofDisplay.update(root);
+		scrollPane.validate();
+	}
 
-
-    private void refill() {
-        try {
-        	if (proofDisplay != null) {
-        		proofDisplay.dispose();
-        	}
-        	
-            explanationDisplayHolder.removeAll();
-            explanationDisplayHolder.validate();
-
-            OWLAxiom entailment = workbenchManager.getEntailment();
-            ProofManager proofManager = workbenchManager.getProofManager();
-            
-            proofDisplay = entailment == null 
-            				? createProofExplanationDisplay(proofManager.getProofRootForInconsistency(), true, ProofFrameExplanationDisplay.INCONSISTENCY_TITLE)
-            				: createProofExplanationDisplay(proofManager.getProofRoot(entailment), true, ProofFrameExplanationDisplay.SUBSUMPTION_TITLE);
-            //GUI
-            ExplanationDisplayList list = new ExplanationDisplayList(editorKit, workbenchManager, proofDisplay, 1);
-            
-            list.setBorder(BorderFactory.createEmptyBorder(2, 0, 10, 0));
-            explanationDisplayHolder.add(list);
-            scrollPane.validate();
-        }
-        catch (ExplanationException e) {
-            ProtegeApplication.getErrorLog().logError(e);
-        }
-    }
-    
-    public void updateProofRoot() {
-    	OWLAxiom entailment = workbenchManager.getEntailment();
-        ProofManager proofManager = workbenchManager.getProofManager();
-        CycleFreeProofRoot root = entailment == null ? proofManager.getProofRootForInconsistency() : proofManager.getProofRoot(entailment);
-        
-        proofDisplay.update(root);
-        scrollPane.validate();
-    }
-
-    @Override
-    public void dispose() {
+	@Override
+	public void dispose() {
 		// nice, but Protege won't call this because OWLModelManager.dispose()
 		// doesn't call dispose on ExplanationManager which would let all loaded
 		// explanation plugins dispose of their resources
-        editorKit.getModelManager().removeListener(this);
-        
-    	if (proofDisplay != null) {
-    		proofDisplay.dispose();
-    	}
-    }
-    
-    boolean isReasonerSynchronized() {
-    	return editorKit.getOWLModelManager().getOWLReasonerManager().getReasonerStatus() != ReasonerStatus.OUT_OF_SYNC;
-    }
+		editorKit.getModelManager().removeListener(this);
 
-    public void handleChange(OWLModelManagerChangeEvent event) {
-    	//System.err.println("Event received: " + event.getType());
-    	if (proofDisplay != null) {
-    		proofDisplay.setReasonerSynchronized(isReasonerSynchronized());
-    	}
-    	
-    	//System.err.println(event.getType());
-    	
-    	switch (event.getType()) {
+		if (proofDisplay != null) {
+			proofDisplay.dispose();
+		}
+	}
+
+	boolean isReasonerSynchronized() {
+		return editorKit.getOWLModelManager().getOWLReasonerManager()
+				.getReasonerStatus() != ReasonerStatus.OUT_OF_SYNC;
+	}
+
+	public void handleChange(OWLModelManagerChangeEvent event) {
+		// System.err.println("Event received: " + event.getType());
+		if (proofDisplay != null) {
+			proofDisplay.setReasonerSynchronized(isReasonerSynchronized());
+		}
+
+		// System.err.println(event.getType());
+
+		switch (event.getType()) {
 		case ONTOLOGY_CLASSIFIED:
 			// update the proof model
 			if (proofDisplay != null) {
 				updateProofRoot();
-			}
-			else {
+			} else {
 				refill();
 			}
-			
+
 			break;
-		// TODO handle also ontology change and reload events	
+		// TODO handle also ontology change and reload events
 		default:
 			break;
-		
+
 		}
-    }
+	}
 
-
-    @Override
-    public Dimension getPreferredSize() {
-        Dimension workspaceSize = editorKit.getWorkspace().getSize();
-        int width = (int) (workspaceSize.getWidth() * 0.8);
-        int height = (int) (workspaceSize.getHeight() * 0.7);
-        return new Dimension(width, height);
-    }
+	@Override
+	public Dimension getPreferredSize() {
+		Dimension workspaceSize = editorKit.getWorkspace().getSize();
+		int width = (int) (workspaceSize.getWidth() * 0.8);
+		int height = (int) (workspaceSize.getHeight() * 0.7);
+		return new Dimension(width, height);
+	}
 }
