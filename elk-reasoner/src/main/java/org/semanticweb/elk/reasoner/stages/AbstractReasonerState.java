@@ -553,6 +553,18 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 				classTaxonomyState.getTaxonomy()));
 	}
 
+	@Deprecated
+	public ElkPolarityExpressionConverter getExpressionConverter() {
+		return this.expressionConverter_;		
+	}	
+	
+	@Deprecated
+	public ElkSubObjectPropertyExpressionVisitor<? extends IndexedPropertyChain> getSubPropertyConverter() {
+		return this.subPropertyConverter_;		
+	}
+	
+	
+	
 	/*---------------------------------------------------
 	 * TRACING METHODS
 	 *---------------------------------------------------*/

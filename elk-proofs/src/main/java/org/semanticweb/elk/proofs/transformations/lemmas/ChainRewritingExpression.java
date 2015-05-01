@@ -30,9 +30,9 @@ import java.util.List;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
-import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
@@ -40,8 +40,8 @@ import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.ExpressionVisitor;
 import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
@@ -73,8 +73,8 @@ class ChainRewritingExpression implements AxiomExpression<ElkSubObjectPropertyOf
 	ChainRewritingExpression(AxiomExpression<ElkSubObjectPropertyOfAxiom> expr, 
 			ElkSubObjectPropertyOfAxiom targetAxiom, ReasonerInferenceReader reader) {
 		expr_ = expr;
-		indexedChainList_ = index(((ElkObjectPropertyChain) expr.getAxiom().getSubObjectPropertyExpression()).getObjectPropertyExpressions(), reader.getIndexer());
-		indexedTargetChainList_ = index(((ElkObjectPropertyChain) targetAxiom.getSubObjectPropertyExpression()).getObjectPropertyExpressions(), reader.getIndexer());
+		indexedChainList_ = index(((ElkObjectPropertyChain) expr.getAxiom().getSubObjectPropertyExpression()).getObjectPropertyExpressions(), reader.getExpressionConverter());
+		indexedTargetChainList_ = index(((ElkObjectPropertyChain) targetAxiom.getSubObjectPropertyExpression()).getObjectPropertyExpressions(), reader.getExpressionConverter());
 		reader_ = reader;
 	}
 	
@@ -92,8 +92,14 @@ class ChainRewritingExpression implements AxiomExpression<ElkSubObjectPropertyOf
 		return reader_.getExpressionFactory();
 	}
 	
-	private IndexObjectConverter getIndexer() {
-		return reader_.getIndexer();
+	@Deprecated
+	private ElkSubObjectPropertyExpressionVisitor<? extends IndexedPropertyChain> getSubPropertyConverter() {
+		return reader_.getSubPropertyConverter();
+	}
+	
+	@Deprecated
+	private ElkPolarityExpressionConverter getExpressionConverter() {
+		return reader_.getExpressionConverter();
 	}
 
 	
@@ -127,19 +133,19 @@ class ChainRewritingExpression implements AxiomExpression<ElkSubObjectPropertyOf
 		List<Inference> inferences = new ArrayList<Inference>();
 		
 		for (int index = indexedChain.size() - 2; index >=0; index--) {
-			IndexedBinaryPropertyChain subChain = (IndexedBinaryPropertyChain) binarize(indexedChain.subList(index,  indexedChain.size()));
-			Multimap<IndexedPropertyChain, ObjectPropertyInference> leftSuperChainToInferences = getSuperChainToInferencesMultimap(subChain.getLeftProperty());
-			Multimap<IndexedPropertyChain, ObjectPropertyInference> rightSuperChainToInferences = getSuperChainToInferencesMultimap(subChain.getRightProperty());
+			IndexedComplexPropertyChain subChain = (IndexedComplexPropertyChain) binarize(indexedChain.subList(index,  indexedChain.size()));
+			Multimap<IndexedPropertyChain, ObjectPropertyInference> leftSuperChainToInferences = getSuperChainToInferencesMultimap(subChain.getFirstProperty());
+			Multimap<IndexedPropertyChain, ObjectPropertyInference> rightSuperChainToInferences = getSuperChainToInferencesMultimap(subChain.getSuffixChain());
 			
 			for (IndexedPropertyChain leftSuperChain : leftSuperChainToInferences.keySet()) {
 				if (leftSuperChain instanceof IndexedObjectProperty) {
 					IndexedObjectProperty leftSuper = (IndexedObjectProperty) leftSuperChain;
 					// now leftSuper o subChain.getRight() is a superchain of subChain
-					if (!composable(leftSuper, subChain.getRightProperty())) {
+					if (!composable(leftSuper, subChain.getSuffixChain())) {
 						continue;
 					}
 					
-					IndexedBinaryPropertyChain superChain = compose(leftSuper, subChain.getRightProperty());
+					IndexedComplexPropertyChain superChain = compose(leftSuper, subChain.getSuffixChain());
 					Inference inf = createInference(subChain, superChain, index, leftSuperChainToInferences.get(leftSuper));
 					
 					if (inf != null) {
@@ -150,11 +156,11 @@ class ChainRewritingExpression implements AxiomExpression<ElkSubObjectPropertyOf
 			
 			for (IndexedPropertyChain rightSuperChain : rightSuperChainToInferences.keySet()) {
 				// now subChain.getLeft() o rightSuperChain is a superchain of subChain
-				if (!composable(subChain.getLeftProperty(), rightSuperChain)) {
+				if (!composable(subChain.getFirstProperty(), rightSuperChain)) {
 					continue;
 				}
 				
-				IndexedBinaryPropertyChain superChain = compose(subChain.getLeftProperty(), rightSuperChain);
+				IndexedComplexPropertyChain superChain = compose(subChain.getFirstProperty(), rightSuperChain);
 				Inference inf = createInference(subChain, superChain, index, rightSuperChainToInferences.get(rightSuperChain));
 				
 				if (inf != null) {
@@ -176,16 +182,16 @@ class ChainRewritingExpression implements AxiomExpression<ElkSubObjectPropertyOf
 		return false;
 	}
 
-	private IndexedBinaryPropertyChain compose(IndexedObjectProperty left, IndexedPropertyChain right) {
+	private IndexedComplexPropertyChain compose(IndexedObjectProperty left, IndexedPropertyChain right) {
 		List<ElkObjectProperty> props = new ArrayList<ElkObjectProperty>();
 		
-		props.add(left.getElkObjectProperty());
+		props.add(left.getElkEntity());
 		
 		for (IndexedObjectProperty iop : flatten(right)) {
-			props.add(iop.getElkObjectProperty());
+			props.add(iop.getElkEntity());
 		}
 		
-		return (IndexedBinaryPropertyChain) index(elkFactory_.getObjectPropertyChain(props), getIndexer());
+		return (IndexedComplexPropertyChain) elkFactory_.getObjectPropertyChain(props).accept(getSubPropertyConverter());
 	}
 
 	private boolean endsWith(List<IndexedObjectProperty> chain, List<IndexedObjectProperty> subChain) {
@@ -264,8 +270,8 @@ class ChainRewritingExpression implements AxiomExpression<ElkSubObjectPropertyOf
 				break;
 			}
 			else {
-				props.add(((IndexedBinaryPropertyChain) top).getLeftProperty());
-				top = ((IndexedBinaryPropertyChain) top).getRightProperty();
+				props.add(((IndexedComplexPropertyChain) top).getFirstProperty());
+				top = ((IndexedComplexPropertyChain) top).getSuffixChain();
 			}
 		}
 		
@@ -276,10 +282,10 @@ class ChainRewritingExpression implements AxiomExpression<ElkSubObjectPropertyOf
 		List<ElkObjectProperty> elkProps = new ArrayList<ElkObjectProperty>(chainList.size());
 		
 		for (IndexedObjectProperty iop : chainList) {
-			elkProps.add(iop.getElkObjectProperty());
+			elkProps.add(iop.getElkEntity());
 		}
 		
-		return index(elkFactory_.getObjectPropertyChain(elkProps), getIndexer());
+		return elkFactory_.getObjectPropertyChain(elkProps).accept(getSubPropertyConverter());
 	}
 	
 	private ElkObjectProperty getSuperProperty() {
@@ -290,43 +296,22 @@ class ChainRewritingExpression implements AxiomExpression<ElkSubObjectPropertyOf
 		List<ElkObjectProperty> props = new ArrayList<ElkObjectProperty>(chainList.size());
 		
 		for (IndexedObjectProperty iop : chainList) {
-			props.add(iop.getElkObjectProperty());
+			props.add(iop.getElkEntity());
 		}
 		
 		return elkFactory_.getObjectPropertyChain(props);
 	}
 
-	private static List<IndexedObjectProperty> index(List<? extends ElkSubObjectPropertyExpression> chain, IndexObjectConverter indexer) {
+	private static List<IndexedObjectProperty> index(List<? extends ElkObjectPropertyExpression> chain, ElkPolarityExpressionConverter converter) {
 		List<IndexedObjectProperty> result = new ArrayList<IndexedObjectProperty>(chain.size());
 		
-		for (ElkSubObjectPropertyExpression next : chain) {
-			result.add((IndexedObjectProperty) index(next, indexer));
+		for (ElkObjectPropertyExpression next : chain) {
+			result.add((IndexedObjectProperty) next.accept(converter));
 		}
 		
 		return result;
 	}
 	
-	private static IndexedPropertyChain index(ElkSubObjectPropertyExpression chain, final IndexObjectConverter indexer) {
-		return chain.accept(new ElkSubObjectPropertyExpressionVisitor<IndexedPropertyChain>() {
-
-			@Override
-			public IndexedPropertyChain visit(ElkObjectInverseOf elkObjectInverseOf) {
-				throw new IllegalArgumentException("Can't have inverses");
-			}
-
-			@Override
-			public IndexedPropertyChain visit(ElkObjectProperty elkObjectProperty) {
-				return indexer.visit(elkObjectProperty);
-			}
-
-			@Override
-			public IndexedPropertyChain visit(ElkObjectPropertyChain elkObjectPropertyChain) {
-				return indexer.visit(elkObjectPropertyChain);
-			}
-			
-		});
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		return expr_.equals(obj);

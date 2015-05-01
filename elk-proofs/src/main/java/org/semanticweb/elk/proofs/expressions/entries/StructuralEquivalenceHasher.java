@@ -47,7 +47,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.AbstractElkObjectVisitor;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.Expression;
@@ -78,11 +77,11 @@ public class StructuralEquivalenceHasher implements ExpressionHasher {
 		return EntityHasher.hashCode(obj);
 	}
 	
-	static int hashCode(ElkAxiom obj) {
+	public static int hashCode(ElkAxiom obj) {
 		return AxiomHasher.hashCode(obj);
 	}
 	
-	static int hashCode(ElkLemma obj) {
+	public static int hashCode(ElkLemma obj) {
 		return LemmaHasher.hashCode(obj);
 	}
 	
@@ -255,11 +254,6 @@ public class StructuralEquivalenceHasher implements ExpressionHasher {
 		@Override
 		public Integer visit(ElkNamedIndividual obj) {
 			return obj.getIri().hashCode();
-		}
-
-		@Override
-		public Integer visit(ElkIri iri) {
-			return iri.hashCode();
 		}
 		
 	}	

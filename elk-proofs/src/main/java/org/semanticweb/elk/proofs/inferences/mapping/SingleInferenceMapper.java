@@ -73,8 +73,8 @@ import org.semanticweb.elk.proofs.inferences.properties.SubPropertyChainLemma;
 import org.semanticweb.elk.proofs.inferences.properties.SubsumptionViaLeftReflexivity;
 import org.semanticweb.elk.proofs.inferences.properties.SubsumptionViaRightReflexivity;
 import org.semanticweb.elk.proofs.inferences.properties.ToldReflexivity;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -99,6 +99,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubs
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SuperReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
@@ -247,7 +248,7 @@ public class SingleInferenceMapper {
 			ElkClassExpression c = Deindexer.deindex(whereStored);
 			ElkObjectProperty r = Deindexer.deindex(inference.getBackwardLink().getRelation());
 			ElkClassExpression d = Deindexer.deindex(inference.getInferenceContextRoot(whereStored));
-			ElkObjectProperty s = Deindexer.deindex(inference.getExpression().getRelation());
+			ElkObjectProperty s = Deindexer.deindex(inference.getExpression().getProperty());
 			ElkClassExpression e = Deindexer.deindex(inference.getExpression().getFiller());
 			ElkObjectSomeValuesFrom rSomeD = factory_.getObjectSomeValuesFrom(r, d);
 			ElkObjectSomeValuesFrom sSomeE = factory_.getObjectSomeValuesFrom(s, e);
@@ -265,7 +266,7 @@ public class SingleInferenceMapper {
 			ElkClassExpression sup = Deindexer.deindex(inference.getExpression());
 			ElkSubClassOfAxiom conclusion = factory_.getSubClassOfAxiom(sub, sup);
 			ElkObjectProperty property = inference.getReflexivityPremise()
-					.getPropertyChain().getElkObjectProperty();
+					.getPropertyChain().getElkEntity();
 
 			return new ReflexiveExistentialComposition(
 					exprFactory_.create(conclusion),
@@ -287,7 +288,7 @@ public class SingleInferenceMapper {
 			ElkSubObjectPropertyExpression ss = null;
 			
 			// now create the right existential premise
-			if (chainPremise.getSubPropertyChain() instanceof IndexedBinaryPropertyChain) {
+			if (chainPremise.getSubPropertyChain() instanceof IndexedComplexPropertyChain) {
 				ss = Deindexer.deindex(chainPremise.getSubPropertyChain());
 				// a lemma
 				rightExistentialPremise = exprFactory_.create(lemmaObjectFactory_.getSubClassOfLemma(d, lemmaObjectFactory_.getComplexObjectSomeValuesFrom((ElkObjectPropertyChain) ss, e)));
@@ -298,9 +299,9 @@ public class SingleInferenceMapper {
 				rightExistentialPremise = exprFactory_.create(factory_.getSubClassOfAxiom(d, factory_.getObjectSomeValuesFrom((ElkObjectProperty) ss, e)));
 			}
 			// create the property chain premise
-			if (chainPremise.getSuperPropertyChain() instanceof IndexedBinaryPropertyChain) {
+			if (chainPremise.getSuperPropertyChain() instanceof IndexedComplexPropertyChain) {
 				// a lemma
-				ElkObjectPropertyChain ssPrime = Deindexer.deindex((IndexedBinaryPropertyChain) chainPremise.getSuperPropertyChain());				
+				ElkObjectPropertyChain ssPrime = Deindexer.deindex((IndexedComplexPropertyChain) chainPremise.getSuperPropertyChain());				
 				
 				rightChainSubsumptionPremise = exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(ss, ssPrime));
 			}
@@ -369,17 +370,19 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ReversedForwardLink inference, IndexedClassExpression whereStored) {
+		public Inference visit(ReversedForwardLink conclusion,
+				IndexedClassExpression input) {
+			// tautological inference
+			return SingleInferenceMapper.STOP;
+		}
+		
+		@Override
+		public Inference visit(SuperReversedForwardLink inference, IndexedClassExpression whereStored) {
 			// skipping tautology
 			//return SingleInferenceMapper.STOP;
 			
 			ForwardLink premise = inference.getSourceLink();
-			
-			if (premise.getRelation().equals(inference.getRelation())) {
-				// skipping tautology
-				return SingleInferenceMapper.STOP;
-			}
-			
+						
 			// existential composition with sub-property chain
 			IndexedPropertyChain subChain = premise.getRelation();
 
@@ -392,11 +395,11 @@ public class SingleInferenceMapper {
 
 				@Override
 				public Expression visit(IndexedObjectProperty subProp) {
-					return exprFactory_.create(factory_.getSubClassOfAxiom(c, factory_.getObjectSomeValuesFrom(subProp.getElkObjectProperty(), d)));
+					return exprFactory_.create(factory_.getSubClassOfAxiom(c, factory_.getObjectSomeValuesFrom(subProp.getElkEntity(), d)));
 				}
 
 				@Override
-				public Expression visit(IndexedBinaryPropertyChain subChain) {
+				public Expression visit(IndexedComplexPropertyChain subChain) {
 					return exprFactory_.create(lemmaObjectFactory_.getSubClassOfLemma(c, lemmaObjectFactory_.getComplexObjectSomeValuesFrom(Deindexer.deindex(subChain), d)));
 				}
 				
@@ -408,7 +411,7 @@ public class SingleInferenceMapper {
 					cSubssSomeC,
 					exprFactory_.create(factory_.getSubObjectPropertyOfAxiom(ss, h)));
 		}
-
+		
 		@Override
 		public Inference visit(DecomposedExistentialBackwardLink inference, IndexedClassExpression input) {
 			// not a self-contained user inference
@@ -495,7 +498,7 @@ public class SingleInferenceMapper {
 
 		@Override
 		public Inference visit(ToldSubPropertyInference inference, Void input) {
-			final ElkObjectProperty h = inference.getPremise().getSubPropertyChain().getElkObjectProperty();
+			final ElkObjectProperty h = inference.getPremise().getSubPropertyChain().getElkEntity();
 			ElkSubObjectPropertyExpression ss = deindex(inference.getSuperPropertyChain());
 			ElkSubObjectPropertyOfAxiom sideCondition = (ElkSubObjectPropertyOfAxiom) sideConditionLookup_.lookup(inference);
 			final AxiomExpression<ElkSubObjectPropertyOfAxiom> rrH = exprFactory_.createAsserted(sideCondition);
@@ -528,7 +531,7 @@ public class SingleInferenceMapper {
 				}
 
 				@Override
-				public ElkSubObjectPropertyExpression visit(IndexedBinaryPropertyChain chain) {
+				public ElkSubObjectPropertyExpression visit(IndexedComplexPropertyChain chain) {
 					return Deindexer.deindex(chain);
 				}
 			});
@@ -554,7 +557,7 @@ public class SingleInferenceMapper {
 
 		@Override
 		public Inference visit(final ReflexivePropertyChainInference inference, Void input) {
-			ElkObjectProperty r = inference.getLeftReflexiveProperty().getPropertyChain().getElkObjectProperty();
+			ElkObjectProperty r = inference.getLeftReflexiveProperty().getPropertyChain().getElkEntity();
 			Expression second = inference.getRightReflexivePropertyChain().getPropertyChain().accept(reflexiveChainExpressionCreator());
 			ElkReflexivePropertyChainLemma conclusion = lemmaObjectFactory_.getReflexivePropertyChainLemma(Deindexer.deindex(inference.getPropertyChain()));
 			
@@ -563,9 +566,9 @@ public class SingleInferenceMapper {
 
 		@Override
 		public Inference visit(LeftReflexiveSubPropertyChainInference inference, Void input) {
-			ElkObjectProperty r = inference.getReflexivePremise().getPropertyChain().getElkObjectProperty();
+			ElkObjectProperty r = inference.getReflexivePremise().getPropertyChain().getElkEntity();
 			final ElkReflexiveObjectPropertyAxiom reflexivityPremise = factory_.getReflexiveObjectPropertyAxiom(r);
-			final IndexedBinaryPropertyChain chainWithReflexivity = inference.getPremiseChain();
+			final IndexedComplexPropertyChain chainWithReflexivity = inference.getPremiseChain();
 			final IndexedPropertyChain subChain = inference.getSubPropertyChain();
 			
 			return inference.getSuperPropertyChain().accept(new IndexedPropertyChainVisitor<Inference>() {
@@ -580,7 +583,7 @@ public class SingleInferenceMapper {
 				}
 
 				@Override
-				public Inference visit(IndexedBinaryPropertyChain chain) {
+				public Inference visit(IndexedComplexPropertyChain chain) {
 					ElkObjectPropertyChain sup = Deindexer.deindex(chain);
 					Expression conclusion = exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(Deindexer.deindex(subChain), sup));
 					Expression subsumptionPremise = exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(Deindexer.deindex(chainWithReflexivity), sup));
@@ -593,7 +596,7 @@ public class SingleInferenceMapper {
 		@Override
 		public Inference visit(RightReflexiveSubPropertyChainInference inference, Void input) {
 			final Expression reflexivityPremise = inference.getReflexivePremise().getPropertyChain().accept(reflexiveChainExpressionCreator());
-			final IndexedBinaryPropertyChain chainWithReflexivity = inference.getPremiseChain();
+			final IndexedComplexPropertyChain chainWithReflexivity = inference.getPremiseChain();
 			final IndexedObjectProperty subProperty = inference.getSubPropertyChain();
 			
 			return inference.getSuperPropertyChain().accept(new IndexedPropertyChainVisitor<Inference>() {
@@ -608,7 +611,7 @@ public class SingleInferenceMapper {
 				}
 
 				@Override
-				public Inference visit(IndexedBinaryPropertyChain chain) {
+				public Inference visit(IndexedComplexPropertyChain chain) {
 					ElkObjectPropertyChain sup = Deindexer.deindex(chain);
 					Expression conclusion = exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(Deindexer.deindex(subProperty), sup));
 					Expression subsumptionPremise = exprFactory_.create(lemmaObjectFactory_.getSubPropertyChainOfLemma(Deindexer.deindex(chainWithReflexivity), sup));
@@ -624,17 +627,18 @@ public class SingleInferenceMapper {
 
 				@Override
 				public Expression visit(IndexedObjectProperty property) {
-					return exprFactory_.create(factory_.getReflexiveObjectPropertyAxiom(property.getElkObjectProperty()));
+					return exprFactory_.create(factory_.getReflexiveObjectPropertyAxiom(property.getElkEntity()));
 				}
 
 				@Override
-				public Expression visit(IndexedBinaryPropertyChain chain) {
+				public Expression visit(IndexedComplexPropertyChain chain) {
 					// can't represent reflexive chains as axioms
 					return exprFactory_.create(lemmaObjectFactory_.getReflexivePropertyChainLemma(Deindexer.deindex(chain)));
 				}
 				
 			};
 		}
+		
 	}
 	
 	private static abstract class BaseElkSubObjectPropertyExpressionVisitor<O> implements ElkSubObjectPropertyExpressionVisitor<O> {

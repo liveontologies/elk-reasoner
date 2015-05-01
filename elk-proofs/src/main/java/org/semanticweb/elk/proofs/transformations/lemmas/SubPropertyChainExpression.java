@@ -92,7 +92,7 @@ class SubPropertyChainExpression implements AxiomExpression<ElkSubObjectProperty
 			if (superProperty_.getSaturated().getSubPropertyChains().contains(superChain)) {
 				for (ObjectPropertyInference inf : superChainToInferences.get(superChain)) {
 					AxiomExpression<ElkSubObjectPropertyOfAxiom> firstPremise = exprFactory.create(
-							elkFactory_.getSubObjectPropertyOfAxiom(Deindexer.deindex(superChain), superProperty_.getElkObjectProperty()));
+							elkFactory_.getSubObjectPropertyOfAxiom(Deindexer.deindex(superChain), superProperty_.getElkEntity()));
 					Inference result = inf.acceptTraced(roleInfFactory, firstPremise); 
 					
 					if (result != null) {

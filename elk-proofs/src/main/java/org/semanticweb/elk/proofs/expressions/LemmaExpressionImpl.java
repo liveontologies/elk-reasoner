@@ -24,18 +24,25 @@ package org.semanticweb.elk.proofs.expressions;
  * #L%
  */
 
+import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceChecker;
+import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceHasher;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
 import org.semanticweb.elk.proofs.inferences.InferenceReader;
 import org.semanticweb.elk.proofs.utils.ElkLemmaPrinter;
+import org.semanticweb.elk.util.collections.entryset.Entry;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class LemmaExpressionImpl<L extends ElkLemma> extends AbstractExpression implements LemmaExpression<L> {
+public class LemmaExpressionImpl<L extends ElkLemma> extends AbstractExpression
+		implements LemmaExpression<L>,
+		Entry<LemmaExpressionImpl<?>, LemmaExpressionImpl<?>> {
 
 	private final L lemma_;
+	
+	private LemmaExpressionImpl<?> next_;
 	
 	public LemmaExpressionImpl(L lemma, InferenceReader r) {
 		super(r);
@@ -55,5 +62,36 @@ public class LemmaExpressionImpl<L extends ElkLemma> extends AbstractExpression 
 	@Override
 	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
+	}
+
+	@Override
+	public void setNext(LemmaExpressionImpl<?> next) {
+		this.next_ = next;
+		
+	}
+
+	@Override
+	public LemmaExpressionImpl<?> getNext() {
+		return next_;
+	}
+
+	@Override
+	public LemmaExpressionImpl<?> structuralEquals(Object other) {		
+		if (this == other) {
+			return this;
+		}
+		if (other instanceof LemmaExpressionImpl<?>) {
+			LemmaExpressionImpl<?> otherLemma = (LemmaExpressionImpl<?>) other;
+			if (StructuralEquivalenceChecker.equal(otherLemma.lemma_, lemma_)) {
+				return otherLemma;
+			}
+		}
+		// else
+		return null;
+	}
+
+	@Override
+	public int structuralHashCode() {
+		return StructuralEquivalenceHasher.hashCode(lemma_);
 	}	
 }

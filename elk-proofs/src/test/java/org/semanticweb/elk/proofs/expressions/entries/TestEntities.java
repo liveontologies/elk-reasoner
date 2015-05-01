@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
+import org.semanticweb.elk.owl.iris.ElkPrefixImpl;
 
 /**
  * @author Pavel Klinov
@@ -39,7 +40,7 @@ import org.semanticweb.elk.owl.iris.ElkPrefix;
  */
 public class TestEntities {
 
-	public static final ElkPrefix prefix_ = new ElkPrefix("", new ElkFullIri("http://test.org/"));
+	public static final ElkPrefix prefix_ = new ElkPrefixImpl("", new ElkFullIri("http://test.org/"));
 	private static final ElkObjectFactory factory_ = new ElkObjectFactoryImpl();
 	
 	public static final ElkClass a = factory_.getClass(new ElkAbbreviatedIri(prefix_, "A"));

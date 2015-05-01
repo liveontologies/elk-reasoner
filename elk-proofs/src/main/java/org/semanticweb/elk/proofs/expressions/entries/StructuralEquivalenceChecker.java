@@ -51,7 +51,6 @@ import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.AbstractElkObjectVisitor;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
@@ -472,19 +471,7 @@ public class StructuralEquivalenceChecker implements ExpressionEqualityChecker, 
 						
 					});
 				}
-				
-
-				@Override
-				public Boolean visit(final ElkIri first) {
-					return second.accept(new EntityChecker() {
-						@Override
-						public Boolean visit(ElkIri second) {
-							return first.equals(second);
-						}
-						
-					});
-				}
-				
+								
 			});
 		}
 		

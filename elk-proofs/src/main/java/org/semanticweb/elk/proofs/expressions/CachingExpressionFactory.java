@@ -25,10 +25,9 @@ package org.semanticweb.elk.proofs.expressions;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
-import org.semanticweb.elk.proofs.expressions.entries.ExpressionEntryFactory;
 import org.semanticweb.elk.proofs.expressions.lemmas.ElkLemma;
 import org.semanticweb.elk.proofs.inferences.InferenceReader;
-import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
+import org.semanticweb.elk.util.collections.entryset.EntryCollection;
 
 /**
  * TODO
@@ -39,42 +38,60 @@ import org.semanticweb.elk.util.collections.entryset.KeyEntryHashSet;
  */
 public class CachingExpressionFactory implements ExpressionFactory {
 
-	private final KeyEntryHashSet<AxiomExpressionImpl<?>> axiomLookup_;
+	private final EntryCollection<AxiomExpressionImpl<?>> axiomLookup_;
 	
-	private final KeyEntryHashSet<LemmaExpressionImpl<?>> lemmaLookup_;
+	private final EntryCollection<LemmaExpressionImpl<?>> lemmaLookup_;
 	
 	private final InferenceReader reader_;
 
 	public CachingExpressionFactory(InferenceReader reader) {
-		axiomLookup_ = new KeyEntryHashSet<AxiomExpressionImpl<?>>(new ExpressionEntryFactory<AxiomExpressionImpl<?>>(), 128);
-		lemmaLookup_ = new KeyEntryHashSet<LemmaExpressionImpl<?>>(new ExpressionEntryFactory<LemmaExpressionImpl<?>>(), 32);
+		axiomLookup_ = new EntryCollection<AxiomExpressionImpl<?>>(128);
+		lemmaLookup_ = new EntryCollection<LemmaExpressionImpl<?>>(32);
 		reader_ = reader;
 	}
 	
 	@Override
 	public <E extends ElkAxiom> AxiomExpression<E> create(E axiom) {
 		AxiomExpressionImpl<E> newExpr = new AxiomExpressionImpl<E>(axiom, reader_);
-		
-		return (AxiomExpression<E>) axiomLookup_.merge(newExpr);
+		return merge(newExpr);
 	}
 
 	@Override
 	public <L extends ElkLemma> LemmaExpression<L> create(L lemma) {
 		LemmaExpressionImpl<L> newExpr = new LemmaExpressionImpl<L>(lemma, reader_);
-		
-		return (LemmaExpression<L>) lemmaLookup_.merge(newExpr);
+		return merge(newExpr);		
 	}
 
 	@Override
 	public <E extends ElkAxiom> AxiomExpressionImpl<E> createAsserted(E axiom) {
 		AxiomExpressionImpl<E> newExpr = new AxiomExpressionImpl<E>(axiom, reader_, true);
-		AxiomExpressionImpl<E> oldExpr = (AxiomExpressionImpl<E>) axiomLookup_.merge(newExpr);
+		AxiomExpressionImpl<E> oldExpr = merge(newExpr);
 		
 		if (!oldExpr.isAsserted()) {
 			oldExpr.setAsserted(axiom);
 		}
 		
 		return oldExpr;
+	}
+	
+	private <E extends ElkAxiom> AxiomExpressionImpl<E> merge(AxiomExpressionImpl<E> newExpr) {
+		@SuppressWarnings("unchecked")
+		AxiomExpressionImpl<E> result = (AxiomExpressionImpl<E>) axiomLookup_.findStructural(newExpr);
+		if (result == null) {
+			axiomLookup_.addStructural(newExpr);
+			result = newExpr;
+		}		
+		return result;		
+	}
+	
+	private <L extends ElkLemma> LemmaExpression<L> merge(LemmaExpressionImpl<L> newExpr) {
+		@SuppressWarnings("unchecked")
+		LemmaExpressionImpl<L> result = (LemmaExpressionImpl<L>) lemmaLookup_.findStructural(newExpr); 
+		if (result == null) {
+			lemmaLookup_.addStructural(newExpr);
+			result = newExpr;
+		}
+		return result;
 	}
 
 }

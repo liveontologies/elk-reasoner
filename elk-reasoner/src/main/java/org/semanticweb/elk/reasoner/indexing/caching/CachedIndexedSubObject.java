@@ -1,10 +1,8 @@
-/**
- * 
- */
-package org.semanticweb.elk.proofs.expressions.entries;
+package org.semanticweb.elk.reasoner.indexing.caching;
+
 /*
  * #%L
- * ELK Proofs Package
+ * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
@@ -24,19 +22,20 @@ package org.semanticweb.elk.proofs.expressions.entries;
  * #L%
  */
 
-import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.util.collections.entryset.KeyEntryFactory;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubObject;
 
 /**
- * @author Pavel Klinov
+ * A {@link ModifiableIndexedSubObject} that can be used for memoization
+ * (caching).
+ * 
+ * @author "Yevgeny Kazakov"
  *
- * pavel.klinov@uni-ulm.de
+ * @param <T>
+ *            the type of the {@link CachedIndexedSubObject}
  */
-public class ExpressionEntryFactory<K extends Expression> implements KeyEntryFactory<K> {
+public interface CachedIndexedSubObject<T extends CachedIndexedSubObject<T>>
+		extends ModifiableIndexedSubObject, CachedIndexedObject<T> {
 
-	@Override
-	public ExpressionEntry<K> createEntry(K key) {
-		return new ExpressionEntry<K>(key);
-	}
+	// nothing specific
 
 }

@@ -31,7 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
@@ -80,7 +80,7 @@ abstract class PropertyInferenceVisitor extends AbstractObjectPropertyInferenceV
 			}
 
 			@Override
-			public Inference visit(IndexedBinaryPropertyChain ipc) {
+			public Inference visit(IndexedComplexPropertyChain ipc) {
 				return createReflexivityEliminationInference(createReflexivityPremises(ipc));
 			}
 		});
@@ -100,10 +100,10 @@ abstract class PropertyInferenceVisitor extends AbstractObjectPropertyInferenceV
 	}
 
 	private AxiomExpression<ElkReflexiveObjectPropertyAxiom> createReflexivityPremise(IndexedObjectProperty ipc) {
-		return exprFactory_.create(elkFactory_.getReflexiveObjectPropertyAxiom(((IndexedObjectProperty) ipc).getElkObjectProperty()));
+		return exprFactory_.create(elkFactory_.getReflexiveObjectPropertyAxiom(((IndexedObjectProperty) ipc).getElkEntity()));
 	}
 
-	private Iterable<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> createReflexivityPremises(IndexedBinaryPropertyChain ipc) {
+	private Iterable<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> createReflexivityPremises(IndexedComplexPropertyChain ipc) {
 		List<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> premises = new ArrayList<AxiomExpression<ElkReflexiveObjectPropertyAxiom>>();
 		IndexedPropertyChain top = ipc;
 		
@@ -113,8 +113,8 @@ abstract class PropertyInferenceVisitor extends AbstractObjectPropertyInferenceV
 				break;
 			}
 			else {
-				premises.add(createReflexivityPremise(((IndexedBinaryPropertyChain) top).getLeftProperty()));
-				top = ((IndexedBinaryPropertyChain) top).getRightProperty();
+				premises.add(createReflexivityPremise(((IndexedComplexPropertyChain) top).getFirstProperty()));
+				top = ((IndexedComplexPropertyChain) top).getSuffixChain();
 			}
 		}
 		

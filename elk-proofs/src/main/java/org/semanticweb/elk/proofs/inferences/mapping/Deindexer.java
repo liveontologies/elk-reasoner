@@ -37,9 +37,9 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
@@ -75,32 +75,32 @@ public class Deindexer implements IndexedClassExpressionVisitor<ElkClassExpressi
 			}
 
 			@Override
-			public ElkSubObjectPropertyExpression visit(IndexedBinaryPropertyChain element) {
+			public ElkSubObjectPropertyExpression visit(IndexedComplexPropertyChain element) {
 				return deindex(element);
 			}
 		});
 	}
 	
 	public static ElkObjectProperty deindex(IndexedObjectProperty ip) {
-		return ip.getElkObjectProperty();
+		return ip.getElkEntity();
 	}
 	
-	public static ElkObjectPropertyChain deindex(IndexedBinaryPropertyChain ipc) {
+	public static ElkObjectPropertyChain deindex(IndexedComplexPropertyChain ipc) {
 		final List<ElkObjectPropertyExpression> properties = new LinkedList<ElkObjectPropertyExpression>();
 		
 		while (ipc != null) {
-			properties.add(deindex(ipc.getLeftProperty()));
+			properties.add(deindex(ipc.getFirstProperty()));
 			
-			ipc = ipc.getRightProperty().accept(new IndexedPropertyChainVisitor<IndexedBinaryPropertyChain>() {
+			ipc = ipc.getSuffixChain().accept(new IndexedPropertyChainVisitor<IndexedComplexPropertyChain>() {
 
 				@Override
-				public IndexedBinaryPropertyChain visit(IndexedObjectProperty element) {
-					properties.add(element.getElkObjectProperty());
+				public IndexedComplexPropertyChain visit(IndexedObjectProperty element) {
+					properties.add(element.getElkEntity());
 					return null;
 				}
 
 				@Override
-				public IndexedBinaryPropertyChain visit(IndexedBinaryPropertyChain element) {
+				public IndexedComplexPropertyChain visit(IndexedComplexPropertyChain element) {
 					return element;
 				}
 			});
@@ -110,7 +110,7 @@ public class Deindexer implements IndexedClassExpressionVisitor<ElkClassExpressi
 	}
 	
 	private List<? extends ElkClassExpression> deindex(
-			Set<IndexedClassExpression> expressions) {
+			Set<? extends IndexedClassExpression> expressions) {
 		List<ElkClassExpression> deindexed = new ArrayList<ElkClassExpression>(expressions.size());
 		
 		for (IndexedClassExpression ice : expressions) {
@@ -122,12 +122,12 @@ public class Deindexer implements IndexedClassExpressionVisitor<ElkClassExpressi
 	
 	@Override
 	public ElkClass visit(IndexedClass element) {
-		return element.getElkClass();
+		return element.getElkEntity();
 	}
 
 	@Override
 	public ElkClassExpression visit(IndexedIndividual element) {
-		return factory_.getObjectOneOf(element.getElkNamedIndividual());
+		return factory_.getObjectOneOf(element.getElkEntity());
 	}
 
 	@Override
@@ -142,7 +142,7 @@ public class Deindexer implements IndexedClassExpressionVisitor<ElkClassExpressi
 
 	@Override
 	public ElkClassExpression visit(IndexedObjectSomeValuesFrom element) {
-		return factory_.getObjectSomeValuesFrom(deindex(element.getRelation()), element.getFiller().accept(this));
+		return factory_.getObjectSomeValuesFrom(deindex(element.getProperty()), element.getFiller().accept(this));
 	}
 
 	@Override

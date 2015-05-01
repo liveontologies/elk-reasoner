@@ -26,18 +26,24 @@ package org.semanticweb.elk.proofs.expressions;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceChecker;
+import org.semanticweb.elk.proofs.expressions.entries.StructuralEquivalenceHasher;
 import org.semanticweb.elk.proofs.inferences.InferenceReader;
+import org.semanticweb.elk.util.collections.entryset.Entry;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public class AxiomExpressionImpl<E extends ElkAxiom> extends AbstractExpression implements AxiomExpression<E> {
+public class AxiomExpressionImpl<E extends ElkAxiom> extends AbstractExpression implements AxiomExpression<E>,
+    Entry<AxiomExpressionImpl<?>, AxiomExpressionImpl<?>> {
 
 	private E axiom_;
 	
 	private boolean asserted_;
+	
+	private AxiomExpressionImpl<?> next_;
 	
 	public AxiomExpressionImpl(E ax, InferenceReader r) {
 		this(ax, r, false);
@@ -74,6 +80,36 @@ public class AxiomExpressionImpl<E extends ElkAxiom> extends AbstractExpression 
 	@Override
 	public <I, O> O accept(ExpressionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
+	}
+
+	@Override
+	public void setNext(AxiomExpressionImpl<?> next) {
+		this.next_ = next;
+		
+	}
+
+	@Override
+	public AxiomExpressionImpl<?> getNext() {
+		return next_;
+	}
+
+	@Override
+	public AxiomExpressionImpl<?> structuralEquals(Object other) {
+		if (this == other)
+			return this;
+		if (other instanceof AxiomExpressionImpl<?>) {
+			AxiomExpressionImpl<?> otherExpression = (AxiomExpressionImpl<?>) other;
+			if (StructuralEquivalenceChecker.equal(axiom_,otherExpression.axiom_)) {
+				return otherExpression;
+			};
+		}
+		// else
+		return null;
+	}
+
+	@Override
+	public int structuralHashCode() {		
+		return StructuralEquivalenceHasher.hashCode(axiom_);
 	}
 	
 }

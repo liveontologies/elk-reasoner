@@ -39,6 +39,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.owl.visitors.AbstractElkEntityVisitor;
+import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
 import org.semanticweb.elk.proofs.expressions.CachingExpressionFactory;
 import org.semanticweb.elk.proofs.expressions.Expression;
@@ -57,8 +58,9 @@ import org.semanticweb.elk.proofs.inferences.mapping.InferenceMapper;
 import org.semanticweb.elk.proofs.inferences.mapping.SatisfiabilityChecker;
 import org.semanticweb.elk.proofs.inferences.mapping.TracingInput;
 import org.semanticweb.elk.proofs.transformations.lemmas.BaseExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.util.collections.Operations;
@@ -76,7 +78,7 @@ import org.semanticweb.elk.util.collections.Operations;
 public class ReasonerInferenceReader implements InferenceReader {
 
 	final AbstractReasonerState reasoner;
-	
+		
 	private final ExpressionFactory expressionFactory_;
 	
 	private final ExpressionMapper expressionMapper_;
@@ -85,7 +87,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 		reasoner = r;
 		// this expression factory will guarantee pointer equality for structurally equivalent expressions
 		expressionFactory_ = new CachingExpressionFactory(this);
-		expressionMapper_ = new ExpressionMapper(reasoner.getIndexObjectConverter());
+		expressionMapper_ = new ExpressionMapper(reasoner.getExpressionConverter(), reasoner.getSubPropertyConverter());
 	}
 	
 	public AxiomExpression<?> initialize(ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
@@ -132,10 +134,16 @@ public class ReasonerInferenceReader implements InferenceReader {
 		return expressionFactory_;
 	}
 	
-	public IndexObjectConverter getIndexer() {
-		return reasoner.getIndexObjectConverter();
-	}
+	@Deprecated
+	public ElkPolarityExpressionConverter getExpressionConverter() {
+		return reasoner.getExpressionConverter();		
+	}	
 	
+	@Deprecated
+	public ElkSubObjectPropertyExpressionVisitor<? extends IndexedPropertyChain> getSubPropertyConverter() {
+		return reasoner.getSubPropertyConverter();		
+	}
+			
 	public TraceStore.Reader getTraceReader() {
 		return reasoner.getTraceState().getTraceStore().getReader();
 	}
@@ -210,7 +218,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 
 		@Override
 		public Inference visit(ElkSubClassOfLemma lemma, Void input) {
-			IndexedClassExpression sub = lemma.getSubClass().accept(reasoner.getIndexObjectConverter());
+			IndexedClassExpression sub = lemma.getSubClass().accept(reasoner.getExpressionConverter());
 			
 			if (!entailmentChecker_.isSatisfiable(sub)) {
 				ElkObjectFactory factory = new ElkObjectFactoryImpl();
@@ -224,7 +232,7 @@ public class ReasonerInferenceReader implements InferenceReader {
 
 		@Override
 		public Inference visit(ElkSubClassOfAxiom axiom) {
-			IndexedClassExpression sub = axiom.getSubClassExpression().accept(reasoner.getIndexObjectConverter());
+			IndexedClassExpression sub = axiom.getSubClassExpression().accept(reasoner.getExpressionConverter());
 			
 			if (!entailmentChecker_.isSatisfiable(sub) && !isNothing(axiom.getSuperClassExpression())) {
 				ElkObjectFactory factory = new ElkObjectFactoryImpl();

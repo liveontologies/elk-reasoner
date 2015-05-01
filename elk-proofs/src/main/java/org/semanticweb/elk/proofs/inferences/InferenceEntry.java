@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.semanticweb.elk.proofs.expressions.Expression;
-import org.semanticweb.elk.util.collections.entryset.StrongKeyEntry;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
 /**
@@ -38,15 +37,24 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  * 			pavel.klinov@uni-ulm.de
  *
  */
-public class InferenceEntry<I extends Inference> extends StrongKeyEntry<I, I> {
+public class InferenceEntry<I extends Inference> {
 
+	private final I key_;
+	
+	private final int hash_;
+	
 	public InferenceEntry(I inf) {
-		super(inf);
+		this.key_ = inf;
+		this.hash_ = computeHashCode(inf);
 	}
 
-	@Override
-	public int computeHashCode() {
+	public int computeHashCode(I key) {
 		return HashGenerator.combineListHash(key.getRule().hashCode(), HashGenerator.combinedHashCode(key.getPremises()), key.getConclusion().hashCode());
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.hash_;
 	}
 
 	@Override
@@ -59,9 +67,9 @@ public class InferenceEntry<I extends Inference> extends StrongKeyEntry<I, I> {
 			return false;
 		}
 		
-		Inference otherInf = ((InferenceEntry<?>) object).key;
+		Inference otherInf = ((InferenceEntry<?>) object).key_;
 		
-		return key.getRule().equals(otherInf.getRule()) && key.getConclusion().equals(otherInf.getConclusion()) && equal(key.getPremises(), otherInf.getPremises());
+		return key_.getRule().equals(otherInf.getRule()) && key_.getConclusion().equals(otherInf.getConclusion()) && equal(key_.getPremises(), otherInf.getPremises());
 	}
 
 	private boolean equal(Collection<? extends Expression> premises, Collection<? extends Expression> other) {

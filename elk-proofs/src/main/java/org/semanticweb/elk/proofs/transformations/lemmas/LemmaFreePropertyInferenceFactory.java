@@ -33,7 +33,7 @@ import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.mapping.Deindexer;
 import org.semanticweb.elk.proofs.inferences.properties.SubPropertyChainAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
@@ -84,7 +84,7 @@ class LemmaFreePropertyInferenceFactory extends AbstractObjectPropertyInferenceV
 			}
 
 			@Override
-			public Inference visit(IndexedBinaryPropertyChain ipc) {
+			public Inference visit(IndexedComplexPropertyChain ipc) {
 				return new ReflexivityElimination(expr_, premise, createReflexivityPremises(ipc));
 			}
 		});
@@ -101,10 +101,10 @@ class LemmaFreePropertyInferenceFactory extends AbstractObjectPropertyInferenceV
 	}
 
 	private AxiomExpression<ElkReflexiveObjectPropertyAxiom> createReflexivityPremise(IndexedObjectProperty ipc) {
-		return exprFactory_.create(elkFactory_.getReflexiveObjectPropertyAxiom(((IndexedObjectProperty) ipc).getElkObjectProperty()));
+		return exprFactory_.create(elkFactory_.getReflexiveObjectPropertyAxiom(((IndexedObjectProperty) ipc).getElkEntity()));
 	}
 
-	private Iterable<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> createReflexivityPremises(IndexedBinaryPropertyChain ipc) {
+	private Iterable<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> createReflexivityPremises(IndexedComplexPropertyChain ipc) {
 		List<AxiomExpression<ElkReflexiveObjectPropertyAxiom>> premises = new ArrayList<AxiomExpression<ElkReflexiveObjectPropertyAxiom>>();
 		IndexedPropertyChain top = ipc;
 		
@@ -114,8 +114,8 @@ class LemmaFreePropertyInferenceFactory extends AbstractObjectPropertyInferenceV
 				break;
 			}
 			else {
-				premises.add(createReflexivityPremise(((IndexedBinaryPropertyChain) top).getLeftProperty()));
-				top = ((IndexedBinaryPropertyChain) top).getRightProperty();
+				premises.add(createReflexivityPremise(((IndexedComplexPropertyChain) top).getFirstProperty()));
+				top = ((IndexedComplexPropertyChain) top).getSuffixChain();
 			}
 		}
 		
@@ -125,7 +125,7 @@ class LemmaFreePropertyInferenceFactory extends AbstractObjectPropertyInferenceV
 	private Inference createSubChainInference(	IndexedPropertyChain subChain, 
 												IndexedObjectProperty superChain, 
 												AxiomExpression<ElkSubObjectPropertyOfAxiom> firstPremise) {
-		ElkSubObjectPropertyOfAxiom subChainAxiom = elkFactory_.getSubObjectPropertyOfAxiom(Deindexer.deindex(subChain), superChain.getElkObjectProperty());
+		ElkSubObjectPropertyOfAxiom subChainAxiom = elkFactory_.getSubObjectPropertyOfAxiom(Deindexer.deindex(subChain), superChain.getElkEntity());
 		
 		return new SubPropertyChainAxiom(expr_, firstPremise, exprFactory_.create(subChainAxiom));
 	}

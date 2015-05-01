@@ -53,7 +53,6 @@ import org.semanticweb.elk.proofs.inferences.classes.ExistentialComposition;
 import org.semanticweb.elk.proofs.inferences.classes.ExistentialLemmaChainComposition;
 import org.semanticweb.elk.proofs.inferences.classes.NaryExistentialAxiomComposition;
 import org.semanticweb.elk.proofs.transformations.InferenceTransformation;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
@@ -192,9 +191,8 @@ public class LemmaEliminationViaChainRewriting implements InferenceTransformatio
 		// which produces lemma-free derivations.
 		private AxiomExpression<ElkSubObjectPropertyOfAxiom> wrapSubPropertyExpression(AxiomExpression<ElkSubObjectPropertyOfAxiom> expr) {
 			ElkSubObjectPropertyOfAxiom axiom = expr.getAxiom();
-			IndexObjectConverter indexer = reader_.getIndexer();
 			
-			if (!axiom.getSubObjectPropertyExpression().accept(indexer).equals(axiom.getSuperObjectPropertyExpression().accept(indexer))) {
+			if (!axiom.getSubObjectPropertyExpression().accept(reader_.getSubPropertyConverter()).equals(axiom.getSuperObjectPropertyExpression().accept(reader_.getExpressionConverter()))) {
 				return createSubPropertyExpression(expr);
 			}
 			
@@ -202,9 +200,8 @@ public class LemmaEliminationViaChainRewriting implements InferenceTransformatio
 		}
 		
 		private SubPropertyChainExpression createSubPropertyExpression(AxiomExpression<ElkSubObjectPropertyOfAxiom> expr) {
-			IndexObjectConverter indexer = reader_.getIndexer();
-			IndexedObjectProperty superProperty = (IndexedObjectProperty) expr.getAxiom().getSuperObjectPropertyExpression().accept(indexer);
-			IndexedPropertyChain subChain = expr.getAxiom().getSubObjectPropertyExpression().accept(indexer);
+			IndexedObjectProperty superProperty = (IndexedObjectProperty) expr.getAxiom().getSuperObjectPropertyExpression().accept(reader_.getExpressionConverter());
+			IndexedPropertyChain subChain = expr.getAxiom().getSubObjectPropertyExpression().accept(reader_.getSubPropertyConverter());
 			
 			return new SubPropertyChainExpression(expr, superProperty, subChain, reader_);
 		}
