@@ -27,6 +27,8 @@ package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.visitors.ElkObjectOneOfVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Enumeration_of_Individuals">Enumeration of
@@ -44,5 +46,14 @@ public interface ElkObjectOneOf extends ElkClassExpression {
 	 * @return list of individuals
 	 */
 	public List<? extends ElkIndividual> getIndividuals();
+
+	/**
+	 * Accept an {@link ElkObjectOneOfVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkObjectOneOfVisitor<O> visitor);
 
 }

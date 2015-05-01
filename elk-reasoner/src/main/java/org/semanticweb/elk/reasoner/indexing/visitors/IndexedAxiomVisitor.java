@@ -1,7 +1,6 @@
 package org.semanticweb.elk.reasoner.indexing.visitors;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubObjectPropertyOfAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiom;
 
 /*
  * #%L
@@ -25,10 +24,19 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPro
  * #L%
  */
 
+/**
+ * Visitor pattern interface for instances of {@link IndexedAxiom}.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
+ */
 public interface IndexedAxiomVisitor<O> extends
-		IndexedSubClassOfAxiomVisitor<O>, IndexedDisjointnessAxiomVisitor<O> {
+		IndexedDisjointClassesAxiomVisitor<O>, IndexedSubClassOfAxiomVisitor<O>,
+		IndexedSubObjectPropertyOfAxiomVisitor<O>,
+		IndexedReflexiveObjectPropertyAxiomVisitor<O>,
+		IndexedDeclarationAxiomVisitor<O> {
 
-	O visit(IndexedSubObjectPropertyOfAxiom<?> axiom);
-	
-	O visit(IndexedReflexiveObjectPropertyAxiom<?> axiom);
+	// combined visitor
 }

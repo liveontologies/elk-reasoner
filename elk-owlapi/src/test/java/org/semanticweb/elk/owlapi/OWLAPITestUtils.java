@@ -30,7 +30,7 @@ import java.io.InputStream;
 
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.reasoner.config.ReasonerConfiguration;
-import org.semanticweb.elk.reasoner.stages.RestartingTestStageExecutor;
+import org.semanticweb.elk.reasoner.stages.RestartingStageExecutor;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyCreationIOException;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -59,14 +59,18 @@ public class OWLAPITestUtils {
 			throw new Owl2ParseException(e);
 		}
 
-		return createReasoner(ontology);
+		return new ElkReasoner(ontology, false, new RestartingStageExecutor());
 	}
 
 	public static ElkReasoner createReasoner(OWLOntology ontology) {
-		return new ElkReasoner(ontology, false, new RestartingTestStageExecutor());
+		return new ElkReasoner(ontology, false, new RestartingStageExecutor());
 	}
-	
-	public static ElkReasoner createReasoner(OWLOntology ontology, ReasonerConfiguration config) {
-		return new ElkReasoner(ontology, false, new ElkReasonerConfiguration(ElkReasonerConfiguration.getDefaultOwlReasonerConfiguration(null), config));
+
+	public static ElkReasoner createReasoner(OWLOntology ontology,
+			ReasonerConfiguration config) {
+		return new ElkReasoner(ontology, false,
+				new ElkReasonerConfiguration(ElkReasonerConfiguration
+						.getDefaultOwlReasonerConfiguration(null), config));
+
 	}
 }

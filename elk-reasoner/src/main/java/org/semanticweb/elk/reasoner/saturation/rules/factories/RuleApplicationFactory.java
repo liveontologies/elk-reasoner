@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * A common interface for factories for worker engines that process a
@@ -41,7 +42,8 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
  * 
  * @author "Yevgeny Kazakov"
  */
-public interface RuleApplicationFactory<C extends Context, I extends RuleApplicationInput> {
+public interface RuleApplicationFactory<C extends Context, I extends RuleApplicationInput>
+		extends Interrupter {
 
 	/**
 	 * @return the {@link SaturationState} with which this

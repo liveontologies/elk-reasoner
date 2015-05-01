@@ -84,6 +84,7 @@ public class LazySetUnion<E> extends AbstractSet<E> {
 
 	@Override
 	public int size() {
+		// TODO: document that this is correct only when the sets are disjoint
 		return firstSet.size() + secondSet.size();
 	}
 

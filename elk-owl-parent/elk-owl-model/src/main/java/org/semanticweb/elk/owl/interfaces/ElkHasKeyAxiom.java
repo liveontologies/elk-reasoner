@@ -27,18 +27,31 @@ package org.semanticweb.elk.owl.interfaces;
 
 import java.util.Set;
 
+import org.semanticweb.elk.owl.visitors.ElkHasKeyAxiomVisitor;
+
 /**
- * Corresponds to a <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Keys">Keys<a> in the OWL 2 specification.
+ * Corresponds to a <a href= "http://www.w3.org/TR/owl2-syntax/#Keys">Keys<a> in
+ * the OWL 2 specification.
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  *
  */
 public interface ElkHasKeyAxiom extends ElkAxiom {
 
 	public ElkClassExpression getClassExpression();
+
 	public Set<ElkObjectPropertyExpression> getObjectPropertyExpressions();
+
 	public Set<ElkDataPropertyExpression> getDataPropertyExpressions();
+
+	/**
+	 * Accept an {@link ElkHasKeyAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkHasKeyAxiomVisitor<O> visitor);
 }

@@ -22,8 +22,11 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import java.util.ArrayList;
+
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -92,9 +95,8 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	public static void produceDecomposedExistentialLink(
 			ConclusionProducer producer, IndexedClassExpression source,
 			IndexedObjectSomeValuesFrom existential) {
-		IndexedObjectProperty relation = existential.getRelation();
-		if (relation.getSaturated().getCompositionsByLeftSubProperty()
-				.isEmpty()) {
+		if (existential.getProperty().getSaturated()
+				.getCompositionsByLeftSubProperty().isEmpty()) {
 			producer.produce(existential.getFiller(),
 					new DecomposedExistentialBackwardLink(source, existential));
 		} else {
@@ -109,15 +111,19 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 			IndexedClassExpression inferenceRoot,
 			IndexedPropertyChain forwardRelation,
 			IndexedClassExpression target,
-			IndexedBinaryPropertyChain composition) {
+			IndexedComplexPropertyChain composition) {
 
 		if (composition.getSaturated().getCompositionsByLeftSubProperty()
 				.isEmpty()) {
-			for (IndexedObjectProperty toldSuper : composition
-					.getToldSuperProperties()) {
+			ArrayList<IndexedObjectProperty> toldSuperProperties = composition
+					.getToldSuperProperties();
+			ArrayList<ElkAxiom> toldSuperPropertiesReasons = composition
+					.getToldSuperPropertiesReasons();
+			for (int i = 0; i < toldSuperProperties.size(); i++) {
 				producer.produce(target, new ComposedBackwardLink(source,
 						backwardRelation, inferenceRoot, forwardRelation,
-						target, composition, toldSuper));
+						target, composition, toldSuperProperties.get(i),
+						toldSuperPropertiesReasons.get(i)));
 			}
 		} else {
 			producer.produce(source, new ComposedForwardLink(source,
@@ -125,5 +131,4 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 					composition));
 		}
 	}
-
 }

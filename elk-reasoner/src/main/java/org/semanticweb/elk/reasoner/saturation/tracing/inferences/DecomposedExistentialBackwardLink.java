@@ -53,7 +53,7 @@ public class DecomposedExistentialBackwardLink extends BackwardLinkImpl
 	 */
 	public DecomposedExistentialBackwardLink(IndexedClassExpression source,
 			IndexedObjectSomeValuesFrom subsumer) {
-		super(source, subsumer.getRelation());
+		super(source, subsumer.getProperty());
 		existential_ = subsumer;
 		inferenceContext_ = source;
 	}

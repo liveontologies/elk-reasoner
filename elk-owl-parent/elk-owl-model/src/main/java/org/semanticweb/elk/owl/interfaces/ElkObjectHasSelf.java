@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkObjectHasSelfVisitor;
+
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Self-Restriction">Self-Restriction<a> in
@@ -34,5 +36,14 @@ package org.semanticweb.elk.owl.interfaces;
  */
 public interface ElkObjectHasSelf extends
 		ElkPropertyRestriction<ElkObjectPropertyExpression> {
+
+	/**
+	 * Accept an {@link ElkObjectHasSelfVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkObjectHasSelfVisitor<O> visitor);
 
 }

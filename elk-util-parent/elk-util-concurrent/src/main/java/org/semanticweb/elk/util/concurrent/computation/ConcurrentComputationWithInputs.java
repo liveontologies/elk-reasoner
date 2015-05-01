@@ -50,10 +50,16 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 	/**
 	 * the internal buffer for queuing input
 	 */
-	protected final BlockingQueue<I> buffer;
-	// we are never going to call any method on this object
+	private final BlockingQueue<I> buffer_;
+	/**
+	 * the capacity of the buffer
+	 */
+	private final int bufferCapacity_;
+	/**
+	 * a special object to "wake up" worker threads waiting for the input
+	 */
 	@SuppressWarnings("unchecked")
-	private I POISION_PILL = (I) new Object();
+	private final I poison_pill_ = (I) new Object();
 
 	/**
 	 * Creating a {@link ConcurrentComputationWithInputs} instance.
@@ -72,7 +78,13 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 	public ConcurrentComputationWithInputs(F inputProcessorFactory,
 			ComputationExecutor executor, int maxWorkers, int bufferCapacity) {
 		super(inputProcessorFactory, executor, maxWorkers);
-		this.buffer = new ArrayBlockingQueue<I>(bufferCapacity);
+		if (bufferCapacity <= maxWorkers) {
+			// we need poisons from the workers plus one input to fit in the
+			// buffer
+			bufferCapacity = maxWorkers + 1;
+		}
+		this.bufferCapacity_ = bufferCapacity;
+		this.buffer_ = new ArrayBlockingQueue<I>(bufferCapacity);
 	}
 
 	/**
@@ -105,28 +117,22 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 	 *             available
 	 */
 	public synchronized boolean submit(I input) throws InterruptedException {
-		if (finishRequested)
+		if (termination)
 			return false;
-		buffer.put(input);
+		buffer_.put(input);
 		return true;
 	}
 
-	/**
-	 * Request all currently running workers to stop; no input can be submitted
-	 * after calling this method. When this method returns, no worker should be
-	 * running.
-	 * 
-	 * @return the submitted inputs that were not processed by the workers
-	 * @throws InterruptedException
-	 */
 	@Override
-	public synchronized Iterable<I> interrupt() throws InterruptedException {
-		if (!interrupted) {
-			interrupted = true;
-			executor.interrupt();
+	protected synchronized void waitWorkers() throws InterruptedException {
+		if (buffer_.isEmpty())
+			// wake up blocked workers if not done already
+			buffer_.offer(poison_pill_);
+		super.waitWorkers();
+		// remove all poison pills		
+		while (buffer_.peek() == poison_pill_) {
+			buffer_.remove();
 		}
-		executor.waitDone();
-		return buffer;
 	}
 
 	@Override
@@ -134,16 +140,6 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 		return new Worker();
 	}
 
-	@Override
-	public void finish() throws InterruptedException {
-		if (!finishRequested) {
-			finishRequested = true;
-			buffer.put(POISION_PILL);
-		}
-		executor.waitDone();
-		processorFactory.finish();
-	}
-	
 	/**
 	 * The {@link Runnable} for workers processing the input
 	 * 
@@ -158,54 +154,49 @@ public class ConcurrentComputationWithInputs<I, F extends InputProcessorFactory<
 		private RuntimeException workerException_ = null;
 
 		@Override
-		public final void run() {
-			I nextInput = null;
+		public final void run() {			
+			// TODO: reuse the code from the superclass
 			// we use one engine per worker run
 			InputProcessor<I> inputProcessor = processorFactory.getEngine();
 
 			try {
 				boolean doneProcess = false;
 				for (;;) {
-					if (interrupted) {
-						break;
+					// make sure that all previously submitted inputs are
+					// processed
+					if (!doneProcess) {
+						inputProcessor.process(); // can be interrupted
+						doneProcess = true;
 					}
-					try {
-						// make sure that all previously submitted inputs are
-						// processed
-						if (!doneProcess) {
-							inputProcessor.process(); // can be interrupted
-							doneProcess = true;
+					I nextInput = buffer_.take();
+					if (nextInput != poison_pill_) {						
+						inputProcessor.submit(nextInput); // should not fail
+						inputProcessor.process(); // can be interrupted
+					}
+					if (termination) {
+						if (buffer_.isEmpty()) {
+							// wake up blocked workers if not done already
+							buffer_.put(poison_pill_);
+							break;
 						}
-						if (finishRequested) {
-							// do not poll if we've already eaten the poison pill
-							nextInput = buffer.poll();
-							//if (nextInput == null) {
-							if (nextInput == POISION_PILL || nextInput == null) {
-								// let's poison the workers blocked by the empty buffer
-								buffer.put(POISION_PILL);
-								// make sure nothing is left unprocessed
-								inputProcessor.process(); // can be interrupted
-								if (!interrupted && Thread.interrupted())
-									continue;
-								break;
-							}
-						} else {
-							nextInput = buffer.take();
-							
-							if (nextInput == POISION_PILL) {
+						if (isInterrupted()) {
+							if (buffer_.size() == bufferCapacity_) {
+								// buffer is full, producer may be blocked,
+								// need to consume one more input
 								continue;
 							}
-						}
-						inputProcessor.submit(nextInput); // should never fail
-						inputProcessor.process(); // can be interrupted
-					} catch (InterruptedException e) {
-						if (interrupted) {
-							// restore the interrupt status and exit
-							Thread.currentThread().interrupt();
+							// else
 							break;
 						}
 					}
 				}
+			} catch (InterruptedException e) {
+				/*
+				 * we don't know what is causing this but we need to obey;
+				 * consistency of the computation for such interrupt is not
+				 * guaranteed; restore the interrupt status and exit
+				 */
+				Thread.currentThread().interrupt();
 			} catch (Throwable e) {
 				workerException_ = new RuntimeException(
 						"Exception in worker thread: ", e);

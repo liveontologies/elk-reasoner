@@ -27,10 +27,10 @@ import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkDisjointObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.visitors.ElkDisjointObjectPropertiesAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectPropertyAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLDisjointObjectPropertiesAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
-
 
 /**
  * Implements the {@link ElkDisjointObjectPropertiesAxiom} interface by wrapping
@@ -61,6 +61,11 @@ public class ElkDisjointObjectPropertiesAxiomWrap<T extends OWLDisjointObjectPro
 
 	@Override
 	public <O> O accept(ElkObjectPropertyAxiomVisitor<O> visitor) {
+		return accept((ElkDisjointObjectPropertiesAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDisjointObjectPropertiesAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

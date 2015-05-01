@@ -28,10 +28,11 @@ import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDifferentIndividualsAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * ELK implementation of ElkDifferentIndividualsAxiom.
+ * Implementation of {@link ElkDifferentIndividualsAxiom}.
  * 
  * @author Markus Kroetzsch
  */
@@ -49,11 +50,16 @@ public class ElkDifferentIndividualsAxiomImpl extends ElkIndividualListObject
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkDifferentIndividualsAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkDifferentIndividualsAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDifferentIndividualsAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

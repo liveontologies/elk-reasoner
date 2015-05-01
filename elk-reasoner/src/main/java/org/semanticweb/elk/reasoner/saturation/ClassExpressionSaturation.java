@@ -54,7 +54,7 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 	 * Takes inputs and uses the default rule application factory and a dummy
 	 * listener
 	 */
-	public ClassExpressionSaturation(Collection<I> inputs,
+	public ClassExpressionSaturation(Collection<? extends I> inputs,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor,
 			RuleApplicationFactory<?, RuleApplicationInput> ruleAppFactory) {
@@ -65,7 +65,7 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 	/*
 	 * Takes inputs and uses the default rule application factory
 	 */
-	public ClassExpressionSaturation(Collection<I> inputs,
+	public ClassExpressionSaturation(Collection<? extends I> inputs,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor,
 			RuleApplicationFactory<?, RuleApplicationInput> ruleAppFactory,
@@ -97,9 +97,9 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 	private static class TodoJobs<I extends IndexedClassExpression> extends
 			AbstractCollection<SaturationJob<I>> {
 
-		private final Collection<I> inputs;
+		private final Collection<? extends I> inputs;
 
-		TodoJobs(Collection<I> inputs) {
+		TodoJobs(Collection<? extends I> inputs) {
 			this.inputs = inputs;
 		}
 
@@ -112,7 +112,7 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 		public Iterator<SaturationJob<I>> iterator() {
 			return new Iterator<SaturationJob<I>>() {
 
-				final Iterator<I> inputsIterator = inputs.iterator();
+				final Iterator<? extends I> inputsIterator = inputs.iterator();
 
 				@Override
 				public boolean hasNext() {

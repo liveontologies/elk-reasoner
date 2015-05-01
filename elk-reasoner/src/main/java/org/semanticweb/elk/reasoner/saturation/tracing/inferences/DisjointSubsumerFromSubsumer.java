@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,8 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
@@ -33,25 +35,28 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
- * Represents an inference of the {@link DisjointSubsumer} from a regular subsumer.
+ * Represents an inference of the {@link DisjointSubsumer} from a regular
+ * subsumer.
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
-public class DisjointSubsumerFromSubsumer extends DisjointSubsumerImpl implements ClassInference {
+public class DisjointSubsumerFromSubsumer extends DisjointSubsumerImpl
+		implements ClassInference {
 
-	public DisjointSubsumerFromSubsumer(IndexedDisjointnessAxiom axiom,
-			IndexedClassExpression member) {
-		super(axiom, member);
+	public DisjointSubsumerFromSubsumer(IndexedClassExpression member,
+			IndexedDisjointClassesAxiom axiom, ElkAxiom reason) {
+		super(member, axiom, reason);
 	}
-	
+
 	public Subsumer<?> getPremise() {
 		return new DecomposedSubsumerImpl<IndexedClassExpression>(getMember());
 	}
 
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

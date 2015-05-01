@@ -25,8 +25,6 @@
  */
 package org.semanticweb.elk.owl.visitors;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 
 /**
@@ -36,12 +34,11 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
  * @author "Yevgeny Kazakov"
  * 
  * @param <O>
- *            the output type of the visitor
+ *            the type of the output of this visitor
  */
-public interface ElkObjectPropertyExpressionVisitor<O> {
+public interface ElkObjectPropertyExpressionVisitor<O> extends
+		ElkObjectInverseOfVisitor<O>, ElkObjectPropertyVisitor<O> {
 
-	O visit(ElkObjectInverseOf elkObjectInverseOf);
-
-	O visit(ElkObjectProperty elkObjectProperty);
+	// combined visitor
 
 }

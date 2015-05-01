@@ -28,6 +28,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkEquivalentClassesAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 
@@ -58,6 +59,11 @@ public class ElkEquivalentClassesAxiomWrap<T extends OWLEquivalentClassesAxiom>
 
 	@Override
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {
+		return accept((ElkEquivalentClassesAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkEquivalentClassesAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

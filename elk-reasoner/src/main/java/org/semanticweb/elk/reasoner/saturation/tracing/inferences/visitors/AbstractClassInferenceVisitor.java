@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
@@ -37,13 +38,13 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExis
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjunctionComposition;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InitializationSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedContradiction;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SuperReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
 
 /**
@@ -109,6 +110,11 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 	}
 
 	@Override
+	public O visit(SuperReversedForwardLink conclusion, I input) {
+		return defaultTracedVisit(conclusion, input);
+	}
+
+	@Override
 	public O visit(SubClassOfSubsumer<?> conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
@@ -148,7 +154,7 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 	public O visit(DisjointSubsumerFromSubsumer conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
-	
+
 	@Override
 	public O visit(DisjunctionComposition conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);

@@ -35,14 +35,14 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
-import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
-import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
@@ -76,16 +76,16 @@ import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxio
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
@@ -103,7 +103,8 @@ import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.iris.ElkIri;
+import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
 
 /**
  * A skeleton implementation
@@ -371,7 +372,7 @@ public abstract class AbstractElkObjectVisitor<O> implements ElkObjectVisitor<O>
 	}
 
 	@Override
-	public O visit(ElkDataExactCardinality obj) {
+	public O visit(ElkDataExactCardinalityUnqualified obj) {
 		
 		return defaultVisit(obj);
 	}
@@ -390,7 +391,7 @@ public abstract class AbstractElkObjectVisitor<O> implements ElkObjectVisitor<O>
 	}
 
 	@Override
-	public O visit(ElkDataMaxCardinality obj) {
+	public O visit(ElkDataMaxCardinalityUnqualified obj) {
 		
 		return defaultVisit(obj);
 	}
@@ -402,7 +403,7 @@ public abstract class AbstractElkObjectVisitor<O> implements ElkObjectVisitor<O>
 	}
 
 	@Override
-	public O visit(ElkDataMinCardinality obj) {
+	public O visit(ElkDataMinCardinalityUnqualified obj) {
 		
 		return defaultVisit(obj);
 	}
@@ -432,7 +433,7 @@ public abstract class AbstractElkObjectVisitor<O> implements ElkObjectVisitor<O>
 	}
 
 	@Override
-	public O visit(ElkObjectExactCardinality obj) {
+	public O visit(ElkObjectExactCardinalityUnqualified obj) {
 		
 		return defaultVisit(obj);
 	}
@@ -463,7 +464,7 @@ public abstract class AbstractElkObjectVisitor<O> implements ElkObjectVisitor<O>
 	}
 
 	@Override
-	public O visit(ElkObjectMaxCardinality obj) {
+	public O visit(ElkObjectMaxCardinalityUnqualified obj) {
 		
 		return defaultVisit(obj);
 	}
@@ -476,7 +477,7 @@ public abstract class AbstractElkObjectVisitor<O> implements ElkObjectVisitor<O>
 	}
 
 	@Override
-	public O visit(ElkObjectMinCardinality obj) {
+	public O visit(ElkObjectMinCardinalityUnqualified obj) {
 		
 		return defaultVisit(obj);
 	}
@@ -603,7 +604,13 @@ public abstract class AbstractElkObjectVisitor<O> implements ElkObjectVisitor<O>
 	}
 
 	@Override
-	public O visit(ElkIri iri) {
+	public O visit(ElkFullIri iri) {
+		
+		return defaultVisit(iri);
+	}
+	
+	@Override
+	public O visit(ElkAbbreviatedIri iri) {
 		
 		return defaultVisit(iri);
 	}

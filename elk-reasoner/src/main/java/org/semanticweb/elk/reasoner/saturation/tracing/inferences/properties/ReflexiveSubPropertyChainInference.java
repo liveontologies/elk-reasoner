@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.util.hashing.HashGenerator;
 
@@ -37,9 +37,9 @@ import org.semanticweb.elk.util.hashing.HashGenerator;
  */
 public abstract class ReflexiveSubPropertyChainInference<R extends IndexedPropertyChain> extends SubPropertyChain<R, IndexedPropertyChain> implements ObjectPropertyInference {
 
-	final IndexedBinaryPropertyChain chain;
+	final IndexedComplexPropertyChain chain;
 	
-	protected ReflexiveSubPropertyChainInference(IndexedBinaryPropertyChain chain, R subChain, IndexedPropertyChain sup) {
+	protected ReflexiveSubPropertyChainInference(IndexedComplexPropertyChain chain, R subChain, IndexedPropertyChain sup) {
 		super(subChain, sup);
 		
 		this.chain = chain;
@@ -61,7 +61,7 @@ public abstract class ReflexiveSubPropertyChainInference<R extends IndexedProper
 		return HashGenerator.combineListHash(chain.hashCode(), getSuperPropertyChain().hashCode());
 	}	
 	
-	public IndexedBinaryPropertyChain getPremiseChain() {
+	public IndexedComplexPropertyChain getPremiseChain() {
 		return chain;
 	}
 	

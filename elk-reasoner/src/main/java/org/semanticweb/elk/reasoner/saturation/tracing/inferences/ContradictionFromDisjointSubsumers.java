@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,8 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.AbstractConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DisjointSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
@@ -36,32 +38,38 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
 
 /**
  * Represents a {@link Contradiction} as the result of processing a
- * {@link Subsumer} which occurs in the same {@link IndexedDisjointnessAxiom} as
- * some previously derived subsumer.
+ * {@link Subsumer} which occurs in the same {@link IndexedDisjointClassesAxiom}
+ * as some previously derived subsumer.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ContradictionFromDisjointSubsumers extends AbstractConclusion implements Contradiction, ClassInference {
+public class ContradictionFromDisjointSubsumers extends AbstractConclusion
+		implements Contradiction, ClassInference {
 
 	/**
-	 * Subsumer for which the contradiction rule was applied
+	 * The axiom which causes the contradiction
 	 */
-	private final IndexedClassExpression premise_;
+	private final IndexedDisjointClassesAxiom axiom_;
+
 	/**
-	 * Previously derived disjoint subsumers occurring in the same disjointness axiom.
+	 * The original {@link ElkAxiom} due to which this axiom was indexed
+	 */
+	private final ElkAxiom reason_;
+
+	/**
+	 * The two members that violate the disjointness axiom
 	 */
 	private final IndexedClassExpression[] disjointSubsumers_;
-	
-	private final IndexedDisjointnessAxiom axiom_;
-	
-	public ContradictionFromDisjointSubsumers(DisjointSubsumer ds, IndexedClassExpression[] disjointSubsumers) {
-		premise_ = ds.getMember();
-		axiom_ = ds.getAxiom();
-		disjointSubsumers_ = disjointSubsumers;
+
+	public ContradictionFromDisjointSubsumers(DisjointSubsumer premise,
+			IndexedClassExpression[] disjointSubsumers) {
+		this.axiom_ = premise.getAxiom();
+		this.disjointSubsumers_ = disjointSubsumers;
+		this.reason_ = premise.getReason();
 	}
-	
+
 	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
@@ -69,26 +77,26 @@ public class ContradictionFromDisjointSubsumers extends AbstractConclusion imple
 
 	@Override
 	public String toString() {
-		return "Contradiction from disjoint subsumer " + premise_;
+		return "Contradiction from disjoint subsumer " + disjointSubsumers_[1]
+				+ " using " + disjointSubsumers_[0] + " due to " + reason_;
 	}
 
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 
 	public DisjointSubsumer[] getPremises() {
 		return new DisjointSubsumer[] {
-				new DisjointSubsumerImpl(axiom_, premise_),
-				new DisjointSubsumerImpl(axiom_, disjointSubsumers_[0]),
-				new DisjointSubsumerImpl(axiom_, disjointSubsumers_[1]) };
-		//return new DisjointSubsumerImpl(axiom_, premise_);
+				new DisjointSubsumerImpl(disjointSubsumers_[0], axiom_, reason_),
+				new DisjointSubsumerImpl(disjointSubsumers_[1], axiom_, reason_) };
 	}
-	
-	public IndexedDisjointnessAxiom getAxiom() {
-		return axiom_;
+
+	public ElkAxiom getReason() {
+		return reason_;
 	}
-	
+
 	@Override
 	public IndexedClassExpression getInferenceContextRoot(
 			IndexedClassExpression rootWhereStored) {

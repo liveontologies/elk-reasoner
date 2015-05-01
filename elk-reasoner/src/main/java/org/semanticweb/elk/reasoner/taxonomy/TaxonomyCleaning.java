@@ -51,6 +51,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTypeNode;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 
 /**
  * Cleans both class and instance taxonomies concurrently
@@ -80,7 +81,7 @@ public class TaxonomyCleaning
  * 
  *         pavel.klinov@uni-ulm.de
  */
-class TaxonomyCleaningFactory
+class TaxonomyCleaningFactory extends SimpleInterrupter
 		implements
 		InputProcessorFactory<IndexedClassEntity, InputProcessor<IndexedClassEntity>> {
 
@@ -135,7 +136,7 @@ class TaxonomyCleaningFactory
 			}
 
 			private void submitClass(IndexedClass indexedClass) {
-				ElkClass elkClass = indexedClass.getElkClass();
+				ElkClass elkClass = indexedClass.getElkEntity();
 				UpdateableTaxonomy<ElkClass> classTaxonomy = classTaxonomyState_
 						.getTaxonomy();
 				UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = instanceTaxonomyState_
@@ -233,7 +234,7 @@ class TaxonomyCleaningFactory
 					UpdateableInstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = instanceTaxonomyState_
 							.getTaxonomy();
 					ElkNamedIndividual individual = indexedIndividual
-							.getElkNamedIndividual();
+							.getElkEntity();
 					UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy
 							.getInstanceNode(individual);
 
@@ -258,8 +259,11 @@ class TaxonomyCleaningFactory
 			}
 
 			@Override
-			public void process() throws InterruptedException {
+			public void process() {
 				for (;;) {
+					if (isInterrupted())
+						return;
+
 					UpdateableTaxonomyNode<ElkClass> node = toRemove_.poll();
 
 					if (node == null) {
@@ -298,4 +302,5 @@ class TaxonomyCleaningFactory
 	public void finish() {
 		// nothing to do
 	}
+
 }

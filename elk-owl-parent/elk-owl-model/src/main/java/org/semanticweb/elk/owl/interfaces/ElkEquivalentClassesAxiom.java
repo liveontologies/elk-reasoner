@@ -27,6 +27,8 @@ package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.visitors.ElkEquivalentClassesAxiomVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Equivalent_Classes">Equivalent Class
@@ -44,5 +46,14 @@ public interface ElkEquivalentClassesAxiom extends ElkClassAxiom {
 	 * @return list of equivalent class expressions
 	 */
 	public List<? extends ElkClassExpression> getClassExpressions();
+
+	/**
+	 * Accept an {@link ElkEquivalentClassesAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(ElkEquivalentClassesAxiomVisitor<O> visitor);
 
 }

@@ -22,10 +22,14 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
-import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.visitors.ElkCardinalityRestrictionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectExactCardinalityUnqualifiedVisitor;
+import org.semanticweb.elk.owl.visitors.ElkObjectExactCardinalityVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionVisitor;
 import org.semanticweb.owlapi.model.OWLObjectExactCardinality;
 
 /**
@@ -38,7 +42,8 @@ import org.semanticweb.owlapi.model.OWLObjectExactCardinality;
  *            the type of the wrapped object
  */
 public class ElkObjectExactCardinalityWrap<T extends OWLObjectExactCardinality>
-		extends ElkClassExpressionWrap<T> implements ElkObjectExactCardinality {
+		extends ElkClassExpressionWrap<T> implements
+		ElkObjectExactCardinalityUnqualified {
 
 	ElkObjectExactCardinalityWrap(T owlObjectExactCardinality) {
 		super(owlObjectExactCardinality);
@@ -56,6 +61,26 @@ public class ElkObjectExactCardinalityWrap<T extends OWLObjectExactCardinality>
 
 	@Override
 	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+		return accept((ElkObjectExactCardinalityUnqualifiedVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectExactCardinalityVisitor<O> visitor) {
+		return accept((ElkObjectExactCardinalityUnqualifiedVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkCardinalityRestrictionVisitor<O> visitor) {
+		return accept((ElkObjectExactCardinalityUnqualifiedVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyRestrictionVisitor<O> visitor) {
+		return accept((ElkObjectExactCardinalityUnqualifiedVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectExactCardinalityUnqualifiedVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

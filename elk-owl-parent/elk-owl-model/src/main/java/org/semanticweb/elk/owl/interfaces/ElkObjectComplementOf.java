@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkObjectComplementOfVisitor;
+
 /**
  * Corresponds to the <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Complement_of_Class_Expressions"
@@ -32,10 +34,19 @@ package org.semanticweb.elk.owl.interfaces;
 public interface ElkObjectComplementOf extends ElkClassExpression {
 
 	/**
-	 * Get the class expression that this expression refers to.
+	 * Get the class expression that this expression negation of.
 	 * 
 	 * @return class expression
 	 */
 	public ElkClassExpression getClassExpression();
+
+	/**
+	 * Accept an {@link ElkObjectComplementOfVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkObjectComplementOfVisitor<O> visitor);
 
 }

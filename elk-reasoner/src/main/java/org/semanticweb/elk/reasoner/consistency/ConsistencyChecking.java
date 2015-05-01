@@ -30,8 +30,8 @@ import java.util.NoSuchElementException;
 
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
@@ -41,6 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Contra
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
 import org.semanticweb.elk.util.collections.Operations;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,7 +140,7 @@ public class ConsistencyChecking
 	 */
 	public static Collection<IndexedClassEntity> getTestEntities(
 			final OntologyIndex ontologyIndex) {
-		if (!ontologyIndex.getIndexedOwlNothing().occursPositively()) {
+		if (!ontologyIndex.hasPositivelyOwlNothing()) {
 			LOGGER_.trace("owl:Nothing does not occur positively; ontology is consistent");
 			/*
 			 * if the ontology does not have any positive occurrence of bottom,
@@ -155,18 +156,17 @@ public class ConsistencyChecking
 		 */
 		return new AbstractCollection<IndexedClassEntity>() {
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public Iterator<IndexedClassEntity> iterator() {
-				return Operations
-						.concat(Operations.singleton(ontologyIndex
-								.getIndexedOwlThing()),
-								ontologyIndex.getIndexedIndividuals())
-						.iterator();
+				return Operations.concat(
+						Operations.singleton(ontologyIndex.getOwlThing()),
+						ontologyIndex.getIndividuals()).iterator();
 			}
 
 			@Override
 			public int size() {
-				return ontologyIndex.getIndexedIndividuals().size() + 1;
+				return ontologyIndex.getIndividuals().size() + 1;
 			}
 		};
 	}
@@ -193,9 +193,9 @@ public class ConsistencyChecking
 
 	@Override
 	public void process() {
-		consistencyMonitor_.registerCurrentThreadToInterrupt();
+		consistencyMonitor_.registerInterrupt(ConsistencyChecking.this);
 		super.process();
-		consistencyMonitor_.clearThreadToInterrupt();
+		consistencyMonitor_.clearComputationToInterrupt();
 	}
 
 	/**
@@ -206,7 +206,7 @@ public class ConsistencyChecking
 	public boolean isInconsistent() {
 		return consistencyMonitor_.isInconsistent();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -242,7 +242,7 @@ public class ConsistencyChecking
 		public void notifyFinished(SaturationJob<IndexedClassEntity> job) {
 			boolean inconsistent = job.getOutput().containsConclusion(
 					ContradictionImpl.getInstance());
-			
+
 			if (inconsistent)
 				consistenceMonitor.setInconsistent(job.getInput());
 			if (LOGGER_.isTraceEnabled())
@@ -262,33 +262,31 @@ public class ConsistencyChecking
 	 */
 	static class ConsistencyMonitor {
 		private volatile IndexedClassEntity inconsistentEntity_ = null;
-		private volatile Thread controlThread_;
+		private volatile Interrupter interrupter_;
 
-		public void registerThreadToInterrupt(Thread controlThread) {
-			this.controlThread_ = controlThread;
+		public void registerInterrupt(Interrupter computation) {
+			this.interrupter_ = computation;
 		}
 
-		public void registerCurrentThreadToInterrupt() {
-			registerThreadToInterrupt(Thread.currentThread());
-		}
-
-		public void clearThreadToInterrupt() {
-			this.controlThread_ = null;
+		public void clearComputationToInterrupt() {
+			this.interrupter_ = null;
 		}
 
 		public boolean isInconsistent() {
 			return inconsistentEntity_ != null;
 		}
-		
+
 		public IndexedClassEntity getInconsistentEntity() {
 			return inconsistentEntity_;
 		}
 
 		public void setInconsistent(IndexedClassEntity entity) {
 			inconsistentEntity_ = entity;
-			// interrupt the reasoner
-			if (controlThread_ != null)
-				controlThread_.interrupt();
+			// interrupt all workers
+			if (interrupter_ != null)
+				interrupter_.setInterrupt(true);
+			else
+				LOGGER_.error("no interrupter registered!");
 		}
 
 	}

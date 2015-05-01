@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkSubClassOfAxiomVisitor;
+
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Subclass_Axioms">Subclass Axiom<a> in the
@@ -47,5 +49,14 @@ public interface ElkSubClassOfAxiom extends ElkClassAxiom {
 	 * @return super class expression
 	 */
 	public ElkClassExpression getSuperClassExpression();
+
+	/**
+	 * Accept an {@link ElkSubClassOfAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(ElkSubClassOfAxiomVisitor<O> visitor);
 
 }

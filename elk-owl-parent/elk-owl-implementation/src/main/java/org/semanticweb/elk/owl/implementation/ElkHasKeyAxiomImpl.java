@@ -32,6 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkHasKeyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -44,40 +45,45 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  */
 public class ElkHasKeyAxiomImpl implements ElkHasKeyAxiom {
 
-	private final ElkClassExpression classExpr;
-	private final Set<ElkObjectPropertyExpression> objectPropExprs;
-	private final Set<ElkDataPropertyExpression> dataPropExprs;
+	private final ElkClassExpression classExp_;
+	private final Set<ElkObjectPropertyExpression> objectPropExprs_;
+	private final Set<ElkDataPropertyExpression> dataPropExprs_;
 
-	ElkHasKeyAxiomImpl(ElkClassExpression clazz,
+	ElkHasKeyAxiomImpl(ElkClassExpression classExp,
 			Set<ElkObjectPropertyExpression> objectPEs,
 			Set<ElkDataPropertyExpression> dataPEs) {
-		classExpr = clazz;
-		objectPropExprs = objectPEs;
-		dataPropExprs = dataPEs;
-	}
-
-	@Override
-	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return visitor.visit(this);
+		classExp_ = classExp;
+		objectPropExprs_ = objectPEs;
+		dataPropExprs_ = dataPEs;
 	}
 
 	@Override
 	public ElkClassExpression getClassExpression() {
-		return classExpr;
+		return classExp_;
 	}
 
 	@Override
 	public Set<ElkObjectPropertyExpression> getObjectPropertyExpressions() {
-		return objectPropExprs;
+		return objectPropExprs_;
 	}
 
 	@Override
 	public Set<ElkDataPropertyExpression> getDataPropertyExpressions() {
-		return dataPropExprs;
+		return dataPropExprs_;
+	}
+
+	@Override
+	public <O> O accept(ElkAxiomVisitor<O> visitor) {
+		return accept((ElkHasKeyAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkHasKeyAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkHasKeyAxiomVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }

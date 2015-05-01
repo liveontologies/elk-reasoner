@@ -33,8 +33,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.visitors.AbstractIndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.NoOpIndexedClassExpressionVisitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
@@ -68,7 +68,7 @@ public class IncrementalDeletionInitializationStage extends
 
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		LinkedContextInitRule changedInitRules = null;
-		Map<IndexedClassExpression, ChainableSubsumerRule> changedRulesByCE = null;
+		Map<? extends IndexedClassExpression, ChainableSubsumerRule> changedRulesByCE = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 
 		changedInitRules = diffIndex.getRemovedContextInitRules();
@@ -82,7 +82,7 @@ public class IncrementalDeletionInitializationStage extends
 
 		// System.err.println(changedRulesByCE.keySet().size());
 
-		this.initialization_ = new IncrementalChangesInitialization(inputs,
+		this.initialization = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
 				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
 				reasoner.getProgressMonitor());
@@ -94,7 +94,7 @@ public class IncrementalDeletionInitializationStage extends
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		this.initialization_ = null;
+		this.initialization = null;
 		// initializing contexts which will be removed
 		final SaturationStateWriter<?> satStateWriter = SaturationUtils
 				.getStatsAwareWriter(
@@ -104,7 +104,7 @@ public class IncrementalDeletionInitializationStage extends
 				.getWriter();
 		final InstanceTaxonomyState.Writer instanceTaxStateWriter = reasoner.instanceTaxonomyState
 				.getWriter();
-		final IndexedClassExpressionVisitor<Object> entityRemovalVisitor = new AbstractIndexedClassEntityVisitor<Object>() {
+		final IndexedClassExpressionVisitor<Object> entityRemovalVisitor = new NoOpIndexedClassExpressionVisitor<Object>() {
 
 			@Override
 			public Object visit(IndexedClass element) {

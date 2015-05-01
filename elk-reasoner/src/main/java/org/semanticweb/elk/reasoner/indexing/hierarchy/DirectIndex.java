@@ -22,215 +22,129 @@
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import java.util.AbstractCollection;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
-
-import org.semanticweb.elk.owl.interfaces.ElkClass;
-import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
+import org.semanticweb.elk.owl.predefined.PredefinedElkDeclaration;
+import org.semanticweb.elk.reasoner.indexing.caching.ModifiableIndexedObjectCacheImpl;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ChainableContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
-import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.HashListMultimap;
+import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 
 /**
+ * An implementation of {@link ModifiableOntologyIndex}
  * 
- * 
+ * @author "Yevgeny Kazakov"
+ *
  */
-public class DirectIndex implements ModifiableOntologyIndex {
+public class DirectIndex extends ModifiableIndexedObjectCacheImpl implements
+		ModifiableOntologyIndex {
 
-	final IndexedClass indexedOwlThing, indexedOwlNothing;
-
-	final IndexedObjectCache objectCache;
 	private ChainableContextInitRule contextInitRules_;
 
-	private final Set<IndexedObjectProperty> reflexiveObjectProperties_;
+	private final Multimap<IndexedObjectProperty, ElkAxiom> reflexiveObjectProperties_;
 
-	public DirectIndex(IndexedObjectCache objectCache) {
-		this.objectCache = objectCache;
+	private int negativeOwlThingOccurrenceNo_ = 0,
+			positiveOwlNothingOccurrenceNo_ = 0;
+
+	public DirectIndex() {
+		this.reflexiveObjectProperties_ = new HashListMultimap<IndexedObjectProperty, ElkAxiom>(
+				64);
 
 		// the context root initialization rule is always registered
 		RootContextInitializationRule.addRuleFor(this);
 
-		// index predefined entities
-		MainAxiomIndexerVisitor tmpAxiomInserter = new MainAxiomIndexerVisitor(
-				this, true);
-		// TODO: what to do if someone tries to delete them?
-		this.indexedOwlThing = tmpAxiomInserter
-				.indexClassDeclaration(PredefinedElkClass.OWL_THING);
-		this.indexedOwlNothing = tmpAxiomInserter
-				.indexClassDeclaration(PredefinedElkClass.OWL_NOTHING);
-
-		this.reflexiveObjectProperties_ = new ArrayHashSet<IndexedObjectProperty>(
-				64);
+		// index build-in declarations TODO: move somewhere else
+		ElkAxiomConverter tmpConverter = new ElkAxiomConverterImpl(this, 1);
+		for (ElkDeclarationAxiom declaration : PredefinedElkDeclaration
+				.values()) {
+			try {
+				declaration.accept(tmpConverter);
+			} catch (ElkIndexingUnsupportedException e) {
+				// ignore unsupported declarations
+				continue;
+			}
+		}
 	}
 
 	/* read-only methods required by the interface */
-	
+
 	@Override
 	public LinkedContextInitRule getContextInitRuleHead() {
 		return contextInitRules_;
 	}
 
 	@Override
-	public Collection<IndexedClassExpression> getIndexedClassExpressions() {
-		return objectCache.indexedClassExpressionLookup;
-	}
-
-	@Override
-	public Collection<IndexedClass> getIndexedClasses() {
-		return new AbstractCollection<IndexedClass>() {
-			@Override
-			public Iterator<IndexedClass> iterator() {
-				return Operations.filter(getIndexedClassExpressions(),
-						IndexedClass.class).iterator();
-			}
-
-			@Override
-			public int size() {
-				return objectCache.indexedClassCount;
-			}
-		};
-	}
-
-	@Override
-	public Collection<IndexedIndividual> getIndexedIndividuals() {
-		return new AbstractCollection<IndexedIndividual>() {
-
-			@Override
-			public Iterator<IndexedIndividual> iterator() {
-				return Operations.filter(getIndexedClassExpressions(),
-						IndexedIndividual.class).iterator();
-			}
-
-			@Override
-			public int size() {
-				return objectCache.indexedIndividualCount;
-			}
-
-		};
-	}
-
-	@Override
-	public Collection<IndexedPropertyChain> getIndexedPropertyChains() {
-		return objectCache.indexedPropertyChainLookup;
-	}
-
-	@Override
-	public Collection<IndexedObjectProperty> getIndexedObjectProperties() {
-		return new AbstractCollection<IndexedObjectProperty>() {
-
-			@Override
-			public Iterator<IndexedObjectProperty> iterator() {
-				return Operations.filter(getIndexedPropertyChains(),
-						IndexedObjectProperty.class).iterator();
-			}
-
-			@Override
-			public int size() {
-				return objectCache.indexedObjectPropertyCount;
-			}
-		};
-	}
-
-	@Override
-	public Collection<IndexedObjectProperty> getReflexiveObjectProperties() {
-		return Collections.unmodifiableCollection(reflexiveObjectProperties_);
-	}
-
-	@Override
-	public IndexedClass getIndexedOwlThing() {
-		return indexedOwlThing;
-	}
-
-	@Override
-	public IndexedClass getIndexedOwlNothing() {
-		return indexedOwlNothing;
+	public Multimap<IndexedObjectProperty, ElkAxiom> getReflexiveObjectProperties() {
+		// TODO: make unmodifiable
+		return reflexiveObjectProperties_;
 	}
 
 	/* read-write methods required by the interface */
 
 	@Override
-	public IndexedObjectCache getIndexedObjectCache() {
-		return this.objectCache;
+	public boolean addContextInitRule(ChainableContextInitRule newRule) {
+		return newRule.addTo(getContextInitRuleChain());
 	}
 
 	@Override
-	public void addClass(ElkClass newClass) {
-		// we do not rack signature changes
+	public boolean removeContextInitRule(ChainableContextInitRule oldRule) {
+		return oldRule.removeFrom(getContextInitRuleChain());
 	}
 
 	@Override
-	public void removeClass(ElkClass oldClass) {
-		// we do not rack signature changes
+	public boolean add(ModifiableIndexedClassExpression target,
+			ChainableSubsumerRule rule) {
+		return rule.addTo(target.getCompositionRuleChain());
 	}
 
 	@Override
-	public void addNamedIndividual(ElkNamedIndividual newIndividual) {
-		// we do not rack signature changes
+	public boolean remove(ModifiableIndexedClassExpression target,
+			ChainableSubsumerRule rule) {
+		return rule.removeFrom(target.getCompositionRuleChain());
 	}
 
 	@Override
-	public void removeNamedIndividual(ElkNamedIndividual oldIndividual) {
-		// we do not rack signature changes
+	public boolean addReflexiveProperty(IndexedObjectProperty property,
+			ElkAxiom reason) {
+		return reflexiveObjectProperties_.add(property, reason);
 	}
 
 	@Override
-	public void addContextInitRule(ChainableContextInitRule newRule) {
-		newRule.addTo(getContextInitRuleChain());
+	public boolean removeReflexiveProperty(IndexedObjectProperty property,
+			ElkAxiom reason) {
+		return reflexiveObjectProperties_.remove(property, reason);
 	}
 
 	@Override
-	public void removeContextInitRule(ChainableContextInitRule oldRule) {
-		if (!oldRule.removeFrom(getContextInitRuleChain()))
-			throw new ElkUnexpectedIndexingException(
-					"Cannot remove context initialization rule "
-							+ oldRule.getName());
+	public boolean hasNegativeOwlThing() {
+		return negativeOwlThingOccurrenceNo_ > 0;
 	}
 
 	@Override
-	public void add(IndexedClassExpression target, ChainableSubsumerRule rule) {
-		rule.addTo(target.getCompositionRuleChain());
+	public boolean updateNegativeOwlThingOccurrenceNo(int increment) {
+		negativeOwlThingOccurrenceNo_ += increment;
+		return true;
 	}
 
 	@Override
-	public void remove(IndexedClassExpression target, ChainableSubsumerRule rule) {
-		if (!rule.removeFrom(target.getCompositionRuleChain()))
-			throw new ElkUnexpectedIndexingException(
-					"Cannot remove composition rule " + rule.getName()
-							+ " for " + target);
+	public boolean hasPositivelyOwlNothing() {
+		return positiveOwlNothingOccurrenceNo_ > 0;
 	}
 
 	@Override
-	public void add(IndexedObject newObject) {
-		newObject.accept(objectCache.inserter);
-	}
-
-	@Override
-	public void remove(IndexedObject oldObject) {
-		if (!oldObject.accept(objectCache.deletor))
-			throw new ElkUnexpectedIndexingException(
-					"Cannot remove indexed object from the cache " + oldObject);
-	}
-
-	@Override
-	public void addReflexiveProperty(IndexedObjectProperty property) {
-		reflexiveObjectProperties_.add(property);
-	}
-
-	@Override
-	public void removeReflexiveProperty(IndexedObjectProperty property) {
-		if (!reflexiveObjectProperties_.remove(property))
-			throw new ElkUnexpectedIndexingException(
-					"Cannot remove reflexivity of object property " + property);
+	public boolean updatePositiveOwlNothingOccurrenceNo(int increment) {
+		positiveOwlNothingOccurrenceNo_ += increment;
+		return true;
 	}
 
 	/* class-specific methods */

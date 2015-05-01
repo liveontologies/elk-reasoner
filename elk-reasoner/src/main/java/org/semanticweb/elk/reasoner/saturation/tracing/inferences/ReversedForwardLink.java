@@ -27,11 +27,9 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
@@ -41,7 +39,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ReversedForwardLink extends BackwardLinkImpl implements ClassInference {
+public class ReversedForwardLink extends BackwardLinkImpl implements
+		ClassInference {
 
 	private final ForwardLink sourceLink_;
 
@@ -58,17 +57,13 @@ public class ReversedForwardLink extends BackwardLinkImpl implements ClassInfere
 	}
 
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 
 	public ForwardLink getSourceLink() {
 		return sourceLink_;
-	}
-	
-	// this is a side condition
-	public SubPropertyChain<IndexedPropertyChain, IndexedObjectProperty> getSubPropertyChain() {
-		return new SubPropertyChain<IndexedPropertyChain, IndexedObjectProperty>(sourceLink_.getRelation(), getRelation());
 	}
 
 	@Override

@@ -37,6 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> implements ContextTracingFactory<J> {
+public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> extends SimpleInterrupter implements ContextTracingFactory<J> {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(NonRecursiveContextTracingFactory.class);
@@ -92,6 +93,11 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> impl
 	@Override
 	public Engine getEngine() {
 		return new Engine();
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		tracingFactory_.setInterrupt(flag);
 	}
 
 	@Override

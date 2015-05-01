@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,31 +25,34 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Represents a {@link Contradiction} as the result of a class occurring
- * multiple times in one {@link IndexedDisjointnessAxiom}.
- * 
- * TODO it's possible to get the inconsistent axiom from the premise, however, the number of such axioms is probably so small that we don't mind storing it explicitly.
+ * multiple times in one {@link IndexedDisjointClassesAxiom}. *
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author "Yevgeny Kazakov"
  */
-public class ContradictionFromInconsistentDisjointnessAxiom extends ContradictionFromSubsumer<IndexedClassExpression> implements Contradiction, ClassInference {
+public class ContradictionFromInconsistentDisjointnessAxiom extends
+		ContradictionFromSubsumer<IndexedClassExpression> implements
+		Contradiction, ClassInference {
 
-	private final IndexedDisjointnessAxiom axiom_;
-	
-	public ContradictionFromInconsistentDisjointnessAxiom(IndexedClassExpression p, IndexedDisjointnessAxiom ax) {
-		super(p);
-		axiom_ = ax;
+	private final ElkAxiom reason_;
+
+	public ContradictionFromInconsistentDisjointnessAxiom(
+			IndexedClassExpression premise, ElkAxiom reason) {
+		super(premise);
+		reason_ = reason;
 	}
-	
+
 	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
@@ -56,15 +60,16 @@ public class ContradictionFromInconsistentDisjointnessAxiom extends Contradictio
 
 	@Override
 	public String toString() {
-		return "Contradiction from " + premise;
+		return "Contradiction from " + premise + " due to " + reason_;
 	}
-	
-	public IndexedDisjointnessAxiom getAxiom() {
-		return axiom_;
+
+	public ElkAxiom getReason() {
+		return reason_;
 	}
-	
+
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

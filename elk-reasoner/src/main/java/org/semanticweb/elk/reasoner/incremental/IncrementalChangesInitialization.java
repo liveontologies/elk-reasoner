@@ -56,7 +56,7 @@ public class IncrementalChangesInitialization
 	public IncrementalChangesInitialization(
 			Collection<ArrayList<Context>> inputs,
 			LinkedContextInitRule changedInitRules,
-			Map<IndexedClassExpression, ChainableSubsumerRule> changes,
+			Map<? extends IndexedClassExpression, ChainableSubsumerRule> changes,
 			SaturationState<?> state, ComputationExecutor executor,
 			SaturationStatistics stageStats, int maxWorkers,
 			ProgressMonitor progressMonitor) {

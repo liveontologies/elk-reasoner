@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,57 +22,32 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 
-public class IndexedSubClassOfAxiom extends IndexedAxiom {
+/**
+ * Represents occurrences of an {@link ElkSubClassOfAxiom} in an ontology.
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
+public interface IndexedSubClassOfAxiom extends IndexedAxiom {
 
-	static final Logger LOGGER_ = LoggerFactory
-			.getLogger(IndexedSubClassOfAxiom.class);
+	/**
+	 * @return the {@link IndexedClassExpression} representing the sub class of
+	 *         the {@link ElkSubClassOfAxiom} represented by this
+	 *         {@link IndexedSubClassOfAxiom}
+	 * 
+	 * @see IndexedSubClassOfAxiom#getSubClass()
+	 */
+	public IndexedClassExpression getSubClass();
 
-	private final IndexedClassExpression subClass_, superClass_;
-	
-	protected IndexedSubClassOfAxiom(IndexedClassExpression subClass,
-			IndexedClassExpression superClass) {
-		this.subClass_ = subClass;
-		this.superClass_ = superClass;
-	}
-
-	public IndexedClassExpression getSubClass() {
-		return this.subClass_;
-	}
-
-	public IndexedClassExpression getSuperClass() {
-		return this.superClass_;
-	}
-
-	@Override
-	public boolean occurs() {
-		// we do not cache sub class axioms
-		// TODO: introduce a method for testing if we cache an object in the
-		// index
-		return false;
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "SubClassOf(" + this.subClass_ + ' ' + this.superClass_ + ')';
-	}
-
-	@Override
-	public <O> O accept(IndexedAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index, final int increment) {
-		if (increment > 0) {
-			SuperClassFromSubClassRule.addRuleFor(this, index);
-		} else {
-			SuperClassFromSubClassRule.removeRuleFor(this, index);
-		}
-	}
+	/**
+	 * @return the {@link IndexedClassExpression} representing the super class
+	 *         of the {@link ElkSubClassOfAxiom} represented by this
+	 *         {@link IndexedSubClassOfAxiom}
+	 * 
+	 * @see IndexedSubClassOfAxiom#getSuperClass()
+	 */
+	public IndexedClassExpression getSuperClass();
 
 }

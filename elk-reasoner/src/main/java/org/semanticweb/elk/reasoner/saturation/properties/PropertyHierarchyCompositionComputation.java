@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,13 +26,14 @@ import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
- * A {@link ReasonerComputationWithInputs} that computes relevant sub-properties and composition maps
+ * A {@link ReasonerComputationWithInputs} that computes relevant sub-properties
+ * and composition maps
  * 
  * @author Yevgeny Kazakov
  * 
@@ -44,7 +46,7 @@ public class PropertyHierarchyCompositionComputation
 			TraceStore.Writer traceWriter,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
-		this(ontIndex.getIndexedPropertyChains(),
+		this(ontIndex.getPropertyChains(),
 				new PropertyHierarchyCompositionComputationFactory(traceWriter), executor,
 				maxWorkers, progressMonitor);
 	}

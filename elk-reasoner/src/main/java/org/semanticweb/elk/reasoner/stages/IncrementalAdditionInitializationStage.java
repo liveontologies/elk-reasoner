@@ -37,8 +37,9 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.reasoner.incremental.IncrementalChangesInitialization;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
@@ -68,24 +69,7 @@ public class IncrementalAdditionInitializationStage extends
 		return IncrementalStages.ADDITIONS_INIT;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.semanticweb.elk.reasoner.stages.AbstractReasonerStage#preExecute()
-	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean preExecute() {
 		if (!super.preExecute())
@@ -93,7 +77,7 @@ public class IncrementalAdditionInitializationStage extends
 
 		DifferentialIndex diffIndex = reasoner.ontologyIndex;
 		LinkedContextInitRule changedInitRules = null;
-		Map<IndexedClassExpression, ChainableSubsumerRule> changedRulesByCE = null;
+		Map<? extends IndexedClassExpression, ChainableSubsumerRule> changedRulesByCE = null;
 		Collection<ArrayList<Context>> inputs = Collections.emptyList();
 		ContextCreationListener contextCreationListener = SaturationUtils
 				.addStatsToContextCreationListener(
@@ -105,8 +89,8 @@ public class IncrementalAdditionInitializationStage extends
 						stageStatistics_.getContextStatistics());
 
 		// first, create and init contexts for new classes
-		final IndexObjectConverter converter = reasoner.objectCache_
-				.getIndexObjectConverter();
+		final ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
+				reasoner.ontologyIndex);
 		final SaturationStateWriter<?> writer =
 
 		SaturationUtils.getStatsAwareWriter(reasoner.saturationState
@@ -171,7 +155,7 @@ public class IncrementalAdditionInitializationStage extends
 					8 * workerNo);
 		}
 
-		this.initialization_ = new IncrementalChangesInitialization(inputs,
+		this.initialization = new IncrementalChangesInitialization(inputs,
 				changedInitRules, changedRulesByCE, reasoner.saturationState,
 				reasoner.getProcessExecutor(), stageStatistics_, workerNo,
 				reasoner.getProgressMonitor());
@@ -183,10 +167,9 @@ public class IncrementalAdditionInitializationStage extends
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		this.initialization_ = null;
 		reasoner.ontologyIndex.commitAddedRules();
-		reasoner.ontologyIndex.initClassSignatureChanges();
-		reasoner.ontologyIndex.initIndividualSignatureChanges();
+		reasoner.ontologyIndex.initClassChanges();
+		reasoner.ontologyIndex.initIndividualChanges();
 		return true;
 	}
 

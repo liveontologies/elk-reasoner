@@ -44,6 +44,11 @@ public class Owl2ParserLoader extends AbstractAxiomLoader implements
 		AxiomLoader {
 
 	/**
+	 * a special batch to detect that all axioms are loaded
+	 */
+	private static final ArrayList<ElkAxiom> POISON_BATCH_ = new ArrayList<ElkAxiom>(
+			1);
+	/**
 	 * the parser used to provide the axioms
 	 */
 	private final Owl2Parser parser_;
@@ -62,22 +67,13 @@ public class Owl2ParserLoader extends AbstractAxiomLoader implements
 	 */
 	private final Thread parserThread_;
 	/**
-	 * the thread from which axioms are taken
-	 */
-	private volatile Thread controlThread_;
-	/**
 	 * {@code true} if the parser thread has started
 	 */
-	private volatile boolean started_;
+	private boolean started_;
 	/**
 	 * {@code true} if the parser has finished processing the ontology
 	 */
 	private volatile boolean finished_;
-	/**
-	 * {@code true} if the master thread expects new axioms from the parser
-	 * thread
-	 */
-	private volatile boolean waiting_;
 	/**
 	 * the exception created if something goes wrong
 	 */
@@ -116,66 +112,50 @@ public class Owl2ParserLoader extends AbstractAxiomLoader implements
 	}
 
 	@Override
-	public void load(ElkAxiomProcessor axiomInserter,
+	public synchronized void load(ElkAxiomProcessor axiomInserter,
 			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
-		controlThread_ = Thread.currentThread();
-		waiting_ = true;
+		if (finished_)
+			return;
 
 		if (!started_) {
 			parserThread_.start();
 			started_ = true;
 		}
 
-		ArrayList<ElkAxiom> nextBatch = null;
+		ArrayList<ElkAxiom> nextBatch;
 
-		try {
-			for (;;) {
-				if (Thread.currentThread().isInterrupted())
-					break;
-				if (finished_) {
-					nextBatch = axiomExchanger_.poll();
-				} else {
-					try {
-						nextBatch = axiomExchanger_.take();
-					} catch (InterruptedException e) {
-						/*
-						 * we don't know for sure why the thread was
-						 * interrupted, so we need to obey; if interrupt was not
-						 * relevant, the process will restart; we need to
-						 * restore the interrupt status so that the called
-						 * methods know that there was an interrupt
-						 */
-						Thread.currentThread().interrupt();
-						break;
-					}
-				}
-				if (nextBatch == null)
-					break;
-				for (int i = 0; i < nextBatch.size(); i++) {
-					ElkAxiom axiom = nextBatch.get(i);
-					axiomInserter.visit(axiom);
-				}
+		for (;;) {
+			if (isInterrupted())
+				break;
+			try {
+				nextBatch = axiomExchanger_.take();
+			} catch (InterruptedException e) {
+				/*
+				 * we don't know for sure why the thread was interrupted, so we
+				 * need to obey; if interrupt was not relevant, the process will
+				 * restart; we need to restore the interrupt status so that the
+				 * called methods know that there was an interrupt
+				 */
+				Thread.currentThread().interrupt();
+				break;
 			}
-		} finally {
-			/*
-			 * should be executed in any case
-			 */
-			synchronized (axiomExchanger_) {
-				waiting_ = false;
+			if (nextBatch == POISON_BATCH_) {
+				break;
 			}
-			if (exception != null) {
-				throw exception;
+			for (int i = 0; i < nextBatch.size(); i++) {
+				ElkAxiom axiom = nextBatch.get(i);
+				axiomInserter.visit(axiom);
 			}
+		}
+		if (exception != null) {
+			throw exception;
 		}
 	}
 
 	@Override
-	public void dispose() {
-		if (!finished_)
-			parserThread_.interrupt();
+	public synchronized void dispose() {
 		disposeParserResources();
 		this.axiomExchanger_.clear();
-		// this.exception = null;
 	}
 
 	/**
@@ -193,13 +173,16 @@ public class Owl2ParserLoader extends AbstractAxiomLoader implements
 				exception = new ElkLoadingException(
 						"Cannot load the ontology!", e);
 			} finally {
-				/*
-				 * this should be executed in any case
-				 */
 				finished_ = true;
-				synchronized (axiomExchanger_) {
-					if (waiting_)
-						controlThread_.interrupt();
+				try {
+					axiomExchanger_.put(POISON_BATCH_);
+				} catch (InterruptedException e) {
+					/*
+					 * we don't know what is causing this but we need to obey;
+					 * consistency of the computation for such interrupt is not
+					 * guaranteed; restore the interrupt status and exit
+					 */
+					Thread.currentThread().interrupt();
 				}
 				disposeParserResources();
 			}

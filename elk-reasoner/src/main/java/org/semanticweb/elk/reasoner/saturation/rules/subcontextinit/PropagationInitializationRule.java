@@ -61,8 +61,8 @@ public class PropagationInitializationRule extends AbstractSubContextInitRule {
 	@Override
 	public void apply(SubContextInitialization premise,
 			ContextPremises premises, ConclusionProducer producer) {
-		IndexedObjectSomeValuesFrom.generatePropagations(premise.getSubRoot(),
-				premises, producer);
+		IndexedObjectSomeValuesFrom.Helper.generatePropagations(
+				premise.getSubRoot(), premises, producer);
 	}
 
 }

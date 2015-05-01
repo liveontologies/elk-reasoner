@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -95,14 +95,15 @@ public interface ContextPremises {
 
 	/**
 	 * @param axiom
-	 *            the {@link IndexedDisjointnessAxiom} whose members could be
+	 *            the {@link IndexedDisjointClassesAxiom} whose members could be
 	 *            subsumers in this {@link ContextPremises}.
 	 * 
 	 * @return the derived {@link IndexedClassExpression} subsumers by
-	 *         {@link IndexedDisjointnessAxiom}s in which they occur as members
+	 *         {@link IndexedDisjointClassesAxiom}s in which they occur as
+	 *         members
 	 */
 	public IndexedClassExpression[] getDisjointSubsumers(
-			IndexedDisjointnessAxiom axiom);
+			IndexedDisjointClassesAxiom axiom);
 
 	public Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(
 			IndexedPropertyChain subRoot);

@@ -29,6 +29,8 @@ import java.util.Collection;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.taxonomy.ClassTaxonomyComputation;
 import org.semanticweb.elk.util.collections.Operations;
@@ -70,11 +72,17 @@ public class IncrementalClassTaxonomyComputationStage extends
 		 * removed classes
 		 */
 		Operations.Transformation<ElkClass, IndexedClass> transformation = new Operations.Transformation<ElkClass, IndexedClass>() {
+
+			private final ElkPolarityExpressionConverter converter = new ElkPolarityExpressionConverterImpl(
+					reasoner.ontologyIndex);
+
 			@Override
 			public IndexedClass transform(ElkClass element) {
 				IndexedClass indexedClass = (IndexedClass) element
-						.accept(reasoner.objectCache_.getIndexObjectConverter());
-
+						.accept(converter);
+				if (indexedClass == null)
+					return null;
+				// else
 				return indexedClass.occurs() ? indexedClass : null;
 			}
 		};
@@ -105,11 +113,9 @@ public class IncrementalClassTaxonomyComputationStage extends
 			return false;
 		}
 		reasoner.classTaxonomyState.getWriter().clearModifiedNodeObjects();
-		reasoner.ontologyIndex.initClassSignatureChanges();
+		reasoner.ontologyIndex.initClassChanges();
 		reasoner.ruleAndConclusionStats.add(computation_
 				.getRuleAndConclusionStatistics());
-		this.computation_ = null;
-
 		return true;
 	}
 
@@ -119,4 +125,9 @@ public class IncrementalClassTaxonomyComputationStage extends
 			computation_.printStatistics();
 	}
 
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(computation_, flag);
+	}
 }

@@ -28,9 +28,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.ComposedAxiomLoader;
-import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkEntity;
@@ -38,29 +36,22 @@ import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
-import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.reasoner.ElkInconsistentOntologyException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
-import org.semanticweb.elk.reasoner.incremental.NonIncrementalChangeListener;
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ChangeIndexingProcessor;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverterImpl;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.ElkAxiomIndexingVisitor;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexObjectConverter;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedAxiomFactoryWithBinding;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectCache;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.MainAxiomIndexerVisitor;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.NonIncrementalChangeCheckingVisitor;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.PlainIndexedAxiomFactory;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -81,6 +72,7 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,13 +85,13 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class AbstractReasonerState {
+public abstract class AbstractReasonerState extends SimpleInterrupter {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(AbstractReasonerState.class);
-	
-	//TODO create reasoner configuration options instead of these flags?
+
+	// TODO create reasoner configuration options instead of these flags?
 	/**
 	 * If true, all inferences will be stored in the trace store.
 	 */
@@ -131,25 +123,9 @@ public abstract class AbstractReasonerState {
 	 */
 	final SaturationStatistics ruleAndConclusionStats;
 	/**
-	 * {@code true} if the reasoner is interrupted
-	 */
-	private volatile boolean isInterrupted_ = false;
-	/**
-	 * the cache for indexed objects
-	 */
-	final IndexedObjectCache objectCache_;
-	/**
 	 * the (differential) index for loading of axioms and changes
 	 */
 	final DifferentialIndex ontologyIndex;
-	/**
-	 * the object using which axioms are inserted into the index
-	 */
-	private final ElkAxiomIndexingVisitor axiomInserter_;
-	/**
-	 * the object using which axioms are deleted from the index
-	 */
-	private final ElkAxiomIndexingVisitor axiomDeleter_;
 	/**
 	 * {@code true} if the current ontology is inconsistent
 	 */
@@ -181,49 +157,40 @@ public abstract class AbstractReasonerState {
 	 * if the property hierarchy correspond to the loading axioms
 	 */
 	boolean propertyHierarchyUpToDate_ = true;
-	/**
-	 * The listener used to detect if the axiom has an impact on the role
-	 * hierarchy
-	 */
-	private NonIncrementalChangeListener<ElkAxiom> nonIncrementalChangeListener_ = new NonIncrementalChangeListener<ElkAxiom>() {
-
-		@Override
-		public void notify(ElkAxiom axiom) {
-			if (!propertyHierarchyUpToDate_)
-				return;
-
-			if (LOGGER_.isDebugEnabled()) {
-				LOGGER_.debug("Disallowing incremental mode due to "
-						+ OwlFunctionalStylePrinter.toString(axiom));
-			}
-
-			propertyHierarchyUpToDate_ = false;
-		}
-	};
 
 	/**
 	 * Keeps relevant information about tracing
 	 */
 	TraceState traceState;
 
-	protected AbstractReasonerState() {
-		IndexedObjectFactory factory = BIND_AXIOMS ? new IndexedAxiomFactoryWithBinding()
-				: new PlainIndexedAxiomFactory();
+	private final ElkPolarityExpressionConverter expressionConverter_;
 
-		this.objectCache_ = new IndexedObjectCache(factory);
-		this.ontologyIndex = new DifferentialIndex(objectCache_);
-		this.axiomInserter_ = new MainAxiomIndexerVisitor(ontologyIndex,
-				factory, true);
-		this.axiomDeleter_ = new MainAxiomIndexerVisitor(ontologyIndex, false);
+	private final ElkSubObjectPropertyExpressionVisitor<ModifiableIndexedPropertyChain> subPropertyConverter_;
+
+	protected AbstractReasonerState() {
+		this.ontologyIndex = new DifferentialIndex();
 		this.saturationState = SaturationStateFactory
 				.createSaturationState(ontologyIndex);
 		this.ruleAndConclusionStats = new SaturationStatistics();
 		this.stageManager = new ReasonerStageManager(this);
+		this.expressionConverter_ = new ElkPolarityExpressionConverterImpl(
+				ontologyIndex);
+		this.subPropertyConverter_ = new ElkAxiomConverterImpl(ontologyIndex);
 	}
 
 	protected AbstractReasonerState(AxiomLoader axiomLoader) {
 		this();
 		registerAxiomLoader(axiomLoader);
+	}
+
+	protected void complete(ReasonerStage stage) throws ElkException {
+		try {
+			getStageExecutor().complete(stage);
+		} catch (ElkInterruptedException e) {
+			// clear the interrupt flag
+			setInterrupt(false);
+			throw e;
+		}
 	}
 
 	public synchronized void setAllowIncrementalMode(boolean allow) {
@@ -274,6 +241,14 @@ public abstract class AbstractReasonerState {
 		stageManager.incrementalCompletionStage.invalidate();
 	}
 
+	/**
+	 * Reset the property saturation stage and all subsequent stages
+	 */
+	public synchronized void resetPropertySaturation() {
+		LOGGER_.trace("Reset property saturation");
+		stageManager.propertyInitializationStage.invalidate();
+	}
+
 	public synchronized void registerAxiomLoader(AxiomLoader newAxiomLoader) {
 		LOGGER_.trace("Registering new axiom loader");
 
@@ -286,28 +261,23 @@ public abstract class AbstractReasonerState {
 	}
 
 	/**
+	 * @return the {@link AxiomLoader} currently registered for loading of
+	 *         axioms or {@code null} if no loader is registered
+	 */
+	public AxiomLoader getAxiomLoader() {
+		return this.axiomLoader_;
+	}
+
+	/**
 	 * Forces loading of all axioms from the registered {@link AxiomLoader}s.
 	 * Typically, loading lazily when reasoning tasks are requested.
 	 * 
-	 * @throws ElkLoadingException
-	 *             if axioms cannot be loaded
+	 * @throws ElkException
 	 */
-	public void forceLoading() throws ElkLoadingException {
-		if (axiomLoader_ == null || axiomLoader_.isLoadingFinished()) {
-			return;
-		}
-		// wrapping both the inserter and the deleter to receive notifications
-		// if some axiom change can't be incorporated incrementally
-
-		ElkAxiomProcessor axiomInserter = new ChangeIndexingProcessor(
-				new NonIncrementalChangeCheckingVisitor(axiomInserter_,
-						nonIncrementalChangeListener_));
-		ElkAxiomProcessor axiomDeleter = new ChangeIndexingProcessor(
-				new NonIncrementalChangeCheckingVisitor(axiomDeleter_,
-						nonIncrementalChangeListener_));
-
-		axiomLoader_.load(axiomInserter, axiomDeleter);
-
+	public synchronized void forceLoading() throws ElkException {
+		if (classTaxonomyState.getTaxonomy() != null)
+			trySetIncrementalMode();
+		complete(stageManager.axiomLoadingStage);
 	}
 
 	/**
@@ -334,31 +304,16 @@ public abstract class AbstractReasonerState {
 	 */
 	protected abstract ProgressMonitor getProgressMonitor();
 
+	protected ModifiableOntologyIndex getModifiableOntologyIndex() {
+		return this.ontologyIndex;
+	}
+
 	/**
 	 * interrupts running reasoning stages
 	 */
-	public synchronized void interrupt() {
+	public void interrupt() {
 		LOGGER_.info("Interrupt requested");
-
-		isInterrupted_ = true;
-		ReasonerStageExecutor stageExecutor = getStageExecutor();
-		if (stageExecutor != null)
-			stageExecutor.interrupt();
-	}
-
-	/**
-	 * @return {@code true} if the reasoner has been interrupted and the
-	 *         interrupt status of the reasoner has not been cleared yet
-	 */
-	public synchronized boolean isInterrupted() {
-		return isInterrupted_;
-	}
-
-	/**
-	 * clears the interrupt status of the reasoner
-	 */
-	public synchronized void clearInterrupt() {
-		isInterrupted_ = false;
+		setInterrupt(true);
 	}
 
 	/**
@@ -372,38 +327,17 @@ public abstract class AbstractReasonerState {
 	public synchronized boolean isInconsistent() throws ElkException {
 
 		ruleAndConclusionStats.reset();
-		loadAxioms();
+		forceLoading();
 
 		if (isIncrementalMode() && !saturationState.getContexts().isEmpty()) {
-			getStageExecutor().complete(
-					stageManager.incrementalConsistencyCheckingStage);
+			complete(stageManager.incrementalConsistencyCheckingStage);
 		} else {
 			setNonIncrementalMode();
-			getStageExecutor().complete(stageManager.consistencyCheckingStage);
+			complete(stageManager.consistencyCheckingStage);
 			stageManager.incrementalConsistencyCheckingStage.setCompleted();
 		}
 
 		return inconsistentEntity != null;
-	}
-
-	/**
-	 * Forces the reasoner to load the axioms (deletions and additions)
-	 * 
-	 * @throws ElkException
-	 *             if the reasoning process cannot be completed successfully
-	 */
-	void loadAxioms() throws ElkException {
-		if (classTaxonomyState.getTaxonomy() != null)
-			trySetIncrementalMode();
-		getStageExecutor().complete(stageManager.axiomLoadingStage);
-		if (!propertyHierarchyUpToDate_) {
-			/*
-			 * switching to non-incremental mode due to changes in property
-			 * axioms
-			 */
-			stageManager.propertyInitializationStage.invalidate();
-			setNonIncrementalMode();
-		}
 	}
 
 	/**
@@ -425,12 +359,10 @@ public abstract class AbstractReasonerState {
 			throw new ElkInconsistentOntologyException();
 
 		if (isIncrementalMode() && classTaxonomyState.getTaxonomy() != null) {
-			getStageExecutor().complete(
-					stageManager.incrementalClassTaxonomyComputationStage);
+			complete(stageManager.incrementalClassTaxonomyComputationStage);
 		} else {
 			setNonIncrementalMode();
-			getStageExecutor().complete(
-					stageManager.classTaxonomyComputationStage);
+			complete(stageManager.classTaxonomyComputationStage);
 			stageManager.incrementalClassTaxonomyComputationStage
 					.setCompleted();
 		}
@@ -483,12 +415,10 @@ public abstract class AbstractReasonerState {
 			throw new ElkInconsistentOntologyException();
 
 		if (isIncrementalMode() && instanceTaxonomyState.getTaxonomy() != null) {
-			getStageExecutor().complete(
-					stageManager.incrementalInstanceTaxonomyComputationStage);
+			complete(stageManager.incrementalInstanceTaxonomyComputationStage);
 		} else {
 			setNonIncrementalMode();
-			getStageExecutor().complete(
-					stageManager.instanceTaxonomyComputationStage);
+			complete(stageManager.instanceTaxonomyComputationStage);
 			stageManager.incrementalInstanceTaxonomyComputationStage
 					.setCompleted();
 		}
@@ -536,9 +466,9 @@ public abstract class AbstractReasonerState {
 	 */
 	public synchronized Set<ElkClass> getAllClasses() {
 		Set<ElkClass> result = new ArrayHashSet<ElkClass>(ontologyIndex
-				.getIndexedClasses().size());
-		for (IndexedClass ic : ontologyIndex.getIndexedClasses())
-			result.add(ic.getElkClass());
+				.getClasses().size());
+		for (IndexedClass ic : ontologyIndex.getClasses())
+			result.add(ic.getElkEntity());
 		return result;
 	}
 
@@ -547,9 +477,9 @@ public abstract class AbstractReasonerState {
 	 */
 	public synchronized Set<ElkNamedIndividual> getAllNamedIndividuals() {
 		Set<ElkNamedIndividual> allNamedIndividuals = new ArrayHashSet<ElkNamedIndividual>(
-				ontologyIndex.getIndexedClasses().size());
-		for (IndexedIndividual ii : ontologyIndex.getIndexedIndividuals())
-			allNamedIndividuals.add(ii.getElkNamedIndividual());
+				ontologyIndex.getClasses().size());
+		for (IndexedIndividual ii : ontologyIndex.getIndividuals())
+			allNamedIndividuals.add(ii.getElkEntity());
 		return allNamedIndividuals;
 	}
 
@@ -575,6 +505,15 @@ public abstract class AbstractReasonerState {
 		return stageManager.instanceTaxonomyComputationStage.isCompleted;
 	}
 
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		ReasonerStageExecutor stageExecutor = getStageExecutor();
+		if (stageExecutor != null)
+			stageExecutor.setInterrupt(flag);
+		// this flag will be cleared after ElkInterruptedException is thrown
+	}
+
 	/**
 	 * Compute the index representation of the given ontology if it has not been
 	 * done yet.
@@ -584,7 +523,7 @@ public abstract class AbstractReasonerState {
 	 *             if the reasoning process cannot be completed successfully
 	 */
 	protected OntologyIndex getOntologyIndex() throws ElkException {
-		loadAxioms();
+		forceLoading();
 		return ontologyIndex;
 	}
 
@@ -618,21 +557,20 @@ public abstract class AbstractReasonerState {
 	 * TRACING METHODS
 	 *---------------------------------------------------*/
 
-	public TraceStore.Reader explainSubsumption(ElkClassExpression sub, ElkClassExpression sup) throws ElkException {
+	public TraceStore.Reader explainSubsumption(ElkClassExpression sub,
+			ElkClassExpression sup) throws ElkException {
 		if (traceState == null) {
 			resetTraceState();
 		}
 
-		IndexedClassExpression subsumee = sub.accept(objectCache_
-				.getIndexObjectConverter());
-		IndexedClassExpression subsumer = sup.accept(objectCache_
-				.getIndexObjectConverter());
+		IndexedClassExpression subsumee = sub.accept(expressionConverter_);
+		IndexedClassExpression subsumer = sup.accept(expressionConverter_);
 
 		stageBasedTrace(subsumee, subsumer);
 
 		return traceState.getTraceStore().getReader();
 	}
-	
+
 	/**
 	 * @return either owl:Thing, if it was derived to be a subclass of
 	 *         owl:Nothing or the individual which was inferred to be an
@@ -643,102 +581,88 @@ public abstract class AbstractReasonerState {
 		if (!isInconsistent()) {
 			throw new IllegalStateException("The ontology is consistent");
 		}
-		
+
 		traceState.clearTracingMap();
-		traceState.addConclusionToTrace(inconsistentEntity, ContradictionImpl.getInstance());
+		traceState.addConclusionToTrace(inconsistentEntity,
+				ContradictionImpl.getInstance());
 		trace(false);
 		traceState.clearTracingMap();
-
-		return inconsistentEntity.accept(new IndexedClassEntityVisitor<ElkEntity>() {
-
-			@Override
-			public ElkEntity visit(IndexedClass element) {
-				return element.getElkClass();
-			}
-
-			@Override
-			public ElkEntity visit(IndexedIndividual element) {
-				return element.getElkNamedIndividual();
-			}
-		});
+		return inconsistentEntity.getElkEntity();
 	}
-	
+
 	// TODO hide this?
 	public void submitForTracing(ElkClassExpression sub, ElkClassExpression sup) {
-		IndexedClassExpression subsumee = sub.accept(objectCache_
-				.getIndexObjectConverter());
-		IndexedClassExpression subsumer = sup.accept(objectCache_
-				.getIndexObjectConverter());
-		traceState.addConclusionToTrace(subsumee, convertTraceTarget(subsumee, subsumer));
+		IndexedClassExpression subsumee = sub.accept(expressionConverter_);
+		IndexedClassExpression subsumer = sup.accept(expressionConverter_);
+		traceState.addConclusionToTrace(subsumee,
+				convertTraceTarget(subsumee, subsumer));
 	}
-	
+
 	public TraceStore.Reader trace(boolean forceTrace) throws ElkException {
 		if (!stageManager.inferenceTracingStage.isCompleted()) {
 			// to make sure we start with a clean trace store, esp. clear the
 			// previously stored class inferences which may no longer be valid
-			// if there were changed to the ontology 
+			// if there were changed to the ontology
 			traceState.clearClassTraces();
-		} 
-		else if (forceTrace) {
+		} else if (forceTrace) {
 			stageManager.inferenceTracingStage.invalidate();
 		}
-		
+
 		getStageExecutor().complete(stageManager.inferenceTracingStage);
-		
+
 		return traceState.getTraceStore().getReader();
 	}
-	
-	void stageBasedTrace(IndexedClassExpression subsumee, IndexedClassExpression subsumer) throws ElkException {
+
+	void stageBasedTrace(IndexedClassExpression subsumee,
+			IndexedClassExpression subsumer) throws ElkException {
 		if (isInconsistent()) {
-			throw new ElkInconsistentOntologyException("The ontology is inconsistent. Use explainInconsistency() method instead");
-		}
-		else {
+			throw new ElkInconsistentOntologyException(
+					"The ontology is inconsistent. Use explainInconsistency() method instead");
+		} else {
 			// explain subsumption or sub-class unsatisfiability
-			traceState.addConclusionToTrace(subsumee, convertTraceTarget(subsumee, subsumer));
+			traceState.addConclusionToTrace(subsumee,
+					convertTraceTarget(subsumee, subsumer));
 		}
-		
+
 		trace(true);
 		traceState.clearTracingMap();
 	}
-	
+
 	boolean isSatisfiable(IndexedClassExpression subsumee) {
 		Context subsumeeContext = saturationState.getContext(subsumee);
-		
+
 		if (subsumeeContext != null) {
-			return !subsumeeContext.containsConclusion(ContradictionImpl.getInstance());
+			return !subsumeeContext.containsConclusion(ContradictionImpl
+					.getInstance());
 		}
 		// shouldn't happen if we suppport only named classes or abbreviate
 		// class expressions and saturate them prior to tracing
 		return true;
 	}
-	
-	private Conclusion convertTraceTarget(IndexedClassExpression subsumee, IndexedClassExpression subsumer) {
+
+	private Conclusion convertTraceTarget(IndexedClassExpression subsumee,
+			IndexedClassExpression subsumer) {
 		if (!isSatisfiable(subsumee)) {
 			// the subsumee is unsatisfiable so we explain the unsatisfiability
 			return ContradictionImpl.getInstance();
-		}
-		else {
+		} else {
 			return new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer);
 		}
 	}
-	
+
 	@Deprecated
 	IndexedClassExpression transform(ElkClassExpression ce) {
-		return ce.accept(objectCache_.getIndexObjectConverter());
+		return ce.accept(expressionConverter_);
 	}
-	
+
 	@Deprecated
 	IndexedObjectProperty transform(ElkObjectProperty ce) {
-		return (IndexedObjectProperty) ce.accept(objectCache_.getIndexObjectConverter());
+		return ce.accept(expressionConverter_);
 	}
-	
+
 	@Deprecated
 	IndexedPropertyChain transform(ElkSubObjectPropertyExpression ce) {
-		return ce.accept(objectCache_.getIndexObjectConverter());
-	}
-	
-	IndexObjectConverter getIndexObjectConverter() {
-		return objectCache_.getIndexObjectConverter(); 
+		return ce.accept(subPropertyConverter_);
 	}
 
 	public void resetTraceState() {
@@ -762,7 +686,7 @@ public abstract class AbstractReasonerState {
 	 * SOME DEBUG METHODS, FIXME: REMOVE
 	 */
 	// ////////////////////////////////////////////////////////////////
-	public synchronized Collection<IndexedClassExpression> getIndexedClassExpressions() {
-		return ontologyIndex.getIndexedClassExpressions();
+	public synchronized Collection<? extends IndexedClassExpression> getIndexedClassExpressions() {
+		return ontologyIndex.getClassExpressions();
 	}
 }

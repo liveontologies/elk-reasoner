@@ -27,6 +27,8 @@ package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.visitors.ElkDataIntersectionOfVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Intersection_of_Data_Ranges" >Intersection
@@ -44,5 +46,14 @@ public interface ElkDataIntersectionOf extends ElkDataRange {
 	 * @return list of data ranges
 	 */
 	public List<? extends ElkDataRange> getDataRanges();
+
+	/**
+	 * Accept an {@link ElkDataIntersectionOfVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkDataIntersectionOfVisitor<O> visitor);
 
 }

@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
@@ -43,7 +43,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  * 
  * @author "Yevgeny Kazakov"
  */
-public class ComposedForwardLink extends ForwardLinkImpl implements ClassInference {
+public class ComposedForwardLink extends ForwardLinkImpl implements
+		ClassInference {
 
 	private final IndexedClassExpression backwardLinkSource_;
 
@@ -58,7 +59,7 @@ public class ComposedForwardLink extends ForwardLinkImpl implements ClassInferen
 			IndexedClassExpression inferenceContext,
 			IndexedPropertyChain forwardLinkChain,
 			IndexedClassExpression linkTarget,
-			IndexedBinaryPropertyChain composition) {
+			IndexedComplexPropertyChain composition) {
 		super(composition, linkTarget);
 		this.backwardLinkSource_ = linkSource;
 		this.backwardLinkRelation_ = backwardLinkRelation;
@@ -67,7 +68,8 @@ public class ComposedForwardLink extends ForwardLinkImpl implements ClassInferen
 	}
 
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 
@@ -78,18 +80,21 @@ public class ComposedForwardLink extends ForwardLinkImpl implements ClassInferen
 	public ForwardLink getForwardLink() {
 		return new ForwardLinkImpl(forwardLinkChain_, getTarget());
 	}
-	
-	private IndexedBinaryPropertyChain getComposition() {
-		// TODO parameterize forward links to get rid of this cast. Composed forward links are always compositions, never atomic properties.
-		return (IndexedBinaryPropertyChain) getRelation();
+
+	private IndexedComplexPropertyChain getComposition() {
+		// TODO parameterize forward links to get rid of this cast. Composed
+		// forward links are always compositions, never atomic properties.
+		return (IndexedComplexPropertyChain) getRelation();
 	}
-	
+
 	public SubObjectProperty getLeftSubObjectProperty() {
-		return new SubObjectProperty(backwardLinkRelation_, getComposition().getLeftProperty());
+		return new SubObjectProperty(backwardLinkRelation_, getComposition()
+				.getFirstProperty());
 	}
-	
-	public SubPropertyChain<?,?> getRightSubObjectPropertyChain() {
-		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(forwardLinkChain_, getComposition().getRightProperty());
+
+	public SubPropertyChain<?, ?> getRightSubObjectPropertyChain() {
+		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(
+				forwardLinkChain_, getComposition().getSuffixChain());
 	}
 
 	@Override

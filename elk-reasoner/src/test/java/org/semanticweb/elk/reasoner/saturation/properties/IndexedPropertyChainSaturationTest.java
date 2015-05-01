@@ -42,10 +42,12 @@ import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectsCreator;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.implementation.IndexedObjectsCreator;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.VerifySymmetricPropertySaturation.AsymmetricCompositionHook;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
@@ -66,34 +68,37 @@ public class IndexedPropertyChainSaturationTest {
 	public void testPropertyCompositionSymmetry() {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
-		IndexedObjectProperty R1 = IndexedObjectsCreator
+		ModifiableIndexedObjectProperty R1 = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R1")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] {}, false);
-		IndexedObjectProperty R2 = IndexedObjectsCreator
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] {}, false);
+		ModifiableIndexedObjectProperty R2 = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R2")),
-						new IndexedPropertyChain[] { R1 },
-						new IndexedObjectProperty[] {}, false);
-		IndexedObjectProperty R3 = IndexedObjectsCreator
+						new ModifiableIndexedPropertyChain[] { R1 },
+						new ModifiableIndexedObjectProperty[] {}, false);
+		ModifiableIndexedObjectProperty R3 = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R3")),
-						new IndexedPropertyChain[] { R2 },
-						new IndexedObjectProperty[] {}, false);
+						new ModifiableIndexedPropertyChain[] { R2 },
+						new ModifiableIndexedObjectProperty[] {}, false);
 
-		IndexedPropertyChain R1R2 = IndexedObjectsCreator.createIndexedChain(
-				R1, R2, new IndexedObjectProperty[] { R1, R3 });
-		IndexedPropertyChain R1R3 = IndexedObjectsCreator.createIndexedChain(
-				R1, R3, new IndexedObjectProperty[] { R1, R3 });
-		IndexedPropertyChain R2R3 = IndexedObjectsCreator.createIndexedChain(
-				R2, R3, new IndexedObjectProperty[] { R1, R3 });
+		ModifiableIndexedPropertyChain R1R2 = IndexedObjectsCreator
+				.createIndexedChain(R1, R2,
+						new ModifiableIndexedObjectProperty[] { R1, R3 });
+		ModifiableIndexedPropertyChain R1R3 = IndexedObjectsCreator
+				.createIndexedChain(R1, R3,
+						new ModifiableIndexedObjectProperty[] { R1, R3 });
+		ModifiableIndexedPropertyChain R2R3 = IndexedObjectsCreator
+				.createIndexedChain(R2, R3,
+						new ModifiableIndexedObjectProperty[] { R1, R3 });
 
-		List<IndexedPropertyChain> chains = Arrays.asList(R1, R2, R3, R1R2,
-				R1R3, R2R3);
+		List<ModifiableIndexedPropertyChain> chains = Arrays.asList(R1, R2, R3,
+				R1R2, R1R3, R2R3);
 
 		AsymmetricCompositionHook hook = new AsymmetricCompositionHook() {
 
@@ -132,60 +137,61 @@ public class IndexedPropertyChainSaturationTest {
 	public void testCyclicCompositions() {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
-		IndexedObjectProperty H = IndexedObjectsCreator
+		ModifiableIndexedObjectProperty H = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/H")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] {}, false);
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] {}, false);
 		// S1 -> S2 -> S3
-		IndexedObjectProperty S3 = IndexedObjectsCreator
+		ModifiableIndexedObjectProperty S3 = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/S3")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] {}, false);
-		IndexedObjectProperty S2 = IndexedObjectsCreator
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] {}, false);
+		ModifiableIndexedObjectProperty S2 = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/S2")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] { S3 }, false);
-		IndexedObjectProperty S1 = IndexedObjectsCreator
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] { S3 }, false);
+		ModifiableIndexedObjectProperty S1 = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/S1")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] { S2 }, false);
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] { S2 }, false);
 		// P1 -> P2 -> P3
-		IndexedObjectProperty P3 = IndexedObjectsCreator
+		ModifiableIndexedObjectProperty P3 = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/P3")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] {}, false);
-		IndexedObjectProperty P2 = IndexedObjectsCreator
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] {}, false);
+		ModifiableIndexedObjectProperty P2 = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/P2")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] { P3 }, false);
-		IndexedObjectProperty P1 = IndexedObjectsCreator
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] { P3 }, false);
+		ModifiableIndexedObjectProperty P1 = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/P1")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] { P2 }, false);
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] { P2 }, false);
 		// S3 -> R, R -> S1, R -> P1
-		IndexedObjectProperty R = IndexedObjectsCreator
+		ModifiableIndexedObjectProperty R = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R")),
-						new IndexedPropertyChain[] { S3 },
-						new IndexedObjectProperty[] { S1, P1 }, false);
+						new ModifiableIndexedPropertyChain[] { S3 },
+						new ModifiableIndexedObjectProperty[] { S1, P1 }, false);
 		// R o R -> H
-		IndexedPropertyChain RR = IndexedObjectsCreator.createIndexedChain(R,
-				R, new IndexedObjectProperty[] { H });
+		ModifiableIndexedPropertyChain RR = IndexedObjectsCreator
+				.createIndexedChain(R, R,
+						new ModifiableIndexedObjectProperty[] { H });
 		// create the factory and run the computation
 		int maxThreads = Runtime.getRuntime().availableProcessors();
 		PropertyHierarchyCompositionComputation computation = new PropertyHierarchyCompositionComputation(
@@ -209,86 +215,91 @@ public class IndexedPropertyChainSaturationTest {
 	@Test
 	public void testReflexivity() {
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
-		List<IndexedObjectProperty> toldReflexive = new ArrayList<IndexedObjectProperty>();
+		List<ModifiableIndexedObjectProperty> toldReflexive = new ArrayList<ModifiableIndexedObjectProperty>();
 
-		IndexedObjectProperty t = IndexedObjectsCreator
+		ModifiableIndexedObjectProperty t = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/T")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] {}, false);
-		IndexedObjectProperty r1 = IndexedObjectsCreator
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] {}, false);
+		ModifiableIndexedObjectProperty r1 = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R1")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] {}, true);
-		IndexedObjectProperty r = IndexedObjectsCreator
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] {}, true);
+		ModifiableIndexedObjectProperty r = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] {}, false);
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] {}, false);
 		// r1 o r1 -> r, thus r must be reflexive
-		IndexedPropertyChain r1r1 = IndexedObjectsCreator.createIndexedChain(
-				r1, r1, new IndexedObjectProperty[] { r });
+		ModifiableIndexedPropertyChain r1r1 = IndexedObjectsCreator
+				.createIndexedChain(r1, r1,
+						new ModifiableIndexedObjectProperty[] { r });
 
-		IndexedPropertyChain rt = IndexedObjectsCreator.createIndexedChain(r,
-				t, new IndexedObjectProperty[] {});
+		ModifiableIndexedPropertyChain rt = IndexedObjectsCreator
+				.createIndexedChain(r, t,
+						new ModifiableIndexedObjectProperty[] {});
 		// r o t -> u
-		IndexedObjectProperty u = IndexedObjectsCreator
+		ModifiableIndexedObjectProperty u = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/U")),
-						new IndexedPropertyChain[] { rt },
-						new IndexedObjectProperty[] {}, false);
+						new ModifiableIndexedPropertyChain[] { rt },
+						new ModifiableIndexedObjectProperty[] {}, false);
 
-		IndexedObjectProperty h = IndexedObjectsCreator
+		ModifiableIndexedObjectProperty h = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/H")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] {}, true);
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] {}, true);
 		// h -> h1, thus h1 must be reflexive
-		IndexedObjectProperty h1 = IndexedObjectsCreator
+		ModifiableIndexedObjectProperty h1 = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/H1")),
-						new IndexedPropertyChain[] { h },
-						new IndexedObjectProperty[] {}, false);
-		IndexedObjectProperty s = IndexedObjectsCreator
+						new ModifiableIndexedPropertyChain[] { h },
+						new ModifiableIndexedObjectProperty[] {}, false);
+		ModifiableIndexedObjectProperty s = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/S")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] {}, false);
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] {}, false);
 		// r o h1 -> s, both are implicitly reflexive, thus s must be reflexive
-		IndexedPropertyChain rh1 = IndexedObjectsCreator.createIndexedChain(r,
-				h1, new IndexedObjectProperty[] { s });
+		ModifiableIndexedPropertyChain rh1 = IndexedObjectsCreator
+				.createIndexedChain(r, h1,
+						new ModifiableIndexedObjectProperty[] { s });
 		// finally, add some loops
-		IndexedObjectProperty v1 = IndexedObjectsCreator
+		ModifiableIndexedObjectProperty v1 = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/V1")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] {}, false);
-		IndexedObjectProperty v2 = IndexedObjectsCreator
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] {}, false);
+		ModifiableIndexedObjectProperty v2 = IndexedObjectsCreator
 				.createIndexedObjectProperty(
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/V2")),
-						new IndexedPropertyChain[] {},
-						new IndexedObjectProperty[] {}, false);
-		IndexedPropertyChain v1v1 = IndexedObjectsCreator.createIndexedChain(
-				v1, v1, new IndexedObjectProperty[] { v2 });
-		IndexedPropertyChain v2v2 = IndexedObjectsCreator.createIndexedChain(
-				v2, v2, new IndexedObjectProperty[] { v1 });
+						new ModifiableIndexedPropertyChain[] {},
+						new ModifiableIndexedObjectProperty[] {}, false);
+		ModifiableIndexedPropertyChain v1v1 = IndexedObjectsCreator
+				.createIndexedChain(v1, v1,
+						new ModifiableIndexedObjectProperty[] { v2 });
+		ModifiableIndexedPropertyChain v2v2 = IndexedObjectsCreator
+				.createIndexedChain(v2, v2,
+						new ModifiableIndexedObjectProperty[] { v1 });
 
 		toldReflexive.addAll(Arrays
-				.asList(new IndexedObjectProperty[] { r1, h }));
+				.asList(new ModifiableIndexedObjectProperty[] { r1, h }));
 
-		final List<IndexedPropertyChain> chains = Arrays
-				.asList(new IndexedPropertyChain[] { t, r1, r, r1r1, rt, u, h,
-						h1, s, rh1, v1, v2, v1v1, v2v2 });
+		final List<ModifiableIndexedPropertyChain> chains = Arrays
+				.asList(new ModifiableIndexedPropertyChain[] { t, r1, r, r1r1,
+						rt, u, h, h1, s, rh1, v1, v2, v1v1, v2v2 });
 		final Set<IndexedPropertyChain> correctReflexive = new HashSet<IndexedPropertyChain>(
 				Arrays.asList(new IndexedPropertyChain[] { r, h, h1, r1, r1r1,
 						rh1, s }));
@@ -314,14 +325,12 @@ public class IndexedPropertyChainSaturationTest {
 			@Override
 			public Boolean visit(IndexedObjectProperty prop) {
 				return prop.isToldReflexive()
-						|| (prop.getSaturated() != null && prop.getSaturated()
-								.isDerivedReflexive());
+						|| (prop.getSaturated().isDerivedReflexive());
 			}
 
 			@Override
-			public Boolean visit(IndexedBinaryPropertyChain binaryChain) {
-				return binaryChain.getSaturated() != null
-						&& binaryChain.getSaturated().isDerivedReflexive();
+			public Boolean visit(IndexedComplexPropertyChain binaryChain) {
+				return binaryChain.getSaturated().isDerivedReflexive();
 			}
 		});
 	}

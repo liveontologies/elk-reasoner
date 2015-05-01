@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLi
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -42,10 +43,9 @@ import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * A {@link LinkableBackwardLinkRule} applied when processing a
- * {@link BackwardLink} producing {@link BackwardLink}s resulted by
- * composing the processed {@link BackwardLink} with the
- * {@link ForwardLink}s contained in the {@link ContextPremises} using
- * property chain axioms
+ * {@link BackwardLink} producing {@link BackwardLink}s resulted by composing
+ * the processed {@link BackwardLink} with the {@link ForwardLink}s contained in
+ * the {@link ContextPremises} using property chain axioms
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -138,8 +138,9 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 			ConclusionProducer producer) {
 
 		/* compose the link with all forward links */
-		final Multimap<IndexedPropertyChain, IndexedBinaryPropertyChain> comps = link
-				.getRelation().getSaturated()
+		SaturatedPropertyChain linkSaturation = link.getRelation()
+				.getSaturated();
+		final Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> comps = linkSaturation
 				.getCompositionsByRightSubProperty();
 		if (comps == null)
 			return;
@@ -147,12 +148,12 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 		for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
 				comps.keySet(), forwardLinksByObjectProperty_.keySet())) {
 
-			Collection<IndexedBinaryPropertyChain> compositions = comps
+			Collection<IndexedComplexPropertyChain> compositions = comps
 					.get(forwardRelation);
 			Collection<IndexedClassExpression> forwardTargets = forwardLinksByObjectProperty_
 					.get(forwardRelation);
 
-			for (IndexedBinaryPropertyChain composition : compositions)
+			for (IndexedComplexPropertyChain composition : compositions)
 				for (IndexedClassExpression forwardTarget : forwardTargets)
 					ForwardLinkImpl.produceComposedLink(producer,
 							link.getSource(), link.getRelation(),

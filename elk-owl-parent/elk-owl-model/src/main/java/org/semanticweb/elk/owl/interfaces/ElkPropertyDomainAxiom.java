@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkPropertyDomainAxiomVisitor;
+
 /**
  * A generic interface for for object and data property domain axioms.
  * properties.
@@ -41,5 +43,14 @@ public interface ElkPropertyDomainAxiom<P, D> extends ElkPropertyAxiom<P> {
 	 * @return the domain of this axiom
 	 */
 	D getDomain();
+
+	/**
+	 * Accept an {@link ElkPropertyDomainAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkPropertyDomainAxiomVisitor<O> visitor);
 
 }

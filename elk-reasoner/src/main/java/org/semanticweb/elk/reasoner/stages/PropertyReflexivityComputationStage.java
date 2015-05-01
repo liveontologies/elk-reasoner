@@ -64,26 +64,25 @@ public class PropertyReflexivityComputationStage extends AbstractReasonerStage {
 
 	@Override
 	public void executeStage() throws ElkException {
-		for (;;) {
-			computation_.process();
-			if (!spuriousInterrupt())
-				break;
-		}
+		computation_.process();
 	}
 
 	@Override
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		computation_ = null;
-		this.computation_ = null;
 		return true;
 	}
 
 	@Override
 	public void printInfo() {
 		// TODO Auto-generated method stub
+	}
 
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(computation_, flag);
 	}
 
 }

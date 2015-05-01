@@ -48,7 +48,7 @@ class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 		if (!super.preExecute())
 			return false;
 
-		this.computation_ = new ConsistencyChecking(
+		this.computation = new ConsistencyChecking(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.ontologyIndex,
 				reasoner.saturationState);
@@ -59,7 +59,6 @@ class IncrementalConsistencyCheckingStage extends ConsistencyCheckingStage {
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		this.computation_ = null;
 		return true;
 	}
 

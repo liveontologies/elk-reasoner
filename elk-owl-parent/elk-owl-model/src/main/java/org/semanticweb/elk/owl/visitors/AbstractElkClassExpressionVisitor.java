@@ -27,25 +27,25 @@ package org.semanticweb.elk.owl.visitors;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
-import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
-import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
@@ -73,7 +73,7 @@ public abstract class AbstractElkClassExpressionVisitor<O> implements
 	}
 
 	@Override
-	public O visit(ElkDataExactCardinality ce) {
+	public O visit(ElkDataExactCardinalityUnqualified ce) {
 		return defaultVisit(ce);
 	}
 
@@ -91,7 +91,7 @@ public abstract class AbstractElkClassExpressionVisitor<O> implements
 	}
 
 	@Override
-	public O visit(ElkDataMaxCardinality ce) {
+	public O visit(ElkDataMaxCardinalityUnqualified ce) {
 		
 		return defaultVisit(ce);
 	}
@@ -103,7 +103,7 @@ public abstract class AbstractElkClassExpressionVisitor<O> implements
 	}
 
 	@Override
-	public O visit(ElkDataMinCardinality ce) {
+	public O visit(ElkDataMinCardinalityUnqualified ce) {
 		
 		return defaultVisit(ce);
 	}
@@ -133,7 +133,7 @@ public abstract class AbstractElkClassExpressionVisitor<O> implements
 	}
 
 	@Override
-	public O visit(ElkObjectExactCardinality ce) {
+	public O visit(ElkObjectExactCardinalityUnqualified ce) {
 		
 		return defaultVisit(ce);
 	}
@@ -164,7 +164,7 @@ public abstract class AbstractElkClassExpressionVisitor<O> implements
 	}
 
 	@Override
-	public O visit(ElkObjectMaxCardinality ce) {
+	public O visit(ElkObjectMaxCardinalityUnqualified ce) {
 		
 		return defaultVisit(ce);
 	}
@@ -177,7 +177,7 @@ public abstract class AbstractElkClassExpressionVisitor<O> implements
 	}
 
 	@Override
-	public O visit(ElkObjectMinCardinality ce) {
+	public O visit(ElkObjectMinCardinalityUnqualified ce) {
 		
 		return defaultVisit(ce);
 	}

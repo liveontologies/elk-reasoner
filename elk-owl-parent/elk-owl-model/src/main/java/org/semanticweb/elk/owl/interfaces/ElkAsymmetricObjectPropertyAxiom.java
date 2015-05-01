@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkAsymmetricObjectPropertyAxiomVisitor;
+
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Asymmetric_Object_Properties">Asymmetric
@@ -35,5 +37,15 @@ package org.semanticweb.elk.owl.interfaces;
  */
 public interface ElkAsymmetricObjectPropertyAxiom extends
 		ElkObjectPropertyAxiom, ElkPropertyAxiom<ElkObjectPropertyExpression> {
+
+	/**
+	 * Accept an {@link ElkAsymmetricObjectPropertyAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(
+			ElkAsymmetricObjectPropertyAxiomVisitor<O> visitor);
 
 }

@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkPropertyRangeAxiomVisitor;
+
 /**
  * A generic interface for for object and data property range axioms.
  * properties.
@@ -41,5 +43,14 @@ public interface ElkPropertyRangeAxiom<P, R> extends ElkPropertyAxiom<P> {
 	 * @return the range of this axiom
 	 */
 	R getRange();
+
+	/**
+	 * Accept an {@link ElkPropertyRangeAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkPropertyRangeAxiomVisitor<O> visitor);
 
 }

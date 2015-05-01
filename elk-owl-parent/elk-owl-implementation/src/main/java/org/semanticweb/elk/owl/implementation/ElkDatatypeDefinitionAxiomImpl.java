@@ -29,6 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeDefinitionAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDatatypeDefinitionAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -42,32 +43,38 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkDatatypeDefinitionAxiomImpl implements
 		ElkDatatypeDefinitionAxiom {
 
-	private final ElkDatatype datatype;
-	private final ElkDataRange dataRange;
+	private final ElkDatatype datatype_;
+	private final ElkDataRange dataRange_;
 
 	ElkDatatypeDefinitionAxiomImpl(ElkDatatype dt, ElkDataRange dr) {
-		datatype = dt;
-		dataRange = dr;
-	}
-
-	@Override
-	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return visitor.visit(this);
+		datatype_ = dt;
+		dataRange_ = dr;
 	}
 
 	@Override
 	public ElkDatatype getDatatype() {
-		return datatype;
+		return datatype_;
 	}
 
 	@Override
 	public ElkDataRange getDataRange() {
-		return dataRange;
+		return dataRange_;
+	}
+
+	@Override
+	public <O> O accept(ElkAxiomVisitor<O> visitor) {
+
+		return null;
+	}
+
+	@Override
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkDatatypeDefinitionAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDatatypeDefinitionAxiomVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 
 }

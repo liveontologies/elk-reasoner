@@ -76,7 +76,7 @@ public class OwlChangesLoader extends AbstractAxiomLoader implements
 			
 			int currentAxiom = 0;
 			for (;;) {
-				if (Thread.currentThread().isInterrupted())
+				if (isInterrupted())
 					break;
 				OWLOntologyChange change = pendingChanges_.poll();
 				if (change == null)

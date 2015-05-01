@@ -29,6 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 import org.semanticweb.elk.owl.interfaces.ElkDatatypeRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.visitors.ElkDataRangeVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDatatypeRestrictionVisitor;
 import org.semanticweb.owlapi.model.OWLDatatypeRestriction;
 import org.semanticweb.owlapi.model.OWLFacetRestriction;
 
@@ -64,6 +65,11 @@ public class ElkDatatypeRestrictionWrap<T extends OWLDatatypeRestriction>
 
 	@Override
 	public <O> O accept(ElkDataRangeVisitor<O> visitor) {
+		return accept((ElkDatatypeRestrictionVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDatatypeRestrictionVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 }

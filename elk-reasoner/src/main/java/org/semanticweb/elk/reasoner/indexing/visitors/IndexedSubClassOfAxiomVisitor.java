@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.indexing.visitors;
+
 /*
  * #%L
  * ELK Reasoner
@@ -23,6 +24,14 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedSubClassOfAxiom;
 
+/**
+ * Visitor pattern interface for instances of {@link IndexedSubClassOfAxiom}.
+ * 
+ * @author "Yevgeny Kazakov"
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
+ */
 public interface IndexedSubClassOfAxiomVisitor<O> {
 
 	O visit(IndexedSubClassOfAxiom axiom);

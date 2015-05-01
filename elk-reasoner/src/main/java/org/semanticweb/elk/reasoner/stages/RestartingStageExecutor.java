@@ -23,8 +23,6 @@
 package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
-import org.semanticweb.elk.util.logging.Statistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class RestartingStageExecutor extends SimpleInterrupter implements
-		ReasonerStageExecutor {
+public class RestartingStageExecutor extends SimpleStageExecutor {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -45,37 +42,16 @@ public class RestartingStageExecutor extends SimpleInterrupter implements
 
 	@Override
 	public void complete(ReasonerStage stage) throws ElkException {
-		if (!stage.isCompleted()) {
-			LOGGER_.debug(stage.getName() + " stage:");
-			for (ReasonerStage dependentStage : stage.getPreStages()) {
-				complete(dependentStage);
+		for (;;) {
+			try {
+				super.complete(stage);
+			} catch (ElkInterruptedException e) {
+				LOGGER_.info(stage.getName() + " restarted");
+				stage.setInterrupt(false);
+				continue;
 			}
-			Statistics.logOperationStart(stage.getName(), LOGGER_);
-			registerCurrentThreadToInterrupt();
-			for (;;) {
-				try {
-					stage.preExecute();
-					stage.execute();
-					break;
-				} catch (ElkException e) {
-					if (e instanceof ElkInterruptedException) {
-						stage.clearInterrupt();
-						continue;
-					}
-					throw e;
-				} finally {
-					stage.postExecute();
-					finish(stage);
-				}
-			}
+			break;
 		}
-	}
-
-	private void finish(ReasonerStage stage) {
-		clearThreadToInterrupt();
-		Statistics.logOperationFinish(stage.getName(), LOGGER_);
-		Statistics.logMemoryUsage(LOGGER_);
-		stage.printInfo();
 	}
 
 }

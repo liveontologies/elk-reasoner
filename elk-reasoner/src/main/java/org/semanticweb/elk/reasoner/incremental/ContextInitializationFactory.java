@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.incremental;
+
 /*
  * #%L
  * ELK Reasoner
@@ -38,6 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRul
 import org.semanticweb.elk.util.concurrent.computation.BaseInputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.semanticweb.elk.util.logging.CachedTimeThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-class ContextInitializationFactory
+class ContextInitializationFactory extends SimpleInterrupter
 		implements
 		InputProcessorFactory<ArrayList<Context>, InputProcessor<ArrayList<Context>>> {
 
@@ -56,7 +58,7 @@ class ContextInitializationFactory
 			.getLogger(ContextInitializationFactory.class);
 
 	private final SaturationState<?> saturationState_;
-	private final Map<IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges_;
+	private final Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges_;
 	private final IndexedClassExpression[] indexChangesKeys_;
 	private final LinkedContextInitRule changedGlobalRuleHead_;
 	private AtomicInteger ruleHits = new AtomicInteger(0);
@@ -64,7 +66,7 @@ class ContextInitializationFactory
 
 	public ContextInitializationFactory(
 			SaturationState<?> state,
-			Map<IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges,
+			Map<? extends IndexedClassExpression, ? extends LinkedSubsumerRule> indexChanges,
 			LinkedContextInitRule changedGlobalRuleHead,
 			SaturationStatistics stageStats) {
 
@@ -160,7 +162,7 @@ class ContextInitializationFactory
 			final ContextProcessor baseProcessor) {
 		if (SaturationUtils.COLLECT_PROCESSING_TIMES) {
 			return new TimedContextCollectionProcessor(baseProcessor,
-					stageStatistics_.getIncrementalProcessingStatistics());
+					stageStatistics_.getIncrementalProcessingStatistics(), this);
 		}
 		// else
 		return new ContextCollectionProcessor(baseProcessor);
@@ -179,7 +181,7 @@ class ContextInitializationFactory
 	 * 
 	 *         pavel.klinov@uni-ulm.de
 	 */
-	private static class ContextCollectionProcessor extends
+	private class ContextCollectionProcessor extends
 			BaseInputProcessor<ArrayList<Context>> {
 
 		private final ContextProcessor contextProcessor_;
@@ -199,6 +201,11 @@ class ContextInitializationFactory
 		public void finish() {
 			super.finish();
 			contextProcessor_.finish();
+		}
+
+		@Override
+		protected boolean isInterrupted() {
+			return ContextInitializationFactory.this.isInterrupted();
 		}
 
 	}
@@ -252,6 +259,18 @@ class ContextInitializationFactory
 			// no need to add the local stats to the stage-level stats, as it's
 			// done by the caller
 		}
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean isInterrupted() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

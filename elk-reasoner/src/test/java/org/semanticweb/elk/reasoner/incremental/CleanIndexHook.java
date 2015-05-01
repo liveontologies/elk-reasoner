@@ -27,8 +27,6 @@ package org.semanticweb.elk.reasoner.incremental;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAxiom;
@@ -36,6 +34,8 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.util.collections.Operations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Removes all axioms from the reasoner
@@ -49,6 +49,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(CleanIndexHook.class);
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void apply(Reasoner reasoner, OnOffVector<ElkAxiom> changingAxioms,
 			List<ElkAxiom> staticAxioms) throws ElkException {
@@ -85,7 +86,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 			LOGGER_.error("index must be empty but its size is " + cnt);
 		}
 		// add stuff back
-		//loader.clear();
+		// loader.clear();
 
 		for (ElkAxiom axiom : axioms) {
 			if (axiom instanceof ElkClassAxiom
@@ -111,8 +112,7 @@ public class CleanIndexHook implements RandomWalkTestHook {
 
 		for (IndexedClassExpression ice : reasoner.getIndexedClassExpressions()) {
 			cnt++;
-			LOGGER_.trace("indexed CE: " + ice + " "
-					+ ice.printOccurrenceNumbers());
+			LOGGER_.trace(ice + ": indexed");
 		}
 		if (reasoner.getIndexedClassExpressions().size() != cnt)
 			LOGGER_.error("Index size mismatch: "

@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkInverseObjectPropertiesAxiomVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Inverse_Object_Properties_2">Inverse
@@ -47,5 +49,15 @@ public interface ElkInverseObjectPropertiesAxiom extends ElkObjectPropertyAxiom 
 	 * @return the second object property
 	 */
 	public ElkObjectPropertyExpression getSecondObjectPropertyExpression();
+
+	/**
+	 * Accept an {@link ElkInverseObjectPropertiesAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(
+			ElkInverseObjectPropertiesAxiomVisitor<O> visitor);
 
 }

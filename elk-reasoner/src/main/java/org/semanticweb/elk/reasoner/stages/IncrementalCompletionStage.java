@@ -73,11 +73,7 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 
 	@Override
 	public void executeStage() throws ElkException {
-		for (;;) {
-			completion_.process();
-			if (!spuriousInterrupt())
-				break;
-		}
+		completion_.process();
 	}
 
 	@Override
@@ -93,6 +89,12 @@ public class IncrementalCompletionStage extends AbstractReasonerStage {
 	@Override
 	public void printInfo() {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(completion_, flag);
 	}
 
 }

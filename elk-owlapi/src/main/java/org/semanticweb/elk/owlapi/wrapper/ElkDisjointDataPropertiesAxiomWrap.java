@@ -28,6 +28,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointDataPropertiesAxiom;
 import org.semanticweb.elk.owl.visitors.ElkDataPropertyAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDisjointDataPropertiesAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
 import org.semanticweb.owlapi.model.OWLDisjointDataPropertiesAxiom;
 
@@ -44,8 +45,7 @@ public class ElkDisjointDataPropertiesAxiomWrap<T extends OWLDisjointDataPropert
 		extends ElkDataPropertyAxiomWrap<T> implements
 		ElkDisjointDataPropertiesAxiom {
 
-	public ElkDisjointDataPropertiesAxiomWrap(
-			T owlDisjointDataPropertiesAxiom) {
+	public ElkDisjointDataPropertiesAxiomWrap(T owlDisjointDataPropertiesAxiom) {
 		super(owlDisjointDataPropertiesAxiom);
 	}
 
@@ -60,6 +60,11 @@ public class ElkDisjointDataPropertiesAxiomWrap<T extends OWLDisjointDataPropert
 
 	@Override
 	public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor) {
+		return accept((ElkDisjointDataPropertiesAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDisjointDataPropertiesAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 }

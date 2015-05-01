@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,21 +27,13 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiomWithBinding;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectPropertyWithBinding;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
-import org.semanticweb.elk.reasoner.saturation.rules.subsumers.SuperClassFromSubClassRuleWithAxiomBinding;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromDisjointSubsumers;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromInconsistentDisjointnessAxiom;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SuperReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
@@ -49,8 +42,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Abstr
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.util.collections.chains.Matcher;
-import org.semanticweb.elk.util.collections.chains.SimpleTypeBasedMatcher;
 
 /**
  * Given a {@link ClassInference} or a {@link ObjectPropertyInference} tries to
@@ -74,105 +65,41 @@ public class SideConditionLookup {
 		}
 
 		@Override
-		public ElkAxiom visit(SubClassOfSubsumer<?> inference,
-				Void ignored) {
-			// looking for a super class rule
-			SuperClassFromSubClassRuleWithAxiomBinding ruleWithBinding = find(
-					inference.getPremise().getExpression().getCompositionRuleHead(),
-					new SimpleTypeBasedMatcher<LinkedSubsumerRule, SuperClassFromSubClassRuleWithAxiomBinding>(
-							SuperClassFromSubClassRuleWithAxiomBinding.class));
-			// if we found a rule with axiom binding, we can then look for the
-			// asserted axiom which corresponds to this derived subsumer
-			if (ruleWithBinding != null) {
-				return ruleWithBinding.getAxiomForConclusion(inference.getExpression());
-			}
-
-			return null;
+		public ElkAxiom visit(SubClassOfSubsumer<?> inference, Void ignored) {
+			return inference.getReason();
 		}
 
 		@Override
-		public ElkAxiom visit(DisjointSubsumerFromSubsumer inference,
-				Void input) {
-			IndexedDisjointnessAxiom indexedAxiom = inference.getAxiom();
-			
-			return indexedAxiom instanceof IndexedDisjointnessAxiomWithBinding 
-					? ((IndexedDisjointnessAxiomWithBinding) indexedAxiom).getAssertedAxiom() 
-					: null;
+		public ElkAxiom visit(DisjointSubsumerFromSubsumer inference, Void input) {
+			return inference.getReason();
 		}
-		
+
 		@Override
 		public ElkAxiom visit(ContradictionFromDisjointSubsumers inference,
 				Void input) {
-			IndexedDisjointnessAxiom indexedAxiom = inference.getAxiom();
-			
-			return indexedAxiom instanceof IndexedDisjointnessAxiomWithBinding 
-					? ((IndexedDisjointnessAxiomWithBinding) indexedAxiom).getAssertedAxiom() 
-					: null;
+			return inference.getReason();
 		}
 
 		@Override
-		public ElkAxiom visit(ContradictionFromInconsistentDisjointnessAxiom inference,
+		public ElkAxiom visit(
+				ContradictionFromInconsistentDisjointnessAxiom inference,
 				Void input) {
-			IndexedDisjointnessAxiom indexedAxiom = inference.getAxiom();
-			
-			return indexedAxiom instanceof IndexedDisjointnessAxiomWithBinding 
-					? ((IndexedDisjointnessAxiomWithBinding) indexedAxiom).getAssertedAxiom() 
-					: null;
+			return inference.getReason();
 		}
 
 		@Override
 		public ElkAxiom visit(ComposedBackwardLink inference, Void input) {
-			if (inference.getRelation() instanceof IndexedObjectPropertyWithBinding) {
-				IndexedObjectPropertyWithBinding propertyWithBinding = (IndexedObjectPropertyWithBinding) inference.getRelation();
-				IndexedPropertyChain subChain = inference.getSubPropertyChain().getSubPropertyChain();
-				
-				if (subChain != inference.getRelation()) {
-					ElkObjectPropertyAxiom axiom = propertyWithBinding.getSubChainAxiom(inference.getSubPropertyChain().getSubPropertyChain());
-				
-					return axiom;
-				}
-			}
-			
-			return null;
+			return inference.getReason();
 		}
 
 		@Override
-		public ElkAxiom visit(ReversedForwardLink inference, Void input) {
-			if (inference.getRelation() instanceof IndexedObjectPropertyWithBinding) {
-				IndexedObjectPropertyWithBinding propertyWithBinding = (IndexedObjectPropertyWithBinding) inference.getRelation();
-				IndexedPropertyChain subChain = inference.getSubPropertyChain().getSubPropertyChain();
-				
-				if (subChain != inference.getRelation()) {
-					ElkObjectPropertyAxiom axiom = propertyWithBinding.getSubChainAxiom(inference.getSubPropertyChain().getSubPropertyChain());
-				
-					return axiom;
-				}
-			}
-			
-			return null;
+		public ElkAxiom visit(SuperReversedForwardLink inference, Void input) {
+			return inference.getReason();
 		}
 
-		@Override
-		public ElkAxiom visit(TracedPropagation inference, Void input) {
-			IndexedObjectProperty superProperty = inference.getCarry().getRelation();
-			
-			if (superProperty instanceof IndexedObjectPropertyWithBinding) {
-				IndexedObjectPropertyWithBinding propertyWithBinding = (IndexedObjectPropertyWithBinding) superProperty;
-				IndexedPropertyChain subProperty = inference.getRelation();
-				
-				if (subProperty != propertyWithBinding) {
-					ElkObjectPropertyAxiom axiom = propertyWithBinding.getSubChainAxiom(subProperty);
-				
-					return axiom;
-				}
-			}
-			
-			return null;
-		}
-		
 	};
-	
-	private ObjectPropertyInferenceVisitor<Void, ElkObjectPropertyAxiom> propertyAxiomGetter = new AbstractObjectPropertyInferenceVisitor<Void, ElkObjectPropertyAxiom>() {
+
+	private ObjectPropertyInferenceVisitor<Void, ElkAxiom> propertyAxiomGetter = new AbstractObjectPropertyInferenceVisitor<Void, ElkAxiom>() {
 
 		@Override
 		protected ElkObjectPropertyAxiom defaultTracedVisit(
@@ -182,66 +109,29 @@ public class SideConditionLookup {
 		}
 
 		@Override
-		public ElkObjectPropertyAxiom visit(ToldReflexiveProperty inference,
+		public ElkAxiom visit(ToldReflexiveProperty inference, Void input) {
+			return inference.getReason();
+		}
+
+		@Override
+		public ElkAxiom visit(ReflexiveToldSubObjectProperty inference,
 				Void input) {
-			IndexedObjectPropertyWithBinding property = withBinding(inference.getPropertyChain());
-			
-			if (property != null) {
-				return property.getReflexivityAxiom();
-			}
-			
-			return null;
+			return inference.getReason();
 		}
 
 		@Override
-		public ElkObjectPropertyAxiom visit(
-				ReflexiveToldSubObjectProperty inference, Void input) {
-			IndexedObjectPropertyWithBinding property = withBinding(inference.getPropertyChain());
-			
-			if (property != null) {
-				return property.getSubChainAxiom(inference.getSubProperty().getPropertyChain());
-			}
-			
-			return null;
-		}
-
-		@Override
-		public ElkObjectPropertyAxiom visit(
-				ToldSubPropertyInference inference, Void input) {
-			IndexedObjectPropertyWithBinding property = withBinding(inference.getPremise().getSubPropertyChain());
-			
-			if (property != null) {
-				return property.getSubChainAxiom(inference.getSubPropertyChain());
-			}
-			
-			return null;
+		public ElkAxiom visit(ToldSubPropertyInference inference, Void input) {
+			return inference.getReason();
 		}
 
 	};
-	
-	private IndexedObjectPropertyWithBinding withBinding(IndexedObjectProperty property) {
-		return property instanceof IndexedObjectPropertyWithBinding ? (IndexedObjectPropertyWithBinding) property : null;
-	}
 
 	public ElkAxiom lookup(ClassInference inference) {
 		return inference.acceptTraced(classAxiomGetter, null);
 	}
 
-	public ElkObjectPropertyAxiom lookup(ObjectPropertyInference inference) {
+	public ElkAxiom lookup(ObjectPropertyInference inference) {
 		return inference.acceptTraced(propertyAxiomGetter, null);
 	}
 
-	// FIXME Why can't we have this for any Link<LinkRule>?
-	private static <O> O find(LinkedSubsumerRule link,
-			Matcher<LinkedSubsumerRule, O> matcher) {
-		LinkedSubsumerRule candidate = link;
-		for (;;) {
-			if (candidate == null)
-				return null;
-			O match = matcher.match(candidate);
-			if (match != null)
-				return match;
-			candidate = candidate.next();
-		}
-	}
 }

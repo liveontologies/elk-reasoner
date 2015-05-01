@@ -80,6 +80,7 @@ public class PropagatedContradiction extends AbstractConclusion implements Contr
 		return new BackwardLinkImpl(premiseSource_, premiseRelation_);
 	}
 	
+	@SuppressWarnings("static-method")
 	public Contradiction getContradictionPremise() {
 		return ContradictionImpl.getInstance();
 	}

@@ -23,9 +23,8 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collection;
+import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionFactory;
@@ -44,6 +43,9 @@ import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.model.UpdateableTaxonomyNode;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The factory for engines that concurrently construct a {@link Taxonomy}. The
@@ -54,8 +56,8 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch
  */
-public class ClassTaxonomyComputationFactory implements
-		InputProcessorFactory<Collection<IndexedClass>, Engine> {
+public class ClassTaxonomyComputationFactory extends SimpleInterrupter
+		implements InputProcessorFactory<Collection<IndexedClass>, Engine> {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -150,11 +152,11 @@ public class ClassTaxonomyComputationFactory implements
 			UpdateableTaxonomyNode<ElkClass> node = taxonomy_
 					.getCreateNode(output.getEquivalent());
 
-			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
+			for (List<ElkClass> directSuperEquivalent : output
 					.getDirectSubsumers()) {
 
 				UpdateableTaxonomyNode<ElkClass> superNode = taxonomy_
-						.getCreateNode(directSuperEquivalent.getEquivalent());
+						.getCreateNode(directSuperEquivalent);
 				assignDirectSuperClassNode(node, superNode);
 			}
 
@@ -165,7 +167,7 @@ public class ClassTaxonomyComputationFactory implements
 		public void visit(
 				TransitiveReductionOutputUnsatisfiable<IndexedClass> output) {
 
-			taxonomy_.addToBottomNode(output.getRoot().getElkClass());
+			taxonomy_.addToBottomNode(output.getRoot().getElkEntity());
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace(output.getRoot() + ": added to the bottom node");
 			}
@@ -217,6 +219,12 @@ public class ClassTaxonomyComputationFactory implements
 	public Engine getEngine() {
 		return new Engine();
 
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		transitiveReductionShared_.setInterrupt(flag);
 	}
 
 	@Override

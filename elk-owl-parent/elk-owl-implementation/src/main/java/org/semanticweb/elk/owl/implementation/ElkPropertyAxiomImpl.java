@@ -25,6 +25,7 @@ package org.semanticweb.elk.owl.implementation;
 import org.semanticweb.elk.owl.interfaces.ElkPropertyAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyAxiomVisitor;
 
 /**
  * Implementation of {@link ElkPropertyAxiom}
@@ -37,23 +38,25 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public abstract class ElkPropertyAxiomImpl<P> extends ElkObjectImpl implements
 		ElkPropertyAxiom<P> {
 
-	protected final P property;
+	private final P property_;
 
 	ElkPropertyAxiomImpl(P property) {
-		this.property = property;
+		this.property_ = property;
 	}
 
 	@Override
 	public P getProperty() {
-		return this.property;
+		return this.property_;
 	}
 
 	@Override
-	public abstract <O> O accept(ElkAxiomVisitor<O> visitor);
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkPropertyAxiomVisitor<O>) visitor);
+	}
 
 	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return accept((ElkAxiomVisitor<O>) visitor);
+	public <O> O accept(ElkAxiomVisitor<O> visitor) {
+		return accept((ElkPropertyAxiomVisitor<O>) visitor);
 	}
 
 }

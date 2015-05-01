@@ -72,6 +72,8 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 
 	@Override
 	public void executeStage() throws ElkException {
+		// TODO: it seems like this stage cannot be currently interrupted
+
 		// first, pick random class expressions
 		List<IndexedClassExpression> contexts = pickRandomContexts(RandomSeedProvider.VALUE);
 		// init them for deletions
@@ -119,8 +121,8 @@ public class RandomContextResaturationStage extends AbstractReasonerStage {
 	private List<IndexedClassExpression> pickRandomContexts(long seed) {
 		Random rnd = new Random(seed);
 		List<IndexedClassExpression> contexts = new ArrayList<IndexedClassExpression>();
-		Collection<IndexedClassExpression> ices = reasoner.ontologyIndex
-				.getIndexedClassExpressions();
+		Collection<? extends IndexedClassExpression> ices = reasoner.ontologyIndex
+				.getClassExpressions();
 		int number = Math.max(1, (int) (ices.size() * RATIO_));
 		Set<Integer> indexes = new ArrayHashSet<Integer>(number);
 

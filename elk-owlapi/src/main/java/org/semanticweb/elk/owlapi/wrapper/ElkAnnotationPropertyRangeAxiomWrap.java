@@ -26,6 +26,9 @@ import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationPropertyRangeAxiom;
 import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.visitors.ElkAnnotationAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAnnotationPropertyRangeAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyRangeAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLAnnotationPropertyRangeAxiom;
 
 /**
@@ -56,7 +59,22 @@ public class ElkAnnotationPropertyRangeAxiomWrap<T extends OWLAnnotationProperty
 	}
 
 	@Override
-	public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor) {
+	public <O> O accept(ElkAnnotationPropertyRangeAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyRangeAxiomVisitor<O> visitor) {
+		return accept((ElkAnnotationPropertyRangeAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkPropertyAxiomVisitor<O> visitor) {
+		return accept((ElkAnnotationPropertyRangeAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor) {
+		return accept((ElkAnnotationPropertyRangeAxiomVisitor<O>) visitor);
 	}
 }

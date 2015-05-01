@@ -38,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * relation
  * 
  * @see IndexedObjectSomeValuesFrom#getFiller()
- * @see IndexedObjectSomeValuesFrom#getRelation()
+ * @see IndexedObjectSomeValuesFrom#getProperty()
  * 
  * @author "Yevgeny Kazakov"
  */

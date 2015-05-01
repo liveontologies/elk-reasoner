@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -33,30 +34,31 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectProper
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
-public class SubPropertyChain<R extends IndexedPropertyChain, S extends IndexedPropertyChain> implements ObjectPropertyConclusion {
+public class SubPropertyChain<R extends IndexedPropertyChain, S extends IndexedPropertyChain>
+		implements ObjectPropertyConclusion {
 
-	private final R chain_;
-	
-	private final S superProperty_;
-	
-	public SubPropertyChain(R chain, S sup) {
-		chain_ = chain;
-		superProperty_ = sup;
+	private final R subChain_;
+
+	private final S superChain_;
+
+	public SubPropertyChain(R subChain, S superChain) {
+		subChain_ = subChain;
+		superChain_ = superChain;
 	}
-	
+
 	public R getSubPropertyChain() {
-		return chain_;
+		return subChain_;
 	}
-	
+
 	public S getSuperPropertyChain() {
-		return superProperty_;
+		return superChain_;
 	}
 
 	@Override
 	public String toString() {
-		return "SubPropertyChain(" + chain_ + " " + superProperty_ + ")";
+		return "SubPropertyChain(" + subChain_ + " " + superChain_ + ")";
 	}
 
 	@Override
@@ -64,5 +66,5 @@ public class SubPropertyChain<R extends IndexedPropertyChain, S extends IndexedP
 			I input) {
 		return visitor.visit(this, input);
 	}
-	
+
 }

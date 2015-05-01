@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionQualifiedVisitor;
+
 /**
  * A generic interface for restrictions on properties with fillers (qualifiers).
  * 
@@ -41,5 +43,14 @@ public interface ElkPropertyRestrictionQualified<P, F> extends
 	 * @return the filer of this restriction
 	 */
 	F getFiller();
+
+	/**
+	 * Accept an {@link ElkPropertyRestrictionQualifiedVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkPropertyRestrictionQualifiedVisitor<O> visitor);
 
 }

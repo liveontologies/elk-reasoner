@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -21,12 +22,15 @@ package org.semanticweb.elk.reasoner.saturation.properties;
  * #L%
  */
 
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
@@ -35,6 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Ref
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,22 +51,26 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ReflexivePropertyComputationFactory
+public class ReflexivePropertyComputationFactory extends SimpleInterrupter
 		implements
 		InputProcessorFactory<IndexedObjectProperty, ReflexivePropertyComputationFactory.Engine> {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ReflexivePropertyComputationFactory.class);
-	
+
+	private final OntologyIndex index_;
+
 	private final TraceStore.Writer traceWriter_;
-	
-	public ReflexivePropertyComputationFactory() {
-		this(TraceStore.Writer.Dummy);
+
+	public ReflexivePropertyComputationFactory(OntologyIndex index) {
+		this(index, TraceStore.Writer.Dummy);
 	}
-	
-	public ReflexivePropertyComputationFactory(TraceStore.Writer traceWriter) {
-		traceWriter_ = traceWriter;
+
+	public ReflexivePropertyComputationFactory(OntologyIndex index,
+			TraceStore.Writer traceWriter) {
+		this.index_ = index;
+		this.traceWriter_ = traceWriter;
 	}
 
 	/**
@@ -81,10 +90,9 @@ public class ReflexivePropertyComputationFactory
 		// nothing to do
 	}
 
-	private void toDo(IndexedPropertyChain ipc, ObjectPropertyInference inference) {
-		SaturatedPropertyChain saturation = SaturatedPropertyChain
-				.getCreate(ipc);
-		if (saturation.setReflexive()) {
+	private void toDo(IndexedPropertyChain ipc,
+			ObjectPropertyInference inference) {
+		if (ipc.getSaturated().setReflexive()) {
 			LOGGER_.trace("{}: set reflexive", ipc);
 
 			toDo_.add(ipc);
@@ -94,26 +102,27 @@ public class ReflexivePropertyComputationFactory
 	}
 
 	private void toDoSuperProperties(IndexedPropertyChain ipc) {
-		for (IndexedObjectProperty sup : ipc.getToldSuperProperties()) {
-			toDo(sup, new ReflexiveToldSubObjectProperty(sup, ipc));
+		ArrayList<IndexedObjectProperty> toldSuper = ipc
+				.getToldSuperProperties();
+		ArrayList<ElkAxiom> reasons = ipc.getToldSuperPropertiesReasons();
+		for (int i = 0; i < toldSuper.size(); i++) {
+			IndexedObjectProperty sup = toldSuper.get(i);
+			toDo(sup,
+					new ReflexiveToldSubObjectProperty(sup, ipc, reasons.get(i)));
 		}
 	}
 
 	private void toDoLeftChains(IndexedObjectProperty iop) {
-		for (IndexedBinaryPropertyChain chain : iop.getLeftChains()) {
-			SaturatedPropertyChain rightSaturation = chain.getRightProperty()
-					.getSaturated();
-			if (rightSaturation == null || !rightSaturation.isDerivedReflexive())
+		for (IndexedComplexPropertyChain chain : iop.getLeftChains()) {
+			if (!chain.getSuffixChain().getSaturated().isDerivedReflexive())
 				continue;
 			toDo(chain, new ReflexivePropertyChainInference(chain));
 		}
 	}
 
 	private void toDoRightChains(IndexedPropertyChain ipc) {
-		for (IndexedBinaryPropertyChain chain : ipc.getRightChains()) {
-			SaturatedPropertyChain leftSaturation = chain.getLeftProperty()
-					.getSaturated();
-			if (leftSaturation == null || !leftSaturation.isDerivedReflexive())
+		for (IndexedComplexPropertyChain chain : ipc.getRightChains()) {
+			if (!chain.getFirstProperty().getSaturated().isDerivedReflexive())
 				continue;
 			toDo(chain, new ReflexivePropertyChainInference(chain));
 		}
@@ -132,7 +141,7 @@ public class ReflexivePropertyComputationFactory
 		}
 
 		@Override
-		public Void visit(IndexedBinaryPropertyChain element) {
+		public Void visit(IndexedComplexPropertyChain element) {
 			commonVisit(element);
 			return null;
 		}
@@ -146,8 +155,11 @@ public class ReflexivePropertyComputationFactory
 	class Engine implements InputProcessor<IndexedObjectProperty> {
 
 		@Override
-		public void submit(IndexedObjectProperty job) {
-			toDo(job, new ToldReflexiveProperty(job));
+		public void submit(IndexedObjectProperty property) {
+			for (ElkAxiom reason : index_.getReflexiveObjectProperties().get(
+					property)) {
+				toDo(property, new ToldReflexiveProperty(property, reason));
+			}
 		}
 
 		@Override

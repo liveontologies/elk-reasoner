@@ -62,12 +62,4 @@ class InitializeContextsAfterDeletionsStage extends
 		return true;
 	}
 
-	@Override
-	public boolean postExecute() {
-		if (!super.postExecute())
-			return false;
-		this.todo = null;
-		return true;
-	}
-
 }

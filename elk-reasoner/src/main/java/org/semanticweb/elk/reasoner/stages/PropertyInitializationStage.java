@@ -24,8 +24,6 @@ package org.semanticweb.elk.reasoner.stages;
 
 import java.util.Iterator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 
@@ -40,14 +38,6 @@ import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain
  */
 class PropertyInitializationStage extends AbstractReasonerStage {
 
-	// logger for this class
-	private static final Logger LOGGER_ = LoggerFactory
-			.getLogger(PropertyInitializationStage.class);
-
-	/**
-	 * The counter for deleted saturations
-	 */
-	private int clearedSaturations_;
 	/**
 	 * The progress counter
 	 */
@@ -60,7 +50,7 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	/**
 	 * The state of the iterator of the input to be processed
 	 */
-	private Iterator<IndexedPropertyChain> todo_ = null;
+	private Iterator<? extends IndexedPropertyChain> todo_ = null;
 
 	public PropertyInitializationStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -76,29 +66,22 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		todo_ = reasoner.ontologyIndex.getIndexedPropertyChains()
-				.iterator();
-		maxProgress_ = reasoner.ontologyIndex.getIndexedPropertyChains()
-				.size();
+		todo_ = reasoner.ontologyIndex.getPropertyChains().iterator();
+		maxProgress_ = reasoner.ontologyIndex.getPropertyChains().size();
 		progress_ = 0;
-		clearedSaturations_ = 0;
 		return true;
 	}
 
 	@Override
 	public void executeStage() throws ElkInterruptedException {
 		for (;;) {
+			checkInterrupt();
 			if (!todo_.hasNext())
 				break;
 			IndexedPropertyChain ipc = todo_.next();
 			SaturatedPropertyChain saturation = ipc.getSaturated();
-			if (saturation != null) {
-				saturation.clear();
-				clearedSaturations_++;
-			}
+			saturation.clear();
 			progressMonitor.report(++progress_, maxProgress_);
-			if (spuriousInterrupt())
-				continue;
 		}
 	}
 
@@ -112,8 +95,7 @@ class PropertyInitializationStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
-		if (clearedSaturations_ > 0 && LOGGER_.isDebugEnabled())
-			LOGGER_.debug("Saturations cleared: " + clearedSaturations_);
+		// nothing interesting to print
 	}
 
 }

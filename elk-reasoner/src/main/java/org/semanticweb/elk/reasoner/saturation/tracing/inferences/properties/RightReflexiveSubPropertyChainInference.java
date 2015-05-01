@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
@@ -38,13 +38,13 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Objec
  */
 public class RightReflexiveSubPropertyChainInference extends ReflexiveSubPropertyChainInference<IndexedObjectProperty> {
 
-	public RightReflexiveSubPropertyChainInference(IndexedBinaryPropertyChain sub, IndexedPropertyChain sup) {
-		super(sub, sub.getLeftProperty(), sup);
+	public RightReflexiveSubPropertyChainInference(IndexedComplexPropertyChain sub, IndexedPropertyChain sup) {
+		super(sub, sub.getFirstProperty(), sup);
 	}
 
 	@Override
 	public ReflexivePropertyChain<IndexedPropertyChain> getReflexivePremise() {
-		return new ReflexivePropertyChain<IndexedPropertyChain>(chain.getRightProperty());
+		return new ReflexivePropertyChain<IndexedPropertyChain>(chain.getSuffixChain());
 	}
 
 	@Override

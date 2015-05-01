@@ -22,10 +22,10 @@
  */
 package org.semanticweb.elk.reasoner.indexing.visitors;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 
 /**
- * Visitor pattern interface for instances of {@link IndexedBinaryPropertyChain}
+ * Visitor pattern interface for instances of {@link IndexedComplexPropertyChain}
  * .
  * 
  * @author Frantisek Simancik
@@ -36,6 +36,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChai
  */
 public interface IndexedBinaryPropertyChainVisitor<O> {
 
-	O visit(IndexedBinaryPropertyChain element);
+	O visit(IndexedComplexPropertyChain element);
 
 }

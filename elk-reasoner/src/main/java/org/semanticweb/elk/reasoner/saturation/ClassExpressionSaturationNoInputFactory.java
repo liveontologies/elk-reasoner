@@ -72,6 +72,16 @@ public class ClassExpressionSaturationNoInputFactory implements
 	}
 
 	@Override
+	public void setInterrupt(boolean flag) {
+		ruleAppFactory_.setInterrupt(flag);
+	}
+
+	@Override
+	public boolean isInterrupted() {
+		return ruleAppFactory_.isInterrupted();
+	}
+
+	@Override
 	public void finish() {
 		ruleAppFactory_.dispose();
 	}

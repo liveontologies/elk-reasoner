@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -98,7 +98,7 @@ public class HybridContextPremises implements ContextPremises {
 
 	@Override
 	public IndexedClassExpression[] getDisjointSubsumers(
-			IndexedDisjointnessAxiom axiom) {
+			IndexedDisjointClassesAxiom axiom) {
 		// local
 		return localPremises_.getDisjointSubsumers(axiom);
 	}

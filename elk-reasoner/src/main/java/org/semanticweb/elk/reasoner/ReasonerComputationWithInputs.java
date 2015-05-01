@@ -33,7 +33,8 @@ import org.semanticweb.elk.util.concurrent.computation.ConcurrentComputationWith
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 
 /**
- * A {@link ConcurrentComputationWithInputs} used for executing of reasoner stages
+ * A {@link ConcurrentComputationWithInputs} used for executing of reasoner
+ * stages
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -108,26 +109,21 @@ public class ReasonerComputationWithInputs<I, F extends InputProcessorFactory<I,
 			}
 			finish();
 		} catch (InterruptedException e) {
-			// interrupt all workers
-			for (;;) {
-				try {
-					interrupt();
-					break;
-				} catch (InterruptedException e1) {
-					// we'll still wait until all workers stop
-					continue;
-				}
-			}
 			// restore interrupt status
 			Thread.currentThread().interrupt();
+			throw new ElkRuntimeException(
+					"Reasoner computation interrupted externally!");
 		}
 	}
 
 	private boolean processNextInput() throws InterruptedException {
-		submit(nextInput);
+		if (!submit(nextInput)) {
+			waitWorkers();
+			return false;
+		}
 		nextInput = null;
-		if (Thread.currentThread().isInterrupted()) {
-			interrupt();
+		if (isInterrupted()) {
+			waitWorkers();
 			return false;
 		}
 		progressMonitor.report(++progress, maxProgress);

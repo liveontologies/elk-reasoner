@@ -1,6 +1,7 @@
 package org.semanticweb.elk.loading;
 
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 
 /*
  * #%L
@@ -32,7 +33,8 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class ComposedAxiomLoader implements AxiomLoader {
+public class ComposedAxiomLoader extends SimpleInterrupter implements
+		AxiomLoader {
 
 	private final AxiomLoader firstLoader_, secondLoader_;
 
@@ -44,8 +46,10 @@ public class ComposedAxiomLoader implements AxiomLoader {
 	@Override
 	public void load(ElkAxiomProcessor axiomInserter,
 			ElkAxiomProcessor axiomDeleter) throws ElkLoadingException {
-		firstLoader_.load(axiomInserter, axiomDeleter);
-		secondLoader_.load(axiomInserter, axiomDeleter);
+		if (!firstLoader_.isLoadingFinished())
+			firstLoader_.load(axiomInserter, axiomDeleter);
+		if (!secondLoader_.isLoadingFinished())
+			secondLoader_.load(axiomInserter, axiomDeleter);
 
 	}
 
@@ -59,6 +63,13 @@ public class ComposedAxiomLoader implements AxiomLoader {
 	public boolean isLoadingFinished() {
 		return firstLoader_.isLoadingFinished()
 				&& secondLoader_.isLoadingFinished();
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		firstLoader_.setInterrupt(flag);
+		secondLoader_.setInterrupt(flag);
 	}
 
 }

@@ -77,6 +77,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 				reasoner.classTaxonomyState.getRemovedClasses());
 		final Collection<IndexedClassEntity> removedIndividuals = new IndexedClassEntityCollection(
 				reasoner.instanceTaxonomyState.getRemovedIndividuals());
+		@SuppressWarnings("unchecked")
 		Collection<IndexedClassEntity> inputs = Operations.getCollection(
 				Operations.concat(modifiedEntities,
 						Operations.concat(removedClasses, removedIndividuals)),
@@ -101,11 +102,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			// nothing to do
 			return;
 		}
-		for (;;) {
-			cleaning_.process();
-			if (!spuriousInterrupt())
-				break;
-		}
+		cleaning_.process();
 	}
 
 	@Override
@@ -125,6 +122,12 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	@Override
 	public void printInfo() {
 		// TODO
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(cleaning_, flag);
 	}
 
 	/*

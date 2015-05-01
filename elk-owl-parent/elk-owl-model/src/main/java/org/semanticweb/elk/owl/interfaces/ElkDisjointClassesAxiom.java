@@ -27,6 +27,8 @@ package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.visitors.ElkDisjointClassesAxiomVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Disjoint_Classes">Disjoint Classes
@@ -44,5 +46,14 @@ public interface ElkDisjointClassesAxiom extends ElkClassAxiom {
 	 * @return list of disjoint class expressions
 	 */
 	public List<? extends ElkClassExpression> getClassExpressions();
+
+	/**
+	 * Accept an {@link ElkDisjointClassesAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(ElkDisjointClassesAxiomVisitor<O> visitor);
 
 }

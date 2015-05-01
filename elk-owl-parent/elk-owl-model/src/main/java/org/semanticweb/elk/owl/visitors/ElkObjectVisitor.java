@@ -35,7 +35,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * @author Frantisek Simancik
  * 
  * @param <O>
- *            the output type of the visitor
+ *            the type of the output of this visitor
  */
 public interface ElkObjectVisitor<O> extends ElkAxiomVisitor<O>,
 		ElkClassExpressionVisitor<O>, ElkSubObjectPropertyExpressionVisitor<O>,
@@ -43,4 +43,6 @@ public interface ElkObjectVisitor<O> extends ElkAxiomVisitor<O>,
 		ElkLiteralVisitor<O>, ElkEntityVisitor<O>, ElkDataRangeVisitor<O>,
 		ElkFacetRestrictionVisitor<O>, ElkAnnotationVisitor<O>,
 		ElkAnnotationSubjectVisitor<O>, ElkAnnotationValueVisitor<O> {
+
+	// combined visitor
 }

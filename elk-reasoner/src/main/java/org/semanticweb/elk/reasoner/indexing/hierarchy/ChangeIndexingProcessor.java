@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
 /*
  * #%L
  * ELK Reasoner
@@ -27,6 +28,8 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.ElkAxiomProcessor;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkAxiomConverter;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkIndexingUnsupportedException;
 import org.semanticweb.elk.util.logging.LogLevel;
 import org.semanticweb.elk.util.logging.LoggerWrap;
 import org.slf4j.Logger;
@@ -46,27 +49,34 @@ public class ChangeIndexingProcessor implements ElkAxiomProcessor {
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ChangeIndexingProcessor.class);
 
-	private final ElkAxiomIndexingVisitor indexer_;
+	/**
+	 * Some predefined types of processing
+	 */
+	public static final String ADDITION = "addition", REMOVAL = "removal";
 
-	public ChangeIndexingProcessor(ElkAxiomIndexingVisitor indexer) {
-		indexer_ = indexer;
+	private final ElkAxiomConverter indexer_;
+
+	private final String type_; // deletion or addition
+
+	public ChangeIndexingProcessor(ElkAxiomConverter indexer, String type) {
+		this.indexer_ = indexer;
+		this.type_ = type;
 	}
 
 	@Override
 	public void visit(ElkAxiom elkAxiom) {
 		try {
-			elkAxiom.accept(indexer_);
 			if (LOGGER_.isTraceEnabled())
 				LOGGER_.trace("$$ indexing "
 						+ OwlFunctionalStylePrinter.toString(elkAxiom)
-						+ " for "
-						+ (indexer_.getMultiplicity() == 1 ? "addition"
-								: "deletion"));
+						+ " for " + type_);
+			elkAxiom.accept(indexer_);
 		} catch (ElkIndexingUnsupportedException e) {
 			if (LOGGER_.isWarnEnabled()) {
-				LoggerWrap.log(LOGGER_, LogLevel.WARN, "reasoner.indexing.axiomIgnored", e.getMessage()
-						+ " Axiom ignored:\n"
-						+ OwlFunctionalStylePrinter.toString(elkAxiom));
+				LoggerWrap.log(LOGGER_, LogLevel.WARN,
+						"reasoner.indexing.axiomIgnored", e.getMessage()
+								+ " Axiom ignored:\n"
+								+ OwlFunctionalStylePrinter.toString(elkAxiom));
 			}
 		}
 	}

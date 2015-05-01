@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,25 +25,39 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.InferencePrinter;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
 
 /**
- * Represents an inference based on a ReflexiveObjectProperty axiom in the ontology.
+ * Represents an inference based on a ReflexiveObjectProperty axiom in the
+ * ontology.
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
-public class ToldReflexiveProperty extends ReflexivePropertyChain<IndexedObjectProperty> implements ObjectPropertyInference {
+public class ToldReflexiveProperty extends
+		ReflexivePropertyChain<IndexedObjectProperty> implements
+		ObjectPropertyInference {
 
-	public ToldReflexiveProperty(IndexedObjectProperty property) {
+	/**
+	 * The {@link ElkAxiom} responsible for the reflexivity of the property
+	 */
+	private final ElkAxiom reason_;
+
+	public ToldReflexiveProperty(IndexedObjectProperty property, ElkAxiom reason) {
 		super(property);
+		this.reason_ = reason;
 	}
-	
+
 	public SubObjectProperty getPropertyInitialization() {
 		return new SubObjectProperty(getPropertyChain(), getPropertyChain());
+	}
+
+	public ElkAxiom getReason() {
+		return this.reason_;
 	}
 
 	@Override
@@ -50,20 +65,20 @@ public class ToldReflexiveProperty extends ReflexivePropertyChain<IndexedObjectP
 			I input) {
 		return visitor.visit(this, input);
 	}
-	
+
 	@Override
 	public String toString() {
 		return new InferencePrinter().visit(this, null);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || !(obj instanceof ToldReflexiveProperty)) {
 			return false;
 		}
-		
+
 		ToldReflexiveProperty inf = (ToldReflexiveProperty) obj;
-		
+
 		return getPropertyChain().equals(inf.getPropertyChain());
 	}
 

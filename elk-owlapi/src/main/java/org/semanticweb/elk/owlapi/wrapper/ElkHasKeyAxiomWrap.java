@@ -33,6 +33,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkHasKeyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
 import org.semanticweb.owlapi.model.OWLHasKeyAxiom;
@@ -52,16 +53,6 @@ public class ElkHasKeyAxiomWrap<T extends OWLHasKeyAxiom> extends
 
 	public ElkHasKeyAxiomWrap(T owlAxiom) {
 		super(owlAxiom);
-	}
-
-	@Override
-	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public <O> O accept(ElkObjectVisitor<O> visitor) {
-		return visitor.visit(this);
 	}
 
 	@Override
@@ -93,5 +84,20 @@ public class ElkHasKeyAxiomWrap<T extends OWLHasKeyAxiom> extends
 		}
 
 		return dpes;
+	}
+
+	@Override
+	public <O> O accept(ElkAxiomVisitor<O> visitor) {
+		return accept((ElkHasKeyAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkHasKeyAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkHasKeyAxiomVisitor<O> visitor) {
+		return visitor.visit(this);
 	}
 }

@@ -1,14 +1,12 @@
-/**
- * 
- */
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
+
 /*
  * #%L
  * ELK Reasoner
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,57 +22,33 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
+import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 
 /**
- * @author Pavel Klinov
+ * Represents occurrences of an {@link ElkSubObjectPropertyOfAxiom} in an
+ * ontology.
+ * 
+ * @author "Yevgeny Kazakov"
  *
- * pavel.klinov@uni-ulm.de
  */
-public class IndexedSubObjectPropertyOfAxiom<I extends IndexedObjectProperty> extends IndexedAxiom {
+public interface IndexedSubObjectPropertyOfAxiom extends IndexedAxiom {
 
-	protected final IndexedPropertyChain subProperty_;
-	
-	protected final I superProperty_;
-	
-	IndexedSubObjectPropertyOfAxiom(IndexedPropertyChain sub, I sup) {
-		subProperty_ = sub;
-		superProperty_ = sup;
-	}
-	
-	public IndexedPropertyChain getSubProperty() {
-		return subProperty_;
-	}
-	
-	public IndexedObjectProperty getSuperProperty() {
-		return superProperty_;
-	}
-	
-	@Override
-	void updateOccurrenceNumbers(ModifiableOntologyIndex index, int increment) {
-		if (increment > 0) {
-			subProperty_.addToldSuperObjectProperty(superProperty_);
-			superProperty_.addToldSubPropertyChain(subProperty_);
-		} else {
-			subProperty_.removeToldSuperObjectProperty(superProperty_);
-			superProperty_.removeToldSubObjectProperty(subProperty_);
-		}
-	}
+	/**
+	 * @return the {@link IndexedPropertyChain} representing the sub property
+	 *         expression of the {@link ElkSubObjectPropertyOfAxiom} represented
+	 *         by this {@link IndexedSubObjectPropertyOfAxiom}
+	 * 
+	 * @see ElkSubObjectPropertyOfAxiom#getSubObjectPropertyExpression()
+	 */
+	public IndexedPropertyChain getSubPropertyChain();
 
-	@Override
-	public <O> O accept(IndexedAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public boolean occurs() {
-		// we do not cache property axioms
-		return false;
-	}
-
-	@Override
-	String toStringStructural() {
-		return "SubObjectPropertyChain(" + subProperty_ + " " + superProperty_ + ")";
-	}
+	/**
+	 * @return the {@link IndexedObjectProperty} representing the super property
+	 *         of the {@link ElkSubObjectPropertyOfAxiom} represented by this
+	 *         {@link IndexedSubObjectPropertyOfAxiom}
+	 * 
+	 * @see ElkSubObjectPropertyOfAxiom#getSuperObjectPropertyExpression()
+	 */
+	public IndexedObjectProperty getSuperProperty();
 
 }

@@ -218,8 +218,7 @@ public class PropertyInferenceTracingTest {
 								backwardLink.getBackwardLink().getRelation().equals(rIndexed) &&
 								backwardLink.getForwardLink().getTarget().equals(dIndexed) &&
 								backwardLink.getForwardLink().getRelation().equals(sshhIndexed) &&
-								backwardLink.getRelation().equals(tIndexed) &&
-								backwardLink.getSubPropertyChain().getSubPropertyChain().equals(rrsshhIndexed);
+								backwardLink.getRelation().equals(tIndexed);
 					}
 
 				}, 

@@ -30,47 +30,52 @@ import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkDataPropertyAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
+import org.semanticweb.elk.owl.visitors.ElkSubDataPropertyOfAxiomVisitor;
 
 /**
  * ELK implementation of ElkSubDataPropertyOfAxiom.
  *
- * @author Markus Kroetzsch 
+ * @author Markus Kroetzsch
  */
 public class ElkSubDataPropertyOfAxiomImpl extends ElkObjectImpl implements
 		ElkSubDataPropertyOfAxiom {
 
-	protected final ElkDataPropertyExpression subDataPropertyExpression;
-	protected final ElkDataPropertyExpression superDataPropertyExpression;
+	private final ElkDataPropertyExpression subProperty_;
+	private final ElkDataPropertyExpression superProperty_;
 
-	ElkSubDataPropertyOfAxiomImpl(
-			ElkDataPropertyExpression subDataPropertyExpression,
-			ElkDataPropertyExpression superDataPropertyExpression) {
-		this.subDataPropertyExpression = subDataPropertyExpression;
-		this.superDataPropertyExpression = superDataPropertyExpression;
+	ElkSubDataPropertyOfAxiomImpl(ElkDataPropertyExpression subProperty,
+			ElkDataPropertyExpression superProperty) {
+		this.subProperty_ = subProperty;
+		this.superProperty_ = superProperty;
 	}
 
 	@Override
 	public ElkDataPropertyExpression getSubDataPropertyExpression() {
-		return subDataPropertyExpression;
+		return subProperty_;
 	}
 
 	@Override
 	public ElkDataPropertyExpression getSuperDataPropertyExpression() {
-		return superDataPropertyExpression;
+		return superProperty_;
 	}
 
 	@Override
 	public <O> O accept(ElkDataPropertyAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkSubDataPropertyOfAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkSubDataPropertyOfAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkSubDataPropertyOfAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkSubDataPropertyOfAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

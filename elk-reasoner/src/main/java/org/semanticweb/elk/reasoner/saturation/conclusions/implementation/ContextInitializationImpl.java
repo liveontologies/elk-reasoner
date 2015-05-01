@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;

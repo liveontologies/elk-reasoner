@@ -23,10 +23,10 @@
 package org.semanticweb.elk.reasoner.taxonomy;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionFactory;
 import org.semanticweb.elk.reasoner.reduction.TransitiveReductionJob;
@@ -138,13 +138,12 @@ public class InstanceTaxonomyComputationFactory implements
 			// only supports singleton individuals
 			UpdateableInstanceNode<ElkClass, ElkNamedIndividual> node = taxonomy_
 					.getCreateInstanceNode(Collections.singleton(output
-							.getRoot().getElkNamedIndividual()));
+							.getRoot().getElkEntity()));
 
-			for (TransitiveReductionOutputEquivalent<IndexedClass> directSuperEquivalent : output
+			for (List<ElkClass> directSuperEquivalent : output
 					.getDirectSubsumers()) {
 				UpdateableTypeNode<ElkClass, ElkNamedIndividual> superNode = taxonomy_
-						.getCreateTypeNode(directSuperEquivalent
-								.getEquivalent());
+						.getCreateTypeNode(directSuperEquivalent);
 				assignDirectTypeNode(node, superNode);
 			}
 
@@ -156,7 +155,8 @@ public class InstanceTaxonomyComputationFactory implements
 				TransitiveReductionOutputUnsatisfiable<IndexedIndividual> output) {
 			// the ontology is inconsistent, this should have been checked
 			// earlier
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("individual " + output.getRoot()
+					+ " cannot be inconsistent!");
 		}
 
 		@Override
@@ -205,6 +205,16 @@ public class InstanceTaxonomyComputationFactory implements
 	public Engine getEngine() {
 		return new Engine();
 
+	}
+
+	@Override
+	public void setInterrupt(boolean flag) {
+		transitiveReductionShared_.setInterrupt(flag);
+	}
+
+	@Override
+	public boolean isInterrupted() {
+		return transitiveReductionShared_.isInterrupted();
 	}
 
 	@Override

@@ -25,8 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
@@ -44,8 +45,11 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
  */
-public class ComposedBackwardLink extends BackwardLinkImpl implements ClassInference {
+public class ComposedBackwardLink extends BackwardLinkImpl implements
+		ClassInference {
 
 	private final IndexedClassExpression inferenceContext_;
 
@@ -54,26 +58,33 @@ public class ComposedBackwardLink extends BackwardLinkImpl implements ClassInfer
 	private final IndexedPropertyChain forwardLinkRelation_;
 
 	private final IndexedClassExpression forwardLinkTarget_;
-	
-	private final IndexedBinaryPropertyChain composition_;
+
+	private final IndexedComplexPropertyChain composition_;
+
+	/**
+	 * The {@link ElkAxiom} that yields the super-property of the composition
+	 */
+	private final ElkAxiom reason_;
 
 	public ComposedBackwardLink(IndexedClassExpression linkSource,
 			IndexedObjectProperty backwardLinkRelation,
 			IndexedClassExpression inferenceContext,
 			IndexedPropertyChain forwardLinkChain,
 			IndexedClassExpression linkTarget,
-			IndexedBinaryPropertyChain composition,
-			IndexedObjectProperty compositionSuperProperty) {
+			IndexedComplexPropertyChain composition,
+			IndexedObjectProperty compositionSuperProperty, ElkAxiom reason) {
 		super(linkSource, compositionSuperProperty);
-		backwardLinkRelation_ = backwardLinkRelation;
-		forwardLinkRelation_ = forwardLinkChain;
-		forwardLinkTarget_ = linkTarget;
-		inferenceContext_ = inferenceContext;
-		composition_ = composition;
+		this.backwardLinkRelation_ = backwardLinkRelation;
+		this.forwardLinkRelation_ = forwardLinkChain;
+		this.forwardLinkTarget_ = linkTarget;
+		this.inferenceContext_ = inferenceContext;
+		this.composition_ = composition;
+		this.reason_ = reason;
 	}
 
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 
@@ -90,20 +101,21 @@ public class ComposedBackwardLink extends BackwardLinkImpl implements ClassInfer
 			IndexedClassExpression rootWhereStored) {
 		return inferenceContext_;
 	}
-	
+
 	public SubObjectProperty getLeftSubObjectProperty() {
-		return new SubObjectProperty(backwardLinkRelation_, composition_.getLeftProperty());
+		return new SubObjectProperty(backwardLinkRelation_,
+				composition_.getFirstProperty());
 	}
-	
-	public SubPropertyChain<?,?> getRightSubObjectPropertyChain() {
-		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(forwardLinkRelation_, composition_.getRightProperty());
+
+	public SubPropertyChain<?, ?> getRightSubObjectPropertyChain() {
+		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(
+				forwardLinkRelation_, composition_.getSuffixChain());
 	}
-	
-	//this is a side-condition, not a premise 
-	public SubPropertyChain<IndexedBinaryPropertyChain, IndexedObjectProperty> getSubPropertyChain() {
-		return new SubPropertyChain<IndexedBinaryPropertyChain, IndexedObjectProperty>(composition_, getRelation());
+
+	public ElkAxiom getReason() {
+		return reason_;
 	}
-	
+
 	@Override
 	public String toString() {
 		return super.toString() + " (composition)";

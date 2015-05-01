@@ -28,9 +28,12 @@ import java.util.List;
 import java.util.Queue;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.owl.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +43,8 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-abstract class AbstractReasonerStage implements ReasonerStage {
+abstract class AbstractReasonerStage extends SimpleInterrupter implements
+		ReasonerStage {
 
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
@@ -104,35 +108,6 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 		return preStages;
 	}
 
-	@Override
-	public boolean isInterrupted() {
-		return reasoner.isInterrupted();
-	}
-
-	@Override
-	public void clearInterrupt() {
-		reasoner.clearInterrupt();
-	}
-
-	/**
-	 * Check if the reasoner was interrupted and clears the interrupt status
-	 * 
-	 * @return {@code true} if the current thread was interrupted but the
-	 *         reasoner was not interrupted (e.g., spurious interrupt)
-	 * @throws ElkInterruptedException
-	 *             if the reasoner was interrupted
-	 */
-	public boolean spuriousInterrupt() throws ElkInterruptedException {
-		boolean result = false;
-		if (Thread.interrupted())
-			result = true;
-		if (isInterrupted()) {
-			clearInterrupt();
-			throw new ElkInterruptedException(getName() + " interrupted");
-		}
-		return result;
-	}
-
 	/**
 	 * Initialize the parameters of the computation for this stage; this is the
 	 * first thing to be done before stage is executed
@@ -184,11 +159,8 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 		progressMonitor.start(getName());
 
 		try {
-			for (;;) {
-				executeStage();
-				if (!spuriousInterrupt())
-					break;
-			}
+			executeStage();
+			checkInterrupt();
 		} finally {
 			progressMonitor.finish();
 		}
@@ -246,6 +218,24 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 				}
 			}
 		}
+	}
+
+	protected void checkInterrupt() throws ElkInterruptedException {
+		if (isInterrupted()) {
+			LOGGER_.info("{}: interrupted", getName());
+			throw new ElkInterruptedException(getName() + " interrupted");
+		}
+	}
+
+	protected void setInterrupt(Interrupter interrupter, boolean flag) {
+		if (interrupter == null) {
+			if (!flag)
+				throw new ElkRuntimeException(getName()
+						+ ": cannot clear interrupt!");
+			return;
+		}
+		// else
+		interrupter.setInterrupt(flag);
 	}
 
 	protected void markAllContextsAsSaturated() {

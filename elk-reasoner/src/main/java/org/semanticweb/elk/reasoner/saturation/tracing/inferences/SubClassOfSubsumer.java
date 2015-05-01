@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
@@ -42,17 +43,26 @@ public class SubClassOfSubsumer<S extends IndexedClassExpression> extends
 
 	private final IndexedClassExpression premise_;
 
-	public SubClassOfSubsumer(IndexedClassExpression premise, S expression) {
-		super(expression);
-		premise_ = premise;
+	private final ElkAxiom reason_;
+
+	public SubClassOfSubsumer(IndexedClassExpression premise, S conclusion,
+			ElkAxiom reason) {
+		super(conclusion);
+		this.premise_ = premise;
+		this.reason_ = reason;
 	}
 
 	public Subsumer<?> getPremise() {
 		return new DecomposedSubsumerImpl<IndexedClassExpression>(premise_);
 	}
 
+	public ElkAxiom getReason() {
+		return this.reason_;
+	}
+
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 
@@ -66,4 +76,5 @@ public class SubClassOfSubsumer<S extends IndexedClassExpression> extends
 	public String toString() {
 		return super.toString() + " (subclassof)";
 	}
+
 }

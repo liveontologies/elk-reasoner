@@ -46,6 +46,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubs
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SuperReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
@@ -64,7 +65,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Objec
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class InferencePrinter implements ClassInferenceVisitor<Void, String>, ObjectPropertyInferenceVisitor<Void, String> {
+public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
+		ObjectPropertyInferenceVisitor<Void, String> {
 
 	public static String print(ClassInference conclusion) {
 		return conclusion.acceptTraced(new InferencePrinter(), null);
@@ -126,6 +128,11 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>, Ob
 	}
 
 	@Override
+	public String visit(SuperReversedForwardLink conclusion, Void input) {	
+		return "Reversing forward link " + conclusion.getSourceLink() + " and unfolding under " + conclusion.getReason();
+	}
+
+	@Override
 	public String visit(DecomposedExistentialBackwardLink conclusion,
 			Void parameter) {
 		return "Creating backward link from " + conclusion.getExistential();
@@ -145,18 +152,20 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>, Ob
 	public String visit(
 			ContradictionFromInconsistentDisjointnessAxiom conclusion,
 			Void input) {
-		return "Contradiction since " + conclusion.getPremise() + " is disjoint with itself";
+		return "Contradiction since " + conclusion.getPremise()
+				+ " is disjoint with itself";
 	}
 
 	@Override
 	public String visit(ContradictionFromDisjointSubsumers conclusion,
 			Void input) {
-		return "Contradiction due to " + conclusion.getAxiom() + ", derived through " + conclusion.getPremises()[0].getMember();
+		return conclusion.toString();
 	}
 
 	@Override
 	public String visit(ContradictionFromNegation conclusion, Void input) {
-		return "Contradiction due to derived " + conclusion.getPremise() + " and " + conclusion.getPositivePremise();
+		return "Contradiction due to derived " + conclusion.getPremise()
+				+ " and " + conclusion.getPositivePremise();
 	}
 
 	@Override
@@ -171,12 +180,14 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>, Ob
 
 	@Override
 	public String visit(DisjointSubsumerFromSubsumer conclusion, Void input) {
-		return "Disjoint subsumer " + conclusion + " derived from " + conclusion.getPremise(); 
+		return "Disjoint subsumer " + conclusion + " derived from "
+				+ conclusion.getPremise();
 	}
 
 	@Override
 	public String visit(DisjunctionComposition conclusion, Void input) {
-		return "Composed disjunction " + conclusion.getExpression() + " from " + conclusion.getPremise();
+		return "Composed disjunction " + conclusion.getExpression() + " from "
+				+ conclusion.getPremise();
 	}
 
 	@Override
@@ -191,27 +202,36 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>, Ob
 
 	@Override
 	public String visit(ReflexiveToldSubObjectProperty inference, Void input) {
-		return inference.getPropertyChain() + "is reflexive because its told sub-property " + inference.getSubProperty() + " is reflexive";
+		return inference.getPropertyChain()
+				+ "is reflexive because its told sub-property "
+				+ inference.getSubProperty() + " is reflexive";
 	}
 
 	@Override
 	public String visit(ReflexivePropertyChainInference inference, Void input) {
-		return inference.getPropertyChain() + "is reflexive because of composition of reflexive chains";
+		return inference.getPropertyChain()
+				+ "is reflexive because of composition of reflexive chains";
 	}
 
 	@Override
-	public String visit(LeftReflexiveSubPropertyChainInference inference, Void input) {
-		return "Left part of " + inference.getSuperPropertyChain() + " is reflexive";
+	public String visit(LeftReflexiveSubPropertyChainInference inference,
+			Void input) {
+		return "Left part of " + inference.getSuperPropertyChain()
+				+ " is reflexive";
 	}
 
 	@Override
-	public String visit(RightReflexiveSubPropertyChainInference inference, 	Void input) {
-		return "Right part of " + inference.getSuperPropertyChain() + " is reflexive";
+	public String visit(RightReflexiveSubPropertyChainInference inference,
+			Void input) {
+		return "Right part of " + inference.getSuperPropertyChain()
+				+ " is reflexive";
 	}
 
 	@Override
 	public String visit(ToldSubPropertyInference inference, Void input) {
-		return "Told sub-chain: " + inference.getSubPropertyChain() + " => " + inference.getSuperPropertyChain() + ", premise: " + inference.getPremise();
+		return "Told sub-chain: " + inference.getSubPropertyChain() + " => "
+				+ inference.getSuperPropertyChain() + ", premise: "
+				+ inference.getPremise();
 	}
 
 }

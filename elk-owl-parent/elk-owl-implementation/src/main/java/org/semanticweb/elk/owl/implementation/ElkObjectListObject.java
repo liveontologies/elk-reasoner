@@ -39,10 +39,14 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 public abstract class ElkObjectListObject<O extends ElkObject> extends
 		ElkObjectImpl {
 
-	protected final List<? extends O> elkObjects;
+	private final List<? extends O> elkObjects_;
 
 	ElkObjectListObject(List<? extends O> elkObjects) {
-		this.elkObjects = elkObjects;
+		this.elkObjects_ = elkObjects;
+	}
+
+	public List<? extends O> getObjects() {
+		return elkObjects_;
 	}
 
 	public static <O> List<? extends O> varArgsToList(O firstObject,

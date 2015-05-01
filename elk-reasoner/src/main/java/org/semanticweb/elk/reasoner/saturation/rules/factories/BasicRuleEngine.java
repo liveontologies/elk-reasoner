@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.saturation.rules.factories;
-
 /*
  * #%L
  * ELK Reasoner
@@ -21,8 +19,9 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * limitations under the License.
  * #L%
  */
+package org.semanticweb.elk.reasoner.saturation.rules.factories;
 
-import org.semanticweb.elk.reasoner.indexing.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
@@ -30,6 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule;
+import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
  * An {@link AbstractRuleEngine} which produces {@link Conclusion}s and
@@ -54,11 +54,12 @@ public class BasicRuleEngine<I extends RuleApplicationInput> extends AbstractRul
 
 	protected BasicRuleEngine(OntologyIndex index,
 			ConclusionVisitor<? super Context, Boolean> conclusionProcessor,
-			WorkerLocalTodo localTodo, SaturationStateWriter<?> writer,
+			WorkerLocalTodo localTodo, Interrupter interrupter,
+			SaturationStateWriter<?> writer,
 			SaturationStatistics aggregatedStatistics,
 			SaturationStatistics localStatistics) {
-		super(conclusionProcessor, localTodo, aggregatedStatistics,
-				localStatistics);
+		super(conclusionProcessor, localTodo, interrupter,
+				aggregatedStatistics, localStatistics);
 		this.writer_ = writer;
 		this.contextInitConclusion_ = new ContextInitializationImpl(index);
 	}

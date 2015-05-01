@@ -74,6 +74,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 		io_ = io;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void run(final Reasoner reasoner,
 			final OnOffVector<T> changingAxioms, final List<T> staticAxioms,
 			final long seed) throws ElkException, InterruptedException,
@@ -185,6 +186,7 @@ public class RandomWalkIncrementalClassificationRunner<T> {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void failWithResults(Reasoner testReasoner,
 			final OnOffVector<T> changingAxioms, final List<T> staticAxioms,
 			long seed) throws ElkException {

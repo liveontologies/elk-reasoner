@@ -29,6 +29,8 @@ import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataAllValuesFromVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataPropertyListRestrictionQualifiedVisitor;
 import org.semanticweb.owlapi.model.OWLDataAllValuesFrom;
 
 /**
@@ -48,17 +50,30 @@ public class ElkDataAllValuesFromWrap<T extends OWLDataAllValuesFrom> extends
 	}
 
 	@Override
-	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
 	public List<? extends ElkDataPropertyExpression> getDataPropertyExpressions() {
-		return Collections.singletonList(converter.convert(owlObject.getProperty()));
+		return Collections.singletonList(converter.convert(owlObject
+				.getProperty()));
 	}
 
 	@Override
 	public ElkDataRange getDataRange() {
 		return converter.convert(owlObject.getFiller());
 	}
+
+	@Override
+	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+		return accept((ElkDataAllValuesFromVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(
+			ElkDataPropertyListRestrictionQualifiedVisitor<O> visitor) {
+		return accept((ElkDataAllValuesFromVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDataAllValuesFromVisitor<O> visitor) {
+		return visitor.visit(this);
+	}
+
 }

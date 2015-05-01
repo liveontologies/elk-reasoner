@@ -29,6 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
 import org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDisjointUnionAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDisjointUnionAxiom;
@@ -65,6 +66,11 @@ public class ElkDisjointUnionAxiomWrap<T extends OWLDisjointUnionAxiom> extends
 
 	@Override
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {
+		return accept((ElkDisjointUnionAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDisjointUnionAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

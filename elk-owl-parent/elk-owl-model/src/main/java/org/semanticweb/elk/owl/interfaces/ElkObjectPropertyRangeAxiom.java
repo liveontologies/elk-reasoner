@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkObjectPropertyRangeAxiomVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Object_Property_Range">Object Property
@@ -35,4 +37,13 @@ package org.semanticweb.elk.owl.interfaces;
  */
 public interface ElkObjectPropertyRangeAxiom extends ElkObjectPropertyAxiom,
 		ElkPropertyRangeAxiom<ElkObjectPropertyExpression, ElkClassExpression> {
+
+	/**
+	 * Accept an {@link ElkObjectPropertyRangeAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(ElkObjectPropertyRangeAxiomVisitor<O> visitor);
 }

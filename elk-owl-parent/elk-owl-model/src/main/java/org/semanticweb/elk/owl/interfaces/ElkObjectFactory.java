@@ -193,16 +193,16 @@ public interface ElkObjectFactory {
 	public ElkDataComplementOf getDataComplementOf(ElkDataRange dataRange);
 
 	/**
-	 * Create an {@link ElkDataExactCardinality}.
+	 * Create an {@link ElkDataExactCardinalityUnqualified}.
 	 * 
 	 * @param dataPropertyExpression
 	 *            the {@link ElkDataPropertyExpression} for which the object
 	 *            should be created
 	 * @param cardinality
 	 *            the cardinality for which the object should be created
-	 * @return an {@link ElkDataExactCardinality} corresponding to the input
+	 * @return an {@link ElkDataExactCardinalityUnqualified} corresponding to the input
 	 */
-	public ElkDataExactCardinality getDataExactCardinality(
+	public ElkDataExactCardinalityUnqualified getDataExactCardinalityUnqualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality);
 
 	/**
@@ -266,16 +266,16 @@ public interface ElkObjectFactory {
 			List<? extends ElkDataRange> dataRanges);
 
 	/**
-	 * Create an {@link ElkDataMaxCardinality}.
+	 * Create an {@link ElkDataMaxCardinalityUnqualified}.
 	 * 
 	 * @param dataPropertyExpression
 	 *            the {@link ElkDataPropertyExpression} for which the object
 	 *            should be created
 	 * @param cardinality
 	 *            the cardinality for which the object should be created
-	 * @return an {@link ElkDataMaxCardinality} corresponding to the input
+	 * @return an {@link ElkDataMaxCardinalityUnqualified} corresponding to the input
 	 */
-	public ElkDataMaxCardinality getDataMaxCardinality(
+	public ElkDataMaxCardinalityUnqualified getDataMaxCardinalityUnqualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality);
 
 	/**
@@ -297,16 +297,16 @@ public interface ElkObjectFactory {
 			ElkDataRange dataRange);
 
 	/**
-	 * Create an {@link ElkDataMinCardinality}.
+	 * Create an {@link ElkDataMinCardinalityUnqualified}.
 	 * 
 	 * @param dataPropertyExpression
 	 *            the {@link ElkDataPropertyExpression} for which the object
 	 *            should be created
 	 * @param cardinality
 	 *            the cardinality for which the object should be created
-	 * @return an {@link ElkDataMinCardinality} corresponding to the input
+	 * @return an {@link ElkDataMinCardinalityUnqualified} corresponding to the input
 	 */
-	public ElkDataMinCardinality getDataMinCardinality(
+	public ElkDataMinCardinalityUnqualified getDataMinCardinalityUnqualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality);
 
 	/**
@@ -905,16 +905,16 @@ public interface ElkObjectFactory {
 			ElkClassExpression classExpression);
 
 	/**
-	 * Create an {@link ElkObjectExactCardinality}.
+	 * Create an {@link ElkObjectExactCardinalityUnqualified}.
 	 * 
 	 * @param objectPropertyExpression
 	 *            the {@link ElkObjectPropertyExpression} for which the object
 	 *            should be created
 	 * @param cardinality
 	 *            the cardinality for which the object should be created
-	 * @return an {@link ElkObjectExactCardinality} corresponding to the input
+	 * @return an {@link ElkObjectExactCardinalityUnqualified} corresponding to the input
 	 */
-	public ElkObjectExactCardinality getObjectExactCardinality(
+	public ElkObjectExactCardinalityUnqualified getObjectExactCardinalityUnqualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality);
 
@@ -1004,16 +1004,16 @@ public interface ElkObjectFactory {
 			ElkObjectProperty objectProperty);
 
 	/**
-	 * Create an {@link ElkObjectMaxCardinality}.
+	 * Create an {@link ElkObjectMaxCardinalityUnqualified}.
 	 * 
 	 * @param objectPropertyExpression
 	 *            the {@link ElkObjectPropertyExpression} for which the object
 	 *            should be created
 	 * @param cardinality
 	 *            the cardinality for which the object should be created
-	 * @return an {@link ElkObjectMaxCardinality} corresponding to the input
+	 * @return an {@link ElkObjectMaxCardinalityUnqualified} corresponding to the input
 	 */
-	public ElkObjectMaxCardinality getObjectMaxCardinality(
+	public ElkObjectMaxCardinalityUnqualified getObjectMaxCardinalityUnqualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality);
 
@@ -1036,16 +1036,16 @@ public interface ElkObjectFactory {
 			int cardinality, ElkClassExpression classExpression);
 
 	/**
-	 * Create an {@link ElkObjectMinCardinality}.
+	 * Create an {@link ElkObjectMinCardinalityUnqualified}.
 	 * 
 	 * @param objectPropertyExpression
 	 *            the {@link ElkObjectPropertyExpression} for which the object
 	 *            should be created
 	 * @param cardinality
 	 *            the cardinality for which the object should be created
-	 * @return an {@link ElkObjectMinCardinality} corresponding to the input
+	 * @return an {@link ElkObjectMinCardinalityUnqualified} corresponding to the input
 	 */
-	public ElkObjectMinCardinality getObjectMinCardinality(
+	public ElkObjectMinCardinalityUnqualified getObjectMinCardinalityUnqualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
 			int cardinality);
 

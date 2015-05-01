@@ -99,7 +99,7 @@ public class Statistics {
 			ElkTimer timer = ElkTimer.getNamedTimer(operationName,
 					ElkTimer.RECORD_WALLTIME);
 			timer.stop();
-			LoggerWrap.log(logger, priority, operationName + " finished in "
+			LoggerWrap.log(logger, priority, operationName + " took "
 					+ timer.getTotalWallTime() / 1000000 + " ms");
 		}
 	}

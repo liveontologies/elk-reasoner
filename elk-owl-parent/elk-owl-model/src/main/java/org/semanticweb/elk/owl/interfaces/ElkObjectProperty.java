@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkObjectPropertyVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Object_Properties">Object Property<a> in
@@ -34,4 +36,13 @@ package org.semanticweb.elk.owl.interfaces;
  */
 public interface ElkObjectProperty extends ElkObjectPropertyExpression,
 		ElkEntity {
+
+	/**
+	 * Accept an {@link ElkObjectPropertyVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkObjectPropertyVisitor<O> visitor);
 }

@@ -25,13 +25,14 @@ package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
 import java.util.Collection;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -85,17 +86,18 @@ public class ReflexiveBackwardLinkCompositionRule extends
 	public void apply(ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		/* compose the link with all reflexive backward links */
-		final Multimap<IndexedObjectProperty, IndexedBinaryPropertyChain> comps = this.forwardLink_
-				.getRelation().getSaturated()
+		SaturatedPropertyChain linkSaturation = this.forwardLink_.getRelation()
+				.getSaturated();
+		final Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> comps = linkSaturation
 				.getCompositionsByLeftSubProperty();
 		final Set<IndexedObjectProperty> reflexiveBackwardRelations = premises
 				.getLocalReflexiveObjectProperties();
 
 		for (IndexedObjectProperty backwardRelation : new LazySetIntersection<IndexedObjectProperty>(
 				comps.keySet(), reflexiveBackwardRelations)) {
-			Collection<IndexedBinaryPropertyChain> compositions = comps
+			Collection<IndexedComplexPropertyChain> compositions = comps
 					.get(backwardRelation);
-			for (IndexedBinaryPropertyChain composition : compositions) {
+			for (IndexedComplexPropertyChain composition : compositions) {
 				IndexedClassExpression root = premises.getRoot();
 				ForwardLinkImpl.produceComposedLink(producer, root,
 						backwardRelation, root, forwardLink_.getRelation(),

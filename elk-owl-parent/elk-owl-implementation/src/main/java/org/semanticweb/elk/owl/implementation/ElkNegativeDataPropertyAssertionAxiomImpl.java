@@ -26,8 +26,8 @@ import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkLiteral;
 import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
-import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
-import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkNegativeDataPropertyAssertionAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkPropertyAssertionAxiomVisitor;
 
 /**
  * Implementation of {@link ElkNegativeDataPropertyAssertionAxiom}.
@@ -48,12 +48,12 @@ public class ElkNegativeDataPropertyAssertionAxiomImpl
 	}
 
 	@Override
-	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+	public <O> O accept(ElkPropertyAssertionAxiomVisitor<O> visitor) {
+		return accept((ElkNegativeDataPropertyAssertionAxiomVisitor<O>) visitor);
 	}
 
 	@Override
-	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor) {
+	public <O> O accept(ElkNegativeDataPropertyAssertionAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

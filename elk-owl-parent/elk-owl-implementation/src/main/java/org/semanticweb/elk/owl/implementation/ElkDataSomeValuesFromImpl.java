@@ -30,7 +30,8 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
-import org.semanticweb.elk.owl.visitors.ElkClassExpressionVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataPropertyListRestrictionQualifiedVisitor;
+import org.semanticweb.elk.owl.visitors.ElkDataSomeValuesFromVisitor;
 
 /**
  * Implementation of {@link ElkDataSomeValuesFrom}.
@@ -50,7 +51,13 @@ public class ElkDataSomeValuesFromImpl extends
 	}
 
 	@Override
-	public <O> O accept(ElkClassExpressionVisitor<O> visitor) {
+	public <O> O accept(
+			ElkDataPropertyListRestrictionQualifiedVisitor<O> visitor) {
+		return accept((ElkDataSomeValuesFromVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkDataSomeValuesFromVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

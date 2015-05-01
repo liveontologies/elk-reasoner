@@ -36,7 +36,7 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	/**
 	 * the computation used for this stage
 	 */
-	protected ConsistencyChecking computation_ = null;
+	protected ConsistencyChecking computation = null;
 
 	public ConsistencyCheckingStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -52,7 +52,7 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 	public boolean preExecute() {
 		if (!super.preExecute())
 			return false;
-		this.computation_ = new ConsistencyChecking(
+		this.computation = new ConsistencyChecking(
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), reasoner.ontologyIndex,
 				reasoner.saturationState);
@@ -61,15 +61,15 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 
 	@Override
 	public void executeStage() throws ElkInterruptedException {
-		computation_.process();
+		computation.process();
 	}
 
 	@Override
 	public boolean postExecute() {
 		if (!super.postExecute())
 			return false;
-		reasoner.inconsistentEntity = computation_.getInconsistentEntity();
-		reasoner.ruleAndConclusionStats.add(computation_
+		reasoner.inconsistentEntity = computation.getInconsistentEntity();
+		reasoner.ruleAndConclusionStats.add(computation
 				.getRuleAndConclusionStatistics());
 
 		// FIXME Obviously needed a better clean-up after inconsistency
@@ -77,15 +77,18 @@ class ConsistencyCheckingStage extends AbstractReasonerStage {
 			reasoner.classTaxonomyState.getWriter().clearTaxonomy();
 			reasoner.instanceTaxonomyState.getWriter().clearTaxonomy();
 		}
-
-		this.computation_ = null;
 		return true;
 	}
 
 	@Override
 	public void printInfo() {
-		if (computation_ != null)
-			computation_.printStatistics();
+		if (computation != null)
+			computation.printStatistics();
 	}
 
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(computation, flag);
+	}
 }

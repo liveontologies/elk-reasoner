@@ -110,8 +110,10 @@ public abstract class BaseIncrementalReasoningCorrectnessTest<T, EO extends Test
 	public void incrementalReasoning() throws ElkException {
 		changingAxioms.setAllOn();
 
+		@SuppressWarnings("unchecked")
 		Reasoner standardReasoner = getReasoner(Operations.concat(staticAxioms,
 				changingAxioms.getOnElements()));
+		@SuppressWarnings("unchecked")
 		Reasoner incrementalReasoner = getReasoner(Operations.concat(
 				staticAxioms, changingAxioms.getOnElements()));
 

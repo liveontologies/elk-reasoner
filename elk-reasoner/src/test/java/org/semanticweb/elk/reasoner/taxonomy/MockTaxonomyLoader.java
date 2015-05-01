@@ -129,6 +129,16 @@ public class MockTaxonomyLoader {
 		}
 
 		@Override
+		protected Void defaultLogicalVisit(ElkAxiom axiom) {
+			return null;
+		}
+
+		@Override
+		protected Void defaultNonLogicalVisit(ElkAxiom axiom) {
+			return null;
+		}
+
+		@Override
 		public Void visit(ElkEquivalentClassesAxiom elkEquivalentClassesAxiom) {
 			// a new node
 			Set<ElkClass> classes = new HashSet<ElkClass>();
@@ -268,5 +278,6 @@ public class MockTaxonomyLoader {
 		public void finish() throws Owl2ParseException {
 			// everything is processed immediately
 		}
+
 	}
 }

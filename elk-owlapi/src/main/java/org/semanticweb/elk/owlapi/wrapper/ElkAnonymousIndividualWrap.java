@@ -23,6 +23,9 @@
 package org.semanticweb.elk.owlapi.wrapper;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnonymousIndividual;
+import org.semanticweb.elk.owl.visitors.ElkAnnotationSubjectVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAnnotationValueVisitor;
+import org.semanticweb.elk.owl.visitors.ElkAnonymousIndividualVisitor;
 import org.semanticweb.elk.owl.visitors.ElkIndividualVisitor;
 import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 
@@ -48,7 +51,22 @@ public class ElkAnonymousIndividualWrap<T extends OWLAnonymousIndividual>
 	}
 
 	@Override
+	public <O> O accept(ElkAnnotationValueVisitor<O> visitor) {
+		return accept((ElkAnonymousIndividualVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkAnnotationSubjectVisitor<O> visitor) {
+		return accept((ElkAnonymousIndividualVisitor<O>) visitor);
+	}
+
+	@Override
 	public <O> O accept(ElkIndividualVisitor<O> visitor) {
+		return accept((ElkAnonymousIndividualVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkAnonymousIndividualVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 

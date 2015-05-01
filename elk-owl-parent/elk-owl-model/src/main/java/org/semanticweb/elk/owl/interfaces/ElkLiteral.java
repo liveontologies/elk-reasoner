@@ -67,7 +67,7 @@ public interface ElkLiteral extends ElkObject, ElkAnnotationValue {
 	 * Accept an {@link ElkLiteralVisitor}.
 	 * 
 	 * @param visitor
-	 *            the visitor that can work with this axiom type
+	 *            the visitor that can work with this object type
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkLiteralVisitor<O> visitor);

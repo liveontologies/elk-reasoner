@@ -47,12 +47,11 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SuperReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
@@ -99,7 +98,8 @@ public class TracingTest {
 		assumeTrue(!ignore(manifest.getInput()));
 	}
 
-	protected boolean ignore(TestInput input) {
+	@SuppressWarnings("static-method")
+	protected boolean ignore(@SuppressWarnings("unused") TestInput input) {
 		return false;
 	}
 
@@ -139,6 +139,7 @@ public class TracingTest {
 		}
 	}	
 	
+	// FIXME: this test is not necessary as side conditions are not null by construction
 	private ClassInferenceVisitor<IndexedClassExpression, Boolean> getClassInferenceCheckerForAxiomBinding() {
 		return new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
 
@@ -166,29 +167,17 @@ public class TracingTest {
 			
 			@Override
 			public Boolean visit(ComposedBackwardLink inference, IndexedClassExpression root) {
-				IndexedPropertyChain subChain = inference.getSubPropertyChain().getSubPropertyChain();
+				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 				
-				if (subChain != inference.getRelation()) {
-					ElkAxiom axiom = new SideConditionLookup().lookup(inference);
-					
-					assertNotNull("Failed to look up the property axiom for the composition infrence " + inference, axiom);
-					return true;
-				}
-				
+				assertNotNull("Failed to look up the property axiom for the composition infrence " + inference, axiom);
 				return true;
 			}
 
 			@Override
-			public Boolean visit(ReversedForwardLink inference, IndexedClassExpression root) {
-				IndexedPropertyChain subChain = inference.getSubPropertyChain().getSubPropertyChain();
+			public Boolean visit(SuperReversedForwardLink inference, IndexedClassExpression root) {
+				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 				
-				if (subChain != inference.getRelation()) {
-					ElkAxiom axiom = new SideConditionLookup().lookup(inference);
-					
-					assertNotNull("Failed to look up the property axiom for the composition infrence " + inference, axiom);
-					return true;
-				}
-				
+				assertNotNull("Failed to look up the property axiom for the composition infrence " + inference, axiom);
 				return true;
 			}
 			
@@ -313,6 +302,7 @@ public class TracingTest {
 		};
 	}
 
+	@SuppressWarnings("static-method")
 	protected TracingTests getTracingTests(Reasoner reasoner) throws ElkException {
 		return new ComprehensiveSubsumptionTracingTests(reasoner);
 	}

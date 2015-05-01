@@ -35,4 +35,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  * @author Markus Kroetzsch
  */
 public abstract class ElkObjectImpl implements ElkObject {
+
+	// noting common so far
+
 }

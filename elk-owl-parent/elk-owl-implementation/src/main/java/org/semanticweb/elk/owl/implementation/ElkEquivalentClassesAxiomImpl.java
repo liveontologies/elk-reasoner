@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor;
+import org.semanticweb.elk.owl.visitors.ElkEquivalentClassesAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
@@ -52,16 +53,22 @@ public class ElkEquivalentClassesAxiomImpl extends ElkClassExpressionListObject
 
 	@Override
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkEquivalentClassesAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkEquivalentClassesAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkEquivalentClassesAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkEquivalentClassesAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
+
 }

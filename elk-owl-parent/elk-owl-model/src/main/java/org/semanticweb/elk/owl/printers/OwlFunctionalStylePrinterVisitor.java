@@ -35,24 +35,21 @@ import org.semanticweb.elk.owl.interfaces.ElkCardinalityRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkCardinalityRestrictionQualified;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataComplementOf;
-import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkDataIntersectionOf;
-import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyDomainAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyRangeAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDataRange;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkDataUnionOf;
 import org.semanticweb.elk.owl.interfaces.ElkDatatype;
@@ -72,7 +69,6 @@ import org.semanticweb.elk.owl.interfaces.ElkFacetRestriction;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalDataPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkHasKeyAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkInverseObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIrreflexiveObjectPropertyAxiom;
@@ -83,22 +79,21 @@ import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxio
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectInverseOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityQualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
@@ -117,8 +112,9 @@ import org.semanticweb.elk.owl.interfaces.ElkSubDataPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
-import org.semanticweb.elk.owl.iris.ElkIri;
-import org.semanticweb.elk.owl.predefined.PredefinedElkIri;
+import org.semanticweb.elk.owl.iris.ElkAbbreviatedIri;
+import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.predefined.PredefinedElkIris;
 import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
@@ -173,7 +169,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkAsymmetricObjectPropertyAxiom elkAsymmetricObjectPropertyAxiom) {
 		write("AsymmetricObjectProperty(");
-		write((ElkPropertyAxiom<ElkObjectPropertyExpression>) elkAsymmetricObjectPropertyAxiom);
+		write(elkAsymmetricObjectPropertyAxiom);
 		write(')');
 		return null;
 	}
@@ -213,9 +209,9 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	}
 
 	@Override
-	public Void visit(ElkDataExactCardinality elkDataExactCardinality) {
+	public Void visit(ElkDataExactCardinalityUnqualified elkDataExactCardinality) {
 		write("DataExactCardinality(");
-		write((ElkCardinalityRestriction<ElkDataPropertyExpression>) elkDataExactCardinality);
+		write(elkDataExactCardinality);
 		write(')');
 		return null;
 	}
@@ -224,7 +220,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkDataExactCardinalityQualified elkDataExactCardinalityQualified) {
 		write("DataExactCardinality(");
-		write((ElkCardinalityRestrictionQualified<ElkDataPropertyExpression, ElkDataRange>) elkDataExactCardinalityQualified);
+		write(elkDataExactCardinalityQualified);
 		write(')');
 		return null;
 	}
@@ -232,7 +228,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	@Override
 	public Void visit(ElkDataHasValue elkDataHasValue) {
 		write("DataHasValue(");
-		write((ElkPropertyRestrictionQualified<ElkDataPropertyExpression, ElkLiteral>) elkDataHasValue);
+		write(elkDataHasValue);
 		write(')');
 		return null;
 	}
@@ -246,9 +242,9 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	}
 
 	@Override
-	public Void visit(ElkDataMaxCardinality elkDataMaxCardinality) {
+	public Void visit(ElkDataMaxCardinalityUnqualified elkDataMaxCardinality) {
 		write("DataMaxCardinality(");
-		write((ElkCardinalityRestriction<ElkDataPropertyExpression>) elkDataMaxCardinality);
+		write(elkDataMaxCardinality);
 		write(')');
 		return null;
 	}
@@ -257,15 +253,15 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkDataMaxCardinalityQualified elkDataMaxCardinalityQualified) {
 		write("DataMaxCardinality(");
-		write((ElkCardinalityRestrictionQualified<ElkDataPropertyExpression, ElkDataRange>) elkDataMaxCardinalityQualified);
+		write(elkDataMaxCardinalityQualified);
 		write(')');
 		return null;
 	}
 
 	@Override
-	public Void visit(ElkDataMinCardinality elkDataMinCardinality) {
+	public Void visit(ElkDataMinCardinalityUnqualified elkDataMinCardinality) {
 		write("DataMinCardinality(");
-		write((ElkCardinalityRestriction<ElkDataPropertyExpression>) elkDataMinCardinality);
+		write(elkDataMinCardinality);
 		write(')');
 		return null;
 	}
@@ -274,7 +270,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkDataMinCardinalityQualified elkDataMinCardinalityQualified) {
 		write("DataMinCardinality(");
-		write((ElkCardinalityRestrictionQualified<ElkDataPropertyExpression, ElkDataRange>) elkDataMinCardinalityQualified);
+		write(elkDataMinCardinalityQualified);
 		write(')');
 		return null;
 	}
@@ -297,7 +293,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkDataPropertyAssertionAxiom elkDataPropertyAssertionAxiom) {
 		write("DataPropertyAssertion(");
-		write((ElkPropertyAssertionAxiom<ElkDataPropertyExpression, ElkIndividual, ElkLiteral>) elkDataPropertyAssertionAxiom);
+		write(elkDataPropertyAssertionAxiom);
 		write(')');
 		return null;
 	}
@@ -305,7 +301,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	@Override
 	public Void visit(ElkDataPropertyDomainAxiom elkDataPropertyDomainAxiom) {
 		write("DataPropertyDomain(");
-		write((ElkPropertyDomainAxiom<ElkDataPropertyExpression, ElkClassExpression>) elkDataPropertyDomainAxiom);
+		write(elkDataPropertyDomainAxiom);
 		write(')');
 		return null;
 	}
@@ -313,7 +309,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	@Override
 	public Void visit(ElkDataPropertyRangeAxiom elkDataPropertyRangeAxiom) {
 		write("DataPropertyRange(");
-		write((ElkPropertyRangeAxiom<ElkDataPropertyExpression, ElkDataRange>) elkDataPropertyRangeAxiom);
+		write(elkDataPropertyRangeAxiom);
 		write(')');
 		return null;
 	}
@@ -424,7 +420,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	@Override
 	public Void visit(
 			ElkEquivalentObjectPropertiesAxiom elkEquivalentObjectProperties) {
-		write("DisjointObjectProperties(");
+		write("EquivalentObjectProperties(");
 		write(elkEquivalentObjectProperties.getObjectPropertyExpressions());
 		write(')');
 		return null;
@@ -442,7 +438,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkFunctionalDataPropertyAxiom elkFunctionalDataPropertyAxiom) {
 		write("FunctionalDataProperty(");
-		write((ElkPropertyAxiom<ElkDataPropertyExpression>) elkFunctionalDataPropertyAxiom);
+		write(elkFunctionalDataPropertyAxiom);
 		write(')');
 		return null;
 	}
@@ -451,7 +447,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkFunctionalObjectPropertyAxiom elkFunctionalObjectPropertyAxiom) {
 		write("FunctionalObjectProperty(");
-		write((ElkPropertyAxiom<ElkObjectPropertyExpression>) elkFunctionalObjectPropertyAxiom);
+		write(elkFunctionalObjectPropertyAxiom);
 		write(')');
 		return null;
 	}
@@ -460,7 +456,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkInverseFunctionalObjectPropertyAxiom elkInverseFunctionalObjectPropertyAxiom) {
 		write("InverseFunctionalObjectProperty(");
-		write((ElkPropertyAxiom<ElkObjectPropertyExpression>) elkInverseFunctionalObjectPropertyAxiom);
+		write(elkInverseFunctionalObjectPropertyAxiom);
 		write(')');
 		return null;
 	}
@@ -482,7 +478,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkIrreflexiveObjectPropertyAxiom elkIrreflexiveObjectPropertyAxiom) {
 		write("IrreflexiveObjectProperty(");
-		write((ElkPropertyAxiom<ElkObjectPropertyExpression>) elkIrreflexiveObjectPropertyAxiom);
+		write(elkIrreflexiveObjectPropertyAxiom);
 		write(')');
 		return null;
 	}
@@ -504,8 +500,8 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	private static boolean isPlain(ElkLiteral elkLiteral) {
 
 		return elkLiteral.getDatatype() == null
-				|| PredefinedElkIri.RDF_PLAIN_LITERAL.get().equals(
-						elkLiteral.getDatatype().getIri());
+				|| PredefinedElkIris.RDF_PLAIN_LITERAL.equals(elkLiteral
+						.getDatatype().getIri());
 	}
 
 	@Override
@@ -518,7 +514,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkNegativeDataPropertyAssertionAxiom elkNegativeDataPropertyAssertion) {
 		write("NegativeDataPropertyAssertion(");
-		write((ElkPropertyAssertionAxiom<ElkDataPropertyExpression, ElkIndividual, ElkLiteral>) elkNegativeDataPropertyAssertion);
+		write(elkNegativeDataPropertyAssertion);
 		write(')');
 		return null;
 	}
@@ -527,7 +523,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkNegativeObjectPropertyAssertionAxiom elkNegativeObjectPropertyAssertion) {
 		write("NegativeObjectPropertyAssertion(");
-		write((ElkPropertyAssertionAxiom<ElkObjectPropertyExpression, ElkIndividual, ElkIndividual>) elkNegativeObjectPropertyAssertion);
+		write(elkNegativeObjectPropertyAssertion);
 		write(')');
 		return null;
 	}
@@ -535,7 +531,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	@Override
 	public Void visit(ElkObjectAllValuesFrom elkObjectAllValuesFrom) {
 		write("ObjectAllValuesFrom(");
-		write((ElkPropertyRestrictionQualified<ElkObjectPropertyExpression, ElkClassExpression>) elkObjectAllValuesFrom);
+		write(elkObjectAllValuesFrom);
 		write(')');
 		return null;
 	}
@@ -549,9 +545,10 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	}
 
 	@Override
-	public Void visit(ElkObjectExactCardinality elkObjectExactCardinality) {
+	public Void visit(
+			ElkObjectExactCardinalityUnqualified elkObjectExactCardinality) {
 		write("ObjectExactCardinality(");
-		write((ElkCardinalityRestriction<ElkObjectPropertyExpression>) elkObjectExactCardinality);
+		write(elkObjectExactCardinality);
 		write(')');
 		return null;
 	}
@@ -560,7 +557,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkObjectExactCardinalityQualified elkObjectExactCardinalityQualified) {
 		write("ObjectExactCardinality(");
-		write((ElkCardinalityRestrictionQualified<ElkObjectPropertyExpression, ElkClassExpression>) elkObjectExactCardinalityQualified);
+		write(elkObjectExactCardinalityQualified);
 		write(')');
 		return null;
 	}
@@ -568,7 +565,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	@Override
 	public Void visit(ElkObjectHasSelf elkObjectHasSelf) {
 		write("ObjectHasSelf(");
-		write((ElkPropertyRestriction<ElkObjectPropertyExpression>) elkObjectHasSelf);
+		write(elkObjectHasSelf);
 		write(')');
 		return null;
 	}
@@ -576,7 +573,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	@Override
 	public Void visit(ElkObjectHasValue elkObjectHasValue) {
 		write("ObjectHasValue(");
-		write((ElkPropertyRestrictionQualified<ElkObjectPropertyExpression, ElkIndividual>) elkObjectHasValue);
+		write(elkObjectHasValue);
 		write(')');
 		return null;
 	}
@@ -598,9 +595,9 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	}
 
 	@Override
-	public Void visit(ElkObjectMaxCardinality elkObjectMaxCardinality) {
+	public Void visit(ElkObjectMaxCardinalityUnqualified elkObjectMaxCardinality) {
 		write("ObjectMaxCardinality(");
-		write((ElkCardinalityRestriction<ElkObjectPropertyExpression>) elkObjectMaxCardinality);
+		write(elkObjectMaxCardinality);
 		write(')');
 		return null;
 	}
@@ -609,15 +606,15 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkObjectMaxCardinalityQualified elkObjectMaxCardinalityQualified) {
 		write("ObjectMaxCardinality(");
-		write((ElkCardinalityRestrictionQualified<ElkObjectPropertyExpression, ElkClassExpression>) elkObjectMaxCardinalityQualified);
+		write(elkObjectMaxCardinalityQualified);
 		write(')');
 		return null;
 	}
 
 	@Override
-	public Void visit(ElkObjectMinCardinality elkObjectMinCardinality) {
+	public Void visit(ElkObjectMinCardinalityUnqualified elkObjectMinCardinality) {
 		write("ObjectMinCardinality(");
-		write((ElkCardinalityRestriction<ElkObjectPropertyExpression>) elkObjectMinCardinality);
+		write(elkObjectMinCardinality);
 		write(')');
 		return null;
 	}
@@ -626,7 +623,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkObjectMinCardinalityQualified elkObjectMinCardinalityQualified) {
 		write("ObjectMinCardinality(");
-		write((ElkCardinalityRestrictionQualified<ElkObjectPropertyExpression, ElkClassExpression>) elkObjectMinCardinalityQualified);
+		write(elkObjectMinCardinalityQualified);
 		write(')');
 		return null;
 	}
@@ -649,7 +646,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkObjectPropertyAssertionAxiom elkObjectPropertyAssertionAxiom) {
 		write("ObjectPropertyAssertion(");
-		write((ElkPropertyAssertionAxiom<ElkObjectPropertyExpression, ElkIndividual, ElkIndividual>) elkObjectPropertyAssertionAxiom);
+		write(elkObjectPropertyAssertionAxiom);
 		write(')');
 		return null;
 	}
@@ -665,7 +662,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	@Override
 	public Void visit(ElkObjectPropertyDomainAxiom elkObjectPropertyDomainAxiom) {
 		write("ObjectPropertyDomain(");
-		write((ElkPropertyDomainAxiom<ElkObjectPropertyExpression, ElkClassExpression>) elkObjectPropertyDomainAxiom);
+		write(elkObjectPropertyDomainAxiom);
 		write(')');
 		return null;
 	}
@@ -673,7 +670,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	@Override
 	public Void visit(ElkObjectPropertyRangeAxiom elkObjectPropertyRangeAxiom) {
 		write("ObjectPropertyRange(");
-		write((ElkPropertyRangeAxiom<ElkObjectPropertyExpression, ElkClassExpression>) elkObjectPropertyRangeAxiom);
+		write(elkObjectPropertyRangeAxiom);
 		write(')');
 		return null;
 	}
@@ -681,7 +678,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	@Override
 	public Void visit(ElkObjectSomeValuesFrom elkObjectSomeValuesFrom) {
 		write("ObjectSomeValuesFrom(");
-		write((ElkPropertyRestrictionQualified<ElkObjectPropertyExpression, ElkClassExpression>) elkObjectSomeValuesFrom);
+		write(elkObjectSomeValuesFrom);
 		write(')');
 		return null;
 	}
@@ -698,7 +695,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
 		write("ReflexiveObjectProperty(");
-		write((ElkPropertyAxiom<ElkObjectPropertyExpression>) elkReflexiveObjectPropertyAxiom);
+		write(elkReflexiveObjectPropertyAxiom);
 		write(')');
 		return null;
 	}
@@ -745,7 +742,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkSymmetricObjectPropertyAxiom elkSymmetricObjectPropertyAxiom) {
 		write("SymmetricObjectProperty(");
-		write((ElkPropertyAxiom<ElkObjectPropertyExpression>) elkSymmetricObjectPropertyAxiom);
+		write(elkSymmetricObjectPropertyAxiom);
 		write(')');
 		return null;
 	}
@@ -754,7 +751,7 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	public Void visit(
 			ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom) {
 		write("TransitiveObjectProperty(");
-		write((ElkPropertyAxiom<ElkObjectPropertyExpression>) elkTransitiveObjectPropertyAxiom);
+		write(elkTransitiveObjectPropertyAxiom);
 		write(')');
 		return null;
 	}
@@ -794,7 +791,13 @@ class OwlFunctionalStylePrinterVisitor implements ElkObjectVisitor<Void> {
 	}
 
 	@Override
-	public Void visit(ElkIri iri) {
+	public Void visit(ElkFullIri iri) {
+		write(iri.toString());
+		return null;
+	}
+
+	@Override
+	public Void visit(ElkAbbreviatedIri iri) {
 		write(expandAbbreviatedIris ? "<" + iri.getFullIriAsString() + ">"
 				: iri.toString());
 		return null;

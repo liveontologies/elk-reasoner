@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkObjectHasValueVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Individual_Value_Restriction">Individual
@@ -35,5 +37,14 @@ package org.semanticweb.elk.owl.interfaces;
 public interface ElkObjectHasValue
 		extends
 		ElkPropertyRestrictionQualified<ElkObjectPropertyExpression, ElkIndividual> {
+
+	/**
+	 * Accept an {@link ElkObjectHasValueVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkObjectHasValueVisitor<O> visitor);
 
 }

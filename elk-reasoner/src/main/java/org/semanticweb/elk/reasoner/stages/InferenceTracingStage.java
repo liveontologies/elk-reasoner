@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.stages;
+
 /*
  * #%L
  * ELK Reasoner
@@ -29,16 +30,17 @@ import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTracingComputati
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
 
 /**
- * Executes {@link RecursiveTracingComputation} to trace inferences queued in {@link TraceState} 
+ * Executes {@link RecursiveTracingComputation} to trace inferences queued in
+ * {@link TraceState}
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
 public class InferenceTracingStage extends AbstractReasonerStage {
 
 	private RecursiveTracingComputation tracing_;
-	
+
 	public InferenceTracingStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
 		super(reasoner, preStages);
@@ -53,40 +55,31 @@ public class InferenceTracingStage extends AbstractReasonerStage {
 	public void printInfo() {
 		// TODO Auto-generated method stub
 	}
-	
+
 	@Override
 	public boolean preExecute() {
 		if (!super.preExecute()) {
 			return false;
 		}
-		
+
 		tracing_ = new RecursiveTracingComputation(reasoner.traceState,
 				reasoner.saturationState, reasoner.getProcessExecutor(),
 				reasoner.getNumberOfWorkers(), reasoner.getProgressMonitor());
-		
+
 		return true;
 	}
 
-
 	@Override
 	void executeStage() throws ElkException {
-		for (;;) {
-			tracing_.process();
-			
-			if (!spuriousInterrupt()) {
-				break;
-			}
-		}
+		tracing_.process();
 	}
 
 	@Override
 	public boolean postExecute() {
 		// merge the stats
 		reasoner.ruleAndConclusionStats.add(tracing_.getStatistics());
-		
+
 		return super.postExecute();
 	}
-	
-	
 
 }

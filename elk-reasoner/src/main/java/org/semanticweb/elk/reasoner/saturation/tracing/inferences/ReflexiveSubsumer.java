@@ -52,16 +52,18 @@ public class ReflexiveSubsumer<S extends IndexedObjectSomeValuesFrom> extends
 	}
 
 	public IndexedObjectProperty getRelation() {
-		return getExpression().getRelation();
+		return getExpression().getProperty();
 	}
 
 	// this is a premise of this inference
 	public ReflexivePropertyChain<IndexedObjectProperty> getReflexivityPremise() {
-		return new ReflexivePropertyChain<IndexedObjectProperty>(getExpression().getRelation());
+		return new ReflexivePropertyChain<IndexedObjectProperty>(
+				getExpression().getProperty());
 	}
-	
+
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

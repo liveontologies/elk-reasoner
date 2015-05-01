@@ -69,11 +69,10 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 
 		RuleApplicationFactory<Context, RuleApplicationInput> ruleFactory = null;
 		RuleApplicationVisitorFactory ruleAppVisitorFactory = null;
-		
+
 		if (reasoner.REDUNDANT_RULES) {
 			ruleAppVisitorFactory = new RedundantRuleApplicationVisitorFactory();
-		}
-		else {
+		} else {
 			ruleAppVisitorFactory = new NonRedundantRuleApplicationVisitorFactory();
 		}
 
@@ -88,7 +87,7 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 		}
 
 		this.computation_ = new ClassExpressionSaturation<IndexedClass>(
-				reasoner.ontologyIndex.getIndexedClasses(),
+				reasoner.ontologyIndex.getClasses(),
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), ruleFactory);
 		if (LOGGER_.isInfoEnabled())
@@ -115,6 +114,12 @@ public class ClassSaturationStage extends AbstractReasonerStage {
 	public void printInfo() {
 		if (computation_ != null)
 			computation_.printStatistics();
+	}
+	
+	@Override
+	public void setInterrupt(boolean flag) {
+		super.setInterrupt(flag);
+		setInterrupt(computation_, flag);
 	}
 
 }

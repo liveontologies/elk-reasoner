@@ -190,9 +190,9 @@ import org.semanticweb.owlapi.model.SWRLRule;
 /**
  * 
  * @author Yevgeny Kazakov
- * @author Pavel Klinov 
+ * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
 public class OwlConverter {
 
@@ -309,9 +309,9 @@ public class OwlConverter {
 		if (owlDataExactCardinality.isQualified())
 			return new ElkDataExactCardinalityQualifiedWrap<OWLDataExactCardinality>(
 					owlDataExactCardinality);
-		else
-			return new ElkDataExactCardinalityWrap<OWLDataExactCardinality>(
-					owlDataExactCardinality);
+		// else
+		return new ElkDataExactCardinalityWrap<OWLDataExactCardinality>(
+				owlDataExactCardinality);
 	}
 
 	@SuppressWarnings("static-method")
@@ -332,9 +332,9 @@ public class OwlConverter {
 		if (owlDataMaxCardinality.isQualified())
 			return new ElkDataMaxCardinalityQualifiedWrap<OWLDataMaxCardinality>(
 					owlDataMaxCardinality);
-		else
-			return new ElkDataMaxCardinalityWrap<OWLDataMaxCardinality>(
-					owlDataMaxCardinality);
+		// else
+		return new ElkDataMaxCardinalityWrap<OWLDataMaxCardinality>(
+				owlDataMaxCardinality);
 	}
 
 	@SuppressWarnings("static-method")
@@ -343,9 +343,9 @@ public class OwlConverter {
 		if (owlDataMinCardinality.isQualified())
 			return new ElkDataMinCardinalityQualifiedWrap<OWLDataMinCardinality>(
 					owlDataMinCardinality);
-		else
-			return new ElkDataMinCardinalityWrap<OWLDataMinCardinality>(
-					owlDataMinCardinality);
+		// else
+		return new ElkDataMinCardinalityWrap<OWLDataMinCardinality>(
+				owlDataMinCardinality);
 	}
 
 	@SuppressWarnings("static-method")
@@ -584,9 +584,9 @@ public class OwlConverter {
 		if (owlObjectExactCardinality.isQualified())
 			return new ElkObjectExactCardinalityQualifiedWrap<OWLObjectExactCardinality>(
 					owlObjectExactCardinality);
-		else
-			return new ElkObjectExactCardinalityWrap<OWLObjectExactCardinality>(
-					owlObjectExactCardinality);
+		// else
+		return new ElkObjectExactCardinalityWrap<OWLObjectExactCardinality>(
+				owlObjectExactCardinality);
 	}
 
 	@SuppressWarnings("static-method")
@@ -612,9 +612,9 @@ public class OwlConverter {
 		if (owlObjectMaxCardinality.isQualified())
 			return new ElkObjectMaxCardinalityQualifiedWrap<OWLObjectMaxCardinality>(
 					owlObjectMaxCardinality);
-		else
-			return new ElkObjectMaxCardinalityWrap<OWLObjectMaxCardinality>(
-					owlObjectMaxCardinality);
+		// else
+		return new ElkObjectMaxCardinalityWrap<OWLObjectMaxCardinality>(
+				owlObjectMaxCardinality);
 	}
 
 	@SuppressWarnings("static-method")
@@ -623,9 +623,9 @@ public class OwlConverter {
 		if (owlObjectMaxCardinality.isQualified())
 			return new ElkObjectMinCardinalityQualifiedWrap<OWLObjectMinCardinality>(
 					owlObjectMaxCardinality);
-		else
-			return new ElkObjectMinCardinalityWrap<OWLObjectMinCardinality>(
-					owlObjectMaxCardinality);
+		// else
+		return new ElkObjectMinCardinalityWrap<OWLObjectMinCardinality>(
+				owlObjectMaxCardinality);
 	}
 
 	@SuppressWarnings("static-method")
@@ -770,7 +770,8 @@ public class OwlConverter {
 		return axiom.isLogicalAxiom() || axiom.isOfType(AxiomType.DECLARATION);
 	}
 
+	@SuppressWarnings("static-method")
 	public ElkSWRLRule convert(SWRLRule rule) {
-		return new ElkSWRLRuleWrap();
+		return new ElkSWRLRuleWrap<SWRLRule>(rule);
 	}
 }

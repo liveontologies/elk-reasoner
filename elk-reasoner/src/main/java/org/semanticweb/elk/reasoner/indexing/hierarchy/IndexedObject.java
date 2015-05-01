@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2015 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,32 +22,24 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
  * #L%
  */
 
+import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 
 /**
- * Top level class for all indexed objects
+ * Represents occurrences of an {@link ElkObject} in an ontology.
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class IndexedObject {
+public interface IndexedObject {
 
 	/**
-	 * @return {@code true} if this {@link IndexedObject} occur in the ontology
-	 *         index
+	 * @return a string representation of the object; if two indexed objects
+	 *         have the same string representation, they must be equal according
+	 *         to {@link Object#equals(Object)}
 	 */
-	public abstract boolean occurs();
+	String toStringStructural();
 
-	/**
-	 * @return a structural string representation of the object
-	 */
-	abstract String toStringStructural();
-
-	@Override
-	public String toString() {
-		return toStringStructural();
-	}
-
-	public abstract <O> O accept(IndexedObjectVisitor<O> visitor);
+	public <O> O accept(IndexedObjectVisitor<O> visitor);
 
 }

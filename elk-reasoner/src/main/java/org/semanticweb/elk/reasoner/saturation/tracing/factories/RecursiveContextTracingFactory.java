@@ -46,6 +46,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Abstr
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.PremiseVisitor;
 import org.semanticweb.elk.util.collections.Pair;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class RecursiveContextTracingFactory implements ContextTracingFactory<RecursiveContextTracingJob> {
+public class RecursiveContextTracingFactory extends SimpleInterrupter implements ContextTracingFactory<RecursiveContextTracingJob> {
 
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(RecursiveContextTracingFactory.class);
 	

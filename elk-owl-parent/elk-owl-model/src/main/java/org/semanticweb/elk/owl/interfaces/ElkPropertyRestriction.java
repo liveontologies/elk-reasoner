@@ -22,6 +22,8 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
+import org.semanticweb.elk.owl.visitors.ElkPropertyRestrictionVisitor;
+
 /**
  * A generic interface for class expressions with data properties or object
  * properties.
@@ -39,5 +41,14 @@ public interface ElkPropertyRestriction<P> extends ElkClassExpression {
 	 * @return the property of this restriction
 	 */
 	P getProperty();
+
+	/**
+	 * Accept an {@link ElkPropertyRestrictionVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkPropertyRestrictionVisitor<O> visitor);
 
 }

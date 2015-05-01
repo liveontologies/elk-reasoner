@@ -29,25 +29,25 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataAllValuesFrom;
-import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataExactCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
-import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkDataMaxCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkDataMinCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkDataSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinality;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityQualified;
-import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinality;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMaxCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityQualified;
+import org.semanticweb.elk.owl.interfaces.ElkObjectMinCardinalityUnqualified;
 import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
@@ -88,7 +88,7 @@ class ClassExpressionConverter implements ElkClassExpressionVisitor<OWLClassExpr
 	}
 
 	@Override
-	public OWLClassExpression visit(ElkDataExactCardinality dr) {
+	public OWLClassExpression visit(ElkDataExactCardinalityUnqualified dr) {
 		DataPropertyExpressionConverter dpConverter = new DataPropertyExpressionConverter(factory_);
 		
 		return factory_.getOWLDataExactCardinality(dr.getCardinality(), dr.getProperty().accept(dpConverter));
@@ -108,7 +108,7 @@ class ClassExpressionConverter implements ElkClassExpressionVisitor<OWLClassExpr
 	}
 
 	@Override
-	public OWLClassExpression visit(ElkDataMaxCardinality ce) {
+	public OWLClassExpression visit(ElkDataMaxCardinalityUnqualified ce) {
 		return factory_.getOWLDataMaxCardinality(ce.getCardinality(), ce.getProperty().accept(new DataPropertyExpressionConverter(factory_)));
 	}
 
@@ -118,7 +118,7 @@ class ClassExpressionConverter implements ElkClassExpressionVisitor<OWLClassExpr
 	}
 
 	@Override
-	public OWLClassExpression visit(ElkDataMinCardinality ce) {
+	public OWLClassExpression visit(ElkDataMinCardinalityUnqualified ce) {
 		return factory_.getOWLDataMinCardinality(ce.getCardinality(), ce.getProperty().accept(new DataPropertyExpressionConverter(factory_)));
 	}
 
@@ -150,7 +150,7 @@ class ClassExpressionConverter implements ElkClassExpressionVisitor<OWLClassExpr
 	}
 
 	@Override
-	public OWLClassExpression visit(ElkObjectExactCardinality ce) {
+	public OWLClassExpression visit(ElkObjectExactCardinalityUnqualified ce) {
 		return factory_.getOWLObjectExactCardinality(ce.getCardinality(), ce.getProperty().accept(new ObjectPropertyExpressionConverter(factory_)));
 	}
 
@@ -185,7 +185,7 @@ class ClassExpressionConverter implements ElkClassExpressionVisitor<OWLClassExpr
 	}
 
 	@Override
-	public OWLClassExpression visit(ElkObjectMaxCardinality ce) {
+	public OWLClassExpression visit(ElkObjectMaxCardinalityUnqualified ce) {
 		return factory_.getOWLObjectMaxCardinality(ce.getCardinality(), ce.getProperty().accept(new ObjectPropertyExpressionConverter(factory_)));
 	}
 
@@ -195,7 +195,7 @@ class ClassExpressionConverter implements ElkClassExpressionVisitor<OWLClassExpr
 	}
 
 	@Override
-	public OWLClassExpression visit(ElkObjectMinCardinality ce) {
+	public OWLClassExpression visit(ElkObjectMinCardinalityUnqualified ce) {
 		return factory_.getOWLObjectMinCardinality(ce.getCardinality(), ce.getProperty().accept(new ObjectPropertyExpressionConverter(factory_)));
 	}
 

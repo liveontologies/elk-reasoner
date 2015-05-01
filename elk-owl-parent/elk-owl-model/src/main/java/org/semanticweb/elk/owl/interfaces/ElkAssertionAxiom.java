@@ -43,6 +43,6 @@ public interface ElkAssertionAxiom extends ElkAxiom {
 	 *            the visitor that can work with this axiom type
 	 * @return the output of the visitor
 	 */
-	public abstract <O> O accept(ElkAssertionAxiomVisitor<O> visitor);
+	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor);
 
 }

@@ -24,70 +24,24 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassEntityVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedIndividualVisitor;
 
 /**
- * Represents all occurrences of an {@link ElkIndividual} in an ontology.
+ * Represents occurrences of an {@link ElkIndividual} in an ontology.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
  */
-public class IndexedIndividual extends IndexedClassEntity {
-	/**
-	 * The ElkNamedIndividual that is the sole instance of this nominal
-	 */
-	private final ElkNamedIndividual elkNamedIndividual_;
-
-	private int occurrenceNo_ = 0;
-
-	IndexedIndividual(ElkNamedIndividual elkNamedIndividual) {
-		this.elkNamedIndividual_ = elkNamedIndividual;
-	}
+public interface IndexedIndividual extends IndexedClassEntity {
 
 	/**
-	 * @return The represented ElkNamedIndividual.
+	 * @return The {@link ElkNamedIndividual} represented by this
+	 *         {@link IndexedIndividual}.
 	 */
-	public ElkNamedIndividual getElkNamedIndividual() {
-		return elkNamedIndividual_;
-	}
-
-	public <O> O accept(IndexedIndividualVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
 	@Override
-	public <O> O accept(IndexedClassEntityVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
+	public ElkNamedIndividual getElkEntity();
 
-	@Override
-	protected void updateOccurrenceNumbers(final ModifiableOntologyIndex index,
-			int increment, int positiveIncrement, int negativeIncrement) {
-
-		if (occurrenceNo_ == 0 && increment > 0) {
-			index.addNamedIndividual(elkNamedIndividual_);
-		}
-
-		occurrenceNo_ += increment;
-		positiveOccurrenceNo += positiveIncrement;
-		negativeOccurrenceNo += negativeIncrement;
-
-		if (occurrenceNo_ == 0 && increment < 0) {
-			index.removeNamedIndividual(elkNamedIndividual_);
-		}
-	}
-
-	@Override
-	public boolean occurs() {
-		return occurrenceNo_ > 0;
-	}
-
-	@Override
-	public String toStringStructural() {
-		return "ObjectOneOf(<"
-				+ elkNamedIndividual_.getIri().getFullIriAsString() + ">)";
-	}
+	public <O> O accept(IndexedIndividualVisitor<O> visitor);
 
 }

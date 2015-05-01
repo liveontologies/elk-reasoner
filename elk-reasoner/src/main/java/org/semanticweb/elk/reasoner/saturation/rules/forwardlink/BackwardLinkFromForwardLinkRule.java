@@ -22,6 +22,9 @@ package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
  * #L%
  */
 
+import java.util.ArrayList;
+
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -30,6 +33,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLin
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SuperReversedForwardLink;
 
 /**
  * A {@link ForwardLinkRule} applied when processing {@link ForwardLink}
@@ -63,10 +67,15 @@ public class BackwardLinkFromForwardLinkRule extends AbstractForwardLinkRule {
 			producer.produce(target, new ReversedForwardLink(source,
 					(IndexedObjectProperty) relation, premise));
 		} else {
-			for (IndexedObjectProperty toldSuper : relation
-					.getToldSuperProperties()) {
-				producer.produce(target, new ReversedForwardLink(source,
-						toldSuper, premise));
+			ArrayList<IndexedObjectProperty> superProperties = relation
+					.getToldSuperProperties();
+			ArrayList<ElkAxiom> superPropertiesReasons = relation
+					.getToldSuperPropertiesReasons();
+			for (int i = 0; i < superProperties.size(); i++) {
+				producer.produce(
+						target,
+						new SuperReversedForwardLink(source, superProperties
+								.get(i), premise, superPropertiesReasons.get(i)));
 			}
 		}
 

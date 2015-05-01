@@ -27,6 +27,8 @@ package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
 
+import org.semanticweb.elk.owl.visitors.ElkEquivalentDataPropertiesAxiomVisitor;
+
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Equivalent_Data_Properties">Equivalent
@@ -34,8 +36,7 @@ import java.util.List;
  * 
  * @author Markus Kroetzsch
  */
-public interface ElkEquivalentDataPropertiesAxiom extends
-		ElkDataPropertyAxiom {
+public interface ElkEquivalentDataPropertiesAxiom extends ElkDataPropertyAxiom {
 
 	/**
 	 * Get the list of equivalent data property expressions that this axiom
@@ -45,5 +46,15 @@ public interface ElkEquivalentDataPropertiesAxiom extends
 	 * @return list of equivalent data property expressions
 	 */
 	public List<? extends ElkDataPropertyExpression> getDataPropertyExpressions();
+
+	/**
+	 * Accept an {@link ElkEquivalentDataPropertiesAxiomVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this axiom type
+	 * @return the output of the visitor
+	 */
+	public abstract <O> O accept(
+			ElkEquivalentDataPropertiesAxiomVisitor<O> visitor);
 
 }

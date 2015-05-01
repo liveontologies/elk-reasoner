@@ -56,7 +56,7 @@ public class TracedPropagation extends PropagationImpl implements ClassInference
 	}
 	
 	public SubObjectProperty getSubPropertyPremise() {
-		return new SubObjectProperty(getRelation(), getCarry().getRelation());
+		return new SubObjectProperty(getRelation(), getCarry().getProperty());
 	}
 
 	@Override

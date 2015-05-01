@@ -1,7 +1,7 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
+import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 
 /*
  * #%L
@@ -25,18 +25,15 @@ import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
  * #L%
  */
 
-public abstract class IndexedAxiom extends IndexedObject {
+/**
+ * Represents occurrences of an {@link ElkAxiom} in an ontology.
+ * 
+ * @author Frantisek Simancik
+ * @author "Yevgeny Kazakov"
+ * 
+ */
+public interface IndexedAxiom extends IndexedObject {
 
-	/**
-	 * Non-recursively. The recursion is implemented in indexing visitors.
-	 */
-	abstract void updateOccurrenceNumbers(final ModifiableOntologyIndex index, final int increment);
-
-	public abstract <O> O accept(IndexedAxiomVisitor<O> visitor);
-
-	@Override
-	public <O> O accept(IndexedObjectVisitor<O> visitor) {
-		return accept((IndexedAxiomVisitor<O>) visitor);
-	}
+	public <O> O accept(IndexedAxiomVisitor<O> visitor);
 
 }

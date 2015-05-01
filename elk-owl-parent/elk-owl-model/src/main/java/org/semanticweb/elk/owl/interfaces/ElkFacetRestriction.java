@@ -23,7 +23,7 @@
 package org.semanticweb.elk.owl.interfaces;
 
 import org.semanticweb.elk.owl.iris.ElkIri;
-
+import org.semanticweb.elk.owl.visitors.ElkFacetRestrictionVisitor;
 
 /**
  * Corresponds to a pair of constraining facet and restriction value as used in
@@ -47,4 +47,13 @@ public interface ElkFacetRestriction extends ElkObject {
 	 * @return the literal used as restriction value
 	 */
 	public ElkLiteral getRestrictionValue();
+
+	/**
+	 * Accept an {@link ElkFacetRestrictionVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @return the output of the visitor
+	 */
+	public <O> O accept(ElkFacetRestrictionVisitor<O> visitor);
 }

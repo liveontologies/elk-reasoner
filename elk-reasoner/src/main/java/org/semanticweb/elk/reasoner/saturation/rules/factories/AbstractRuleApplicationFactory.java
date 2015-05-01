@@ -34,6 +34,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVi
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.RuleVisitor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
+import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  */
 public abstract class AbstractRuleApplicationFactory<C extends Context, I extends RuleApplicationInput>
-		implements RuleApplicationFactory<C, I> {
+		extends SimpleInterrupter implements RuleApplicationFactory<C, I> {
 
 	// logger for this class
 	protected static final Logger LOGGER_ = LoggerFactory
@@ -82,7 +83,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 		conclusionProcessor = SaturationUtils.getTimedConclusionVisitor(
 				conclusionProcessor, localStatistics);
 		return new BasicRuleEngine<I>(saturationState_.getOntologyIndex(),
-				conclusionProcessor, localTodo, saturationStateWriter,
+				conclusionProcessor, localTodo, this, saturationStateWriter,
 				aggregatedStats_, localStatistics);
 	}
 

@@ -23,13 +23,6 @@
 package org.semanticweb.elk.owl.visitors;
 
 import org.semanticweb.elk.owl.interfaces.ElkAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDataPropertyAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkNegativeDataPropertyAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkNegativeObjectPropertyAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
-import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 
 /**
  * Visitor pattern interface for instances of {@link ElkAssertionAxiom}.
@@ -40,20 +33,11 @@ import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
  * @param <O>
  *            the output type of the visitor
  */
-public interface ElkAssertionAxiomVisitor<O> {
+public interface ElkAssertionAxiomVisitor<O> extends
+		ElkClassAssertionAxiomVisitor<O>,
+		ElkDifferentIndividualsAxiomVisitor<O>,
+		ElkPropertyAssertionAxiomVisitor<O>, ElkSameIndividualAxiomVisitor<O> {
 
-	O visit(ElkClassAssertionAxiom elkClassAssertionAxiom);
-
-	O visit(ElkDataPropertyAssertionAxiom elkDataPropertyAssertionAxiom);
-
-	O visit(ElkDifferentIndividualsAxiom elkDifferentIndividualsAxiom);
-
-	O visit(ElkNegativeDataPropertyAssertionAxiom elkNegativeDataPropertyAssertion);
-
-	O visit(ElkNegativeObjectPropertyAssertionAxiom elkNegativeObjectPropertyAssertion);
-
-	O visit(ElkObjectPropertyAssertionAxiom elkObjectPropertyAssertionAxiom);
-
-	O visit(ElkSameIndividualAxiom elkSameIndividualAxiom);
+	// combined visitor
 
 }

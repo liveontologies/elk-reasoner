@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -96,9 +96,9 @@ public class ContextImpl implements ExtendedContext {
 
 	/**
 	 * the derived {@link IndexedClassExpression} subsumers by
-	 * {@link IndexedDisjointnessAxiom}s in which they occur as members
+	 * {@link IndexedDisjointClassesAxiom}s in which they occur as members
 	 */
-	private Map<IndexedDisjointnessAxiom, IndexedClassExpression[]> disjointnessAxioms_;
+	private Map<IndexedDisjointClassesAxiom, IndexedClassExpression[]> disjointnessAxioms_;
 
 	/**
 	 * {@code true} if {@code owl:Nothing} is stored in {@link #subsumers_}
@@ -233,26 +233,22 @@ public class ContextImpl implements ExtendedContext {
 		return subsumers_;
 	}
 
-	/*@Override
-	public boolean isInconsistForDisjointnessAxiom(
-			IndexedDisjointnessAxiom axiom) {
-		if (disjointnessAxioms_ == null)
-			return false;
-		IndexedClassExpression[] members = disjointnessAxioms_.get(axiom);
-		if (members == null)
-			return false;
-		// check if both members are not null; this is always when the second
-		// member is not null
-		return (members[1] != null);
-	}*/
+	/*
+	 * @Override public boolean isInconsistForDisjointnessAxiom(
+	 * IndexedDisjointnessAxiom axiom) { if (disjointnessAxioms_ == null) return
+	 * false; IndexedClassExpression[] members = disjointnessAxioms_.get(axiom);
+	 * if (members == null) return false; // check if both members are not null;
+	 * this is always when the second // member is not null return (members[1]
+	 * != null); }
+	 */
 
 	@Override
 	public IndexedClassExpression[] getDisjointSubsumers(
-			IndexedDisjointnessAxiom axiom) {
+			IndexedDisjointClassesAxiom axiom) {
 		if (disjointnessAxioms_ == null) {
 			return null;
 		}
-		
+
 		return disjointnessAxioms_.get(axiom);
 	}
 
@@ -273,9 +269,7 @@ public class ContextImpl implements ExtendedContext {
 
 	@Override
 	public String toString() {
-		return root_.toString()
-				+ (this != ((IndexedObjectWithContext) root_).getContext() ? "[local]"
-						: "");
+		return root_.toString() + (this != root_.getContext() ? "[local]" : "");
 	}
 
 	@Override
@@ -357,9 +351,9 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(DisjointSubsumer conclusion, ContextImpl input) {
 			if (input.disjointnessAxioms_ == null) {
-				input.disjointnessAxioms_ = new ArrayHashMap<IndexedDisjointnessAxiom, IndexedClassExpression[]>();
+				input.disjointnessAxioms_ = new ArrayHashMap<IndexedDisjointClassesAxiom, IndexedClassExpression[]>();
 			}
-			IndexedDisjointnessAxiom axiom = conclusion.getAxiom();
+			IndexedDisjointClassesAxiom axiom = conclusion.getAxiom();
 			IndexedClassExpression member = conclusion.getMember();
 			IndexedClassExpression[] members = input.disjointnessAxioms_
 					.get(axiom);
@@ -468,7 +462,7 @@ public class ContextImpl implements ExtendedContext {
 			if (input.disjointnessAxioms_ == null) {
 				return false;
 			}
-			IndexedDisjointnessAxiom axiom = conclusion.getAxiom();
+			IndexedDisjointClassesAxiom axiom = conclusion.getAxiom();
 			IndexedClassExpression member = conclusion.getMember();
 			IndexedClassExpression[] members = input.disjointnessAxioms_
 					.get(axiom);
@@ -575,7 +569,7 @@ public class ContextImpl implements ExtendedContext {
 			if (input.disjointnessAxioms_ == null) {
 				return false;
 			}
-			IndexedDisjointnessAxiom axiom = conclusion.getAxiom();
+			IndexedDisjointClassesAxiom axiom = conclusion.getAxiom();
 			IndexedClassExpression member = conclusion.getMember();
 			IndexedClassExpression[] members = input.disjointnessAxioms_
 					.get(axiom);

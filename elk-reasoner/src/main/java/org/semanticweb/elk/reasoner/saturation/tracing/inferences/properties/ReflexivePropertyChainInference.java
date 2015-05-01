@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedBinaryPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.InferencePrinter;
@@ -37,9 +37,9 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Objec
  *
  * pavel.klinov@uni-ulm.de
  */
-public class ReflexivePropertyChainInference extends ReflexivePropertyChain<IndexedBinaryPropertyChain> implements ObjectPropertyInference {
+public class ReflexivePropertyChainInference extends ReflexivePropertyChain<IndexedComplexPropertyChain> implements ObjectPropertyInference {
 
-	public ReflexivePropertyChainInference(IndexedBinaryPropertyChain chain) {
+	public ReflexivePropertyChainInference(IndexedComplexPropertyChain chain) {
 		super(chain);
 	}
 	
@@ -48,11 +48,11 @@ public class ReflexivePropertyChainInference extends ReflexivePropertyChain<Inde
 	}
 	
 	public ReflexivePropertyChain<IndexedObjectProperty> getLeftReflexiveProperty() {
-		return new ReflexivePropertyChain<IndexedObjectProperty>(getPropertyChain().getLeftProperty());
+		return new ReflexivePropertyChain<IndexedObjectProperty>(getPropertyChain().getFirstProperty());
 	}
 	
 	public ReflexivePropertyChain<?> getRightReflexivePropertyChain() {
-		return new ReflexivePropertyChain<IndexedPropertyChain>(getPropertyChain().getRightProperty());
+		return new ReflexivePropertyChain<IndexedPropertyChain>(getPropertyChain().getSuffixChain());
 	}
 
 	@Override

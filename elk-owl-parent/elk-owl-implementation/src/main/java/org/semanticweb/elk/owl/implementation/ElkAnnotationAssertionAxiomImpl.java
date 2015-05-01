@@ -29,6 +29,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationProperty;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationSubject;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationValue;
+import org.semanticweb.elk.owl.visitors.ElkAnnotationAssertionAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAnnotationAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
@@ -39,29 +40,31 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  *
  */
-public class ElkAnnotationAssertionAxiomImpl implements ElkAnnotationAssertionAxiom {
+public class ElkAnnotationAssertionAxiomImpl implements
+		ElkAnnotationAssertionAxiom {
 
-	private final ElkAnnotationSubject annSubject;
-	private final ElkAnnotationProperty annProperty;
-	private final ElkAnnotationValue annValue;
-	
-	ElkAnnotationAssertionAxiomImpl(ElkAnnotationProperty annProperty, ElkAnnotationSubject annSubject, ElkAnnotationValue annValue) {
-		this.annSubject = annSubject;
-		this.annProperty = annProperty;
-		this.annValue = annValue;
+	private final ElkAnnotationSubject annSubject_;
+	private final ElkAnnotationProperty annProperty_;
+	private final ElkAnnotationValue annValue_;
+
+	ElkAnnotationAssertionAxiomImpl(ElkAnnotationProperty annProperty,
+			ElkAnnotationSubject annSubject, ElkAnnotationValue annValue) {
+		this.annSubject_ = annSubject;
+		this.annProperty_ = annProperty;
+		this.annValue_ = annValue;
 	}
-	
+
 	@Override
 	public ElkAnnotationProperty getProperty() {
-		return annProperty;
+		return annProperty_;
 	}
 
 	@Override
 	public ElkAnnotationValue getValue() {
-		return annValue;
+		return annValue_;
 	}
 
 	@Override
@@ -71,16 +74,21 @@ public class ElkAnnotationAssertionAxiomImpl implements ElkAnnotationAssertionAx
 
 	@Override
 	public ElkAnnotationSubject getSubject() {
-		return annSubject;
+		return annSubject_;
 	}
 
 	@Override
 	public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor) {
-		return visitor.visit(this);
+		return accept((ElkAnnotationAssertionAxiomVisitor<O>) visitor);
 	}
 
 	@Override
 	public <O> O accept(ElkObjectVisitor<O> visitor) {
+		return accept((ElkAnnotationAssertionAxiomVisitor<O>) visitor);
+	}
+
+	@Override
+	public <O> O accept(ElkAnnotationAssertionAxiomVisitor<O> visitor) {
 		return visitor.visit(this);
 	}
 }

@@ -28,8 +28,8 @@ import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 import org.semanticweb.owlapi.model.OWLAnnotationAxiom;
 
 /**
- * Implements the {@link ElkAnnotationAxiom} interface by wrapping instances
- * of {@link OWLAnnotationAxiom}
+ * Implements the {@link ElkAnnotationAxiom} interface by wrapping instances of
+ * {@link OWLAnnotationAxiom}
  * 
  * @author Frantisek Simancik
  * 
@@ -42,9 +42,6 @@ public abstract class ElkAnnotationAxiomWrap<T extends OWLAnnotationAxiom>
 	public ElkAnnotationAxiomWrap(T owlAnnotationAxiom) {
 		super(owlAnnotationAxiom);
 	}
-
-	@Override
-	abstract public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor);
 
 	@Override
 	public <O> O accept(ElkAxiomVisitor<O> visitor) {

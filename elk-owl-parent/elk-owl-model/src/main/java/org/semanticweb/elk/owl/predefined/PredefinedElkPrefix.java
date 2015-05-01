@@ -25,28 +25,41 @@ package org.semanticweb.elk.owl.predefined;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.iris.ElkPrefix;
 
-public enum PredefinedElkPrefix {
+/**
+ * Corresponds to <a href= "http://www.w3.org/TR/owl2-syntax/#IRIs" >Standard
+ * prefix names<a> in OWL 2 (see Table 2 in the link).
+ * 
+ * @author "Yevgeny Kazakov"
+ *
+ */
+public enum PredefinedElkPrefix implements ElkPrefix {
 
-	OWL(new ElkPrefix("owl:", new ElkFullIri("http://www.w3.org/2002/07/owl#"))), //
+	RDF("rdf:", new ElkFullIri("http://www.w3.org/1999/02/22-rdf-syntax-ns#")),
 
-	RDF(new ElkPrefix("rdf:", new ElkFullIri(
-			"http://www.w3.org/1999/02/22-rdf-syntax-ns#"))), //
+	RDFS("rdfs:", new ElkFullIri("http://www.w3.org/2000/01/rdf-schema#")),
 
-	RDFS(new ElkPrefix("rdfs:", new ElkFullIri(
-			"http://www.w3.org/2000/01/rdf-schema#"))), //
+	XSD("xsd:", new ElkFullIri("http://www.w3.org/2001/XMLSchema#")),
 
-	XSD(new ElkPrefix("xsd:", new ElkFullIri(
-			"http://www.w3.org/2001/XMLSchema#")))//
+	OWL("owl:", new ElkFullIri("http://www.w3.org/2002/07/owl#")),
+
 	;
 
-	private final ElkPrefix prefix;
+	private final String name_;
+	private final ElkFullIri iri_;
 
-	private PredefinedElkPrefix(ElkPrefix prefix) {
-		this.prefix = prefix;
+	PredefinedElkPrefix(String prefixName, ElkFullIri iri) {
+		this.name_ = prefixName;
+		this.iri_ = iri;
 	}
 
-	public ElkPrefix get() {
-		return this.prefix;
+	@Override
+	public String getName() {
+		return name_;
+	}
+
+	@Override
+	public ElkFullIri getIri() {
+		return iri_;
 	}
 
 }
