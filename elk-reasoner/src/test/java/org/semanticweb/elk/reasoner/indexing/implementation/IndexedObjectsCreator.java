@@ -26,11 +26,10 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.implementation.CachedIndexedComplexPropertyChainImpl;
-import org.semanticweb.elk.reasoner.indexing.implementation.CachedIndexedObjectPropertyImpl;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 
 /**
  * A utility class to create indexed objects for other tests
@@ -42,24 +41,25 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropert
 public class IndexedObjectsCreator {
 
 	public static ModifiableIndexedObjectProperty createIndexedObjectProperty(
-			ElkObjectProperty prop, ModifiableIndexedPropertyChain[] toldSubs,
+			ModifiableOntologyIndex index, ElkObjectProperty prop,
+			ModifiableIndexedPropertyChain[] toldSubs,
 			ModifiableIndexedObjectProperty[] toldSupers, boolean reflexive) {
 
 		ModifiableIndexedObjectProperty property = new CachedIndexedObjectPropertyImpl(
 				prop);
 
 		for (ModifiableIndexedPropertyChain sub : toldSubs) {
-			property.addToldSubPropertyChain(sub);
-			sub.addToldSuperObjectProperty(property);
+			property.addToldSubPropertyChain(sub, null);
+			sub.addToldSuperObjectProperty(property, null);
 		}
 
 		for (ModifiableIndexedObjectProperty sup : toldSupers) {
-			property.addToldSuperObjectProperty(sup);
-			sup.addToldSubPropertyChain(property);
+			property.addToldSuperObjectProperty(sup, null);
+			sup.addToldSubPropertyChain(property, null);
 		}
 
 		if (reflexive) {
-			property.updateReflexiveOccurrenceNumber(1);
+			index.addReflexiveProperty(property, null);
 		}
 
 		return property;
@@ -74,8 +74,8 @@ public class IndexedObjectsCreator {
 				left, right);
 
 		for (ModifiableIndexedObjectProperty sup : toldSupers) {
-			chain.addToldSuperObjectProperty(sup);
-			sup.addToldSubPropertyChain(chain);
+			chain.addToldSuperObjectProperty(sup, null);
+			sup.addToldSubPropertyChain(chain, null);
 		}
 
 		left.addLeftChain(chain);

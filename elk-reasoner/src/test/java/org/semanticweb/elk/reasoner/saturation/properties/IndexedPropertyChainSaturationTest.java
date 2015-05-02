@@ -42,12 +42,15 @@ import org.semanticweb.elk.owl.implementation.ElkObjectFactoryImpl;
 import org.semanticweb.elk.owl.interfaces.ElkObjectFactory;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.reasoner.DummyProgressMonitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.DirectIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.implementation.IndexedObjectsCreator;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.properties.VerifySymmetricPropertySaturation.AsymmetricCompositionHook;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
@@ -66,22 +69,23 @@ public class IndexedPropertyChainSaturationTest {
 	@Test
 	@Ignore
 	public void testPropertyCompositionSymmetry() {
+		ModifiableOntologyIndex index = new DirectIndex();
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
 		ModifiableIndexedObjectProperty R1 = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R1")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {}, false);
 		ModifiableIndexedObjectProperty R2 = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R2")),
 						new ModifiableIndexedPropertyChain[] { R1 },
 						new ModifiableIndexedObjectProperty[] {}, false);
 		ModifiableIndexedObjectProperty R3 = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R3")),
 						new ModifiableIndexedPropertyChain[] { R2 },
@@ -135,55 +139,56 @@ public class IndexedPropertyChainSaturationTest {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testCyclicCompositions() {
+		ModifiableOntologyIndex index = new DirectIndex();
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 
 		ModifiableIndexedObjectProperty H = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/H")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {}, false);
 		// S1 -> S2 -> S3
 		ModifiableIndexedObjectProperty S3 = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/S3")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {}, false);
 		ModifiableIndexedObjectProperty S2 = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/S2")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] { S3 }, false);
 		ModifiableIndexedObjectProperty S1 = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/S1")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] { S2 }, false);
 		// P1 -> P2 -> P3
 		ModifiableIndexedObjectProperty P3 = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/P3")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {}, false);
 		ModifiableIndexedObjectProperty P2 = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/P2")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] { P3 }, false);
 		ModifiableIndexedObjectProperty P1 = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/P1")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] { P2 }, false);
 		// S3 -> R, R -> S1, R -> P1
 		ModifiableIndexedObjectProperty R = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R")),
 						new ModifiableIndexedPropertyChain[] { S3 },
@@ -196,9 +201,9 @@ public class IndexedPropertyChainSaturationTest {
 		int maxThreads = Runtime.getRuntime().availableProcessors();
 		PropertyHierarchyCompositionComputation computation = new PropertyHierarchyCompositionComputation(
 				Arrays.asList(H, S3, S2, S1, P3, P2, P1, R, RR),
-				new PropertyHierarchyCompositionComputationFactory(TraceStore.Writer.Dummy),
-				new ComputationExecutor(maxThreads,
-						"test-hierarchy-compositions"), maxThreads,
+				new PropertyHierarchyCompositionComputationFactory(
+						TraceStore.Writer.Dummy), new ComputationExecutor(
+						maxThreads, "test-hierarchy-compositions"), maxThreads,
 				new DummyProgressMonitor());
 
 		computation.process();
@@ -214,23 +219,24 @@ public class IndexedPropertyChainSaturationTest {
 	 */
 	@Test
 	public void testReflexivity() {
+		ModifiableOntologyIndex index = new DirectIndex();
 		ElkObjectFactory factory = new ElkObjectFactoryImpl();
 		List<ModifiableIndexedObjectProperty> toldReflexive = new ArrayList<ModifiableIndexedObjectProperty>();
 
 		ModifiableIndexedObjectProperty t = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/T")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {}, false);
 		ModifiableIndexedObjectProperty r1 = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R1")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {}, true);
 		ModifiableIndexedObjectProperty r = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/R")),
 						new ModifiableIndexedPropertyChain[] {},
@@ -245,27 +251,27 @@ public class IndexedPropertyChainSaturationTest {
 						new ModifiableIndexedObjectProperty[] {});
 		// r o t -> u
 		ModifiableIndexedObjectProperty u = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/U")),
 						new ModifiableIndexedPropertyChain[] { rt },
 						new ModifiableIndexedObjectProperty[] {}, false);
 
 		ModifiableIndexedObjectProperty h = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/H")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {}, true);
 		// h -> h1, thus h1 must be reflexive
 		ModifiableIndexedObjectProperty h1 = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/H1")),
 						new ModifiableIndexedPropertyChain[] { h },
 						new ModifiableIndexedObjectProperty[] {}, false);
 		ModifiableIndexedObjectProperty s = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/S")),
 						new ModifiableIndexedPropertyChain[] {},
@@ -276,13 +282,13 @@ public class IndexedPropertyChainSaturationTest {
 						new ModifiableIndexedObjectProperty[] { s });
 		// finally, add some loops
 		ModifiableIndexedObjectProperty v1 = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/V1")),
 						new ModifiableIndexedPropertyChain[] {},
 						new ModifiableIndexedObjectProperty[] {}, false);
 		ModifiableIndexedObjectProperty v2 = IndexedObjectsCreator
-				.createIndexedObjectProperty(
+				.createIndexedObjectProperty(index,
 						factory.getObjectProperty(new ElkFullIri(
 								"http://test.com/V2")),
 						new ModifiableIndexedPropertyChain[] {},
@@ -307,7 +313,7 @@ public class IndexedPropertyChainSaturationTest {
 		int maxThreads = Runtime.getRuntime().availableProcessors();
 
 		ReflexivePropertyComputation computation = new ReflexivePropertyComputation(
-				toldReflexive, new ReflexivePropertyComputationFactory(),
+				toldReflexive, new ReflexivePropertyComputationFactory(index),
 				new ComputationExecutor(maxThreads, "test-reflexivity"),
 				maxThreads, new DummyProgressMonitor());
 
@@ -315,16 +321,18 @@ public class IndexedPropertyChainSaturationTest {
 
 		for (IndexedPropertyChain chain : chains) {
 			assertEquals(chain.toString(), correctReflexive.contains(chain),
-					isReflexive(chain));
+					isReflexive(index, chain));
 		}
 	}
 
-	private boolean isReflexive(IndexedPropertyChain chain) {
+	private boolean isReflexive(final OntologyIndex index,
+			IndexedPropertyChain chain) {
 		return chain.accept(new IndexedPropertyChainVisitor<Boolean>() {
 
 			@Override
 			public Boolean visit(IndexedObjectProperty prop) {
-				return prop.isToldReflexive()
+				return index.getReflexiveObjectProperties().keySet()
+						.contains(prop)
 						|| (prop.getSaturated().isDerivedReflexive());
 			}
 
