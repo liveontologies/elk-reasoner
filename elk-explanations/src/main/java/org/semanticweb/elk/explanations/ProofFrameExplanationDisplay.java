@@ -64,7 +64,7 @@ public class ProofFrameExplanationDisplay extends JPanel {
         
         setLayout(new BorderLayout());
         
-        frameList =  new ProofFrameList(editorKit, frame, proofWorkbenchPanel);
+        frameList =  new ProofFrameList(editorKit, frame);
         add(frameList, BorderLayout.NORTH);       
         frameList.setBorder(BorderFactory.createEmptyBorder(7, 10, 7, 10));
     }

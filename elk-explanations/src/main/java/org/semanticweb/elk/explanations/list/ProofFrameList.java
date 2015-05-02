@@ -55,7 +55,6 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.framelist.OWLFrameList;
 import org.protege.editor.owl.ui.framelist.OWLFrameListInferredSectionRowBorder;
 import org.protege.editor.owl.ui.inference.PrecomputeAction;
-import org.semanticweb.elk.explanations.ProofWorkbenchPanel;
 import org.semanticweb.elk.explanations.editing.AxiomExpressionEditor;
 import org.semanticweb.elk.explanations.editing.CollapseButton;
 import org.semanticweb.elk.explanations.editing.EditAndSyncAxiomPane;
@@ -93,13 +92,10 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 	
 	private final PrecomputeAction reasonerSyncAction_;
 	
-	private final ProofWorkbenchPanel mainPanel_;
-	
-    public ProofFrameList(OWLEditorKit editorKit, ProofFrame proofFrame, ProofWorkbenchPanel proofWorkbenchPanel) {
+    public ProofFrameList(OWLEditorKit editorKit, ProofFrame proofFrame) {
         super(editorKit, proofFrame);
         
         kit_ = editorKit;
-        mainPanel_ = proofWorkbenchPanel;
         reasonerSyncAction_ = new PrecomputeAction();
         reasonerSyncAction_.setEditorKit(editorKit);
         setCellRenderer(new ProofFrameListRenderer(editorKit));
@@ -199,6 +195,19 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 						);
 			}
         }
+        else if (value == getFrame().getRootSection()) {
+        	if (!getFrame().isFullyExpanded()) {
+        		// add the "expand all" button
+        		return Arrays.<MListButton> asList(new ExpandButton(
+						new AbstractAction() {
+
+							public void actionPerformed(ActionEvent e) {
+								getFrame().fullyExpand();
+								refreshComponent();
+							}
+						}, "Explain all inferences"));
+        	}
+        }
 
         return Collections.emptyList();
     }
@@ -241,16 +250,12 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
     
     protected void collapseRow(ProofFrameSectionRow expressionRow) {
     	expressionRow.setExpanded(false);
+    	getFrame().setFullyExpanded(false);
     	refreshComponent();
     }
 
 	protected void explainRow(ProofFrameSectionRow expressionRow) {
-		expressionRow.setExpanded(true);
-		
-		if (!expressionRow.isFilled()) {
-			expressionRow.refillInferenceSections();
-		}
-		
+		expressionRow.expand(false/*do not recursively expand inferences that derive the expression*/);
 		refreshComponent();
 	}
 

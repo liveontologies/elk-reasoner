@@ -101,6 +101,20 @@ public class ProofFrameSectionRow implements OWLFrameSectionRow<OWLExpression, O
     	return inferenceSections_;
     }
     
+    void expand(boolean expandInferences) {
+    	setExpanded(true);
+		
+		if (!isFilled()) {
+			refillInferenceSections();
+		}
+		
+		if (expandInferences) {
+			for (ProofFrameSection inferenceSection : inferenceSections_) {
+				inferenceSection.expand();
+			}
+		}
+    }
+    
     void refillInferenceSections() {
     	inferenceSections_.clear();
     	
