@@ -110,6 +110,7 @@ public class ProofFrameSection implements OWLFrameSection<OWLExpression, OWLAxio
     			//System.err.println("Row added " + row.getRoot());
     			
                 rows_.add(row);
+                getFrame().setFullyExpanded(false);
     		}
     		else {
     			// updating this row
@@ -240,7 +241,15 @@ public class ProofFrameSection implements OWLFrameSection<OWLExpression, OWLAxio
 		return null;
 	}
 
-    protected void refill() {
+	void expand() {
+		refill();
+	
+		for (ProofFrameSectionRow row : rows_) {
+           row.expand(true/*recursively expand the inferences of this row*/);
+        }
+	}
+	
+    void refill() {
         if(filled) {
             return;
         }

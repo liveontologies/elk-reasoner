@@ -38,7 +38,11 @@ import org.protege.editor.core.ui.list.MListButton;
 public class ExpandButton extends MListButton {
 
     public ExpandButton(ActionListener actionListener) {
-        super("Explain inference", new Color(100, 40, 140), actionListener);
+        this(actionListener, "Explain inference");
+    }
+    
+    public ExpandButton(ActionListener actionListener, String tooltip) {
+        super(tooltip, new Color(100, 40, 140), actionListener);
     }
 
 
