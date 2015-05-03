@@ -356,37 +356,6 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 			items_ = items.toArray();
 		}
 		
-		/*@Override
-		public Object getElementAt(int arg0) {
-			int i = 0;
-			Iterator<?> iter = iterate();
-			
-			while (iter.hasNext()) {
-				Object item = iter.next();
-				
-				if (i == arg0) {
-					return item;
-				}
-				
-				i++;
-			}
-			
-			return null;
-		}
-
-		@Override
-		public int getSize() {
-			int i = 0;
-			Iterator<?> iter = iterate();
-			
-			while (iter.hasNext()) {
-				iter.next();
-				i++;
-			}
-			
-			return i;
-		}*/
-		
 		Iterator<?> iterate() {
 			final LinkedList<Object> todo = new LinkedList<Object>();
 			
