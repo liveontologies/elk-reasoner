@@ -300,6 +300,7 @@ public class LemmaElimination implements InferenceTransformation {
 
 	@Override
 	public boolean mayIntroduceDuplicates() {
-		return false;
+		// TODO figure out exactly why and whether it can be fixed
+		return true;
 	}
 }
