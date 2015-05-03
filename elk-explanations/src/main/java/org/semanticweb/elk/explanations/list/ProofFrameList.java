@@ -258,6 +258,12 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 		expressionRow.expand(false/*do not recursively expand inferences that derive the expression*/);
 		refreshComponent();
 	}
+	
+	@Override
+	public void refreshComponent() {
+		super.refreshComponent(); 
+		getModel().invalidate();
+	}
 
 	@Override
 	protected Border createPaddingBorder(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -304,16 +310,53 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
         return super.getItemBackgroundColor(item);
     }
 	
-	// TODO cache the list of items for better performance, e.g., constant time lookup by index
+	// TODO incrementally update the list model when small changes happen, e.g.
+	// a single row is expanded or collapsed. recompute fully only when many
+	// levels are affected.
 	private static class FlattenedListModel extends AbstractListModel<Object> {
 
 		private final ProofFrameSection header_;
+		
+		private Object[] items_ = null;
 		
 		FlattenedListModel(ProofFrameSection header) {
 			header_ = header;
 		}
 		
 		@Override
+		public Object getElementAt(int i) {
+			if (items_ == null) {
+				recomputeModel();
+			}
+			
+			return items_[i];
+		}
+		
+		@Override
+		public int getSize() {
+			if (items_ == null) {
+				recomputeModel();
+			}
+			
+			return items_.length;
+		}
+		
+		void invalidate() {
+			items_ = null;
+		}
+		
+		void recomputeModel() {
+			ArrayList<Object> items = new ArrayList<Object>();
+			Iterator<?> iter = iterate();
+			
+			while (iter.hasNext()) {
+				items.add(iter.next());
+			}
+			
+			items_ = items.toArray();
+		}
+		
+		/*@Override
 		public Object getElementAt(int arg0) {
 			int i = 0;
 			Iterator<?> iter = iterate();
@@ -342,7 +385,7 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 			}
 			
 			return i;
-		}
+		}*/
 		
 		Iterator<?> iterate() {
 			final LinkedList<Object> todo = new LinkedList<Object>();
