@@ -196,7 +196,7 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 			}
         }
         else if (value == getFrame().getRootSection()) {
-        	if (!getFrame().isFullyExpanded()) {
+        	if (!getModel().isFullyExpanded()) {
         		// add the "expand all" button
         		return Arrays.<MListButton> asList(new ExpandButton(
 						new AbstractAction() {
@@ -250,7 +250,6 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
     
     protected void collapseRow(ProofFrameSectionRow expressionRow) {
     	expressionRow.setExpanded(false);
-    	getFrame().setFullyExpanded(false);
     	refreshComponent();
     }
 
@@ -312,12 +311,14 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 	
 	// TODO incrementally update the list model when small changes happen, e.g.
 	// a single row is expanded or collapsed. recompute fully only when many
-	// levels are affected.
+	// levels are affected. need to be careful about the fully expanded flag.
 	private static class FlattenedListModel extends AbstractListModel<Object> {
 
 		private final ProofFrameSection header_;
 		
 		private Object[] items_ = null;
+		// true means there's no expression to explain in the model
+		private boolean fullyExpanded_ = true;
 		
 		FlattenedListModel(ProofFrameSection header) {
 			header_ = header;
@@ -343,6 +344,7 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 		
 		void invalidate() {
 			items_ = null;
+			fullyExpanded_ = true;
 		}
 		
 		void recomputeModel() {
@@ -394,6 +396,9 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 								todo.add(i++, section);
 							}
 						}
+						else {
+							fullyExpanded_ = false;
+						}
 					}
 					
 					return true;
@@ -416,6 +421,13 @@ public class ProofFrameList extends OWLFrameList<CycleFreeProofRoot> {
 			};
 		}
 		
+		public boolean isFullyExpanded() {
+			if (items_ == null) {
+				recomputeModel();
+			}
+			
+			return fullyExpanded_;
+		}
 	}
 	
 	private boolean isBufferingMode() {

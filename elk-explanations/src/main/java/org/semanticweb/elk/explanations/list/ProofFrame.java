@@ -65,8 +65,6 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
     
     private boolean reasonerInSync_ = true;
     
-    private boolean fullyExpanded_ = false;
-	
     public ProofFrame(CycleFreeProofRoot proofRoot, OWLRenderer renderer, OWLOntology active, String title) {
     	renderer_ = renderer;
     	activeOntology_ = active;
@@ -86,14 +84,6 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 
     OWLOntology getActiveOntology() {
     	return activeOntology_;
-    }
-    
-    void setFullyExpanded(boolean expanded) {
-    	fullyExpanded_ = expanded;
-    }
-    
-    boolean isFullyExpanded() {
-    	return fullyExpanded_;
     }
     
     public void setReasonerSynchronized(boolean v) {
@@ -125,7 +115,6 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 	// fully expands the proof
 	void fullyExpand() {
 		rootSection_.expand();
-		setFullyExpanded(true);
 	}
 	
 	// called after the root has been updated
@@ -138,7 +127,6 @@ public class ProofFrame implements OWLFrame<CycleFreeProofRoot> {
 				
 				rootSection_.dispose();
 				rootSection_ = new ProofFrameSection(this, Collections.<OWLExpression>emptyList(), String.format(msg, rendering), 0, renderer_);
-				setFullyExpanded(true);
 			}
 			else {
 				// run down the model and refresh it
