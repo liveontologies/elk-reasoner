@@ -32,6 +32,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDeclarationAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDifferentIndividualsAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkDisjointClassesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkDisjointUnionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentClassesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkIndividual;
@@ -65,6 +66,10 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectP
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
+import org.semanticweb.elk.util.logging.LogLevel;
+import org.semanticweb.elk.util.logging.LoggerWrap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //TODO: reduce the boilerplate, especially for equivalence and disjointness axioms
 
@@ -79,6 +84,10 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
  * 
  */
 public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
+
+	// logger for events
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(ElkAxiomConverterImpl.class);
 
 	/**
 	 * The factory to create axioms
@@ -334,10 +343,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 */
 	private final static int DISJOINT_AXIOM_BINARIZATION_THRESHOLD = 2;
 
-	@Override
-	public Void visit(ElkDisjointClassesAxiom axiom) {
-		List<? extends ElkClassExpression> members = axiom
-				.getClassExpressions();
+	private void indexDisjointClasses(List<? extends ElkClassExpression> members) {
 		/*
 		 * if the axiom contains sufficiently many disjoint classes, convert it
 		 * natively
@@ -348,7 +354,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 			for (ElkClassExpression member : members)
 				indexedMembers.add(member.accept(negativeConverter_));
 			axiomFactory_.getIndexedDisjointClassesAxiom(indexedMembers);
-			return null;
+			return;
 		}
 		/*
 		 * otherwise create a binary disjointness axiom for all pairs (member,
@@ -374,9 +380,54 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 								indexedOtherMember), indexedOwlNothing);
 			}
 		}
+	}
+
+	@Override
+	public Void visit(ElkDisjointClassesAxiom axiom) {
+		indexDisjointClasses(axiom.getClassExpressions());
 		return null;
-	}		
-	
+	}
+
+	@Override
+	public Void visit(ElkDisjointUnionAxiom axiom) {
+		List<? extends ElkClassExpression> disjoint = axiom
+				.getClassExpressions();
+		indexDisjointClasses(disjoint);
+		ModifiableIndexedClassExpression defined;
+		ModifiableIndexedClassExpression member;
+		int size = disjoint.size();
+		switch (size) {
+		case 0:
+			defined = axiom.getDefinedClass().accept(positiveConverter_);
+			member = negativeFactory_
+					.getIndexedClass(PredefinedElkClass.OWL_THING);
+			axiomFactory_.getIndexedSubClassOfAxiom(member, defined);
+			break;
+		case 1:
+			defined = axiom.getDefinedClass().accept(dualConverter_);
+			member = disjoint.iterator().next().accept(dualConverter_);
+			axiomFactory_.getIndexedSubClassOfAxiom(member, defined);
+			axiomFactory_.getIndexedSubClassOfAxiom(defined, member);
+			break;
+		default:
+			// indexing only one direction of the equivalence
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap
+						.log(LOGGER_, LogLevel.WARN,
+								"reasoner.indexing.disjointUnion",
+								"ELK supports DisjointUnion only partially. Reasoning might be incomplete!");
+			}
+			defined = axiom.getDefinedClass().accept(positiveConverter_);
+			for (ElkClassExpression c : disjoint) {
+				member = c.accept(negativeConverter_);
+				axiomFactory_.getIndexedSubClassOfAxiom(member, defined);
+			}
+			break;
+		}
+		return null;
+
+	}
+
 	@Override
 	public Void visit(ElkDifferentIndividualsAxiom axiom) {
 		List<? extends ElkIndividual> members = axiom.getIndividuals();
