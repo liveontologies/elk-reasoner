@@ -82,7 +82,7 @@ public interface WorkerLocalTodo {
 	 * Deactivates this {@link WorkerLocalTodo}. After that,
 	 * {@link #isActivated()} returns {@code false}
 	 * 
-	 * @return {@code true} if this {@link WorkerLocalTodo} was deactivated and
+	 * @return {@code true} if this {@link WorkerLocalTodo} was activated and
 	 *         {@code false} otherwise
 	 */
 	boolean deactivate();

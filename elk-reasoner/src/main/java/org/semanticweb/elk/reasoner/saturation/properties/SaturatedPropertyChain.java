@@ -85,14 +85,14 @@ public class SaturatedPropertyChain {
 	volatile boolean leftSubComposableSubPropertiesByRightPropertiesComputed = false;
 
 	/**
-	 * A {@link Multimap} from R to S such that ObjectPropertyChain(R, root)
-	 * implies S
+	 * A {@link Multimap} from R to S such that ObjectPropertyChain(R, root) is
+	 * a subrole of S
 	 */
 	AbstractHashMultimap<IndexedObjectProperty, IndexedComplexPropertyChain> compositionsByLeftSubProperty;
 
 	/**
-	 * A {@link Multimap} from R to S such that ObjectPropertyChain(root, R)
-	 * implies S
+	 * A {@link Multimap} from R to S such that ObjectPropertyChain(root, R) is
+	 * a subrole of S
 	 */
 	AbstractHashMultimap<IndexedPropertyChain, IndexedComplexPropertyChain> compositionsByRightSubProperty;
 
@@ -161,7 +161,7 @@ public class SaturatedPropertyChain {
 
 	/**
 	 * @return A {@link Multimap} from R to S such that ObjectPropertyChain(R,
-	 *         root) implies S
+	 *         root) is a subrole of S
 	 */
 	public Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> getCompositionsByLeftSubProperty() {
 		return compositionsByLeftSubProperty == null ? Operations
@@ -171,7 +171,7 @@ public class SaturatedPropertyChain {
 
 	/**
 	 * @return A {@link Multimap} from R to S such that
-	 *         ObjectPropertyChain(root, R) implies S
+	 *         ObjectPropertyChain(root, R) is a subrole of S
 	 */
 	public Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> getCompositionsByRightSubProperty() {
 		return compositionsByRightSubProperty == null ? Operations
