@@ -52,7 +52,7 @@ public class ActivationStackTest extends TestCase {
 	/**
 	 * the stack to store all non-empty stacks
 	 */
-	final ActivationStack<StackMonitor<Integer>> nonEmptyStacks = new ActivationStack<StackMonitor<Integer>>();
+	final ActivationStack<StackMonitor<Integer>> nonEmptyStacks = new ConcurrentLinkedActivationStack<StackMonitor<Integer>>();
 	/**
 	 * this will be used to determine in which stack to insert elements
 	 */
@@ -132,8 +132,8 @@ public class ActivationStackTest extends TestCase {
 	}
 
 	/**
-	 * A wrapper around {@link ActivationStack} which allows to monitor access
-	 * to the stack using locks (boolean values)
+	 * A wrapper around {@link ConcurrentLinkedActivationStack} which allows to
+	 * monitor access to the stack using locks (boolean values)
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
@@ -141,14 +141,14 @@ public class ActivationStackTest extends TestCase {
 	 *            the type of elements in the stack
 	 */
 	private static class StackMonitor<T> {
-		final ActivationStack<T> stack;
+		final ConcurrentLinkedActivationStack<T> stack;
 		/**
 		 * {@code true} if this monitor is locked by a worker
 		 */
 		private volatile boolean islocked_ = false;
 
 		public StackMonitor() {
-			this.stack = new ActivationStack<T>();
+			this.stack = new ConcurrentLinkedActivationStack<T>();
 		}
 
 		public void lock() {
