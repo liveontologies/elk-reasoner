@@ -100,7 +100,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		}
 	}
 
-	void process() {
+	private void process() {
 		for (;;) {
 			IndexedPropertyChain next = toDoSubProperties_.poll();
 			if (next == null)

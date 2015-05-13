@@ -28,6 +28,7 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.Set;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -71,6 +72,18 @@ public class SaturatedPropertyChain {
 	 * {@link #derivedSubProperyChains} are not {@code null} and fully computed
 	 */
 	volatile boolean derivedSubPropertiesComputed = false;
+
+	/**
+	 * the {@code IndexedClassExpression}s that are ranges of the
+	 * {@code IndexedObjectProperty}s that subsume {@link #root}
+	 */
+	Set<IndexedClassExpression> derivedRanges;
+
+	/**
+	 * {@code true} if {@link #derivedRanges} is not {@code null} and fully
+	 * computed
+	 */
+	volatile boolean derivedRangesComputed = false;
 
 	/**
 	 * a multimap T -> {S} such that both S and ObjectPropertyChain(S, T) imply
@@ -150,6 +163,16 @@ public class SaturatedPropertyChain {
 		return derivedSubProperyChains == null ? Collections
 				.<IndexedPropertyChain> singleton(root)
 				: derivedSubProperyChains;
+	}
+
+	/**
+	 * @return All ranges of super-{@link IndexedObjectProperty} of root.
+	 */
+	public Set<IndexedClassExpression> getRanges() {
+		if (derivedRanges == null)
+			return Collections.emptySet();
+		// else
+		return derivedRanges;
 	}
 
 	/**

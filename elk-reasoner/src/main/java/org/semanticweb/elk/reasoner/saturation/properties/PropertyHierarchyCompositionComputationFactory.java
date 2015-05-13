@@ -90,6 +90,11 @@ public class PropertyHierarchyCompositionComputationFactory extends
 		public Void visit(IndexedObjectProperty element) {
 			// ensure that sub-properties are computed
 			SubPropertyExplorer.getSubPropertyChains(element);
+			// ensure that property ranges are computed
+			RangeExplorer.getRanges(element);
+			// TODO: verify that global restrictions on range axioms are
+			// satisfied:
+			// http://www.w3.org/TR/owl2-profiles/#Global_Restrictions
 			return null;
 		}
 
