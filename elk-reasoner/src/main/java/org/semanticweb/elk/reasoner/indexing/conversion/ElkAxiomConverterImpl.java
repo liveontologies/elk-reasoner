@@ -41,6 +41,7 @@ import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyAssertionAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyChain;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyDomainAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSameIndividualAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
@@ -254,6 +255,14 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	}
 
 	@Override
+	public Void visit(ElkObjectPropertyRangeAxiom axiom) {
+		axiomFactory_.getIndexedObjectPropertyRangeAxiom(axiom.getProperty()
+				.accept(negativeConverter_),
+				axiom.getRange().accept(positiveConverter_));
+		return null;
+	}
+
+	@Override
 	public Void visit(ElkReflexiveObjectPropertyAxiom axiom) {
 		axiomFactory_.getIndexedReflexiveObjectPropertyAxiom(axiom
 				.getProperty().accept(positiveConverter_));
@@ -291,7 +300,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		ModifiableIndexedObjectProperty p = axiom.getProperty().accept(
 				dualConverter_);
 		axiomFactory_.getIndexedSubObjectPropertyOfAxiom(
-				negativeFactory_.getIndexedBinaryPropertyChain(p, p), p);
+				negativeFactory_.getIndexedComplexPropertyChain(p, p), p);
 		return null;
 	}
 
@@ -516,8 +525,8 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 				result = iop;
 				continue;
 			}
-			result = negativeFactory_
-					.getIndexedBinaryPropertyChain(iop, result);
+			result = negativeFactory_.getIndexedComplexPropertyChain(iop,
+					result);
 		}
 		return result;
 	}

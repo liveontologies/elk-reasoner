@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.modifiable;
+package org.semanticweb.elk.reasoner.indexing.factories;
 
 /*
  * #%L
@@ -22,20 +22,21 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectPropertyRangeAxiom;
 
 /**
- * An {@link IndexedReflexiveObjectPropertyAxiom} that can be modified as a
- * result of updating the {@link ModifiableOntologyIndex} where this object is
- * stored.
+ * A factory for creating instances of
+ * {@link ModifiableIndexedObjectPropertyRangeAxiom}
  * 
  * @author "Yevgeny Kazakov"
- *
+ * 
  */
-public interface ModifiableIndexedReflexiveObjectPropertyAxiom extends
-		ModifiableIndexedAxiom, IndexedReflexiveObjectPropertyAxiom {
+public interface ModifiableIndexedObjectPropertyRangeAxiomFactory {
 
-	@Override
-	public ModifiableIndexedObjectProperty getProperty();
+	public ModifiableIndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
+			ModifiableIndexedObjectProperty property,
+			ModifiableIndexedClassExpression range);
 
 }

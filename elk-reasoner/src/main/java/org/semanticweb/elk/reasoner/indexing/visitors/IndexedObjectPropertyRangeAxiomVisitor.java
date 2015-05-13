@@ -1,4 +1,4 @@
-package org.semanticweb.elk.reasoner.indexing.modifiable;
+package org.semanticweb.elk.reasoner.indexing.visitors;
 
 /*
  * #%L
@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2012 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +22,19 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectPropertyRangeAxiom;
 
 /**
- * An {@link IndexedReflexiveObjectPropertyAxiom} that can be modified as a
- * result of updating the {@link ModifiableOntologyIndex} where this object is
- * stored.
+ * Visitor pattern interface for instances of
+ * {@link IndexedObjectPropertyRangeAxiom}.
  * 
  * @author "Yevgeny Kazakov"
- *
+ * 
+ * @param <O>
+ *            the type of the output of this visitor
  */
-public interface ModifiableIndexedReflexiveObjectPropertyAxiom extends
-		ModifiableIndexedAxiom, IndexedReflexiveObjectPropertyAxiom {
+public interface IndexedObjectPropertyRangeAxiomVisitor<O> {
 
-	@Override
-	public ModifiableIndexedObjectProperty getProperty();
+	O visit(IndexedObjectPropertyRangeAxiom axiom);
 
 }

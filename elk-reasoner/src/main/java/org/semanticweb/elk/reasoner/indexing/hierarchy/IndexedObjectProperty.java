@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 
@@ -57,6 +58,16 @@ public interface IndexedObjectProperty extends IndexedPropertyChain,
 	 * @see ElkSubObjectPropertyOfAxiom#getSuperObjectPropertyExpression()
 	 */
 	public List<IndexedPropertyChain> getToldSubProperties();
+
+	/**
+	 * @return The representation of ranges for all
+	 *         {@link ElkObjectPropertyRangeAxiom} with the property represented
+	 *         by this {@link IndexedObjectProperty}
+	 * 
+	 * @see ElkObjectPropertyRangeAxiom#getRange()
+	 * @see ElkObjectPropertyRangeAxiom#getProperty()
+	 */
+	public List<IndexedClassExpression> getToldRanges();
 
 	/**
 	 * @return All {@link IndexedComplexPropertyChain}s in which this

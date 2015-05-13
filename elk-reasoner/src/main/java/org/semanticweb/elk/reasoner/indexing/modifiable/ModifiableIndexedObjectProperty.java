@@ -22,6 +22,7 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -84,6 +85,30 @@ public interface ModifiableIndexedObjectProperty extends
 	 *         {@link IndexedObjectProperty} does not change
 	 */
 	boolean removeToldSubPropertyChain(IndexedPropertyChain subObjectProperty);
+
+	/**
+	 * Adds the given {@link IndexedClassExpression} as range of this
+	 * {@link IndexedObjectProperty}
+	 * 
+	 * @param range
+	 *            the {@link IndexedClassExpression} to be added as range
+	 * @return {@code true} if the operation is successful or {@code false}
+	 *         otherwise; if {@code false} is returned, this
+	 *         {@link IndexedObjectProperty} does not change
+	 */
+	boolean addToldRange(IndexedClassExpression range);
+
+	/**
+	 * Removes the given {@link IndexedClassExpression} from ranges of this
+	 * {@link IndexedObjectProperty}
+	 * 
+	 * @param range
+	 *            the {@link IndexedClassExpression} to be removed
+	 * @return {@code true} if the operation is successful or {@code false}
+	 *         otherwise; if {@code false} is returned, this
+	 *         {@link IndexedObjectProperty} does not change
+	 */
+	boolean removeToldRange(IndexedClassExpression range);
 
 	boolean updateReflexiveOccurrenceNumber(int increment);
 

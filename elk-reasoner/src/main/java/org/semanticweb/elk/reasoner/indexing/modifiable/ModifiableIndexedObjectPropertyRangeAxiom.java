@@ -1,5 +1,3 @@
-package org.semanticweb.elk.reasoner.indexing.modifiable;
-
 /*
  * #%L
  * ELK Reasoner
@@ -22,20 +20,25 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
+package org.semanticweb.elk.reasoner.indexing.modifiable;
+
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectPropertyRangeAxiom;
 
 /**
- * An {@link IndexedReflexiveObjectPropertyAxiom} that can be modified as a
- * result of updating the {@link ModifiableOntologyIndex} where this object is
- * stored.
+ * An {@link IndexedObjectPropertyRangeAxiom} that can be modified as a result
+ * of updating the {@link ModifiableOntologyIndex} where this object is stored.
  * 
  * @author "Yevgeny Kazakov"
- *
  */
-public interface ModifiableIndexedReflexiveObjectPropertyAxiom extends
-		ModifiableIndexedAxiom, IndexedReflexiveObjectPropertyAxiom {
+public interface ModifiableIndexedObjectPropertyRangeAxiom extends
+		ModifiableIndexedAxiom, IndexedObjectPropertyRangeAxiom {
 
 	@Override
-	public ModifiableIndexedObjectProperty getProperty();
+	public IndexedObjectProperty getProperty();
+
+	@Override
+	public IndexedClassExpression getRange();
 
 }

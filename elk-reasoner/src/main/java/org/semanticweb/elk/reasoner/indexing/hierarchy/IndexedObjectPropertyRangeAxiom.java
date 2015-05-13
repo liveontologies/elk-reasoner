@@ -22,24 +22,33 @@
 
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
-import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 
 /**
- * Represents occurrences of an {@link ElkReflexiveObjectPropertyAxiom} in an
+ * Represents occurrences of an {@link ElkObjectPropertyRangeAxiom} in an
  * ontology.
  * 
  * @author "Yevgeny Kazakov"
  *
  */
-public interface IndexedReflexiveObjectPropertyAxiom extends IndexedAxiom {
+public interface IndexedObjectPropertyRangeAxiom extends IndexedAxiom {
 
 	/**
 	 * @return the {@link IndexedObjectProperty} representing the property of
-	 *         the {@link ElkReflexiveObjectPropertyAxiom} represented by this
-	 *         {@link IndexedReflexiveObjectPropertyAxiom}
+	 *         the {@link ElkObjectPropertyRangeAxiom} represented by this
+	 *         {@link IndexedObjectPropertyRangeAxiom}
 	 * 
-	 * @see ElkReflexiveObjectPropertyAxiom#getProperty()
+	 * @see ElkObjectPropertyRangeAxiom#getProperty()
 	 */
 	public IndexedObjectProperty getProperty();
+
+	/**
+	 * @return the {@link IndexedClassExpression} representing the range of the
+	 *         {@link ElkObjectPropertyRangeAxiom} represented by this
+	 *         {@link IndexedObjectPropertyRangeAxiom}
+	 * 
+	 * @see ElkObjectPropertyRangeAxiom#getRange()
+	 */
+	public IndexedClassExpression getRange();
 
 }

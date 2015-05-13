@@ -30,6 +30,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedPropertyChainFilter;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
@@ -59,10 +60,14 @@ final class CachedIndexedObjectPropertyImpl
 	private Collection<IndexedComplexPropertyChain> leftChains_;
 
 	/**
-	 * Correctness of axioms deletions requires that toldSubProperties is a
-	 * List.
+	 * List of all property chains asserted to be sub-properties
 	 */
 	private List<IndexedPropertyChain> toldSubProperties_;
+
+	/**
+	 * List of all class expressions from range axioms with this property
+	 */
+	private List<IndexedClassExpression> toldRanges_;
 
 	/**
 	 * Number of occurrence in reflexivity axioms
@@ -81,16 +86,26 @@ final class CachedIndexedObjectPropertyImpl
 
 	@Override
 	public final List<IndexedPropertyChain> getToldSubProperties() {
-		return toldSubProperties_ == null ? Collections
-				.<IndexedPropertyChain> emptyList() : Collections
-				.<IndexedPropertyChain> unmodifiableList(toldSubProperties_);
+		if (toldSubProperties_ == null)
+			return Collections.emptyList();
+		// else
+		return Collections.unmodifiableList(toldSubProperties_);
+	}
+
+	@Override
+	public final List<IndexedClassExpression> getToldRanges() {
+		if (toldRanges_ == null)
+			return Collections.emptyList();
+		// else
+		return Collections.unmodifiableList(toldRanges_);
 	}
 
 	@Override
 	public final Collection<IndexedComplexPropertyChain> getLeftChains() {
-		return leftChains_ == null ? Collections
-				.<IndexedComplexPropertyChain> emptySet() : Collections
-				.unmodifiableCollection(leftChains_);
+		if (leftChains_ == null)
+			return Collections.emptySet();
+		// else
+		return Collections.unmodifiableCollection(leftChains_);
 	}
 
 	@Override
@@ -138,6 +153,25 @@ final class CachedIndexedObjectPropertyImpl
 			success = toldSubProperties_.remove(subObjectProperty);
 			if (toldSubProperties_.isEmpty())
 				toldSubProperties_ = null;
+		}
+		return success;
+	}
+
+	@Override
+	public final boolean addToldRange(IndexedClassExpression range) {
+		if (toldRanges_ == null)
+			toldRanges_ = new ArrayList<IndexedClassExpression>(1);
+		toldRanges_.add(range);
+		return true;
+	}
+
+	@Override
+	public final boolean removeToldRange(IndexedClassExpression range) {
+		boolean success = false;
+		if (toldRanges_ != null) {
+			success = toldRanges_.remove(range);
+			if (toldRanges_.isEmpty())
+				toldRanges_ = null;
 		}
 		return success;
 	}
