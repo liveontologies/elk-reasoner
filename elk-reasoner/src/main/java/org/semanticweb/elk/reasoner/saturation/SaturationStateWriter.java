@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -38,7 +37,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  *         pavel.klinov@uni-ulm.de
  * @author "Yevgeny Kazakov"
  */
-public interface SaturationStateWriter<C extends Context> extends ConclusionProducer {
+public interface SaturationStateWriter<C extends Context> extends
+		ConclusionProducer {
 
 	/**
 	 * @return the {@link SaturationState} modified by this
@@ -60,25 +60,25 @@ public interface SaturationStateWriter<C extends Context> extends ConclusionProd
 	public Context pollForActiveContext();
 
 	/**
-	 * Marks the {@link Context} with the given root
-	 * {@link IndexedClassExpression} as not saturated. That is, after calling
-	 * of this method, {@code Context#isSaturated()} returns {@code true} for
-	 * the {@link Context} returned by
-	 * {@code SaturationState#getContext(IndexedClassExpression)} for the given
+	 * Marks the {@link Context} with the given {@link IndexedContextRoot} as
+	 * not saturated. That is, after calling of this method,
+	 * {@code Context#isSaturated()} returns {@code true} for the
+	 * {@link Context} returned by
+	 * {@code SaturationState#getContext(IndexedContextRoot)} for the given
 	 * root.
 	 * 
 	 * @param root
 	 * @return {@code true} if the {@link Context} was marked as saturated or
 	 *         {@code false} if the {@link Context} for the given
-	 *         {@link IndexedClassExpression} does not exist or already marked
-	 *         as saturated.
+	 *         {@link IndexedContextRoot} does not exist or already marked as
+	 *         saturated.
 	 */
-	public boolean markAsNotSaturated(IndexedClassExpression root);
+	public boolean markAsNotSaturated(IndexedContextRoot root);
 
 	/**
-	 * Removes all assignments of {@link Context}s to
-	 * {@link IndexedClassExpression}s of this {@link SaturationState}. After
-	 * that, {@link SaturationState#getContexts()} should be empty.
+	 * Removes all assignments of {@link Context}s to {@link IndexedContextRoot}
+	 * s of this {@link SaturationState}. After that,
+	 * {@link SaturationState#getContexts()} should be empty.
 	 */
 	public void resetContexts();
 

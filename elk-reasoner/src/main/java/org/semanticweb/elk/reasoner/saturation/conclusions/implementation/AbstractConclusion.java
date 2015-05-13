@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 
 /**
@@ -36,8 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
 public abstract class AbstractConclusion implements Conclusion {
 
 	@Override
-	public IndexedClassExpression getSourceRoot(
-			IndexedClassExpression rootWhereStored) {
+	public IndexedContextRoot getSourceRoot(IndexedContextRoot rootWhereStored) {
 		// by default where the conclusion is stored
 		return rootWhereStored;
 	}

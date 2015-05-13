@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation;
 import java.util.Collections;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
@@ -35,8 +34,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusio
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 
-public class SubContextImpl extends ArrayHashSet<IndexedClassExpression>
-		implements SubContext {
+public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
+		SubContext {
 
 	private static final SubConclusionVisitor<SubContextImpl, Boolean> SUB_CONCLUSION_INSERTER_ = new SubConclusionInserter();
 	private static final SubConclusionVisitor<SubContextImpl, Boolean> SUB_CONCLUSION_DELETOR_ = new SubConclusionDeletor();
@@ -55,7 +54,7 @@ public class SubContextImpl extends ArrayHashSet<IndexedClassExpression>
 	}
 
 	@Override
-	public Set<IndexedClassExpression> getLinkedRoots() {
+	public Set<IndexedContextRoot> getLinkedRoots() {
 		return this;
 	}
 
@@ -81,12 +80,11 @@ public class SubContextImpl extends ArrayHashSet<IndexedClassExpression>
 	public boolean containsSubConclusion(SubConclusion conclusion) {
 		return conclusion.accept(SUB_CONCLUSION_OCCURRENCE_CHECKER_, this);
 	}
-	
+
 	@Override
 	public boolean isInitialized() {
 		return isInitialized_;
 	}
-
 
 	public static class SubConclusionInserter implements
 			SubConclusionVisitor<SubContextImpl, Boolean> {

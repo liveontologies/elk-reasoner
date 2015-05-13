@@ -30,7 +30,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -43,7 +42,8 @@ import org.slf4j.LoggerFactory;
  * @author "Yevgeny Kazakov"
  * 
  */
-public abstract class AbstractSaturationState<EC extends ExtendedContext> implements SaturationState<EC> {
+public abstract class AbstractSaturationState<EC extends ExtendedContext>
+		implements SaturationState<EC> {
 
 	// logger for events
 	private static final Logger LOGGER_ = LoggerFactory
@@ -74,10 +74,11 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext> implem
 	 * increments every time a {@link Context} is marked as saturated
 	 */
 	private final AtomicInteger contextSetSaturatedCount_ = new AtomicInteger(0);
-	
+
 	private final ContextFactory<EC> contextFactory;
 
-	public AbstractSaturationState(OntologyIndex index, ContextFactory<EC> factory) {
+	public AbstractSaturationState(OntologyIndex index,
+			ContextFactory<EC> factory) {
 		this.ontologyIndex = index;
 		this.contextFactory = factory;
 	}
@@ -89,19 +90,18 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext> implem
 
 	@Override
 	public Collection<EC> getNotSaturatedContexts() {
-		return Collections
-				.unmodifiableCollection(new AbstractCollection<EC>() {
-					@Override
-					public Iterator<EC> iterator() {
-						return notSaturatedContexts_.iterator();
-					}
+		return Collections.unmodifiableCollection(new AbstractCollection<EC>() {
+			@Override
+			public Iterator<EC> iterator() {
+				return notSaturatedContexts_.iterator();
+			}
 
-					@Override
-					public int size() {
-						return countextMarkNonSaturatedCount_.get()
-								- contextSetSaturatedCount_.get();
-					}
-				});
+			@Override
+			public int size() {
+				return countextMarkNonSaturatedCount_.get()
+						- contextSetSaturatedCount_.get();
+			}
+		});
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext> implem
 	@Override
 	public Context setNextContextSaturated() {
 		EC next = notSaturatedContexts_.poll();
-		
+
 		if (next == null)
 			return null;
 		// else
@@ -154,7 +154,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext> implem
 	}
 
 	@Override
-	abstract public EC getContext(IndexedClassExpression ice);
+	abstract public EC getContext(IndexedContextRoot root);
 
 	abstract void resetContexts();
 
@@ -201,7 +201,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext> implem
 		}
 
 		@Override
-		public void produce(IndexedClassExpression root, Conclusion conclusion) {
+		public void produce(IndexedContextRoot root, Conclusion conclusion) {
 			// TODO: what if NPE?
 			produce(getContext(root), conclusion);
 		}
@@ -214,9 +214,9 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext> implem
 		}
 
 		@Override
-		public boolean markAsNotSaturated(IndexedClassExpression root) {
+		public boolean markAsNotSaturated(IndexedContextRoot root) {
 			EC context = getContext(root);
-			
+
 			if (context == null)
 				return false;
 			// else
@@ -246,8 +246,9 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext> implem
 	 *         pavel.klinov@uni-ulm.de
 	 * @author "Yevgeny Kazakov"
 	 */
-	protected class AbstractContextCreatingWriter extends ContextModifyingWriter
-			implements ContextCreatingSaturationStateWriter<EC> {
+	protected class AbstractContextCreatingWriter extends
+			ContextModifyingWriter implements
+			ContextCreatingSaturationStateWriter<EC> {
 
 		private final ContextCreationListener contextCreationListener_;
 
@@ -265,22 +266,22 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext> implem
 		}
 
 		@Override
-		public void produce(IndexedClassExpression root, Conclusion conclusion) {
+		public void produce(IndexedContextRoot root, Conclusion conclusion) {
 			produce(getCreateContext(root), conclusion);
 		}
 
 		@Override
-		public EC getCreateContext(IndexedClassExpression root) {
+		public EC getCreateContext(IndexedContextRoot root) {
 			EC previous = getContext(root);
-			
+
 			if (previous != null) {
 				return previous;
 			}
 			// else try to assign a new context
 			EC newContext = contextFactory.createContext(root);
-			
+
 			previous = setIfAbsent(newContext);
-			
+
 			if (previous != null) {
 				// the context is already assigned meanwhile
 				return previous;
@@ -289,10 +290,10 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext> implem
 			// markAsNotSaturatedInternal(newContext);
 			contextCreationListener_.notifyContextCreation(newContext);
 			LOGGER_.trace("{}: context created", newContext);
-			
+
 			return newContext;
 		}
-		
+
 	}
 
 }

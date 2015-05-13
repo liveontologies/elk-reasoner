@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 
 /**
@@ -37,12 +37,12 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
  */
 public interface UntracedConclusionListener {
 
-	public void notifyUntraced(Conclusion conclusion, IndexedClassExpression root);
+	public void notifyUntraced(Conclusion conclusion, IndexedContextRoot root);
 	
 	public static final UntracedConclusionListener DUMMY = new UntracedConclusionListener() {
 
 		@Override
-		public void notifyUntraced(Conclusion conclusion, IndexedClassExpression root) {
+		public void notifyUntraced(Conclusion conclusion, IndexedContextRoot root) {
 			//no-op			
 		}
 		

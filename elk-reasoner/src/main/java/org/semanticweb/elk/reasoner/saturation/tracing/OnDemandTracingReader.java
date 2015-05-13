@@ -24,10 +24,10 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreatingSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
@@ -64,8 +64,8 @@ public class OnDemandTracingReader extends DelegatingTraceReader {
 	}
 	
 	@Override
-	public void accept(final IndexedClassExpression root, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
-		IndexedClassExpression conclusionContextRoot = conclusion.getSourceRoot(root);
+	public void accept(final IndexedContextRoot root, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
+		IndexedContextRoot conclusionContextRoot = conclusion.getSourceRoot(root);
 		TracedContext tracedContext = tracingContextWriter_.getCreateContext(conclusionContextRoot);	
 		
 		while (!tracedContext.isInitialized() || !tracedContext.isSaturated()) {

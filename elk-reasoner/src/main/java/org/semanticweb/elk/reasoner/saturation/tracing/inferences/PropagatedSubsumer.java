@@ -25,9 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ComposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
@@ -48,11 +48,11 @@ public class PropagatedSubsumer extends
 
 	private final IndexedObjectProperty linkRelation_;
 
-	private final IndexedClassExpression linkSourceRoot_;
+	private final IndexedContextRoot linkSourceRoot_;
 
-	private final IndexedClassExpression inferenceContextRoot_;
+	private final IndexedContextRoot inferenceContextRoot_;
 
-	public PropagatedSubsumer(IndexedClassExpression inferenceRoot,
+	public PropagatedSubsumer(IndexedContextRoot inferenceRoot,
 			BackwardLink backwardLink, IndexedObjectSomeValuesFrom carry) {
 		super(carry);
 		linkSourceRoot_ = backwardLink.getSource();
@@ -60,9 +60,9 @@ public class PropagatedSubsumer extends
 		inferenceContextRoot_ = inferenceRoot;
 	}
 
-	public PropagatedSubsumer(IndexedClassExpression contextRoot,
+	public PropagatedSubsumer(IndexedContextRoot contextRoot,
 			Propagation propagation, IndexedObjectProperty linkRelation,
-			IndexedClassExpression linkSource) {
+			IndexedContextRoot linkSource) {
 		super(propagation.getCarry());
 		linkSourceRoot_ = linkSource;
 		linkRelation_ = linkRelation;
@@ -83,8 +83,8 @@ public class PropagatedSubsumer extends
 	}
 
 	@Override
-	public IndexedClassExpression getInferenceContextRoot(
-			IndexedClassExpression rootWhereStored) {
+	public IndexedContextRoot getInferenceContextRoot(
+			IndexedContextRoot rootWhereStored) {
 		return inferenceContextRoot_;
 	}
 

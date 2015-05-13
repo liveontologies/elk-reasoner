@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Iterator;
 
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
@@ -63,7 +63,7 @@ abstract class AbstractIncrementalContextInitializationStage extends
 	/**
 	 * The state of the iterator of the input to be processed
 	 */
-	protected Iterator<IndexedClassExpression> todo = null;
+	protected Iterator<IndexedContextRoot> todo = null;
 
 	private SaturationStateWriter<?> writer_;
 
@@ -94,13 +94,13 @@ abstract class AbstractIncrementalContextInitializationStage extends
 				return;
 			if (!todo.hasNext())
 				break;
-			IndexedClassExpression ice = todo.next();
+			IndexedContextRoot root = todo.next();
 
 			Conclusion init = new ContextInitializationImpl(
 					reasoner.saturationState.getOntologyIndex());
 
-			if (reasoner.saturationState.getContext(ice) != null) {
-				writer_.produce(ice, init);
+			if (reasoner.saturationState.getContext(root) != null) {
+				writer_.produce(root, init);
 			}
 
 			initContexts++;

@@ -28,6 +28,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.AbstractSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
@@ -51,7 +53,7 @@ public class TracedPropagation extends PropagationImpl implements Inference {
 
 	public Subsumer<?> getPremise() {
 		return new DecomposedSubsumerImpl<IndexedClassExpression>(getCarry()
-				.getFiller());
+				.getFillerConcept());
 	}
 
 	@Override
@@ -60,8 +62,8 @@ public class TracedPropagation extends PropagationImpl implements Inference {
 	}
 
 	@Override
-	public IndexedClassExpression getInferenceContextRoot(
-			IndexedClassExpression rootWhereStored) {
+	public IndexedContextRoot getInferenceContextRoot(
+			IndexedContextRoot rootWhereStored) {
 		return rootWhereStored;
 	}
 

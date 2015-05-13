@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
@@ -53,11 +54,11 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 
 	private final TraceStore.Reader traceReader_;
 
-	private final static InferenceVisitor<IndexedClassExpression, ?> DUMMY_INFERENCE_VISITOR = new AbstractInferenceVisitor<IndexedClassExpression, Void>() {
+	private final static InferenceVisitor<IndexedContextRoot, ?> DUMMY_INFERENCE_VISITOR = new AbstractInferenceVisitor<IndexedContextRoot, Void>() {
 
 		@Override
 		protected Void defaultTracedVisit(Inference conclusion,
-				IndexedClassExpression input) {
+				IndexedContextRoot input) {
 			return null;
 		}
 
@@ -69,7 +70,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 
 	public void accept(IndexedClassExpression context,
 			final Conclusion conclusion,
-			final ConclusionVisitor<IndexedClassExpression, ?> premiseVisitor) {
+			final ConclusionVisitor<IndexedContextRoot, ?> premiseVisitor) {
 		accept(context, conclusion, premiseVisitor, DUMMY_INFERENCE_VISITOR);
 	}
 
@@ -84,16 +85,16 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 	 */
 	@Override
 	public void accept(
-			IndexedClassExpression context,
+			IndexedContextRoot context,
 			final Conclusion conclusion,
-			final ConclusionVisitor<IndexedClassExpression, ?> conclusionVisitor,
-			final InferenceVisitor<IndexedClassExpression, ?> inferenceVisitor) {
+			final ConclusionVisitor<IndexedContextRoot, ?> conclusionVisitor,
+			final InferenceVisitor<IndexedContextRoot, ?> inferenceVisitor) {
 		final TraceUnwindingState unwindingState = new TraceUnwindingState();
 
 		unwindingState.addToUnwindingQueue(conclusion, context);
 
 		for (;;) {
-			Pair<Conclusion, IndexedClassExpression> next = unwindingState
+			Pair<Conclusion, IndexedContextRoot> next = unwindingState
 					.pollFromUnwindingQueue();
 
 			if (next == null) {
@@ -106,15 +107,15 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 	}
 
 	private void unwind(Conclusion conclusion,
-			final IndexedClassExpression rootWhereStored,
+			final IndexedContextRoot rootWhereStored,
 			final TraceUnwindingState unwindingState,
-			final InferenceVisitor<IndexedClassExpression, ?> inferenceVisitor) {
+			final InferenceVisitor<IndexedContextRoot, ?> inferenceVisitor) {
 
-		final PremiseVisitor<IndexedClassExpression, ?> premiseVisitor = new PremiseVisitor<IndexedClassExpression, Void>() {
+		final PremiseVisitor<IndexedContextRoot, ?> premiseVisitor = new PremiseVisitor<IndexedContextRoot, Void>() {
 
 			@Override
 			protected Void defaultVisit(Conclusion premise,
-					IndexedClassExpression inferenceContext) {
+					IndexedContextRoot inferenceContext) {
 				unwindingState.addToUnwindingQueue(premise, inferenceContext);
 				return null;
 			}
@@ -127,7 +128,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder {
 					protected Void defaultTracedVisit(Inference inference,
 							Void v) {
 						if (unwindingState.addToProcessed(inference)) {
-							IndexedClassExpression inferenceContextRoot = inference
+							IndexedContextRoot inferenceContextRoot = inference
 									.getInferenceContextRoot(rootWhereStored);
 							// visit the premises so they can be put into the
 							// queue

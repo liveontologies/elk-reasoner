@@ -22,8 +22,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
@@ -67,7 +67,7 @@ public class BasicRuleEngine extends AbstractRuleEngineWithStatistics {
 	}
 
 	@Override
-	public void submit(IndexedClassExpression job) {
+	public void submit(IndexedContextRoot job) {
 		writer_.produce(job, contextInitConclusion_);
 	}
 

@@ -24,8 +24,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.propagations;
 
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -67,7 +67,7 @@ public class ReflexivePropagationRule extends AbstractPropagationRule {
 		if (reflexive.contains(premise.getRelation())) {
 			// producer.produce(premises.getRoot(), new
 			// ComposedSubsumer(premise.getCarry()));
-			IndexedClassExpression thisRoot = premises.getRoot();
+			IndexedContextRoot thisRoot = premises.getRoot();
 
 			producer.produce(thisRoot, new PropagatedSubsumer(thisRoot,
 					premise, premise.getRelation(), thisRoot));

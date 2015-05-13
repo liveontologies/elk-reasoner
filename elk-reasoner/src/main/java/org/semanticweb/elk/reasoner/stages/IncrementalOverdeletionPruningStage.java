@@ -28,8 +28,8 @@ package org.semanticweb.elk.reasoner.stages;
 import java.util.Collection;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturation;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.context.ContextRootCollection;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionPruningFactory;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
@@ -46,7 +46,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFa
  */
 public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 
-	private ClassExpressionSaturation<IndexedClassExpression> completion_;
+	private ClassExpressionSaturation<IndexedContextRoot> completion_;
 
 	public IncrementalOverdeletionPruningStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -73,10 +73,10 @@ public class IncrementalOverdeletionPruningStage extends AbstractReasonerStage {
 
 		RuleApplicationFactory<?> ruleAppFactory = new RuleApplicationAdditionPruningFactory(
 				reasoner.saturationState);
-		Collection<IndexedClassExpression> inputs = new ContextRootCollection(
+		Collection<IndexedContextRoot> inputs = new ContextRootCollection(
 				reasoner.saturationState.getNotSaturatedContexts());
 
-		completion_ = new ClassExpressionSaturation<IndexedClassExpression>(
+		completion_ = new ClassExpressionSaturation<IndexedContextRoot>(
 				inputs, reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor(), ruleAppFactory);
 

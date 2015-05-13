@@ -22,9 +22,9 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
@@ -55,7 +55,7 @@ public interface RuleApplicationFactory<C extends Context> extends Interrupter {
 	 * Create a new {@link InputProcessor} that concurrently processes
 	 * {@link Conclusion}s within {@link Context}s of the
 	 * {@link SaturationState} by applying inference rules. The input
-	 * {@link Conclusion}s can be created using {@link IndexedClassExpression}s
+	 * {@link Conclusion}s can be created using {@link IndexedContextRoot}s
 	 * submitted using this {@link InputProcessor}, or they may be taken from
 	 * the {@link Context}s of the {@link SaturationState} using
 	 * {@link Context#takeToDo()}. Since the {@link SaturationState} is shared
@@ -69,10 +69,10 @@ public interface RuleApplicationFactory<C extends Context> extends Interrupter {
 	 *            the {@link ContextModificationListener} that registers all
 	 *            {@link Context}s that become not saturated by operations of
 	 *            this {@link InputProcessor}
-	 * @return the new {@link InputProcessor} for {@link IndexedClassExpression}
+	 * @return the new {@link InputProcessor} for {@link IndexedContextRoot}
 	 *         that can perform computation in parallel.
 	 */
-	public InputProcessor<IndexedClassExpression> getEngine(
+	public InputProcessor<IndexedContextRoot> getEngine(
 			ContextCreationListener creationListener,
 			ContextModificationListener modificationListener);
 

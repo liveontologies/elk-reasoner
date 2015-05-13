@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.util;
  */
 
 import org.semanticweb.elk.MutableBoolean;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionEqualityChecker;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
@@ -50,10 +50,10 @@ public class IsInferenceCyclic {
 	 * @param targetContextRoot The root of the context to which this inference should be produced to (i.e. the target)
 	 * @return
 	 */
-	public static Conclusion check(final Inference inference, final IndexedClassExpression targetContextRoot, final TraceStore.Reader inferenceReader) {
+	public static Conclusion check(final Inference inference, final IndexedContextRoot targetContextRoot, final TraceStore.Reader inferenceReader) {
 		// the inference is cyclic if at least one of the premises has been
 		// derived only through this inference's conclusion
-		final IndexedClassExpression inferenceContext = inference.getInferenceContextRoot(targetContextRoot);
+		final IndexedContextRoot inferenceContext = inference.getInferenceContextRoot(targetContextRoot);
 		
 		Conclusion cyclicPremise = Premises.find(inference, new Condition<Conclusion>(){
 
@@ -78,8 +78,8 @@ public class IsInferenceCyclic {
 	 */
 	static boolean derivedOnlyViaGivenConclusion(final Conclusion premise,
 			final Conclusion conclusion,
-			final IndexedClassExpression premiseContext,
-			final IndexedClassExpression conclusionContext,
+			final IndexedContextRoot premiseContext,
+			final IndexedContextRoot conclusionContext,
 			final TraceStore.Reader inferenceReader) {
 		final MutableBoolean foundAlternative = new MutableBoolean(false);
 		final MutableBoolean anyInference = new MutableBoolean(false);
@@ -108,7 +108,7 @@ public class IsInferenceCyclic {
 	 * the given conclusion). It is assumed that the premises are stored in the
 	 * same context as the conclusion.
 	 */
-	public static boolean isAlternative(final Inference inference, final Conclusion conclusion, final IndexedClassExpression conclusionContext) {
+	public static boolean isAlternative(final Inference inference, final Conclusion conclusion, final IndexedContextRoot conclusionContext) {
 		// if the premise is produced in a context different
 		// from where the conclusion is stored, then it must be
 		// produced by an alternative inference.

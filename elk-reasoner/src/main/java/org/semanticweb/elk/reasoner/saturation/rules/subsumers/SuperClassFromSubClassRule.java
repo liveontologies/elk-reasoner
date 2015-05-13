@@ -92,7 +92,7 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 				new SuperClassFromSubClassRule(axiom.getSuperClass()));
 	}
 
-	// TODO: hide this method
+	@Deprecated
 	public Collection<IndexedClassExpression> getToldSuperclasses() {
 		return toldSuperClassExpressions_;
 	}

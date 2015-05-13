@@ -1,7 +1,4 @@
-/**
- * 
- */
-package org.semanticweb.elk.reasoner.saturation.tracing.factories;
+package org.semanticweb.elk.reasoner.indexing.visitors;
 
 /*
  * #%L
@@ -25,23 +22,34 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedFiller;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.SaturationJob;
 
 /**
- * A job for non-recursive context tracing.
+ * An {@link IndexedContextRootVisitor} that always returns {@code null}.
  * 
- * @author Pavel Klinov
- * 
- *         pavel.klinov@uni-ulm.de
+ * @author "Yevgeny Kazakov"
+ *
+ * @param <O>
  */
-public class ContextTracingJob extends SaturationJob<IndexedContextRoot> {
+public class NoOpIndexedContextRootVisitor<O> extends
+		NoOpIndexedClassExpressionVisitor<O> implements
+		IndexedContextRootVisitor<O> {
 
-	public ContextTracingJob(IndexedContextRoot input) {
-		super(input);
+	@SuppressWarnings("unused")
+	protected O defaultVisit(IndexedContextRoot element) {
+		return null;
 	}
 
-	public static ContextTracingListener getCallback() {
-		return ContextTracingListener.DUMMY;
+	@Override
+	protected O defaultVisit(IndexedClassExpression element) {
+		return defaultVisit((IndexedContextRoot) element);
 	}
+
+	@Override
+	public O visit(IndexedFiller element) {
+		return defaultVisit(element);
+	}
+
 }

@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
@@ -44,19 +45,19 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagatio
 public interface SubContextPremises {
 
 	/**
-	 * @return the representation of all derived {@link BackwardLink}s with
-	 *         relations {@link BackwardLink#getRelation()} to be sub-root of
-	 *         this {@link SubContextPremises}
+	 * @return the sources of all derived {@link BackwardLink}s with relations
+	 *         {@link BackwardLink#getRelation()} to be sub-root of this
+	 *         {@link SubContextPremises}
 	 */
-	Set<IndexedClassExpression> getLinkedRoots();
+	Set<IndexedContextRoot> getLinkedRoots();
 
 	/**
 	 * @return the representation of all derived {@link Propagation}s with
 	 *         relations {@link Propagation#getRelation()} to be sub-root of
 	 *         this {@link SubContextPremises}
 	 */
-	//Set<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers();
-	
+	// Set<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers();
+
 	boolean isInitialized();
 
 }

@@ -28,7 +28,6 @@ import java.util.Iterator;
 
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 import org.slf4j.Logger;
@@ -36,12 +35,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ReasonerComputationWithInputs} that computes saturation for the
- * input collection of {@link IndexedClassExpression}s
+ * input collection of {@link IndexedContextRoot}s
  * 
  * @author Yevgeny Kazakov
  * 
  */
-public class ClassExpressionSaturation<I extends IndexedClassExpression>
+public class ClassExpressionSaturation<I extends IndexedContextRoot>
 		extends
 		ReasonerComputationWithInputs<SaturationJob<I>, ClassExpressionSaturationFactory<SaturationJob<I>>> {
 
@@ -88,12 +87,12 @@ public class ClassExpressionSaturation<I extends IndexedClassExpression>
 
 	/**
 	 * Dynamic collection view for saturation checking jobs that correspond to
-	 * the given input of {@link IndexedClassExpression}s.
+	 * the given input of {@link IndexedContextRoot}s.
 	 * 
 	 * @author "Yevgeny Kazakov"
 	 * 
 	 */
-	private static class TodoJobs<I extends IndexedClassExpression> extends
+	private static class TodoJobs<I extends IndexedContextRoot> extends
 			AbstractCollection<SaturationJob<I>> {
 
 		private final Collection<? extends I> inputs;

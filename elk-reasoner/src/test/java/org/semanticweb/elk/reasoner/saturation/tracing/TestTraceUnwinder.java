@@ -31,7 +31,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.semanticweb.elk.MutableInteger;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -64,10 +64,10 @@ public class TestTraceUnwinder implements TraceUnwinder {
 
 	private final UntracedConclusionListener listener_;
 
-	private final static InferenceVisitor<IndexedClassExpression, ?> DUMMY_INFERENCE_VISITOR = new AbstractInferenceVisitor<IndexedClassExpression, Void>() {
+	private final static InferenceVisitor<IndexedContextRoot, ?> DUMMY_INFERENCE_VISITOR = new AbstractInferenceVisitor<IndexedContextRoot, Void>() {
 		@Override
 		protected Void defaultTracedVisit(Inference conclusion,
-				IndexedClassExpression input) {
+				IndexedContextRoot input) {
 			return null;
 		}
 	};
@@ -85,9 +85,9 @@ public class TestTraceUnwinder implements TraceUnwinder {
 		tracingState_ = state;
 	}
 
-	public void accept(IndexedClassExpression context,
+	public void accept(IndexedContextRoot context,
 			final Conclusion conclusion,
-			final ConclusionVisitor<IndexedClassExpression, ?> premiseVisitor) {
+			final ConclusionVisitor<IndexedContextRoot, ?> premiseVisitor) {
 		accept(context, conclusion, premiseVisitor, DUMMY_INFERENCE_VISITOR);
 	}
 
@@ -101,21 +101,21 @@ public class TestTraceUnwinder implements TraceUnwinder {
 	 *            Visitor over all
 	 */
 	@Override
-	public void accept(IndexedClassExpression context,
+	public void accept(IndexedContextRoot context,
 			final Conclusion conclusion,
-			final ConclusionVisitor<IndexedClassExpression, ?> premiseVisitor,
-			final InferenceVisitor<IndexedClassExpression, ?> inferenceVisitor) {
+			final ConclusionVisitor<IndexedContextRoot, ?> premiseVisitor,
+			final InferenceVisitor<IndexedContextRoot, ?> inferenceVisitor) {
 		final Queue<InferenceWrapper> toDo = new LinkedList<InferenceWrapper>();
 		final Set<Inference> seenInferences = new HashSet<Inference>();
 
 		addToQueue(context, conclusion, toDo, seenInferences, premiseVisitor,
 				inferenceVisitor);
 		// this visitor visits all premises and putting them into the todo queue
-		PremiseVisitor<IndexedClassExpression, ?> tracedVisitor = new PremiseVisitor<IndexedClassExpression, Void>() {
+		PremiseVisitor<IndexedContextRoot, ?> tracedVisitor = new PremiseVisitor<IndexedContextRoot, Void>() {
 
 			@Override
 			protected Void defaultVisit(Conclusion premise,
-					IndexedClassExpression cxt) {
+					IndexedContextRoot cxt) {
 				// the context passed into this method is the context where the
 				// inference has been made
 				addToQueue(cxt, premise, toDo, seenInferences, premiseVisitor,
@@ -135,11 +135,11 @@ public class TestTraceUnwinder implements TraceUnwinder {
 		}
 	}
 
-	private void addToQueue(final IndexedClassExpression root,
+	private void addToQueue(final IndexedContextRoot root,
 			final Conclusion conclusion, final Queue<InferenceWrapper> toDo,
 			final Set<Inference> seenInferences,
-			final ConclusionVisitor<IndexedClassExpression, ?> visitor,
-			final InferenceVisitor<IndexedClassExpression, ?> inferenceVisitor) {
+			final ConclusionVisitor<IndexedContextRoot, ?> visitor,
+			final InferenceVisitor<IndexedContextRoot, ?> inferenceVisitor) {
 
 		Context tracedContext = tracingState_.getContext(conclusion
 				.getSourceRoot(root));
@@ -163,7 +163,7 @@ public class TestTraceUnwinder implements TraceUnwinder {
 					protected Void defaultTracedVisit(Inference inference,
 							Void v) {
 						if (!seenInferences.contains(inference)) {
-							IndexedClassExpression inferenceContextRoot = inference
+							IndexedContextRoot inferenceContextRoot = inference
 									.getInferenceContextRoot(root);
 
 							inference.acceptTraced(inferenceVisitor,
@@ -193,9 +193,9 @@ public class TestTraceUnwinder implements TraceUnwinder {
 	private static class InferenceWrapper {
 
 		final Inference inference;
-		final IndexedClassExpression contextRoot;
+		final IndexedContextRoot contextRoot;
 
-		InferenceWrapper(Inference inf, IndexedClassExpression root) {
+		InferenceWrapper(Inference inf, IndexedContextRoot root) {
 			inference = inf;
 			contextRoot = root;
 		}

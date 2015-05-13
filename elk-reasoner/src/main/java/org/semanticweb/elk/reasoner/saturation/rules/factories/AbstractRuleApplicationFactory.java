@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -76,7 +77,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context> extends
 	 *         {@link SaturationStateWriter} and updates the supplied local
 	 *         {@link SaturationStatistics} accordingly
 	 */
-	protected InputProcessor<IndexedClassExpression> getEngine(
+	protected InputProcessor<IndexedContextRoot> getEngine(
 			ConclusionVisitor<? super Context, Boolean> conclusionProcessor,
 			SaturationStateWriter<? extends C> saturationStateWriter,
 			WorkerLocalTodo localTodo, SaturationStatistics localStatistics) {
@@ -134,7 +135,7 @@ public abstract class AbstractRuleApplicationFactory<C extends Context> extends
 			SaturationStatistics localStatistics);
 
 	@Override
-	public final InputProcessor<IndexedClassExpression> getEngine(
+	public final InputProcessor<IndexedContextRoot> getEngine(
 			ContextCreationListener creationListener,
 			ContextModificationListener modificationListener) {
 		SaturationStatistics localStatistics = new SaturationStatistics();

@@ -22,9 +22,9 @@ package org.semanticweb.elk.reasoner.saturation.rules.forwardlink;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
@@ -56,8 +56,8 @@ public class BackwardLinkFromForwardLinkRule extends AbstractForwardLinkRule {
 	public void apply(ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		IndexedPropertyChain relation = premise.getRelation();
-		IndexedClassExpression source = premises.getRoot();
-		IndexedClassExpression target = premise.getTarget();
+		IndexedContextRoot source = premises.getRoot();
+		IndexedContextRoot target = premise.getTarget();
 		if (relation instanceof IndexedObjectProperty) {
 			producer.produce(target, new ReversedForwardLink(source,
 					(IndexedObjectProperty) relation, premise));

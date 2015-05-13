@@ -36,6 +36,7 @@ import org.semanticweb.elk.MutableInteger;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
@@ -72,7 +73,7 @@ public class TracingTestUtils {
 
 		@Override
 		public void notifyUntraced(Conclusion conclusion,
-				IndexedClassExpression contextRoot) {
+				IndexedContextRoot contextRoot) {
 			fail("Conclusion " + conclusion + " stored in " + contextRoot
 					+ " was not traced");
 		}
@@ -98,11 +99,11 @@ public class TracingTestUtils {
 				ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
-		ConclusionVisitor<IndexedClassExpression, Boolean> counter = new AbstractConclusionVisitor<IndexedClassExpression, Boolean>() {
+		ConclusionVisitor<IndexedContextRoot, Boolean> counter = new AbstractConclusionVisitor<IndexedContextRoot, Boolean>() {
 
 			@Override
 			protected Boolean defaultVisit(Conclusion conclusion,
-					IndexedClassExpression root) {
+					IndexedContextRoot root) {
 				conclusionCount.incrementAndGet();
 
 				return true;
@@ -132,7 +133,7 @@ public class TracingTestUtils {
 				subsumee, subsumer, collector);
 
 		for (Context traced : traceState.getTracedContexts()) {
-			IndexedClassExpression root = traced.getRoot();
+			IndexedContextRoot root = traced.getRoot();
 
 			assertTrue(root + " has been traced for no good reason", collector
 					.getTracedRoots().contains(traced.getRoot()));
@@ -177,7 +178,7 @@ public class TracingTestUtils {
 				.getSaturationState();
 		final MutableInteger counter = new MutableInteger(0);
 
-		for (final IndexedClassExpression root : traceReader.getContextRoots()) {
+		for (final IndexedContextRoot root : traceReader.getContextRoots()) {
 
 			traceReader.visitInferences(root,
 					new AbstractInferenceVisitor<Void, Void>() {
@@ -213,7 +214,7 @@ public class TracingTestUtils {
 				for (Inference blocked : context.getBlockedInferences().get(
 						premise)) {
 
-					IndexedClassExpression targetRoot = blocked.acceptTraced(
+					IndexedContextRoot targetRoot = blocked.acceptTraced(
 							new GetInferenceTarget(), context);
 
 					counter.increment();
@@ -235,11 +236,11 @@ public class TracingTestUtils {
 
 	// the most straightforward (and slow) implementation
 	public static boolean isInferenceCyclic(final Inference inference,
-			final IndexedClassExpression inferenceTargetRoot,
+			final IndexedContextRoot inferenceTargetRoot,
 			final TraceStore.Reader traceReader) {
 		// first, create a map of premises to their inferences
 		final Multimap<Conclusion, Inference> premiseInferenceMap = new HashListMultimap<Conclusion, Inference>();
-		final IndexedClassExpression inferenceContextRoot = inference
+		final IndexedContextRoot inferenceContextRoot = inference
 				.getInferenceContextRoot(inferenceTargetRoot);
 
 		inference.acceptTraced(new PremiseVisitor<Void, Void>() {

@@ -81,9 +81,4 @@ public abstract class AbstractSubsumer<S extends IndexedClassExpression>
 				premises, producer));
 	}
 
-	@Override
-	public IndexedClassExpression getSourceRoot(
-			IndexedClassExpression rootWhereStored) {
-		return rootWhereStored;
-	}
 }

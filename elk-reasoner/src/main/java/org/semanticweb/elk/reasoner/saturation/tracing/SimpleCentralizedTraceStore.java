@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.InferencePrinter;
@@ -46,7 +46,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	
 	private final static Logger LOGGER_ = LoggerFactory.getLogger(SimpleCentralizedTraceStore.class);	
 
-	private final ConcurrentHashMap<IndexedClassExpression, ContextTraceStore> storage_ = new ConcurrentHashMap<IndexedClassExpression, ContextTraceStore>();
+	private final ConcurrentHashMap<IndexedContextRoot, ContextTraceStore> storage_ = new ConcurrentHashMap<IndexedContextRoot, ContextTraceStore>();
 	
 	@Override
 	public TraceStore.Reader getReader() {
@@ -65,7 +65,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private class Reader implements TraceStore.Reader {
 
 		@Override
-		public void accept(IndexedClassExpression root, Conclusion conclusion, InferenceVisitor<?,?> visitor) {
+		public void accept(IndexedContextRoot root, Conclusion conclusion, InferenceVisitor<?,?> visitor) {
 			ContextTraceStore tracer = storage_.get(root);
 			
 			if (tracer != null) {
@@ -74,12 +74,12 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 		}
 
 		@Override
-		public Iterable<IndexedClassExpression> getContextRoots() {
+		public Iterable<IndexedContextRoot> getContextRoots() {
 			return storage_.keySet();
 		}
 		
 		@Override
-		public void visitInferences(IndexedClassExpression root, InferenceVisitor<?, ?> visitor) {
+		public void visitInferences(IndexedContextRoot root, InferenceVisitor<?, ?> visitor) {
 			ContextTraceStore tracer = storage_.get(root);
 			
 			if (tracer != null) {
@@ -92,7 +92,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private class Writer implements TraceStore.Writer {
 
 		@Override
-		public boolean addInference(IndexedClassExpression root, Inference conclusion) {
+		public boolean addInference(IndexedContextRoot root, Inference conclusion) {
 			ContextTraceStore tracer = storage_.get(root);
 			
 			if (LOGGER_.isTraceEnabled()) {

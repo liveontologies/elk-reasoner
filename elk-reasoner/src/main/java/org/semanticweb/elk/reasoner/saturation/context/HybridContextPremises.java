@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxi
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 
@@ -58,7 +59,7 @@ public class HybridContextPremises implements ContextPremises {
 	}
 
 	@Override
-	public IndexedClassExpression getRoot() {
+	public IndexedContextRoot getRoot() {
 		// should be the same for local and non-local
 		return localPremises_.getRoot();
 	}
@@ -81,13 +82,11 @@ public class HybridContextPremises implements ContextPremises {
 		return localPremises_.getBackwardLinkRuleHead();
 	}
 
-	/*@Override
-	public boolean isInconsistForDisjointnessAxiom(
-			IndexedDisjointnessAxiom axiom) {
-		// local
-		return localPremises_.isInconsistForDisjointnessAxiom(axiom);
-	}*/
-	
+	/*
+	 * @Override public boolean isInconsistForDisjointnessAxiom(
+	 * IndexedDisjointnessAxiom axiom) { // local return
+	 * localPremises_.isInconsistForDisjointnessAxiom(axiom); }
+	 */
 
 	@Override
 	public Iterable<? extends IndexedObjectSomeValuesFrom> getPropagatedSubsumers(

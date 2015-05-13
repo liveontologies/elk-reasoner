@@ -27,12 +27,12 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
 
 import java.util.Collection;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextCreatingSaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
@@ -73,7 +73,7 @@ public class NonRecursiveContextTracingFactory extends SimpleInterrupter
 	 * Pending tracing jobs indexed by the context roots (there could be more
 	 * than one job for the same context)
 	 */
-	private final Multimap<IndexedClassExpression, ContextTracingJob> pendingJobsByRoot_;
+	private final Multimap<IndexedContextRoot, ContextTracingJob> pendingJobsByRoot_;
 
 	public NonRecursiveContextTracingFactory(
 			SaturationState<?> saturationState,
@@ -86,7 +86,7 @@ public class NonRecursiveContextTracingFactory extends SimpleInterrupter
 		tracingFactory_ = new ClassExpressionSaturationFactory<ContextTracingJob>(
 				ruleTracingFactory, maxWorkers,
 				new ThisClassExpressionSaturationListener());
-		pendingJobsByRoot_ = new HashListMultimap<IndexedClassExpression, ContextTracingJob>();
+		pendingJobsByRoot_ = new HashListMultimap<IndexedContextRoot, ContextTracingJob>();
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class NonRecursiveContextTracingFactory extends SimpleInterrupter
 		tracingFactory_.finish();
 	}
 
-	void notifyCallers(IndexedClassExpression root) {
+	void notifyCallers(IndexedContextRoot root) {
 		Collection<ContextTracingJob> jobs = removePendingJobs(root);
 
 		for (ContextTracingJob job : jobs) {
@@ -113,7 +113,7 @@ public class NonRecursiveContextTracingFactory extends SimpleInterrupter
 	}
 
 	private synchronized Collection<ContextTracingJob> removePendingJobs(
-			IndexedClassExpression root) {
+			IndexedContextRoot root) {
 		return pendingJobsByRoot_.remove(root);
 	}
 
@@ -143,7 +143,7 @@ public class NonRecursiveContextTracingFactory extends SimpleInterrupter
 
 		@Override
 		public void submit(ContextTracingJob job) {
-			IndexedClassExpression root = job.getInput();
+			IndexedContextRoot root = job.getInput();
 			TracedContext context = tracingContextWriter_
 					.getCreateContext(root);
 
@@ -189,7 +189,7 @@ public class NonRecursiveContextTracingFactory extends SimpleInterrupter
 		@Override
 		public void notifyFinished(ContextTracingJob job)
 				throws InterruptedException {
-			IndexedClassExpression root = job.getInput();
+			IndexedContextRoot root = job.getInput();
 			TracedContext context = tracingState_.getContext(root);
 
 			LOGGER_.trace("{} finished tracing", root);

@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,8 +25,6 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-
 /**
  * Creates instances of {@link ContextImpl}.
  * 
@@ -36,7 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 public class MainContextFactory implements ContextFactory<ExtendedContext> {
 
 	@Override
-	public ExtendedContext createContext(IndexedClassExpression root) {
+	public ExtendedContext createContext(IndexedContextRoot root) {
 		return new ContextImpl(root);
 	}
 

@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.readers;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
@@ -51,7 +52,7 @@ public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 	}
 
 	@Override
-	public void accept(final IndexedClassExpression root,
+	public void accept(final IndexedContextRoot root,
 			final Conclusion inferredConclusion,
 			final InferenceVisitor<?, ?> visitor) {
 		reader.accept(

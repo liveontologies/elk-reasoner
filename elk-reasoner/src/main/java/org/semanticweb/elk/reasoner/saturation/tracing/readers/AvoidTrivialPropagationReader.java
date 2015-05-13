@@ -26,7 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.readers;
  */
 
 import org.semanticweb.elk.MutableBoolean;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
@@ -53,7 +53,7 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 	}
 
 	@Override
-	public void accept(final IndexedClassExpression root,
+	public void accept(final IndexedContextRoot root,
 			final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
 		reader.accept(root, conclusion,
 				new AbstractInferenceVisitor<Void, Void>() {
@@ -80,14 +80,14 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 	}
 
 	boolean isTrivialPropagation(PropagatedSubsumer propagated,
-			IndexedClassExpression contextRoot) {
+			IndexedContextRoot contextRoot) {
 		// a propagation is trivial if two conditions are met:
 		// 1) the root is propagated (not one of its subsumers)
 		// 2) the backward link has been derived by decomposing the existential
 		// (which is the same as the propagation carry)
 		BackwardLink link = propagated.getBackwardLink();
 		Propagation propagation = propagated.getPropagation();
-		IndexedClassExpression inferenceContextRoot = propagated
+		IndexedContextRoot inferenceContextRoot = propagated
 				.getInferenceContextRoot(contextRoot);
 
 		if (inferenceContextRoot != propagation.getCarry().getFiller()) {

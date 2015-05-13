@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.backwardlinks;
 import java.util.Collection;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
@@ -66,11 +66,11 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 	 * {@link ContextPremises} in which this rule is saved; it stores every
 	 * {@link ForwardLink} by indexing its target by its property
 	 */
-	private final Multimap<IndexedPropertyChain, IndexedClassExpression> forwardLinksByObjectProperty_;
+	private final Multimap<IndexedPropertyChain, IndexedContextRoot> forwardLinksByObjectProperty_;
 
 	private BackwardLinkChainFromBackwardLinkRule(LinkableBackwardLinkRule tail) {
 		super(tail);
-		this.forwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedClassExpression>(
+		this.forwardLinksByObjectProperty_ = new HashSetMultimap<IndexedPropertyChain, IndexedContextRoot>(
 				3);
 	}
 
@@ -122,9 +122,9 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 		return rule == null ? false : rule.forwardLinksByObjectProperty_
 				.contains(link.getRelation(), link.getTarget());
 	}
-
-	// TODO: hide this method
-	public Multimap<IndexedPropertyChain, IndexedClassExpression> getForwardLinksByObjectProperty() {
+	
+	@Deprecated
+	public Multimap<IndexedPropertyChain, IndexedContextRoot> getForwardLinksByObjectProperty() {
 		return forwardLinksByObjectProperty_;
 	}
 
@@ -150,11 +150,11 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 
 			Collection<IndexedComplexPropertyChain> compositions = comps
 					.get(forwardRelation);
-			Collection<IndexedClassExpression> forwardTargets = forwardLinksByObjectProperty_
+			Collection<IndexedContextRoot> forwardTargets = forwardLinksByObjectProperty_
 					.get(forwardRelation);
 
 			for (IndexedComplexPropertyChain composition : compositions)
-				for (IndexedClassExpression forwardTarget : forwardTargets)
+				for (IndexedContextRoot forwardTarget : forwardTargets)
 					ForwardLinkImpl.produceComposedLink(producer,
 							link.getSource(), link.getRelation(),
 							premises.getRoot(), forwardRelation, forwardTarget,

@@ -113,11 +113,11 @@ public class ContextImpl implements ExtendedContext {
 	private volatile boolean isSaturated_ = true;
 
 	/**
-	 * the root {@link IndexedClassExpression} for which the {@link #subsumers_}
-	 * are computed
+	 * the {@link IndexedContextRoot} for which the {@link #subsumers_} are
+	 * computed
 	 * 
 	 */
-	private final IndexedClassExpression root_;
+	private final IndexedContextRoot root_;
 
 	/**
 	 * the derived {@link IndexedClassExpression}s that are subsumers (i.e,
@@ -137,12 +137,12 @@ public class ContextImpl implements ExtendedContext {
 	private volatile boolean isInitialized_ = false;
 
 	/**
-	 * Construct a new {@link Context} for the given root
-	 * {@link IndexedClassExpression}. Initially, the context is not active.
+	 * Construct a new {@link Context} for the given {@link IndexedContextRoot}.
+	 * Initially, the context is not active.
 	 * 
 	 * @param root
 	 */
-	public ContextImpl(IndexedClassExpression root) {
+	public ContextImpl(IndexedContextRoot root) {
 		this.root_ = root;
 		this.toDo_ = new SynchronizedArrayListActivationStack<Conclusion>();
 		this.subsumers_ = new ArrayHashSet<IndexedClassExpression>(13);
@@ -225,7 +225,7 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	@Override
-	public IndexedClassExpression getRoot() {
+	public IndexedContextRoot getRoot() {
 		return root_;
 	}
 

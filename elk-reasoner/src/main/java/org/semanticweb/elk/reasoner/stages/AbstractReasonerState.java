@@ -43,6 +43,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateFactory;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
@@ -579,7 +580,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			}
 
 			unwinder.accept(subsumee, conclusion,
-					new DummyConclusionVisitor<IndexedClassExpression>());
+					new DummyConclusionVisitor<IndexedContextRoot>());
 		} else {
 			throw new IllegalArgumentException("Unknown class: " + sub);
 		}

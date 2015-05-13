@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
@@ -49,7 +49,7 @@ public class DecomposedExistentialForwardLink extends ForwardLinkImpl implements
 	 * 
 	 */
 	public DecomposedExistentialForwardLink(IndexedObjectSomeValuesFrom subsumer) {
-		super(subsumer.getProperty(), subsumer.getFiller());
+		super(subsumer.getProperty(), subsumer.getFillerConcept());
 		existential_ = subsumer;
 	}
 
@@ -64,8 +64,8 @@ public class DecomposedExistentialForwardLink extends ForwardLinkImpl implements
 	}
 
 	@Override
-	public IndexedClassExpression getInferenceContextRoot(
-			IndexedClassExpression rootWhereStored) {
+	public IndexedContextRoot getInferenceContextRoot(
+			IndexedContextRoot rootWhereStored) {
 		return rootWhereStored;
 	}
 

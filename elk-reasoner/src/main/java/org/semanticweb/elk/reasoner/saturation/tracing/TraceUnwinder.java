@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
@@ -39,7 +39,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  */
 public interface TraceUnwinder {
 
-	public void accept(IndexedClassExpression root, Conclusion conclusion,
-			ConclusionVisitor<IndexedClassExpression, ?> conclusionVisitor,
-			InferenceVisitor<IndexedClassExpression, ?> inferenceVisitor);
+	public void accept(IndexedContextRoot root, Conclusion conclusion,
+			ConclusionVisitor<IndexedContextRoot, ?> conclusionVisitor,
+			InferenceVisitor<IndexedContextRoot, ?> inferenceVisitor);
 }

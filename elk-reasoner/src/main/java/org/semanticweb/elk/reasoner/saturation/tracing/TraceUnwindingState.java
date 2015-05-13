@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
@@ -44,20 +44,20 @@ import org.semanticweb.elk.util.collections.Pair;
  */
 public class TraceUnwindingState {
 
-	private final Queue<Pair<Conclusion, IndexedClassExpression>> toUnwind_;
+	private final Queue<Pair<Conclusion, IndexedContextRoot>> toUnwind_;
 
 	private final Set<Inference> processedInferences_;
 
 	TraceUnwindingState() {
-		toUnwind_ = new LinkedList<Pair<Conclusion, IndexedClassExpression>>();
+		toUnwind_ = new LinkedList<Pair<Conclusion, IndexedContextRoot>>();
 		processedInferences_ = new ArrayHashSet<Inference>();
 	}
 
-	void addToUnwindingQueue(Conclusion conclusion, IndexedClassExpression rootWhereStored) {
-		toUnwind_.add(new Pair<Conclusion, IndexedClassExpression>(conclusion, rootWhereStored));
+	void addToUnwindingQueue(Conclusion conclusion, IndexedContextRoot rootWhereStored) {
+		toUnwind_.add(new Pair<Conclusion, IndexedContextRoot>(conclusion, rootWhereStored));
 	}
 
-	Pair<Conclusion, IndexedClassExpression> pollFromUnwindingQueue() {
+	Pair<Conclusion, IndexedContextRoot> pollFromUnwindingQueue() {
 		return toUnwind_.poll();
 	}
 

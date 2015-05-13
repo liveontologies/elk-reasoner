@@ -23,10 +23,10 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -56,13 +56,13 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	final IndexedPropertyChain relation_;
 
 	/**
-	 * the {@link IndexedClassExpression}, which root is the filler of the
+	 * the {@link IndexedContextRoot} corresponding to the filler of the
 	 * existential restriction corresponding to this {@link ForwardLinkImpl}
 	 */
-	final IndexedClassExpression target_;
+	final IndexedContextRoot target_;
 
 	public ForwardLinkImpl(IndexedPropertyChain relation,
-			IndexedClassExpression target) {
+			IndexedContextRoot target) {
 		this.relation_ = relation;
 		this.target_ = target;
 	}
@@ -73,7 +73,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	}
 
 	@Override
-	public IndexedClassExpression getTarget() {
+	public IndexedContextRoot getTarget() {
 		return target_;
 	}
 
@@ -90,11 +90,12 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	// TODO: find a better place for the following methods
 
 	public static void produceDecomposedExistentialLink(
-			ConclusionProducer producer, IndexedClassExpression source,
+			ConclusionProducer producer, IndexedContextRoot source,
 			IndexedObjectSomeValuesFrom existential) {
 		if (existential.getProperty().getSaturated()
 				.getCompositionsByLeftSubProperty().isEmpty()) {
-			producer.produce(existential.getFiller(),
+			// TODO: check property ranges
+			producer.produce(existential.getFillerConcept(),
 					new DecomposedExistentialBackwardLink(source, existential));
 		} else {
 			producer.produce(source, new DecomposedExistentialForwardLink(
@@ -103,11 +104,9 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	}
 
 	public static void produceComposedLink(ConclusionProducer producer,
-			IndexedClassExpression source,
-			IndexedObjectProperty backwardRelation,
-			IndexedClassExpression inferenceRoot,
-			IndexedPropertyChain forwardRelation,
-			IndexedClassExpression target,
+			IndexedContextRoot source, IndexedObjectProperty backwardRelation,
+			IndexedContextRoot inferenceRoot,
+			IndexedPropertyChain forwardRelation, IndexedContextRoot target,
 			IndexedComplexPropertyChain composition) {
 
 		if (composition.getSaturated().getCompositionsByLeftSubProperty()

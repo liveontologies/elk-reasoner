@@ -26,9 +26,9 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
@@ -43,19 +43,19 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Infer
  */
 public class ComposedForwardLink extends ForwardLinkImpl implements Inference {
 
-	private final IndexedClassExpression backwardLinkSource_;
+	private final IndexedContextRoot backwardLinkSource_;
 
 	private final IndexedObjectProperty backwardLinkRelation_;
 
-	private final IndexedClassExpression inferenceContext_;
+	private final IndexedContextRoot inferenceContext_;
 
 	private final IndexedPropertyChain forwardLinkChain_;
 
-	public ComposedForwardLink(IndexedClassExpression linkSource,
+	public ComposedForwardLink(IndexedContextRoot linkSource,
 			IndexedObjectProperty backwardLinkRelation,
-			IndexedClassExpression inferenceContext,
+			IndexedContextRoot inferenceContext,
 			IndexedPropertyChain forwardLinkChain,
-			IndexedClassExpression linkTarget,
+			IndexedContextRoot linkTarget,
 			IndexedComplexPropertyChain composition) {
 		super(composition, linkTarget);
 		this.backwardLinkSource_ = linkSource;
@@ -78,8 +78,8 @@ public class ComposedForwardLink extends ForwardLinkImpl implements Inference {
 	}
 
 	@Override
-	public IndexedClassExpression getInferenceContextRoot(
-			IndexedClassExpression rootWhereStored) {
+	public IndexedContextRoot getInferenceContextRoot(
+			IndexedContextRoot rootWhereStored) {
 		return inferenceContext_;
 	}
 

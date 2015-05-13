@@ -56,7 +56,9 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	 * 
 	 * @see ElkObjectSomeValuesFrom#getFiller()
 	 */
-	public IndexedClassExpression getFiller();
+	public IndexedClassExpression getFillerConcept();
+
+	public IndexedFiller getFiller();
 
 	public <O> O accept(IndexedObjectSomeValuesFromVisitor<O> visitor);
 

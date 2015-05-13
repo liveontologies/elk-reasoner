@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -89,7 +89,7 @@ public class HybridLocalRuleApplicationConclusionVisitor extends
 	}
 
 	private ContextPremises getPremises(Conclusion conclusion, Context input) {
-		IndexedClassExpression root = input.getRoot();
+		IndexedContextRoot root = input.getRoot();
 		ContextPremises mainPremises = mainState_.getContext(root);
 		if (conclusion.getSourceRoot(root) != root)
 			// there are currently no rules which can use other context premises

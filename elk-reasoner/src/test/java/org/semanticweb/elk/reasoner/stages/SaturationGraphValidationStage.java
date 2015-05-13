@@ -32,11 +32,15 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedFiller;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedContextRootVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.NoOpIndexedContextRootVisitor;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
@@ -95,6 +99,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 	private final ContextValidator contextValidator_ = new ContextValidator();
 
 	private final ClassExpressionValidator iceValidator_ = new ClassExpressionValidator();
+
+	private final IndexedContextRootValidator rootValidator_ = new IndexedContextRootValidator();
 
 	private final OntologyIndex index_;
 
@@ -189,6 +195,23 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 	}
 
+	private class IndexedContextRootValidator extends
+			NoOpIndexedContextRootVisitor<Void> implements
+			IndexedContextRootVisitor<Void> {
+
+		@Override
+		protected Void defaultVisit(IndexedClassExpression element) {
+			iceValidator_.checkNew(element);
+			return null;
+		}
+
+		@Override
+		public Void visit(IndexedFiller element) {
+			iceValidator_.checkNew(element.getFillerConcept());
+			return null;
+		}
+	}
+
 	/**
 	 * 
 	 */
@@ -200,9 +223,9 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				ConclusionProducer producer) {
 			for (IndexedPropertyChain prop : rule
 					.getForwardLinksByObjectProperty().keySet()) {
-				for (IndexedClassExpression target : rule
+				for (IndexedContextRoot target : rule
 						.getForwardLinksByObjectProperty().get(prop)) {
-					iceValidator_.checkNew(target);
+					target.accept(rootValidator_);
 				}
 			}
 		}
@@ -258,7 +281,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		public void visit(DisjointSubsumerFromMemberRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
-			for (IndexedDisjointClassesAxiom axiom : rule.getDisjointnessAxioms()) {
+			for (IndexedDisjointClassesAxiom axiom : rule
+					.getDisjointnessAxioms()) {
 				if (!axiom.occurs()) {
 					LOGGER_.error("Dead disjointness axiom: " + axiom);
 				}
@@ -438,8 +462,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			}
 
 			// validating the root
-			IndexedClassExpression root = context.getRoot();
-			iceValidator_.checkNew(root);
+			IndexedContextRoot root = context.getRoot();
+			root.accept(rootValidator_);
 			if (saturationState_.getContext(root) != context)
 				LOGGER_.error("Invalid root for " + context);
 
@@ -451,13 +475,13 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			// validating sub-contexts
 			for (SubContextPremises subContext : context
 					.getSubContextPremisesByObjectProperty().values()) {
-				for (IndexedClassExpression linkedRoot : subContext
+				for (IndexedContextRoot linkedRoot : subContext
 						.getLinkedRoots()) {
-					iceValidator_.checkNew(linkedRoot);
+					linkedRoot.accept(rootValidator_);
 				}
-				for (IndexedClassExpression propagation : subContext
+				for (IndexedContextRoot propagation : subContext
 						.getLinkedRoots()) {
-					iceValidator_.checkNew(propagation);
+					propagation.accept(rootValidator_);
 				}
 			}
 

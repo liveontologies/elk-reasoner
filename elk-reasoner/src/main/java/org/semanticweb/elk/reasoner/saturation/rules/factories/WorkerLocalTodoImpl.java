@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
@@ -61,7 +61,7 @@ public class WorkerLocalTodoImpl implements WorkerLocalTodo {
 	 * the root of the {@link Context} to which this {@link WorkerLocalTodo} is
 	 * assigned or {@link null} if it is not activated.
 	 */
-	private IndexedClassExpression activeRoot_ = null;
+	private IndexedContextRoot activeRoot_ = null;
 
 	public WorkerLocalTodoImpl() {
 		this.thisThread_ = Thread.currentThread();
@@ -88,7 +88,7 @@ public class WorkerLocalTodoImpl implements WorkerLocalTodo {
 	}
 
 	@Override
-	public IndexedClassExpression getActiveRoot() {
+	public IndexedContextRoot getActiveRoot() {
 		checkThread();
 		if (isActivated_)
 			return activeRoot_;
@@ -97,7 +97,7 @@ public class WorkerLocalTodoImpl implements WorkerLocalTodo {
 	}
 
 	@Override
-	public void setActiveRoot(IndexedClassExpression currentActiveRoot) {
+	public void setActiveRoot(IndexedContextRoot currentActiveRoot) {
 		checkThread();
 		LOGGER_.trace("{}: new active root", currentActiveRoot);
 		this.activeRoot_ = currentActiveRoot;

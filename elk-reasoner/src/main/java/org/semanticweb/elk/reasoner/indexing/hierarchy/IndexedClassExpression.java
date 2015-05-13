@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.saturation.IndexedObjectWithContext;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRule;
 
@@ -36,7 +36,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.LinkedSubsumerRul
  * @author "Yevgeny Kazakov"
  * @author Pavel Klinov
  */
-public interface IndexedClassExpression extends IndexedObjectWithContext {
+public interface IndexedClassExpression extends IndexedContextRoot {
 
 	/**
 	 * @return the first composition rule assigned to this

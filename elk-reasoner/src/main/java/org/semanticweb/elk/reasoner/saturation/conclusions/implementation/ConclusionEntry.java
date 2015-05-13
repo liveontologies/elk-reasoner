@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionEqualityChecker;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionHashGenerator;
@@ -76,8 +76,7 @@ public class ConclusionEntry implements Conclusion {
 	}
 
 	@Override
-	public IndexedClassExpression getSourceRoot(
-			IndexedClassExpression rootWhereStored) {
+	public IndexedContextRoot getSourceRoot(IndexedContextRoot rootWhereStored) {
 		return conclusion_.getSourceRoot(rootWhereStored);
 	}
 

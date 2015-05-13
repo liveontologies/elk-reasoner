@@ -84,7 +84,7 @@ public class PropagationFromExistentialFillerRule extends
 		this.negExistentials_.add(negExistential);
 	}
 
-	// TODO: hide this method
+	@Deprecated
 	public Collection<IndexedObjectSomeValuesFrom> getNegativeExistentials() {
 		return negExistentials_;
 	}
@@ -92,14 +92,14 @@ public class PropagationFromExistentialFillerRule extends
 	public static boolean addRuleFor(
 			ModifiableIndexedObjectSomeValuesFrom existential,
 			ModifiableOntologyIndex index) {
-		return index.add(existential.getFiller(),
+		return index.add(existential.getFillerConcept(),
 				new PropagationFromExistentialFillerRule(existential));
 	}
 
 	public static boolean removeRuleFor(
 			ModifiableIndexedObjectSomeValuesFrom existential,
 			ModifiableOntologyIndex index) {
-		return index.remove(existential.getFiller(),
+		return index.remove(existential.getFillerConcept(),
 				new PropagationFromExistentialFillerRule(existential));
 	}
 

@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.Inference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceVisitor;
@@ -51,11 +51,11 @@ public interface TraceStore {
 		 * @param conclusion
 		 * @param visitor
 		 */
-		public void accept(IndexedClassExpression root, Conclusion conclusion, InferenceVisitor<?,?> visitor);
+		public void accept(IndexedContextRoot root, Conclusion conclusion, InferenceVisitor<?,?> visitor);
 		
-		public Iterable<IndexedClassExpression> getContextRoots();
+		public Iterable<IndexedContextRoot> getContextRoots();
 		
-		public void visitInferences(IndexedClassExpression root, InferenceVisitor<?, ?> visitor);
+		public void visitInferences(IndexedContextRoot root, InferenceVisitor<?, ?> visitor);
 	}
 
 	/**
@@ -70,7 +70,7 @@ public interface TraceStore {
 		 * @param inference
 		 * @return
 		 */
-		public boolean addInference(IndexedClassExpression root, Inference conclusion);
+		public boolean addInference(IndexedContextRoot root, Inference conclusion);
 	}
 
 	/**
