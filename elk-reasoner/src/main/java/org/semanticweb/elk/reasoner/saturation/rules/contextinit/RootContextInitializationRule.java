@@ -110,7 +110,12 @@ public class RootContextInitializationRule extends
 				producer.produce(premises.getRoot(),
 						new InitializationSubsumer<IndexedClassExpression>(
 								element.getFillerConcept()));
-				// TODO: produce property ranges
+				for (IndexedClassExpression range : element.getProperty()
+						.getSaturated().getRanges()) {
+					producer.produce(premises.getRoot(),
+							new InitializationSubsumer<IndexedClassExpression>(
+									range));
+				}
 				return null;
 			}
 		});

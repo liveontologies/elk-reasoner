@@ -26,8 +26,10 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 
@@ -79,6 +81,24 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 						ice.getCompositionRuleHead(), property, premises,
 						producer);
 			}
+		}
+
+		/**
+		 * @param existential
+		 * @return the {@link IndexedContextRoot} that is required for
+		 *         decomposition of the given
+		 *         {@link IndexedObjectSomeValuesFrom}, taking into account the
+		 *         property ranges, if necessary
+		 */
+		public static IndexedContextRoot getTarget(
+				IndexedObjectSomeValuesFrom existential) {
+			SaturatedPropertyChain propertySaturation = existential
+					.getProperty().getSaturated();
+			if (propertySaturation.getRanges().isEmpty())
+				// filler concept is sufficient
+				return existential.getFillerConcept();
+			// else we need to remember the property
+			return existential.getFiller();
 		}
 
 	}

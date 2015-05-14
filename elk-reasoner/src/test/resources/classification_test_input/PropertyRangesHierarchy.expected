@@ -1,0 +1,10 @@
+Prefix( : = <http://example.org/> )
+Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
+Ontology(<www.example.org#property_ranges_hierarchy#taxonomy>
+
+SubClassOf(:A :E)
+Declaration(Class(:B))
+Declaration(Class(:C))
+Declaration(Class(:D))
+
+)

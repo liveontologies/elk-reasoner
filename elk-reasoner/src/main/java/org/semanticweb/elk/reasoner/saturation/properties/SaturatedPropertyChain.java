@@ -121,6 +121,8 @@ public class SaturatedPropertyChain {
 		derivedSubProperties = null;
 		derivedSubProperyChains = null;
 		derivedSubPropertiesComputed = false;
+		derivedRanges = null;
+		derivedRangesComputed = false;		
 		leftSubComposableSubPropertiesByRightProperties = null;
 		leftSubComposableSubPropertiesByRightPropertiesComputed = false;
 		compositionsByLeftSubProperty = null;

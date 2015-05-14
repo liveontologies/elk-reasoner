@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
@@ -92,10 +93,11 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	public static void produceDecomposedExistentialLink(
 			ConclusionProducer producer, IndexedContextRoot source,
 			IndexedObjectSomeValuesFrom existential) {
-		if (existential.getProperty().getSaturated()
-				.getCompositionsByLeftSubProperty().isEmpty()) {
-			// TODO: check property ranges
-			producer.produce(existential.getFillerConcept(),
+		SaturatedPropertyChain propertySaturation = existential.getProperty()
+				.getSaturated();
+		if (propertySaturation.getCompositionsByLeftSubProperty().isEmpty()) {
+			producer.produce(
+					IndexedObjectSomeValuesFrom.Helper.getTarget(existential),
 					new DecomposedExistentialBackwardLink(source, existential));
 		} else {
 			producer.produce(source, new DecomposedExistentialForwardLink(

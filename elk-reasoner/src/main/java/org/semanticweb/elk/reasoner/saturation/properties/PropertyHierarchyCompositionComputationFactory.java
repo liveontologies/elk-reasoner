@@ -88,6 +88,7 @@ public class PropertyHierarchyCompositionComputationFactory extends
 
 		@Override
 		public Void visit(IndexedObjectProperty element) {
+			LOGGER_.trace("{}: computing sub-property chains and ranges", element);
 			// ensure that sub-properties are computed
 			SubPropertyExplorer.getSubPropertyChains(element);
 			// ensure that property ranges are computed

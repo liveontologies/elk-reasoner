@@ -159,6 +159,12 @@ class CachedIndexedObjectSomeValuesFromImpl
 		}
 
 		@Override
+		public final String toString() {
+			// use in debugging to identify the object uniquely (more or less)
+			return toStringStructural() + "#" + hashCode();
+		}
+
+		@Override
 		public final ExtendedContext getContext() {
 			return this.context_;
 		}

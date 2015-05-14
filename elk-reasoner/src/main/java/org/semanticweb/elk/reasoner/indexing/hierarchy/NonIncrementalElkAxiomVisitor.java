@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkEquivalentObjectPropertiesAxiom;
+import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyRangeAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkTransitiveObjectPropertyAxiom;
@@ -54,30 +55,33 @@ public class NonIncrementalElkAxiomVisitor extends DelegatingElkAxiomVisitor
 	}
 
 	@Override
-	public Void visit(
-			ElkEquivalentObjectPropertiesAxiom elkEquivalentObjectProperties) {
-		listener_.notify(elkEquivalentObjectProperties);
-		return super.visit(elkEquivalentObjectProperties);
+	public Void visit(ElkEquivalentObjectPropertiesAxiom axiom) {
+		listener_.notify(axiom);
+		return super.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkReflexiveObjectPropertyAxiom elkReflexiveObjectPropertyAxiom) {
-		listener_.notify(elkReflexiveObjectPropertyAxiom);
-		return super.visit(elkReflexiveObjectPropertyAxiom);
+	public Void visit(ElkReflexiveObjectPropertyAxiom axiom) {
+		listener_.notify(axiom);
+		return super.visit(axiom);
 	}
 
 	@Override
-	public Void visit(ElkSubObjectPropertyOfAxiom elkSubObjectPropertyOfAxiom) {
-		listener_.notify(elkSubObjectPropertyOfAxiom);
-		return super.visit(elkSubObjectPropertyOfAxiom);
+	public Void visit(ElkSubObjectPropertyOfAxiom axiom) {
+		listener_.notify(axiom);
+		return super.visit(axiom);
 	}
 
 	@Override
-	public Void visit(
-			ElkTransitiveObjectPropertyAxiom elkTransitiveObjectPropertyAxiom) {
-		listener_.notify(elkTransitiveObjectPropertyAxiom);
-		return super.visit(elkTransitiveObjectPropertyAxiom);
+	public Void visit(ElkTransitiveObjectPropertyAxiom axiom) {
+		listener_.notify(axiom);
+		return super.visit(axiom);
+	}
+
+	@Override
+	public Void visit(ElkObjectPropertyRangeAxiom axiom) {
+		listener_.notify(axiom);
+		return super.visit(axiom);
 	}
 
 }
