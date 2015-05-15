@@ -30,6 +30,7 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedPropertyChainFilter;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
@@ -70,6 +71,16 @@ final class CachedIndexedObjectPropertyImpl
 	 */
 	private ArrayList<ElkAxiom> toldSubChainsReasons_;
 
+	/**
+	 * The {@link IndexedClassExpression} from range axioms with this property
+	 */
+	private ArrayList<IndexedClassExpression> toldRanges_;
+
+	/**
+	 * The corresponding {@link ElkAxiom}s that resulted for the ranges
+	 */
+	private ArrayList<ElkAxiom> toldRangesReasons_;
+
 	CachedIndexedObjectPropertyImpl(ElkObjectProperty entity) {
 		super(CachedIndexedObjectProperty.Helper.structuralHashCode(entity));
 		this.property_ = entity;
@@ -82,21 +93,42 @@ final class CachedIndexedObjectPropertyImpl
 
 	@Override
 	public final ArrayList<IndexedPropertyChain> getToldSubChains() {
-		return toldSubChains_ == null ? (CachedIndexedPropertyChainImpl
-				.<IndexedPropertyChain> emptyArrayList()) : toldSubChains_;
+		if (toldSubChains_ == null)
+			return emptyArrayList();
+		// else
+		return toldSubChains_;
 	}
 
 	@Override
-	public ArrayList<ElkAxiom> getToldSubChainsReasons() {
-		return toldSubChainsReasons_ == null ? (CachedIndexedPropertyChainImpl
-				.<ElkAxiom> emptyArrayList()) : toldSubChainsReasons_;
+	public final ArrayList<ElkAxiom> getToldSubChainsReasons() {
+		if (toldSubChainsReasons_ == null)
+			return emptyArrayList();
+		// else
+		return toldSubChainsReasons_;
+	}
+
+	@Override
+	public final ArrayList<IndexedClassExpression> getToldRanges() {
+		if (toldRanges_ == null)
+			return emptyArrayList();
+		// else
+		return toldRanges_;
+	}
+
+	@Override
+	public final ArrayList<ElkAxiom> getToldRangesReasons() {
+		if (toldRangesReasons_ == null)
+			return emptyArrayList();
+		// else
+		return toldRangesReasons_;
 	}
 
 	@Override
 	public final Collection<IndexedComplexPropertyChain> getLeftChains() {
-		return leftChains_ == null ? Collections
-				.<IndexedComplexPropertyChain> emptySet() : Collections
-				.unmodifiableCollection(leftChains_);
+		if (leftChains_ == null)
+			return Collections.emptySet();
+		// else
+		return Collections.unmodifiableCollection(leftChains_);
 	}
 
 	@Override
@@ -152,11 +184,51 @@ final class CachedIndexedObjectPropertyImpl
 		return true;
 	}
 
+	@Override
+	public final boolean addToldRange(IndexedClassExpression range,
+			ElkAxiom reason) {
+		if (toldRanges_ == null) {
+			toldRanges_ = new ArrayList<IndexedClassExpression>(1);
+		}
+		if (toldRangesReasons_ == null) {
+			toldRangesReasons_ = new ArrayList<ElkAxiom>(1);
+		}
+		toldRanges_.add(range);
+		toldRangesReasons_.add(reason);
+		return true;
+	}
+
+	@Override
+	public final boolean removeToldRange(IndexedClassExpression range,
+			ElkAxiom reason) {
+		int i = indexOf(range, reason);
+		if (i < 0)
+			return false;
+		// else success
+		toldRanges_.remove(i);
+		toldRangesReasons_.remove(i);
+		if (toldRanges_.isEmpty())
+			toldRanges_ = null;
+		if (toldRangesReasons_.isEmpty())
+			toldRangesReasons_ = null;
+		return true;
+	}
+
 	// TODO: create a generic method for this operation (used in other places)
 	private int indexOf(IndexedPropertyChain subChain, ElkAxiom reason) {
 		for (int i = 0; i < toldSubChains_.size(); i++) {
 			if (toldSubChains_.get(i).equals(subChain)
 					&& toldSubChainsReasons_.get(i).equals(reason))
+				return i;
+		}
+		// else not found
+		return -1;
+	}
+
+	private int indexOf(IndexedClassExpression range, ElkAxiom reason) {
+		for (int i = 0; i < toldRanges_.size(); i++) {
+			if (toldRanges_.get(i).equals(range)
+					&& toldRangesReasons_.get(i).equals(reason))
 				return i;
 		}
 		// else not found

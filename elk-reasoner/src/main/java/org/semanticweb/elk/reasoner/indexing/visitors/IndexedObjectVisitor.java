@@ -34,7 +34,8 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
  */
 public interface IndexedObjectVisitor<O> extends
 		IndexedClassExpressionVisitor<O>, IndexedPropertyChainVisitor<O>,
-		IndexedAxiomVisitor<O>, IndexedEntityVisitor<O> {
+		IndexedAxiomVisitor<O>, IndexedEntityVisitor<O>,
+		IndexedContextRootVisitor<O> {
 
 	// combined visitor
 

@@ -26,7 +26,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
@@ -63,7 +62,7 @@ import org.slf4j.LoggerFactory;
  * @see ClassExpressionSaturationListener
  * 
  */
-public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends IndexedClassExpression>>
+public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends IndexedContextRoot>>
 		implements
 		InputProcessorFactory<J, ClassExpressionSaturationFactory<J>.Engine> {
 
@@ -437,7 +436,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 			if (countJobsFinishedUpper_.compareAndSet(snapshotJobsFinished,
 					++snapshotJobsFinished)) {
 				J nextJob = jobsInProgress_.poll();
-				IndexedClassExpression root = nextJob.getInput();
+				IndexedContextRoot root = nextJob.getInput();
 				Context rootSaturation = saturationState_.getContext(root);
 				/*
 				 * rootSaturation should be already marked as saturated but we
@@ -571,7 +570,7 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 				J nextJob = jobsToDo_.poll();
 				if (nextJob == null)
 					return;
-				IndexedClassExpression root = nextJob.getInput();
+				IndexedContextRoot root = nextJob.getInput();
 				/*
 				 * if the context is already assigned and saturated, this job is
 				 * already complete

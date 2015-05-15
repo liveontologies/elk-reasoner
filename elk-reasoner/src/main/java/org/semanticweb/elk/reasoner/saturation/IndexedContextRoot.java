@@ -23,8 +23,9 @@ package org.semanticweb.elk.reasoner.saturation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedContextRootVisitor;
 
-public interface IndexedObjectWithContext extends IndexedObject {
+public interface IndexedContextRoot extends IndexedObject {
 
 	/**
 	 * @return The corresponding context or {@code null} if none was assigned.
@@ -49,5 +50,7 @@ public interface IndexedObjectWithContext extends IndexedObject {
 	 *         {@link ExtendedContext} will be assigned)
 	 */
 	ExtendedContext setContextIfAbsent(ExtendedContext context);
+
+	public <O> O accept(IndexedContextRootVisitor<O> visitor);
 
 }

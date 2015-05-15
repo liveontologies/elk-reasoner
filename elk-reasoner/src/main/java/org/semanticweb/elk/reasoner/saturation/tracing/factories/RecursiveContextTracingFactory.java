@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
@@ -149,7 +149,7 @@ public class RecursiveContextTracingFactory extends SimpleInterrupter implements
 
 		private void unwindCurrentState() throws InterruptedException {
 			for (;;) {
-				Pair<Conclusion, IndexedClassExpression> next = currentState_.pollFromClassUnwindingQueue();
+				Pair<Conclusion, IndexedContextRoot> next = currentState_.pollFromClassUnwindingQueue();
 
 				if (next == null) {
 					// end of class conclusion unwinding
@@ -192,17 +192,17 @@ public class RecursiveContextTracingFactory extends SimpleInterrupter implements
 			}
 		}
 
-		private void unwindClassConclusion(final Conclusion conclusion, final IndexedClassExpression rootWhereStored) {
-			final PremiseVisitor<IndexedClassExpression, ?> premiseVisitor = 
-					new PremiseVisitor<IndexedClassExpression, Void>(new AbstractConclusionVisitor<IndexedClassExpression, Void>() {
+		private void unwindClassConclusion(final Conclusion conclusion, final IndexedContextRoot rootWhereStored) {
+			final PremiseVisitor<IndexedContextRoot, ?> premiseVisitor = 
+					new PremiseVisitor<IndexedContextRoot, Void>(new AbstractConclusionVisitor<IndexedContextRoot, Void>() {
 						@Override
-						protected Void defaultVisit(Conclusion premise, IndexedClassExpression inferenceContext) {
+						protected Void defaultVisit(Conclusion premise, IndexedContextRoot inferenceContext) {
 							currentState_.addToClassUnwindingQueue(premise, inferenceContext);
 							return null;
 						}						
-					}, new AbstractObjectPropertyConclusionVIsitor<IndexedClassExpression, Void>() {
+					}, new AbstractObjectPropertyConclusionVIsitor<IndexedContextRoot, Void>() {
 						@Override
-						protected Void defaultVisit(ObjectPropertyConclusion premise, IndexedClassExpression _ignored) {
+						protected Void defaultVisit(ObjectPropertyConclusion premise, IndexedContextRoot _ignored) {
 							// property conclusions are put into another queue
 							currentState_.addToPropertyUnwindingQueue(premise);
 							return null;
@@ -210,12 +210,12 @@ public class RecursiveContextTracingFactory extends SimpleInterrupter implements
 					});
 
 			reader_.accept(rootWhereStored, conclusion,
-					new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
+					new AbstractClassInferenceVisitor<IndexedContextRoot, Void>() {
 
 						@Override
-						protected Void defaultTracedVisit(ClassInference inference, IndexedClassExpression _ignored) {
+						protected Void defaultTracedVisit(ClassInference inference, IndexedContextRoot _ignored) {
 							if (currentState_.addToProcessed(inference)) {
-								IndexedClassExpression inferenceContextRoot = inference.getInferenceContextRoot(rootWhereStored);
+								IndexedContextRoot inferenceContextRoot = inference.getInferenceContextRoot(rootWhereStored);
 								// visit the premises to put into the queue
 								inference.acceptTraced(premiseVisitor, inferenceContextRoot);
 							}

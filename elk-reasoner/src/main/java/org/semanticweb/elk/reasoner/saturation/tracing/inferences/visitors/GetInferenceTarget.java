@@ -25,11 +25,12 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 
@@ -42,10 +43,10 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwar
  *         pavel.klinov@uni-ulm.de
  */
 public class GetInferenceTarget extends
-		AbstractClassInferenceVisitor<Context, IndexedClassExpression> {
+		AbstractClassInferenceVisitor<Context, IndexedContextRoot> {
 
 	@Override
-	protected IndexedClassExpression defaultTracedVisit(ClassInference conclusion,
+	protected IndexedContextRoot defaultTracedVisit(ClassInference conclusion,
 			Context premiseContext) {
 		// by default produce to the context where the inference has been
 		// made (where its premises are stored)
@@ -53,26 +54,27 @@ public class GetInferenceTarget extends
 	}
 
 	@Override
-	public IndexedClassExpression visit(PropagatedSubsumer conclusion,
+	public IndexedContextRoot visit(PropagatedSubsumer conclusion,
 			Context premiseContext) {
 		return conclusion.getBackwardLink().getSource();
 	}
 
 	@Override
-	public IndexedClassExpression visit(ComposedBackwardLink conclusion,
+	public IndexedContextRoot visit(ComposedBackwardLink conclusion,
 			Context premiseContext) {
 		return conclusion.getForwardLink().getTarget();
 	}
 
 	@Override
-	public IndexedClassExpression visit(ReversedForwardLink conclusion,
+	public IndexedContextRoot visit(ReversedForwardLink conclusion,
 			Context premiseContext) {
 		return conclusion.getSourceLink().getTarget();
 	}
 
 	@Override
-	public IndexedClassExpression visit(
+	public IndexedContextRoot visit(
 			DecomposedExistentialBackwardLink conclusion, Context premiseContext) {
-		return conclusion.getExistential().getExpression().getFiller();
+		return IndexedObjectSomeValuesFrom.Helper.getTarget(conclusion
+				.getExistential().getExpression());
 	}
 }

@@ -28,7 +28,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriterWrap;
@@ -145,7 +145,7 @@ public class CycleBlockingRuleApplicationFactory extends
 		}
 
 		@Override
-		public void produce(IndexedClassExpression root, Conclusion conclusion) {
+		public void produce(IndexedContextRoot root, Conclusion conclusion) {
 			final SaturationState<? extends TracedContext> tracingState = CycleBlockingRuleApplicationFactory.this
 					.getSaturationState();
 			// no need to check for duplicates of inferences since rules for all
@@ -236,7 +236,7 @@ public class CycleBlockingRuleApplicationFactory extends
 
 					// this is the context to which the blocked inference should
 					// be produced (if unblocked)
-					IndexedClassExpression targetRoot = blockedInference
+					IndexedContextRoot targetRoot = blockedInference
 							.acceptTraced(new GetInferenceTarget(), cxt);
 					// deciding if the new inference should unblock the
 					// previously blocked one.

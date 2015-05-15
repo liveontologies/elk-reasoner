@@ -22,7 +22,6 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionCounter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
@@ -36,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
  * produced {@link Conclusion}s using a provided {@link ConclusionCounter}
  * 
  * @see ConclusionProducer#produce(Context, Conclusion)
- * @see ConclusionProducer#produce(IndexedClassExpression, Conclusion)
+ * @see ConclusionProducer#produce(IndexedContextRoot, Conclusion)
  * 
  * @author "Yevgeny Kazakov"
  */
@@ -52,7 +51,7 @@ public class CountingSaturationStateWriter<C extends Context> extends
 	}
 
 	@Override
-	public void produce(IndexedClassExpression root, Conclusion conclusion) {
+	public void produce(IndexedContextRoot root, Conclusion conclusion) {
 		mainWriter.produce(root, conclusion);
 		conclusion.accept(countingVisitor_, null);
 	}

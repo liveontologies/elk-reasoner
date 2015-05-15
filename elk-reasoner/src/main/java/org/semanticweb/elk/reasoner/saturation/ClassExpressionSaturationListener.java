@@ -22,7 +22,6 @@
  */
 package org.semanticweb.elk.reasoner.saturation;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNotifyFinishedJob;
 
 /**
@@ -35,7 +34,7 @@ import org.semanticweb.elk.util.concurrent.computation.InputProcessorListenerNot
  *            the type of the input jobs of
  *            {@link ClassExpressionSaturationFactory}
  */
-public interface ClassExpressionSaturationListener<J extends SaturationJob<? extends IndexedClassExpression>>
+public interface ClassExpressionSaturationListener<J extends SaturationJob<? extends IndexedContextRoot>>
 		extends InputProcessorListenerNotifyFinishedJob<J> {
 	
 	// nothing else

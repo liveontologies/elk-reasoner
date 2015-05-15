@@ -38,6 +38,9 @@ public interface ModifiableIndexedObjectSomeValuesFrom extends
 	public ModifiableIndexedObjectProperty getProperty();
 
 	@Override
+	public ModifiableIndexedRangeFiller getRangeFiller();
+	
+	@Override
 	public ModifiableIndexedClassExpression getFiller();
 
 }

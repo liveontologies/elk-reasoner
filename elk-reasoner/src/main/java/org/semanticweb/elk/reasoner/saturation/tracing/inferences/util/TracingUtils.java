@@ -33,6 +33,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
@@ -60,10 +61,10 @@ public class TracingUtils {
 	public static Collection<ClassInference> getClassInferences(TraceStore.Reader reader, IndexedClassExpression cxt, Conclusion conclusion) {
 		final List<ClassInference> inferences = new LinkedList<ClassInference>();
 		
-		reader.accept(cxt, conclusion, new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
+		reader.accept(cxt, conclusion, new AbstractClassInferenceVisitor<IndexedContextRoot, Void>() {
 
 			@Override
-			protected Void defaultTracedVisit(ClassInference inf, IndexedClassExpression root) {
+			protected Void defaultTracedVisit(ClassInference inf, IndexedContextRoot root) {
 				inferences.add(inf);
 				return null;
 			}

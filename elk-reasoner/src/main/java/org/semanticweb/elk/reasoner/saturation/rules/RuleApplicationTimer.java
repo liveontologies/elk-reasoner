@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkC
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ReflexivePropertyRangesContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradictionCompositionRule;
@@ -178,6 +179,11 @@ public class RuleApplicationTimer {
 	long timeSuperClassFromSubClassRule;
 
 	/**
+	 * timer for {@link ReflexivePropertyRangesContextInitRule}
+	 */
+	long timeReflexivePropertyRangesContextInitRule;
+
+	/**
 	 * Add the values the corresponding values of the given timer
 	 * 
 	 * @param timer
@@ -207,6 +213,7 @@ public class RuleApplicationTimer {
 		timeReflexivePropagationRule += timer.timeReflexivePropagationRule;
 		timePropagationInitializationRule += timer.timePropagationInitializationRule;
 		timeBackwardLinkFromForwardLinkRule += timer.timeBackwardLinkFromForwardLinkRule;
+		timeReflexivePropertyRangesContextInitRule += timer.timeReflexivePropertyRangesContextInitRule;
 	}
 
 	public long getTotalRuleAppTime() {
@@ -232,7 +239,8 @@ public class RuleApplicationTimer {
 				+ timeNonReflexivePropagationRule
 				+ timeReflexivePropagationRule
 				+ timePropagationInitializationRule
-				+ timeBackwardLinkFromForwardLinkRule;
+				+ timeBackwardLinkFromForwardLinkRule
+				+ timeReflexivePropertyRangesContextInitRule;
 	}
 
 	/**
@@ -263,6 +271,7 @@ public class RuleApplicationTimer {
 		timeReflexivePropagationRule = 0;
 		timePropagationInitializationRule = 0;
 		timeBackwardLinkFromForwardLinkRule = 0;
+		timeReflexivePropertyRangesContextInitRule = 0;
 	}
 
 }

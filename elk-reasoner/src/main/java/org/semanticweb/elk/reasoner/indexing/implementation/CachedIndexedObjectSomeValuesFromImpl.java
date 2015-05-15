@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressio
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
@@ -42,27 +43,30 @@ class CachedIndexedObjectSomeValuesFromImpl
 		CachedIndexedComplexClassExpressionImpl<CachedIndexedObjectSomeValuesFrom>
 		implements CachedIndexedObjectSomeValuesFrom {
 
-	private final ModifiableIndexedObjectProperty property_;
-
-	private final ModifiableIndexedClassExpression filler_;
+	private final ModifiableIndexedRangeFillerImpl rangeFiller_;
 
 	CachedIndexedObjectSomeValuesFromImpl(
 			ModifiableIndexedObjectProperty property,
 			ModifiableIndexedClassExpression filler) {
 		super(CachedIndexedObjectSomeValuesFrom.Helper.structuralHashCode(
 				property, filler));
-		this.property_ = property;
-		this.filler_ = filler;
+		this.rangeFiller_ = new ModifiableIndexedRangeFillerImpl(property,
+				filler);
 	}
 
 	@Override
 	public final ModifiableIndexedObjectProperty getProperty() {
-		return property_;
+		return rangeFiller_.getProperty();
 	}
 
 	@Override
 	public final ModifiableIndexedClassExpression getFiller() {
-		return filler_;
+		return rangeFiller_.getFiller();
+	}
+
+	@Override
+	public ModifiableIndexedRangeFiller getRangeFiller() {
+		return rangeFiller_;
 	}
 
 	@Override
@@ -99,7 +103,7 @@ class CachedIndexedObjectSomeValuesFromImpl
 
 	@Override
 	public final String toStringStructural() {
-		return "ObjectSomeValuesFrom(" + this.property_ + ' ' + this.filler_
+		return "ObjectSomeValuesFrom(" + getProperty() + ' ' + getFiller()
 				+ ')';
 	}
 

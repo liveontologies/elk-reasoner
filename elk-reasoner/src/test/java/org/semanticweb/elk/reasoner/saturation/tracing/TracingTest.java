@@ -46,7 +46,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
@@ -140,17 +140,17 @@ public class TracingTest {
 	}	
 	
 	// FIXME: this test is not necessary as side conditions are not null by construction
-	private ClassInferenceVisitor<IndexedClassExpression, Boolean> getClassInferenceCheckerForAxiomBinding() {
-		return new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
+	private ClassInferenceVisitor<IndexedContextRoot, Boolean> getClassInferenceCheckerForAxiomBinding() {
+		return new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
 			@Override
-			protected Boolean defaultTracedVisit(ClassInference inference, IndexedClassExpression root) {
+			protected Boolean defaultTracedVisit(ClassInference inference, IndexedContextRoot root) {
 				return true;
 			}
 			
 			// axioms used as side conditions of this rule, should be able to look them up
 			@Override
-			public Boolean visit(SubClassOfSubsumer<?> inference, IndexedClassExpression root) {
+			public Boolean visit(SubClassOfSubsumer<?> inference, IndexedContextRoot root) {
 				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 				
 				assertNotNull("Failed to look up the ontology axiom for the subsumption inference " + inference, axiom);
@@ -158,7 +158,7 @@ public class TracingTest {
 			}
 			
 			@Override
-			public Boolean visit(DisjointSubsumerFromSubsumer inference, IndexedClassExpression root) {
+			public Boolean visit(DisjointSubsumerFromSubsumer inference, IndexedContextRoot root) {
 				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 				
 				assertNotNull("Failed to look up the ontology axiom for the disjoint subsumer inference " + inference, axiom);
@@ -166,7 +166,7 @@ public class TracingTest {
 			}
 			
 			@Override
-			public Boolean visit(ComposedBackwardLink inference, IndexedClassExpression root) {
+			public Boolean visit(ComposedBackwardLink inference, IndexedContextRoot root) {
 				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 				
 				assertNotNull("Failed to look up the property axiom for the composition infrence " + inference, axiom);
@@ -174,7 +174,7 @@ public class TracingTest {
 			}
 
 			@Override
-			public Boolean visit(SuperReversedForwardLink inference, IndexedClassExpression root) {
+			public Boolean visit(SuperReversedForwardLink inference, IndexedContextRoot root) {
 				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 				
 				assertNotNull("Failed to look up the property axiom for the composition infrence " + inference, axiom);

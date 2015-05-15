@@ -29,6 +29,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObject;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedContextRootVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
 import org.semanticweb.elk.reasoner.saturation.ExtendedContext;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -129,6 +130,11 @@ abstract class CachedIndexedClassExpressionImpl<T extends CachedIndexedClassExpr
 	@Override
 	public final synchronized void resetContext() {
 		context_ = null;
+	}
+
+	@Override
+	public final <O> O accept(IndexedContextRootVisitor<O> visitor) {
+		return accept((IndexedClassExpressionVisitor<O>) visitor);
 	}
 
 	@Override

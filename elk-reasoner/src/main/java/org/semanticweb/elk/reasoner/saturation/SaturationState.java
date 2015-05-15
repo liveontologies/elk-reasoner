@@ -49,16 +49,16 @@ public interface SaturationState<C extends Context> {
 	public Collection<C> getContexts();
 
 	/**
-	 * @param ice
-	 *            the root {@link IndexedClassExpression} for which to find the
+	 * @param root
+	 *            the {@link IndexedContextRoot} for which to find the
 	 *            {@link Context}
 	 * @return the {@link Context} in this {@link SaturationState} with the
-	 *         given root {@link IndexedClassExpression}, or {@code null} if
-	 *         there exists no such {@link Context}. There can be at most one
-	 *         {@link Context} for any given root.
+	 *         given {@link IndexedContextRoot} or {@code null} if there exists
+	 *         no such {@link Context}. There can be at most one {@link Context}
+	 *         for any given {@link IndexedContextRoot}.
 	 * @see Context#getRoot()
 	 */
-	public C getContext(IndexedClassExpression ice);
+	public C getContext(IndexedContextRoot root);
 
 	/**
 	 * @return the {@link OntologyIndex} associated with this

@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
@@ -44,14 +44,14 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
 public class DecomposedExistentialBackwardLink extends BackwardLinkImpl
 		implements ClassInference {
 
-	private final IndexedClassExpression inferenceContext_;
+	private final IndexedContextRoot inferenceContext_;
 
 	private final IndexedObjectSomeValuesFrom existential_;
 
 	/**
 	 * 
 	 */
-	public DecomposedExistentialBackwardLink(IndexedClassExpression source,
+	public DecomposedExistentialBackwardLink(IndexedContextRoot source,
 			IndexedObjectSomeValuesFrom subsumer) {
 		super(source, subsumer.getProperty());
 		existential_ = subsumer;
@@ -69,8 +69,8 @@ public class DecomposedExistentialBackwardLink extends BackwardLinkImpl
 	}
 
 	@Override
-	public IndexedClassExpression getInferenceContextRoot(
-			IndexedClassExpression rootWhereStored) {
+	public IndexedContextRoot getInferenceContextRoot(
+			IndexedContextRoot rootWhereStored) {
 		return inferenceContext_;
 	}
 

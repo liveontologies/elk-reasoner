@@ -27,10 +27,10 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.ContextFactory;
 import org.semanticweb.elk.reasoner.saturation.ContextImpl;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.MapSaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -56,7 +56,7 @@ public class LocalTracingSaturationState extends
 		super(index, new ContextFactory<TracedContext>() {
 
 			@Override
-			public TracedContext createContext(IndexedClassExpression root) {
+			public TracedContext createContext(IndexedContextRoot root) {
 				return new TracedContext(root);
 			}
 
@@ -64,8 +64,8 @@ public class LocalTracingSaturationState extends
 	}
 
 	@Override
-	public TracedContext getContext(IndexedClassExpression ice) {
-		return super.getContext(ice);
+	public TracedContext getContext(IndexedContextRoot root) {
+		return super.getContext(root);
 	}
 
 	public Iterable<TracedContext> getTracedContexts() {
@@ -102,7 +102,7 @@ public class LocalTracingSaturationState extends
 		 */
 		private Multimap<Conclusion, ClassInference> blockedInferences_;
 
-		public TracedContext(IndexedClassExpression root) {
+		public TracedContext(IndexedContextRoot root) {
 			super(root);
 		}
 

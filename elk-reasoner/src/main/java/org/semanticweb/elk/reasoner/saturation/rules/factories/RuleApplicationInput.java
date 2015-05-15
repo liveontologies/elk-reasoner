@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 
 /**
  * Represents the input taken by {@link RuleApplicationFactory}'s processing
@@ -37,13 +37,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  */
 public class RuleApplicationInput {
 
-	private final IndexedClassExpression root_;
+	private final IndexedContextRoot root_;
 	
-	public RuleApplicationInput(IndexedClassExpression root) {
+	public RuleApplicationInput(IndexedContextRoot root) {
 		root_ = root;
 	}
 	
-	public IndexedClassExpression getRoot() {
+	public IndexedContextRoot getRoot() {
 		return root_;
 	}
 

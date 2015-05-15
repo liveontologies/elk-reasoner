@@ -38,18 +38,18 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 public class MapSaturationState<EC extends ExtendedContext> extends
 		AbstractSaturationState<EC> {
 
-	private final ConcurrentHashMap<IndexedClassExpression, EC> contextAssignment_;
+	private final ConcurrentHashMap<IndexedContextRoot, EC> contextAssignment_;
 
 	public MapSaturationState(OntologyIndex index, ContextFactory<EC> factory,
 			int expectedSize) {
 		super(index, factory);
-		this.contextAssignment_ = new ConcurrentHashMap<IndexedClassExpression, EC>(
+		this.contextAssignment_ = new ConcurrentHashMap<IndexedContextRoot, EC>(
 				expectedSize);
 	}
 
 	public MapSaturationState(OntologyIndex index, ContextFactory<EC> factory) {
 		super(index, factory);
-		this.contextAssignment_ = new ConcurrentHashMap<IndexedClassExpression, EC>(
+		this.contextAssignment_ = new ConcurrentHashMap<IndexedContextRoot, EC>(
 				index.getClassExpressions().size());
 	}
 
@@ -59,8 +59,8 @@ public class MapSaturationState<EC extends ExtendedContext> extends
 	}
 
 	@Override
-	public EC getContext(IndexedClassExpression ice) {
-		return contextAssignment_.get(ice);
+	public EC getContext(IndexedContextRoot root) {
+		return contextAssignment_.get(root);
 	}
 
 	@Override

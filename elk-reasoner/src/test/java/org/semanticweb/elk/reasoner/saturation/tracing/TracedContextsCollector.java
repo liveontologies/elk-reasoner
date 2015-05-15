@@ -27,9 +27,10 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
+
 
 /**
  * Collects roots of all contexts which must have been traced 
@@ -38,18 +39,18 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Abstr
  *
  * pavel.klinov@uni-ulm.de
  */
-public class TracedContextsCollector extends AbstractClassInferenceVisitor<IndexedClassExpression, Boolean> {
+public class TracedContextsCollector extends AbstractClassInferenceVisitor<IndexedContextRoot, Boolean> {
 
-	private final Set<IndexedClassExpression> tracedRoots_ = new HashSet<IndexedClassExpression>();
+	private final Set<IndexedContextRoot> tracedRoots_ = new HashSet<IndexedContextRoot>();
 	
 	@Override
-	protected Boolean defaultTracedVisit(ClassInference conclusion, IndexedClassExpression root) {
+	protected Boolean defaultTracedVisit(ClassInference conclusion, IndexedContextRoot root) {
 		tracedRoots_.add(conclusion.getSourceRoot(root));
 		
 		return true;
 	}
 
-	public Set<IndexedClassExpression> getTracedRoots() {
+	public Set<IndexedContextRoot> getTracedRoots() {
 		return tracedRoots_;
 	}
 }

@@ -23,11 +23,13 @@
 package org.semanticweb.elk.reasoner.indexing.hierarchy;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
-import org.semanticweb.elk.owl.interfaces.ElkObjectPropertyExpression;
+import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 
@@ -41,9 +43,9 @@ import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromEx
 public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 
 	/**
-	 * @return The representation of the {@link ElkObjectPropertyExpression}
-	 *         that is a property of the {@link ElkObjectSomeValuesFrom}
-	 *         represented by this {@link IndexedObjectSomeValuesFrom}.
+	 * @return The representation of the {@link ElkObjectProperty} that is a
+	 *         property of the {@link ElkObjectSomeValuesFrom} represented by
+	 *         this {@link IndexedObjectSomeValuesFrom}.
 	 * 
 	 * @see ElkObjectSomeValuesFrom#getProperty()
 	 */
@@ -57,6 +59,13 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 	 * @see ElkObjectSomeValuesFrom#getFiller()
 	 */
 	public IndexedClassExpression getFiller();
+
+	/**
+	 * @return The {@link IndexedRangeFiller} corresponding to this
+	 *         {@link IndexedObjectSomeValuesFrom}, i.e., having the same
+	 *         property and filler.
+	 */
+	public IndexedRangeFiller getRangeFiller();
 
 	public <O> O accept(IndexedObjectSomeValuesFromVisitor<O> visitor);
 
@@ -77,6 +86,24 @@ public interface IndexedObjectSomeValuesFrom extends IndexedClassExpression {
 						ice.getCompositionRuleHead(), property, premises,
 						producer);
 			}
+		}
+
+		/**
+		 * @param existential
+		 * @return the {@link IndexedContextRoot} that is required for
+		 *         decomposition of the given
+		 *         {@link IndexedObjectSomeValuesFrom}, taking into account the
+		 *         property ranges, if necessary
+		 */
+		public static IndexedContextRoot getTarget(
+				IndexedObjectSomeValuesFrom existential) {
+			SaturatedPropertyChain propertySaturation = existential
+					.getProperty().getSaturated();
+			if (propertySaturation.getRanges().isEmpty())
+				// filler is sufficient
+				return existential.getFiller();
+			// else we also need to take the property into account
+			return existential.getRangeFiller();
 		}
 
 	}

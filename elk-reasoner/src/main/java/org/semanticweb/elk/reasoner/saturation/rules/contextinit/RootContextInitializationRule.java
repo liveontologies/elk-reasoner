@@ -23,7 +23,10 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.visitors.NoOpIndexedContextRootVisitor;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -90,15 +93,34 @@ public class RootContextInitializationRule extends
 	}
 
 	@Override
-	public void apply(ContextInitialization premise, ContextPremises premises,
-			ConclusionProducer producer) {
-		// producer.produce(premises.getRoot(), new
-		// DecomposedSubsumer(premises.getRoot()));
+	public void apply(ContextInitialization premise,
+			final ContextPremises premises, final ConclusionProducer producer) {
+		IndexedContextRoot root = premises.getRoot();
+		root.accept(new NoOpIndexedContextRootVisitor<Void>() {
+			@Override
+			protected Void defaultVisit(IndexedClassExpression element) {
+				producer.produce(premises.getRoot(),
+						new InitializationSubsumer<IndexedClassExpression>(
+								element));
+				return null;
+			}
 
-		producer.produce(
-				premises.getRoot(),
-				new InitializationSubsumer<IndexedClassExpression>(premises
-						.getRoot()));
+			@Override
+			public Void visit(IndexedRangeFiller element) {
+				producer.produce(premises.getRoot(),
+						new InitializationSubsumer<IndexedClassExpression>(
+								element.getFiller()));
+				for (IndexedClassExpression range : element.getProperty()
+						.getSaturated().getRanges()) {
+					// TODO: introduce a specific inference
+					producer.produce(premises.getRoot(),
+							new InitializationSubsumer<IndexedClassExpression>(
+									range));
+				}
+				return null;
+			}
+		});
+
 	}
 
 	@Override

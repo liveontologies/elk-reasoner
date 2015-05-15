@@ -21,7 +21,6 @@ package org.semanticweb.elk.reasoner.saturation;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
  * A {@link ClassExpressionSaturationListener} that does nothing with finished
@@ -33,7 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
  *            the type of the input jobs of
  *            {@link ClassExpressionSaturationFactory}
  */
-public class DummyClassExpressionSaturationListener<J extends SaturationJob<? extends IndexedClassExpression>>
+public class DummyClassExpressionSaturationListener<J extends SaturationJob<? extends IndexedContextRoot>>
 		implements ClassExpressionSaturationListener<J> {
 
 	@Override

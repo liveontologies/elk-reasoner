@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassEx
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubClassOfAxiom;
@@ -69,8 +70,8 @@ public class ResolvingModifiableIndexedObjectFactory extends
 
 	@Override
 	public final ModifiableIndexedDeclarationAxiom getIndexedDeclarationAxiom(
-			ModifiableIndexedEntity entity, ElkAxiom source) {
-		return filter(baseFactory_.getIndexedDeclarationAxiom(entity, source));
+			ModifiableIndexedEntity entity, ElkAxiom reason) {
+		return filter(baseFactory_.getIndexedDeclarationAxiom(entity, reason));
 	}
 
 	@Override
@@ -83,17 +84,25 @@ public class ResolvingModifiableIndexedObjectFactory extends
 	@Override
 	public final ModifiableIndexedSubClassOfAxiom getIndexedSubClassOfAxiom(
 			ModifiableIndexedClassExpression subClass,
-			ModifiableIndexedClassExpression superClass, ElkAxiom source) {
+			ModifiableIndexedClassExpression superClass, ElkAxiom reason) {
 		return filter(baseFactory_.getIndexedSubClassOfAxiom(subClass,
-				superClass, source));
+				superClass, reason));
 	}
 
 	@Override
 	public final ModifiableIndexedSubObjectPropertyOfAxiom getIndexedSubObjectPropertyOfAxiom(
 			ModifiableIndexedPropertyChain subPropertyChain,
-			ModifiableIndexedObjectProperty superProperty, ElkAxiom source) {
+			ModifiableIndexedObjectProperty superProperty, ElkAxiom reason) {
 		return filter(baseFactory_.getIndexedSubObjectPropertyOfAxiom(
-				subPropertyChain, superProperty, source));
+				subPropertyChain, superProperty, reason));
+	}
+
+	@Override
+	public ModifiableIndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
+			ModifiableIndexedObjectProperty property,
+			ModifiableIndexedClassExpression range, ElkAxiom reason) {
+		return filter(baseFactory_.getIndexedObjectPropertyRangeAxiom(property,
+				range, reason));
 	}
 
 }

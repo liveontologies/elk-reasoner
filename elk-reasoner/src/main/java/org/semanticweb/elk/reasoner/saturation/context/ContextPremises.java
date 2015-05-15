@@ -30,6 +30,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxi
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.rules.LinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.Rule;
@@ -37,8 +38,8 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackw
 
 /**
  * A representation for a set of {@link Conclusion}s that can be used as
- * premises of inference rules associated with a given root
- * {@link IndexedClassExpression} that can be obtained using {@link #getRoot()}.
+ * premises of inference rules associated with a given
+ * {@link IndexedContextRoot} that can be obtained using {@link #getRoot()}.
  * Whenever a {@link Conclusion} can participate in an inference with this root,
  * it should be saved in the {@link ContextPremises} with the corresponding
  * root.
@@ -49,11 +50,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackw
 public interface ContextPremises {
 
 	/**
-	 * @return the {@link IndexedClassExpression} for which the
-	 *         {@link Conclusion}s stored in this {@link ContextPremises} are
-	 *         assigned. This may never been {@code null}.
+	 * @return the {@link IndexedContextRoot} for which the {@link Conclusion}s
+	 *         stored in this {@link ContextPremises} are assigned. This serves
+	 *         as the key for {@link ContextPremises} and can never been
+	 *         {@code null}.
 	 */
-	public IndexedClassExpression getRoot();
+	public IndexedContextRoot getRoot();
 
 	/**
 	 * @return the object representing all derived (implied)

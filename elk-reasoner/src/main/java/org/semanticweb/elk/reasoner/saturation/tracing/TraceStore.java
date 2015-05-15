@@ -24,8 +24,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
@@ -55,7 +55,7 @@ public interface TraceStore {
 		 * @param conclusion
 		 * @param visitor
 		 */
-		public void accept(IndexedClassExpression root, Conclusion conclusion, ClassInferenceVisitor<IndexedClassExpression, ?> visitor);
+		public void accept(IndexedContextRoot root, Conclusion conclusion, ClassInferenceVisitor<IndexedContextRoot, ?> visitor);
 		/**
 		 * Visiting all {@link ObjectPropertyInference}s for the given {@link ObjectPropertyConclusion}.
 		 * 
@@ -64,9 +64,9 @@ public interface TraceStore {
 		 */
 		public void accept(ObjectPropertyConclusion conclusion, ObjectPropertyInferenceVisitor<?,?> visitor);
 		
-		public Iterable<IndexedClassExpression> getContextRoots();
+		public Iterable<IndexedContextRoot> getContextRoots();
 		
-		public void visitInferences(IndexedClassExpression root, ClassInferenceVisitor<IndexedClassExpression, ?> visitor);
+		public void visitInferences(IndexedContextRoot root, ClassInferenceVisitor<IndexedContextRoot, ?> visitor);
 		
 		public void visitInferences(IndexedPropertyChain root, ObjectPropertyInferenceVisitor<?, ?> visitor);
 	}
@@ -83,7 +83,7 @@ public interface TraceStore {
 		 * @param inference
 		 * @return
 		 */
-		public boolean addInference(IndexedClassExpression root, ClassInference conclusion);
+		public boolean addInference(IndexedContextRoot root, ClassInference conclusion);
 		
 		public boolean addObjectPropertyInference(ObjectPropertyInference conclusion);
 		
@@ -91,7 +91,7 @@ public interface TraceStore {
 		public static final Writer Dummy = new Writer() {
 
 			@Override
-			public boolean addInference(IndexedClassExpression root, ClassInference conclusion) {
+			public boolean addInference(IndexedContextRoot root, ClassInference conclusion) {
 				// no-op
 				return false;
 			}

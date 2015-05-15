@@ -55,13 +55,14 @@ public class PropertyHierarchyCompositionComputationFactory extends
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(PropertyHierarchyCompositionComputationFactory.class);
-	
+
 	/**
 	 * used to record sub-property inferences
 	 */
 	final private TraceStore.Writer traceWriter_;
-	
-	public PropertyHierarchyCompositionComputationFactory(TraceStore.Writer writer) {
+
+	public PropertyHierarchyCompositionComputationFactory(
+			TraceStore.Writer writer) {
 		traceWriter_ = writer;
 	}
 
@@ -98,8 +99,15 @@ public class PropertyHierarchyCompositionComputationFactory extends
 
 		@Override
 		public Void visit(IndexedObjectProperty element) {
+			LOGGER_.trace("{}: computing sub-property chains and ranges",
+					element);
 			// ensure that sub-properties are computed
 			SubPropertyExplorer.getSubPropertyChains(element, traceWriter_);
+			// ensure that property ranges are computed
+			RangeExplorer.getRanges(element);// TODO: tracing
+			// TODO: verify that global restrictions on range axioms are
+			// satisfied:
+			// http://www.w3.org/TR/owl2-profiles/#Global_Restrictions
 			return null;
 		}
 
@@ -143,7 +151,8 @@ public class PropertyHierarchyCompositionComputationFactory extends
 								.getFirstProperty();
 						redundantLeftProperties = SubPropertyExplorer
 								.getLeftSubComposableSubPropertiesByRightProperties(
-										left, traceWriter_).get(rightLeftSubProperty);
+										left, traceWriter_).get(
+										rightLeftSubProperty);
 					}
 				}
 

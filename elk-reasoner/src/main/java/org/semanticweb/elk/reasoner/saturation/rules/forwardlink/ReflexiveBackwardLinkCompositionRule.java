@@ -26,8 +26,8 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
@@ -98,7 +98,7 @@ public class ReflexiveBackwardLinkCompositionRule extends
 			Collection<IndexedComplexPropertyChain> compositions = comps
 					.get(backwardRelation);
 			for (IndexedComplexPropertyChain composition : compositions) {
-				IndexedClassExpression root = premises.getRoot();
+				IndexedContextRoot root = premises.getRoot();
 				ForwardLinkImpl.produceComposedLink(producer, root,
 						backwardRelation, root, forwardLink_.getRelation(),
 						forwardLink_.getTarget(), composition);

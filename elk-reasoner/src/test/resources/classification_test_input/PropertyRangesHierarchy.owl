@@ -1,0 +1,14 @@
+Prefix( : = <http://example.org/> )
+Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
+Prefix( rdfs: = <http://www.w3.org/2000/01/rdf-schema#> )
+Ontology(<www.example.org#property_ranges_hierarchy>
+Annotation(rdfs:label ":R has two range restrictions :B and :C due to super-properties :S and :H. Hence :A has an :S-successor satisfying :B, :C, and :D")
+
+SubObjectPropertyOf(:R :S)
+SubObjectPropertyOf(:R :H)
+ObjectPropertyRange(:S :B)
+ObjectPropertyRange(:H :C)
+SubClassOf(:A ObjectSomeValuesFrom(:R :D))
+SubClassOf(ObjectSomeValuesFrom(:S ObjectIntersectionOf(:B :C :D)) :E)
+
+)

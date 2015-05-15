@@ -27,7 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
@@ -46,13 +46,13 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Objec
  */
 public class SideConditions {
 
-	public static <O> ClassInferenceVisitor<IndexedClassExpression, O> getClassSideConditionVisitor(
+	public static <O> ClassInferenceVisitor<IndexedContextRoot, O> getClassSideConditionVisitor(
 			final ElkAxiomVisitor<O> visitor) {
-		return new AbstractClassInferenceVisitor<IndexedClassExpression, O>() {
+		return new AbstractClassInferenceVisitor<IndexedContextRoot, O>() {
 
 			@Override
 			protected O defaultTracedVisit(ClassInference conclusion,
-					IndexedClassExpression input) {
+					IndexedContextRoot input) {
 				ElkAxiom sideCondition = new SideConditionLookup()
 						.lookup(conclusion);
 

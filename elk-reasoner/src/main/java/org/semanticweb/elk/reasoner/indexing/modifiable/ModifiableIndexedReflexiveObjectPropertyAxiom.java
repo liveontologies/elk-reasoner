@@ -25,8 +25,9 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
 
 /**
- * An {@link ModifiableIndexedAxiom} that can be modified as a result of
- * updating the {@link ModifiableOntologyIndex} where this object is stored.
+ * An {@link IndexedReflexiveObjectPropertyAxiom} that can be modified as a
+ * result of updating the {@link ModifiableOntologyIndex} where this object is
+ * stored.
  * 
  * @author "Yevgeny Kazakov"
  *

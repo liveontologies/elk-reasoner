@@ -38,6 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkC
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ReflexivePropertyRangesContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradictionCompositionRule;
@@ -263,6 +264,14 @@ public class RuleCounterVisitor implements RuleVisitor {
 		counter_.countReflexivePropagationRule++;
 		visitor_.visit(rule, premise, premises, producer);
 
+	}
+
+	@Override
+	public void visit(ReflexivePropertyRangesContextInitRule rule,
+			ContextInitialization premise, ContextPremises premises,
+			ConclusionProducer producer) {
+		counter_.countReflexivePropertyRangesContextInitRule++;
+		visitor_.visit(rule, premise, premises, producer);
 	}
 
 	@Override

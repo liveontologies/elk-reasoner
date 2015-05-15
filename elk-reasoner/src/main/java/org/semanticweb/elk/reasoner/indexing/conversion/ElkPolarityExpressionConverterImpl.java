@@ -28,14 +28,17 @@ import java.util.List;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataHasValue;
+import org.semanticweb.elk.owl.interfaces.ElkIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
+import org.semanticweb.elk.owl.interfaces.ElkObjectOneOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectUnionOf;
 import org.semanticweb.elk.owl.predefined.ElkPolarity;
+import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
 import org.semanticweb.elk.reasoner.indexing.caching.ModifiableIndexedObjectCache;
 import org.semanticweb.elk.reasoner.indexing.caching.ResolvingModifiableIndexedObjectFactory;
 import org.semanticweb.elk.reasoner.indexing.factories.ModifiableIndexedObjectFactory;
@@ -165,17 +168,24 @@ public class ElkPolarityExpressionConverterImpl extends
 	@Override
 	public ModifiableIndexedClassExpression visit(
 			ElkObjectIntersectionOf elkObjectIntersectionOf) {
-		// binarization
-		ModifiableIndexedClassExpression result = null;
-		for (ElkClassExpression conjunct : elkObjectIntersectionOf
-				.getClassExpressions()) {
-			ModifiableIndexedClassExpression ice = conjunct.accept(this);
-			if (result == null)
-				result = ice;
-			else
-				result = factory_.getIndexedObjectIntersectionOf(result, ice);
+		int size = elkObjectIntersectionOf.getClassExpressions().size();
+		switch (size) {
+		case 0:
+			return factory_.getIndexedClass(PredefinedElkClass.OWL_NOTHING);
+		default:
+			// binarization
+			ModifiableIndexedClassExpression result = null;
+			for (ElkClassExpression conjunct : elkObjectIntersectionOf
+					.getClassExpressions()) {
+				ModifiableIndexedClassExpression ice = conjunct.accept(this);
+				if (result == null)
+					result = ice;
+				else
+					result = factory_.getIndexedObjectIntersectionOf(result,
+							ice);
+			}
+			return result;
 		}
-		return result;
 	}
 
 	@Override
@@ -187,16 +197,49 @@ public class ElkPolarityExpressionConverterImpl extends
 	}
 
 	@Override
+	public ModifiableIndexedClassExpression visit(ElkObjectOneOf elkObjectOneOf) {
+		int size = elkObjectOneOf.getIndividuals().size();
+		switch (size) {
+		case 0:
+			return factory_.getIndexedClass(PredefinedElkClass.OWL_THING);
+		case 1:
+			if (LOGGER_.isWarnEnabled()) {
+				LoggerWrap
+						.log(LOGGER_, LogLevel.WARN,
+								"reasoner.indexing.objectOneOf",
+								"ELK supports ObjectOneOf only partially. Reasoning might be incomplete!");
+			}
+			return elkObjectOneOf.getIndividuals().iterator().next()
+					.accept(this);
+		default:
+			List<ModifiableIndexedClassExpression> disjuncts = new ArrayList<ModifiableIndexedClassExpression>(
+					size);
+			for (ElkIndividual member : elkObjectOneOf.getIndividuals()) {
+				disjuncts.add(member.accept(this));
+			}
+			return factory_.getIndexedObjectUnionOf(disjuncts);
+		}
+	}
+
+	@Override
 	public ModifiableIndexedClassExpression visit(
 			ElkObjectUnionOf elkObjectUnionOf) {
-		// TODO: handle a special case of singleton ObjectOneOf
-		List<ModifiableIndexedClassExpression> disjuncts = new ArrayList<ModifiableIndexedClassExpression>(
-				elkObjectUnionOf.getClassExpressions().size());
-		for (ElkClassExpression conjunct : elkObjectUnionOf
-				.getClassExpressions()) {
-			disjuncts.add(conjunct.accept(this));
+		int size = elkObjectUnionOf.getClassExpressions().size();
+		switch (size) {
+		case 0:
+			return factory_.getIndexedClass(PredefinedElkClass.OWL_THING);
+		case 1:
+			return elkObjectUnionOf.getClassExpressions().iterator().next()
+					.accept(this);
+		default:
+			List<ModifiableIndexedClassExpression> disjuncts = new ArrayList<ModifiableIndexedClassExpression>(
+					size);
+			for (ElkClassExpression disjunct : elkObjectUnionOf
+					.getClassExpressions()) {
+				disjuncts.add(disjunct.accept(this));
+			}
+			return factory_.getIndexedObjectUnionOf(disjuncts);
 		}
-		return factory_.getIndexedObjectUnionOf(disjuncts);
 	}
 
 	@Override

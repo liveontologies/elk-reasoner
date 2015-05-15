@@ -22,8 +22,8 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
@@ -38,10 +38,10 @@ public class BackwardLinkImpl extends AbstractConclusion implements
 		BackwardLink {
 
 	/**
-	 * the source {@link IndexedClassExpression} of this
-	 * {@link BackwardLinkImpl}; the root of the source implies this link.
+	 * the source {@link IndexedContextRoot} of this {@link BackwardLinkImpl};
+	 * the root of the source implies this link.
 	 */
-	private final IndexedClassExpression source_;
+	private final IndexedContextRoot source_;
 
 	/**
 	 * the {@link IndexedObjectProperty} in the existential restriction
@@ -49,15 +49,14 @@ public class BackwardLinkImpl extends AbstractConclusion implements
 	 */
 	private final IndexedObjectProperty relation_;
 
-	public BackwardLinkImpl(IndexedClassExpression source,
+	public BackwardLinkImpl(IndexedContextRoot source,
 			IndexedObjectProperty relation) {
 		this.relation_ = relation;
 		this.source_ = source;
 	}
 
 	@Override
-	public IndexedClassExpression getSourceRoot(
-			IndexedClassExpression rootWhereStored) {
+	public IndexedContextRoot getSourceRoot(IndexedContextRoot rootWhereStored) {
 		return source_;
 	}
 
@@ -87,7 +86,7 @@ public class BackwardLinkImpl extends AbstractConclusion implements
 	}
 
 	@Override
-	public IndexedClassExpression getSource() {
+	public IndexedContextRoot getSource() {
 		return source_;
 	}
 

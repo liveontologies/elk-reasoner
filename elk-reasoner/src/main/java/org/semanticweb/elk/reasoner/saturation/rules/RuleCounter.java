@@ -26,6 +26,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.BackwardLinkC
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.ContradictionOverBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ReflexivePropertyRangesContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradictionCompositionRule;
@@ -177,6 +178,11 @@ public class RuleCounter {
 	long countSuperClassFromSubClassRule;
 
 	/**
+	 * counter for {@link ReflexivePropertyRangesContextInitRule};
+	 */
+	long countReflexivePropertyRangesContextInitRule;
+
+	/**
 	 * Add the values the corresponding values of the given counter
 	 * 
 	 * @param counter
@@ -206,6 +212,7 @@ public class RuleCounter {
 		countReflexiveBackwardLinkCompositionRule += counter.countReflexiveBackwardLinkCompositionRule;
 		countPropagationInitializationRule += counter.countPropagationInitializationRule;
 		countBackwardLinkFromForwardLinkRule += counter.countBackwardLinkFromForwardLinkRule;
+		countReflexivePropertyRangesContextInitRule += counter.countReflexivePropertyRangesContextInitRule;
 	}
 
 	public long getTotalRuleAppCount() {
@@ -232,7 +239,8 @@ public class RuleCounter {
 				+ countNonReflexivePropagationRule
 				+ countReflexivePropagationRule
 				+ countPropagationInitializationRule
-				+ countBackwardLinkFromForwardLinkRule;
+				+ countBackwardLinkFromForwardLinkRule
+				+ countReflexivePropertyRangesContextInitRule;
 	}
 
 	/**
@@ -263,5 +271,6 @@ public class RuleCounter {
 		countReflexivePropagationRule = 0;
 		countPropagationInitializationRule = 0;
 		countBackwardLinkFromForwardLinkRule = 0;
+		countReflexivePropertyRangesContextInitRule = 0;
 	}
 }

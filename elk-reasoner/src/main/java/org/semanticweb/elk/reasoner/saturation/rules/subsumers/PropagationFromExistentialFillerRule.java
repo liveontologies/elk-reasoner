@@ -83,7 +83,7 @@ public class PropagationFromExistentialFillerRule extends
 		this.negExistentials_.add(negExistential);
 	}
 
-	// TODO: hide this method
+	@Deprecated
 	public Collection<IndexedObjectSomeValuesFrom> getNegativeExistentials() {
 		return negExistentials_;
 	}

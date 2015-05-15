@@ -26,7 +26,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing.readers;
  */
 
 import org.semanticweb.elk.MutableBoolean;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
@@ -54,14 +55,14 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 	}
 
 	@Override
-	public void accept(final IndexedClassExpression root,
-			final Conclusion conclusion, final ClassInferenceVisitor<IndexedClassExpression, ?> visitor) {
+	public void accept(final IndexedContextRoot root,
+			final Conclusion conclusion, final ClassInferenceVisitor<IndexedContextRoot, ?> visitor) {
 		reader.accept(root, conclusion,
-				new AbstractClassInferenceVisitor<IndexedClassExpression, Void>() {
+				new AbstractClassInferenceVisitor<IndexedContextRoot, Void>() {
 
 					@Override
 					protected Void defaultTracedVisit(ClassInference inference,
-							IndexedClassExpression ignored) {
+							IndexedContextRoot ignored) {
 						inference.acceptTraced(visitor, null);
 
 						return null;
@@ -69,7 +70,7 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 
 					@Override
 					public Void visit(PropagatedSubsumer propagated,
-							IndexedClassExpression ignored) {
+							IndexedContextRoot ignored) {
 						if (!isTrivialPropagation(propagated, root)) {
 							propagated.acceptTraced(visitor, null);
 						}
@@ -81,17 +82,18 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 	}
 
 	boolean isTrivialPropagation(PropagatedSubsumer propagated,
-			IndexedClassExpression contextRoot) {
+			IndexedContextRoot contextRoot) {
 		// a propagation is trivial if two conditions are met:
 		// 1) the root is propagated (not one of its subsumers)
 		// 2) the backward link has been derived by decomposing the existential
 		// (which is the same as the propagation carry)
 		BackwardLink link = propagated.getBackwardLink();
 		Propagation propagation = propagated.getPropagation();
-		IndexedClassExpression inferenceContextRoot = propagated
+		IndexedContextRoot inferenceContextRoot = propagated
 				.getInferenceContextRoot(contextRoot);
 
-		if (inferenceContextRoot != propagation.getCarry().getFiller()) {
+		if (inferenceContextRoot != IndexedObjectSomeValuesFrom.Helper
+				.getTarget(propagation.getCarry())) {
 			return false;
 		}
 
@@ -99,18 +101,18 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 				false);
 
 		reader.accept(inferenceContextRoot, link,
-				new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
+				new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
 					@Override
 					protected Boolean defaultTracedVisit(ClassInference conclusion,
-							IndexedClassExpression ignored) {
+							IndexedContextRoot ignored) {
 						return false;
 					}
 
 					@Override
 					public Boolean visit(
 							DecomposedExistentialBackwardLink conclusion,
-							IndexedClassExpression ignored) {
+							IndexedContextRoot ignored) {
 						linkProducedByDecomposition.set(true);
 
 						return true;

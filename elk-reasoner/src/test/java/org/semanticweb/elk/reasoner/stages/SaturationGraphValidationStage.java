@@ -32,11 +32,16 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedContextRootVisitor;
+import org.semanticweb.elk.reasoner.indexing.visitors.NoOpIndexedContextRootVisitor;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
@@ -55,6 +60,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.Contradiction
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ReflexivePropertyRangesContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradictionCompositionRule;
@@ -95,6 +101,10 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 	private final ContextValidator contextValidator_ = new ContextValidator();
 
 	private final ClassExpressionValidator iceValidator_ = new ClassExpressionValidator();
+
+	private final ObjectPropertyValidator iopValidator_ = new ObjectPropertyValidator();
+
+	private final IndexedContextRootValidator rootValidator_ = new IndexedContextRootValidator();
 
 	private final OntologyIndex index_;
 
@@ -178,6 +188,14 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			if (context != null) {
 				contextValidator_.add(context);
 			}
+			if (ice instanceof IndexedObjectSomeValuesFrom) {
+				IndexedContextRoot root = ((IndexedObjectSomeValuesFrom) ice)
+						.getRangeFiller();
+				context = saturationState_.getContext(root);
+				if (context != null) {
+					contextValidator_.add(context);
+				}
+			}
 
 			// validating context rules
 			LinkedSubsumerRule rule = ice.getCompositionRuleHead();
@@ -192,6 +210,79 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 	/**
 	 * 
 	 */
+	private class ObjectPropertyValidator {
+
+		private final Set<IndexedObjectProperty> cache_ = new ArrayHashSet<IndexedObjectProperty>();
+
+		private final Queue<IndexedObjectProperty> toValidate_ = new LinkedList<IndexedObjectProperty>();
+
+		boolean add(IndexedObjectProperty property) {
+			if (cache_.add(property)) {
+				toValidate_.add(property);
+				return true;
+			}
+			return false;
+		}
+
+		void checkNew(IndexedObjectProperty property) {
+			if (add(property)) {
+				LOGGER_.error("Unexpected reachable object property: "
+						+ property);
+			}
+		}
+
+		/**
+		 * @return {@code true} if something new has been validated, otherwise
+		 *         returns {@code false}
+		 */
+		boolean validate() {
+			if (toValidate_.isEmpty())
+				return false;
+			for (;;) {
+				IndexedObjectProperty property = toValidate_.poll();
+				if (property == null)
+					break;
+				validate(property);
+			}
+			return true;
+		}
+
+		private void validate(IndexedObjectProperty property) {
+			LOGGER_.trace("Validating object property {}", property);
+
+			// told ranges
+			for (IndexedClassExpression ice : property.getToldRanges()) {
+				iceValidator_.checkNew(ice);
+			}
+
+			// told super properties
+			for (IndexedObjectProperty iop : property.getToldSuperProperties()) {
+				iopValidator_.checkNew(iop);
+			}
+
+		}
+	}
+
+	private class IndexedContextRootValidator extends
+			NoOpIndexedContextRootVisitor<Void> implements
+			IndexedContextRootVisitor<Void> {
+
+		@Override
+		protected Void defaultVisit(IndexedClassExpression element) {
+			iceValidator_.checkNew(element);
+			return null;
+		}
+
+		@Override
+		public Void visit(IndexedRangeFiller element) {
+			iceValidator_.checkNew(element.getFiller());
+			return null;
+		}
+	}
+
+	/**
+	 * 
+	 */
 	private class ContextRuleValidator implements RuleVisitor {
 
 		@Override
@@ -200,9 +291,9 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				ConclusionProducer producer) {
 			for (IndexedPropertyChain prop : rule
 					.getForwardLinksByObjectProperty().keySet()) {
-				for (IndexedClassExpression target : rule
+				for (IndexedContextRoot target : rule
 						.getForwardLinksByObjectProperty().get(prop)) {
-					iceValidator_.checkNew(target);
+					target.accept(rootValidator_);
 				}
 			}
 		}
@@ -258,7 +349,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		public void visit(DisjointSubsumerFromMemberRule rule,
 				IndexedClassExpression premise, ContextPremises premises,
 				ConclusionProducer producer) {
-			for (IndexedDisjointClassesAxiom axiom : rule.getDisjointnessAxioms()) {
+			for (IndexedDisjointClassesAxiom axiom : rule
+					.getDisjointnessAxioms()) {
 				if (!axiom.occurs()) {
 					LOGGER_.error("Dead disjointness axiom: " + axiom);
 				}
@@ -397,6 +489,15 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			// nothing is stored in the rule
 		}
 
+		@Override
+		public void visit(ReflexivePropertyRangesContextInitRule rule,
+				ContextInitialization premise, ContextPremises premises,
+				ConclusionProducer producer) {
+			for (IndexedObjectProperty reflexive : rule
+					.getToldReflexiveProperties()) {
+				iopValidator_.checkNew(reflexive);
+			}
+		}
 	}
 
 	/**
@@ -438,8 +539,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			}
 
 			// validating the root
-			IndexedClassExpression root = context.getRoot();
-			iceValidator_.checkNew(root);
+			IndexedContextRoot root = context.getRoot();
+			root.accept(rootValidator_);
 			if (saturationState_.getContext(root) != context)
 				LOGGER_.error("Invalid root for " + context);
 
@@ -451,13 +552,13 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			// validating sub-contexts
 			for (SubContextPremises subContext : context
 					.getSubContextPremisesByObjectProperty().values()) {
-				for (IndexedClassExpression linkedRoot : subContext
+				for (IndexedContextRoot linkedRoot : subContext
 						.getLinkedRoots()) {
-					iceValidator_.checkNew(linkedRoot);
+					linkedRoot.accept(rootValidator_);
 				}
-				for (IndexedClassExpression propagation : subContext
+				for (IndexedContextRoot propagation : subContext
 						.getLinkedRoots()) {
-					iceValidator_.checkNew(propagation);
+					propagation.accept(rootValidator_);
 				}
 			}
 

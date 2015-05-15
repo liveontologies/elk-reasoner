@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -63,29 +64,63 @@ public interface ModifiableIndexedObjectProperty extends
 	boolean removeLeftChain(IndexedComplexPropertyChain chain);
 
 	/**
-	 * Adds the given {@link IndexedPropertyChain} as a sub-role of this
+	 * Adds the given {@link IndexedPropertyChain} as a sub-property of this
 	 * {@link IndexedObjectProperty}
 	 * 
 	 * @param subObjectProperty
 	 *            the {@link IndexedPropertyChain} to be added
+	 * @param reason
+	 *            the {@link ElkAxiom} responsible for the addition of the
+	 *            sub-property
 	 * @return {@code true} if the operation is successful or {@code false}
 	 *         otherwise; if {@code false} is returned, this
 	 *         {@link IndexedObjectProperty} does not change
 	 */
 	boolean addToldSubPropertyChain(IndexedPropertyChain subObjectProperty,
-			ElkAxiom source);
+			ElkAxiom reason);
 
 	/**
-	 * Removes the given {@link IndexedPropertyChain} from sub-roles of this
-	 * {@link IndexedObjectProperty}
+	 * Removes the given {@link IndexedPropertyChain} from sub-properties of
+	 * this {@link IndexedObjectProperty}
 	 * 
 	 * @param subObjectProperty
 	 *            the {@link IndexedPropertyChain} to be removed
+	 * @param reason
+	 *            the {@link ElkAxiom} responsible for the removal of the
+	 *            sub-property
 	 * @return {@code true} if the operation is successful or {@code false}
 	 *         otherwise; if {@code false} is returned, this
 	 *         {@link IndexedObjectProperty} does not change
 	 */
 	boolean removeToldSubPropertyChain(IndexedPropertyChain subObjectProperty,
-			ElkAxiom source);
+			ElkAxiom reason);
+
+	/**
+	 * Adds the given {@link IndexedClassExpression} as range of this
+	 * {@link IndexedObjectProperty}
+	 * 
+	 * @param range
+	 *            the {@link IndexedClassExpression} to be added as range
+	 * @param reason
+	 *            the {@link ElkAxiom} responsible for the addition of the range
+	 * @return {@code true} if the operation is successful or {@code false}
+	 *         otherwise; if {@code false} is returned, this
+	 *         {@link IndexedObjectProperty} does not change
+	 */
+	boolean addToldRange(IndexedClassExpression range, ElkAxiom reason);
+
+	/**
+	 * Removes the given {@link IndexedClassExpression} from ranges of this
+	 * {@link IndexedObjectProperty}
+	 * 
+	 * @param range
+	 *            the {@link IndexedClassExpression} to be removed
+	 * @param reason
+	 *            the {@link ElkAxiom} responsible for the removal of the range
+	 * @return {@code true} if the operation is successful or {@code false}
+	 *         otherwise; if {@code false} is returned, this
+	 *         {@link IndexedObjectProperty} does not change
+	 */
+	boolean removeToldRange(IndexedClassExpression range, ElkAxiom reason);
 
 }

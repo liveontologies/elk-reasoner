@@ -32,7 +32,7 @@ import java.util.Iterator;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.incremental.IncrementalStages;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassEntity;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.context.ContextRootCollection;
 import org.semanticweb.elk.reasoner.taxonomy.TaxonomyCleaning;
 import org.semanticweb.elk.util.collections.Operations;
@@ -136,11 +136,11 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 	private static class IndexedClassEntityCollection extends
 			AbstractCollection<IndexedClassEntity> {
 
-		private final Collection<? extends IndexedClassExpression> ices_;
+		private final Collection<? extends IndexedContextRoot> roots_;
 
 		IndexedClassEntityCollection(
-				Collection<? extends IndexedClassExpression> ices) {
-			ices_ = ices;
+				Collection<? extends IndexedContextRoot> roots) {
+			roots_ = roots;
 		}
 
 		@Override
@@ -148,7 +148,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 			return new Iterator<IndexedClassEntity>() {
 
 				private IndexedClassEntity curr_ = null;
-				private final Iterator<? extends IndexedClassExpression> iter_ = ices_
+				private final Iterator<? extends IndexedContextRoot> iter_ = roots_
 						.iterator();
 
 				@Override
@@ -157,7 +157,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 						return true;
 					}
 					while (curr_ == null && iter_.hasNext()) {
-						IndexedClassExpression expr = iter_.next();
+						IndexedContextRoot expr = iter_.next();
 
 						if (expr instanceof IndexedClassEntity) {
 							curr_ = (IndexedClassEntity) expr;
@@ -187,7 +187,7 @@ public class IncrementalTaxonomyCleaningStage extends AbstractReasonerStage {
 		public int size() {
 			// upper bound, the actual size may be smaller since some contexts'
 			// roots could be complex expressions
-			return ices_.size();
+			return roots_.size();
 		}
 	}
 }

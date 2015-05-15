@@ -143,7 +143,7 @@ public class ObjectIntersectionFromConjunctRule extends
 		return false;
 	}
 
-	// TODO: hide this method
+	@Deprecated
 	public Map<IndexedClassExpression, IndexedObjectIntersectionOf> getConjunctionsByConjunct() {
 		return conjunctionsByConjunct_;
 	}

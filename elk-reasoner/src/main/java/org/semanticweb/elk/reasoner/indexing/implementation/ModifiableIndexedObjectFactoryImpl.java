@@ -45,6 +45,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassEx
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedEntity;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedSubClassOfAxiom;
@@ -62,7 +63,7 @@ public class ModifiableIndexedObjectFactoryImpl implements
 		ModifiableIndexedObjectFactory, CachedIndexedObjectFactory {
 
 	@Override
-	public CachedIndexedComplexPropertyChain getIndexedBinaryPropertyChain(
+	public CachedIndexedComplexPropertyChain getIndexedComplexPropertyChain(
 			ModifiableIndexedObjectProperty leftProperty,
 			ModifiableIndexedPropertyChain rightProperty) {
 		return new CachedIndexedComplexPropertyChainImpl(leftProperty,
@@ -150,6 +151,14 @@ public class ModifiableIndexedObjectFactoryImpl implements
 			ModifiableIndexedObjectProperty superProperty, ElkAxiom reason) {
 		return new ModifiableIndexedSubObjectPropertyOfAxiomImpl(
 				subPropertyChain, superProperty);
+	}
+
+	@Override
+	public ModifiableIndexedObjectPropertyRangeAxiom getIndexedObjectPropertyRangeAxiom(
+			ModifiableIndexedObjectProperty property,
+			ModifiableIndexedClassExpression range, ElkAxiom reason) {
+		return new ModifiableIndexedObjectPropertyRangeAxiomImpl(property,
+				range);
 	}
 
 }

@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
 
 /**
@@ -35,16 +35,16 @@ import org.semanticweb.elk.reasoner.saturation.SaturationJob;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ContextTracingJob extends SaturationJob<IndexedClassExpression> {
+public class ContextTracingJob extends SaturationJob<IndexedContextRoot> {
 
 private final ContextTracingListener callback_;
 	
-	public ContextTracingJob(IndexedClassExpression input, ContextTracingListener callback) {
+	public ContextTracingJob(IndexedContextRoot input, ContextTracingListener callback) {
 		super(input);
 		callback_ = callback;
 	}
 	
-	public ContextTracingJob(IndexedClassExpression input) {
+	public ContextTracingJob(IndexedContextRoot input) {
 		this(input, ContextTracingListener.DUMMY);
 	}
 

@@ -22,7 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
@@ -59,13 +59,13 @@ public interface WorkerLocalTodo {
 	boolean isActivated();
 
 	/**
-	 * @return the root {@link IndexedClassExpression} of the currently assigned
+	 * @return the {@link IndexedContextRoot} of the currently assigned
 	 *         {@link Context} or {@code null} if this {@link WorkerLocalTodo}
 	 *         is not activated.
 	 * @see #isActivated()
 	 * @see Context#getRoot()
 	 */
-	IndexedClassExpression getActiveRoot();
+	IndexedContextRoot getActiveRoot();
 
 	/**
 	 * Set the new value of the root for the currently processed {@link Context}
@@ -76,13 +76,13 @@ public interface WorkerLocalTodo {
 	 *            the new value of the root for the currently processed
 	 *            {@link Context}
 	 */
-	void setActiveRoot(IndexedClassExpression currentActiveRoot);
+	void setActiveRoot(IndexedContextRoot currentActiveRoot);
 
 	/**
 	 * Deactivates this {@link WorkerLocalTodo}. After that,
 	 * {@link #isActivated()} returns {@code false}
 	 * 
-	 * @return {@code true} if this {@link WorkerLocalTodo} was deactivated and
+	 * @return {@code true} if this {@link WorkerLocalTodo} was activated and
 	 *         {@code false} otherwise
 	 */
 	boolean deactivate();

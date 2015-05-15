@@ -28,6 +28,7 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.Set;
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
@@ -73,6 +74,18 @@ public class SaturatedPropertyChain {
 	volatile boolean derivedSubPropertiesComputed = false;
 
 	/**
+	 * the {@code IndexedClassExpression}s that are ranges of the
+	 * {@code IndexedObjectProperty}s that subsume {@link #root}
+	 */
+	Set<IndexedClassExpression> derivedRanges;
+
+	/**
+	 * {@code true} if {@link #derivedRanges} is not {@code null} and fully
+	 * computed
+	 */
+	volatile boolean derivedRangesComputed = false;
+
+	/**
 	 * a multimap T -> {S} such that both S and ObjectPropertyChain(S, T) imply
 	 * {@link #root}
 	 */
@@ -85,14 +98,14 @@ public class SaturatedPropertyChain {
 	volatile boolean leftSubComposableSubPropertiesByRightPropertiesComputed = false;
 
 	/**
-	 * A {@link Multimap} from R to S such that ObjectPropertyChain(R, root)
-	 * implies S
+	 * A {@link Multimap} from R to S such that ObjectPropertyChain(R, root) is
+	 * a subrole of S
 	 */
 	AbstractHashMultimap<IndexedObjectProperty, IndexedComplexPropertyChain> compositionsByLeftSubProperty;
 
 	/**
-	 * A {@link Multimap} from R to S such that ObjectPropertyChain(root, R)
-	 * implies S
+	 * A {@link Multimap} from R to S such that ObjectPropertyChain(root, R) is
+	 * a subrole of S
 	 */
 	AbstractHashMultimap<IndexedPropertyChain, IndexedComplexPropertyChain> compositionsByRightSubProperty;
 
@@ -108,6 +121,8 @@ public class SaturatedPropertyChain {
 		derivedSubProperties = null;
 		derivedSubProperyChains = null;
 		derivedSubPropertiesComputed = false;
+		derivedRanges = null;
+		derivedRangesComputed = false;		
 		leftSubComposableSubPropertiesByRightProperties = null;
 		leftSubComposableSubPropertiesByRightPropertiesComputed = false;
 		compositionsByLeftSubProperty = null;
@@ -153,6 +168,16 @@ public class SaturatedPropertyChain {
 	}
 
 	/**
+	 * @return All ranges of super-{@link IndexedObjectProperty} of root.
+	 */
+	public Set<IndexedClassExpression> getRanges() {
+		if (derivedRanges == null)
+			return Collections.emptySet();
+		// else
+		return derivedRanges;
+	}
+
+	/**
 	 * @return {@code true} if this property was derived to be reflexive.
 	 */
 	public boolean isDerivedReflexive() {
@@ -161,7 +186,7 @@ public class SaturatedPropertyChain {
 
 	/**
 	 * @return A {@link Multimap} from R to S such that ObjectPropertyChain(R,
-	 *         root) implies S
+	 *         root) is a subrole of S
 	 */
 	public Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> getCompositionsByLeftSubProperty() {
 		return compositionsByLeftSubProperty == null ? Operations
@@ -171,7 +196,7 @@ public class SaturatedPropertyChain {
 
 	/**
 	 * @return A {@link Multimap} from R to S such that
-	 *         ObjectPropertyChain(root, R) implies S
+	 *         ObjectPropertyChain(root, R) is a subrole of S
 	 */
 	public Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> getCompositionsByRightSubProperty() {
 		return compositionsByRightSubProperty == null ? Operations

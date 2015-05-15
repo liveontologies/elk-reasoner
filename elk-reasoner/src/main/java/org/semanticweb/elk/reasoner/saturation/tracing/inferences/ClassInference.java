@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
@@ -39,16 +40,18 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  */
 public interface ClassInference extends Conclusion {
 
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter);
-	
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter);
+
 	/**
 	 * Returns the root of the {@link Context} where this inference has been
 	 * made. This is the same context where all premises are stored. This cannot
 	 * be {@code null}.
 	 * 
-	 * @param defaultContext
+	 * @param rootWhereStored
 	 * @return
 	 */
-	public IndexedClassExpression getInferenceContextRoot(IndexedClassExpression rootWhereStored);
+	public IndexedContextRoot getInferenceContextRoot(
+			IndexedContextRoot rootWhereStored);
 
 }

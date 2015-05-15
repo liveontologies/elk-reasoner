@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
@@ -46,7 +46,7 @@ import org.semanticweb.elk.util.collections.Pair;
  */
 public class TraceUnwindingState {
 
-	private final Queue<Pair<Conclusion, IndexedClassExpression>> classConclusionsToUnwind_;
+	private final Queue<Pair<Conclusion, IndexedContextRoot>> classConclusionsToUnwind_;
 	
 	private final Queue<ObjectPropertyConclusion> propertyConclusionsToUnwind_;
 
@@ -55,21 +55,21 @@ public class TraceUnwindingState {
 	private final Set<ObjectPropertyInference> processedPropertyInferences_;
 
 	public TraceUnwindingState() {
-		classConclusionsToUnwind_ = new LinkedList<Pair<Conclusion, IndexedClassExpression>>();
+		classConclusionsToUnwind_ = new LinkedList<Pair<Conclusion, IndexedContextRoot>>();
 		propertyConclusionsToUnwind_ = new LinkedList<ObjectPropertyConclusion>();
 		processedClassInferences_ = new ArrayHashSet<ClassInference>();
 		processedPropertyInferences_ = new ArrayHashSet<ObjectPropertyInference>();
 	}
 
-	public void addToClassUnwindingQueue(Conclusion conclusion, IndexedClassExpression rootWhereStored) {
-		classConclusionsToUnwind_.add(new Pair<Conclusion, IndexedClassExpression>(conclusion, rootWhereStored));
+	public void addToClassUnwindingQueue(Conclusion conclusion, IndexedContextRoot rootWhereStored) {
+		classConclusionsToUnwind_.add(new Pair<Conclusion, IndexedContextRoot>(conclusion, rootWhereStored));
 	}
 	
 	public void addToPropertyUnwindingQueue(ObjectPropertyConclusion conclusion) {
 		propertyConclusionsToUnwind_.add(conclusion);
 	}
 
-	public Pair<Conclusion, IndexedClassExpression> pollFromClassUnwindingQueue() {
+	public Pair<Conclusion, IndexedContextRoot> pollFromClassUnwindingQueue() {
 		return classConclusionsToUnwind_.poll();
 	}
 	

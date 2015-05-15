@@ -1,0 +1,7 @@
+Prefix( : = <http://example.org/> )
+Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
+Ontology(<www.example.org#reflexive_property_domains#taxonomy>
+
+EquivalentClasses(:A owl:Thing)
+
+)

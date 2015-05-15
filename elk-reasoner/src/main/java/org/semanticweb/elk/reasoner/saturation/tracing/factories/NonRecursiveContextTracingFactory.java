@@ -25,9 +25,9 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationFactory;
@@ -66,7 +66,7 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> exte
 	 * only one worker but we should still notify all callers when tracing
 	 * finished.
 	 */
-	private final Multimap<IndexedClassExpression, J> jobsInProgress_;
+	private final Multimap<IndexedContextRoot, J> jobsInProgress_;
 	
 	private final ContextTracingListener tracingFinishedListener_;
 	
@@ -85,7 +85,7 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> exte
 		tracingState_ = tracingState;
 		tracingFactory_ = new ClassExpressionSaturationFactory<J>(
 				ruleTracingFactory, maxWorkers, new ThisTracingListener());
-		jobsInProgress_ = new HashListMultimap<IndexedClassExpression, J>();
+		jobsInProgress_ = new HashListMultimap<IndexedContextRoot, J>();
 		tracingFinishedListener_ = listener;
 		aggregateStatistics_ = new SaturationStatistics();
 	}
@@ -117,7 +117,7 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> exte
 	}
 	
 	private void finishTracing(J job) {
-		IndexedClassExpression root = job.getInput();
+		IndexedContextRoot root = job.getInput();
 		TracedContext context = tracingState_.getContext(root);
 		
 		LOGGER_.trace("{} finished tracing", root);
@@ -129,7 +129,7 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> exte
 		context.beingTracedCompareAndSet(true, false);
 	}	
 
-	private synchronized void notifyCallers(IndexedClassExpression root) {
+	private synchronized void notifyCallers(IndexedContextRoot root) {
 		for (J job : jobsInProgress_.get(root)) {
 			tracingFinishedListener_.notifyFinished(job);
 			job.getCallback().notifyFinished(job);
@@ -155,7 +155,7 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> exte
 		
 		@Override
 		public void submit(J job) {
-			IndexedClassExpression root = job.getInput();
+			IndexedContextRoot root = job.getInput();
 			TracedContext context = tracingState_.getContext(root);
 			
 			if (context != null && context.isInitialized() && context.isSaturated()) {

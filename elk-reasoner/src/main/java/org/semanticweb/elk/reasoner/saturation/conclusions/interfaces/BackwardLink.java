@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,6 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 
 /**
  * A {@link Conclusion} representing derived existential restrictions from a
@@ -48,11 +51,11 @@ public interface BackwardLink extends SubConclusion {
 	public IndexedObjectProperty getRelation();
 
 	/**
-	 * @return the source of this {@link BackwardLink}, that is, the
-	 *         {@link IndexedClassExpression} from which the existential
-	 *         restriction corresponding to this {@link BackwardLink}
-	 *         follows
+	 * @return the source {@link IndexedContextRoot} of this
+	 *         {@link BackwardLink}, that is, the {@link IndexedClassExpression}
+	 *         from which the existential restriction corresponding to this
+	 *         {@link BackwardLink} follows
 	 */
-	public IndexedClassExpression getSource();
+	public IndexedContextRoot getSource();
 
 }

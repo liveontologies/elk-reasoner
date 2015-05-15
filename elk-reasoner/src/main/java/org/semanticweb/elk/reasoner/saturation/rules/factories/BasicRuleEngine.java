@@ -38,7 +38,8 @@ import org.semanticweb.elk.util.concurrent.computation.Interrupter;
  * 
  * @author "Yevgeny Kazakov"
  */
-public class BasicRuleEngine<I extends RuleApplicationInput> extends AbstractRuleEngineWithStatistics<I> {
+public class BasicRuleEngine<I extends RuleApplicationInput> extends
+		AbstractRuleEngineWithStatistics<I> {
 
 	/**
 	 * a {@link SaturationStateWriter} to produce new {@link Conclusion}s and

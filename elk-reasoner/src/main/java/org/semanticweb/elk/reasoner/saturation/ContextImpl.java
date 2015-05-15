@@ -56,6 +56,7 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.chains.AbstractChain;
 import org.semanticweb.elk.util.collections.chains.Chain;
 import org.semanticweb.elk.util.concurrent.collections.ActivationStack;
+import org.semanticweb.elk.util.concurrent.collections.SynchronizedArrayListActivationStack;
 
 /**
  * Context implementation that is used for EL reasoning. It provides data
@@ -112,11 +113,11 @@ public class ContextImpl implements ExtendedContext {
 	private volatile boolean isSaturated_ = true;
 
 	/**
-	 * the root {@link IndexedClassExpression} for which the {@link #subsumers_}
-	 * are computed
+	 * the {@link IndexedContextRoot} for which the {@link #subsumers_} are
+	 * computed
 	 * 
 	 */
-	private final IndexedClassExpression root_;
+	private final IndexedContextRoot root_;
 
 	/**
 	 * the derived {@link IndexedClassExpression}s that are subsumers (i.e,
@@ -136,14 +137,14 @@ public class ContextImpl implements ExtendedContext {
 	private volatile boolean isInitialized_ = false;
 
 	/**
-	 * Construct a new {@link Context} for the given root
-	 * {@link IndexedClassExpression}. Initially, the context is not active.
+	 * Construct a new {@link Context} for the given {@link IndexedContextRoot}.
+	 * Initially, the context is not active.
 	 * 
 	 * @param root
 	 */
-	public ContextImpl(IndexedClassExpression root) {
+	public ContextImpl(IndexedContextRoot root) {
 		this.root_ = root;
-		this.toDo_ = new ActivationStack<Conclusion>();
+		this.toDo_ = new SynchronizedArrayListActivationStack<Conclusion>();
 		this.subsumers_ = new ArrayHashSet<IndexedClassExpression>(13);
 	}
 
@@ -224,7 +225,7 @@ public class ContextImpl implements ExtendedContext {
 	}
 
 	@Override
-	public IndexedClassExpression getRoot() {
+	public IndexedContextRoot getRoot() {
 		return root_;
 	}
 

@@ -32,6 +32,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 
@@ -70,7 +71,8 @@ class ReferenceSaturationState extends AbstractSaturationState<ExtendedContext> 
 					Iterator<? extends IndexedClassExpression> ices = ontologyIndex
 							.getClassExpressions().iterator();
 
-					ExtendedContext next;
+					ExtendedContext nextContext;
+					ExtendedContext nextFillerContext;
 
 					{
 						seekNext();
@@ -78,25 +80,37 @@ class ReferenceSaturationState extends AbstractSaturationState<ExtendedContext> 
 
 					void seekNext() {
 						while (ices.hasNext()) {
-							next = ices.next().getContext();
-							if (next != null)
+							IndexedClassExpression nextIce = ices.next();
+							nextContext = nextIce.getContext();
+							if (nextIce instanceof IndexedObjectSomeValuesFrom) {
+								nextFillerContext = ((IndexedObjectSomeValuesFrom) nextIce)
+										.getRangeFiller().getContext();
+								if (nextFillerContext != null)
+									return;
+							}
+							if (nextContext != null)
 								return;
 						}
-						// no next element
-						next = null;
 					}
 
 					@Override
 					public boolean hasNext() {
-						return next != null;
+						return (nextContext != null || nextFillerContext != null);
 					}
 
 					@Override
 					public ExtendedContext next() {
-						if (next == null)
+						ExtendedContext result;
+						if (nextContext != null) {
+							result = nextContext;
+							nextContext = null;
+						} else if (nextFillerContext != null) {
+							result = nextFillerContext;
+							nextFillerContext = null;
+						} else
 							throw new NoSuchElementException("No next context");
-						ExtendedContext result = next;
-						seekNext();
+						if (!hasNext())
+							seekNext();
 						return result;
 					}
 
@@ -123,8 +137,8 @@ class ReferenceSaturationState extends AbstractSaturationState<ExtendedContext> 
 	}
 
 	@Override
-	public ExtendedContext getContext(IndexedClassExpression ice) {
-		return ice.getContext();
+	public ExtendedContext getContext(IndexedContextRoot root) {
+		return root.getContext();
 	}
 
 	@Override

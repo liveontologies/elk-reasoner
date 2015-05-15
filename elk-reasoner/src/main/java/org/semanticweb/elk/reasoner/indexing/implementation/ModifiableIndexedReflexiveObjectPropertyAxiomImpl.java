@@ -23,10 +23,12 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
  */
 
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
+import org.semanticweb.elk.reasoner.indexing.conversion.ElkUnexpectedIndexingException;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ReflexivePropertyRangesContextInitRule;
 
 /**
  * Implements {@link ModifiableIndexedReflexiveObjectPropertyAxiom}
@@ -61,6 +63,12 @@ class ModifiableIndexedReflexiveObjectPropertyAxiomImpl extends
 			return false;
 		}
 		// else
+		if (!ReflexivePropertyRangesContextInitRule.addRuleFor(this, index)) {
+			// revert the changes
+			if (!index.removeReflexiveProperty(property_, reason))
+				throw new ElkUnexpectedIndexingException(this);
+			return false;
+		}
 		return true;
 	}
 
@@ -68,6 +76,12 @@ class ModifiableIndexedReflexiveObjectPropertyAxiomImpl extends
 	public boolean removeOccurrence(ModifiableOntologyIndex index,
 			ElkAxiom reason) {
 		if (!index.removeReflexiveProperty(property_, reason)) {
+			return false;
+		}
+		if (!ReflexivePropertyRangesContextInitRule.removeRuleFor(this, index)) {
+			// revert the changes
+			if (!index.addReflexiveProperty(property_, reason))
+				throw new ElkUnexpectedIndexingException(this);
 			return false;
 		}
 		// else

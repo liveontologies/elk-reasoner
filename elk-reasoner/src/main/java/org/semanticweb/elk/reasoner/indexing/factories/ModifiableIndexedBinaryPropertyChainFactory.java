@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedPropert
  */
 public interface ModifiableIndexedBinaryPropertyChainFactory {
 
-	public ModifiableIndexedComplexPropertyChain getIndexedBinaryPropertyChain(
+	public ModifiableIndexedComplexPropertyChain getIndexedComplexPropertyChain(
 			ModifiableIndexedObjectProperty leftProperty,
 			ModifiableIndexedPropertyChain rightProperty);
 

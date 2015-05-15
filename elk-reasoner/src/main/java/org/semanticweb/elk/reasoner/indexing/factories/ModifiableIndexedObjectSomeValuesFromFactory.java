@@ -37,6 +37,6 @@ public interface ModifiableIndexedObjectSomeValuesFromFactory {
 
 	public ModifiableIndexedObjectSomeValuesFrom getIndexedObjectSomeValuesFrom(
 			ModifiableIndexedObjectProperty property,
-			ModifiableIndexedClassExpression filler);
+			ModifiableIndexedClassExpression fillerConcept);
 
 }

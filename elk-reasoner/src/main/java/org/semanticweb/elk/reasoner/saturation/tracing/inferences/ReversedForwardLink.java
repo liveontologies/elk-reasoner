@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
@@ -44,12 +44,12 @@ public class ReversedForwardLink extends BackwardLinkImpl implements
 
 	private final ForwardLink sourceLink_;
 
-	private final IndexedClassExpression inferenceContext_;
+	private final IndexedContextRoot inferenceContext_;
 
 	/**
 	 * 
 	 */
-	public ReversedForwardLink(IndexedClassExpression source,
+	public ReversedForwardLink(IndexedContextRoot source,
 			IndexedObjectProperty relation, ForwardLink forwardLink) {
 		super(source, relation);
 		this.sourceLink_ = forwardLink;
@@ -67,8 +67,8 @@ public class ReversedForwardLink extends BackwardLinkImpl implements
 	}
 
 	@Override
-	public IndexedClassExpression getInferenceContextRoot(
-			IndexedClassExpression rootWhereStored) {
+	public IndexedContextRoot getInferenceContextRoot(
+			IndexedContextRoot rootWhereStored) {
 		return inferenceContext_;
 	}
 }

@@ -106,7 +106,7 @@ class CachedIndexedObjectUnionOfImpl extends
 						.log(LOGGER_,
 								LogLevel.WARN,
 								"reasoner.indexing.IndexedObjectUnionOf",
-								"ELK does not support positive occurrences of ObjectUnionOf. Reasoning might be incomplete!");
+								"ELK does not support positive occurrences of ObjectUnionOf or ObjectOneOf. Reasoning might be incomplete!");
 			}
 		}
 

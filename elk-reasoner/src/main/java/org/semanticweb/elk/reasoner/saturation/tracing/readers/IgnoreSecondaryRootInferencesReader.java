@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.readers;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.DelegatingTraceReader;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
@@ -52,17 +52,18 @@ public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 	}
 
 	@Override
-	public void accept(final IndexedClassExpression root,
+	public void accept(final IndexedContextRoot root,
 			final Conclusion inferredConclusion,
-			final ClassInferenceVisitor<IndexedClassExpression, ?> visitor) {
+			final ClassInferenceVisitor<IndexedContextRoot, ?> visitor) {
 		reader.accept(
 				root,
 				inferredConclusion,
-				new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
+				new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
 					@Override
-					protected Boolean defaultTracedVisit(ClassInference conclusion,
-							IndexedClassExpression contextRoot) {
+					protected Boolean defaultTracedVisit(
+							ClassInference conclusion,
+							IndexedContextRoot contextRoot) {
 						conclusion.acceptTraced(visitor, null);
 
 						return true;
@@ -70,7 +71,7 @@ public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 
 					@Override
 					public Boolean visit(SubClassOfSubsumer<?> conclusion,
-							IndexedClassExpression contextRoot) {
+							IndexedContextRoot contextRoot) {
 						if (conclusion.getExpression() != contextRoot) {
 							defaultTracedVisit(conclusion, contextRoot);
 						}
@@ -80,7 +81,7 @@ public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 
 					@Override
 					public Boolean visit(ComposedConjunction conclusion,
-							IndexedClassExpression contextRoot) {
+							IndexedContextRoot contextRoot) {
 						if (conclusion.getExpression() != contextRoot) {
 							defaultTracedVisit(conclusion, contextRoot);
 						}
@@ -90,7 +91,7 @@ public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 
 					@Override
 					public Boolean visit(DecomposedConjunction conclusion,
-							IndexedClassExpression contextRoot) {
+							IndexedContextRoot contextRoot) {
 						if (conclusion.getExpression() != contextRoot) {
 							defaultTracedVisit(conclusion, contextRoot);
 						}
@@ -100,7 +101,7 @@ public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 
 					@Override
 					public Boolean visit(PropagatedSubsumer conclusion,
-							IndexedClassExpression contextRoot) {
+							IndexedContextRoot contextRoot) {
 						if (conclusion.getExpression() != contextRoot) {
 							defaultTracedVisit(conclusion, contextRoot);
 						}

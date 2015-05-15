@@ -43,6 +43,7 @@ import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
@@ -150,18 +151,18 @@ public class PropertyInferenceTracingTest {
 		TracingTestUtils.checkTracingCompleteness(b, e, reasoner);
 		// checking that S o H -> SS o HH is there
 		TracingTestUtils.checkConditionOverUsedInferences(a, e, reasoner, 
-				new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
+				new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
 					@Override
 					protected Boolean defaultTracedVisit(
 							ClassInference conclusion,
-							IndexedClassExpression input) {
+							IndexedContextRoot input) {
 						return false;
 					}
 
 					@Override
 					public Boolean visit(ComposedForwardLink conclusion,
-							IndexedClassExpression input) {
+							IndexedContextRoot input) {
 						// looking for the composition S o H -> SS o HH
 						SubObjectProperty left = conclusion.getLeftSubObjectProperty();
 						SubPropertyChain<?,?> right = conclusion.getRightSubObjectPropertyChain();
@@ -200,17 +201,17 @@ public class PropertyInferenceTracingTest {
 		
 		// checking that the axiom RR o SS o HH -> T is used 
 		TracingTestUtils.checkConditionOverUsedInferences(a, e, reasoner, 
-				new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
+				new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
 					@Override
 					protected Boolean defaultTracedVisit(ClassInference conclusion,
-							IndexedClassExpression input) {
+							IndexedContextRoot input) {
 						return false;
 					}
 
 					@Override
 					public Boolean visit(ComposedBackwardLink backwardLink,
-							IndexedClassExpression input) {
+							IndexedContextRoot input) {
 						// check that we use the inference that A <-R- B and B -SS o HH-> D imply A <-T- D  
 						return backwardLink.getRelation().equals(tIndexed) &&
 								backwardLink.getSource().equals(aIndexed) &&

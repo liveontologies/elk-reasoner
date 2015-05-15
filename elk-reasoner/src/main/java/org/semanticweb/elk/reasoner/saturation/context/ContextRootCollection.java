@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.context;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,17 +26,17 @@ import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 
 /**
- * A collection of {@link IndexedClassExpression}s that are roots of the given
+ * A collection of {@link IndexedContextRoot}s that are roots of the given
  * collection of {@link Context}s
  * 
  * @author "Yevgeny Kazakov"
  * 
  */
 public class ContextRootCollection extends
-		AbstractCollection<IndexedClassExpression> {
+		AbstractCollection<IndexedContextRoot> {
 
 	private final Collection<? extends Context> contexts_;
 
@@ -44,8 +45,8 @@ public class ContextRootCollection extends
 	}
 
 	@Override
-	public Iterator<IndexedClassExpression> iterator() {
-		return new Iterator<IndexedClassExpression>() {
+	public Iterator<IndexedContextRoot> iterator() {
+		return new Iterator<IndexedContextRoot>() {
 
 			private final Iterator<? extends Context> iter_ = contexts_
 					.iterator();
@@ -56,7 +57,7 @@ public class ContextRootCollection extends
 			}
 
 			@Override
-			public IndexedClassExpression next() {
+			public IndexedContextRoot next() {
 				return iter_.next().getRoot();
 			}
 

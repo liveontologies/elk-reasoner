@@ -32,6 +32,6 @@ public class SimpleTypeBasedMatcher<T, O> implements Matcher<T, O> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public O match(T candidate) {
-		return class_.isInstance(candidate) ? (O) candidate : null;
+		return candidate.getClass() == class_ ? (O) candidate : null;
 	}
 }

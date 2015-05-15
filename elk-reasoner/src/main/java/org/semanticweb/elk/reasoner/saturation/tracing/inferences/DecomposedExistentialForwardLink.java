@@ -25,12 +25,14 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.AbstractConclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
@@ -40,8 +42,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  * @author "Yevgeny Kazakov"
  * 
  */
-public class DecomposedExistentialForwardLink extends ForwardLinkImpl implements
-		ClassInference {
+public class DecomposedExistentialForwardLink extends AbstractConclusion
+		implements ForwardLink, ClassInference {
 
 	private final IndexedObjectSomeValuesFrom existential_;
 
@@ -49,12 +51,22 @@ public class DecomposedExistentialForwardLink extends ForwardLinkImpl implements
 	 * 
 	 */
 	public DecomposedExistentialForwardLink(IndexedObjectSomeValuesFrom subsumer) {
-		super(subsumer.getProperty(), subsumer.getFiller());
 		existential_ = subsumer;
 	}
 
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
+	public IndexedPropertyChain getRelation() {
+		return existential_.getProperty();
+	}
+
+	@Override
+	public IndexedContextRoot getTarget() {
+		return IndexedObjectSomeValuesFrom.Helper.getTarget(existential_);
+	}
+
+	@Override
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 
@@ -64,8 +76,8 @@ public class DecomposedExistentialForwardLink extends ForwardLinkImpl implements
 	}
 
 	@Override
-	public IndexedClassExpression getInferenceContextRoot(
-			IndexedClassExpression rootWhereStored) {
+	public IndexedContextRoot getInferenceContextRoot(
+			IndexedContextRoot rootWhereStored) {
 		return rootWhereStored;
 	}
 
@@ -73,4 +85,10 @@ public class DecomposedExistentialForwardLink extends ForwardLinkImpl implements
 	public String toString() {
 		return super.toString() + " (decomposition)";
 	}
+
+	@Override
+	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
+	}
+
 }

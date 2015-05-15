@@ -22,15 +22,17 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDataHasValue;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDeclarationAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectPropertyRangeAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedReflexiveObjectPropertyAxiom;
@@ -53,14 +55,17 @@ public class DelegatingIndexedObjectVisitor<O> implements
 	private final IndexedClassExpressionVisitor<O> classExpressionVisitor_;
 	private final IndexedPropertyChainVisitor<O> propertyChainVisitor_;
 	private final IndexedAxiomVisitor<O> axiomVisitor_;
+	private final IndexedFillerVisitor<O> fillerVisitor_;
 
 	public DelegatingIndexedObjectVisitor(
 			IndexedClassExpressionVisitor<O> classExpressionVisitor,
 			IndexedPropertyChainVisitor<O> propertyChainVisitor,
-			IndexedAxiomVisitor<O> axiomVisitor) {
+			IndexedAxiomVisitor<O> axiomVisitor,
+			IndexedFillerVisitor<O> fillerVisitor) {
 		this.classExpressionVisitor_ = classExpressionVisitor;
 		this.propertyChainVisitor_ = propertyChainVisitor;
 		this.axiomVisitor_ = axiomVisitor;
+		this.fillerVisitor_ = fillerVisitor;
 	}
 
 	@Override
@@ -109,12 +114,22 @@ public class DelegatingIndexedObjectVisitor<O> implements
 	}
 
 	@Override
+	public O visit(IndexedRangeFiller element) {
+		return fillerVisitor_.visit(element);
+	}
+
+	@Override
 	public O visit(IndexedSubClassOfAxiom axiom) {
 		return axiomVisitor_.visit(axiom);
 	}
 
 	@Override
 	public O visit(IndexedSubObjectPropertyOfAxiom axiom) {
+		return axiomVisitor_.visit(axiom);
+	}
+
+	@Override
+	public O visit(IndexedObjectPropertyRangeAxiom axiom) {
 		return axiomVisitor_.visit(axiom);
 	}
 
