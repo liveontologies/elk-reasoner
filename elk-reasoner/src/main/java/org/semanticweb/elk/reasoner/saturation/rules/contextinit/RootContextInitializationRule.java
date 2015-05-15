@@ -112,6 +112,7 @@ public class RootContextInitializationRule extends
 								element.getFillerConcept()));
 				for (IndexedClassExpression range : element.getProperty()
 						.getSaturated().getRanges()) {
+					// TODO: introduce a specific inference
 					producer.produce(premises.getRoot(),
 							new InitializationSubsumer<IndexedClassExpression>(
 									range));

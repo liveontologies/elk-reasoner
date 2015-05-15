@@ -35,6 +35,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxi
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedFiller;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
@@ -59,6 +60,7 @@ import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.Contradiction
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.LinkableBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.backwardlinks.SubsumerBackwardLinkRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.OwlThingContextInitRule;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ReflexivePropertyRangesContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.RootContextInitializationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.contradiction.ContradictionPropagationRule;
 import org.semanticweb.elk.reasoner.saturation.rules.disjointsubsumer.ContradicitonCompositionRule;
@@ -99,6 +101,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 	private final ContextValidator contextValidator_ = new ContextValidator();
 
 	private final ClassExpressionValidator iceValidator_ = new ClassExpressionValidator();
+
+	private final ObjectPropertyValidator iopValidator_ = new ObjectPropertyValidator();
 
 	private final IndexedContextRootValidator rootValidator_ = new IndexedContextRootValidator();
 
@@ -184,6 +188,14 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			if (context != null) {
 				contextValidator_.add(context);
 			}
+			if (ice instanceof IndexedObjectSomeValuesFrom) {
+				IndexedContextRoot root = ((IndexedObjectSomeValuesFrom) ice)
+						.getFiller();
+				context = saturationState_.getContext(root);
+				if (context != null) {
+					contextValidator_.add(context);
+				}
+			}
 
 			// validating context rules
 			LinkedSubsumerRule rule = ice.getCompositionRuleHead();
@@ -192,6 +204,62 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 				rule.accept(ruleValidator_, ice, null, null);
 				rule = rule.next();
 			}
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private class ObjectPropertyValidator {
+
+		private final Set<IndexedObjectProperty> cache_ = new ArrayHashSet<IndexedObjectProperty>();
+
+		private final Queue<IndexedObjectProperty> toValidate_ = new LinkedList<IndexedObjectProperty>();
+
+		boolean add(IndexedObjectProperty property) {
+			if (cache_.add(property)) {
+				toValidate_.add(property);
+				return true;
+			}
+			return false;
+		}
+
+		void checkNew(IndexedObjectProperty property) {
+			if (add(property)) {
+				LOGGER_.error("Unexpected reachable object property: "
+						+ property);
+			}
+		}
+
+		/**
+		 * @return {@code true} if something new has been validated, otherwise
+		 *         returns {@code false}
+		 */
+		boolean validate() {
+			if (toValidate_.isEmpty())
+				return false;
+			for (;;) {
+				IndexedObjectProperty property = toValidate_.poll();
+				if (property == null)
+					break;
+				validate(property);
+			}
+			return true;
+		}
+
+		private void validate(IndexedObjectProperty property) {
+			LOGGER_.trace("Validating object property {}", property);
+
+			// told ranges
+			for (IndexedClassExpression ice : property.getToldRanges()) {
+				iceValidator_.checkNew(ice);
+			}
+
+			// told super properties
+			for (IndexedObjectProperty iop : property.getToldSuperProperties()) {
+				iopValidator_.checkNew(iop);
+			}
+
 		}
 	}
 
@@ -421,6 +489,15 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			// nothing is stored in the rule
 		}
 
+		@Override
+		public void visit(ReflexivePropertyRangesContextInitRule rule,
+				ContextInitialization premise, ContextPremises premises,
+				ConclusionProducer producer) {
+			for (IndexedObjectProperty reflexive : rule
+					.getToldReflexiveProperties()) {
+				iopValidator_.checkNew(reflexive);
+			}
+		}
 	}
 
 	/**

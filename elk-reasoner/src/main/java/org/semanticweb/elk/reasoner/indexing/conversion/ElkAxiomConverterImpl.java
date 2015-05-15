@@ -264,6 +264,11 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 
 	@Override
 	public Void visit(ElkReflexiveObjectPropertyAxiom axiom) {
+		// indexing owl:Thing negatively to make sure reflexive property ranges
+		// are computed correctly as equivalent of owl:Thing
+		@SuppressWarnings("unused")
+		ModifiableIndexedClass unused = negativeFactory_
+				.getIndexedClass(PredefinedElkClass.OWL_THING);
 		axiomFactory_.getIndexedReflexiveObjectPropertyAxiom(axiom
 				.getProperty().accept(positiveConverter_));
 		return null;

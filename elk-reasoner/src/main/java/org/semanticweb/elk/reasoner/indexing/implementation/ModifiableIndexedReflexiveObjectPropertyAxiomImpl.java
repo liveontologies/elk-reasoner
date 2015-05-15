@@ -27,6 +27,7 @@ import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectP
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedAxiomVisitor;
+import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ReflexivePropertyRangesContextInitRule;
 
 /**
  * Implements {@link ModifiableIndexedReflexiveObjectPropertyAxiom}
@@ -63,6 +64,12 @@ class ModifiableIndexedReflexiveObjectPropertyAxiomImpl extends
 			// first occurrence of reflexivity property
 			if (!index.addReflexiveProperty(property_))
 				return false;
+			if (!ReflexivePropertyRangesContextInitRule.addRuleFor(this, index)) {
+				// revert the changes
+				if (!index.removeReflexiveProperty(property_))
+					throw new ElkUnexpectedIndexingException(this);
+				return false;
+			}
 		}
 
 		property_.updateReflexiveOccurrenceNumber(increment);
@@ -72,6 +79,15 @@ class ModifiableIndexedReflexiveObjectPropertyAxiomImpl extends
 			if (!index.removeReflexiveProperty(property_)) {
 				// revert the changes
 				if (!property_.updateReflexiveOccurrenceNumber(-increment))
+					throw new ElkUnexpectedIndexingException(this);
+				return false;
+			}
+			if (!ReflexivePropertyRangesContextInitRule.removeRuleFor(this,
+					index)) {
+				// revert the changes
+				if (!property_.updateReflexiveOccurrenceNumber(-increment))
+					throw new ElkUnexpectedIndexingException(this);
+				if (!index.addReflexiveProperty(property_))
 					throw new ElkUnexpectedIndexingException(this);
 				return false;
 			}
