@@ -55,8 +55,8 @@ public interface CachedIndexedObjectSomeValuesFrom extends
 			if (second instanceof CachedIndexedObjectSomeValuesFrom) {
 				CachedIndexedObjectSomeValuesFrom secondEntry = (CachedIndexedObjectSomeValuesFrom) second;
 				if (first.getProperty().equals(secondEntry.getProperty())
-						&& first.getFillerConcept().equals(
-								secondEntry.getFillerConcept()))
+						&& first.getFiller().equals(
+								secondEntry.getFiller()))
 					return secondEntry;
 			}
 			// else

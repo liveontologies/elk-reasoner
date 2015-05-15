@@ -32,7 +32,7 @@ import java.util.Set;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedFiller;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
@@ -190,7 +190,7 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 			}
 			if (ice instanceof IndexedObjectSomeValuesFrom) {
 				IndexedContextRoot root = ((IndexedObjectSomeValuesFrom) ice)
-						.getFiller();
+						.getRangeFiller();
 				context = saturationState_.getContext(root);
 				if (context != null) {
 					contextValidator_.add(context);
@@ -274,8 +274,8 @@ public class SaturationGraphValidationStage extends BasePostProcessingStage {
 		}
 
 		@Override
-		public Void visit(IndexedFiller element) {
-			iceValidator_.checkNew(element.getFillerConcept());
+		public Void visit(IndexedRangeFiller element) {
+			iceValidator_.checkNew(element.getFiller());
 			return null;
 		}
 	}

@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedFiller;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 
 /**
@@ -48,7 +48,7 @@ public class NoOpIndexedContextRootVisitor<O> extends
 	}
 
 	@Override
-	public O visit(IndexedFiller element) {
+	public O visit(IndexedRangeFiller element) {
 		return defaultVisit(element);
 	}
 

@@ -22,10 +22,10 @@ package org.semanticweb.elk.reasoner.indexing.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedFiller;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 
 /**
- * Visitor pattern interface for instances of {@link IndexedFiller}.
+ * Visitor pattern interface for instances of {@link IndexedRangeFiller}.
  * 
  * @author "Yevgeny Kazakov"
  * 
@@ -34,6 +34,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedFiller;
  */
 public interface IndexedFillerVisitor<O> {
 
-	O visit(IndexedFiller element);
+	O visit(IndexedRangeFiller element);
 
 }

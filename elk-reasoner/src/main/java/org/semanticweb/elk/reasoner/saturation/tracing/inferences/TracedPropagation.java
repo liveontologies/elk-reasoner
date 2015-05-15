@@ -53,7 +53,7 @@ public class TracedPropagation extends PropagationImpl implements Inference {
 
 	public Subsumer<?> getPremise() {
 		return new DecomposedSubsumerImpl<IndexedClassExpression>(getCarry()
-				.getFillerConcept());
+				.getFiller());
 	}
 
 	@Override

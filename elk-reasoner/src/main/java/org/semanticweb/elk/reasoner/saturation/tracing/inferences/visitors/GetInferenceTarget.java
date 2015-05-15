@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
@@ -73,6 +74,7 @@ public class GetInferenceTarget extends
 	@Override
 	public IndexedContextRoot visit(
 			DecomposedExistentialBackwardLink conclusion, Context premiseContext) {
-		return conclusion.getExistential().getExpression().getFiller();
+		return IndexedObjectSomeValuesFrom.Helper.getTarget(conclusion
+				.getExistential().getExpression());
 	}
 }

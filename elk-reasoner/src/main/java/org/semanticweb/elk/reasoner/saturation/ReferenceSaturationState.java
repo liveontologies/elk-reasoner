@@ -84,7 +84,7 @@ class ReferenceSaturationState extends AbstractSaturationState<ExtendedContext> 
 							nextContext = nextIce.getContext();
 							if (nextIce instanceof IndexedObjectSomeValuesFrom) {
 								nextFillerContext = ((IndexedObjectSomeValuesFrom) nextIce)
-										.getFiller().getContext();
+										.getRangeFiller().getContext();
 								if (nextFillerContext != null)
 									return;
 							}

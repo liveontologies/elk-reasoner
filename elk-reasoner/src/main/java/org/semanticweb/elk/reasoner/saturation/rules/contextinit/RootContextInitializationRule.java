@@ -23,7 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.rules.contextinit;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedFiller;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.NoOpIndexedContextRootVisitor;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
@@ -106,10 +106,10 @@ public class RootContextInitializationRule extends
 			}
 
 			@Override
-			public Void visit(IndexedFiller element) {
+			public Void visit(IndexedRangeFiller element) {
 				producer.produce(premises.getRoot(),
 						new InitializationSubsumer<IndexedClassExpression>(
-								element.getFillerConcept()));
+								element.getFiller()));
 				for (IndexedClassExpression range : element.getProperty()
 						.getSaturated().getRanges()) {
 					// TODO: introduce a specific inference

@@ -33,11 +33,12 @@ import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 /**
  * A {@link SubsumerDecompositionRule} that processes
  * {@link IndexedObjectSomeValuesFrom} and produces the corresponding
- * {@link BackwardLink}s in the context corresponding to its filler pointing to
- * the {@link Context} in which the {@link Conclusion} was processed using its
- * relation
+ * {@link BackwardLink}s in the context corresponding to its filler (or range
+ * filler) pointing to the {@link Context} in which the {@link Conclusion} was
+ * processed using its relation
  * 
  * @see IndexedObjectSomeValuesFrom#getFiller()
+ * @see IndexedObjectSomeValuesFrom#getRangeFiller()
  * @see IndexedObjectSomeValuesFrom#getProperty()
  * 
  * @author "Yevgeny Kazakov"

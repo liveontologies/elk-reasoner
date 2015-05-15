@@ -92,14 +92,14 @@ public class PropagationFromExistentialFillerRule extends
 	public static boolean addRuleFor(
 			ModifiableIndexedObjectSomeValuesFrom existential,
 			ModifiableOntologyIndex index) {
-		return index.add(existential.getFillerConcept(),
+		return index.add(existential.getFiller(),
 				new PropagationFromExistentialFillerRule(existential));
 	}
 
 	public static boolean removeRuleFor(
 			ModifiableIndexedObjectSomeValuesFrom existential,
 			ModifiableOntologyIndex index) {
-		return index.remove(existential.getFillerConcept(),
+		return index.remove(existential.getFiller(),
 				new PropagationFromExistentialFillerRule(existential));
 	}
 

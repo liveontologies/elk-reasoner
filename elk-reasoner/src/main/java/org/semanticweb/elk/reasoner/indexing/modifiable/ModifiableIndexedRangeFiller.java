@@ -22,21 +22,21 @@ package org.semanticweb.elk.reasoner.indexing.modifiable;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedFiller;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
 
 /**
- * An {@link IndexedFiller} that can be modified as a result of updating the
- * {@link ModifiableOntologyIndex} where this object is stored.
+ * An {@link IndexedRangeFiller} that can be modified as a result of updating
+ * the {@link ModifiableOntologyIndex} where this object is stored.
  * 
  * @author "Yevgeny Kazakov"
  *
  */
-public interface ModifiableIndexedFiller extends IndexedFiller {
+public interface ModifiableIndexedRangeFiller extends IndexedRangeFiller {
 
 	@Override
 	public ModifiableIndexedObjectProperty getProperty();
 
 	@Override
-	public ModifiableIndexedClassExpression getFillerConcept();
+	public ModifiableIndexedClassExpression getFiller();
 
 }

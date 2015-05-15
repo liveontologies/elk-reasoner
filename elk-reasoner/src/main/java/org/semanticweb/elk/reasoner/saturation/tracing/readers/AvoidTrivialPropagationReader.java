@@ -26,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.readers;
  */
 
 import org.semanticweb.elk.MutableBoolean;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
@@ -90,7 +91,8 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 		IndexedContextRoot inferenceContextRoot = propagated
 				.getInferenceContextRoot(contextRoot);
 
-		if (inferenceContextRoot != propagation.getCarry().getFiller()) {
+		if (inferenceContextRoot != IndexedObjectSomeValuesFrom.Helper
+				.getTarget(propagation.getCarry())) {
 			return false;
 		}
 

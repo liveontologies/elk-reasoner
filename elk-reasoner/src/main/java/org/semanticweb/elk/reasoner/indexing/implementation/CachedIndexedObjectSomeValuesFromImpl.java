@@ -25,16 +25,12 @@ package org.semanticweb.elk.reasoner.indexing.implementation;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedClassExpressionFilter;
 import org.semanticweb.elk.reasoner.indexing.caching.CachedIndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedClassExpression;
-import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedFiller;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableIndexedRangeFiller;
 import org.semanticweb.elk.reasoner.indexing.modifiable.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.modifiable.OccurrenceIncrement;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedContextRootVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedFillerVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectSomeValuesFromVisitor;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedObjectVisitor;
-import org.semanticweb.elk.reasoner.saturation.ExtendedContext;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
 
 /**
@@ -47,29 +43,30 @@ class CachedIndexedObjectSomeValuesFromImpl
 		CachedIndexedComplexClassExpressionImpl<CachedIndexedObjectSomeValuesFrom>
 		implements CachedIndexedObjectSomeValuesFrom {
 
-	private final ModifiableIndexedFillerImpl filler_;
+	private final ModifiableIndexedRangeFillerImpl rangeFiller_;
 
 	CachedIndexedObjectSomeValuesFromImpl(
 			ModifiableIndexedObjectProperty property,
-			ModifiableIndexedClassExpression fillerConcept) {
+			ModifiableIndexedClassExpression filler) {
 		super(CachedIndexedObjectSomeValuesFrom.Helper.structuralHashCode(
-				property, fillerConcept));
-		this.filler_ = new ModifiableIndexedFillerImpl(property, fillerConcept);
+				property, filler));
+		this.rangeFiller_ = new ModifiableIndexedRangeFillerImpl(property,
+				filler);
 	}
 
 	@Override
 	public final ModifiableIndexedObjectProperty getProperty() {
-		return filler_.property_;
+		return rangeFiller_.getProperty();
 	}
 
 	@Override
-	public final ModifiableIndexedClassExpression getFillerConcept() {
-		return filler_.fillerConcept_;
+	public final ModifiableIndexedClassExpression getFiller() {
+		return rangeFiller_.getFiller();
 	}
 
 	@Override
-	public ModifiableIndexedFiller getFiller() {
-		return filler_;
+	public ModifiableIndexedRangeFiller getRangeFiller() {
+		return rangeFiller_;
 	}
 
 	@Override
@@ -106,8 +103,8 @@ class CachedIndexedObjectSomeValuesFromImpl
 
 	@Override
 	public final String toStringStructural() {
-		return "ObjectSomeValuesFrom(" + this.filler_.property_ + ' '
-				+ this.filler_.fillerConcept_ + ')';
+		return "ObjectSomeValuesFrom(" + getProperty() + ' ' + getFiller()
+				+ ')';
 	}
 
 	@Override
@@ -124,81 +121,6 @@ class CachedIndexedObjectSomeValuesFromImpl
 	public CachedIndexedObjectSomeValuesFrom accept(
 			CachedIndexedClassExpressionFilter filter) {
 		return filter.filter(this);
-	}
-
-	private static class ModifiableIndexedFillerImpl implements
-			ModifiableIndexedFiller {
-
-		private final ModifiableIndexedObjectProperty property_;
-
-		private final ModifiableIndexedClassExpression fillerConcept_;
-
-		private volatile ExtendedContext context_ = null;
-
-		ModifiableIndexedFillerImpl(ModifiableIndexedObjectProperty property,
-				ModifiableIndexedClassExpression fillerConcept) {
-			this.property_ = property;
-			this.fillerConcept_ = fillerConcept;
-		}
-
-		@Override
-		public ModifiableIndexedObjectProperty getProperty() {
-			return this.property_;
-		}
-
-		@Override
-		public ModifiableIndexedClassExpression getFillerConcept() {
-			return this.fillerConcept_;
-		}
-
-		@Override
-		public String toStringStructural() {
-			return "ObjectIntersectionOf(" + this.fillerConcept_ + ' '
-					+ "ObjectSomeValuesFrom(ObjectInverseOf(" + property_ + ')'
-					+ " owl:Thing)";
-		}
-
-		@Override
-		public final String toString() {
-			// use in debugging to identify the object uniquely (more or less)
-			return toStringStructural() + "#" + hashCode();
-		}
-
-		@Override
-		public final ExtendedContext getContext() {
-			return this.context_;
-		}
-
-		@Override
-		public final synchronized ExtendedContext setContextIfAbsent(
-				ExtendedContext context) {
-			if (context_ != null)
-				return context_;
-			// else
-			context_ = context;
-			return null;
-		}
-
-		@Override
-		public final synchronized void resetContext() {
-			context_ = null;
-		}
-
-		@Override
-		public <O> O accept(IndexedFillerVisitor<O> visitor) {
-			return visitor.visit(this);
-		}
-
-		@Override
-		public <O> O accept(IndexedContextRootVisitor<O> visitor) {
-			return accept((IndexedFillerVisitor<O>) visitor);
-		}
-
-		@Override
-		public <O> O accept(IndexedObjectVisitor<O> visitor) {
-			return accept((IndexedContextRootVisitor<O>) visitor);
-		}
-
 	}
 
 }
