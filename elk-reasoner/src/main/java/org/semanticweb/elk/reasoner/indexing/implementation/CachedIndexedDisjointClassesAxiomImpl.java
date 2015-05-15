@@ -128,6 +128,13 @@ class CachedIndexedDisjointClassesAxiomImpl extends
 					reason);
 			return false;
 		}
+		if (!index.updatePositiveOwlNothingOccurrenceNo(1)) {
+			// revert the changes
+			DisjointSubsumerFromMemberRule.removeRulesFor(this, index, reason);
+			ContradictionFromDisjointnessRule.removeRulesFor(this, index,
+					reason);
+			return false;
+		}
 		totalOccurrenceNo_++;
 		return true;
 	}
@@ -141,16 +148,23 @@ class CachedIndexedDisjointClassesAxiomImpl extends
 			totalOccurrenceNo_++;
 			return false;
 		}
+		if (!index.updatePositiveOwlNothingOccurrenceNo(-1)) {
+			// revert the changes
+			totalOccurrenceNo_++;
+			return false;
+		}
 		if (!ContradictionFromDisjointnessRule.removeRulesFor(this, index,
 				reason)) {
 			// revert the changes
+			index.updatePositiveOwlNothingOccurrenceNo(1);
 			totalOccurrenceNo_++;
 			return false;
 		}
 		if (!DisjointSubsumerFromMemberRule.removeRulesFor(this, index, reason)) {
 			// revert the changes
-			totalOccurrenceNo_++;
 			ContradictionFromDisjointnessRule.addRulesFor(this, index, reason);
+			index.updatePositiveOwlNothingOccurrenceNo(1);
+			totalOccurrenceNo_++;
 			return false;
 		}
 		return false;
