@@ -39,7 +39,7 @@ import org.semanticweb.elk.testing.TestInput;
 public class OWLAPIDiffClassificationCorrectnessTest extends
 		DiffClassificationCorrectnessTest {
 
-	static final String[] IGNORE_LIST = { "DisjointSelf.owl"/*,
+	static final String[] IGNORE_LIST = { "DisjointSelf.owl", "CompositionReflexivityComplex.owl"/*,
 			"AssertionDisjoint.owl", "Disjoint.owl", "ReflexiveRole.owl",
 			"kangaroo.owl"*/ };
 
