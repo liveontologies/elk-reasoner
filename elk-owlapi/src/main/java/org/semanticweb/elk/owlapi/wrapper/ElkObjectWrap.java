@@ -59,4 +59,20 @@ public abstract class ElkObjectWrap<T extends OWLObject> implements ElkObject {
 		return owlObject.hashCode();
 	}
 
+	@Override
+	public final boolean equals(Object other) {
+		if (other == this)
+			return true;
+		if (other instanceof ElkObjectWrap<?>) {
+			ElkObjectWrap<?> otherWrap = (ElkObjectWrap<?>) other;
+			return (owlObject.equals(otherWrap.owlObject));
+		}
+		// else
+		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return owlObject.toString();
+	}
 }
