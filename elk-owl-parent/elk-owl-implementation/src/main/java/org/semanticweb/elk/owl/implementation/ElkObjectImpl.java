@@ -25,7 +25,11 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
+import org.semanticweb.elk.owl.comparison.ElkObjectSyntacticEqualityVisitor;
+import org.semanticweb.elk.owl.comparison.ElkObjectSyntacticHasherVisitor;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
+import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
+import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
  * Basic implementation of hashable objects in ELK, typically syntactic
@@ -36,6 +40,21 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
  */
 public abstract class ElkObjectImpl implements ElkObject {
 
-	// noting common so far
+	private static final ElkObjectVisitor<Integer> HASHER_VISITOR_ = new ElkObjectSyntacticHasherVisitor();
+
+	@Override
+	public int hashCode() {
+		return this.accept(HASHER_VISITOR_);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return ElkObjectSyntacticEqualityVisitor.equals(this, other);
+	}
+
+	@Override
+	public String toString() {
+		return OwlFunctionalStylePrinter.toString(this);
+	}
 
 }
