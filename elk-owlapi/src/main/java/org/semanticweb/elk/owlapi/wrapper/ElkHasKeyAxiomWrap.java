@@ -25,8 +25,8 @@
  */
 package org.semanticweb.elk.owlapi.wrapper;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
@@ -61,10 +61,9 @@ public class ElkHasKeyAxiomWrap<T extends OWLHasKeyAxiom> extends
 	}
 
 	@Override
-	public Set<ElkObjectPropertyExpression> getObjectPropertyExpressions() {
-		Set<ElkObjectPropertyExpression> opes = new HashSet<ElkObjectPropertyExpression>(
+	public List<? extends ElkObjectPropertyExpression> getObjectPropertyExpressions() {
+		List<ElkObjectPropertyExpression> opes = new ArrayList<ElkObjectPropertyExpression>(
 				this.owlObject.getObjectPropertyExpressions().size());
-
 		for (OWLObjectPropertyExpression ope : this.owlObject
 				.getObjectPropertyExpressions()) {
 			opes.add(converter.convert(ope));
@@ -74,10 +73,9 @@ public class ElkHasKeyAxiomWrap<T extends OWLHasKeyAxiom> extends
 	}
 
 	@Override
-	public Set<ElkDataPropertyExpression> getDataPropertyExpressions() {
-		Set<ElkDataPropertyExpression> dpes = new HashSet<ElkDataPropertyExpression>(
+	public List<? extends ElkDataPropertyExpression> getDataPropertyExpressions() {
+		List<ElkDataPropertyExpression> dpes = new ArrayList<ElkDataPropertyExpression>(
 				this.owlObject.getDataPropertyExpressions().size());
-
 		for (OWLDataPropertyExpression dpe : this.owlObject
 				.getDataPropertyExpressions()) {
 			dpes.add(converter.convert(dpe));

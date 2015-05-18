@@ -43,10 +43,9 @@ PARSER_BEGIN(AbstractOwl2FunctionalStyleParser)
 
 package org.semanticweb.elk.owl.parsing.javacc;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Vector;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
@@ -906,11 +905,11 @@ ElkDataRange dataRange():
 	) { return x; }
 }
 
-Vector<ElkDataRange> dataRangeList():
+List<ElkDataRange> twoOrMoreDataRanges():
 {
 	ElkDataRange x;
-	Vector<ElkDataRange> v =
-		new Vector<ElkDataRange> ();
+	List<ElkDataRange> v =
+		new ArrayList<ElkDataRange> ();
 }{
 	x = dataRange() { v.add(x); }
 	( x = dataRange() { v.add(x); } )+
@@ -920,10 +919,10 @@ Vector<ElkDataRange> dataRangeList():
 /* 7.1 Intersection of Data Ranges */
 ElkDataIntersectionOf dataIntersectionOf():
 {
-	Vector<ElkDataRange> v;
+	List<ElkDataRange> v;
 }{
 	<DATA_INTERSECTION_OF> <OPEN_BRACKET>
-		v = dataRangeList()
+		v = twoOrMoreDataRanges()
 	<CLOSE_BRACKET> {
 		return getElkObjectFactory().getDataIntersectionOf(v);
 	}
@@ -932,10 +931,10 @@ ElkDataIntersectionOf dataIntersectionOf():
 /* 7.2 Union of Data Ranges */
 ElkDataUnionOf dataUnionOf():
 {
-	Vector<ElkDataRange> v;
+	List<ElkDataRange> v;
 }{
 	<DATA_UNION_OF> <OPEN_BRACKET>
-		v = dataRangeList()
+		v = twoOrMoreDataRanges()
 	<CLOSE_BRACKET>{
 		return getElkObjectFactory().getDataUnionOf(v);
 	}
@@ -957,8 +956,8 @@ ElkDataComplementOf dataComplementOf():
 ElkDataOneOf dataOneOf():
 {
 	ElkLiteral x;
-	Vector<ElkLiteral> v =
-		new Vector<ElkLiteral> ();
+	List<ElkLiteral> v =
+		new ArrayList<ElkLiteral> ();
 }{
 	<DATA_ONE_OF> <OPEN_BRACKET>
 		x = literal() { v.add(x); }
@@ -972,7 +971,7 @@ ElkDataOneOf dataOneOf():
 ElkDatatypeRestriction datatypeRestriction():
 {
 	ElkDatatype x;
-	Vector<ElkFacetRestriction> v = new Vector<ElkFacetRestriction>();
+	List<ElkFacetRestriction> v = new ArrayList<ElkFacetRestriction>();
 }{
 	<DATATYPE_RESTRICTION> <OPEN_BRACKET>
 		x = datatype()
@@ -1035,10 +1034,10 @@ ElkClassExpression classExpression():
 /* 8.1.1 Intersection of Class Expressions */
 ElkObjectIntersectionOf objectIntersectionOf():
 {
-	Vector<ElkClassExpression> v;
+	List<ElkClassExpression> v;
 }{
 	<OBJECT_INTERSECTION_OF> <OPEN_BRACKET>
-		v = classExpressionList()
+		v = twoOrMoreClassExpressions()
 	<CLOSE_BRACKET> {
 		return getElkObjectFactory().getObjectIntersectionOf(v);
 	}
@@ -1047,10 +1046,10 @@ ElkObjectIntersectionOf objectIntersectionOf():
 /* 8.1.2 Union of Class Expressions */
 ElkObjectUnionOf objectUnionOf():
 {
-	Vector<ElkClassExpression> v;
+	List<ElkClassExpression> v;
 }{
 	<OBJECT_UNION_OF> <OPEN_BRACKET>
-		v = classExpressionList()
+		v = twoOrMoreClassExpressions()
 	<CLOSE_BRACKET> {
 		return getElkObjectFactory().getObjectUnionOf(v);
 	}
@@ -1072,8 +1071,8 @@ ElkObjectComplementOf objectComplementOf():
 ElkObjectOneOf objectOneOf():
 {
 	ElkIndividual x;
-	Vector<ElkIndividual> v =
-		new Vector<ElkIndividual> ();
+	List<ElkIndividual> v =
+		new ArrayList<ElkIndividual> ();
 }{
 	<OBJECT_ONE_OF> <OPEN_BRACKET>
 		( x = individual() { v.add(x); } )+
@@ -1204,7 +1203,7 @@ ElkObjectExactCardinality objectExactCardinality():
 /* 8.4.1 Existential Quantification */
 ElkDataSomeValuesFrom dataSomeValuesFrom():
 {
-	Vector<ElkDataPropertyExpression> dpList = new Vector<ElkDataPropertyExpression>();
+	List<ElkDataPropertyExpression> dpList = new ArrayList<ElkDataPropertyExpression>();
 	ElkDataRange dr;
 	ElkDataSomeValuesFrom result = null;
 }{
@@ -1216,7 +1215,7 @@ ElkDataSomeValuesFrom dataSomeValuesFrom():
 	}
 }
 
-ElkDataSomeValuesFrom dataSomeValuesFromSuffix(Vector<ElkDataPropertyExpression> dpList):
+ElkDataSomeValuesFrom dataSomeValuesFromSuffix(List<ElkDataPropertyExpression> dpList):
 {
 	ElkDataRange dr = null;
 	ElkDataSomeValuesFrom result = null;
@@ -1237,7 +1236,7 @@ ElkDataSomeValuesFrom dataSomeValuesFromSuffix(Vector<ElkDataPropertyExpression>
 /* 8.4.2 Universal Quantification */
 ElkDataAllValuesFrom dataAllValuesFrom():
 {
-	Vector<ElkDataPropertyExpression> dpList = new Vector<ElkDataPropertyExpression>();
+	List<ElkDataPropertyExpression> dpList = new ArrayList<ElkDataPropertyExpression>();
 	ElkDataRange dr;
 	ElkDataAllValuesFrom result = null;
 }{
@@ -1249,7 +1248,7 @@ ElkDataAllValuesFrom dataAllValuesFrom():
 	}
 }
 
-ElkDataAllValuesFrom dataAllValuesFromSuffix(Vector<ElkDataPropertyExpression> dpList):
+ElkDataAllValuesFrom dataAllValuesFromSuffix(List<ElkDataPropertyExpression> dpList):
 {
 	ElkDataRange dr = null;
 	ElkDataAllValuesFrom result = null;
@@ -1393,11 +1392,11 @@ ElkSubClassOfAxiom subClassOf():
 /* 9.1.2 Equivalent Classes */
 ElkEquivalentClassesAxiom equivalentClasses():
 {
-	Vector<ElkClassExpression> v;
+	List<ElkClassExpression> v;
 }{
 	<EQUIVALENT_CLASSES> <OPEN_BRACKET>
 		axiomAnnotations()
-		v = classExpressionList()
+		v = twoOrMoreClassExpressions()
 	<CLOSE_BRACKET> {
 		return getElkObjectFactory().getEquivalentClassesAxiom(v);
 	}
@@ -1406,11 +1405,11 @@ ElkEquivalentClassesAxiom equivalentClasses():
 /* 9.1.3 Disjoint Classes */
 ElkDisjointClassesAxiom disjointClasses():
 {
-	Vector<ElkClassExpression> v;
+	List<ElkClassExpression> v;
 }{
 	<DISJOINT_CLASSES> <OPEN_BRACKET>
 		axiomAnnotations()
-		v = classExpressionList()
+		v = twoOrMoreClassExpressions()
 	<CLOSE_BRACKET> {
 		return getElkObjectFactory().getDisjointClassesAxiom(v);
 	}
@@ -1420,22 +1419,22 @@ ElkDisjointClassesAxiom disjointClasses():
 ElkDisjointUnionAxiom disjointUnion():
 {
 	ElkClass x;
-	Vector<ElkClassExpression> v;
+	List<ElkClassExpression> v;
 }{
 	<DISJOINT_UNION> <OPEN_BRACKET>
 		axiomAnnotations()
 		x = clazz()
-		v = classExpressionList()
+		v = twoOrMoreClassExpressions()
 	<CLOSE_BRACKET> {
 		return getElkObjectFactory().getDisjointUnionAxiom(x, v);
 	}
 }
 
-Vector<ElkClassExpression> classExpressionList():
+List<ElkClassExpression> twoOrMoreClassExpressions():
 {
 	ElkClassExpression x;
-	Vector<ElkClassExpression> v =
-		new Vector<ElkClassExpression> ();
+	List<ElkClassExpression> v =
+		new ArrayList<ElkClassExpression> ();
 }{
 	x = classExpression() { v.add(x); }
 	( x = classExpression() { v.add(x); } )+
@@ -1484,10 +1483,10 @@ ElkSubObjectPropertyOfAxiom subObjectPropertyOf():
 
 ElkObjectPropertyChain propertyExpressionChain():
 {
-	Vector<ElkObjectPropertyExpression> v;
+	List<ElkObjectPropertyExpression> v;
 }{
 	<OBJECT_PROPERTY_CHAIN> <OPEN_BRACKET>
-		v = objectPropertyExpressionList()
+		v = twoOrMoreObjectPropertyExpressions()
 	<CLOSE_BRACKET> {
 		return getElkObjectFactory().getObjectPropertyChain(v);
 	}
@@ -1496,11 +1495,11 @@ ElkObjectPropertyChain propertyExpressionChain():
 /* 9.2.2 Equivalent Object Properties */
 ElkEquivalentObjectPropertiesAxiom equivalentObjectProperties():
 {
-	Vector<ElkObjectPropertyExpression> v;
+	List<ElkObjectPropertyExpression> v;
 }{
 	<EQUIVALENT_OBJECT_PROPERTIES> <OPEN_BRACKET>
 		axiomAnnotations()
-		v = objectPropertyExpressionList()
+		v = twoOrMoreObjectPropertyExpressions()
 	<CLOSE_BRACKET> {
 		return getElkObjectFactory().getEquivalentObjectPropertiesAxiom(v);
 	}
@@ -1509,27 +1508,26 @@ ElkEquivalentObjectPropertiesAxiom equivalentObjectProperties():
 /* 9.2.3 Disjoint Object Properties */
 ElkDisjointObjectPropertiesAxiom disjointObjectProperties():
 {
-	Vector<ElkObjectPropertyExpression> v;
+	List<ElkObjectPropertyExpression> v;
 }{
 	<DISJOINT_OBJECT_PROPERTIES> <OPEN_BRACKET>
 		axiomAnnotations()
-		v = objectPropertyExpressionList()
+		v = twoOrMoreObjectPropertyExpressions()
 	<CLOSE_BRACKET> {
 		return getElkObjectFactory().getDisjointObjectPropertiesAxiom(v);
 	}
 }
 
-Vector<ElkObjectPropertyExpression> objectPropertyExpressionList():
+List<ElkObjectPropertyExpression> twoOrMoreObjectPropertyExpressions():
 {
 	ElkObjectPropertyExpression x;
-	Vector<ElkObjectPropertyExpression> v =
-		new Vector<ElkObjectPropertyExpression> ();
+	List<ElkObjectPropertyExpression> v =
+		new ArrayList<ElkObjectPropertyExpression> ();
 }{
 	x = objectPropertyExpression() { v.add(x); }
 	( x = objectPropertyExpression() { v.add(x); } )+
 	{ return v; }
 }
-
 
 /* 9.2.4 Inverse Object Properties */
 ElkInverseObjectPropertiesAxiom inverseObjectProperties():
@@ -1698,11 +1696,11 @@ ElkSubDataPropertyOfAxiom subDataPropertyOf():
 /* 9.3.2 Equivalent Data Properties */
 ElkEquivalentDataPropertiesAxiom equivalentDataProperties():
 {
-	Vector<ElkDataPropertyExpression> v;
+	List<ElkDataPropertyExpression> v;
 }{
 	<EQUIVALENT_DATA_PROPERTIES> <OPEN_BRACKET>
 		axiomAnnotations()
-		v = dataPropertyExpressionList()
+		v = twoOrMoreDataPropertyExpressions()
 	<CLOSE_BRACKET> {
 		return getElkObjectFactory().getEquivalentDataPropertiesAxiom(v);
 	}
@@ -1711,21 +1709,21 @@ ElkEquivalentDataPropertiesAxiom equivalentDataProperties():
 /* 9.3.3 Disjoint Data Properties */
 ElkDisjointDataPropertiesAxiom disjointDataProperties():
 {
-	Vector<ElkDataPropertyExpression> v;
+	List<ElkDataPropertyExpression> v;
 }{
 	<DISJOINT_DATA_PROPERTIES> <OPEN_BRACKET>
 		axiomAnnotations()
-		v = dataPropertyExpressionList()
+		v = twoOrMoreDataPropertyExpressions()
 	<CLOSE_BRACKET> {
 		return getElkObjectFactory().getDisjointDataPropertiesAxiom(v);
 	}
 }
 
-Vector<ElkDataPropertyExpression> dataPropertyExpressionList():
+List<ElkDataPropertyExpression> twoOrMoreDataPropertyExpressions():
 {
 	ElkDataPropertyExpression x;
-	Vector<ElkDataPropertyExpression> v =
-		new Vector<ElkDataPropertyExpression> ();
+	List<ElkDataPropertyExpression> v =
+		new ArrayList<ElkDataPropertyExpression> ();
 }{
 	x = dataPropertyExpression() { v.add(x); }
 	( x = dataPropertyExpression() { v.add(x); } )+
@@ -1795,16 +1793,18 @@ ElkDatatypeDefinitionAxiom datatypeDefinition():
 ElkHasKeyAxiom hasKey():
 {
 	ElkClassExpression ce = null;
-	Set<ElkObjectPropertyExpression> opexprs = new HashSet<ElkObjectPropertyExpression>();
-	Set<ElkDataPropertyExpression> dpexprs = new HashSet<ElkDataPropertyExpression>();
+	ElkObjectPropertyExpression x;
+	ElkDataPropertyExpression y;
+	List<ElkObjectPropertyExpression> opes = new ArrayList<ElkObjectPropertyExpression>();
+	List<ElkDataPropertyExpression> dpes = new ArrayList<ElkDataPropertyExpression>();	
 }{
 	<HAS_KEY> <OPEN_BRACKET>
 		axiomAnnotations()
 		ce = classExpression()
-		<OPEN_BRACKET> ( addObjectPropertyExpression(opexprs) )* <CLOSE_BRACKET>
-		<OPEN_BRACKET> ( addDataPropertyExpression(dpexprs) )* <CLOSE_BRACKET>
+		<OPEN_BRACKET> ( x = objectPropertyExpression() { opes.add(x); } )* <CLOSE_BRACKET>
+		<OPEN_BRACKET> ( y = dataPropertyExpression() { dpes.add(y); } )* <CLOSE_BRACKET>
 	<CLOSE_BRACKET> {
-		return getElkObjectFactory().getHasKeyAxiom(ce, opexprs, dpexprs);
+		return getElkObjectFactory().getHasKeyAxiom(ce, opes, dpes);
 	}
 }
 
@@ -1852,11 +1852,11 @@ ElkAssertionAxiom assertion():
 /* 9.6.1 Individual Equality */
 ElkSameIndividualAxiom sameIndividual():
 {
-	Vector<ElkIndividual> v;
+	List<ElkIndividual> v;
 }{
 	<SAME_INDIVIDUAL> <OPEN_BRACKET>
 		axiomAnnotations()
-		v = individualList()
+		v = twoOrMoreIndividuals()
 	<CLOSE_BRACKET> {
 		return getElkObjectFactory().getSameIndividualAxiom(v);
 	}
@@ -1865,21 +1865,21 @@ ElkSameIndividualAxiom sameIndividual():
 /* 9.6.2 Individual Inequality */
 ElkDifferentIndividualsAxiom differentIndividuals():
 {
-	Vector<ElkIndividual> v;
+	List<ElkIndividual> v;
 }{
 	<DIFFERENT_INDIVIDUALS> <OPEN_BRACKET>
 		axiomAnnotations()
-		v = individualList()
+		v = twoOrMoreIndividuals()
 	<CLOSE_BRACKET> {
 		return getElkObjectFactory().getDifferentIndividualsAxiom(v);
 	}
 }
 
-Vector<ElkIndividual> individualList():
+List<ElkIndividual> twoOrMoreIndividuals():
 {
 	ElkIndividual x;
-	Vector<ElkIndividual> v =
-		new Vector<ElkIndividual> ();
+	List<ElkIndividual> v =
+		new ArrayList<ElkIndividual> ();
 }{
 	x = individual() { v.add(x); }
 	( x = individual() { v.add(x); } )+
