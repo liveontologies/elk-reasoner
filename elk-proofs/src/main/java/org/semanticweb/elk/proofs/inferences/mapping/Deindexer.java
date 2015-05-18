@@ -48,78 +48,89 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectUnionOf;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.indexing.visitors.IndexedClassExpressionVisitor;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedRangeFiller;
+import org.semanticweb.elk.reasoner.indexing.visitors.IndexedContextRootVisitor;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 
 /**
  * Converts indexed objects to ELK OWL objects i.e. the inverse of indexing.
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
-public class Deindexer implements IndexedClassExpressionVisitor<ElkClassExpression> {
+public class Deindexer implements IndexedContextRootVisitor<ElkClassExpression> {
 
 	private final static ElkObjectFactory factory_ = new ElkObjectFactoryImpl();
-	
-	public static ElkClassExpression deindex(IndexedClassExpression ice) {
+
+	public static ElkClassExpression deindex(IndexedContextRoot ice) {
 		return ice.accept(new Deindexer());
 	}
-	
-	public static ElkSubObjectPropertyExpression deindex(IndexedPropertyChain ipc) {
-		return ipc.accept(new IndexedPropertyChainVisitor<ElkSubObjectPropertyExpression>() {
 
-			@Override
-			public ElkSubObjectPropertyExpression visit(IndexedObjectProperty element) {
-				return deindex(element);
-			}
+	public static ElkSubObjectPropertyExpression deindex(
+			IndexedPropertyChain ipc) {
+		return ipc
+				.accept(new IndexedPropertyChainVisitor<ElkSubObjectPropertyExpression>() {
 
-			@Override
-			public ElkSubObjectPropertyExpression visit(IndexedComplexPropertyChain element) {
-				return deindex(element);
-			}
-		});
+					@Override
+					public ElkSubObjectPropertyExpression visit(
+							IndexedObjectProperty element) {
+						return deindex(element);
+					}
+
+					@Override
+					public ElkSubObjectPropertyExpression visit(
+							IndexedComplexPropertyChain element) {
+						return deindex(element);
+					}
+				});
 	}
-	
+
 	public static ElkObjectProperty deindex(IndexedObjectProperty ip) {
 		return ip.getElkEntity();
 	}
-	
+
 	public static ElkObjectPropertyChain deindex(IndexedComplexPropertyChain ipc) {
 		final List<ElkObjectPropertyExpression> properties = new LinkedList<ElkObjectPropertyExpression>();
-		
+
 		while (ipc != null) {
 			properties.add(deindex(ipc.getFirstProperty()));
-			
-			ipc = ipc.getSuffixChain().accept(new IndexedPropertyChainVisitor<IndexedComplexPropertyChain>() {
 
-				@Override
-				public IndexedComplexPropertyChain visit(IndexedObjectProperty element) {
-					properties.add(element.getElkEntity());
-					return null;
-				}
+			ipc = ipc
+					.getSuffixChain()
+					.accept(new IndexedPropertyChainVisitor<IndexedComplexPropertyChain>() {
 
-				@Override
-				public IndexedComplexPropertyChain visit(IndexedComplexPropertyChain element) {
-					return element;
-				}
-			});
+						@Override
+						public IndexedComplexPropertyChain visit(
+								IndexedObjectProperty element) {
+							properties.add(element.getElkEntity());
+							return null;
+						}
+
+						@Override
+						public IndexedComplexPropertyChain visit(
+								IndexedComplexPropertyChain element) {
+							return element;
+						}
+					});
 		}
-		
+
 		return factory_.getObjectPropertyChain(properties);
 	}
-	
+
 	private List<? extends ElkClassExpression> deindex(
 			Set<? extends IndexedClassExpression> expressions) {
-		List<ElkClassExpression> deindexed = new ArrayList<ElkClassExpression>(expressions.size());
-		
+		List<ElkClassExpression> deindexed = new ArrayList<ElkClassExpression>(
+				expressions.size());
+
 		for (IndexedClassExpression ice : expressions) {
 			deindexed.add(deindex(ice));
 		}
-		
+
 		return deindexed;
 	}
-	
+
 	@Override
 	public ElkClass visit(IndexedClass element) {
 		return element.getElkEntity();
@@ -132,17 +143,20 @@ public class Deindexer implements IndexedClassExpressionVisitor<ElkClassExpressi
 
 	@Override
 	public ElkClassExpression visit(IndexedObjectComplementOf element) {
-		return factory_.getObjectComplementOf(element.getNegated().accept(this));
+		return factory_
+				.getObjectComplementOf(element.getNegated().accept(this));
 	}
 
 	@Override
 	public ElkClassExpression visit(IndexedObjectIntersectionOf element) {
-		return factory_.getObjectIntersectionOf(element.getFirstConjunct().accept(this), element.getSecondConjunct().accept(this));
+		return factory_.getObjectIntersectionOf(element.getFirstConjunct()
+				.accept(this), element.getSecondConjunct().accept(this));
 	}
 
 	@Override
 	public ElkClassExpression visit(IndexedObjectSomeValuesFrom element) {
-		return factory_.getObjectSomeValuesFrom(deindex(element.getProperty()), element.getFiller().accept(this));
+		return factory_.getObjectSomeValuesFrom(deindex(element.getProperty()),
+				element.getFiller().accept(this));
 	}
 
 	@Override
@@ -152,7 +166,14 @@ public class Deindexer implements IndexedClassExpressionVisitor<ElkClassExpressi
 
 	@Override
 	public ElkClassExpression visit(IndexedDataHasValue element) {
-		return factory_.getDataHasValue(element.getRelation(), element.getFiller());
+		return factory_.getDataHasValue(element.getRelation(),
+				element.getFiller());
+	}
+
+	@Override
+	public ElkClassExpression visit(IndexedRangeFiller element) {
+		// TODO: take property ranges into account
+		return element.getFiller().accept(this);		
 	}
 
 }

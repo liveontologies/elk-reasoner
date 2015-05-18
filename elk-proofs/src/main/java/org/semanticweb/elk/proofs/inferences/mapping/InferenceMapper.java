@@ -28,6 +28,7 @@ import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
@@ -80,14 +81,14 @@ public class InferenceMapper {
 	}
 	
 	// class and object property inferences
-	public void map(final IndexedClassExpression cxt, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
+	public void map(final IndexedContextRoot cxt, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
 		final SingleInferenceMapper singleMapper = new SingleInferenceMapper(exprFactory_);
 		
 		unwinder_.accept(cxt, conclusion, 
-				new AbstractClassInferenceVisitor<IndexedClassExpression, Boolean>() {
+				new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
 					@Override
-					protected Boolean defaultTracedVisit(ClassInference inference, IndexedClassExpression whereStored) {
+					protected Boolean defaultTracedVisit(ClassInference inference, IndexedContextRoot whereStored) {
 						Inference mapped = singleMapper.map(inference, whereStored);
 						
 						if (mapped == SingleInferenceMapper.CONTINUE) {

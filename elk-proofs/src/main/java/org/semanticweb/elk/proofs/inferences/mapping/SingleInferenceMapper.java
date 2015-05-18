@@ -79,6 +79,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersection
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.SideConditionLookup;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
@@ -147,7 +148,7 @@ public class SingleInferenceMapper {
 	}
 	
 	public Inference map(ClassInference inference,
-			IndexedClassExpression whereStored) {
+			IndexedContextRoot whereStored) {
 		return inference.acceptTraced(new MappingVisitor(), whereStored);
 	}
 
@@ -196,19 +197,19 @@ public class SingleInferenceMapper {
 	 */
 	private class MappingVisitor
 			implements
-			org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor<IndexedClassExpression, Inference>,
+			org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor<IndexedContextRoot, Inference>,
 			org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor<Void, Inference> {
 
 		@Override
 		public Inference visit(InitializationSubsumer<?> inference,
-				IndexedClassExpression parameter) {
+				IndexedContextRoot parameter) {
 			// don't map init inferences
 			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
 		public Inference visit(SubClassOfSubsumer<?> inference,
-				IndexedClassExpression parameter) {
+				IndexedContextRoot parameter) {
 			ElkAxiom sideCondition = sideConditionLookup_.lookup(inference);
 			
 			return new ClassSubsumption(sideCondition, Deindexer.deindex(parameter),
@@ -219,7 +220,7 @@ public class SingleInferenceMapper {
 
 		@Override
 		public Inference visit(ComposedConjunction inference,
-				IndexedClassExpression input) {
+				IndexedContextRoot input) {
 			return new ConjunctionComposition(Deindexer.deindex(input),
 					Deindexer.deindex(inference.getFirstConjunct()
 							.getExpression()), Deindexer.deindex(inference
@@ -228,7 +229,7 @@ public class SingleInferenceMapper {
 
 		@Override
 		public Inference visit(DecomposedConjunction inference,
-				IndexedClassExpression input) {
+				IndexedContextRoot input) {
 			IndexedClassExpression conclusion = inference.getExpression();
 			IndexedObjectIntersectionOf conjunction = inference
 					.getConjunction().getExpression();
@@ -243,7 +244,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(PropagatedSubsumer inference, IndexedClassExpression whereStored) {
+		public Inference visit(PropagatedSubsumer inference, IndexedContextRoot whereStored) {
 			// the left premise is an axiom with a simple existential on the right
 			ElkClassExpression c = Deindexer.deindex(whereStored);
 			ElkObjectProperty r = Deindexer.deindex(inference.getBackwardLink().getRelation());
@@ -261,7 +262,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ReflexiveSubsumer<?> inference, IndexedClassExpression input) {
+		public Inference visit(ReflexiveSubsumer<?> inference, IndexedContextRoot input) {
 			ElkClassExpression sub = Deindexer.deindex(input);
 			ElkClassExpression sup = Deindexer.deindex(inference.getExpression());
 			ElkSubClassOfAxiom conclusion = factory_.getSubClassOfAxiom(sub, sup);
@@ -316,7 +317,7 @@ public class SingleInferenceMapper {
 		}
 		
 		@Override
-		public Inference visit(ComposedBackwardLink inference, 	IndexedClassExpression whereStored) {
+		public Inference visit(ComposedBackwardLink inference, 	IndexedContextRoot whereStored) {
 			SubObjectProperty leftPropertyPremise = inference.getLeftSubObjectProperty();
 			SubPropertyChain<?,?> rightChainPremise = inference.getRightSubObjectPropertyChain();			
 			ElkObjectProperty r = Deindexer.deindex(leftPropertyPremise.getSubPropertyChain());
@@ -345,7 +346,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ComposedForwardLink inference, IndexedClassExpression whereStored) {
+		public Inference visit(ComposedForwardLink inference, IndexedContextRoot whereStored) {
 			SubObjectProperty leftPropertyPremise = inference.getLeftSubObjectProperty();
 			SubPropertyChain<?,?> rightChainPremise = inference.getRightSubObjectPropertyChain();			
 			ElkObjectProperty r = Deindexer.deindex(leftPropertyPremise.getSubPropertyChain());
@@ -371,13 +372,13 @@ public class SingleInferenceMapper {
 
 		@Override
 		public Inference visit(ReversedForwardLink conclusion,
-				IndexedClassExpression input) {
+				IndexedContextRoot input) {
 			// tautological inference
 			return SingleInferenceMapper.STOP;
 		}
 		
 		@Override
-		public Inference visit(SuperReversedForwardLink inference, IndexedClassExpression whereStored) {
+		public Inference visit(SuperReversedForwardLink inference, IndexedContextRoot whereStored) {
 			// skipping tautology
 			//return SingleInferenceMapper.STOP;
 			
@@ -413,26 +414,26 @@ public class SingleInferenceMapper {
 		}
 		
 		@Override
-		public Inference visit(DecomposedExistentialBackwardLink inference, IndexedClassExpression input) {
+		public Inference visit(DecomposedExistentialBackwardLink inference, IndexedContextRoot input) {
 			// not a self-contained user inference
 			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
-		public Inference visit(DecomposedExistentialForwardLink inference, IndexedClassExpression input) {
+		public Inference visit(DecomposedExistentialForwardLink inference, IndexedContextRoot input) {
 			// not a self-contained user inference
 			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
-		public Inference visit(TracedPropagation inference, IndexedClassExpression input) {
+		public Inference visit(TracedPropagation inference, IndexedContextRoot input) {
 			// not a self-contained user inference
 			return SingleInferenceMapper.STOP;
 		}
 
 		@Override
 		public Inference visit(
-				ContradictionFromInconsistentDisjointnessAxiom inference, IndexedClassExpression input) {
+				ContradictionFromInconsistentDisjointnessAxiom inference, IndexedContextRoot input) {
 			ElkDisjointClassesAxiom sideCondition = (ElkDisjointClassesAxiom) sideConditionLookup_.lookup(inference);
 			ElkClassExpression c = Deindexer.deindex(input);
 			ElkClassExpression d = Deindexer.deindex(inference.getPremise().getExpression());
@@ -441,7 +442,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ContradictionFromDisjointSubsumers inference, IndexedClassExpression input) {
+		public Inference visit(ContradictionFromDisjointSubsumers inference, IndexedContextRoot input) {
 			ElkDisjointClassesAxiom sideCondition = (ElkDisjointClassesAxiom) sideConditionLookup_.lookup(inference);
 			ElkClassExpression c = Deindexer.deindex(input);
 			ElkClassExpression d = Deindexer.deindex(inference.getPremises()[0].getMember());
@@ -451,7 +452,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ContradictionFromNegation inference, IndexedClassExpression input) {
+		public Inference visit(ContradictionFromNegation inference, IndexedContextRoot input) {
 			ElkClassExpression c = Deindexer.deindex(input);
 			ElkClassExpression d = Deindexer.deindex(inference.getPositivePremise().getExpression());
 			
@@ -459,13 +460,13 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ContradictionFromOwlNothing inference, IndexedClassExpression input) {
+		public Inference visit(ContradictionFromOwlNothing inference, IndexedContextRoot input) {
 			// not a self-contained user inference but we need to see inferences for owl:Nothing and map those.
 			return SingleInferenceMapper.CONTINUE;
 		}
 
 		@Override
-		public Inference visit(PropagatedContradiction inference, IndexedClassExpression whereStored) {
+		public Inference visit(PropagatedContradiction inference, IndexedContextRoot whereStored) {
 			// the left premise is an axiom with a simple existential on the right
 			ElkClassExpression c = Deindexer.deindex(whereStored);
 			ElkObjectProperty r = Deindexer.deindex(inference.getLinkPremise().getRelation());
@@ -480,7 +481,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(DisjointSubsumerFromSubsumer inference, IndexedClassExpression input) {
+		public Inference visit(DisjointSubsumerFromSubsumer inference, IndexedContextRoot input) {
 			// not a self-contained user inference
 			return SingleInferenceMapper.STOP;
 		}
@@ -488,7 +489,7 @@ public class SingleInferenceMapper {
 		@Override
 		public Inference visit(
 				org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjunctionComposition inference,
-				IndexedClassExpression input) {
+				IndexedContextRoot input) {
 			ElkClassExpression c = Deindexer.deindex(input);
 			ElkClassExpression d = Deindexer.deindex(inference.getPremise().getExpression());
 			ElkObjectUnionOf dOrE = (ElkObjectUnionOf) Deindexer.deindex(inference.getExpression());
