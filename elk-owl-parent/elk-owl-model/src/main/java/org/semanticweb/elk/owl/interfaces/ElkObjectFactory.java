@@ -26,7 +26,6 @@
 package org.semanticweb.elk.owl.interfaces;
 
 import java.util.List;
-import java.util.Set;
 
 import org.semanticweb.elk.owl.iris.ElkIri;
 
@@ -200,7 +199,8 @@ public interface ElkObjectFactory {
 	 *            should be created
 	 * @param cardinality
 	 *            the cardinality for which the object should be created
-	 * @return an {@link ElkDataExactCardinalityUnqualified} corresponding to the input
+	 * @return an {@link ElkDataExactCardinalityUnqualified} corresponding to
+	 *         the input
 	 */
 	public ElkDataExactCardinalityUnqualified getDataExactCardinalityUnqualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality);
@@ -273,7 +273,8 @@ public interface ElkObjectFactory {
 	 *            should be created
 	 * @param cardinality
 	 *            the cardinality for which the object should be created
-	 * @return an {@link ElkDataMaxCardinalityUnqualified} corresponding to the input
+	 * @return an {@link ElkDataMaxCardinalityUnqualified} corresponding to the
+	 *         input
 	 */
 	public ElkDataMaxCardinalityUnqualified getDataMaxCardinalityUnqualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality);
@@ -304,7 +305,8 @@ public interface ElkObjectFactory {
 	 *            should be created
 	 * @param cardinality
 	 *            the cardinality for which the object should be created
-	 * @return an {@link ElkDataMinCardinalityUnqualified} corresponding to the input
+	 * @return an {@link ElkDataMinCardinalityUnqualified} corresponding to the
+	 *         input
 	 */
 	public ElkDataMinCardinalityUnqualified getDataMinCardinalityUnqualified(
 			ElkDataPropertyExpression dataPropertyExpression, int cardinality);
@@ -912,7 +914,8 @@ public interface ElkObjectFactory {
 	 *            should be created
 	 * @param cardinality
 	 *            the cardinality for which the object should be created
-	 * @return an {@link ElkObjectExactCardinalityUnqualified} corresponding to the input
+	 * @return an {@link ElkObjectExactCardinalityUnqualified} corresponding to
+	 *         the input
 	 */
 	public ElkObjectExactCardinalityUnqualified getObjectExactCardinalityUnqualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
@@ -1011,7 +1014,8 @@ public interface ElkObjectFactory {
 	 *            should be created
 	 * @param cardinality
 	 *            the cardinality for which the object should be created
-	 * @return an {@link ElkObjectMaxCardinalityUnqualified} corresponding to the input
+	 * @return an {@link ElkObjectMaxCardinalityUnqualified} corresponding to
+	 *         the input
 	 */
 	public ElkObjectMaxCardinalityUnqualified getObjectMaxCardinalityUnqualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
@@ -1043,7 +1047,8 @@ public interface ElkObjectFactory {
 	 *            should be created
 	 * @param cardinality
 	 *            the cardinality for which the object should be created
-	 * @return an {@link ElkObjectMinCardinalityUnqualified} corresponding to the input
+	 * @return an {@link ElkObjectMinCardinalityUnqualified} corresponding to
+	 *         the input
 	 */
 	public ElkObjectMinCardinalityUnqualified getObjectMinCardinalityUnqualified(
 			ElkObjectPropertyExpression objectPropertyExpression,
@@ -1390,8 +1395,8 @@ public interface ElkObjectFactory {
 	 * @return an {@link ElkHasKeyAxiom} corresponding to the input
 	 */
 	public ElkHasKeyAxiom getHasKeyAxiom(ElkClassExpression classExpr,
-			Set<ElkObjectPropertyExpression> objectPEs,
-			Set<ElkDataPropertyExpression> dataPEs);
+			List<? extends ElkObjectPropertyExpression> objectPEs,
+			List<? extends ElkDataPropertyExpression> dataPEs);
 
 	/**
 	 * Create an {@link ElkDatatypeDefinitionAxiom}
@@ -1416,7 +1421,7 @@ public interface ElkObjectFactory {
 	 */
 	public ElkFacetRestriction getFacetRestriction(ElkIri iri,
 			ElkLiteral literal);
-	
+
 	/**
 	 * No arguments since we don't have a full representation of SWRL rules
 	 * 

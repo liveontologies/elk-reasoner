@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.owl.implementation;
 
-import java.util.Set;
+import java.util.List;
 
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkDataPropertyExpression;
@@ -46,12 +46,12 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 public class ElkHasKeyAxiomImpl implements ElkHasKeyAxiom {
 
 	private final ElkClassExpression classExp_;
-	private final Set<ElkObjectPropertyExpression> objectPropExprs_;
-	private final Set<ElkDataPropertyExpression> dataPropExprs_;
+	private final List<? extends ElkObjectPropertyExpression> objectPropExprs_;
+	private final List<? extends ElkDataPropertyExpression> dataPropExprs_;
 
 	ElkHasKeyAxiomImpl(ElkClassExpression classExp,
-			Set<ElkObjectPropertyExpression> objectPEs,
-			Set<ElkDataPropertyExpression> dataPEs) {
+			List<? extends ElkObjectPropertyExpression> objectPEs,
+			List<? extends ElkDataPropertyExpression> dataPEs) {
 		classExp_ = classExp;
 		objectPropExprs_ = objectPEs;
 		dataPropExprs_ = dataPEs;
@@ -63,12 +63,12 @@ public class ElkHasKeyAxiomImpl implements ElkHasKeyAxiom {
 	}
 
 	@Override
-	public Set<ElkObjectPropertyExpression> getObjectPropertyExpressions() {
+	public List<? extends ElkObjectPropertyExpression> getObjectPropertyExpressions() {
 		return objectPropExprs_;
 	}
 
 	@Override
-	public Set<ElkDataPropertyExpression> getDataPropertyExpressions() {
+	public List<? extends ElkDataPropertyExpression> getDataPropertyExpressions() {
 		return dataPropExprs_;
 	}
 

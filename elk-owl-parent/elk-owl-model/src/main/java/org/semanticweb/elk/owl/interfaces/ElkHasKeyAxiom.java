@@ -25,7 +25,7 @@
  */
 package org.semanticweb.elk.owl.interfaces;
 
-import java.util.Set;
+import java.util.List;
 
 import org.semanticweb.elk.owl.visitors.ElkHasKeyAxiomVisitor;
 
@@ -42,9 +42,9 @@ public interface ElkHasKeyAxiom extends ElkAxiom {
 
 	public ElkClassExpression getClassExpression();
 
-	public Set<ElkObjectPropertyExpression> getObjectPropertyExpressions();
+	public List<? extends ElkObjectPropertyExpression> getObjectPropertyExpressions();
 
-	public Set<ElkDataPropertyExpression> getDataPropertyExpressions();
+	public List<? extends ElkDataPropertyExpression> getDataPropertyExpressions();
 
 	/**
 	 * Accept an {@link ElkHasKeyAxiomVisitor}.

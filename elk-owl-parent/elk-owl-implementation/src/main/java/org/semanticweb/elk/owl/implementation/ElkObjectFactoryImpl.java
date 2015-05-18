@@ -23,7 +23,6 @@
 package org.semanticweb.elk.owl.implementation;
 
 import java.util.List;
-import java.util.Set;
 
 import org.semanticweb.elk.owl.interfaces.ElkAnnotation;
 import org.semanticweb.elk.owl.interfaces.ElkAnnotationAssertionAxiom;
@@ -892,9 +891,8 @@ public class ElkObjectFactoryImpl implements ElkObjectFactory {
 
 	@Override
 	public ElkHasKeyAxiom getHasKeyAxiom(ElkClassExpression classExpr,
-			Set<ElkObjectPropertyExpression> objectPEs,
-			Set<ElkDataPropertyExpression> dataPEs) {
-
+			List<? extends ElkObjectPropertyExpression> objectPEs,
+			List<? extends ElkDataPropertyExpression> dataPEs) {
 		return (ElkHasKeyAxiom) objectRecycler_.recycle(new ElkHasKeyAxiomImpl(
 				classExpr, objectPEs, dataPEs));
 	}
