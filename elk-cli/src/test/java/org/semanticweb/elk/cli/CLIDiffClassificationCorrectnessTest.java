@@ -49,7 +49,7 @@ import org.semanticweb.elk.testing.TestInput;
 public class CLIDiffClassificationCorrectnessTest extends
 		DiffClassificationCorrectnessTest {
 
-	static final String[] IGNORE_LIST = {};
+	static final String[] IGNORE_LIST = {"CompositionReflexivityComplex.owl"};
 
 	static {
 		Arrays.sort(IGNORE_LIST);

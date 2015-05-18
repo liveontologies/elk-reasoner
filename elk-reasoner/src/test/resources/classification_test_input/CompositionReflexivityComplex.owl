@@ -1,0 +1,17 @@
+Prefix( : = <http://example.org/> )
+Prefix( owl: = <http://www.w3.org/2002/07/owl#> )
+Prefix( rdfs: = <http://www.w3.org/2000/01/rdf-schema#> )
+Ontology(<www.example.org#composition_reflexivity_complex>
+Annotation(rdfs:label "Due to reflexivity of :R, ontology implies SubObjectPropertyOf(ObjectPropertyChain(:S :T) :H) and hence SubClassOf(:A :B)")
+
+ReflexiveObjectProperty(:R)
+SubObjectPropertyOf(ObjectPropertyChain(:R :S :T) :H)
+SubObjectPropertyOf(ObjectPropertyChain(:H :V) :W)
+
+SubClassOf(:A ObjectSomeValuesFrom(:S :B))
+SubClassOf(:B ObjectSomeValuesFrom(:T :C))
+SubClassOf(:C ObjectSomeValuesFrom(:V :D))
+
+EquivalentClasses(ObjectSomeValuesFrom(:W :D) :E)
+
+)
