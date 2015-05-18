@@ -167,7 +167,7 @@ class CachedIndexedDisjointClassesAxiomImpl extends
 			totalOccurrenceNo_++;
 			return false;
 		}
-		return false;
+		return true;
 	}
 
 	@Override

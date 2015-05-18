@@ -41,8 +41,8 @@ public interface CachedIndexedObjectComplementOf extends
 	static class Helper extends CachedIndexedObject.Helper {
 
 		public static int structuralHashCode(IndexedClassExpression negated) {
-			return combinedHashCode(combinedHashCode(
-					CachedIndexedObjectComplementOf.class, negated));
+			return combinedHashCode(CachedIndexedObjectComplementOf.class,
+					negated);
 		}
 
 		public static CachedIndexedObjectComplementOf structuralEquals(
