@@ -578,7 +578,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		IndexedClassExpression subsumee = sub.accept(expressionConverter_);
 		IndexedClassExpression subsumer = sup.accept(expressionConverter_);
 
-		stageBasedTrace(subsumee, subsumer);
+		if (subsumee != null & subsumer != null)
+			stageBasedTrace(subsumee, subsumer);
 
 		return traceState.getTraceStore().getReader();
 	}

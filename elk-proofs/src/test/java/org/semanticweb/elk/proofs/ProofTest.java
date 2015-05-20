@@ -30,6 +30,7 @@ import static org.junit.Assume.assumeTrue;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -74,6 +75,13 @@ public class ProofTest {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(ProofTest.class);
+	
+	// remove when proofs for ranges are supported
+	static final String[] IGNORE_LIST = {"kangaroo.owl", "PropertyRangesHierarchy.owl", "ReflexivePropertyRanges.owl"};
+
+	static {
+		Arrays.sort(IGNORE_LIST);
+	}
 
 	protected final TracingTestManifest manifest;
 
@@ -87,7 +95,7 @@ public class ProofTest {
 	}
 
 	protected boolean ignore(TestInput input) {
-		return false;
+		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
 
 	@Test

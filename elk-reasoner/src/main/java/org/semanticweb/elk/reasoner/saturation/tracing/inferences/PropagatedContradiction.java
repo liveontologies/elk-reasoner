@@ -73,7 +73,7 @@ public class PropagatedContradiction extends AbstractConclusion implements
 
 	@Override
 	public String toString() {
-		return "Propagated contradiction";
+		return "Propagated contradiction" + premiseRelation_ + "<-" + inconsistentRoot_;
 	}
 
 	@Override
