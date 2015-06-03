@@ -497,7 +497,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		axiomFactory_.getIndexedSubClassOfAxiom(
 				axiom.getSubject().accept(negativeConverter_), positiveFactory_
 						.getIndexedObjectSomeValuesFrom(axiom.getProperty()
-								.accept(positiveConverter_), axiom.getSubject()
+								.accept(positiveConverter_), axiom.getObject()
 								.accept(positiveConverter_)));
 		return null;
 	}
