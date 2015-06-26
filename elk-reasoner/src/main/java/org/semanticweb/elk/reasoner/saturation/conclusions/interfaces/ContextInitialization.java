@@ -26,8 +26,8 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 
 /**
- * A {@code Conclusion} indicating that the {@link Context} where it is stored
- * should be initialized.
+ * A {@code Conclusion} indicating that the {@link Context} corresponding to the
+ * root should be initialized.
  * 
  * @author "Yevgeny Kazakov"
  */

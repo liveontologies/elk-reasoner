@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,10 +26,9 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 
 /**
  * A {@link Conclusion} representing a subsumer {@link IndexedClassExpression}
- * of the root {@link IndexedClassExpression} for which it is produced.
- * Intuitively, if a subclass axiom {@code SubClassOf(:A :B)} is derived by
- * inference rules, then a {@link Subsumer} corresponding to {@code :B} can be
- * produced for the context with root {@code :A}
+ * of the root. Intuitively, if a subclass axiom {@code SubClassOf(:A :B)} is
+ * derived by inference rules, then this axiom corresponds to a {@link Subsumer}
+ * with root {@code :A} and expression {@code :B}.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"

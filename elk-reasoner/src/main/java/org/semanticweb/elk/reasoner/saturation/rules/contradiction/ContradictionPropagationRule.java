@@ -69,8 +69,9 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 		for (IndexedObjectProperty propRelation : subPremises.keySet()) {
 			for (IndexedContextRoot target : subPremises.get(propRelation)
 					.getLinkedRoots()) {
-				//producer.produce(target, premise);
-				producer.produce(target, new PropagatedContradiction(propRelation, target, premises.getRoot()));
+				// producer.produce(target, premise);
+				producer.produce(new PropagatedContradiction(target,
+						propRelation, premises.getRoot()));
 			}
 		}
 	}

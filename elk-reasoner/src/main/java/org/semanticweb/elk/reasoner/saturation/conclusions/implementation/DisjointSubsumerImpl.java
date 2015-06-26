@@ -28,6 +28,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 
@@ -46,8 +47,10 @@ public class DisjointSubsumerImpl extends AbstractConclusion implements
 
 	private final ElkAxiom reason_;
 
-	public DisjointSubsumerImpl(IndexedClassExpression member,
-			IndexedDisjointClassesAxiom axiom, ElkAxiom reason) {
+	public DisjointSubsumerImpl(IndexedContextRoot root,
+			IndexedClassExpression member, IndexedDisjointClassesAxiom axiom,
+			ElkAxiom reason) {
+		super(root);
 		this.member_ = member;
 		this.axiom_ = axiom;
 		this.reason_ = reason;

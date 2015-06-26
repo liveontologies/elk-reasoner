@@ -22,17 +22,15 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 
 /**
- * A {@link Conclusion} representing derived existential restrictions from this
- * source {@link IndexedClassExpression} to a target
- * {@link IndexedClassExpression}. Intuitively, if a subclass axiom
+ * A {@link Conclusion} representing derived existential restriction for the
+ * root. Intuitively, if a subclass axiom
  * {@code SubClassOf(:A ObjectSomeValuesFrom(:r :B))} is derived by inference
- * rules, then a {@link ForwardLink} with the relation {@code :r} and the
- * target {@code :B} can be produced for {@code :A}.
+ * rules, then a {@link ForwardLink} with the root {@code :A}, relation
+ * {@code :r} and the target {@code :B} can is produced.
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
@@ -50,8 +48,7 @@ public interface ForwardLink extends Conclusion {
 
 	/**
 	 * @return the {@link IndexedContextRoot} corresponding to the filler of the
-	 *         existential restriction corresponding to this
-	 *         {@link ForwardLink}
+	 *         existential restriction corresponding to this {@link ForwardLink}
 	 */
 	public IndexedContextRoot getTarget();
 

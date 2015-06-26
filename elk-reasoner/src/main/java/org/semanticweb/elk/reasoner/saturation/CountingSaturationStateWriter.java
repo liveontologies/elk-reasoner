@@ -51,8 +51,8 @@ public class CountingSaturationStateWriter<C extends Context> extends
 	}
 
 	@Override
-	public void produce(IndexedContextRoot root, Conclusion conclusion) {
-		mainWriter.produce(root, conclusion);
+	public void produce(Conclusion conclusion) {
+		mainWriter.produce(conclusion);
 		conclusion.accept(countingVisitor_, null);
 	}
 

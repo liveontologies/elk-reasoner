@@ -65,8 +65,9 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	 */
 	final IndexedContextRoot target_;
 
-	public ForwardLinkImpl(IndexedPropertyChain relation,
-			IndexedContextRoot target) {
+	public ForwardLinkImpl(IndexedContextRoot root,
+			IndexedPropertyChain relation, IndexedContextRoot target) {
+		super(root);
 		this.relation_ = relation;
 		this.target_ = target;
 	}
@@ -99,11 +100,10 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 		SaturatedPropertyChain propertySaturation = existential.getProperty()
 				.getSaturated();
 		if (propertySaturation.getCompositionsByLeftSubProperty().isEmpty()) {
-			producer.produce(
-					IndexedObjectSomeValuesFrom.Helper.getTarget(existential),
-					new DecomposedExistentialBackwardLink(source, existential));
+			producer.produce(new DecomposedExistentialBackwardLink(source,
+					existential));
 		} else {
-			producer.produce(source, new DecomposedExistentialForwardLink(
+			producer.produce(new DecomposedExistentialForwardLink(source,
 					existential));
 		}
 	}
@@ -121,15 +121,14 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 			ArrayList<ElkAxiom> toldSuperPropertiesReasons = composition
 					.getToldSuperPropertiesReasons();
 			for (int i = 0; i < toldSuperProperties.size(); i++) {
-				producer.produce(target, new ComposedBackwardLink(source,
+				producer.produce(new ComposedBackwardLink(source,
 						backwardRelation, inferenceRoot, forwardRelation,
 						target, composition, toldSuperProperties.get(i),
 						toldSuperPropertiesReasons.get(i)));
 			}
 		} else {
-			producer.produce(source, new ComposedForwardLink(source,
-					backwardRelation, inferenceRoot, forwardRelation, target,
-					composition));
+			producer.produce(new ComposedForwardLink(source, backwardRelation,
+					inferenceRoot, forwardRelation, target, composition));
 		}
 	}
 }

@@ -74,8 +74,7 @@ public class ContradictionOverBackwardLinkRule extends
 	@Override
 	public void apply(BackwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		//producer.produce(premise.getSource(), ContradictionImpl.getInstance());
-		producer.produce(premise.getSource(), new PropagatedContradiction(premise, premises.getRoot()));
+		producer.produce(new PropagatedContradiction(premise));
 	}
 
 	@Override

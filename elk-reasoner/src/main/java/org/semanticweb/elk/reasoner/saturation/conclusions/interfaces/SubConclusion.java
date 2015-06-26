@@ -28,9 +28,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusio
 
 /**
  * A {@link Conclusion} that can be used in inferences that are assigned with a
- * {@link IndexedObjectProperty} sub-root ( {@link SubConclusion#getSubRoot()}
- * in addition to the {@link IndexedClassExpression} root
- * {@link Conclusion#getSourceRoot(IndexedClassExpression)} .
+ * {@link IndexedObjectProperty} sub-root {@link SubConclusion#getSubRoot()} in
+ * addition to the {@link IndexedClassExpression} root
+ * {@link Conclusion#getRoot()} .
  * 
  * @author "Yevgeny Kazakov"
  * 

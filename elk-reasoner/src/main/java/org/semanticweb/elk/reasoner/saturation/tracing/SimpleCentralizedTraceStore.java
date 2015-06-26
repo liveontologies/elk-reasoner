@@ -73,9 +73,9 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private class Reader implements TraceStore.Reader {
 
 		@Override
-		public void accept(IndexedContextRoot root, Conclusion conclusion,
+		public void accept(Conclusion conclusion,
 				ClassInferenceVisitor<IndexedContextRoot, ?> visitor) {
-			ContextTraceStore tracer = storage_.get(root);
+			ContextTraceStore tracer = storage_.get(conclusion.getRoot());
 
 			if (tracer != null) {
 				tracer.accept(conclusion, visitor);

@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.proofs.inferences.mapping;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -25,7 +26,6 @@ package org.semanticweb.elk.proofs.inferences.mapping;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,7 +39,6 @@ import org.semanticweb.elk.owl.interfaces.ElkReflexiveObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubClassOfAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkSubObjectPropertyOfAxiom;
 import org.semanticweb.elk.owl.predefined.PredefinedElkClass;
-import org.semanticweb.elk.owl.printers.OwlFunctionalStylePrinter;
 import org.semanticweb.elk.owl.visitors.AbstractElkClassExpressionVisitor;
 import org.semanticweb.elk.owl.visitors.ElkSubObjectPropertyExpressionVisitor;
 import org.semanticweb.elk.proofs.expressions.AxiomExpression;
@@ -67,7 +66,8 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Sub
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
 
 /**
- * Converts {@link Expression}s to instances of {@link TracingInput} which can be used to launch tracing. 
+ * Converts {@link Expression}s to instances of {@link TracingInput} which can
+ * be used to launch tracing.
  * 
  * @author Pavel Klinov
  * 
@@ -77,13 +77,16 @@ public class ExpressionMapper {
 
 	private final ElkPolarityExpressionConverter converter_;
 	private final ElkSubObjectPropertyExpressionVisitor<? extends IndexedPropertyChain> propertyChainConverter_;
-	
-	public ExpressionMapper(ElkPolarityExpressionConverter converter, ElkSubObjectPropertyExpressionVisitor<? extends IndexedPropertyChain> propertyChainConverter) {
+
+	public ExpressionMapper(
+			ElkPolarityExpressionConverter converter,
+			ElkSubObjectPropertyExpressionVisitor<? extends IndexedPropertyChain> propertyChainConverter) {
 		this.converter_ = converter;
 		this.propertyChainConverter_ = propertyChainConverter;
 	}
 
-	public Iterable<TracingInput> convertExpressionToTracingInputs(Expression expression) {
+	public Iterable<TracingInput> convertExpressionToTracingInputs(
+			Expression expression) {
 		return expression.accept(new Converter(), null);
 	}
 
@@ -100,8 +103,8 @@ public class ExpressionMapper {
 		}
 
 		@Override
-		public Iterable<TracingInput> visit(ElkReflexivePropertyChainLemma lemma,
-				Void input) {
+		public Iterable<TracingInput> visit(
+				ElkReflexivePropertyChainLemma lemma, Void input) {
 			IndexedPropertyChain chain = lemma.getPropertyChain().accept(
 					propertyChainConverter_);
 
@@ -110,30 +113,33 @@ public class ExpressionMapper {
 		}
 
 		@Override
-		public Iterable<TracingInput> visit(ElkSubClassOfLemma lemma, Void input) {
-			IndexedClassExpression subsumee = lemma.getSubClass().accept(converter_);
-			Conclusion subsumer = lemma.getSuperClass().accept(
+		public Iterable<TracingInput> visit(final ElkSubClassOfLemma lemma,
+				Void input) {
+			Conclusion subsumption = lemma.getSuperClass().accept(
 					new ElkComplexClassExpressionVisitor<Void, Conclusion>() {
 
 						@Override
-						public Conclusion visit(ElkComplexObjectSomeValuesFrom ce, Void input) {
+						public Conclusion visit(
+								ElkComplexObjectSomeValuesFrom ce, Void input) {
 							// a forward link
 							IndexedPropertyChain chain = ce.getPropertyChain()
 									.accept(propertyChainConverter_);
 							IndexedClassExpression filler = ce.getFiller()
 									.accept(converter_);
 
-							return new ForwardLinkImpl(chain, filler);
+							return new ForwardLinkImpl(lemma.getSubClass()
+									.accept(converter_), chain, filler);
 						}
 
 					}, input);
 
-			return singleton(new ClassTracingInput(subsumee, subsumer));
-			
+			return singleton(new ClassTracingInput(subsumption));
+
 		}
 
 		@Override
-		public Iterable<TracingInput> visit(ElkSubPropertyChainOfLemma lemma, Void input) {
+		public Iterable<TracingInput> visit(ElkSubPropertyChainOfLemma lemma,
+				Void input) {
 			IndexedPropertyChain subchain = lemma.getSubPropertyChain().accept(
 					propertyChainConverter_);
 			IndexedPropertyChain superchain = lemma.getSuperPropertyChain()
@@ -156,77 +162,100 @@ public class ExpressionMapper {
 
 		@Override
 		public Iterable<TracingInput> visit(ElkSubClassOfAxiom ax) {
-			IndexedClassExpression subsumee = getIndexedSubClassOf(ax.getSubClassExpression());
-			ElkClassExpression sup = ax.getSuperClassExpression();	
+			IndexedClassExpression subsumee = getIndexedSubClassOf(ax
+					.getSubClassExpression());
+			ElkClassExpression sup = ax.getSuperClassExpression();
 			List<TracingInput> result = new ArrayList<TracingInput>(2);
 			if (sup == PredefinedElkClass.OWL_NOTHING) {
-				result.add(new ClassTracingInput(subsumee, ContradictionImpl.getInstance()));
+				result.add(new ClassTracingInput(
+						new ContradictionImpl(subsumee)));
 				return result;
 			}
 			// else
-			IndexedClassExpression subsumer = sup.accept(converter_);						
+			IndexedClassExpression subsumer = sup.accept(converter_);
 			if (subsumer != null) {
-				result.add(new ClassTracingInput(subsumee, new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer)));
+				result.add(new ClassTracingInput(
+						new DecomposedSubsumerImpl<IndexedClassExpression>(
+								subsumee, subsumer)));
 			}
-			
+
 			if (sup instanceof ElkObjectSomeValuesFrom) {
 				ElkObjectSomeValuesFrom existential = (ElkObjectSomeValuesFrom) sup;
-				 //This expression can also represent a backward link so we create that input, too
-				result.add(new ClassTracingInput(existential.getFiller().accept(converter_), new BackwardLinkImpl(subsumee, existential.getProperty().accept(converter_))));
+				// This expression can also represent a backward link so we
+				// create that input, too
+				result.add(new ClassTracingInput(new BackwardLinkImpl(
+						existential.getFiller().accept(converter_), subsumee,
+						existential.getProperty().accept(converter_))));
 			}
-			
+
 			return result;
 		}
-		
-		private IndexedClassExpression getIndexedSubClassOf(ElkClassExpression ce) {
-			return ce.accept(new AbstractElkClassExpressionVisitor<IndexedClassExpression>() {
 
-				@Override
-				protected IndexedClassExpression defaultVisit(ElkClassExpression ce) {
-					return ce.accept(converter_);
-				}
+		private IndexedClassExpression getIndexedSubClassOf(
+				ElkClassExpression ce) {
+			return ce
+					.accept(new AbstractElkClassExpressionVisitor<IndexedClassExpression>() {
 
-				@Override
-				public IndexedClassExpression visit(ElkObjectOneOf ce) {
-					return ce.getIndividuals().size() == 1 ? ce.getIndividuals().get(0).accept(converter_) : defaultVisit(ce);
-				}
-				
-			});
+						@Override
+						protected IndexedClassExpression defaultVisit(
+								ElkClassExpression ce) {
+							return ce.accept(converter_);
+						}
+
+						@Override
+						public IndexedClassExpression visit(ElkObjectOneOf ce) {
+							return ce.getIndividuals().size() == 1 ? ce
+									.getIndividuals().get(0).accept(converter_)
+									: defaultVisit(ce);
+						}
+
+					});
 		}
 
 		@Override
 		public Iterable<TracingInput> visit(ElkClassAssertionAxiom ax) {
-			IndexedClassExpression subsumee = ax.getIndividual().accept(converter_);
-			IndexedClassExpression subsumer = ax.getClassExpression().accept(converter_);
-			
-			Conclusion conclusion = isNothing(ax.getClassExpression()) ? ContradictionImpl.getInstance() : new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer);
-			TracingInput input = new ClassTracingInput(subsumee, conclusion);
-			
+			IndexedClassExpression subsumee = ax.getIndividual().accept(
+					converter_);
+			IndexedClassExpression subsumer = ax.getClassExpression().accept(
+					converter_);
+
+			Conclusion conclusion = isNothing(ax.getClassExpression()) ? new ContradictionImpl(
+					subsumee)
+					: new DecomposedSubsumerImpl<IndexedClassExpression>(
+							subsumee, subsumer);
+			TracingInput input = new ClassTracingInput(conclusion);
+
 			return Collections.singleton(input);
 		}
 
 		@Override
 		public Iterable<TracingInput> visit(ElkSubObjectPropertyOfAxiom ax) {
-			IndexedPropertyChain subchain = ax.getSubObjectPropertyExpression().accept(propertyChainConverter_);
-			IndexedPropertyChain sup = ax.getSuperObjectPropertyExpression().accept(converter_);
+			IndexedPropertyChain subchain = ax.getSubObjectPropertyExpression()
+					.accept(propertyChainConverter_);
+			IndexedPropertyChain sup = ax.getSuperObjectPropertyExpression()
+					.accept(converter_);
 
 			return singleton(new ObjectPropertyTracingInput(
-					new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(subchain, sup)));
+					new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(
+							subchain, sup)));
 		}
 
 		@Override
 		public Iterable<TracingInput> visit(ElkReflexiveObjectPropertyAxiom ax) {
-			IndexedObjectProperty p = (IndexedObjectProperty) ax.getProperty().accept(converter_);
-			
-			return singleton(new ObjectPropertyTracingInput(new ToldReflexiveProperty(p, ax)));
+			IndexedObjectProperty p = (IndexedObjectProperty) ax.getProperty()
+					.accept(converter_);
+
+			return singleton(new ObjectPropertyTracingInput(
+					new ToldReflexiveProperty(p, ax)));
 		}
 
 		private Iterable<TracingInput> singleton(TracingInput input) {
 			return Collections.singletonList(input);
 		}
-		
+
 		private boolean isNothing(ElkClassExpression ce) {
-			return StructuralEquivalenceChecker.equal(ce, PredefinedElkClass.OWL_NOTHING);
+			return StructuralEquivalenceChecker.equal(ce,
+					PredefinedElkClass.OWL_NOTHING);
 		}
 
 	}

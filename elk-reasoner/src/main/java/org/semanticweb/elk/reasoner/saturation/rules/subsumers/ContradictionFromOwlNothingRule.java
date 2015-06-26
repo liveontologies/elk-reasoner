@@ -82,7 +82,7 @@ public class ContradictionFromOwlNothingRule extends
 	@Override
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
-		producer.produce(premises.getRoot(), new ContradictionFromOwlNothing(
+		producer.produce(new ContradictionFromOwlNothing(premises.getRoot(),
 				(IndexedClass) premise));
 	}
 

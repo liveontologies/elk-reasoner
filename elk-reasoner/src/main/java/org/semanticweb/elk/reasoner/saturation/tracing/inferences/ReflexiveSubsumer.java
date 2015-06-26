@@ -47,8 +47,13 @@ public class ReflexiveSubsumer<S extends IndexedObjectSomeValuesFrom> extends
 	/**
 	 * @param superClassExpression
 	 */
-	public ReflexiveSubsumer(S existential) {
-		super(existential);
+	public ReflexiveSubsumer(IndexedContextRoot root, S existential) {
+		super(root, existential);
+	}
+
+	@Override
+	public IndexedContextRoot getInferenceContextRoot() {
+		return getRoot();
 	}
 
 	public IndexedObjectProperty getRelation() {
@@ -65,12 +70,6 @@ public class ReflexiveSubsumer<S extends IndexedObjectSomeValuesFrom> extends
 	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
 			I parameter) {
 		return visitor.visit(this, parameter);
-	}
-
-	@Override
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored) {
-		return rootWhereStored;
 	}
 
 }

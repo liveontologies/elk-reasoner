@@ -31,7 +31,7 @@ import java.util.NoSuchElementException;
 
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
@@ -62,7 +62,7 @@ public class RecursiveTracingComputation extends
 				progressMonitor);
 	}
 	
-	private static Collection<RecursiveContextTracingJob> getInputJobs(Multimap<IndexedClassExpression, Conclusion> toTrace) {
+	private static Collection<RecursiveContextTracingJob> getInputJobs(Multimap<IndexedContextRoot, Conclusion> toTrace) {
 		Collection<RecursiveContextTracingJob> todo = new ToDoJobs(toTrace);
 		
 		/*for (RecursiveContextTracingJob job : todo) {
@@ -86,9 +86,9 @@ public class RecursiveTracingComputation extends
 	 */
 	private static class ToDoJobs extends AbstractCollection<RecursiveContextTracingJob> {
 
-		private final Multimap<IndexedClassExpression, Conclusion> inputs_;
+		private final Multimap<IndexedContextRoot, Conclusion> inputs_;
 
-		ToDoJobs(Multimap<IndexedClassExpression, Conclusion> inputs) {
+		ToDoJobs(Multimap<IndexedContextRoot, Conclusion> inputs) {
 			inputs_ = inputs;
 		}
 		
@@ -96,11 +96,11 @@ public class RecursiveTracingComputation extends
 		public Iterator<RecursiveContextTracingJob> iterator() {
 			return new Iterator<RecursiveContextTracingJob>() {
 				
-				private final Iterator<IndexedClassExpression> keyIterator_ = inputs_.keySet().iterator();
+				private final Iterator<IndexedContextRoot> keyIterator_ = inputs_.keySet().iterator();
 				
 				private Iterator<Conclusion> currentValueIterator_;
 				
-				private IndexedClassExpression currentKey_;
+				private IndexedContextRoot currentKey_;
 				
 				private RecursiveContextTracingJob nextJob_;
 

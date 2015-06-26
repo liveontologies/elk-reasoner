@@ -55,9 +55,8 @@ public class ContradictionCompositionRule extends AbstractDisjointSubsumerRule {
 
 		if (disjointSubsumers[1] != null) {
 			// two disjoint members were derived
-			producer.produce(premises.getRoot(),
-					new ContradictionFromDisjointSubsumers(premise,
-							disjointSubsumers));
+			producer.produce(new ContradictionFromDisjointSubsumers(premise,
+					disjointSubsumers));
 		}
 	}
 

@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 
 /**
@@ -39,7 +39,7 @@ public class RecursiveContextTracingJob extends ContextTracingJob {
 
 	private final Conclusion target_;
 	
-	public RecursiveContextTracingJob(IndexedClassExpression input, Conclusion t) {
+	public RecursiveContextTracingJob(IndexedContextRoot input, Conclusion t) {
 		super(input);
 		target_ = t;
 	}

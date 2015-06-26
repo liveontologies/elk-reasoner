@@ -25,12 +25,11 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * A {@code Conclusion} representing that some {@link IndexedClassExpression}
  * member of an {@link IndexedDisjointClassesAxiom} was derived as a subsumer in
- * the {@link Context}.
+ * the root.
  * 
  * @see IndexedDisjointClassesAxiom#getDisjointMembers()
  * 

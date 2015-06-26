@@ -25,7 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
@@ -46,7 +46,7 @@ public class TraceState {
 
 	private LocalTracingSaturationState tracingSaturationState_;
 
-	private final Multimap<IndexedClassExpression, Conclusion> toTraceMap_ = new HashListMultimap<IndexedClassExpression, Conclusion>();
+	private final Multimap<IndexedContextRoot, Conclusion> toTraceMap_ = new HashListMultimap<IndexedContextRoot, Conclusion>();
 
 	public TraceState(SaturationState<?> mainState) {
 		traceStore_ = new SimpleCentralizedTraceStore();
@@ -66,12 +66,12 @@ public class TraceState {
 		return tracingSaturationState_.getTracedContexts();
 	}
 	
-	public Multimap<IndexedClassExpression, Conclusion> getTracingMap() {
+	public Multimap<IndexedContextRoot, Conclusion> getTracingMap() {
 		return toTraceMap_;
 	}
 	
-	public void addConclusionToTrace(IndexedClassExpression root, Conclusion target) {
-		toTraceMap_.add(root, target);
+	public void addConclusionToTrace(Conclusion target) {
+		toTraceMap_.add(target.getRoot(), target);
 	}
 	
 	public void clearTracingMap() {

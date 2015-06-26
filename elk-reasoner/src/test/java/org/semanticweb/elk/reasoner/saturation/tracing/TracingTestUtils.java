@@ -84,10 +84,8 @@ public class TracingTestUtils {
 	private static final UntracedConclusionListener UNTRACED_LISTENER = new UntracedConclusionListener() {
 
 		@Override
-		public void notifyUntraced(Conclusion conclusion,
-				IndexedContextRoot contextRoot) {
-			fail("Conclusion " + conclusion + " stored in " + contextRoot
-					+ " was not traced");
+		public void notifyUntraced(Conclusion conclusion) {
+			fail("Conclusion " + conclusion + " was not traced");
 		}
 
 		@Override
@@ -95,85 +93,106 @@ public class TracingTestUtils {
 			fail("Property conclusion " + conclusion + " was not traced");
 		}
 	};
-	
-	static Conclusion getConclusionToTrace(Context context, IndexedClassExpression subsumer) {
+
+	static Conclusion getConclusionToTrace(Context context,
+			IndexedClassExpression subsumer) {
 		if (context != null) {
-			if (context.containsConclusion(ContradictionImpl.getInstance())) {
-				return ContradictionImpl.getInstance();
+			IndexedContextRoot root = context.getRoot();
+			Conclusion contradiction = new ContradictionImpl(root);
+			if (context.containsConclusion(contradiction)) {
+				return contradiction;
 			}
-			
-			return new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer);
+
+			return new DecomposedSubsumerImpl<IndexedClassExpression>(root,
+					subsumer);
 		}
-		
+
 		throw new IllegalArgumentException("Context may not be null");
 	}
 
-	public static void checkTracingCompleteness(ElkClassExpression sub, ElkClassExpression sup, Reasoner reasoner) {
-		IndexedClassExpression subsumee = ReasonerStateAccessor.transform(reasoner, sub);
-		Conclusion subsumer = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), ReasonerStateAccessor.transform(reasoner, sup));
+	public static void checkTracingCompleteness(ElkClassExpression sub,
+			ElkClassExpression sup, Reasoner reasoner) {
+		IndexedClassExpression subsumee = ReasonerStateAccessor.transform(
+				reasoner, sub);
+		Conclusion subsumer = getConclusionToTrace(
+				ReasonerStateAccessor.getContext(reasoner, subsumee),
+				ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 		ClassInferenceVisitor<IndexedContextRoot, Boolean> counter = new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
 			@Override
-			protected Boolean defaultTracedVisit(ClassInference conclusion, IndexedContextRoot input) {
+			protected Boolean defaultTracedVisit(ClassInference conclusion,
+					IndexedContextRoot input) {
 				conclusionCount.incrementAndGet();
 				return true;
 			}
 		};
 
-		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState.getTraceStore().getReader(), UNTRACED_LISTENER);
+		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState
+				.getTraceStore().getReader(), UNTRACED_LISTENER);
 
-		explorer.accept(subsumee, subsumer, counter);
+		explorer.accept(subsumer, counter);
 	}
-	
+
 	public static void checkTracingOfInconsistencyCompleteness(Reasoner reasoner) {
-		IndexedClassEntity entity = ReasonerStateAccessor.getInconsistentEntity(reasoner);
-		
+		IndexedClassEntity entity = ReasonerStateAccessor
+				.getInconsistentEntity(reasoner);
+
 		if (entity == null) {
 			throw new IllegalStateException("The ontology is consistent");
 		}
-		
+
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 		ClassInferenceVisitor<IndexedContextRoot, Boolean> counter = new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
 			@Override
-			protected Boolean defaultTracedVisit(ClassInference conclusion, IndexedContextRoot input) {
+			protected Boolean defaultTracedVisit(ClassInference conclusion,
+					IndexedContextRoot input) {
 				conclusionCount.incrementAndGet();
 				return true;
 			}
 		};
 
-		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState.getTraceStore().getReader(), UNTRACED_LISTENER);
+		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState
+				.getTraceStore().getReader(), UNTRACED_LISTENER);
 
-		explorer.accept(entity, ContradictionImpl.getInstance(), counter);
+		Conclusion contradiction = new ContradictionImpl(entity);
+		explorer.accept(contradiction, counter);
 	}
 
 	public static void checkTracingMinimality(ElkClassExpression sub,
 			ElkClassExpression sup, Reasoner reasoner) {
-		IndexedClassExpression subsumee = ReasonerStateAccessor.transform(reasoner, sub);
-		Conclusion subsumer = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), ReasonerStateAccessor.transform(reasoner, sup));
+		IndexedClassExpression subsumee = ReasonerStateAccessor.transform(
+				reasoner, sub);
+		Conclusion subsumer = getConclusionToTrace(
+				ReasonerStateAccessor.getContext(reasoner, subsumee),
+				ReasonerStateAccessor.transform(reasoner, sup));
 		TracedContextsCollector collector = new TracedContextsCollector();
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 
-		new TestTraceUnwinder(traceState.getTraceStore().getReader(), UNTRACED_LISTENER).accept(subsumee, subsumer, collector);
+		new TestTraceUnwinder(traceState.getTraceStore().getReader(),
+				UNTRACED_LISTENER).accept(subsumer, collector);
 
 		for (Context traced : traceState.getTracedContexts()) {
 			IndexedContextRoot root = traced.getRoot();
 
-			assertTrue(root + " has been traced for no good reason", collector.getTracedRoots().contains(traced.getRoot()));
+			assertTrue(root + " has been traced for no good reason", collector
+					.getTracedRoots().contains(traced.getRoot()));
 		}
 	}
 
 	/*
-	 * checking that the number of inferences for the given class subsumption is as expected
+	 * checking that the number of inferences for the given class subsumption is
+	 * as expected
 	 */
 	public static void checkNumberOfInferences(ElkClassExpression sub,
 			ElkClassExpression sup, Reasoner reasoner, int expected) {
 		final IndexedClassExpression subsumee = ReasonerStateAccessor
 				.transform(reasoner, sub);
-		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
+		Conclusion conclusion = getConclusionToTrace(
+				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
 		final AtomicInteger inferenceCount = new AtomicInteger(0);
 		ClassInferenceVisitor<IndexedContextRoot, Boolean> counter = new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
@@ -192,21 +211,23 @@ public class TracingTestUtils {
 		};
 
 		ReasonerStateAccessor.getTraceState(reasoner).getTraceStore()
-				.getReader().accept(subsumee, conclusion, counter);
+				.getReader().accept(conclusion, counter);
 
 		assertEquals(expected, inferenceCount.get());
 	}
-	
+
 	/*
-	 * checking that the number of inferences for the given property subsumption is as expected
+	 * checking that the number of inferences for the given property subsumption
+	 * is as expected
 	 */
 	public static void checkNumberOfInferences(ElkObjectProperty sub,
 			ElkObjectProperty sup, Reasoner reasoner, int expected) {
-		final IndexedObjectProperty subsumee = ReasonerStateAccessor
-				.transform(reasoner, sub);
-		final IndexedObjectProperty subsumer = ReasonerStateAccessor
-				.transform(reasoner, sup);
-		ObjectPropertyConclusion conclusion = new SubObjectProperty(subsumee, subsumer);
+		final IndexedObjectProperty subsumee = ReasonerStateAccessor.transform(
+				reasoner, sub);
+		final IndexedObjectProperty subsumer = ReasonerStateAccessor.transform(
+				reasoner, sup);
+		ObjectPropertyConclusion conclusion = new SubObjectProperty(subsumee,
+				subsumer);
 		final AtomicInteger inferenceCount = new AtomicInteger(0);
 		ObjectPropertyInferenceVisitor<Void, Boolean> counter = new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
 
@@ -226,9 +247,10 @@ public class TracingTestUtils {
 
 		assertEquals(expected, inferenceCount.get());
 	}
-	
+
 	/*
-	 * Either the class inference visitor or the property inference visitor should return true for some used inference in the trace.
+	 * Either the class inference visitor or the property inference visitor
+	 * should return true for some used inference in the trace.
 	 * 
 	 * TODO Generalize this to look for multiple inferences in the trace.
 	 */
@@ -238,108 +260,143 @@ public class TracingTestUtils {
 			Reasoner reasoner,
 			final ClassInferenceVisitor<IndexedContextRoot, Boolean> classInferenceVisitor,
 			final ObjectPropertyInferenceVisitor<Void, Boolean> propertyInferenceVisitor) {
-		final IndexedClassExpression subsumee = ReasonerStateAccessor.transform(reasoner, sub);
-		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), ReasonerStateAccessor.transform(reasoner, sup));
+		final IndexedClassExpression subsumee = ReasonerStateAccessor
+				.transform(reasoner, sub);
+		Conclusion conclusion = getConclusionToTrace(
+				ReasonerStateAccessor.getContext(reasoner, subsumee),
+				ReasonerStateAccessor.transform(reasoner, sup));
 		final MutableBoolean classInferenceCondition = new MutableBoolean(false);
-		final MutableBoolean propertyInferenceCondition = new MutableBoolean(false);
+		final MutableBoolean propertyInferenceCondition = new MutableBoolean(
+				false);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 
-		new TestTraceUnwinder(traceState.getTraceStore().getReader(), UNTRACED_LISTENER).accept(subsumee, conclusion,
-				new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
+		new TestTraceUnwinder(traceState.getTraceStore().getReader(),
+				UNTRACED_LISTENER)
+				.accept(conclusion,
+						new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
-					@Override
-					protected Boolean defaultTracedVisit(ClassInference inference, IndexedContextRoot input) {
-						classInferenceCondition.or(inference.acceptTraced(classInferenceVisitor, input));
-						
-						return true;
-					}
-					
-				},
-				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
+							@Override
+							protected Boolean defaultTracedVisit(
+									ClassInference inference,
+									IndexedContextRoot input) {
+								classInferenceCondition.or(inference
+										.acceptTraced(classInferenceVisitor,
+												input));
 
-					@Override
-					protected Boolean defaultTracedVisit(ObjectPropertyInference inference, Void input) {
-						propertyInferenceCondition.or(inference.acceptTraced(propertyInferenceVisitor, input));
-						
-						return true;
-					}
-					
-				});		
-		
+								return true;
+							}
 
-		assertTrue("The condition didn't succeed on any used class inference", classInferenceCondition.get());
-		assertTrue("The condition didn't succeed on any used property inference", propertyInferenceCondition.get());
+						},
+						new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
+
+							@Override
+							protected Boolean defaultTracedVisit(
+									ObjectPropertyInference inference,
+									Void input) {
+								propertyInferenceCondition.or(inference
+										.acceptTraced(propertyInferenceVisitor,
+												input));
+
+								return true;
+							}
+
+						});
+
+		assertTrue("The condition didn't succeed on any used class inference",
+				classInferenceCondition.get());
+		assertTrue(
+				"The condition didn't succeed on any used property inference",
+				propertyInferenceCondition.get());
 	}
-	
+
 	/*
 	 */
 	public static Set<ElkAxiom> getSideConditions(ElkClassExpression sub,
 			ElkClassExpression sup, Reasoner reasoner) {
 		final Set<ElkAxiom> sideConditions = new HashSet<ElkAxiom>();
-		final IndexedClassExpression subsumee = ReasonerStateAccessor.transform(reasoner, sub);
-		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), ReasonerStateAccessor.transform(reasoner, sup));
-		ClassInferenceVisitor<IndexedContextRoot, ?> sideConditionVisitor = SideConditions.getClassSideConditionVisitor(new AbstractElkAxiomVisitor<Void>() {
+		final IndexedClassExpression subsumee = ReasonerStateAccessor
+				.transform(reasoner, sub);
+		Conclusion conclusion = getConclusionToTrace(
+				ReasonerStateAccessor.getContext(reasoner, subsumee),
+				ReasonerStateAccessor.transform(reasoner, sup));
+		ClassInferenceVisitor<IndexedContextRoot, ?> sideConditionVisitor = SideConditions
+				.getClassSideConditionVisitor(new AbstractElkAxiomVisitor<Void>() {
 
-			@Override
-			protected Void defaultLogicalVisit(ElkAxiom axiom) {
-				sideConditions.add(axiom);
-				return null;
-			}
-			
-		});
+					@Override
+					protected Void defaultLogicalVisit(ElkAxiom axiom) {
+						sideConditions.add(axiom);
+						return null;
+					}
+
+				});
 
 		ReasonerStateAccessor.getTraceState(reasoner).getTraceStore()
-				.getReader().accept(subsumee, conclusion, sideConditionVisitor);
+				.getReader().accept(conclusion, sideConditionVisitor);
 
 		return sideConditions;
-	}	
-	
-	public static void visitClassInferences(ElkClassExpression sub,
-			ElkClassExpression sup, Reasoner reasoner, ClassInferenceVisitor<IndexedContextRoot, Boolean> visitor) throws ElkException {
-		final IndexedClassExpression subsumee = ReasonerStateAccessor
-				.transform(reasoner, sub);
-		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
-				ReasonerStateAccessor.transform(reasoner, sup));
-		TraceStore.Reader inferenceReader = ReasonerStateAccessor.getTraceState(reasoner).getTraceStore().getReader();
-		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader, UNTRACED_LISTENER);
-
-		reasoner.explainSubsumption(sub, sup);
-		traceUnwinder.accept(subsumee, conclusion, visitor);		
-	}	
-	
-	public static void visitInferences(ElkClassExpression sub,
-			ElkClassExpression sup, Reasoner reasoner, 
-			final ClassInferenceVisitor<IndexedContextRoot, Boolean> classInferenceVisitor,
-			final ObjectPropertyInferenceVisitor<?, Boolean> propertyInferenceVisitor) throws ElkException {
-		final IndexedClassExpression subsumee = ReasonerStateAccessor
-				.transform(reasoner, sub);
-		Conclusion conclusion = getConclusionToTrace(ReasonerStateAccessor.getContext(reasoner, subsumee), 
-				ReasonerStateAccessor.transform(reasoner, sup));
-		TraceStore.Reader inferenceReader = ReasonerStateAccessor.getTraceState(reasoner).getTraceStore().getReader();
-		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader, UNTRACED_LISTENER);
-
-		reasoner.explainSubsumption(sub, sup);
-		traceUnwinder.accept(subsumee, conclusion, classInferenceVisitor,
-				propertyInferenceVisitor);		
 	}
-	
-	public static void visitInferencesForInconsistency(Reasoner reasoner, 
+
+	public static void visitClassInferences(ElkClassExpression sub,
+			ElkClassExpression sup, Reasoner reasoner,
+			ClassInferenceVisitor<IndexedContextRoot, Boolean> visitor)
+			throws ElkException {
+		final IndexedClassExpression subsumee = ReasonerStateAccessor
+				.transform(reasoner, sub);
+		Conclusion conclusion = getConclusionToTrace(
+				ReasonerStateAccessor.getContext(reasoner, subsumee),
+				ReasonerStateAccessor.transform(reasoner, sup));
+		TraceStore.Reader inferenceReader = ReasonerStateAccessor
+				.getTraceState(reasoner).getTraceStore().getReader();
+		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(
+				inferenceReader, UNTRACED_LISTENER);
+
+		reasoner.explainSubsumption(sub, sup);
+		traceUnwinder.accept(conclusion, visitor);
+	}
+
+	public static void visitInferences(
+			ElkClassExpression sub,
+			ElkClassExpression sup,
+			Reasoner reasoner,
 			final ClassInferenceVisitor<IndexedContextRoot, Boolean> classInferenceVisitor,
-			final ObjectPropertyInferenceVisitor<?, Boolean> propertyInferenceVisitor) throws ElkException {
-		IndexedClassEntity entity = ReasonerStateAccessor.getInconsistentEntity(reasoner);
-		
+			final ObjectPropertyInferenceVisitor<?, Boolean> propertyInferenceVisitor)
+			throws ElkException {
+		final IndexedClassExpression subsumee = ReasonerStateAccessor
+				.transform(reasoner, sub);
+		Conclusion conclusion = getConclusionToTrace(
+				ReasonerStateAccessor.getContext(reasoner, subsumee),
+				ReasonerStateAccessor.transform(reasoner, sup));
+		TraceStore.Reader inferenceReader = ReasonerStateAccessor
+				.getTraceState(reasoner).getTraceStore().getReader();
+		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(
+				inferenceReader, UNTRACED_LISTENER);
+
+		reasoner.explainSubsumption(sub, sup);
+		traceUnwinder.accept(conclusion, classInferenceVisitor,
+				propertyInferenceVisitor);
+	}
+
+	public static void visitInferencesForInconsistency(
+			Reasoner reasoner,
+			final ClassInferenceVisitor<IndexedContextRoot, Boolean> classInferenceVisitor,
+			final ObjectPropertyInferenceVisitor<?, Boolean> propertyInferenceVisitor)
+			throws ElkException {
+		IndexedClassEntity entity = ReasonerStateAccessor
+				.getInconsistentEntity(reasoner);
+
 		if (entity == null) {
 			throw new IllegalStateException("The ontology is consistent");
 		}
-		
-		TraceStore.Reader inferenceReader = ReasonerStateAccessor.getTraceState(reasoner).getTraceStore().getReader();
-		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(inferenceReader, UNTRACED_LISTENER);
+
+		TraceStore.Reader inferenceReader = ReasonerStateAccessor
+				.getTraceState(reasoner).getTraceStore().getReader();
+		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(
+				inferenceReader, UNTRACED_LISTENER);
 
 		reasoner.explainInconsistency();
-		traceUnwinder.accept(entity, ContradictionImpl.getInstance(), classInferenceVisitor,
-				propertyInferenceVisitor);		
+		traceUnwinder.accept(new ContradictionImpl(entity),
+				classInferenceVisitor, propertyInferenceVisitor);
 	}
-	
 
 	public static int checkInferenceAcyclicity(Reasoner reasoner) {
 		final AtomicInteger conclusionCount = new AtomicInteger(0);
@@ -353,25 +410,29 @@ public class TracingTestUtils {
 
 		for (final IndexedContextRoot root : traceReader.getContextRoots()) {
 
-			traceReader.visitInferences(root,
-					new AbstractClassInferenceVisitor<IndexedContextRoot, Void>() {
+			traceReader
+					.visitInferences(
+							root,
+							new AbstractClassInferenceVisitor<IndexedContextRoot, Void>() {
 
-						@Override
-						protected Void defaultTracedVisit(ClassInference inference,
-								IndexedContextRoot ignored) {
-							counter.increment();
+								@Override
+								protected Void defaultTracedVisit(
+										ClassInference inference,
+										IndexedContextRoot ignored) {
+									counter.increment();
 
-							if (isInferenceCyclic(inference, root, traceReader)) {
-								// isInferenceCyclic(inference, root,
-								// traceReader);
-								fail(inference + " saved in " + root
-										+ " is cyclic ");
-							}
+									if (isInferenceCyclic(inference, root,
+											traceReader)) {
+										// isInferenceCyclic(inference, root,
+										// traceReader);
+										fail(inference + " saved in " + root
+												+ " is cyclic ");
+									}
 
-							return null;
-						}
+									return null;
+								}
 
-					});
+							});
 		}
 
 		// now check if some blocked inferences are, in fact, acyclic
@@ -381,8 +442,8 @@ public class TracingTestUtils {
 			TracedContext context = (TracedContext) cxt;
 
 			for (Conclusion premise : context.getBlockedInferences().keySet()) {
-				for (ClassInference blocked : context.getBlockedInferences().get(
-						premise)) {
+				for (ClassInference blocked : context.getBlockedInferences()
+						.get(premise)) {
 
 					IndexedContextRoot targetRoot = blocked.acceptTraced(
 							new GetInferenceTarget(), context);
@@ -408,59 +469,69 @@ public class TracingTestUtils {
 		// first, create a map of premises to their inferences
 		final Multimap<Conclusion, ClassInference> premiseInferenceMap = new HashListMultimap<Conclusion, ClassInference>();
 		final IndexedContextRoot inferenceContextRoot = inference
-				.getInferenceContextRoot(inferenceTargetRoot);
+				.getInferenceContextRoot();
 
-		inference.acceptTraced(new PremiseVisitor<Void, Void>(new AbstractConclusionVisitor<Void, Void>() {
-			@Override
-			protected Void defaultVisit(final Conclusion premise, Void ignored) {
+		inference.acceptTraced(new PremiseVisitor<Void, Void>(
+				new AbstractConclusionVisitor<Void, Void>() {
+					@Override
+					protected Void defaultVisit(final Conclusion premise,
+							Void ignored) {
 
-				traceReader.accept(inferenceContextRoot, premise,
-						new AbstractClassInferenceVisitor<IndexedContextRoot, Void>() {
+						traceReader
+								.accept(premise,
+										new AbstractClassInferenceVisitor<IndexedContextRoot, Void>() {
 
-							@Override
-							protected Void defaultTracedVisit(
-									ClassInference premiseInference, IndexedContextRoot ignored) {
+											@Override
+											protected Void defaultTracedVisit(
+													ClassInference premiseInference,
+													IndexedContextRoot ignored) {
 
-								premiseInferenceMap.add(premise,
-										premiseInference);
+												premiseInferenceMap.add(
+														premise,
+														premiseInference);
 
-								return null;
-							}
+												return null;
+											}
 
-						});
+										});
 
-				return null;
-			}
-		}), null);
+						return null;
+					}
+				}), null);
 
 		// now, let's see if there's an alternative inference for every premise
 		for (Conclusion premise : premiseInferenceMap.keySet()) {
 			final MutableBoolean isPremiseCyclic = new MutableBoolean(true);
 
-			for (ClassInference premiseInference : premiseInferenceMap.get(premise)) {
+			for (ClassInference premiseInference : premiseInferenceMap
+					.get(premise)) {
 				final MutableBoolean isPremiseInferenceCyclic = new MutableBoolean(
 						false);
 				// does it use the given conclusion as a premise?
-				if (premiseInference.getInferenceContextRoot(inferenceContextRoot) == inferenceTargetRoot) {
-					
-					premiseInference.acceptTraced(
-							new PremiseVisitor<Void, Void>(new AbstractConclusionVisitor<Void, Void>() {
-								@Override
-								protected Void defaultVisit(
-										Conclusion premiseOfPremise,
-										Void ignored) {
+				if (premiseInference.getInferenceContextRoot() == inferenceTargetRoot) {
 
-									if (premiseOfPremise.accept(
-											new ConclusionEqualityChecker(),
-											inference)) {
-										// ok, this inference uses the given
-										// conclusion
-										isPremiseInferenceCyclic.set(true);
-									}
+					premiseInference
+							.acceptTraced(
+									new PremiseVisitor<Void, Void>(
+											new AbstractConclusionVisitor<Void, Void>() {
+												@Override
+												protected Void defaultVisit(
+														Conclusion premiseOfPremise,
+														Void ignored) {
 
-									return null;
-								}
-							}), null);
+													if (premiseOfPremise
+															.accept(new ConclusionEqualityChecker(),
+																	inference)) {
+														// ok, this inference
+														// uses the given
+														// conclusion
+														isPremiseInferenceCyclic
+																.set(true);
+													}
+
+													return null;
+												}
+											}), null);
 				} else {
 					// ok, the premise was inferred in a context different from
 					// where the current inference was made.
@@ -478,10 +549,10 @@ public class TracingTestUtils {
 
 		return false;
 	}
-	
-	////////////////////////////////////////////////////////////////////////
+
+	// //////////////////////////////////////////////////////////////////////
 	// some dummy utility visitors
-	////////////////////////////////////////////////////////////////////////
+	// //////////////////////////////////////////////////////////////////////
 	static final AbstractClassInferenceVisitor<IndexedContextRoot, Boolean> DUMMY_CLASS_INFERENCE_CHECKER = new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
 		@Override
@@ -489,9 +560,9 @@ public class TracingTestUtils {
 				IndexedContextRoot input) {
 			return true;
 		}
-		
+
 	};
-	
+
 	static final AbstractObjectPropertyInferenceVisitor<Void, Boolean> DUMMY_PROPERTY_INFERENCE_CHECKER = new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 		@Override

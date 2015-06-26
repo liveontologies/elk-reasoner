@@ -126,10 +126,10 @@ public class ReflexivePropertyRangesContextInitRule extends
 		for (IndexedObjectProperty reflexive : toldReflexiveProperties_) {
 			for (IndexedClassExpression range : reflexive.getSaturated()
 					.getRanges()) {
-				producer.produce(premises.getRoot(),
+				producer.produce(
 				// TODO: introduce a specific inference
-						new InitializationSubsumer<IndexedClassExpression>(
-								range));
+				new InitializationSubsumer<IndexedClassExpression>(premises
+						.getRoot(), range));
 			}
 		}
 	}

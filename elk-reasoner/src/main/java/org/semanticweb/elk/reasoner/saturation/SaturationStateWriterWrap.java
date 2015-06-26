@@ -45,8 +45,8 @@ public class SaturationStateWriterWrap<C extends Context> implements
 	}
 
 	@Override
-	public void produce(IndexedContextRoot root, Conclusion conclusion) {
-		mainWriter.produce(root, conclusion);
+	public void produce(Conclusion conclusion) {
+		mainWriter.produce(conclusion);
 	}
 
 	@Override

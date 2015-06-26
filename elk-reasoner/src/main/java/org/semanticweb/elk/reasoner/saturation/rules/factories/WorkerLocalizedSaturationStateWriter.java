@@ -22,7 +22,6 @@ package org.semanticweb.elk.reasoner.saturation.rules.factories;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriterWrap;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
@@ -37,22 +36,25 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * @author "Yevgeny Kazakov"
  * 
  */
-public class WorkerLocalizedSaturationStateWriter<C extends Context> extends SaturationStateWriterWrap<C> {
+public class WorkerLocalizedSaturationStateWriter<C extends Context> extends
+		SaturationStateWriterWrap<C> {
 
 	private final WorkerLocalTodo localTodo_;
 
 	public WorkerLocalizedSaturationStateWriter(
-			SaturationStateWriter<? extends C> mainWriter, WorkerLocalTodo localTodo) {
+			SaturationStateWriter<? extends C> mainWriter,
+			WorkerLocalTodo localTodo) {
 		super(mainWriter);
 		this.localTodo_ = localTodo;
 	}
 
 	@Override
-	public void produce(IndexedContextRoot root, Conclusion conclusion) {
-		if (localTodo_.isActivated() && root == localTodo_.getActiveRoot()) {
+	public void produce(Conclusion conclusion) {
+		if (localTodo_.isActivated()
+				&& conclusion.getRoot() == localTodo_.getActiveRoot()) {
 			localTodo_.add(conclusion);
 		} else {
-			mainWriter.produce(root, conclusion);
+			mainWriter.produce(conclusion);
 		}
 	}
 

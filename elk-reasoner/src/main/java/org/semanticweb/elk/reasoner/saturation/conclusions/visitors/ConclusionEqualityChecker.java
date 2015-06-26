@@ -47,8 +47,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContext
  */
 public class ConclusionEqualityChecker implements ConclusionVisitor<Conclusion, Boolean> {
 
-	public static boolean equal(Conclusion first, Conclusion second, IndexedClassExpression contextRoot) {
-		if (first.getSourceRoot(contextRoot) != second.getSourceRoot(contextRoot)) {
+	public static boolean equal(Conclusion first, Conclusion second) {
+		if (first.getSourceRoot() != second.getSourceRoot()) {
 			return false;
 		}
 		

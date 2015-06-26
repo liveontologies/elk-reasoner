@@ -44,11 +44,11 @@ public class ContextExistenceCheckingWriter<C extends Context> extends
 	}
 
 	@Override
-	public void produce(IndexedContextRoot root, Conclusion conclusion) {
-		Context context = state_.getContext(root);
+	public void produce(Conclusion conclusion) {
+		Context context = state_.getContext(conclusion.getRoot());
 
 		if (context != null) {
-			super.produce(root, conclusion);
+			super.produce(conclusion);
 		}
 	}
 

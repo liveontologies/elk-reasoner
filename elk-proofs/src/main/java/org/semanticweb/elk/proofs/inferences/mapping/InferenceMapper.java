@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.proofs.inferences.mapping;
+
 /*
  * #%L
  * ELK Proofs Package
@@ -27,8 +28,6 @@ package org.semanticweb.elk.proofs.inferences.mapping;
 import org.semanticweb.elk.proofs.expressions.ExpressionFactory;
 import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.InferenceVisitor;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTraceUnwinder;
@@ -50,102 +49,108 @@ import org.slf4j.LoggerFactory;
  */
 public class InferenceMapper {
 
-	private static final Logger LOGGER_ = LoggerFactory.getLogger(InferenceMapper.class);
-	
+	private static final Logger LOGGER_ = LoggerFactory
+			.getLogger(InferenceMapper.class);
+
 	private final RecursiveTraceUnwinder unwinder_;
-	
+
 	private final ExpressionFactory exprFactory_;
-	
-	public InferenceMapper(RecursiveTraceUnwinder unwinder, ExpressionFactory factory) {
+
+	public InferenceMapper(RecursiveTraceUnwinder unwinder,
+			ExpressionFactory factory) {
 		unwinder_ = unwinder;
 		exprFactory_ = factory;
 	}
-	
-	public void map(final Iterable<? extends TracingInput> inputs, final InferenceVisitor<?, ?> visitor) {
+
+	public void map(final Iterable<? extends TracingInput> inputs,
+			final InferenceVisitor<?, ?> visitor) {
 		for (TracingInput input : inputs) {
-			//TODO visitor here (that would get rid of the exception at the bottom)?
+			// TODO visitor here (that would get rid of the exception at the
+			// bottom)?
 			if (input instanceof ClassTracingInput) {
 				ClassTracingInput ci = (ClassTracingInput) input;
-				
-				map(ci.root, ci.conclusion, visitor);
-			}
-			else if (input instanceof ObjectPropertyTracingInput) {
+
+				map(ci.conclusion, visitor);
+			} else if (input instanceof ObjectPropertyTracingInput) {
 				ObjectPropertyTracingInput pi = (ObjectPropertyTracingInput) input;
-				
+
 				map(pi.conclusion, visitor);
-			}
-			else {
-				throw new IllegalArgumentException("Unsupported tracing input " + input.getClass());
+			} else {
+				throw new IllegalArgumentException("Unsupported tracing input "
+						+ input.getClass());
 			}
 		}
 	}
-	
+
 	// class and object property inferences
-	public void map(final IndexedContextRoot cxt, final Conclusion conclusion, final InferenceVisitor<?, ?> visitor) {
-		final SingleInferenceMapper singleMapper = new SingleInferenceMapper(exprFactory_);
-		
-		unwinder_.accept(cxt, conclusion, 
-				new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
+	public void map(final Conclusion conclusion,
+			final InferenceVisitor<?, ?> visitor) {
+		final SingleInferenceMapper singleMapper = new SingleInferenceMapper(
+				exprFactory_);
+
+		unwinder_.accept(conclusion,
+				new AbstractClassInferenceVisitor<Void, Boolean>() {
 
 					@Override
-					protected Boolean defaultTracedVisit(ClassInference inference, IndexedContextRoot whereStored) {
-						Inference mapped = singleMapper.map(inference, whereStored);
-						
+					protected Boolean defaultTracedVisit(
+							ClassInference inference, Void parameter) {
+						Inference mapped = singleMapper.map(inference, null);
+
 						if (mapped == SingleInferenceMapper.CONTINUE) {
 							// continue unwinding and mapping
 							return true;
-						}
-						else if (mapped != SingleInferenceMapper.STOP) {
-							LOGGER_.trace("Mapped {} in {} => {}", inference, whereStored, mapped);
-							
+						} else if (mapped != SingleInferenceMapper.STOP) {
+							LOGGER_.trace("Mapped {} => {}", inference, mapped);
+
 							mapped.accept(visitor, null);
 						}
-						// stop because either an inference was mapped or it can be ignored
+						// stop because either an inference was mapped
+						// or it can be ignored
 						return false;
 					}
-				}, 
-				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
+				}, new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 					@Override
-					protected Boolean defaultTracedVisit(ObjectPropertyInference inference, Void input) {
+					protected Boolean defaultTracedVisit(
+							ObjectPropertyInference inference, Void input) {
 						Inference mapped = singleMapper.map(inference);
-						
+
 						if (mapped == SingleInferenceMapper.CONTINUE) {
 							return true;
-						}
-						else if (mapped != SingleInferenceMapper.STOP) {
+						} else if (mapped != SingleInferenceMapper.STOP) {
 							LOGGER_.trace("Mapped {} => {}", inference, mapped);
-							
+
 							mapped.accept(visitor, null);
 						}
-						
+
 						return false;
 					}
 				});
 	}
-	
+
 	// only object property inferences
-	public void map(final ObjectPropertyConclusion conclusion, final InferenceVisitor<?, ?> visitor) {
-		final SingleInferenceMapper singleMapper = new SingleInferenceMapper(exprFactory_);
-		
-		unwinder_.accept(
-				conclusion,
+	public void map(final ObjectPropertyConclusion conclusion,
+			final InferenceVisitor<?, ?> visitor) {
+		final SingleInferenceMapper singleMapper = new SingleInferenceMapper(
+				exprFactory_);
+
+		unwinder_.accept(conclusion,
 				new AbstractObjectPropertyInferenceVisitor<Void, Boolean>() {
 
 					@Override
 					protected Boolean defaultTracedVisit(
 							ObjectPropertyInference inference, Void input) {
 						Inference mapped = singleMapper.map(inference);
-						
+
 						if (mapped != null) {
 							LOGGER_.trace("Mapped {} => {}", inference, mapped);
-							
+
 							mapped.accept(visitor, null);
 							return false;
 						}
-						
+
 						return true;
 					}
 				});
-	}	
+	}
 }

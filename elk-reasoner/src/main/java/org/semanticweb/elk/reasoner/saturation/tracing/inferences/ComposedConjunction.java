@@ -34,46 +34,48 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
- * A {@link ComposedSubsumer} for {@link IndexedObjectIntersectionOf}
- * obtained from its conjunts.
+ * A {@link ComposedSubsumer} for {@link IndexedObjectIntersectionOf} obtained
+ * from its conjunts.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
  */
 public class ComposedConjunction extends
-		ComposedSubsumerImpl<IndexedObjectIntersectionOf> implements ClassInference {
+		ComposedSubsumerImpl<IndexedObjectIntersectionOf> implements
+		ClassInference {
 
 	/**
 	 */
-	public ComposedConjunction(IndexedObjectIntersectionOf conjunction) {
-		super(conjunction);
+	public ComposedConjunction(IndexedContextRoot root,
+			IndexedObjectIntersectionOf conjunction) {
+		super(root, conjunction);
+	}
+
+	@Override
+	public IndexedContextRoot getInferenceContextRoot() {
+		return getRoot();
 	}
 
 	public Subsumer<IndexedClassExpression> getFirstConjunct() {
-		return new ComposedSubsumerImpl<IndexedClassExpression>(getExpression()
-				.getFirstConjunct());
+		return new ComposedSubsumerImpl<IndexedClassExpression>(
+				getInferenceContextRoot(), getExpression().getFirstConjunct());
 	}
 
 	public Subsumer<IndexedClassExpression> getSecondConjunct() {
-		return new ComposedSubsumerImpl<IndexedClassExpression>(getExpression()
-				.getSecondConjunct());
-	}
-
-	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
-		return visitor.visit(this, parameter);
-	}
-
-	@Override
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored) {
-		return rootWhereStored;
+		return new ComposedSubsumerImpl<IndexedClassExpression>(
+				getInferenceContextRoot(), getExpression().getSecondConjunct());
 	}
 
 	@Override
 	public String toString() {
 		return super.toString() + " (conjunction+)";
+	}
+
+	@Override
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
+		return visitor.visit(this, parameter);
 	}
 
 }

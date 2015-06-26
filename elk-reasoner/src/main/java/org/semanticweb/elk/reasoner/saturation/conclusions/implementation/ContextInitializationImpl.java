@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
@@ -39,7 +40,9 @@ public class ContextInitializationImpl extends AbstractConclusion implements
 	// but they can change after creating this object
 	private final OntologyIndex ontologyIndex_;
 
-	public ContextInitializationImpl(OntologyIndex ontologyIndex) {
+	public ContextInitializationImpl(IndexedContextRoot root,
+			OntologyIndex ontologyIndex) {
+		super(root);
 		this.ontologyIndex_ = ontologyIndex;
 	}
 

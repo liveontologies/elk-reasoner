@@ -45,7 +45,7 @@ public class TracedContextsCollector extends AbstractClassInferenceVisitor<Index
 	
 	@Override
 	protected Boolean defaultTracedVisit(ClassInference conclusion, IndexedContextRoot root) {
-		tracedRoots_.add(conclusion.getSourceRoot(root));
+		tracedRoots_.add(conclusion.getSourceRoot());
 		
 		return true;
 	}

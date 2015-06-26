@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
+
 /*
  * #%L
  * ELK Reasoner
@@ -22,8 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.interfaces;
  */
 
 /**
- * A {@link Conclusion} representing that some inconsistency for a concept has
- * been derived.
+ * A {@link Conclusion} representing an inconsistency derived for the root.
  * 
  * @author Pavel Klinov
  * 

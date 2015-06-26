@@ -96,11 +96,11 @@ abstract class AbstractIncrementalContextInitializationStage extends
 				break;
 			IndexedContextRoot root = todo.next();
 
-			Conclusion init = new ContextInitializationImpl(
+			Conclusion init = new ContextInitializationImpl(root,
 					reasoner.saturationState.getOntologyIndex());
 
 			if (reasoner.saturationState.getContext(root) != null) {
-				writer_.produce(root, init);
+				writer_.produce(init);
 			}
 
 			initContexts++;

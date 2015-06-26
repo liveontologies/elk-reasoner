@@ -46,15 +46,21 @@ public class SubClassOfSubsumer<S extends IndexedClassExpression> extends
 
 	private final ElkAxiom reason_;
 
-	public SubClassOfSubsumer(IndexedClassExpression premise, S conclusion,
-			ElkAxiom reason) {
-		super(conclusion);
+	public SubClassOfSubsumer(IndexedContextRoot root,
+			IndexedClassExpression premise, S conclusion, ElkAxiom reason) {
+		super(root, conclusion);
 		this.premise_ = premise;
 		this.reason_ = reason;
 	}
 
+	@Override
+	public IndexedContextRoot getInferenceContextRoot() {
+		return getRoot();
+	}
+
 	public Subsumer<?> getPremise() {
-		return new DecomposedSubsumerImpl<IndexedClassExpression>(premise_);
+		return new DecomposedSubsumerImpl<IndexedClassExpression>(
+				getInferenceContextRoot(), premise_);
 	}
 
 	public ElkAxiom getReason() {
@@ -62,20 +68,14 @@ public class SubClassOfSubsumer<S extends IndexedClassExpression> extends
 	}
 
 	@Override
+	public String toString() {
+		return super.toString() + " (subclassof)";
+	}
+
+	@Override
 	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
 			I parameter) {
 		return visitor.visit(this, parameter);
-	}
-
-	@Override
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored) {
-		return rootWhereStored;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + " (subclassof)";
 	}
 
 }

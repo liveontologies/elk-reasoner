@@ -23,6 +23,7 @@
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
@@ -48,7 +49,8 @@ public abstract class AbstractSubsumer<S extends IndexedClassExpression>
 	 */
 	private final S expression_;
 
-	public AbstractSubsumer(S expression) {
+	public AbstractSubsumer(IndexedContextRoot root, S expression) {
+		super(root);
 		if (expression == null)
 			throw new NullPointerException("Subsumer cannot be null!");
 		this.expression_ = expression;

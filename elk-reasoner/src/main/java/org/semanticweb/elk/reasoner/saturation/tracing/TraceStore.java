@@ -51,11 +51,10 @@ public interface TraceStore {
 		/**
 		 * TODO 
 		 * 
-		 * @param context
 		 * @param conclusion
 		 * @param visitor
 		 */
-		public void accept(IndexedContextRoot root, Conclusion conclusion, ClassInferenceVisitor<IndexedContextRoot, ?> visitor);
+		public void accept(Conclusion conclusion, ClassInferenceVisitor<IndexedContextRoot, ?> visitor);
 		/**
 		 * Visiting all {@link ObjectPropertyInference}s for the given {@link ObjectPropertyConclusion}.
 		 * 

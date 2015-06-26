@@ -42,35 +42,37 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  *         pavel.klinov@uni-ulm.de
  */
 public class DecomposedConjunction extends
-		DecomposedSubsumerImpl<IndexedClassExpression> implements ClassInference {
+		DecomposedSubsumerImpl<IndexedClassExpression> implements
+		ClassInference {
 
 	private final IndexedObjectIntersectionOf conjunction_;
 
-	public DecomposedConjunction(IndexedObjectIntersectionOf conjunction,
+	public DecomposedConjunction(IndexedContextRoot root,
+			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression expression) {
-		super(expression);
+		super(root, expression);
 		conjunction_ = conjunction;
 	}
 
 	public Subsumer<IndexedObjectIntersectionOf> getConjunction() {
 		return new DecomposedSubsumerImpl<IndexedObjectIntersectionOf>(
-				conjunction_);
+				getInferenceContextRoot(), conjunction_);
 	}
 
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
-		return visitor.visit(this, parameter);
-	}
-
-	@Override
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored) {
-		return rootWhereStored;
+	public IndexedContextRoot getInferenceContextRoot() {
+		return getRoot();
 	}
 
 	@Override
 	public String toString() {
 		return super.toString() + " (conjunction-)";
+	}
+
+	@Override
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
+		return visitor.visit(this, parameter);
 	}
 
 }

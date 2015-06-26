@@ -22,7 +22,6 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 
 /**
@@ -46,9 +45,9 @@ public class CombinedConclusionProducer implements ConclusionProducer {
 	}
 
 	@Override
-	public void produce(IndexedContextRoot root, Conclusion conclusion) {
-		firstProducer_.produce(root, conclusion);
-		secondProducer_.produce(root, conclusion);
+	public void produce(Conclusion conclusion) {
+		firstProducer_.produce(conclusion);
+		secondProducer_.produce(conclusion);
 	}
 
 }

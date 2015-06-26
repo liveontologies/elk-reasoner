@@ -50,16 +50,16 @@ public class IsInferenceCyclic {
 	 * @param targetContextRoot The root of the context to which this inference should be produced to (i.e. the target)
 	 * @return
 	 */
-	public static Conclusion check(final ClassInference inference, final IndexedContextRoot targetContextRoot, final TraceStore.Reader inferenceReader) {
+	public static Conclusion check(final ClassInference inference, final TraceStore.Reader inferenceReader) {
 		// the inference is cyclic if at least one of the premises has been
 		// derived only through this inference's conclusion
-		final IndexedContextRoot inferenceContext = inference.getInferenceContextRoot(targetContextRoot);
+		final IndexedContextRoot inferenceContext = inference.getInferenceContextRoot();
 		
 		Conclusion cyclicPremise = Premises.find(inference, new Condition<Conclusion>(){
 
 			@Override
 			public boolean holds(Conclusion premise) {
-				return derivedOnlyViaGivenConclusion(premise, inference, inferenceContext, targetContextRoot, inferenceReader);
+				return derivedOnlyViaGivenConclusion(premise, inference, inferenceReader);
 			}
 			
 		});
@@ -72,25 +72,21 @@ public class IsInferenceCyclic {
 	 * 
 	 * @param premise
 	 * @param conclusion
-	 * @param premiseContext
-	 * @param conclusionContext 
 	 * @return
 	 */
 	static boolean derivedOnlyViaGivenConclusion(final Conclusion premise,
 			final Conclusion conclusion,
-			final IndexedContextRoot premiseContext,
-			final IndexedContextRoot conclusionContext,
 			final TraceStore.Reader inferenceReader) {
 		final MutableBoolean foundAlternative = new MutableBoolean(false);
 		final MutableBoolean anyInference = new MutableBoolean(false);
 
-		inferenceReader.accept(premiseContext, premise, new AbstractClassInferenceVisitor<IndexedContextRoot, Void>(){
+		inferenceReader.accept(premise, new AbstractClassInferenceVisitor<IndexedContextRoot, Void>(){
 
 			@Override
 			protected Void defaultTracedVisit(ClassInference premiseInference, IndexedContextRoot ignored) {
 				anyInference.set(true);
 				
-				if (isAlternative(premiseInference, conclusion, conclusionContext)) {
+				if (isAlternative(premiseInference, conclusion)) {
 					foundAlternative.set(true);
 				}
 				
@@ -108,11 +104,11 @@ public class IsInferenceCyclic {
 	 * the given conclusion). It is assumed that the premises are stored in the
 	 * same context as the conclusion.
 	 */
-	public static boolean isAlternative(final ClassInference inference, final Conclusion conclusion, final IndexedContextRoot conclusionContext) {
+	public static boolean isAlternative(final ClassInference inference, final Conclusion conclusion) {
 		// if the premise is produced in a context different
 		// from where the conclusion is stored, then it must be
 		// produced by an alternative inference.
-		if (inference.getInferenceContextRoot(conclusionContext) != conclusionContext) {
+		if (inference.getInferenceContextRoot() != conclusion.getRoot()) {
 			return true;
 		}
 		

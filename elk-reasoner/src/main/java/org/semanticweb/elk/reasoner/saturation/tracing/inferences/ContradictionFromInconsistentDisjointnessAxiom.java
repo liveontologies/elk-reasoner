@@ -28,6 +28,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedDisjointClassesAxiom;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
@@ -48,23 +49,24 @@ public class ContradictionFromInconsistentDisjointnessAxiom extends
 	private final ElkAxiom reason_;
 
 	public ContradictionFromInconsistentDisjointnessAxiom(
-			IndexedClassExpression premise, ElkAxiom reason) {
-		super(premise);
+			IndexedContextRoot root, IndexedClassExpression premise,
+			ElkAxiom reason) {
+		super(root, premise);
 		reason_ = reason;
+	}
+
+	public ElkAxiom getReason() {
+		return reason_;
+	}
+
+	@Override
+	public String toString() {
+		return "Contradiction from " + premiseSubsumer + " due to " + reason_;
 	}
 
 	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
-	}
-
-	@Override
-	public String toString() {
-		return "Contradiction from " + premise + " due to " + reason_;
-	}
-
-	public ElkAxiom getReason() {
-		return reason_;
 	}
 
 	@Override

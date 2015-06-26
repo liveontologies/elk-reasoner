@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -37,30 +38,33 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
-public class DisjunctionComposition extends ComposedSubsumerImpl<IndexedObjectUnionOf> implements ClassInference {
+public class DisjunctionComposition extends
+		ComposedSubsumerImpl<IndexedObjectUnionOf> implements ClassInference {
 
 	private final IndexedClassExpression disjunct_;
-	
-	public DisjunctionComposition(IndexedClassExpression premise, IndexedObjectUnionOf disjunction) {
-		super(disjunction);
+
+	public DisjunctionComposition(IndexedContextRoot root,
+			IndexedClassExpression premise, IndexedObjectUnionOf disjunction) {
+		super(root, disjunction);
 		disjunct_ = premise;
 	}
 
-	public Subsumer<?> getPremise() {
-		return new DecomposedSubsumerImpl<IndexedClassExpression>(disjunct_);
-	}
-	
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
-		return visitor.visit(this, parameter);
+	public IndexedContextRoot getInferenceContextRoot() {
+		return getRoot();
+	}
+
+	public Subsumer<?> getPremise() {
+		return new DecomposedSubsumerImpl<IndexedClassExpression>(
+				getInferenceContextRoot(), disjunct_);
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored) {
-		return rootWhereStored;
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
+		return visitor.visit(this, parameter);
 	}
 
 }

@@ -22,6 +22,7 @@
  */
 package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.slf4j.Logger;
@@ -39,21 +40,12 @@ import org.slf4j.LoggerFactory;
 public class ContradictionImpl extends AbstractConclusion implements
 		Contradiction {
 
+	public ContradictionImpl(IndexedContextRoot root) {
+		super(root);
+	}
+
 	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ContradictionImpl.class);
-
-	/**
-	 * we use just one instance of this class
-	 */
-	private static ContradictionImpl INSTANCE_ = new ContradictionImpl();
-
-	public static ContradictionImpl getInstance() {
-		return INSTANCE_;
-	}
-
-	private ContradictionImpl() {
-		// do not allow creation of instances outside of this class
-	}
 
 	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {

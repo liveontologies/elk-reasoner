@@ -25,7 +25,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore.Reader;
@@ -54,8 +53,8 @@ public class TestTraceUnwinder extends RecursiveTraceUnwinder {
 	}
 
 	@Override
-	protected void handleUntraced(Conclusion untraced, IndexedContextRoot root) {
-		listener_.notifyUntraced(untraced, root);
+	protected void handleUntraced(Conclusion untraced) {
+		listener_.notifyUntraced(untraced);
 	}
 
 	@Override

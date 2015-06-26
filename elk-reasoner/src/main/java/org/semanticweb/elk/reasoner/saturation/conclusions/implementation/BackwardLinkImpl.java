@@ -49,14 +49,15 @@ public class BackwardLinkImpl extends AbstractConclusion implements
 	 */
 	private final IndexedObjectProperty relation_;
 
-	public BackwardLinkImpl(IndexedContextRoot source,
+	public BackwardLinkImpl(IndexedContextRoot root, IndexedContextRoot source,
 			IndexedObjectProperty relation) {
+		super(root);
 		this.relation_ = relation;
 		this.source_ = source;
 	}
 
 	@Override
-	public IndexedContextRoot getSourceRoot(IndexedContextRoot rootWhereStored) {
+	public IndexedContextRoot getSourceRoot() {
 		return source_;
 	}
 

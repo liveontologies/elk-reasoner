@@ -61,9 +61,8 @@ public class BackwardLinkFromForwardLinkRule extends AbstractForwardLinkRule {
 			ConclusionProducer producer) {
 		IndexedPropertyChain relation = premise.getRelation();
 		IndexedContextRoot source = premises.getRoot();
-		IndexedContextRoot target = premise.getTarget();
 		if (relation instanceof IndexedObjectProperty) {
-			producer.produce(target, new ReversedForwardLink(source,
+			producer.produce(new ReversedForwardLink(source,
 					(IndexedObjectProperty) relation, premise));
 		} else {
 			ArrayList<IndexedObjectProperty> superProperties = relation
@@ -72,7 +71,6 @@ public class BackwardLinkFromForwardLinkRule extends AbstractForwardLinkRule {
 					.getToldSuperPropertiesReasons();
 			for (int i = 0; i < superProperties.size(); i++) {
 				producer.produce(
-						target,
 						new SuperReversedForwardLink(source, superProperties
 								.get(i), premise, superPropertiesReasons.get(i)));
 			}

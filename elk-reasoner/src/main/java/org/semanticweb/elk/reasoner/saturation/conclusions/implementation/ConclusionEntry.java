@@ -52,6 +52,16 @@ public class ConclusionEntry implements Conclusion {
 	}
 
 	@Override
+	public IndexedContextRoot getRoot() {
+		return conclusion_.getRoot();
+	}
+	
+	@Override
+	public IndexedContextRoot getSourceRoot() {
+		return conclusion_.getSourceRoot();
+	}
+	
+	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I parameter) {
 		return conclusion_.accept(visitor, parameter);
 	}
@@ -73,11 +83,6 @@ public class ConclusionEntry implements Conclusion {
 	@Override
 	public String toString() {
 		return conclusion_.toString();
-	}
-
-	@Override
-	public IndexedContextRoot getSourceRoot(IndexedContextRoot rootWhereStored) {
-		return conclusion_.getSourceRoot(rootWhereStored);
-	}
+	}	
 
 }

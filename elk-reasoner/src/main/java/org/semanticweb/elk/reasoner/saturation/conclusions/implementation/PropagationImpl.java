@@ -27,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
@@ -52,8 +53,9 @@ public class PropagationImpl extends AbstractConclusion implements Propagation {
 
 	private final IndexedObjectSomeValuesFrom carry_;
 
-	public PropagationImpl(IndexedObjectProperty relation,
-			IndexedObjectSomeValuesFrom carry) {
+	public PropagationImpl(IndexedContextRoot root,
+			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
+		super(root);
 		relation_ = relation;
 		carry_ = carry;
 	}

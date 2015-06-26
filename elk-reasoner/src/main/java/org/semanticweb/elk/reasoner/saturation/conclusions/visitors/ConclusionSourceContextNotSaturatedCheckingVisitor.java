@@ -60,8 +60,7 @@ public class ConclusionSourceContextNotSaturatedCheckingVisitor extends
 
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, Context context) {
-		IndexedContextRoot sourceRoot = conclusion.getSourceRoot(context
-				.getRoot());
+		IndexedContextRoot sourceRoot = conclusion.getSourceRoot();
 		Context sourceContext = state_.getContext(sourceRoot);
 		if (sourceContext.isInitialized() && sourceContext.isSaturated()) {
 			LOGGER_.error(

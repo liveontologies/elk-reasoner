@@ -91,7 +91,7 @@ public class HybridLocalRuleApplicationConclusionVisitor extends
 	private ContextPremises getPremises(Conclusion conclusion, Context input) {
 		IndexedContextRoot root = input.getRoot();
 		ContextPremises mainPremises = mainState_.getContext(root);
-		if (conclusion.getSourceRoot(root) != root)
+		if (conclusion.getSourceRoot() != root)
 			// there are currently no rules which can use other context premises
 			// with the same source, so we can just take all main premises
 			return mainPremises;

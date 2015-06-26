@@ -28,7 +28,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Contex
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule;
 import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 
 /**
@@ -41,17 +40,13 @@ import org.semanticweb.elk.util.concurrent.computation.Interrupter;
 public class BasicRuleEngine<I extends RuleApplicationInput> extends
 		AbstractRuleEngineWithStatistics<I> {
 
+	private final OntologyIndex index_;
+
 	/**
 	 * a {@link SaturationStateWriter} to produce new {@link Conclusion}s and
 	 * query for active {@link Context}s
 	 */
 	private final SaturationStateWriter<?> writer_;
-
-	/**
-	 * The {@link Conclusion} used to initialize contexts using
-	 * {@link ContextInitRule}s
-	 */
-	private final Conclusion contextInitConclusion_;
 
 	protected BasicRuleEngine(OntologyIndex index,
 			ConclusionVisitor<? super Context, Boolean> conclusionProcessor,
@@ -61,13 +56,13 @@ public class BasicRuleEngine<I extends RuleApplicationInput> extends
 			SaturationStatistics localStatistics) {
 		super(conclusionProcessor, localTodo, interrupter,
 				aggregatedStatistics, localStatistics);
+		this.index_ = index;
 		this.writer_ = writer;
-		this.contextInitConclusion_ = new ContextInitializationImpl(index);
 	}
 
 	@Override
 	public void submit(RuleApplicationInput job) {
-		writer_.produce(job.getRoot(), contextInitConclusion_);
+		writer_.produce(new ContextInitializationImpl(job.getRoot(), index_));
 	}
 
 	@Override

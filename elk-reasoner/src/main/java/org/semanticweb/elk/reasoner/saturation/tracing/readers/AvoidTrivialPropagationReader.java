@@ -55,9 +55,9 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 	}
 
 	@Override
-	public void accept(final IndexedContextRoot root,
-			final Conclusion conclusion, final ClassInferenceVisitor<IndexedContextRoot, ?> visitor) {
-		reader.accept(root, conclusion,
+	public void accept(final Conclusion conclusion,
+			final ClassInferenceVisitor<IndexedContextRoot, ?> visitor) {
+		reader.accept(conclusion,
 				new AbstractClassInferenceVisitor<IndexedContextRoot, Void>() {
 
 					@Override
@@ -71,7 +71,7 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 					@Override
 					public Void visit(PropagatedSubsumer propagated,
 							IndexedContextRoot ignored) {
-						if (!isTrivialPropagation(propagated, root)) {
+						if (!isTrivialPropagation(propagated)) {
 							propagated.acceptTraced(visitor, null);
 						}
 
@@ -81,8 +81,7 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 				});
 	}
 
-	boolean isTrivialPropagation(PropagatedSubsumer propagated,
-			IndexedContextRoot contextRoot) {
+	boolean isTrivialPropagation(PropagatedSubsumer propagated) {
 		// a propagation is trivial if two conditions are met:
 		// 1) the root is propagated (not one of its subsumers)
 		// 2) the backward link has been derived by decomposing the existential
@@ -90,7 +89,7 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 		BackwardLink link = propagated.getBackwardLink();
 		Propagation propagation = propagated.getPropagation();
 		IndexedContextRoot inferenceContextRoot = propagated
-				.getInferenceContextRoot(contextRoot);
+				.getInferenceContextRoot();
 
 		if (inferenceContextRoot != IndexedObjectSomeValuesFrom.Helper
 				.getTarget(propagation.getCarry())) {
@@ -100,25 +99,25 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 		final MutableBoolean linkProducedByDecomposition = new MutableBoolean(
 				false);
 
-		reader.accept(inferenceContextRoot, link,
-				new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
+		reader.accept(
 
-					@Override
-					protected Boolean defaultTracedVisit(ClassInference conclusion,
-							IndexedContextRoot ignored) {
-						return false;
-					}
+		link, new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
-					@Override
-					public Boolean visit(
-							DecomposedExistentialBackwardLink conclusion,
-							IndexedContextRoot ignored) {
-						linkProducedByDecomposition.set(true);
+			@Override
+			protected Boolean defaultTracedVisit(ClassInference conclusion,
+					IndexedContextRoot ignored) {
+				return false;
+			}
 
-						return true;
-					}
+			@Override
+			public Boolean visit(DecomposedExistentialBackwardLink conclusion,
+					IndexedContextRoot ignored) {
+				linkProducedByDecomposition.set(true);
 
-				});
+				return true;
+			}
+
+		});
 
 		return linkProducedByDecomposition.get();
 	}

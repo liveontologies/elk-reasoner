@@ -50,7 +50,9 @@ public class DecomposedExistentialForwardLink extends AbstractConclusion
 	/**
 	 * 
 	 */
-	public DecomposedExistentialForwardLink(IndexedObjectSomeValuesFrom subsumer) {
+	public DecomposedExistentialForwardLink(IndexedContextRoot root,
+			IndexedObjectSomeValuesFrom subsumer) {
+		super(root);
 		existential_ = subsumer;
 	}
 
@@ -64,21 +66,14 @@ public class DecomposedExistentialForwardLink extends AbstractConclusion
 		return IndexedObjectSomeValuesFrom.Helper.getTarget(existential_);
 	}
 
-	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
-			I parameter) {
-		return visitor.visit(this, parameter);
-	}
-
 	public Subsumer<IndexedObjectSomeValuesFrom> getExistential() {
 		return new DecomposedSubsumerImpl<IndexedObjectSomeValuesFrom>(
-				existential_);
+				getInferenceContextRoot(), existential_);
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored) {
-		return rootWhereStored;
+	public IndexedContextRoot getInferenceContextRoot() {
+		return getRoot();
 	}
 
 	@Override
@@ -89,6 +84,12 @@ public class DecomposedExistentialForwardLink extends AbstractConclusion
 	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
+	}
+
+	@Override
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
+		return visitor.visit(this, parameter);
 	}
 
 }

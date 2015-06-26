@@ -64,8 +64,8 @@ public class Deindexer implements IndexedContextRootVisitor<ElkClassExpression> 
 
 	private final static ElkObjectFactory factory_ = new ElkObjectFactoryImpl();
 
-	public static ElkClassExpression deindex(IndexedContextRoot ice) {
-		return ice.accept(new Deindexer());
+	public static ElkClassExpression deindex(IndexedContextRoot root) {
+		return root.accept(new Deindexer());
 	}
 
 	public static ElkSubObjectPropertyExpression deindex(

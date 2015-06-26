@@ -53,24 +53,19 @@ public class DecomposedExistentialBackwardLink extends BackwardLinkImpl
 	 */
 	public DecomposedExistentialBackwardLink(IndexedContextRoot source,
 			IndexedObjectSomeValuesFrom subsumer) {
-		super(source, subsumer.getProperty());
+		super(IndexedObjectSomeValuesFrom.Helper.getTarget(subsumer), source,
+				subsumer.getProperty());
 		existential_ = subsumer;
 		inferenceContext_ = source;
 	}
 
-	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
-		return visitor.visit(this, parameter);
-	}
-
 	public Subsumer<IndexedObjectSomeValuesFrom> getExistential() {
 		return new DecomposedSubsumerImpl<IndexedObjectSomeValuesFrom>(
-				existential_);
+				getInferenceContextRoot(), existential_);
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored) {
+	public IndexedContextRoot getInferenceContextRoot() {
 		return inferenceContext_;
 	}
 
@@ -78,4 +73,11 @@ public class DecomposedExistentialBackwardLink extends BackwardLinkImpl
 	public String toString() {
 		return super.toString() + " (decomposition)";
 	}
+
+	@Override
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
+		return visitor.visit(this, parameter);
+	}
+
 }

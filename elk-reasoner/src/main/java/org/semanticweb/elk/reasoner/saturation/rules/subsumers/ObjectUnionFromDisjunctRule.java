@@ -146,7 +146,7 @@ public class ObjectUnionFromDisjunctRule extends AbstractChainableSubsumerRule {
 	public void apply(IndexedClassExpression premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		for (IndexedObjectUnionOf disjunction : disjunctions_) {
-			producer.produce(premises.getRoot(), new DisjunctionComposition(
+			producer.produce(new DisjunctionComposition(premises.getRoot(),
 					premise, disjunction));
 		}
 	}

@@ -155,7 +155,7 @@ public class ObjectIntersectionFromConjunctRule extends
 				conjunctionsByConjunct_.keySet(), premises.getSubsumers())) {
 			// producer.produce(premises.getRoot(), new
 			// ComposedSubsumer(conjunctionsByConjunct_.get(common)));
-			producer.produce(premises.getRoot(), new ComposedConjunction(
+			producer.produce(new ComposedConjunction(premises.getRoot(),
 					conjunctionsByConjunct_.get(common)));
 		}
 

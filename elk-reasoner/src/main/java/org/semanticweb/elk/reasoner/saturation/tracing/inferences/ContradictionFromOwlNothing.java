@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,6 +26,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClass;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
@@ -36,17 +38,14 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
-public class ContradictionFromOwlNothing extends ContradictionFromSubsumer<IndexedClass> implements Contradiction {
+public class ContradictionFromOwlNothing extends
+		ContradictionFromSubsumer<IndexedClass> implements Contradiction {
 
-	public ContradictionFromOwlNothing(IndexedClass p) {
-		super(p);
-	}
-	
-	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public ContradictionFromOwlNothing(IndexedContextRoot root,
+			IndexedClass premiseSubsumer) {
+		super(root, premiseSubsumer);
 	}
 
 	@Override
@@ -55,9 +54,14 @@ public class ContradictionFromOwlNothing extends ContradictionFromSubsumer<Index
 	}
 
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
-		return visitor.visit(this, parameter);
+	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 
+	@Override
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
+		return visitor.visit(this, parameter);
+	}
 
 }

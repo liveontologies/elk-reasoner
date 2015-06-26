@@ -63,9 +63,9 @@ public class IndexedObjectIntersectionOfDecomposition extends
 		// producer.produce(premises.getRoot(), new
 		// DecomposedSubsumer(premise.getSecondConjunct()));
 
-		producer.produce(premises.getRoot(), new DecomposedConjunction(premise,
+		producer.produce(new DecomposedConjunction(premises.getRoot(), premise,
 				premise.getFirstConjunct()));
-		producer.produce(premises.getRoot(), new DecomposedConjunction(premise,
+		producer.produce(new DecomposedConjunction(premises.getRoot(), premise,
 				premise.getSecondConjunct()));
 	}
 

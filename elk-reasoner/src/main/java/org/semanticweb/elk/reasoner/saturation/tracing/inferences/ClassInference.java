@@ -40,18 +40,13 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  */
 public interface ClassInference extends Conclusion {
 
+	/**
+	 * @return the root of the {@link Context} where this {@link ClassInference}
+	 *         was produced; this cannot be {@code null}.
+	 */
+	public IndexedContextRoot getInferenceContextRoot();
+
 	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
 			I parameter);
-
-	/**
-	 * Returns the root of the {@link Context} where this inference has been
-	 * made. This is the same context where all premises are stored. This cannot
-	 * be {@code null}.
-	 * 
-	 * @param rootWhereStored
-	 * @return
-	 */
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored);
 
 }

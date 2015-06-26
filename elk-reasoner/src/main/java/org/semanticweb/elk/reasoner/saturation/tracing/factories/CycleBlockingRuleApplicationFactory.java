@@ -145,30 +145,30 @@ public class CycleBlockingRuleApplicationFactory extends
 		}
 
 		@Override
-		public void produce(IndexedContextRoot root, Conclusion conclusion) {
+		public void produce(Conclusion conclusion) {
 			final SaturationState<? extends TracedContext> tracingState = CycleBlockingRuleApplicationFactory.this
 					.getSaturationState();
 			// no need to check for duplicates of inferences since rules for all
 			// conclusions are applied only once.
-			final TracedContext thisContext = tracingState.getContext(root);
+			final TracedContext thisContext = tracingState.getContext(conclusion.getRoot());
 
 			if (thisContext == null || !(conclusion instanceof ClassInference)
 					|| !CYCLE_AVOIDANCE) {
-				super.produce(root, conclusion);
+				super.produce(conclusion);
 				return;
 			}
 
 			final ClassInference inference = (ClassInference) conclusion;
 			// get the premise which blocks this inference, if any
-			Conclusion cyclicPremise = IsInferenceCyclic.check(inference, root,
+			Conclusion cyclicPremise = IsInferenceCyclic.check(inference,
 					inferenceReader_);
 
 			if (cyclicPremise == null) {
 				// cool, the inference isn't cyclic, go ahead
-				super.produce(root, inference);
+				super.produce(inference);
 			} else {
 				final TracedContext inferenceContext = tracingState
-						.getContext(inference.getInferenceContextRoot(root));
+						.getContext(inference.getInferenceContextRoot());
 				// block the inference in the context where the inference has
 				// been made
 				LOGGER_.trace("Inference {} is blocked in {} through {}",
@@ -234,16 +234,12 @@ public class CycleBlockingRuleApplicationFactory extends
 							"Checking if {} should be unblocked in {} since we derived {}",
 							blockedInference, cxt, premiseInference);
 
-					// this is the context to which the blocked inference should
-					// be produced (if unblocked)
-					IndexedContextRoot targetRoot = blockedInference
-							.acceptTraced(new GetInferenceTarget(), cxt);
 					// deciding if the new inference should unblock the
 					// previously blocked one.
 					// i.e. if the new inference derives its conclusion NOT via
 					// the conclusion of the blocked inference.
 					if (IsInferenceCyclic.isAlternative(premiseInference,
-							blockedInference, targetRoot)) {
+							blockedInference)) {
 						inferenceIter.remove();
 						// unblock the inference
 						LOGGER_.trace("Inference {} is unblocked in {}",
@@ -251,7 +247,7 @@ public class CycleBlockingRuleApplicationFactory extends
 						// produce again to the same producer, the inference
 						// will again be checked for cyclicity and may be
 						// blocked by another premise or finally produced
-						localProducer_.produce(targetRoot, blockedInference);
+						localProducer_.produce(blockedInference);
 					}
 				}
 			}

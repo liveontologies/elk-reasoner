@@ -309,7 +309,7 @@ public class ContextImpl implements ExtendedContext {
 			IndexedObjectProperty relation = subConclusion.getRelation();
 			// make sure that relevant context always exists
 			SubContext subContext = input.getCreateSubContext(relation);
-			if (subConclusion.getSourceRoot(input.root_) == input.root_) {
+			if (subConclusion.getSourceRoot() == input.root_) {
 				// reflexive
 				if (input.reflexiveBackwardLinks_ == null) {
 					input.reflexiveBackwardLinks_ = new ArrayHashSet<IndexedObjectProperty>(
@@ -408,7 +408,7 @@ public class ContextImpl implements ExtendedContext {
 			boolean changed = false;
 			IndexedObjectProperty relation = subConclusion.getRelation();
 			SubContext subContext = input.getCreateSubContext(relation);
-			if (subConclusion.getSourceRoot(input.root_) == input.root_) {
+			if (subConclusion.getSourceRoot() == input.root_) {
 				// link is reflexive
 				if (input.reflexiveBackwardLinks_ != null) {
 					changed = input.reflexiveBackwardLinks_.remove(relation);
@@ -532,7 +532,7 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
-			if (subConclusion.getSourceRoot(input.root_) == input.root_) {
+			if (subConclusion.getSourceRoot() == input.root_) {
 				// reflexive
 				return input.reflexiveBackwardLinks_ != null
 						&& input.reflexiveBackwardLinks_.contains(subConclusion

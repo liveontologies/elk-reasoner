@@ -23,6 +23,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.implementation;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
@@ -41,7 +42,9 @@ public class SubContextInitializationImpl extends AbstractConclusion implements
 	 */
 	private final IndexedObjectProperty subRoot_;
 
-	public SubContextInitializationImpl(IndexedObjectProperty subRoot) {
+	public SubContextInitializationImpl(IndexedContextRoot root,
+			IndexedObjectProperty subRoot) {
+		super(root);
 		this.subRoot_ = subRoot;
 	}
 

@@ -555,16 +555,14 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 
 	@Deprecated
 	public ElkPolarityExpressionConverter getExpressionConverter() {
-		return this.expressionConverter_;		
-	}	
-	
+		return this.expressionConverter_;
+	}
+
 	@Deprecated
 	public ElkSubObjectPropertyExpressionVisitor<? extends IndexedPropertyChain> getSubPropertyConverter() {
-		return this.subPropertyConverter_;		
+		return this.subPropertyConverter_;
 	}
-	
-	
-	
+
 	/*---------------------------------------------------
 	 * TRACING METHODS
 	 *---------------------------------------------------*/
@@ -596,8 +594,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		}
 
 		traceState.clearTracingMap();
-		traceState.addConclusionToTrace(inconsistentEntity,
-				ContradictionImpl.getInstance());
+		traceState.addConclusionToTrace(new ContradictionImpl(
+				inconsistentEntity));
 		trace(false);
 		traceState.clearTracingMap();
 		return inconsistentEntity.getElkEntity();
@@ -607,8 +605,7 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	public void submitForTracing(ElkClassExpression sub, ElkClassExpression sup) {
 		IndexedClassExpression subsumee = sub.accept(expressionConverter_);
 		IndexedClassExpression subsumer = sup.accept(expressionConverter_);
-		traceState.addConclusionToTrace(subsumee,
-				convertTraceTarget(subsumee, subsumer));
+		traceState.addConclusionToTrace(convertTraceTarget(subsumee, subsumer));
 	}
 
 	public TraceStore.Reader trace(boolean forceTrace) throws ElkException {
@@ -631,11 +628,9 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		if (isInconsistent()) {
 			throw new ElkInconsistentOntologyException(
 					"The ontology is inconsistent. Use explainInconsistency() method instead");
-		} else {
-			// explain subsumption or sub-class unsatisfiability
-			traceState.addConclusionToTrace(subsumee,
-					convertTraceTarget(subsumee, subsumer));
 		}
+		// elsse explain subsumption or sub-class unsatisfiability
+		traceState.addConclusionToTrace(convertTraceTarget(subsumee, subsumer));
 
 		trace(true);
 		traceState.clearTracingMap();
@@ -645,8 +640,8 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		Context subsumeeContext = saturationState.getContext(subsumee);
 
 		if (subsumeeContext != null) {
-			return !subsumeeContext.containsConclusion(ContradictionImpl
-					.getInstance());
+			return !subsumeeContext.containsConclusion(new ContradictionImpl(
+					subsumee));
 		}
 		// shouldn't happen if we suppport only named classes or abbreviate
 		// class expressions and saturate them prior to tracing
@@ -657,10 +652,11 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 			IndexedClassExpression subsumer) {
 		if (!isSatisfiable(subsumee)) {
 			// the subsumee is unsatisfiable so we explain the unsatisfiability
-			return ContradictionImpl.getInstance();
-		} else {
-			return new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer);
+			return new ContradictionImpl(subsumee);
 		}
+		// else
+		return new DecomposedSubsumerImpl<IndexedClassExpression>(subsumee,
+				subsumer);
 	}
 
 	@Deprecated

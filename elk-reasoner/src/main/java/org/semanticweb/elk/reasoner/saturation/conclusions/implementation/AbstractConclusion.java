@@ -35,10 +35,20 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
  */
 public abstract class AbstractConclusion implements Conclusion {
 
+	private final IndexedContextRoot root_;
+
+	protected AbstractConclusion(IndexedContextRoot root) {
+		this.root_ = root;
+	}
+
 	@Override
-	public IndexedContextRoot getSourceRoot(IndexedContextRoot rootWhereStored) {
-		// by default where the conclusion is stored
-		return rootWhereStored;
+	public IndexedContextRoot getRoot() {
+		return this.root_;
+	}
+
+	@Override
+	public IndexedContextRoot getSourceRoot() {
+		return this.root_;
 	}
 
 }

@@ -73,7 +73,7 @@ public class ComposedBackwardLink extends BackwardLinkImpl implements
 			IndexedContextRoot linkTarget,
 			IndexedComplexPropertyChain composition,
 			IndexedObjectProperty compositionSuperProperty, ElkAxiom reason) {
-		super(linkSource, compositionSuperProperty);
+		super(linkTarget, linkSource, compositionSuperProperty);
 		this.backwardLinkRelation_ = backwardLinkRelation;
 		this.forwardLinkRelation_ = forwardLinkChain;
 		this.forwardLinkTarget_ = linkTarget;
@@ -83,23 +83,18 @@ public class ComposedBackwardLink extends BackwardLinkImpl implements
 	}
 
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
-			I parameter) {
-		return visitor.visit(this, parameter);
+	public IndexedContextRoot getInferenceContextRoot() {
+		return inferenceContext_;
 	}
 
 	public BackwardLink getBackwardLink() {
-		return new BackwardLinkImpl(getSource(), backwardLinkRelation_);
+		return new BackwardLinkImpl(getInferenceContextRoot(), getSource(),
+				backwardLinkRelation_);
 	}
 
 	public ForwardLink getForwardLink() {
-		return new ForwardLinkImpl(forwardLinkRelation_, forwardLinkTarget_);
-	}
-
-	@Override
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored) {
-		return inferenceContext_;
+		return new ForwardLinkImpl(getInferenceContextRoot(),
+				forwardLinkRelation_, forwardLinkTarget_);
 	}
 
 	public SubObjectProperty getLeftSubObjectProperty() {
@@ -119,6 +114,12 @@ public class ComposedBackwardLink extends BackwardLinkImpl implements
 	@Override
 	public String toString() {
 		return super.toString() + " (composition)";
+	}
+
+	@Override
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
+		return visitor.visit(this, parameter);
 	}
 
 }

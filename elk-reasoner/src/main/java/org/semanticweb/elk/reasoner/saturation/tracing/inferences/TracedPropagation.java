@@ -45,31 +45,32 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TracedPropagation extends PropagationImpl implements ClassInference {
+public class TracedPropagation extends PropagationImpl implements
+		ClassInference {
 
-	public TracedPropagation(IndexedObjectProperty relation,
-			IndexedObjectSomeValuesFrom carry) {
-		super(relation, carry);
+	public TracedPropagation(IndexedContextRoot root,
+			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
+		super(root, relation, carry);
+	}
+
+	@Override
+	public IndexedContextRoot getInferenceContextRoot() {
+		return getRoot();
 	}
 
 	public Subsumer<?> getSubsumer() {
-		return new DecomposedSubsumerImpl<IndexedClassExpression>(getCarry()
-				.getFiller());
+		return new DecomposedSubsumerImpl<IndexedClassExpression>(
+				getInferenceContextRoot(), getCarry().getFiller());
 	}
-	
+
 	public SubObjectProperty getSubPropertyPremise() {
 		return new SubObjectProperty(getRelation(), getCarry().getProperty());
 	}
 
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
-	}
-
-	@Override
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored) {
-		return rootWhereStored;
 	}
 
 }

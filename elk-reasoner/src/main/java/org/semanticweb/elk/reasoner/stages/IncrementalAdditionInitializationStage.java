@@ -41,12 +41,12 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionCon
 import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionConverterImpl;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.DifferentialIndex;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.saturation.ContextCreationListener;
 import org.semanticweb.elk.reasoner.saturation.ContextModificationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationUtils;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
-import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.contextinit.LinkedContextInitRule;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.ChainableSubsumerRule;
@@ -98,8 +98,7 @@ public class IncrementalAdditionInitializationStage extends
 						contextModificationListener), stageStatistics_);
 
 		// used to initialize new contexts
-		Conclusion contextInitConclusion = new ContextInitializationImpl(
-				reasoner.saturationState.getOntologyIndex());
+		OntologyIndex index = reasoner.saturationState.getOntologyIndex();
 
 		for (ElkEntity newEntity : Operations.concat(
 				reasoner.ontologyIndex.getAddedClasses(),
@@ -144,7 +143,7 @@ public class IncrementalAdditionInitializationStage extends
 					});
 
 			if (reasoner.saturationState.getContext(ice) == null)
-				writer.produce(ice, contextInitConclusion);
+				writer.produce(new ContextInitializationImpl(ice, index));
 		}
 
 		changedInitRules = diffIndex.getAddedContextInitRules();

@@ -1,4 +1,5 @@
 package org.semanticweb.elk.reasoner.saturation.tracing;
+
 /*
  * #%L
  * ELK Reasoner
@@ -25,14 +26,12 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
-import org.semanticweb.elk.util.collections.Pair;
 
 /**
  * The state of the recursive trace unwinding procedure for some
@@ -46,33 +45,33 @@ import org.semanticweb.elk.util.collections.Pair;
  */
 public class TraceUnwindingState {
 
-	private final Queue<Pair<Conclusion, IndexedContextRoot>> classConclusionsToUnwind_;
-	
+	private final Queue<Conclusion> classConclusionsToUnwind_;
+
 	private final Queue<ObjectPropertyConclusion> propertyConclusionsToUnwind_;
 
 	private final Set<ClassInference> processedClassInferences_;
-	
+
 	private final Set<ObjectPropertyInference> processedPropertyInferences_;
 
 	public TraceUnwindingState() {
-		classConclusionsToUnwind_ = new LinkedList<Pair<Conclusion, IndexedContextRoot>>();
+		classConclusionsToUnwind_ = new LinkedList<Conclusion>();
 		propertyConclusionsToUnwind_ = new LinkedList<ObjectPropertyConclusion>();
 		processedClassInferences_ = new ArrayHashSet<ClassInference>();
 		processedPropertyInferences_ = new ArrayHashSet<ObjectPropertyInference>();
 	}
 
-	public void addToClassUnwindingQueue(Conclusion conclusion, IndexedContextRoot rootWhereStored) {
-		classConclusionsToUnwind_.add(new Pair<Conclusion, IndexedContextRoot>(conclusion, rootWhereStored));
+	public void addToClassUnwindingQueue(Conclusion conclusion) {
+		classConclusionsToUnwind_.add(conclusion);
 	}
-	
+
 	public void addToPropertyUnwindingQueue(ObjectPropertyConclusion conclusion) {
 		propertyConclusionsToUnwind_.add(conclusion);
 	}
 
-	public Pair<Conclusion, IndexedContextRoot> pollFromClassUnwindingQueue() {
+	public Conclusion pollFromClassUnwindingQueue() {
 		return classConclusionsToUnwind_.poll();
 	}
-	
+
 	public ObjectPropertyConclusion pollFromPropertyUnwindingQueue() {
 		return propertyConclusionsToUnwind_.poll();
 	}
@@ -80,7 +79,7 @@ public class TraceUnwindingState {
 	public boolean addToProcessed(ClassInference inference) {
 		return processedClassInferences_.add(inference);
 	}
-	
+
 	public boolean addToProcessed(ObjectPropertyInference inference) {
 		return processedPropertyInferences_.add(inference);
 	}

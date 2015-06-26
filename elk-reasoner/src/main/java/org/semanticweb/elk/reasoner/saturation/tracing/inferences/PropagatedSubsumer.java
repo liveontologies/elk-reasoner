@@ -44,56 +44,56 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  *         pavel.klinov@uni-ulm.de
  */
 public class PropagatedSubsumer extends
-		ComposedSubsumerImpl<IndexedObjectSomeValuesFrom> implements ClassInference {
+		ComposedSubsumerImpl<IndexedObjectSomeValuesFrom> implements
+		ClassInference {
 
 	private final IndexedObjectProperty linkRelation_;
 
-	private final IndexedContextRoot linkSourceRoot_;
+	private final IndexedContextRoot inferenceRoot_;
 
-	private final IndexedContextRoot inferenceContextRoot_;
-
-	public PropagatedSubsumer(IndexedContextRoot inferenceRoot,
-			BackwardLink backwardLink, IndexedObjectSomeValuesFrom carry) {
-		super(carry);
-		linkSourceRoot_ = backwardLink.getSource();
+	public PropagatedSubsumer(BackwardLink backwardLink,
+			IndexedObjectSomeValuesFrom carry) {
+		super(backwardLink.getSource(), carry);
+		inferenceRoot_ = backwardLink.getRoot();
 		linkRelation_ = backwardLink.getRelation();
-		inferenceContextRoot_ = inferenceRoot;
 	}
 
-	public PropagatedSubsumer(IndexedContextRoot contextRoot,
-			Propagation propagation, IndexedObjectProperty linkRelation,
-			IndexedContextRoot linkSource) {
-		super(propagation.getCarry());
-		linkSourceRoot_ = linkSource;
-		linkRelation_ = linkRelation;
-		inferenceContextRoot_ = contextRoot;
+	public PropagatedSubsumer(IndexedContextRoot conclusionRoot,
+			Propagation propagation) {
+		super(conclusionRoot, propagation.getCarry());
+		inferenceRoot_ = propagation.getRoot();
+		linkRelation_ = propagation.getRelation();
+	}
+
+	@Override
+	public IndexedContextRoot getInferenceContextRoot() {
+		return inferenceRoot_;
 	}
 
 	public Propagation getPropagation() {
-		return new PropagationImpl(linkRelation_, getExpression());
+		return new PropagationImpl(getInferenceContextRoot(), linkRelation_,
+				getExpression());
 	}
 
 	public BackwardLink getBackwardLink() {
-		return new BackwardLinkImpl(linkSourceRoot_, linkRelation_);
-	}
-	
-	/*public SubObjectProperty getSubPropertyPremise() {
-		return new SubObjectProperty(linkRelation_, getExpression().getRelation());
-	}*/
-
-	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
-		return visitor.visit(this, parameter);
-	}
-
-	@Override
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored) {
-		return inferenceContextRoot_;
+		return new BackwardLinkImpl(getInferenceContextRoot(), getRoot(),
+				linkRelation_);
 	}
 
 	@Override
 	public String toString() {
 		return super.toString() + " (propagation)";
 	}
+
+	/*
+	 * public SubObjectProperty getSubPropertyPremise() { return new
+	 * SubObjectProperty(linkRelation_, getExpression().getRelation()); }
+	 */
+
+	@Override
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
+		return visitor.visit(this, parameter);
+	}
+
 }

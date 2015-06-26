@@ -24,7 +24,6 @@ package org.semanticweb.elk.proofs.inferences.mapping;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 
 /**
@@ -33,13 +32,10 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion
  * pavel.klinov@uni-ulm.de
  */
 class ClassTracingInput implements TracingInput {
-
-	final IndexedClassExpression root;
 	
 	final Conclusion conclusion;
 	
-	ClassTracingInput(IndexedClassExpression r, Conclusion c) {
-		root = r;
+	ClassTracingInput(Conclusion c) {
 		conclusion = c;
 	}
 }

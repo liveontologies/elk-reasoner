@@ -66,14 +66,27 @@ public class ContradictionFromDisjointSubsumers extends AbstractConclusion
 
 	public ContradictionFromDisjointSubsumers(DisjointSubsumer premise,
 			IndexedClassExpression[] disjointSubsumers) {
+		super(premise.getRoot());
 		this.axiom_ = premise.getAxiom();
 		this.disjointSubsumers_ = disjointSubsumers;
 		this.reason_ = premise.getReason();
 	}
 
 	@Override
-	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
-		return visitor.visit(this, input);
+	public IndexedContextRoot getInferenceContextRoot() {
+		return getRoot();
+	}
+
+	public DisjointSubsumer[] getPremises() {
+		return new DisjointSubsumer[] {
+				new DisjointSubsumerImpl(getInferenceContextRoot(),
+						disjointSubsumers_[0], axiom_, reason_),
+				new DisjointSubsumerImpl(getInferenceContextRoot(),
+						disjointSubsumers_[1], axiom_, reason_) };
+	}
+
+	public ElkAxiom getReason() {
+		return reason_;
 	}
 
 	@Override
@@ -83,25 +96,14 @@ public class ContradictionFromDisjointSubsumers extends AbstractConclusion
 	}
 
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
-			I parameter) {
-		return visitor.visit(this, parameter);
-	}
-
-	public DisjointSubsumer[] getPremises() {
-		return new DisjointSubsumer[] {
-				new DisjointSubsumerImpl(disjointSubsumers_[0], axiom_, reason_),
-				new DisjointSubsumerImpl(disjointSubsumers_[1], axiom_, reason_) };
-	}
-
-	public ElkAxiom getReason() {
-		return reason_;
+	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
+		return visitor.visit(this, input);
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored) {
-		return rootWhereStored;
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
+		return visitor.visit(this, parameter);
 	}
 
 }

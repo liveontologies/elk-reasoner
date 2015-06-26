@@ -178,7 +178,7 @@ public class TracingSaturationTest {
 
 		reasoner.explainSubsumption(a, rSomeC);
 		TracingTestUtils.checkNumberOfInferences(a, rSomeC, reasoner, 1);
-		TracingTestUtils.checkNumberOfInferences(b, c, reasoner, 1);
+		TracingTestUtils.checkNumberOfInferences(b, c, reasoner, 1); // b might be not traced because it is a filler
 		TracingTestUtils.checkTracingCompleteness(a, rSomeC, reasoner);
 	}
 

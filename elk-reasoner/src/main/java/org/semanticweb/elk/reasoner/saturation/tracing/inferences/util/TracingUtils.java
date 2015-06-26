@@ -58,10 +58,10 @@ import org.semanticweb.elk.util.collections.Multimap;
  */
 public class TracingUtils {
 
-	public static Collection<ClassInference> getClassInferences(TraceStore.Reader reader, IndexedClassExpression cxt, Conclusion conclusion) {
+	public static Collection<ClassInference> getClassInferences(TraceStore.Reader reader, Conclusion conclusion) {
 		final List<ClassInference> inferences = new LinkedList<ClassInference>();
 		
-		reader.accept(cxt, conclusion, new AbstractClassInferenceVisitor<IndexedContextRoot, Void>() {
+		reader.accept(conclusion, new AbstractClassInferenceVisitor<IndexedContextRoot, Void>() {
 
 			@Override
 			protected Void defaultTracedVisit(ClassInference inf, IndexedContextRoot root) {
@@ -146,13 +146,15 @@ public class TracingUtils {
 		return superChains;
 	}
 	
-	public static Conclusion getConclusionToTrace(Context context, IndexedClassExpression subsumer) {
+	public static Conclusion getConclusionToTrace(Context context, IndexedClassExpression subsumer) {		
 		if (context != null) {
-			if (context.containsConclusion(ContradictionImpl.getInstance())) {
-				return ContradictionImpl.getInstance();
+			IndexedContextRoot root = context.getRoot();
+			Conclusion contradiction = new ContradictionImpl(root);
+			if (context.containsConclusion(contradiction)) {
+				return contradiction;
 			}
 			
-			return new DecomposedSubsumerImpl<IndexedClassExpression>(subsumer);
+			return new DecomposedSubsumerImpl<IndexedClassExpression>(root, subsumer);
 		}
 		
 		throw new IllegalArgumentException("Context may not be null");

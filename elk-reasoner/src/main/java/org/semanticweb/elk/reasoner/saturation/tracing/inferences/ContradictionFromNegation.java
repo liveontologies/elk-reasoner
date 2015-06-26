@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,6 +27,7 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectComplementOf;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
@@ -40,28 +42,33 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class ContradictionFromNegation extends ContradictionFromSubsumer<IndexedObjectComplementOf> implements Contradiction {
+public class ContradictionFromNegation extends
+		ContradictionFromSubsumer<IndexedObjectComplementOf> implements
+		Contradiction {
 
-	public ContradictionFromNegation(IndexedObjectComplementOf p) {
-		super(p);
+	public ContradictionFromNegation(IndexedContextRoot root,
+			IndexedObjectComplementOf premiseSubsumer) {
+		super(root, premiseSubsumer);
 	}
-	
+
 	@Override
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
 	}
-	
+
 	public Subsumer<IndexedClassExpression> getPositivePremise() {
-		return new DecomposedSubsumerImpl<IndexedClassExpression>(premise.getNegated());
+		return new DecomposedSubsumerImpl<IndexedClassExpression>(
+				getInferenceContextRoot(), premiseSubsumer.getNegated());
 	}
 
 	@Override
 	public String toString() {
-		return "Contradiction from Not " + premise;
+		return "Contradiction from Not " + premiseSubsumer;
 	}
 
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 

@@ -67,7 +67,8 @@ public class IndexedObjectComplementOfDecomposition extends
 	public void apply(IndexedObjectComplementOf premise,
 			ContextPremises premises, ConclusionProducer producer) {
 		if (premises.getSubsumers().contains(premise.getNegated())) {
-			producer.produce(premises.getRoot(), new ContradictionFromNegation(premise));
+			producer.produce(new ContradictionFromNegation(premises.getRoot(),
+					premise));
 		}
 	}
 }

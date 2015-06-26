@@ -22,9 +22,7 @@ package org.semanticweb.elk.reasoner.saturation.rules;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 
 /**
  * An object using which {@link Conclusion}s of inferences can be produced
@@ -35,14 +33,10 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 public interface ConclusionProducer {
 
 	/**
-	 * Tells that the given {@link Conclusion} is derived for the
-	 * {@link ContextPremises} with the given {@link IndexedContextRoot}.
+	 * Tells that the given {@link Conclusion} is derived.
 	 * 
-	 * @see ContextPremises#getRoot()
-	 * 
-	 * @param root
 	 * @param conclusion
 	 */
-	public void produce(IndexedContextRoot root, Conclusion conclusion);
+	public void produce(Conclusion conclusion);
 
 }

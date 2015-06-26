@@ -60,7 +60,7 @@ public class ComposedForwardLink extends ForwardLinkImpl implements
 			IndexedPropertyChain forwardLinkChain,
 			IndexedContextRoot linkTarget,
 			IndexedComplexPropertyChain composition) {
-		super(composition, linkTarget);
+		super(linkSource, composition, linkTarget);
 		this.backwardLinkSource_ = linkSource;
 		this.backwardLinkRelation_ = backwardLinkRelation;
 		this.inferenceContext_ = inferenceContext;
@@ -73,12 +73,19 @@ public class ComposedForwardLink extends ForwardLinkImpl implements
 		return visitor.visit(this, parameter);
 	}
 
+	@Override
+	public IndexedContextRoot getInferenceContextRoot() {
+		return inferenceContext_;
+	}
+
 	public BackwardLink getBackwardLink() {
-		return new BackwardLinkImpl(backwardLinkSource_, backwardLinkRelation_);
+		return new BackwardLinkImpl(getInferenceContextRoot(),
+				backwardLinkSource_, backwardLinkRelation_);
 	}
 
 	public ForwardLink getForwardLink() {
-		return new ForwardLinkImpl(forwardLinkChain_, getTarget());
+		return new ForwardLinkImpl(getInferenceContextRoot(),
+				forwardLinkChain_, getTarget());
 	}
 
 	private IndexedComplexPropertyChain getComposition() {
@@ -95,12 +102,6 @@ public class ComposedForwardLink extends ForwardLinkImpl implements
 	public SubPropertyChain<?, ?> getRightSubObjectPropertyChain() {
 		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(
 				forwardLinkChain_, getComposition().getSuffixChain());
-	}
-
-	@Override
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored) {
-		return inferenceContext_;
 	}
 
 	@Override

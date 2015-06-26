@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.saturation.SaturationStatistics;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationAdditionFactory;
+import org.semanticweb.elk.reasoner.saturation.rules.factories.RuleApplicationInput;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
@@ -144,7 +145,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 		this.jobsWithSaturatedRoot_ = new ConcurrentLinkedQueue<J>();
 		this.saturationState_ = saturationState;
 		this.saturationFactory_ = new ClassExpressionSaturationFactory<SaturationJobForTransitiveReduction<R, ?, J>>(
-				new RuleApplicationAdditionFactory(saturationState),
+				new RuleApplicationAdditionFactory<RuleApplicationInput>(saturationState),
 				maxWorkers, new ThisClassExpressionSaturationListener());
 		this.owlThing_ = saturationState.getOntologyIndex().getOwlThing();
 		this.defaultTopOutput_ = new ArrayList<ElkClass>(1);
@@ -251,7 +252,7 @@ public class TransitiveReductionFactory<R extends IndexedClassExpression, J exte
 			/*
 			 * If saturation is unsatisfiable, return the unsatisfiable output.
 			 */
-			if (saturation.containsConclusion(ContradictionImpl.getInstance())) {
+			if (saturation.containsConclusion(new ContradictionImpl(root))) {
 				LOGGER_.trace(
 						"{}: transitive reduction finished: inconsistent", root);
 

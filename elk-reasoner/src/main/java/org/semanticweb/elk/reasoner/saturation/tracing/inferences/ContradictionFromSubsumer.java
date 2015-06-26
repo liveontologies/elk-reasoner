@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,39 +27,37 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContradictionImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Contradiction;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 
 /**
- * The base implementation of a {@link Contradiction} inference produced when processing a {@link Subsumer}.
+ * The base implementation of a {@link Contradiction} inference produced when
+ * processing a {@link Subsumer}.
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
-abstract class ContradictionFromSubsumer<S extends IndexedClassExpression> implements ClassInference {
+abstract class ContradictionFromSubsumer<S extends IndexedClassExpression>
+		extends ContradictionImpl implements ClassInference {
 
-	protected S premise;
-	
-	ContradictionFromSubsumer(S p) {
-		premise = p;
+	protected S premiseSubsumer;
+
+	ContradictionFromSubsumer(IndexedContextRoot root, S premiseSubsumer) {
+		super(root);
+		this.premiseSubsumer = premiseSubsumer;
 	}
-	
+
+	@Override
+	public IndexedContextRoot getInferenceContextRoot() {
+		return getRoot();
+	}
+
 	public Subsumer<S> getPremise() {
-		return new DecomposedSubsumerImpl<S>(premise);
-	}
-	
-	@Override
-	public IndexedContextRoot getSourceRoot(
-			IndexedContextRoot rootWhereStored) {
-		return rootWhereStored;
-	}
-
-	@Override
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored) {
-		return rootWhereStored;
+		return new DecomposedSubsumerImpl<S>(getInferenceContextRoot(),
+				premiseSubsumer);
 	}
 
 }

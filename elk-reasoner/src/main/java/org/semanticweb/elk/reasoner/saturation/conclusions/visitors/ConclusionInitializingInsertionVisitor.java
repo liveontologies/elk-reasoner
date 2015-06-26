@@ -23,6 +23,8 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ContextInitializationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.SubContextInitializationImpl;
@@ -33,7 +35,6 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContext
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.context.SubContext;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.rules.contextinit.ContextInitRule;
 
 /**
  * A {@link ConclusionInsertionVisitor} that additionally initializes
@@ -52,31 +53,29 @@ public class ConclusionInitializingInsertionVisitor extends
 	 */
 	private final ConclusionProducer producer_;
 
-	/**
-	 * The {@link Conclusion} used to initialize contexts using
-	 * {@link ContextInitRule}s
-	 */
-	private final ContextInitialization contextInitConclusion_;
+	private final OntologyIndex index_;
 
 	public ConclusionInitializingInsertionVisitor(
 			SaturationStateWriter<?> writer) {
 		super(writer);
 		this.producer_ = writer;
-		this.contextInitConclusion_ = new ContextInitializationImpl(writer
-				.getSaturationState().getOntologyIndex());
+		this.index_ = writer.getSaturationState().getOntologyIndex();
 	}
 
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, Context context) {
-		if (!context.containsConclusion(contextInitConclusion_))
-			producer_.produce(context.getRoot(), contextInitConclusion_);
+		IndexedContextRoot root = context.getRoot();
+		Conclusion contextInitConclusion = new ContextInitializationImpl(root,
+				index_);
+		if (!context.containsConclusion(contextInitConclusion))
+			producer_.produce(contextInitConclusion);
 		if (conclusion instanceof SubConclusion) {
 			IndexedObjectProperty subRoot = ((SubConclusion) conclusion)
 					.getSubRoot();
 			SubConclusion subContextInit = new SubContextInitializationImpl(
-					subRoot);
+					root, subRoot);
 			if (!context.containsConclusion(subContextInit))
-				producer_.produce(context.getRoot(), subContextInit);
+				producer_.produce(subContextInit);
 		}
 		return super.defaultVisit(conclusion, context);
 	}

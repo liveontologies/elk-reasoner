@@ -161,9 +161,8 @@ public class DisjointSubsumerFromMemberRule extends
 	public void apply(IndexedClassExpression member, ContextPremises premises,
 			ConclusionProducer producer) {
 		for (int i = 0; i < axioms_.size(); i++) {
-			producer.produce(premises.getRoot(),
-					new DisjointSubsumerFromSubsumer(member, axioms_.get(i),
-							reasons_.get(i)));
+			producer.produce(new DisjointSubsumerFromSubsumer(premises
+					.getRoot(), member, axioms_.get(i), reasons_.get(i)));
 		}
 	}
 

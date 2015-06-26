@@ -40,19 +40,19 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
 public class InitializationSubsumer<S extends IndexedClassExpression> extends
 		DecomposedSubsumerImpl<S> implements ClassInference {
 
-	public InitializationSubsumer(S expression) {
-		super(expression);
+	public InitializationSubsumer(IndexedContextRoot root, S expression) {
+		super(root, expression);
 	}
 
 	@Override
-	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor, I parameter) {
+	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,
+			I parameter) {
 		return visitor.visit(this, parameter);
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot(
-			IndexedContextRoot rootWhereStored) {
-		return rootWhereStored;
+	public IndexedContextRoot getInferenceContextRoot() {
+		return getRoot();
 	}
 
 	@Override

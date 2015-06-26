@@ -51,10 +51,10 @@ public class FirstNInferencesReader extends DelegatingTraceReader {
 	}
 	
 	@Override
-	public void accept(IndexedContextRoot root, Conclusion conclusion, final ClassInferenceVisitor<IndexedContextRoot, ?> visitor) {
+	public void accept(Conclusion conclusion, final ClassInferenceVisitor<IndexedContextRoot, ?> visitor) {
 		final MutableInteger counter = new MutableInteger(0);
 		
-		reader.accept(root, conclusion, new AbstractClassInferenceVisitor<IndexedContextRoot, Void>() {
+		reader.accept(conclusion, new AbstractClassInferenceVisitor<IndexedContextRoot, Void>() {
 
 			@Override
 			protected Void defaultTracedVisit(ClassInference inference, IndexedContextRoot ignored) {
