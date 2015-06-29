@@ -53,7 +53,7 @@ public class IsInferenceCyclic {
 	public static Conclusion check(final ClassInference inference, final TraceStore.Reader inferenceReader) {
 		// the inference is cyclic if at least one of the premises has been
 		// derived only through this inference's conclusion
-		final IndexedContextRoot inferenceContext = inference.getInferenceContextRoot();
+		final IndexedContextRoot inferenceContext = inference.getInferenceRoot();
 		
 		Conclusion cyclicPremise = Premises.find(inference, new Condition<Conclusion>(){
 
@@ -108,7 +108,7 @@ public class IsInferenceCyclic {
 		// if the premise is produced in a context different
 		// from where the conclusion is stored, then it must be
 		// produced by an alternative inference.
-		if (inference.getInferenceContextRoot() != conclusion.getRoot()) {
+		if (inference.getInferenceRoot() != conclusion.getConclusionRoot()) {
 			return true;
 		}
 		

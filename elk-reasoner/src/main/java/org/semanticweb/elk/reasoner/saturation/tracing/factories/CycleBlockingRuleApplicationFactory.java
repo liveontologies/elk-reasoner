@@ -150,7 +150,7 @@ public class CycleBlockingRuleApplicationFactory extends
 					.getSaturationState();
 			// no need to check for duplicates of inferences since rules for all
 			// conclusions are applied only once.
-			final TracedContext thisContext = tracingState.getContext(conclusion.getRoot());
+			final TracedContext thisContext = tracingState.getContext(conclusion.getConclusionRoot());
 
 			if (thisContext == null || !(conclusion instanceof ClassInference)
 					|| !CYCLE_AVOIDANCE) {
@@ -168,7 +168,7 @@ public class CycleBlockingRuleApplicationFactory extends
 				super.produce(inference);
 			} else {
 				final TracedContext inferenceContext = tracingState
-						.getContext(inference.getInferenceContextRoot());
+						.getContext(inference.getInferenceRoot());
 				// block the inference in the context where the inference has
 				// been made
 				LOGGER_.trace("Inference {} is blocked in {} through {}",

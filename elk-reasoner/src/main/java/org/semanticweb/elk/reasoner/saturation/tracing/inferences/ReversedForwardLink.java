@@ -26,9 +26,10 @@ package org.semanticweb.elk.reasoner.saturation.tracing.inferences;
  */
 
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
-import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.BackwardLinkImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
@@ -43,28 +44,25 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
 public class ReversedForwardLink extends BackwardLinkImpl implements
 		ClassInference {
 
-	// TODO: do not make references to conclusions
-	private final ForwardLink sourceLink_;
-
-	private final IndexedContextRoot inferenceRoot_;
+	private final IndexedPropertyChain forwardChain_;
 
 	/**
 	 * 
 	 */
-	public ReversedForwardLink(IndexedContextRoot inferenceRoot,
-			IndexedObjectProperty relation, ForwardLink forwardLink) {
-		super(forwardLink.getTarget(), inferenceRoot, relation);
-		this.sourceLink_ = forwardLink;
-		this.inferenceRoot_ = inferenceRoot;
+	public ReversedForwardLink(ForwardLink premise,
+			IndexedObjectProperty superRelation) {
+		super(premise.getTarget(), superRelation, premise.getConclusionRoot());
+		this.forwardChain_ = premise.getForwardChain();
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
-		return inferenceRoot_;
+	public IndexedContextRoot getInferenceRoot() {
+		return getOriginRoot();
 	}
 
-	public ForwardLink getSourceLink() {
-		return sourceLink_;
+	public ForwardLink getPremise() {
+		return new ForwardLinkImpl<IndexedPropertyChain>(getInferenceRoot(),
+				forwardChain_, getConclusionRoot());
 	}
 
 	@Override

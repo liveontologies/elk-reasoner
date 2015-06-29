@@ -65,7 +65,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsu
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SuperReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.util.collections.ArrayHashMap;
 import org.semanticweb.elk.util.collections.HashListMultimap;
@@ -149,7 +149,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		@Override
 		public Void visit(BackwardLink link,
 				ClassInferenceVisitor<IndexedContextRoot, ?> visitor) {
-			visitBackwardLinkInferences(link.getRelation(), link.getSource(),
+			visitBackwardLinkInferences(link.getBackwardRelation(), link.getOriginRoot(),
 					visitor);
 
 			return null;
@@ -159,7 +159,7 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 		public Void visit(ForwardLink link,
 				ClassInferenceVisitor<IndexedContextRoot, ?> visitor) {
 			visitAll(
-					getInferences(forwardLinkInferenceMap_, link.getRelation(),
+					getInferences(forwardLinkInferenceMap_, link.getForwardChain(),
 							link.getTarget()), visitor);
 
 			return null;
@@ -242,46 +242,46 @@ public class SimpleContextTraceStore implements ContextTraceStore {
 
 		@Override
 		public Boolean visit(ComposedBackwardLink conclusion, Void param) {
-			return addTracedBackwardLink(conclusion.getRelation(),
-					conclusion.getSource(), conclusion);
+			return addTracedBackwardLink(conclusion.getBackwardRelation(),
+					conclusion.getOriginRoot(), conclusion);
 		}
 
 		@Override
 		public Boolean visit(ComposedForwardLink conclusion, Void input) {
 			return addInference(forwardLinkInferenceMap_,
-					conclusion.getRelation(), conclusion.getTarget(),
+					conclusion.getForwardChain(), conclusion.getTarget(),
 					conclusion);
 		}
 
 		@Override
 		public Boolean visit(ReversedForwardLink conclusion, Void param) {
-			return addTracedBackwardLink(conclusion.getRelation(),
-					conclusion.getSource(), conclusion);
+			return addTracedBackwardLink(conclusion.getBackwardRelation(),
+					conclusion.getOriginRoot(), conclusion);
 		}
 
 		@Override
 		public Boolean visit(SuperReversedForwardLink conclusion, Void input) {
-			return addTracedBackwardLink(conclusion.getRelation(),
-					conclusion.getSource(), conclusion);
+			return addTracedBackwardLink(conclusion.getBackwardRelation(),
+					conclusion.getOriginRoot(), conclusion);
 		}
 
 		@Override
 		public Boolean visit(DecomposedExistentialBackwardLink conclusion,
 				Void param) {
-			return addTracedBackwardLink(conclusion.getRelation(),
-					conclusion.getSource(), conclusion);
+			return addTracedBackwardLink(conclusion.getBackwardRelation(),
+					conclusion.getOriginRoot(), conclusion);
 		}
 
 		@Override
 		public Boolean visit(DecomposedExistentialForwardLink conclusion,
 				Void input) {
 			return addInference(forwardLinkInferenceMap_,
-					conclusion.getRelation(), conclusion.getTarget(),
+					conclusion.getForwardChain(), conclusion.getTarget(),
 					conclusion);
 		}
 
 		@Override
-		public Boolean visit(TracedPropagation conclusion, Void param) {
+		public Boolean visit(GeneratedPropagation conclusion, Void param) {
 			return addInference(propagationMap_, conclusion.getRelation(),
 					conclusion.getCarry(), conclusion);
 		}

@@ -57,12 +57,12 @@ public class ConclusionHashGenerator implements ConclusionVisitor<Void, Integer>
 
 	@Override
 	public Integer visit(BackwardLink link, Void context) {
-		return HashGenerator.combineListHash(link.getRelation().hashCode(), link.getSource().hashCode());
+		return HashGenerator.combineListHash(link.getBackwardRelation().hashCode(), link.getOriginRoot().hashCode());
 	}
 
 	@Override
 	public Integer visit(ForwardLink link, Void context) {
-		return HashGenerator.combineListHash(link.getRelation().hashCode(), link.getTarget().hashCode());
+		return HashGenerator.combineListHash(link.getForwardChain().hashCode(), link.getTarget().hashCode());
 	}
 
 	@Override

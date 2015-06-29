@@ -227,7 +227,7 @@ public class RecursiveContextTracingFactory extends SimpleInterrupter implements
 								IndexedContextRoot _ignored) {
 							if (currentState_.addToProcessed(inference)) {
 								IndexedContextRoot inferenceContextRoot = inference
-										.getInferenceContextRoot();
+										.getInferenceRoot();
 								// visit the premises to put into the queue
 								inference.acceptTraced(premiseVisitor,
 										inferenceContextRoot);

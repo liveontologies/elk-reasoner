@@ -35,7 +35,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
 
 /**
  * Represents a {@link Contradiction} as the result of a class occurring
- * multiple times in one {@link IndexedDisjointClassesAxiom}. *
+ * multiple times in one {@link IndexedDisjointClassesAxiom}.
  * 
  * @author Pavel Klinov
  * 
@@ -49,9 +49,9 @@ public class ContradictionFromInconsistentDisjointnessAxiom extends
 	private final ElkAxiom reason_;
 
 	public ContradictionFromInconsistentDisjointnessAxiom(
-			IndexedContextRoot root, IndexedClassExpression premise,
+			IndexedContextRoot inferenceRoot, IndexedClassExpression premise,
 			ElkAxiom reason) {
-		super(root, premise);
+		super(inferenceRoot, premise);
 		reason_ = reason;
 	}
 
@@ -61,7 +61,8 @@ public class ContradictionFromInconsistentDisjointnessAxiom extends
 
 	@Override
 	public String toString() {
-		return "Contradiction from " + premiseSubsumer + " due to " + reason_;
+		return "Contradiction from " + getPremiseSubsumer() + " due to "
+				+ reason_;
 	}
 
 	@Override

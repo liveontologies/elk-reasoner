@@ -70,7 +70,7 @@ public class NonReflexivePropagationRule extends AbstractPropagationRule {
 		// IndexedClassExpression carry = premise.getCarry();
 		for (IndexedContextRoot target : targets.getLinkedRoots()) {
 			// producer.produce(target, new ComposedSubsumer(carry));
-			producer.produce(new PropagatedSubsumer(target, premise));
+			producer.produce(new PropagatedSubsumer(premise, target));
 		}
 	}
 

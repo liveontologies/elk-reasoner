@@ -52,13 +52,13 @@ public class ConclusionEntry implements Conclusion {
 	}
 
 	@Override
-	public IndexedContextRoot getRoot() {
-		return conclusion_.getRoot();
+	public IndexedContextRoot getConclusionRoot() {
+		return conclusion_.getConclusionRoot();
 	}
 	
 	@Override
-	public IndexedContextRoot getSourceRoot() {
-		return conclusion_.getSourceRoot();
+	public IndexedContextRoot getOriginRoot() {
+		return conclusion_.getOriginRoot();
 	}
 	
 	@Override

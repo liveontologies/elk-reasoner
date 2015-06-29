@@ -48,7 +48,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.SubContext
 public class ConclusionEqualityChecker implements ConclusionVisitor<Conclusion, Boolean> {
 
 	public static boolean equal(Conclusion first, Conclusion second) {
-		if (first.getSourceRoot() != second.getSourceRoot()) {
+		if (first.getOriginRoot() != second.getOriginRoot()) {
 			return false;
 		}
 		
@@ -96,7 +96,7 @@ public class ConclusionEqualityChecker implements ConclusionVisitor<Conclusion, 
 
 			@Override
 			public Boolean visit(BackwardLink otherLink, Void ignored) {
-				return otherLink.getRelation() == link.getRelation() && otherLink.getSource() == link.getSource();
+				return otherLink.getBackwardRelation() == link.getBackwardRelation() && otherLink.getOriginRoot() == link.getOriginRoot();
 			}
 			
 		}, null);
@@ -108,7 +108,7 @@ public class ConclusionEqualityChecker implements ConclusionVisitor<Conclusion, 
 
 			@Override
 			public Boolean visit(ForwardLink otherLink, Void ignored) {
-				return otherLink.getRelation() == link.getRelation() && otherLink.getTarget() == link.getTarget();
+				return otherLink.getForwardChain() == link.getForwardChain() && otherLink.getTarget() == link.getTarget();
 			}
 			
 		}, null);

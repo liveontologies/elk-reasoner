@@ -51,7 +51,7 @@ public class WorkerLocalizedSaturationStateWriter<C extends Context> extends
 	@Override
 	public void produce(Conclusion conclusion) {
 		if (localTodo_.isActivated()
-				&& conclusion.getRoot() == localTodo_.getActiveRoot()) {
+				&& conclusion.getConclusionRoot() == localTodo_.getActiveRoot()) {
 			localTodo_.add(conclusion);
 		} else {
 			mainWriter.produce(conclusion);

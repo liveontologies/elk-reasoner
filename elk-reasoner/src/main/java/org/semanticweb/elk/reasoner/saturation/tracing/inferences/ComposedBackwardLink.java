@@ -51,13 +51,11 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
 public class ComposedBackwardLink extends BackwardLinkImpl implements
 		ClassInference {
 
-	private final IndexedContextRoot inferenceContext_;
+	private final IndexedContextRoot inferenceRoot_;
 
-	private final IndexedObjectProperty backwardLinkRelation_;
+	private final IndexedObjectProperty backwardRelation_;
 
-	private final IndexedPropertyChain forwardLinkRelation_;
-
-	private final IndexedContextRoot forwardLinkTarget_;
+	private final IndexedPropertyChain forwardChain_;
 
 	private final IndexedComplexPropertyChain composition_;
 
@@ -66,45 +64,43 @@ public class ComposedBackwardLink extends BackwardLinkImpl implements
 	 */
 	private final ElkAxiom reason_;
 
-	public ComposedBackwardLink(IndexedContextRoot linkSource,
-			IndexedObjectProperty backwardLinkRelation,
-			IndexedContextRoot inferenceContext,
-			IndexedPropertyChain forwardLinkChain,
-			IndexedContextRoot linkTarget,
+	public ComposedBackwardLink(IndexedContextRoot originRoot,
+			IndexedObjectProperty backwardRelation,
+			IndexedContextRoot inferenceRoot,
+			IndexedPropertyChain forwardChain, IndexedContextRoot targetRoot,
 			IndexedComplexPropertyChain composition,
 			IndexedObjectProperty compositionSuperProperty, ElkAxiom reason) {
-		super(linkTarget, linkSource, compositionSuperProperty);
-		this.backwardLinkRelation_ = backwardLinkRelation;
-		this.forwardLinkRelation_ = forwardLinkChain;
-		this.forwardLinkTarget_ = linkTarget;
-		this.inferenceContext_ = inferenceContext;
+		super(targetRoot, compositionSuperProperty, originRoot);
+		this.backwardRelation_ = backwardRelation;
+		this.forwardChain_ = forwardChain;
+		this.inferenceRoot_ = inferenceRoot;
 		this.composition_ = composition;
 		this.reason_ = reason;
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
-		return inferenceContext_;
+	public IndexedContextRoot getInferenceRoot() {
+		return inferenceRoot_;
 	}
 
 	public BackwardLink getBackwardLink() {
-		return new BackwardLinkImpl(getInferenceContextRoot(), getSource(),
-				backwardLinkRelation_);
+		return new BackwardLinkImpl(getInferenceRoot(), backwardRelation_,
+				getOriginRoot());
 	}
 
 	public ForwardLink getForwardLink() {
-		return new ForwardLinkImpl(getInferenceContextRoot(),
-				forwardLinkRelation_, forwardLinkTarget_);
+		return new ForwardLinkImpl<IndexedPropertyChain>(getInferenceRoot(),
+				forwardChain_, getConclusionRoot());
 	}
 
 	public SubObjectProperty getLeftSubObjectProperty() {
-		return new SubObjectProperty(backwardLinkRelation_,
+		return new SubObjectProperty(backwardRelation_,
 				composition_.getFirstProperty());
 	}
 
 	public SubPropertyChain<?, ?> getRightSubObjectPropertyChain() {
 		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(
-				forwardLinkRelation_, composition_.getSuffixChain());
+				forwardChain_, composition_.getSuffixChain());
 	}
 
 	public ElkAxiom getReason() {

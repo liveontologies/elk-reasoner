@@ -46,7 +46,7 @@ public class SaturationCheckingWriter<C extends Context> extends
 
 	@Override
 	public void produce(Conclusion conclusion) {
-		Context sourceContext = state_.getContext(conclusion.getSourceRoot());
+		Context sourceContext = state_.getContext(conclusion.getOriginRoot());
 
 		if (sourceContext == null || !sourceContext.isSaturated()) {
 			super.produce(conclusion);

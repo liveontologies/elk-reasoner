@@ -59,7 +59,7 @@ public class SubsumerBackwardLinkRule extends AbstractBackwardLinkRule {
 			ConclusionProducer producer) {
 
 		for (IndexedObjectSomeValuesFrom carry : premises
-				.getPropagatedSubsumers(premise.getRelation())) {
+				.getPropagatedSubsumers(premise.getBackwardRelation())) {
 			producer.produce(new PropagatedSubsumer(premise, carry));
 		}
 	}

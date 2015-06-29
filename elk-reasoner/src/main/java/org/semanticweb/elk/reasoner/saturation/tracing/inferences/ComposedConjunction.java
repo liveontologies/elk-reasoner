@@ -47,24 +47,24 @@ public class ComposedConjunction extends
 
 	/**
 	 */
-	public ComposedConjunction(IndexedContextRoot root,
+	public ComposedConjunction(IndexedContextRoot inferenceRoot,
 			IndexedObjectIntersectionOf conjunction) {
-		super(root, conjunction);
+		super(inferenceRoot, conjunction);
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
-		return getRoot();
+	public IndexedContextRoot getInferenceRoot() {
+		return getConclusionRoot();
 	}
 
 	public Subsumer<IndexedClassExpression> getFirstConjunct() {
 		return new ComposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceContextRoot(), getExpression().getFirstConjunct());
+				getInferenceRoot(), getExpression().getFirstConjunct());
 	}
 
 	public Subsumer<IndexedClassExpression> getSecondConjunct() {
 		return new ComposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceContextRoot(), getExpression().getSecondConjunct());
+				getInferenceRoot(), getExpression().getSecondConjunct());
 	}
 
 	@Override

@@ -47,21 +47,21 @@ public class DecomposedConjunction extends
 
 	private final IndexedObjectIntersectionOf conjunction_;
 
-	public DecomposedConjunction(IndexedContextRoot root,
+	public DecomposedConjunction(IndexedContextRoot inferenceRoot,
 			IndexedObjectIntersectionOf conjunction,
 			IndexedClassExpression expression) {
-		super(root, expression);
+		super(inferenceRoot, expression);
 		conjunction_ = conjunction;
 	}
 
 	public Subsumer<IndexedObjectIntersectionOf> getConjunction() {
 		return new DecomposedSubsumerImpl<IndexedObjectIntersectionOf>(
-				getInferenceContextRoot(), conjunction_);
+				getInferenceRoot(), conjunction_);
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
-		return getRoot();
+	public IndexedContextRoot getInferenceRoot() {
+		return getConclusionRoot();
 	}
 
 	@Override

@@ -66,7 +66,7 @@ public class ReflexivePropagationRule extends AbstractPropagationRule {
 		if (reflexive.contains(premise.getRelation())) {
 			// producer.produce(premises.getRoot(), new
 			// ComposedSubsumer(premise.getCarry()));
-			producer.produce(new PropagatedSubsumer(premises.getRoot(), premise));
+			producer.produce(new PropagatedSubsumer(premise, premises.getRoot()));
 		}
 	}
 

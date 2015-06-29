@@ -42,12 +42,12 @@ public abstract class AbstractConclusion implements Conclusion {
 	}
 
 	@Override
-	public IndexedContextRoot getRoot() {
+	public IndexedContextRoot getConclusionRoot() {
 		return this.root_;
 	}
 
 	@Override
-	public IndexedContextRoot getSourceRoot() {
+	public IndexedContextRoot getOriginRoot() {
 		return this.root_;
 	}
 

@@ -85,7 +85,7 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 	public void apply(ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		/* compose the link with all non-reflexive backward links */
-		SaturatedPropertyChain linkSaturation = this.forwardLink_.getRelation()
+		SaturatedPropertyChain linkSaturation = this.forwardLink_.getForwardChain()
 				.getSaturated();
 		final Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> comps = linkSaturation
 				.getCompositionsByLeftSubProperty();
@@ -105,7 +105,7 @@ public class NonReflexiveBackwardLinkCompositionRule extends
 						.getLinkedRoots()) {
 					ForwardLinkImpl.produceComposedLink(producer, source,
 							backwardRelation, premises.getRoot(),
-							forwardLink_.getRelation(),
+							forwardLink_.getForwardChain(),
 							forwardLink_.getTarget(), composition);
 				}
 		}

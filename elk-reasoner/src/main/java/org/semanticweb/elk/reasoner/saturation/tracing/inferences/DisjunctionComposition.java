@@ -45,20 +45,20 @@ public class DisjunctionComposition extends
 
 	private final IndexedClassExpression disjunct_;
 
-	public DisjunctionComposition(IndexedContextRoot root,
+	public DisjunctionComposition(IndexedContextRoot inferenceRoot,
 			IndexedClassExpression premise, IndexedObjectUnionOf disjunction) {
-		super(root, disjunction);
+		super(inferenceRoot, disjunction);
 		disjunct_ = premise;
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
-		return getRoot();
+	public IndexedContextRoot getInferenceRoot() {
+		return getConclusionRoot();
 	}
 
 	public Subsumer<?> getPremise() {
 		return new DecomposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceContextRoot(), disjunct_);
+				getInferenceRoot(), disjunct_);
 	}
 
 	@Override

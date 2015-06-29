@@ -23,7 +23,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsu
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SuperReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.GeneratedPropagation;
 
 /*
  * #%L
@@ -80,7 +80,7 @@ public interface ClassInferenceVisitor<I, O> {
 
 	public O visit(DecomposedExistentialForwardLink conclusion, I input);
 
-	public O visit(TracedPropagation conclusion, I input);
+	public O visit(GeneratedPropagation conclusion, I input);
 
 	public O visit(ContradictionFromInconsistentDisjointnessAxiom conclusion,
 			I input);

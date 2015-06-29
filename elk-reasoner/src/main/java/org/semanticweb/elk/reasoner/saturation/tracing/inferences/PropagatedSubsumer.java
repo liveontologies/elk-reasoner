@@ -47,48 +47,43 @@ public class PropagatedSubsumer extends
 		ComposedSubsumerImpl<IndexedObjectSomeValuesFrom> implements
 		ClassInference {
 
-	private final IndexedObjectProperty linkRelation_;
+	private final IndexedObjectProperty propagationRelation_;
 
 	private final IndexedContextRoot inferenceRoot_;
 
-	public PropagatedSubsumer(BackwardLink backwardLink,
-			IndexedObjectSomeValuesFrom carry) {
-		super(backwardLink.getSource(), carry);
-		inferenceRoot_ = backwardLink.getRoot();
-		linkRelation_ = backwardLink.getRelation();
+	public PropagatedSubsumer(Propagation premise,
+			IndexedContextRoot conclusionRoot) {
+		super(conclusionRoot, premise.getCarry());
+		inferenceRoot_ = premise.getConclusionRoot();
+		propagationRelation_ = premise.getRelation();
 	}
 
-	public PropagatedSubsumer(IndexedContextRoot conclusionRoot,
-			Propagation propagation) {
-		super(conclusionRoot, propagation.getCarry());
-		inferenceRoot_ = propagation.getRoot();
-		linkRelation_ = propagation.getRelation();
+	public PropagatedSubsumer(BackwardLink premise,
+			IndexedObjectSomeValuesFrom carry) {
+		super(premise.getOriginRoot(), carry);
+		inferenceRoot_ = premise.getConclusionRoot();
+		propagationRelation_ = premise.getBackwardRelation();
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
+	public IndexedContextRoot getInferenceRoot() {
 		return inferenceRoot_;
 	}
 
 	public Propagation getPropagation() {
-		return new PropagationImpl(getInferenceContextRoot(), linkRelation_,
+		return new PropagationImpl(getInferenceRoot(), propagationRelation_,
 				getExpression());
 	}
 
 	public BackwardLink getBackwardLink() {
-		return new BackwardLinkImpl(getInferenceContextRoot(), getRoot(),
-				linkRelation_);
+		return new BackwardLinkImpl(getInferenceRoot(), propagationRelation_,
+				getConclusionRoot());
 	}
 
 	@Override
 	public String toString() {
 		return super.toString() + " (propagation)";
 	}
-
-	/*
-	 * public SubObjectProperty getSubPropertyPremise() { return new
-	 * SubObjectProperty(linkRelation_, getExpression().getRelation()); }
-	 */
 
 	@Override
 	public <I, O> O acceptTraced(ClassInferenceVisitor<I, O> visitor,

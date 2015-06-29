@@ -50,14 +50,14 @@ public class DecomposedExistentialForwardLink extends AbstractConclusion
 	/**
 	 * 
 	 */
-	public DecomposedExistentialForwardLink(IndexedContextRoot root,
+	public DecomposedExistentialForwardLink(IndexedContextRoot inferenceRoot,
 			IndexedObjectSomeValuesFrom subsumer) {
-		super(root);
+		super(inferenceRoot);
 		existential_ = subsumer;
 	}
 
 	@Override
-	public IndexedPropertyChain getRelation() {
+	public IndexedPropertyChain getForwardChain() {
 		return existential_.getProperty();
 	}
 
@@ -68,12 +68,12 @@ public class DecomposedExistentialForwardLink extends AbstractConclusion
 
 	public Subsumer<IndexedObjectSomeValuesFrom> getExistential() {
 		return new DecomposedSubsumerImpl<IndexedObjectSomeValuesFrom>(
-				getInferenceContextRoot(), existential_);
+				getInferenceRoot(), existential_);
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
-		return getRoot();
+	public IndexedContextRoot getInferenceRoot() {
+		return getConclusionRoot();
 	}
 
 	@Override

@@ -70,8 +70,8 @@ public class ContradictionPropagationRule extends AbstractContradictionRule {
 			for (IndexedContextRoot target : subPremises.get(propRelation)
 					.getLinkedRoots()) {
 				// producer.produce(target, premise);
-				producer.produce(new PropagatedContradiction(target,
-						propRelation, premises.getRoot()));
+				producer.produce(new PropagatedContradiction(premises.getRoot(),
+						propRelation, target));
 			}
 		}
 	}

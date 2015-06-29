@@ -87,7 +87,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 	public static boolean addRuleFor(ForwardLink link, Context context) {
 		BackwardLinkChainFromBackwardLinkRule rule = context
 				.getBackwardLinkRuleChain().getCreate(MATCHER_, FACTORY_);
-		return rule.forwardLinksByObjectProperty_.add(link.getRelation(),
+		return rule.forwardLinksByObjectProperty_.add(link.getForwardChain(),
 				link.getTarget());
 	}
 
@@ -105,7 +105,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 		BackwardLinkChainFromBackwardLinkRule rule = context
 				.getBackwardLinkRuleChain().find(MATCHER_);
 		return rule == null ? false : rule.forwardLinksByObjectProperty_
-				.remove(link.getRelation(), link.getTarget());
+				.remove(link.getForwardChain(), link.getTarget());
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 		BackwardLinkChainFromBackwardLinkRule rule = context
 				.getBackwardLinkRuleChain().find(MATCHER_);
 		return rule == null ? false : rule.forwardLinksByObjectProperty_
-				.contains(link.getRelation(), link.getTarget());
+				.contains(link.getForwardChain(), link.getTarget());
 	}
 	
 	@Deprecated
@@ -138,7 +138,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 			ConclusionProducer producer) {
 
 		/* compose the link with all forward links */
-		SaturatedPropertyChain linkSaturation = link.getRelation()
+		SaturatedPropertyChain linkSaturation = link.getBackwardRelation()
 				.getSaturated();
 		final Multimap<IndexedPropertyChain, IndexedComplexPropertyChain> comps = linkSaturation
 				.getCompositionsByRightSubProperty();
@@ -156,7 +156,7 @@ public class BackwardLinkChainFromBackwardLinkRule extends
 			for (IndexedComplexPropertyChain composition : compositions)
 				for (IndexedContextRoot forwardTarget : forwardTargets)
 					ForwardLinkImpl.produceComposedLink(producer,
-							link.getSource(), link.getRelation(),
+							link.getOriginRoot(), link.getBackwardRelation(),
 							premises.getRoot(), forwardRelation, forwardTarget,
 							composition);
 		}

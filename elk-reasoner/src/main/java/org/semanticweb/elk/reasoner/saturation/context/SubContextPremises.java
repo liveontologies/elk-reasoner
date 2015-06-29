@@ -46,7 +46,7 @@ public interface SubContextPremises {
 
 	/**
 	 * @return the sources of all derived {@link BackwardLink}s with relations
-	 *         {@link BackwardLink#getRelation()} to be sub-root of this
+	 *         {@link BackwardLink#getBackwardRelation()} to be sub-root of this
 	 *         {@link SubContextPremises}
 	 */
 	Set<IndexedContextRoot> getLinkedRoots();

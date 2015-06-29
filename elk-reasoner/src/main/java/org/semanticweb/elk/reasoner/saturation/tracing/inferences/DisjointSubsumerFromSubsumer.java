@@ -46,20 +46,20 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
 public class DisjointSubsumerFromSubsumer extends DisjointSubsumerImpl
 		implements ClassInference {
 
-	public DisjointSubsumerFromSubsumer(IndexedContextRoot root,
+	public DisjointSubsumerFromSubsumer(IndexedContextRoot inferenceRoot,
 			IndexedClassExpression member, IndexedDisjointClassesAxiom axiom,
 			ElkAxiom reason) {
-		super(root, member, axiom, reason);
+		super(inferenceRoot, member, axiom, reason);
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
-		return getRoot();
+	public IndexedContextRoot getInferenceRoot() {
+		return getConclusionRoot();
 	}
 
 	public Subsumer<?> getPremise() {
 		return new DecomposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceContextRoot(), getMember());
+				getInferenceRoot(), getMember());
 	}
 
 	@Override

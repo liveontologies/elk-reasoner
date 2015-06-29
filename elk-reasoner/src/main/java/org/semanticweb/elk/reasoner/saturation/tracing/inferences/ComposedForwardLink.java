@@ -42,29 +42,28 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
  * a {@link ForwardLink}
  * 
  * @author "Yevgeny Kazakov"
+ * 
+ * @param <R>
+ *            The type of the forward relation
  */
-public class ComposedForwardLink extends ForwardLinkImpl implements
-		ClassInference {
+public class ComposedForwardLink extends
+		ForwardLinkImpl<IndexedComplexPropertyChain> implements ClassInference {
 
-	private final IndexedContextRoot backwardLinkSource_;
+	private final IndexedObjectProperty backwardRelation_;
 
-	private final IndexedObjectProperty backwardLinkRelation_;
+	private final IndexedContextRoot inferenceRoot_;
 
-	private final IndexedContextRoot inferenceContext_;
+	private final IndexedPropertyChain forwardChain_;
 
-	private final IndexedPropertyChain forwardLinkChain_;
-
-	public ComposedForwardLink(IndexedContextRoot linkSource,
-			IndexedObjectProperty backwardLinkRelation,
-			IndexedContextRoot inferenceContext,
-			IndexedPropertyChain forwardLinkChain,
-			IndexedContextRoot linkTarget,
+	public ComposedForwardLink(IndexedContextRoot originRoot,
+			IndexedObjectProperty backwardRelation,
+			IndexedContextRoot inferenceRoot,
+			IndexedPropertyChain forwardChain, IndexedContextRoot targetRoot,
 			IndexedComplexPropertyChain composition) {
-		super(linkSource, composition, linkTarget);
-		this.backwardLinkSource_ = linkSource;
-		this.backwardLinkRelation_ = backwardLinkRelation;
-		this.inferenceContext_ = inferenceContext;
-		this.forwardLinkChain_ = forwardLinkChain;
+		super(originRoot, composition, targetRoot);
+		this.backwardRelation_ = backwardRelation;
+		this.inferenceRoot_ = inferenceRoot;
+		this.forwardChain_ = forwardChain;
 	}
 
 	@Override
@@ -74,34 +73,32 @@ public class ComposedForwardLink extends ForwardLinkImpl implements
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
-		return inferenceContext_;
+	public IndexedContextRoot getInferenceRoot() {
+		return inferenceRoot_;
 	}
 
 	public BackwardLink getBackwardLink() {
-		return new BackwardLinkImpl(getInferenceContextRoot(),
-				backwardLinkSource_, backwardLinkRelation_);
+		return new BackwardLinkImpl(getInferenceRoot(), backwardRelation_,
+				getConclusionRoot());
 	}
 
 	public ForwardLink getForwardLink() {
-		return new ForwardLinkImpl(getInferenceContextRoot(),
-				forwardLinkChain_, getTarget());
+		return new ForwardLinkImpl<IndexedPropertyChain>(getInferenceRoot(),
+				forwardChain_, getTarget());
 	}
 
 	private IndexedComplexPropertyChain getComposition() {
-		// TODO parameterize forward links to get rid of this cast. Composed
-		// forward links are always compositions, never atomic properties.
-		return (IndexedComplexPropertyChain) getRelation();
+		return getForwardChain();
 	}
 
 	public SubObjectProperty getLeftSubObjectProperty() {
-		return new SubObjectProperty(backwardLinkRelation_, getComposition()
+		return new SubObjectProperty(backwardRelation_, getComposition()
 				.getFirstProperty());
 	}
 
 	public SubPropertyChain<?, ?> getRightSubObjectPropertyChain() {
 		return new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(
-				forwardLinkChain_, getComposition().getSuffixChain());
+				forwardChain_, getComposition().getSuffixChain());
 	}
 
 	@Override

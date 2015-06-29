@@ -47,7 +47,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsu
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SuperReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChainInference;
@@ -124,12 +124,12 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 
 	@Override
 	public String visit(ReversedForwardLink conclusion, Void parameter) {
-		return "Reversing forward link " + conclusion.getSourceLink();
+		return "Reversing forward link " + conclusion.getPremise();
 	}
 
 	@Override
 	public String visit(SuperReversedForwardLink conclusion, Void input) {	
-		return "Reversing forward link " + conclusion.getSourceLink() + " and unfolding under " + conclusion.getReason();
+		return "Reversing forward link " + conclusion.getPremise() + " and unfolding under " + conclusion.getReason();
 	}
 
 	@Override
@@ -144,8 +144,8 @@ public class InferencePrinter implements ClassInferenceVisitor<Void, String>,
 	}
 
 	@Override
-	public String visit(TracedPropagation conclusion, Void parameter) {
-		return "Creating propagation from " + conclusion.getSubsumer();
+	public String visit(GeneratedPropagation conclusion, Void parameter) {
+		return "Creating propagation from " + conclusion.getPremise();
 	}
 
 	@Override

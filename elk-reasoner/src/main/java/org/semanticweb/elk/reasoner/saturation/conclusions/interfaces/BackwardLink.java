@@ -48,7 +48,7 @@ public interface BackwardLink extends SubConclusion {
 	 * @return the {@link IndexedPropertyChain} that is the relation of this
 	 *         {@link BackwardLink}
 	 */
-	public IndexedObjectProperty getRelation();
+	public IndexedObjectProperty getBackwardRelation();
 
 	/**
 	 * @return the source {@link IndexedContextRoot} of this
@@ -56,6 +56,7 @@ public interface BackwardLink extends SubConclusion {
 	 *         from which the existential restriction corresponding to this
 	 *         {@link BackwardLink} follows
 	 */
-	public IndexedContextRoot getSource();
+	@Override
+	public IndexedContextRoot getOriginRoot();
 
 }

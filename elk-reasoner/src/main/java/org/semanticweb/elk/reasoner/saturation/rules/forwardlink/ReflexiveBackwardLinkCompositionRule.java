@@ -86,7 +86,7 @@ public class ReflexiveBackwardLinkCompositionRule extends
 	public void apply(ForwardLink premise, ContextPremises premises,
 			ConclusionProducer producer) {
 		/* compose the link with all reflexive backward links */
-		SaturatedPropertyChain linkSaturation = this.forwardLink_.getRelation()
+		SaturatedPropertyChain linkSaturation = this.forwardLink_.getForwardChain()
 				.getSaturated();
 		final Multimap<IndexedObjectProperty, IndexedComplexPropertyChain> comps = linkSaturation
 				.getCompositionsByLeftSubProperty();
@@ -100,7 +100,7 @@ public class ReflexiveBackwardLinkCompositionRule extends
 			for (IndexedComplexPropertyChain composition : compositions) {
 				IndexedContextRoot root = premises.getRoot();
 				ForwardLinkImpl.produceComposedLink(producer, root,
-						backwardRelation, root, forwardLink_.getRelation(),
+						backwardRelation, root, forwardLink_.getForwardChain(),
 						forwardLink_.getTarget(), composition);
 			}
 		}

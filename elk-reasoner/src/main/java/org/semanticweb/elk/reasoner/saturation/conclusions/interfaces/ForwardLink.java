@@ -44,7 +44,7 @@ public interface ForwardLink extends Conclusion {
 	 * @return the {@link IndexedPropertyChain} in the existential restriction
 	 *         corresponding to this {@link ForwardLink}
 	 */
-	public IndexedPropertyChain getRelation();
+	public IndexedPropertyChain getForwardChain();
 
 	/**
 	 * @return the {@link IndexedContextRoot} corresponding to the filler of the

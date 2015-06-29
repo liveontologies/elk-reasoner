@@ -47,8 +47,11 @@ import org.slf4j.LoggerFactory;
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
  * 
+ * @param <R>
+ *            The type of the forward relation
  */
-public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
+public class ForwardLinkImpl<R extends IndexedPropertyChain> extends
+		AbstractConclusion implements ForwardLink {
 
 	static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ForwardLinkImpl.class);
@@ -57,7 +60,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	 * the {@link IndexedPropertyChain} in the existential restriction
 	 * corresponding to this {@link ForwardLinkImpl}
 	 */
-	final IndexedPropertyChain relation_;
+	final R forwardChain_;
 
 	/**
 	 * the {@link IndexedContextRoot} corresponding to the filler of the
@@ -65,16 +68,16 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 	 */
 	final IndexedContextRoot target_;
 
-	public ForwardLinkImpl(IndexedContextRoot root,
-			IndexedPropertyChain relation, IndexedContextRoot target) {
+	public ForwardLinkImpl(IndexedContextRoot root, R relation,
+			IndexedContextRoot target) {
 		super(root);
-		this.relation_ = relation;
+		this.forwardChain_ = relation;
 		this.target_ = target;
 	}
 
 	@Override
-	public IndexedPropertyChain getRelation() {
-		return relation_;
+	public R getForwardChain() {
+		return forwardChain_;
 	}
 
 	@Override
@@ -89,7 +92,7 @@ public class ForwardLinkImpl extends AbstractConclusion implements ForwardLink {
 
 	@Override
 	public String toString() {
-		return relation_ + "->" + target_;
+		return forwardChain_ + "->" + target_;
 	}
 
 	// TODO: find a better place for the following methods

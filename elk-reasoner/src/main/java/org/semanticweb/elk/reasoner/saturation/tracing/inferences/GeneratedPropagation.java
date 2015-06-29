@@ -29,7 +29,6 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.AbstractSubsumer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.PropagationImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Propagation;
@@ -38,29 +37,33 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.Sub
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
- * Represents an inference which creates a {@link Propagation} from a
- * {@link AbstractSubsumer}.
+ * Represents an inference which creates a {@link Propagation} of an
+ * {@link IndexedObjectSomeValuesFrom} over a given
+ * {@link IndexedObjectProperty}.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
  */
-public class TracedPropagation extends PropagationImpl implements
+public class GeneratedPropagation extends PropagationImpl implements
 		ClassInference {
 
-	public TracedPropagation(IndexedContextRoot root,
-			IndexedObjectProperty relation, IndexedObjectSomeValuesFrom carry) {
-		super(root, relation, carry);
+	public GeneratedPropagation(IndexedContextRoot inferenceRoot,
+			IndexedObjectProperty superRelation,
+			IndexedObjectSomeValuesFrom carry) {
+		super(inferenceRoot, superRelation, carry);
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
-		return getRoot();
+	public IndexedContextRoot getInferenceRoot() {
+		return getConclusionRoot();
 	}
 
-	public Subsumer<?> getSubsumer() {
+	public Subsumer<?> getPremise() {
 		return new DecomposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceContextRoot(), getCarry().getFiller());
+				getInferenceRoot(), getCarry().getFiller());
 	}
 
 	public SubObjectProperty getSubPropertyPremise() {

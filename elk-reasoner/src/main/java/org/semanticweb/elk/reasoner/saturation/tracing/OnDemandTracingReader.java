@@ -76,7 +76,7 @@ public class OnDemandTracingReader extends DelegatingTraceReader {
 	@Override
 	public void accept(final Conclusion conclusion,
 			final ClassInferenceVisitor<IndexedContextRoot, ?> visitor) {
-		IndexedContextRoot conclusionContextRoot = conclusion.getSourceRoot();
+		IndexedContextRoot conclusionContextRoot = conclusion.getOriginRoot();
 		TracedContext tracedContext = tracingContextWriter_
 				.getCreateContext(conclusionContextRoot);
 

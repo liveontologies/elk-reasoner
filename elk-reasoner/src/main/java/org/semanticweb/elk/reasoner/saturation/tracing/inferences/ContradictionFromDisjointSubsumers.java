@@ -66,22 +66,22 @@ public class ContradictionFromDisjointSubsumers extends AbstractConclusion
 
 	public ContradictionFromDisjointSubsumers(DisjointSubsumer premise,
 			IndexedClassExpression[] disjointSubsumers) {
-		super(premise.getRoot());
+		super(premise.getConclusionRoot());
 		this.axiom_ = premise.getAxiom();
 		this.disjointSubsumers_ = disjointSubsumers;
 		this.reason_ = premise.getReason();
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
-		return getRoot();
+	public IndexedContextRoot getInferenceRoot() {
+		return getConclusionRoot();
 	}
 
 	public DisjointSubsumer[] getPremises() {
 		return new DisjointSubsumer[] {
-				new DisjointSubsumerImpl(getInferenceContextRoot(),
+				new DisjointSubsumerImpl(getInferenceRoot(),
 						disjointSubsumers_[0], axiom_, reason_),
-				new DisjointSubsumerImpl(getInferenceContextRoot(),
+				new DisjointSubsumerImpl(getInferenceRoot(),
 						disjointSubsumers_[1], axiom_, reason_) };
 	}
 

@@ -469,7 +469,7 @@ public class TracingTestUtils {
 		// first, create a map of premises to their inferences
 		final Multimap<Conclusion, ClassInference> premiseInferenceMap = new HashListMultimap<Conclusion, ClassInference>();
 		final IndexedContextRoot inferenceContextRoot = inference
-				.getInferenceContextRoot();
+				.getInferenceRoot();
 
 		inference.acceptTraced(new PremiseVisitor<Void, Void>(
 				new AbstractConclusionVisitor<Void, Void>() {
@@ -508,7 +508,7 @@ public class TracingTestUtils {
 				final MutableBoolean isPremiseInferenceCyclic = new MutableBoolean(
 						false);
 				// does it use the given conclusion as a premise?
-				if (premiseInference.getInferenceContextRoot() == inferenceTargetRoot) {
+				if (premiseInference.getInferenceRoot() == inferenceTargetRoot) {
 
 					premiseInference
 							.acceptTraced(

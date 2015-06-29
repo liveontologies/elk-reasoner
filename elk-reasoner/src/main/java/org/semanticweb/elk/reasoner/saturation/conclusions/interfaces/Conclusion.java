@@ -44,15 +44,17 @@ public interface Conclusion {
 	 * @return The root of the {@link Context} in which this conclusion should
 	 *         participate in inferences; it cannot be {@code null}.
 	 */
-	public IndexedContextRoot getRoot();
+	public IndexedContextRoot getConclusionRoot();
 
 	/**
 	 * 
-	 * @return The {@link IndexedContextRoot} the root of {@link Context} in
-	 *         which this {@link Conclusion} was derived; it cannot be
-	 *         {@code null}. This value be different from {@link #getRoot()}
+	 * @return The {@link IndexedContextRoot} of the {@link Context} from which
+	 *         this {@link Conclusion} originate, that is, if to start deriving
+	 *         conclusions with this root, it will be derived; this value cannot
+	 *         be {@code null}. This value be different from
+	 *         {@link #getConclusionRoot()}
 	 */
-	public IndexedContextRoot getSourceRoot();
+	public IndexedContextRoot getOriginRoot();
 
 	public <I, O> O accept(ConclusionVisitor<I, O> visitor, I input);
 

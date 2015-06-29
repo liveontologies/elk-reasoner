@@ -46,9 +46,9 @@ public class ContradictionFromNegation extends
 		ContradictionFromSubsumer<IndexedObjectComplementOf> implements
 		Contradiction {
 
-	public ContradictionFromNegation(IndexedContextRoot root,
+	public ContradictionFromNegation(IndexedContextRoot inferenceRoot,
 			IndexedObjectComplementOf premiseSubsumer) {
-		super(root, premiseSubsumer);
+		super(inferenceRoot, premiseSubsumer);
 	}
 
 	@Override
@@ -58,12 +58,12 @@ public class ContradictionFromNegation extends
 
 	public Subsumer<IndexedClassExpression> getPositivePremise() {
 		return new DecomposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceContextRoot(), premiseSubsumer.getNegated());
+				getInferenceRoot(), getPremiseSubsumer().getNegated());
 	}
 
 	@Override
 	public String toString() {
-		return "Contradiction from Not " + premiseSubsumer;
+		return "Contradiction from Not " + getPremiseSubsumer();
 	}
 
 	@Override

@@ -172,7 +172,7 @@ public class PropertyInferenceTracingTest {
 									left.getSuperPropertyChain().equals(ssIndexed) &&
 									right.getSubPropertyChain().equals(hIndexed) &&
 									right.getSuperPropertyChain().equals(hhIndexed) &&
-									conclusion.getRelation().equals(sshhIndexed);
+									conclusion.getForwardChain().equals(sshhIndexed);
 					}
 			
 				}, 
@@ -213,13 +213,13 @@ public class PropertyInferenceTracingTest {
 					public Boolean visit(ComposedBackwardLink backwardLink,
 							IndexedContextRoot input) {
 						// check that we use the inference that A <-R- B and B -SS o HH-> D imply A <-T- D  
-						return backwardLink.getRelation().equals(tIndexed) &&
-								backwardLink.getSource().equals(aIndexed) &&
-								backwardLink.getBackwardLink().getSource().equals(aIndexed) &&
-								backwardLink.getBackwardLink().getRelation().equals(rIndexed) &&
+						return backwardLink.getBackwardRelation().equals(tIndexed) &&
+								backwardLink.getOriginRoot().equals(aIndexed) &&
+								backwardLink.getBackwardLink().getOriginRoot().equals(aIndexed) &&
+								backwardLink.getBackwardLink().getBackwardRelation().equals(rIndexed) &&
 								backwardLink.getForwardLink().getTarget().equals(dIndexed) &&
-								backwardLink.getForwardLink().getRelation().equals(sshhIndexed) &&
-								backwardLink.getRelation().equals(tIndexed);
+								backwardLink.getForwardLink().getForwardChain().equals(sshhIndexed) &&
+								backwardLink.getBackwardRelation().equals(tIndexed);
 					}
 
 				}, 

@@ -46,37 +46,38 @@ public class PropagatedContradiction extends ContradictionImpl implements
 
 	private final IndexedObjectProperty premiseRelation_;
 
-	private final IndexedContextRoot inconsistentRoot_;
+	private final IndexedContextRoot inferenceRoot_;
 
-	public PropagatedContradiction(IndexedContextRoot conclusionRoot,
-			IndexedObjectProperty relation, IndexedContextRoot inconsistentRoot) {
+	public PropagatedContradiction(IndexedContextRoot inferenceRoot,
+			IndexedObjectProperty relation, IndexedContextRoot conclusionRoot) {
 		super(conclusionRoot);
 		premiseRelation_ = relation;
-		inconsistentRoot_ = inconsistentRoot;
+		inferenceRoot_ = inferenceRoot;
 	}
 
 	public PropagatedContradiction(BackwardLink premise) {
-		this(premise.getSource(), premise.getRelation(), premise.getRoot());
+		this(premise.getConclusionRoot(), premise.getBackwardRelation(),
+				premise.getOriginRoot());
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
-		return inconsistentRoot_;
+	public IndexedContextRoot getInferenceRoot() {
+		return inferenceRoot_;
 	}
 
 	public BackwardLink getLinkPremise() {
-		return new BackwardLinkImpl(getInferenceContextRoot(), getRoot(),
-				premiseRelation_);
+		return new BackwardLinkImpl(getInferenceRoot(), premiseRelation_,
+				getConclusionRoot());
 	}
 
 	public Contradiction getContradictionPremise() {
-		return new ContradictionImpl(getInferenceContextRoot());
+		return new ContradictionImpl(getInferenceRoot());
 	}
 
 	@Override
 	public String toString() {
 		return "Propagated contradiction" + premiseRelation_ + "<-"
-				+ inconsistentRoot_;
+				+ inferenceRoot_;
 	}
 
 	@Override

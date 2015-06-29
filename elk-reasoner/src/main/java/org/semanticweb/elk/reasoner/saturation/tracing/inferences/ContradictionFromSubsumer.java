@@ -43,21 +43,26 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 abstract class ContradictionFromSubsumer<S extends IndexedClassExpression>
 		extends ContradictionImpl implements ClassInference {
 
-	protected S premiseSubsumer;
+	private final S premiseSubsumer_;
 
-	ContradictionFromSubsumer(IndexedContextRoot root, S premiseSubsumer) {
-		super(root);
-		this.premiseSubsumer = premiseSubsumer;
+	ContradictionFromSubsumer(IndexedContextRoot inferenceRoot,
+			S premiseSubsumer) {
+		super(inferenceRoot);
+		this.premiseSubsumer_ = premiseSubsumer;
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
-		return getRoot();
+	public IndexedContextRoot getInferenceRoot() {
+		return getConclusionRoot();
 	}
 
 	public Subsumer<S> getPremise() {
-		return new DecomposedSubsumerImpl<S>(getInferenceContextRoot(),
-				premiseSubsumer);
+		return new DecomposedSubsumerImpl<S>(getInferenceRoot(),
+				premiseSubsumer_);
+	}
+
+	protected S getPremiseSubsumer() {
+		return this.premiseSubsumer_;
 	}
 
 }

@@ -42,25 +42,26 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
 public class SubClassOfSubsumer<S extends IndexedClassExpression> extends
 		DecomposedSubsumerImpl<S> implements ClassInference {
 
-	private final IndexedClassExpression premise_;
+	private final IndexedClassExpression premiseSubsumer_;
 
 	private final ElkAxiom reason_;
 
-	public SubClassOfSubsumer(IndexedContextRoot root,
-			IndexedClassExpression premise, S conclusion, ElkAxiom reason) {
-		super(root, conclusion);
-		this.premise_ = premise;
+	public SubClassOfSubsumer(IndexedContextRoot inferenceRoot,
+			IndexedClassExpression premiseSubsumer, S conclusion,
+			ElkAxiom reason) {
+		super(inferenceRoot, conclusion);
+		this.premiseSubsumer_ = premiseSubsumer;
 		this.reason_ = reason;
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
-		return getRoot();
+	public IndexedContextRoot getInferenceRoot() {
+		return getConclusionRoot();
 	}
 
 	public Subsumer<?> getPremise() {
 		return new DecomposedSubsumerImpl<IndexedClassExpression>(
-				getInferenceContextRoot(), premise_);
+				getInferenceRoot(), premiseSubsumer_);
 	}
 
 	public ElkAxiom getReason() {

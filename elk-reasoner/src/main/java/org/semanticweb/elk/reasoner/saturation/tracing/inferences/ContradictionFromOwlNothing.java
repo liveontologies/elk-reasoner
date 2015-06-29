@@ -34,8 +34,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
 /**
  * Represents a {@link Contradiction} produced from owl:Nothing.
  * 
- * TODO can we make this a singleton?
- * 
  * @author Pavel Klinov
  *
  *         pavel.klinov@uni-ulm.de
@@ -43,9 +41,9 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
 public class ContradictionFromOwlNothing extends
 		ContradictionFromSubsumer<IndexedClass> implements Contradiction {
 
-	public ContradictionFromOwlNothing(IndexedContextRoot root,
+	public ContradictionFromOwlNothing(IndexedContextRoot inferenceRoot,
 			IndexedClass premiseSubsumer) {
-		super(root, premiseSubsumer);
+		super(inferenceRoot, premiseSubsumer);
 	}
 
 	@Override

@@ -29,7 +29,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVi
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.SubConclusionVisitor;
 
 /**
- * An implementation for {@link BackwardLink}
+ * An implementation of {@link BackwardLink}
  * 
  * @author Frantisek Simancik
  * @author "Yevgeny Kazakov"
@@ -41,34 +41,39 @@ public class BackwardLinkImpl extends AbstractConclusion implements
 	 * the source {@link IndexedContextRoot} of this {@link BackwardLinkImpl};
 	 * the root of the source implies this link.
 	 */
-	private final IndexedContextRoot source_;
+	private final IndexedContextRoot origin_;
 
 	/**
 	 * the {@link IndexedObjectProperty} in the existential restriction
 	 * corresponding to this link
 	 */
-	private final IndexedObjectProperty relation_;
+	private final IndexedObjectProperty backwardRelation_;
 
-	public BackwardLinkImpl(IndexedContextRoot root, IndexedContextRoot source,
-			IndexedObjectProperty relation) {
+	public BackwardLinkImpl(IndexedContextRoot root,
+			IndexedObjectProperty relation, IndexedContextRoot source) {
 		super(root);
-		this.relation_ = relation;
-		this.source_ = source;
+		this.backwardRelation_ = relation;
+		this.origin_ = source;
 	}
 
 	@Override
-	public IndexedContextRoot getSourceRoot() {
-		return source_;
+	public IndexedContextRoot getOriginRoot() {
+		return origin_;
 	}
 
 	@Override
 	public IndexedObjectProperty getSubRoot() {
-		return relation_;
+		return backwardRelation_;
+	}
+
+	@Override
+	public IndexedObjectProperty getBackwardRelation() {
+		return backwardRelation_;
 	}
 
 	@Override
 	public String toString() {
-		return (relation_ + "<-" + source_);
+		return (backwardRelation_ + "<-" + origin_);
 	}
 
 	@Override
@@ -79,16 +84,6 @@ public class BackwardLinkImpl extends AbstractConclusion implements
 	@Override
 	public <I, O> O accept(SubConclusionVisitor<I, O> visitor, I input) {
 		return visitor.visit(this, input);
-	}
-
-	@Override
-	public IndexedObjectProperty getRelation() {
-		return relation_;
-	}
-
-	@Override
-	public IndexedContextRoot getSource() {
-		return source_;
 	}
 
 }

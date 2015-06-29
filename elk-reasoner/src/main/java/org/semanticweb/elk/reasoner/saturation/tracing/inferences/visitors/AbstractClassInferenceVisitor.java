@@ -45,7 +45,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsu
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SuperReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.GeneratedPropagation;
 
 /**
  * A skeleton implementation of {@link ClassInferenceVisitor}.
@@ -120,7 +120,7 @@ public abstract class AbstractClassInferenceVisitor<I, O> implements
 	}
 
 	@Override
-	public O visit(TracedPropagation conclusion, I input) {
+	public O visit(GeneratedPropagation conclusion, I input) {
 		return defaultTracedVisit(conclusion, input);
 	}
 

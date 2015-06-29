@@ -91,7 +91,7 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, SubContextImpl input) {
-			return input.add(subConclusion.getSource());
+			return input.add(subConclusion.getOriginRoot());
 		}
 
 		@Override
@@ -119,7 +119,7 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, SubContextImpl input) {
-			return input.remove(subConclusion.getSource());
+			return input.remove(subConclusion.getOriginRoot());
 		}
 
 		@Override
@@ -147,7 +147,7 @@ public class SubContextImpl extends ArrayHashSet<IndexedContextRoot> implements
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, SubContextImpl input) {
-			return input.contains(subConclusion.getSource());
+			return input.contains(subConclusion.getOriginRoot());
 		}
 
 		@Override

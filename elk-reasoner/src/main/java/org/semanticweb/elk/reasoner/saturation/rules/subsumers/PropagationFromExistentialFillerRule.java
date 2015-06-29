@@ -41,7 +41,7 @@ import org.semanticweb.elk.reasoner.saturation.context.SubContextPremises;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.GeneratedPropagation;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
 import org.semanticweb.elk.util.collections.LazySetUnion;
 import org.semanticweb.elk.util.collections.chains.Chain;
@@ -138,7 +138,7 @@ public class PropagationFromExistentialFillerRule extends
 				if (subContextMap.get(property).isInitialized()) {
 					// propagation introduction is a binary rule where the
 					// sub-context being initialized is a premise
-					producer.produce(new TracedPropagation(premises.getRoot(),
+					producer.produce(new GeneratedPropagation(premises.getRoot(),
 							property, e));
 				}
 			}
@@ -225,7 +225,7 @@ public class PropagationFromExistentialFillerRule extends
 		for (IndexedObjectSomeValuesFrom e : negExistentials_) {
 			if (e.getProperty().getSaturated().getSubPropertyChains()
 					.contains(property)) {
-				producer.produce(new TracedPropagation(premises.getRoot(),
+				producer.produce(new GeneratedPropagation(premises.getRoot(),
 						property, e));
 			}
 		}

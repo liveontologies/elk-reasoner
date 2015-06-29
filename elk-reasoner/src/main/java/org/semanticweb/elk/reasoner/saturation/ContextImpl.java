@@ -85,7 +85,7 @@ public class ContextImpl implements ExtendedContext {
 	 * {@link BackwardLinkImpl} s, i.e., the {@link BackwardLinkImpl}s whose
 	 * source is this {@link Context}; can be {@code null}
 	 * 
-	 * @see BackwardLinkImpl#getSource()
+	 * @see BackwardLinkImpl#getOriginRoot()
 	 */
 	private Set<IndexedObjectProperty> reflexiveBackwardLinks_ = null;
 
@@ -306,10 +306,10 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
-			IndexedObjectProperty relation = subConclusion.getRelation();
+			IndexedObjectProperty relation = subConclusion.getBackwardRelation();
 			// make sure that relevant context always exists
 			SubContext subContext = input.getCreateSubContext(relation);
-			if (subConclusion.getSourceRoot() == input.root_) {
+			if (subConclusion.getOriginRoot() == input.root_) {
 				// reflexive
 				if (input.reflexiveBackwardLinks_ == null) {
 					input.reflexiveBackwardLinks_ = new ArrayHashSet<IndexedObjectProperty>(
@@ -406,9 +406,9 @@ public class ContextImpl implements ExtendedContext {
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
 			boolean changed = false;
-			IndexedObjectProperty relation = subConclusion.getRelation();
+			IndexedObjectProperty relation = subConclusion.getBackwardRelation();
 			SubContext subContext = input.getCreateSubContext(relation);
-			if (subConclusion.getSourceRoot() == input.root_) {
+			if (subConclusion.getOriginRoot() == input.root_) {
 				// link is reflexive
 				if (input.reflexiveBackwardLinks_ != null) {
 					changed = input.reflexiveBackwardLinks_.remove(relation);
@@ -532,15 +532,15 @@ public class ContextImpl implements ExtendedContext {
 
 		@Override
 		public Boolean visit(BackwardLink subConclusion, ContextImpl input) {
-			if (subConclusion.getSourceRoot() == input.root_) {
+			if (subConclusion.getOriginRoot() == input.root_) {
 				// reflexive
 				return input.reflexiveBackwardLinks_ != null
 						&& input.reflexiveBackwardLinks_.contains(subConclusion
-								.getRelation());
+								.getBackwardRelation());
 			}
 			// else non-reflexive
 			SubContext subContext = input.getCreateSubContext(subConclusion
-					.getRelation());
+					.getBackwardRelation());
 			return subContext != null
 					&& subContext.containsSubConclusion(subConclusion);
 		}

@@ -50,7 +50,7 @@ public class ConclusionSourceContextUnsaturationVisitor extends
 
 	@Override
 	protected Boolean defaultVisit(Conclusion conclusion, Context context) {
-		IndexedContextRoot root = conclusion.getSourceRoot();
+		IndexedContextRoot root = conclusion.getOriginRoot();
 		writer_.markAsNotSaturated(root);
 		return true;
 	}

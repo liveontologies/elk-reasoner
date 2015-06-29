@@ -203,7 +203,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 		@Override
 		public void produce(Conclusion conclusion) {
 			// TODO: what if NPE?
-			produce(getContext(conclusion.getRoot()), conclusion);
+			produce(getContext(conclusion.getConclusionRoot()), conclusion);
 		}
 
 		void markAsNotSaturatedInternal(EC context) {
@@ -267,7 +267,7 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 
 		@Override
 		public void produce(Conclusion conclusion) {
-			produce(getCreateContext(conclusion.getRoot()), conclusion);
+			produce(getCreateContext(conclusion.getConclusionRoot()), conclusion);
 		}
 
 		@Override

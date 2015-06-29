@@ -89,7 +89,7 @@ public class AvoidTrivialPropagationReader extends DelegatingTraceReader {
 		BackwardLink link = propagated.getBackwardLink();
 		Propagation propagation = propagated.getPropagation();
 		IndexedContextRoot inferenceContextRoot = propagated
-				.getInferenceContextRoot();
+				.getInferenceRoot();
 
 		if (inferenceContextRoot != IndexedObjectSomeValuesFrom.Helper
 				.getTarget(propagation.getCarry())) {

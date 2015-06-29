@@ -44,29 +44,29 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
 public class DecomposedExistentialBackwardLink extends BackwardLinkImpl
 		implements ClassInference {
 
-	private final IndexedContextRoot inferenceContext_;
+	private final IndexedContextRoot inferenceRoot_;
 
 	private final IndexedObjectSomeValuesFrom existential_;
 
 	/**
 	 * 
 	 */
-	public DecomposedExistentialBackwardLink(IndexedContextRoot source,
+	public DecomposedExistentialBackwardLink(IndexedContextRoot inferenceRoot,
 			IndexedObjectSomeValuesFrom subsumer) {
-		super(IndexedObjectSomeValuesFrom.Helper.getTarget(subsumer), source,
-				subsumer.getProperty());
+		super(IndexedObjectSomeValuesFrom.Helper.getTarget(subsumer), subsumer
+				.getProperty(), inferenceRoot);
 		existential_ = subsumer;
-		inferenceContext_ = source;
+		inferenceRoot_ = inferenceRoot;
 	}
 
 	public Subsumer<IndexedObjectSomeValuesFrom> getExistential() {
 		return new DecomposedSubsumerImpl<IndexedObjectSomeValuesFrom>(
-				getInferenceContextRoot(), existential_);
+				getInferenceRoot(), existential_);
 	}
 
 	@Override
-	public IndexedContextRoot getInferenceContextRoot() {
-		return inferenceContext_;
+	public IndexedContextRoot getInferenceRoot() {
+		return inferenceRoot_;
 	}
 
 	@Override

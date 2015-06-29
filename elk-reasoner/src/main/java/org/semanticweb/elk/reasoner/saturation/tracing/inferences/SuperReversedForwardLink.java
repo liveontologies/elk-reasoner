@@ -47,7 +47,7 @@ public class SuperReversedForwardLink extends ReversedForwardLink {
 	public SuperReversedForwardLink(IndexedContextRoot source,
 			IndexedObjectProperty relation, ForwardLink forwardLink,
 			ElkAxiom reason) {
-		super(source, relation, forwardLink);
+		super(forwardLink, relation);
 		this.reason_ = reason;
 	}
 

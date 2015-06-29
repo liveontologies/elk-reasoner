@@ -127,8 +127,9 @@ public class ExpressionMapper {
 							IndexedClassExpression filler = ce.getFiller()
 									.accept(converter_);
 
-							return new ForwardLinkImpl(lemma.getSubClass()
-									.accept(converter_), chain, filler);
+							return new ForwardLinkImpl<IndexedPropertyChain>(
+									lemma.getSubClass().accept(converter_),
+									chain, filler);
 						}
 
 					}, input);
@@ -184,8 +185,8 @@ public class ExpressionMapper {
 				// This expression can also represent a backward link so we
 				// create that input, too
 				result.add(new ClassTracingInput(new BackwardLinkImpl(
-						existential.getFiller().accept(converter_), subsumee,
-						existential.getProperty().accept(converter_))));
+						existential.getFiller().accept(converter_), existential
+								.getProperty().accept(converter_), subsumee)));
 			}
 
 			return result;

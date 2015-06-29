@@ -52,7 +52,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsu
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SuperReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.TracedPropagation;
+import org.semanticweb.elk.reasoner.saturation.tracing.inferences.GeneratedPropagation;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
@@ -146,13 +146,13 @@ public class PremiseVisitor<I, O> implements ClassInferenceVisitor<I, O>, Object
 
 	@Override
 	public O visit(ReversedForwardLink conclusion, I parameter) {
-		conclusion.getSourceLink().accept(classConclusionVisitor_, parameter);
+		conclusion.getPremise().accept(classConclusionVisitor_, parameter);
 		return null;
 	}
 	
 	@Override
 	public O visit(SuperReversedForwardLink conclusion, I parameter) {
-		conclusion.getSourceLink().accept(classConclusionVisitor_, parameter);
+		conclusion.getPremise().accept(classConclusionVisitor_, parameter);
 		return null;
 	}
 
@@ -169,8 +169,8 @@ public class PremiseVisitor<I, O> implements ClassInferenceVisitor<I, O>, Object
 	}
 
 	@Override
-	public O visit(TracedPropagation conclusion, I parameter) {
-		conclusion.getSubsumer().accept(classConclusionVisitor_, parameter);
+	public O visit(GeneratedPropagation conclusion, I parameter) {
+		conclusion.getPremise().accept(classConclusionVisitor_, parameter);
 		conclusion.getSubPropertyPremise().accept(propertyConclusionVisitor_, parameter);
 		return null;
 	}

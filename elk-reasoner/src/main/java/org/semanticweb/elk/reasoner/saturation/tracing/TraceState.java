@@ -71,7 +71,7 @@ public class TraceState {
 	}
 	
 	public void addConclusionToTrace(Conclusion target) {
-		toTraceMap_.add(target.getRoot(), target);
+		toTraceMap_.add(target.getConclusionRoot(), target);
 	}
 	
 	public void clearTracingMap() {

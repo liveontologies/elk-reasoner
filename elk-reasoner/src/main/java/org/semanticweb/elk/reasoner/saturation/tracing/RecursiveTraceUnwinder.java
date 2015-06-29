@@ -265,7 +265,7 @@ public class RecursiveTraceUnwinder implements TraceUnwinder<Boolean> {
 
 		@Override
 		public String toString() {
-			return inference + " stored in " + inference.getRoot();
+			return inference + " stored in " + inference.getConclusionRoot();
 		}
 
 	}
