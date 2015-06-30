@@ -1,0 +1,4 @@
+Prefix(:=<http://example.org/>)
+Ontology(<www.example.org#assertions_property_ranges#taxonomy>
+ClassAssertion(:B :b)
+)

@@ -49,14 +49,14 @@ import org.semanticweb.elk.testing.TestInput;
 public class CLIDiffClassificationCorrectnessTest extends
 		DiffClassificationCorrectnessTest {
 
-	static final String[] IGNORE_LIST = {"CompositionReflexivityComplex.owl"};
+	static final String[] IGNORE_LIST = { "CompositionReflexivityComplex.owl" };
 
 	static {
 		Arrays.sort(IGNORE_LIST);
 	}
 
 	public CLIDiffClassificationCorrectnessTest(
-			final ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> testManifest) {
+			final ReasoningTestManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 
@@ -71,6 +71,7 @@ public class CLIDiffClassificationCorrectnessTest extends
 
 	@Override
 	protected boolean ignore(TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
+		return super.ignore(input)
+				|| Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
 }

@@ -27,7 +27,6 @@ package org.semanticweb.elk.owlapi;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.parsing.Owl2ParseException;
@@ -36,7 +35,6 @@ import org.semanticweb.elk.reasoner.InstanceTaxonomyTestOutput;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.testing.PolySuite;
-import org.semanticweb.elk.testing.TestInput;
 
 /**
  * @author Pavel Klinov
@@ -47,14 +45,8 @@ import org.semanticweb.elk.testing.TestInput;
 public class OWLAPIDiffRealizationCorrectnessTest extends
 		DiffRealizationCorrectnessTest {
 
-	static final String[] IGNORE_LIST = { "BasicABox.owl", "Inconsistent.owl" };
-
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
-
 	public OWLAPIDiffRealizationCorrectnessTest(
-			final ReasoningTestManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> testManifest) {
+			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 
@@ -64,8 +56,4 @@ public class OWLAPIDiffRealizationCorrectnessTest extends
 		return OWLAPITestUtils.createReasoner(input).getInternalReasoner();
 	}
 
-	@Override
-	protected boolean ignore(TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
-	}
 }

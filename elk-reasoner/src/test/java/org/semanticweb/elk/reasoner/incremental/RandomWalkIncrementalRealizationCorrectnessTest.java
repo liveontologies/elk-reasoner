@@ -54,7 +54,7 @@ public class RandomWalkIncrementalRealizationCorrectnessTest extends
 	final static String INPUT_DATA_LOCATION = "realization_test_input";
 
 	public RandomWalkIncrementalRealizationCorrectnessTest(
-			ReasoningTestManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> testManifest) {
+			ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 
@@ -81,12 +81,12 @@ public class RandomWalkIncrementalRealizationCorrectnessTest extends
 						RandomWalkIncrementalClassificationCorrectnessTest.class,
 						"owl",
 						"expected",
-						new TestManifestCreator<URLTestIO, InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput>() {
+						new TestManifestCreator<URLTestIO, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>() {
 							@Override
-							public TestManifest<URLTestIO, InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> create(
+							public TestManifest<URLTestIO, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> create(
 									URL input, URL output) throws IOException {
 								// don't need an expected output for these tests
-								return new TaxonomyDiffManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput>(
+								return new TaxonomyDiffManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>(
 										input, null);
 							}
 						});

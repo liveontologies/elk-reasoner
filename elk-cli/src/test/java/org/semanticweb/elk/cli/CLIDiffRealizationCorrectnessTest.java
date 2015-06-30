@@ -27,7 +27,6 @@ package org.semanticweb.elk.cli;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 import org.semanticweb.elk.loading.AxiomLoader;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
@@ -39,7 +38,6 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.ReasonerFactory;
 import org.semanticweb.elk.reasoner.ReasoningTestManifest;
 import org.semanticweb.elk.reasoner.stages.RestartingStageExecutor;
-import org.semanticweb.elk.testing.TestInput;
 
 /**
  * @author Pavel Klinov
@@ -49,14 +47,8 @@ import org.semanticweb.elk.testing.TestInput;
 public class CLIDiffRealizationCorrectnessTest extends
 		DiffRealizationCorrectnessTest {
 
-	static final String[] IGNORE_LIST = { "BasicABox.owl", "Inconsistent.owl" };
-
-	static {
-		Arrays.sort(IGNORE_LIST);
-	}
-
 	public CLIDiffRealizationCorrectnessTest(
-			final ReasoningTestManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> testManifest) {
+			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 
@@ -69,8 +61,4 @@ public class CLIDiffRealizationCorrectnessTest extends
 				new RestartingStageExecutor());
 	}
 
-	@Override
-	protected boolean ignore(TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
-	}
 }

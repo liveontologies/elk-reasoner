@@ -56,7 +56,7 @@ public class IncrementalRealizationCorrectnessTest extends
 		BaseIncrementalRealizationCorrectnessTest<ElkAxiom> {
 
 	public IncrementalRealizationCorrectnessTest(
-			ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> testManifest) {
+			ReasoningTestManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 

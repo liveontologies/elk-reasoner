@@ -1,0 +1,7 @@
+Prefix(:=<http://example.org/>)
+Ontology(<www.example.org#assertions_existentials#taxonomy>
+ClassAssertion(:A :a)
+ClassAssertion(:B :b)
+ClassAssertion(:C :a)
+ClassAssertion(:D :b)
+)

@@ -32,16 +32,21 @@ import org.semanticweb.elk.reasoner.taxonomy.hashing.TaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.Taxonomy;
 import org.semanticweb.elk.testing.TestOutput;
 
-public class ClassTaxonomyTestOutput implements TestOutput {
+public class ClassTaxonomyTestOutput<T extends Taxonomy<ElkClass>> implements
+		TestOutput {
 
-	protected final Taxonomy<ElkClass> taxonomy;
+	private final T taxonomy_;
 
-	ClassTaxonomyTestOutput(Taxonomy<ElkClass> taxonomy) {
-		this.taxonomy = taxonomy;
+	ClassTaxonomyTestOutput(T taxonomy) {
+		this.taxonomy_ = taxonomy;
+	}
+
+	public T getTaxonomy() {
+		return this.taxonomy_;
 	}
 
 	int getHashCode() {
-		return TaxonomyHasher.hash(taxonomy);
+		return TaxonomyHasher.hash(taxonomy_);
 	}
 
 	@Override
@@ -49,7 +54,7 @@ public class ClassTaxonomyTestOutput implements TestOutput {
 
 		Writer writer = new StringWriter();
 		try {
-			TaxonomyPrinter.dumpClassTaxomomy(taxonomy, writer, false);
+			TaxonomyPrinter.dumpClassTaxomomy(taxonomy_, writer, false);
 		} catch (IOException e) {
 			// TODO: what to return?
 			return e.toString();

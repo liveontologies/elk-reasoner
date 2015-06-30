@@ -26,7 +26,7 @@ import java.net.URL;
 
 import org.semanticweb.elk.testing.TestResultComparisonException;
 
-public class TaxonomyDiffManifest<EO extends ClassTaxonomyTestOutput, AO extends ClassTaxonomyTestOutput>
+public class TaxonomyDiffManifest<EO extends ClassTaxonomyTestOutput<?>, AO extends ClassTaxonomyTestOutput<?>>
 		extends ReasoningTestManifest<EO, AO> {
 
 	public TaxonomyDiffManifest(URL input, EO expOutput) {
@@ -43,9 +43,10 @@ public class TaxonomyDiffManifest<EO extends ClassTaxonomyTestOutput, AO extends
 			// FIXME: where do I see the expected and actual values (if I do not
 			// print them myself as below)?
 			throw new TestResultComparisonException("\n"
-					+ "EXPECTED TAXONOMY: (hash=" + expectedHash + ")\n" + getExpectedOutput()
-					+ "ACTUAL TAXONOMY: (hash=" + actualHash +")\n" + actualOutput, 
-					getExpectedOutput(), actualOutput);
+					+ "EXPECTED TAXONOMY: (hash=" + expectedHash + ")\n"
+					+ getExpectedOutput() + "ACTUAL TAXONOMY: (hash="
+					+ actualHash + ")\n" + actualOutput, getExpectedOutput(),
+					actualOutput);
 		}
 	}
 }

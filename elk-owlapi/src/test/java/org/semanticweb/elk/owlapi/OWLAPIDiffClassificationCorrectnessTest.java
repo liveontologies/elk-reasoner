@@ -39,16 +39,15 @@ import org.semanticweb.elk.testing.TestInput;
 public class OWLAPIDiffClassificationCorrectnessTest extends
 		DiffClassificationCorrectnessTest {
 
-	static final String[] IGNORE_LIST = { "DisjointSelf.owl", "CompositionReflexivityComplex.owl"/*,
-			"AssertionDisjoint.owl", "Disjoint.owl", "ReflexiveRole.owl",
-			"kangaroo.owl"*/ };
+	static final String[] IGNORE_LIST = { "DisjointSelf.owl",
+			"CompositionReflexivityComplex.owl" };
 
 	static {
 		Arrays.sort(IGNORE_LIST);
 	}
 
 	public OWLAPIDiffClassificationCorrectnessTest(
-			final ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> testManifest) {
+			final ReasoningTestManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 
@@ -60,7 +59,8 @@ public class OWLAPIDiffClassificationCorrectnessTest extends
 
 	@Override
 	protected boolean ignore(TestInput input) {
-		return Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
+		return super.ignore(input)
+				|| Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
 	}
 
 }

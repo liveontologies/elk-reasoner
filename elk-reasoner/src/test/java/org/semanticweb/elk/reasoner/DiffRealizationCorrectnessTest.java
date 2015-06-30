@@ -53,10 +53,10 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  *         pavel.klinov@uni-ulm.de
  */
 public abstract class DiffRealizationCorrectnessTest extends
-		BaseRealizationCorrectnessTest<InstanceTaxonomyTestOutput> {
+		BaseRealizationCorrectnessTest<InstanceTaxonomyTestOutput<?>> {
 
 	public DiffRealizationCorrectnessTest(
-			ReasoningTestManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> testManifest) {
+			ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 
@@ -72,10 +72,10 @@ public abstract class DiffRealizationCorrectnessTest extends
 						DiffRealizationCorrectnessTest.class,
 						"owl",
 						"expected",
-						new TestManifestCreator<URLTestIO, InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput>() {
+						new TestManifestCreator<URLTestIO, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>() {
 							@SuppressWarnings("resource")
 							@Override
-							public TestManifest<URLTestIO, InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> create(
+							public TestManifest<URLTestIO, InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> create(
 									URL input, URL output) throws IOException {
 								// input and expected output are OWL ontologies
 								InputStream stream = null;
@@ -89,9 +89,9 @@ public abstract class DiffRealizationCorrectnessTest extends
 															objectFactory).getParser(stream = output
 															.openStream()));
 
-									return new TaxonomyDiffManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput>(
+									return new TaxonomyDiffManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>>(
 											input,
-											new InstanceTaxonomyTestOutput(
+											new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
 													expectedTaxonomy));
 
 								} catch (Owl2ParseException e) {

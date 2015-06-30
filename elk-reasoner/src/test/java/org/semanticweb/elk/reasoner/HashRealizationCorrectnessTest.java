@@ -44,7 +44,7 @@ public abstract class HashRealizationCorrectnessTest extends
 		BaseRealizationCorrectnessTest<HashTestOutput> {
 
 	public HashRealizationCorrectnessTest(
-			ReasoningTestManifest<HashTestOutput, InstanceTaxonomyTestOutput> testManifest) {
+			ReasoningTestManifest<HashTestOutput, InstanceTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 
@@ -56,6 +56,6 @@ public abstract class HashRealizationCorrectnessTest extends
 	public static Configuration getConfig() throws URISyntaxException,
 			IOException {
 		return HashConfigurationUtils
-				.<InstanceTaxonomyTestOutput> loadConfiguration(INPUT_DATA_LOCATION);
+				.<InstanceTaxonomyTestOutput<?>> loadConfiguration(INPUT_DATA_LOCATION);
 	}
 }

@@ -31,7 +31,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.semanticweb.elk.loading.AxiomLoader;
-import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.Owl2StreamLoader;
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkClass;
@@ -112,50 +111,59 @@ public class NativeRunner {
 		Reasoner reasoner = reasoningFactory.createReasoner(loader,
 				new SimpleStageExecutor());
 
+		boolean printedStarted = false, printedTime = false;
+		
+		long ts = System.currentTimeMillis();
+		
 		try {
 			loadOntology(reasoner);
 			
-			long ts = System.currentTimeMillis();
+			ts = System.currentTimeMillis();
 
 			System.out.println("Started " + task.toString() + " on " + input);
+			printedStarted = true;
 
 			switch (task) {
 			case CLASSIFICATION:
 				Taxonomy<ElkClass> taxonomy = reasoner.getTaxonomyQuietly();
 
 				printTime(ts);
+				printedTime = true;
 
 				writeClassTaxonomyToFile(output, taxonomy);
-
-				printCompleted(task, input);
 
 				break;
 			case REALISATION:
 				InstanceTaxonomy<ElkClass, ElkNamedIndividual> instanceTaxonomy = reasoner.getInstanceTaxonomyQuietly();
 
 				printTime(ts);
+				printedTime = true;
 
 				writeInstanceTaxonomyToFile(output, instanceTaxonomy);
-
-				printCompleted(task, input);
 
 				break;				
 			case CONSISTENCY:
 				boolean isConsistent = reasoner.isInconsistent();
 
 				printTime(ts);
+				printedTime = true;
 
 				writeStringToFile(output, String.valueOf(!isConsistent), false);
-
-				printCompleted(task, input);
 
 				break;
 			default:
 			}
-		} catch (ElkLoadingException e) {
-			System.err
-					.println("ELK could not parse the ontology. Please, make sure that it is in the OWL 2 Functional Style Syntax.");
+		} catch (ElkException e) {
+			System.err.println("ELK error: " + e);
+			if (!printedStarted) {
+				ts = System.currentTimeMillis();
+				System.out.println("Started " + task.toString() + " on " + input);				
+			}
+			if (!printedTime) {
+				printTime(ts);
+			}			
 		} finally {
+			printCompleted(task, input);
 			reasoner.shutdown();
 		}
 	}

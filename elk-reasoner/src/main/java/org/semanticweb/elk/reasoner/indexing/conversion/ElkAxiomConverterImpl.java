@@ -362,7 +362,8 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 	 */
 	private final static int DISJOINT_AXIOM_BINARIZATION_THRESHOLD = 2;
 
-	private void indexDisjointClasses(List<? extends ElkClassExpression> members, ElkAxiom axiom) {
+	private void indexDisjointClasses(
+			List<? extends ElkClassExpression> members, ElkAxiom axiom) {
 		/*
 		 * if the axiom contains sufficiently many disjoint classes, convert it
 		 * natively
@@ -504,7 +505,7 @@ public class ElkAxiomConverterImpl extends FailingElkAxiomConverter {
 		axiomFactory_.getIndexedSubClassOfAxiom(
 				axiom.getSubject().accept(negativeConverter_), positiveFactory_
 						.getIndexedObjectSomeValuesFrom(axiom.getProperty()
-								.accept(positiveConverter_), axiom.getSubject()
+								.accept(positiveConverter_), axiom.getObject()
 								.accept(positiveConverter_)), axiom);
 		return null;
 	}
