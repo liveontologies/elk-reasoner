@@ -25,6 +25,8 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.semanticweb.elk.owl.exceptions.ElkException;
@@ -32,6 +34,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 import org.semanticweb.elk.testing.PolySuite;
+import org.semanticweb.elk.testing.TestInput;
 import org.semanticweb.elk.testing.TestOutput;
 import org.semanticweb.elk.testing.TestResultComparisonException;
 
@@ -48,6 +51,13 @@ public abstract class BaseRealizationCorrectnessTest<EO extends TestOutput>
 		extends BaseReasoningCorrectnessTest<EO, InstanceTaxonomyTestOutput<?>> {
 
 	final static String INPUT_DATA_LOCATION = "realization_test_input";
+
+	static final String[] IGNORE_LIST = { "AssertionsPropertyRanges.owl",
+			"Inconsistent.owl" };
+
+	static {
+		Arrays.sort(IGNORE_LIST);
+	}
 
 	public BaseRealizationCorrectnessTest(
 			ReasoningTestManifest<EO, InstanceTaxonomyTestOutput<?>> testManifest) {
@@ -71,4 +81,11 @@ public abstract class BaseRealizationCorrectnessTest<EO extends TestOutput>
 		manifest.compare(new InstanceTaxonomyTestOutput<InstanceTaxonomy<ElkClass, ElkNamedIndividual>>(
 				taxonomy));
 	}
+
+	@Override
+	protected boolean ignore(TestInput input) {
+		return super.ignore(input)
+				|| Arrays.binarySearch(IGNORE_LIST, input.getName()) >= 0;
+	}
+
 }
