@@ -25,8 +25,13 @@
  */
 package org.semanticweb.elk.reasoner;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+
 import org.semanticweb.elk.owl.interfaces.ElkClass;
 import org.semanticweb.elk.owl.interfaces.ElkNamedIndividual;
+import org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter;
 import org.semanticweb.elk.reasoner.taxonomy.hashing.InstanceTaxonomyHasher;
 import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
 
@@ -35,20 +40,30 @@ import org.semanticweb.elk.reasoner.taxonomy.model.InstanceTaxonomy;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class InstanceTaxonomyTestOutput extends ClassTaxonomyTestOutput {
+public class InstanceTaxonomyTestOutput<T extends InstanceTaxonomy<ElkClass, ElkNamedIndividual>>
+		extends ClassTaxonomyTestOutput<T> {
 
-	InstanceTaxonomyTestOutput(
-			InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy) {
+	InstanceTaxonomyTestOutput(T taxonomy) {
 		super(taxonomy);
-	}
-
-	@SuppressWarnings("unchecked")
-	InstanceTaxonomy<ElkClass, ElkNamedIndividual> getTaxonomy() {
-		return (InstanceTaxonomy<ElkClass, ElkNamedIndividual>) taxonomy;
 	}
 
 	@Override
 	int getHashCode() {
 		return InstanceTaxonomyHasher.hash(getTaxonomy());
+	}
+
+	@Override
+	public String toString() {
+
+		Writer writer = new StringWriter();
+		try {
+			TaxonomyPrinter.dumpInstanceTaxomomy(getTaxonomy(), writer, false);
+		} catch (IOException e) {
+			// TODO: what to return?
+			return e.toString();
+		}
+		return writer.toString();
+
+		// return String.valueOf(getHashCode());
 	}
 }

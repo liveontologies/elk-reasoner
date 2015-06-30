@@ -54,7 +54,7 @@ public class OWLAPIDiffRealizationCorrectnessTest extends
 	}
 
 	public OWLAPIDiffRealizationCorrectnessTest(
-			final ReasoningTestManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> testManifest) {
+			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 

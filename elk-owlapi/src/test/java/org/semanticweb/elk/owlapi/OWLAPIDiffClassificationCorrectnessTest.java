@@ -48,7 +48,7 @@ public class OWLAPIDiffClassificationCorrectnessTest extends
 	}
 
 	public OWLAPIDiffClassificationCorrectnessTest(
-			final ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> testManifest) {
+			final ReasoningTestManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 

@@ -51,7 +51,7 @@ public class CLIHashRealizationCorrectnessTest extends
 		HashRealizationCorrectnessTest {
 
 	public CLIHashRealizationCorrectnessTest(
-			final ReasoningTestManifest<HashTestOutput, InstanceTaxonomyTestOutput> testManifest) {
+			final ReasoningTestManifest<HashTestOutput, InstanceTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 

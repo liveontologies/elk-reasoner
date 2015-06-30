@@ -56,7 +56,7 @@ public class CLIDiffRealizationCorrectnessTest extends
 	}
 
 	public CLIDiffRealizationCorrectnessTest(
-			final ReasoningTestManifest<InstanceTaxonomyTestOutput, InstanceTaxonomyTestOutput> testManifest) {
+			final ReasoningTestManifest<InstanceTaxonomyTestOutput<?>, InstanceTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 

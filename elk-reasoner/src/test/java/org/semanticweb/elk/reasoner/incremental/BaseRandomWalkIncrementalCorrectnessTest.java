@@ -76,10 +76,10 @@ public abstract class BaseRandomWalkIncrementalCorrectnessTest {
 	 */
 	static int ITERATIONS = 5;
 
-	protected final ReasoningTestManifest<? extends ClassTaxonomyTestOutput, ? extends ClassTaxonomyTestOutput> manifest;
+	protected final ReasoningTestManifest<? extends ClassTaxonomyTestOutput<?>, ? extends ClassTaxonomyTestOutput<?>> manifest;
 
 	public BaseRandomWalkIncrementalCorrectnessTest(
-			ReasoningTestManifest<? extends ClassTaxonomyTestOutput, ? extends ClassTaxonomyTestOutput> testManifest) {
+			ReasoningTestManifest<? extends ClassTaxonomyTestOutput<?>, ? extends ClassTaxonomyTestOutput<?>> testManifest) {
 		manifest = testManifest;
 	}
 

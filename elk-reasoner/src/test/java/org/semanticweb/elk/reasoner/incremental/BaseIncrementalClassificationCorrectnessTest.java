@@ -61,12 +61,12 @@ import org.semanticweb.elk.testing.io.URLTestIO;
 @RunWith(PolySuite.class)
 public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 		extends
-		BaseIncrementalReasoningCorrectnessTest<T, ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> {
+		BaseIncrementalReasoningCorrectnessTest<T, ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> {
 
 	final static String INPUT_DATA_LOCATION = "classification_test_input";
 
 	public BaseIncrementalClassificationCorrectnessTest(
-			ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> testManifest) {
+			ReasoningTestManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 
@@ -109,12 +109,12 @@ public abstract class BaseIncrementalClassificationCorrectnessTest<T>
 						IncrementalClassificationCorrectnessTest.class,
 						"owl",
 						"expected",
-						new TestManifestCreator<URLTestIO, ClassTaxonomyTestOutput, ClassTaxonomyTestOutput>() {
+						new TestManifestCreator<URLTestIO, ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>>() {
 							@Override
-							public TestManifest<URLTestIO, ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> create(
+							public TestManifest<URLTestIO, ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> create(
 									URL input, URL output) throws IOException {
 								// don't need an expected output for these tests
-								return new TaxonomyDiffManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput>(
+								return new TaxonomyDiffManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>>(
 										input, null);
 							}
 						});

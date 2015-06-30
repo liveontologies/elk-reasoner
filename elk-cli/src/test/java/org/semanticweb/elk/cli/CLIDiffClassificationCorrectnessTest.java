@@ -56,7 +56,7 @@ public class CLIDiffClassificationCorrectnessTest extends
 	}
 
 	public CLIDiffClassificationCorrectnessTest(
-			final ReasoningTestManifest<ClassTaxonomyTestOutput, ClassTaxonomyTestOutput> testManifest) {
+			final ReasoningTestManifest<ClassTaxonomyTestOutput<?>, ClassTaxonomyTestOutput<?>> testManifest) {
 		super(testManifest);
 	}
 

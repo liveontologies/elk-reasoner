@@ -46,7 +46,7 @@ import org.semanticweb.elk.testing.io.URLTestIO;
  */
 public class HashConfigurationUtils {
 
-	static <AO extends ClassTaxonomyTestOutput> Configuration loadConfiguration(
+	static <AO extends ClassTaxonomyTestOutput<?>> Configuration loadConfiguration(
 			String location) throws URISyntaxException, IOException {
 		return ConfigurationUtils.loadFileBasedTestConfiguration(location,
 				HashClassificationCorrectnessTest.class, "owl",
