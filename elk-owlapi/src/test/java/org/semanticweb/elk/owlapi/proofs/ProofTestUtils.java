@@ -146,13 +146,21 @@ public class ProofTestUtils {
 			if (nextNode == null) {
 				break;
 			}
-			// first visit all subsumptions within the node
-			List<OWLClass> eqClassList = new ArrayList<OWLClass>(nextNode.getEntities());
 			
-			for (int i = 0; i < eqClassList.size() - 1; i++) {
-				for (int j = i + 1; j < eqClassList.size(); j++) {
-					OWLClass sub = eqClassList.get(i);
-					OWLClass sup = eqClassList.get(j);
+			List<OWLClass> membersList = new ArrayList<OWLClass>(nextNode.getEntities());
+			
+			if (nextNode.isBottomNode()) {
+				// do not check inconsistent concepts for now				
+				continue;
+			}
+			
+			// else visit all subsumptions within the node
+			
+			
+			for (int i = 0; i < membersList.size() - 1; i++) {
+				for (int j = i + 1; j < membersList.size(); j++) {
+					OWLClass sub = membersList.get(i);
+					OWLClass sup = membersList.get(j);
 					
 					if (!sub.equals(sup)) {
 						if (!sup.equals(factory.getOWLThing()) && !sub.equals(factory.getOWLNothing())) {
@@ -174,6 +182,8 @@ public class ProofTestUtils {
 			
 			for (OWLClass sup : nextNode.getEntities()) {
 				for (Node<OWLClass> subNode : reasoner.getSubClasses(sup, true)) {
+					if (subNode.isBottomNode())
+						continue;
 					for (OWLClass sub : subNode.getEntitiesMinusBottom()) {
 						if (!sup.equals(factory.getOWLThing())) {
 							visitor.visit(sub, sup);
