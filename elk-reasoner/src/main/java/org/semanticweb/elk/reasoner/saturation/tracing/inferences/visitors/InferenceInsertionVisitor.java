@@ -52,9 +52,9 @@ public class InferenceInsertionVisitor extends
 	private final ClassInferenceVisitor<Context, Boolean> inferenceInserter_ = new AbstractClassInferenceVisitor<Context, Boolean>() {
 
 		@Override
-		protected Boolean defaultTracedVisit(ClassInference conclusion,
+		protected Boolean defaultTracedVisit(ClassInference inference,
 				Context context) {
-			traceWriter_.addInference(context.getRoot(), conclusion);
+			traceWriter_.addClassInference(inference);
 
 			return true;
 		}

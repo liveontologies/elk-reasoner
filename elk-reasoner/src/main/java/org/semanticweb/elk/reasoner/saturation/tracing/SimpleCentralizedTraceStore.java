@@ -52,7 +52,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private final static Logger LOGGER_ = LoggerFactory
 			.getLogger(SimpleCentralizedTraceStore.class);
 
-	private final ConcurrentHashMap<IndexedContextRoot, ContextTraceStore> storage_ = new ConcurrentHashMap<IndexedContextRoot, ContextTraceStore>();
+	private final ConcurrentHashMap<IndexedContextRoot, ClassInferenceSet> storage_ = new ConcurrentHashMap<IndexedContextRoot, ClassInferenceSet>();
 
 	private final ObjectPropertyInferenceStore propertyInferenceStore_ = new SimpleObjectPropertyInferenceStore();
 
@@ -75,7 +75,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 		@Override
 		public void accept(Conclusion conclusion,
 				ClassInferenceVisitor<IndexedContextRoot, ?> visitor) {
-			ContextTraceStore tracer = storage_.get(conclusion.getConclusionRoot());
+			ClassInferenceSet tracer = storage_.get(conclusion.getConclusionRoot());
 
 			if (tracer != null) {
 				tracer.accept(conclusion, visitor);
@@ -89,11 +89,11 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 
 		@Override
 		public void visitInferences(IndexedContextRoot root,
-				ClassInferenceVisitor<IndexedContextRoot, ?> visitor) {
-			ContextTraceStore tracer = storage_.get(root);
+				ClassInferenceVisitor<?, ?> visitor) {
+			ClassInferenceSet tracer = storage_.get(root);
 
 			if (tracer != null) {
-				tracer.visitInferences(visitor);
+				tracer.accept(visitor);
 			}
 		}
 
@@ -114,33 +114,33 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 	private class Writer implements TraceStore.Writer {
 
 		@Override
-		public boolean addInference(IndexedContextRoot root,
-				ClassInference conclusion) {
-			ContextTraceStore tracer = storage_.get(root);
+		public void addClassInference(ClassInference inference) {
+			IndexedContextRoot root = inference.getConclusionRoot();
+			ClassInferenceSet tracer = storage_.get(root);
 
 			if (LOGGER_.isTraceEnabled()) {
-				LOGGER_.trace("Writing inference for {} in {}: {}", conclusion,
+				LOGGER_.trace("Writing inference for {} in {}: {}", inference,
 						root,
-						conclusion.acceptTraced(new InferencePrinter(), null));
+						inference.acceptTraced(new InferencePrinter(), null));
 			}
 
 			if (tracer == null) {
-				tracer = new SimpleContextTraceStore(root);
+				tracer = new ContextInferenceSet(root);
 				storage_.putIfAbsent(root, tracer);
 			}
 
-			return tracer.addInference(conclusion);
+			tracer.addInference(inference);
 		}
 
 		@Override
-		public boolean addObjectPropertyInference(
+		public void addObjectPropertyInference(
 				ObjectPropertyInference conclusion) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Writing property inference {}",
 						conclusion.acceptTraced(new InferencePrinter(), null));
 			}
 
-			return propertyInferenceStore_.addInference(conclusion);
+			propertyInferenceStore_.addInference(conclusion);
 		}
 
 	}

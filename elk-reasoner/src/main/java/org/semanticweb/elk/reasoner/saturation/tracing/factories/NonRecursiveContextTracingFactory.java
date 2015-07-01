@@ -48,7 +48,8 @@ import org.slf4j.LoggerFactory;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> extends SimpleInterrupter implements ContextTracingFactory<J> {
+public class NonRecursiveContextTracingFactory<J extends ContextTracingJob>
+		extends SimpleInterrupter implements ContextTracingFactory<J> {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(NonRecursiveContextTracingFactory.class);
@@ -67,21 +68,19 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> exte
 	 * finished.
 	 */
 	private final Multimap<IndexedContextRoot, J> jobsInProgress_;
-	
+
 	private final ContextTracingListener tracingFinishedListener_;
-	
+
 	private final SaturationStatistics aggregateStatistics_;
-	
+
 	public NonRecursiveContextTracingFactory(
 			SaturationState<?> saturationState,
-			SaturationState<TracedContext> tracingState,
-			TraceStore traceStore,
-			int maxWorkers,
-			ContextTracingListener listener
-			) {
+			SaturationState<TracedContext> tracingState, TraceStore traceStore,
+			int maxWorkers, ContextTracingListener listener) {
 		// this factory applies all local rules (non-redundant and redundant)
-		RuleApplicationFactory<TracedContext, RuleApplicationInput> ruleTracingFactory = new CycleBlockingRuleApplicationFactory(saturationState, tracingState, traceStore);
-		
+		RuleApplicationFactory<TracedContext, RuleApplicationInput> ruleTracingFactory = new CycleBlockingRuleApplicationFactory(
+				saturationState, tracingState, traceStore);
+
 		tracingState_ = tracingState;
 		tracingFactory_ = new ClassExpressionSaturationFactory<J>(
 				ruleTracingFactory, maxWorkers, new ThisTracingListener());
@@ -103,7 +102,8 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> exte
 	@Override
 	public void finish() {
 		// aggregating statistics over both factories
-		aggregateStatistics_.add(tracingFactory_.getRuleAndConclusionStatistics());
+		aggregateStatistics_.add(tracingFactory_
+				.getRuleAndConclusionStatistics());
 		tracingFactory_.finish();
 	}
 
@@ -111,37 +111,37 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> exte
 	public SaturationStatistics getStatistics() {
 		return aggregateStatistics_;
 	}
-	
+
 	SaturationState<TracedContext> getTracingSaturationState() {
 		return tracingState_;
 	}
-	
+
 	private void finishTracing(J job) {
 		IndexedContextRoot root = job.getInput();
 		TracedContext context = tracingState_.getContext(root);
-		
+
 		LOGGER_.trace("{} finished tracing", root);
 		// cleaning up the auxiliary data structures
 		context.clearBlockedInferences();
 		context.setSaturated(true);
-		
+
 		notifyCallers(job.getInput());
 		context.beingTracedCompareAndSet(true, false);
-	}	
+	}
 
 	private synchronized void notifyCallers(IndexedContextRoot root) {
 		for (J job : jobsInProgress_.get(root)) {
 			tracingFinishedListener_.notifyFinished(job);
 			job.getCallback().notifyFinished(job);
 		}
-		
+
 		jobsInProgress_.remove(root);
 	}
 
 	private synchronized void addTracingJobInProgress(J job) {
-		jobsInProgress_.add(job.getInput(), job);		
+		jobsInProgress_.add(job.getInput(), job);
 	}
-	
+
 	/**
 	 * TODO doc
 	 * 
@@ -151,21 +151,24 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> exte
 	 */
 	public class Engine implements InputProcessor<J> {
 
-		private final ClassExpressionSaturationFactory<J>.Engine tracingEngine_ = tracingFactory_.getEngine();
-		
+		private final ClassExpressionSaturationFactory<J>.Engine tracingEngine_ = tracingFactory_
+				.getEngine();
+
 		@Override
 		public void submit(J job) {
 			IndexedContextRoot root = job.getInput();
 			TracedContext context = tracingState_.getContext(root);
-			
-			if (context != null && context.isInitialized() && context.isSaturated()) {
+
+			if (context != null && context.isInitialized()
+					&& context.isSaturated()) {
 				// do nothing, the context has finished tracing before
 				notifyCallers(root);
 			}
-			
+
 			addTracingJobInProgress(job);
-			
-			if (context != null && !context.beingTracedCompareAndSet(false, true)) {
+
+			if (context != null
+					&& !context.beingTracedCompareAndSet(false, true)) {
 				LOGGER_.trace("{} is being traced by another worker", root);
 				return;
 			}
@@ -178,7 +181,7 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> exte
 		public void process() throws InterruptedException {
 			tracingEngine_.process();
 		}
-		
+
 		@Override
 		public void finish() {
 			tracingEngine_.finish();
@@ -189,9 +192,10 @@ public class NonRecursiveContextTracingFactory<J extends ContextTracingJob> exte
 	 * 
 	 * @author Pavel Klinov
 	 *
-	 * pavel.klinov@uni-ulm.de
+	 *         pavel.klinov@uni-ulm.de
 	 */
-	private class ThisTracingListener implements ClassExpressionSaturationListener<J> {
+	private class ThisTracingListener implements
+			ClassExpressionSaturationListener<J> {
 
 		@Override
 		public void notifyFinished(J job) throws InterruptedException {

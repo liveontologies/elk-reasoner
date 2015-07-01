@@ -2,6 +2,7 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing;
+
 /*
  * #%L
  * ELK Reasoner
@@ -26,22 +27,33 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
- * Stores and retrieves {@link ClassInference} for {@link Conclusion}s stored in a single {@link Context}.
+ * An object containing {@link ClassInference}s, which can be used to retrieve
+ * inferences producing given {@link Conclusion}s.
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
+ * 
+ * @author "Yevgeny Kazakov"
+ *
  */
-public interface ContextTraceStore {
+public interface ClassInferenceSet {
 
-	public void accept(Conclusion conclusion, ClassInferenceVisitor<IndexedContextRoot, ?> visitor);
-	
-	public void visitInferences(ClassInferenceVisitor<IndexedContextRoot, ?> visitor);
-	
-	public boolean addInference(ClassInference inference);
+	/**
+	 * Adds the given {@link ClassInference} to this {@link ClassInferenceSetTmp}
+	 * 
+	 * @param inference
+	 *            the {@link ClassInference} to be added
+	 */
+	public void addInference(ClassInference inference);
+
+	public void accept(ClassInferenceVisitor<?, ?> visitor);
+
+	public void accept(Conclusion conclusion,
+			ClassInferenceVisitor<IndexedContextRoot, ?> visitor);
+
 }

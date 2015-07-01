@@ -120,10 +120,9 @@ public class RecursiveContextTracingFactory extends SimpleInterrupter implements
 			LOGGER_.trace("Recursive tracing started");
 
 			for (;;) {
-				if (Thread.currentThread().isInterrupted()) {
+				if (isInterrupted()) {
 					LOGGER_.trace("Recursive tracing interrupted");
 					finish();
-
 					break;
 				}
 				// first, continue some existing unwinding
@@ -138,7 +137,6 @@ public class RecursiveContextTracingFactory extends SimpleInterrupter implements
 
 				if (job == null) {
 					LOGGER_.trace("Recursive tracing finished");
-
 					break;
 				}
 
@@ -149,8 +147,12 @@ public class RecursiveContextTracingFactory extends SimpleInterrupter implements
 			}
 		}
 
-		private void unwindCurrentState() throws InterruptedException {
+		private void unwindCurrentState() {
 			for (;;) {
+				if (isInterrupted()) {
+					LOGGER_.trace("Unwinding interrupted");
+					return;
+				}
 				Conclusion next = currentState_.pollFromClassUnwindingQueue();
 
 				if (next == null) {
@@ -161,14 +163,7 @@ public class RecursiveContextTracingFactory extends SimpleInterrupter implements
 				LOGGER_.trace("Unwinding of {}", next);
 
 				unwindClassConclusion(next);
-
-				if (Thread.currentThread().isInterrupted()) {
-					LOGGER_.trace("Unwinding interrupted at {}", next);
-					// will re-start from this point later
-					currentState_.addToClassUnwindingQueue(next);
-
-					return;
-				}
+				
 			}
 			// we're done with class conclusions, moving to object property
 			// conclusions
@@ -186,7 +181,7 @@ public class RecursiveContextTracingFactory extends SimpleInterrupter implements
 
 				unwindPropertyConclusion(next);
 
-				if (Thread.currentThread().isInterrupted()) {
+				if (isInterrupted()) {
 					LOGGER_.trace("Unwinding interrupted at {}", next);
 					// will re-start from this point later
 					currentState_.addToPropertyUnwindingQueue(next);
@@ -201,7 +196,7 @@ public class RecursiveContextTracingFactory extends SimpleInterrupter implements
 					new AbstractConclusionVisitor<IndexedContextRoot, Void>() {
 						@Override
 						protected Void defaultVisit(Conclusion premise,
-								IndexedContextRoot inferenceContext) {
+								IndexedContextRoot _ignored) {
 							currentState_.addToClassUnwindingQueue(premise);
 							return null;
 						}
@@ -224,13 +219,13 @@ public class RecursiveContextTracingFactory extends SimpleInterrupter implements
 						@Override
 						protected Void defaultTracedVisit(
 								ClassInference inference,
-								IndexedContextRoot _ignored) {
+								IndexedContextRoot _ignored) {														
 							if (currentState_.addToProcessed(inference)) {
-								IndexedContextRoot inferenceContextRoot = inference
+								IndexedContextRoot inferenceRoot = inference
 										.getInferenceRoot();
-								// visit the premises to put into the queue
+								// visit the premises to put into the queue								
 								inference.acceptTraced(premiseVisitor,
-										inferenceContextRoot);
+										inferenceRoot);
 							}
 
 							return null;

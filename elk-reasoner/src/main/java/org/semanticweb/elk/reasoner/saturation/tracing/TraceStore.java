@@ -65,7 +65,7 @@ public interface TraceStore {
 		
 		public Iterable<IndexedContextRoot> getContextRoots();
 		
-		public void visitInferences(IndexedContextRoot root, ClassInferenceVisitor<IndexedContextRoot, ?> visitor);
+		public void visitInferences(IndexedContextRoot root, ClassInferenceVisitor<?, ?> visitor);
 		
 		public void visitInferences(IndexedPropertyChain root, ObjectPropertyInferenceVisitor<?, ?> visitor);
 	}
@@ -82,23 +82,21 @@ public interface TraceStore {
 		 * @param inference
 		 * @return
 		 */
-		public boolean addInference(IndexedContextRoot root, ClassInference conclusion);
+		public void addClassInference(ClassInference conclusion);
 		
-		public boolean addObjectPropertyInference(ObjectPropertyInference conclusion);
+		public void addObjectPropertyInference(ObjectPropertyInference conclusion);
 		
 		
 		public static final Writer Dummy = new Writer() {
 
 			@Override
-			public boolean addInference(IndexedContextRoot root, ClassInference conclusion) {
+			public void addClassInference(ClassInference conclusion) {
 				// no-op
-				return false;
 			}
 			
 			@Override
-			public boolean addObjectPropertyInference(ObjectPropertyInference conclusion) {
+			public void addObjectPropertyInference(ObjectPropertyInference conclusion) {
 				// no-op
-				return false;
 			}
 			
 		};

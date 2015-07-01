@@ -28,7 +28,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriter;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateWriterWrap;
@@ -52,7 +51,6 @@ import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationSta
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.IsInferenceCyclic;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.GetInferenceTarget;
 import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.InferenceInsertionVisitor;
 
 /**

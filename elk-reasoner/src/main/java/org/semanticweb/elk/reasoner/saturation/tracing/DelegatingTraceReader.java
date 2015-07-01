@@ -60,7 +60,7 @@ public abstract class DelegatingTraceReader implements TraceStore.Reader {
 
 	@Override
 	public void visitInferences(IndexedContextRoot root,
-			ClassInferenceVisitor<IndexedContextRoot, ?> visitor) {
+			ClassInferenceVisitor<?, ?> visitor) {
 		reader.visitInferences(root, visitor);
 	}
 
