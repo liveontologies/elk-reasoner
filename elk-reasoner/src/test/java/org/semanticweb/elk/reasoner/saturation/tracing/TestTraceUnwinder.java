@@ -27,7 +27,6 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
 
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore.Reader;
 
 /**
  * Recursively visits all conclusions which were used to produce a given
@@ -47,8 +46,9 @@ public class TestTraceUnwinder extends RecursiveTraceUnwinder {
 
 	private final UntracedConclusionListener listener_;
 
-	public TestTraceUnwinder(Reader reader, UntracedConclusionListener listener) {
-		super(reader);
+	public TestTraceUnwinder(InferenceSet inferences,
+			UntracedConclusionListener listener) {
+		super(inferences);
 		listener_ = listener;
 	}
 

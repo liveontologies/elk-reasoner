@@ -53,16 +53,16 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectProp
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.AbstractConclusionVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionEqualityChecker;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferencePremiseVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.GetInferenceTarget;
 import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.GetInferenceTarget;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.PremiseVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.util.collections.HashListMultimap;
 import org.semanticweb.elk.util.collections.Multimap;
@@ -129,8 +129,8 @@ public class TracingTestUtils {
 			}
 		};
 
-		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState
-				.getTraceStore().getReader(), UNTRACED_LISTENER);
+		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState,
+				UNTRACED_LISTENER);
 
 		explorer.accept(subsumer, counter);
 	}
@@ -155,8 +155,8 @@ public class TracingTestUtils {
 			}
 		};
 
-		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState
-				.getTraceStore().getReader(), UNTRACED_LISTENER);
+		TestTraceUnwinder explorer = new TestTraceUnwinder(traceState,
+				UNTRACED_LISTENER);
 
 		Conclusion contradiction = new ContradictionImpl(entity);
 		explorer.accept(contradiction, counter);
@@ -172,8 +172,8 @@ public class TracingTestUtils {
 		TracedContextsCollector collector = new TracedContextsCollector();
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 
-		new TestTraceUnwinder(traceState.getTraceStore().getReader(),
-				UNTRACED_LISTENER).accept(subsumer, collector);
+		new TestTraceUnwinder(traceState, UNTRACED_LISTENER).accept(subsumer,
+				collector);
 
 		for (Context traced : traceState.getTracedContexts()) {
 			IndexedContextRoot root = traced.getRoot();
@@ -270,8 +270,7 @@ public class TracingTestUtils {
 				false);
 		TraceState traceState = ReasonerStateAccessor.getTraceState(reasoner);
 
-		new TestTraceUnwinder(traceState.getTraceStore().getReader(),
-				UNTRACED_LISTENER)
+		new TestTraceUnwinder(traceState, UNTRACED_LISTENER)
 				.accept(conclusion,
 						new AbstractClassInferenceVisitor<IndexedContextRoot, Boolean>() {
 
@@ -279,9 +278,8 @@ public class TracingTestUtils {
 							protected Boolean defaultTracedVisit(
 									ClassInference inference,
 									IndexedContextRoot input) {
-								classInferenceCondition.or(inference
-										.acceptTraced(classInferenceVisitor,
-												input));
+								classInferenceCondition.or(inference.accept(
+										classInferenceVisitor, input));
 
 								return true;
 							}
@@ -293,9 +291,8 @@ public class TracingTestUtils {
 							protected Boolean defaultTracedVisit(
 									ObjectPropertyInference inference,
 									Void input) {
-								propertyInferenceCondition.or(inference
-										.acceptTraced(propertyInferenceVisitor,
-												input));
+								propertyInferenceCondition.or(inference.accept(
+										propertyInferenceVisitor, input));
 
 								return true;
 							}
@@ -345,10 +342,9 @@ public class TracingTestUtils {
 		Conclusion conclusion = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
-		TraceStore.Reader inferenceReader = ReasonerStateAccessor
-				.getTraceState(reasoner).getTraceStore().getReader();
 		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(
-				inferenceReader, UNTRACED_LISTENER);
+				ReasonerStateAccessor.getTraceState(reasoner),
+				UNTRACED_LISTENER);
 
 		reasoner.explainSubsumption(sub, sup);
 		traceUnwinder.accept(conclusion, visitor);
@@ -366,10 +362,9 @@ public class TracingTestUtils {
 		Conclusion conclusion = getConclusionToTrace(
 				ReasonerStateAccessor.getContext(reasoner, subsumee),
 				ReasonerStateAccessor.transform(reasoner, sup));
-		TraceStore.Reader inferenceReader = ReasonerStateAccessor
-				.getTraceState(reasoner).getTraceStore().getReader();
 		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(
-				inferenceReader, UNTRACED_LISTENER);
+				ReasonerStateAccessor.getTraceState(reasoner),
+				UNTRACED_LISTENER);
 
 		reasoner.explainSubsumption(sub, sup);
 		traceUnwinder.accept(conclusion, classInferenceVisitor,
@@ -388,10 +383,9 @@ public class TracingTestUtils {
 			throw new IllegalStateException("The ontology is consistent");
 		}
 
-		TraceStore.Reader inferenceReader = ReasonerStateAccessor
-				.getTraceState(reasoner).getTraceStore().getReader();
 		TestTraceUnwinder traceUnwinder = new TestTraceUnwinder(
-				inferenceReader, UNTRACED_LISTENER);
+				ReasonerStateAccessor.getTraceState(reasoner),
+				UNTRACED_LISTENER);
 
 		reasoner.explainInconsistency();
 		traceUnwinder.accept(new ContradictionImpl(entity),
@@ -445,7 +439,7 @@ public class TracingTestUtils {
 				for (ClassInference blocked : context.getBlockedInferences()
 						.get(premise)) {
 
-					IndexedContextRoot targetRoot = blocked.acceptTraced(
+					IndexedContextRoot targetRoot = blocked.accept(
 							new GetInferenceTarget(), context);
 
 					counter.increment();
@@ -471,7 +465,7 @@ public class TracingTestUtils {
 		final IndexedContextRoot inferenceContextRoot = inference
 				.getInferenceRoot();
 
-		inference.acceptTraced(new PremiseVisitor<Void, Void>(
+		inference.accept(new ClassInferencePremiseVisitor<Void, Void>(
 				new AbstractConclusionVisitor<Void, Void>() {
 					@Override
 					protected Void defaultVisit(final Conclusion premise,
@@ -511,27 +505,26 @@ public class TracingTestUtils {
 				if (premiseInference.getInferenceRoot() == inferenceTargetRoot) {
 
 					premiseInference
-							.acceptTraced(
-									new PremiseVisitor<Void, Void>(
-											new AbstractConclusionVisitor<Void, Void>() {
-												@Override
-												protected Void defaultVisit(
-														Conclusion premiseOfPremise,
-														Void ignored) {
+							.accept(new ClassInferencePremiseVisitor<Void, Void>(
+									new AbstractConclusionVisitor<Void, Void>() {
+										@Override
+										protected Void defaultVisit(
+												Conclusion premiseOfPremise,
+												Void ignored) {
 
-													if (premiseOfPremise
-															.accept(new ConclusionEqualityChecker(),
-																	inference)) {
-														// ok, this inference
-														// uses the given
-														// conclusion
-														isPremiseInferenceCyclic
-																.set(true);
-													}
+											if (premiseOfPremise
+													.accept(new ConclusionEqualityChecker(),
+															inference)) {
+												// ok, this inference
+												// uses the given
+												// conclusion
+												isPremiseInferenceCyclic
+														.set(true);
+											}
 
-													return null;
-												}
-											}), null);
+											return null;
+										}
+									}), null);
 				} else {
 					// ok, the premise was inferred in a context different from
 					// where the current inference was made.

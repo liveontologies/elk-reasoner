@@ -2,6 +2,9 @@
  * 
  */
 package org.semanticweb.elk.reasoner.saturation.tracing.factories;
+
+import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
+
 /*
  * #%L
  * ELK Reasoner
@@ -24,27 +27,15 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
  * #L%
  */
 
-
 /**
  * Receives a notification when a {@link ContextTracingJob} is finished.
  * 
  * @author Pavel Klinov
  *
- * pavel.klinov@uni-ulm.de
+ *         pavel.klinov@uni-ulm.de
  */
-public interface ContextTracingListener {
+public interface ContextTracingListener<R extends IndexedContextRoot, J extends ContextTracingJob<R>> {
 
-	/**
-	 * 
-	 * @param context
-	 */
-	public void notifyFinished(ContextTracingJob job);
-	
-	public static final ContextTracingListener DUMMY = new ContextTracingListener() {
-		
-		@Override
-		public void notifyFinished(ContextTracingJob job) {
-			//no-op
-		}
-	};
+	public void notifyFinished(J job);
+
 }

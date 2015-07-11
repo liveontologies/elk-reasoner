@@ -31,9 +31,9 @@ import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.BackwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SuperReversedForwardLink;
 
 /**
  * A {@link ForwardLinkRule} applied when processing {@link ForwardLink}

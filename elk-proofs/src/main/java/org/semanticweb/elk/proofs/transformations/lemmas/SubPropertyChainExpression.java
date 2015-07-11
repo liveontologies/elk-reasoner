@@ -35,8 +35,8 @@ import org.semanticweb.elk.proofs.inferences.Inference;
 import org.semanticweb.elk.proofs.inferences.mapping.Deindexer;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.TracingUtils;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.util.TracingUtils;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -93,7 +93,7 @@ class SubPropertyChainExpression implements AxiomExpression<ElkSubObjectProperty
 				for (ObjectPropertyInference inf : superChainToInferences.get(superChain)) {
 					AxiomExpression<ElkSubObjectPropertyOfAxiom> firstPremise = exprFactory.create(
 							elkFactory_.getSubObjectPropertyOfAxiom(Deindexer.deindex(superChain), superProperty_.getElkEntity()));
-					Inference result = inf.acceptTraced(roleInfFactory, firstPremise); 
+					Inference result = inf.accept(roleInfFactory, firstPremise); 
 					
 					if (result != null) {
 						inferences.add(result);

@@ -59,8 +59,8 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Contra
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
+import org.semanticweb.elk.reasoner.saturation.tracing.ClassInferenceSet;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentClassTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.ConcurrentInstanceTaxonomy;
 import org.semanticweb.elk.reasoner.taxonomy.OrphanInstanceNode;
@@ -567,7 +567,16 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	 * TRACING METHODS
 	 *---------------------------------------------------*/
 
-	public TraceStore.Reader explainSubsumption(ElkClassExpression sub,
+	private void toTrace(Conclusion conclusion) {
+		if (traceState.getInferencesForOrigin(conclusion.getOriginRoot()) != null)
+			// already traced
+			return;
+		// else
+		stageManager.inferenceTracingStage.invalidate();
+		traceState.addToTrace(conclusion);
+	}
+
+	public ClassInferenceSet explainSubsumption(ElkClassExpression sub,
 			ElkClassExpression sup) throws ElkException {
 		if (traceState == null) {
 			resetTraceState();
@@ -576,10 +585,13 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		IndexedClassExpression subsumee = sub.accept(expressionConverter_);
 		IndexedClassExpression subsumer = sup.accept(expressionConverter_);
 
-		if (subsumee != null & subsumer != null)
-			stageBasedTrace(subsumee, subsumer);
+		if (subsumee != null & subsumer != null) {
+			toTrace(convertTraceTarget(subsumee, subsumer));
+		}
 
-		return traceState.getTraceStore().getReader();
+		getStageExecutor().complete(stageManager.inferenceTracingStage);
+
+		return traceState;
 	}
 
 	/**
@@ -592,48 +604,9 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 		if (!isInconsistent()) {
 			throw new IllegalStateException("The ontology is consistent");
 		}
-
-		traceState.clearTracingMap();
-		traceState.addConclusionToTrace(new ContradictionImpl(
-				inconsistentEntity));
-		trace(false);
-		traceState.clearTracingMap();
-		return inconsistentEntity.getElkEntity();
-	}
-
-	// TODO hide this?
-	public void submitForTracing(ElkClassExpression sub, ElkClassExpression sup) {
-		IndexedClassExpression subsumee = sub.accept(expressionConverter_);
-		IndexedClassExpression subsumer = sup.accept(expressionConverter_);
-		traceState.addConclusionToTrace(convertTraceTarget(subsumee, subsumer));
-	}
-
-	public TraceStore.Reader trace(boolean forceTrace) throws ElkException {
-		if (!stageManager.inferenceTracingStage.isCompleted()) {
-			// to make sure we start with a clean trace store, esp. clear the
-			// previously stored class inferences which may no longer be valid
-			// if there were changed to the ontology
-			traceState.clearClassTraces();
-		} else if (forceTrace) {
-			stageManager.inferenceTracingStage.invalidate();
-		}
-
+		toTrace(new ContradictionImpl(inconsistentEntity));
 		getStageExecutor().complete(stageManager.inferenceTracingStage);
-
-		return traceState.getTraceStore().getReader();
-	}
-
-	void stageBasedTrace(IndexedClassExpression subsumee,
-			IndexedClassExpression subsumer) throws ElkException {
-		if (isInconsistent()) {
-			throw new ElkInconsistentOntologyException(
-					"The ontology is inconsistent. Use explainInconsistency() method instead");
-		}
-		// elsse explain subsumption or sub-class unsatisfiability
-		traceState.addConclusionToTrace(convertTraceTarget(subsumee, subsumer));
-
-		trace(true);
-		traceState.clearTracingMap();
+		return inconsistentEntity.getElkEntity();
 	}
 
 	boolean isSatisfiable(IndexedClassExpression subsumee) {
@@ -675,11 +648,11 @@ public abstract class AbstractReasonerState extends SimpleInterrupter {
 	}
 
 	public void resetTraceState() {
-		createTraceState(saturationState);
+		createTraceState();
 	}
 
-	private void createTraceState(SaturationState<?> mainState) {
-		traceState = new TraceState(mainState);
+	private void createTraceState() {
+		traceState = new TraceState();
 	}
 
 	TraceState getTraceState() {

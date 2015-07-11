@@ -96,8 +96,7 @@ public class RuleApplicationAdditionPruningFactory extends
 								new ConclusionOccurrenceCheckingVisitor(),
 								mainSaturationState_),
 						// if all fine, insert the conclusion to the local
-						// context
-						// copies
+						// context copies
 						new ConclusionInsertionVisitor(localWriter),
 						// count conclusions used in the rules, if necessary
 						SaturationUtils

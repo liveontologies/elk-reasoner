@@ -61,9 +61,9 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.Contra
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.DecomposedSubsumerImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.implementation.ForwardLinkImpl;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChain;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexivePropertyChainImpl;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
 
 /**
  * Converts {@link Expression}s to instances of {@link TracingInput} which can
@@ -109,7 +109,7 @@ public class ExpressionMapper {
 					propertyChainConverter_);
 
 			return singleton(new ObjectPropertyTracingInput(
-					new ReflexivePropertyChain<IndexedPropertyChain>(chain)));
+					new ReflexivePropertyChainImpl<IndexedPropertyChain>(chain)));
 		}
 
 		@Override
@@ -147,7 +147,7 @@ public class ExpressionMapper {
 					.accept(propertyChainConverter_);
 
 			return singleton(new ObjectPropertyTracingInput(
-					new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(
+					new SubPropertyChainImpl<IndexedPropertyChain, IndexedPropertyChain>(
 							subchain, superchain)));
 		}
 
@@ -237,7 +237,7 @@ public class ExpressionMapper {
 					.accept(converter_);
 
 			return singleton(new ObjectPropertyTracingInput(
-					new SubPropertyChain<IndexedPropertyChain, IndexedPropertyChain>(
+					new SubPropertyChainImpl<IndexedPropertyChain, IndexedPropertyChain>(
 							subchain, sup)));
 		}
 

@@ -44,8 +44,8 @@ import org.semanticweb.elk.reasoner.indexing.conversion.ElkPolarityExpressionCon
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.TracingUtils;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.util.TracingUtils;
 import org.semanticweb.elk.reasoner.stages.ReasonerInferenceReader;
 import org.semanticweb.elk.util.collections.Multimap;
 
@@ -250,7 +250,7 @@ class ChainRewritingExpression implements AxiomExpression<ElkSubObjectPropertyOf
 		LemmaFreePropertyInferenceFactory roleInfFactory = new LemmaFreePropertyInferenceFactory(expr_, reader_.getExpressionFactory());
 		
 		for (ObjectPropertyInference inf : superChainInferences) {
-			Inference result = inf.acceptTraced(roleInfFactory, premise);
+			Inference result = inf.accept(roleInfFactory, premise);
 			
 			if (result != null) {
 				return result;

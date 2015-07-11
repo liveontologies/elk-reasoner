@@ -32,11 +32,13 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyCha
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.LeftReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.PropertyChainInitialization;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.RightReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
+import org.semanticweb.elk.reasoner.saturation.tracing.ObjectPropertyInferenceProducer;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.collections.HashSetMultimap;
 import org.semanticweb.elk.util.collections.LazySetIntersection;
@@ -72,22 +74,21 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	 * the sub-properties for which the told sub-properties may not be yet
 	 * expanded
 	 */
-	final private Queue<IndexedPropertyChain> toDoSubProperties_ = new LinkedList<IndexedPropertyChain>();
+	final private Queue<IndexedPropertyChain> toDoSubPropertyChains_ = new LinkedList<IndexedPropertyChain>();
 	/**
 	 * used to record sub-property inferences
 	 */
-	final private TraceStore.Writer traceWriter_;
+	final private ObjectPropertyInferenceProducer inferenceProducer_;
 
 	SubPropertyExplorer(IndexedPropertyChain element,
 			Set<IndexedPropertyChain> subPropertyChains,
 			Set<IndexedObjectProperty> subProperties,
-			TraceStore.Writer traceWriter) {
+			ObjectPropertyInferenceProducer inferenceProducer) {
 		this.superChain_ = element;
 		this.subPropertyChains_ = subPropertyChains;
 		this.subProperties_ = subProperties;
-		this.traceWriter_ = traceWriter;
-
-		toDo(element);
+		this.inferenceProducer_ = inferenceProducer;
+		toDo(new PropertyChainInitialization(element));
 	}
 
 	@Override
@@ -98,8 +99,7 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		for (int i = 0; i < toldSubChains.size(); i++) {
 			IndexedPropertyChain sub = toldSubChains.get(i);
 			ElkAxiom reason = reasons.get(i);
-			toDoWithTracing(sub, new ToldSubPropertyInference(sub, element,
-					superChain_, reason));
+			toDo(new ToldSubProperty(sub, element, superChain_, reason));
 		}
 
 		return null;
@@ -111,74 +111,33 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 		IndexedPropertyChain right = element.getSuffixChain();
 		SaturatedPropertyChain leftSaturation = left.getSaturated();
 		SaturatedPropertyChain rightSaturation = right.getSaturated();
-		// reflexivity-based inferences
 		if (leftSaturation != null && leftSaturation.isDerivedReflexive()) {
-			LOGGER_.trace("{} is reflexive thus {} is a sub-property of {}",
-					left, right, superChain_);
-
-			traceWriter_
-					.addObjectPropertyInference(new LeftReflexiveSubPropertyChainInference(
-							element, superChain_));
-
-			toDo(right);
-			// toDoReflexive(element, left, right, new
-			// LeftReflexiveSubPropertyChainInference(element, superProperty_));
+			toDo(new LeftReflexiveSubPropertyChainInference(element,
+					superChain_));
 		}
 		if (rightSaturation != null && rightSaturation.isDerivedReflexive()) {
-			LOGGER_.trace("{} is reflexive thus {} is a sub-property of {}",
-					right, left, superChain_);
-
-			traceWriter_
-					.addObjectPropertyInference(new RightReflexiveSubPropertyChainInference(
-							element, superChain_));
-
-			toDo(left);
-			// toDoReflexive(element, right, left, new
-			// RightReflexiveSubPropertyChainInference(element,
-			// superProperty_));
+			toDo(new RightReflexiveSubPropertyChainInference(element,
+					superChain_));
 		}
-
 		return null;
 	}
 
-	/*
-	 * private void toDoReflexive(IndexedComplexPropertyChain chain,
-	 * IndexedPropertyChain reflexive, IndexedPropertyChain other,
-	 * ReflexiveSubPropertyChainInference<?> inference) {
-	 * LOGGER_.trace("{} is reflexive thus {} is a sub-property of {}",
-	 * reflexive, other, chain);
-	 * 
-	 * traceWriter_.addObjectPropertyInference(inference);
-	 * 
-	 * if (superProperty_ != inference.getSuperPropertyChain()) { // with
-	 * tracing toDoWithTracing(other, new GeneralSubPropertyInference(other,
-	 * superProperty_, chain)); } else { // we have already written this
-	 * inference, avoiding it here toDo(other); } }
-	 */
-
-	private void toDo(IndexedPropertyChain subProperty) {
+	private void toDo(SubPropertyChainInference<?, ?> inference) {
+		LOGGER_.trace("{}: new inference", inference);
+		inferenceProducer_.produce(inference);
+		IndexedPropertyChain subProperty = inference.getSubPropertyChain();
 		if (subPropertyChains_.add(subProperty)) {
-			toDoSubProperties_.add(subProperty);
-
+			toDoSubPropertyChains_.add(subProperty);
 			if (subProperty instanceof IndexedObjectProperty) {
 				subProperties_.add((IndexedObjectProperty) subProperty);
 			}
 		}
-	}
 
-	private void toDoWithTracing(IndexedPropertyChain subProperty,
-			ObjectPropertyInference subPropertyInference) {
-		toDo(subProperty);
-
-		LOGGER_.trace("{}: new sub-property inference {}, inference {}",
-				superChain_, subProperty, subPropertyInference);
-		// record the inference
-		traceWriter_.addObjectPropertyInference(subPropertyInference);
 	}
 
 	private void process() {
 		for (;;) {
-			IndexedPropertyChain next = toDoSubProperties_.poll();
+			IndexedPropertyChain next = toDoSubPropertyChains_.poll();
 			if (next == null)
 				break;
 			next.accept(this);
@@ -188,15 +147,16 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 	private static void expandUnderSubProperties(IndexedPropertyChain property,
 			Set<IndexedPropertyChain> currentSubPropertyChains,
 			Set<IndexedObjectProperty> currentSubProperties,
-			TraceStore.Writer traceWriter) {
+			ObjectPropertyInferenceProducer inferenceProducer) {
 		new SubPropertyExplorer(property, currentSubPropertyChains,
-				currentSubProperties, traceWriter).process();
-		LOGGER_.trace("{} sub-property chains: {}, sub-properties", property,
-				currentSubPropertyChains, currentSubProperties);
+				currentSubProperties, inferenceProducer).process();
+		LOGGER_.trace("{} sub-property chains: {}, sub-properties: {}",
+				property, currentSubPropertyChains, currentSubProperties);
 	}
 
 	private static SaturatedPropertyChain computeSubProperties(
-			IndexedPropertyChain element, TraceStore.Writer traceWriter) {
+			IndexedPropertyChain element,
+			ObjectPropertyInferenceProducer inferenceProducer) {
 		SaturatedPropertyChain saturation = element.getSaturated();
 		if (saturation.derivedSubPropertiesComputed)
 			return saturation;
@@ -215,40 +175,79 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 						8);
 			expandUnderSubProperties(element,
 					saturation.derivedSubProperyChains,
-					saturation.derivedSubProperties, traceWriter);
+					saturation.derivedSubProperties, inferenceProducer);
 			saturation.derivedSubPropertiesComputed = true;
 		}
 		return saturation;
 	}
 
 	/**
+	 * Computes all sub-{@link IndexedPropertyChain}s of the given
+	 * {@link IndexedPropertyChain}, if not computing before, recording all
+	 * {@link ObjectPropertyInference}s using the provided
+	 * {@link ObjectPropertyInferenceProducer}. It is ensured that all
+	 * {@link ObjectPropertyInference}s are applied only ones even if the method
+	 * is called multiple times.
+	 * 
 	 * @param element
+	 *            the {@link IndexedPropertyChain} for which to find the sub-
+	 *            {@link IndexedPropertyChain}s.
+	 * @param inferenceProducer
+	 *            the {@link ObjectPropertyInferenceProducer} using which all
+	 *            applied {@link ObjectPropertyInference}s are recorded.
 	 * @return the sub-{@link IndexedPropertyChain}s of the given
 	 *         {@link IndexedPropertyChain}
 	 */
 	static Set<IndexedPropertyChain> getSubPropertyChains(
-			IndexedPropertyChain element, TraceStore.Writer traceWriter) {
-		return computeSubProperties(element, traceWriter)
+			IndexedPropertyChain element,
+			ObjectPropertyInferenceProducer inferenceProducer) {
+		return computeSubProperties(element, inferenceProducer)
 				.getSubPropertyChains();
 	}
 
 	/**
+	 * Computes all sub-{@link IndexedPropertyChain}s of the given
+	 * {@link IndexedPropertyChain}, if not computing before, recording all
+	 * {@link ObjectPropertyInference}s using the provided
+	 * {@link ObjectPropertyInferenceProducer}. It is ensured that all
+	 * {@link ObjectPropertyInference}s are applied only ones even if the method
+	 * is called multiple times.
+	 * 
 	 * @param element
+	 * @param inferenceProducer
+	 *            the {@link ObjectPropertyInferenceProducer} using which all
+	 *            applied {@link ObjectPropertyInference}s are recorded.
 	 * @return the sub-{@link IndexedObjectProperty} of the given
 	 *         {@link IndexedPropertyChain}
 	 */
 	static Set<IndexedObjectProperty> getSubProperties(
-			IndexedPropertyChain element, TraceStore.Writer traceWriter) {
-		return computeSubProperties(element, traceWriter).getSubProperties();
+			IndexedPropertyChain element,
+			ObjectPropertyInferenceProducer inferenceProducer) {
+		return computeSubProperties(element, inferenceProducer)
+				.getSubProperties();
 	}
 
 	/**
+	 * Given an {@link IndexedObjectProperty} Computes a {@link Multimap} from
+	 * {@link IndexedObjectProperty}s to {@link IndexedObjectProperty}
+	 * consisting of the the assignments T -> S such that both S and
+	 * ObjectPropertyChain(S, T) are sub-properties of the given
+	 * {@link IndexedObjectProperty}. The provided
+	 * {@link ObjectPropertyInferenceProducer} is used to record all
+	 * {@link ObjectPropertyInference}s that are applied in this computation of
+	 * sub-{@link IndexedPropertyChain}s involved. It is ensured that the
+	 * computation is performed only ones.
+	 * 
 	 * @param element
-	 * @return a multimap T -> {S} such that both S and ObjectPropertyChain(S,
-	 *         T) are sub-properties of the given {@link IndexedObjectProperty}
+	 *            a given {@link IndexedObjectProperty}
+	 * @param inferenceProducer
+	 * @return a multimap consisting of assignments T -> S such that both S and
+	 *         ObjectPropertyChain(S, T) are sub-properties of the given
+	 *         {@link IndexedObjectProperty}
 	 */
 	static Multimap<IndexedObjectProperty, IndexedObjectProperty> getLeftSubComposableSubPropertiesByRightProperties(
-			IndexedObjectProperty element, TraceStore.Writer traceWriter) {
+			IndexedObjectProperty element,
+			ObjectPropertyInferenceProducer inferenceProducer) {
 		SaturatedPropertyChain saturation = element.getSaturated();
 		if (saturation.leftSubComposableSubPropertiesByRightPropertiesComputed)
 			return saturation.leftSubComposableSubPropertiesByRightProperties;
@@ -262,19 +261,19 @@ class SubPropertyExplorer implements IndexedPropertyChainVisitor<Void> {
 				return saturation.leftSubComposableSubPropertiesByRightProperties;
 			// else compute it
 			Set<IndexedObjectProperty> subProperties = getSubProperties(
-					element, traceWriter);
+					element, inferenceProducer);
 			for (IndexedPropertyChain subPropertyChain : getSubPropertyChains(
-					element, traceWriter)) {
+					element, inferenceProducer)) {
 				if (subPropertyChain instanceof IndexedComplexPropertyChain) {
 					IndexedComplexPropertyChain composition = (IndexedComplexPropertyChain) subPropertyChain;
 					Set<IndexedObjectProperty> leftSubProperties = getSubProperties(
-							composition.getFirstProperty(), traceWriter);
+							composition.getFirstProperty(), inferenceProducer);
 					Set<IndexedObjectProperty> commonSubProperties = new LazySetIntersection<IndexedObjectProperty>(
 							subProperties, leftSubProperties);
 					if (commonSubProperties.isEmpty())
 						continue;
 					for (IndexedObjectProperty rightSubProperty : getSubProperties(
-							composition.getSuffixChain(), traceWriter))
+							composition.getSuffixChain(), inferenceProducer))
 						for (IndexedObjectProperty commonLeft : commonSubProperties)
 							saturation.leftSubComposableSubPropertiesByRightProperties
 									.add(rightSubProperty, commonLeft);

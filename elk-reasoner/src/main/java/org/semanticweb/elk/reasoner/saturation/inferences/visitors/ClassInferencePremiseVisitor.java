@@ -1,0 +1,287 @@
+/**
+ * 
+ */
+package org.semanticweb.elk.reasoner.saturation.inferences.visitors;
+
+/*
+ * #%L
+ * ELK Reasoner
+ * $Id:$
+ * $HeadURL:$
+ * %%
+ * Copyright (C) 2011 - 2014 Department of Computer Science, University of Oxford
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.DisjointSubsumer;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.DummyObjectPropertyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ObjectPropertyConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition;
+import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
+import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
+import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ReflexiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.LeftReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.PropertyChainInitialization;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ComposedReflexivePropertyChain;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexiveToldSubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.RightReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
+
+/**
+ * Visits all premises for the given {@link ClassInference} or
+ * {@link ObjectPropertyInference}. Each premise implements {@link Conclusion}
+ * or {@link ObjectPropertyConclusion}.
+ * 
+ * @author Pavel Klinov
+ * 
+ *         pavel.klinov@uni-ulm.de
+ */
+public class ClassInferencePremiseVisitor<I, O> implements
+		ClassInferenceVisitor<I, O>, ObjectPropertyInferenceVisitor<I, O> {
+
+	private final ConclusionVisitor<I, O> classPremiseVisitor_;
+
+	private final ObjectPropertyConclusionVisitor<I, O> propertyPremiseVisitor_;
+
+	public ClassInferencePremiseVisitor(
+			ConclusionVisitor<I, O> classPremiseVisitor,
+			ObjectPropertyConclusionVisitor<I, O> propertyPremiseVisitor) {
+		classPremiseVisitor_ = classPremiseVisitor;
+		propertyPremiseVisitor_ = propertyPremiseVisitor;
+	}
+
+	public ClassInferencePremiseVisitor(
+			ConclusionVisitor<I, O> classPremiseVisitor) {
+		this(classPremiseVisitor,
+				new DummyObjectPropertyConclusionVisitor<I, O>());
+	}
+
+	public ClassInferencePremiseVisitor(
+			ObjectPropertyConclusionVisitor<I, O> propertyPremiseVisitor) {
+		this(new DummyConclusionVisitor<I, O>(), propertyPremiseVisitor);
+	}
+
+	@Override
+	public O visit(InitializationSubsumer<?> conclusion, I input) {
+		return null;
+	}
+
+	@Override
+	public O visit(SubClassOfSubsumer<?> conclusion, I input) {
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(ComposedConjunction conclusion, I input) {
+		conclusion.getFirstConjunct().accept(classPremiseVisitor_, input);
+		conclusion.getSecondConjunct().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(DecomposedConjunction conclusion, I input) {
+		conclusion.getConjunction().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(PropagatedSubsumer conclusion, I input) {
+		conclusion.getBackwardLink().accept(classPremiseVisitor_, input);
+		conclusion.getPropagation().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(ReflexiveSubsumer<?> conclusion, I input) {
+		conclusion.getReflexivityPremise().accept(propertyPremiseVisitor_,
+				input);
+		return null;
+	}
+
+	@Override
+	public O visit(ComposedBackwardLink conclusion, I input) {
+		conclusion.getBackwardLink().accept(classPremiseVisitor_, input);
+		conclusion.getForwardLink().accept(classPremiseVisitor_, input);
+		conclusion.getLeftSubObjectProperty().accept(propertyPremiseVisitor_,
+				input);
+		conclusion.getRightSubObjectPropertyChain().accept(
+				propertyPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(ComposedForwardLink conclusion, I input) {
+		conclusion.getBackwardLink().accept(classPremiseVisitor_, input);
+		conclusion.getForwardLink().accept(classPremiseVisitor_, input);
+		conclusion.getLeftSubObjectProperty().accept(propertyPremiseVisitor_,
+				input);
+		conclusion.getRightSubObjectPropertyChain().accept(
+				propertyPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(ReversedForwardLink conclusion, I input) {
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(SuperReversedForwardLink conclusion, I input) {
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(DecomposedExistentialBackwardLink conclusion, I input) {
+		conclusion.getExistential().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(DecomposedExistentialForwardLink conclusion, I input) {
+		conclusion.getExistential().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(GeneratedPropagation conclusion, I input) {
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
+		conclusion.getSubPropertyPremise().accept(propertyPremiseVisitor_,
+				input);
+		return null;
+	}
+
+	@Override
+	public O visit(ContradictionFromInconsistentDisjointnessAxiom conclusion,
+			I input) {
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(ContradictionFromDisjointSubsumers conclusion, I input) {
+		for (DisjointSubsumer subsumer : conclusion.getPremises()) {
+			subsumer.accept(classPremiseVisitor_, input);
+		}
+
+		return null;
+	}
+
+	@Override
+	public O visit(ContradictionFromNegation conclusion, I input) {
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
+		conclusion.getPositivePremise().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(ContradictionFromOwlNothing conclusion, I input) {
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(PropagatedContradiction conclusion, I input) {
+		conclusion.getLinkPremise().accept(classPremiseVisitor_, input);
+		conclusion.getContradictionPremise()
+				.accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(DisjointSubsumerFromSubsumer conclusion, I input) {
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(DisjunctionComposition conclusion, I input) {
+		conclusion.getPremise().accept(classPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(PropertyChainInitialization conclusion, I input) {
+		// no premises
+		return null;
+	}
+
+	@Override
+	public O visit(ToldReflexiveProperty inference, I input) {
+		inference.getPropertyInitialization().accept(propertyPremiseVisitor_,
+				input);
+		return null;
+	}
+
+	@Override
+	public O visit(ReflexiveToldSubObjectProperty inference, I input) {
+		inference.getSubProperty().accept(propertyPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(ComposedReflexivePropertyChain inference, I input) {
+		inference.getLeftReflexiveProperty().accept(propertyPremiseVisitor_,
+				input);
+		inference.getRightReflexivePropertyChain().accept(
+				propertyPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(LeftReflexiveSubPropertyChainInference inference, I input) {
+		inference.getReflexivePremise().accept(propertyPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(RightReflexiveSubPropertyChainInference inference, I input) {
+		inference.getReflexivePremise().accept(propertyPremiseVisitor_, input);
+		return null;
+	}
+
+	@Override
+	public O visit(ToldSubProperty inference, I input) {
+		inference.getPremise().accept(propertyPremiseVisitor_, input);
+		return null;
+	}
+
+}

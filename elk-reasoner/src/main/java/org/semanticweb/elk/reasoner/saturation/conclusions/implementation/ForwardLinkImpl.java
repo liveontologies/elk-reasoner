@@ -32,12 +32,12 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
 import org.semanticweb.elk.reasoner.saturation.conclusions.visitors.ConclusionVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialForwardLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

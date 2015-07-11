@@ -31,11 +31,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.util.InferencePrinter;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.util.InferencePrinter;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +54,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 
 	private final ConcurrentHashMap<IndexedContextRoot, ClassInferenceSet> storage_ = new ConcurrentHashMap<IndexedContextRoot, ClassInferenceSet>();
 
-	private final ObjectPropertyInferenceStore propertyInferenceStore_ = new SimpleObjectPropertyInferenceStore();
+	private final ObjectPropertyInferenceStore propertyInferenceStore_ = new ModifiableObjectPropertyInferenceSetImpl();
 
 	@Override
 	public TraceStore.Reader getReader() {
@@ -121,7 +121,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Writing inference for {} in {}: {}", inference,
 						root,
-						inference.acceptTraced(new InferencePrinter(), null));
+						inference.accept(new InferencePrinter(), null));
 			}
 
 			if (tracer == null) {
@@ -137,7 +137,7 @@ public class SimpleCentralizedTraceStore implements TraceStore {
 				ObjectPropertyInference conclusion) {
 			if (LOGGER_.isTraceEnabled()) {
 				LOGGER_.trace("Writing property inference {}",
-						conclusion.acceptTraced(new InferencePrinter(), null));
+						conclusion.accept(new InferencePrinter(), null));
 			}
 
 			propertyInferenceStore_.addInference(conclusion);

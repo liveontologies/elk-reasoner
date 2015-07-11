@@ -47,19 +47,19 @@ import org.semanticweb.elk.owl.parsing.javacc.Owl2FunctionalStyleParserFactory;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.TestReasonerUtils;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SuperReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexiveToldSubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.PostProcessingStageExecutor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.semanticweb.elk.testing.ConfigurationUtils;
@@ -214,7 +214,7 @@ public class TracingTest {
 
 			@Override
 			public Boolean visit(
-					ToldSubPropertyInference inference,
+					ToldSubProperty inference,
 					Void input) {
 				ElkAxiom axiom = new SideConditionLookup().lookup(inference);
 				
@@ -230,7 +230,7 @@ public class TracingTest {
 			
 			@Override
 			public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) {
-				ReasonerStateAccessor.cleanClassTraces(reasoner);
+//				ReasonerStateAccessor.cleanClassTraces(reasoner);
 				
 				try {
 					LOGGER_.trace("Axiom binding test for {} => {}", subsumee, subsumer);
@@ -248,7 +248,7 @@ public class TracingTest {
 
 			@Override
 			public void inconsistencyTest() throws Exception {
-				ReasonerStateAccessor.cleanClassTraces(reasoner);
+//				ReasonerStateAccessor.cleanClassTraces(reasoner);
 				
 				try {
 					LOGGER_.trace("Axiom binding test for inconsistency");
@@ -271,7 +271,7 @@ public class TracingTest {
 			
 			@Override
 			public void subsumptionTest(ElkClass subsumee, ElkClass subsumer) {
-				ReasonerStateAccessor.cleanClassTraces(reasoner);
+//				ReasonerStateAccessor.cleanClassTraces(reasoner);
 				
 				try {
 					LOGGER_.trace("Tracing test: {} => {}", subsumee, subsumer);
@@ -279,7 +279,7 @@ public class TracingTest {
 					reasoner.explainSubsumption(subsumee, subsumer);
 						
 					TracingTestUtils.checkTracingCompleteness(subsumee, subsumer, reasoner);
-					TracingTestUtils.checkTracingMinimality(subsumee, subsumer, reasoner);
+//					TracingTestUtils.checkTracingMinimality(subsumee, subsumer, reasoner);
 				} catch (ElkException e) {
 					throw new RuntimeException(e);
 				}
@@ -287,7 +287,7 @@ public class TracingTest {
 
 			@Override
 			public void inconsistencyTest() throws Exception {
-				ReasonerStateAccessor.cleanClassTraces(reasoner);
+//				ReasonerStateAccessor.cleanClassTraces(reasoner);
 				
 				try {
 					LOGGER_.trace("Tracing test: inconsistency");

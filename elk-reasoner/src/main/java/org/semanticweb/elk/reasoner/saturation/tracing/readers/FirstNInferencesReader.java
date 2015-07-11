@@ -27,11 +27,11 @@ package org.semanticweb.elk.reasoner.saturation.tracing.readers;
 import org.semanticweb.elk.MutableInteger;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.DelegatingTraceReader;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Visits only the first N inferences provided by the underlying
@@ -60,7 +60,7 @@ public class FirstNInferencesReader extends DelegatingTraceReader {
 			protected Void defaultTracedVisit(ClassInference inference, IndexedContextRoot ignored) {
 				if (counter.get() < numberOfInferencesToVisit_) {
 					counter.increment();
-					inference.acceptTraced(visitor, null);
+					inference.accept(visitor, null);
 				}
 				
 				return null;

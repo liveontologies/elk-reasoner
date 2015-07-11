@@ -27,15 +27,15 @@ package org.semanticweb.elk.reasoner.saturation.tracing.readers;
 
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.saturation.tracing.DelegatingTraceReader;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedConjunction;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
 
 /**
  * Ignores all inferences for the root of a context (except of the
@@ -62,7 +62,7 @@ public class IgnoreSecondaryRootInferencesReader extends DelegatingTraceReader {
 					protected Boolean defaultTracedVisit(
 							ClassInference conclusion,
 							IndexedContextRoot contextRoot) {
-						conclusion.acceptTraced(visitor, null);
+						conclusion.accept(visitor, null);
 
 						return true;
 					}

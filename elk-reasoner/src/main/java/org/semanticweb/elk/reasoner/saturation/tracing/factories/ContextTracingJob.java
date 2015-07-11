@@ -25,32 +25,36 @@ package org.semanticweb.elk.reasoner.saturation.tracing.factories;
  * #L%
  */
 
+import org.semanticweb.elk.reasoner.ReasonerJob;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.SaturationJob;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 
 /**
- * A job for non-recursive context tracing.
+ * A job for computing applied {@link ClassInference}s with the given
+ * {@link IndexedContextRoot} origin. Intended to be used with
+ * {@link ContextTracingFactory}.
  * 
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * @author "Yevgeny Kazakov"
  */
-public class ContextTracingJob extends SaturationJob<IndexedContextRoot> {
+public class ContextTracingJob<R extends IndexedContextRoot> extends
+		ReasonerJob<R, Iterable<? extends ClassInference>> {
 
-private final ContextTracingListener callback_;
-	
-	public ContextTracingJob(IndexedContextRoot input, ContextTracingListener callback) {
+	public ContextTracingJob(R input) {
 		super(input);
-		callback_ = callback;
-	}
-	
-	public ContextTracingJob(IndexedContextRoot input) {
-		this(input, ContextTracingListener.DUMMY);
 	}
 
-	public ContextTracingListener getCallback() {
-		return callback_;
+	@Override
+	public String toString() {
+		return getInput().toString() + " [class inference tracing]";
+
 	}
-	
-	
+
+	@Override
+	protected void setOutput(Iterable<? extends ClassInference> output) {
+		super.setOutput(output);
+	}
+
 }

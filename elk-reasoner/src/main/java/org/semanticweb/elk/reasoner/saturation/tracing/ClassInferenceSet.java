@@ -25,14 +25,14 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
+import java.util.Collections;
+
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 
 /**
  * An object containing {@link ClassInference}s, which can be used to retrieve
- * inferences producing given {@link Conclusion}s.
+ * inferences producing a given {@link Conclusion}.
  * 
  * @author Pavel Klinov
  *
@@ -44,16 +44,23 @@ import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.Class
 public interface ClassInferenceSet {
 
 	/**
-	 * Adds the given {@link ClassInference} to this {@link ClassInferenceSetTmp}
-	 * 
-	 * @param inference
-	 *            the {@link ClassInference} to be added
+	 * @param conclusion
+	 *            the {@link Conclusion} for which return {@link ClassInference}
+	 *            s
+	 * @return the {@link ClassInference}s producing the given
+	 *         {@link Conclusion}
 	 */
-	public void addInference(ClassInference inference);
+	public Iterable<? extends ClassInference> getClassInferences(
+			Conclusion conclusion);
 
-	public void accept(ClassInferenceVisitor<?, ?> visitor);
+	public final static ClassInferenceSet EMPTY = new ClassInferenceSet() {
 
-	public void accept(Conclusion conclusion,
-			ClassInferenceVisitor<IndexedContextRoot, ?> visitor);
+		@Override
+		public Iterable<? extends ClassInference> getClassInferences(
+				Conclusion conclusion) {
+			return Collections.emptyList();
+		}
+
+	};
 
 }

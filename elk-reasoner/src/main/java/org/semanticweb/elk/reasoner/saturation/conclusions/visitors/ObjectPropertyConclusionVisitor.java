@@ -24,30 +24,30 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.visitors;
  * #L%
  */
 
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChain;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexivePropertyChainImpl;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
 
 /**
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
  */
-public interface ObjectPropertyConclusionVisitor<I, O> {
-
-	public O visit(SubPropertyChain<?, ?> conclusion, I input);
+public interface ObjectPropertyConclusionVisitor<I, O> {	
 	
-	public O visit(ReflexivePropertyChain<?> conclusion, I input);
+	public O visit(SubPropertyChainImpl<?, ?> conclusion, I input);
+	
+	public O visit(ReflexivePropertyChainImpl<?> conclusion, I input);
 	
 	public static ObjectPropertyConclusionVisitor<?, ?> DUMMY = new ObjectPropertyConclusionVisitor<Void, Void>() {
 
 		@Override
-		public Void visit(ReflexivePropertyChain<?> conclusion, Void input) {
+		public Void visit(ReflexivePropertyChainImpl<?> conclusion, Void input) {
 			// no-op
 			return null;
 		}
 
 		@Override
-		public Void visit(SubPropertyChain<?, ?> conclusion, Void input) {
+		public Void visit(SubPropertyChainImpl<?, ?> conclusion, Void input) {
 			// no-op
 			return null;
 		}

@@ -44,18 +44,18 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractClassInferenceVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.LeftReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ComposedReflexivePropertyChain;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexiveToldSubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.visitors.AbstractClassInferenceVisitor;
 import org.semanticweb.elk.reasoner.stages.ReasonerStateAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +106,7 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(ToldSubPropertyInference inference,
+					public Boolean visit(ToldSubProperty inference,
 							Void input) {
 						// checking that S -> HH is in the trace (i.e. is used)
 						return inference.getSubPropertyChain().equals(s) && 
@@ -165,7 +165,7 @@ public class PropertyInferenceTracingTest {
 							IndexedContextRoot input) {
 						// looking for the composition S o H -> SS o HH
 						SubObjectProperty left = conclusion.getLeftSubObjectProperty();
-						SubPropertyChain<?,?> right = conclusion.getRightSubObjectPropertyChain();
+						SubPropertyChainImpl<?,?> right = conclusion.getRightSubObjectPropertyChain();
 						
 							return conclusion.getTarget().equals(dIndexed) &&
 									left.getSubPropertyChain().equals(sIndexed) &&
@@ -191,7 +191,7 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(ToldSubPropertyInference inference,
+					public Boolean visit(ToldSubProperty inference,
 							Void input) {
 						return inference.getSubPropertyChain().equals(sIndexed) &&
 								inference.getSuperPropertyChain().equals(ssIndexed);
@@ -232,7 +232,7 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(ToldSubPropertyInference inference,
+					public Boolean visit(ToldSubProperty inference,
 							Void input) {
 						return inference.getSubPropertyChain().equals(rIndexed) &&
 								inference.getSuperPropertyChain().equals(rrIndexed);
@@ -287,7 +287,7 @@ public class PropertyInferenceTracingTest {
 					}
 
 					@Override
-					public Boolean visit(ReflexivePropertyChainInference inference, Void input) {
+					public Boolean visit(ComposedReflexivePropertyChain inference, Void input) {
 						// S o RR must be entailed as reflexive because S and RR are reflexive
 						return inference.getPropertyChain().equals(srrIndexed) &&
 								inference.getLeftReflexiveProperty().getPropertyChain().equals(sIndexed) &&

@@ -25,8 +25,8 @@ package org.semanticweb.elk.reasoner.saturation.rules.subsumers;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectIntersectionOf;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Subsumer;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedConjunction;
 import org.semanticweb.elk.reasoner.saturation.rules.ConclusionProducer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedConjunction;
 
 /**
  * A {@link SubsumerDecompositionRule} that processes an

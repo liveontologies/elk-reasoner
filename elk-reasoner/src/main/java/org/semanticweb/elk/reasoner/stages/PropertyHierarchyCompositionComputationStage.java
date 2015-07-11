@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.properties.PropertyHierarchyCompositionComputation;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
+import org.semanticweb.elk.reasoner.saturation.tracing.ObjectPropertyInferenceProducer;
 
 public class PropertyHierarchyCompositionComputationStage extends
 		AbstractReasonerStage {
@@ -49,18 +49,18 @@ public class PropertyHierarchyCompositionComputationStage extends
 		if (!super.preExecute()) {
 			return false;
 		}
-		
+
 		if (reasoner.traceState == null) {
 			reasoner.resetTraceState();
 		}
-		
-		TraceStore.Writer traceWriter = reasoner.traceState.getTraceStore().getWriter();
-		
+
+		ObjectPropertyInferenceProducer inferenceProducer = reasoner.traceState;
+
 		computation_ = new PropertyHierarchyCompositionComputation(
-				reasoner.ontologyIndex, traceWriter,
+				reasoner.ontologyIndex, inferenceProducer,
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor());
-		
+
 		return true;
 	}
 

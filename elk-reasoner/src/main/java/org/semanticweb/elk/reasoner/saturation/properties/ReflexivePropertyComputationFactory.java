@@ -32,11 +32,11 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ComposedReflexivePropertyChain;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexiveToldSubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
+import org.semanticweb.elk.reasoner.saturation.tracing.ObjectPropertyInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessorFactory;
 import org.semanticweb.elk.util.concurrent.computation.SimpleInterrupter;
@@ -61,16 +61,16 @@ public class ReflexivePropertyComputationFactory extends SimpleInterrupter
 
 	private final OntologyIndex index_;
 
-	private final TraceStore.Writer traceWriter_;
+	private final ObjectPropertyInferenceProducer inferenceProducer_;
 
 	public ReflexivePropertyComputationFactory(OntologyIndex index) {
-		this(index, TraceStore.Writer.Dummy);
+		this(index, ObjectPropertyInferenceProducer.DUMMY);
 	}
 
 	public ReflexivePropertyComputationFactory(OntologyIndex index,
-			TraceStore.Writer traceWriter) {
+			ObjectPropertyInferenceProducer inferenceProducer) {
 		this.index_ = index;
-		this.traceWriter_ = traceWriter;
+		this.inferenceProducer_ = inferenceProducer;
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class ReflexivePropertyComputationFactory extends SimpleInterrupter
 
 			toDo_.add(ipc);
 			// record the reflexivity inference
-			traceWriter_.addObjectPropertyInference(inference);
+			inferenceProducer_.produce(inference);
 		}
 	}
 
@@ -116,7 +116,7 @@ public class ReflexivePropertyComputationFactory extends SimpleInterrupter
 		for (IndexedComplexPropertyChain chain : iop.getLeftChains()) {
 			if (!chain.getSuffixChain().getSaturated().isDerivedReflexive())
 				continue;
-			toDo(chain, new ReflexivePropertyChainInference(chain));
+			toDo(chain, new ComposedReflexivePropertyChain(chain));
 		}
 	}
 
@@ -124,7 +124,7 @@ public class ReflexivePropertyComputationFactory extends SimpleInterrupter
 		for (IndexedComplexPropertyChain chain : ipc.getRightChains()) {
 			if (!chain.getFirstProperty().getSaturated().isDerivedReflexive())
 				continue;
-			toDo(chain, new ReflexivePropertyChainInference(chain));
+			toDo(chain, new ComposedReflexivePropertyChain(chain));
 		}
 	}
 

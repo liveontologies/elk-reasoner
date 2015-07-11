@@ -67,12 +67,12 @@ public class ConclusionInsertionVisitor extends
 
 	@Override
 	public Boolean visit(ContextInitialization conclusion, Context input) {
-		// Mark context as non-saturated if conclusion was not already
-		// initialized. It is important to mark before we insert, otherwise
-		// the concept can be found initialized and saturated when it is not.
 		if (input.containsConclusion(conclusion))
 			return false;
 		// else
+		// Mark context as non-saturated if conclusion was not already
+		// initialized. It is important to mark before we insert, otherwise
+		// the context can be found initialized and saturated when it is not.		
 		writer_.markAsNotSaturated(input.getRoot());
 		return defaultVisit(conclusion, input);
 	}

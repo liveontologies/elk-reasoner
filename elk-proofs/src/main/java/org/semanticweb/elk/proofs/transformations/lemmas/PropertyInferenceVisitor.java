@@ -35,12 +35,12 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyCha
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.AbstractObjectPropertyInferenceVisitor;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.LeftReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.RightReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.SideConditionLookup;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.AbstractObjectPropertyInferenceVisitor;
 
 /**
  * 
@@ -87,7 +87,7 @@ abstract class PropertyInferenceVisitor extends AbstractObjectPropertyInferenceV
 	}
 
 	@Override
-	public Inference visit(ToldSubPropertyInference inference, AxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
+	public Inference visit(ToldSubProperty inference, AxiomExpression<ElkSubObjectPropertyOfAxiom> premise) {
 		// using only told hierarchy here
 		if (inference.getSuperPropertyChain() instanceof IndexedObjectProperty && 
 				inference.getSubPropertyChain().getToldSuperProperties().contains(inference.getSuperPropertyChain())) {

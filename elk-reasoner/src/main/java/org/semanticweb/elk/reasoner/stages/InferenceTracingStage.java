@@ -25,9 +25,15 @@ package org.semanticweb.elk.reasoner.stages;
  * #L%
  */
 
+import java.util.Collection;
+
 import org.semanticweb.elk.owl.exceptions.ElkException;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
 import org.semanticweb.elk.reasoner.saturation.tracing.RecursiveTracingComputation;
 import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
+import org.semanticweb.elk.reasoner.saturation.tracing.factories.ProofUnwindingJob;
+import org.semanticweb.elk.util.collections.Operations;
+import org.semanticweb.elk.util.collections.Operations.Transformation;
 
 /**
  * Executes {@link RecursiveTracingComputation} to trace inferences queued in
@@ -39,7 +45,7 @@ import org.semanticweb.elk.reasoner.saturation.tracing.TraceState;
  */
 public class InferenceTracingStage extends AbstractReasonerStage {
 
-	private RecursiveTracingComputation tracing_;
+	private RecursiveTracingComputation computation_;
 
 	public InferenceTracingStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {
@@ -53,7 +59,8 @@ public class InferenceTracingStage extends AbstractReasonerStage {
 
 	@Override
 	public void printInfo() {
-		// TODO Auto-generated method stub
+		if (computation_ != null)
+			computation_.printStatistics();
 	}
 
 	@Override
@@ -62,23 +69,31 @@ public class InferenceTracingStage extends AbstractReasonerStage {
 			return false;
 		}
 
-		tracing_ = new RecursiveTracingComputation(reasoner.traceState,
-				reasoner.saturationState, reasoner.getProcessExecutor(),
-				reasoner.getNumberOfWorkers(), reasoner.getProgressMonitor());
-
+		Collection<ProofUnwindingJob<Conclusion>> inputs = Operations
+				.map(reasoner.traceState.getToTrace(),
+						new Transformation<Conclusion, ProofUnwindingJob<Conclusion>>() {
+							@Override
+							public ProofUnwindingJob<Conclusion> transform(
+									Conclusion conclusion) {
+								return new ProofUnwindingJob<Conclusion>(
+										conclusion);
+							}
+						});
+		computation_ = new RecursiveTracingComputation(inputs,
+				reasoner.getProcessExecutor(), reasoner.getNumberOfWorkers(),
+				reasoner.getProgressMonitor(), reasoner.saturationState,
+				reasoner.traceState);
 		return true;
 	}
 
 	@Override
 	void executeStage() throws ElkException {
-		tracing_.process();
+		computation_.process();
 	}
 
 	@Override
 	public boolean postExecute() {
-		// merge the stats
-		reasoner.ruleAndConclusionStats.add(tracing_.getStatistics());
-
+		reasoner.traceState.clearToTrace();
 		return super.postExecute();
 	}
 

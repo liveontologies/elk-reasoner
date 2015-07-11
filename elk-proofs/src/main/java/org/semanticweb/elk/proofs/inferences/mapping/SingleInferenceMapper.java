@@ -80,37 +80,37 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.ComposedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromDisjointSubsumers;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromInconsistentDisjointnessAxiom;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromNegation;
+import org.semanticweb.elk.reasoner.saturation.inferences.ContradictionFromOwlNothing;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedConjunction;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialBackwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DecomposedExistentialForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.DisjointSubsumerFromSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.GeneratedPropagation;
+import org.semanticweb.elk.reasoner.saturation.inferences.InitializationSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedContradiction;
+import org.semanticweb.elk.reasoner.saturation.inferences.PropagatedSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ReflexiveSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.ReversedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.SubClassOfSubsumer;
+import org.semanticweb.elk.reasoner.saturation.inferences.SuperReversedForwardLink;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.LeftReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.PropertyChainInitialization;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ComposedReflexivePropertyChain;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ReflexiveToldSubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.RightReflexiveSubPropertyChainInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubObjectProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.SubPropertyChainImpl;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldReflexiveProperty;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ToldSubProperty;
 import org.semanticweb.elk.reasoner.saturation.tracing.SideConditionLookup;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ClassInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedConjunction;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ComposedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromDisjointSubsumers;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromInconsistentDisjointnessAxiom;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromNegation;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ContradictionFromOwlNothing;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedConjunction;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialBackwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DecomposedExistentialForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjointSubsumerFromSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.InitializationSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedContradiction;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.PropagatedSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReflexiveSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.ReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SubClassOfSubsumer;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.SuperReversedForwardLink;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.GeneratedPropagation;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.LeftReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ObjectPropertyInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.PropertyChainInitialization;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexivePropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ReflexiveToldSubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.RightReflexiveSubPropertyChainInference;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubObjectProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.SubPropertyChain;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldReflexiveProperty;
-import org.semanticweb.elk.reasoner.saturation.tracing.inferences.properties.ToldSubPropertyInference;
 
 /**
  * Maps one or more lower-level inferences to a single {@link Inference}. If the given low-level
@@ -148,11 +148,11 @@ public class SingleInferenceMapper {
 	
 	public Inference map(ClassInference inference,
 			Void parameter) {
-		return inference.acceptTraced(new MappingVisitor(), null);
+		return inference.accept(new MappingVisitor(), null);
 	}
 
 	public Inference map(ObjectPropertyInference inference) {
-		return inference.acceptTraced(new MappingVisitor(), null);
+		return inference.accept(new MappingVisitor(), null);
 	}
 	
 	/**
@@ -196,8 +196,8 @@ public class SingleInferenceMapper {
 	 */
 	private class MappingVisitor
 			implements
-			org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ClassInferenceVisitor<Void, Inference>,
-			org.semanticweb.elk.reasoner.saturation.tracing.inferences.visitors.ObjectPropertyInferenceVisitor<Void, Inference> {
+			org.semanticweb.elk.reasoner.saturation.inferences.visitors.ClassInferenceVisitor<Void, Inference>,
+			org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInferenceVisitor<Void, Inference> {
 
 		@Override
 		public Inference visit(InitializationSubsumer<?> inference,
@@ -278,7 +278,7 @@ public class SingleInferenceMapper {
 		private Expression[] createExistentialPremises(
 				ElkClassExpression d,
 				ElkClassExpression e,
-				SubPropertyChain<?,?> chainPremise,
+				SubPropertyChainImpl<?,?> chainPremise,
 				ElkSubClassOfAxiom leftExistentialPremise,
 				ElkSubObjectPropertyOfAxiom leftChainPremise,
 				ElkObjectPropertyAxiom chainAxiom
@@ -318,7 +318,7 @@ public class SingleInferenceMapper {
 		@Override
 		public Inference visit(ComposedBackwardLink inference, 	Void parameter) {
 			SubObjectProperty leftPropertyPremise = inference.getLeftSubObjectProperty();
-			SubPropertyChain<?,?> rightChainPremise = inference.getRightSubObjectPropertyChain();			
+			SubPropertyChainImpl<?,?> rightChainPremise = inference.getRightSubObjectPropertyChain();			
 			ElkObjectProperty r = Deindexer.deindex(leftPropertyPremise.getSubPropertyChain());
 			ElkClassExpression c = Deindexer.deindex(inference.getBackwardLink().getOriginRoot());
 			ElkClassExpression d = Deindexer.deindex(inference.getInferenceRoot());
@@ -347,7 +347,7 @@ public class SingleInferenceMapper {
 		@Override
 		public Inference visit(ComposedForwardLink inference, Void parameter) {
 			SubObjectProperty leftPropertyPremise = inference.getLeftSubObjectProperty();
-			SubPropertyChain<?,?> rightChainPremise = inference.getRightSubObjectPropertyChain();			
+			SubPropertyChainImpl<?,?> rightChainPremise = inference.getRightSubObjectPropertyChain();			
 			ElkObjectProperty r = Deindexer.deindex(leftPropertyPremise.getSubPropertyChain());
 			ElkClassExpression c = Deindexer.deindex(inference.getConclusionRoot());
 			ElkClassExpression d = Deindexer.deindex(inference.getInferenceRoot());
@@ -487,7 +487,7 @@ public class SingleInferenceMapper {
 
 		@Override
 		public Inference visit(
-				org.semanticweb.elk.reasoner.saturation.tracing.inferences.DisjunctionComposition inference,
+				org.semanticweb.elk.reasoner.saturation.inferences.DisjunctionComposition inference,
 				Void parameter) {
 			ElkClassExpression c = Deindexer.deindex(inference.getConclusionRoot());
 			ElkClassExpression d = Deindexer.deindex(inference.getPremise().getExpression());
@@ -497,7 +497,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(ToldSubPropertyInference inference, Void input) {
+		public Inference visit(ToldSubProperty inference, Void input) {
 			final ElkObjectProperty h = inference.getPremise().getSubPropertyChain().getElkEntity();
 			ElkSubObjectPropertyExpression ss = deindex(inference.getSuperPropertyChain());
 			ElkSubObjectPropertyOfAxiom sideCondition = (ElkSubObjectPropertyOfAxiom) sideConditionLookup_.lookup(inference);
@@ -556,7 +556,7 @@ public class SingleInferenceMapper {
 		}
 
 		@Override
-		public Inference visit(final ReflexivePropertyChainInference inference, Void input) {
+		public Inference visit(final ComposedReflexivePropertyChain inference, Void input) {
 			ElkObjectProperty r = inference.getLeftReflexiveProperty().getPropertyChain().getElkEntity();
 			Expression second = inference.getRightReflexivePropertyChain().getPropertyChain().accept(reflexiveChainExpressionCreator());
 			ElkReflexivePropertyChainLemma conclusion = lemmaObjectFactory_.getReflexivePropertyChainLemma(Deindexer.deindex(inference.getPropertyChain()));

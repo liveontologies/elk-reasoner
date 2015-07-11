@@ -31,7 +31,7 @@ import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedComplexPropertyCha
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.visitors.IndexedPropertyChainVisitor;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
+import org.semanticweb.elk.reasoner.saturation.tracing.ObjectPropertyInferenceProducer;
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.InputProcessor;
@@ -59,11 +59,11 @@ public class PropertyHierarchyCompositionComputationFactory extends
 	/**
 	 * used to record sub-property inferences
 	 */
-	final private TraceStore.Writer traceWriter_;
+	private final ObjectPropertyInferenceProducer inferenceProducer_;
 
 	public PropertyHierarchyCompositionComputationFactory(
-			TraceStore.Writer writer) {
-		traceWriter_ = writer;
+			ObjectPropertyInferenceProducer inferenceProducer) {
+		this.inferenceProducer_ = inferenceProducer;
 	}
 
 	@Override
@@ -102,7 +102,8 @@ public class PropertyHierarchyCompositionComputationFactory extends
 			LOGGER_.trace("{}: computing sub-property chains and ranges",
 					element);
 			// ensure that sub-properties are computed
-			SubPropertyExplorer.getSubPropertyChains(element, traceWriter_);
+			SubPropertyExplorer.getSubPropertyChains(element,
+					inferenceProducer_);
 			// ensure that property ranges are computed
 			RangeExplorer.getRanges(element);// TODO: tracing
 			// TODO: verify that global restrictions on range axioms are
@@ -118,11 +119,11 @@ public class PropertyHierarchyCompositionComputationFactory extends
 			IndexedObjectProperty left = element.getFirstProperty();
 			IndexedPropertyChain right = element.getSuffixChain();
 			Set<IndexedObjectProperty> leftSubProperties = SubPropertyExplorer
-					.getSubProperties(left, traceWriter_);
+					.getSubProperties(left, inferenceProducer_);
 			if (leftSubProperties.isEmpty())
 				return null;
 			Set<IndexedPropertyChain> rightSubProperties = SubPropertyExplorer
-					.getSubPropertyChains(right, traceWriter_);
+					.getSubPropertyChains(right, inferenceProducer_);
 			if (rightSubProperties.isEmpty())
 				return null;
 
@@ -151,7 +152,7 @@ public class PropertyHierarchyCompositionComputationFactory extends
 								.getFirstProperty();
 						redundantLeftProperties = SubPropertyExplorer
 								.getLeftSubComposableSubPropertiesByRightProperties(
-										left, traceWriter_).get(
+										left, inferenceProducer_).get(
 										rightLeftSubProperty);
 					}
 				}

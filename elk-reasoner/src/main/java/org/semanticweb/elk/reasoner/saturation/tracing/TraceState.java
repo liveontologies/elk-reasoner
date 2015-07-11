@@ -25,12 +25,17 @@ package org.semanticweb.elk.reasoner.saturation.tracing;
  * #L%
  */
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.semanticweb.elk.reasoner.saturation.IndexedContextRoot;
-import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.Conclusion;
-import org.semanticweb.elk.reasoner.saturation.tracing.LocalTracingSaturationState.TracedContext;
-import org.semanticweb.elk.util.collections.HashListMultimap;
-import org.semanticweb.elk.util.collections.Multimap;
+import org.semanticweb.elk.reasoner.saturation.conclusions.interfaces.ObjectPropertyConclusion;
+import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
+import org.semanticweb.elk.reasoner.saturation.inferences.properties.ObjectPropertyInference;
 
 /**
  * A collections of objects for tracing contexts and keeping the relevant
@@ -40,53 +45,74 @@ import org.semanticweb.elk.util.collections.Multimap;
  * 
  *         pavel.klinov@uni-ulm.de
  */
-public class TraceState {
+public class TraceState implements InferenceSet,
+		ModifiableClassInferenceTracingState, ObjectPropertyInferenceProducer {
 
-	private final TraceStore traceStore_;
+	private final Queue<Conclusion> toTrace_ = new LinkedList<Conclusion>();
 
-	private LocalTracingSaturationState tracingSaturationState_;
+	private final ConcurrentHashMap<IndexedContextRoot, ClassInferenceSet> classInferenceMap_ = new ConcurrentHashMap<IndexedContextRoot, ClassInferenceSet>();
 
-	private final Multimap<IndexedContextRoot, Conclusion> toTraceMap_ = new HashListMultimap<IndexedContextRoot, Conclusion>();
+	private final ModifiableObjectPropertyInferenceSet objectPropertyInferenceSet_ = new ModifiableObjectPropertyInferenceSetImpl();
 
-	public TraceState(SaturationState<?> mainState) {
-		traceStore_ = new SimpleCentralizedTraceStore();
-		tracingSaturationState_ = new LocalTracingSaturationState(
-				mainState.getOntologyIndex());
-	}
-
-	public TraceStore getTraceStore() {
-		return traceStore_;
+	public Collection<? extends Conclusion> getToTrace() {
+		return toTrace_;
 	}
 
-	public SaturationState<TracedContext> getSaturationState() {
-		return tracingSaturationState_;
+	public void addToTrace(Conclusion conclusion) {
+		toTrace_.add(conclusion);
 	}
 
-	public Iterable<TracedContext> getTracedContexts() {
-		return tracingSaturationState_.getTracedContexts();
+	public void clearToTrace() {
+		toTrace_.clear();
 	}
-	
-	public Multimap<IndexedContextRoot, Conclusion> getTracingMap() {
-		return toTraceMap_;
+
+	@Override
+	public ClassInferenceSet getInferencesForOrigin(
+			IndexedContextRoot inferenceOriginRoot) {
+		return classInferenceMap_.get(inferenceOriginRoot);
 	}
-	
-	public void addConclusionToTrace(Conclusion target) {
-		toTraceMap_.add(target.getConclusionRoot(), target);
+
+	@Override
+	public ClassInferenceSet setClassInferences(
+			IndexedContextRoot inferenceOriginRoot,
+			Iterable<? extends ClassInference> classInferences) {
+		ClassInferenceSet result = classInferenceMap_.get(inferenceOriginRoot);
+		if (result != null)
+			return result;
+		ModifiableClassInferenceSet newSet = new ModifiableClassInferenceSetImpl(
+				inferenceOriginRoot);
+		// TODO: filter cyclic inferences
+		for (ClassInference inference : classInferences) {
+			newSet.add(inference);
+		}
+		result = classInferenceMap_.putIfAbsent(inferenceOriginRoot, newSet);
+		if (result != null)
+			return result;
+		// else
+		return newSet;
 	}
-	
-	public void clearTracingMap() {
-		toTraceMap_.clear();
+
+	@Override
+	public Iterable<? extends ClassInference> getClassInferences(
+			Conclusion conclusion) {
+		IndexedContextRoot originRoot = conclusion.getOriginRoot();
+		ClassInferenceSet inferences = classInferenceMap_.get(originRoot);
+		if (inferences == null)
+			return Collections.emptyList();
+		// else
+		return inferences.getClassInferences(conclusion);
 	}
-	
-	/**
-	 * Wipes out all information about class inferences but keeps object
-	 * property inferences.
-	 * 
-	 * TODO remove this as soon as we can re-generate property inferences on-demand.
-	 */
-	public void clearClassTraces() {
-		traceStore_.cleanClassInferences();
-		tracingSaturationState_ = new LocalTracingSaturationState(
-				tracingSaturationState_.getOntologyIndex());
+
+	@Override
+	public void produce(ObjectPropertyInference inference) {
+		objectPropertyInferenceSet_.add(inference);
 	}
+
+	@Override
+	public Iterable<? extends ObjectPropertyInference> getObjectPropertyInferences(
+			ObjectPropertyConclusion conclusion) {
+		return objectPropertyInferenceSet_
+				.getObjectPropertyInferences(conclusion);
+	}
+
 }

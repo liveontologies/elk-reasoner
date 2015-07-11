@@ -28,7 +28,7 @@ import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.hierarchy.OntologyIndex;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
+import org.semanticweb.elk.reasoner.saturation.tracing.ObjectPropertyInferenceProducer;
 import org.semanticweb.elk.util.concurrent.computation.ComputationExecutor;
 
 /**
@@ -43,12 +43,13 @@ public class PropertyHierarchyCompositionComputation
 		ReasonerComputationWithInputs<IndexedPropertyChain, PropertyHierarchyCompositionComputationFactory> {
 
 	public PropertyHierarchyCompositionComputation(OntologyIndex ontIndex,
-			TraceStore.Writer traceWriter,
+			ObjectPropertyInferenceProducer inferenceProducer,
 			ComputationExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {
 		this(ontIndex.getPropertyChains(),
-				new PropertyHierarchyCompositionComputationFactory(traceWriter), executor,
-				maxWorkers, progressMonitor);
+				new PropertyHierarchyCompositionComputationFactory(
+						inferenceProducer), executor, maxWorkers,
+				progressMonitor);
 	}
 
 	PropertyHierarchyCompositionComputation(

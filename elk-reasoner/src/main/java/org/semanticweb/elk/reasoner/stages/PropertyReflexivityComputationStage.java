@@ -24,7 +24,7 @@ package org.semanticweb.elk.reasoner.stages;
 
 import org.semanticweb.elk.owl.exceptions.ElkException;
 import org.semanticweb.elk.reasoner.saturation.properties.ReflexivePropertyComputation;
-import org.semanticweb.elk.reasoner.saturation.tracing.TraceStore;
+import org.semanticweb.elk.reasoner.saturation.tracing.ObjectPropertyInferenceProducer;
 
 public class PropertyReflexivityComputationStage extends AbstractReasonerStage {
 
@@ -52,10 +52,10 @@ public class PropertyReflexivityComputationStage extends AbstractReasonerStage {
 			reasoner.resetTraceState();
 		}
 		
-		TraceStore.Writer traceWriter = reasoner.traceState.getTraceStore().getWriter();
+		ObjectPropertyInferenceProducer inferenceProducer = reasoner.traceState;
 		
 		this.computation_ = new ReflexivePropertyComputation(
-				reasoner.ontologyIndex, traceWriter,
+				reasoner.ontologyIndex, inferenceProducer,
 				reasoner.getProcessExecutor(), workerNo,
 				reasoner.getProgressMonitor());
 		
